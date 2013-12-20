@@ -25,9 +25,11 @@ import javax.ws.rs.core.Response;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MagmaEngineVariableResolver;
 import org.obiba.opal.core.domain.security.SubjectAcl;
+import org.obiba.opal.core.security.ProjectPermissionConverter;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.security.AbstractPermissionsResource;
 import org.obiba.opal.web.security.PermissionsToAclFunction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -43,15 +45,7 @@ import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 @Component
 @Scope("request")
 @Path("/project/{name}/permissions")
-public class ProjectPermissionsResource extends AbstractProjectPermissionsResource {
-
-  public static final String DOMAIN = "opal";
-
-  // ugly: duplicate of ProjectsPermissionConverter.Permission
-
-  public enum ProjectPermission {
-    PROJECT_ALL
-  }
+public class ProjectPermissionsResource extends AbstractPermissionsResource {
 
   @Autowired
   private SubjectAclService subjectAclService;
@@ -145,7 +139,7 @@ public class ProjectPermissionsResource extends AbstractProjectPermissionsResour
   @Path("/project")
   public Response addProjectPermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals,
-      @QueryParam("permission") @DefaultValue("PROJECT_ALL") ProjectPermission permission) {
+      @QueryParam("permission") ProjectPermissionConverter.Permission permission) {
     // make sure project exists
     projectService.getProject(name);
     setPermission(principals, type, permission.name());

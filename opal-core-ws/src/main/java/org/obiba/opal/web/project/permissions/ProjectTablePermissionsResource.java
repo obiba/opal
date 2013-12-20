@@ -23,8 +23,10 @@ import javax.ws.rs.core.Response;
 
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
+import org.obiba.opal.core.security.TablePermissionConverter;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.security.AbstractPermissionsResource;
 import org.obiba.opal.web.security.PermissionsToAclFunction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -33,23 +35,12 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.Iterables;
 
 import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
-import static org.obiba.opal.web.project.permissions.ProjectPermissionsResource.DOMAIN;
 import static org.obiba.opal.web.project.permissions.ProjectPermissionsResource.MagmaPermissionsPredicate;
 
 @Component
 @Scope("request")
 @Path("/project/{name}/permissions/table/{table}")
-public class ProjectTablePermissionsResource extends AbstractProjectPermissionsResource {
-
-  // ugly: duplicate of ProjectsPermissionConverter.Permission
-
-  public enum TablePermission {
-    TABLE_READ,
-    TABLE_VALUES,
-    TABLE_EDIT,
-    TABLE_VALUES_EDIT,
-    TABLE_ALL
-  }
+public class ProjectTablePermissionsResource extends AbstractPermissionsResource {
 
   @Autowired
   private SubjectAclService subjectAclService;
@@ -91,7 +82,7 @@ public class ProjectTablePermissionsResource extends AbstractProjectPermissionsR
    */
   @POST
   public Response setTablePermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
-      @QueryParam("principal") List<String> principals, @QueryParam("permission") TablePermission permission) {
+      @QueryParam("principal") List<String> principals, @QueryParam("permission") TablePermissionConverter.Permission permission) {
 
     // make sure datasource and table exists
     getValueTable();

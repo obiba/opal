@@ -1,12 +1,12 @@
-/*******************************************************************************
- * Copyright (c) 2012 OBiBa. All rights reserved.
+/*
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ */
 package org.obiba.opal.core.security;
 
 import org.obiba.opal.web.model.Opal.AclAction;
@@ -18,7 +18,7 @@ import com.google.common.collect.Lists;
  * Converts opal administration related resources permissions from opal domain to magma domain.
  */
 @Component
-public class AdministrationPermissionConverter extends OpalPermissionConverter {
+public class RPermissionConverter extends OpalPermissionConverter {
 
   @Override
   protected boolean hasPermission(AclAction action) {
@@ -36,20 +36,10 @@ public class AdministrationPermissionConverter extends OpalPermissionConverter {
   }
 
   public enum Permission {
-    SYSTEM_ALL {
+    R_USE {
       @Override
       public Iterable<String> convert(String node) {
-        return Lists.newArrayList(toRest("/", "*"));
-      }
-
-    },
-
-    PROJECT_ADD {
-      @Override
-      public Iterable<String> convert(String node) {
-        return Lists.newArrayList(toRest("/projects", "POST"),//
-            toRest("/files/projects", "GET"), //
-            toRest("/system/databases", "GET:GET/GET"));
+        return Lists.newArrayList(toRest("/r/session", "*:GET/*"));
       }
 
     };

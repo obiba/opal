@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 OBiBa. All rights reserved.
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -18,10 +18,10 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 /**
- * Converts datasources related resources permissions from opal domain to magma domain.
+ * Converts datasource tables related resources permissions from opal domain to magma domain.
  */
 @Component
-public class ProjectsPermissionConverter extends OpalPermissionConverter {
+public class TablePermissionConverter extends OpalPermissionConverter {
 
   @Override
   protected boolean hasPermission(AclAction action) {
@@ -38,57 +38,7 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
     return Permission.valueOf(permission.toUpperCase()).convert(node);
   }
 
-  enum Permission {
-    PROJECT_ALL {
-      @Override
-      public Iterable<String> convert(String node) {
-        String[] args = args(node, "/project/(.+)");
-        return Lists.newArrayList(toRest("/datasource/{0}", "*:GET/*", args), //
-            toRest("/system/identifiers/mappings", "GET"), //
-            toRest("/project/{0}", "*:GET/*", args),//
-            toRest("/files/projects/{0}", "*:GET/*", args));
-      }
-
-    },
-
-    CREATE_PROJECT {
-      @Override
-      public Iterable<String> convert(String node) {
-        return Lists.newArrayList(toRest("/projects", "POST"),//
-            toRest("/files/projects", "GET"), //
-            toRest("/system/databases", "GET:GET/GET"));
-      }
-
-    },
-
-    DATASOURCE_ALL {
-      @Override
-      public Iterable<String> convert(String node) {
-        String[] args = args(node, "/datasource/(.+)");
-        return Lists.newArrayList(toRest("/datasource/{0}", "*:GET/*", args), //
-            toRest("/system/identifiers/mappings", "GET"), //
-            toRest("/project/{0}", "GET:GET/*", args),//
-            toRest("/files/projects/{0}", "GET:GET/*", args), //
-            toRest("/files/projects/{0}", "POST:GET/*", args), //
-            toRest("/files/projects/{0}", "PUT:GET/*", args));
-      }
-
-    },
-    CREATE_TABLE {
-      @Override
-      public Iterable<String> convert(String node) {
-        String[] args = args(node, "/datasource/(.+)");
-        return Lists.newArrayList(toRest("/datasource/{0}/tables", "GET:GET", args), //
-            toRest("/datasource/{0}/tables", "POST:GET", args),//
-            toRest("/datasource/{0}/views", "POST:GET", args),//
-            toRest("/project/{0}", "GET:GET", args),//
-            toRest("/project/{0}/summary", "GET:GET", args),//
-            toRest("/project/{0}/transient-datasources", "POST", args),//
-            toRest("/files/projects/{0}", "GET:GET/*", args), //
-            toRest("/files/projects/{0}", "POST:GET/*", args), //
-            toRest("/files/projects/{0}", "PUT:GET/*", args));
-      }
-    },
+  public enum Permission {
     TABLE_ALL {
       @Override
       public Iterable<String> convert(String node) {
@@ -202,16 +152,6 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
         return perms;
       }
 
-    },
-    VARIABLE_READ {
-      @Override
-      public Iterable<String> convert(String node) {
-        String[] args = args(node, "/datasource/(.+)/table/(.+)/variable/(.+)");
-        return Lists.newArrayList(toRest("/datasource/{0}/table/{1}/variable/{2}", "GET:GET/GET", args),//
-            toRest("/datasource/{0}/table/{1}/variable/_transient/summary", "POST:GET", args),//
-            toRest("/project/{0}", "GET:GET", args),//
-            toRest("/project/{0}/summary", "GET:GET", args));
-      }
     };
 
     public abstract Iterable<String> convert(String node);

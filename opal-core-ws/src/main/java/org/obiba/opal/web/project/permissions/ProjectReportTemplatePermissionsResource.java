@@ -26,6 +26,7 @@ import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.ReportTemplate;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.security.AbstractPermissionsResource;
 import org.obiba.opal.web.security.PermissionsToAclFunction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -34,13 +35,12 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.Iterables;
 
 import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
-import static org.obiba.opal.web.project.permissions.ProjectPermissionsResource.DOMAIN;
 import static org.obiba.opal.web.project.permissions.ProjectPermissionsResource.MagmaPermissionsPredicate;
 
 @Component
 @Scope("request")
 @Path("/project/{name}/permissions/report-template/{template}")
-public class ProjectReportTemplatePermissionsResource extends AbstractProjectPermissionsResource {
+public class ProjectReportTemplatePermissionsResource extends AbstractPermissionsResource {
 
   // ugly: duplicate of ReportTemplatePermissionConverter.Permission
 

@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.project.permissions;
+package org.obiba.opal.web.system.permissions;
 
 import java.util.List;
 
@@ -17,12 +17,10 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.obiba.magma.MagmaEngine;
-import org.obiba.opal.core.security.DatasourcePermissionConverter;
+import org.obiba.opal.core.security.RPermissionConverter;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.AbstractPermissionsResource;
@@ -37,39 +35,27 @@ import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 
 @Component
 @Scope("request")
-@Path("/project/{name}/permissions/datasource")
-public class ProjectDatasourcePermissionsResource extends AbstractPermissionsResource {
+@Path("/system/permissions/r")
+public class RPermissionsResource extends AbstractPermissionsResource {
 
   @Autowired
   private SubjectAclService subjectAclService;
 
-  @PathParam("name")
-  private String name;
-
-  //
-  // Datasource
-  //
-
   /**
-   * Get all datasource-level permissions in the project.
+   * Get R permissions.
    *
    * @param domain
    * @param type
    * @return
    */
   @GET
-  public Iterable<Opal.Acl> getDatasourcePermissions(@QueryParam("type") SubjectType type) {
-    // make sure datasource exists
-    MagmaEngine.get().getDatasource(name);
-
-    Iterable<SubjectAclService.Permissions> permissions = subjectAclService
-        .getNodePermissions(ProjectPermissionsResource.DOMAIN, getNode(), type);
-
+  public Iterable<Opal.Acl> getRPermissions(@QueryParam("type") SubjectType type) {
+    Iterable<SubjectAclService.Permissions> permissions = subjectAclService.getNodePermissions(DOMAIN, getNode(), type);
     return Iterables.transform(permissions, PermissionsToAclFunction.INSTANCE);
   }
 
   /**
-   * Set a datasource-level permission for a subject in the project.
+   * Set R permission for a subject.
    *
    * @param type
    * @param principals
@@ -77,34 +63,30 @@ public class ProjectDatasourcePermissionsResource extends AbstractPermissionsRes
    * @return
    */
   @POST
-  public Response setDatasourcePermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
+  public Response setRPermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals,
-      @QueryParam("permission") DatasourcePermissionConverter.Permission permission) {
-    // make sure datasource exists
-    MagmaEngine.get().getDatasource(name);
+      @QueryParam("permission") RPermissionConverter.Permission permission) {
     setPermission(principals, type, permission.name());
     return Response.ok().build();
   }
 
   /**
-   * Remove any datasource-level permission of a subject in the project.
+   * Remove any R permissions of a subject.
    *
    * @param type
    * @param principals
    * @return
    */
   @DELETE
-  public Response deleteDatasourcePermissions(@QueryParam("type") @DefaultValue("USER") SubjectType type,
+  public Response deleteRPermissions(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals) {
-    // make sure datasource exists
-    MagmaEngine.get().getDatasource(name);
     deletePermissions(principals, type);
     return Response.ok().build();
   }
 
   @Override
   protected String getNode() {
-    return "/datasource/" + name;
+    return "/r";
   }
 
   @Override

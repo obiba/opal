@@ -69,7 +69,7 @@ public class RAdministrationPresenter
   @Override
   protected void onBind() {
     super.onBind();
-    authorizationPresenter.setAclRequest("r", new AclRequest(AclAction.R_SESSION_ALL, "/r/session"));
+    authorizationPresenter.setAclRequest("r", new AclRequest(AclAction.R_USE, "/r"));
   }
 
   @Override

@@ -16,8 +16,11 @@ import java.util.Iterator;
 import org.obiba.opal.web.model.client.opal.AclAction;
 
 public enum ResourcePermissionType {
+  ADMINISTRATION(AclAction.SYSTEM_ALL, AclAction.PROJECT_ADD),
+  DATASHIELD(AclAction.DATASHIELD_ALL, AclAction.DATASHIELD_USE),
+  R(AclAction.R_USE),
   PROJECT(AclAction.PROJECT_ALL),
-  DATASOURCE(AclAction.CREATE_TABLE, AclAction.DATASOURCE_ALL),
+  DATASOURCE(AclAction.TABLE_ADD, AclAction.DATASOURCE_ALL),
   TABLE(AclAction.TABLE_READ, AclAction.TABLE_VALUES, AclAction.TABLE_EDIT, AclAction.TABLE_VALUES_EDIT,
       AclAction.TABLE_ALL),
   VARIABLE(AclAction.VARIABLE_READ),
@@ -28,17 +31,17 @@ public enum ResourcePermissionType {
   }
 
   public boolean hasPermission(String name) {
-    for (Iterator<AclAction> iterator = permissions.iterator(); iterator.hasNext();) {
-      if (iterator.next().getName().equals(name)) return true;
+    for(Iterator<AclAction> iterator = permissions.iterator(); iterator.hasNext(); ) {
+      if(iterator.next().getName().equals(name)) return true;
     }
 
     return false;
   }
 
   public static ResourcePermissionType getTypeByPermission(String permission) {
-    for (ResourcePermissionType type : ResourcePermissionType.values()) {
-      for (AclAction action : type.permissions) {
-        if (action.getName().equals(permission)) {
+    for(ResourcePermissionType type : ResourcePermissionType.values()) {
+      for(AclAction action : type.permissions) {
+        if(action.getName().equals(permission)) {
           return type;
         }
       }

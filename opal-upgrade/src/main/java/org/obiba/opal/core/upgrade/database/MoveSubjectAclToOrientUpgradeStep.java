@@ -47,7 +47,7 @@ public class MoveSubjectAclToOrientUpgradeStep extends AbstractUpgradeStep {
     public SubjectAcl mapRow(ResultSet rs, int rowNum) throws SQLException {
       SubjectAcl acl = new SubjectAcl();
       acl.setDomain(upgradeDomain(rs.getString("domain")));
-      acl.setNode(rs.getString("node"));
+      acl.setNode(upgradeNode(rs.getString("node")));
       acl.setPermission(upgradePermission(rs.getString("permission")));
       acl.setPrincipal(rs.getString("principal"));
       switch(rs.getString("type")) {
@@ -61,10 +61,18 @@ public class MoveSubjectAclToOrientUpgradeStep extends AbstractUpgradeStep {
       return acl;
     }
 
+    private String upgradeNode(String node) {
+      if (node.equals("/datashield/session")) return "/datashield";
+      if (node.equals("/r/session")) return "/r";
+      return node;
+    }
+
     private String upgradePermission(String permission) {
       switch(permission) {
+        case "CREATE_TABLE":
+          return "TABLE_ADD";
         case "CREATE_VIEW":
-          return "CREATE_TABLE";
+          return "TABLE_ADD";
         case "VIEW_ALL":
           return "TABLE_ALL";
         case "VIEW_READ":
@@ -75,6 +83,10 @@ public class MoveSubjectAclToOrientUpgradeStep extends AbstractUpgradeStep {
           return "TABLE_EDIT";
         case "VIEW_VALUES_EDIT":
           return "TABLE_VALUES_EDIT";
+        case "R_SESSION_ALL":
+          return "R_USE";
+        case "DATASHIELD_SESSION_ALL":
+          return "DATASHIELD_USE";
         default:
           return permission;
       }

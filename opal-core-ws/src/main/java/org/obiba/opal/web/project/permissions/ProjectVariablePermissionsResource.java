@@ -23,8 +23,10 @@ import javax.ws.rs.core.Response;
 
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
+import org.obiba.opal.core.security.VariablePermissionConverter;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.security.AbstractPermissionsResource;
 import org.obiba.opal.web.security.PermissionsToAclFunction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -33,18 +35,11 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.Iterables;
 
 import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
-import static org.obiba.opal.web.project.permissions.ProjectPermissionsResource.DOMAIN;
 
 @Component
 @Scope("request")
 @Path("/project/{name}/permissions/table/{table}/variable/{variable}")
-public class ProjectVariablePermissionsResource extends AbstractProjectPermissionsResource {
-
-  // ugly: duplicate of ProjectsPermissionConverter.Permission
-
-  public enum VariablePermission {
-    VARIABLE_READ
-  }
+public class ProjectVariablePermissionsResource extends AbstractPermissionsResource {
 
   @Autowired
   private SubjectAclService subjectAclService;
@@ -90,7 +85,7 @@ public class ProjectVariablePermissionsResource extends AbstractProjectPermissio
    */
   @POST
   public Response setTableVariablePermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
-      @QueryParam("principal") List<String> principals, @QueryParam("permission") VariablePermission permission) {
+      @QueryParam("principal") List<String> principals, @QueryParam("permission") VariablePermissionConverter.Permission permission) {
 
     // make sure datasource, table and variable exists
     getValueTable().getVariable(variable);
@@ -106,7 +101,7 @@ public class ProjectVariablePermissionsResource extends AbstractProjectPermissio
    * @return
    */
   @DELETE
-  public Response setTableVariablePermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
+  public Response deleteTableVariablePermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals) {
     // make sure datasource, table and variable exists
     getValueTable().getVariable(variable);

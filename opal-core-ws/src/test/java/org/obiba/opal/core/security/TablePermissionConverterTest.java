@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 OBiBa. All rights reserved.
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -15,8 +15,8 @@ import org.junit.Test;
 /**
  *
  */
-public class ProjectsPermissionConverterTest
-    extends OpalPermissionConverterTest<ProjectsPermissionConverter.Permission> {
+public class TablePermissionConverterTest
+    extends OpalPermissionConverterTest<TablePermissionConverter.Permission> {
 
   @Test
   public void testArgs() {
@@ -27,43 +27,10 @@ public class ProjectsPermissionConverterTest
     Assert.assertEquals("pwel", args[1]);
   }
 
-  @Test
-  public void testProjectAll() {
-    testConversion("/project/patate", ProjectsPermissionConverter.Permission.PROJECT_ALL, //
-        "rest:/datasource/patate:*:GET/*", //
-        "rest:/system/identifiers/mappings:GET", //
-        "rest:/project/patate:*:GET/*",//
-        "rest:/files/projects/patate:*:GET/*");
-  }
-
-  @Test
-  public void testDatasourceAll() {
-    testConversion("/datasource/patate", ProjectsPermissionConverter.Permission.DATASOURCE_ALL, //
-        "rest:/datasource/patate:*:GET/*", //
-        "rest:/system/identifiers/mappings:GET", //
-        "rest:/project/patate:GET:GET/*",//
-        "rest:/files/projects/patate:GET:GET/*",//
-        "rest:/files/projects/patate:POST:GET/*",//
-        "rest:/files/projects/patate:PUT:GET/*");
-  }
-
-  @Test
-  public void testCreateTable() {
-    testConversion("/datasource/patate", ProjectsPermissionConverter.Permission.CREATE_TABLE, //
-        "rest:/datasource/patate/tables:GET:GET", //
-        "rest:/datasource/patate/tables:POST:GET", //
-        "rest:/datasource/patate/views:POST:GET", //
-        "rest:/project/patate:GET:GET", //
-        "rest:/project/patate/summary:GET:GET", //
-        "rest:/project/patate/transient-datasources:POST", //
-        "rest:/files/projects/patate:GET:GET/*", //
-        "rest:/files/projects/patate:POST:GET/*",//
-        "rest:/files/projects/patate:PUT:GET/*");
-  }
 
   @Test
   public void testTableAll() {
-    testConversion("/datasource/patate/table/pwel", ProjectsPermissionConverter.Permission.TABLE_ALL, //
+    testConversion("/datasource/patate/table/pwel", TablePermissionConverter.Permission.TABLE_ALL, //
         "rest:/datasource/patate/table/pwel:*:GET/*", //
         "rest:/project/patate/commands/_export:POST:GET", //
         "rest:/project/patate/commands/_copy:POST:GET", //
@@ -79,7 +46,7 @@ public class ProjectsPermissionConverterTest
 
   @Test
   public void testTableAllOnView() {
-    testConversion("/datasource/patate/view/pwel", ProjectsPermissionConverter.Permission.TABLE_ALL, //
+    testConversion("/datasource/patate/view/pwel", TablePermissionConverter.Permission.TABLE_ALL, //
         "rest:/datasource/patate/table/pwel:*:GET/*", //
         "rest:/project/patate/commands/_export:POST:GET", //
         "rest:/project/patate/commands/_copy:POST:GET", //
@@ -96,7 +63,7 @@ public class ProjectsPermissionConverterTest
 
   @Test
   public void testTableEdit() {
-    testConversion("/datasource/patate/table/pwel", ProjectsPermissionConverter.Permission.TABLE_EDIT, //
+    testConversion("/datasource/patate/table/pwel", TablePermissionConverter.Permission.TABLE_EDIT, //
         "rest:/datasource/patate/table/pwel:PUT:GET", //
         "rest:/datasource/patate/table/pwel/variables:POST:GET/*", //
         "rest:/datasource/patate/table/pwel/variables:DELETE:GET", //
@@ -117,7 +84,7 @@ public class ProjectsPermissionConverterTest
 
   @Test
   public void testTableValuesEdit() {
-    testConversion("/datasource/patate/table/pwel", ProjectsPermissionConverter.Permission.TABLE_VALUES_EDIT, //
+    testConversion("/datasource/patate/table/pwel", TablePermissionConverter.Permission.TABLE_VALUES_EDIT, //
         "rest:/datasource/patate/table/pwel/valueSet:GET:GET/GET", //
         "rest:/datasource/patate/table/pwel/entities:GET", //
         "rest:/datasource/patate/table/pwel/index:GET:GET/GET", //
@@ -158,7 +125,7 @@ public class ProjectsPermissionConverterTest
 
   @Test
   public void testTableReadOnView() {
-    testConversion("/datasource/patate/view/pwel", ProjectsPermissionConverter.Permission.TABLE_READ, //
+    testConversion("/datasource/patate/view/pwel", TablePermissionConverter.Permission.TABLE_READ, //
         "rest:/datasource/patate/table/pwel:GET:GET", //
         "rest:/datasource/patate/table/pwel/variable:GET:GET/GET", //
         "rest:/datasource/patate/table/pwel/variables:GET:GET/GET", //
@@ -172,7 +139,7 @@ public class ProjectsPermissionConverterTest
 
   @Test
   public void testTableValuesOnView() {
-    testConversion("/datasource/patate/view/pwel", ProjectsPermissionConverter.Permission.TABLE_VALUES, //
+    testConversion("/datasource/patate/view/pwel", TablePermissionConverter.Permission.TABLE_VALUES, //
         "rest:/datasource/patate/table/pwel/valueSet:GET:GET/GET", //
         "rest:/datasource/patate/table/pwel/entities:GET", //
         "rest:/datasource/patate/table/pwel/index:GET:GET/GET", //
@@ -196,19 +163,9 @@ public class ProjectsPermissionConverterTest
         "rest:/datasource/patate/view/pwel/xml:GET:GET");
   }
 
-  @Test
-  public void testVariableRead() {
-    testConversion("/datasource/patate/table/pwel/variable/pouet", ProjectsPermissionConverter.Permission.VARIABLE_READ,
-        //
-        "rest:/datasource/patate/table/pwel/variable/pouet:GET:GET/GET", //
-        "rest:/datasource/patate/table/pwel/variable/_transient/summary:POST:GET", //
-        "rest:/project/patate:GET:GET", //
-        "rest:/project/patate/summary:GET:GET");
-  }
-
   @Override
   protected SubjectPermissionConverter newConverter() {
-    return new ProjectsPermissionConverter();
+    return new TablePermissionConverter();
   }
 
 }

@@ -124,7 +124,7 @@ public class DataShieldConfigPresenter
   protected void onBind() {
     super.onBind();
     authorizationPresenter
-        .setAclRequest("datashield", new AclRequest(AclAction.DATASHIELD_SESSION_ALL, "/datashield/session"),
+        .setAclRequest("datashield", new AclRequest(AclAction.DATASHIELD_USE, "/datashield"),
             new AclRequest(AclAction.DATASHIELD_ALL, "/datashield"));
 
     addToSlot(PackageSlot, packagePresenter);

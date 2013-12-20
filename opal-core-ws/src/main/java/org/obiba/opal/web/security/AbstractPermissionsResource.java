@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.project.permissions;
+package org.obiba.opal.web.security;
 
 import java.util.Collection;
 
@@ -18,15 +18,17 @@ import org.obiba.opal.web.support.InvalidRequestException;
 
 import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 
-public abstract class AbstractProjectPermissionsResource {
+public abstract class AbstractPermissionsResource {
+
+  public static final String DOMAIN = "opal";
 
   protected void setPermission(Collection<String> principals, SubjectType type, String permission) {
     validatePrincipals(principals);
 
     for(String principal : principals) {
       SubjectAcl.Subject subject = type.subjectFor(principal);
-      getSubjectAclService().deleteSubjectPermissions(ProjectPermissionsResource.DOMAIN, getNode(), subject);
-      getSubjectAclService().addSubjectPermission(ProjectPermissionsResource.DOMAIN, getNode(), subject, permission);
+      getSubjectAclService().deleteSubjectPermissions(DOMAIN, getNode(), subject);
+      getSubjectAclService().addSubjectPermission(DOMAIN, getNode(), subject, permission);
     }
   }
 
@@ -35,7 +37,7 @@ public abstract class AbstractProjectPermissionsResource {
 
     for(String principal : principals) {
       SubjectAcl.Subject subject = type.subjectFor(principal);
-      getSubjectAclService().deleteSubjectPermissions(ProjectPermissionsResource.DOMAIN, getNode(), subject);
+      getSubjectAclService().deleteSubjectPermissions(DOMAIN, getNode(), subject);
     }
   }
 

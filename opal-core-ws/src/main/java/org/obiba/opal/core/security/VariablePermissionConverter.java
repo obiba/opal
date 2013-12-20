@@ -1,12 +1,12 @@
-/*******************************************************************************
- * Copyright (c) 2012 OBiBa. All rights reserved.
+/*
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ */
 package org.obiba.opal.core.security;
 
 import org.obiba.opal.web.model.Opal.AclAction;
@@ -15,10 +15,10 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.Lists;
 
 /**
- * Converts opal administration related resources permissions from opal domain to magma domain.
+ * Converts datasource table variables related resources permissions from opal domain to magma domain.
  */
 @Component
-public class AdministrationPermissionConverter extends OpalPermissionConverter {
+public class VariablePermissionConverter extends OpalPermissionConverter {
 
   @Override
   protected boolean hasPermission(AclAction action) {
@@ -36,22 +36,15 @@ public class AdministrationPermissionConverter extends OpalPermissionConverter {
   }
 
   public enum Permission {
-    SYSTEM_ALL {
+    VARIABLE_READ {
       @Override
       public Iterable<String> convert(String node) {
-        return Lists.newArrayList(toRest("/", "*"));
+        String[] args = args(node, "/datasource/(.+)/table/(.+)/variable/(.+)");
+        return Lists.newArrayList(toRest("/datasource/{0}/table/{1}/variable/{2}", "GET:GET/GET", args),//
+            toRest("/datasource/{0}/table/{1}/variable/_transient/summary", "POST:GET", args),//
+            toRest("/project/{0}", "GET:GET", args),//
+            toRest("/project/{0}/summary", "GET:GET", args));
       }
-
-    },
-
-    PROJECT_ADD {
-      @Override
-      public Iterable<String> convert(String node) {
-        return Lists.newArrayList(toRest("/projects", "POST"),//
-            toRest("/files/projects", "GET"), //
-            toRest("/system/databases", "GET:GET/GET"));
-      }
-
     };
 
     public abstract Iterable<String> convert(String node);
