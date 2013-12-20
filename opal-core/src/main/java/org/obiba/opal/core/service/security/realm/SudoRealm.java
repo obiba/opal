@@ -50,7 +50,8 @@ public class SudoRealm extends AuthorizingRealm {
     return info;
   }
 
-  private static class SudoPrincipal {
+  @SuppressWarnings({ "ClassMayBeInterface", "EmptyClass" })
+  public static class SudoPrincipal {
 
   }
 }

@@ -10,6 +10,8 @@
 
 package org.obiba.opal.core.service.security.authc;
 
+import javax.annotation.Nullable;
+
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.shiro.authc.AuthenticationException;
@@ -23,6 +25,7 @@ import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.core.service.security.realm.BackgroundJobRealm;
+import org.obiba.opal.core.service.security.realm.SudoRealm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,17 +54,20 @@ public class SubjectProfileAuthenticationListener implements AuthenticationListe
   public void onSuccess(AuthenticationToken token, AuthenticationInfo info) {
     // TODO should move this to OpalSessionListener.onStart() but we can't access username on Session start
     Subject subject = new Subject.Builder().principals(info.getPrincipals()).buildSubject();
-    Object principal = subject.getPrincipal();
-    if(principal != null) {
-      String username = principal.toString();
-      if(!BackgroundJobRealm.SystemPrincipal.PRINCIPAL.equals(username)) {
-        log.debug("Ensure HOME folder for {}", username);
-        subjectProfileService.ensureProfile(subject);
-        ensureUserHomeExists(username);
-        ensureFolderPermissions(username, "/home/" + username);
-        ensureFolderPermissions(username, "/tmp");
-      }
+    if(supportProfile(subject.getPrincipal())) {
+      String username = subject.getPrincipal().toString();
+      log.debug("Ensure HOME folder for {}", username);
+      subjectProfileService.ensureProfile(subject);
+      ensureUserHomeExists(username);
+      ensureFolderPermissions(username, "/home/" + username);
+      ensureFolderPermissions(username, "/tmp");
     }
+  }
+
+  private boolean supportProfile(@Nullable Object principal) {
+    return principal != null && //
+        !(principal instanceof BackgroundJobRealm.SystemPrincipal) && //
+        !(principal instanceof SudoRealm.SudoPrincipal);
   }
 
   @Override
@@ -94,8 +100,7 @@ public class SubjectProfileAuthenticationListener implements AuthenticationListe
     }
     if(!found) {
       subjectAclService
-          .addSubjectPermission("opal", folderNode, SubjectAcl.SubjectType.USER.subjectFor(username),
-              HOME_PERM);
+          .addSubjectPermission("opal", folderNode, SubjectAcl.SubjectType.USER.subjectFor(username), HOME_PERM);
     }
   }
 
