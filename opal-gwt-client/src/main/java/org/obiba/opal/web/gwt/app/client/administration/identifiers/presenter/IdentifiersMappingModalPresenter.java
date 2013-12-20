@@ -18,7 +18,6 @@ import org.obiba.opal.web.gwt.app.client.administration.identifiers.event.Identi
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
@@ -39,13 +38,14 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
 /**
  *
  */
 public class IdentifiersMappingModalPresenter extends ModalPresenterWidget<IdentifiersMappingModalPresenter.Display>
     implements IdentifiersMappingModalUiHandlers {
+
+  private static final String DESCRIPTION = "description";
 
   private final Translations translations;
 
@@ -166,29 +166,30 @@ public class IdentifiersMappingModalPresenter extends ModalPresenterWidget<Ident
 
   private void updateInfoFromView(VariableDto v) {
     v.setName(getView().getName());
-//    if(variable.getAttributesArray() == null) {
-//      variable.setAttributesArray((JsArray<AttributeDto>) JsArrays.create());
-//    }
-//    AttributeDto labelAttr = null;
-//    for (AttributeDto attr : JsArrays.toIterable(variable.getAttributesArray())) {
-//      if (attr.getName().equals("label")) {
-//        labelAttr = attr;
-//        break;
-//      }
-//    }
-//    if (labelAttr == null) {
-//      labelAttr = AttributeDto.create();
-//      labelAttr.setName("label");
-//      variable.getAttributesArray().push(labelAttr);
-//    }
-//    labelAttr.setValue(getView().getLabel());
+    if(variable.getAttributesArray() == null) {
+      JsArray<AttributeDto> attributes = JsArrays.create().cast();
+      v.setAttributesArray(attributes);
+    }
+    AttributeDto labelAttr = null;
+    for(AttributeDto attr : JsArrays.toIterable(variable.getAttributesArray())) {
+      if(attr.getName().equals(DESCRIPTION)) {
+        labelAttr = attr;
+        break;
+      }
+    }
+    if(labelAttr == null) {
+      labelAttr = AttributeDto.create();
+      labelAttr.setName(DESCRIPTION);
+      v.getAttributesArray().push(labelAttr);
+    }
+    labelAttr.setValue(getView().getDescription());
   }
 
   public interface Display extends PopupView, HasUiHandlers<IdentifiersMappingModalUiHandlers> {
 
     String getName();
 
-    String getLabel();
+    String getDescription();
 
     enum FormField {
       NAME
