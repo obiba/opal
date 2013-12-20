@@ -16,7 +16,7 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.GroupDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -122,11 +122,8 @@ public class GroupSuggestOracle extends SuggestOracle {
 
     final String query = originalQuery;
 
-    UriBuilder ub = UriBuilder.create().segment("groups");
-
     // Get groups candidates from search words.
-    ResourceRequestBuilderFactory.<JsArray<GroupDto>>newBuilder().forResource(ub.build()).get()
-        .withCallback(com.google.gwt.http.client.Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
+    ResourceRequestBuilderFactory.<JsArray<GroupDto>>newBuilder().forResource(UriBuilders.GROUPS.create().build()).get().withCallback(com.google.gwt.http.client.Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
 
           @Override
           public void onResponseCode(com.google.gwt.http.client.Request request,
