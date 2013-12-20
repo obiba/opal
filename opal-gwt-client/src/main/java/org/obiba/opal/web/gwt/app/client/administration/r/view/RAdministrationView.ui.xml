@@ -42,7 +42,7 @@
       <b:Heading size="4">
         <ui:msg description="Permissions label">Permissions</ui:msg>
       </b:Heading>
-      <g:SimplePanel ui:field="permissions"></g:SimplePanel>
+      <g:SimplePanel ui:field="permissions"/>
     </g:FlowPanel>
 
   </g:FlowPanel>

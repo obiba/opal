@@ -5,7 +5,10 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.keystore.presenter.CreateKeyPairModalPresenter;
 import org.obiba.opal.web.gwt.app.client.keystore.presenter.ImportKeyPairModalPresenter;
-import org.obiba.opal.web.gwt.app.client.keystore.presenter.KeyPairModalSavedHandler;
+import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.support.AclRequest;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
@@ -14,11 +17,13 @@ import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.GeneralConf;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.Presenter;
@@ -37,6 +42,8 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
 
   private final ModalProvider<ImportKeyPairModalPresenter> importKeyPairModalProvider;
 
+  private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
+
   private GeneralConf conf = null;
 
   @ProxyStandard
@@ -51,12 +58,14 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
   public ConfigurationPresenter(Display display, EventBus eventBus, Proxy proxy, Translations translations,
       ModalProvider<GeneralConfModalPresenter> generalConfModalProvider,
       ModalProvider<CreateKeyPairModalPresenter> createKeyPairModalProvider,
-      ModalProvider<ImportKeyPairModalPresenter> importKeyPairModalProvider, BreadcrumbsBuilder breadcrumbsBuilder) {
+      ModalProvider<ImportKeyPairModalPresenter> importKeyPairModalProvider,
+      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, BreadcrumbsBuilder breadcrumbsBuilder) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     this.translations = translations;
     this.createKeyPairModalProvider = createKeyPairModalProvider.setContainer(this);
     this.importKeyPairModalProvider = importKeyPairModalProvider.setContainer(this);
     this.generalConfModalProvider = generalConfModalProvider.setContainer(this);
+    this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.breadcrumbsBuilder = breadcrumbsBuilder;
     getView().setUiHandlers(this);
   }
@@ -70,6 +79,9 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
   public void onReveal() {
     super.onReveal();
     breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs()).build();
+    // set permissions
+    AclRequest.newResourceAuthorizationRequestBuilder()
+        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
   @Override
@@ -117,7 +129,38 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
     fireEvent(new FileDownloadRequestEvent(UriBuilders.SYSTEM_KEYSTORE_HTTPS_CERTIFICATE.create().build()));
   }
 
+  /**
+   * Update permissions on authorization.
+   */
+  private final class PermissionsUpdate implements HasAuthorization {
+    @Override
+    public void unauthorized() {
+      clearSlot(Display.Slots.Permissions);
+    }
+
+    @Override
+    public void beforeAuthorization() {
+
+    }
+
+    @Override
+    public void authorized() {
+      ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
+      resourcePermissionsPresenter.initialize(ResourcePermissionType.ADMINISTRATION,
+          ResourcePermissionRequestPaths.UriBuilders.SYSTEM_PERMISSIONS_ADMINISTRATION);
+
+      setInSlot(Display.Slots.Permissions, resourcePermissionsPresenter);
+    }
+  }
+
   public interface Display extends View, HasUiHandlers<ConfigurationUiHandlers>, HasBreadcrumbs {
+
+    enum Slots {
+      Permissions
+    }
+
     void renderGeneralProperties(GeneralConf resource);
+
+    HasAuthorization getPermissionsAuthorizer();
   }
 }

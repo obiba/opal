@@ -16,7 +16,7 @@ import java.util.Iterator;
 import org.obiba.opal.web.model.client.opal.AclAction;
 
 public enum ResourcePermissionType {
-  ADMINISTRATION(AclAction.SYSTEM_ALL, AclAction.PROJECT_ADD),
+  ADMINISTRATION(AclAction.PROJECT_ADD, AclAction.SYSTEM_ALL),
   DATASHIELD(AclAction.DATASHIELD_USE, AclAction.DATASHIELD_ALL),
   R(AclAction.R_USE),
   PROJECT(AclAction.PROJECT_ALL),

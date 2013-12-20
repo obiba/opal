@@ -39,7 +39,7 @@ public class AdministrationPermissionConverter extends OpalPermissionConverter {
     SYSTEM_ALL {
       @Override
       public Iterable<String> convert(String node) {
-        return Lists.newArrayList(toRest("/", "*"));
+        return Lists.newArrayList(toRest("/", "*:*/*"));
       }
 
     },
