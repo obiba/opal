@@ -135,31 +135,31 @@ public class IdentifiersMappingModalPresenter extends ModalPresenterWidget<Ident
   }
 
   private VariableDto getVariableDto() {
-    VariableDto v = VariableDto.create();
-    v.setIsNewVariable(variable == null);
-    v.setEntityType(tableDto.getEntityType());
-    v.setIsRepeatable(false);
-    v.setValueType("text");
+    VariableDto variableDto = VariableDto.create();
+    variableDto.setIsNewVariable(variable == null);
+    variableDto.setEntityType(tableDto.getEntityType());
+    variableDto.setIsRepeatable(false);
+    variableDto.setValueType("text");
     if(variable != null) {
-      v.setLink(variable.getLink());
-      v.setIndex(variable.getIndex());
+      variableDto.setLink(variable.getLink());
+      variableDto.setIndex(variable.getIndex());
 
-      v.setParentLink(variable.getParentLink());
-      v.setName(variable.getName());
-      v.setValueType(variable.getValueType());
+      variableDto.setParentLink(variable.getParentLink());
+      variableDto.setName(variable.getName());
+      variableDto.setValueType(variable.getValueType());
 
       if(variable.getAttributesArray() != null && variable.getAttributesArray().length() > 0) {
-        v.setAttributesArray(variable.getAttributesArray());
+        variableDto.setAttributesArray(variable.getAttributesArray());
       }
 
       if(variable.getCategoriesArray() != null && variable.getCategoriesArray().length() > 0) {
-        v.setCategoriesArray(variable.getCategoriesArray());
+        variableDto.setCategoriesArray(variable.getCategoriesArray());
       }
     }
 
     // Update info from view
-    updateInfoFromView(v);
-    return v;
+    updateInfoFromView(variableDto);
+    return variableDto;
   }
 
   private void updateInfoFromView(VariableDto v) {
