@@ -17,8 +17,8 @@ import opal.export_csv
 import opal.user
 import opal.group
 import opal.system
-import opal.encrypt
-import opal.decrypt
+import opal.security.encrypt
+import opal.security.decrypt
 
 
 def add_opal_arguments(parser):
@@ -73,8 +73,10 @@ add_subcommand('group', 'Manage groups.', opal.group.add_arguments, opal.group.d
 add_subcommand('system', 'Query for system status and configuration', opal.system.add_arguments, opal.system.do_command)
 add_subcommand('rest', 'Request directly the Opal REST API, for advanced users.', opal.rest.add_arguments,
                opal.rest.do_command)
-add_subcommand('encrypt', "Encrypt string using Opal's secret key", opal.encrypt.add_arguments, opal.encrypt.do_command)
-add_subcommand('decrypt', "Decrypt string using Opal's secret key", opal.decrypt.add_arguments, opal.decrypt.do_command)
+add_subcommand('encrypt', "Encrypt string using Opal's secret key", opal.security.encrypt.add_arguments,
+               opal.security.encrypt.do_command)
+add_subcommand('decrypt', "Decrypt string using Opal's secret key", opal.security.decrypt.add_arguments,
+               opal.security.decrypt.do_command)
 
 
 # Execute selected command
