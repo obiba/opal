@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.vcs;
+package org.obiba.opal.web.magma.vcs;
 
 import java.util.List;
 

@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.security;
+package org.obiba.opal.web.system.subject;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.security.Group;
 import org.obiba.opal.core.service.security.SubjectCredentialsService;
+import org.obiba.opal.web.security.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

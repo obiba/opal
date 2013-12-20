@@ -61,7 +61,7 @@ import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.obiba.opal.web.model.Opal.LocaleDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
-import org.obiba.opal.web.system.project.ProjectTransientDatasourcesResource;
+import org.obiba.opal.web.project.ProjectTransientDatasourcesResource;
 import org.springframework.context.ApplicationContext;
 
 import com.google.common.collect.ImmutableList;

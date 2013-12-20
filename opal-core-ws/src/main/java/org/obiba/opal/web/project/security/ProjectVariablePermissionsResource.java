@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.system.project.security;
+package org.obiba.opal.web.project.security;
 
 import java.util.List;
 
@@ -33,22 +33,17 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.Iterables;
 
 import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
-import static org.obiba.opal.web.system.project.security.ProjectPermissionsResource.DOMAIN;
-import static org.obiba.opal.web.system.project.security.ProjectPermissionsResource.MagmaPermissionsPredicate;
+import static org.obiba.opal.web.project.security.ProjectPermissionsResource.DOMAIN;
 
 @Component
 @Scope("request")
-@Path("/project/{name}/permissions/table/{table}")
-public class ProjectTablePermissionsResource extends AbstractProjectPermissionsResource {
+@Path("/project/{name}/permissions/table/{table}/variable/{variable}")
+public class ProjectVariablePermissionsResource extends AbstractProjectPermissionsResource {
 
   // ugly: duplicate of ProjectsPermissionConverter.Permission
 
-  public enum TablePermission {
-    TABLE_READ,
-    TABLE_VALUES,
-    TABLE_EDIT,
-    TABLE_VALUES_EDIT,
-    TABLE_ALL
+  public enum VariablePermission {
+    VARIABLE_READ
   }
 
   @Autowired
@@ -60,29 +55,33 @@ public class ProjectTablePermissionsResource extends AbstractProjectPermissionsR
   @PathParam("table")
   private String table;
 
+  @PathParam("variable")
+  private String variable;
+
   private ValueTable valueTable;
 
   /**
-   * Get all table-level permissions of a table in the project.
+   * Get variable-level permissions of a variable in the project.
    *
    * @param domain
    * @param type
    * @return
    */
   @GET
-  public Iterable<Opal.Acl> getTablePermissions(@QueryParam("type") SubjectType type) {
+  public Iterable<Opal.Acl> getTableVariablesPermissions(@QueryParam("type") SubjectType type) {
 
-    // make sure datasource and table exists
-    getValueTable();
+    // make sure datasource, table and variable exists
+    MagmaEngine.get().getDatasource(name).getValueTable(table).getVariable(variable);
 
     Iterable<SubjectAclService.Permissions> permissions = subjectAclService.getNodePermissions(DOMAIN, getNode(), type);
 
     return Iterables
-        .transform(Iterables.filter(permissions, new MagmaPermissionsPredicate()), PermissionsToAclFunction.INSTANCE);
+        .transform(Iterables.filter(permissions, new ProjectPermissionsResource.MagmaPermissionsPredicate()),
+            PermissionsToAclFunction.INSTANCE);
   }
 
   /**
-   * Set a table-level permission for a subject in the project.
+   * Set a variable-level permission for a subject in the project.
    *
    * @param type
    * @param principals
@@ -90,55 +89,29 @@ public class ProjectTablePermissionsResource extends AbstractProjectPermissionsR
    * @return
    */
   @POST
-  public Response setTablePermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
-      @QueryParam("principal") List<String> principals, @QueryParam("permission") TablePermission permission) {
+  public Response setTableVariablePermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
+      @QueryParam("principal") List<String> principals, @QueryParam("permission") VariablePermission permission) {
 
-    // make sure datasource and table exists
-    getValueTable();
+    // make sure datasource, table and variable exists
+    getValueTable().getVariable(variable);
     setPermission(principals, type, permission.name());
     return Response.ok().build();
   }
 
   /**
-   * Remove any table-level permission of a subject in the project.
+   * Remove any variable-level permission of a subject in the project.
    *
    * @param type
    * @param principals
    * @return
    */
   @DELETE
-  public Response deleteTablePermissions(@QueryParam("type") @DefaultValue("USER") SubjectType type,
+  public Response setTableVariablePermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals) {
-
-    // make sure datasource and table exists
-    getValueTable();
+    // make sure datasource, table and variable exists
+    getValueTable().getVariable(variable);
     deletePermissions(principals, type);
     return Response.ok().build();
-  }
-
-  //
-  // Variables
-  //
-
-  /**
-   * Get all variable-level permissions of a table in the project.
-   *
-   * @param domain
-   * @param type
-   * @return
-   */
-  @GET
-  @Path("/variables")
-  public Iterable<Opal.Acl> getTableVariablesPermissions(@QueryParam("type") SubjectType type) {
-
-    // make sure datasource and table exists
-    getValueTable();
-
-    Iterable<SubjectAclService.Permissions> permissions = Iterables
-        .filter(subjectAclService.getNodeHierarchyPermissions(DOMAIN, getNode() + "/variable", type),
-            new MagmaPermissionsPredicate());
-
-    return Iterables.transform(permissions, PermissionsToAclFunction.INSTANCE);
   }
 
   private ValueTable getValueTable() {
@@ -150,7 +123,7 @@ public class ProjectTablePermissionsResource extends AbstractProjectPermissionsR
 
   @Override
   protected String getNode() {
-    return "/datasource/" + name + (getValueTable().isView() ? "/view/" : "/table/") + table;
+    return "/datasource/" + name + (getValueTable().isView() ? "/view/" : "/table/") + table + "/variable/" + variable;
   }
 
   @Override
