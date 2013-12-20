@@ -23,20 +23,22 @@
     <b:Heading size="4">
       <ui:msg description="R server admin label">R Server</ui:msg>
     </b:Heading>
-    <b:Form>
-      <b:Button ui:field="rTestButton" type="SUCCESS">
-        <ui:msg description="R server test label">Test connection with R</ui:msg>
-      </b:Button>
-    </b:Form>
-    <b:Form>
-      <b:Paragraph>
-        Whether the R server can be started and stopped depends on the configuration of the system. Stopping the R
-        server will destroy all current client connections.
-      </b:Paragraph>
-      <b:Button ui:field="startStopButton" type="INVERSE">
-        Start/Stop
-      </b:Button>
-    </b:Form>
+    <b:Paragraph>
+      Whether the R server can be started and stopped depends on the configuration of the system. Stopping the R
+      server will destroy all current client connections.
+    </b:Paragraph>
+    <g:FlowPanel>
+      <b:ButtonGroup>
+        <b:Button ui:field="startStopButton" type="INVERSE">
+          Start/Stop
+        </b:Button>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:Button ui:field="rTestButton" type="SUCCESS">
+          <ui:msg description="R server test label">Test connection with R</ui:msg>
+        </b:Button>
+      </b:ButtonGroup>
+    </g:FlowPanel>
 
     <g:FlowPanel ui:field="permissionsPanel">
       <b:Heading size="4">

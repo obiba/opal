@@ -21,76 +21,75 @@
       <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
 
-    <g:FlowPanel>
-      <b:Heading size="4">
-        <ui:msg description="Search service label">Search service</ui:msg>
-      </b:Heading>
+    <b:Heading size="4">
+      <ui:msg description="Search service label">Search service</ui:msg>
+    </b:Heading>
 
-      <b:Paragraph>
-        <ui:msg description="configure help label">Search service must be stopped to edit configuration. Changes will
-          take effect on service start.
-        </ui:msg>
-      </b:Paragraph>
-
-      <g:FlowPanel>
-        <b:ButtonGroup>
-          <b:Button ui:field="startStopButton">
-            Start/Stop
-          </b:Button>
-        </b:ButtonGroup>
-        <b:ButtonGroup>
-          <b:Button ui:field="configureButton" addStyleNames="small-indent">
-            <ui:msg description="Configure">Configure</ui:msg>
-          </b:Button>
-        </b:ButtonGroup>
-      </g:FlowPanel>
-    </g:FlowPanel>
+    <b:Paragraph>
+      <ui:msg description="Search service text">Changes in search service configuration will take effect on service
+        start. See details in
+        <a href="http://wiki.obiba.org/display/OPALDOC/Administrating+Opal#AdministratingOpal-SearchService"
+            target="_blank">Search Service Administration documentation
+        </a>.
+      </ui:msg>
+    </b:Paragraph>
 
     <g:FlowPanel>
-      <b:Heading size="4">
-        <ui:msg description="Indices label">Table indices</ui:msg>
-      </b:Heading>
+      <b:ButtonGroup>
+        <b:Button ui:field="startStopButton" type="INVERSE">
+          Start/Stop
+        </b:Button>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:Button ui:field="configureButton" type="INFO" icon="EDIT" addStyleNames="small-indent">
+          <ui:msg description="Configure">Configure</ui:msg>
+        </b:Button>
+      </b:ButtonGroup>
+    </g:FlowPanel>
 
-      <g:FlowPanel addStyleNames="clearfix small-bottom-margin">
-        <g:FlowPanel addStyleNames="pull-left">
-          <b:ButtonGroup>
-            <b:Button ui:field="refreshIndicesButton" icon="REFRESH">
-              <ui:msg description="Refresh indices label">Refresh</ui:msg>
-            </b:Button>
-          </b:ButtonGroup>
-          <b:DropdownButton ui:field="actionsDropdown" text="Actions">
-            <b:NavLink ui:field="scheduleLink">
-              <ui:msg description="Index Action Schedule Indexing">Schedule indexing</ui:msg>
-            </b:NavLink>
-            <b:NavLink ui:field="clearLink">
-              <ui:msg description="Index Action Clear">Clear</ui:msg>
-            </b:NavLink>
-          </b:DropdownButton>
-        </g:FlowPanel>
+    <b:Heading size="4">
+      <ui:msg description="Indices label">Table indices</ui:msg>
+    </b:Heading>
 
-        <b:SimplePager ui:field="indexTablePager" location="RIGHT" addStyleNames="pull-right"/>
+    <g:FlowPanel addStyleNames="clearfix small-bottom-margin">
+      <g:FlowPanel addStyleNames="pull-left">
+        <b:ButtonGroup>
+          <b:Button ui:field="refreshIndicesButton" icon="REFRESH">
+            <ui:msg description="Refresh indices label">Refresh</ui:msg>
+          </b:Button>
+        </b:ButtonGroup>
+        <b:DropdownButton ui:field="actionsDropdown" text="Actions">
+          <b:NavLink ui:field="scheduleLink">
+            <ui:msg description="Index Action Schedule Indexing">Schedule indexing</ui:msg>
+          </b:NavLink>
+          <b:NavLink ui:field="clearLink">
+            <ui:msg description="Index Action Clear">Clear</ui:msg>
+          </b:NavLink>
+        </b:DropdownButton>
       </g:FlowPanel>
 
-      <b:Alert ui:field="selectAllAlert" close="false" visible="false" addStyleNames="select">
-        <g:Grid>
-          <g:row>
-            <g:customCell>
-              <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
-            </g:customCell>
-            <g:customCell>
-              <b2:IconAnchor ui:field="selectAllAnchor" addStyleNames="inline xsmall-indent"/>
-            </g:customCell>
-            <g:customCell>
-              <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" visible="false"
-                  addStyleNames="inline xsmall-indent">
-                <ui:msg description="Clear selection label">Clear</ui:msg>
-              </b2:IconAnchor>
-            </g:customCell>
-          </g:row>
-        </g:Grid>
-      </b:Alert>
-      <o:Table ui:field="indexTable" addStyleNames="small-top-margin"/>
+      <b:SimplePager ui:field="indexTablePager" location="RIGHT" addStyleNames="pull-right"/>
     </g:FlowPanel>
+
+    <b:Alert ui:field="selectAllAlert" close="false" visible="false" addStyleNames="select">
+      <g:Grid>
+        <g:row>
+          <g:customCell>
+            <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
+          </g:customCell>
+          <g:customCell>
+            <b2:IconAnchor ui:field="selectAllAnchor" addStyleNames="inline xsmall-indent"/>
+          </g:customCell>
+          <g:customCell>
+            <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" visible="false"
+                addStyleNames="inline xsmall-indent">
+              <ui:msg description="Clear selection label">Clear</ui:msg>
+            </b2:IconAnchor>
+          </g:customCell>
+        </g:row>
+      </g:Grid>
+    </b:Alert>
+    <o:Table ui:field="indexTable" addStyleNames="small-top-margin"/>
 
   </g:FlowPanel>
 </ui:UiBinder>

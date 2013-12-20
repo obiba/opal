@@ -32,7 +32,7 @@
         is available by default. You can provide your own.
       </ui:msg>
     </b:Paragraph>
-    <g:FlowPanel addStyleNames="large-bottom-margin">
+    <g:FlowPanel>
       <b:DropdownButton text="Set Key Pair" type="INFO" icon="EDIT">
         <b:NavLink ui:field="importKeyPair">
           <ui:msg description="Import Key Pair label">Import key pair...</ui:msg>

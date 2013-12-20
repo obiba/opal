@@ -214,12 +214,13 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
       case Stoppable:
         startStopButton.setText(translations.stopLabel());
         startStopButton.setEnabled(true);
-        configureButton.setEnabled(false);
+        configureButton.setEnabled(true);
         refreshIndicesButton.setEnabled(true);
         actionsDropdown.setVisible(true);
         break;
       case Pending:
         startStopButton.setEnabled(false);
+        configureButton.setEnabled(false);
         break;
     }
   }
