@@ -8,9 +8,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.project.security;
+package org.obiba.opal.web.project.permissions;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -21,8 +22,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.ValueTable;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.cfg.ReportTemplate;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.PermissionsToAclFunction;
@@ -33,34 +34,32 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.Iterables;
 
 import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
-import static org.obiba.opal.web.project.security.ProjectPermissionsResource.DOMAIN;
-import static org.obiba.opal.web.project.security.ProjectPermissionsResource.MagmaPermissionsPredicate;
+import static org.obiba.opal.web.project.permissions.ProjectPermissionsResource.DOMAIN;
+import static org.obiba.opal.web.project.permissions.ProjectPermissionsResource.MagmaPermissionsPredicate;
 
 @Component
 @Scope("request")
-@Path("/project/{name}/permissions/table/{table}")
-public class ProjectTablePermissionsResource extends AbstractProjectPermissionsResource {
+@Path("/project/{name}/permissions/report-template/{template}")
+public class ProjectReportTemplatePermissionsResource extends AbstractProjectPermissionsResource {
 
-  // ugly: duplicate of ProjectsPermissionConverter.Permission
+  // ugly: duplicate of ReportTemplatePermissionConverter.Permission
 
-  public enum TablePermission {
-    TABLE_READ,
-    TABLE_VALUES,
-    TABLE_EDIT,
-    TABLE_VALUES_EDIT,
-    TABLE_ALL
+  public enum ReportTemplatePermission {
+    REPORT_TEMPLATE_READ,
+    REPORT_TEMPLATE_ALL
   }
 
   @Autowired
   private SubjectAclService subjectAclService;
 
+  @Autowired
+  private OpalConfigurationService configService;
+
   @PathParam("name")
   private String name;
 
-  @PathParam("table")
-  private String table;
-
-  private ValueTable valueTable;
+  @PathParam("template")
+  private String template;
 
   /**
    * Get all table-level permissions of a table in the project.
@@ -72,8 +71,8 @@ public class ProjectTablePermissionsResource extends AbstractProjectPermissionsR
   @GET
   public Iterable<Opal.Acl> getTablePermissions(@QueryParam("type") SubjectType type) {
 
-    // make sure datasource and table exists
-    getValueTable();
+    // make sure project exists
+    validateTemplate();
 
     Iterable<SubjectAclService.Permissions> permissions = subjectAclService.getNodePermissions(DOMAIN, getNode(), type);
 
@@ -91,10 +90,9 @@ public class ProjectTablePermissionsResource extends AbstractProjectPermissionsR
    */
   @POST
   public Response setTablePermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
-      @QueryParam("principal") List<String> principals, @QueryParam("permission") TablePermission permission) {
-
-    // make sure datasource and table exists
-    getValueTable();
+      @QueryParam("principal") List<String> principals, @QueryParam("permission") ReportTemplatePermission permission) {
+    // make sure template exists
+    validateTemplate();
     setPermission(principals, type, permission.name());
     return Response.ok().build();
   }
@@ -110,47 +108,20 @@ public class ProjectTablePermissionsResource extends AbstractProjectPermissionsR
   public Response deleteTablePermissions(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals) {
 
-    // make sure datasource and table exists
-    getValueTable();
+    // make sure template exists
+    validateTemplate();
     deletePermissions(principals, type);
     return Response.ok().build();
   }
 
-  //
-  // Variables
-  //
-
-  /**
-   * Get all variable-level permissions of a table in the project.
-   *
-   * @param domain
-   * @param type
-   * @return
-   */
-  @GET
-  @Path("/variables")
-  public Iterable<Opal.Acl> getTableVariablesPermissions(@QueryParam("type") SubjectType type) {
-
-    // make sure datasource and table exists
-    getValueTable();
-
-    Iterable<SubjectAclService.Permissions> permissions = Iterables
-        .filter(subjectAclService.getNodeHierarchyPermissions(DOMAIN, getNode() + "/variable", type),
-            new MagmaPermissionsPredicate());
-
-    return Iterables.transform(permissions, PermissionsToAclFunction.INSTANCE);
-  }
-
-  private ValueTable getValueTable() {
-    if(valueTable == null) {
-      valueTable = MagmaEngine.get().getDatasource(name).getValueTable(table);
-    }
-    return valueTable;
+  private void validateTemplate() {
+    ReportTemplate rt = configService.getOpalConfiguration().getReportTemplate(template);
+    if(rt == null || !rt.hasProject() || !name.equals(rt.getProject())) throw new NoSuchElementException();
   }
 
   @Override
   protected String getNode() {
-    return "/datasource/" + name + (getValueTable().isView() ? "/view/" : "/table/") + table;
+    return "/project/" + name + "/report-template/" + template;
   }
 
   @Override

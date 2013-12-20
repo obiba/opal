@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.project.security;
+package org.obiba.opal.web.project.permissions;
 
 import java.util.Collection;
 

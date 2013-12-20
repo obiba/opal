@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.project.security;
+package org.obiba.opal.web.project.permissions;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -30,8 +30,8 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.Iterables;
 
 import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
-import static org.obiba.opal.web.project.security.ProjectPermissionsResource.DOMAIN;
-import static org.obiba.opal.web.project.security.ProjectPermissionsResource.MagmaPermissionsPredicate;
+import static org.obiba.opal.web.project.permissions.ProjectPermissionsResource.DOMAIN;
+import static org.obiba.opal.web.project.permissions.ProjectPermissionsResource.MagmaPermissionsPredicate;
 
 @Component
 @Scope("request")
