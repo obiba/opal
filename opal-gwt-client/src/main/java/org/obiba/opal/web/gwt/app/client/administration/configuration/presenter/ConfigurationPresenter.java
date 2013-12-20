@@ -43,16 +43,17 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
   @NameToken(Places.SERVER)
   public interface Proxy extends ProxyPlace<ConfigurationPresenter> {}
 
-  private static final Translations translations = GWT.create(Translations.class);
+  private final Translations translations;
 
   private final BreadcrumbsBuilder breadcrumbsBuilder;
 
   @Inject
-  public ConfigurationPresenter(Display display, EventBus eventBus, Proxy proxy,
+  public ConfigurationPresenter(Display display, EventBus eventBus, Proxy proxy, Translations translations,
       ModalProvider<GeneralConfModalPresenter> generalConfModalProvider,
       ModalProvider<CreateKeyPairModalPresenter> createKeyPairModalProvider,
       ModalProvider<ImportKeyPairModalPresenter> importKeyPairModalProvider, BreadcrumbsBuilder breadcrumbsBuilder) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
+    this.translations = translations;
     this.createKeyPairModalProvider = createKeyPairModalProvider.setContainer(this);
     this.importKeyPairModalProvider = importKeyPairModalProvider.setContainer(this);
     this.generalConfModalProvider = generalConfModalProvider.setContainer(this);
@@ -74,15 +75,12 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
   @Override
   protected void onBind() {
     refresh();
-
-    registerHandler(getEventBus()
-        .addHandler(GeneralConfigSavedEvent.getType(), new GeneralConfigSavedEvent.GeneralConfigSavedHandler() {
-          @Override
-          public void onGeneralConfigSaved(GeneralConfigSavedEvent event) {
-            refresh();
-          }
-        }));
-
+    addRegisteredHandler(GeneralConfigSavedEvent.getType(), new GeneralConfigSavedEvent.GeneralConfigSavedHandler() {
+      @Override
+      public void onGeneralConfigSaved(GeneralConfigSavedEvent event) {
+        refresh();
+      }
+    });
   }
 
   private void refresh() {
@@ -116,10 +114,8 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
 
   @Override
   public void onDownloadCertificate() {
-    getEventBus()
-        .fireEvent(new FileDownloadRequestEvent(UriBuilders.SYSTEM_KEYSTORE_HTTPS_CERTIFICATE.create().build()));
+    fireEvent(new FileDownloadRequestEvent(UriBuilders.SYSTEM_KEYSTORE_HTTPS_CERTIFICATE.create().build()));
   }
-
 
   public interface Display extends View, HasUiHandlers<ConfigurationUiHandlers>, HasBreadcrumbs {
     void renderGeneralProperties(GeneralConf resource);

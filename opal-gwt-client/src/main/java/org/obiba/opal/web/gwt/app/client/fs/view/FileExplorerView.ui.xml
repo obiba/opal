@@ -8,14 +8,16 @@
   <g:FlowPanel>
     <g:SimplePanel ui:field="filePathPanel"/>
     <g:FlowPanel addStyleNames="bottom-margin">
-      <b:DropdownButton text="Add" icon="PLUS" ui:field="deriveBtn">
-        <b:NavLink icon="FOLDER_CLOSE" ui:field="addFolder">
-          <ui:msg description="Add Folder label">Add folder...</ui:msg>
-        </b:NavLink>
-        <b:NavLink icon="UPLOAD" ui:field="uploadFile">
-          <ui:msg description="Upload File label">Upload file...</ui:msg>
-        </b:NavLink>
-      </b:DropdownButton>
+      <b:ButtonGroup>
+        <b:Button icon="PLUS" type="INFO" ui:field="addFolder">
+          <ui:msg description="Add Folder label">Add Folder</ui:msg>
+        </b:Button>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:Button icon="UPLOAD" ui:field="uploadFile">
+          <ui:msg description="Upload File label">Upload</ui:msg>
+        </b:Button>
+      </b:ButtonGroup>
       <b:ButtonGroup>
         <b:Button icon="DOWNLOAD" ui:field="download">
           <ui:msg description="Download label">Download</ui:msg>

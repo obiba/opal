@@ -27,19 +27,21 @@
       <ui:msg description="Keystore label">Keystore</ui:msg>
     </b:Heading>
     <b:Paragraph>
-      HTTPS connection requires to have a private key and a public key (certificate) defined. A self-signed key-pair is
-      available by default. You can provide your own.
+      <ui:msg description="System Keystore text">
+        HTTPS connection requires to have a private key and a public key (certificate) defined. A self-signed key-pair
+        is available by default. You can provide your own.
+      </ui:msg>
     </b:Paragraph>
+    <b:DropdownButton text="Set Key Pair" type="INFO" icon="PLUS">
+      <b:NavLink ui:field="importKeyPair">
+        <ui:msg description="Import Key Pair label">Import key pair...</ui:msg>
+      </b:NavLink>
+      <b:NavLink ui:field="createKeyPair">
+        <ui:msg description="Create Key Pair label">Create key pair...</ui:msg>
+      </b:NavLink>
+    </b:DropdownButton>
     <b:ButtonGroup>
-      <b:DropdownButton text="Set Key Pair" type="INFO" icon="PLUS">
-        <b:NavLink ui:field="importKeyPair">
-          <ui:msg description="Import Key Pair label">Import key pair...</ui:msg>
-        </b:NavLink>
-        <b:NavLink ui:field="createKeyPair">
-          <ui:msg description="Create Key Pair label">Create key pair...</ui:msg>
-        </b:NavLink>
-      </b:DropdownButton>
-      <b:Button ui:field="downloadCertificate" icon="DOWNLOAD_ALT" addStyleNames="small-indent">
+      <b:Button ui:field="downloadCertificate" icon="DOWNLOAD_ALT">
         <ui:msg description="Download Certificate label">Download Certificate</ui:msg>
       </b:Button>
     </b:ButtonGroup>

@@ -45,7 +45,7 @@ public class FileExplorerView extends ViewWithUiHandlers<FileExplorerUiHandlers>
   Panel folderDetailsPanel;
 
   @UiField
-  NavLink uploadFile;
+  Button uploadFile;
 
   @UiField
   Button remove;
@@ -63,7 +63,7 @@ public class FileExplorerView extends ViewWithUiHandlers<FileExplorerUiHandlers>
   Button paste;
 
   @UiField
-  NavLink addFolder;
+  Button addFolder;
 
   @Inject
   public FileExplorerView(Binder uiBinder) {
