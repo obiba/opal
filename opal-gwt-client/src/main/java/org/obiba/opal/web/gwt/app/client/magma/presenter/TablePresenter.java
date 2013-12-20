@@ -154,6 +154,14 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   }
 
   @Override
+  protected void onReset() {
+    super.onReset();
+    if(indexProgressTimer != null) {
+      indexProgressTimer.cancel();
+    }
+  }
+
+  @Override
   public void onTableSelectionChanged(TableSelectionChangeEvent event) {
     if(event.hasTable()) {
       updateDisplay(event.getTable());
