@@ -45,8 +45,6 @@ import com.gwtplatform.mvp.client.PopupView;
 public class IdentifiersMappingModalPresenter extends ModalPresenterWidget<IdentifiersMappingModalPresenter.Display>
     implements IdentifiersMappingModalUiHandlers {
 
-  private static final String DESCRIPTION = "description";
-
   private final Translations translations;
 
   private VariableDto variable;
@@ -172,14 +170,14 @@ public class IdentifiersMappingModalPresenter extends ModalPresenterWidget<Ident
     }
     AttributeDto labelAttr = null;
     for(AttributeDto attr : JsArrays.toIterable(variable.getAttributesArray())) {
-      if(attr.getName().equals(DESCRIPTION)) {
+      if(attr.getName().equals("description")) {
         labelAttr = attr;
         break;
       }
     }
     if(labelAttr == null) {
       labelAttr = AttributeDto.create();
-      labelAttr.setName(DESCRIPTION);
+      labelAttr.setName("description");
       v.getAttributesArray().push(labelAttr);
     }
     labelAttr.setValue(getView().getDescription());
