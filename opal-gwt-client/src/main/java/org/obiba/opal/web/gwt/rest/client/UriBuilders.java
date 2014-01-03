@@ -434,30 +434,52 @@ public enum UriBuilders {
   IDENTIFIERS_TABLE {
     @Override
     public UriBuilder create() {
-      return UriBuilder.create().segment("identifiers", "table","{}");
+      return UriBuilder.create().segment("identifiers", "table", "{}");
     }
   },
 
   IDENTIFIERS_TABLE_VARIABLES {
     @Override
     public UriBuilder create() {
-      return UriBuilder.create().segment("identifiers", "table","{}", "variables");
+      return UriBuilder.create().segment("identifiers", "table", "{}", "variables");
     }
   },
 
   IDENTIFIERS_TABLE_VARIABLE {
     @Override
     public UriBuilder create() {
-      return UriBuilder.create().segment("identifiers", "table","{}", "variable", "{}");
+      return UriBuilder.create().segment("identifiers", "table", "{}", "variable", "{}");
     }
   },
 
   IDENTIFIERS_TABLE_VALUESETS {
     @Override
     public UriBuilder create() {
-      return UriBuilder.create().segment("identifiers", "table","{}", "valueSets");
+      return UriBuilder.create().segment("identifiers", "table", "{}", "valueSets");
     }
-  };
+  },
 
+  VCS_VARIABLE_COMMIT_INFOS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasource", "{}", "view", "{}", "vcs", "variable", "{}", "commits");
+    }
+  },
+
+  VCS_VARIABLE_COMMIT_INFO {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasource", "{}", "view", "{}", "vcs", "variable", "{}", "commit", "{}", "{}");
+    }
+  },
+
+  VCS_VARIABLE_BLOB {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasource", "{}", "view", "{}", "vcs", "variable", "{}", "blob", "{}");
+    }
+
+  };
+  
   public abstract UriBuilder create();
 }

@@ -21,31 +21,38 @@ import org.obiba.opal.web.gwt.datetime.client.FormatType;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.opal.VcsCommitInfoDto;
 import org.obiba.opal.web.model.client.opal.VcsCommitInfosDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.UiHandlers;
 import com.gwtplatform.mvp.client.View;
 
 public class VariableVcsCommitHistoryPresenter extends PresenterWidget<VariableVcsCommitHistoryPresenter.Display>
-    implements VariableVcsCommitHistoryUiHandlers {
+    implements UiHandlers {
 
-  public interface Display extends View, HasUiHandlers<VariableVcsCommitHistoryUiHandlers> {
-    static final String DIFF_ACTION = "CommitDiff";
-    static final String DIFF_CURRENT_ACTION = "DiffWithCurrent";
+  public interface Display extends View, HasUiHandlers<UiHandlers> {
+    String DIFF_ACTION = "CommitDiff";
+    String DIFF_CURRENT_ACTION = "DiffWithCurrent";
 
     void setData(JsArray<VcsCommitInfoDto> commitInfos);
 
     HasActionHandler<VcsCommitInfoDto> getActions();
   }
+
+  static final String HEAD_REVISION = "head";
 
   private final ModalProvider<VcsCommitHistoryModalPresenter> vcsHistoryModalProvider;
 
@@ -70,76 +77,14 @@ public class VariableVcsCommitHistoryPresenter extends PresenterWidget<VariableV
     getView().setUiHandlers(this);
   }
 
-  @Override
-  protected void onBind() {
-    super.onBind();
+  public void retrieveCommitInfos(TableDto tableDto, VariableDto variableDto) {
+    if(tableDto == null || variableDto == null) return;
 
-    getView().getActions().setActionHandler(new ActionHandler<VcsCommitInfoDto>() {
+    table = tableDto;
+    variable = variableDto;
 
-      @Override
-      public void doAction(VcsCommitInfoDto commitInfo, String actionName) {
-        if (ActionsColumn.EDIT_ACTION.equals(actionName)) {
-          viewCommitContent(commitInfo);
-        }
-        else if (Display.DIFF_ACTION.equals(actionName)) {
-          showCommitInfo(commitInfo, false);
-        }
-        else if (Display.DIFF_CURRENT_ACTION.equals(actionName)) {
-          showCommitInfo(commitInfo, true);
-        }
-      }
-    });
-
-  }
-
-  private void showCommitInfo(VcsCommitInfoDto dto, boolean withCurrent) {
-    String requestUri = UriBuilder.create()
-        .segment("datasource", table.getDatasourceName(), "view", table.getName(), "vcs", "variable",
-            variable.getName(), "commit", withCurrent ? "head" : "", dto.getCommitId()).build();
-
-    ResourceRequestBuilderFactory.<VcsCommitInfoDto>newBuilder()//
-        .forResource(requestUri).withCallback(new ResourceCallback<VcsCommitInfoDto>() {
-      @Override
-      public void onResource(Response response, VcsCommitInfoDto resource) {
-        if(vcsHistoryModalPresenter == null) {
-          vcsHistoryModalPresenter = vcsHistoryModalProvider.create();
-        }
-        vcsHistoryModalPresenter.setCommitInfo(resource);
-        vcsHistoryModalProvider.show();
-      }
-    }).get().send();
-  }
-
-  private void viewCommitContent(VcsCommitInfoDto dto) {
-    Moment m = Moment.create(dto.getDate());
-    String age = TranslationsUtils
-        .replaceArguments(translations.momentWithAgo(), m.format(FormatType.MONTH_NAME_TIME_SHORT), m.fromNow());
-
-    getEventBus().fireEvent(
-        NotificationEvent.newBuilder().info("VcsScriptContentInfo").args(age, dto.getAuthor()).build());
-
-    String requestUri = UriBuilder.create()
-        .segment("datasource", table.getDatasourceName(), "view", table.getName(), "vcs", "variable",
-            variable.getName(), "blob", dto.getCommitId()).build();
-
-    ResourceRequestBuilderFactory.<VcsCommitInfoDto>newBuilder()//
-        .forResource(requestUri).withCallback(new ResourceCallback<VcsCommitInfoDto>() {
-      @Override
-      public void onResource(Response response, VcsCommitInfoDto resource) {
-        getEventBus().fireEvent(new VcsCommitInfoReceivedEvent(resource));
-      }
-    }).get().send();
-  }
-
-  public void retrieveCommitInfos(TableDto table, VariableDto variable) {
-    if(table == null || variable == null) return;
-
-    this.table = table;
-    this.variable = variable;
-
-    String requestUri = UriBuilder.create()
-        .segment("datasource", table.getDatasourceName(), "view", table.getName(), "vcs", "variable",
-            variable.getName(), "commits").build();
+    String requestUri = UriBuilders.VCS_VARIABLE_COMMIT_INFOS.create()
+        .build(table.getDatasourceName(), table.getName(), variable.getName());
 
     ResourceRequestBuilderFactory.<VcsCommitInfosDto>newBuilder()//
         .forResource(requestUri).withCallback(new ResourceCallback<VcsCommitInfosDto>() {
@@ -147,7 +92,77 @@ public class VariableVcsCommitHistoryPresenter extends PresenterWidget<VariableV
       public void onResource(Response response, VcsCommitInfosDto commitInfos) {
         getView().setData(commitInfos.getCommitInfosArray());
       }
-    }).get().send();
+    }).withCallback(Response.SC_BAD_REQUEST, new CsvErrorResponseCallback()).get().send();
   }
 
+  @Override
+  protected void onBind() {
+    super.onBind();
+
+    getView().getActions().setActionHandler(new VcsCommitInfoActionHandler());
+  }
+
+  private final class CsvErrorResponseCallback implements ResponseCodeCallback {
+
+    CsvErrorResponseCallback() {}
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+      fireEvent(NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray()).build());
+    }
+  }
+
+  private class VcsCommitInfoActionHandler implements ActionHandler<VcsCommitInfoDto> {
+
+    @Override
+    public void doAction(VcsCommitInfoDto commitInfo, String actionName) {
+        if(ActionsColumn.EDIT_ACTION.equals(actionName)) {
+          viewCommitContent(commitInfo);
+        } else if(Display.DIFF_ACTION.equals(actionName)) {
+          showCommitInfo(commitInfo, false);
+        } else if(Display.DIFF_CURRENT_ACTION.equals(actionName)) {
+          showCommitInfo(commitInfo, true);
+        }
+    }
+
+    private void showCommitInfo(VcsCommitInfoDto dto, boolean withCurrent) {
+      String requestUri = UriBuilders.VCS_VARIABLE_COMMIT_INFO.create()
+          .build(table.getDatasourceName(), table.getName(), variable.getName(), withCurrent ? HEAD_REVISION : "",
+              dto.getCommitId());
+
+      ResourceRequestBuilderFactory.<VcsCommitInfoDto>newBuilder()//
+          .forResource(requestUri).withCallback(new ResourceCallback<VcsCommitInfoDto>() {
+        @Override
+        public void onResource(Response response, VcsCommitInfoDto resource) {
+          if(vcsHistoryModalPresenter == null) {
+            vcsHistoryModalPresenter = vcsHistoryModalProvider.create();
+          }
+          vcsHistoryModalPresenter.setCommitInfo(resource);
+          vcsHistoryModalProvider.show();
+        }
+      }).withCallback(Response.SC_BAD_REQUEST, new CsvErrorResponseCallback()).get().send();
+    }
+
+    private void viewCommitContent(VcsCommitInfoDto dto) {
+      Moment m = Moment.create(dto.getDate());
+      String age = TranslationsUtils
+          .replaceArguments(translations.momentWithAgo(), m.format(FormatType.MONTH_NAME_TIME_SHORT), m.fromNow());
+
+      getEventBus()
+          .fireEvent(NotificationEvent.newBuilder().info("VcsScriptContentInfo").args(age, dto.getAuthor()).build());
+
+      String requestUri = UriBuilders.VCS_VARIABLE_BLOB.create()
+          .build(table.getDatasourceName(), table.getName(), variable.getName(), dto.getCommitId());
+
+      ResourceRequestBuilderFactory.<VcsCommitInfoDto>newBuilder()//
+          .forResource(requestUri).withCallback(new ResourceCallback<VcsCommitInfoDto>() {
+        @Override
+        public void onResource(Response response, VcsCommitInfoDto resource) {
+          getEventBus().fireEvent(new VcsCommitInfoReceivedEvent(resource));
+        }
+      }).withCallback(Response.SC_BAD_REQUEST, new CsvErrorResponseCallback()).get().send();
+    }
+
+  }
 }

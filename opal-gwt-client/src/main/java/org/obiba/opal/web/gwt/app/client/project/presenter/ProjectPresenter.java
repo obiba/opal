@@ -113,7 +113,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private final PlaceManager placeManager;
 
-  private String name;
+  private String projectName;
 
   private Display.ProjectTab tab = Display.ProjectTab.TABLES;
 
@@ -128,8 +128,6 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   private TasksPresenter tasksPresenter;
 
   private ProjectPermissionsPresenter projectPermissionsPresenter;
-
-  private ProjectKeyStorePresenter projectKeyStorePresenter;
 
   private ProjectAdministrationPresenter projectAdministrationPresenter;
 
@@ -160,31 +158,31 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   @Override
   public void prepareFromRequest(PlaceRequest request) {
     super.prepareFromRequest(request);
-    name = request.getParameter(ParameterTokens.TOKEN_NAME, null);
+    projectName = request.getParameter(ParameterTokens.TOKEN_NAME, null);
     tab = validateTab(request.getParameter(ParameterTokens.TOKEN_TAB, null));
 
     // TODO check that datasource name is the one of project
-    String path = validatePath(name, request.getParameter(ParameterTokens.TOKEN_PATH, null));
+    String path = validatePath(projectName, request.getParameter(ParameterTokens.TOKEN_PATH, null));
     getView().setTabData(tab.ordinal(), tab == Display.ProjectTab.TABLES ? path : null);
 
     refresh();
   }
 
   private void authorize() {
-    if(name == null) return;
+    if(projectName == null) return;
 
     // permissions tab
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.PROJECT_PERMISSIONS_ALL.create().build(name)).get()//
+        .forResource(UriBuilders.PROJECT_PERMISSIONS_ALL.create().build(projectName)).get()//
         .authorize(getView().getPermissionsAuthorizer())//
         .send();
   }
 
   public void refresh() {
     // TODO handle wrong or missing project name
-    if(name == null) return;
+    if(projectName == null) return;
     // reset
-    ResourceRequestBuilderFactory.<ProjectDto>newBuilder().forResource(UriBuilders.PROJECT.create().build(name))
+    ResourceRequestBuilderFactory.<ProjectDto>newBuilder().forResource(UriBuilders.PROJECT.create().build(projectName))
         .withCallback(new ResourceCallback<ProjectDto>() {
           @Override
           public void onResource(Response response, ProjectDto resource) {
@@ -201,9 +199,9 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private void refreshSummary() {
     // TODO handle wrong or missing project name
-    if(name == null) return;
+    if(projectName == null) return;
     ResourceRequestBuilderFactory.<ProjectSummaryDto>newBuilder()
-        .forResource(UriBuilders.PROJECT_SUMMARY.create().build(name))
+        .forResource(UriBuilders.PROJECT_SUMMARY.create().build(projectName))
         .withCallback(new ResourceCallback<ProjectSummaryDto>() {
           @Override
           public void onResource(Response response, ProjectSummaryDto resource) {
@@ -221,6 +219,19 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   @SuppressWarnings("PMD.NcssMethodCount")
   public void onTabSelected(int index) {
     String queryPathParam = (String) getView().getTabData(index);
+    selectTab(index, queryPathParam);
+
+    PlaceRequest.Builder builder = PlaceRequestHelper
+        .createRequestBuilderWithParams(placeManager.getCurrentPlaceRequest(),
+            Arrays.asList(ParameterTokens.TOKEN_NAME)) //
+        .with(ParameterTokens.TOKEN_TAB, tab.toString());
+    if(!Strings.isNullOrEmpty(queryPathParam)) {
+      builder.with(ParameterTokens.TOKEN_PATH, queryPathParam);
+    }
+    placeManager.updateHistory(builder.build(), true);
+  }
+
+  private void selectTab(int index, String queryPathParam) {
     tab = Display.ProjectTab.values()[index];
     switch(tab) {
       case TABLES:
@@ -242,15 +253,6 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
         onAdminTabSelected();
         break;
     }
-
-    PlaceRequest.Builder builder = PlaceRequestHelper
-        .createRequestBuilderWithParams(placeManager.getCurrentPlaceRequest(),
-            Arrays.asList(ParameterTokens.TOKEN_NAME)) //
-        .with(ParameterTokens.TOKEN_TAB, tab.toString());
-    if(!Strings.isNullOrEmpty(queryPathParam)) {
-      builder.with(ParameterTokens.TOKEN_PATH, queryPathParam);
-    }
-    placeManager.updateHistory(builder.build(), true);
   }
 
   private void onTablesTabSelected(String path) {
@@ -268,9 +270,9 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       fileExplorerPresenter = fileExplorerPresenterProvider.get();
       setInSlot(FILES_PANE, fileExplorerPresenter);
     }
-    fileExplorerPresenter.showProject(name);
+    fileExplorerPresenter.showProject(projectName);
     fireEvent(Strings.isNullOrEmpty(path)
-        ? new FolderRequestEvent(FileDtos.project(name))
+        ? new FolderRequestEvent(FileDtos.project(projectName))
         : new FolderRequestEvent(FileDtos.create(path.split("/"))));
   }
 
@@ -279,7 +281,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       reportsPresenter = reportsPresenterProvider.get();
       setInSlot(REPORTS_PANE, reportsPresenter);
     }
-    reportsPresenter.showProject(name);
+    reportsPresenter.showProject(projectName);
   }
 
   private void onTasksTabSelected() {
@@ -287,7 +289,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       tasksPresenter = tasksPresenterProvider.get();
       setInSlot(TASKS_PANE, tasksPresenter);
     }
-    tasksPresenter.showProject(name);
+    tasksPresenter.showProject(projectName);
   }
 
   private void onPermissionsTabSelected() {
@@ -325,10 +327,10 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     getView().setTabData(tab.ordinal(), queryPathParam);
   }
 
-  private Display.ProjectTab validateTab(String tab) {
-    if(!Strings.isNullOrEmpty(tab)) {
+  private Display.ProjectTab validateTab(String tabName) {
+    if(!Strings.isNullOrEmpty(tabName)) {
       try {
-        return Display.ProjectTab.valueOf(tab);
+        return Display.ProjectTab.valueOf(tabName);
       } catch(IllegalArgumentException ignored) {
       }
     }

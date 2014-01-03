@@ -558,6 +558,7 @@ public interface Translations extends Constants {
       "MultipleIdentifiersDatabase", "Database for identifiers already exists: {0}", //
       "DatabaseAlreadyExists", "Database named {0} already exists", //
       "VcsScriptContentInfo", "The retrieved script content is from '{0}' committed by '{1}'.", //
+      "VcsOperationFailed", "Failed to retrieve revision information. Please contact technical support.", //
       "GeneralConfigSaved", "Opal general configuration was successfully saved.", //
       "PostInstallNotCompleted", "Post-install configuration not completed.",//
       "TermNameMustBeUnique", "Term name must be unique",//
@@ -2276,14 +2277,6 @@ public interface Translations extends Constants {
   @Description("Script Update Default Prefix Label")
   @DefaultStringValue("Update")
   String scriptUpdateDefaultPrefixLabel();
-
-  @Description("User message map")
-  @DefaultStringMapValue({ //
-      "FailedToRetrieveVariableCommitInfos", "Failed to retrieve all variable commit information.", //
-      "FailedToRetrieveVariableContent", "Failed to retrieve variable content for the given id.", //
-      "FailedToRetrieveVariableCommitInfo", "Failed to retrieve variable commit information for the given id." })
-//
-  Map<String, String> vcsResourceErrorMap();
 
   @Description("Edit label")
   @DefaultStringValue("Edit")
