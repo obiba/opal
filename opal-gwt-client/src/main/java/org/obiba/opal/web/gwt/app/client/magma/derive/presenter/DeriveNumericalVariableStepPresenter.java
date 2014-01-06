@@ -16,17 +16,18 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
+import org.obiba.opal.web.gwt.app.client.magma.derive.helper.DerivationHelper;
+import org.obiba.opal.web.gwt.app.client.magma.derive.helper.NumericalVariableDerivationHelper;
+import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry;
 import org.obiba.opal.web.gwt.app.client.magma.event.SummaryReceivedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.StepInHandler;
-import org.obiba.opal.web.gwt.app.client.magma.derive.helper.DerivationHelper;
-import org.obiba.opal.web.gwt.app.client.magma.derive.helper.NumericalVariableDerivationHelper;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
@@ -35,10 +36,10 @@ import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.View;
 
 /**
@@ -65,7 +66,9 @@ public class DeriveNumericalVariableStepPresenter
       VariableDto derivedVariable) {
     super.initialize(originalTable, destinationTable, originalVariable, derivedVariable);
     getView().setNumberType(originalVariable.getValueType());
-    summaryTabPresenter.setResourceUri(originalVariable.getLink() + "/summary", originalTable.getValueSetCount());
+    summaryTabPresenter
+        .setResourceUri(UriBuilders.DATASOURCE_TABLE_VARIABLE_SUMMARY.create(), originalTable.getValueSetCount(),
+            originalTable.getDatasourceName(), originalTable.getName(), originalVariable.getName());
     summaryTabPresenter.forgetSummary();
     summaryTabPresenter.onReset();
   }
@@ -93,6 +96,7 @@ public class DeriveNumericalVariableStepPresenter
     return stepBuilders;
   }
 
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private boolean addValueMapEntry(@Nullable String value, String newValue) {
     if(derivationHelper.hasValueMapEntryWithValue(value)) {
       getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.valueMapAlreadyAdded()).build());
@@ -270,6 +274,7 @@ public class DeriveNumericalVariableStepPresenter
       addRangesByLength(getView().getRangeLength().doubleValue());
     }
 
+    @SuppressWarnings("UnusedAssignment")
     private void addRangesByLength(double length) {
       double lowerLimit = getView().getLowerLimit().doubleValue();
       double upperLimit = getView().getUpperLimit().doubleValue();

@@ -235,8 +235,8 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
           max = count;
           summary.mode = value;
         }
-        summary.frequencies
-            .add(new Frequency(value, summary.frequencyDist.getCount(value), summary.frequencyDist.getPct(value)));
+        summary.frequencies.add(new Frequency(value, summary.frequencyDist.getCount(value),
+            Double.isNaN(summary.frequencyDist.getPct(value)) ? 0.0 : summary.frequencyDist.getPct(value)));
       }
       summary.n = summary.frequencyDist.getSumFreq();
     }
