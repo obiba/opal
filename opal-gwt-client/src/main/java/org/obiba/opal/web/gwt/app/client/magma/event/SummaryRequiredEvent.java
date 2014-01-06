@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.event;
 
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
@@ -25,21 +27,25 @@ public class SummaryRequiredEvent extends GwtEvent<SummaryRequiredEvent.Handler>
 
   private static final Type<Handler> TYPE = new Type<Handler>();
 
-  private final String resourceUri;
+  private final UriBuilder uri;
+
+  private final String[] args;
 
   private Integer max = null;
 
-  public SummaryRequiredEvent(String resourceUri) {
-    this.resourceUri = resourceUri;
+  public SummaryRequiredEvent(UriBuilder uri, String... args) {
+    this.uri = uri;
+    this.args = args;
   }
 
-  public SummaryRequiredEvent(String resourceUri, Integer max) {
-    this.resourceUri = resourceUri;
+  public SummaryRequiredEvent(UriBuilder uri, Integer max, String... args) {
+    this.uri = uri;
     this.max = max;
+    this.args = args;
   }
 
-  public String getResourceUri() {
-    return resourceUri;
+  public UriBuilder getResourceUri() {
+    return uri;
   }
 
   public Integer getMax() {
@@ -48,6 +54,10 @@ public class SummaryRequiredEvent extends GwtEvent<SummaryRequiredEvent.Handler>
 
   public static Type<Handler> getType() {
     return TYPE;
+  }
+
+  public String[] getArgs() {
+    return args;
   }
 
   @Override

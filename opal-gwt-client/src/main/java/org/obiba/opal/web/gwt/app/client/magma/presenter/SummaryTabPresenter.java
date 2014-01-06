@@ -86,16 +86,15 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     getView().hideSummaryPreview();
   }
 
-  public void setResourceUri(String resourceUri, int entitiesCount) {
+  public void setResourceUri(UriBuilder uri, int entitiesCount, String... args) {
     cancelPendingSummaryRequest();
 
     this.entitiesCount = entitiesCount;
-    UriBuilder uriBuilder = UriBuilder.create().fromPath(resourceUri);
     if(limit < entitiesCount) {
-      uriBuilder.query("limit", String.valueOf(limit));
+      uri.query("limit", String.valueOf(limit));
     }
     resourceRequestBuilder = ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()
-        .forResource(uriBuilder.build()).get();
+        .forResource(uri.build(args)).get();
 
     limit = Math.min(entitiesCount, limit);
   }
@@ -174,7 +173,7 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     @Override
     public void onSummaryRequest(SummaryRequiredEvent event) {
       cancelPendingSummaryRequest();
-      setResourceUri(event.getResourceUri(), event.getMax() == null ? DEFAULT_LIMIT : event.getMax());
+      setResourceUri(event.getResourceUri(), event.getMax() == null ? DEFAULT_LIMIT : event.getMax(), event.getArgs());
     }
 
   }

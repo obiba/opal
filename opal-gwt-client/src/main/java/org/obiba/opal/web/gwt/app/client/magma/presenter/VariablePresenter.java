@@ -653,7 +653,9 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     }
 
     private void requestSummary(VariableDto selection) {
-      fireEvent(new SummaryRequiredEvent(selection.getLink() + "/summary"));
+      fireEvent(
+          new SummaryRequiredEvent(UriBuilders.DATASOURCE_TABLE_VARIABLE_SUMMARY.create(), table.getDatasourceName(),
+              table.getName(), selection.getName()));
     }
   }
 

@@ -194,6 +194,13 @@ public enum UriBuilders {
     }
   },
 
+  DATASOURCE_TABLE_VARIABLE_SUMMARY {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasource", "{}", "table", "{}", "variable", "{}", "summary");
+    }
+  },
+
   DATASOURCE_TABLE_VARIABLES_SEARCH {
     @Override
     public UriBuilder create() {
