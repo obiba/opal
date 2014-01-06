@@ -25,9 +25,9 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingConfigDto;
+import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.ExportCommandOptionsDto;
-import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingDto;
 
 import com.google.common.collect.Sets;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -133,19 +133,23 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
         JsArray<IdentifiersMappingDto> mappings = JsArrays.toSafeArray(resource);
 
         // if exporting at least one table of type 'identifiersEntityType', show id mappings selection
-        for(TableDto table : exportTables) {
-          if(hasEntityTypeMapping(table, mappings)) {
-            getView().setIdentifiersMappings(mappings);
-            break;
-          }
-        }
+        getView().setIdentifiersMappings(getEntityTypeMappings(exportTables, mappings));
       }
 
-      private boolean hasEntityTypeMapping(TableDto table, JsArray<IdentifiersMappingDto> mappings) {
+      private JsArray<IdentifiersMappingDto> getEntityTypeMappings(Set<TableDto> tables,
+          JsArray<IdentifiersMappingDto> mappings) {
+        JsArray<IdentifiersMappingDto> entityTypeMappings = JsArrays.create();
+
         for(IdentifiersMappingDto mapping : JsArrays.toIterable(mappings)) {
-          if(hasEntityType(table, mapping)) return true;
+          for(TableDto table : tables) {
+            if(hasEntityType(table, mapping)) {
+              entityTypeMappings.push(mapping);
+              break;
+            }
+          }
         }
-        return false;
+
+        return entityTypeMappings;
       }
 
       private boolean hasEntityType(TableDto table, IdentifiersMappingDto mapping) {
