@@ -401,3 +401,10 @@ td.row-actions span {
   padding-bottom: 2px;
   padding-top: 2px;
 }
+
+/*
+ * Property disclosure panel for java.class.path
+ */
+.collapsible-property > table > tbody > tr > td {
+  border-top: 0;
+}
