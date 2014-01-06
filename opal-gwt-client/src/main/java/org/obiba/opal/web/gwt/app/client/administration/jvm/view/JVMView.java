@@ -13,6 +13,7 @@ import org.obiba.opal.web.gwt.app.client.administration.jvm.presenter.JVMPresent
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
 import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
 import org.obiba.opal.web.gwt.datetime.client.Duration;
 import org.obiba.opal.web.gwt.plot.client.MonitoringChartFactory;
@@ -39,6 +40,8 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
   private static final double B_TO_MB_FACTOR = 0.000000954;
 
   public static final int HEIGHT = 300;
+
+  private static final int MAX_LENGTH = 100;
 
   interface Binder extends UiBinder<Widget, JVMView> {}
 
@@ -106,8 +109,23 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
     systemProperties.clearProperties();
     JsArray<EntryDto> entries = JsArrays.toSafeArray(env.getSystemPropertiesArray());
     for(int i = 0; i < entries.length(); i++) {
-      systemProperties.addProperty(entries.get(i).getKey(), entries.get(i).getValue());
+      if("java.class.path".equals(entries.get(i).getKey())) {
+        addCollapsibleProperty(entries.get(i));
+      } else {
+        systemProperties.addProperty(entries.get(i).getKey(), entries.get(i).getValue());
+      }
     }
+  }
+
+  private void addCollapsibleProperty(EntryDto entry) {
+    String header = entry.getValue().length() > MAX_LENGTH
+        ? entry.getValue().substring(0, MAX_LENGTH) + "..."
+        : entry.getValue();
+    CollapsiblePanel value = new CollapsiblePanel(header);
+    value.addStyleName("collapsible-property");
+    value.add(new Label(entry.getValue()));
+    value.setOpen(false);
+    systemProperties.addProperty(new Label(entry.getKey()), value);
   }
 
   @Override
