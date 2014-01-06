@@ -61,6 +61,7 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
   @Override
   public void onAdd() {
     ReportTemplateUpdateModalPresenter presenter = reportTemplateUpdateModalPresenterProvider.get();
+    presenter.setDialogMode(ReportTemplateUpdateModalPresenter.Mode.CREATE);
     presenter.setProject(project);
   }
 
@@ -75,8 +76,8 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
     addHandlers();
   }
 
-  public void showProject(String project) {
-    this.project = project;
+  public void showProject(String projectName) {
+    project = projectName;
     refreshReportTemplates(null);
   }
 
@@ -95,7 +96,7 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
       @Override
       public void onReportTemplateSelected(ReportTemplateSelectedEvent event) {
         reportTemplate = event.getReportTemplate();
-        getView().setCurrentReportTemplateVisible(reportTemplate != null);
+        getView().setCurrentReportTemplate(reportTemplate);
       }
     });
     addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEvent.Handler() {
@@ -113,11 +114,10 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
 
   private void refreshReportTemplates(ReportTemplateDto templateToSelect) {
     String uri;
-    if(project == null) {
-      uri = UriBuilders.REPORT_TEMPLATES.create().build();
-    } else {
-      uri = UriBuilders.PROJECT_REPORT_TEMPLATES.create().build(project);
-    }
+    uri = project == null
+        ? UriBuilders.REPORT_TEMPLATES.create().build()
+        : UriBuilders.PROJECT_REPORT_TEMPLATES.create().build(project);
+
     ResourceRequestBuilderFactory.<JsArray<ReportTemplateDto>>newBuilder().forResource(uri).get()
         .withCallback(new ReportTemplatesResourceCallback(templateToSelect)).withCallback(new ResponseCodeCallback() {
       @Override
@@ -126,27 +126,6 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
       }
     }, Response.SC_FORBIDDEN).send();
   }
-
-  private JsArray<ReportTemplateDto> sortReportTemplates(JsArray<ReportTemplateDto> templates) {
-    List<ReportTemplateDto> templateList = JsArrays.toList(templates);
-
-    Collections.sort(templateList, new Comparator<ReportTemplateDto>() {
-
-      @Override
-      public int compare(ReportTemplateDto first, ReportTemplateDto second) {
-        return first.getName().compareTo(second.getName());
-      }
-    });
-
-    @SuppressWarnings("unchecked")
-    JsArray<ReportTemplateDto> sortedTemplates = (JsArray<ReportTemplateDto>) JsArray.createArray();
-    for(ReportTemplateDto template : templateList) {
-      if(project == null || project.equals(template.getProject())) sortedTemplates.push(template);
-    }
-
-    return sortedTemplates;
-  }
-
 
   private class ReportTemplateCreatedHandler implements ReportTemplateCreatedEvent.Handler {
 
@@ -186,6 +165,26 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
         onSelection(sortedTemplates.get(0));
       }
     }
+
+    private JsArray<ReportTemplateDto> sortReportTemplates(JsArray<ReportTemplateDto> templates) {
+      List<ReportTemplateDto> templateList = JsArrays.toList(templates);
+
+      Collections.sort(templateList, new Comparator<ReportTemplateDto>() {
+
+        @Override
+        public int compare(ReportTemplateDto first, ReportTemplateDto second) {
+          return first.getName().compareTo(second.getName());
+        }
+      });
+
+      @SuppressWarnings("unchecked")
+      JsArray<ReportTemplateDto> sortedTemplates = (JsArray<ReportTemplateDto>) JsArray.createArray();
+      for(ReportTemplateDto template : templateList) {
+        if(project == null || project.equals(template.getProject())) sortedTemplates.push(template);
+      }
+
+      return sortedTemplates;
+    }
   }
 
 
@@ -200,7 +199,7 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
     HasAuthorization getAddReportTemplateAuthorizer();
 
 
-    void setCurrentReportTemplateVisible(boolean visible);
+    void setCurrentReportTemplate(ReportTemplateDto reportTemplateDto);
 
     void setReportTemplates(JsArray<ReportTemplateDto> templates);
   }

@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissio
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateUpdatedEvent;
@@ -181,18 +182,17 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
     registerHandler(getView().addReportDesignClickHandler(new ReportDesignClickHandler()));
     addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler());
-    addRegisteredHandler(ReportTemplateUpdatedEvent.getType(), new ReportTemplateUpdatedHandler());
+    addRegisteredHandler(ReportTemplateCreatedEvent.getType(), new ReportTemplateCreatedUpdatedHandler());
+    addRegisteredHandler(ReportTemplateUpdatedEvent.getType(), new ReportTemplateCreatedUpdatedHandler());
   }
 
   private void authorize() {
     // display reports
     String uri;
-    if(reportTemplate.hasProject()) {
-      uri = UriBuilder.create()
-          .segment("files", "meta", "reports", reportTemplate.getProject(), reportTemplate.getName()).build();
-    } else {
-      uri = UriBuilder.create().segment("files", "meta", "reports", reportTemplate.getName()).build();
-    }
+    uri = reportTemplate.hasProject()
+        ? UriBuilder.create().segment("files", "meta", "reports", reportTemplate.getProject(), reportTemplate.getName())
+        .build()
+        : UriBuilder.create().segment("files", "meta", "reports", reportTemplate.getName()).build();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(uri).get()
         .authorize(getView().getListReportsAuthorizer()).send();
@@ -254,7 +254,22 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
           actionRequiringConfirmation = new Runnable() {
             @Override
             public void run() {
-              deleteReportFile(dto);
+              ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+                @Override
+                public void onResponseCode(Request request, Response response) {
+                  if(response.getStatusCode() == Response.SC_OK) {
+                    refreshProducedReports(reportTemplate);
+                  } else {
+                    getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+                  }
+                }
+              };
+
+              ResourceRequestBuilderFactory.newBuilder().forResource(dto.getLink()).delete()
+                  .withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler)
+                  .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler)
+                  .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
             }
           };
           fireEvent(
@@ -264,41 +279,22 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
     }
   }
 
-  private void deleteReportFile(ReportDto report) {
-    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
-
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() == Response.SC_OK) {
-          refreshProducedReports(reportTemplate);
-        } else {
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-        }
-      }
-    };
-
-    ResourceRequestBuilderFactory.newBuilder().forResource(report.getLink()).delete()
-        .withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler)
-        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler)
-        .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
-  }
-
-  private void refreshProducedReports(ReportTemplateDto reportTemplate) {
-    String uri = UriBuilder.create().segment("report-template", reportTemplate.getName(), "reports").build();
-    if(reportTemplate.hasProject()) {
+  private void refreshProducedReports(ReportTemplateDto reportTemplateDto) {
+    String uri = UriBuilder.create().segment("report-template", reportTemplateDto.getName(), "reports").build();
+    if(reportTemplateDto.hasProject()) {
       uri = UriBuilders.PROJECT_REPORT_TEMPLATE_REPORTS.create()
-          .build(reportTemplate.getProject(), reportTemplate.getName());
+          .build(reportTemplateDto.getProject(), reportTemplateDto.getName());
     }
     ResourceRequestBuilderFactory.<JsArray<ReportDto>>newBuilder().forResource(uri).get()
         .withCallback(new ProducedReportsResourceCallback())
         .withCallback(Response.SC_NOT_FOUND, new NoProducedReportsResourceCallback()).send();
   }
 
-  private void refreshReportTemplateDetails(ReportTemplateDto reportTemplate) {
-    String reportTemplateName = reportTemplate.getName();
+  private void refreshReportTemplateDetails(ReportTemplateDto reportTemplateDto) {
+    String reportTemplateName = reportTemplateDto.getName();
     String uri = UriBuilder.create().segment("report-template", reportTemplateName).build();
-    if(reportTemplate.hasProject()) {
-      uri = UriBuilders.PROJECT_REPORT_TEMPLATE.create().build(reportTemplate.getProject(), reportTemplateName);
+    if(reportTemplateDto.hasProject()) {
+      uri = UriBuilders.PROJECT_REPORT_TEMPLATE.create().build(reportTemplateDto.getProject(), reportTemplateName);
     }
 
     ResourceRequestBuilderFactory.<ReportTemplateDto>newBuilder().forResource(uri).get()
@@ -343,13 +339,18 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
     fireEvent(new FileDownloadRequestEvent("/files" + filePath));
   }
 
-  private class ReportTemplateUpdatedHandler implements ReportTemplateUpdatedEvent.Handler {
+  private class ReportTemplateCreatedUpdatedHandler
+      implements ReportTemplateUpdatedEvent.Handler, ReportTemplateCreatedEvent.Handler {
 
     @Override
     public void onReportTemplateUpdated(ReportTemplateUpdatedEvent event) {
       refreshReportTemplateDetails(event.getReportTemplate());
     }
 
+    @Override
+    public void onReportTemplateCreated(ReportTemplateCreatedEvent event) {
+      refreshReportTemplateDetails(event.getReportTemplate());
+    }
   }
 
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {

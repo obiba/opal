@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.report.view;
 
-import java.util.Collection;
-
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -24,6 +22,7 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.NavHeader;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.NavList;
+import com.github.gwtbootstrap.client.ui.NavWidget;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.gwt.core.client.JsArray;
@@ -51,6 +50,8 @@ public class ReportsView extends ViewWithUiHandlers<ReportsUiHandlers> implement
   @UiField
   NavList reportList;
 
+  private NavLink currentLink;
+
   interface Binder extends UiBinder<Widget, ReportsView> {}
 
   @Inject
@@ -71,7 +72,7 @@ public class ReportsView extends ViewWithUiHandlers<ReportsUiHandlers> implement
 
     // group templates by project
     Multimap<String, ReportTemplateDto> templateMap = ArrayListMultimap.create();
-    for(final ReportTemplateDto template : JsArrays.toIterable(JsArrays.toSafeArray(templates))) {
+    for(ReportTemplateDto template : JsArrays.toIterable(JsArrays.toSafeArray(templates))) {
       templateMap.get(template.getProject()).add(template);
     }
 
@@ -81,6 +82,7 @@ public class ReportsView extends ViewWithUiHandlers<ReportsUiHandlers> implement
     }
   }
 
+  @SuppressWarnings("UnusedParameters")
   @UiHandler("add")
   public void onAdd(ClickEvent event) {
     getUiHandlers().onAdd();
@@ -92,22 +94,28 @@ public class ReportsView extends ViewWithUiHandlers<ReportsUiHandlers> implement
   }
 
   @Override
-  public void setCurrentReportTemplateVisible(boolean visible) {
+  public void setCurrentReportTemplate(ReportTemplateDto reportTemplateDto) {
+    String reportName = reportTemplateDto.getName();
+    for(Widget w : reportList) {
+      if(w instanceof NavLink) {
+        NavLink link = (NavLink) w;
+        if(link.getText().trim().equals(reportName)) {
+          if(currentLink != null) currentLink.setActive(false);
+          link.setActive(true);
+          currentLink = link;
+          break;
+        }
+      }
+    }
   }
 
   //
   // Private methods
   //
 
-  private void addReportTemplateLinks(Collection<ReportTemplateDto> templates) {
-    boolean activated = false;
+  private void addReportTemplateLinks(Iterable<ReportTemplateDto> templates) {
     for(ReportTemplateDto template : templates) {
       NavLink link = new NavLink(template.getName());
-      // first one is selected
-      if(!activated) {
-        link.setActive(true);
-        activated = true;
-      }
       link.addClickHandler(new ReportTemplateClickHandler(template, link));
       reportList.add(link);
     }
@@ -134,7 +142,7 @@ public class ReportsView extends ViewWithUiHandlers<ReportsUiHandlers> implement
     private void unActivateLinks() {
       for(int i = 0; i < reportList.getWidgetCount(); i++) {
         if(reportList.getWidget(i) instanceof NavLink) {
-          ((NavLink) reportList.getWidget(i)).setActive(false);
+          ((NavWidget) reportList.getWidget(i)).setActive(false);
         }
       }
     }
