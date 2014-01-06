@@ -11,6 +11,14 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class DiffTable extends DefaultFlexTable {
 
+  private int row = 0;
+
+  private int aLineNumber = -1;
+
+  private int bLineNumber = -1;
+
+  private String style = "";
+
   public DiffTable() {
     setZebra(false);
   }
@@ -18,6 +26,10 @@ public class DiffTable extends DefaultFlexTable {
   @Override
   public void clear() {
     removeAllRows();
+    row = 0;
+    aLineNumber = -1;
+    bLineNumber = -1;
+    style = "";
   }
 
   public void setDiff(String diffEntries) {
@@ -25,64 +37,69 @@ public class DiffTable extends DefaultFlexTable {
     fillDiffTable(diffEntries.split("\\n"));
   }
 
-
-  private void fillDiffTable(String[] diffEntries) {
-    int row = 0;
-    int aLineNumber = -1;
-    int bLineNumber = -1;
-    String style = "";
+  private void fillDiffTable(String... diffEntries) {
     for(String line : diffEntries) {
       if(line.startsWith("@@")) {
-        fillHunkRow(row, line);
-
-        RegExp regExp = RegExp.compile("@@ -(\\d+)(,\\d+)? \\+(\\d+)(,\\d+)? @@");
-        MatchResult matcher = regExp.exec(line);
-        aLineNumber = Integer.parseInt(matcher.getGroup(1));
-        bLineNumber = Integer.parseInt(matcher.getGroup(3));
-
-        style = "diff-hunk";
-
-        row++;
+        parseHunkRow(line);
       } else if(!Strings.isNullOrEmpty(line) && !line.startsWith("\\ No newline") && (aLineNumber > 0 || bLineNumber > 0)) {
-        Label lineWidget = new Label(line.substring(1));
-        Widget lineStartWidget;
-        if(line.charAt(0) == '+') {
-          setWidget(row, 1, new Label(bLineNumber++ + ""));
-          lineStartWidget = new Label("+");
-          style = "diff-add";
-        } else if(line.charAt(0) == '-') {
-          setWidget(row, 0, new Label(aLineNumber++ + ""));
-          lineStartWidget = new Label("-");
-          style = "diff-rm";
-        } else {
-          setWidget(row, 0, new Label(aLineNumber++ + ""));
-          setWidget(row, 1, new Label(bLineNumber++ + ""));
-          lineStartWidget = new HTMLPanel(new SafeHtmlBuilder().appendHtmlConstant("&nbsp;").toSafeHtml());
-        }
-        for (int i=0; i<2; i++) {
-          getFlexCellFormatter().addStyleName(row, i, "diff-line-num");
-        }
-        getFlexCellFormatter().addStyleName(row, 2, "diff-line-code");
-
-        FlowPanel panel = new FlowPanel();
-        panel.add(lineStartWidget);
-        panel.add(lineWidget);
-        lineStartWidget.addStyleName("right-indent inline-block");
-        lineWidget.addStyleName("inline");
-        setWidget(row, 2, panel);
-
-        row++;
+        parseDiffRows(line);
       }
+
       if (!Strings.isNullOrEmpty(style)) {
         for (int i=0; i<3; i++) {
           getFlexCellFormatter().addStyleName(row - 1, i, style);
         }
         style = "";
       }
+
+      row++;
     }
   }
 
-  private void fillHunkRow(int row, String line) {
+  private void parseDiffRows(String line) {Label lineWidget = new Label(line.substring(1));
+    Widget lineStartWidget;
+
+    if(line.charAt(0) == '+') {
+      setWidget(row, 1, new Label(bLineNumber++ + ""));
+      lineStartWidget = new Label("+");
+      style = "diff-add";
+    } else if(line.charAt(0) == '-') {
+      setWidget(row, 0, new Label(aLineNumber++ + ""));
+      lineStartWidget = new Label("-");
+      style = "diff-rm";
+    } else {
+      setWidget(row, 0, new Label(aLineNumber++ + ""));
+      setWidget(row, 1, new Label(bLineNumber++ + ""));
+      lineStartWidget = new HTMLPanel(new SafeHtmlBuilder().appendHtmlConstant("&nbsp;").toSafeHtml());
+    }
+
+    for (int i=0; i<2; i++) {
+      getFlexCellFormatter().addStyleName(row, i, "diff-line-num");
+    }
+
+    getFlexCellFormatter().addStyleName(row, 2, "diff-line-code");
+    createDiffRowPanel(lineWidget, lineStartWidget);
+  }
+
+  private void createDiffRowPanel(Label lineWidget, Widget lineStartWidget) {FlowPanel panel = new FlowPanel();
+    panel.add(lineStartWidget);
+    panel.add(lineWidget);
+    lineStartWidget.addStyleName("right-indent inline-block");
+    lineWidget.addStyleName("inline");
+    setWidget(row, 2, panel);
+  }
+
+  private void parseHunkRow(String line) {
+    fillHunkRow(line);
+
+    RegExp regExp = RegExp.compile("@@ -(\\d+)(,\\d+)? \\+(\\d+)(,\\d+)? @@");
+    MatchResult matcher = regExp.exec(line);
+    aLineNumber = Integer.parseInt(matcher.getGroup(1));
+    bLineNumber = Integer.parseInt(matcher.getGroup(3));
+    style = "diff-hunk";
+  }
+
+  private void fillHunkRow(String line) {
     for (int i=0; i<2; i++) {
       setWidget(row, i, new Label("..."));
       getFlexCellFormatter().addStyleName(row, i, "diff-line-num");

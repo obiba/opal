@@ -15,7 +15,6 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableVcsCommitHistoryPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableVcsCommitHistoryUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
@@ -34,9 +33,10 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
+import com.gwtplatform.mvp.client.UiHandlers;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
-public class VariableVcsCommitHistoryView extends ViewWithUiHandlers<VariableVcsCommitHistoryUiHandlers>
+public class VariableVcsCommitHistoryView extends ViewWithUiHandlers<UiHandlers>
     implements VariableVcsCommitHistoryPresenter.Display {
 
   interface Binder extends UiBinder<Widget, VariableVcsCommitHistoryView> {}

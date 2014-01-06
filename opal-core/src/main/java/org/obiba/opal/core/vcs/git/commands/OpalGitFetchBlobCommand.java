@@ -64,6 +64,11 @@ public class OpalGitFetchBlobCommand extends OpalGitCommand<String> {
 
   private TreeWalk getPathTreeWalk(ObjectReader reader) throws IOException {
     ObjectId id = repository.resolve(commitId);
+
+    if (id == null) {
+      throw new OpalGitException(String.format("There are no commit for commit id '%s'", commitId));
+    }
+
     RevWalk walk = new RevWalk(reader);
     RevCommit commit = walk.parseCommit(id);
     RevTree tree = commit.getTree();
