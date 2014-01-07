@@ -329,16 +329,7 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
         return;
       }
 
-      if(event.isSortAscending()) {
-        Collections.sort(getList(), ASCENDING_COMPARATOR);
-      } else {
-        Collections.sort(getList(), new Comparator<FileDto>() {
-          @Override
-          public int compare(FileDto o1, FileDto o2) {
-            return DESCENDING_COMPARATOR.compare(o1, o2);
-          }
-        });
-      }
+      Collections.sort(getList(), event.isSortAscending() ? ASCENDING_COMPARATOR : DESCENDING_COMPARATOR);
     }
   }
 
