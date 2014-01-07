@@ -132,8 +132,8 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
   private void initTable() {
     addCheckColumn();
 
-    FileNameColumn fileNameColumn;
-    table.addColumn(fileNameColumn = new FileNameColumn(), translations.nameLabel());
+    FileNameColumn fileNameColumn = new FileNameColumn();
+    table.addColumn(fileNameColumn, translations.nameLabel());
 
     fileNameColumn.addFileSelectionHandler(new FileSelectionHandler() {
       @Override
