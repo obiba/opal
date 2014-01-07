@@ -11,6 +11,8 @@
 package org.obiba.opal.web.gwt.app.client.fs.view;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -41,6 +43,7 @@ import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -57,8 +60,6 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
   Table<FileDto> table;
 
   private CheckboxColumn<FileDto> checkColumn;
-
-  private FileNameColumn fileNameColumn;
 
   private final Translations translations = GWT.create(Translations.class);
 
@@ -98,6 +99,11 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
     int fileCount = children.length();
     table.setPageSize(fileCount);
     table.setRowCount(fileCount, true);
+
+    ColumnSortEvent.Handler columnSortHandler = new FolderColumnSortHandler(dataProvider.getList());
+    table.addColumnSortHandler(columnSortHandler);
+
+    Collections.sort(dataProvider.getList(), FolderColumnSortHandler.comparator);
   }
 
   @Override
@@ -126,7 +132,8 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
   private void initTable() {
     addCheckColumn();
 
-    table.addColumn(fileNameColumn = new FileNameColumn(), translations.nameLabel());
+    FileNameColumn fileNameColumn = new FileNameColumn();
+    table.addColumn(fileNameColumn, translations.nameLabel());
 
     fileNameColumn.addFileSelectionHandler(new FileSelectionHandler() {
       @Override
@@ -211,6 +218,8 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
           }
         }
       });
+      setDefaultSortAscending(false);
+      setSortable(true);
     }
 
     public HandlerRegistration addFileSelectionHandler(final FileSelectionHandler handler) {
@@ -284,6 +293,60 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
   public interface FileSelectionHandler {
 
     void onFileSelection(FileDto fileDto);
+  }
+
+  private static class FolderColumnSortHandler extends ColumnSortEvent.ListHandler<FileDto> {
+
+    final static Comparator<FileDto> comparator = new Comparator<FileDto>() {
+      @Override
+      public int compare(FileDto o1, FileDto o2) {
+        if(o1 == o2) {
+          return 0;
+        }
+
+        if(o1 != null) {
+          if(o2 != null) {
+            if(o1.getType().isFileType(o2.getType())) {
+              return o1.getName().compareTo(o2.getName());
+            } else {
+              // Always show folder first
+              return o1.getType().isFileType(FileType.FOLDER) ? -1 : 1;
+            }
+          } else {
+            return 1;
+          }
+        }
+        return -1;
+      }
+    };
+
+    private FolderColumnSortHandler(List<FileDto> list) {
+      super(list);
+    }
+
+    @Override
+    public void onColumnSort(ColumnSortEvent event) {
+      // Get the sorted column.
+      Column<?, ?> column = event.getColumn();
+      if(column == null) {
+        return;
+      }
+
+      if(event.isSortAscending()) {
+        Collections.sort(getList(), comparator);
+      } else {
+        Collections.sort(getList(), new Comparator<FileDto>() {
+          @Override
+          public int compare(FileDto o1, FileDto o2) {
+            // Always show folder first
+            if(o1.getType().isFileType(FileType.FOLDER)) return -1;
+            if(o2.getType().isFileType(FileType.FOLDER)) return 1;
+
+            return -comparator.compare(o1, o2);
+          }
+        });
+      }
+    }
   }
 
 }
