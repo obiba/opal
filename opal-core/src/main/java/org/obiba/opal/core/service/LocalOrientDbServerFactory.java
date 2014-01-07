@@ -1,5 +1,7 @@
 package org.obiba.opal.core.service;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
@@ -7,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.orientechnologies.orient.core.db.ODatabase;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.server.OServer;
@@ -25,7 +26,7 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
 
   private String url;
 
-  private static OServer server;
+  private OServer server;
 
   // TODO: wait for these issues to be fixed to start OrientDB with @PostConstruct and change admin password
   // https://github.com/orientechnologies/orientdb/issues/1876
@@ -44,48 +45,23 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
     this.url = url;
   }
 
-  public static void start(String url) {
+  @PostConstruct
+  public void start() throws Exception {
     log.info("Start OrientDB server ({})", url);
     System.setProperty("ORIENTDB_HOME", ORIENTDB_HOME);
-    try {
-      server = new OServer() //
-          .startup(LocalOrientDbServerFactory.class.getResourceAsStream("/orientdb-server-config.xml")) //
-          .activate();
-
-      // create database if does not exist
-      ODatabase database = new ODatabaseDocumentTx(url);
-      if(!database.exists()) {
-        database.create();
-      }
-      database.close();
-
-    } catch(Exception e) {
-      log.error("Cannot start OrientDB server", e);
-      throw new RuntimeException("Cannot start OrientDB server", e);
-    }
+    server = new OServer() //
+        .startup(LocalOrientDbServerFactory.class.getResourceAsStream("/orientdb-server-config.xml")) //
+        .activate();
+    ODatabaseDocumentTx database = new ODatabaseDocumentTx(url);
+    if(!database.exists()) database.create();
+    database.close();
   }
 
-//  @PostConstruct
-//  public void start() throws Exception {
-//    log.info("Start OrientDB server ({})", url);
-//    System.setProperty("ORIENTDB_HOME", ORIENTDB_HOME);
-//    server = new OServer() //
-//        .startup(LocalOrientDbServerFactory.class.getResourceAsStream("/orientdb-server-config.xml")) //
-//        .activate();
-//    ODatabaseDocumentTx database = new ODatabaseDocumentTx(url);
-//    if(!database.exists()) database.create();
-//    database.close();
-//  }
-
-  public static void stop() {
+  @PreDestroy
+  public void stop() {
+    log.info("Stop OrientDB server ({})", url);
     if(server != null) server.shutdown();
   }
-
-//  @PreDestroy
-//  public void stop() {
-//    log.info("Stop OrientDB server ({})", url);
-//    if(server != null) server.shutdown();
-//  }
 
   @NotNull
   @Override
