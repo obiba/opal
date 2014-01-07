@@ -113,6 +113,11 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   }
 
   @Override
+  public void clearTabsData() {
+    tabPanel.clearData();
+  }
+
+  @Override
   public void setProject(ProjectDto project) {
     this.project = project;
     if(titlecrumbs.getWidgetCount() > 1) {

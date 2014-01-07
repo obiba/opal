@@ -6,4 +6,6 @@ public interface HasTabPanel {
   void setTabData(int index, Object data);
 
   Object getTabData(int index);
+
+  void clearTabsData();
 }

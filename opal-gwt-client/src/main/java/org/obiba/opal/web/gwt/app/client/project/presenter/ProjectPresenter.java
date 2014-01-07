@@ -158,12 +158,15 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   @Override
   public void prepareFromRequest(PlaceRequest request) {
     super.prepareFromRequest(request);
+    String oldProject = projectName;
     projectName = request.getParameter(ParameterTokens.TOKEN_NAME, null);
     tab = validateTab(request.getParameter(ParameterTokens.TOKEN_TAB, null));
-
-    // TODO check that datasource name is the one of project
-    String path = validatePath(projectName, request.getParameter(ParameterTokens.TOKEN_PATH, null));
-    getView().setTabData(tab.ordinal(), tab == Display.ProjectTab.TABLES ? path : null);
+    if (oldProject == null || projectName.equals(oldProject)) {
+      getView().setTabData(tab.ordinal(), tab == Display.ProjectTab.TABLES ? validatePath(projectName,
+          request.getParameter(ParameterTokens.TOKEN_PATH, null)) : null);
+    } else {
+      getView().clearTabsData();
+    }
 
     refresh();
   }
