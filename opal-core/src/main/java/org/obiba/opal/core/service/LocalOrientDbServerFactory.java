@@ -28,8 +28,7 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
 
   private OServer server;
 
-  // TODO: wait for these issues to be fixed to start OrientDB with @PostConstruct and change admin password
-  // https://github.com/orientechnologies/orientdb/issues/1876
+  // TODO: wait for this issue to be fixed to change admin password
   // https://github.com/orientechnologies/orientdb/pull/1870
 
 //  private OpalConfigurationService opalConfigurationService;
