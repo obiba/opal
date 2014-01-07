@@ -32,6 +32,8 @@ import org.obiba.opal.web.model.client.opal.FileDto.FileType;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Ordering;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
@@ -103,7 +105,7 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
     ColumnSortEvent.Handler columnSortHandler = new FolderColumnSortHandler(dataProvider.getList());
     table.addColumnSortHandler(columnSortHandler);
 
-    Collections.sort(dataProvider.getList(), FolderColumnSortHandler.comparator);
+    Collections.sort(dataProvider.getList(), FolderColumnSortHandler.ASCENDING_COMPARATOR);
   }
 
   @Override
@@ -297,26 +299,21 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
 
   private static class FolderColumnSortHandler extends ColumnSortEvent.ListHandler<FileDto> {
 
-    final static Comparator<FileDto> comparator = new Comparator<FileDto>() {
+    final static Comparator<FileDto> ASCENDING_COMPARATOR = new Comparator<FileDto>() {
       @Override
       public int compare(FileDto o1, FileDto o2) {
-        if(o1 == o2) {
-          return 0;
-        }
+        return ComparisonChain.start()
+            .compare(o1.getType().getName(), o2.getType().getName(), Ordering.natural().reverse())
+            .compare(o1.getName(), o2.getName()).result();
+      }
+    };
 
-        if(o1 != null) {
-          if(o2 != null) {
-            if(o1.getType().isFileType(o2.getType())) {
-              return o1.getName().compareTo(o2.getName());
-            } else {
-              // Always show folder first
-              return o1.getType().isFileType(FileType.FOLDER) ? -1 : 1;
-            }
-          } else {
-            return 1;
-          }
-        }
-        return -1;
+    final static Comparator<FileDto> DESCENDING_COMPARATOR = new Comparator<FileDto>() {
+      @Override
+      public int compare(FileDto o1, FileDto o2) {
+        return ComparisonChain.start()
+            .compare(o1.getType().getName(), o2.getType().getName(), Ordering.natural().reverse())
+            .compare(o1.getName(), o2.getName(), Ordering.natural().reverse()).result();
       }
     };
 
@@ -333,16 +330,12 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
       }
 
       if(event.isSortAscending()) {
-        Collections.sort(getList(), comparator);
+        Collections.sort(getList(), ASCENDING_COMPARATOR);
       } else {
         Collections.sort(getList(), new Comparator<FileDto>() {
           @Override
           public int compare(FileDto o1, FileDto o2) {
-            // Always show folder first
-            if(o1.getType().isFileType(FileType.FOLDER)) return -1;
-            if(o2.getType().isFileType(FileType.FOLDER)) return 1;
-
-            return -comparator.compare(o1, o2);
+            return DESCENDING_COMPARATOR.compare(o1, o2);
           }
         });
       }
