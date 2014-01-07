@@ -1699,7 +1699,7 @@
     <httpclient.version>4.3.1</httpclient.version>
     <javassist.version>3.18.1-GA</javassist.version>
     <javax-el.version>2.2.4</javax-el.version>
-    <jetty.version>7.6.8.v20121106</jetty.version>
+    <jetty.version>8.1.14.v20131031</jetty.version>
     <jetty-util.version>6.1.22</jetty-util.version>
     <jewelcli.version>0.6</jewelcli.version>
     <jgit.version>3.0.0.201306101825-r</jgit.version>

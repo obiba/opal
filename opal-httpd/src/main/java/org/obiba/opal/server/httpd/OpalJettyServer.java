@@ -28,9 +28,7 @@ import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
 import org.eclipse.jetty.servlet.FilterHolder;
-import org.eclipse.jetty.servlet.FilterMapping;
 import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.resource.FileResource;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
@@ -46,10 +44,10 @@ import org.springframework.web.filter.DelegatingFilterProxy;
 
 import com.google.common.collect.ImmutableMap;
 
-import static org.eclipse.jetty.server.DispatcherType.ERROR;
-import static org.eclipse.jetty.server.DispatcherType.FORWARD;
-import static org.eclipse.jetty.server.DispatcherType.INCLUDE;
-import static org.eclipse.jetty.server.DispatcherType.REQUEST;
+import static javax.servlet.DispatcherType.ERROR;
+import static javax.servlet.DispatcherType.FORWARD;
+import static javax.servlet.DispatcherType.INCLUDE;
+import static javax.servlet.DispatcherType.REQUEST;
 import static org.springframework.web.context.ContextLoader.CONFIG_LOCATION_PARAM;
 
 /**
@@ -173,7 +171,7 @@ public class OpalJettyServer {
     servletContextHandler.addEventListener(new SpringContextLoaderListener());
     servletContextHandler.addEventListener(new RequestContextListener());
 
-    servletContextHandler.addFilter(OpalVersionFilter.class, "/*", FilterMapping.DEFAULT);
+    servletContextHandler.addFilter(OpalVersionFilter.class, "/*", EnumSet.of(REQUEST));
     FilterHolder authenticationFilterHolder = new FilterHolder(DelegatingFilterProxy.class);
     authenticationFilterHolder.setName("authenticationFilter");
     authenticationFilterHolder.setInitParameters(ImmutableMap.of("targetFilterLifecycle", "true"));
