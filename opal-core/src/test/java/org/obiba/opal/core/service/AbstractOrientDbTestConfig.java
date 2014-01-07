@@ -54,12 +54,9 @@ public abstract class AbstractOrientDbTestConfig {
 
   @Bean
   public OrientDbServerFactory orientDbServerFactory() {
-//    OrientDbServerFactory factory = new LocalOrientDbServerFactory();
-//    factory.setUrl(LocalOrientDbServerFactory.URL.replace("${OPAL_HOME}", TEMP_FILE.getAbsolutePath()));
-//    return factory;
-    String url = LocalOrientDbServerFactory.URL.replace("${OPAL_HOME}", TEMP_FILE.getAbsolutePath());
-    LocalOrientDbServerFactory.start(url);
-    return new LocalOrientDbServerFactory();
+    OrientDbServerFactory factory = new LocalOrientDbServerFactory();
+    factory.setUrl(LocalOrientDbServerFactory.URL.replace("${OPAL_HOME}", TEMP_FILE.getAbsolutePath()));
+    return factory;
   }
 
   @Bean
