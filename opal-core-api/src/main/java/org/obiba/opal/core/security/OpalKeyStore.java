@@ -152,8 +152,7 @@ public class OpalKeyStore implements KeyProvider {
       throws NoSuchKeyException, org.obiba.magma.crypt.KeyProviderSecurityException {
     KeyPair keyPair = null;
     try {
-      CacheablePasswordCallback passwordCallback = createPasswordCallback("Password for '" + alias + "':  ");
-      keyPair = findKeyPairForPrivateKey(alias, store, passwordCallback);
+      keyPair = findKeyPairForPrivateKey(alias);
     } catch(KeyPairNotFoundException ex) {
       throw ex;
     } catch(UnrecoverableKeyException ex) {
@@ -241,17 +240,17 @@ public class OpalKeyStore implements KeyProvider {
     return passwordCallback.getPassword();
   }
 
-  private KeyPair findKeyPairForPrivateKey(String alias, KeyStore ks, CacheablePasswordCallback passwordCallback)
-      throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedCallbackException,
+  private KeyPair findKeyPairForPrivateKey(String alias) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedCallbackException,
       IOException {
-    Key key = ks.getKey(alias, getKeyPassword(passwordCallback));
+
+    Key key = store.getKey(alias, getKeyPassword(createPasswordCallback("Password for '" + alias + "':  ")));
     if(key == null) {
       throw new KeyPairNotFoundException("KeyPair not found for specified alias (" + alias + ")");
     }
 
     if(key instanceof PrivateKey) {
       // Get certificate of public key
-      Certificate cert = ks.getCertificate(alias);
+      Certificate cert = store.getCertificate(alias);
 
       // Get public key
       PublicKey publicKey = cert.getPublicKey();
@@ -299,7 +298,6 @@ public class OpalKeyStore implements KeyProvider {
     certificateGenerator.setNotBefore(new Date());
     certificateGenerator.setNotAfter(expiry.getTime());
     certificateGenerator.setSignatureAlgorithm(signatureAlgorithm);
-
     return certificateGenerator.generate(issuerPrivateKey);
   }
 
@@ -562,6 +560,7 @@ public class OpalKeyStore implements KeyProvider {
 
   @SuppressWarnings({ "StaticMethodOnlyUsedInOneClass", "ParameterHidesMemberVariable" })
   public static class Builder {
+
     private String name;
 
     private CallbackHandler callbackHandler;

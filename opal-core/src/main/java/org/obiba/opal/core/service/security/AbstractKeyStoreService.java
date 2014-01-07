@@ -19,6 +19,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.UnrecoverableKeyException;
 
+import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -189,6 +190,7 @@ public abstract class AbstractKeyStoreService {
     saveKeyStore(opalKeyStore);
   }
 
+  @Nullable
   private OpalKeyStore getKeyStore(@NotNull String name) {
     KeyStoreState state = findByName(name);
     return state == null ? null : loadKeyStore(name, state);

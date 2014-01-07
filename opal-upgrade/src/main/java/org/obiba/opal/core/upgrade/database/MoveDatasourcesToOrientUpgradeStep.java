@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
+import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
@@ -254,6 +255,7 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
     }
   }
 
+  @Nullable
   private String getChildTextContent(Element element, String child) {
     NodeList children = element.getElementsByTagName(child);
     return children.getLength() == 1 ? children.item(0).getTextContent() : null;

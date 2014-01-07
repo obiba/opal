@@ -69,13 +69,8 @@ public class ProjectsServiceImpl implements ProjectService {
     orientDbService.createUniqueIndex(Project.class);
 
     // In the @PostConstruct there is no way to ensure that all the post processing is already done,
-    // so (indeed) there can be no Transactions.
-    // The only way to ensure that that is working is by using a TransactionTemplate.
-    registerAllProjects(); // add all project datasources to MagmaEngine
-  }
-
-  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
-  private void registerAllProjects() {
+    // so (indeed) there can be no Transactions. The only way to ensure that that is working is by using a TransactionTemplate.
+    // Add all project datasources to MagmaEngine
     for(Project project : getProjects()) {
       registerDatasource(project);
     }
@@ -83,9 +78,7 @@ public class ProjectsServiceImpl implements ProjectService {
 
   @Override
   @PreDestroy
-  public void stop() {
-
-  }
+  public void stop() {}
 
   @Override
   public Iterable<Project> getProjects() {

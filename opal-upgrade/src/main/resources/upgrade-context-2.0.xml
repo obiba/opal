@@ -34,6 +34,14 @@
 
   <bean id="generalConfigService" class="org.obiba.opal.core.service.OpalGeneralConfigServiceImpl"/>
 
+  <bean id="passwordCallbackHandler" class="org.obiba.opal.core.crypt.OpalSecretKeyPasswordCallbackHandler"/>
+
+  <bean id="subjectCredentialsService" class="org.obiba.opal.core.service.security.CredentialsKeyStoreServiceImpl"/>
+
+  <bean id="projectsKeyStoreService" class="org.obiba.opal.core.service.security.ProjectsKeyStoreServiceImpl"/>
+
+  <bean id="subjectProfileService" class="org.obiba.opal.core.service.DefaultSubjectProfileServiceImpl"/>
+
   <bean id="versionProvider" class="org.obiba.runtime.upgrade.support.JdbcVersionModifier">
     <property name="datasource" ref="dataSource"/>
   </bean>

@@ -32,12 +32,6 @@ public class OpalSecretKeyPasswordCallbackHandler implements CallbackHandler {
   @Value("${org.obiba.opal.keystore.password}")
   private String customPassword;
 
-  private char[] getPassword() {
-    return Strings.isNullOrEmpty(customPassword) || "KEYSTORE_PASSWORD_NOT_SPECIFIED".equals(customPassword)
-        ? configService.getOpalConfiguration().getSecretKey().toCharArray()
-        : customPassword.toCharArray();
-  }
-
   @Override
   public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
     if(callbacks == null || callbacks.length < 1) return;
@@ -47,6 +41,12 @@ public class OpalSecretKeyPasswordCallbackHandler implements CallbackHandler {
       return;
     }
     throw new UnsupportedCallbackException(callback);
+  }
+
+  private char[] getPassword() {
+    return Strings.isNullOrEmpty(customPassword) || "KEYSTORE_PASSWORD_NOT_SPECIFIED".equals(customPassword)
+        ? configService.getOpalConfiguration().getSecretKey().toCharArray()
+        : customPassword.toCharArray();
   }
 
 }
