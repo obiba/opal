@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import javax.annotation.Nullable;
 import javax.ws.rs.DELETE;
@@ -34,11 +35,13 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
+import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableUpdateListener;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
+import org.obiba.magma.security.MagmaSecurityExtension;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.views.ViewManager;
@@ -149,8 +152,21 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
 
   @Override
   @POST
-  public Response createTable(TableDto table) {
+  public Response createTable(final TableDto table) {
+    if(MagmaEngine.get().hasExtension(MagmaSecurityExtension.class)) {
+      return MagmaEngine.get().getExtension(MagmaSecurityExtension.class).getAuthorizer()
+          .silentSudo(new Callable<Response>() {
+            @Override
+            public Response call() throws Exception {
+              return createTableInternal(table);
+            }
+          });
+    }
 
+    return createTableInternal(table);
+  }
+
+  private Response createTableInternal(TableDto table) {
     try {
       if(datasource.hasValueTable(table.getName())) {
         return Response.status(Status.BAD_REQUEST)
