@@ -25,18 +25,6 @@ import com.google.gwt.i18n.client.LocalizableResource.GenerateKeys;
 @Generate(format = "com.google.gwt.i18n.rebind.format.PropertiesFormat", locales = { "default" })
 public interface Translations extends Constants {
 
-  @Description("Error dialog title")
-  @DefaultStringValue("Errors")
-  String errorDialogTitle();
-
-  @Description("Error dialog title when used to display warnings")
-  @DefaultStringValue("Warnings")
-  String warningDialogTitle();
-
-  @Description("Error dialog title when used to display information")
-  @DefaultStringValue("Information")
-  String infoDialogTitle();
-
   @Description("Report template create dialog title")
   @DefaultStringValue("Add Report Template")
   String addReportTemplateDialogTitle();
@@ -48,10 +36,6 @@ public interface Translations extends Constants {
   @Description("Name label")
   @DefaultStringValue("Name")
   String nameLabel();
-
-  @Description("Tags label")
-  @DefaultStringValue("Tags")
-  String tagsLabel();
 
   @Description("Namespace label")
   @DefaultStringValue("Namespace")
@@ -184,10 +168,6 @@ public interface Translations extends Constants {
   })
   Map<String, String> permissionResourceNodeTypeMap();
 
-  @Description("resource Node Datasource Name")
-  @DefaultStringValue("All")
-  String resourceNodeDatasourceName();
-
   @Description("Update Resource Permission User label")
   @DefaultStringValue("Permission of user: ")
   String userResourcePermissionLabel();
@@ -218,21 +198,6 @@ public interface Translations extends Constants {
       "REPORT_TEMPLATE_READ.help", "View reports only." })
   Map<String, String> permissionExplanationMap();
 
-  @Description("Authorization explanation map")
-  @DefaultStringMapValue({ //
-      "datasource", "Specify the access rights to the datasource and its content.", //
-      "table",
-      "Specify the access rights to the table and its content. Induces the visibility of the parent datasource.", //
-      "view", "Specify the access rights to the view and its content. Induces the visibility of the parent datasource.",
-      //
-      "variable",
-      "Specify the access rights to the variable. Induces the visibility of the parent table and datasource.", //
-      "databases", "Specify the access rights to the databases configuration.",//
-      "datashield", "Specify the access rights to the DataShield services.",//
-      "r", "Specify the access rights to the R services."//
-  })
-  Map<String, String> authorizationExplanationMap();
-
   @Description("Table Comparison Result map")
   @DefaultStringMapValue({ "CREATION", "Table to be created", //
       "MODIFICATION", "Table to be modified", //
@@ -261,14 +226,6 @@ public interface Translations extends Constants {
   @Description("Job label")
   @DefaultStringValue("Job")
   String jobLabel();
-
-  @Description("Jobs menu item")
-  @DefaultStringValue("Jobs")
-  String jobsLabel();
-
-  @Description("File system label")
-  @DefaultStringValue("File System")
-  String fileSystemLabel();
 
   @Description("Entity type label")
   @DefaultStringValue("Entity Type")
@@ -306,10 +263,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Unit")
   String unitLabel();
 
-  @Description("Attribute name required label")
-  @DefaultStringValue("An attribute name is required.")
-  String attributeNameRequired();
-
   @Description("Table name already exists label")
   @DefaultStringValue("A table already exists with this name.")
   String tableNameAlreadyExists();
@@ -322,15 +275,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("An identifiers mapping already exists with this name.")
   String identifiersMappingNameAlreadyExists();
 
-  @Description("Attribute name already exists label")
-  @DefaultStringValue("The specified attribute name already exists.")
-  String attributeNameAlreadyExists();
-
-  @Description("Attribute value required label")
-  @DefaultStringValue(
-      "Provide a value for the attribute (either localised, or not localised).")
-  String attributeValueRequired();
-
   @Description("Category name already exists label")
   @DefaultStringValue("The specified category name already exists.")
   String categoryNameAlreadyExists();
@@ -338,14 +282,6 @@ public interface Translations extends Constants {
   @Description("Provide a name for this category label")
   @DefaultStringValue("Provide a name for this category.")
   String categoryNameRequired();
-
-  @Description("Category label required label")
-  @DefaultStringValue("Provide a label for the this category.")
-  String categoryLabelRequired();
-
-  @Description("Category dialog name required label")
-  @DefaultStringValue("A category name is required.")
-  String categoryDialogNameRequired();
 
   @Description("Category name duplicated")
   @DefaultStringValue("Duplicated category name {0}.")
@@ -624,10 +560,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("New Value")
   String newValueLabel();
 
-  @Description("Code label")
-  @DefaultStringValue("Code")
-  String codeLabel();
-
   @Description("Mime Type label")
   @DefaultStringValue("Mime Type")
   String mimeTypeLabel();
@@ -640,33 +572,9 @@ public interface Translations extends Constants {
   @DefaultStringValue("Occurrence Group")
   String occurrenceGroupLabel();
 
-  @Description("Multiple table selection instructions")
-  @DefaultStringValue("Select one or more tables:")
-  String multipleTableSelectionInstructionsLabel();
-
-  @Description("Single table selection instructions")
-  @DefaultStringValue("Select one table:")
-  String singleTableSelectionInstructionsLabel();
-
-  @Description("Datasource label")
-  @DefaultStringValue("Datasource")
-  String datasourceLabel();
-
-  @Description("Table selector title")
-  @DefaultStringValue("Table selector")
-  String tableSelectorTitle();
-
-  @Description("Select all label")
-  @DefaultStringValue("select all")
-  String selectAllLabel();
-
   @Description("File Selector title")
   @DefaultStringValue("File Selector")
   String fileSelectorTitle();
-
-  @Description("Log label")
-  @DefaultStringValue("Log")
-  String logLabel();
 
   @Description("Delete attribute label")
   @DefaultStringValue("Delete Attribute")
@@ -675,10 +583,6 @@ public interface Translations extends Constants {
   @Description("Delete category label")
   @DefaultStringValue("Delete Category")
   String deleteCategory();
-
-  @Description("Delete label")
-  @DefaultStringValue("Delete")
-  String deleteLabel();
 
   @Description("Confirmation title map")
   @DefaultStringMapValue({ //
@@ -779,59 +683,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("The names '.' and '..' are not permitted.")
   String dotNamesAreInvalid();
 
-  @Description("Data copy instructions")
-  @DefaultStringValue("Select the tables to be copied.")
-  String dataCopyInstructions();
-
-  @Description("Data copy pending conclusion")
-  @DefaultStringValue("Data copy task is being launched.")
-  String dataCopyPendingConclusion();
-
-  @Description("Data copy completed conclusion")
-  @DefaultStringValue("Data copy task was successfully launched.")
-  String dataCopyCompletedConclusion();
-
-  @Description("Data copy failed conclusion")
-  @DefaultStringValue("Data copy task launch failed.")
-  String dataCopyFailedConclusion();
-
-  @Description("Data copy destination")
-  @DefaultStringValue("Select the destination of the copy.")
-  String dataCopyDestination();
-
-  @Description("Data export instructions")
-  @DefaultStringValue("Select the tables to be exported.")
-  String dataExportInstructions();
-
-  @Description("Data export pending conclusion")
-  @DefaultStringValue("Data export task is being launched.")
-  String dataExportPendingConclusion();
-
-  @Description("Data export completed conclusion")
-  @DefaultStringValue("Data export task was successfully launched.")
-  String dataExportCompletedConclusion();
-
-  @Description("Data export failed conclusion")
-  @DefaultStringValue("Data export task launch failed.")
-  String dataExportFailedConclusion();
-
-  @Description("Data export options")
-  @DefaultStringValue("Select the export options.")
-  String dataExportOptions();
-
-  @Description("Data export destination")
-  @DefaultStringValue("Select the destination of the exportation.")
-  String dataExportDestination();
-
-  @Description("Data export unit")
-  @DefaultStringValue("Select the participant identifiers to be exported.")
-  String dataExportUnit();
-
-  @Description("Data import instructions")
-  @DefaultStringValue(
-      "Select the file to be imported and the destination datasource.")
-  String dataImportInstructions();
-
   @Description("Data import Compared Datasources Report instructions")
   @DefaultStringValue(
       "Review the data dictionary that will be imported.")
@@ -841,68 +692,9 @@ public interface Translations extends Constants {
   @DefaultStringValue("Review the data that will be imported.")
   String dataImportValuesStep();
 
-  @Description("Data import instructions conclusion")
-  @DefaultStringValue("Data import task is launched.")
-  String dataImportInstructionsConclusion();
-
-  @Description("Identifiers Map File Step")
-  @DefaultStringValue("Select the file of identifiers to be mapped.")
-  String identifiersMapFileStep();
-
-  @Description("Identifiers Map Unit Step")
-  @DefaultStringValue(
-      "Select which unit is to be used for retrieving the participants to be mapped.")
-  String identifiersMapUnitStep();
-
-  @Description("Identifier map pending conclusion")
-  @DefaultStringValue("Identifier mapping task is being launched.")
-  String identifierMapPendingConclusion();
-
-  @Description("Identifier map completed conclusion")
-  @DefaultStringValue(
-      "Identifier mapping task completed successfully.")
-  String identifierMapCompletedConclusion();
-
-  @Description("Identifier map update count")
-  @DefaultStringValue("Number of Participants updated")
-  String identifierMapUpdateCount();
-
-  @Description("Identifier map failed conclusion")
-  @DefaultStringValue("Identifier mapping task failed.")
-  String identifierMapFailedConclusion();
-
-  @Description("Identifiers Import File Step")
-  @DefaultStringValue("Select the file of identifiers to be imported.")
-  String identifiersImportFileStep();
-
-  @Description("Identifier import pending conclusion")
-  @DefaultStringValue("Identifier import task is being launched.")
-  String identifierImportPendingConclusion();
-
-  @Description("Identifier import completed conclusion")
-  @DefaultStringValue(
-      "Identifier import task completed successfully.")
-  String identifierImportCompletedConclusion();
-
-  @Description("Identifier import failed conclusion")
-  @DefaultStringValue("Identifier import task failed.")
-  String identifierImportFailedConclusion();
-
-  @Description("Export to Excel icon title")
-  @DefaultStringValue("Export to Excel file")
-  String exportToExcelTitle();
-
-  @Description("Download View XML menu item")
-  @DefaultStringValue("Download View XML")
-  String downloadViewXML();
-
   @Description("Csv label")
   @DefaultStringValue("CSV")
   String csvLabel();
-
-  @Description("Excel label")
-  @DefaultStringValue("Excel")
-  String excelLabel();
 
   @Description("Opal XML label")
   @DefaultStringValue("Opal Archive")
@@ -935,34 +727,6 @@ public interface Translations extends Constants {
   @Description("Geonames Postal Codes label")
   @DefaultStringValue("Postal Codes")
   String geonamesPostalCodesLabel();
-
-  @Description("Select file and data format label")
-  @DefaultStringValue("Select a file and data format")
-  String selectFileAndDataFormatLabel();
-
-  @Description("Row must be integer message")
-  @DefaultStringValue("Row must be an integer.")
-  String rowMustBeIntegerMessage();
-
-  @Description("Row must be positive message")
-  @DefaultStringValue("Row must must be a positive value.")
-  String rowMustBePositiveMessage();
-
-  @Description("Charset must not be null message")
-  @DefaultStringValue("The character set must not be empty.")
-  String charsetMustNotBeNullMessage();
-
-  @Description("Charset does not exist message")
-  @DefaultStringValue("The specified character set could not be found.")
-  String charsetDoesNotExistMessage();
-
-  @Description("Sheet label")
-  @DefaultStringValue("Sheet")
-  String sheetLabel();
-
-  @Description("Row number label")
-  @DefaultStringValue("Row Number")
-  String rowNumberLabel();
 
   @Description("Error label")
   @DefaultStringValue("Error")
@@ -1114,14 +878,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Add/update tables from dictionary (no storage)")
   String addUpdateTablesNoStorageLabel();
 
-  @Description("Create Datasource Completed summary")
-  @DefaultStringValue("The datasource was successfully created.")
-  String datasourceCreationCompleted();
-
-  @Description("Create Datasource Failed summary")
-  @DefaultStringValue("The datasource creation has failed.")
-  String datasourceCreationFailed();
-
   @Description("Script label")
   @DefaultStringValue("Script")
   String scriptLabel();
@@ -1129,22 +885,6 @@ public interface Translations extends Constants {
   @Description("Script Evaluation label")
   @DefaultStringValue("Script Evaluation")
   String scriptEvaluationLabel();
-
-  @Description("Line label")
-  @DefaultStringValue("Line")
-  String lineLabel();
-
-  @Description("Add new category title")
-  @DefaultStringValue("Add New Category")
-  String addNewCategory();
-
-  @Description("Edit category title")
-  @DefaultStringValue("Edit Category")
-  String editCategory();
-
-  @Description("Add new attribute title")
-  @DefaultStringValue("Add New Attribute")
-  String addNewAttribute();
 
   @Description("Add attribute title")
   @DefaultStringValue("Add Attribute")
@@ -1158,126 +898,9 @@ public interface Translations extends Constants {
   @DefaultStringValue("Edit Attributes")
   String editAttributes();
 
-  @Description("Report produced date")
-  @DefaultStringValue("Produced Date")
-  String producedDate();
-
-  @Description("Run label")
-  @DefaultStringValue("Run")
-  String runLabel();
-
-  @Description("Download Report Design label")
-  @DefaultStringValue("Download Report Design")
-  String downloadReportDesignLabel();
-
-  @Description("Paging of label")
-  @DefaultStringValue("to")
-  String toLabel();
-
-  @Description("Values label")
-  @DefaultStringValue("Values")
-  String valuesLabel();
-
-  @Description("Copy of label")
-  @DefaultStringValue("Copy_of_")
-  String copyOf();
-
-  @Description("Script contains errors and was not saved")
-  @DefaultStringValue(
-      "The script contains errors and was not saved. Click 'Test' to execute the script and see a detailed report of the errors.")
-  String scriptContainsErrorsAndWasNotSaved();
-
-  @Description("Create Datasource Step summary")
-  @DefaultStringValue("Select the type of datasource to be created.")
-  String createDatasourceStepSummary();
-
-  @Description("Datasource Options label")
-  @DefaultStringValue("Provide datasource type specific options.")
-  String datasourceOptionsLabel();
-
-  @Description("Create Datasource Process summary")
-  @DefaultStringValue(
-      "The datasource is in the process of being created.")
-  String createDatasourceProcessSummary();
-
-  @Description("Edit View Type Step")
-  @DefaultStringValue("Define the type of view to be added.")
-  String editViewTypeStep();
-
-  @Description("Edit View Tables Step")
-  @DefaultStringValue("Select the tables to be included in the view.")
-  String editViewTablesStep();
-
-  @Description("No locale label")
-  @DefaultStringValue("no locale")
-  String noLocale();
-
-  @Description("Add Unit label")
-  @DefaultStringValue("Add Unit")
-  String addUnit();
-
-  @Description("Edit Unit label")
-  @DefaultStringValue("Edit Unit")
-  String editUnit();
-
-  @Description("Download Identifiers label")
-  @DefaultStringValue("Export Identifiers")
-  String downloadUnitIdentifiers();
-
-  @Description("Export Identifiers to Excel label")
-  @DefaultStringValue("Export Identifiers Mapping")
-  String exportUnitIdentifiersToExcel();
-
-  @Description("Add Cryptographic Key label")
-  @DefaultStringValue("Add Cryptographic Key")
-  String addAddCryptographicKey();
-
-  @Description("Add Cryptographic Key label")
-  @DefaultStringValue("Add Cryptographic Key")
-  String addCryptoKey();
-
   @Description("Generate Identifiers label")
   @DefaultStringValue("Generate Identifiers")
   String generateIdentifiers();
-
-  @Description("Import Unit Identifiers From Data label")
-  @DefaultStringValue("Import Identifiers from Data File")
-  String importUnitIdentifiersFromData();
-
-  @Description("Import Mapped Unit Identifiers label")
-  @DefaultStringValue("Add/Update Identifiers Mapping")
-  String importMappedUnitIdentifiers();
-
-  @Description("Alias label")
-  @DefaultStringValue("Name")
-  String aliasLabel();
-
-  @Description("Select Key Type Step label")
-  @DefaultStringValue(
-      "Provide a name and a type for the cryptographic key to add to this Unit.")
-  String keyTypeStep();
-
-  @Description("Import Certificate label")
-  @DefaultStringValue(
-      "Provide the Public Certificate by pasting it here (PEM format).")
-  String importCertificateStep();
-
-  @Description("Private Key Step label")
-  @DefaultStringValue(
-      "Select how to add the private key of the key pair (create a new one or import an existing one)")
-  String privateKeyStep();
-
-  @Description("Public Key Step label")
-  @DefaultStringValue("Provide the Public Certificate definition.")
-  String publicKeyStep();
-
-  @Description("Keystore label")
-  @DefaultStringValue("Keystore")
-  String keystoreLabel();
-
-  @Description("Identifiers label")
-  @DefaultStringValue("Identifiers")
-  String identifiersLabel();
 
   @Description("Properties label")
   @DefaultStringValue("Properties")
@@ -1303,21 +926,9 @@ public interface Translations extends Constants {
   @DefaultStringValue("< Previous")
   String previousLabel();
 
-  @Description("Help label")
-  @DefaultStringValue("Help")
-  String helpLabel();
-
   @Description("KeyType map")
   @DefaultStringMapValue({ "KEY_PAIR", "Key Pair", "CERTIFICATE", "Certificate" })
   Map<String, String> keyTypeMap();
-
-  @Description("Paste Private Key PEM label")
-  @DefaultStringValue("(paste private key in PEM format)")
-  String pastePrivateKeyPEM();
-
-  @Description("Paste Public Key PEM label")
-  @DefaultStringValue("(paste public certificate in PEM format)")
-  String pastePublicKeyPEM();
 
   @Description("Import data label")
   @DefaultStringValue("Import Data...")
@@ -1334,10 +945,6 @@ public interface Translations extends Constants {
   @Description("Import Certificate title")
   @DefaultStringValue("Import Certificate Pair")
   String importCertificateTitle();
-
-  @Description("Data import title")
-  @DefaultStringValue("Import Data")
-  String importData();
 
   @Description("Data export title")
   @DefaultStringValue("Export Data")
@@ -1360,10 +967,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Importing Variables...")
   String variablesImportPending();
 
-  @Description("Add View Pending")
-  @DefaultStringValue("View is being created ...")
-  String addViewPending();
-
   @Description("Add View Success")
   @DefaultStringValue("View successfully created.")
   String addViewSuccess();
@@ -1371,19 +974,6 @@ public interface Translations extends Constants {
   @Description("Update View Success")
   @DefaultStringValue("View successfully updated.")
   String updateViewSuccess();
-
-  @Description("Add View Failed")
-  @DefaultStringValue("View creation failed.")
-  String addViewFailed();
-
-  @Description("No format options step")
-  @DefaultStringValue(
-      "No format options are available for the selected file format")
-  String noFormatOptionsStep();
-
-  @Description("CSV format options step")
-  @DefaultStringValue("CSV format options step")
-  String csvFormatOptionsStep();
 
   @Description("Datasource Type map")
   @DefaultStringMapValue({ "mongodb", "MongoDB", //
@@ -1403,10 +993,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Select the source to be imported.")
   String dataImportFileStep();
 
-  @Description("Data Import Unit Step")
-  @DefaultStringValue("Specify how the participant are identified.")
-  String dataImportUnitStep();
-
   @Description("Data Import Configuration Step")
   @DefaultStringValue("Configure data import")
   String configureDataImport();
@@ -1414,30 +1000,6 @@ public interface Translations extends Constants {
   @Description("Data Import Archive Step")
   @DefaultStringValue("Specify whether the data file is to be archived.")
   String dataImportArchiveStep();
-
-  @Description("Data Import Destination Step")
-  @DefaultStringValue("Select the destination of the import.")
-  String dataImportDestinationStep();
-
-  @Description("Data Import Pending Validation")
-  @DefaultStringValue("Data to import are being validated...")
-  String dataImportPendingValidation();
-
-  @Description("Data Import Completed Validation")
-  @DefaultStringValue("Data import validation completed.")
-  String dataImportCompletedValidation();
-
-  @Description("Data Import Failed Validation")
-  @DefaultStringValue("Data import validation failed.")
-  String dataImportFailedValidation();
-
-  @Description("Import Unit Identifiers Instructions")
-  @DefaultStringValue("First column MUST be identifiers from unit")
-  String importUnitIdentifiersInstructions();
-
-  @Description("Import Opal Identifiers Instructions")
-  @DefaultStringValue("First column MUST be Opal identifiers.")
-  String importOpalIdentifiersInstructions();
 
   @Description("Package description label")
   @DefaultStringValue("Package Description")
@@ -1463,10 +1025,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("R Function")
   String rFunctionLabel();
 
-  @Description("Who label")
-  @DefaultStringValue("Who")
-  String whoLabel();
-
   @Description("Value Type map")
   @DefaultStringMapValue({ "TEXTUAL", "Textual", //
       "text", "text",//
@@ -1487,11 +1045,6 @@ public interface Translations extends Constants {
   })
   Map<String, String> valueTypeMap();
 
-  @Description("Subject Type Name map")
-  @DefaultStringMapValue({ "USER.name", "User Name", //
-      "GROUP.name", "Group Name" })
-  Map<String, String> subjectTypeMap();
-
   @Description("Subject Type map")
   @DefaultStringMapValue({ "USER", "User", //
       "GROUP", "Group" })
@@ -1504,26 +1057,6 @@ public interface Translations extends Constants {
   @Description("Subject Type Groups label")
   @DefaultStringValue("Groups")
   String subjectTypeGroups();
-
-  @Description("Derive label")
-  @DefaultStringValue("Derive")
-  String deriveLabel();
-
-  @Description("Derive Categorize label")
-  @DefaultStringValue("Categorize")
-  String deriveCategorizeLabel();
-
-  @Description("Derive Custom label")
-  @DefaultStringValue("Custom")
-  String deriveCustomLabel();
-
-  @Description("Derive This to Another label")
-  @DefaultStringValue("This variable to another")
-  String deriveThisVariableToAnotherLabel();
-
-  @Description("Derive Another to This label")
-  @DefaultStringValue("Another variable to this")
-  String deriveAnotherVariableToThisLabel();
 
   @Description("Invalid Destination View label")
   @DefaultStringValue("Not a valid destination view.")
@@ -1738,10 +1271,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Frequency")
   String frequency();
 
-  @Description("Create a Coding View")
-  @DefaultStringValue("Create a Coding View")
-  String createCodingView();
-
   @Description("Script Evaluation Failed Label")
   @DefaultStringValue(
       "Script evaluation failed: check if value type is correct.")
@@ -1838,36 +1367,6 @@ public interface Translations extends Constants {
   @Description("Key/Value label")
   @DefaultStringValue("key=value")
   String keyValueLabel();
-
-  @Description("Identifiers Sync Count label")
-  @DefaultStringValue("Identifiers / Total")
-  String identifiersSyncCountLabel();
-
-  @Description("Identifiers Sync Datasource Step")
-  @DefaultStringValue(
-      "Some datasources could have entities with identifiers unknown in the identifiers database (usually after an additional database has been connected to Opal). This operation will import them in the identifiers database.")
-  String identifiersSyncDatasourceStep();
-
-  @Description("Identifiers Sync Table Step")
-  @DefaultStringValue(
-      "Preview the count of identifiers that can be imported and select from which table identifiers will be extracted.")
-  String identifiersSyncTableStep();
-
-  @Description("Information label")
-  @DefaultStringValue("Information")
-  String infoLabel();
-
-  @Description("Created label")
-  @DefaultStringValue("Created")
-  String createdLabel();
-
-  @Description("Created On label")
-  @DefaultStringValue("Created on {0}")
-  String createdOnLabel();
-
-  @Description("Last Update label")
-  @DefaultStringValue("Last Update")
-  String lastUpdateLabel();
 
   @Description("Last Update On label")
   @DefaultStringValue("Last update {0}")
@@ -2059,14 +1558,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Add Identifiers Mapping")
   String addIdentifiersMapping();
 
-  @Description("Add variables to view... label")
-  @DefaultStringValue("Add Variables to View...")
-  String addVariablesToView();
-
-  @Description("Add variable to view... label")
-  @DefaultStringValue("Add Variable to View...")
-  String addVariableToView();
-
   @Description("Original variable label")
   @DefaultStringValue("Original variable")
   String originalVariable();
@@ -2083,10 +1574,6 @@ public interface Translations extends Constants {
   @Constants.DefaultStringValue("Schedule indexing")
   String indexActionScheduleIndexing();
 
-  @Description("Summary Frequency Plot")
-  @Constants.DefaultStringValue("Frequency Plot")
-  String summaryFrequencyPlot();
-
   @Description("Filter Variable label")
   @Constants.DefaultStringValue("Filter variables...")
   String filterVariables();
@@ -2102,10 +1589,6 @@ public interface Translations extends Constants {
   @Description("Page Dashboard title")
   @DefaultStringValue("Dashboard")
   String pageDashboardTitle();
-
-  @Description("Page Datasources title")
-  @DefaultStringValue("Datasources")
-  String pageDatasourcesTitle();
 
   @Description("Page Databases title")
   @DefaultStringValue("Databases")
@@ -2167,10 +1650,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Vocabulary")
   String pageVocabularyTitle();
 
-  @Description("Add Vocabulary")
-  @DefaultStringValue("Add Vocabulary")
-  String addVocabulary();
-
   @Description("Page Java title")
   @DefaultStringValue("Java Virtual Machine")
   String pageJVMTitle();
@@ -2199,14 +1678,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Users")
   String groupUsersLabel();
 
-  @Description("Enabled label")
-  @DefaultStringValue("enabled")
-  String enabledLabel();
-
-  @Description("Disabled label")
-  @DefaultStringValue("disabled")
-  String disabledLabel();
-
   @Description("Add user with password label")
   @DefaultStringValue("Add user with password")
   String addUserWithPasswordLabel();
@@ -2234,14 +1705,6 @@ public interface Translations extends Constants {
   @Description("Entity Details Modal title")
   @DefaultStringValue("Entity Details")
   String entityDetailsModalTitle();
-
-  @Description("Configure View Modal title")
-  @DefaultStringValue("Configure View")
-  String configureViewModalTitle();
-
-  @Description("Add derived variable Modal title")
-  @DefaultStringValue("Add Derived Variable")
-  String addDerivedVariableModalTitle();
 
   @Description("Vcs Commit History Modal title")
   @DefaultStringValue("Commit Details")
@@ -2344,10 +1807,6 @@ public interface Translations extends Constants {
   })
   Map<String, String> jvmMap();
 
-  @Description("System Configuration page title")
-  @DefaultStringValue("Configuration")
-  String pageServerConfigurationTitle();
-
   @Description("Select languages label")
   @DefaultStringValue("Select languages...")
   String selectLanguages();
@@ -2409,10 +1868,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Edit categories")
   String editCategories();
 
-  @Description("Edit <Variable> categories label")
-  @DefaultStringValue("Edit {0} categories")
-  String editVariableCategories();
-
   @Description("Edit properties label")
   @DefaultStringValue("Edit properties")
   String editProperties();
@@ -2421,21 +1876,9 @@ public interface Translations extends Constants {
   @DefaultStringValue("Edit Identifiers Mapping")
   String editIdentifiersMapping();
 
-  @Description("Edit <Variable> properties label")
-  @DefaultStringValue("Edit {0} properties")
-  String editVariableProperties();
-
   @Description("Last Update Ago label")
   @DefaultStringValue("Last update {0}")
   String lastUpdateAgoLabel();
-
-  @Description("Variables count property label")
-  @DefaultStringValue("Variables Count")
-  String variablesCountProperty();
-
-  @Description("Entities count property label")
-  @DefaultStringValue("Entities Count")
-  String entitiesCountProperty();
 
   @Description("Report templates header")
   @DefaultStringValue("{0} Reports")
@@ -2448,10 +1891,6 @@ public interface Translations extends Constants {
   @Description("Storage label")
   @DefaultStringValue("Storage")
   String storageLabel();
-
-  @Description("Export label")
-  @DefaultStringValue("Export")
-  String exportLabel();
 
   @Description("Opal SQL label")
   @DefaultStringValue("Opal SQL")
@@ -2508,10 +1947,6 @@ public interface Translations extends Constants {
   @Description("None label")
   @DefaultStringValue("None")
   String none();
-
-  @Description("General Settings label")
-  @DefaultStringValue("General settings")
-  String generalSettings();
 
   @Description("Project Database Name label")
   @DefaultStringValue("Project tables (dictionaries and data) are stored in the database:")
@@ -2613,18 +2048,6 @@ public interface Translations extends Constants {
   @Description("Remove User label")
   @DefaultStringValue("Remove User")
   String removeUser();
-
-  @Description("Unknown tables count label")
-  @DefaultStringValue("? tables")
-  String unknownTablesCount();
-
-  @Description("Unknown variables count label")
-  @DefaultStringValue("? variables")
-  String unknownVariablesCount();
-
-  @Description("Unknown entities count label")
-  @DefaultStringValue("? entities")
-  String unknownEntitiesCount();
 
   @Description("Create Key Pair label")
   @DefaultStringValue("Create Key Pair")
