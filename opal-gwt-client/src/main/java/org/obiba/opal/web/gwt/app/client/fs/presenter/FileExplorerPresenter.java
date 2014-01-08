@@ -83,6 +83,10 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
     filePlacesPresenter.showProject(project);
   }
 
+  public void reset() {
+    folderDetailsPresenter.setCurrentFolder(null);
+  }
+
   @Override
   protected void onBind() {
     super.onBind();

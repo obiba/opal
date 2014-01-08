@@ -165,6 +165,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       getView().setTabData(tab.ordinal(), tab == Display.ProjectTab.TABLES ? validatePath(projectName,
           request.getParameter(ParameterTokens.TOKEN_PATH, null)) : null);
     } else {
+      if(fileExplorerPresenter != null) fileExplorerPresenter.reset();
       getView().clearTabsData();
     }
 
