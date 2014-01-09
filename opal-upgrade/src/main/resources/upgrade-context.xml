@@ -28,7 +28,7 @@
 
   <bean id="generalConfigService" class="org.obiba.opal.core.service.OpalGeneralConfigServiceImpl"/>
 
-  <bean id="opalConfigurationIo" class="org.obiba.opal.core.cfg.OpalConfigurationIo"/>
+  <bean id="opalConfigurationIo" class="org.obiba.opal.core.cfg.DefaultOpalConfigurationIo"/>
 
   <bean id="upgradeCryptoService" class="org.obiba.opal.core.service.security.CryptoServiceImpl"/>
 

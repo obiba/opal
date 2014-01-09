@@ -20,16 +20,22 @@ import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
 import org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.DefaultResourceLoader;
 
 public class HibernateSqlOrderColumnsUpgradeStep extends AbstractUpgradeStep {
 
-  private static final Logger log = LoggerFactory.getLogger(HibernateSqlOrderColumnsUpgradeStep.class);
-
+  @Autowired
   private DatabaseRegistry databaseRegistry;
 
-  private SqlScriptUpgradeStep sqlScriptUpgradeStep;
+  private final SqlScriptUpgradeStep sqlScriptUpgradeStep;
+
+  public HibernateSqlOrderColumnsUpgradeStep() {
+    sqlScriptUpgradeStep = new SqlScriptUpgradeStep();
+    sqlScriptUpgradeStep
+        .setScriptPath(new DefaultResourceLoader().getResource("classpath:/META-INF/opal/upgrade-scripts/2.0.x/"));
+    sqlScriptUpgradeStep.setScriptBasename("nullable-order-columns");
+  }
 
   @Override
   public void execute(Version currentVersion) {
@@ -51,11 +57,4 @@ public class HibernateSqlOrderColumnsUpgradeStep extends AbstractUpgradeStep {
     sqlScriptUpgradeStep.execute(currentVersion);
   }
 
-  public void setDatabaseRegistry(DatabaseRegistry databaseRegistry) {
-    this.databaseRegistry = databaseRegistry;
-  }
-
-  public void setSqlScriptUpgradeStep(SqlScriptUpgradeStep sqlScriptUpgradeStep) {
-    this.sqlScriptUpgradeStep = sqlScriptUpgradeStep;
-  }
 }

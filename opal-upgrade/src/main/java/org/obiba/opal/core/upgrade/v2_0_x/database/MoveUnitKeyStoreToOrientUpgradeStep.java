@@ -32,6 +32,7 @@ import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.domain.security.KeyStoreState;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
+import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
@@ -49,7 +50,6 @@ import org.xml.sax.SAXException;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 
 @SuppressWarnings({ "SpringJavaAutowiringInspection", "MethodOnlyUsedFromInnerClass" })
 public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
@@ -63,18 +63,19 @@ public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
   private OrientDbService orientDbService;
 
   @Autowired
-  private CallbackHandler callbackHandler;
-
-  @Autowired
   private SubjectCredentialsService subjectCredentialsService;
 
   @Autowired
   private ProjectsKeyStoreService projectsKeyStoreService;
 
+  @Autowired
+  private CallbackHandler upgradePasswordCallbackHandler;
+
   @Override
   public void execute(Version currentVersion) {
 
     orientDbService.createUniqueIndex(KeyStoreState.class);
+    orientDbService.createUniqueIndex(SubjectProfile.class);
 
     JdbcOperations dataJdbcTemplate = new JdbcTemplate(databaseRegistry.getDataSource("opal-data", null));
     dataJdbcTemplate.query("select * from unit_key_store", new RowCallbackHandler() {
@@ -106,7 +107,7 @@ public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
     CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(name)
         .prompt(OpalKeyStore.PASSWORD_FOR + " '" + name + "':  ").build();
 
-    callbackHandler.handle(new CacheablePasswordCallback[] { passwordCallback });
+    upgradePasswordCallbackHandler.handle(new CacheablePasswordCallback[] { passwordCallback });
 
     KeyStore keyStore = KeyStore.getInstance("JCEKS");
     keyStore.load(new ByteArrayInputStream(keyStoreBytes), passwordCallback.getPassword());
@@ -151,8 +152,8 @@ public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
       byte[] privateKey = keyPair.getPrivate().getEncoded();
       byte[] publicKey = keyPair.getPublic().getEncoded();
       for(Project project : orientDbService.list(Project.class)) {
-        projectsKeyStoreService.importKey(project, unit, new ByteInputStream(privateKey, privateKey.length),
-            new ByteInputStream(publicKey, publicKey.length));
+        projectsKeyStoreService
+            .importKey(project, unit, new ByteArrayInputStream(privateKey), new ByteArrayInputStream(publicKey));
       }
     }
   }
@@ -173,4 +174,5 @@ public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
   public void setConfigFile(File configFile) {
     this.configFile = configFile;
   }
+
 }

@@ -16,7 +16,17 @@
     <property name="password" value="${org.obiba.opal.datasource.opal.password}"/>
   </bean>
 
-  <bean id="configDataSource" class="org.obiba.opal.core.cfg.QuartzDataSourceFactoryBean"/>
+  <bean id="upgradeOpalConfigurationService" class="org.obiba.opal.core.upgrade.v2_0_x.UpgradeOpalConfigurationService">
+    <property name="configFile" value="file:${OPAL_HOME}/conf/opal-config.xml"/>
+  </bean>
+
+  <bean id="upgradeOpalConfigurationIo" class="org.obiba.opal.core.upgrade.v2_0_x.UpgradeOpalConfigurationIo"/>
+
+  <bean id="cryptoService" class="org.obiba.opal.core.service.security.CryptoServiceImpl"/>
+
+  <bean id="configDataSource" class="org.obiba.opal.core.cfg.QuartzDataSourceFactoryBean">
+    <property name="encryptNullPassword" value="false"/>
+  </bean>
 
   <bean id="dataSourceFactory" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactory"/>
 
@@ -36,11 +46,15 @@
 
   <bean id="passwordCallbackHandler" class="org.obiba.opal.core.crypt.OpalSecretKeyPasswordCallbackHandler"/>
 
-  <bean id="subjectCredentialsService" class="org.obiba.opal.core.service.security.CredentialsKeyStoreServiceImpl"/>
+  <bean id="subjectAclService" class="org.obiba.opal.core.service.security.DefaultSubjectAclService"/>
+
+  <bean id="subjectCredentialsService" class="org.obiba.opal.core.service.security.SubjectCredentialsServiceImpl"/>
+
+  <bean id="subjectProfileService" class="org.obiba.opal.core.service.DefaultSubjectProfileServiceImpl"/>
 
   <bean id="projectsKeyStoreService" class="org.obiba.opal.core.service.security.ProjectsKeyStoreServiceImpl"/>
 
-  <bean id="subjectProfileService" class="org.obiba.opal.core.service.DefaultSubjectProfileServiceImpl"/>
+  <bean id="credentialsKeyStoreService" class="org.obiba.opal.core.service.security.CredentialsKeyStoreServiceImpl"/>
 
   <bean id="versionProvider" class="org.obiba.runtime.upgrade.support.JdbcVersionModifier">
     <property name="datasource" ref="dataSource"/>
@@ -60,13 +74,10 @@
       <list>
 
         <!-- 2.0.0 / import database config from XML to OrientDB -->
-        <bean class="org.obiba.opal.core.upgrade.v2_0_x.database.MoveDatasourcesToOrientUpgradeStep">
+        <bean class="org.obiba.opal.core.upgrade.v2_0_x.database.MoveUnitKeyStoreToOrientUpgradeStep">
           <property name="description" value="Move database config from properties file to OrientDB"/>
           <property name="appliesTo" value="2.0.0"/>
           <property name="configFile" value="file:${OPAL_HOME}/conf/opal-config.xml"/>
-          <property name="propertiesFile" value="file:${OPAL_HOME}/conf/opal-config.properties"/>
-          <property name="databaseRegistry" ref="databaseRegistry"/>
-          <property name="orientDbService" ref="orientDbService"/>
         </bean>
 
         <!-- 2.0.0 / create quartz schema in opal config database -->
@@ -82,8 +93,6 @@
         <bean class="org.obiba.opal.core.upgrade.v2_0_x.database.MoveQuartzTablesUpgradeStep">
           <property name="description" value="Move Quartz tables to opal config database"/>
           <property name="appliesTo" value="2.0.0"/>
-          <property name="configDataSource" ref="configDataSource"/>
-          <property name="databaseRegistry" ref="databaseRegistry"/>
         </bean>
 
         <!-- 2.0.0 / import general config to OrientDB -->
@@ -91,13 +100,13 @@
           <property name="description" value="Extract general config from properties file to Opal config database"/>
           <property name="appliesTo" value="2.0.0"/>
           <property name="propertiesFile" value="file:${OPAL_HOME}/conf/opal-config.properties"/>
-          <property name="generalConfigService" ref="generalConfigService"/>
         </bean>
 
         <!-- 2.0.0 / move Unit Key Store to OrientDB -->
         <bean class="org.obiba.opal.core.upgrade.v2_0_x.database.MoveUnitKeyStoreToOrientUpgradeStep">
           <property name="description" value="Move Unit Key Store to OrientDB"/>
           <property name="appliesTo" value="2.0.0"/>
+          <property name="configFile" value="file:${OPAL_HOME}/conf/opal-config.xml"/>
         </bean>
 
         <!-- 2.0.0 / move Subject ACL to OrientDB -->
@@ -115,15 +124,7 @@
         <!-- 2.0.0 / alter Hibernate schemas for nullable order columns -->
         <bean class="org.obiba.opal.core.upgrade.v2_0_x.HibernateSqlOrderColumnsUpgradeStep">
           <property name="description" value="Alter Hibernate schemas for nullable order columns"/>
-          <property name="databaseRegistry" ref="databaseRegistry"/>
           <property name="appliesTo" value="2.0.0"/>
-          <property name="sqlScriptUpgradeStep">
-            <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
-              <property name="description" value="Update schema for Magma hibernate datasource binaries storage."/>
-              <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/2.0.x/"/>
-              <property name="scriptBasename" value="nullable-order-columns"/>
-            </bean>
-          </property>
         </bean>
 
         <!-- 2.0.0 / update Opal Configuration -->

@@ -17,6 +17,7 @@ import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
 import com.google.common.base.Function;
@@ -33,6 +34,7 @@ public class MoveGeneralConfigToOrientUpgradeStep extends AbstractUpgradeStep {
 
   private File propertiesFile;
 
+  @Autowired
   private OpalGeneralConfigService generalConfigService;
 
   @Override
@@ -97,7 +99,4 @@ public class MoveGeneralConfigToOrientUpgradeStep extends AbstractUpgradeStep {
     this.propertiesFile = propertiesFile;
   }
 
-  public void setGeneralConfigService(OpalGeneralConfigService generalConfigService) {
-    this.generalConfigService = generalConfigService;
-  }
 }

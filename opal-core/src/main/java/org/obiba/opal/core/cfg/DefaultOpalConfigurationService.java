@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.core.cfg;
 
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -57,9 +57,9 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
     configureDatabasePassword();
   }
 
-  private void configureMagma() {
+  protected void configureMagma() {
     // Add opal specific javascript methods
-    Set<GlobalMethodProvider> providers = new HashSet<>();
+    Collection<GlobalMethodProvider> providers = new HashSet<>();
     providers.add(new OpalGlobalMethodProvider());
     MagmaContextFactory ctxFactory = new MagmaContextFactory();
     ctxFactory.setGlobalMethodProviders(providers);

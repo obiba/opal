@@ -37,7 +37,7 @@ public class UpgradeCommand {
 
   private static final String[] CONTEXT_PATHS = { "classpath:/META-INF/spring/opal-server/upgrade.xml" };
 
-  private static final String[] OPAL2_CONTEXT_PATHS = { "classpath:/META-INF/spring/opal-server/upgrade-2.0.xml" };
+  private static final String[] OPAL2_CONTEXT_PATHS = { "classpath:/META-INF/spring/opal-server/upgrade-2.0.0.xml" };
 
   public void execute() {
     if(!isMigratedToOpal2()) {

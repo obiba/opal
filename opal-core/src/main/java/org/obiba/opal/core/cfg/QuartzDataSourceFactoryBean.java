@@ -20,6 +20,9 @@ public class QuartzDataSourceFactoryBean extends DataSourceFactoryBean {
   @Autowired
   private CryptoService cryptoService;
 
+  // use to skip password encryption during upgrade
+  private boolean encryptNullPassword = true;
+
   public QuartzDataSourceFactoryBean() {
     setDriverClass("org.hsqldb.jdbcDriver");
     setUrl("jdbc:hsqldb:file:" + DB_PATH + ";shutdown=true;hsqldb.tx=mvcc");
@@ -28,9 +31,13 @@ public class QuartzDataSourceFactoryBean extends DataSourceFactoryBean {
 
   @Override
   public DataSource getObject() {
-    if(password == null) {
+    if(password == null && encryptNullPassword) {
       setPassword(cryptoService.decrypt(opalConfigurationService.getOpalConfiguration().getDatabasePassword()));
     }
     return super.getObject();
+  }
+
+  public void setEncryptNullPassword(boolean encryptNullPassword) {
+    this.encryptNullPassword = encryptNullPassword;
   }
 }

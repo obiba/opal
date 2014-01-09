@@ -13,6 +13,7 @@ import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -32,8 +33,10 @@ public class MoveQuartzTablesUpgradeStep extends AbstractUpgradeStep {
       "QRTZ_FIRED_TRIGGERS", "QRTZ_JOB_LISTENERS", "QRTZ_PAUSED_TRIGGER_GRPS", "QRTZ_SCHEDULER_STATE",
       "QRTZ_SIMPLE_TRIGGERS", "QRTZ_TRIGGER_LISTENERS", "QRTZ_TRIGGERS", "QRTZ_JOB_DETAILS", "QRTZ_LOCKS" };
 
+  @Autowired
   private DatabaseRegistry databaseRegistry;
 
+  @Autowired
   private DataSource configDataSource;
 
   @Override
@@ -75,11 +78,4 @@ public class MoveQuartzTablesUpgradeStep extends AbstractUpgradeStep {
     }
   }
 
-  public void setDatabaseRegistry(DatabaseRegistry databaseRegistry) {
-    this.databaseRegistry = databaseRegistry;
-  }
-
-  public void setConfigDataSource(DataSource configDataSource) {
-    this.configDataSource = configDataSource;
-  }
 }
