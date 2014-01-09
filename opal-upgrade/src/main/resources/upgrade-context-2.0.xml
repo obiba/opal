@@ -112,6 +112,20 @@
         <!-- 2.0.0 / hash passwords in shiro.ini -->
         <bean class="org.obiba.opal.core.upgrade.security.HashShiroIniPasswordUpgradeStep"/>
 
+        <!-- 2.0.0 / alter Hibernate schemas for nullable order columns -->
+        <bean class="org.obiba.opal.core.upgrade.v2_0_x.HibernateSqlOrderColumnsUpgradeStep">
+          <property name="description" value="Alter Hibernate schemas for nullable order columns"/>
+          <property name="databaseRegistry" ref="databaseRegistry"/>
+          <property name="appliesTo" value="2.0.0"/>
+          <property name="sqlScriptUpgradeStep">
+            <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
+              <property name="description" value="Update schema for Magma hibernate datasource binaries storage."/>
+              <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/2.0.x/"/>
+              <property name="scriptBasename" value="nullable-order-columns"/>
+            </bean>
+          </property>
+        </bean>
+
         <!-- 2.0.0 / update Opal Configuration -->
         <bean class="org.obiba.opal.core.upgrade.database.UpdateOpalConfigurationFlagUpgradeStep"/>
 
