@@ -1493,7 +1493,7 @@ public interface Translations extends Constants {
   String publicDatasources();
 
   @Description("Elastic Search Configuration")
-  @DefaultStringValue("Elastic search configuration")
+  @DefaultStringValue("Elastic Search Configuration")
   String esConfigurationLabel();
 
   @Description("Specify Generate Identifier")

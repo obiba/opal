@@ -41,9 +41,6 @@ public class IndexConfigurationView extends ModalPopupViewWithUiHandlers<IndexCo
   TextBox clusterName;
 
   @UiField
-  TextBox indexName;
-
-  @UiField
   NumericTextBox nbShards;
 
   @UiField
@@ -67,19 +64,12 @@ public class IndexConfigurationView extends ModalPopupViewWithUiHandlers<IndexCo
   }
 
   @Override
-  public void show() {
-    indexName.setFocus(true);
-    super.show();
-  }
-
-  @Override
   public void hideDialog() {
     dialog.hide();
   }
 
   @Override
   public void setDialogMode(IndexConfigurationPresenter.Mode dialogMode) {
-    //name.setEnabled(IndexPresenter.Mode.UPDATE.equals(dialogMode));
     dialog.setTitle(translations.esConfigurationLabel());
   }
 
@@ -99,11 +89,6 @@ public class IndexConfigurationView extends ModalPopupViewWithUiHandlers<IndexCo
   }
 
   @Override
-  public void setIndexName(String indexName) {
-    this.indexName.setText(indexName);
-  }
-
-  @Override
   public void setSettings(String settings) {
     this.settings.setText(settings);
   }
@@ -111,11 +96,6 @@ public class IndexConfigurationView extends ModalPopupViewWithUiHandlers<IndexCo
   @Override
   public String getClusterName() {
     return clusterName.getText();
-  }
-
-  @Override
-  public String getIndexName() {
-    return indexName.getText();
   }
 
   @Override

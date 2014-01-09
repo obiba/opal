@@ -38,10 +38,6 @@ public class IndexConfigurationPresenter extends ModalPresenterWidget<IndexConfi
 
     String getClusterName();
 
-    void setIndexName(String indexName);
-
-    String getIndexName();
-
     void setSettings(String settings);
 
     String getSettings();
@@ -60,6 +56,8 @@ public class IndexConfigurationPresenter extends ModalPresenterWidget<IndexConfi
   private boolean isEnabled;
 
   private boolean dataNode;
+
+  private String indexName;
 
   public enum Mode {
     UPDATE
@@ -89,9 +87,9 @@ public class IndexConfigurationPresenter extends ModalPresenterWidget<IndexConfi
 
             isEnabled = cfg.getEnabled();
             dataNode = cfg.getDataNode();
+            indexName = cfg.getIndexName();
 
             getView().setClusterName(cfg.getClusterName());
-            getView().setIndexName(cfg.getIndexName());
             getView().setNbShards(cfg.getShards());
             getView().setNbReplicas(cfg.getReplicas());
             getView().setSettings(cfg.getSettings());
@@ -117,7 +115,7 @@ public class IndexConfigurationPresenter extends ModalPresenterWidget<IndexConfi
     ESCfgDto config = ESCfgDto.create();
     config.setEnabled(isEnabled);
     config.setClusterName(getView().getClusterName());
-    config.setIndexName(getView().getIndexName());
+    config.setIndexName(indexName);
     config.setDataNode(dataNode);
     config.setShards(getView().getNbShards().intValue());
     config.setReplicas(getView().getNbReplicas().intValue());
