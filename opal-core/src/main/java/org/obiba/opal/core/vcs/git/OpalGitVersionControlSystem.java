@@ -69,7 +69,7 @@ public class OpalGitVersionControlSystem implements OpalVersionControlSystem {
       @Nullable String prevCommitId, @Nullable String path) {
     OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(getRepository(datasource), commitId).addPath(path)
         .addDatasourceName(datasource).addPreviousCommitId(prevCommitId).build();
-    return command.execute();
+    return command.formatAsStringList(command.execute());
   }
 
   public Repository getRepository(String name) {

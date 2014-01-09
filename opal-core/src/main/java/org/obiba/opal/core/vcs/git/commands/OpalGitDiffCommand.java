@@ -36,7 +36,7 @@ import com.google.common.base.Strings;
  * Opal GIT command used to extract the diff between two commits. By default, the diff is between the given commit and
  * its parent. By providing a valid 'nthCommit' value, the command will extract the appropriate diff from the repo.
  */
-public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
+public class OpalGitDiffCommand extends OpalGitCommand<List<DiffEntry>> {
 
   private final String path;
 
@@ -55,7 +55,7 @@ public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
   }
 
   @Override
-  public List<String> execute() {
+  public List<DiffEntry> execute() {
     ObjectReader reader = repository.newObjectReader();
 
     try {
@@ -71,12 +71,10 @@ public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
     }
   }
 
-  private List<String> CompareDiffTrees(CanonicalTreeParser currentCommitParser,
+  private List<DiffEntry> CompareDiffTrees(CanonicalTreeParser currentCommitParser,
       AbstractTreeIterator previousCommitParser) throws IOException {
 
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    List<String> diffEntries = new ArrayList<>();
-    DiffFormatter df = new DiffFormatter(out);
+    DiffFormatter df = new DiffFormatter(null);
     df.setRepository(repository);
     df.setDiffComparator(RawTextComparator.DEFAULT);
     df.setDetectRenames(true);
@@ -85,16 +83,30 @@ public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
       df.setPathFilter(PathFilter.create(path));
     }
 
-    List<DiffEntry> diffs = df.scan(previousCommitParser, currentCommitParser);
+    return df.scan(previousCommitParser, currentCommitParser);
+  }
 
-    for(DiffEntry diffEntry : diffs) {
-      df.format(diffEntry);
-      diffEntry.getOldId();
-      diffEntries.add(out.toString("UTF-8"));
-      out.reset();
+  public List<String> formatAsStringList(List<DiffEntry> diffs) {
+    try {
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      List<String> diffEntries = new ArrayList<>();
+      DiffFormatter df = new DiffFormatter(out);
+      df.setRepository(repository);
+      df.setDiffComparator(RawTextComparator.DEFAULT);
+      df.setDetectRenames(true);
+
+      for(DiffEntry diffEntry : diffs) {
+        df.format(diffEntry);
+        diffEntry.getOldId();
+        diffEntries.add(out.toString("UTF-8"));
+        out.reset();
+      }
+
+      return diffEntries;
+
+    } catch(IOException e) {
+      throw new OpalGitException(e);
     }
-
-    return diffEntries;
   }
 
   /**
