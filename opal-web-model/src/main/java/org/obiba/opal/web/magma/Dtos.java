@@ -373,7 +373,7 @@ public final class Dtos {
     if(isNumeric(descriptiveStats.getMin())) descriptiveBuilder.setMin(descriptiveStats.getMin());
     if(isNumeric(descriptiveStats.getMax())) descriptiveBuilder.setMax(descriptiveStats.getMax());
     if(isNumeric(descriptiveStats.getMean())) descriptiveBuilder.setMean(descriptiveStats.getMean());
-    if(isNumeric(descriptiveStats.getSum())) descriptiveBuilder.setSum(descriptiveStats.getSumsq());
+    if(isNumeric(descriptiveStats.getSum())) descriptiveBuilder.setSum(descriptiveStats.getSum());
     if(isNumeric(descriptiveStats.getSumsq())) descriptiveBuilder.setSumsq(descriptiveStats.getSumsq());
     if(isNumeric(descriptiveStats.getStandardDeviation())) {
       descriptiveBuilder.setStdDev(descriptiveStats.getStandardDeviation());
