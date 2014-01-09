@@ -109,6 +109,8 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
   private final ActionsIndexColumn<TableIndexStatusDto> actionsColumn;
 
+  private Status status;
+
   @Inject
   public IndexAdministrationView(Binder uiBinder, PlaceManager placeManager) {
     this.placeManager = placeManager;
@@ -158,11 +160,8 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
   @UiHandler("startStopButton")
   public void onStartStop(ClickEvent event) {
-    if(configureButton.isEnabled()) {
-      getUiHandlers().start();
-    } else {
-      getUiHandlers().stop();
-    }
+    if(status == Status.Startable) getUiHandlers().start();
+    else getUiHandlers().stop();
   }
 
   @UiHandler("refreshIndicesButton")
@@ -203,6 +202,7 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
   @Override
   public void setServiceStatus(Status status) {
+    this.status = status;
     switch(status) {
       case Startable:
         startStopButton.setText(translations.startLabel());
