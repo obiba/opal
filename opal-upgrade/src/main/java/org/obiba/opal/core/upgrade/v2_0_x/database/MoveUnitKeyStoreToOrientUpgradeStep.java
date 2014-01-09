@@ -30,6 +30,7 @@ import javax.xml.xpath.XPathFactory;
 import org.obiba.opal.core.crypt.CacheablePasswordCallback;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.domain.security.KeyStoreState;
+import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.OrientDbService;
@@ -46,6 +47,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 
 @SuppressWarnings({ "SpringJavaAutowiringInspection", "MethodOnlyUsedFromInnerClass" })
@@ -128,8 +131,18 @@ public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
           .enabled(true) //
           .group(unit);
       subjectCredentialsService.save(builder.build());
-      //TODO change unit permission to GROUP
+      changeUnitSubjectTypeToGroup(unit);
     }
+  }
+
+  private void changeUnitSubjectTypeToGroup(final String unit) {
+    orientDbService.execute(new OrientDbService.WithinDocumentTxCallbackWithoutResult() {
+      @Override
+      protected void withinDocumentTxWithoutResult(ODatabaseDocumentTx db) {
+        db.command(new OCommandSQL("update " + SubjectAcl.class.getSimpleName() + " set type = ? where principal = ?"))
+            .execute(SubjectAcl.SubjectType.GROUP, unit);
+      }
+    });
   }
 
   private void importKeyPairs(String unit, OpalKeyStore keyStore) throws KeyStoreException {
