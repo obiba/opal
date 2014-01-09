@@ -1,4 +1,4 @@
-package org.obiba.opal.core.upgrade.database;
+package org.obiba.opal.core.upgrade.v2_0_x.database;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -62,8 +62,8 @@ public class MoveSubjectAclToOrientUpgradeStep extends AbstractUpgradeStep {
     }
 
     private String upgradeNode(String node) {
-      if (node.equals("/datashield/session")) return "/datashield";
-      if (node.equals("/r/session")) return "/r";
+      if(node.equals("/datashield/session")) return "/datashield";
+      if(node.equals("/r/session")) return "/r";
       return node;
     }
 

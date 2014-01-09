@@ -22,6 +22,7 @@ import org.apache.shiro.util.StringUtils;
 import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
+import org.obiba.opal.core.upgrade.v2_0_x.HashShiroIniPasswordUpgradeStep;
 import org.springframework.util.ResourceUtils;
 
 import com.google.common.collect.ImmutableMap;

@@ -1,4 +1,4 @@
-package org.obiba.opal.core.upgrade;
+package org.obiba.opal.core.upgrade.v2_0_x;
 
 import java.io.File;
 import java.io.IOException;

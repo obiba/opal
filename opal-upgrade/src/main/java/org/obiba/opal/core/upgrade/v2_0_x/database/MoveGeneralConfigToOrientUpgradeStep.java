@@ -1,4 +1,4 @@
-package org.obiba.opal.core.upgrade.database;
+package org.obiba.opal.core.upgrade.v2_0_x.database;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.core.upgrade.security;
+package org.obiba.opal.core.upgrade.v2_0_x;
 
 import java.io.File;
 import java.io.FileWriter;

@@ -60,7 +60,7 @@
       <list>
 
         <!-- 2.0.0 / import database config from XML to OrientDB -->
-        <bean class="org.obiba.opal.core.upgrade.database.MoveDatasourcesToOrientUpgradeStep">
+        <bean class="org.obiba.opal.core.upgrade.v2_0_x.database.MoveDatasourcesToOrientUpgradeStep">
           <property name="description" value="Move database config from properties file to OrientDB"/>
           <property name="appliesTo" value="2.0.0"/>
           <property name="configFile" value="file:${OPAL_HOME}/conf/opal-config.xml"/>
@@ -79,7 +79,7 @@
         </bean>
 
         <!-- 2.0.0 / move Quartz tables to opal config database -->
-        <bean class="org.obiba.opal.core.upgrade.database.MoveQuartzTablesUpgradeStep">
+        <bean class="org.obiba.opal.core.upgrade.v2_0_x.database.MoveQuartzTablesUpgradeStep">
           <property name="description" value="Move Quartz tables to opal config database"/>
           <property name="appliesTo" value="2.0.0"/>
           <property name="configDataSource" ref="configDataSource"/>
@@ -87,7 +87,7 @@
         </bean>
 
         <!-- 2.0.0 / import general config to OrientDB -->
-        <bean class="org.obiba.opal.core.upgrade.database.MoveGeneralConfigToOrientUpgradeStep">
+        <bean class="org.obiba.opal.core.upgrade.v2_0_x.database.MoveGeneralConfigToOrientUpgradeStep">
           <property name="description" value="Extract general config from properties file to Opal config database"/>
           <property name="appliesTo" value="2.0.0"/>
           <property name="propertiesFile" value="file:${OPAL_HOME}/conf/opal-config.properties"/>
@@ -95,22 +95,22 @@
         </bean>
 
         <!-- 2.0.0 / move Unit Key Store to OrientDB -->
-        <bean class="org.obiba.opal.core.upgrade.database.MoveUnitKeyStoreToOrientUpgradeStep">
+        <bean class="org.obiba.opal.core.upgrade.v2_0_x.database.MoveUnitKeyStoreToOrientUpgradeStep">
           <property name="description" value="Move Unit Key Store to OrientDB"/>
           <property name="appliesTo" value="2.0.0"/>
         </bean>
 
         <!-- 2.0.0 / move Subject ACL to OrientDB -->
-        <bean class="org.obiba.opal.core.upgrade.database.MoveSubjectAclToOrientUpgradeStep">
+        <bean class="org.obiba.opal.core.upgrade.v2_0_x.database.MoveSubjectAclToOrientUpgradeStep">
           <property name="description" value="Move Subject ACL to OrientDB"/>
           <property name="appliesTo" value="2.0.0"/>
         </bean>
 
         <!-- 2.0.0 / move version from table to opal-config.xml -->
-        <bean class="org.obiba.opal.core.upgrade.database.CopyVersionToOpalConfigurationUpgradeStep"/>
+        <bean class="org.obiba.opal.core.upgrade.v2_0_x.database.CopyVersionToOpalConfigurationUpgradeStep"/>
 
         <!-- 2.0.0 / hash passwords in shiro.ini -->
-        <bean class="org.obiba.opal.core.upgrade.security.HashShiroIniPasswordUpgradeStep"/>
+        <bean class="org.obiba.opal.core.upgrade.v2_0_x.HashShiroIniPasswordUpgradeStep"/>
 
         <!-- 2.0.0 / alter Hibernate schemas for nullable order columns -->
         <bean class="org.obiba.opal.core.upgrade.v2_0_x.HibernateSqlOrderColumnsUpgradeStep">
@@ -127,7 +127,7 @@
         </bean>
 
         <!-- 2.0.0 / update Opal Configuration -->
-        <bean class="org.obiba.opal.core.upgrade.database.UpdateOpalConfigurationFlagUpgradeStep"/>
+        <bean class="org.obiba.opal.core.upgrade.v2_0_x.database.UpdateOpalConfigurationFlagUpgradeStep"/>
 
       </list>
     </property>
