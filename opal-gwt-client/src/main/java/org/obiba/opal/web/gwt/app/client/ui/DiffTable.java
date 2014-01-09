@@ -41,8 +41,10 @@ public class DiffTable extends DefaultFlexTable {
     for(String line : diffEntries) {
       if(line.startsWith("@@")) {
         parseHunkRow(line);
+        row++;
       } else if(!Strings.isNullOrEmpty(line) && !line.startsWith("\\ No newline") && (aLineNumber > 0 || bLineNumber > 0)) {
         parseDiffRows(line);
+        row++;
       }
 
       if (!Strings.isNullOrEmpty(style)) {
@@ -51,8 +53,6 @@ public class DiffTable extends DefaultFlexTable {
         }
         style = "";
       }
-
-      row++;
     }
   }
 
