@@ -1,6 +1,7 @@
 package org.obiba.opal.core.upgrade.database;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
@@ -14,6 +15,17 @@ import java.util.Map;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.obiba.opal.core.crypt.CacheablePasswordCallback;
 import org.obiba.opal.core.domain.Project;
@@ -30,11 +42,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 
 @SuppressWarnings({ "SpringJavaAutowiringInspection", "MethodOnlyUsedFromInnerClass" })
 public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
+
+  private File configFile;
 
   @Autowired
   private DatabaseRegistry databaseRegistry;
@@ -77,6 +94,7 @@ public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
 
     });
     dataJdbcTemplate.execute("drop table unit_key_store");
+    deleteFunctionalUnitsFromXmlConfig();
   }
 
   private KeyStore getKeyStore(String name, byte... keyStoreBytes)
@@ -124,5 +142,22 @@ public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
             new ByteInputStream(publicKey, publicKey.length));
       }
     }
+  }
+
+  private void deleteFunctionalUnitsFromXmlConfig() {
+    try {
+      Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(configFile);
+      XPath xPath = XPathFactory.newInstance().newXPath();
+      Node node = (Node) xPath.compile("//functionalUnits").evaluate(doc.getDocumentElement(), XPathConstants.NODE);
+      if(node != null) node.getParentNode().removeChild(node);
+      Transformer transformer = TransformerFactory.newInstance().newTransformer();
+      transformer.transform(new DOMSource(doc), new StreamResult(configFile));
+    } catch(SAXException | TransformerException | XPathExpressionException | ParserConfigurationException | IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void setConfigFile(File configFile) {
+    this.configFile = configFile;
   }
 }
