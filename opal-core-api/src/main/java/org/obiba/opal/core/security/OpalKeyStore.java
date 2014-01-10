@@ -499,6 +499,7 @@ public class OpalKeyStore implements KeyProvider {
     }
   }
 
+  @NotNull
   private PEMReader getPEMReader(InputStream certificate) {
     return new PEMReader(new InputStreamReader(certificate), new PasswordFinder() {
       @Override

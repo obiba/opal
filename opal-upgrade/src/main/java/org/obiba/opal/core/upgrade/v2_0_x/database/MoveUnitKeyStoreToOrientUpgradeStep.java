@@ -15,6 +15,7 @@ import java.util.Map;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.validation.ConstraintViolationException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
@@ -28,17 +29,24 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.obiba.opal.core.crypt.CacheablePasswordCallback;
+import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.Project;
+import org.obiba.opal.core.domain.security.Group;
 import org.obiba.opal.core.domain.security.KeyStoreState;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.security.OpalKeyStore;
+import org.obiba.opal.core.service.DuplicateSubjectProfileException;
 import org.obiba.opal.core.service.OrientDbService;
+import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
+import org.obiba.opal.core.service.security.CredentialsKeyStoreService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
-import org.obiba.opal.core.service.security.SubjectCredentialsService;
+import org.obiba.opal.core.service.security.realm.OpalUserRealm;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -47,11 +55,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import com.google.common.collect.Maps;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
 
 @SuppressWarnings({ "SpringJavaAutowiringInspection", "MethodOnlyUsedFromInnerClass" })
 public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
+
+  private static final Logger log = LoggerFactory.getLogger(MoveUnitKeyStoreToOrientUpgradeStep.class);
 
   private File configFile;
 
@@ -62,7 +73,10 @@ public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
   private OrientDbService orientDbService;
 
   @Autowired
-  private SubjectCredentialsService subjectCredentialsService;
+  private SubjectProfileService subjectProfileService;
+
+  @Autowired
+  private CredentialsKeyStoreService credentialsKeyStoreService;
 
   @Autowired
   private ProjectsKeyStoreService projectsKeyStoreService;
@@ -72,19 +86,25 @@ public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
 
   @Override
   public void execute(Version currentVersion) {
+
+    orientDbService.createUniqueIndex(SubjectCredentials.class);
+    orientDbService.createUniqueIndex(Group.class);
+
     JdbcOperations dataJdbcTemplate = new JdbcTemplate(databaseRegistry.getDataSource("opal-data", null));
     dataJdbcTemplate.query("select * from unit_key_store", new RowCallbackHandler() {
       @Override
       public void processRow(ResultSet rs) throws SQLException {
         String unit = rs.getString("unit");
         byte[] keyStoreBytes = rs.getBytes("key_store");
+        log.debug("Import '{}' key store", unit);
         if("OpalInstance".equals(unit)) {
           importSystemKeyStore(keyStoreBytes);
         } else {
           try {
-            OpalKeyStore keyStore = new OpalKeyStore(unit, getKeyStore(unit, keyStoreBytes));
-            importCertificates(unit, keyStore);
-            importKeyPairs(unit, keyStore);
+            OpalKeyStore opalKeyStore = new OpalKeyStore(unit, getKeyStore(unit, keyStoreBytes));
+            opalKeyStore.setCallbackHandler(upgradePasswordCallbackHandler);
+            importCertificates(unit, opalKeyStore);
+            importKeyPairs(unit, opalKeyStore);
           } catch(GeneralSecurityException | UnsupportedCallbackException | IOException e) {
             throw new RuntimeException(e);
           }
@@ -116,19 +136,40 @@ public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
     orientDbService.save(null, state);
   }
 
-  private void importCertificates(String unit, OpalKeyStore keyStore) throws CertificateEncodingException {
-    Map<String, Certificate> certificates = keyStore.getCertificates();
-    for(String alias : keyStore.listCertificates()) {
+  private void importCertificates(String unit, OpalKeyStore opalKeyStore)
+      throws CertificateEncodingException, KeyStoreException {
+    Map<String, Certificate> certificates = opalKeyStore.getCertificates();
+    for(String alias : opalKeyStore.listCertificates()) {
+      log.info("Import certificate for '{}' alias within '{}' unit", alias, unit);
+
       Certificate certificate = certificates.get(alias);
       SubjectCredentials.Builder builder = SubjectCredentials.Builder.create() //
           .name(unit + "-" + alias) //
-          .certificate(certificate.getEncoded()) //
           .authenticationType(SubjectCredentials.AuthenticationType.CERTIFICATE) //
           .enabled(true) //
           .group(unit);
-      subjectCredentialsService.save(builder.build());
+      saveSubjectCredentials(builder.build(), certificate);
       changeUnitSubjectTypeToGroup(unit);
     }
+  }
+
+  private void saveSubjectCredentials(SubjectCredentials subjectCredentials, Certificate certificate)
+      throws ConstraintViolationException, DuplicateSubjectProfileException, KeyStoreException {
+
+    OpalKeyStore opalKeyStore = credentialsKeyStoreService.getKeyStore();
+    opalKeyStore.getKeyStore().setCertificateEntry(subjectCredentials.getName(), certificate);
+    credentialsKeyStoreService.saveKeyStore(opalKeyStore);
+
+    Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
+    toSave.put(subjectCredentials, subjectCredentials);
+    for(String groupName : subjectCredentials.getGroups()) {
+      Group group = new Group(groupName);
+      group.addSubjectCredential(subjectCredentials.getName());
+      toSave.put(group, group);
+    }
+    orientDbService.save(toSave);
+
+    subjectProfileService.ensureProfile(subjectCredentials.getName(), OpalUserRealm.OPAL_REALM);
   }
 
   private void changeUnitSubjectTypeToGroup(final String unit) {
@@ -141,14 +182,16 @@ public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
     });
   }
 
-  private void importKeyPairs(String unit, OpalKeyStore keyStore) throws KeyStoreException {
-    for(String alias : keyStore.listKeyPairs()) {
-      KeyPair keyPair = keyStore.getKeyPair(alias);
+  private void importKeyPairs(String unit, OpalKeyStore opalKeyStore) throws KeyStoreException {
+    for(String alias : opalKeyStore.listKeyPairs()) {
+      log.info("Import key pair for '{}' alias within '{}' unit", alias, unit);
+      KeyPair keyPair = opalKeyStore.getKeyPair(alias);
       byte[] privateKey = keyPair.getPrivate().getEncoded();
-      byte[] publicKey = keyPair.getPublic().getEncoded();
+      Certificate certificate = opalKeyStore.getKeyStore().getCertificate(alias);
       for(Project project : orientDbService.list(Project.class)) {
-        projectsKeyStoreService
-            .importKey(project, unit, new ByteArrayInputStream(privateKey), new ByteArrayInputStream(publicKey));
+        OpalKeyStore projectKeyStore = projectsKeyStoreService.getKeyStore(project);
+        projectKeyStore.getKeyStore().setKeyEntry(alias, privateKey, new Certificate[] { certificate });
+        projectsKeyStoreService.saveKeyStore(projectKeyStore);
       }
     }
   }
