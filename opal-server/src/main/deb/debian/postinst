@@ -54,7 +54,10 @@ case "$1" in
 
         chown -R opal:adm /var/lib/opal /var/log/opal /etc/opal /tmp/opal
         chmod -R 750      /var/lib/opal /var/log/opal /etc/opal /tmp/opal
-    
+        if [ -f "/etc/opal/log4j.properties" ]; then
+          mv /etc/opal/log4j.properties /etc/opal/log4j.properties.old
+        fi
+
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
