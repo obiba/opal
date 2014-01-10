@@ -51,6 +51,7 @@ public class ValueTableFacetsResource {
   @Path("/_search")
   @Transactional(readOnly = true)
   public Response search(@Context HttpServletRequest servletRequest, Search.QueryTermsDto dtoQueries) {
+    String s = dtoQueries.toString();
     Search.QueryResultDto dtoResult = Search.QueryResultDto.newBuilder().setTotalHits(0).build();
 
     try {

@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -16,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
+import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
@@ -36,6 +40,7 @@ import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.ListBox;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.ProgressBar;
 import com.github.gwtbootstrap.client.ui.SimplePager;
@@ -174,6 +179,18 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiField
   Panel permissionsPanel;
 
+  @UiField
+  Chooser variables;
+
+  @UiField
+  ListBox categoricalVariables;
+
+  @UiField
+  Button crossVariables;
+
+  @UiField
+  FlowPanel crossResultsPanel;
+
   private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
 
   private final Translations translations;
@@ -209,9 +226,13 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
       panel = valuesPanel;
     } else if(slot == Slots.Permissions) {
       panel = permissionsPanel;
+    } else if(slot == Slots.CrossVariables) {
+      panel = crossResultsPanel;
     }
+
     if(panel != null) {
-      panel.clear();
+      if(slot != Slots.CrossVariables) panel.clear();
+
       if(content != null) {
         panel.add(content.asWidget());
       }
@@ -296,6 +317,20 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
     pager.firstPage();
     dataProvider.refresh();
+
+    // Prepare cross table form
+    categoricalVariables.clear();
+    variables.clear();
+    categoricalVariables.setWidth("400px");
+    variables.setWidth("400px");
+    for(int i = 0; i < rows.length(); i++) {
+      // TODO: variable InstrumentRun.user is of value type 'TEXT'
+      if(rows.get(i).getCategoriesArray().length() > 0 || rows.get(i).getValueType().equals("double") ||
+          rows.get(i).getValueType().equals("integer")) variables.addItem(rows.get(i).getName(), rows.get(i).getName());
+      if(rows.get(i).getCategoriesArray().length() > 0) {
+        categoricalVariables.addItem(rows.get(i).getName(), rows.get(i).getName());
+      }
+    }
   }
 
   @Override
@@ -338,6 +373,23 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
       }
       propertiesTable.addProperty(new Label(translations.tableReferencesLabel()), fromTableLinks);
     }
+  }
+
+  @Override
+  public String getSelectedVariable() {
+    return categoricalVariables.getValue(categoricalVariables.getSelectedIndex());
+  }
+
+  @Override
+  public List<String> getCrossWithVariables() {
+    List<String> selected = new ArrayList<String>();
+
+    for(int i = 0; i < variables.getItemCount(); i++) {
+      if(variables.isItemSelected(i)) {
+        selected.add(variables.getItemText(i));
+      }
+    }
+    return selected;
   }
 
   @UiHandler("downloadDictionary")
@@ -403,6 +455,12 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiHandler("scheduleLink")
   void onIndexSchedule(ClickEvent event) {
     getUiHandlers().onIndexSchedule();
+  }
+
+  @UiHandler("crossVariables")
+  void onCrossVariables(ClickEvent event) {
+    crossResultsPanel.clear();
+    getUiHandlers().onCrossVariables();
   }
 
   @Override
@@ -557,6 +615,91 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     indexNowLink.setText(translations.indexActionIndexNow());
     scheduleLink.setText(translations.indexActionScheduleIndexing());
   }
+
+//  @Override
+//  public String getSelectedVariable() {
+//    return categoricalVariables.getSelectedValue();
+//  }
+//
+//  @Override
+//  public List<String> getCrossWithVariables() {
+//    List<String> selected = new ArrayList<String>();
+//
+//    for(int i = 0; i < variables.getItemCount(); i++) {
+//      if(variables.isItemSelected(i)) {
+//        selected.add(variables.getItemText(i));
+//      }
+//    }
+//    return selected;
+//  }
+
+//  @Override
+//  public void addCrossVariableCategoricalResult(QueryResultDto resource, VariableDto variable, VariableDto crossWithVariable) {
+//    // Process the resource to have a map by categoryXcrossCategory
+//    Map<String, Map<String, FacetResultDto.TermFrequencyResultDto>> facets
+//        = new HashMap<String, Map<String, FacetResultDto.TermFrequencyResultDto>>();
+//    Map<String, Integer> variableFacetTotals = new HashMap<String, Integer>();
+//    Map<String, Integer> crossFacetTotals = new HashMap<String, Integer>();
+//    for(int i = 0; i < resource.getFacetsArray().length(); i++) {
+//      Map<String, FacetResultDto.TermFrequencyResultDto> termByFacets
+//          = new HashMap<String, FacetResultDto.TermFrequencyResultDto>();
+//      int total = 0;
+//      for(int j = 0; j < resource.getFacetsArray().get(i).getFrequenciesArray().length(); j++) {
+//        termByFacets.put(resource.getFacetsArray().get(i).getFrequenciesArray().get(j).getTerm(),
+//            resource.getFacetsArray().get(i).getFrequenciesArray().get(j));
+//        facets.put(resource.getFacetsArray().get(i).getFacet(), termByFacets);
+//        total += resource.getFacetsArray().get(i).getFrequenciesArray().get(j).getCount();
+//
+//        if(resource.getFacetsArray().get(i).getFacet().equals("total")) {
+//          crossFacetTotals.put(resource.getFacetsArray().get(i).getFrequenciesArray().get(j).getTerm(),
+//              resource.getFacetsArray().get(i).getFrequenciesArray().get(j).getCount());
+//        }
+//      }
+//
+//      variableFacetTotals.put(resource.getFacetsArray().get(i).getFacet(), total);
+//    }
+//
+//    DefaultFlexTable parentTable = new DefaultFlexTable();
+//    parentTable.setWidget(0, 0, new Label(crossWithVariable.getName()));
+//    parentTable.setWidget(0, 1, new Label(variable.getName()));
+//    parentTable.setWidget(0, 2, new Label("Totals"));
+//    parentTable.getFlexCellFormatter().setRowSpan(0, 0, 2);
+//    parentTable.getFlexCellFormatter().setRowSpan(0, 2, 2);
+//    parentTable.getFlexCellFormatter().setColSpan(0, 1, variable.getCategoriesArray().length());
+//
+//    for(int i = 0; i < variable.getCategoriesArray().length(); i++) {
+//      parentTable.setWidget(1, i, new Label(variable.getCategoriesArray().get(i).getName()));
+//    }
+//
+//    for(int i = 0; i < crossWithVariable.getCategoriesArray().length(); i++) {
+//      parentTable.setWidget(i + 2, 0, new Label(crossWithVariable.getCategoriesArray().get(i).getName()));
+//
+//      for(int j = 0; j < variable.getCategoriesArray().length(); j++) {
+//        FacetResultDto.TermFrequencyResultDto termFrequencyResultDto = facets
+//            .get(variable.getCategoriesArray().get(j).getName())
+//            .get(crossWithVariable.getCategoriesArray().get(i).getName());
+//        parentTable.setWidget(i + 2, j + 1, new Label("" + termFrequencyResultDto.getCount()));
+//      }
+//
+//      //total
+//      parentTable.setWidget(i + 2, variable.getCategoriesArray().length() + 1,
+//          new Label("" + crossFacetTotals.get(crossWithVariable.getCategoriesArray().get(i).getName())));
+//    }
+//
+//    // N
+//    parentTable.setWidget(crossWithVariable.getCategoriesArray().length() + 3, 0, new Label("Totals"));
+//    int total = 0;
+//    for(int i = 0; i < variable.getCategoriesArray().length(); i++) {
+//      parentTable.setWidget(crossWithVariable.getCategoriesArray().length() + 3, i + 1,
+//          new Label("" + variableFacetTotals.get(variable.getCategoriesArray().get(i).getName())));
+//      total += variableFacetTotals.get(variable.getCategoriesArray().get(i).getName());
+//    }
+//    parentTable
+//        .setWidget(crossWithVariable.getCategoriesArray().length() + 3, variable.getCategoriesArray().length() + 1,
+//            new Label("" + variableFacetTotals.get("total")));
+//
+//    crossResultsPanel.add(parentTable);
+//  }
 
   private class VariableDtoDisplay implements CheckboxColumn.Display<VariableDto> {
     @Override

@@ -2061,4 +2061,24 @@ public interface Translations extends Constants {
   @Description("AuthenticationType Labels")
   @DefaultStringMapValue({ "PASSWORD", "Password", "CERTIFICATE", "Certificate" })
   Map<String, String> authenticationTypeMap();
+
+  @Description("Results of X with Y label")
+  @DefaultStringValue("Results of {0} with {1}")
+  String crossTableResult();
+
+  @Description("Totals label")
+  @DefaultStringValue("Totals")
+  String totalLabel();
+
+  @Description("No results found label")
+  @DefaultStringValue("No results found")
+  String noResultsFound();
+
+  @Description("Mean (Std. deviation) label")
+  @DefaultStringValue("Mean (Std. deviation)")
+  String meanStdDeviationLabel();
+
+  @Description("N label")
+  @DefaultStringValue("N")
+  String NLabel();
 }

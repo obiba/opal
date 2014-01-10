@@ -187,6 +187,13 @@ public enum UriBuilders {
     }
   },
 
+  DATASOURCE_TABLE_FACETS_SEARCH {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasource", "{}", "table", "{}", "facets", "_search");
+    }
+  },
+
   DATASOURCE_TABLE_FACET_VARIABLE_SEARCH {
     @Override
     public UriBuilder create() {
@@ -476,7 +483,8 @@ public enum UriBuilders {
   VCS_VARIABLE_COMMIT_INFO {
     @Override
     public UriBuilder create() {
-      return UriBuilder.create().segment("datasource", "{}", "view", "{}", "vcs", "variable", "{}", "commit", "{}", "{}");
+      return UriBuilder.create()
+          .segment("datasource", "{}", "view", "{}", "vcs", "variable", "{}", "commit", "{}", "{}");
     }
   },
 
@@ -487,6 +495,6 @@ public enum UriBuilders {
     }
 
   };
-  
+
   public abstract UriBuilder create();
 }

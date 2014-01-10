@@ -192,6 +192,30 @@
           </b:Column>
         </b:FluidRow>
 
+        <!-- Cross variables -->
+        <b:FluidRow addStyleNames="min-height-450">
+          <b:Column size="12">
+            <b:Well>
+              <g:FlowPanel>
+                <b:Icon type="LINK"/>
+                <g:Label addStyleNames="xsmall-indent inline-block">
+                  <ui:msg description="Cross variables label">Cross variables</ui:msg>
+                </g:Label>
+              </g:FlowPanel>
+              <g:FlowPanel>
+                <b:ListBox name="variable" ui:field="categoricalVariables" addStyleNames="xsmall-indent"/>
+                <o:Chooser name="cross_with" ui:field="variables" multipleSelect="true" addStyleNames="xsmall-indent"/>
+                <b:Button ui:field="crossVariables" type="PRIMARY" addStyleNames="xsmall-indent">
+                  <ui:msg description="Cross variables button label">Execute</ui:msg>
+                </b:Button>
+              </g:FlowPanel>
+              <g:FlowPanel ui:field="crossResultsPanel">
+
+              </g:FlowPanel>
+            </b:Well>
+          </b:Column>
+        </b:FluidRow>
+
       </b:Tab>
 
       <b:Tab heading="Values">

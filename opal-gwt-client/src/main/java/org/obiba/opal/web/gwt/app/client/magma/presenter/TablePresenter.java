@@ -29,6 +29,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewPropertiesModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CrossVariablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
@@ -114,6 +115,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final ModalProvider<IndexPresenter> indexPresenter;
 
+  private final Provider<CrossVariablePresenter> crossVariableProvider;
+
   private final Translations translations;
 
   private Runnable removeConfirmation;
@@ -131,8 +134,9 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @SuppressWarnings({ "ConstructorWithTooManyParameters", "PMD.ExcessiveParameterList" })
   @Inject
   public TablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
-      ValuesTablePresenter valuesTablePresenter, Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
-      ModalProvider<IndexPresenter> indexPresenter, ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
+      ValuesTablePresenter valuesTablePresenter, Provider<CrossVariablePresenter> crossVariableProvider,
+      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, ModalProvider<IndexPresenter> indexPresenter,
+      ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
       ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider,
       ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider,
       ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider,
@@ -150,6 +154,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     this.viewPropertiesModalProvider = viewPropertiesModalProvider.setContainer(this);
     this.dataExportModalProvider = dataExportModalProvider.setContainer(this);
     this.dataCopyModalProvider = dataCopyModalProvider.setContainer(this);
+    this.crossVariableProvider = crossVariableProvider;
     getView().setUiHandlers(this);
   }
 
@@ -174,7 +179,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   protected void onBind() {
     super.onBind();
     setInSlot(Display.Slots.Values, valuesTablePresenter);
-
     addEventHandlers();
   }
 
@@ -559,6 +563,32 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     dialog.updateSchedules(objects);
   }
 
+  @Override
+  public void onCrossVariables() {
+    ResourceRequestBuilderFactory.<VariableDto>newBuilder() //
+        .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
+            .build(table.getDatasourceName(), table.getName(), getView().getSelectedVariable())) //
+        .get() //
+        .withCallback(new ResourceCallback<VariableDto>() {
+          @Override
+          public void onResource(Response response, final VariableDto variableDto) {
+            for(int i = 0; i < getView().getCrossWithVariables().size(); i++)
+              ResourceRequestBuilderFactory.<VariableDto>newBuilder() //
+                  .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
+                      .build(table.getDatasourceName(), table.getName(), getView().getCrossWithVariables().get(i))) //
+                  .get() //
+                  .withCallback(new ResourceCallback<VariableDto>() {
+                    @Override
+                    public void onResource(Response response, VariableDto crossWithVariable) {
+                      CrossVariablePresenter crossVariablePresenter = crossVariableProvider.get();
+                      crossVariablePresenter.initialize(table, variableDto, crossWithVariable);
+                      setInSlot(Display.Slots.CrossVariables, crossVariablePresenter);
+                    }//
+                  }).send();
+          }//
+        }).send();
+  }
+
   private final class ValuesCommand implements Command {
 
     @Override
@@ -724,7 +754,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   public interface Display extends View, HasUiHandlers<TableUiHandlers> {
 
     enum Slots {
-      Permissions, Values
+      Permissions, Values, CrossVariables
     }
 
     void beforeRenderRows();
@@ -776,6 +806,13 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     TextBoxClearable getFilter();
 
     void setCancelVisible(boolean b);
+
+    String getSelectedVariable();
+
+    List<String> getCrossWithVariables();
+
+//    void addCrossVariableCategoricalResult(QueryResultDto resource, VariableDto variable,
+//        VariableDto crossWithVariable);
   }
 
   private class RemoveRunnable implements Runnable {

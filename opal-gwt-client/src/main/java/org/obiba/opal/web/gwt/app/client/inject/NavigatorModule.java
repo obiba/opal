@@ -54,9 +54,11 @@ import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewPropertiesMod
 import org.obiba.opal.web.gwt.app.client.magma.table.view.TablePropertiesModalView;
 import org.obiba.opal.web.gwt.app.client.magma.table.view.ViewPropertiesModalView;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CategoriesEditorModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CrossVariablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.view.CategoriesEditorModalView;
+import org.obiba.opal.web.gwt.app.client.magma.variable.view.CrossVariableView;
 import org.obiba.opal.web.gwt.app.client.magma.variable.view.VariableAttributeModalView;
 import org.obiba.opal.web.gwt.app.client.magma.variable.view.VariablePropertiesModalView;
 import org.obiba.opal.web.gwt.app.client.magma.view.CodingViewModalView;
@@ -95,7 +97,7 @@ public class NavigatorModule extends AbstractOpalModule {
   protected void configure() {
     configureProject();
     configureMagma();
-    configureDereiveVariableWizard();
+    configureDeriveVariableWizard();
     configureDatasource();
     configureDeriveVariablePresenters();
   }
@@ -105,6 +107,7 @@ public class NavigatorModule extends AbstractOpalModule {
     bindPresenterWidget(DatasourcePresenter.class, DatasourcePresenter.Display.class, DatasourceView.class);
     bindPresenterWidget(TablePresenter.class, TablePresenter.Display.class, TableView.class);
     bindPresenterWidget(VariablePresenter.class, VariablePresenter.Display.class, VariableView.class);
+    bindPresenterWidget(CrossVariablePresenter.class, CrossVariablePresenter.Display.class, CrossVariableView.class);
     bindPresenterWidget(ValuesTablePresenter.class, ValuesTablePresenter.Display.class, ValuesTableView.class);
     bindPresenterWidget(EntityModalPresenter.class, EntityModalPresenter.Display.class, EntityModalView.class);
     bindPresenterWidget(VariableVcsCommitHistoryPresenter.class, VariableVcsCommitHistoryPresenter.Display.class,
@@ -139,7 +142,7 @@ public class NavigatorModule extends AbstractOpalModule {
         NullDatasourceFormView.class, NullDatasourceFormPresenter.Subscriber.class);
   }
 
-  private void configureDereiveVariableWizard() {
+  private void configureDeriveVariableWizard() {
     bindWizardPresenterWidget(DeriveVariablePresenter.class, DeriveVariablePresenter.Display.class,
         DeriveVariableView.class, DeriveVariablePresenter.CategorizeWizard.class);
     // tricky case: one wizard presenter for 3 different types

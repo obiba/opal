@@ -1,0 +1,248 @@
+/*
+ * Copyright (c) 2013 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.obiba.opal.web.gwt.app.client.magma.variable.view;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CrossVariablePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CrossVariableUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.DefaultFlexTable;
+import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.search.FacetResultDto;
+import org.obiba.opal.web.model.client.search.QueryResultDto;
+
+import com.github.gwtbootstrap.client.ui.Heading;
+import com.github.gwtbootstrap.client.ui.NavLink;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+
+public class CrossVariableView extends ViewWithUiHandlers<CrossVariableUiHandlers>
+    implements CrossVariablePresenter.Display {
+
+  private static final int DEFAULT_WIDTH = 60;
+
+  private QueryResultDto queryResult;
+
+  private VariableDto variable;
+
+  private VariableDto crossWithVariable;
+
+  private boolean showFrequencies = true;
+
+  interface Binder extends UiBinder<Widget, CrossVariableView> {}
+
+  @UiField
+  FlowPanel crossTable;
+
+  @UiField
+  NavLink frequency;
+
+  @UiField
+  NavLink percentage;
+
+  @UiField
+  Heading title;
+
+  private final Translations translations;
+
+  @Inject
+  public CrossVariableView(Binder uiBinder, Translations translations) {
+    this.translations = translations;
+
+    initWidget(uiBinder.createAndBindUi(this));
+
+  }
+
+  @UiHandler("percentage")
+  public void onPercentage(ClickEvent event) {
+    percentage.setActive(true);
+    frequency.setActive(false);
+    showFrequencies = false;
+    crossTable.clear();
+    draw();
+  }
+
+  @UiHandler("frequency")
+  public void onFrequency(ClickEvent event) {
+    frequency.setActive(true);
+    percentage.setActive(false);
+    showFrequencies = true;
+    crossTable.clear();
+    draw();
+  }
+
+  @Override
+  public void init(QueryResultDto resource, VariableDto variable, VariableDto crossWithVariable) {
+    queryResult = resource;
+    this.variable = variable;
+    this.crossWithVariable = crossWithVariable;
+  }
+
+  @Override
+  public void draw() {
+    DefaultFlexTable parentTable = new DefaultFlexTable();
+
+    title.setText(TranslationsUtils
+        .replaceArguments(translations.crossTableResult(), variable.getName(), crossWithVariable.getName()));
+    addHeader(parentTable);
+
+    percentage.setVisible(!queryResult.getFacetsArray().get(0).hasStatistics());
+    frequency.setVisible(!queryResult.getFacetsArray().get(0).hasStatistics());
+
+    // data
+    if(queryResult.getFacetsArray().get(0).hasStatistics()) {
+      addContinuousStatistics(parentTable);
+    } else {
+      addCategoricalStatistics(parentTable);
+    }
+    crossTable.add(parentTable);
+
+  }
+
+  private void addCategoricalStatistics(DefaultFlexTable parentTable) {
+    // Process the resource to have a map by categoryXcrossCategory
+    Map<String, Map<String, FacetResultDto.TermFrequencyResultDto>> facets
+        = new HashMap<String, Map<String, FacetResultDto.TermFrequencyResultDto>>();
+    Map<String, Integer> variableFacetTotals = new HashMap<String, Integer>();
+    Map<String, Integer> crossFacetTotals = new HashMap<String, Integer>();
+    initStatsticsMaps(facets, variableFacetTotals, crossFacetTotals);
+
+    int nbCrossCategories = crossWithVariable.getCategoriesArray().length();
+    int nbVariableCategories = variable.getCategoriesArray().length();
+    if(facets.size() > 0) {
+
+      for(int i = 0; i < nbCrossCategories; i++) {
+        String crossName = crossWithVariable.getCategoriesArray().get(i).getName();
+        parentTable.setWidget(i + 2, 0, new Label(crossName));
+
+        for(int j = 0; j < nbVariableCategories; j++) {
+          String categoryName = variable.getCategoriesArray().get(j).getName();
+
+          if(facets.containsKey(categoryName)) {
+            FacetResultDto.TermFrequencyResultDto termFrequencyResultDto = facets.get(categoryName).get(crossName);
+            addValue(parentTable, i + 2, j + 1, termFrequencyResultDto == null ? 0 : termFrequencyResultDto.getCount(),
+                crossFacetTotals.get(crossName));
+          } else {
+            addValue(parentTable, i + 2, j + 1, 0, crossFacetTotals.get(crossName));
+          }
+        }
+
+        addValue(parentTable, i + 2, nbVariableCategories + 1,
+            crossFacetTotals.containsKey(crossName) ? crossFacetTotals.get(crossName) : 0,
+            variableFacetTotals.get("total"));
+      }
+
+      // N
+      parentTable.setWidget(nbCrossCategories + 3, 0, new Label(translations.totalLabel()));
+      for(int i = 0; i < nbVariableCategories; i++) {
+        addValue(parentTable, nbCrossCategories + 3, i + 1,
+            variableFacetTotals.get(variable.getCategoriesArray().get(i).getName()), variableFacetTotals.get("total"));
+      }
+
+      addValue(parentTable, nbCrossCategories + 3, nbVariableCategories + 1, variableFacetTotals.get("total"),
+          variableFacetTotals.get("total"));
+    } else {
+      parentTable.setWidget(2, 0, new Label(translations.noResultsFound()));
+      parentTable.getFlexCellFormatter().setColSpan(2, 0, nbVariableCategories + 4);
+
+      percentage.setVisible(false);
+      frequency.setVisible(false);
+    }
+
+  }
+
+  private void initStatsticsMaps(Map<String, Map<String, FacetResultDto.TermFrequencyResultDto>> facets,
+      Map<String, Integer> variableFacetTotals, Map<String, Integer> crossFacetTotals) {
+    for(int i = 0; i < queryResult.getFacetsArray().length(); i++) {
+      Map<String, FacetResultDto.TermFrequencyResultDto> termByFacets
+          = new HashMap<String, FacetResultDto.TermFrequencyResultDto>();
+      int total = 0;
+      for(int j = 0; j < queryResult.getFacetsArray().get(i).getFrequenciesArray().length(); j++) {
+        termByFacets.put(queryResult.getFacetsArray().get(i).getFrequenciesArray().get(j).getTerm(),
+            queryResult.getFacetsArray().get(i).getFrequenciesArray().get(j));
+        facets.put(queryResult.getFacetsArray().get(i).getFacet(), termByFacets);
+        total += queryResult.getFacetsArray().get(i).getFrequenciesArray().get(j).getCount();
+
+        if(queryResult.getFacetsArray().get(i).getFacet().equals("total")) {
+          crossFacetTotals.put(queryResult.getFacetsArray().get(i).getFrequenciesArray().get(j).getTerm(),
+              queryResult.getFacetsArray().get(i).getFrequenciesArray().get(j).getCount());
+        }
+      }
+
+      variableFacetTotals.put(queryResult.getFacetsArray().get(i).getFacet(), total);
+    }
+  }
+
+  private void addValue(DefaultFlexTable parentTable, int row, int column, int count, Integer total) {
+    if(showFrequencies) {
+      parentTable.setWidget(row, column, new Label(count + ""));
+    } else {
+      double d = count;
+      parentTable.setWidget(row, column, new Label(total == null ? "0 %" : d / total * 100 + " %"));
+    }
+  }
+
+  private void addContinuousStatistics(DefaultFlexTable parentTable) {
+    Map<String, FacetResultDto.StatisticalResultDto> continuousFacets
+        = new HashMap<String, FacetResultDto.StatisticalResultDto>();
+    for(int i = 0; i < queryResult.getFacetsArray().length(); i++) {
+      continuousFacets
+          .put(queryResult.getFacetsArray().get(i).getFacet(), queryResult.getFacetsArray().get(i).getStatistics());
+    }
+
+    parentTable.setWidget(2, 0, new Label(translations.meanStdDeviationLabel()));
+    parentTable.setWidget(3, 0, new Label(translations.NLabel()));
+    for(int i = 0; i < variable.getCategoriesArray().length(); i++) {
+      parentTable.setWidget(2, i + 1,
+          new Label(continuousFacets.get(variable.getCategoriesArray().get(i).getName()).getMean() + " (" +
+              continuousFacets.get(variable.getCategoriesArray().get(i).getName()).getStdDeviation() + ")"));
+
+      parentTable.setWidget(3, i + 1,
+          new Label((int) continuousFacets.get(variable.getCategoriesArray().get(i).getName()).getCount() + ""));
+    }
+
+    parentTable.setWidget(2, variable.getCategoriesArray().length() + 1, new Label(
+        continuousFacets.get("total").getMean() + " (" + continuousFacets.get("total").getStdDeviation() + ")"));
+    parentTable.setWidget(3, variable.getCategoriesArray().length() + 1,
+        new Label((int) continuousFacets.get("total").getCount() + ""));
+  }
+
+  private void addHeader(DefaultFlexTable parentTable) {
+    parentTable.setWidget(0, 0, new Label(crossWithVariable.getName()));
+    parentTable.setWidget(0, 1, new Label(variable.getName()));
+    parentTable.setWidget(0, 2, new Label(translations.totalLabel()));
+    parentTable.getFlexCellFormatter().setRowSpan(0, 0, 2);
+    parentTable.getFlexCellFormatter().setRowSpan(0, 2, 2);
+    parentTable.getFlexCellFormatter().setColSpan(0, 1, variable.getCategoriesArray().length());
+    parentTable.getFlexCellFormatter().setWidth(0, 1, DEFAULT_WIDTH + "%");
+    parentTable.getFlexCellFormatter().setWidth(0, 2, "10%");
+
+    parentTable.getFlexCellFormatter().addStyleName(0, 0, "cross-table-header");
+    parentTable.getFlexCellFormatter().addStyleName(0, 1, "cross-table-header");
+    parentTable.getFlexCellFormatter().addStyleName(0, 2, "cross-table-header");
+
+    int width = DEFAULT_WIDTH / variable.getCategoriesArray().length();
+    for(int i = 0; i < variable.getCategoriesArray().length(); i++) {
+      parentTable.setWidget(1, i, new Label(variable.getCategoriesArray().get(i).getName()));
+      parentTable.getFlexCellFormatter().setWidth(1, i, width + "%");
+      parentTable.getFlexCellFormatter().addStyleName(1, i, "cross-table-header");
+    }
+  }
+}
