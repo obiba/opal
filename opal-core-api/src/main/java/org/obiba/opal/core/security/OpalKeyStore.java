@@ -43,6 +43,7 @@ import java.util.Set;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -150,9 +151,8 @@ public class OpalKeyStore implements KeyProvider {
   @Override
   public KeyPair getKeyPair(String alias)
       throws NoSuchKeyException, org.obiba.magma.crypt.KeyProviderSecurityException {
-    KeyPair keyPair = null;
     try {
-      keyPair = findKeyPairForPrivateKey(alias);
+      return findKeyPairForPrivateKey(alias);
     } catch(KeyPairNotFoundException ex) {
       throw ex;
     } catch(UnrecoverableKeyException ex) {
@@ -163,8 +163,6 @@ public class OpalKeyStore implements KeyProvider {
     } catch(Exception ex) {
       throw new RuntimeException(ex);
     }
-
-    return keyPair;
   }
 
   @Override
@@ -240,7 +238,8 @@ public class OpalKeyStore implements KeyProvider {
     return passwordCallback.getPassword();
   }
 
-  private KeyPair findKeyPairForPrivateKey(String alias) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedCallbackException,
+  private KeyPair findKeyPairForPrivateKey(String alias)
+      throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedCallbackException,
       IOException {
 
     Key key = store.getKey(alias, getKeyPassword(createPasswordCallback("Password for '" + alias + "':  ")));
@@ -438,29 +437,14 @@ public class OpalKeyStore implements KeyProvider {
   }
 
   private KeyPair getKeyPair(InputStream privateKey) {
-    PEMReader pemReader = null;
-    try {
-      pemReader = new PEMReader(new InputStreamReader(privateKey), new PasswordFinder() {
-        @Override
-        public char[] getPassword() {
-          return System.console().readPassword("%s:  ", "Password for imported private key");
-        }
-      });
-      Object object = pemReader.readObject();
-      if(object == null) {
-        throw new RuntimeException("No PEM information.");
-      }
+    try(PEMReader pemReader = getPEMReader(privateKey)) {
+      Object object = getPemObject(pemReader);
       if(object instanceof KeyPair) {
         return (KeyPair) object;
       }
       throw new RuntimeException("Unexpected type [" + object + "]. Expected KeyPair.");
     } catch(IOException e) {
       throw new RuntimeException(e);
-    } finally {
-      try {
-        if(pemReader != null) pemReader.close();
-      } catch(IOException ignored) {
-      }
     }
   }
 
@@ -475,27 +459,10 @@ public class OpalKeyStore implements KeyProvider {
   }
 
   private Key getPrivateKey(InputStream privateKey) {
-
-    PEMReader pemReader = null;
-    try {
-      pemReader = new PEMReader(new InputStreamReader(privateKey), new PasswordFinder() {
-        @Override
-        public char[] getPassword() {
-          return System.console().readPassword("%s:  ", "Password for imported private key");
-        }
-      });
-      Object pemObject = pemReader.readObject();
-      if(pemObject == null) {
-        throw new RuntimeException("No PEM information.");
-      }
-      return toPrivateKey(pemObject);
+    try(PEMReader pemReader = getPEMReader(privateKey)) {
+      return toPrivateKey(getPemObject(pemReader));
     } catch(IOException e) {
       throw new RuntimeException(e);
-    } finally {
-      try {
-        if(pemReader != null) pemReader.close();
-      } catch(IOException ignored) {
-      }
     }
   }
 
@@ -521,30 +488,31 @@ public class OpalKeyStore implements KeyProvider {
   }
 
   private X509Certificate getCertificate(InputStream certificate) {
-    PEMReader pemReader = null;
-    try {
-      pemReader = new PEMReader(new InputStreamReader(certificate), new PasswordFinder() {
-        @Override
-        public char[] getPassword() {
-          return System.console().readPassword("%s:  ", "Password for imported certificate");
-        }
-      });
-      Object object = pemReader.readObject();
-      if(object == null) {
-        throw new RuntimeException("No PEM information.");
-      }
+    try(PEMReader pemReader = getPEMReader(certificate)) {
+      Object object = getPemObject(pemReader);
       if(object instanceof X509Certificate) {
         return (X509Certificate) object;
       }
       throw new RuntimeException("Unexpected type [" + object + "]. Expected X509Certificate.");
     } catch(IOException e) {
       throw new RuntimeException(e);
-    } finally {
-      try {
-        if(pemReader != null) pemReader.close();
-      } catch(IOException ignored) {
-      }
     }
+  }
+
+  private PEMReader getPEMReader(InputStream certificate) {
+    return new PEMReader(new InputStreamReader(certificate), new PasswordFinder() {
+      @Override
+      public char[] getPassword() {
+        return System.console().readPassword("%s:  ", "Password for imported certificate");
+      }
+    });
+  }
+
+  @NotNull
+  private Object getPemObject(PEMReader pemReader) throws IOException {
+    Object object = pemReader.readObject();
+    if(object == null) throw new RuntimeException("No PEM information.");
+    return object;
   }
 
   /**
@@ -553,10 +521,6 @@ public class OpalKeyStore implements KeyProvider {
   private String getPasswordFor(String target) {
     return PASSWORD_FOR + " '" + target + "':  ";
   }
-
-  //
-  // Inner Classes
-  //
 
   @SuppressWarnings({ "StaticMethodOnlyUsedInOneClass", "ParameterHidesMemberVariable" })
   public static class Builder {
