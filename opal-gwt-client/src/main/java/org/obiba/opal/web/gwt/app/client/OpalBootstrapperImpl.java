@@ -123,12 +123,17 @@ public class OpalBootstrapperImpl implements Bootstrapper {
       public void onSessionEnded(SessionEndedEvent event) {
         if(requestCredentials.hasCredentials()) {
           ResourceRequestBuilderFactory.newBuilder().forResource(
-              UriBuilder.create().segment("auth", "session", requestCredentials.extractCredentials()).build()).delete()
-              .send();
+              UriBuilder.create().segment("auth", "session", requestCredentials.extractCredentials()).build())//
+              .withCallback(new ResponseCodeCallback() {
+                @Override
+                public void onResponseCode(Request request, Response response) {
+                  // Reload application and reset history
+                  Window.Location.replace("/");
+                }
+              }) //
+              .delete().send();
           requestCredentials.invalidate();
         }
-        // Reload application and reset history
-        Window.Location.replace("/");
       }
     });
 

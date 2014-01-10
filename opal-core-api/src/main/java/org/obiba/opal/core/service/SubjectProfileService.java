@@ -51,4 +51,9 @@ public interface SubjectProfileService extends SystemService {
   @Nullable
   SubjectProfile getProfile(@NotNull String principal);
 
+  /**
+   * Update profile timestamp.
+   * @param principal
+   */
+  void updateProfile(@NotNull String principal);
 }

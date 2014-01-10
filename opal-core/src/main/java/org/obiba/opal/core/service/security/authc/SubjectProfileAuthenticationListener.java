@@ -76,6 +76,10 @@ public class SubjectProfileAuthenticationListener implements AuthenticationListe
 
   @Override
   public void onLogout(PrincipalCollection principals) {
+    Object primaryPrincipal = principals.getPrimaryPrincipal();
+    if (supportProfile(primaryPrincipal)) {
+      subjectProfileService.updateProfile(primaryPrincipal.toString());
+    }
   }
 
   private void ensureUserHomeExists(String username) {

@@ -10,6 +10,8 @@
 
 package org.obiba.opal.core.service;
 
+import java.util.Date;
+
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
@@ -47,8 +49,8 @@ public class DefaultSubjectProfileServiceImpl implements SubjectProfileService {
 
     SubjectProfile profile = getProfile(principal);
     if(profile == null) {
-      SubjectProfile p = new SubjectProfile(principal, realm);
-      orientDbService.save(p, p);
+      profile = new SubjectProfile(principal, realm);
+      orientDbService.save(profile, profile);
     } else if(!profile.getRealm().equals(realm)) {
       throw new AuthenticationException(
           "Wrong realm for subject '" + principal + "': " + realm + " (" + profile.getRealm() +
@@ -75,5 +77,14 @@ public class DefaultSubjectProfileServiceImpl implements SubjectProfileService {
   @Override
   public SubjectProfile getProfile(@NotNull String principal) {
     return orientDbService.findUnique(SubjectProfile.Builder.create(principal).build());
+  }
+
+  @Override
+  public void updateProfile(@NotNull String principal) {
+    SubjectProfile profile = getProfile(principal);
+    if(profile != null) {
+      profile.setUpdated(new Date());
+      orientDbService.save(profile, profile);
+    }
   }
 }
