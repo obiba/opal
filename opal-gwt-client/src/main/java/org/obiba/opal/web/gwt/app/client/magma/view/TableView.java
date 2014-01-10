@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -16,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
+import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
@@ -36,6 +40,7 @@ import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.ListBox;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.ProgressBar;
 import com.github.gwtbootstrap.client.ui.SimplePager;
@@ -174,6 +179,18 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiField
   Panel permissionsPanel;
 
+  @UiField
+  Chooser variables;
+
+  @UiField
+  ListBox categoricalVariables;
+
+  @UiField
+  Button crossVariables;
+
+  @UiField
+  FlowPanel crossResultsPanel;
+
   private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
 
   private final Translations translations;
@@ -209,9 +226,13 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
       panel = valuesPanel;
     } else if(slot == Slots.Permissions) {
       panel = permissionsPanel;
+    } else if(slot == Slots.CrossVariables) {
+      panel = crossResultsPanel;
     }
+
     if(panel != null) {
-      panel.clear();
+      if(slot != Slots.CrossVariables) panel.clear();
+
       if(content != null) {
         panel.add(content.asWidget());
       }
@@ -296,6 +317,20 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
     pager.firstPage();
     dataProvider.refresh();
+
+    // Prepare cross table form
+    categoricalVariables.clear();
+    variables.clear();
+    categoricalVariables.setWidth("400px");
+    variables.setWidth("400px");
+
+    for(VariableDto variableDto : JsArrays.toIterable(rows)) {
+      if(variableDto.getCategoriesArray().length() > 0 || variableDto.getValueType().equals("double") ||
+          variableDto.getValueType().equals("integer")) variables.addItem(variableDto.getName(), variableDto.getName());
+      if(variableDto.getCategoriesArray().length() > 0) {
+        categoricalVariables.addItem(variableDto.getName(), variableDto.getName());
+      }
+    }
   }
 
   @Override
@@ -338,6 +373,23 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
       }
       propertiesTable.addProperty(new Label(translations.tableReferencesLabel()), fromTableLinks);
     }
+  }
+
+  @Override
+  public String getSelectedVariable() {
+    return categoricalVariables.getValue(categoricalVariables.getSelectedIndex());
+  }
+
+  @Override
+  public List<String> getCrossWithVariables() {
+    List<String> selected = new ArrayList<String>();
+
+    for(int i = 0; i < variables.getItemCount(); i++) {
+      if(variables.isItemSelected(i)) {
+        selected.add(variables.getItemText(i));
+      }
+    }
+    return selected;
   }
 
   @UiHandler("downloadDictionary")
@@ -403,6 +455,12 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiHandler("scheduleLink")
   void onIndexSchedule(ClickEvent event) {
     getUiHandlers().onIndexSchedule();
+  }
+
+  @UiHandler("crossVariables")
+  void onCrossVariables(ClickEvent event) {
+    crossResultsPanel.clear();
+    getUiHandlers().onCrossVariables();
   }
 
   @Override
