@@ -18,13 +18,11 @@ import org.obiba.opal.web.gwt.app.client.ui.SuggestListBox;
 import org.obiba.opal.web.gwt.app.client.ui.VariableSearchListItem;
 import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 
 import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -89,14 +87,13 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
       }
     });
 
-    search.getSuggestBox().addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
+    search.setUpdaterCallback(new Typeahead.UpdaterCallback() {
       @Override
-      public void onSelection(SelectionEvent<SuggestOracle.Suggestion> event) {
-        // Reset suggestBox text to user input text
+      public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {// Reset suggestBox text to user input text
         String originalQuery = oracle.getOriginalQuery();
-        search.getSuggestBox().setText(originalQuery);
         // Forward selection event
-        getUiHandlers().onSelection(event);
+        getUiHandlers().onSelection((VariableSuggestOracle.VariableSuggestion)selectedSuggestion);
+        return originalQuery;
       }
     });
   }

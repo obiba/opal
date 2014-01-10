@@ -38,6 +38,7 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
 
+import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
@@ -381,7 +382,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
 
     void hideDialog();
 
-    SuggestBox getNamespaceSuggestBox();
+    TextBox getNamespaceSuggestBox();
 
     HasText getName();
 

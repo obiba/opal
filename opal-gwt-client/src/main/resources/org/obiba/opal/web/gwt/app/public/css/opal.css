@@ -139,6 +139,7 @@ ul.closeables {
   float: left;
   margin-bottom: 0;
   margin-left: 0;
+  margin-top: 1px;
 }
 
 /* Truncate labels depending on screen resolution */
@@ -227,7 +228,8 @@ ul.closeables li a {
 
 .obiba-SuggestListBox > div {
   margin: 0;
-  padding: 0;
+  padding: 4px 6px;
+  height: 20px;
 }
 
 .obiba-SuggestListBox input {
@@ -272,11 +274,6 @@ div.obiba-SuggestListBox {
 
 .textbox-clearable-anchor {
   color: #666;
-}
-
-.obiba-SuggestListBox.pull-left.navbar-search {
-  margin-top: 8px;
-  padding-top: 2px;
 }
 
 /*

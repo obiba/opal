@@ -25,7 +25,9 @@
             <o:RequiredIcon/>
           </b:ControlLabel>
           <b:Controls>
-            <o:SuggestListBox ui:field="namespace"/>
+            <b:Typeahead ui:field="namespaceTypeahead">
+              <b:TextBox ui:field="namespace"/>
+            </b:Typeahead>
             <b:HelpBlock>
               <ui:msg description="Namespace help">Namespace, if applicable</ui:msg>
             </b:HelpBlock>

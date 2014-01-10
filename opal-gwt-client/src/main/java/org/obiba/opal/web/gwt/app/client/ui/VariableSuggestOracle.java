@@ -231,7 +231,9 @@ public class VariableSuggestOracle extends SuggestOracle {
     accum.appendHtmlConstant("<strong>");
     accum.appendEscaped(attributes.get("name"));
     accum.appendHtmlConstant("</strong>");
-    accum.appendEscaped(" " + attributes.get("datasource") + "." + attributes.get("table") + "");
+    accum.appendHtmlConstant(" <i>");
+    accum.appendEscaped(attributes.get("datasource") + "." + attributes.get("table"));
+    accum.appendHtmlConstant("</i>");
 
     if(attributes.containsKey("label")) {
       accum.appendHtmlConstant("<br>");

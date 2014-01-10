@@ -150,22 +150,11 @@ public class GroupSuggestOracle extends SuggestOracle {
 
           private GroupSuggestion convertToFormattedSuggestions(String query, GroupDto group) {
             SafeHtmlBuilder accum = new SafeHtmlBuilder();
-
-            accum.appendHtmlConstant("<span class='variable-search-suggest-box'>");
-            accum.appendHtmlConstant("<strong>");
             accum.appendEscaped(group.getName());
-            accum.appendHtmlConstant("</strong>");
-
             return createSuggestion(query, accum.toSafeHtml().asString(), group.getName());
           }
         })//
-        .withCallback(com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(com.google.gwt.http.client.Request request,
-              com.google.gwt.http.client.Response response) {
-            eventBus.fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
-          }
-        }).send();
+        .send();
 
   }
 
