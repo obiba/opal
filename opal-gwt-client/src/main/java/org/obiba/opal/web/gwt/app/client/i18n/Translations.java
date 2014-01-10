@@ -1050,6 +1050,11 @@ public interface Translations extends Constants {
       "GROUP", "Group" })
   Map<String, String> shortSubjectTypeMap();
 
+  @Description("Add Subject Permission map")
+  @DefaultStringMapValue({ "USER.title", "Add User Permission", //
+      "GROUP.title", "Add Group Permission" })
+  Map<String, String> addSubjectPermissionMap();
+
   @Description("Subject Type Users label")
   @DefaultStringValue("Users")
   String subjectTypeUsers();

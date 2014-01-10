@@ -73,9 +73,14 @@ public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissi
     return permissionsDataProvider.getList();
   }
 
-  @UiHandler("addPermission")
-  public void onAddPermissionClicked(ClickEvent event) {
-    getUiHandlers().addPersmission();
+  @UiHandler("addUserPermission")
+  public void onAddUserPermission(ClickEvent event) {
+    getUiHandlers().addUserPermission();
+  }
+
+  @UiHandler("addGroupPermission")
+  public void onAddGroupPermission(ClickEvent event) {
+    getUiHandlers().addGroupPermission();
   }
 
   private void renderSubjectsPermissionTable(List<Acl> acls) {

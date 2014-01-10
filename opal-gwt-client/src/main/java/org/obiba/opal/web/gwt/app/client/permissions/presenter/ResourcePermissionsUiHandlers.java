@@ -15,9 +15,12 @@ import org.obiba.opal.web.model.client.opal.Acl;
 import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface ResourcePermissionsUiHandlers extends UiHandlers {
-  void addPersmission();
 
-  void editPersmission(Acl acl);
+  void addUserPermission();
+
+  void addGroupPermission();
+
+  void editPermission(Acl acl);
 
   void deletePermission(Acl acl);
 }

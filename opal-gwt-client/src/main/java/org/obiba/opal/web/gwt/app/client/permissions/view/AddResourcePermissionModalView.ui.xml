@@ -14,16 +14,10 @@
         </b:ControlLabel>
         <b:TextBox ui:field="principal" b:id="principal"/>
       </b:ControlGroup>
-      <b:ControlGroup ui:field="subjectTypeGroup">
-        <b:ControlLabel for="subjectType">
-          <ui:msg description="Usage label">Type</ui:msg>
-        </b:ControlLabel>
-        <o:Chooser ui:field="subjectType" name="subjectType"/>
-      </b:ControlGroup>
       <b:ControlGroup ui:field="permissionsGroup">
         <b1:InlineLabel><ui:msg description="Add Resource Permission label">Permissions</ui:msg></b1:InlineLabel>
         <b:Controls>
-          <o:ResourcePermissionsPanel ui:field="permissions" addStyleNames="large-top-margin"></o:ResourcePermissionsPanel>
+          <o:ResourcePermissionsPanel ui:field="permissions" addStyleNames="small-top-margin"/>
         </b:Controls>
       </b:ControlGroup>
     </g:FlowPanel>

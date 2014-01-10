@@ -47,7 +47,7 @@ public class UpdateResourcePermissionModalPresenter
   @Override
   public void save() {
     if(updateHandler != null) {
-      updateHandler.update(Arrays.asList(acl.getSubject().getPrincipal()), acl.getSubject().getType().getName(),
+      updateHandler.update(Arrays.asList(acl.getSubject().getPrincipal()), acl.getSubject().getType(),
           getView().getPermission());
     }
     getView().close();

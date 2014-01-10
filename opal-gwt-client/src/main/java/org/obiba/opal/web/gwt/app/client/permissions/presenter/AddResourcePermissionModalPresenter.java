@@ -17,7 +17,6 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
@@ -41,18 +40,20 @@ public class AddResourcePermissionModalPresenter
 
   private List<Acl> currentAclList;
 
+  private Subject.SubjectType currentSubjectType;
+
   @Inject
-  public AddResourcePermissionModalPresenter(Display display, EventBus eventBus, Translations translations) {
+  public AddResourcePermissionModalPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
     getView().setUiHandlers(this);
-    initializeViewSubjectTypes(translations);
   }
 
   public void initialize(@Nonnull ResourcePermissionType type, @Nonnull UpdateResourcePermissionHandler handler,
-      List<Acl> aclList) {
-    getView().setData(type);
+      List<Acl> aclList, Subject.SubjectType subjectType) {
+    getView().setData(type, subjectType);
     updateHandler = handler;
     currentAclList = aclList;
+    currentSubjectType = subjectType;
   }
 
   @Override
@@ -60,20 +61,10 @@ public class AddResourcePermissionModalPresenter
     getView().clearErrors();
     if(new ViewValidatorHandler().validate()) {
       if(updateHandler != null) {
-        updateHandler.update(Arrays.asList(getView().getPrincipal().getText()), getView().getSubjectType().getValue(),
-            getView().getPermission());
+        updateHandler.update(Arrays.asList(getView().getPrincipal().getText()), currentSubjectType, getView().getPermission());
       }
       getView().close();
     }
-  }
-
-  private void initializeViewSubjectTypes(Translations translations) {
-    String userType = Subject.SubjectType.USER.getName();
-    String groupType = Subject.SubjectType.GROUP.getName();
-
-    ResourceSubjectType subjectType = getView().getSubjectType();
-    subjectType.addItem(translations.shortSubjectTypeMap().get(userType), userType);
-    subjectType.addItem(translations.shortSubjectTypeMap().get(groupType), groupType);
   }
 
   private final class ViewValidatorHandler extends ViewValidationHandler {
@@ -85,9 +76,8 @@ public class AddResourcePermissionModalPresenter
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
       validators.add(
           new RequiredTextValidator(getView().getPrincipal(), "NameIsRequired", Display.FormField.PRINCIPAL.name()));
-      validators.add(
-          new DuplicateSubjectValidator(getView().getPrincipal().getText(), getView().getSubjectType().getValue(),
-              Display.FormField.PERMISSIONS.name()));
+      validators.add(new DuplicateSubjectValidator(getView().getPrincipal().getText(), currentSubjectType.getName(),
+          Display.FormField.PERMISSIONS.name()));
       return validators;
     }
 
@@ -103,15 +93,12 @@ public class AddResourcePermissionModalPresenter
 
     private final Subject.SubjectType type;
 
-    public DuplicateSubjectValidator(String principal, String typeName, String id) {
+    DuplicateSubjectValidator(String principal, String typeName, String id) {
       super("", id);
       this.principal = principal;
-      type = Subject.SubjectType.USER.getName().equals(typeName)
-          ? Subject.SubjectType.USER
-          : Subject.SubjectType.GROUP;
-      setErrorMessageKey(Subject.SubjectType.USER.isSubjectType(type)
-          ? "DuplicateAclSubjectUser"
-          : "DuplicateAclSubjectGroup");
+      type = Subject.SubjectType.USER.getName().equals(typeName) ? Subject.SubjectType.USER : Subject.SubjectType.GROUP;
+      setErrorMessageKey(
+          Subject.SubjectType.USER.isSubjectType(type) ? "DuplicateAclSubjectUser" : "DuplicateAclSubjectGroup");
       setArgs(Arrays.asList(principal));
     }
 
@@ -129,23 +116,15 @@ public class AddResourcePermissionModalPresenter
     }
   }
 
-  public static interface ResourceSubjectType {
-    void addItem(String item, String value);
-    String getValue();
-  }
-
   public interface Display extends PopupView, HasUiHandlers<ResourcePermissionModalUiHandlers> {
     enum FormField {
       PRINCIPAL,
-      SUBJECT_TYPE,
       PERMISSIONS
     }
 
-    void setData(ResourcePermissionType type);
+    void setData(ResourcePermissionType type, Subject.SubjectType subjectType);
 
     String getPermission();
-
-    ResourceSubjectType getSubjectType();
 
     HasText getPrincipal();
 
@@ -155,6 +134,5 @@ public class AddResourcePermissionModalPresenter
 
     void clearErrors();
   }
-
 
 }

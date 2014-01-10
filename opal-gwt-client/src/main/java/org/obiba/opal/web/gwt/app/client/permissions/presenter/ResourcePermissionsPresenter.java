@@ -26,6 +26,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.opal.Acl;
+import org.obiba.opal.web.model.client.opal.Subject;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
@@ -74,7 +75,7 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
       @Override
       public void doAction(Acl acl, String actionName) {
         if (ActionsColumn.EDIT_ACTION.equals(actionName)) {
-          editPersmission(acl);
+          editPermission(acl);
         }
         else if (ActionsColumn.DELETE_ACTION.equals(actionName)) {
           deletePermission(acl);
@@ -93,12 +94,17 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
   }
 
   @Override
-  public void addPersmission() {
-    addModalProvider.get().initialize(resourceType, this, getView().getAclList());
+  public void addUserPermission() {
+    addModalProvider.get().initialize(resourceType, this, getView().getAclList(), Subject.SubjectType.USER);
   }
 
   @Override
-  public void editPersmission(Acl acl) {
+  public void addGroupPermission() {
+    addModalProvider.get().initialize(resourceType, this, getView().getAclList(), Subject.SubjectType.GROUP);
+  }
+
+  @Override
+  public void editPermission(Acl acl) {
     updateModalProvider.get().initialize(resourceType, acl, this);
   }
 
@@ -119,8 +125,8 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
   }
 
   @Override
-  public void update(List<String> subjectPrincipals, String subjectType, String permission) {
-    UriBuilder uri = uriBuilder.create().query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, subjectType)//
+  public void update(List<String> subjectPrincipals, Subject.SubjectType subjectType, String permission) {
+    UriBuilder uri = uriBuilder.create().query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, subjectType.getName())//
         .query(ResourcePermissionRequestPaths.PERMISSION_QUERY_PARAM, permission);
 
     for (String principal : subjectPrincipals) {

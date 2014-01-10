@@ -12,6 +12,10 @@ package org.obiba.opal.web.gwt.app.client.permissions.presenter;
 
 import java.util.List;
 
+import org.obiba.opal.web.model.client.opal.Subject;
+
 public interface UpdateResourcePermissionHandler {
-  void update(List<String> subjectPrincipals, String subjectType, String permission);
+
+  void update(List<String> subjectPrincipals, Subject.SubjectType subjectType, String permission);
+
 }

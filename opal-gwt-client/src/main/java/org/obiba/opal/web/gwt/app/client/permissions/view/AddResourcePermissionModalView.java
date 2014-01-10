@@ -26,20 +26,13 @@ public class AddResourcePermissionModalView
 
   interface Binder extends UiBinder<Widget, AddResourcePermissionModalView> {}
 
-  @UiField
-  Modal dialog;
+  private final Translations translations;
 
   @UiField
   TextBox principal;
 
   @UiField
-  Chooser subjectType;
-
-  @UiField
   ControlGroup principalGroup;
-
-  @UiField
-  ControlGroup subjectTypeGroup;
 
   @UiField
   ControlGroup permissionsGroup;
@@ -48,33 +41,18 @@ public class AddResourcePermissionModalView
   public AddResourcePermissionModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
     super(eventBus);
     initWidget(uiBinder.createAndBindUi(this));
-    dialog.setTitle(translations.addResourcePermissionsModalTile());
+    this.translations = translations;
   }
 
   @Override
-  public void setData(ResourcePermissionType type) {
+  public void setData(ResourcePermissionType type, Subject.SubjectType subjectType) {
     createPermissionRadios(type, null);
+    dialog.setTitle(translations.addSubjectPermissionMap().get(subjectType.getName() + ".title"));
   }
 
   @Override
   public String getPermission() {
     return getSelectedPermission();
-  }
-
-  @Override
-  public AddResourcePermissionModalPresenter.ResourceSubjectType getSubjectType() {
-    return new AddResourcePermissionModalPresenter.ResourceSubjectType() {
-
-      @Override
-      public void addItem(String item, String value) {
-        subjectType.addItem(item, value);
-      }
-
-      @Override
-      public String getValue() {
-        return subjectType.getSelectedValue();
-      }
-    };
   }
 
   @Override
@@ -94,9 +72,6 @@ public class AddResourcePermissionModalView
       switch(field) {
         case PRINCIPAL:
           group = principalGroup;
-          break;
-        case SUBJECT_TYPE:
-          group = subjectTypeGroup;
           break;
         case PERMISSIONS:
           group = permissionsGroup;
