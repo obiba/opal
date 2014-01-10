@@ -48,8 +48,6 @@ public class OpalConfiguration {
 
   private final List<OpalConfigurationExtension> extensions;
 
-  private boolean migratedToOpal2;
-
   public OpalConfiguration() {
     functionalUnits = Sets.newLinkedHashSet();
     reportTemplates = Sets.newLinkedHashSet();
@@ -144,14 +142,6 @@ public class OpalConfiguration {
 
   public boolean hasReportTemplates() {
     return reportTemplates.size() > 0;
-  }
-
-  public boolean isMigratedToOpal2() {
-    return migratedToOpal2;
-  }
-
-  public void setMigratedToOpal2(boolean migratedToOpal2) {
-    this.migratedToOpal2 = migratedToOpal2;
   }
 
   /**

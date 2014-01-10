@@ -25,7 +25,6 @@ import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.database.MongoDbSettingsDto;
 import org.obiba.opal.web.model.client.database.SqlSettingsDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.VariableEntityDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
@@ -177,8 +176,8 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
         .withCallback(new ResourceCallback<JsArray<TableDto>>() {
           @Override
           public void onResource(Response response, @Nullable JsArray<TableDto> tables) {
-            for (TableDto table : JsArrays.toIterable(tables)) {
-              if (table.getValueSetCount()>0) {
+            for(TableDto table : JsArrays.toIterable(tables)) {
+              if(table.getValueSetCount() > 0) {
                 getView().enableDeletion(false);
                 return;
               }

@@ -46,7 +46,7 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
 
   private final Condition opalConfigAvailable = opalConfigurationLock.newCondition();
 
-  private OpalConfiguration opalConfiguration;
+  protected OpalConfiguration opalConfiguration;
 
   @Override
   @PostConstruct
@@ -57,7 +57,7 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
     configureDatabasePassword();
   }
 
-  protected void configureMagma() {
+  private void configureMagma() {
     // Add opal specific javascript methods
     Collection<GlobalMethodProvider> providers = new HashSet<>();
     providers.add(new OpalGlobalMethodProvider());

@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component("configDataSource")
-public class QuartzDataSourceFactoryBean extends DataSourceFactoryBean {
+public class ConfigDataSourceFactoryBean extends DataSourceFactoryBean {
 
   public static final String DB_PATH = System.getProperty("OPAL_HOME") + "/data/hsql/opal_config";
 
@@ -20,10 +20,7 @@ public class QuartzDataSourceFactoryBean extends DataSourceFactoryBean {
   @Autowired
   private CryptoService cryptoService;
 
-  // use to skip password encryption during upgrade
-  private boolean encryptNullPassword = true;
-
-  public QuartzDataSourceFactoryBean() {
+  public ConfigDataSourceFactoryBean() {
     setDriverClass("org.hsqldb.jdbcDriver");
     setUrl("jdbc:hsqldb:file:" + DB_PATH + ";shutdown=true;hsqldb.tx=mvcc");
     setUsername(USERNAME);
@@ -31,13 +28,10 @@ public class QuartzDataSourceFactoryBean extends DataSourceFactoryBean {
 
   @Override
   public DataSource getObject() {
-    if(password == null && encryptNullPassword) {
+    if(password == null) {
       setPassword(cryptoService.decrypt(opalConfigurationService.getOpalConfiguration().getDatabasePassword()));
     }
     return super.getObject();
   }
 
-  public void setEncryptNullPassword(boolean encryptNullPassword) {
-    this.encryptNullPassword = encryptNullPassword;
-  }
 }

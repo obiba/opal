@@ -24,9 +24,7 @@
 
   <bean id="cryptoService" class="org.obiba.opal.core.service.security.CryptoServiceImpl"/>
 
-  <bean id="configDataSource" class="org.obiba.opal.core.cfg.QuartzDataSourceFactoryBean">
-    <property name="encryptNullPassword" value="false"/>
-  </bean>
+  <bean id="configDataSource" class="org.obiba.opal.core.cfg.ConfigDataSourceFactoryBean"/>
 
   <bean id="dataSourceFactory" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactory"/>
 
@@ -127,9 +125,6 @@
           <property name="description" value="Alter Hibernate schemas for nullable order columns"/>
           <property name="appliesTo" value="2.0.0"/>
         </bean>
-
-        <!-- 2.0.0 / update Opal Configuration -->
-        <bean class="org.obiba.opal.core.upgrade.v2_0_x.database.UpdateOpalConfigurationFlagUpgradeStep"/>
 
       </list>
     </property>

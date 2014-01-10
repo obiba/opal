@@ -12,9 +12,12 @@ package org.obiba.opal.server;
 import java.io.File;
 import java.io.IOException;
 
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.obiba.opal.core.upgrade.v2_0_x.ConfigFolderUpgrade;
 import org.obiba.opal.core.upgrade.v2_0_x.database.Opal2DatabaseConfigurator;
@@ -24,9 +27,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.xml.sax.Attributes;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * Command to perform an upgrade (i.e., invoke the upgrade manager).
@@ -57,22 +60,22 @@ public class UpgradeCommand {
   }
 
   /**
-   * Load opal-config.xml and search for migratedToOpal2 node
+   * Load opal-config.xml and search for version node
    */
   private boolean isMigratedToOpal2() {
-    String opalHome = System.getenv().get("OPAL_HOME");
     try {
-      SAXParser saxParser = SAXParserFactory.newInstance().newSAXParser();
-      ConfigurationHandler handler = new ConfigurationHandler();
-      saxParser.parse(new File(opalHome + "/conf/opal-config.xml"), handler);
-      return handler.isMigrated();
-    } catch(SAXException | ParserConfigurationException | IOException e) {
-      throw new RuntimeException("An error occurred while reading opal-config.xml during upgrade", e);
+      Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+          .parse(new File(System.getenv().get("OPAL_HOME") + "/conf/opal-config.xml"));
+      XPath xPath = XPathFactory.newInstance().newXPath();
+      Node node = (Node) xPath.compile("//version").evaluate(doc.getDocumentElement(), XPathConstants.NODE);
+      return node != null;
+    } catch(SAXException | XPathExpressionException | ParserConfigurationException | IOException e) {
+      throw new RuntimeException(e);
     }
   }
 
   private void opal2Upgrade() {
-    log.info("Prepare upgrade to Opal 2.0");
+    log.info("Prepare upgrade to Opal 2.0.0");
 
     // need to be run out of Spring context
     new Opal2DatabaseConfigurator().configureDatabase();
@@ -82,24 +85,9 @@ public class UpgradeCommand {
       try {
         ctx.getBean("upgradeManager", UpgradeManager.class).executeUpgrade();
       } catch(UpgradeException upgradeFailed) {
-        throw new RuntimeException("An error occurred while running the opal2 upgrade manager", upgradeFailed);
+        throw new RuntimeException("An error occurred while running the opal-2.0.0 upgrade manager", upgradeFailed);
       }
     }
   }
 
-  private static class ConfigurationHandler extends DefaultHandler {
-
-    private boolean migrated;
-
-    @Override
-    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-      if("migratedToOpal2".equals(qName)) {
-        migrated = true;
-      }
-    }
-
-    private boolean isMigrated() {
-      return migrated;
-    }
-  }
 }

@@ -13,9 +13,14 @@ package org.obiba.opal.core.upgrade.v2_0_x;
 import java.io.File;
 import java.io.IOException;
 
-import javax.annotation.PostConstruct;
+import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -32,34 +37,49 @@ public class UpgradeOpalConfigurationService extends DefaultOpalConfigurationSer
 
   private File configFile;
 
-  @Override
-  @PostConstruct
-  public void start() {
-    configureMagma();
-  }
+  private static final XPath XPATH = XPathFactory.newInstance().newXPath();
 
   @Override
   public OpalConfiguration getOpalConfiguration() {
-    OpalConfiguration configuration = new OpalConfiguration();
-    try {
-      Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(configFile);
-      XPath xPath = XPathFactory.newInstance().newXPath();
-      Node node = (Node) xPath.compile("//secretKey").evaluate(doc.getDocumentElement(), XPathConstants.NODE);
-      configuration.setSecretKey(node.getTextContent());
-    } catch(SAXException | XPathExpressionException | ParserConfigurationException | IOException e) {
-      throw new RuntimeException(e);
-    }
-    return configuration;
+    readOpalConfiguration();
+    return opalConfiguration;
   }
 
   @Override
   public void readOpalConfiguration() {
-    throw new IllegalStateException("Should not be called during upgrade");
+    if(opalConfiguration == null) opalConfiguration = new OpalConfiguration();
+    try {
+      Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(configFile);
+      opalConfiguration.setSecretKey(getNodeValue("//secretKey", doc));
+      opalConfiguration.setDatabasePassword(getNodeValue("//databasePassword", doc));
+    } catch(SAXException | XPathExpressionException | ParserConfigurationException | IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Nullable
+  private String getNodeValue(String expression, Document doc) throws XPathExpressionException {
+    Node node = (Node) XPATH.compile(expression).evaluate(doc.getDocumentElement(), XPathConstants.NODE);
+    return node == null ? null : node.getTextContent();
   }
 
   @Override
   public void modifyConfiguration(OpalConfigurationService.ConfigModificationTask task) {
-    throw new IllegalStateException("Should not be called during upgrade");
+    task.doWithConfig(opalConfiguration);
+    persistDatabasePassword();
+  }
+
+  private void persistDatabasePassword() {
+    try {
+      Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(configFile);
+      Node node = doc.createElement("databasePassword");
+      node.setTextContent(opalConfiguration.getDatabasePassword());
+      doc.getFirstChild().appendChild(node);
+      Transformer transformer = TransformerFactory.newInstance().newTransformer();
+      transformer.transform(new DOMSource(doc), new StreamResult(configFile));
+    } catch(SAXException | ParserConfigurationException | IOException | TransformerException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public void setConfigFile(File configFile) {
