@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueSequencePopupPrese
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewPropertiesModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CrossVariablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
@@ -54,6 +55,7 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     displayMock = createMock(TablePresenter.Display.class);
     eventBusMock = createMock(EventBus.class);
     Provider<ResourcePermissionsPresenter> resourcePermissionsPresenterProvider = createMock(Provider.class);
+    Provider<CrossVariablePresenter> crossVariablePresenterProvider = createMock(Provider.class);
     ModalProvider<IndexPresenter> mockIndexProvider = createMock(ModalProvider.class);
     ModalProvider<EntityModalPresenter> modalEntityModalPresenter = createMock(ModalProvider.class);
     ModalProvider<ValueSequencePopupPresenter> modalProviderValueSequence = createMock(ModalProvider.class);
@@ -66,7 +68,7 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
 
     ValuesTablePresenter values = new ValuesTablePresenter(null, null, null, modalProviderValueSequence,
         modalEntityModalPresenter);
-    presenter = new TablePresenter(displayMock, new CountingEventBus(), null, values,
+    presenter = new TablePresenter(displayMock, new CountingEventBus(), null, values, crossVariablePresenterProvider,
         resourcePermissionsPresenterProvider, mockIndexProvider, variablesToViewProvider,
         variablePropertiesModalProvider, viewPropertiesModalProvider, tablePropertiesModalPresenterModalProvider, null,
         null, translations);
