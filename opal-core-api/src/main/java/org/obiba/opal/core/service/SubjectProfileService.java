@@ -56,4 +56,10 @@ public interface SubjectProfileService extends SystemService {
    * @param principal
    */
   void updateProfile(@NotNull String principal);
+
+  /**
+   * Get all subject profiles.
+   * @return
+   */
+  Iterable<SubjectProfile> getProfiles();
 }

@@ -87,4 +87,9 @@ public class DefaultSubjectProfileServiceImpl implements SubjectProfileService {
       orientDbService.save(profile, profile);
     }
   }
+
+  @Override
+  public Iterable<SubjectProfile> getProfiles() {
+    return orientDbService.list(SubjectProfile.class);
+  }
 }

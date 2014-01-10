@@ -1,12 +1,17 @@
 package org.obiba.opal.web.security;
 
+import java.text.SimpleDateFormat;
+
 import org.obiba.opal.core.domain.security.Group;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
+import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.web.model.Opal;
 
 import com.google.common.collect.Sets;
 
 public class Dtos {
+
+  private static final SimpleDateFormat ISO_8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
   private Dtos() {}
 
@@ -49,6 +54,14 @@ public class Dtos {
         .setName(group.getName()) //
         .addAllSubjectCredentials(group.getSubjectCredentials()) //
         .build();
+  }
+
+  public static Opal.SubjectProfileDto asDto(SubjectProfile profile) {
+    return Opal.SubjectProfileDto.newBuilder() //
+        .setPrincipal(profile.getPrincipal()) //
+        .setRealm(profile.getRealm()) //
+        .setCreated(ISO_8601.format(profile.getCreated())) //
+        .setLastUpdate(ISO_8601.format(profile.getUpdated())).build();
   }
 
 }

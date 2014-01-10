@@ -232,6 +232,13 @@ message GroupDto {
   repeated string subjectCredentials = 2;
 }
 
+message SubjectProfileDto {
+  required string principal = 1;
+  required string realm = 2;
+  required string created = 3;
+  required string lastUpdate = 4;
+}
+
 // Extracts from RuntimeMXBean
 message OpalEnv {
   required string version = 1; // opal version
