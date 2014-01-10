@@ -44,6 +44,11 @@ public class SubjectCredentials extends AbstractTimestamped
   @SuppressWarnings("TransientFieldInNonSerializableClass")
   private transient byte[] certificate; // for application only
 
+  /**
+   * alias used to store certificate into KeyStore
+   */
+  private String certificateAlias;
+
   private boolean enabled;
 
   private Set<String> groups = new HashSet<>();
@@ -63,6 +68,10 @@ public class SubjectCredentials extends AbstractTimestamped
   @Override
   public List<Object> getUniqueValues() {
     return Lists.<Object>newArrayList(name);
+  }
+
+  public String generateCertificateAlias() {
+    return name.toLowerCase().replaceAll("[^A-Za-z0-9]", "") + "-" + System.currentTimeMillis();
   }
 
   @NotNull
@@ -97,6 +106,14 @@ public class SubjectCredentials extends AbstractTimestamped
 
   public void setCertificate(byte... certificate) {
     this.certificate = certificate;
+  }
+
+  public String getCertificateAlias() {
+    return certificateAlias;
+  }
+
+  public void setCertificateAlias(String certificateAlias) {
+    this.certificateAlias = certificateAlias;
   }
 
   public Set<String> getGroups() {

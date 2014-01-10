@@ -95,8 +95,8 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
     assertSubjectEquals(subjectCredentials, found);
 
     OpalKeyStore keyStore = credentialsKeyStoreService.getKeyStore();
-    assertThat(keyStore.aliasExists(subjectCredentials.getName()), is(true));
-    assertThat(keyStore.getKeyType(subjectCredentials.getName()), is(OpalKeyStore.KeyType.CERTIFICATE));
+    assertThat(keyStore.aliasExists(subjectCredentials.getCertificateAlias()), is(true));
+    assertThat(keyStore.getKeyType(subjectCredentials.getCertificateAlias()), is(OpalKeyStore.KeyType.CERTIFICATE));
   }
 
   @Test

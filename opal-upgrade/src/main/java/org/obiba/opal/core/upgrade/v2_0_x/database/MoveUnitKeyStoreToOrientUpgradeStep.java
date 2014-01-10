@@ -154,8 +154,10 @@ public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
   private void saveSubjectCredentials(SubjectCredentials subjectCredentials, Certificate certificate)
       throws ConstraintViolationException, DuplicateSubjectProfileException, KeyStoreException {
 
+    subjectCredentials.setCertificateAlias(subjectCredentials.generateCertificateAlias());
+
     OpalKeyStore opalKeyStore = credentialsKeyStoreService.getKeyStore();
-    opalKeyStore.getKeyStore().setCertificateEntry(subjectCredentials.getName(), certificate);
+    opalKeyStore.getKeyStore().setCertificateEntry(subjectCredentials.getCertificateAlias(), certificate);
     credentialsKeyStoreService.saveKeyStore(opalKeyStore);
 
     Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();

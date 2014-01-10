@@ -128,8 +128,9 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
       case CERTIFICATE:
         if(subjectCredentials.getCertificate() != null) {
           keyStore = credentialsKeyStoreService.getKeyStore();
-          keyStore.importCertificate(subjectCredentials.getName(),
-              new ByteArrayInputStream(subjectCredentials.getCertificate()));
+          String alias = subjectCredentials.generateCertificateAlias();
+          subjectCredentials.setCertificateAlias(alias);
+          keyStore.importCertificate(alias, new ByteArrayInputStream(subjectCredentials.getCertificate()));
         }
         break;
     }
