@@ -32,7 +32,6 @@ import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.domain.security.KeyStoreState;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
-import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
@@ -73,10 +72,6 @@ public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
 
   @Override
   public void execute(Version currentVersion) {
-
-    orientDbService.createUniqueIndex(KeyStoreState.class);
-    orientDbService.createUniqueIndex(SubjectProfile.class);
-
     JdbcOperations dataJdbcTemplate = new JdbcTemplate(databaseRegistry.getDataSource("opal-data", null));
     dataJdbcTemplate.query("select * from unit_key_store", new RowCallbackHandler() {
       @Override

@@ -74,10 +74,11 @@
       <list>
 
         <!-- 2.0.0 / import database config from XML to OrientDB -->
-        <bean class="org.obiba.opal.core.upgrade.v2_0_x.database.MoveUnitKeyStoreToOrientUpgradeStep">
+        <bean class="org.obiba.opal.core.upgrade.v2_0_x.database.MoveDatasourcesToOrientUpgradeStep">
           <property name="description" value="Move database config from properties file to OrientDB"/>
           <property name="appliesTo" value="2.0.0"/>
           <property name="configFile" value="file:${OPAL_HOME}/conf/opal-config.xml"/>
+          <property name="propertiesFile" value="file:${OPAL_HOME}/conf/opal-config.properties"/>
         </bean>
 
         <!-- 2.0.0 / create quartz schema in opal config database -->
@@ -119,7 +120,9 @@
         <bean class="org.obiba.opal.core.upgrade.v2_0_x.database.CopyVersionToOpalConfigurationUpgradeStep"/>
 
         <!-- 2.0.0 / hash passwords in shiro.ini -->
-        <bean class="org.obiba.opal.core.upgrade.v2_0_x.HashShiroIniPasswordUpgradeStep"/>
+        <bean class="org.obiba.opal.core.upgrade.v2_0_x.HashShiroIniPasswordUpgradeStep">
+          <property name="appliesTo" value="2.0.0"/>
+        </bean>
 
         <!-- 2.0.0 / alter Hibernate schemas for nullable order columns -->
         <bean class="org.obiba.opal.core.upgrade.v2_0_x.HibernateSqlOrderColumnsUpgradeStep">

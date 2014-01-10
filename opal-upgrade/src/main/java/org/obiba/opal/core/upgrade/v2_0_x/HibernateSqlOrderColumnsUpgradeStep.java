@@ -35,6 +35,7 @@ public class HibernateSqlOrderColumnsUpgradeStep extends AbstractUpgradeStep {
     sqlScriptUpgradeStep
         .setScriptPath(new DefaultResourceLoader().getResource("classpath:/META-INF/opal/upgrade-scripts/2.0.x/"));
     sqlScriptUpgradeStep.setScriptBasename("nullable-order-columns");
+    sqlScriptUpgradeStep.setAppliesTo(new Version(2, 0, 0));
   }
 
   @Override
@@ -48,13 +49,13 @@ public class HibernateSqlOrderColumnsUpgradeStep extends AbstractUpgradeStep {
   }
 
   private void upgradeSchema(Version currentVersion, DataSource dataSource, String name) {
-    sqlScriptUpgradeStep.setDataSource(dataSource);
     try {
+      sqlScriptUpgradeStep.setDataSource(dataSource);
       sqlScriptUpgradeStep.initialize();
+      sqlScriptUpgradeStep.execute(currentVersion);
     } catch(IOException e) {
-      throw new RuntimeException("Cannot upgrade " + name + "schema", e);
+      throw new RuntimeException("Cannot upgrade " + name + " schema", e);
     }
-    sqlScriptUpgradeStep.execute(currentVersion);
   }
 
 }

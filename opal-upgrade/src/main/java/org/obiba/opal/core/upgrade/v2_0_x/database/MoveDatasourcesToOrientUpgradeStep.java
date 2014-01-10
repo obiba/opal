@@ -33,6 +33,7 @@ import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -74,8 +75,10 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
 
   private File propertiesFile;
 
+  @Autowired
   private DatabaseRegistry databaseRegistry;
 
+  @Autowired
   private OrientDbService orientDbService;
 
   @Override
@@ -350,14 +353,6 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
 
   public void setPropertiesFile(File propertiesFile) {
     this.propertiesFile = propertiesFile;
-  }
-
-  public void setDatabaseRegistry(DatabaseRegistry databaseRegistry) {
-    this.databaseRegistry = databaseRegistry;
-  }
-
-  public void setOrientDbService(OrientDbService orientDbService) {
-    this.orientDbService = orientDbService;
   }
 
 }
