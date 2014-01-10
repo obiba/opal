@@ -1,4 +1,4 @@
-package org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.presenter;
+package org.obiba.opal.web.gwt.app.client.administration.users.presenter;
 
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 

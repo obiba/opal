@@ -7,15 +7,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.view;
+package org.obiba.opal.web.gwt.app.client.administration.users.view;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.presenter.SubjectCredentialsPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.presenter.SubjectCredentialsUiHandlers;
+import org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectCredentialsPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectCredentialsUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.GroupSuggestOracle;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
@@ -30,7 +30,6 @@ import com.github.gwtbootstrap.client.ui.TextArea;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;

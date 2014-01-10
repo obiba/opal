@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.administration.subjectCredentials;
+package org.obiba.opal.web.gwt.app.client.administration.users;
 
 import org.obiba.opal.web.model.client.opal.SubjectCredentialsDto;
 

@@ -7,14 +7,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.presenter;
+package org.obiba.opal.web.gwt.app.client.administration.users.presenter;
 
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
-import org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.event.GroupsRefreshedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.event.SubjectCredentialsRefreshedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.users.event.GroupsRefreshedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.users.event.SubjectCredentialsRefreshedEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
