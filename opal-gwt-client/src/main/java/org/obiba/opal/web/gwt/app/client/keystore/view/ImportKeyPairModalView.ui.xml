@@ -16,7 +16,7 @@
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <o:Modal ui:field="modal" resizable="false" closeVisible="true" keyboard="true" animation="false">
+  <o:Modal ui:field="modal" resizable="true" closeVisible="true" keyboard="true" animation="false">
     <g:FlowPanel>
       <b:ControlGroup ui:field="nameGroup">
         <b:ControlLabel>
@@ -28,29 +28,33 @@
         </b:Controls>
       </b:ControlGroup>
 
-      <g:FlowPanel ui:field="privateKeyPanel">
-        <b:ControlGroup ui:field="privateKeyGroup">
-          <b:ControlLabel>
-            <ui:msg description="Import Key Modal Private Key label">Private Key</ui:msg>
-            <o:RequiredIcon/>
-          </b:ControlLabel>
-          <b:Controls>
-            <b:TextArea ui:field="privateKey"/>
-          </b:Controls>
-        </b:ControlGroup>
-      </g:FlowPanel>
+      <g:HorizontalPanel verticalAlignment="MIDDLE">
+        <g:FlowPanel ui:field="privateKeyPanel" addStyleNames="small-right-indent">
+          <b:ControlGroup ui:field="privateKeyGroup">
+            <b:ControlLabel>
+              <ui:msg description="Import Key Modal Private Key label">Private Key</ui:msg>
+              <o:RequiredIcon/>
+            </b:ControlLabel>
+            <b:Controls>
+              <b:TextArea ui:field="privateKey" alternateSize="LARGE" visibleLines="10"/>
+            </b:Controls>
+          </b:ControlGroup>
+        </g:FlowPanel>
 
-      <g:FlowPanel>
         <b:ControlGroup ui:field="publicKeyGroup">
           <b:ControlLabel>
             <ui:msg description="Import Key Modal Public Key label">Public Key (Certificate)</ui:msg>
             <o:RequiredIcon/>
           </b:ControlLabel>
           <b:Controls>
-            <b:TextArea ui:field="publicKey"/>
+            <b:TextArea ui:field="publicKey" alternateSize="LARGE" visibleLines="10"/>
           </b:Controls>
         </b:ControlGroup>
-      </g:FlowPanel>
+      </g:HorizontalPanel>
+      <b:HelpBlock>
+        <ui:msg description="Import Keys help">Paste encryption key in PEM format.
+        </ui:msg>
+      </b:HelpBlock>
     </g:FlowPanel>
 
     <b:ModalFooter>
