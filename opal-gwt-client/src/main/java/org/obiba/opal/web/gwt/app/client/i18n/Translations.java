@@ -931,11 +931,11 @@ public interface Translations extends Constants {
   Map<String, String> keyTypeMap();
 
   @Description("Import data label")
-  @DefaultStringValue("Import Data...")
+  @DefaultStringValue("Import data...")
   String importDataLabel();
 
   @Description("Import data no storage label")
-  @DefaultStringValue("Import Data (no storage)")
+  @DefaultStringValue("Import data (no storage)")
   String importDataNoStorageLabel();
 
   @Description("Import Key Pair title")
