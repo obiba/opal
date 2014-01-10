@@ -20,14 +20,14 @@
     <b:FluidRow addStyleNames="no-bottom-margin">
       <b:Column size="3">
         <b:DropdownButton ui:field="addDropdown" text="Add Key" type="INFO" icon="PLUS">
-          <b:NavLink ui:field="createKeyPair">
-            <ui:msg description="Create Key Pair label">Create Key Pair...</ui:msg>
-          </b:NavLink>
           <b:NavLink ui:field="importKeyPair">
-            <ui:msg description="Import Key Pair label">Import Key Pair...</ui:msg>
+            <ui:msg description="Import Key Pair label">Import key pair...</ui:msg>
           </b:NavLink>
-          <b:NavLink ui:field="importCertificate">
-            <ui:msg description="Import Certificate label">Import Certificate...</ui:msg>
+          <b:NavLink ui:field="createKeyPair">
+            <ui:msg description="Create Key Pair label">Create key pair...</ui:msg>
+          </b:NavLink>
+          <b:NavLink ui:field="importCertificate" visible="false">
+            <ui:msg description="Import Certificate label">Import certificate...</ui:msg>
           </b:NavLink>
         </b:DropdownButton>
       </b:Column>
