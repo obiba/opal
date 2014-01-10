@@ -26,6 +26,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -35,7 +36,6 @@ import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
-import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -47,8 +47,6 @@ import static org.obiba.opal.web.gwt.app.client.magma.variable.presenter.Variabl
  */
 public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<VariableAttributeModalUiHandlers>
     implements Display {
-
-  private final MultiWordSuggestOracle oracle;
 
   private final Translations translations;
 
@@ -66,29 +64,26 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
   @UiField
   ControlGroup nameGroup;
 
-  @UiField(provided = true)
-  SuggestListBox namespace;
+  @UiField
+  Typeahead namespaceTypeahead;
+
+  @UiField
+  TextBox namespace;
 
   @UiField
   TextBox name;
 
   @UiField
-  FlowPanel valuesPanel;
+  ControlGroup valuesGroup;
 
   @UiField
-  FlowPanel values;
+  FlowPanel valuesPanel;
 
   @Inject
   public VariableAttributeModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
     super(eventBus);
     this.translations = translations;
-    oracle = new MultiWordSuggestOracle();
-    namespace = new SuggestListBox(oracle);
-    namespace.getSuggestBox().setWidth("100px");
-
     initWidget(uiBinder.createAndBindUi(this));
-
-    name.setWidth("150px");
     modal.setTitle(translations.addAttribute());
   }
 
@@ -108,12 +103,14 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
   }
 
   @Override
-  public SuggestBox getNamespaceSuggestBox() {
-    return namespace.getSuggestBox();
+  public TextBox getNamespaceSuggestBox() {
+    return namespace;
   }
 
   @Override
   public void setNamespaceSuggestions(VariableDto variableDto) {
+    MultiWordSuggestOracle oracle = (MultiWordSuggestOracle) namespaceTypeahead.getSuggestOracle();
+    oracle.clear();
     for(int i = 0; i < variableDto.getAttributesArray().length(); i++) {
       oracle.add(variableDto.getAttributesArray().get(i).getNamespace());
     }
@@ -127,8 +124,8 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
   @Override
   public void setDialogMode(VariableAttributeModalPresenter.Mode mode) {
     if(mode == VariableAttributeModalPresenter.Mode.UPDATE_MULTIPLE) {
-      values.setVisible(false);
-      name.setVisible(false);
+      valuesGroup.setVisible(false);
+      nameGroup.setVisible(false);
 
       modal.setTitle(translations.editAttributes());
     } else if(mode == VariableAttributeModalPresenter.Mode.UPDATE_SINGLE) {

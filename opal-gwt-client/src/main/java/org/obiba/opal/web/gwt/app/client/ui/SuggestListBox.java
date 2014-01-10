@@ -15,7 +15,8 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.ui.CloseableList.ItemRemovedHandler;
 
 import com.github.gwtbootstrap.client.ui.NavWidget;
-import com.github.gwtbootstrap.client.ui.base.TextBox;
+import com.github.gwtbootstrap.client.ui.Typeahead;
+import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.base.UnorderedList;
 import com.github.gwtbootstrap.client.ui.constants.Constants;
 import com.google.common.base.Strings;
@@ -44,9 +45,9 @@ public class SuggestListBox extends FocusPanel {
 
   private final CloseableList closeables;
 
-  private SuggestBox suggestBox;
+  private Typeahead aheadBox;
 
-  private final UnorderedList suggestionMenu = new UnorderedList();
+  private TextBox textBox;
 
   private final Anchor clear;
 
@@ -66,18 +67,16 @@ public class SuggestListBox extends FocusPanel {
 
       @Override
       public void onItemRemoved(ListItem item) {
-        suggestBox.setFocus(true);
+        textBox.setFocus(true);
       }
     });
 
     rebuildSuggestBox();
-    suggestionMenu.addStyleName("dropdown-menu block");
-    content.add(suggestionMenu);
 
     addFocusHandler(new FocusHandler() {
       @Override
       public void onFocus(FocusEvent event) {
-        suggestBox.setFocus(true);
+        textBox.setFocus(true);
       }
     });
 
@@ -89,12 +88,10 @@ public class SuggestListBox extends FocusPanel {
       @Override
       public void onClick(ClickEvent event) {
         closeables.clear();
-        suggestBox.setText("");
+        textBox.setText("");
         clear.setVisible(false);
         empty.setVisible(true);
-        suggestBox.setFocus(false);
-        suggestionMenu.clear();
-        suggestionMenu.setVisible(false);
+        textBox.setFocus(false);
       }
     });
     content.add(clear);
@@ -107,8 +104,18 @@ public class SuggestListBox extends FocusPanel {
     add(content);
   }
 
-  public SuggestBox getSuggestBox() {
-    return suggestBox;
+  public TextBox getTextBox() {
+    return textBox;
+  }
+
+  public void setUpdaterCallback(final Typeahead.UpdaterCallback updaterCallback) {
+    aheadBox.setUpdaterCallback(new Typeahead.UpdaterCallback() {
+      @Override
+      public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {
+        textBox.setFocus(true);
+        return updaterCallback.onSelection(selectedSuggestion);
+      }
+    });
   }
 
   public List<String> getSelectedItemsTexts() {
@@ -116,22 +123,24 @@ public class SuggestListBox extends FocusPanel {
   }
 
   private void rebuildSuggestBox() {
-    if(suggestBox != null) {
+    if(textBox != null) {
       // do this because not able to clear suggest box text
-      content.remove(suggestBox);
+      content.remove(textBox);
     }
 
-    content.add(suggestBox = new SuggestBox(oracle, new TextBox(), new SuggestionDisplayImpl(suggestionMenu)));
+    textBox = new TextBox();
+    aheadBox = new Typeahead(oracle);
+    aheadBox.add(textBox);
+    content.add(aheadBox);// = new Typeahead(oracle, textBox, new SuggestionDisplayImpl(suggestionMenu)));
     addSuggestBoxHandlers();
-
   }
 
   private void addSuggestBoxHandlers() {
-    suggestBox.getValueBox().addKeyDownHandler(new KeyDownHandler() {
+    textBox.addKeyDownHandler(new KeyDownHandler() {
       @Override
       public void onKeyDown(KeyDownEvent event) {
         if(event.getNativeKeyCode() == KeyCodes.KEY_BACKSPACE) {
-          if(Strings.isNullOrEmpty(suggestBox.getText())) {
+          if(Strings.isNullOrEmpty(textBox.getText())) {
             closeables.focusOrRemoveLastItem();
           }
         } else {
@@ -139,16 +148,16 @@ public class SuggestListBox extends FocusPanel {
           closeables.removeLastItemFocus();
 
           // Lose focus on enter
-          suggestBox.setFocus(event.getNativeKeyCode() != KeyCodes.KEY_ENTER);
+          textBox.setFocus(event.getNativeKeyCode() != KeyCodes.KEY_ENTER);
         }
       }
     });
 
-    suggestBox.getValueBox().addKeyUpHandler(new KeyUpHandler() {
+    textBox.addKeyUpHandler(new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent event) {
-        clear.setVisible(!suggestBox.getValueBox().getText().isEmpty());
-        empty.setVisible(suggestBox.getValueBox().getText().isEmpty());
+        clear.setVisible(!textBox.getText().isEmpty());
+        empty.setVisible(textBox.getText().isEmpty());
       }
     });
   }
@@ -168,7 +177,7 @@ public class SuggestListBox extends FocusPanel {
 
   @SuppressWarnings("UnusedDeclaration")
   public SuggestOracle getSuggestOracle() {
-    return suggestBox.getSuggestOracle();
+    return aheadBox.getSuggestOracle();
   }
 
   public void addItemRemovedHandler(ItemRemovedHandler handler) {

@@ -146,11 +146,11 @@
                   </ui:msg>
                 </g:Label>
               </g:FlowPanel>
-              <b:Divider/>
-              <o:OpalNavLink ui:field="taxonomiesPlace" icon="COG">
+              <b:Divider visible="false"/>
+              <o:OpalNavLink ui:field="taxonomiesPlace" icon="COG" visible="false">
                 <ui:msg description="Main Administration Taxonomies title">Taxonomies</ui:msg>
               </o:OpalNavLink>
-              <g:FlowPanel>
+              <g:FlowPanel visible="false">
                 <g:Label styleName="help-block">
                   <ui:msg description="Main Administration Taxonomies help">
                     Manage pre-defined variable attributes

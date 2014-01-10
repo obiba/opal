@@ -36,6 +36,7 @@ import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.client.ui.SuggestOracle;
@@ -249,11 +250,13 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   }
 
   @Override
-  public void onSelection(SelectionEvent<SuggestOracle.Suggestion> event) {
+  public void onSelection(VariableSuggestOracle.VariableSuggestion suggestion) {
     // Get the table dto to fire the event to select the variable
-    String datasourceName = ((VariableSuggestOracle.VariableSuggestion) event.getSelectedItem()).getDatasource();
-    String tableName = ((VariableSuggestOracle.VariableSuggestion) event.getSelectedItem()).getTable();
-    String variableName = ((VariableSuggestOracle.VariableSuggestion) event.getSelectedItem()).getVariable();
+    String datasourceName = suggestion.getDatasource();
+    String tableName = suggestion.getTable();
+    String variableName = suggestion.getVariable();
+
+    GWT.log(datasourceName + "." + tableName + ":" + variableName);
 
     getView().clearSearch();
 

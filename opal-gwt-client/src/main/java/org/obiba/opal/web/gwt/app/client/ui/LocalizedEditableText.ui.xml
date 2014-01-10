@@ -3,7 +3,7 @@
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator">
 
-  <b:FluidRow>
+  <b:FluidRow addStyleNames="small-bottom-margin">
     <b:InputAddOn ui:field="locale">
       <b:TextBox ui:field="text"/>
     </b:InputAddOn>

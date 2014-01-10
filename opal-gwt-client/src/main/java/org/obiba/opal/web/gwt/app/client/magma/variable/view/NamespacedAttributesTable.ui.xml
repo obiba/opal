@@ -20,7 +20,7 @@
   <g:FlowPanel>
 
     <g:FlowPanel addStyleNames="clearfix">
-      <b:Heading size="5" ui:field="namespaceLabel"/>
+      <b:Label ui:field="namespaceLabel" addStyleNames="small-top-margin"/>
       <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
     </g:FlowPanel>
 
@@ -57,7 +57,7 @@
       </b:Alert>
     </g:FlowPanel>
 
-    <o:Table ui:field="table"/>
+    <o:Table ui:field="table" addStyleNames="bottom-margin"/>
   </g:FlowPanel>
 
 </ui:UiBinder>
