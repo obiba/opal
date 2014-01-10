@@ -11,6 +11,7 @@ package org.obiba.opal.core.vcs.git.commands;
 
 import java.util.List;
 
+import org.eclipse.jgit.diff.DiffEntry;
 import org.junit.Test;
 import org.obiba.opal.core.vcs.CommitInfo;
 import org.obiba.opal.core.vcs.git.OpalGitException;
@@ -127,6 +128,24 @@ public class OpalGitCommitsLogCommandTest extends AbstractOpalGitCommandTest {
     assertThat(firstCommit.getCommitId(), not(is(nullValue())));
     assertThat(firstCommit.getIsHead(), is(false));
     assertThat(firstCommit.getIsCurrent(), is(false));
+  }
+
+  @Test
+  public void testHistoryWithDeletedCommits() {
+    String datasourceWithDeletions = "Kobe";
+    String path = "TestSitting/InstrumentRun.user.js";
+    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(
+        versionControlSystem.getRepository(datasourceWithDeletions)).addDatasourceName(datasourceWithDeletions)
+        .addPath(path).build();
+    List<CommitInfo> commitInfos = command.execute();
+    assertThat(commitInfos.size(), is(3));
+
+    command = new OpalGitCommitsLogCommand.Builder(
+        versionControlSystem.getRepository(datasourceWithDeletions)).addDatasourceName(datasourceWithDeletions)
+        .addPath(path).addExcludeDeletedRevisions(false).build();
+    commitInfos = command.execute();
+    assertThat(commitInfos.size(), is(5));
+
   }
 
 }

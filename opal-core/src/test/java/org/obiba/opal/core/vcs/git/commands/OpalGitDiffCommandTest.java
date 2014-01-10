@@ -107,7 +107,7 @@ public class OpalGitDiffCommandTest extends AbstractOpalGitCommandTest {
   public void testDiffWithValidCommit() {
     OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(versionControlSystem.getRepository(DATASOURCE_NAME),
         COMMIT_ID).addDatasourceName(DATASOURCE_NAME).build();
-    List<String> diffs = command.execute();
+    List<String> diffs = command.formatAsStringList(command.execute());
     assertThat(diffs, matches(DIFF_VARIABLE));
     assertThat(diffs, matches(DIFF_VIEW));
   }
@@ -116,7 +116,7 @@ public class OpalGitDiffCommandTest extends AbstractOpalGitCommandTest {
   public void testDiffWithValidVariablePath() {
     OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(versionControlSystem.getRepository(DATASOURCE_NAME),
         COMMIT_ID).addPath("TestView/TOTO_VAR.js").addDatasourceName(DATASOURCE_NAME).build();
-    List<String> diffs = command.execute();
+    List<String> diffs = command.formatAsStringList(command.execute());
     assertThat(diffs, matches(DIFF_VARIABLE));
   }
 
@@ -130,7 +130,7 @@ public class OpalGitDiffCommandTest extends AbstractOpalGitCommandTest {
   public void testDiffWithValidViewPath() {
     OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(versionControlSystem.getRepository(DATASOURCE_NAME),
         COMMIT_ID).addPath("TestView").addDatasourceName(DATASOURCE_NAME).build();
-    List<String> diffs = command.execute();
+    List<String> diffs = command.formatAsStringList(command.execute());
     assertThat(diffs, matches(DIFF_VARIABLE));
     assertThat(diffs, matches(DIFF_VIEW));
   }
@@ -145,7 +145,7 @@ public class OpalGitDiffCommandTest extends AbstractOpalGitCommandTest {
   public void testDiffWithTwoVersionsBack() {
     OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(versionControlSystem.getRepository(DATASOURCE_NAME),
         COMMIT_ID).addPath("TestView").addDatasourceName(DATASOURCE_NAME).addNthCommit(2).build();
-    List<String> diffs = command.execute();
+    List<String> diffs = command.formatAsStringList(command.execute());
     assertThat(diffs, matches(DIFF_VIEW_TWO_VERSIONS_BACK));
   }
 
@@ -154,7 +154,7 @@ public class OpalGitDiffCommandTest extends AbstractOpalGitCommandTest {
     OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(versionControlSystem.getRepository(DATASOURCE_NAME),
         "HEAD").addPath("TestView/View.xml").addDatasourceName(DATASOURCE_NAME)
         .addPreviousCommitId("be77432d15dec81b4c60ed858d5d678ceb247171").build();
-    List<String> diffs = command.execute();
+    List<String> diffs = command.formatAsStringList(command.execute());
     assertThat(diffs, matches(DIFF_VIEW_WITH_HEAD));
   }
 

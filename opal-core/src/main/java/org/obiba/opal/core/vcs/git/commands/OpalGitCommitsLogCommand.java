@@ -19,6 +19,7 @@ import javax.validation.constraints.NotNull;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -33,10 +34,12 @@ import com.google.common.base.Strings;
 public class OpalGitCommitsLogCommand extends OpalGitCommand<List<CommitInfo>> {
 
   private final String path;
+  private boolean excludeDeletedCommits = true;
 
   private OpalGitCommitsLogCommand(Builder builder) {
     super(builder.repository, builder.datasourceName);
     path = builder.path;
+    excludeDeletedCommits = builder.excludeDeletedCommits;
   }
 
   @Override
@@ -69,6 +72,8 @@ public class OpalGitCommitsLogCommand extends OpalGitCommand<List<CommitInfo>> {
     boolean isCurrent = true;
 
     for(RevCommit commit : logCommand.call()) {
+      if (excludeDeletedCommits && hasDeletedCommit(commit)) break;
+
       String commitId = commit.getName();
       boolean isHeadCommit = headCommitId.equals(commitId);
       PersonIdent personIdent = commit.getAuthorIdent();
@@ -78,7 +83,32 @@ public class OpalGitCommitsLogCommand extends OpalGitCommand<List<CommitInfo>> {
 
       isCurrent = false;
     }
+
     return commits;
+  }
+
+  /**
+   * A file commit has only one diff entry. Having many diff entries imply that the commit path corresponds to the
+   * whole repository or a folder in the commit tree. In this case, we do not exclude the commit if there are modified
+   * or added changes as well.
+   * @param commit
+   * @return
+   */
+  private boolean hasDeletedCommit(RevCommit commit) {
+    OpalGitDiffCommand diffCommand = new OpalGitDiffCommand.Builder(repository, commit.getName())
+        .addPath(path).addDatasourceName(datasourceName).build();
+
+    List<DiffEntry> diffs = diffCommand.execute();
+
+    if (diffs.size() == 0) return false;
+
+    for (DiffEntry diff : diffs) {
+      if (DiffEntry.ChangeType.DELETE != diff.getChangeType()) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   private String getNoCommitsErrorMessage() {
@@ -97,8 +127,15 @@ public class OpalGitCommitsLogCommand extends OpalGitCommand<List<CommitInfo>> {
    */
   public static class Builder extends OpalGitCommand.Builder<Builder> {
 
+    private boolean excludeDeletedCommits = true;
+
     public Builder(@NotNull Repository repository) {
       super(repository);
+    }
+
+    public Builder addExcludeDeletedRevisions(boolean value) {
+      excludeDeletedCommits = value;
+      return this;
     }
 
     public OpalGitCommitsLogCommand build() {
