@@ -8,7 +8,6 @@ import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateEncodingException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
@@ -136,8 +135,7 @@ public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
     orientDbService.save(null, state);
   }
 
-  private void importCertificates(String unit, OpalKeyStore opalKeyStore)
-      throws CertificateEncodingException, KeyStoreException {
+  private void importCertificates(String unit, OpalKeyStore opalKeyStore) throws KeyStoreException {
     Map<String, Certificate> certificates = opalKeyStore.getCertificates();
     for(String alias : opalKeyStore.listCertificates()) {
       log.info("Import certificate for '{}' alias within '{}' unit", alias, unit);

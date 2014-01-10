@@ -23,6 +23,7 @@ public class CreateOpalGeneralConfigInstallStep implements InstallStep {
   private OpalGeneralConfigService generalConfigService;
 
   @Override
+  @SuppressWarnings("MethodReturnAlwaysConstant")
   public String getDescription() {
     return "Generate and store default configuration.";
   }

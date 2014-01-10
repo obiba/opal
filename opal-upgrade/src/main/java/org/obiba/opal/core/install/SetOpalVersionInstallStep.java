@@ -31,6 +31,7 @@ public class SetOpalVersionInstallStep implements InstallStep {
   }
 
   @Override
+  @SuppressWarnings("MethodReturnAlwaysConstant")
   public String getDescription() {
     return "Set current version to Opal Configuration";
   }

@@ -37,6 +37,7 @@ public class CopyVersionToOpalConfigurationUpgradeStep extends AbstractConfigura
   }
 
   @Override
+  @SuppressWarnings("MethodReturnAlwaysConstant")
   public String getDescription() {
     return "Drop version table from previous opal-data database because it's now moved to opal-config database";
   }

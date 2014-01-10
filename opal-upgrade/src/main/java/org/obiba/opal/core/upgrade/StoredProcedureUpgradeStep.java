@@ -21,6 +21,7 @@ import org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.CallableStatementCallback;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.google.common.io.CharStreams;
@@ -48,7 +49,7 @@ public class StoredProcedureUpgradeStep extends SqlScriptUpgradeStep {
 
   @Override
   protected void executeScript(DataSource dataSource, Resource script) {
-    JdbcTemplate template = new JdbcTemplate(dataSource);
+    JdbcOperations template = new JdbcTemplate(dataSource);
     String sql = readFully(script);
     template.update(sql);
     template.execute("CALL " + procedureName + "()", new CallableStatementCallback<Boolean>() {

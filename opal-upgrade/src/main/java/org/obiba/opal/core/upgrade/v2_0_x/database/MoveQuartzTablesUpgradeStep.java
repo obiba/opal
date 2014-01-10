@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.google.common.collect.Lists;
@@ -41,9 +42,8 @@ public class MoveQuartzTablesUpgradeStep extends AbstractUpgradeStep {
 
   @Override
   public void execute(Version currentVersion) {
-    JdbcTemplate dataJdbcTemplate = new JdbcTemplate(databaseRegistry.getDataSource("opal-data", null));
-    JdbcTemplate configJdbcTemplate = new JdbcTemplate(configDataSource);
-
+    JdbcOperations dataJdbcTemplate = new JdbcTemplate(databaseRegistry.getDataSource("opal-data", null));
+    JdbcOperations configJdbcTemplate = new JdbcTemplate(configDataSource);
     for(String table : TABLES) {
       copyTable(table, dataJdbcTemplate, configJdbcTemplate);
     }
@@ -52,7 +52,7 @@ public class MoveQuartzTablesUpgradeStep extends AbstractUpgradeStep {
     }
   }
 
-  private void copyTable(final String table, JdbcTemplate dataJdbcTemplate, JdbcTemplate configJdbcTemplate) {
+  private void copyTable(final String table, JdbcOperations dataJdbcTemplate, JdbcOperations configJdbcTemplate) {
     final List<Map<String, Object>> rows = dataJdbcTemplate.queryForList("select * from " + table);
 
     if(!rows.isEmpty()) {

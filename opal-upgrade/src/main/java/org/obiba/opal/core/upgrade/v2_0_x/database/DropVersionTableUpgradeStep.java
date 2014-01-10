@@ -14,8 +14,7 @@ public class DropVersionTableUpgradeStep extends AbstractUpgradeStep {
 
   @Override
   public void execute(Version currentVersion) {
-    JdbcTemplate dataJdbcTemplate = new JdbcTemplate(databaseRegistry.getDataSource("opal-data", null));
-    dataJdbcTemplate.execute("drop table version");
+    new JdbcTemplate(databaseRegistry.getDataSource("opal-data", null)).execute("drop table version");
   }
 
 }

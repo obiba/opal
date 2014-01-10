@@ -37,7 +37,6 @@ import de.schlichtherle.io.FileInputStream;
 
 public abstract class AbstractConfigurationAlteringStep {
 
-  @SuppressWarnings("FieldMayBeFinal")
   @Value("${OPAL_HOME}/conf/opal-config.xml")
   private String opalConfigFile;
 

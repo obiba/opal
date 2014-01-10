@@ -62,11 +62,17 @@ public class MoveSubjectAclToOrientUpgradeStep extends AbstractUpgradeStep {
     }
 
     private String upgradeNode(String node) {
-      if(node.equals("/datashield/session")) return "/datashield";
-      if(node.equals("/r/session")) return "/r";
-      return node;
+      switch(node) {
+        case "/datashield/session":
+          return "/datashield";
+        case "/r/session":
+          return "/r";
+        default:
+          return node;
+      }
     }
 
+    @SuppressWarnings({ "PMD.NcssMethodCount", "OverlyLongMethod" })
     private String upgradePermission(String permission) {
       switch(permission) {
         case "CREATE_TABLE":
