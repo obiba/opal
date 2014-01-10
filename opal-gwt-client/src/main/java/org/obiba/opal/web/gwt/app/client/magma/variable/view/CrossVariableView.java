@@ -128,36 +128,8 @@ public class CrossVariableView extends ViewImpl implements CrossVariablePresente
     int nbVariableCategories = variable.getCategoriesArray().length();
     if(facets.size() > 0) {
 
-      for(int i = 0; i < nbCrossCategories; i++) {
-        String crossName = crossWithVariable.getCategoriesArray().get(i).getName();
-        parentTable.setWidget(i + 2, 0, new Label(crossName));
-
-        for(int j = 0; j < nbVariableCategories; j++) {
-          String categoryName = variable.getCategoriesArray().get(j).getName();
-
-          if(facets.containsKey(categoryName)) {
-            FacetResultDto.TermFrequencyResultDto termFrequencyResultDto = facets.get(categoryName).get(crossName);
-            addValue(parentTable, i + 2, j + 1, termFrequencyResultDto == null ? 0 : termFrequencyResultDto.getCount(),
-                crossFacetTotals.get(crossName));
-          } else {
-            addValue(parentTable, i + 2, j + 1, 0, crossFacetTotals.get(crossName));
-          }
-        }
-
-        addValue(parentTable, i + 2, nbVariableCategories + 1,
-            crossFacetTotals.containsKey(crossName) ? crossFacetTotals.get(crossName) : 0,
-            variableFacetTotals.get("total"));
-      }
-
-      // N
-      parentTable.setWidget(nbCrossCategories + 3, 0, new Label(translations.totalLabel()));
-      for(int i = 0; i < nbVariableCategories; i++) {
-        addValue(parentTable, nbCrossCategories + 3, i + 1,
-            variableFacetTotals.get(variable.getCategoriesArray().get(i).getName()), variableFacetTotals.get("total"));
-      }
-
-      addValue(parentTable, nbCrossCategories + 3, nbVariableCategories + 1, variableFacetTotals.get("total"),
-          variableFacetTotals.get("total"));
+      addStatistics(parentTable, facets, variableFacetTotals, crossFacetTotals, nbCrossCategories,
+          nbVariableCategories);
     } else {
       parentTable.setWidget(2, 0, new Label(translations.noResultsFound()));
       parentTable.getFlexCellFormatter().setColSpan(2, 0, nbVariableCategories + 4);
@@ -166,6 +138,41 @@ public class CrossVariableView extends ViewImpl implements CrossVariablePresente
       frequency.setVisible(false);
     }
 
+  }
+
+  private void addStatistics(DefaultFlexTable parentTable,
+      Map<String, Map<String, FacetResultDto.TermFrequencyResultDto>> facets, Map<String, Integer> variableFacetTotals,
+      Map<String, Integer> crossFacetTotals, int nbCrossCategories, int nbVariableCategories) {
+    for(int i = 0; i < nbCrossCategories; i++) {
+      String crossName = crossWithVariable.getCategoriesArray().get(i).getName();
+      parentTable.setWidget(i + 2, 0, new Label(crossName));
+
+      for(int j = 0; j < nbVariableCategories; j++) {
+        String categoryName = variable.getCategoriesArray().get(j).getName();
+
+        if(facets.containsKey(categoryName)) {
+          FacetResultDto.TermFrequencyResultDto termFrequencyResultDto = facets.get(categoryName).get(crossName);
+          addValue(parentTable, i + 2, j + 1, termFrequencyResultDto == null ? 0 : termFrequencyResultDto.getCount(),
+              crossFacetTotals.get(crossName));
+        } else {
+          addValue(parentTable, i + 2, j + 1, 0, crossFacetTotals.get(crossName));
+        }
+      }
+
+      addValue(parentTable, i + 2, nbVariableCategories + 1,
+          crossFacetTotals.containsKey(crossName) ? crossFacetTotals.get(crossName) : 0,
+          variableFacetTotals.get("total"));
+    }
+
+    // N
+    parentTable.setWidget(nbCrossCategories + 3, 0, new Label(translations.totalLabel()));
+    for(int i = 0; i < nbVariableCategories; i++) {
+      addValue(parentTable, nbCrossCategories + 3, i + 1,
+          variableFacetTotals.get(variable.getCategoriesArray().get(i).getName()), variableFacetTotals.get("total"));
+    }
+
+    addValue(parentTable, nbCrossCategories + 3, nbVariableCategories + 1, variableFacetTotals.get("total"),
+        variableFacetTotals.get("total"));
   }
 
   private void initStatsticsMaps(Map<String, Map<String, FacetResultDto.TermFrequencyResultDto>> facets,
