@@ -252,12 +252,6 @@ ul.closeables li a {
   }
 }
 
-@media all and (min-width: 1530px) {
-  .obiba-SuggestListBox input {
-    width: 475px;
-  }
-}
-
 .obiba-SuggestListBox input:focus {
   border: none;
   box-shadow: none;

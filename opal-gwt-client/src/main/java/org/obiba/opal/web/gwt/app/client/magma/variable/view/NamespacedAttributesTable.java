@@ -66,7 +66,7 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
   private CheckboxColumn<JsArray<AttributeDto>> checkColumn;
 
   @UiField
-  Heading namespaceLabel;
+  com.github.gwtbootstrap.client.ui.Label namespaceLabel;
 
   @UiField
   Alert selectAllItemsAlert;
@@ -95,8 +95,9 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
     initWidget(uiBinder.createAndBindUi(this));
 
     if(!namespace.isEmpty()) {
-      namespaceLabel.setText(translations.namespaceLabel() + ": " + namespace);
+      namespaceLabel.setText(namespace);
     }
+    namespaceLabel.setVisible(!namespace.isEmpty());
 
     initColumns();
 

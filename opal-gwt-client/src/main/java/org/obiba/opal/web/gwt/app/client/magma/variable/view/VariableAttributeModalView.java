@@ -74,18 +74,16 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
   TextBox name;
 
   @UiField
-  FlowPanel valuesPanel;
+  ControlGroup valuesGroup;
 
   @UiField
-  FlowPanel values;
+  FlowPanel valuesPanel;
 
   @Inject
   public VariableAttributeModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
     super(eventBus);
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
-
-    name.setWidth("150px");
     modal.setTitle(translations.addAttribute());
   }
 
@@ -126,8 +124,8 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
   @Override
   public void setDialogMode(VariableAttributeModalPresenter.Mode mode) {
     if(mode == VariableAttributeModalPresenter.Mode.UPDATE_MULTIPLE) {
-      values.setVisible(false);
-      name.setVisible(false);
+      valuesGroup.setVisible(false);
+      nameGroup.setVisible(false);
 
       modal.setTitle(translations.editAttributes());
     } else if(mode == VariableAttributeModalPresenter.Mode.UPDATE_SINGLE) {

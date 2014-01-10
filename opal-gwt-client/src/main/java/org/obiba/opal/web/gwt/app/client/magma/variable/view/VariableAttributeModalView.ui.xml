@@ -17,37 +17,46 @@
 
   <o:Modal ui:field="modal" resizable="false" closeVisible="true" keyboard="true" animation="false">
 
-    <g:FlowPanel addStyleNames="clearfix">
-      <b:Form type="INLINE">
-        <b:ControlGroup ui:field="nameGroup">
-          <b:ControlLabel for="name">
-            <ui:msg description="Attribute Name label">Name</ui:msg>
-            <o:RequiredIcon/>
-          </b:ControlLabel>
-          <b:Controls>
-            <b:Typeahead ui:field="namespaceTypeahead">
-              <b:TextBox ui:field="namespace"/>
-            </b:Typeahead>
-            <b:HelpBlock>
-              <ui:msg description="Namespace help">Namespace, if applicable</ui:msg>
-            </b:HelpBlock>
-            <b:TextBox ui:field="name" addStyleNames="inline-block"/>
-          </b:Controls>
-        </b:ControlGroup>
+    <b:ControlGroup>
+      <b:ControlLabel>
+        <ui:msg description="Namespace label">Namespace</ui:msg>
+      </b:ControlLabel>
+      <b:Controls>
+        <b:Typeahead ui:field="namespaceTypeahead">
+          <b:TextBox ui:field="namespace"/>
+        </b:Typeahead>
+      </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="Attribute Namespace help">A namespace allows to group attributes (optional).</ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
 
-        <g:FlowPanel ui:field="values">
-          <b:ControlGroup ui:field="valueGroup">
-            <b:ControlLabel for="value">
-              <ui:msg description="Value label">Values</ui:msg>
-            </b:ControlLabel>
-            <b:Controls>
-              <g:FlowPanel ui:field="valuesPanel"/>
-            </b:Controls>
-          </b:ControlGroup>
-        </g:FlowPanel>
-      </b:Form>
+    <b:ControlGroup ui:field="nameGroup">
+      <b:ControlLabel for="name">
+        <ui:msg description="Name label">Name</ui:msg>
+        <o:RequiredIcon/>
+      </b:ControlLabel>
+      <b:Controls>
+        <b:TextBox ui:field="name"/>
+      </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="Attribute Name help">A name is required and is unique in its namespace.</ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
 
-    </g:FlowPanel>
+    <b:ControlGroup ui:field="valuesGroup">
+      <b:ControlLabel for="value">
+        <ui:msg description="Value label">Values</ui:msg>
+      </b:ControlLabel>
+      <b:Controls>
+        <g:FlowPanel ui:field="valuesPanel"/>
+      </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="Attribute Values help">Values can be expressed in different languages (at least one value
+          is required).
+        </ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
 
     <b:ModalFooter>
       <b:Button ui:field="saveButton" type="PRIMARY">
