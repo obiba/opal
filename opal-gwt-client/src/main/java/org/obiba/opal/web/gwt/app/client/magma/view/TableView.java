@@ -323,12 +323,12 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     variables.clear();
     categoricalVariables.setWidth("400px");
     variables.setWidth("400px");
-    for(int i = 0; i < rows.length(); i++) {
-      // TODO: variable InstrumentRun.user is of value type 'TEXT'
-      if(rows.get(i).getCategoriesArray().length() > 0 || rows.get(i).getValueType().equals("double") ||
-          rows.get(i).getValueType().equals("integer")) variables.addItem(rows.get(i).getName(), rows.get(i).getName());
-      if(rows.get(i).getCategoriesArray().length() > 0) {
-        categoricalVariables.addItem(rows.get(i).getName(), rows.get(i).getName());
+
+    for(VariableDto variableDto : JsArrays.toIterable(rows)) {
+      if(variableDto.getCategoriesArray().length() > 0 || variableDto.getValueType().equals("double") ||
+          variableDto.getValueType().equals("integer")) variables.addItem(variableDto.getName(), variableDto.getName());
+      if(variableDto.getCategoriesArray().length() > 0) {
+        categoricalVariables.addItem(variableDto.getName(), variableDto.getName());
       }
     }
   }

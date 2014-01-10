@@ -31,18 +31,14 @@ import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
-public class CrossVariablePresenter extends PresenterWidget<CrossVariablePresenter.Display>
-    implements CrossVariableUiHandlers {
+public class CrossVariablePresenter extends PresenterWidget<CrossVariablePresenter.Display> {
 
   @Inject
   public CrossVariablePresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
-
-    getView().setUiHandlers(this);
   }
 
   public void initialize(TableDto table, final VariableDto variableDto, final VariableDto crossWithVariable) {
@@ -71,53 +67,53 @@ public class CrossVariablePresenter extends PresenterWidget<CrossVariablePresent
   }
 
   private void addTotalTerm(VariableDto variableDto, VariableDto crossWithVariable, JsArray<QueryTermDto> terms) {
-    QueryTermDto q = QueryTermDto.create();
-    q.setFacet("total");
+    QueryTermDto query = QueryTermDto.create();
+    query.setFacet("total");
 
-    VariableTermDto v = VariableTermDto.create();
-    v.setVariable(crossWithVariable.getName());
-    q.setExtension("Search.VariableTermDto.field", v);
+    VariableTermDto variableTerm = VariableTermDto.create();
+    variableTerm.setVariable(crossWithVariable.getName());
+    query.setExtension("Search.VariableTermDto.field", variableTerm);
 
-    LogicalTermDto l = getLogicalTermDto(variableDto);
-    q.setExtension("Search.LogicalTermDto.facetFilter", l);
+    LogicalTermDto logicalTerm = getLogicalTermDto(variableDto);
+    query.setExtension("Search.LogicalTermDto.facetFilter", logicalTerm);
 
-    terms.push(q);
+    terms.push(query);
   }
 
   private LogicalTermDto getLogicalTermDto(VariableDto variableDto) {
-    LogicalTermDto l = LogicalTermDto.create();
-    l.setOperator(TermOperator.AND_OP);
-    FilterDto f = FilterDto.create();
-    f.setVariable(variableDto.getName());
-    InTermDto t = InTermDto.create();
+    LogicalTermDto logicalTerm = LogicalTermDto.create();
+    logicalTerm.setOperator(TermOperator.AND_OP);
+    FilterDto filter = FilterDto.create();
+    filter.setVariable(variableDto.getName());
+    InTermDto inTerm = InTermDto.create();
     JsArrayString values = JavaScriptObject.createArray().cast();
 
     for(int i = 0; i < variableDto.getCategoriesArray().length(); i++) {
       values.push(variableDto.getCategoriesArray().get(i).getName());
     }
 
-    t.setValuesArray(values);
-    t.setMinimumMatch(1);
+    inTerm.setValuesArray(values);
+    inTerm.setMinimumMatch(1);
 
-    f.setExtension("Search.InTermDto.terms", t);
-    l.setExtension("Search.FilterDto.filters", f);
-    return l;
+    filter.setExtension("Search.InTermDto.terms", inTerm);
+    logicalTerm.setExtension("Search.FilterDto.filters", filter);
+    return logicalTerm;
   }
 
   private void addFacetTerms(VariableDto variableDto, VariableDto crossWithVariable, JsArray<QueryTermDto> terms) {
     for(int i = 0; i < variableDto.getCategoriesArray().length(); i++) {
-      QueryTermDto q = QueryTermDto.create();
-      q.setFacet(variableDto.getCategoriesArray().get(i).getName());
+      QueryTermDto query = QueryTermDto.create();
+      query.setFacet(variableDto.getCategoriesArray().get(i).getName());
 
-      VariableTermDto v = VariableTermDto.create();
-      v.setVariable(crossWithVariable.getName());
-      q.setExtension("Search.VariableTermDto.field", v);
+      VariableTermDto variableTerm = VariableTermDto.create();
+      variableTerm.setVariable(crossWithVariable.getName());
+      query.setExtension("Search.VariableTermDto.field", variableTerm);
 
-      LogicalTermDto l = getLogicalTermDto(variableDto, i);
+      LogicalTermDto logicalTerm = getLogicalTermDto(variableDto, i);
 
-      q.setExtension("Search.LogicalTermDto.facetFilter", l);
+      query.setExtension("Search.LogicalTermDto.facetFilter", logicalTerm);
 
-      terms.push(q);
+      terms.push(query);
     }
   }
 
@@ -126,18 +122,18 @@ public class CrossVariablePresenter extends PresenterWidget<CrossVariablePresent
     logicalTerm.setOperator(TermOperator.AND_OP);
     FilterDto filter = FilterDto.create();
     filter.setVariable(variableDto.getName());
-    InTermDto t = InTermDto.create();
+    InTermDto inTerm = InTermDto.create();
     JsArrayString values = JavaScriptObject.createArray().cast();
     values.push(variableDto.getCategoriesArray().get(i).getName());
-    t.setValuesArray(values);
-    t.setMinimumMatch(1);
+    inTerm.setValuesArray(values);
+    inTerm.setMinimumMatch(1);
 
-    filter.setExtension("Search.InTermDto.terms", t);
+    filter.setExtension("Search.InTermDto.terms", inTerm);
     logicalTerm.setExtension("Search.FilterDto.filters", filter);
     return logicalTerm;
   }
 
-  public interface Display extends View, HasUiHandlers<CrossVariableUiHandlers> {
+  public interface Display extends View {
 
     void init(QueryResultDto resource, VariableDto variableDto, VariableDto crossWithVariable);
 

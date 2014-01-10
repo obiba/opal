@@ -811,8 +811,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
     List<String> getCrossWithVariables();
 
-//    void addCrossVariableCategoricalResult(QueryResultDto resource, VariableDto variable,
-//        VariableDto crossWithVariable);
   }
 
   private class RemoveRunnable implements Runnable {

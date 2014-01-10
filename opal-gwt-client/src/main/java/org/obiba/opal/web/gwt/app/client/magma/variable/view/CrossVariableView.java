@@ -14,9 +14,10 @@ import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CrossVariablePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CrossVariableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.DefaultFlexTable;
+import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.FacetResultDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
@@ -31,10 +32,9 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class CrossVariableView extends ViewWithUiHandlers<CrossVariableUiHandlers>
-    implements CrossVariablePresenter.Display {
+public class CrossVariableView extends ViewImpl implements CrossVariablePresenter.Display {
 
   private static final int DEFAULT_WIDTH = 60;
 
@@ -170,23 +170,25 @@ public class CrossVariableView extends ViewWithUiHandlers<CrossVariableUiHandler
 
   private void initStatsticsMaps(Map<String, Map<String, FacetResultDto.TermFrequencyResultDto>> facets,
       Map<String, Integer> variableFacetTotals, Map<String, Integer> crossFacetTotals) {
-    for(int i = 0; i < queryResult.getFacetsArray().length(); i++) {
+
+    for(FacetResultDto facetResultDto : JsArrays.toIterable(queryResult.getFacetsArray())) {
       Map<String, FacetResultDto.TermFrequencyResultDto> termByFacets
           = new HashMap<String, FacetResultDto.TermFrequencyResultDto>();
-      int total = 0;
-      for(int j = 0; j < queryResult.getFacetsArray().get(i).getFrequenciesArray().length(); j++) {
-        termByFacets.put(queryResult.getFacetsArray().get(i).getFrequenciesArray().get(j).getTerm(),
-            queryResult.getFacetsArray().get(i).getFrequenciesArray().get(j));
-        facets.put(queryResult.getFacetsArray().get(i).getFacet(), termByFacets);
-        total += queryResult.getFacetsArray().get(i).getFrequenciesArray().get(j).getCount();
 
-        if(queryResult.getFacetsArray().get(i).getFacet().equals("total")) {
-          crossFacetTotals.put(queryResult.getFacetsArray().get(i).getFrequenciesArray().get(j).getTerm(),
-              queryResult.getFacetsArray().get(i).getFrequenciesArray().get(j).getCount());
+      int total = 0;
+      for(FacetResultDto.TermFrequencyResultDto termFrequencyResultDto : JsArrays
+          .toIterable(facetResultDto.getFrequenciesArray())) {
+
+        termByFacets.put(termFrequencyResultDto.getTerm(), termFrequencyResultDto);
+        facets.put(facetResultDto.getFacet(), termByFacets);
+        total += termFrequencyResultDto.getCount();
+
+        if(facetResultDto.getFacet().equals("total")) {
+          crossFacetTotals.put(termFrequencyResultDto.getTerm(), termFrequencyResultDto.getCount());
         }
       }
 
-      variableFacetTotals.put(queryResult.getFacetsArray().get(i).getFacet(), total);
+      variableFacetTotals.put(facetResultDto.getFacet(), total);
     }
   }
 
@@ -202,20 +204,18 @@ public class CrossVariableView extends ViewWithUiHandlers<CrossVariableUiHandler
   private void addContinuousStatistics(DefaultFlexTable parentTable) {
     Map<String, FacetResultDto.StatisticalResultDto> continuousFacets
         = new HashMap<String, FacetResultDto.StatisticalResultDto>();
-    for(int i = 0; i < queryResult.getFacetsArray().length(); i++) {
-      continuousFacets
-          .put(queryResult.getFacetsArray().get(i).getFacet(), queryResult.getFacetsArray().get(i).getStatistics());
+    for(FacetResultDto facetResultDto : JsArrays.toIterable(queryResult.getFacetsArray())) {
+      continuousFacets.put(facetResultDto.getFacet(), facetResultDto.getStatistics());
     }
 
     parentTable.setWidget(2, 0, new Label(translations.meanStdDeviationLabel()));
     parentTable.setWidget(3, 0, new Label(translations.NLabel()));
     for(int i = 0; i < variable.getCategoriesArray().length(); i++) {
-      parentTable.setWidget(2, i + 1,
-          new Label(continuousFacets.get(variable.getCategoriesArray().get(i).getName()).getMean() + " (" +
-              continuousFacets.get(variable.getCategoriesArray().get(i).getName()).getStdDeviation() + ")"));
+      CategoryDto categoryDto = variable.getCategoriesArray().get(i);
+      parentTable.setWidget(2, i + 1, new Label(continuousFacets.get(categoryDto.getName()).getMean() + " (" +
+          continuousFacets.get(categoryDto.getName()).getStdDeviation() + ")"));
 
-      parentTable.setWidget(3, i + 1,
-          new Label((int) continuousFacets.get(variable.getCategoriesArray().get(i).getName()).getCount() + ""));
+      parentTable.setWidget(3, i + 1, new Label((int) continuousFacets.get(categoryDto.getName()).getCount() + ""));
     }
 
     parentTable.setWidget(2, variable.getCategoriesArray().length() + 1, new Label(
