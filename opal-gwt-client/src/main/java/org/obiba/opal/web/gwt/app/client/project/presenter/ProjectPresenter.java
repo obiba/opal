@@ -235,6 +235,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     placeManager.updateHistory(builder.build(), true);
   }
 
+  @SuppressWarnings("PMD.NcssMethodCount")
   private void selectTab(int index, String queryPathParam) {
     tab = Display.ProjectTab.values()[index];
     switch(tab) {

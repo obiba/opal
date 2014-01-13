@@ -82,7 +82,6 @@ public class ReportsView extends ViewWithUiHandlers<ReportsUiHandlers> implement
     }
   }
 
-  @SuppressWarnings("UnusedParameters")
   @UiHandler("add")
   public void onAdd(ClickEvent event) {
     getUiHandlers().onAdd();
@@ -94,11 +93,12 @@ public class ReportsView extends ViewWithUiHandlers<ReportsUiHandlers> implement
   }
 
   @Override
+  @SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
   public void setCurrentReportTemplate(ReportTemplateDto reportTemplateDto) {
     String reportName = reportTemplateDto.getName();
-    for(Widget w : reportList) {
-      if(w instanceof NavLink) {
-        NavLink link = (NavLink) w;
+    for(Widget widget : reportList) {
+      if(widget instanceof NavLink) {
+        NavLink link = (NavLink) widget;
         if(link.getText().trim().equals(reportName)) {
           if(currentLink != null) currentLink.setActive(false);
           link.setActive(true);
