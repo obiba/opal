@@ -116,7 +116,20 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     if(newSubject) {
       validateProfile(subjectCredentials);
     }
+    persist(subjectCredentials, ensureCredentials(subjectCredentials, existing));
+    if(newSubject) {
+      ensureProfile(subjectCredentials);
+    }
+  }
 
+  /**
+   * Re-apply the credentials to the provided subject if it already exists.
+   * @param subjectCredentials
+   * @param existing
+   * @return
+   */
+  private OpalKeyStore ensureCredentials(SubjectCredentials subjectCredentials, SubjectCredentials existing) {
+    boolean newSubject = existing == null;
     OpalKeyStore keyStore = null;
     switch(subjectCredentials.getAuthenticationType()) {
       case PASSWORD:
@@ -134,14 +147,14 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
         }
         break;
     }
-
-    persist(subjectCredentials, keyStore);
-
-    if(newSubject) {
-      ensureProfile(subjectCredentials);
-    }
+    return keyStore;
   }
 
+  /**
+   * Persist subject and related groups.
+   * @param subjectCredentials
+   * @param keyStore
+   */
   private void persist(SubjectCredentials subjectCredentials, @Nullable OpalKeyStore keyStore) {
     Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
     toSave.put(subjectCredentials, subjectCredentials);
@@ -155,8 +168,13 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     }
   }
 
+  /**
+   * Ensure subject has a profile.
+   * @param subjectCredentials
+   */
   private void ensureProfile(SubjectCredentials subjectCredentials) {
-    subjectProfileService.ensureProfile(subjectCredentials.getName(), getRealmFromType(subjectCredentials.getAuthenticationType()));
+    subjectProfileService
+        .ensureProfile(subjectCredentials.getName(), getRealmFromType(subjectCredentials.getAuthenticationType()));
   }
 
   private String getRealmFromType(SubjectCredentials.AuthenticationType type) {
@@ -169,6 +187,10 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     return "";
   }
 
+  /**
+   * Ensure that the subject does not conflict with another one in a different realm.
+   * @param subjectCredentials
+   */
   private void validateProfile(SubjectCredentials subjectCredentials) {
     String realm = getRealmFromType(subjectCredentials.getAuthenticationType());
     SubjectProfile profile = subjectProfileService.getProfile(subjectCredentials.getName());
