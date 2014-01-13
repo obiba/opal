@@ -6,8 +6,6 @@
 
   <fileSystemRoot>file://${OPAL_HOME}/fs</fileSystemRoot>
 
-  <functionalUnits/>
-
   <magmaEngineFactory>
 
     <extensions>
