@@ -138,14 +138,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     persist(subjectCredentials, keyStore);
 
     if(newSubject) {
-      switch(subjectCredentials.getAuthenticationType()) {
-        case PASSWORD:
-          subjectProfileService.ensureProfile(subjectCredentials.getName(), OpalUserRealm.OPAL_REALM);
-          break;
-        case CERTIFICATE:
-          subjectProfileService.ensureProfile(subjectCredentials.getName(), ApplicationRealm.APPLICATION_REALM);
-          break;
-      }
+      ensureProfile(subjectCredentials);
     }
   }
 
@@ -162,9 +155,24 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     }
   }
 
+  private void ensureProfile(SubjectCredentials subjectCredentials) {
+    subjectProfileService.ensureProfile(subjectCredentials.getName(), getRealmFromType(subjectCredentials.getAuthenticationType()));
+  }
+
+  private String getRealmFromType(SubjectCredentials.AuthenticationType type) {
+    switch(type) {
+      case PASSWORD:
+        return OpalUserRealm.OPAL_REALM;
+      case CERTIFICATE:
+        return ApplicationRealm.APPLICATION_REALM;
+    }
+    return "";
+  }
+
   private void validateProfile(SubjectCredentials subjectCredentials) {
+    String realm = getRealmFromType(subjectCredentials.getAuthenticationType());
     SubjectProfile profile = subjectProfileService.getProfile(subjectCredentials.getName());
-    if(profile != null && !OpalUserRealm.OPAL_REALM.equals(profile.getRealm())) {
+    if(profile != null && !realm.equals(profile.getRealm())) {
       throw new DuplicateSubjectProfileException(profile);
     }
   }
