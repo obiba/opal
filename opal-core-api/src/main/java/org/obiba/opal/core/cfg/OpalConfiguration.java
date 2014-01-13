@@ -18,7 +18,6 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import org.obiba.magma.support.MagmaEngineFactory;
-import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.runtime.Version;
 
 import com.google.common.collect.Iterables;
@@ -40,16 +39,11 @@ public class OpalConfiguration {
 
   private MagmaEngineFactory magmaEngineFactory;
 
-  //TODO delete this once unit upgrade is done
-  @SuppressWarnings({ "FieldCanBeLocal", "UnusedDeclaration", "PMD.UnusedPrivateField" })
-  private final Set<FunctionalUnit> functionalUnits;
-
   private final Set<ReportTemplate> reportTemplates;
 
   private final List<OpalConfigurationExtension> extensions;
 
   public OpalConfiguration() {
-    functionalUnits = Sets.newLinkedHashSet();
     reportTemplates = Sets.newLinkedHashSet();
     extensions = Lists.newArrayList();
   }

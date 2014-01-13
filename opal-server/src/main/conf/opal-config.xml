@@ -1,7 +1,5 @@
 <org.obiba.opal.core.cfg.OpalConfiguration>
 
-  <version/>
-
   <secretKey/>
 
   <databasePassword/>

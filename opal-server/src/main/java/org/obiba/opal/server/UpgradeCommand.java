@@ -11,6 +11,7 @@ package org.obiba.opal.server;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -27,6 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -43,7 +46,7 @@ public class UpgradeCommand {
   private static final String[] OPAL2_CONTEXT_PATHS = { "classpath:/META-INF/spring/opal-server/upgrade-2.0.0.xml" };
 
   public void execute() {
-    if(!isMigratedToOpal2()) {
+    if(needToUpgradeToOpal2()) {
       opal2Upgrade();
     }
     standardUpgrade();
@@ -59,10 +62,14 @@ public class UpgradeCommand {
     }
   }
 
+  private boolean needToUpgradeToOpal2() {
+    return !hasVersionInConfigXml() && hasDatasourceInConfigProperties();
+  }
+
   /**
    * Load opal-config.xml and search for version node
    */
-  private boolean isMigratedToOpal2() {
+  private boolean hasVersionInConfigXml() {
     try {
       Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
           .parse(new File(System.getenv().get("OPAL_HOME") + "/conf/opal-config.xml"));
@@ -70,6 +77,19 @@ public class UpgradeCommand {
       Node node = (Node) xPath.compile("//version").evaluate(doc.getDocumentElement(), XPathConstants.NODE);
       return node != null;
     } catch(SAXException | XPathExpressionException | ParserConfigurationException | IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * Load opal-config.properties and search for datasource definition
+   */
+  private boolean hasDatasourceInConfigProperties() {
+    try {
+      Properties properties = PropertiesLoaderUtils.loadProperties(
+          new FileSystemResource(new File(System.getenv().get("OPAL_HOME") + "/conf/opal-config.properties")));
+      return properties.containsKey("org.obiba.opal.datasource.opal.driver");
+    } catch(IOException e) {
       throw new RuntimeException(e);
     }
   }
