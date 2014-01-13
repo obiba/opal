@@ -55,7 +55,7 @@ public class SubjectCredentialsAdministrationPresenter extends
     implements SubjectCredentialsAdministrationUiHandlers {
 
   @ProxyStandard
-  @NameToken(Places.USER)
+  @NameToken(Places.USERS)
   public interface Proxy extends ProxyPlace<SubjectCredentialsAdministrationPresenter> {}
 
   private final ModalProvider<SubjectCredentialsPresenter> modalProvider;
