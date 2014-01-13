@@ -45,14 +45,8 @@
           <ui:msg description="Create MongoDB database label">MongoDB</ui:msg>
         </b:NavLink>
       </b:DropdownButton>
-
-      <g:FlowPanel addStyleNames="top-margin">
-        <b:Heading size="5" addStyleNames="inline-block">
-          <ui:msg description="Databases label">Databases</ui:msg>
-        </b:Heading>
-        <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
-      </g:FlowPanel>
-      <o:Table ui:field="table" width="100%"/>
+      <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
+      <o:Table ui:field="table" addStyleNames="small-top-margin"/>
     </g:FlowPanel>
 
   </g:FlowPanel>
