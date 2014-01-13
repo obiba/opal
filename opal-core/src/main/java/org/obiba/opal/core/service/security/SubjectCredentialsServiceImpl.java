@@ -28,6 +28,7 @@ import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.DuplicateSubjectProfileException;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SubjectProfileService;
+import org.obiba.opal.core.service.security.realm.ApplicationRealm;
 import org.obiba.opal.core.service.security.realm.OpalUserRealm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -136,7 +137,14 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     persist(subjectCredentials, keyStore);
 
     if(newSubject) {
-      subjectProfileService.ensureProfile(subjectCredentials.getName(), OpalUserRealm.OPAL_REALM);
+      switch(subjectCredentials.getAuthenticationType()) {
+        case PASSWORD:
+          subjectProfileService.ensureProfile(subjectCredentials.getName(), OpalUserRealm.OPAL_REALM);
+          break;
+        case CERTIFICATE:
+          subjectProfileService.ensureProfile(subjectCredentials.getName(), ApplicationRealm.APPLICATION_REALM);
+          break;
+      }
     }
   }
 
@@ -215,8 +223,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     orientDbService.delete(subjectCredentials);
     if(!toSave.isEmpty()) orientDbService.save(toSave);
     // Delete subjectCredentials's permissions
-    subjectAclService
-        .deleteSubjectPermissions(OPAL_DOMAIN, null, USER.subjectFor(subjectCredentials.getName()));
+    subjectAclService.deleteSubjectPermissions(OPAL_DOMAIN, null, USER.subjectFor(subjectCredentials.getName()));
     subjectProfileService.deleteProfile(subjectCredentials.getName());
 
     if(subjectCredentials.getAuthenticationType() == SubjectCredentials.AuthenticationType.CERTIFICATE) {
