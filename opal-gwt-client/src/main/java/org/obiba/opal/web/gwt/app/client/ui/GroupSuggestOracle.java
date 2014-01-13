@@ -12,7 +12,6 @@ package org.obiba.opal.web.gwt.app.client.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -23,7 +22,6 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.ui.SuggestOracle;
-import com.google.web.bindery.event.shared.EventBus;
 
 public class GroupSuggestOracle extends SuggestOracle {
 
@@ -74,11 +72,6 @@ public class GroupSuggestOracle extends SuggestOracle {
     }
   }
 
-  private Response defaultResponse;
-
-  private final EventBus eventBus;
-
-  private String originalQuery;
 
   /**
    * Constructor for <code>MultiWordSuggestOracle</code> which takes in a set of
@@ -93,8 +86,8 @@ public class GroupSuggestOracle extends SuggestOracle {
    *
    * @param whitespaceChars the characters to treat as word separators
    */
-  public GroupSuggestOracle(EventBus eventBus) {
-    this.eventBus = eventBus;
+  public GroupSuggestOracle() {
+
   }
 
   @Override
@@ -104,26 +97,19 @@ public class GroupSuggestOracle extends SuggestOracle {
 
   @Override
   public void requestDefaultSuggestions(Request request, Callback callback) {
-    if(defaultResponse != null) {
-      callback.onSuggestionsReady(request, defaultResponse);
-    } else {
-      requestSuggestions(request, callback);
-    }
-  }
-
-  public String getOriginalQuery() {
-    return originalQuery;
+    requestSuggestions(request, callback);
   }
 
   @Override
   public void requestSuggestions(final Request request, final Callback callback) {
-    originalQuery = request.getQuery();
+    String originalQuery = request.getQuery();
     if(originalQuery == null || originalQuery.trim().isEmpty()) return;
 
     final String query = originalQuery;
 
     // Get groups candidates from search words.
-    ResourceRequestBuilderFactory.<JsArray<GroupDto>>newBuilder().forResource(UriBuilders.GROUPS.create().build()).get().withCallback(com.google.gwt.http.client.Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
+    ResourceRequestBuilderFactory.<JsArray<GroupDto>>newBuilder().forResource(UriBuilders.GROUPS.create().build()).get()
+        .withCallback(com.google.gwt.http.client.Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
 
           @Override
           public void onResponseCode(com.google.gwt.http.client.Request request,

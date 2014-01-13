@@ -93,7 +93,7 @@ public class SubjectCredentialsView extends ModalPopupViewWithUiHandlers<Subject
   public SubjectCredentialsView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
 
-    groups = new SuggestListBox(new GroupSuggestOracle(eventBus));
+    groups = new SuggestListBox(new GroupSuggestOracle());
 
     initWidget(uiBinder.createAndBindUi(this));
 

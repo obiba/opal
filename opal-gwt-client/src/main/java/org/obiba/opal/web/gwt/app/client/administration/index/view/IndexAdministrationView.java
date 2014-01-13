@@ -206,23 +206,29 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     switch(status) {
       case Startable:
         startStopButton.setText(translations.startLabel());
-        startStopButton.setEnabled(true);
-        configureButton.setEnabled(true);
-        refreshIndicesButton.setEnabled(false);
-        actionsDropdown.setVisible(false);
+        enableStart(true);
+        enableActions(false);
         break;
       case Stoppable:
         startStopButton.setText(translations.stopLabel());
-        startStopButton.setEnabled(true);
-        configureButton.setEnabled(true);
-        refreshIndicesButton.setEnabled(true);
-        actionsDropdown.setVisible(true);
+        enableStart(true);
+        enableActions(true);
         break;
       case Pending:
-        startStopButton.setEnabled(false);
-        configureButton.setEnabled(false);
+        enableStart(false);
+        enableActions(false);
         break;
     }
+  }
+
+  private void enableStart(boolean enable) {
+    startStopButton.setEnabled(enable);
+    configureButton.setEnabled(enable);
+  }
+
+  private void enableActions(boolean enable) {
+    refreshIndicesButton.setEnabled(enable);
+    actionsDropdown.setVisible(enable);
   }
 
   @Override
