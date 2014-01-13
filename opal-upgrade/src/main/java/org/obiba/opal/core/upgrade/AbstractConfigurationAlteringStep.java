@@ -37,7 +37,7 @@ import de.schlichtherle.io.FileInputStream;
 
 public abstract class AbstractConfigurationAlteringStep {
 
-  @Value("${OPAL_HOME}/conf/opal-config.xml")
+  @Value("${OPAL_HOME}/data/opal-config.xml")
   private String opalConfigFile;
 
   private final Transformer transformer;

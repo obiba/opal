@@ -35,7 +35,7 @@ import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider
 @Component
 public class DefaultOpalConfigurationIo implements OpalConfigurationIo {
 
-  @Value("${OPAL_HOME}/conf/opal-config.xml")
+  @Value("${OPAL_HOME}/data/opal-config.xml")
   private File configFile;
 
   @Autowired

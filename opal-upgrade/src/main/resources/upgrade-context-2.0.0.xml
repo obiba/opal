@@ -17,7 +17,7 @@
   </bean>
 
   <bean id="upgradeOpalConfigurationService" class="org.obiba.opal.core.upgrade.v2_0_x.UpgradeOpalConfigurationService">
-    <property name="configFile" value="file:${OPAL_HOME}/conf/opal-config.xml"/>
+    <property name="configFile" value="file:${OPAL_HOME}/data/opal-config.xml"/>
   </bean>
 
   <bean id="upgradeOpalConfigurationIo" class="org.obiba.opal.core.upgrade.v2_0_x.UpgradeOpalConfigurationIo"/>
@@ -73,7 +73,7 @@
         <bean class="org.obiba.opal.core.upgrade.v2_0_x.database.MoveDatasourcesToOrientUpgradeStep">
           <property name="description" value="Move database config from properties file to OrientDB"/>
           <property name="appliesTo" value="2.0.0"/>
-          <property name="configFile" value="file:${OPAL_HOME}/conf/opal-config.xml"/>
+          <property name="configFile" value="file:${OPAL_HOME}/data/opal-config.xml"/>
           <property name="propertiesFile" value="file:${OPAL_HOME}/conf/opal-config.properties"/>
         </bean>
 
@@ -109,7 +109,7 @@
         <bean class="org.obiba.opal.core.upgrade.v2_0_x.database.MoveUnitKeyStoreToOrientUpgradeStep">
           <property name="description" value="Move Unit Key Store to OrientDB"/>
           <property name="appliesTo" value="2.0.0"/>
-          <property name="configFile" value="file:${OPAL_HOME}/conf/opal-config.xml"/>
+          <property name="configFile" value="file:${OPAL_HOME}/data/opal-config.xml"/>
         </bean>
 
         <!-- 2.0.0 / move version from table to opal-config.xml -->
