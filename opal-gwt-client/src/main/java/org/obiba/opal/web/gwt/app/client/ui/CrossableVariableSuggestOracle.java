@@ -10,14 +10,9 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
-import java.util.Map;
-
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.web.bindery.event.shared.EventBus;
 
-public class CrossableVariableSuggestOracle extends VariableSuggestOracle {
-
-  private static final int LABEL_MAX_SIZE = 75;
+public class CrossableVariableSuggestOracle extends TableVariableSuggestOracle {
 
   /**
    * Same behavior as VariableSuggestOracle but the list of results do not display the datasource and table name
@@ -30,31 +25,7 @@ public class CrossableVariableSuggestOracle extends VariableSuggestOracle {
 
   @Override
   public String getOriginalQuery() {
-    // Filter query for valuetypes: integer, text, decimal, date, datetime
+    // Filter query for categorical or continuous variables
     return originalQuery + " nature:(CATEGORICAL OR CONTINUOUS)";
-  }
-
-  @Override
-  protected VariableSuggestion convertToFormattedSuggestions(String query, Map<String, String> attributes) {
-    SafeHtmlBuilder accum = new SafeHtmlBuilder();
-
-    accum.appendHtmlConstant("<span class='variable-search-suggest-box'>");
-    accum.appendHtmlConstant("<strong>");
-    accum.appendEscaped(attributes.get("name"));
-    accum.appendHtmlConstant("</strong>");
-
-    if(attributes.containsKey("label")) {
-      accum.appendHtmlConstant("<br>");
-
-      String label = attributes.get("label");
-      if(label.length() > LABEL_MAX_SIZE) {
-        label = label.substring(0, LABEL_MAX_SIZE) + " ...";
-      }
-      accum.appendEscaped(label);
-    }
-    accum.appendHtmlConstant("</span>");
-
-    return createSuggestion(query, accum.toSafeHtml().asString(), attributes.get("datasource"), attributes.get("table"),
-        attributes.get("name"));
   }
 }
