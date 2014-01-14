@@ -20,12 +20,11 @@
     <!-- Cross variables -->
     <b:FluidRow>
       <b:Column size="12">
-        <b:Heading size="5" ui:field="title"/>
         <b:NavPills>
-          <b:NavLink active="true" ui:field="frequency">
+          <b:NavLink active="true" ui:field="frequency" visible="false">
             <ui:msg description="Frequency label">Frequency</ui:msg>
           </b:NavLink>
-          <b:NavLink ui:field="percentage">
+          <b:NavLink ui:field="percentage" visible="false">
             <ui:msg description="Percentage label">Percentage</ui:msg>
           </b:NavLink>
         </b:NavPills>

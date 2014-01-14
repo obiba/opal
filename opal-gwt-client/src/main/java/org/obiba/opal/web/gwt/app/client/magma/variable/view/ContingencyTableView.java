@@ -13,18 +13,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CrossVariablePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.ContingencyTablePresenter;
 import org.obiba.opal.web.gwt.app.client.ui.DefaultFlexTable;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.FacetResultDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
-import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -34,7 +33,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
 
-public class CrossVariableView extends ViewImpl implements CrossVariablePresenter.Display {
+public class ContingencyTableView extends ViewImpl implements ContingencyTablePresenter.Display {
 
   private static final int DEFAULT_WIDTH = 60;
 
@@ -46,7 +45,7 @@ public class CrossVariableView extends ViewImpl implements CrossVariablePresente
 
   private boolean showFrequencies = true;
 
-  interface Binder extends UiBinder<Widget, CrossVariableView> {}
+  interface Binder extends UiBinder<Widget, ContingencyTableView> {}
 
   @UiField
   FlowPanel crossTable;
@@ -57,13 +56,10 @@ public class CrossVariableView extends ViewImpl implements CrossVariablePresente
   @UiField
   NavLink percentage;
 
-  @UiField
-  Heading title;
-
   private final Translations translations;
 
   @Inject
-  public CrossVariableView(Binder uiBinder, Translations translations) {
+  public ContingencyTableView(Binder uiBinder, Translations translations) {
     this.translations = translations;
 
     initWidget(uiBinder.createAndBindUi(this));
@@ -99,8 +95,6 @@ public class CrossVariableView extends ViewImpl implements CrossVariablePresente
   public void draw() {
     DefaultFlexTable parentTable = new DefaultFlexTable();
 
-    title.setText(TranslationsUtils
-        .replaceArguments(translations.crossTableResult(), variable.getName(), crossWithVariable.getName()));
     addHeader(parentTable);
 
     percentage.setVisible(!queryResult.getFacetsArray().get(0).hasStatistics());
@@ -201,10 +195,10 @@ public class CrossVariableView extends ViewImpl implements CrossVariablePresente
 
   private void addValue(DefaultFlexTable parentTable, int row, int column, int count, Integer total) {
     if(showFrequencies) {
-      parentTable.setWidget(row, column, new Label(count + ""));
+      parentTable.setWidget(row, column, new Label(String.valueOf(count)));
     } else {
       double d = count;
-      parentTable.setWidget(row, column, new Label(total == null ? "0 %" : d / total * 100 + " %"));
+      parentTable.setWidget(row, column, new Label(total == null ? "0 %" : formatDecimal(d / total * 100) + " %"));
     }
   }
 
@@ -215,20 +209,30 @@ public class CrossVariableView extends ViewImpl implements CrossVariablePresente
       continuousFacets.put(facetResultDto.getFacet(), facetResultDto.getStatistics());
     }
 
-    parentTable.setWidget(2, 0, new Label(translations.meanStdDeviationLabel()));
-    parentTable.setWidget(3, 0, new Label(translations.NLabel()));
+    parentTable.setWidget(2, 0, new Label(translations.meanLabel()));
+    parentTable.setWidget(3, 0, new Label(translations.standardDeviationLabel()));
+    parentTable.setWidget(4, 0, new Label(translations.NLabel()));
     for(int i = 0; i < variable.getCategoriesArray().length(); i++) {
       CategoryDto categoryDto = variable.getCategoriesArray().get(i);
-      parentTable.setWidget(2, i + 1, new Label(continuousFacets.get(categoryDto.getName()).getMean() + " (" +
-          continuousFacets.get(categoryDto.getName()).getStdDeviation() + ")"));
 
-      parentTable.setWidget(3, i + 1, new Label((int) continuousFacets.get(categoryDto.getName()).getCount() + ""));
+      parentTable.setWidget(2, i + 1, new Label(formatDecimal(continuousFacets.get(categoryDto.getName()).getMean())));
+      parentTable
+          .setWidget(3, i + 1, new Label(formatDecimal(continuousFacets.get(categoryDto.getName()).getStdDeviation())));
+      parentTable
+          .setWidget(4, i + 1, new Label(String.valueOf((int) continuousFacets.get(categoryDto.getName()).getCount())));
     }
 
-    parentTable.setWidget(2, variable.getCategoriesArray().length() + 1, new Label(
-        continuousFacets.get("total").getMean() + " (" + continuousFacets.get("total").getStdDeviation() + ")"));
+    parentTable.setWidget(2, variable.getCategoriesArray().length() + 1,
+        new Label(formatDecimal(continuousFacets.get("total").getMean())));
     parentTable.setWidget(3, variable.getCategoriesArray().length() + 1,
-        new Label((int) continuousFacets.get("total").getCount() + ""));
+        new Label(formatDecimal(continuousFacets.get("total").getStdDeviation())));
+    parentTable.setWidget(4, variable.getCategoriesArray().length() + 1,
+        new Label(String.valueOf((int) continuousFacets.get("total").getCount())));
+  }
+
+  private String formatDecimal(double number) {
+    NumberFormat nf = NumberFormat.getFormat("#.##");
+    return nf.format(number);
   }
 
   private void addHeader(DefaultFlexTable parentTable) {

@@ -34,10 +34,10 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
-public class CrossVariablePresenter extends PresenterWidget<CrossVariablePresenter.Display> {
+public class ContingencyTablePresenter extends PresenterWidget<ContingencyTablePresenter.Display> {
 
   @Inject
-  public CrossVariablePresenter(Display display, EventBus eventBus) {
+  public ContingencyTablePresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
   }
 

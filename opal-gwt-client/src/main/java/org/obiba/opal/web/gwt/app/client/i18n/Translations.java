@@ -193,7 +193,8 @@ public interface Translations extends Constants {
       "DATABASES_ALL.help", "Administrate databases.", //
       "R_USE.help", "Use R services: can push accessible data to R and can execute ANY R commands on them.", //
       "DATASHIELD_ALL.help", "Administrate DataSHIELD settings.", //
-      "DATASHIELD_USE.help", "Use DataSHIELD services: can push accessible data to R and can execute limited R commands on them.", //
+      "DATASHIELD_USE.help",
+      "Use DataSHIELD services: can push accessible data to R and can execute limited R commands on them.", //
       "REPORT_TEMPLATE_ALL.help", "Full access to the report template (settings and reports).", //
       "REPORT_TEMPLATE_READ.help", "View reports only." })
   Map<String, String> permissionExplanationMap();
@@ -2062,10 +2063,6 @@ public interface Translations extends Constants {
   @DefaultStringMapValue({ "PASSWORD", "Password", "CERTIFICATE", "Certificate" })
   Map<String, String> authenticationTypeMap();
 
-  @Description("Results of X with Y label")
-  @DefaultStringValue("Results of {0} with {1}")
-  String crossTableResult();
-
   @Description("Totals label")
   @DefaultStringValue("Totals")
   String totalLabel();
@@ -2074,11 +2071,23 @@ public interface Translations extends Constants {
   @DefaultStringValue("No results found")
   String noResultsFound();
 
-  @Description("Mean (Std. deviation) label")
-  @DefaultStringValue("Mean (Std. deviation)")
-  String meanStdDeviationLabel();
+  @Description("Mean label")
+  @DefaultStringValue("Mean")
+  String meanLabel();
+
+  @Description("Standard deviation) label")
+  @DefaultStringValue("Standard deviation")
+  String standardDeviationLabel();
 
   @Description("N label")
   @DefaultStringValue("N")
   String NLabel();
+
+  @Description("Select first variable label")
+  @DefaultStringValue("Select first variable...")
+  String selectFirstVariableLabel();
+
+  @Description("Select second variable label")
+  @DefaultStringValue("Select second variable...")
+  String selectSecondVariableLabel();
 }

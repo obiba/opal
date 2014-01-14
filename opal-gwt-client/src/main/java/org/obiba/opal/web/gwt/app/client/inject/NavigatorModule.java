@@ -54,11 +54,11 @@ import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewPropertiesMod
 import org.obiba.opal.web.gwt.app.client.magma.table.view.TablePropertiesModalView;
 import org.obiba.opal.web.gwt.app.client.magma.table.view.ViewPropertiesModalView;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CategoriesEditorModalPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CrossVariablePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.ContingencyTablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.view.CategoriesEditorModalView;
-import org.obiba.opal.web.gwt.app.client.magma.variable.view.CrossVariableView;
+import org.obiba.opal.web.gwt.app.client.magma.variable.view.ContingencyTableView;
 import org.obiba.opal.web.gwt.app.client.magma.variable.view.VariableAttributeModalView;
 import org.obiba.opal.web.gwt.app.client.magma.variable.view.VariablePropertiesModalView;
 import org.obiba.opal.web.gwt.app.client.magma.view.CodingViewModalView;
@@ -107,7 +107,8 @@ public class NavigatorModule extends AbstractOpalModule {
     bindPresenterWidget(DatasourcePresenter.class, DatasourcePresenter.Display.class, DatasourceView.class);
     bindPresenterWidget(TablePresenter.class, TablePresenter.Display.class, TableView.class);
     bindPresenterWidget(VariablePresenter.class, VariablePresenter.Display.class, VariableView.class);
-    bindPresenterWidget(CrossVariablePresenter.class, CrossVariablePresenter.Display.class, CrossVariableView.class);
+    bindPresenterWidget(ContingencyTablePresenter.class, ContingencyTablePresenter.Display.class,
+        ContingencyTableView.class);
     bindPresenterWidget(ValuesTablePresenter.class, ValuesTablePresenter.Display.class, ValuesTableView.class);
     bindPresenterWidget(EntityModalPresenter.class, EntityModalPresenter.Display.class, EntityModalView.class);
     bindPresenterWidget(VariableVcsCommitHistoryPresenter.class, VariableVcsCommitHistoryPresenter.Display.class,

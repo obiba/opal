@@ -9,9 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -19,10 +16,12 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
-import org.obiba.opal.web.gwt.app.client.ui.Chooser;
+import org.obiba.opal.web.gwt.app.client.ui.CategoricalVariableSuggestOracle;
+import org.obiba.opal.web.gwt.app.client.ui.CrossableVariableSuggestOracle;
 import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
+import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.VariableAttributeColumn;
@@ -40,11 +39,13 @@ import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.ListBox;
+import com.github.gwtbootstrap.client.ui.FluidRow;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.ProgressBar;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TabPanel;
+import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
@@ -67,16 +68,20 @@ import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements TablePresenter.Display {
+
+  private final EventBus eventBus;
 
   interface Binder extends UiBinder<Widget, TableView> {}
 
@@ -179,17 +184,23 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiField
   Panel permissionsPanel;
 
-  @UiField
-  Chooser variables;
-
-  @UiField
-  ListBox categoricalVariables;
-
-  @UiField
-  Button crossVariables;
+  @UiField(provided = true)
+  Typeahead categoricalVariables;
 
   @UiField
   FlowPanel crossResultsPanel;
+
+  @UiField
+  TextBox categoricalVariable;
+
+  @UiField(provided = true)
+  Typeahead crossWithVariables;
+
+  @UiField
+  TextBox crossWithVariable;
+
+  @UiField
+  FluidRow contingencyTablePanel;
 
   private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
 
@@ -206,11 +217,16 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   private boolean hasLinkAuthorization = true;
 
   @Inject
-  public TableView(Binder uiBinder, Translations translations, TranslationMessages translationMessages,
-      PlaceManager placeManager) {
+  public TableView(Binder uiBinder, EventBus eventBus, Translations translations,
+      TranslationMessages translationMessages, PlaceManager placeManager) {
+    this.eventBus = eventBus;
     this.translations = translations;
     this.translationMessages = translationMessages;
     this.placeManager = placeManager;
+
+    categoricalVariables = new Typeahead(new CategoricalVariableSuggestOracle(this.eventBus));
+    crossWithVariables = new Typeahead(new CrossableVariableSuggestOracle(this.eventBus));
+
     initWidget(uiBinder.createAndBindUi(this));
     addTableColumns();
     initializeAnchorTexts();
@@ -226,12 +242,12 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
       panel = valuesPanel;
     } else if(slot == Slots.Permissions) {
       panel = permissionsPanel;
-    } else if(slot == Slots.CrossVariables) {
+    } else if(slot == Slots.ContingencyTable) {
       panel = crossResultsPanel;
     }
 
     if(panel != null) {
-      if(slot != Slots.CrossVariables) panel.clear();
+      panel.clear();
 
       if(content != null) {
         panel.add(content.asWidget());
@@ -317,20 +333,35 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
     pager.firstPage();
     dataProvider.refresh();
+  }
+
+  @Override
+  public void initContingencyTable(JsArray<VariableDto> rows) {
+    contingencyTablePanel.setVisible(true);
 
     // Prepare cross table form
-    categoricalVariables.clear();
-    variables.clear();
-    categoricalVariables.setWidth("400px");
-    variables.setWidth("400px");
+    categoricalVariable.setPlaceholder(translations.selectFirstVariableLabel());
+    categoricalVariable.setText("");
+    crossWithVariable.setPlaceholder(translations.selectSecondVariableLabel());
+    crossWithVariable.setText("");
 
-    for(VariableDto variableDto : JsArrays.toIterable(rows)) {
-      if(variableDto.getCategoriesArray().length() > 0 || variableDto.getValueType().equals("double") ||
-          variableDto.getValueType().equals("integer")) variables.addItem(variableDto.getName(), variableDto.getName());
-      if(variableDto.getCategoriesArray().length() > 0) {
-        categoricalVariables.addItem(variableDto.getName(), variableDto.getName());
+    categoricalVariables.setUpdaterCallback(new Typeahead.UpdaterCallback() {
+      @Override
+      public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {
+        categoricalVariable.setText(((VariableSuggestOracle.VariableSuggestion) selectedSuggestion).getVariable());
+        getUiHandlers().onCrossVariables();
+        return ((VariableSuggestOracle.VariableSuggestion) selectedSuggestion).getVariable();
       }
-    }
+    });
+
+    crossWithVariables.setUpdaterCallback(new Typeahead.UpdaterCallback() {
+      @Override
+      public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {
+        crossWithVariable.setText(((VariableSuggestOracle.VariableSuggestion) selectedSuggestion).getVariable());
+        getUiHandlers().onCrossVariables();
+        return ((VariableSuggestOracle.VariableSuggestion) selectedSuggestion).getVariable();
+      }
+    });
   }
 
   @Override
@@ -339,6 +370,8 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     renderRows((JsArray<VariableDto>) JavaScriptObject.createArray());
     checkColumn.clearSelection();
     if(cleanFilter) filter.setText("");
+    crossResultsPanel.clear();
+    contingencyTablePanel.setVisible(false);
   }
 
   @Override
@@ -349,6 +382,14 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     timestamps.setText(Moment.create(dto.getTimestamps().getLastUpdate()).fromNow());
     variableCount.setText(dto.hasVariableCount() ? dto.getVariableCount() + "" : "-");
     entityCount.setText(dto.hasValueSetCount() ? dto.getValueSetCount() + "" : "-");
+
+    VariableSuggestOracle oracle = (VariableSuggestOracle) categoricalVariables.getSuggestOracle();
+    oracle.setDatasource(tableDto.getDatasourceName());
+    oracle.setTable(tableDto.getName());
+
+    VariableSuggestOracle crossOracle = (VariableSuggestOracle) crossWithVariables.getSuggestOracle();
+    crossOracle.setDatasource(tableDto.getDatasourceName());
+    crossOracle.setTable(tableDto.getName());
   }
 
   @Override
@@ -376,20 +417,18 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   }
 
   @Override
-  public String getSelectedVariable() {
-    return categoricalVariables.getValue(categoricalVariables.getSelectedIndex());
+  public String getSelectedVariableName() {
+    return categoricalVariable.getText();
   }
 
   @Override
-  public List<String> getCrossWithVariables() {
-    List<String> selected = new ArrayList<String>();
+  public String getCrossWithVariableName() {
+    return crossWithVariable.getText();
+  }
 
-    for(int i = 0; i < variables.getItemCount(); i++) {
-      if(variables.isItemSelected(i)) {
-        selected.add(variables.getItemText(i));
-      }
-    }
-    return selected;
+  @Override
+  public void hideContingencyTable() {
+    contingencyTablePanel.setVisible(false);
   }
 
   @UiHandler("downloadDictionary")
@@ -457,7 +496,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     getUiHandlers().onIndexSchedule();
   }
 
-  @UiHandler("crossVariables")
+  @UiHandler("crossVariablesButton")
   void onCrossVariables(ClickEvent event) {
     crossResultsPanel.clear();
     getUiHandlers().onCrossVariables();
