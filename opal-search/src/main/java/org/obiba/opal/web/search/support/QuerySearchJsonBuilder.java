@@ -47,6 +47,8 @@ public class QuerySearchJsonBuilder {
 
   private Collection<String> fields;
 
+  private Collection<String> facets;
+
   private Collection<String> filterTypes;
 
   private String query;
@@ -74,6 +76,11 @@ public class QuerySearchJsonBuilder {
 
   public QuerySearchJsonBuilder setFields(@NotNull Collection<String> value) {
     fields = value;
+    return this;
+  }
+
+  public QuerySearchJsonBuilder setFacets(@NotNull Collection<String> value) {
+    facets = value;
     return this;
   }
 
@@ -105,10 +112,11 @@ public class QuerySearchJsonBuilder {
     JSONObject jsonQuery = new JSONObject();
     jsonQuery.accumulate("query", new JSONObject().put("query_string", buildQueryStringJson()));
     jsonQuery.put("sort", buildSortJson());
-    if(fields != null && fields.size() > 0) jsonQuery.put("fields", new JSONArray(fields));
+    if(fields != null && fields.size() > 0) jsonQuery.put("partial_fields", buildFields());
     if(filterTypes != null && filterTypes.size() > 0) jsonQuery.put("filter", buildFilter());
     jsonQuery.put("from", from);
     jsonQuery.put("size", size);
+    if (hasFacets()) jsonQuery.put("facets", buildFacetsJson());
 
     return jsonQuery;
   }
@@ -119,7 +127,7 @@ public class QuerySearchJsonBuilder {
 
   private JSONObject buildQueryStringJson() throws JSONException {
     JSONObject json = new JSONObject();
-    if(!"*".equals(query)) json.put("fields", new JSONArray(defaultQueryFields));
+    if(!hasFacets() && !"*".equals(query)) json.put("fields", new JSONArray(defaultQueryFields));
     json.put("query", query);
     json.put("default_operator", DEFAULT_QUERY_OPERATOR);
 
@@ -137,6 +145,24 @@ public class QuerySearchJsonBuilder {
   private JSONObject buildFilter() throws JSONException {
     return new JSONObject().put("bool", new JSONObject()
         .put("must", new JSONObject().put("terms", new JSONObject().put("_type", new JSONArray(filterTypes)))));
+  }
+
+
+  private JSONObject buildFacetsJson() throws JSONException {
+    JSONObject jsonFacets = new JSONObject();
+    for (String facet : facets) {
+      jsonFacets.accumulate(facet, new JSONObject().put("terms", new JSONObject().put("field", facet)));
+    }
+
+    return jsonFacets;
+  }
+
+  private JSONObject buildFields() throws JSONException {
+    return new JSONObject().put("partial", new JSONObject().put("include", new JSONArray(fields)));
+  }
+
+  private boolean hasFacets() {
+    return facets != null && facets.size() > 0;
   }
 
 }

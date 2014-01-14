@@ -47,16 +47,19 @@ public class EsResultConverter {
     Assert.notNull(json, "Result JSON is null!");
 
     JSONObject jsonHits = json.getJSONObject("hits");
+    JSONArray hits = jsonHits.getJSONArray("hits");
     Search.QueryResultDto.Builder dtoResultsBuilder = Search.QueryResultDto.newBuilder()
         .setTotalHits(jsonHits.getInt("total"));
+
+    if (hits.length() > 0) {
+      HitsConverter hitsConverter = new HitsConverter();
+      hitsConverter.setStrategy(itemResultStrategy);
+      dtoResultsBuilder.addAllHits(hitsConverter.convert(jsonHits.getJSONArray("hits")));
+    }
 
     if(json.has("facets")) {
       FacetsConverter facetsConverter = new FacetsConverter();
       dtoResultsBuilder.addAllFacets(facetsConverter.convert(json.getJSONObject("facets")));
-    } else if(jsonHits.has("hits")) {
-      HitsConverter hitsConverter = new HitsConverter();
-      hitsConverter.setStrategy(itemResultStrategy);
-      dtoResultsBuilder.addAllHits(hitsConverter.convert(jsonHits.getJSONArray("hits")));
     }
 
     return dtoResultsBuilder.build();
@@ -159,7 +162,7 @@ public class EsResultConverter {
         Search.ItemResultDto.Builder dtoItemResultBuilder = Search.ItemResultDto.newBuilder();
         JSONObject jsonHit = jsonHits.getJSONObject(i);
         dtoItemResultBuilder.setIdentifier(jsonHit.getString("_id"));
-        JSONObject fields = jsonHit.getJSONObject("fields");
+        JSONObject fields = jsonHit.getJSONObject("fields").getJSONObject("partial");
 
         int tableIndex = fields.getInt("index");
         fields.remove("index"); // no longer needed

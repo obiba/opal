@@ -78,7 +78,7 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
       if(!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
       if(!valuesIndexManager.hasIndex(getValueTable())) return Response.status(Response.Status.NOT_FOUND).build();
 
-      JSONObject jsonResponse = executeQuery(buildQuerySearch(query, offset, limit, null, null, null).build());
+      JSONObject jsonResponse = executeQuery(buildQuerySearch(query, offset, limit, null, null, null, null).build());
 
       Search.ValueSetsResultDto.Builder dtoResponseBuilder = getvalueSetsDtoBuilder(uriInfo, select, jsonResponse);
 
