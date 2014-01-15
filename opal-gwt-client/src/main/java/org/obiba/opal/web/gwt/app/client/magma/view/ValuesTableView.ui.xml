@@ -23,69 +23,73 @@
     <g:PopupPanel ui:field="navigationPopup" autoHideEnabled="true" styleName="gwt-MenuBarPopup"/>
 
     <g:FlowPanel ui:field="searchPanel">
-      <b:ControlGroup ui:field="searchIdentifierGroup" visible="false">
-      <b:InputAddOn prependIcon="SEARCH">
-          <b:TextBox ui:field="searchBox" placeholder="search for an identifier..."/>
-        </b:InputAddOn>
-      </b:ControlGroup>
+      <b:Well>
+        <b:ControlGroup ui:field="searchIdentifierGroup" visible="false">
+          <b:InputAddOn prependIcon="SEARCH">
+            <b:TextBox ui:field="searchBox" placeholder="search for an identifier..."/>
+          </b:InputAddOn>
+        </b:ControlGroup>
 
-      <b:ControlGroup ui:field="valuesFilterGroup" visible="false">
-        <b:ControlLabel>
-          <ui:msg description="Values Filter label">Values Filter</ui:msg>
-        </b:ControlLabel>
-        <b:Controls>
-          <g:FlowPanel ui:field="filters"/>
-          <b:Typeahead ui:field="variableTypeahead">
-            <b:TextBox placeholder="more variable criteria..."/>
-          </b:Typeahead>
-        </b:Controls>
-        <b:HelpBlock>
-          <ui:msg description="Values Filter help">Select variables and apply value filter on each of them.</ui:msg>
-        </b:HelpBlock>
-      </b:ControlGroup>
+        <b:ControlGroup ui:field="valuesFilterGroup" visible="false">
+          <b:ControlLabel>
+            <ui:msg description="Values Filter label">Values Filter</ui:msg>
+          </b:ControlLabel>
+          <b:Controls>
+            <g:FlowPanel ui:field="filters"/>
+            <b:Typeahead ui:field="variableTypeahead">
+              <b:TextBox placeholder="More variable criteria..."/>
+            </b:Typeahead>
+          </b:Controls>
+          <b:HelpBlock>
+            <ui:msg description="Values Filter help">Select some variables and apply value filter on each of them.</ui:msg>
+          </b:HelpBlock>
+        </b:ControlGroup>
+      </b:Well>
+    </g:FlowPanel>
+
+    <g:FlowPanel addStyleNames="clearfix">
+      <o:CollapsiblePanel ui:field="addPanel" addStyleNames="pull-left">
+        <g:Image ui:field="refreshPending" url="image/loading.gif" addStyleNames="small-indent"/>
+        <g:Grid>
+          <g:row>
+            <g:customCell>
+              <g:FlowPanel>
+                <g:Label>
+                  <ui:msg description="Filter Variables label">Variables filter</ui:msg>
+                </g:Label>
+                <g:HorizontalPanel>
+                  <b:Controls>
+                    <b:InputAddOn prependIcon="FILTER">
+                      <o:TextBoxClearable ui:field="filter"/>
+                    </b:InputAddOn>
+                  </b:Controls>
+                </g:HorizontalPanel>
+              </g:FlowPanel>
+            </g:customCell>
+            <g:customCell styleName="small-indent">
+              <g:FlowPanel>
+                <g:Label>
+                  <ui:msg description="Number of Visible Variables label">Number of visible variables</ui:msg>
+                </g:Label>
+                <o:NumericTextBox ui:field="visibleColumns" addStyleNames="span1"/>
+              </g:FlowPanel>
+            </g:customCell>
+            <g:customCell styleName="small-indent">
+              <g:FlowPanel>
+                <g:Label>
+                  <ui:msg description="Number of Rows label">Number of rows</ui:msg>
+                </g:Label>
+                <o:NumericTextBox ui:field="pageSize" addStyleNames="span1"/>
+              </g:FlowPanel>
+            </g:customCell>
+          </g:row>
+        </g:Grid>
+      </o:CollapsiblePanel>
 
       <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
     </g:FlowPanel>
 
-    <o:CollapsiblePanel ui:field="addPanel">
-      <g:Image ui:field="refreshPending" url="image/loading.gif" addStyleNames="small-indent"/>
-      <g:Grid>
-        <g:row>
-          <g:customCell>
-            <g:FlowPanel>
-              <g:Label>
-                <ui:msg description="Filter Variables label">Variables filter</ui:msg>
-              </g:Label>
-              <g:HorizontalPanel>
-                <b:Controls>
-                  <b:InputAddOn prependIcon="FILTER">
-                    <o:TextBoxClearable ui:field="filter"/>
-                  </b:InputAddOn>
-                </b:Controls>
-              </g:HorizontalPanel>
-            </g:FlowPanel>
-          </g:customCell>
-          <g:customCell styleName="small-indent">
-            <g:FlowPanel>
-              <g:Label>
-                <ui:msg description="Number of Visible Variables label">Number of visible variables</ui:msg>
-              </g:Label>
-              <o:NumericTextBox ui:field="visibleColumns" addStyleNames="span1"/>
-            </g:FlowPanel>
-          </g:customCell>
-          <g:customCell styleName="small-indent">
-            <g:FlowPanel>
-              <g:Label>
-                <ui:msg description="Number of Rows label">Number of rows</ui:msg>
-              </g:Label>
-              <o:NumericTextBox ui:field="pageSize" addStyleNames="span1"/>
-            </g:FlowPanel>
-          </g:customCell>
-        </g:row>
-      </g:Grid>
-    </o:CollapsiblePanel>
-
-    <o:Table ui:field="valuesTable"/>
+    <o:Table ui:field="valuesTable" addStyleNames="small-top-margin"/>
   </g:FlowPanel>
 
 </ui:UiBinder>

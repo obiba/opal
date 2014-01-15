@@ -43,9 +43,9 @@ public class CriterionPanel extends FlowPanel {
 
     InputAddOn w = new InputAddOn();
     w.addStyleName("small-addon");
-    w.addStyleName("input-append");
 
     if(removeable) {
+      w.addStyleName("input-append");
       IconAnchor remove = new IconAnchor();
       remove.setIcon(IconType.REMOVE);
       remove.setTitle(translations.removeLabel());
@@ -62,7 +62,7 @@ public class CriterionPanel extends FlowPanel {
     w.add(criterion);
     add(w);
 
-    addStyleName("xsmall-indent");
+    addStyleName("xsmall-right-indent");
     addStyleName("inline-block");
   }
 
