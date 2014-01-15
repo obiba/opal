@@ -158,16 +158,21 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   @Override
   public void prepareFromRequest(PlaceRequest request) {
     super.prepareFromRequest(request);
-    String oldProject = projectName;
+    String oldProject = Strings.isNullOrEmpty(projectName) ? "" : projectName;
+
     projectName = request.getParameter(ParameterTokens.TOKEN_NAME, null);
     tab = validateTab(request.getParameter(ParameterTokens.TOKEN_TAB, null));
-    if (oldProject == null || projectName.equals(oldProject)) {
-      getView().setTabData(tab.ordinal(), tab == Display.ProjectTab.TABLES ? validatePath(projectName,
-          request.getParameter(ParameterTokens.TOKEN_PATH, null)) : null);
-    } else {
-      if(fileExplorerPresenter != null) fileExplorerPresenter.reset();
-      getView().clearTabsData();
+    String path = request.getParameter(ParameterTokens.TOKEN_PATH, null);
+
+    if (!projectName.equals(oldProject)) {
+
+      if (Strings.isNullOrEmpty(path)) {
+        if(fileExplorerPresenter != null) fileExplorerPresenter.reset();
+        getView().clearTabsData();
+      }
     }
+
+    getView().setTabData(tab.ordinal(), tab == Display.ProjectTab.TABLES ? validatePath(projectName, path) : null);
 
     refresh();
   }
