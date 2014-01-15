@@ -384,12 +384,12 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     entityCount.setText(dto.hasValueSetCount() ? dto.getValueSetCount() + "" : "-");
 
     VariableSuggestOracle oracle = (VariableSuggestOracle) categoricalVariables.getSuggestOracle();
-    oracle.setDatasource(tableDto.getDatasourceName());
-    oracle.setTable(tableDto.getName());
+    oracle.setDatasource("\"" + tableDto.getDatasourceName() + "\"");
+    oracle.setTable("\"" + tableDto.getName() + "\"");
 
     VariableSuggestOracle crossOracle = (VariableSuggestOracle) crossWithVariables.getSuggestOracle();
-    crossOracle.setDatasource(tableDto.getDatasourceName());
-    crossOracle.setTable(tableDto.getName());
+    crossOracle.setDatasource("\"" + tableDto.getDatasourceName() + "\"");
+    crossOracle.setTable("\"" + tableDto.getName() + "\"");
   }
 
   @Override
