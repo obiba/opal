@@ -21,10 +21,12 @@ public interface SubjectCredentialsService extends SystemService {
   Iterable<SubjectCredentials> getSubjectCredentials();
 
   /**
-   * Given a certificate alias, returns the corresponding principal
+   * Given a certificate alias, returns the corresponding SubjectCredentials
+   *
    * @param certificateAlias the certificate alias
+   * @return returns the corresponding a SubjectCredentials
    */
-  String getSubjectPrincipal(String certificateAlias);
+  SubjectCredentials getSubjectCredentialsByCertificateAlias(String certificateAlias);
 
   /**
    * Returns the list of users

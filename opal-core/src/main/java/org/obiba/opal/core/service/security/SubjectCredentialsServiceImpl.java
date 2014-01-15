@@ -85,14 +85,9 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
   }
 
   @Override
-  public String getSubjectPrincipal(String certificateAlias) {
-    for(SubjectCredentials sc : getSubjectCredentials()) {
-      if(sc.getCertificateAlias().equals(certificateAlias)) {
-        return sc.getName();
-      }
-    }
-
-    return null;
+  public SubjectCredentials getSubjectCredentialsByCertificateAlias(String certificateAlias) {
+    return orientDbService.uniqueResult(SubjectCredentials.class,
+        "select from " + SubjectCredentials.class.getSimpleName() + " where certificateAlias = ?", certificateAlias);
   }
 
   @Override

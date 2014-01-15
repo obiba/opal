@@ -69,11 +69,11 @@ public class ApplicationRealm extends AuthorizingRealm {
       try {
         X509Certificate x509Cert = x509Token.getCredentials();
         x509Cert.verify(certificate.getPublicKey());
-        String principal = subjectCredentialsService.getSubjectPrincipal(certificateAlias);
+        SubjectCredentials sc = subjectCredentialsService.getSubjectCredentialsByCertificateAlias(certificateAlias);
 
-        if(!Strings.isNullOrEmpty(principal)) {
+        if(sc != null) {
           SimplePrincipalCollection principals = new SimplePrincipalCollection();
-          principals.add(principal, getName());
+          principals.add(sc.getName(), getName());
           principals.add(x509Token.getPrincipal(), getName());
           return new SimpleAuthenticationInfo(principals, x509Token.getCredentials());
         }
