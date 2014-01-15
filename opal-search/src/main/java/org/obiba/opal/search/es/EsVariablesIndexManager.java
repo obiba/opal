@@ -25,6 +25,7 @@ import org.obiba.magma.Category;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
+import org.obiba.opal.core.domain.VariableNature;
 import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.ValueTableVariablesIndex;
@@ -129,6 +130,7 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
       xcb.field("mimeType", variable.getMimeType());
       xcb.field("unit", variable.getUnit());
       xcb.field("referencedEntityType", variable.getReferencedEntityType());
+      xcb.field("nature", VariableNature.getNature(variable).name());
     }
 
     private void indexVariableAttributes(AttributeAware variable, XContentBuilder xcb) throws IOException {

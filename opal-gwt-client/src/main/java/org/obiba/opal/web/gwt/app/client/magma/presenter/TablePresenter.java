@@ -29,7 +29,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewPropertiesModalPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CrossVariablePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.ContingencyTablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
@@ -115,7 +115,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final ModalProvider<IndexPresenter> indexPresenter;
 
-  private final Provider<CrossVariablePresenter> crossVariableProvider;
+  private final Provider<ContingencyTablePresenter> crossVariableProvider;
 
   private final Translations translations;
 
@@ -134,7 +134,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @SuppressWarnings({ "ConstructorWithTooManyParameters", "PMD.ExcessiveParameterList" })
   @Inject
   public TablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
-      ValuesTablePresenter valuesTablePresenter, Provider<CrossVariablePresenter> crossVariableProvider,
+      ValuesTablePresenter valuesTablePresenter, Provider<ContingencyTablePresenter> crossVariableProvider,
       Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, ModalProvider<IndexPresenter> indexPresenter,
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
       ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider,
@@ -323,6 +323,21 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     updateVariables();
     updateTableIndexStatus();
     authorize();
+  }
+
+  private void updateContingencyTableVariables() {
+    TableIndexationStatus status = statusDto.getStatus();
+    if(status.isTableIndexationStatus(TableIndexationStatus.UPTODATE) ||
+        status.isTableIndexationStatus(TableIndexationStatus.OUTDATED)) {
+
+      ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(table.getLink() + "/variables").get()
+          .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
+            @Override
+            public void onResource(Response response, JsArray<VariableDto> resource) {
+              getView().initContingencyTable(JsArrays.toSafeArray(resource));
+            }
+          }).send();
+    }
   }
 
   private void showFromTables(TableDto tableDto) {// Show from tables
@@ -565,28 +580,34 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onCrossVariables() {
-    ResourceRequestBuilderFactory.<VariableDto>newBuilder() //
-        .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
-            .build(table.getDatasourceName(), table.getName(), getView().getSelectedVariable())) //
-        .get() //
-        .withCallback(new ResourceCallback<VariableDto>() {
-          @Override
-          public void onResource(Response response, final VariableDto variableDto) {
-            for(int i = 0; i < getView().getCrossWithVariables().size(); i++)
+    // If both variables have been selected
+    String selectedVariableName = getView().getSelectedVariableName();
+    final String crossWithVariableName = getView().getCrossWithVariableName();
+
+    if(!selectedVariableName.isEmpty() && !crossWithVariableName.isEmpty()) {
+      ResourceRequestBuilderFactory.<VariableDto>newBuilder() //
+          .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
+              .build(table.getDatasourceName(), table.getName(), selectedVariableName)) //
+          .get() //
+          .withCallback(new ResourceCallback<VariableDto>() {
+            @Override
+            public void onResource(Response response, final VariableDto variableDto) {
+
               ResourceRequestBuilderFactory.<VariableDto>newBuilder() //
                   .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
-                      .build(table.getDatasourceName(), table.getName(), getView().getCrossWithVariables().get(i))) //
+                      .build(table.getDatasourceName(), table.getName(), crossWithVariableName)) //
                   .get() //
                   .withCallback(new ResourceCallback<VariableDto>() {
                     @Override
                     public void onResource(Response response, VariableDto crossWithVariable) {
-                      CrossVariablePresenter crossVariablePresenter = crossVariableProvider.get();
+                      ContingencyTablePresenter crossVariablePresenter = crossVariableProvider.get();
                       crossVariablePresenter.initialize(table, variableDto, crossWithVariable);
-                      setInSlot(Display.Slots.CrossVariables, crossVariablePresenter);
+                      setInSlot(Display.Slots.ContingencyTable, crossVariablePresenter);
                     }//
                   }).send();
-          }//
-        }).send();
+            }//
+          }).send();
+    }
   }
 
   private final class ValuesCommand implements Command {
@@ -709,6 +730,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     @Override
     public void onResource(Response response, JsArray<TableIndexStatusDto> resource) {
 
+      // Hide contingency table and show only if up to date or outdated
+      getView().hideContingencyTable();
       if(response.getStatusCode() == SC_OK) {
         getView().setIndexStatusVisible(true);
         statusDto = TableIndexStatusDto.get(JsArrays.toSafeArray(resource));
@@ -729,6 +752,9 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
           // Schedule the timer to run once in X seconds.
           indexProgressTimer.schedule(DELAY_MILLIS);
+        } else if(statusDto.getStatus().isTableIndexationStatus(TableIndexationStatus.UPTODATE) ||
+            statusDto.getStatus().isTableIndexationStatus(TableIndexationStatus.OUTDATED)) {
+          updateContingencyTableVariables();
         }
       }
     }
@@ -754,7 +780,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   public interface Display extends View, HasUiHandlers<TableUiHandlers> {
 
     enum Slots {
-      Permissions, Values, CrossVariables
+      Permissions, Values, ContingencyTable
     }
 
     void beforeRenderRows();
@@ -762,6 +788,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     void renderRows(JsArray<VariableDto> rows);
 
     void afterRenderRows();
+
+    void initContingencyTable(JsArray<VariableDto> rows);
 
     void clear(boolean cleanFilter);
 
@@ -807,10 +835,11 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
     void setCancelVisible(boolean b);
 
-    String getSelectedVariable();
+    String getSelectedVariableName();
 
-    List<String> getCrossWithVariables();
+    String getCrossWithVariableName();
 
+    void hideContingencyTable();
   }
 
   private class RemoveRunnable implements Runnable {
