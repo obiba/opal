@@ -330,7 +330,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @Override
   public void renderRows(JsArray<VariableDto> rows) {
-    dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
+    dataProvider.setList(JsArrays.toList(rows));
     pager.firstPage();
     dataProvider.refresh();
   }

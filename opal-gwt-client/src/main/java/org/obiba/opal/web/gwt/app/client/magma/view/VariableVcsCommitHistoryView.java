@@ -45,7 +45,7 @@ public class VariableVcsCommitHistoryView extends ViewWithUiHandlers<UiHandlers>
 
   private static final VariableGitHistoryViewUiBinder uiBinder = GWT.create(VariableGitHistoryViewUiBinder.class);
 
-  private static final Translations translations = com.google.gwt.core.shared.GWT.create(Translations.class);
+  private static final Translations translations = GWT.create(Translations.class);
 
   @UiField
   CellTable<VcsCommitInfoDto> commitInfoTable;
@@ -64,7 +64,7 @@ public class VariableVcsCommitHistoryView extends ViewWithUiHandlers<UiHandlers>
 
   @Override
   public void setData(JsArray<VcsCommitInfoDto> commitInfos) {
-    commitInfoDataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(commitInfos)));
+    commitInfoDataProvider.setList(JsArrays.toList(commitInfos));
     commitInfoTablePager.firstPage();
     commitInfoDataProvider.refresh();
     commitInfoTablePager.setVisible(commitInfoDataProvider.getList().size() > commitInfoTablePager.getPageSize());
@@ -112,24 +112,24 @@ public class VariableVcsCommitHistoryView extends ViewWithUiHandlers<UiHandlers>
       }
     };
 
-    static final ActionsColumn<VcsCommitInfoDto> ACTIONS = new ActionsColumn<VcsCommitInfoDto>(new ActionsProvider<VcsCommitInfoDto>() {
+    static final ActionsColumn<VcsCommitInfoDto> ACTIONS = new ActionsColumn<VcsCommitInfoDto>(
+        new ActionsProvider<VcsCommitInfoDto>() {
 
-      @Override
-      public String[] allActions() {
-        return new String[] { DIFF_ACTION, DIFF_CURRENT_ACTION, ActionsColumn.EDIT_ACTION };
-      }
+          @Override
+          public String[] allActions() {
+            return new String[] { DIFF_ACTION, DIFF_CURRENT_ACTION, ActionsColumn.EDIT_ACTION };
+          }
 
-      @Override
-      public String[] getActions(VcsCommitInfoDto value) {
-        return value.getIsCurrent() ? getHeadOnlyActions() : allActions();
-      }
+          @Override
+          public String[] getActions(VcsCommitInfoDto value) {
+            return value.getIsCurrent() ? getHeadOnlyActions() : allActions();
+          }
 
-      private String[] getHeadOnlyActions() {
-        return new String[] { DIFF_ACTION };
-      }
-    });
+          private String[] getHeadOnlyActions() {
+            return new String[] { DIFF_ACTION };
+          }
+        });
 
   }
-
 
 }

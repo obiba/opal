@@ -28,7 +28,6 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.ListAttributeValueColumn;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
-import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.core.client.GWT;
@@ -101,7 +100,7 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
 
     initColumns();
 
-    List<AttributeDto> attributesArray = JsArrays.toList(JsArrays.toSafeArray(attributes));
+    List<AttributeDto> attributesArray = JsArrays.toList(attributes);
     Collections.sort(attributesArray, new Comparator<AttributeDto>() {
       @Override
       public int compare(AttributeDto attributeDto, AttributeDto attributeDto2) {

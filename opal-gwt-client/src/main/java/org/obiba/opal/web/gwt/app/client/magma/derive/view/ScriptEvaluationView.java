@@ -235,7 +235,7 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
 
     @Override
     public void populateValues(int offset, ValueSetsDto valueSets) {
-      updateRowData(offset, JsArrays.toList(JsArrays.toSafeArray(valueSets.getValueSetsArray())));
+      updateRowData(offset, JsArrays.toList(valueSets.getValueSetsArray()));
     }
 
   }

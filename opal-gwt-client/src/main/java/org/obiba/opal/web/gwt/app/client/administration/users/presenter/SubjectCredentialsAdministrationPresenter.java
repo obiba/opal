@@ -206,7 +206,7 @@ public class SubjectCredentialsAdministrationPresenter extends
         .withCallback(new ResourceCallback<JsArray<SubjectCredentialsDto>>() {
           @Override
           public void onResource(Response response, JsArray<SubjectCredentialsDto> resource) {
-            getView().renderUserRows(JsArrays.toList(JsArrays.toSafeArray(resource)));
+            getView().renderUserRows(JsArrays.toList(resource));
           }
         }) //
         .get().send();
@@ -219,7 +219,7 @@ public class SubjectCredentialsAdministrationPresenter extends
         .withCallback(new ResourceCallback<JsArray<GroupDto>>() {
           @Override
           public void onResource(Response response, JsArray<GroupDto> resource) {
-            getView().renderGroupRows(JsArrays.toList(JsArrays.toSafeArray(resource)));
+            getView().renderGroupRows(JsArrays.toList(resource));
           }
         }) //
         .get().send();

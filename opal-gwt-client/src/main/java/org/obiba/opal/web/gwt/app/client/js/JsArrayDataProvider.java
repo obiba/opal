@@ -17,7 +17,7 @@ import com.google.gwt.view.client.ListDataProvider;
 public class JsArrayDataProvider<T extends JavaScriptObject> extends ListDataProvider<T> {
 
   public void setArray(JsArray<T> array) {
-    setList(JsArrays.toList(JsArrays.toSafeArray(array)));
+    setList(JsArrays.toList(array));
   }
 
   public ColumnSortEvent.ListHandler<T> newSortHandler() {

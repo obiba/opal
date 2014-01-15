@@ -266,7 +266,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
 
   @Override
   public void renderRows(JsArray<TableDto> rows) {
-    dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
+    dataProvider.setList(JsArrays.toList(rows));
     pager.firstPage();
   }
 

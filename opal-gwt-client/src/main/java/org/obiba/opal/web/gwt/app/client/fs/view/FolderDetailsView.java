@@ -95,7 +95,7 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
         ? (JsArray<FileDto>) JsArray.createArray()
         : filterChildren(folder.getChildrenArray());
 
-    dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(children)));
+    dataProvider.setList(JsArrays.toList(children));
     dataProvider.refresh();
 
     int fileCount = children.length();

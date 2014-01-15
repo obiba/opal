@@ -9,15 +9,13 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.variable.presenter;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
@@ -33,7 +31,6 @@ import org.obiba.opal.web.model.client.opal.LocaleDto;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -48,115 +45,93 @@ import com.gwtplatform.mvp.client.PopupView;
 public class CategoriesEditorModalPresenter extends ModalPresenterWidget<CategoriesEditorModalPresenter.Display>
     implements CategoriesEditorModalUiHandlers {
 
-  private static final Translations translations = GWT.create(Translations.class);
+  private final TranslationMessages translationMessages;
 
   private VariableDto variable;
 
   private TableDto tableDto;
 
-  private List<LocaleDto> locales;
-
   @Inject
-  public CategoriesEditorModalPresenter(EventBus eventBus, Display display) {
+  public CategoriesEditorModalPresenter(EventBus eventBus, Display display, TranslationMessages translationMessages) {
     super(eventBus, display);
+    this.translationMessages = translationMessages;
   }
 
-  public void initialize(VariableDto variable, TableDto table) {
+  public void initialize(@SuppressWarnings("ParameterHidesMemberVariable") final VariableDto variable, TableDto table) {
     this.variable = variable;
     tableDto = table;
-    locales = new ArrayList<LocaleDto>();
+
     getView().setUiHandlers(this);
 
     // Fetch locales and render categories
     ResourceRequestBuilderFactory.<JsArray<LocaleDto>>newBuilder()
         .forResource(UriBuilders.DATASOURCE_TABLE_LOCALES.create().build(table.getDatasourceName(), table.getName()))
-        .get().withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
-      @Override
-      public void onResource(Response response, JsArray<LocaleDto> resource) {
-        locales = JsArrays.toList(JsArrays.toSafeArray(resource));
-        getView().renderCategoryRows(CategoriesEditorModalPresenter.this.variable.getCategoriesArray(), locales);
-      }
-    }).send();
-
+        .withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<LocaleDto> locales) {
+            getView().renderCategoryRows(variable.getCategoriesArray(), JsArrays.toList(locales));
+          }
+        }).get().send();
   }
 
   @Override
   public void onSave() {
     // Validate category names
-    Set<String> names = new HashSet<String>();
     JsArray<CategoryDto> categories = JsArrays.toSafeArray(getView().getCategories());
-    for(int i = 0; i < categories.length(); i++) {
-      if(!names.add(categories.get(i).getName())) {
-        getView().showError(
-            TranslationsUtils.replaceArguments(translations.categoryNameDuplicated(), categories.get(i).getName()),
-            null);
+    Collection<String> names = new HashSet<String>();
+    for(CategoryDto categoryDto : JsArrays.toIterable(categories)) {
+      if(!names.add(categoryDto.getName())) {
+        getView().showError(translationMessages.categoryNameDuplicated(categoryDto.getName()), null);
         return;
       }
     }
+    VariableDto dto = getVariableDto(categories);
+    String uri = Strings.isNullOrEmpty(tableDto.getViewLink())
+        ? UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
+        .build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName())
+        : UriBuilder.create().segment("datasource", "{}", "view", "{}", "variable", "{}")
+            .query("comment", translationMessages.updateVariableCategories(variable.getName()))
+            .build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName());
 
-    VariableDto v = getVariableDto(categories);
-
-    // If variable from a view
-    if(Strings.isNullOrEmpty(tableDto.getViewLink())) {
-      ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
-          .build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName())) //
-          .put() //
-          .withResourceBody(VariableDto.stringify(v)).accept("application/json") //
-          .withCallback(new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              if(response.getStatusCode() == Response.SC_OK) {
-                getView().hide();
-              } else {
-                getView().showError(response.getText(), null);
-              }
-              fireEvent(new VariableRefreshEvent());
+    ResourceRequestBuilderFactory.newBuilder() //
+        .forResource(uri) //
+        .withResourceBody(VariableDto.stringify(dto)).accept("application/json") //
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if(response.getStatusCode() == Response.SC_OK) {
+              getView().hide();
+            } else {
+              getView().showError(response.getText(), null);
             }
-          }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
-    } else {
-      UriBuilder uriBuilder = UriBuilder.create().segment("datasource", "{}", "view", "{}", "variable", "{}")
-          .query("comment",
-              TranslationsUtils.replaceArguments(translations.updateVariableCategories(), variable.getName()));
-
-      ResourceRequestBuilderFactory.newBuilder()
-          .forResource(uriBuilder.build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName())) //
-          .put() //
-          .withResourceBody(VariableDto.stringify(v)).accept("application/json") //
-          .withCallback(new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              if(response.getStatusCode() == Response.SC_OK) {
-                getView().hide();
-              } else {
-                getView().showError(response.getText(), null);
-              }
-              fireEvent(new VariableRefreshEvent());
-            }
-          }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
-    }
-
+            fireEvent(new VariableRefreshEvent());
+          }
+        }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK) //
+        .put() //
+        .send();
   }
 
   private VariableDto getVariableDto(JsArray<CategoryDto> categories) {
-    VariableDto v = VariableDto.create();
-    v.setLink(variable.getLink());
-    v.setIndex(variable.getIndex());
-    v.setIsNewVariable(variable.getIsNewVariable());
-    v.setParentLink(variable.getParentLink());
-    v.setName(variable.getName());
-    v.setEntityType(variable.getEntityType());
-    v.setValueType(variable.getValueType());
-    v.setIsRepeatable(variable.getIsRepeatable());
-    v.setUnit(variable.getUnit());
-    v.setReferencedEntityType(variable.getReferencedEntityType());
-    v.setMimeType(variable.getMimeType());
-    v.setOccurrenceGroup(variable.getOccurrenceGroup());
-    v.setAttributesArray(variable.getAttributesArray());
-    v.setCategoriesArray(categories);
-    return v;
+    VariableDto dto = VariableDto.create();
+    dto.setLink(variable.getLink());
+    dto.setIndex(variable.getIndex());
+    dto.setIsNewVariable(variable.getIsNewVariable());
+    dto.setParentLink(variable.getParentLink());
+    dto.setName(variable.getName());
+    dto.setEntityType(variable.getEntityType());
+    dto.setValueType(variable.getValueType());
+    dto.setIsRepeatable(variable.getIsRepeatable());
+    dto.setUnit(variable.getUnit());
+    dto.setReferencedEntityType(variable.getReferencedEntityType());
+    dto.setMimeType(variable.getMimeType());
+    dto.setOccurrenceGroup(variable.getOccurrenceGroup());
+    dto.setAttributesArray(variable.getAttributesArray());
+    dto.setCategoriesArray(categories);
+    return dto;
   }
 
   public interface Display extends PopupView, HasUiHandlers<CategoriesEditorModalUiHandlers> {
+
     void renderCategoryRows(JsArray<CategoryDto> rows, List<LocaleDto> locales);
 
     JsArray<CategoryDto> getCategories();

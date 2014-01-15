@@ -284,10 +284,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Provide a name for this category.")
   String categoryNameRequired();
 
-  @Description("Category name duplicated")
-  @DefaultStringValue("Duplicated category name {0}.")
-  String categoryNameDuplicated();
-
   @Description("You must select a file message")
   @DefaultStringValue("You must select a file.")
   String fileMustBeSelected();
@@ -1917,10 +1913,6 @@ public interface Translations extends Constants {
   @Description("Rename {0} to {1} label")
   @DefaultStringValue("Rename {0} to {1}")
   String renameToComment();
-
-  @Description("Update {0} categories label")
-  @DefaultStringValue("Update {0} categories")
-  String updateVariableCategories();
 
   @Description("Update {0} properties label")
   @DefaultStringValue("Update {0} properties")

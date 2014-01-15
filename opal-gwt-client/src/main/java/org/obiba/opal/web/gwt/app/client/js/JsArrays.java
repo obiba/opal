@@ -23,6 +23,7 @@ import com.google.gwt.core.client.JsArrayString;
 /**
  *
  */
+@SuppressWarnings("StaticMethodOnlyUsedInOneClass")
 public class JsArrays {
 
   private JsArrays() {
@@ -114,13 +115,11 @@ public class JsArrays {
   }
 
   public static <T extends JavaScriptObject> List<T> toList(@Nullable JsArray<T> jsArray) {
-    JsArray<T> array = toSafeArray(jsArray);
-    return new JavaScriptObjectList<T>(array);
+    return new JavaScriptObjectList<T>(toSafeArray(jsArray));
   }
 
   public static List<String> toList(JsArrayString jsArray) {
-    JsArrayString array = jsArray == null ? (JsArrayString) JsArrayString.createArray() : jsArray;
-    return new JsArrayStringList(array);
+    return new JsArrayStringList(jsArray == null ? (JsArrayString) JsArrayString.createArray() : jsArray);
   }
 
   public static JsArrayString fromIterable(Iterable<String> iterable) {

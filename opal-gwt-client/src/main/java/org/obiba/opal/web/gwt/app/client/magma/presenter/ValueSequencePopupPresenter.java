@@ -99,14 +99,13 @@ public class ValueSequencePopupPresenter extends ModalPresenterWidget<ValueSeque
     }
 
     private void requestVariablesAndValueSet(final String filter) {
-      StringBuilder link = new StringBuilder(table.getLink());
-      link.append("/variables").append("?script=").append(URL.encodePathSegment(filter));
-      ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(link.toString()).get()
+      ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder()
+          .forResource(table.getLink() + "/variables?script=" + URL.encodePathSegment(filter)).get()
           .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
 
             @Override
             public void onResource(Response response, JsArray<VariableDto> resource) {
-              requestValueSet(JsArrays.toList(JsArrays.toSafeArray(resource)), filter);
+              requestValueSet(JsArrays.toList(resource), filter);
             }
 
           }).send();
@@ -132,10 +131,9 @@ public class ValueSequencePopupPresenter extends ModalPresenterWidget<ValueSeque
 
     @Override
     public void requestBinaryValue(VariableDto variable, String entityIdentifier, int index) {
-      StringBuilder link = new StringBuilder(table.getLink());
-      link.append("/valueSet/").append(entityIdentifier).append("/variable/").append(variable.getName())
-          .append("/value").append("?pos=").append(index);
-      getEventBus().fireEvent(new FileDownloadRequestEvent(link.toString()));
+      getEventBus().fireEvent(new FileDownloadRequestEvent(
+          table.getLink() + "/valueSet/" + entityIdentifier + "/variable/" + variable.getName() + "/value?pos=" +
+              index));
     }
 
     @Override

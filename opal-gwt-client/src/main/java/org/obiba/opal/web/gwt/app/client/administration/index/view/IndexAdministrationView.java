@@ -186,7 +186,7 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
   @Override
   public void renderRows(JsArray<TableIndexStatusDto> rows) {
-    dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
+    dataProvider.setList(JsArrays.toList(rows));
     indexTablePager.firstPage();
     dataProvider.refresh();
     indexTablePager.setVisible(dataProvider.getList().size() > indexTablePager.getPageSize());

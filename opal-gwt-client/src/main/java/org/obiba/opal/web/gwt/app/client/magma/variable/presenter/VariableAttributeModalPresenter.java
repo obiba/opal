@@ -45,7 +45,6 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -109,7 +108,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
   }
 
   private JsArray<AttributeDto> getAttributesArray(VariableDto dto) {
-    List<AttributeDto> attributes = JsArrays.toList(JsArrays.toSafeArray(dto.getAttributesArray()));
+    List<AttributeDto> attributes = JsArrays.toList(dto.getAttributesArray());
 
     if(dialogMode == Mode.CREATE) return addNewAttribute(attributes);
 
@@ -249,7 +248,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
         .get().withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
       @Override
       public void onResource(Response response, JsArray<LocaleDto> resource) {
-        for(LocaleDto localeDto : JsArrays.toList(JsArrays.toSafeArray(resource))) {
+        for(LocaleDto localeDto : JsArrays.toList(resource)) {
           locales.add(localeDto.getName());
         }
         Collections.sort(locales);
@@ -299,7 +298,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
           .get().withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
         @Override
         public void onResource(Response response, JsArray<LocaleDto> resource) {
-          List<LocaleDto> localeDtos = JsArrays.toList(JsArrays.toSafeArray(resource));
+          List<LocaleDto> localeDtos = JsArrays.toList(resource);
           locales = new ArrayList<String>();
           for(LocaleDto localeDto : localeDtos) {
             locales.add(localeDto.getName());

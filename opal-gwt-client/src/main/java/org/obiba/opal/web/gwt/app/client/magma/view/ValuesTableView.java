@@ -752,8 +752,8 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     public void populateValues(int offset, ValueSetsDto valueSets) {
       setRefreshing(false);
 
-      listValueSetVariable = JsArrays.toList(JsArrays.toSafeArray(valueSets.getVariablesArray()));
-      updateRowData(offset, JsArrays.toList(JsArrays.toSafeArray(valueSets.getValueSetsArray())));
+      listValueSetVariable = JsArrays.toList(valueSets.getVariablesArray());
+      updateRowData(offset, JsArrays.toList(valueSets.getValueSetsArray()));
 
       valuesTable.setVisibleRange(offset, getPageSize());
     }

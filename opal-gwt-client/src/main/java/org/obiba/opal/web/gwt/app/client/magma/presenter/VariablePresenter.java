@@ -439,7 +439,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     VariableDto dto = getVariableDto();
 
     JsArray<AttributeDto> filteredAttributes = JsArrays.create().cast();
-    List<AttributeDto> allAttributes = JsArrays.toList(JsArrays.toSafeArray(dto.getAttributesArray()));
+    List<AttributeDto> allAttributes = JsArrays.toList(dto.getAttributesArray());
 
     for(AttributeDto attribute : allAttributes) {
       boolean keep = true;

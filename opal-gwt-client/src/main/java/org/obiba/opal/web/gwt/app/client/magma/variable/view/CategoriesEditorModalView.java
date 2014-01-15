@@ -68,7 +68,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
   private static final String LABEL = "label";
 
-  private static final int DEFAULT_PAGESIZE = 10;
+  private static final int DEFAULT_PAGE_SIZE = 10;
 
   private final Translations translations;
 
@@ -136,7 +136,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     table.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.DISABLED);
     table.setSelectionModel(new SingleSelectionModel<CategoryDto>());
     table.setEmptyTableWidget(new Label(translations.noCategoriesLabel()));
-    table.setPageSize(DEFAULT_PAGESIZE);
+    table.setPageSize(DEFAULT_PAGE_SIZE);
 
     pager.setDisplay(table);
     dataProvider.addDataDisplay(table);
@@ -168,7 +168,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
     dataProvider.setList(categories);
     dataProvider.refresh();
-    pager.setVisible(dataProvider.getList().size() >= DEFAULT_PAGESIZE);
+    pager.setVisible(dataProvider.getList().size() >= DEFAULT_PAGE_SIZE);
   }
 
   @UiHandler("closeButton")
@@ -234,12 +234,12 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   public void renderCategoryRows(JsArray<CategoryDto> rows, List<LocaleDto> locales) {
     addEditableColumns(locales);
 
-    dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
+    dataProvider.setList(JsArrays.toList(rows));
     dataProvider.refresh();
-    pager.setVisible(dataProvider.getList().size() >= DEFAULT_PAGESIZE);
+    pager.setVisible(dataProvider.getList().size() >= DEFAULT_PAGE_SIZE);
   }
 
-  private void addEditableColumns(List<LocaleDto> locales) {
+  private void addEditableColumns(Iterable<LocaleDto> locales) {
     checkActionCol = new CheckboxColumn<CategoryDto>(new CategoryDtoDisplay());
     table.addColumn(checkActionCol, checkActionCol.getTableListCheckColumnHeader());
     table.setColumnWidth(checkActionCol, 1, Style.Unit.PX);
@@ -259,7 +259,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     table.addColumn(nameCol, translations.nameLabel());
 
     // prepare cells for each translations
-    for(final LocaleDto locale : locales) {
+    for(LocaleDto locale : locales) {
       renderLocalizedCategoryRows(locale);
     }
     renderMissingColumn();
@@ -338,12 +338,12 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
     dataProvider.setList(existingCat);
     dataProvider.refresh();
-    pager.setVisible(dataProvider.getList().size() >= DEFAULT_PAGESIZE);
+    pager.setVisible(dataProvider.getList().size() >= DEFAULT_PAGE_SIZE);
     pager.setPage(dataProvider.getList().size() / table.getPageSize());
     addCategoryName.setText("");
   }
 
-  private boolean validateName(List<CategoryDto> existingCat) {
+  private boolean validateName(Iterable<CategoryDto> existingCat) {
     if(addCategoryName.getText().isEmpty()) {
       showError(translations.categoryNameRequired(), nameGroup);
       return false;

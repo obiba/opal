@@ -37,7 +37,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -200,7 +199,7 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
       }
     }
 
-    dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
+    dataProvider.setList(JsArrays.toList(rows));
 
     pager.setVisible(dataProvider.getList().size() > PAGE_SIZE);
     if(dataProvider.getList().size() > 1) {

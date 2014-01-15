@@ -72,4 +72,12 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("{0} entities")
   @AlternateMessage({ "=0", "No entities", "one", "1 entity" })
   String entityCount(@PluralCount int count);
+
+  @Description("Category name duplicated label")
+  @DefaultMessage("Duplicated category name {0}.")
+  String categoryNameDuplicated(String name);
+
+  @Description("Update {0} categories label")
+  @DefaultMessage("Update {0} categories")
+  String updateVariableCategories(String name);
 }
