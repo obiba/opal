@@ -19,16 +19,19 @@
 
       <b:Nav alignment="RIGHT">
         <o:SuggestListBox ui:field="search" addStyleNames="pull-left navbar-search"></o:SuggestListBox>
-        <b:NavLink ui:field="username"></b:NavLink>
         <b:NavLink ui:field="administrationItem">
           <ui:msg description="Administration label">Administration</ui:msg>
         </b:NavLink>
         <b:NavLink target="_blank" href="http://wiki.obiba.org/display/OPALDOC">
           <ui:msg description="Help link text">Help</ui:msg>
         </b:NavLink>
-        <b:NavLink ui:field="quitItem">
-          <ui:msg description="Quit link text">Quit</ui:msg>
-        </b:NavLink>
+        <b:Nav>
+          <b:Dropdown icon="USER" rightDropdown="true" ui:field="username">
+            <b:NavLink ui:field="quitItem">
+              <ui:msg description="Logout text">Logout</ui:msg>
+            </b:NavLink>
+          </b:Dropdown>
+        </b:Nav>
       </b:Nav>
     </b:ResponsiveNavbar>
     <b:FluidContainer addStyleNames="container">

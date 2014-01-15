@@ -20,6 +20,7 @@ import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 
+import com.github.gwtbootstrap.client.ui.Dropdown;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -47,7 +48,7 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
   NavLink administrationItem;
 
   @UiField
-  NavLink username;
+  Dropdown username;
 
   @UiField
   Label version;
