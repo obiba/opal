@@ -23,11 +23,15 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.security.CredentialsKeyStoreService;
+import org.obiba.opal.core.service.security.SubjectCredentialsService;
 import org.obiba.opal.core.service.security.X509CertificateAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.google.common.base.Strings;
 
 /**
  * Realm for applications authenticated by SSL certificate.
@@ -41,6 +45,9 @@ public class ApplicationRealm extends AuthorizingRealm {
 
   @Autowired
   private CredentialsKeyStoreService credentialsKeyStoreService;
+
+  @Autowired
+  private SubjectCredentialsService subjectCredentialsService;
 
   @Override
   public String getName() {
@@ -57,15 +64,19 @@ public class ApplicationRealm extends AuthorizingRealm {
     X509CertificateAuthenticationToken x509Token = (X509CertificateAuthenticationToken) token;
     OpalKeyStore keyStore = credentialsKeyStoreService.getKeyStore();
     for(Map.Entry<String, Certificate> entry : keyStore.getCertificates().entrySet()) {
-      String alias = entry.getKey();
+      String certificateAlias = entry.getKey();
       Certificate certificate = entry.getValue();
       try {
         X509Certificate x509Cert = x509Token.getCredentials();
         x509Cert.verify(certificate.getPublicKey());
-        SimplePrincipalCollection principals = new SimplePrincipalCollection();
-        principals.add(alias, getName());
-        principals.add(x509Token.getPrincipal(), getName());
-        return new SimpleAuthenticationInfo(principals, x509Token.getCredentials());
+        String principal = subjectCredentialsService.getSubjectPrincipal(certificateAlias);
+
+        if(!Strings.isNullOrEmpty(principal)) {
+          SimplePrincipalCollection principals = new SimplePrincipalCollection();
+          principals.add(principal, getName());
+          principals.add(x509Token.getPrincipal(), getName());
+          return new SimpleAuthenticationInfo(principals, x509Token.getCredentials());
+        }
       } catch(GeneralSecurityException e) {
         // Ignore
       }

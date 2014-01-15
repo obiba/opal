@@ -85,6 +85,17 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
   }
 
   @Override
+  public String getSubjectPrincipal(String certificateAlias) {
+    for(SubjectCredentials sc : getSubjectCredentials()) {
+      if(sc.getCertificateAlias().equals(certificateAlias)) {
+        return sc.getName();
+      }
+    }
+
+    return null;
+  }
+
+  @Override
   public Iterable<SubjectCredentials> getSubjectCredentials(SubjectCredentials.AuthenticationType authenticationType) {
     return orientDbService.list(SubjectCredentials.class,
         "select from " + SubjectCredentials.class.getSimpleName() + " where authenticationType = ?",
@@ -124,10 +135,12 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
 
   /**
    * Re-apply the credentials to the provided subject if it already exists.
+   *
    * @param subjectCredentials
    * @param existing
    * @return
    */
+
   private OpalKeyStore ensureCredentials(SubjectCredentials subjectCredentials, SubjectCredentials existing) {
     boolean newSubject = existing == null;
     OpalKeyStore keyStore = null;
@@ -152,6 +165,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
 
   /**
    * Persist subject and related groups.
+   *
    * @param subjectCredentials
    * @param keyStore
    */
@@ -170,6 +184,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
 
   /**
    * Ensure subject has a profile.
+   *
    * @param subjectCredentials
    */
   private void ensureProfile(SubjectCredentials subjectCredentials) {
@@ -189,6 +204,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
 
   /**
    * Ensure that the subject does not conflict with another one in a different realm.
+   *
    * @param subjectCredentials
    */
   private void validateProfile(SubjectCredentials subjectCredentials) {
