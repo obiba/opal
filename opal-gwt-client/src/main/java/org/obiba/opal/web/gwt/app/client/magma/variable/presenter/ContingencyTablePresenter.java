@@ -98,8 +98,8 @@ public class ContingencyTablePresenter extends PresenterWidget<ContingencyTableP
     InTermDto inTerm = InTermDto.create();
     JsArrayString values = JavaScriptObject.createArray().cast();
 
-    for(int i = 0; i < variableCategories.size(); i++) {
-      values.push(variableCategories.get(i));
+    for(String variableCategory : variableCategories) {
+      values.push(variableCategory);
     }
 
     inTerm.setValuesArray(values);
@@ -112,10 +112,8 @@ public class ContingencyTablePresenter extends PresenterWidget<ContingencyTableP
 
   private void addFacetTerms(String variableName, List<String> variableCategories, String crossWithVariableName,
       JsArray<QueryTermDto> terms) {
-    for(int i = 0; i < variableCategories.size(); i++) {
-      QueryTermDto query = getQueryTermDto(variableName, crossWithVariableName, variableCategories.get(i));
-
-      terms.push(query);
+    for(String variableCategory : variableCategories) {
+      terms.push(getQueryTermDto(variableName, crossWithVariableName, variableCategory));
     }
   }
 
