@@ -12,7 +12,7 @@
 
     <b:FluidRow>
       <b:Column size="3" ui:field="datasources">
-        <g:Image url="image/48/table.png" addStyleNames="inline-block"></g:Image>
+        <g:Image url="image/48/table.png" addStyleNames="inline-block"/>
         <b:NavLink ui:field="exploreVariablesLink">
           <ui:msg description="Explore variables link label">Explore Variables</ui:msg>
         </b:NavLink>
@@ -24,7 +24,7 @@
       </b:Column>
 
       <b:Column size="3" ui:field="identifiers">
-        <g:Image url="image/48/units.png" addStyleNames="inline-block"></g:Image>
+        <g:Image url="image/48/units.png" addStyleNames="inline-block"/>
         <b:NavLink ui:field="identifiersLink">
           <ui:msg description="Units link label">Manage Participant Identifiers</ui:msg>
         </b:NavLink>
@@ -36,7 +36,7 @@
       </b:Column>
 
       <b:Column size="3" ui:field="reports">
-        <g:Image url="image/48/report.png" addStyleNames="inline-block"></g:Image>
+        <g:Image url="image/48/report.png" addStyleNames="inline-block"/>
         <b:NavLink ui:field="reportsLink">
           <ui:msg description="Reports link label">Run Reports</ui:msg>
         </b:NavLink>
@@ -48,7 +48,7 @@
       </b:Column>
 
       <b:Column size="3" ui:field="files">
-        <g:Image url="image/48/folder.png" addStyleNames="inline-block"></g:Image>
+        <g:Image url="image/48/folder.png" addStyleNames="inline-block"/>
         <b:NavLink ui:field="exploreFilesLink">
           <ui:msg description="Manage Files link label">Manage Files</ui:msg>
         </b:NavLink>
