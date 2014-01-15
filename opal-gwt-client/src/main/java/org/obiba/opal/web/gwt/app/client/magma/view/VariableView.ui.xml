@@ -48,7 +48,7 @@
 
     <b:TabPanel tabPosition="above" ui:field="tabPanel">
       <b:Tab heading="Dictionary" active="true">
-        <b:Heading size="4" addStyleNames="inline-block">
+        <b:Heading size="4" addStyleNames="inline-block large-top-margin">
           <ui:msg description="Properties label">Properties</ui:msg>
         </b:Heading>
         <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="editProperties">

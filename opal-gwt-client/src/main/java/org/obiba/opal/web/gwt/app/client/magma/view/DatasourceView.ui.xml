@@ -8,8 +8,13 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <g:FlowPanel>
-      <b:DropdownButton text="Tasks" icon="TASKS" ui:field="tasksBtn" addStyleNames="pull-right">
+    <g:FlowPanel addStyleNames="pull-right">
+      <b:ButtonGroup>
+        <b:Button icon="DOWNLOAD" ui:field="downloadDictionary">
+          <ui:msg description="Download dictionary label">Download dictionary</ui:msg>
+        </b:Button>
+      </b:ButtonGroup>
+      <b:DropdownButton text="Tasks" icon="TASKS" ui:field="tasksBtn" rightDropdown="true">
         <b:NavLink icon="SIGNIN" ui:field="importData">
           <ui:msg description="Import data label">Import data...</ui:msg>
         </b:NavLink>
@@ -20,18 +25,10 @@
           <ui:msg description="Copy data label">Copy data...</ui:msg>
         </b:NavLink>
       </b:DropdownButton>
-      <b:ButtonGroup addStyleNames="pull-right">
-        <b:Button icon="DOWNLOAD" ui:field="downloadDictionary">
-          <ui:msg description="Download dictionary label">Download dictionary</ui:msg>
-        </b:Button>
-      </b:ButtonGroup>
     </g:FlowPanel>
 
     <b:TabPanel tabPosition="above" ui:field="tabPanel">
       <b:Tab heading="Dictionary" active="true">
-        <b:Heading size="4">
-          <ui:msg description="Properties label">Tables</ui:msg>
-        </b:Heading>
         <g:FlowPanel addStyleNames="small-bottom-margin">
           <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right small-top-margin small-indent"/>
           <b:DropdownButton text="Add Table" type="INFO" icon="PLUS" ui:field="addBtn"

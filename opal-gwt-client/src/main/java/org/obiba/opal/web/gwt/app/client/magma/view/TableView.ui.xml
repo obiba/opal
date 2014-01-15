@@ -46,7 +46,7 @@
       <b:Tab heading="Dictionary" active="true">
 
         <g:FlowPanel>
-          <b:Heading size="4" addStyleNames="inline-block">
+          <b:Heading size="4" addStyleNames="inline-block large-top-margin">
             <ui:msg description="Properties label">Properties</ui:msg>
           </b:Heading>
           <b2:IconAnchor ui:field="edit" icon="EDIT" addStyleNames="small-indent">
