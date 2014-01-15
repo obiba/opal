@@ -171,11 +171,6 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
     getUiHandlers().onAdministration();
   }
 
-  @UiHandler("helpItem")
-  void onHelp(ClickEvent event) {
-    getUiHandlers().onHelp();
-  }
-
   @UiHandler("quitItem")
   void onQuit(ClickEvent event) {
     getUiHandlers().onQuit();

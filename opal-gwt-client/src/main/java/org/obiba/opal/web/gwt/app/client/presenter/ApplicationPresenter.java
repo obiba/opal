@@ -238,11 +238,6 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   }
 
   @Override
-  public void onHelp() {
-    HelpUtil.openPage();
-  }
-
-  @Override
   public void onQuit() {
     fireEvent(new SessionEndedEvent());
   }
