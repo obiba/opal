@@ -10,13 +10,13 @@
 package org.obiba.opal.web.gwt.app.client.magma.variable.view;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.ContingencyTablePresenter;
 import org.obiba.opal.web.gwt.app.client.ui.DefaultFlexTable;
-import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.FacetResultDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
@@ -42,6 +42,10 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
   private VariableDto variable;
 
   private VariableDto crossWithVariable;
+
+  private List<String> variableCategories;
+
+  private List<String> crossWithCategories;
 
   private boolean showFrequencies = true;
 
@@ -85,10 +89,13 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
   }
 
   @Override
-  public void init(QueryResultDto resource, VariableDto variable, VariableDto crossWithVariable) {
+  public void init(QueryResultDto resource, VariableDto variableDto, List<String> variableCategories,
+      VariableDto crossWithVariableDto, List<String> crossWithCategories) {
     queryResult = resource;
-    this.variable = variable;
-    this.crossWithVariable = crossWithVariable;
+    variable = variableDto;
+    crossWithVariable = crossWithVariableDto;
+    this.variableCategories = variableCategories;
+    this.crossWithCategories = crossWithCategories;
   }
 
   @Override
@@ -102,28 +109,25 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
 
     // data
     if(queryResult.getFacetsArray().get(0).hasStatistics()) {
-      addContinuousStatistics(parentTable);
+      populateContinuousContingencyTable(parentTable);
     } else {
-      addCategoricalStatistics(parentTable);
+      populateCategoricalContingencyTable(parentTable);
     }
     crossTable.add(parentTable);
-
   }
 
-  private void addCategoricalStatistics(DefaultFlexTable parentTable) {
-    // Process the resource to have a map by categoryXcrossCategory
+  private void populateCategoricalContingencyTable(DefaultFlexTable parentTable) {
+    // Process the resource to have a map by category X crossCategory
     Map<String, Map<String, FacetResultDto.TermFrequencyResultDto>> facets
         = new HashMap<String, Map<String, FacetResultDto.TermFrequencyResultDto>>();
     Map<String, Integer> variableFacetTotals = new HashMap<String, Integer>();
     Map<String, Integer> crossFacetTotals = new HashMap<String, Integer>();
     initStatsticsMaps(facets, variableFacetTotals, crossFacetTotals);
 
-    int nbCrossCategories = crossWithVariable.getCategoriesArray().length();
-    int nbVariableCategories = variable.getCategoriesArray().length();
-    if(facets.size() > 0) {
+    int nbVariableCategories = variableCategories.size();
 
-      addStatistics(parentTable, facets, variableFacetTotals, crossFacetTotals, nbCrossCategories,
-          nbVariableCategories);
+    if(facets.size() > 0) {
+      addStatistics(parentTable, facets, variableFacetTotals, crossFacetTotals);
     } else {
       parentTable.setWidget(2, 0, new Label(translations.noResultsFound()));
       parentTable.getFlexCellFormatter().setColSpan(2, 0, nbVariableCategories + 4);
@@ -136,37 +140,47 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
 
   private void addStatistics(DefaultFlexTable parentTable,
       Map<String, Map<String, FacetResultDto.TermFrequencyResultDto>> facets, Map<String, Integer> variableFacetTotals,
-      Map<String, Integer> crossFacetTotals, int nbCrossCategories, int nbVariableCategories) {
-    for(int i = 0; i < nbCrossCategories; i++) {
-      String crossName = crossWithVariable.getCategoriesArray().get(i).getName();
+      Map<String, Integer> crossFacetTotals) {
+
+    int variableCategoriesSize = variableCategories.size();
+    int crossCategoriesSize = crossWithCategories.size();
+    for(int i = 0; i < crossCategoriesSize; i++) {
+      String crossName = crossWithCategories.get(i);
       parentTable.setWidget(i + 2, 0, new Label(crossName));
 
-      for(int j = 0; j < nbVariableCategories; j++) {
-        String categoryName = variable.getCategoriesArray().get(j).getName();
-
-        if(facets.containsKey(categoryName)) {
-          FacetResultDto.TermFrequencyResultDto termFrequencyResultDto = facets.get(categoryName).get(crossName);
-          addValue(parentTable, i + 2, j + 1, termFrequencyResultDto == null ? 0 : termFrequencyResultDto.getCount(),
-              crossFacetTotals.get(crossName));
-        } else {
-          addValue(parentTable, i + 2, j + 1, 0, crossFacetTotals.get(crossName));
-        }
+      for(int j = 0; j < variableCategoriesSize; j++) {
+        String categoryName = variableCategories.get(j);
+        writeFacetValue(parentTable, facets, crossFacetTotals, i, crossName, j, categoryName);
       }
 
-      addValue(parentTable, i + 2, nbVariableCategories + 1,
+      addValue(parentTable, i + 2, variableCategoriesSize + 1,
           crossFacetTotals.containsKey(crossName) ? crossFacetTotals.get(crossName) : 0,
-          variableFacetTotals.get("total"));
+          variableFacetTotals.get(ContingencyTablePresenter.TOTAL_FACET));
     }
 
     // N
-    parentTable.setWidget(nbCrossCategories + 3, 0, new Label(translations.totalLabel()));
-    for(int i = 0; i < nbVariableCategories; i++) {
-      addValue(parentTable, nbCrossCategories + 3, i + 1,
-          variableFacetTotals.get(variable.getCategoriesArray().get(i).getName()), variableFacetTotals.get("total"));
+    parentTable.setWidget(crossCategoriesSize + 3, 0, new Label(translations.totalLabel()));
+    for(int i = 0; i < variableCategoriesSize; i++) {
+      addValue(parentTable, crossCategoriesSize + 3, i + 1, variableFacetTotals.get(variableCategories.get(i)),
+          variableFacetTotals.get(ContingencyTablePresenter.TOTAL_FACET));
     }
 
-    addValue(parentTable, nbCrossCategories + 3, nbVariableCategories + 1, variableFacetTotals.get("total"),
-        variableFacetTotals.get("total"));
+    addValue(parentTable, crossCategoriesSize + 3, variableCategoriesSize + 1,
+        variableFacetTotals.get(ContingencyTablePresenter.TOTAL_FACET),
+        variableFacetTotals.get(ContingencyTablePresenter.TOTAL_FACET));
+  }
+
+  private void writeFacetValue(DefaultFlexTable parentTable,
+      Map<String, Map<String, FacetResultDto.TermFrequencyResultDto>> facets, Map<String, Integer> crossFacetTotals,
+      int i, String crossName, int j, String categoryName) {
+
+    if(facets.containsKey(categoryName)) {
+      FacetResultDto.TermFrequencyResultDto termFrequencyResultDto = facets.get(categoryName).get(crossName);
+      addValue(parentTable, i + 2, j + 1, termFrequencyResultDto == null ? 0 : termFrequencyResultDto.getCount(),
+          crossFacetTotals.get(crossName));
+    } else {
+      addValue(parentTable, i + 2, j + 1, 0, crossFacetTotals.get(crossName));
+    }
   }
 
   private void initStatsticsMaps(Map<String, Map<String, FacetResultDto.TermFrequencyResultDto>> facets,
@@ -184,7 +198,7 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
         facets.put(facetResultDto.getFacet(), termByFacets);
         total += termFrequencyResultDto.getCount();
 
-        if(facetResultDto.getFacet().equals("total")) {
+        if(facetResultDto.getFacet().equals(ContingencyTablePresenter.TOTAL_FACET)) {
           crossFacetTotals.put(termFrequencyResultDto.getTerm(), termFrequencyResultDto.getCount());
         }
       }
@@ -202,7 +216,7 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
     }
   }
 
-  private void addContinuousStatistics(DefaultFlexTable parentTable) {
+  private void populateContinuousContingencyTable(DefaultFlexTable parentTable) {
     Map<String, FacetResultDto.StatisticalResultDto> continuousFacets
         = new HashMap<String, FacetResultDto.StatisticalResultDto>();
     for(FacetResultDto facetResultDto : JsArrays.toIterable(queryResult.getFacetsArray())) {
@@ -212,22 +226,25 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
     parentTable.setWidget(2, 0, new Label(translations.meanLabel()));
     parentTable.setWidget(3, 0, new Label(translations.standardDeviationLabel()));
     parentTable.setWidget(4, 0, new Label(translations.NLabel()));
-    for(int i = 0; i < variable.getCategoriesArray().length(); i++) {
-      CategoryDto categoryDto = variable.getCategoriesArray().get(i);
 
-      parentTable.setWidget(2, i + 1, new Label(formatDecimal(continuousFacets.get(categoryDto.getName()).getMean())));
-      parentTable
-          .setWidget(3, i + 1, new Label(formatDecimal(continuousFacets.get(categoryDto.getName()).getStdDeviation())));
-      parentTable
-          .setWidget(4, i + 1, new Label(String.valueOf((int) continuousFacets.get(categoryDto.getName()).getCount())));
+    int variableCategoriesSize = variableCategories.size();
+    for(int i = 0; i < variableCategoriesSize; i++) {
+      writeFacetRow(parentTable, continuousFacets, i + 1, variableCategories.get(i));
     }
 
-    parentTable.setWidget(2, variable.getCategoriesArray().length() + 1,
-        new Label(formatDecimal(continuousFacets.get("total").getMean())));
-    parentTable.setWidget(3, variable.getCategoriesArray().length() + 1,
-        new Label(formatDecimal(continuousFacets.get("total").getStdDeviation())));
-    parentTable.setWidget(4, variable.getCategoriesArray().length() + 1,
-        new Label(String.valueOf((int) continuousFacets.get("total").getCount())));
+    parentTable.setWidget(2, variableCategoriesSize + 1,
+        new Label(formatDecimal(continuousFacets.get(ContingencyTablePresenter.TOTAL_FACET).getMean())));
+    parentTable.setWidget(3, variableCategoriesSize + 1,
+        new Label(formatDecimal(continuousFacets.get(ContingencyTablePresenter.TOTAL_FACET).getStdDeviation())));
+    parentTable.setWidget(4, variableCategoriesSize + 1,
+        new Label(String.valueOf((int) continuousFacets.get(ContingencyTablePresenter.TOTAL_FACET).getCount())));
+  }
+
+  private void writeFacetRow(DefaultFlexTable parentTable,
+      Map<String, FacetResultDto.StatisticalResultDto> continuousFacets, int col, String name) {
+    parentTable.setWidget(2, col, new Label(formatDecimal(continuousFacets.get(name).getMean())));
+    parentTable.setWidget(3, col, new Label(formatDecimal(continuousFacets.get(name).getStdDeviation())));
+    parentTable.setWidget(4, col, new Label(String.valueOf((int) continuousFacets.get(name).getCount())));
   }
 
   private String formatDecimal(double number) {
@@ -241,7 +258,7 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
     parentTable.setWidget(0, 2, new Label(translations.totalLabel()));
     parentTable.getFlexCellFormatter().setRowSpan(0, 0, 2);
     parentTable.getFlexCellFormatter().setRowSpan(0, 2, 2);
-    parentTable.getFlexCellFormatter().setColSpan(0, 1, variable.getCategoriesArray().length());
+    parentTable.getFlexCellFormatter().setColSpan(0, 1, variableCategories.size());
     parentTable.getFlexCellFormatter().setWidth(0, 1, DEFAULT_WIDTH + "%");
     parentTable.getFlexCellFormatter().setWidth(0, 2, "10%");
 
@@ -249,11 +266,16 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
     parentTable.getFlexCellFormatter().addStyleName(0, 1, "cross-table-header");
     parentTable.getFlexCellFormatter().addStyleName(0, 2, "cross-table-header");
 
-    int width = DEFAULT_WIDTH / variable.getCategoriesArray().length();
-    for(int i = 0; i < variable.getCategoriesArray().length(); i++) {
-      parentTable.setWidget(1, i, new Label(variable.getCategoriesArray().get(i).getName()));
-      parentTable.getFlexCellFormatter().setWidth(1, i, width + "%");
-      parentTable.getFlexCellFormatter().addStyleName(1, i, "cross-table-header");
+    int width = DEFAULT_WIDTH / variableCategories.size();
+    for(int i = 0; i < variableCategories.size(); i++) {
+      writeCategoryHeader(parentTable, variableCategories.get(i), width, i);
     }
+
+  }
+
+  private void writeCategoryHeader(DefaultFlexTable parentTable, String name, int width, int col) {
+    parentTable.setWidget(1, col, new Label(name));
+    parentTable.getFlexCellFormatter().setWidth(1, col, width + "%");
+    parentTable.getFlexCellFormatter().addStyleName(1, col, "cross-table-header");
   }
 }
