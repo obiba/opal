@@ -32,7 +32,7 @@
         <b:Heading size="4">
           <ui:msg description="Properties label">Tables</ui:msg>
         </b:Heading>
-        <g:FlowPanel addStyleNames="bottom-margin">
+        <g:FlowPanel addStyleNames="small-bottom-margin">
           <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right small-top-margin small-indent"/>
           <b:DropdownButton text="Add Table" type="INFO" icon="PLUS" ui:field="addBtn"
               addStyleNames="small-top-margin">

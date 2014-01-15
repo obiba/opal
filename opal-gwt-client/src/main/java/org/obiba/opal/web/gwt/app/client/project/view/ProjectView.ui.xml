@@ -63,23 +63,23 @@
         <g:SimplePanel ui:field="tablesPanel"/>
       </b:Tab>
       <b:Tab icon="HDD">
-        <b:Heading size="3">Files</b:Heading>
+        <b:Heading size="3" addStyleNames="no-top-margin">Files</b:Heading>
         <g:SimplePanel ui:field="filesPanel"/>
       </b:Tab>
       <b:Tab icon="FILE_ALT">
-        <b:Heading size="3">Reports</b:Heading>
+        <b:Heading size="3" addStyleNames="no-top-margin">Reports</b:Heading>
         <g:SimplePanel ui:field="reportsPanel"/>
       </b:Tab>
       <b:Tab icon="TASKS">
-        <b:Heading size="3">Tasks</b:Heading>
+        <b:Heading size="3" addStyleNames="no-top-margin">Tasks</b:Heading>
         <g:SimplePanel ui:field="tasksPanel"/>
       </b:Tab>
       <b:Tab icon="LOCK">
-        <b:Heading size="3">Permissions</b:Heading>
+        <b:Heading size="3" addStyleNames="no-top-margin">Permissions</b:Heading>
         <g:FlowPanel ui:field="permissionsPanel"></g:FlowPanel>
       </b:Tab>
       <b:Tab icon="BOOK">
-        <b:Heading size="3">Administration</b:Heading>
+        <b:Heading size="3" addStyleNames="no-top-margin">Administration</b:Heading>
         <g:SimplePanel ui:field="adminPanel"/>
       </b:Tab>
     </o:OpalTabPanel>

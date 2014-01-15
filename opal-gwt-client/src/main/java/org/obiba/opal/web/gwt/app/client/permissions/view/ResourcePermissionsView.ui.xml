@@ -19,18 +19,16 @@
 
   <g:FlowPanel>
     <g:FlowPanel>
-      <b:Controls>
-        <b:DropdownButton ui:field="addDropdown" text="Add Permission" type="INFO" icon="PLUS">
-          <b:NavLink ui:field="addUserPermission">
-            <ui:msg description="Add user Permission label">Add user permission...</ui:msg>
-          </b:NavLink>
-          <b:NavLink ui:field="addGroupPermission">
-            <ui:msg description="Add Group Permission label">Add group permission...</ui:msg>
-          </b:NavLink>
-        </b:DropdownButton>
-        <b:SimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
-      </b:Controls>
-      <o:Table ui:field="permissionsTable"/>
+      <b:DropdownButton ui:field="addDropdown" text="Add Permission" type="INFO" icon="PLUS">
+        <b:NavLink ui:field="addUserPermission">
+          <ui:msg description="Add user Permission label">Add user permission...</ui:msg>
+        </b:NavLink>
+        <b:NavLink ui:field="addGroupPermission">
+          <ui:msg description="Add Group Permission label">Add group permission...</ui:msg>
+        </b:NavLink>
+      </b:DropdownButton>
+      <b:SimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
+      <o:Table ui:field="permissionsTable" addStyleNames="small-top-margin"/>
     </g:FlowPanel>
 
   </g:FlowPanel>
