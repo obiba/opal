@@ -33,7 +33,7 @@
     </g:FlowPanel>
     <o:OpalTabPanel tabPosition="right" ui:field="tabPanel">
       <b:Tab icon="HOME" active="true">
-        <b:Heading size="3" ui:field="projectHeader" addStyleNames="inline-block">Project</b:Heading>
+        <b:Heading size="3" ui:field="projectHeader" addStyleNames="inline-block no-top-margin">Project</b:Heading>
         <g:FlowPanel ui:field="tagsPanel" addStyleNames="inline-block small-indent"/>
         <b:Paragraph ui:field="description"></b:Paragraph>
         <b:FluidRow addStyleNames="text-align-center">
