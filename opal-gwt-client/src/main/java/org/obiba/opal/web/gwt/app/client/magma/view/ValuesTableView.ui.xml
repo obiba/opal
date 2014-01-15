@@ -41,49 +41,56 @@
             </b:Typeahead>
           </b:Controls>
           <b:HelpBlock>
-            <ui:msg description="Values Filter help">Select some variables and apply value filter on each of them.</ui:msg>
+            <ui:msg description="Values Filter help">Select some variables and apply value filter on each of them.
+            </ui:msg>
           </b:HelpBlock>
         </b:ControlGroup>
       </b:Well>
     </g:FlowPanel>
 
     <g:FlowPanel addStyleNames="clearfix">
+      <g:Image ui:field="refreshPending" url="image/loading.gif" addStyleNames="small-indent"/>
       <o:CollapsiblePanel ui:field="addPanel" addStyleNames="pull-left">
-        <g:Image ui:field="refreshPending" url="image/loading.gif" addStyleNames="small-indent"/>
-        <g:Grid>
-          <g:row>
-            <g:customCell>
-              <g:FlowPanel>
-                <g:Label>
+        <b:Row>
+          <b:Column size="3">
+            <b:Well>
+              <b:ControlGroup>
+                <b:ControlLabel>
                   <ui:msg description="Filter Variables label">Variables filter</ui:msg>
-                </g:Label>
-                <g:HorizontalPanel>
-                  <b:Controls>
-                    <b:InputAddOn prependIcon="FILTER">
-                      <o:TextBoxClearable ui:field="filter"/>
-                    </b:InputAddOn>
-                  </b:Controls>
-                </g:HorizontalPanel>
-              </g:FlowPanel>
-            </g:customCell>
-            <g:customCell styleName="small-indent">
-              <g:FlowPanel>
-                <g:Label>
+                </b:ControlLabel>
+                <b:Controls>
+                  <b:InputAddOn prependIcon="FILTER">
+                    <o:TextBoxClearable ui:field="filter" addStyleNames="span2"/>
+                  </b:InputAddOn>
+                </b:Controls>
+              </b:ControlGroup>
+            </b:Well>
+          </b:Column>
+          <b:Column size="3">
+            <b:Well>
+              <b:ControlGroup>
+                <b:ControlLabel>
                   <ui:msg description="Number of Visible Variables label">Number of visible variables</ui:msg>
-                </g:Label>
-                <o:NumericTextBox ui:field="visibleColumns" addStyleNames="span1"/>
-              </g:FlowPanel>
-            </g:customCell>
-            <g:customCell styleName="small-indent">
-              <g:FlowPanel>
-                <g:Label>
+                </b:ControlLabel>
+                <b:Controls>
+                  <o:NumericTextBox ui:field="visibleColumns" addStyleNames="span1"/>
+                </b:Controls>
+              </b:ControlGroup>
+            </b:Well>
+          </b:Column>
+          <b:Column size="2">
+            <b:Well addStyleNames="inline-block">
+              <b:ControlGroup>
+                <b:ControlLabel>
                   <ui:msg description="Number of Rows label">Number of rows</ui:msg>
-                </g:Label>
-                <o:NumericTextBox ui:field="pageSize" addStyleNames="span1"/>
-              </g:FlowPanel>
-            </g:customCell>
-          </g:row>
-        </g:Grid>
+                </b:ControlLabel>
+                <b:Controls>
+                  <o:NumericTextBox ui:field="pageSize" addStyleNames="span1"/>
+                </b:Controls>
+              </b:ControlGroup>
+            </b:Well>
+          </b:Column>
+        </b:Row>
       </o:CollapsiblePanel>
 
       <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>

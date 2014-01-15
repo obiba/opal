@@ -29,12 +29,10 @@ public class TextBoxClearable extends FlowPanel implements HasKeyUpHandlers, Has
   private final Anchor empty;
 
   public TextBoxClearable() {
-    addStyleName("texbox-clearable-wrapper");
-    addStyleName("inline");
+    super.addStyleName("inline");
 
     textBox = new TextBox();
     clear = new Anchor();
-    textBox.addStyleName("textbox-clearable-texbox");
     textBox.addKeyUpHandler(new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent event) {
@@ -57,7 +55,6 @@ public class TextBoxClearable extends FlowPanel implements HasKeyUpHandlers, Has
     });
 
     empty = new Anchor();
-    empty.addStyleName("textbox-clearable-empty");
     empty.setVisible(true);
 
     add(empty);
@@ -90,5 +87,10 @@ public class TextBoxClearable extends FlowPanel implements HasKeyUpHandlers, Has
   @Override
   public HandlerRegistration addClickHandler(ClickHandler handler) {
     return addDomHandler(handler, ClickEvent.getType());
+  }
+
+  @Override
+  public void addStyleName(String style) {
+    textBox.addStyleName(style);
   }
 }
