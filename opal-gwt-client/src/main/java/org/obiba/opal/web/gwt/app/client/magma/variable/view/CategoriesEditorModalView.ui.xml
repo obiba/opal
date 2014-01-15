@@ -71,7 +71,6 @@
 
     <c:CategoryEditableTable ui:field="table"/>
 
-
     <b:ModalFooter>
       <b:Button ui:field="saveButton" type="PRIMARY">
         <ui:msg description="Save label">Save</ui:msg>

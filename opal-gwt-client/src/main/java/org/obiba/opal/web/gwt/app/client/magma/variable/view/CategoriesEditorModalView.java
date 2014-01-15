@@ -160,9 +160,9 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   void onDelete(ClickEvent event) {
     // Remove selected items from table
     List<CategoryDto> categories = new ArrayList<CategoryDto>();
-    for(CategoryDto c : dataProvider.getList()) {
-      if(!checkActionCol.getSelectionModel().isSelected(c)) {
-        categories.add(c);
+    for(CategoryDto categoryDto : dataProvider.getList()) {
+      if(!checkActionCol.getSelectionModel().isSelected(categoryDto)) {
+        categories.add(categoryDto);
       }
     }
 
@@ -189,14 +189,14 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
     int i = 0;
     int pos = 0;
-    for(CategoryDto c : dataProvider.getList()) {
-      if(checkActionCol.getSelectionModel().isSelected(c)) {
+    for(CategoryDto categoryDto : dataProvider.getList()) {
+      if(checkActionCol.getSelectionModel().isSelected(categoryDto)) {
         if(reordered.isEmpty()) {
           pos = i - 1;
         }
-        reordered.add(c);
+        reordered.add(categoryDto);
       } else {
-        categories.add(c);
+        categories.add(categoryDto);
       }
       i++;
     }
@@ -348,8 +348,8 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
       showError(translations.categoryNameRequired(), nameGroup);
       return false;
     }
-    for(CategoryDto c : existingCat) {
-      if(c.getName().equalsIgnoreCase(addCategoryName.getText())) {
+    for(CategoryDto categoryDto : existingCat) {
+      if(categoryDto.getName().equalsIgnoreCase(addCategoryName.getText())) {
         showError(translations.categoryNameAlreadyExists(), nameGroup);
         return false;
       }
