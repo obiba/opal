@@ -10,17 +10,20 @@
 package org.obiba.opal.web.gwt.app.client.magma.variable.view;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.LocalizedEditableText;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.SuggestListBox;
+import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
@@ -28,6 +31,7 @@ import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -111,8 +115,12 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
   public void setNamespaceSuggestions(VariableDto variableDto) {
     MultiWordSuggestOracle oracle = (MultiWordSuggestOracle) namespaceTypeahead.getSuggestOracle();
     oracle.clear();
-    for(int i = 0; i < variableDto.getAttributesArray().length(); i++) {
-      oracle.add(variableDto.getAttributesArray().get(i).getNamespace());
+    JsArray<AttributeDto> attributesArray = variableDto.getAttributesArray();
+
+    if (attributesArray != null) {
+      for(AttributeDto attributeDto : JsArrays.toList(attributesArray)) {
+        if (attributeDto.hasNamespace()) oracle.add(attributeDto.getNamespace());
+      }
     }
   }
 
