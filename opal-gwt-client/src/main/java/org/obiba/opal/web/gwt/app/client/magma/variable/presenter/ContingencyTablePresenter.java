@@ -10,10 +10,14 @@
 
 package org.obiba.opal.web.gwt.app.client.magma.variable.presenter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.FilterDto;
@@ -36,6 +40,8 @@ import com.gwtplatform.mvp.client.View;
 
 public class ContingencyTablePresenter extends PresenterWidget<ContingencyTablePresenter.Display> {
 
+  public static final String TOTAL_FACET = "total";
+
   @Inject
   public ContingencyTablePresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
@@ -46,8 +52,11 @@ public class ContingencyTablePresenter extends PresenterWidget<ContingencyTableP
 
     JsArray<QueryTermDto> terms = JsArrays.create().cast();
 
-    addFacetTerms(variableDto, crossWithVariable, terms);
-    addTotalTerm(variableDto, crossWithVariable, terms);
+    final List<String> variableCategories = getCategories(variableDto);
+    final List<String> crossWithCategories = getCategories(crossWithVariable);
+
+    addFacetTerms(variableDto.getName(), variableCategories, crossWithVariable.getName(), terms);
+    addTotalTerm(variableDto.getName(), variableCategories, crossWithVariable.getName(), terms);
 
     queries.setQueriesArray(terms);
 
@@ -59,37 +68,38 @@ public class ContingencyTablePresenter extends PresenterWidget<ContingencyTableP
         .withCallback(new ResourceCallback<QueryResultDto>() {
           @Override
           public void onResource(Response response, QueryResultDto resource) {
-            getView().init(resource, variableDto, crossWithVariable);
+            getView().init(resource, variableDto, variableCategories, crossWithVariable, crossWithCategories);
             getView().draw();
 
           }
         }).send();
   }
 
-  private void addTotalTerm(VariableDto variableDto, VariableDto crossWithVariable, JsArray<QueryTermDto> terms) {
+  private void addTotalTerm(String variableName, List<String> variableCategories, String crossWithVariableName,
+      JsArray<QueryTermDto> terms) {
     QueryTermDto query = QueryTermDto.create();
-    query.setFacet("total");
+    query.setFacet(TOTAL_FACET);
 
     VariableTermDto variableTerm = VariableTermDto.create();
-    variableTerm.setVariable(crossWithVariable.getName());
+    variableTerm.setVariable(crossWithVariableName);
     query.setExtension("Search.VariableTermDto.field", variableTerm);
 
-    LogicalTermDto logicalTerm = getLogicalTermDto(variableDto);
+    LogicalTermDto logicalTerm = getLogicalTermDto(variableName, variableCategories);
     query.setExtension("Search.LogicalTermDto.facetFilter", logicalTerm);
 
     terms.push(query);
   }
 
-  private LogicalTermDto getLogicalTermDto(VariableDto variableDto) {
+  private LogicalTermDto getLogicalTermDto(String variableName, List<String> variableCategories) {
     LogicalTermDto logicalTerm = LogicalTermDto.create();
     logicalTerm.setOperator(TermOperator.AND_OP);
     FilterDto filter = FilterDto.create();
-    filter.setVariable(variableDto.getName());
+    filter.setVariable(variableName);
     InTermDto inTerm = InTermDto.create();
     JsArrayString values = JavaScriptObject.createArray().cast();
 
-    for(int i = 0; i < variableDto.getCategoriesArray().length(); i++) {
-      values.push(variableDto.getCategoriesArray().get(i).getName());
+    for(String variableCategory : variableCategories) {
+      values.push(variableCategory);
     }
 
     inTerm.setValuesArray(values);
@@ -100,42 +110,62 @@ public class ContingencyTablePresenter extends PresenterWidget<ContingencyTableP
     return logicalTerm;
   }
 
-  private void addFacetTerms(VariableDto variableDto, VariableDto crossWithVariable, JsArray<QueryTermDto> terms) {
-    for(int i = 0; i < variableDto.getCategoriesArray().length(); i++) {
-      QueryTermDto query = QueryTermDto.create();
-      query.setFacet(variableDto.getCategoriesArray().get(i).getName());
-
-      VariableTermDto variableTerm = VariableTermDto.create();
-      variableTerm.setVariable(crossWithVariable.getName());
-      query.setExtension("Search.VariableTermDto.field", variableTerm);
-
-      LogicalTermDto logicalTerm = getLogicalTermDto(variableDto, i);
-
-      query.setExtension("Search.LogicalTermDto.facetFilter", logicalTerm);
-
-      terms.push(query);
+  private void addFacetTerms(String variableName, List<String> variableCategories, String crossWithVariableName,
+      JsArray<QueryTermDto> terms) {
+    for(String variableCategory : variableCategories) {
+      terms.push(getQueryTermDto(variableName, crossWithVariableName, variableCategory));
     }
   }
 
-  private LogicalTermDto getLogicalTermDto(VariableDto variableDto, int i) {
+  private QueryTermDto getQueryTermDto(String variableName, String crossWithVariableName, String facetName) {
+    QueryTermDto query = QueryTermDto.create();
+    query.setFacet(facetName);
+
+    VariableTermDto variableTerm = VariableTermDto.create();
+    variableTerm.setVariable(crossWithVariableName);
+    query.setExtension("Search.VariableTermDto.field", variableTerm);
+
+    LogicalTermDto logicalTerm = getLogicalTermDto(variableName, facetName);
+
+    query.setExtension("Search.LogicalTermDto.facetFilter", logicalTerm);
+    return query;
+  }
+
+  private LogicalTermDto getLogicalTermDto(String variableName, String facetName) {
     LogicalTermDto logicalTerm = LogicalTermDto.create();
     logicalTerm.setOperator(TermOperator.AND_OP);
     FilterDto filter = FilterDto.create();
-    filter.setVariable(variableDto.getName());
+    filter.setVariable(variableName);
     InTermDto inTerm = InTermDto.create();
     JsArrayString values = JavaScriptObject.createArray().cast();
-    values.push(variableDto.getCategoriesArray().get(i).getName());
+    values.push(facetName);
     inTerm.setValuesArray(values);
     inTerm.setMinimumMatch(1);
 
     filter.setExtension("Search.InTermDto.terms", inTerm);
     logicalTerm.setExtension("Search.FilterDto.filters", filter);
     return logicalTerm;
+  }
+
+  private List<String> getCategories(VariableDto variable) {
+    List<String> categories = new ArrayList<String>();
+
+    if("boolean".equals(variable.getValueType())) {
+      categories.add("true");
+      categories.add("false");
+    } else {
+      for(CategoryDto categoryDto : JsArrays.toIterable(variable.getCategoriesArray())) {
+        categories.add(categoryDto.getName());
+      }
+    }
+
+    return categories;
   }
 
   public interface Display extends View {
 
-    void init(QueryResultDto resource, VariableDto variableDto, VariableDto crossWithVariable);
+    void init(QueryResultDto resource, VariableDto variableDto, List<String> variableCategories,
+        VariableDto crossWithVariable, List<String> crossWithCategories);
 
     void draw();
   }
