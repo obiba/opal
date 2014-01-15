@@ -43,12 +43,13 @@ public class DatasourcesVariablesSearchResource extends AbstractVariablesSearchR
   @Transactional(readOnly = true)
   public Response search(@QueryParam("query") String query, @QueryParam("offset") @DefaultValue("0") int offset,
       @QueryParam("limit") @DefaultValue("10") int limit,
-      @SuppressWarnings("TypeMayBeWeakened") @QueryParam("field") List<String> fields) {
+      @SuppressWarnings("TypeMayBeWeakened") @QueryParam("field") List<String> fields,
+      @SuppressWarnings("TypeMayBeWeakened") @QueryParam("facet") List<String> facets) {
 
     try {
       if(!searchServiceAvailable()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
       QuerySearchJsonBuilder jsonBuilder = //
-          buildQuerySearch(query, offset, limit, fields, DEFAULT_SORT_FIELD, SortDir.DESC.toString());
+          buildQuerySearch(query, offset, limit, fields, facets, DEFAULT_SORT_FIELD, SortDir.DESC.toString());
 
       Search.QueryResultDto dtoResponse = convertResponse(executeQuery(jsonBuilder.build()));
       return Response.ok().entity(dtoResponse).build();
@@ -64,8 +65,8 @@ public class DatasourcesVariablesSearchResource extends AbstractVariablesSearchR
 
   @Override
   protected QuerySearchJsonBuilder buildQuerySearch(String query, int offset, int limit, Collection<String> fields,
-      String sortField, String sortDir) {
-    return super.buildQuerySearch(query, offset, limit, fields, sortField, sortDir).setFilterTypes(getFilterTypes());
+      Collection<String> facets, String sortField, String sortDir) {
+    return super.buildQuerySearch(query, offset, limit, fields, facets, sortField, sortDir).setFilterTypes(getFilterTypes());
   }
 
   //
