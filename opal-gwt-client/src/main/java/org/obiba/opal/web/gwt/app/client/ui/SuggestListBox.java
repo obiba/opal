@@ -97,7 +97,6 @@ public class SuggestListBox extends FocusPanel {
     content.add(clear);
 
     empty = new Anchor();
-//    empty.addStyleName("textbox-clearable-empty");
     empty.setVisible(true);
     content.add(empty);
 
@@ -112,8 +111,9 @@ public class SuggestListBox extends FocusPanel {
     aheadBox.setUpdaterCallback(new Typeahead.UpdaterCallback() {
       @Override
       public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {
+        String rval = updaterCallback.onSelection(selectedSuggestion);
         textBox.setFocus(true);
-        return updaterCallback.onSelection(selectedSuggestion);
+        return rval;
       }
     });
   }
@@ -131,7 +131,7 @@ public class SuggestListBox extends FocusPanel {
     textBox = new TextBox();
     aheadBox = new Typeahead(oracle);
     aheadBox.add(textBox);
-    content.add(aheadBox);// = new Typeahead(oracle, textBox, new SuggestionDisplayImpl(suggestionMenu)));
+    content.add(aheadBox);
     addSuggestBoxHandlers();
   }
 

@@ -18,7 +18,7 @@
       </b:Nav>
 
       <b:Nav alignment="RIGHT">
-        <o:SuggestListBox ui:field="search" addStyleNames="pull-left navbar-search"></o:SuggestListBox>
+        <o:SuggestListBox ui:field="search" addStyleNames="pull-left navbar-search"/>
         <b:NavLink ui:field="administrationItem">
           <ui:msg description="Administration label">Administration</ui:msg>
         </b:NavLink>
