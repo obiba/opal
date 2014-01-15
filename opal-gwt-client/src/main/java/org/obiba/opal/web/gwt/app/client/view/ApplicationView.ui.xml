@@ -6,7 +6,7 @@
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <g:FlowPanel>
-    <b:ResponsiveNavbar position="TOP" scrollspy="false" inverse="true">
+    <b:ResponsiveNavbar position="TOP" scrollspy="false">
       <b:Brand href="#">Opal</b:Brand>
       <b:Nav>
         <b:NavLink ui:field="dashboardItem">

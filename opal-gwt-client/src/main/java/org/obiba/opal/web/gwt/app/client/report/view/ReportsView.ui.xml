@@ -20,7 +20,7 @@
       </ui:msg>
     </b:Paragraph>
     <b:FluidRow>
-      <b:Column size="2">
+      <b:Column size="3">
         <g:ScrollPanel>
           <b:NavList ui:field="reportList">
             <b:NavHeader>
@@ -34,7 +34,7 @@
           </b:Button>
         </b:ButtonGroup>
       </b:Column>
-      <b:Column size="10">
+      <b:Column size="9">
         <g:ScrollPanel ui:field="reportTemplateDetailsPanel"/>
       </b:Column>
     </b:FluidRow>

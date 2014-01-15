@@ -28,7 +28,7 @@
 
 
     <b:FluidRow>
-      <b:Column size="2">
+      <b:Column size="3">
         <b:NavList ui:field="selector">
           <b:NavHeader>
             <ui:msg description="Entity Types label">Entity Types</ui:msg>
@@ -40,7 +40,7 @@
           </b:Button>
         </b:ButtonGroup>
       </b:Column>
-      <b:Column size="10">
+      <b:Column size="9">
         <g:FlowPanel ui:field="body"/>
       </b:Column>
     </b:FluidRow>

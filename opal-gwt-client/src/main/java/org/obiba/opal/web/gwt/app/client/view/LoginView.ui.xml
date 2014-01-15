@@ -5,12 +5,12 @@
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <g:FlowPanel>
-    <b:ResponsiveNavbar position="TOP" scrollspy="false" inverse="true">
+    <b:ResponsiveNavbar position="TOP" scrollspy="false">
       <b:Brand href="#">Opal</b:Brand>
     </b:ResponsiveNavbar>
     <g:FlowPanel addStyleNames="container">
       <b:Row addStyleNames="top-margin">
-        <b:Column size="3" offset="4">
+        <b:Column size="4" offset="4">
           <g:SimplePanel ui:field="alertPanel"/>
           <b:Well>
             <b:ControlGroup>

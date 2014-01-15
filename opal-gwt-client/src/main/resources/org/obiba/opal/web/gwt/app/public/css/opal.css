@@ -1,12 +1,20 @@
 @import "opal-gwt.css";
 @import "opal-bootstrap.css";
 
+body {
+  background-color: #fefefe;
+}
+
 h1 {
   font-size: 1.8em;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
+}
+
+h4 {
+  margin-top: 30px;
 }
 
 li {
@@ -151,7 +159,8 @@ ul.closeables li {
   -webkit-border-radius: 2px 2px 2px 2px;
   margin-left: 4px;
   padding: 0px 6px;
-  background-color: #999999;
+  background-color: #B4BCC2;
+  margin-top: -4px;
   color: #FFFFFF;
   font-weight: bold;
   vertical-align: baseline;
