@@ -22,6 +22,7 @@ import org.obiba.opal.web.model.client.search.FacetResultDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.NavPills;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -53,6 +54,9 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
 
   @UiField
   FlowPanel crossTable;
+
+  @UiField
+  NavPills pills;
 
   @UiField
   NavLink frequency;
@@ -104,8 +108,7 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
 
     addHeader(parentTable);
 
-    percentage.setVisible(!queryResult.getFacetsArray().get(0).hasStatistics());
-    frequency.setVisible(!queryResult.getFacetsArray().get(0).hasStatistics());
+    pills.setVisible(!queryResult.getFacetsArray().get(0).hasStatistics());
 
     // data
     if(queryResult.getFacetsArray().get(0).hasStatistics()) {
@@ -132,8 +135,7 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
       parentTable.setWidget(2, 0, new Label(translations.noResultsFound()));
       parentTable.getFlexCellFormatter().setColSpan(2, 0, nbVariableCategories + 4);
 
-      percentage.setVisible(false);
-      frequency.setVisible(false);
+      pills.setVisible(false);
     }
 
   }

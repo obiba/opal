@@ -2075,11 +2075,11 @@ public interface Translations extends Constants {
   @DefaultStringValue("N")
   String NLabel();
 
-  @Description("Select first variable label")
-  @DefaultStringValue("Select first variable...")
-  String selectFirstVariableLabel();
+  @Description("Select categorical variable label")
+  @DefaultStringValue("Select categorical variable...")
+  String selectCategoricalVariableLabel();
 
-  @Description("Select second variable label")
-  @DefaultStringValue("Select second variable...")
-  String selectSecondVariableLabel();
+  @Description("Select another variable label")
+  @DefaultStringValue("Select another variable...")
+  String selectAnotherVariableLabel();
 }

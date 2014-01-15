@@ -204,13 +204,13 @@
                   <b:Typeahead ui:field="categoricalVariables">
                     <b:TextBox ui:field="categoricalVariable"/>
                   </b:Typeahead>
-
+                  <b:Icon type="REMOVE" addStyleNames="xsmall-dual-indent bottom-margin"/>
                   <b:Typeahead ui:field="crossWithVariables">
                     <b:TextBox ui:field="crossWithVariable"/>
                   </b:Typeahead>
 
-                  <b:Button ui:field="crossVariablesButton" type="PRIMARY" addStyleNames="bottom-margin">
-                    <ui:msg description="Execute label">Execute</ui:msg>
+                  <b:Button ui:field="crossVariablesButton" type="PRIMARY" addStyleNames="bottom-margin small-indent">
+                    <ui:msg description="Submit label">Submit</ui:msg>
                   </b:Button>
 
                   <b:HelpBlock>Displays the multivariate frequency distribution of selected variables.</b:HelpBlock>

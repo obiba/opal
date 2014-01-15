@@ -340,9 +340,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     contingencyTablePanel.setVisible(true);
 
     // Prepare cross table form
-    categoricalVariable.setPlaceholder(translations.selectFirstVariableLabel());
+    categoricalVariable.setPlaceholder(translations.selectCategoricalVariableLabel());
     categoricalVariable.setText("");
-    crossWithVariable.setPlaceholder(translations.selectSecondVariableLabel());
+    crossWithVariable.setPlaceholder(translations.selectAnotherVariableLabel());
     crossWithVariable.setText("");
 
     categoricalVariables.setUpdaterCallback(new Typeahead.UpdaterCallback() {
