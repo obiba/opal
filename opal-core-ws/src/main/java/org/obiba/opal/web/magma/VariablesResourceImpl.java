@@ -22,7 +22,6 @@ import javax.ws.rs.core.UriInfo;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaRuntimeException;
-import org.obiba.magma.NoSuchVariableException;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
@@ -130,17 +129,17 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
   }
 
   void addOrUpdateTableVariables(Iterable<VariableDto> variables) {
-    ValueTableWriter vtw = null;
-    VariableWriter vw = null;
+    ValueTableWriter tableWriter = null;
+    VariableWriter variableWriter = null;
     try {
-      vtw = getValueTable().getDatasource().createWriter(getValueTable().getName(), getValueTable().getEntityType());
-      vw = vtw.writeVariables();
+      tableWriter = getValueTable().getDatasource()
+          .createWriter(getValueTable().getName(), getValueTable().getEntityType());
+      variableWriter = tableWriter.writeVariables();
       for(VariableDto variable : variables) {
-        vw.writeVariable(Dtos.fromDto(variable));
+        variableWriter.writeVariable(Dtos.fromDto(variable));
       }
     } finally {
-      Closeables.closeQuietly(vw);
-      Closeables.closeQuietly(vtw);
+      Closeables.closeQuietly(variableWriter, tableWriter);
     }
   }
 
@@ -149,24 +148,22 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
 
     if(getValueTable().isView()) throw new InvalidRequestException("Derived variable must be deleted by the view");
 
-    ValueTableWriter vtw = null;
-    ValueTableWriter.VariableWriter vw = null;
+    ValueTableWriter tableWriter = null;
+    ValueTableWriter.VariableWriter variableWriter = null;
     try {
-      vtw = getValueTable().getDatasource().createWriter(getValueTable().getName(), getValueTable().getEntityType());
-      vw = vtw.writeVariables();
+      tableWriter = getValueTable().getDatasource()
+          .createWriter(getValueTable().getName(), getValueTable().getEntityType());
+      variableWriter = tableWriter.writeVariables();
 
       for(String name : variables) {
         // The variable must exist
         Variable v = getValueTable().getVariable(name);
-        vw.removeVariable(v);
+        variableWriter.removeVariable(v);
       }
 
       return Response.ok().build();
-    } catch(NoSuchVariableException e) {
-      return Response.status(Response.Status.NOT_FOUND).entity(e.getName()).build();
     } finally {
-      Closeables.closeQuietly(vw);
-      Closeables.closeQuietly(vtw);
+      Closeables.closeQuietly(variableWriter, tableWriter);
     }
   }
 

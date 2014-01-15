@@ -17,7 +17,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.obiba.magma.NoSuchVariableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
@@ -81,35 +80,30 @@ public class VariableResourceImpl implements VariableResource {
   }
 
   @Override
-  public Response updateVariable(VariableDto variable) {
+  public Response updateVariable(VariableDto dto) {
     if(getValueTable().isView()) throw new InvalidRequestException("Derived variable must be updated by the view");
 
-    ValueTableWriter vtw = null;
-    ValueTableWriter.VariableWriter vw = null;
+    // The variable must exist
+    Variable variable = getValueTable().getVariable(name);
+
+    if(!variable.getEntityType().equals(dto.getEntityType())) {
+      throw new InvalidRequestException("Variable entity type must be the same as the one of the table");
+    }
+
+    if(!variable.getName().equals(dto.getName())) {
+      throw new InvalidRequestException("Variable cannot be renamed");
+    }
+
+    ValueTableWriter tableWriter = null;
+    ValueTableWriter.VariableWriter variableWriter = null;
     try {
-      // The variable must exist
-      Variable v = getValueTable().getVariable(name);
-
-      if(!v.getEntityType().equals(variable.getEntityType())) {
-        throw new InvalidRequestException("Variable entity type must be the same as the one of the table");
-      }
-
-      if(!v.getName().equals(variable.getName())) {
-        throw new InvalidRequestException("Variable cannot be renamed");
-      }
-
-      vtw = getValueTable().getDatasource().createWriter(getValueTable().getName(), getValueTable().getEntityType());
-
-      vw = vtw.writeVariables();
-      vw.writeVariable(Dtos.fromDto(variable));
-
+      tableWriter = getValueTable().getDatasource()
+          .createWriter(getValueTable().getName(), getValueTable().getEntityType());
+      variableWriter = tableWriter.writeVariables();
+      variableWriter.writeVariable(Dtos.fromDto(dto));
       return Response.ok().build();
-
-    } catch(NoSuchVariableException e) {
-      return Response.status(Response.Status.NOT_FOUND).build();
     } finally {
-      Closeables.closeQuietly(vw);
-      Closeables.closeQuietly(vtw);
+      Closeables.closeQuietly(variableWriter, tableWriter);
     }
   }
 
@@ -117,23 +111,19 @@ public class VariableResourceImpl implements VariableResource {
   public Response deleteVariable() {
     if(getValueTable().isView()) throw new InvalidRequestException("Derived variable must be deleted by the view");
 
-    ValueTableWriter vtw = null;
-    ValueTableWriter.VariableWriter vw = null;
+    // The variable must exist
+    Variable v = getValueTable().getVariable(name);
+
+    ValueTableWriter tableWriter = null;
+    ValueTableWriter.VariableWriter variableWriter = null;
     try {
-      // The variable must exist
-      Variable v = getValueTable().getVariable(name);
-      vtw = getValueTable().getDatasource().createWriter(getValueTable().getName(), getValueTable().getEntityType());
-
-      vw = vtw.writeVariables();
-      vw.removeVariable(v);
-
+      tableWriter = getValueTable().getDatasource()
+          .createWriter(getValueTable().getName(), getValueTable().getEntityType());
+      variableWriter = tableWriter.writeVariables();
+      variableWriter.removeVariable(v);
       return Response.ok().build();
-
-    } catch(NoSuchVariableException e) {
-      return Response.status(Response.Status.NOT_FOUND).build();
     } finally {
-      Closeables.closeQuietly(vw);
-      Closeables.closeQuietly(vtw);
+      Closeables.closeQuietly(variableWriter, tableWriter);
     }
   }
 
