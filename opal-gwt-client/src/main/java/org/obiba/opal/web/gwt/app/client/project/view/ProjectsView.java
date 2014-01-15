@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.project.view;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -23,7 +24,9 @@ import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsUiHandlers;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
+import com.github.gwtbootstrap.client.ui.Column;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
+import com.github.gwtbootstrap.client.ui.FluidRow;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
@@ -51,6 +54,8 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   private static final Translations translations = GWT.create(Translations.class);
 
   private static final TranslationMessages translationMessages = GWT.create(TranslationMessages.class);
+
+  private static final int DEFAULT_GRID_COLUMNS = 3;
 
   @UiField
   Panel activePanel;
@@ -129,9 +134,17 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     NAME {
       @Override
       void sort(ProjectsUiHandlers handlers, Panel content, JsArray<ProjectDto> projects) {
-        for(ProjectDto project : JsArrays.toIterable(projects)) {
-          content.add(newProjectPanel(handlers, project));
-        }
+        List<ProjectDto> projectList = JsArrays.toList(projects);
+        Collections.sort(projectList, new Comparator<ProjectDto>() {
+          @Override
+          public int compare(ProjectDto o1, ProjectDto o2) {
+            String m1 = o1.hasTitle() ? o1.getTitle() : o1.getName();
+            String m2 = o2.hasTitle() ? o2.getTitle() : o2.getName();
+
+            return m1.compareTo(m2);
+          }
+        });
+        renderGrid(content, JsArrays.toList(projects), handlers);
       }
     }, LAST_UPDATE {
       @Override
@@ -148,11 +161,33 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
             return m2 == null ? -1 : m2.unix() - m1.unix();
           }
         });
-        for(ProjectDto project : projectList) {
-          content.add(newProjectPanel(handlers, project));
-        }
+
+        renderGrid(content, projectList, handlers);
       }
     };
+
+    protected void renderGrid(Panel content, Collection<ProjectDto> projectList, ProjectsUiHandlers handlers) {
+      int col = 0;
+      FluidRow row = new FluidRow();
+      int size = projectList.size();
+      int columns = size < DEFAULT_GRID_COLUMNS ? size : DEFAULT_GRID_COLUMNS;
+
+      for(ProjectDto project : projectList) {
+        Column column = new Column(12 / columns);
+        column.add(newProjectPanel(handlers, project));
+        if (col == columns -1) column.addStyleName("pull-right");
+        if (col == columns) {
+          content.add(row);
+          row = new FluidRow();
+          col = 0;
+        }
+
+        row.add(column);
+        col++;
+      }
+
+      content.add(row);
+    }
 
     /**
      * Perform the sort, add widgets to the panel and callback to project selection.
