@@ -8,7 +8,7 @@
 
   <g:FlowPanel>
     <g:FlowPanel>
-      <b:Heading size="4" addStyleNames="inline-block">
+      <b:Heading size="4" addStyleNames="inline-block no-top-margin">
         <ui:msg description="Identifiers Database label">Identifiers Database</ui:msg>
       </b:Heading>
       <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="edit"/>

@@ -32,7 +32,7 @@
       </b:Nav>
     </b:ResponsiveNavbar>
     <b:FluidContainer addStyleNames="container">
-      <g:SimplePanel ui:field="notification"/>
+      <g:SimplePanel ui:field="notification" addStyleNames="top-margin"/>
       <g:FlowPanel ui:field="workbench">
       </g:FlowPanel>
     </b:FluidContainer>

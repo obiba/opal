@@ -18,7 +18,7 @@ footer.footer .container > div {
 
 .page-header .breadcrumb {
   background: none;
-  font-size: 1.4em;
+  font-size: 2em;
   margin: 0;
   padding: 0;
 }
@@ -90,8 +90,18 @@ a:hover {
 
 .dropdown-menu > li.controls {
   padding: 3px 20px;
+  color: #FFFFFF;
 }
 
 .dropdown-menu > li.active > a, .dropdown-menu > li.active > a:hover {
   color: #FFFFFF;
+}
+
+.input-append .add-on, .input-prepend .add-on {
+  background-color: #BFC6CB;
+}
+
+.alert a {
+  color: #FFFFFF;
+  font-weight: bold;
 }
