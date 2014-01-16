@@ -54,6 +54,10 @@ th input[type="checkbox"], td input[type="checkbox"] {
   margin: 0;
 }
 
+.btn-link, .btn-link:active, .btn-link:focus, .btn-link[disabled] {
+  background-color: #bfc6cb;
+}
+
 .table thead {
   background-color: #EEEEEE;
   border-top: 1px solid #CCCCCC;
@@ -74,6 +78,9 @@ a:hover {
 
 .table select, .table textarea, .table input {
   margin-bottom: 0;
+}
+
+.table textarea, .table input[type="text"] {
   width: 90%;
 }
 
