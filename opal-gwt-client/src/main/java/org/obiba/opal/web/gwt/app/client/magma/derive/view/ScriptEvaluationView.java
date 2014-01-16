@@ -180,6 +180,7 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
 
     dataProvider = new ValueSetsDataProvider();
     dataProvider.addDataDisplay(valuesTable);
+    pager.setVisible(valuesTable.getRowCount() > pager.getPageSize());
   }
 
   @Override

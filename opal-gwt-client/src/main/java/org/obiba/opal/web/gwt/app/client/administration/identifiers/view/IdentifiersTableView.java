@@ -162,6 +162,7 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
     variablesProvider.addDataDisplay(variablesTable);
     variablesProvider.setList(JsArrays.toList(variables));
     variablesProvider.refresh();
+    variablesPager.setVisible(variablesProvider.getList().size() > variablesTable.getPageSize());
   }
 
   private void populateIdentifiersPanel(JsArray<VariableDto> variables) {
