@@ -24,6 +24,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewPropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.ContingencyTablePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
@@ -64,14 +65,17 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalPresenterModalProvider = createMock(
         ModalProvider.class);
     ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider = createMock(ModalProvider.class);
+    ModalProvider<VariableAttributeModalPresenter> attributeModalProvider = createMock(ModalProvider.class);
+
     Translations translations = createMock(Translations.class);
 
     ValuesTablePresenter values = new ValuesTablePresenter(null, null, null, modalProviderValueSequence,
         modalEntityModalPresenter);
+
     presenter = new TablePresenter(displayMock, new CountingEventBus(), null, values, crossVariablePresenterProvider,
         resourcePermissionsPresenterProvider, mockIndexProvider, variablesToViewProvider,
         variablePropertiesModalProvider, viewPropertiesModalProvider, tablePropertiesModalPresenterModalProvider, null,
-        null, translations);
+        null, attributeModalProvider, translations);
   }
 
   @SuppressWarnings({ "unchecked" })

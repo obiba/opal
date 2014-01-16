@@ -25,7 +25,9 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
 import org.obiba.opal.web.gwt.app.client.ui.LocalizedEditableText;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
@@ -40,11 +42,14 @@ import org.obiba.opal.web.model.client.opal.LocaleDto;
 
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -59,7 +64,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
 
   private TableDto table;
 
-  private VariableDto variable;
+  private List<VariableDto> variables = new ArrayList<VariableDto>();
 
   private List<JsArray<AttributeDto>> selectedItems;
 
@@ -94,21 +99,26 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     if(validationHandler.validate()) {
       ResponseCodeCallback successCallback = new AttributeSuccessCallback();
 
-      VariableDto dto = getVariableDto();
-      dto.setAttributesArray(getAttributesArray(dto));
+      JsArrayString variableDtos = JsArrays.create().cast();
+      for(VariableDto variable : variables) {
+        VariableDto dto = getVariableDto(variable);
+        dto.setAttributesArray(getAttributesArray(dto));
+        variableDtos.push(VariableDto.stringify(dto));
+      }
 
       ResourceRequestBuilderFactory.newBuilder() //
-          .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
-              .build(table.getDatasourceName(), table.getName(), variable.getName())) //
-          .withResourceBody(VariableDto.stringify(dto)) //
+          .forResource(
+              UriBuilders.DATASOURCE_TABLE_VARIABLES.create().build(table.getDatasourceName(), table.getName())) //
+          .withResourceBody("[" + variableDtos.toString() + "]") //
           .withCallback(Response.SC_OK, successCallback) //
           .withCallback(Response.SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
-          .put().send();
+          .post().send();
+
     }
   }
 
   private JsArray<AttributeDto> getAttributesArray(VariableDto dto) {
-    List<AttributeDto> attributes = JsArrays.toList(dto.getAttributesArray());
+    List<AttributeDto> attributes = JsArrays.toList(JsArrays.toSafeArray(dto.getAttributesArray()));
 
     if(dialogMode == Mode.CREATE) return addNewAttribute(attributes);
 
@@ -140,12 +150,14 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     JsArray<AttributeDto> newAttributes = JsArrays.create().cast();
 
     String originalName = selectedItems.get(0).get(0).getName();
-    // Update values and namespace
-    updateValuesAndNamespace(attributes, newAttributes, originalName);
+    String originalNamespace = selectedItems.get(0).get(0).getNamespace();
+
+//    // Update values and namespace
+    updateValuesAndNamespace(attributes, newAttributes, originalName, originalNamespace);
 
     // Add other attributes
     for(AttributeDto attribute : attributes) {
-      if(!attribute.getName().equals(getView().getName().getText())) {
+      if(!attribute.getName().equals(originalName) || !attribute.getNamespace().equals(originalNamespace)) {
         newAttributes.push(attribute);
       }
     }
@@ -154,24 +166,15 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
   }
 
   private void updateValuesAndNamespace(List<AttributeDto> attributes, JsArray<AttributeDto> newAttributes,
-      String originalName) {
-    for(LocalizedEditableText localizedText : getView().getLocalizedValues().getValue()) {
-      AttributeDto a = null;
-      for(AttributeDto attribute : attributes) {
-        if(attribute.getName().equals(originalName) &&
-            attribute.getLocale().equals(localizedText.getValue().getLocale())) {
-          a = attribute;
-          break;
-        }
-      }
+      String originalName, String originalNamespace) {
 
-      if(a == null) {
-        newAttributes.push(getNewAttribute(localizedText));
-      } else {
-        a.setName(getView().getName().getText());
-        a.setNamespace(getView().getNamespaceSuggestBox().getText());
-        a.setValue(localizedText.getTextBox().getText());
-        newAttributes.push(a);
+    for(AttributeDto attribute : attributes) {
+      // Find attribute to edit
+      if(attribute.getName().equals(originalName) && attribute.getNamespace().equals(originalNamespace)) {
+        for(LocalizedEditableText localizedText : getView().getLocalizedValues().getValue()) {
+          newAttributes.push(getNewAttribute(localizedText));
+        }
+        break;
       }
     }
   }
@@ -204,7 +207,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     return newAttributes;
   }
 
-  private VariableDto getVariableDto() {
+  private VariableDto getVariableDto(VariableDto variable) {
     VariableDto dto = VariableDto.create();
     dto.setLink(variable.getLink());
     dto.setIndex(variable.getIndex());
@@ -231,9 +234,16 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
   }
 
   public void initialize(TableDto tableDto, VariableDto variableDto) {
+    List<VariableDto> variableDtos = new ArrayList<VariableDto>();
+    variableDtos.add(variableDto);
+
+    initialize(tableDto, variableDtos);
+  }
+
+  public void initialize(TableDto tableDto, List<VariableDto> variableDtos) {
     table = tableDto;
-    variable = variableDto;
-    getView().setNamespaceSuggestions(variableDto);
+    variables.addAll(variableDtos);
+    getView().setNamespaceSuggestions(variables);
 
     renderLocalizableTexts();
   }
@@ -248,7 +258,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
         .get().withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
       @Override
       public void onResource(Response response, JsArray<LocaleDto> resource) {
-        for(LocaleDto localeDto : JsArrays.toList(resource)) {
+        for(LocaleDto localeDto : JsArrays.toList(JsArrays.toSafeArray(resource))) {
           locales.add(localeDto.getName());
         }
         Collections.sort(locales);
@@ -287,9 +297,9 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
 
   public void initialize(TableDto tableDto, VariableDto variableDto, final List<JsArray<AttributeDto>> selectedItems) {
     table = tableDto;
-    variable = variableDto;
+    variables.add(variableDto);
     this.selectedItems = selectedItems;
-    getView().setNamespaceSuggestions(variableDto);
+    getView().setNamespaceSuggestions(variables);
 
     if(selectedItems.size() == 1) {
       // Fetch locales and render categories
@@ -298,7 +308,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
           .get().withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
         @Override
         public void onResource(Response response, JsArray<LocaleDto> resource) {
-          List<LocaleDto> localeDtos = JsArrays.toList(resource);
+          List<LocaleDto> localeDtos = JsArrays.toList(JsArrays.toSafeArray(resource));
           locales = new ArrayList<String>();
           for(LocaleDto localeDto : localeDtos) {
             locales.add(localeDto.getName());
@@ -340,6 +350,11 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     getView().setDialogMode(mode);
   }
 
+  public static native String stringify(JavaScriptObject obj)
+  /*-{
+      return $wnd.JSON.stringify(obj);
+  }-*/;
+
   private class AttributeValidationHandler extends ViewValidationHandler {
 
     private Set<FieldValidator> validators;
@@ -349,9 +364,12 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
       if(validators == null) {
         validators = new LinkedHashSet<FieldValidator>();
 
-        if(dialogMode == Mode.UPDATE_SINGLE) {
+        if(dialogMode != Mode.UPDATE_MULTIPLE) {
           validators.add(
               new RequiredTextValidator(getView().getName(), "AttributeNameIsRequired", Display.FormField.NAME.name()));
+          validators.add(
+              new ConditionValidator(hasValue(getView().getLocalizedValues().getValue()), "AttributeValueIsRequired",
+                  Display.FormField.VALUE.name()));
         }
 
         if(dialogMode == Mode.CREATE) {
@@ -365,6 +383,21 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     @Override
     protected void showMessage(String id, String message) {
       getView().showError(id == null ? null : Display.FormField.valueOf(id), message);
+    }
+
+    private HasValue<Boolean> hasValue(final List<LocalizedEditableText> localizedTexts) {
+      return new HasBooleanValue() {
+        @Override
+        public Boolean getValue() {
+          for(LocalizedEditableText localizedText : localizedTexts) {
+            if(!localizedText.getTextBox().getText().isEmpty()) {
+              return true;
+            }
+          }
+
+          return false;
+        }
+      };
     }
   }
 
@@ -385,7 +418,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
 
     HasText getName();
 
-    void setNamespaceSuggestions(VariableDto variableDto);
+    void setNamespaceSuggestions(List<VariableDto> variableDto);
 
     void showError(@Nullable FormField formField, String message);
 
@@ -401,15 +434,18 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
 
     @Override
     protected boolean hasError() {
-      String safeNamespace = Strings.nullToEmpty(getView().getNamespaceSuggestBox().getText());
-      String safeName = Strings.nullToEmpty(getView().getName().getText());
+      // Permitted when editing multiple variables
+      if(variables.size() == 1) {
+        String safeNamespace = Strings.nullToEmpty(getView().getNamespaceSuggestBox().getText());
+        String safeName = Strings.nullToEmpty(getView().getName().getText());
 
-      // Using the same safeNamespace/safeName as an existing attribute is not permitted.
-      JsArray<AttributeDto> attributesArray = JsArrays.toSafeArray(variable.getAttributesArray());
-      for(int i = 0; i < attributesArray.length(); i++) {
-        AttributeDto dto = attributesArray.get(i);
-        if(safeNamespace.equals(dto.getNamespace()) && safeName.equals(dto.getName())) {
-          return true;
+        // Using the same safeNamespace/safeName as an existing attribute is not permitted.
+        JsArray<AttributeDto> attributesArray = JsArrays.toSafeArray(variables.get(0).getAttributesArray());
+        for(int i = 0; i < attributesArray.length(); i++) {
+          AttributeDto dto = attributesArray.get(i);
+          if(safeNamespace.equals(dto.getNamespace()) && safeName.equals(dto.getName())) {
+            return true;
+          }
         }
       }
       return false;
@@ -422,7 +458,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     @Override
     public void onResponseCode(Request request, Response response) {
       getView().hide();
-      fireEvent(new VariableRefreshEvent());
+      if(dialogMode != null) fireEvent(new VariableRefreshEvent());
     }
 
   }

@@ -30,6 +30,7 @@ import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPr
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewPropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.ContingencyTablePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
@@ -117,6 +118,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final Provider<ContingencyTablePresenter> crossVariableProvider;
 
+  private final ModalProvider<VariableAttributeModalPresenter> attributeModalProvider;
+
   private final Translations translations;
 
   private Runnable removeConfirmation;
@@ -141,7 +144,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider,
       ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider,
       ModalProvider<DataExportPresenter> dataExportModalProvider,
-      ModalProvider<DataCopyPresenter> dataCopyModalProvider, Translations translations) {
+      ModalProvider<DataCopyPresenter> dataCopyModalProvider,
+      ModalProvider<VariableAttributeModalPresenter> attributeModalProvider, Translations translations) {
     super(eventBus, display);
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
@@ -155,6 +159,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     this.dataExportModalProvider = dataExportModalProvider.setContainer(this);
     this.dataCopyModalProvider = dataCopyModalProvider.setContainer(this);
     this.crossVariableProvider = crossVariableProvider;
+    this.attributeModalProvider = attributeModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -213,7 +218,9 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     addRegisteredHandler(VariableRefreshEvent.getType(), new VariableRefreshEvent.Handler() {
       @Override
       public void onVariableRefresh(VariableRefreshEvent event) {
-        updateVariables();
+        if(table != null) {
+          updateVariables();
+        }
       }
     });
 
@@ -325,22 +332,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     authorize();
   }
 
-  private void updateContingencyTableVariables() {
-    TableIndexationStatus status = statusDto.getStatus();
-    if(status.isTableIndexationStatus(TableIndexationStatus.UPTODATE) ||
-        status.isTableIndexationStatus(TableIndexationStatus.OUTDATED)) {
-
-      ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(table.getLink() + "/variables").get()
-          .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
-            @Override
-            public void onResource(Response response, JsArray<VariableDto> resource) {
-              getView().initContingencyTable(JsArrays.toSafeArray(resource));
-            }
-          }).send();
-    }
-  }
-
-  private void showFromTables(TableDto tableDto) {// Show from tables
+  private void showFromTables(TableDto tableDto) {
+    // Show from tables
     ResourceRequestBuilderFactory.<JsArray<ViewDto>>newBuilder().forResource(tableDto.getViewLink()).get() //
         .withCallback(new ResponseCodeCallback() {
           @Override
@@ -610,6 +603,13 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     }
   }
 
+  @Override
+  public void onAddAttribute(List<VariableDto> selectedItems) {
+    VariableAttributeModalPresenter attributeEditorPresenter = attributeModalProvider.get();
+    attributeEditorPresenter.setDialogMode(VariableAttributeModalPresenter.Mode.CREATE);
+    attributeEditorPresenter.initialize(table, selectedItems);
+  }
+
   private final class ValuesCommand implements Command {
 
     @Override
@@ -756,6 +756,21 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
             statusDto.getStatus().isTableIndexationStatus(TableIndexationStatus.OUTDATED)) {
           updateContingencyTableVariables();
         }
+      }
+    }
+
+    private void updateContingencyTableVariables() {
+      TableIndexationStatus status = statusDto.getStatus();
+      if(status.isTableIndexationStatus(TableIndexationStatus.UPTODATE) ||
+          status.isTableIndexationStatus(TableIndexationStatus.OUTDATED)) {
+
+        ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(table.getLink() + "/variables")
+            .get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<VariableDto> resource) {
+            getView().initContingencyTable(JsArrays.toSafeArray(resource));
+          }
+        }).send();
       }
     }
   }

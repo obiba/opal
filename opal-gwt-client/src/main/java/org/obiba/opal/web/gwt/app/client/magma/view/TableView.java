@@ -502,6 +502,11 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     getUiHandlers().onCrossVariables();
   }
 
+  @UiHandler("addAttribute")
+  void onAddAttribute(ClickEvent event) {
+    getUiHandlers().onAddAttribute(checkColumn.getSelectedItems());
+  }
+
   @Override
   public HandlerRegistration addVariableSortHandler(ColumnSortEvent.Handler handler) {
     return table.addColumnSortHandler(handler);
