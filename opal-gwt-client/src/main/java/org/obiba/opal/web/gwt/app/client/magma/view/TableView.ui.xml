@@ -46,7 +46,7 @@
       <b:Tab heading="Dictionary" active="true">
 
         <g:FlowPanel>
-          <b:Heading size="4" addStyleNames="inline-block">
+          <b:Heading size="4" addStyleNames="inline-block large-top-margin">
             <ui:msg description="Properties label">Properties</ui:msg>
           </b:Heading>
           <b2:IconAnchor ui:field="edit" icon="EDIT" addStyleNames="small-indent">
@@ -112,7 +112,12 @@
 
                     <b2:IconAnchor ui:field="copyVariables" icon="PLUS_SIGN"
                         addStyleNames="inline xsmall-indent">
-                      <ui:msg description="Add to variables to view label">Add variables to view</ui:msg>
+                      <ui:msg description="Add variables to view label">Add variables to view</ui:msg>
+                    </b2:IconAnchor>
+
+                    <b2:IconAnchor ui:field="addAttribute" icon="TAG"
+                        addStyleNames="inline xsmall-indent">
+                      <ui:msg description="Add attribute label">Add attribute</ui:msg>
                     </b2:IconAnchor>
 
                     <b2:IconAnchor ui:field="deleteVariables" icon="TRASH" addStyleNames="inline xsmall-indent">

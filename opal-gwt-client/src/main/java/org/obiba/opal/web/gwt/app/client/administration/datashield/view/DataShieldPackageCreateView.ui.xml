@@ -32,8 +32,7 @@
           <b:TextBox name="reference" ui:field="reference"/>
         </b:Controls>
         <b:HelpBlock>
-          <ui:msg description="Git reference description">Could be a commit, tag, or branch name on</ui:msg>
-          <g:Anchor href="https://github.com/datashield" target="_blank">DataSHIELD source</g:Anchor>
+          <ui:msg description="Git reference description">Could be a commit, tag, or branch name on <a href="https://github.com/datashield" target="_blank">DataSHIELD source</a></ui:msg>
         </b:HelpBlock>
       </b:ControlGroup>
     </o:CollapsiblePanel>

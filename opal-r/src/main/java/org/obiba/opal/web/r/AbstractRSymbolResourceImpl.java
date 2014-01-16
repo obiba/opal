@@ -63,7 +63,7 @@ public abstract class AbstractRSymbolResourceImpl extends AbstractOpalRSessionRe
 
   @Override
   public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean missings) {
-    rSession.execute(new MagmaAssignROperation(rSession, name, path, variableFilter, missings));
+    rSession.execute(new MagmaAssignROperation(name, path, variableFilter, missings));
     return Response.created(getSymbolURI(uri)).build();
   }
 

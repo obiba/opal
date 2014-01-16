@@ -100,6 +100,7 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
   public void onTableChange(RowCountChangeEvent event) {
     createPanel.setVisible(!isDatabasesVisible());
     databasesPanel.setVisible(isDatabasesVisible());
+    pager.setVisible(table.getRowCount() > pager.getPageSize());
   }
 
   private boolean isDatabasesVisible() {

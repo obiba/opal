@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.project.event.ProjectHiddenEvent;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportsPresenter;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
@@ -35,6 +36,7 @@ import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.ProjectSummaryDto;
 
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -153,6 +155,11 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   protected void onBind() {
     super.onBind();
     addRegisteredHandler(FolderUpdatedEvent.getType(), this);
+  }
+
+  @Override
+  protected void onHide() {
+    fireEvent(new ProjectHiddenEvent(project));
   }
 
   @Override

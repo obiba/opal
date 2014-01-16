@@ -8,14 +8,15 @@ import javax.annotation.Nullable;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.ModalFooter;
+import com.github.gwtbootstrap.client.ui.base.AlertBase;
 import com.github.gwtbootstrap.client.ui.base.HasType;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.BackdropType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
-import com.github.gwtbootstrap.client.ui.event.CloseEvent;
-import com.github.gwtbootstrap.client.ui.event.CloseHandler;
+import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
+import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
 import com.github.gwtbootstrap.client.ui.event.ShowEvent;
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -26,7 +27,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.dom.client.Element;
 
 /**
  * A Bootstrap Modal, resizable and draggable.
@@ -82,7 +82,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     setMovePanel(getWidget(0));
     setAutoHide(false);
     setDraggable(true);
-    setResizable(false);
+    setResizable(true);
     History.addValueChangeHandler(new HistoryChangeValueHandler());
     add(alertPlace = new FlowPanel());
   }
@@ -446,29 +446,29 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   }
 
   public void addAlert(String message, AlertType type) {
-    addAlert(message, type, (CloseHandler) null);
+    addAlert(message, type, (ClosedHandler<AlertBase>) null);
   }
 
   public void addAlert(String message, AlertType type, final HasType<ControlGroupType> group) {
     group.setType(ControlGroupType.ERROR);
-    addAlert(message, type, new CloseHandler() {
+    addAlert(message, type, new ClosedHandler<AlertBase>() {
       @Override
-      public void onClose(CloseEvent closeEvent) {
+      public void onClosed(ClosedEvent<AlertBase> event) {
         group.setType(ControlGroupType.NONE);
       }
     });
   }
 
-  public void addAlert(String message, AlertType type, @Nullable final CloseHandler groupCloseHandler) {
+  public void addAlert(String message, AlertType type, @Nullable final ClosedHandler<AlertBase> groupCloseHandler) {
     final Alert alert = new Alert(message);
     alert.setType(type);
     alert.setAnimation(true);
     alert.setClose(true);
-    alert.addCloseHandler(new CloseHandler() {
+    alert.addClosedHandler(new ClosedHandler<AlertBase>() {
       @Override
-      public void onClose(CloseEvent closeEvent) {
+      public void onClosed(ClosedEvent<AlertBase> event) {
         alert.removeFromParent();
-        if(groupCloseHandler != null) groupCloseHandler.onClose(closeEvent);
+        if(groupCloseHandler != null) groupCloseHandler.onClosed(event);
       }
     });
     addAlert(alert);

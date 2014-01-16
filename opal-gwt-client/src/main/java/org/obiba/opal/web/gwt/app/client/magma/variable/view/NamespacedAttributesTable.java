@@ -28,6 +28,7 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.ListAttributeValueColumn;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
+import com.github.gwtbootstrap.client.ui.Badge;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.core.client.GWT;
@@ -65,7 +66,7 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
   private CheckboxColumn<JsArray<AttributeDto>> checkColumn;
 
   @UiField
-  com.github.gwtbootstrap.client.ui.Label namespaceLabel;
+  Badge namespaceLabel;
 
   @UiField
   Alert selectAllItemsAlert;

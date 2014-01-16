@@ -273,7 +273,6 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   @Override
   public void setVariables(JsArray<VariableDto> variables) {
     valuesTable.setVisible(true);
-    pager.setVisible(true);
     setVariables(JsArrays.toList(variables));
   }
 
@@ -398,6 +397,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     valuesTable.setPageSize(pageSize.getNumberValue().intValue());
     dataProvider = new ValueSetsDataProvider(isExactMatch);
     dataProvider.addDataDisplay(valuesTable);
+    pager.setVisible(valuesTable.getRowCount() > pager.getPageSize());
   }
 
   private void insertColumns(List<VariableDto> variables) {

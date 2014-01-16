@@ -5,10 +5,6 @@ body {
   background-color: #fefefe;
 }
 
-h1 {
-  font-size: 1.8em;
-}
-
 h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
 }
@@ -141,6 +137,14 @@ li.no-icon > a {
   margin-top: 20px;
 }
 
+.italic {
+  font-style: italic;
+}
+
+.almost-full-width {
+  width: 93%;
+}
+
 /* Suggest list box */
 
 ul.closeables {
@@ -158,7 +162,7 @@ ul.closeables li {
   -moz-border-radius: 2px 2px 2px 2px;
   -webkit-border-radius: 2px 2px 2px 2px;
   margin-left: 4px;
-  padding: 0px 6px;
+  padding: 0px 6px 0 0;
   background-color: #B4BCC2;
   margin-top: -4px;
   color: #FFFFFF;
@@ -200,19 +204,19 @@ ul.closeables li span {
 
 @media all and (max-width: 1189px) {
   ul.closeables li span {
-    max-width: 54px;
+    max-width: 50px;
   }
 }
 
 @media all and (max-width: 1529px) and (min-width: 1190px) {
   ul.closeables li span {
-    max-width: 124px;
+    max-width: 100px;
   }
 }
 
 @media all and (min-width: 1530px) {
   ul.closeables li span {
-    max-width: 234px;
+    max-width: 200px;
   }
 }
 
@@ -266,13 +270,18 @@ ul.closeables li a {
   box-shadow: none;
 }
 
-div.obiba-SuggestListBox {
+.obiba-SuggestListBox {
+  border: 2px solid #DCE4EC;
+  border-radius: 6px;
+  box-shadow: none;
+  padding: 3px;
   background-color: #FFFFFF;
-  border: 1px solid #CCCCCC;
-  border-radius: 3px;
   display: inline-block;
-  padding-right: 4px;
   vertical-align: middle;
+}
+
+.obiba-SuggestListBox.navbar-search {
+  margin-top: 7px;
 }
 
 .textbox-clearable-anchor {
@@ -415,4 +424,11 @@ td.row-actions span {
 .cross-table-header {
   font-weight: bold;
   text-align: center !important;
+}
+
+/*
+ * Attributes
+ */
+.attribute-value > .label {
+  margin-bottom: 2px;
 }

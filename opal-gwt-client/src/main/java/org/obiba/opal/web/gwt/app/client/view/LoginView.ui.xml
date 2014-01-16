@@ -12,18 +12,18 @@
       <b:Row addStyleNames="top-margin">
         <b:Column size="4" offset="4">
           <g:SimplePanel ui:field="alertPanel"/>
-          <b:Well>
+          <b:Well addStyleNames="large-top-margin">
             <b:ControlGroup>
               <b:ControlLabel>
                 <ui:msg description="User name field label">User Name</ui:msg>
               </b:ControlLabel>
-              <b:TextBox ui:field="userName"/>
+              <b:TextBox ui:field="userName" addStyleNames="almost-full-width"/>
             </b:ControlGroup>
             <b:ControlGroup ui:field="passwordGroup">
               <b:ControlLabel>
                 <ui:msg description="Password field label">Password</ui:msg>
               </b:ControlLabel>
-              <b:PasswordTextBox ui:field="password"/>
+              <b:PasswordTextBox ui:field="password" addStyleNames="almost-full-width"/>
               <b:HelpBlock ui:field="passwordHelp" visible="false">
                 <ui:msg description="Password Caps-Lock label">Caps lock is on</ui:msg>
               </b:HelpBlock>

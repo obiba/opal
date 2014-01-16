@@ -96,10 +96,9 @@
           </b:Controls>
 
           <b:HelpBlock>
-            <ui:msg description="Variable Mime Type help">Relevant when value type is binary: see</ui:msg>
-            <g:Anchor href="http://www.iana.org/assignments/media-types" target="_blank">
-              <ui:msg description="Media type label">Media type</ui:msg>
-            </g:Anchor>
+            <ui:msg description="Variable Mime Type help">Relevant when value type is binary: see <a href="http://www.iana.org/assignments/media-types" target="_blank">
+              Media type
+            </a></ui:msg>
           </b:HelpBlock>
         </b:ControlGroup>
 

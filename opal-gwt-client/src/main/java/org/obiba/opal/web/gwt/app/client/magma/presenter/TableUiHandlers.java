@@ -35,4 +35,6 @@ public interface TableUiHandlers extends UiHandlers {
   void onDeleteVariables(List<VariableDto> variables);
 
   void onCrossVariables();
+
+  void onAddAttribute(List<VariableDto> selectedItems);
 }

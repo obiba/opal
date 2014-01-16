@@ -33,7 +33,6 @@ import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MagmaEngineVariableResolver;
 import org.obiba.magma.type.TextType;
-import org.obiba.opal.r.service.VariableEntitiesHolder;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPGenericVector;
 import org.rosuda.REngine.REXPList;
@@ -52,8 +51,6 @@ import com.google.common.collect.Sets;
  */
 public class MagmaAssignROperation extends AbstractROperation {
 
-  private final VariableEntitiesHolder holder;
-
   private final String symbol;
 
   private final String path;
@@ -62,15 +59,15 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   private final boolean withMissings;
 
+  private SortedSet<VariableEntity> entities;
+
   private final Set<MagmaRConverter> magmaRConverters = Sets
       .newHashSet(new DatasourceRConverter(), new ValueTableRConverter(), new VariableRConverter());
 
-  public MagmaAssignROperation(VariableEntitiesHolder holder, String symbol, String path, String variableFilter,
+  public MagmaAssignROperation(String symbol, String path, String variableFilter,
       boolean withMissings) {
-    if(holder == null) throw new IllegalArgumentException("holder cannot be null");
     if(symbol == null) throw new IllegalArgumentException("symbol cannot be null");
     if(path == null) throw new IllegalArgumentException("path cannot be null");
-    this.holder = holder;
     this.symbol = symbol;
     this.path = path;
     this.variableFilter = variableFilter;
@@ -92,10 +89,17 @@ public class MagmaAssignROperation extends AbstractROperation {
     throw new MagmaRRuntimeException("Failed resolving path '" + path + "'");
   }
 
+  private SortedSet<VariableEntity> getEntities() {
+    if(entities == null) throw new IllegalStateException("call setEntities() first");
+    return entities;
+  }
+
+  private void setEntities(SortedSet<VariableEntity> entities) {
+    this.entities = ImmutableSortedSet.copyOf(entities);
+  }
+
   void prepareEntities(ValueTable table) {
-    if(!holder.hasEntities()) {
-      holder.setEntities(ImmutableSortedSet.copyOf(table.getVariableEntities()));
-    }
+    setEntities(ImmutableSortedSet.copyOf(table.getVariableEntities()));
   }
 
   //
@@ -151,13 +155,11 @@ public class MagmaAssignROperation extends AbstractROperation {
     public REXP asVector(String path, boolean withMissings) {
       Datasource datasource = MagmaEngine.get().getDatasource(path);
 
-      if(!holder.hasEntities()) {
-        SortedSet<VariableEntity> entities = Sets.newTreeSet();
-        for(ValueTable vt : datasource.getValueTables()) {
-          entities.addAll(vt.getVariableEntities());
-        }
-        holder.setEntities(entities);
+      SortedSet<VariableEntity> entities = Sets.newTreeSet();
+      for(ValueTable vt : datasource.getValueTables()) {
+        entities.addAll(vt.getVariableEntities());
       }
+      setEntities(entities);
 
       // build a list of list of vectors
       List<REXP> contents = Lists.newArrayList();
@@ -212,12 +214,12 @@ public class MagmaAssignROperation extends AbstractROperation {
       List<String> names = Lists.newArrayList();
 
       // entity identifiers
-      REXP ids = getVector(new VariableEntityValueSource(), holder.getEntities(), withMissings);
+      REXP ids = getVector(new VariableEntityValueSource(), getEntities(), withMissings);
 
       // vector for each variable
       for(Variable v : filterVariables()) {
         VariableValueSource vvs = table.getVariableValueSource(v.getName());
-        contents.add(getVector(vvs, holder.getEntities(), withMissings));
+        contents.add(getVector(vvs, getEntities(), withMissings));
         names.add(vvs.getVariable().getName());
       }
 
@@ -305,7 +307,7 @@ public class MagmaAssignROperation extends AbstractROperation {
 
           @Override
           public Iterable<Value> getValues(SortedSet<VariableEntity> entities) {
-            return Iterables.transform(holder.getEntities(), new Function<VariableEntity, Value>() {
+            return Iterables.transform(getEntities(), new Function<VariableEntity, Value>() {
               @Override
               public Value apply(@NotNull VariableEntity input) {
                 return TextType.get().valueOf(input.getIdentifier());
@@ -351,7 +353,7 @@ public class MagmaAssignROperation extends AbstractROperation {
     public REXP asVector(String path, boolean withMissings) {
       resolvePath(path);
       prepareEntities(table);
-      return getVector(variableValueSource, holder.getEntities(), withMissings);
+      return getVector(variableValueSource, getEntities(), withMissings);
     }
   }
 

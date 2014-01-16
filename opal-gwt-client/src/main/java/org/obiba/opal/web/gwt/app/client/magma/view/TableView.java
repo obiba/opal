@@ -316,6 +316,10 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     pager.setVisible(false);
     selectAllItemsAlert.setVisible(false);
     table.showLoadingIndicator(dataProvider);
+
+    if(checkColumn != null) {
+      checkColumn.clearSelection();
+    }
   }
 
   @Override
@@ -500,6 +504,11 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   void onCrossVariables(ClickEvent event) {
     crossResultsPanel.clear();
     getUiHandlers().onCrossVariables();
+  }
+
+  @UiHandler("addAttribute")
+  void onAddAttribute(ClickEvent event) {
+    getUiHandlers().onAddAttribute(checkColumn.getSelectedItems());
   }
 
   @Override

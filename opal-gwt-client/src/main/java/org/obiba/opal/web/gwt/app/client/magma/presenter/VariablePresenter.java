@@ -444,7 +444,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     for(AttributeDto attribute : allAttributes) {
       boolean keep = true;
       for(JsArray<AttributeDto> toRemove : selectedItems) {
-        if(attribute.getName().equals(toRemove.get(0).getName())) {
+        if(attribute.getName().equals(toRemove.get(0).getName()) &&
+            attribute.getNamespace().equals(toRemove.get(0).getNamespace())) {
           keep = false;
           break;
         }

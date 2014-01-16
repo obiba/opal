@@ -23,6 +23,8 @@ import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEven
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueMapPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.project.event.ProjectHidden;
+import org.obiba.opal.web.gwt.app.client.project.event.ProjectHiddenEvent;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.ui.HasUrl;
@@ -169,6 +171,13 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       }
     });
 
+    addRegisteredHandler(ProjectHiddenEvent.getType(), new ProjectHiddenEvent.ProjectHiddenHandler() {
+      @Override
+      public void onProjectHidden(ProjectHiddenEvent event) {
+        getView().clearSearch();
+      }
+    });
+
     registerUserMessageEventHandler();
   }
 
@@ -235,11 +244,6 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   @Override
   public void onAdministration() {
     placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.ADMINISTRATION).build());
-  }
-
-  @Override
-  public void onHelp() {
-    HelpUtil.openPage();
   }
 
   @Override

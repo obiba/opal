@@ -23,15 +23,11 @@ import org.obiba.opal.web.model.client.datashield.RFunctionDataShieldMethodDto;
 import org.obiba.opal.web.model.client.datashield.RScriptDataShieldMethodDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.SimplePager;
-import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -96,9 +92,9 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
 
     int size = methodsDataProvider.getList().size();
     methodsTablePager.firstPage();
-    methodsTablePager.setVisible(size > 0);
     methodsTable.setVisible(size > 0);
     methodsDataProvider.refresh();
+    methodsTablePager.setVisible(size > methodsTablePager.getPageSize());
   }
 
   @Override

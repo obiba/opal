@@ -1,5 +1,5 @@
 a:visited {
-  color: #0088CC;
+  color: #1ABC9C;
 }
 
 footer.footer {
@@ -18,7 +18,7 @@ footer.footer .container > div {
 
 .page-header .breadcrumb {
   background: none;
-  font-size: 1.4em;
+  font-size: 2em;
   margin: 0;
   padding: 0;
 }
@@ -54,6 +54,10 @@ th input[type="checkbox"], td input[type="checkbox"] {
   margin: 0;
 }
 
+.btn-link, .btn-link:active, .btn-link:focus, .btn-link[disabled] {
+  background-color: #bfc6cb;
+}
+
 .table thead {
   background-color: #EEEEEE;
   border-top: 1px solid #CCCCCC;
@@ -76,6 +80,10 @@ a:hover {
   margin-bottom: 0;
 }
 
+.table textarea, .table input[type="text"] {
+  width: 90%;
+}
+
 .typeahead {
   z-index: 10000;
 }
@@ -90,8 +98,18 @@ a:hover {
 
 .dropdown-menu > li.controls {
   padding: 3px 20px;
+  color: #FFFFFF;
 }
 
 .dropdown-menu > li.active > a, .dropdown-menu > li.active > a:hover {
   color: #FFFFFF;
+}
+
+.input-append .add-on, .input-prepend .add-on {
+  background-color: #BFC6CB;
+}
+
+.alert a {
+  color: #FFFFFF;
+  font-weight: bold;
 }

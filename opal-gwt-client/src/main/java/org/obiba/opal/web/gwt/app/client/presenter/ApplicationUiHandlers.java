@@ -14,8 +14,6 @@ public interface ApplicationUiHandlers extends UiHandlers {
 
   void onAdministration();
 
-  void onHelp();
-
   void onQuit();
 
   void onSelection(VariableSuggestOracle.VariableSuggestion suggestion);
