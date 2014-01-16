@@ -503,6 +503,7 @@ public interface Translations extends Constants {
       "ESQueryBadRequest", "Not a valid search query.", "DuplicateUserName", "A user with same name already exists.",
       "DuplicateSubjectProfile", "A user profile is already registered with the same name.",//
       "AttributeNameIsRequired", "An attribute name is required",//
+      "AttributeValueIsRequired", "At least one value is required",//
       "AttributeAlreadyExists", "An attribute with this namespace and name already exists.",//
       "PermissionRequired", "You must select a at most one permission type.",//
       "DuplicateAclSubjectUser", "User '{0}' already exists, please choose a unique name.",//

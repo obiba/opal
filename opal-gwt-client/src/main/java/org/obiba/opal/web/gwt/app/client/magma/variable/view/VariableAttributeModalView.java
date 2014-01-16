@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.magma.variable.view;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -22,7 +21,6 @@ import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttrib
 import org.obiba.opal.web.gwt.app.client.ui.LocalizedEditableText;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
-import org.obiba.opal.web.gwt.app.client.ui.SuggestListBox;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
@@ -31,7 +29,6 @@ import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -112,14 +109,12 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
   }
 
   @Override
-  public void setNamespaceSuggestions(VariableDto variableDto) {
+  public void setNamespaceSuggestions(List<VariableDto> variableDtos) {
     MultiWordSuggestOracle oracle = (MultiWordSuggestOracle) namespaceTypeahead.getSuggestOracle();
     oracle.clear();
-    JsArray<AttributeDto> attributesArray = variableDto.getAttributesArray();
-
-    if (attributesArray != null) {
-      for(AttributeDto attributeDto : JsArrays.toList(attributesArray)) {
-        if (attributeDto.hasNamespace()) oracle.add(attributeDto.getNamespace());
+    for(VariableDto dto : variableDtos) {
+      for(AttributeDto attributeDto : JsArrays.toIterable(dto.getAttributesArray())) {
+        oracle.add(attributeDto.getNamespace());
       }
     }
   }
@@ -172,6 +167,9 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
       switch(formField) {
         case NAME:
           group = nameGroup;
+          break;
+        case VALUE:
+          group = valuesGroup;
           break;
       }
     }
