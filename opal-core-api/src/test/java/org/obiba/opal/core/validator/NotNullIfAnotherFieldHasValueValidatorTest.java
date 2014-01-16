@@ -18,7 +18,7 @@ import javax.validation.Validator;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class NotNullIfAnotherFieldHasValueValidatorTest {
 
@@ -26,38 +26,38 @@ public class NotNullIfAnotherFieldHasValueValidatorTest {
   public void test_empty() {
     Validator validator = getValidator();
     Set<ConstraintViolation<Stub>> constraintViolations = validator.validate(new Stub());
-    assertEquals(0, constraintViolations.size());
+    assertThat(constraintViolations).isEmpty();
   }
 
   @Test
   public void test_no_dependency() {
     Validator validator = getValidator();
     Set<ConstraintViolation<Stub>> constraintViolations = validator.validate(new Stub("foo", null));
-    assertEquals(0, constraintViolations.size());
+    assertThat(constraintViolations).isEmpty();
   }
 
   @Test
   public void test_string_dependency() {
     Validator validator = getValidator();
     Set<ConstraintViolation<Stub>> constraintViolations = validator.validate(new Stub("OK", null));
-    assertEquals(1, constraintViolations.size());
+    assertThat(constraintViolations).hasSize(1);
     ConstraintViolation<Stub> constraintViolation = constraintViolations.iterator().next();
-    assertEquals("cannot be null if status == OK", constraintViolation.getMessage());
-    assertEquals("{org.obiba.opal.core.validator.NotNullIfAnotherFieldHasValue.message}",
-        constraintViolation.getMessageTemplate());
-    assertEquals("statusDependant", constraintViolation.getPropertyPath().toString());
+    assertThat(constraintViolation.getMessage()).isEqualTo("cannot be null if status == OK");
+    assertThat(constraintViolation.getMessageTemplate())
+        .isEqualTo("{org.obiba.opal.core.validator.NotNullIfAnotherFieldHasValue.message}");
+    assertThat(constraintViolation.getPropertyPath().toString()).isEqualTo("statusDependant");
   }
 
   @Test
   public void test_enum_dependency() {
     Validator validator = getValidator();
     Set<ConstraintViolation<Stub>> constraintViolations = validator.validate(new Stub(Stub.Type.TYPE_2, null));
-    assertEquals(1, constraintViolations.size());
+    assertThat(constraintViolations).hasSize(1);
     ConstraintViolation<Stub> constraintViolation = constraintViolations.iterator().next();
-    assertEquals("cannot be null if type == TYPE_2", constraintViolation.getMessage());
-    assertEquals("{org.obiba.opal.core.validator.NotNullIfAnotherFieldHasValue.message}",
-        constraintViolation.getMessageTemplate());
-    assertEquals("typeDependant", constraintViolation.getPropertyPath().toString());
+    assertThat(constraintViolation.getMessage()).isEqualTo("cannot be null if type == TYPE_2");
+    assertThat(constraintViolation.getMessageTemplate())
+        .isEqualTo("{org.obiba.opal.core.validator.NotNullIfAnotherFieldHasValue.message}");
+    assertThat(constraintViolation.getPropertyPath().toString()).isEqualTo("typeDependant");
   }
 
   private Validator getValidator() {

@@ -13,10 +13,7 @@ import org.junit.Test;
 import org.obiba.opal.core.vcs.CommitInfo;
 import org.obiba.opal.core.vcs.git.OpalGitException;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class OpalGitCommitLogCommandTest extends AbstractOpalGitCommandTest {
 
@@ -25,10 +22,10 @@ public class OpalGitCommitLogCommandTest extends AbstractOpalGitCommandTest {
     OpalGitCommitLogCommand command = new OpalGitCommitLogCommand.Builder(
         versionControlSystem.getRepository(DATASOURCE_NAME), "TestView", COMMIT_ID).build();
     CommitInfo commitInfo = command.execute();
-    assertThat(commitInfo, not(is(nullValue())));
-    assertThat(commitInfo.getCommitId(), is(COMMIT_ID));
-    assertThat(commitInfo.getAuthor(), is("administrator"));
-    assertThat(commitInfo.getComment(), is("Update TestView"));
+    assertThat(commitInfo).isNotNull();
+    assertThat(commitInfo.getCommitId()).isEqualTo(COMMIT_ID);
+    assertThat(commitInfo.getAuthor()).isEqualTo("administrator");
+    assertThat(commitInfo.getComment()).isEqualTo("Update TestView");
   }
 
   @Test(expected = OpalGitException.class)
@@ -43,10 +40,10 @@ public class OpalGitCommitLogCommandTest extends AbstractOpalGitCommandTest {
     OpalGitCommitLogCommand command = new OpalGitCommitLogCommand.Builder(
         versionControlSystem.getRepository(DATASOURCE_NAME), "TestView/TOTO_VAR.js", COMMIT_ID).build();
     CommitInfo commitInfo = command.execute();
-    assertThat(commitInfo, not(is(nullValue())));
-    assertThat(commitInfo.getCommitId(), is(COMMIT_ID));
-    assertThat(commitInfo.getAuthor(), is("administrator"));
-    assertThat(commitInfo.getComment(), is("Update TestView"));
+    assertThat(commitInfo).isNotNull();
+    assertThat(commitInfo.getCommitId()).isEqualTo(COMMIT_ID);
+    assertThat(commitInfo.getAuthor()).isEqualTo("administrator");
+    assertThat(commitInfo.getComment()).isEqualTo("Update TestView");
   }
 
   @Test(expected = OpalGitException.class)

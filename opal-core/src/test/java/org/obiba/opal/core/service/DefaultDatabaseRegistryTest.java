@@ -33,18 +33,12 @@ import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 import com.google.common.base.Predicate;
 
-import static com.google.common.collect.Iterables.size;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
 import static org.easymock.EasyMock.verify;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.obiba.opal.core.domain.database.Database.Usage;
 
@@ -80,17 +74,17 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     databaseRegistry.create(database);
 
     List<Database> databases = newArrayList(databaseRegistry.list());
-    assertEquals(1, databases.size());
+    assertThat(databases).hasSize(1);
     assertDatabaseEquals(database, databases.get(0));
 
     Database found = databaseRegistry.getDatabase(database.getName());
     assertDatabaseEquals(database, found);
 
-    assertEquals(1, size(databaseRegistry.list(Usage.IMPORT)));
-    assertEquals(0, size(databaseRegistry.list(Usage.STORAGE)));
-    assertEquals(0, size(databaseRegistry.list(Usage.EXPORT)));
-    assertEquals(1, size(databaseRegistry.listSqlDatabases()));
-    assertEquals(0, size(databaseRegistry.listMongoDatabases()));
+    assertThat(databaseRegistry.list(Usage.IMPORT)).hasSize(1);
+    assertThat(databaseRegistry.list(Usage.STORAGE)).isEmpty();
+    assertThat(databaseRegistry.list(Usage.EXPORT)).isEmpty();
+    assertThat(databaseRegistry.listSqlDatabases()).hasSize(1);
+    assertThat(databaseRegistry.listMongoDatabases()).isEmpty();
   }
 
   @Test
@@ -99,14 +93,14 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     databaseRegistry.create(database);
 
     List<Database> databases = newArrayList(databaseRegistry.list());
-    assertEquals(1, databases.size());
+    assertThat(databases).hasSize(1);
     assertDatabaseEquals(database, databases.get(0));
 
     Database found = databaseRegistry.getDatabase(database.getName());
     assertDatabaseEquals(database, found);
 
-    assertEquals(1, size(databaseRegistry.listMongoDatabases()));
-    assertEquals(0, size(databaseRegistry.listSqlDatabases()));
+    assertThat(databaseRegistry.listMongoDatabases()).hasSize(1);
+    assertThat(databaseRegistry.listSqlDatabases()).isEmpty();
   }
 
   @Test
@@ -115,20 +109,20 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     databaseRegistry.create(database);
 
     database.setUsage(Usage.STORAGE);
-    assertNotNull(database.getSqlSettings());
+    assertThat(database.getSqlSettings()).isNotNull();
     database.getSqlSettings().setUsername("user2");
     database.getSqlSettings().setUrl("url2");
     databaseRegistry.update(database);
 
     List<Database> databases = newArrayList(databaseRegistry.list());
-    assertEquals(1, databases.size());
+    assertThat(databases).hasSize(1);
     assertDatabaseEquals(database, databases.get(0));
 
     Database found = databaseRegistry.getDatabase(database.getName());
     assertDatabaseEquals(database, found);
 
-    assertEquals(1, size(databaseRegistry.listSqlDatabases()));
-    assertEquals(0, size(databaseRegistry.listMongoDatabases()));
+    assertThat(databaseRegistry.listSqlDatabases()).hasSize(1);
+    assertThat(databaseRegistry.listMongoDatabases()).isEmpty();
   }
 
   @Test
@@ -137,20 +131,20 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     databaseRegistry.create(database);
 
     database.setUsage(Usage.STORAGE);
-    assertNotNull(database.getMongoDbSettings());
+    assertThat(database.getMongoDbSettings()).isNotNull();
     database.getMongoDbSettings().setUsername("user2");
     database.getMongoDbSettings().setUrl("url2");
     databaseRegistry.update(database);
 
     List<Database> databases = newArrayList(databaseRegistry.list());
-    assertEquals(1, databases.size());
+    assertThat(databases).hasSize(1);
     assertDatabaseEquals(database, databases.get(0));
 
     Database found = databaseRegistry.getDatabase(database.getName());
     assertDatabaseEquals(database, found);
 
-    assertEquals(1, size(databaseRegistry.listMongoDatabases()));
-    assertEquals(0, size(databaseRegistry.listSqlDatabases()));
+    assertThat(databaseRegistry.listMongoDatabases()).hasSize(1);
+    assertThat(databaseRegistry.listSqlDatabases()).isEmpty();
   }
 
   @Test
@@ -163,11 +157,11 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
       fail("Should throw ConstraintViolationException");
     } catch(ConstraintViolationException e) {
       Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
-      assertThat(violations.size(), is(1));
+      assertThat(violations).hasSize(1);
       ConstraintViolation<?> violation = violations.iterator().next();
-      assertThat(violation.getMessage(), is("must be unique"));
-      assertThat(violation.getMessageTemplate(), is("{org.obiba.opal.core.validator.Unique.message}"));
-      assertThat(violation.getPropertyPath().toString(), is("name"));
+      assertThat(violation.getMessage()).isEqualTo("must be unique");
+      assertThat(violation.getMessageTemplate()).isEqualTo("{org.obiba.opal.core.validator.Unique.message}");
+      assertThat(violation.getPropertyPath().toString()).isEqualTo("name");
     }
   }
 
@@ -183,11 +177,11 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
       fail("Should throw ConstraintViolationException");
     } catch(ConstraintViolationException e) {
       Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
-      assertThat(violations.size(), is(1));
+      assertThat(violations).hasSize(1);
       ConstraintViolation<?> violation = violations.iterator().next();
-      assertThat(violation.getMessage(), is("must be unique"));
-      assertThat(violation.getMessageTemplate(), is("{org.obiba.opal.core.validator.Unique.message}"));
-      assertThat(violation.getPropertyPath().toString(), is("url"));
+      assertThat(violation.getMessage()).isEqualTo("must be unique");
+      assertThat(violation.getMessageTemplate()).isEqualTo("{org.obiba.opal.core.validator.Unique.message}");
+      assertThat(violation.getPropertyPath().toString()).isEqualTo("url");
     }
   }
 
@@ -208,11 +202,11 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
       fail("Should throw ConstraintViolationException");
     } catch(ConstraintViolationException e) {
       Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
-      assertThat(violations.size(), is(1));
+      assertThat(violations).hasSize(1);
       ConstraintViolation<?> violation = violations.iterator().next();
-      assertThat(violation.getMessage(), is("must be unique"));
-      assertThat(violation.getMessageTemplate(), is("{org.obiba.opal.core.validator.Unique.message}"));
-      assertThat(violation.getPropertyPath().toString(), is("url"));
+      assertThat(violation.getMessage()).isEqualTo("must be unique");
+      assertThat(violation.getMessageTemplate()).isEqualTo("{org.obiba.opal.core.validator.Unique.message}");
+      assertThat(violation.getPropertyPath().toString()).isEqualTo("url");
     }
   }
 
@@ -222,14 +216,14 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
         .build();
     databaseRegistry.create(database);
     Database found = databaseRegistry.getIdentifiersDatabase();
-    assertThat(found.isUsedForIdentifiers(), is(true));
-    assertThat(databaseRegistry.hasIdentifiersDatabase(), is(true));
-    assertThat(size(databaseRegistry.list()), is(0));
-    assertThat(size(databaseRegistry.list(Usage.IMPORT)), is(0));
-    assertThat(size(databaseRegistry.list(Usage.STORAGE)), is(0));
-    assertThat(size(databaseRegistry.list(Usage.EXPORT)), is(0));
-    assertThat(size(databaseRegistry.listMongoDatabases()), is(0));
-    assertThat(size(databaseRegistry.listSqlDatabases()), is(0));
+    assertThat(found.isUsedForIdentifiers()).isTrue();
+    assertThat(databaseRegistry.hasIdentifiersDatabase()).isTrue();
+    assertThat(databaseRegistry.list()).isEmpty();
+    assertThat(databaseRegistry.list(Usage.IMPORT)).isEmpty();
+    assertThat(databaseRegistry.list(Usage.STORAGE)).isEmpty();
+    assertThat(databaseRegistry.list(Usage.EXPORT)).isEmpty();
+    assertThat(databaseRegistry.listMongoDatabases()).isEmpty();
+    assertThat(databaseRegistry.listSqlDatabases()).isEmpty();
   }
 
   @Test(expected = IdentifiersDatabaseNotFoundException.class)
@@ -239,7 +233,7 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
 
   @Test
   public void test_has_identifiers_database() {
-    assertFalse(databaseRegistry.hasIdentifiersDatabase());
+    assertThat(databaseRegistry.hasIdentifiersDatabase()).isFalse();
   }
 
   @Test
@@ -248,7 +242,7 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     databaseRegistry.create(database);
     databaseRegistry.delete(database);
 
-    assertEquals(0, size(databaseRegistry.list()));
+    assertThat(databaseRegistry.list()).isEmpty();
   }
 
   @Test(expected = CannotDeleteDatabaseLinkedToDatasourceException.class)
@@ -278,17 +272,17 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   @Test
   public void test_list_sql_databases() {
     databaseRegistry.create(createSqlDatabase());
-    assertEquals(1, size(databaseRegistry.list()));
-    assertEquals(1, size(databaseRegistry.listSqlDatabases()));
-    assertEquals(0, size(databaseRegistry.listMongoDatabases()));
+    assertThat(databaseRegistry.list()).hasSize(1);
+    assertThat(databaseRegistry.listSqlDatabases()).hasSize(1);
+    assertThat(databaseRegistry.listMongoDatabases()).isEmpty();
   }
 
   @Test
   public void test_list_mongo_databases() {
     databaseRegistry.create(createMongoDatabase());
-    assertEquals(1, size(databaseRegistry.list()));
-    assertEquals(0, size(databaseRegistry.listSqlDatabases()));
-    assertEquals(1, size(databaseRegistry.listMongoDatabases()));
+    assertThat(databaseRegistry.list()).hasSize(1);
+    assertThat(databaseRegistry.listSqlDatabases()).isEmpty();
+    assertThat(databaseRegistry.listMongoDatabases()).hasSize(1);
   }
 
   @Test
@@ -302,10 +296,10 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     database2.getSqlSettings().setUrl("new url");
     databaseRegistry.create(database2);
 
-    assertEquals(2, size(databaseRegistry.list()));
+    assertThat(databaseRegistry.list()).hasSize(2);
 
-    assertFalse(databaseRegistry.getDatabase(database.getName()).isDefaultStorage());
-    assertTrue(databaseRegistry.getDatabase(database2.getName()).isDefaultStorage());
+    assertThat(databaseRegistry.getDatabase(database.getName()).isDefaultStorage()).isFalse();
+    assertThat(databaseRegistry.getDatabase(database2.getName()).isDefaultStorage()).isTrue();
   }
 
   @Test
@@ -322,8 +316,8 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     DataSource datasource = databaseRegistry.getDataSource(database.getName(), "jdbc-datasource");
     verify(dataSourceFactory);
 
-    assertEquals(mockDatasource, datasource);
-    assertTrue(databaseRegistry.hasDatasource(database));
+    assertThat(mockDatasource).isEqualTo(datasource);
+    assertThat(databaseRegistry.hasDatasource(database)).isTrue();
   }
 
   @Test
@@ -342,8 +336,8 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     SessionFactory sessionFactory = databaseRegistry.getSessionFactory(database.getName(), "hibernate-datasource");
     verify(sessionFactoryFactory, dataSourceFactory);
 
-    assertEquals(mockSessionFactory, sessionFactory);
-    assertTrue(databaseRegistry.hasDatasource(database));
+    assertThat(mockSessionFactory).isEqualTo(sessionFactory);
+    assertThat(databaseRegistry.hasDatasource(database)).isTrue();
   }
 
   @Test
@@ -362,7 +356,7 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
 
     databaseRegistry.unregister(database.getName(), "jdbc-datasource");
 
-    assertFalse(databaseRegistry.hasDatasource(database));
+    assertThat(databaseRegistry.hasDatasource(database)).isFalse();
   }
 
   private Database createSqlDatabase() {
@@ -394,12 +388,12 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   }
 
   private void assertDatabaseEquals(Database expected, Database found) {
-    assertNotNull(found);
-    assertEquals(expected, found);
-    assertEquals(expected.getName(), found.getName());
-    assertEquals(expected.getUsage(), found.getUsage());
-    assertEquals(expected.isDefaultStorage(), found.isDefaultStorage());
-    assertEquals(expected.isUsedForIdentifiers(), found.isUsedForIdentifiers());
+    assertThat(found).isNotNull();
+    assertThat(expected).isEqualTo(found);
+    assertThat(expected.getName()).isEqualTo(found.getName());
+    assertThat(expected.getUsage()).isEqualTo(found.getUsage());
+    assertThat(expected.isDefaultStorage()).isEqualTo(found.isDefaultStorage());
+    assertThat(expected.isUsedForIdentifiers()).isEqualTo(found.isUsedForIdentifiers());
     if(expected.hasSqlSettings()) {
       assertSqlSettingsEquals(expected.getSqlSettings(), found.getSqlSettings());
     }
@@ -411,14 +405,14 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   }
 
   private void assertSqlSettingsEquals(SqlSettings expected, SqlSettings found) {
-    assertNotNull(expected);
-    assertNotNull(found);
-    assertEquals(expected.getSqlSchema(), found.getSqlSchema());
-    assertEquals(expected.getDriverClass(), found.getDriverClass());
-    assertEquals(expected.getUrl(), found.getUrl());
-    assertEquals(expected.getUsername(), found.getUsername());
-    assertEquals(expected.getPassword(), found.getPassword());
-    assertEquals(expected.getProperties(), found.getProperties());
+    assertThat(expected).isNotNull();
+    assertThat(found).isNotNull();
+    assertThat(expected.getSqlSchema()).isEqualTo(found.getSqlSchema());
+    assertThat(expected.getDriverClass()).isEqualTo(found.getDriverClass());
+    assertThat(expected.getUrl()).isEqualTo(found.getUrl());
+    assertThat(expected.getUsername()).isEqualTo(found.getUsername());
+    assertThat(expected.getPassword()).isEqualTo(found.getPassword());
+    assertThat(expected.getProperties()).isEqualTo(found.getProperties());
 
     //TODO
 //    expected.getJdbcDatasourceSettings()
@@ -426,12 +420,12 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   }
 
   private void assertMongoDbSettingsEquals(MongoDbSettings expected, MongoDbSettings found) {
-    assertNotNull(expected);
-    assertNotNull(found);
-    assertEquals(expected.getUrl(), found.getUrl());
-    assertEquals(expected.getUsername(), found.getUsername());
-    assertEquals(expected.getPassword(), found.getPassword());
-    assertEquals(expected.getProperties(), found.getProperties());
+    assertThat(expected).isNotNull();
+    assertThat(found).isNotNull();
+    assertThat(expected.getUrl()).isEqualTo(found.getUrl());
+    assertThat(expected.getUsername()).isEqualTo(found.getUsername());
+    assertThat(expected.getPassword()).isEqualTo(found.getPassword());
+    assertThat(expected.getProperties()).isEqualTo(found.getProperties());
   }
 
   @Configuration

@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.OpalShell;
 import org.obiba.opal.shell.commands.Command;
+import org.obiba.opal.shell.service.CommandJobService;
 import org.obiba.opal.shell.service.impl.DefaultCommandJobService.FutureCommandJob;
 import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
 
@@ -35,10 +36,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  * Unit tests for {@link DefaultCommandJobService}.
@@ -125,7 +123,7 @@ public class DefaultCommandJobServiceTest {
 
   @Test
   public void testNotRunning() {
-    assertEquals(false, sut.isRunning());
+    assertThat(sut.isRunning()).isFalse();
   }
 
   @Test
@@ -134,7 +132,7 @@ public class DefaultCommandJobServiceTest {
     sut.start();
 
     // Verify
-    assertEquals(true, sut.isRunning());
+    assertThat(sut.isRunning()).isTrue();
   }
 
   @Test
@@ -143,13 +141,13 @@ public class DefaultCommandJobServiceTest {
     sut.stop();
 
     // Verify
-    assertEquals(false, sut.isRunning());
+    assertThat(sut.isRunning()).isFalse();
   }
 
   @Test
   public void testGetCommand() {
     // Test-specific setup
-    DefaultCommandJobService sut = new DefaultCommandJobService() {
+    CommandJobService sut = new DefaultCommandJobService() {
       @Override
       public List<CommandJob> getHistory() {
         return createJobHistory();
@@ -161,14 +159,14 @@ public class DefaultCommandJobServiceTest {
     CommandJob job = sut.getCommand(jobId);
 
     // Verify
-    assertNotNull(job);
-    assertEquals(jobId, job.getId());
+    assertThat(job).isNotNull();
+    assertThat(job.getId()).isEqualTo(jobId);
   }
 
   @Test
   public void testGetCommand_ReturnsNullIfJobDoesNotExist() {
     // Test-specific setup
-    DefaultCommandJobService sut = new DefaultCommandJobService() {
+    CommandJobService sut = new DefaultCommandJobService() {
       @Override
       public List<CommandJob> getHistory() {
         return createJobHistory();
@@ -180,29 +178,25 @@ public class DefaultCommandJobServiceTest {
     CommandJob job = sut.getCommand(bogusJobId);
 
     // Verify
-    assertNull(job);
+    assertThat(job).isNull();
   }
 
   @Test
   public void testLaunchCommand_AssignsIdToCommandJob() {
     sut.launchCommand(commandJob);
-
-    assertNotNull(commandJob.getId());
+    assertThat(commandJob.getId()).isNotNull();
   }
 
   @Test
   public void testLaunchCommand_MakesTheCurrentUserTheOwnerOfTheCommandJob() {
     sut.launchCommand(commandJob);
-
     verify(mockExecutor);
-
-    assertEquals(SecurityUtils.getSubject().getPrincipal().toString(), commandJob.getOwner());
+    assertThat(commandJob.getOwner()).isEqualTo(SecurityUtils.getSubject().getPrincipal().toString());
   }
 
   @Test
   public void testLaunchCommand_ExecutesCommandJob() {
     sut.launchCommand(commandJob);
-
     verify(mockExecutor);
   }
 
@@ -218,11 +212,12 @@ public class DefaultCommandJobServiceTest {
     List<CommandJob> history = sut.getHistory();
 
     // Verify
-    assertNotNull(history);
-    assertEquals(3, history.size());
-    assertEquals((Integer) 3, history.get(0).getId()); // task 3 first, since it was submitted last
-    assertEquals((Integer) 2, history.get(1).getId()); // then task 2
-    assertEquals((Integer) 1, history.get(2).getId()); // then task 1
+    assertThat(history).isNotNull();
+
+    assertThat(history).hasSize(3);
+    assertThat(history.get(0).getId()).isEqualTo(3); // task 3 first, since it was submitted last
+    assertThat(history.get(1).getId()).isEqualTo(2); // then task 2
+    assertThat(history.get(2).getId()).isEqualTo(1); // then task 1
   }
 
   @Test
@@ -234,7 +229,7 @@ public class DefaultCommandJobServiceTest {
     sut.cancelCommand(commandJob.getId());
 
     // Verify
-    assertEquals(Status.CANCEL_PENDING, commandJob.getStatus());
+    assertThat(commandJob.getStatus()).isEqualTo(Status.CANCEL_PENDING);
   }
 
   @Test(expected = IllegalStateException.class)
@@ -307,7 +302,7 @@ public class DefaultCommandJobServiceTest {
     sut.deleteCompletedCommands();
 
     // Verify that all the completed/terminated jobs were removed
-    assertTrue(jobsTerminated.isEmpty());
+    assertThat(jobsTerminated).isEmpty();
   }
 
   @Test
@@ -319,7 +314,7 @@ public class DefaultCommandJobServiceTest {
     boolean isDeletable = sut.isDeletable(commandJob);
 
     // Verify
-    assertEquals(true, isDeletable);
+    assertThat(isDeletable).isTrue();
   }
 
   @Test
@@ -331,7 +326,7 @@ public class DefaultCommandJobServiceTest {
     boolean isDeletable = sut.isDeletable(commandJob);
 
     // Verify
-    assertEquals(true, isDeletable);
+    assertThat(isDeletable).isTrue();
   }
 
   @Test
@@ -343,7 +338,7 @@ public class DefaultCommandJobServiceTest {
     boolean isDeletable = sut.isDeletable(commandJob);
 
     // Verify
-    assertEquals(true, isDeletable);
+    assertThat(isDeletable).isTrue();
   }
 
   @Test
@@ -355,7 +350,7 @@ public class DefaultCommandJobServiceTest {
     boolean isDeletable = sut.isDeletable(commandJob);
 
     // Verify
-    assertEquals(false, isDeletable);
+    assertThat(isDeletable).isFalse();
   }
 
   @Test
@@ -367,7 +362,7 @@ public class DefaultCommandJobServiceTest {
     boolean isDeletable = sut.isDeletable(commandJob);
 
     // Verify
-    assertEquals(false, isDeletable);
+    assertThat(isDeletable).isFalse();
   }
 
   @Test
@@ -379,7 +374,7 @@ public class DefaultCommandJobServiceTest {
     boolean isDeletable = sut.isDeletable(commandJob);
 
     // Verify
-    assertEquals(false, isDeletable);
+    assertThat(isDeletable).isFalse();
   }
 
   //
@@ -449,7 +444,7 @@ public class DefaultCommandJobServiceTest {
 
   }
 
-  static FutureCommandJob eqFutureCommandJob(FutureCommandJob in) {
+  static Runnable eqFutureCommandJob(FutureCommandJob in) {
     EasyMock.reportMatcher(new FutureCommandJobMatcher(in));
     return null;
   }

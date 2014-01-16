@@ -14,10 +14,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class DefaultParticipantIdentifierImplTest {
 
@@ -30,21 +31,21 @@ public class DefaultParticipantIdentifierImplTest {
 
   @Test
   public void testGenerateParticipantIdentifierNotNull() {
-    Assert.assertNotNull(participantIdentifier.generateIdentifier());
+    assertThat(participantIdentifier.generateIdentifier()).isNotNull();
   }
 
   @Test
   public void testGenerateParticipantIdentifierHasCorrectLength() {
-    Assert.assertEquals(10, participantIdentifier.generateIdentifier().length());
+    assertThat(participantIdentifier.generateIdentifier().length()).isEqualTo(10);
   }
 
   @Test
   public void testGenerateParticipantIdentifierDoesntStartWithZero() {
     // Only run test if the instance is configured that way.
-    Assume.assumeTrue(participantIdentifier.isAllowStartWithZero() == false);
+    Assume.assumeFalse(participantIdentifier.isAllowStartWithZero());
     for(int i = 0; i < 10000; i++) { // Generate 10000 ids.
-      Assert.assertTrue("Participant Identifier not expected to start with '0'",
-          participantIdentifier.generateIdentifier().charAt(0) != '0');
+      assertThat(participantIdentifier.generateIdentifier().charAt(0)).isNotEqualTo('0')
+          .overridingErrorMessage("Participant Identifier not expected to start with '0'");
     }
   }
 
@@ -70,8 +71,8 @@ public class DefaultParticipantIdentifierImplTest {
     Set<Entry<Character, Integer>> entries = distributionMap.entrySet();
     for(Entry<Character, Integer> c : entries) {
       // All characters should be used roughly the same number of times
-      Assert.assertTrue("The distribution of [" + c.getKey() + "] has the value [" + c.getValue() + "].",
-          c.getValue() >= 9500 && c.getValue() <= 10500);
+      assertThat(c.getValue() >= 9500 && c.getValue() <= 10500).isTrue()
+          .overridingErrorMessage("The distribution of [" + c.getKey() + "] has the value [" + c.getValue() + "].");
     }
   }
 }

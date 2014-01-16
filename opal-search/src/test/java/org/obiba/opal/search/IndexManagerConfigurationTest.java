@@ -22,8 +22,7 @@ import org.obiba.opal.web.model.Opal;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  *
@@ -64,9 +63,9 @@ public class IndexManagerConfigurationTest {
     Schedule schedule = new Schedule();
     schedule.setType(Opal.ScheduleType.MINUTES_15);
     config.updateSchedule(vt, schedule);
-    assertEquals(Opal.ScheduleType.MINUTES_15, config.getSchedule(vt).getType());
+    assertThat(config.getSchedule(vt).getType()).isEqualTo(Opal.ScheduleType.MINUTES_15);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     // at 00 of each hour
     index = createMock(ValueTableIndex.class);
@@ -76,7 +75,7 @@ public class IndexManagerConfigurationTest {
     EasyMock.replay(index);
 
     config.updateSchedule(vt, schedule);
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     // at 15 of each hour
     index = createMock(ValueTableIndex.class);
@@ -85,7 +84,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     // at 16 of each hour
     index = createMock(ValueTableIndex.class);
@@ -94,7 +93,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     // at 30 of each hour
     index = createMock(ValueTableIndex.class);
@@ -103,7 +102,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     // at 45 of each hour
     index = createMock(ValueTableIndex.class);
@@ -112,7 +111,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     // at 17 of each hour
     index = createMock(ValueTableIndex.class);
@@ -121,7 +120,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(!config.isReadyForIndexing(vt, index));
+    assertThat(!config.isReadyForIndexing(vt, index)).isTrue();
 
     // at 17 of each hour
     index = createMock(ValueTableIndex.class);
@@ -130,13 +129,13 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(!config.isReadyForIndexing(vt, index));
+    assertThat(!config.isReadyForIndexing(vt, index)).isTrue();
 
     // MINUTES_5
     schedule = new Schedule();
     schedule.setType(Opal.ScheduleType.MINUTES_5);
     config.updateSchedule(vt, schedule);
-    assertEquals(Opal.ScheduleType.MINUTES_5, config.getSchedule(vt).getType());
+    assertThat(config.getSchedule(vt).getType()).isEqualTo(Opal.ScheduleType.MINUTES_5);
 
     index = createMock(ValueTableIndex.class);
     now.set(2012, Calendar.NOVEMBER, 20, 10, 0);
@@ -144,7 +143,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     index = createMock(ValueTableIndex.class);
     now.set(2012, Calendar.NOVEMBER, 20, 10, 1);
@@ -152,7 +151,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     index = createMock(ValueTableIndex.class);
     now.set(2012, Calendar.NOVEMBER, 20, 10, 2);
@@ -160,7 +159,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(!config.isReadyForIndexing(vt, index));
+    assertThat(!config.isReadyForIndexing(vt, index)).isTrue();
 
     index = createMock(ValueTableIndex.class);
     now.set(2012, Calendar.NOVEMBER, 20, 10, 5);
@@ -168,7 +167,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     index = createMock(ValueTableIndex.class);
     now.set(2012, Calendar.NOVEMBER, 20, 10, 10);
@@ -176,7 +175,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     index = createMock(ValueTableIndex.class);
     now.set(2012, Calendar.NOVEMBER, 20, 10, 15);
@@ -184,7 +183,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     index = createMock(ValueTableIndex.class);
     now.set(2012, Calendar.NOVEMBER, 20, 10, 20);
@@ -192,7 +191,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     index = createMock(ValueTableIndex.class);
     now.set(2012, Calendar.NOVEMBER, 20, 10, 25);
@@ -200,7 +199,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     index = createMock(ValueTableIndex.class);
     now.set(2012, Calendar.NOVEMBER, 20, 10, 30);
@@ -208,7 +207,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     index = createMock(ValueTableIndex.class);
     now.set(2012, Calendar.NOVEMBER, 20, 10, 35);
@@ -216,7 +215,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     index = createMock(ValueTableIndex.class);
     now.set(2012, Calendar.NOVEMBER, 20, 10, 40);
@@ -224,7 +223,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     index = createMock(ValueTableIndex.class);
     now.set(2012, Calendar.NOVEMBER, 20, 10, 45);
@@ -232,7 +231,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     index = createMock(ValueTableIndex.class);
     now.set(2012, Calendar.NOVEMBER, 20, 10, 50);
@@ -240,7 +239,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     index = createMock(ValueTableIndex.class);
     now.set(2012, Calendar.NOVEMBER, 20, 10, 55);
@@ -248,7 +247,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
   }
 
   @Test
@@ -275,7 +274,7 @@ public class IndexManagerConfigurationTest {
     schedule.setType(Opal.ScheduleType.HOURLY);
     schedule.setMinutes(0);
     config.updateSchedule(vt, schedule);
-    assertEquals(Opal.ScheduleType.HOURLY, config.getSchedule(vt).getType());
+    assertThat(config.getSchedule(vt).getType()).isEqualTo(Opal.ScheduleType.HOURLY);
 
     // at 00 of each hour
     index = createMock(ValueTableIndex.class);
@@ -284,7 +283,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     // at 00 of each hour
     index = createMock(ValueTableIndex.class);
@@ -293,7 +292,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     // at 01 of each hour
     index = createMock(ValueTableIndex.class);
@@ -302,7 +301,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     // at 02 of each hour
     index = createMock(ValueTableIndex.class);
@@ -311,7 +310,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(!config.isReadyForIndexing(vt, index));
+    assertThat(!config.isReadyForIndexing(vt, index)).isTrue();
 
     // at 59 of each hour
     index = createMock(ValueTableIndex.class);
@@ -320,7 +319,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(!config.isReadyForIndexing(vt, index));
+    assertThat(!config.isReadyForIndexing(vt, index)).isTrue();
   }
 
   @Test
@@ -349,9 +348,9 @@ public class IndexManagerConfigurationTest {
     schedule.setMinutes(0);
 
     config.updateSchedule(vt, schedule);
-    assertEquals(Opal.ScheduleType.DAILY, config.getSchedule(vt).getType());
-    assertEquals((Integer) 12, config.getSchedule(vt).getHours());
-    assertEquals((Integer) 0, config.getSchedule(vt).getMinutes());
+    assertThat(config.getSchedule(vt).getType()).isEqualTo(Opal.ScheduleType.DAILY);
+    assertThat(config.getSchedule(vt).getHours()).isEqualTo(12);
+    assertThat(config.getSchedule(vt).getMinutes()).isEqualTo(0);
 
     // at everyday noon
     index = createMock(ValueTableIndex.class);
@@ -360,7 +359,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     // at everyday noon
     index = createMock(ValueTableIndex.class);
@@ -369,7 +368,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     // at everyday noon
     index = createMock(ValueTableIndex.class);
@@ -378,7 +377,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     // at everyday noon
     index = createMock(ValueTableIndex.class);
@@ -387,7 +386,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     // at everyday noon
     index = createMock(ValueTableIndex.class);
@@ -396,7 +395,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     // at everyday noon
     index = createMock(ValueTableIndex.class);
@@ -405,7 +404,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(!config.isReadyForIndexing(vt, index));
+    assertThat(!config.isReadyForIndexing(vt, index)).isTrue();
 
     // at everyday noon
     index = createMock(ValueTableIndex.class);
@@ -414,7 +413,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(!config.isReadyForIndexing(vt, index));
+    assertThat(!config.isReadyForIndexing(vt, index)).isTrue();
 
   }
 
@@ -445,16 +444,16 @@ public class IndexManagerConfigurationTest {
     schedule.setMinutes(15);
 
     config.updateSchedule(vt, schedule);
-    assertEquals(Opal.ScheduleType.WEEKLY, config.getSchedule(vt).getType());
-    assertEquals(Calendar.FRIDAY, config.getSchedule(vt).getDay().getNumber());
-    assertEquals(Calendar.SUNDAY, Opal.Day.SUNDAY.getNumber());
-    assertEquals(Calendar.MONDAY, Opal.Day.MONDAY.getNumber());
-    assertEquals(Calendar.TUESDAY, Opal.Day.TUESDAY.getNumber());
-    assertEquals(Calendar.WEDNESDAY, Opal.Day.WEDNESDAY.getNumber());
-    assertEquals(Calendar.THURSDAY, Opal.Day.THURSDAY.getNumber());
-    assertEquals(Calendar.SATURDAY, Opal.Day.SATURDAY.getNumber());
-    assertEquals((Integer) 9, config.getSchedule(vt).getHours());
-    assertEquals((Integer) 15, config.getSchedule(vt).getMinutes());
+    assertThat(config.getSchedule(vt).getType()).isEqualTo(Opal.ScheduleType.WEEKLY);
+    assertThat(config.getSchedule(vt).getDay().getNumber()).isEqualTo(Calendar.FRIDAY);
+    assertThat(Opal.Day.SUNDAY.getNumber()).isEqualTo(Calendar.SUNDAY);
+    assertThat(Opal.Day.MONDAY.getNumber()).isEqualTo(Calendar.MONDAY);
+    assertThat(Opal.Day.TUESDAY.getNumber()).isEqualTo(Calendar.TUESDAY);
+    assertThat(Opal.Day.WEDNESDAY.getNumber()).isEqualTo(Calendar.WEDNESDAY);
+    assertThat(Opal.Day.THURSDAY.getNumber()).isEqualTo(Calendar.THURSDAY);
+    assertThat(Opal.Day.SATURDAY.getNumber()).isEqualTo(Calendar.SATURDAY);
+    assertThat(config.getSchedule(vt).getHours()).isEqualTo(9);
+    assertThat(config.getSchedule(vt).getMinutes()).isEqualTo(15);
 
     // at Friday at 9:15
     index = createMock(ValueTableIndex.class);
@@ -463,7 +462,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(!config.isReadyForIndexing(vt, index));
+    assertThat(!config.isReadyForIndexing(vt, index)).isTrue();
 
     // at Friday at 9:15
     index = createMock(ValueTableIndex.class);
@@ -472,7 +471,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(!config.isReadyForIndexing(vt, index));
+    assertThat(!config.isReadyForIndexing(vt, index)).isTrue();
 
     // at Friday at 9:15
     index = createMock(ValueTableIndex.class);
@@ -481,7 +480,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(!config.isReadyForIndexing(vt, index));
+    assertThat(!config.isReadyForIndexing(vt, index)).isTrue();
 
     // at Friday at 9:15
     index = createMock(ValueTableIndex.class);
@@ -490,7 +489,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
     // at Friday at 9:15
     index = createMock(ValueTableIndex.class);
@@ -499,7 +498,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(!config.isReadyForIndexing(vt, index));
+    assertThat(!config.isReadyForIndexing(vt, index)).isTrue();
 
     // at Friday at 9:15
     index = createMock(ValueTableIndex.class);
@@ -508,7 +507,7 @@ public class IndexManagerConfigurationTest {
     expect(index.now()).andReturn(now).atLeastOnce();
     EasyMock.replay(index);
 
-    assertTrue(config.isReadyForIndexing(vt, index));
+    assertThat(config.isReadyForIndexing(vt, index)).isTrue();
 
   }
 }

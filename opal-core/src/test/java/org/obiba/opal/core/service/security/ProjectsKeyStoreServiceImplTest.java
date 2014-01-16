@@ -20,8 +20,6 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.easymock.EasyMock;
-import org.hamcrest.core.IsNull;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.core.util.FileUtil;
@@ -34,8 +32,7 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  * Unit tests for {@link KeyStoreServiceImpl}.
@@ -76,8 +73,8 @@ public class ProjectsKeyStoreServiceImplTest {
     OpalKeyStore opalKeyStore = projectsKeyStoreService.getKeyStore(project);
     verify(mockOrientDbService);
 
-    assertThat(opalKeyStore, IsNull.notNullValue());
-    assertThat(opalKeyStore.getName(), is(state.getName()));
+    assertThat(opalKeyStore).isNotNull();
+    assertThat(opalKeyStore.getName()).isEqualTo(state.getName());
   }
 
   @Test
@@ -98,7 +95,7 @@ public class ProjectsKeyStoreServiceImplTest {
 
     verify(mockOrientDbService);
 
-    Assert.assertNotNull(opalKeyStore);
+    assertThat(opalKeyStore).isNotNull();
   }
 
   //
@@ -120,26 +117,19 @@ public class ProjectsKeyStoreServiceImplTest {
 
   private byte[] getTestKeyStoreByteArray() throws IOException {
 
-    byte[] barray;
-    ByteArrayOutputStream baos = null;
-    InputStream testKeyStoreStream = null;
-    try {
-      baos = new ByteArrayOutputStream();
+    try(ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        InputStream testKeyStoreStream = new FileInputStream(
+            FileUtil.getFileFromResource("DefaultUnitKeyStoreServiceImplTest/opal.jks"))
+    ) {
 
-      testKeyStoreStream = new FileInputStream(
-          FileUtil.getFileFromResource("DefaultUnitKeyStoreServiceImplTest/opal.jks"));
       while(testKeyStoreStream.available() != 0) {
         byte[] buf = new byte[1024];
         int bytesRead = testKeyStoreStream.read(buf);
         baos.write(buf, 0, bytesRead);
       }
 
-      barray = baos.toByteArray();
-    } finally {
-      if(baos != null) baos.close();
-      if(testKeyStoreStream != null) testKeyStoreStream.close();
+      return baos.toByteArray();
     }
-    return barray;
 
   }
 

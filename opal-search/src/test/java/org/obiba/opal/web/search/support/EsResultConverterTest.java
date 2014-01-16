@@ -13,10 +13,11 @@ import java.util.List;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.web.model.Search;
+
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class EsResultConverterTest {
 
@@ -71,32 +72,31 @@ public class EsResultConverterTest {
   }
 
   private void validateCategoricalQueryResultDto(Search.QueryResultDto dtoResult) {
-    Assert.assertNotNull(dtoResult);
+    assertThat(dtoResult).isNotNull();
 
     Search.FacetResultDto dtoFacetResult = dtoResult.getFacets(0);
-    Assert.assertNotNull(dtoFacetResult);
-    Assert.assertEquals(dtoQuery.getFacet(), dtoFacetResult.getFacet());
+    assertThat(dtoFacetResult).isNotNull();
+    assertThat(dtoQuery.getFacet()).isEqualTo(dtoFacetResult.getFacet());
 
     List<Search.FacetResultDto.TermFrequencyResultDto> listTermDto = dtoFacetResult.getFrequenciesList();
-
-    Assert.assertNotNull(listTermDto);
+    assertThat(listTermDto).isNotNull();
 
     Search.FacetResultDto.StatisticalResultDto statistics = dtoFacetResult.getStatistics();
-    Assert.assertFalse(statistics.hasCount());
+    assertThat(statistics.hasCount()).isFalse();
   }
 
   private void validateStatisticalQueryResultDto(Search.QueryResultDto dtoResult) {
-    Assert.assertNotNull(dtoResult);
+    assertThat(dtoResult).isNotNull();
 
     Search.FacetResultDto dtoFacetResult = dtoResult.getFacets(0);
-    Assert.assertNotNull(dtoFacetResult);
-    Assert.assertEquals(dtoQuery.getFacet(), dtoFacetResult.getFacet());
+    assertThat(dtoFacetResult).isNotNull();
+    assertThat(dtoQuery.getFacet()).isEqualTo(dtoFacetResult.getFacet());
 
     Search.FacetResultDto.StatisticalResultDto dtoStatistical = dtoFacetResult.getStatistics();
-    Assert.assertNotNull(dtoStatistical);
-    Assert.assertTrue(dtoStatistical.hasCount());
+    assertThat(dtoStatistical).isNotNull();
+    assertThat(dtoStatistical.hasCount()).isTrue();
 
     List<Search.FacetResultDto.TermFrequencyResultDto> listTermDto = dtoFacetResult.getFrequenciesList();
-    Assert.assertTrue(listTermDto.isEmpty());
+    assertThat(listTermDto).isEmpty();
   }
 }

@@ -43,7 +43,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class ReportTemplateResourceTest {
 
@@ -93,10 +93,10 @@ public class ReportTemplateResourceTest {
     Response response = reportTemplateResource.get();
     ThreadContext.unbindSubject();
 
-    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
 
     ReportTemplateDto reportTemplateDto = (ReportTemplateDto) response.getEntity();
-    assertEquals("template3", reportTemplateDto.getName());
+    assertThat(reportTemplateDto.getName()).isEqualTo("template3");
 
     verify(opalRuntimeMock, opalConfigurationServiceMock, mockSubject);
 
@@ -112,7 +112,7 @@ public class ReportTemplateResourceTest {
     reportTemplateResource.setConfigService(opalConfigurationServiceMock);
 
     Response response = reportTemplateResource.get();
-    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode());
 
     verify(opalRuntimeMock, opalConfigurationServiceMock);
   }
@@ -140,7 +140,7 @@ public class ReportTemplateResourceTest {
     Response response = reportTemplateResource.deleteReportTemplate();
     ThreadContext.unbindSubject();
 
-    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
 
     // Assert.assertTrue(opalConfiguration.getReportTemplate("template2") == null);
 
@@ -158,7 +158,7 @@ public class ReportTemplateResourceTest {
     reportTemplateResource.setConfigService(opalConfigurationServiceMock);
 
     Response response = reportTemplateResource.deleteReportTemplate();
-    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode());
 
     verify(opalRuntimeMock, opalConfigurationServiceMock);
   }
@@ -189,8 +189,8 @@ public class ReportTemplateResourceTest {
 
     Response response = reportTemplateResource.updateReportTemplate(Dtos.asDto(getReportTemplate("template9")));
 
-    assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-    assertEquals(BASE_URI, response.getMetadata().get("location").get(0).toString());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
+    assertThat(response.getMetadata().get("location").get(0).toString()).isEqualTo(BASE_URI);
 
     verify(opalRuntimeMock, opalConfigurationServiceMock, uriInfoMock, commandSchedulerServiceMock);
   }
@@ -213,7 +213,7 @@ public class ReportTemplateResourceTest {
 
     Response response = reportTemplateResource.updateReportTemplate(Dtos.asDto(getReportTemplate("template1")));
 
-    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
 
     verify(opalRuntimeMock, opalConfigurationServiceMock, commandSchedulerServiceMock);
 
@@ -230,8 +230,8 @@ public class ReportTemplateResourceTest {
 
     Response response = reportTemplateResource.updateReportTemplate(Dtos.asDto(getReportTemplate("template2")));
 
-    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-    assertEquals("CouldNotUpdateTheReportTemplate", ((ClientErrorDto) response.getEntity()).getStatus());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
+    assertThat(((ClientErrorDto) response.getEntity()).getStatus()).isEqualTo("CouldNotUpdateTheReportTemplate");
 
     verify(opalRuntimeMock, opalConfigurationServiceMock);
   }

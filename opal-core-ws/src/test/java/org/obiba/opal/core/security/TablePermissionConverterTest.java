@@ -9,24 +9,23 @@
  */
 package org.obiba.opal.core.security;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  *
  */
-public class TablePermissionConverterTest
-    extends OpalPermissionConverterTest<TablePermissionConverter.Permission> {
+public class TablePermissionConverterTest extends OpalPermissionConverterTest<TablePermissionConverter.Permission> {
 
   @Test
   public void testArgs() {
     String[] args = DomainPermissionConverter.args("/datasource/patate/table/pwel", "/datasource/(.+)/table/(.+)");
-    Assert.assertNotNull(args);
-    Assert.assertEquals(2, args.length);
-    Assert.assertEquals("patate", args[0]);
-    Assert.assertEquals("pwel", args[1]);
+    assertThat(args).isNotNull();
+    assertThat(args.length).isEqualTo(2);
+    assertThat(args[0]).isEqualTo("patate");
+    assertThat(args[1]).isEqualTo("pwel");
   }
-
 
   @Test
   public void testTableAll() {

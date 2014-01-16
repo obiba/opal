@@ -23,7 +23,6 @@ import org.apache.shiro.session.mgt.SessionKey;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.easymock.EasyMock;
 import org.easymock.IArgumentMatcher;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -32,6 +31,7 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class SecurityResourceTest {
 
@@ -60,13 +60,13 @@ public class SecurityResourceTest {
   public void testLogin() throws FileSystemException {
     mockRealm.addAccount("administrator", "password");
     Response response = securityResource.createSession(mockHttpServletRequest(), "administrator", "password");
-    Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
   }
 
   @Test
   public void testLoginBadCredentials() throws FileSystemException {
     Response response = securityResource.createSession(mockHttpServletRequest(), "admninistrator", "password");
-    Assert.assertEquals(Status.FORBIDDEN.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Status.FORBIDDEN.getStatusCode());
   }
 
   @Test
@@ -78,7 +78,7 @@ public class SecurityResourceTest {
     replay(sessionManager);
 
     Response response = securityResource.checkSession(TEST_SESSION_ID);
-    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
 
     verify(sessionManager);
   }
@@ -90,7 +90,7 @@ public class SecurityResourceTest {
     replay(sessionManager);
 
     Response response = securityResource.checkSession(TEST_SESSION_ID);
-    Assert.assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 
     verify(sessionManager);
   }
@@ -102,7 +102,7 @@ public class SecurityResourceTest {
     replay(sessionManager);
 
     Response response = securityResource.checkSession(TEST_SESSION_ID);
-    Assert.assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 
     verify(sessionManager);
   }
@@ -110,7 +110,7 @@ public class SecurityResourceTest {
   @Test
   public void testDeleteSession() {
     Response response = securityResource.deleteSession();
-    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
   }
 
   private HttpServletRequest mockHttpServletRequest() {

@@ -37,9 +37,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  * Unit tests for {@link WebShellResource}.
@@ -80,10 +78,10 @@ public class WebShellResourceTest {
 
     // Verify that the HTTP response code was OK (200) and that the body contains
     // the CommandStateDto of the specified task.
-    assertNotNull(response);
-    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    assertNotNull(response.getEntity());
-    assertTrue(containsDtoForJob(response, job));
+    assertThat(response).isNotNull();
+    assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+    assertThat(response.getEntity()).isNotNull();
+    assertThat(containsDtoForJob(response, job)).isTrue();
   }
 
   @Test
@@ -105,7 +103,7 @@ public class WebShellResourceTest {
     verify(mockCommandJobService);
 
     // Verify that the HTTP response code was NOT FOUND (404).
-    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode());
   }
 
   @Test
@@ -129,10 +127,10 @@ public class WebShellResourceTest {
 
     // Verify that the HTTP response code was OK (200) and that the body contains
     // the status of the specified task.
-    assertNotNull(response);
-    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    assertNotNull(response.getEntity());
-    assertEquals(job.getStatus().toString(), response.getEntity());
+    assertThat(response).isNotNull();
+    assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+    assertThat(response.getEntity()).isNotNull();
+    assertThat(response.getEntity()).isEqualTo(job.getStatus().toString());
   }
 
   @Test
@@ -154,7 +152,7 @@ public class WebShellResourceTest {
     verify(mockCommandJobService);
 
     // Verify that the HTTP response code was NOT FOUND (404).
-    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode());
   }
 
   @Test
@@ -177,7 +175,7 @@ public class WebShellResourceTest {
     verify(mockCommandJobService);
 
     // Verify that the HTTP response code was OK (200).
-    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
   }
 
   @Test
@@ -200,7 +198,7 @@ public class WebShellResourceTest {
     verify(mockCommandJobService);
 
     // Verify that the HTTP response code was NOT FOUND (404).
-    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode());
   }
 
   @Test
@@ -223,7 +221,7 @@ public class WebShellResourceTest {
     verify(mockCommandJobService);
 
     // Verify that the HTTP response code was BAD REQUEST (400).
-    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
   }
 
   @Test
@@ -236,7 +234,7 @@ public class WebShellResourceTest {
     Response response = sut.setCommandStatus(jobId, Status.SUCCEEDED.toString());
 
     // Verify that the HTTP response code was BAD REQUEST (400).
-    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
   }
 
   @Test
@@ -259,7 +257,7 @@ public class WebShellResourceTest {
     verify(mockCommandJobService);
 
     // Verify that the HTTP response code was OK (200).
-    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
   }
 
   @Test
@@ -282,7 +280,7 @@ public class WebShellResourceTest {
     verify(mockCommandJobService);
 
     // Verify that the HTTP response code was NOT FOUND (404).
-    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode());
   }
 
   @Test
@@ -305,7 +303,7 @@ public class WebShellResourceTest {
     verify(mockCommandJobService);
 
     // Verify that the HTTP response code was BAD REQUEST (400).
-    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
   }
 
   @Test
@@ -327,7 +325,7 @@ public class WebShellResourceTest {
     verify(mockCommandJobService);
 
     // Verify that the HTTP response code was OK (200).
-    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
   }
 
   @Test
@@ -358,12 +356,12 @@ public class WebShellResourceTest {
 
     // Verify that the options in the dto were applied to the launched command
     ReportCommandOptions importOptions = reportCommand.getOptions();
-    assertEquals(optionsDto.getName(), importOptions.getName());
+    assertThat(optionsDto.getName()).isEqualTo(importOptions.getName());
 
     // Verify that the HTTP response code was CREATED (201) and that the "Location"
     // header was set to '/shell/command/{jobId}'.
-    assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-    assertEquals("/shell/command/" + jobId, response.getMetadata().getFirst("Location").toString());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
+    assertThat(response.getMetadata().getFirst("Location").toString()).isEqualTo("/shell/command/" + jobId);
   }
 
   //
@@ -387,20 +385,20 @@ public class WebShellResourceTest {
     verify(mockCommandJobService);
 
     // Verify state
-    assertNotNull(commandStateDtoList);
+    assertThat(commandStateDtoList).isNotNull();
     assertDtoListMatchesJobList(commandStateDtoList, commandJobList);
   }
 
   private void assertDtoListMatchesJobList(List<CommandStateDto> dtoList, List<CommandJob> jobList) {
-    assertEquals(jobList.size(), dtoList.size());
+    assertThat(jobList.size()).isEqualTo(dtoList.size());
 
     for(int i = 0; i < dtoList.size(); i++) {
       CommandStateDto dto = dtoList.get(i);
       CommandJob job = jobList.get(i);
 
-      assertEquals(job.getCommand().getName(), dto.getCommand());
-      assertEquals(job.getOwner(), dto.getOwner());
-      assertEquals(job.getStatus().toString(), dto.getStatus());
+      assertThat(job.getCommand().getName()).isEqualTo(dto.getCommand());
+      assertThat(job.getOwner()).isEqualTo(dto.getOwner());
+      assertThat(job.getStatus().toString()).isEqualTo(dto.getStatus());
     }
   }
 

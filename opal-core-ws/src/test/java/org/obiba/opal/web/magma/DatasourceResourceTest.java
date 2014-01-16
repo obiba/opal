@@ -74,10 +74,7 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  *
@@ -98,9 +95,9 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     DatasourcesResource resource = new DatasourcesResource();
 
     List<Magma.DatasourceDto> dtos = resource.getDatasources();
-    assertEquals(2, dtos.size());
-    assertEquals(DATASOURCE1, dtos.get(0).getName());
-    assertEquals(DATASOURCE2, dtos.get(1).getName());
+    assertThat(dtos).hasSize(2);
+    assertThat(dtos.get(0).getName()).isEqualTo(DATASOURCE1);
+    assertThat(dtos.get(1).getName()).isEqualTo(DATASOURCE2);
   }
 
   private DatasourceResource createDatasource(String name, ApplicationContext mockContext) {
@@ -181,7 +178,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     resource.setName("datasourceNotExist");
     Response response = resource.removeDatasource();
 
-    assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
   }
 
   @Test
@@ -205,18 +202,15 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     replay(projectMock, projectServiceMock, projectKeyStoreServiceMock);
     Response response = resource.createDatasource(factoryDto);
-    assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
 
     Object entity = response.getEntity();
-    assertNotNull(entity);
-    try {
-      Magma.DatasourceDto dto = (Magma.DatasourceDto) entity;
-      assertTrue(MagmaEngine.get().hasTransientDatasource(dto.getName()));
-      assertNotNull(response.getMetadata().get("Location"));
-      assertEquals("[" + "/datasource/" + dto.getName() + "]", response.getMetadata().get("Location").toString());
-    } catch(Exception e) {
-      assertFalse(true);
-    }
+    assertThat(entity).isNotNull();
+
+    Magma.DatasourceDto dto = (Magma.DatasourceDto) entity;
+    assertThat(MagmaEngine.get().hasTransientDatasource(dto.getName())).isTrue();
+    assertThat(response.getMetadata().get("Location")).isNotNull();
+    assertThat(response.getMetadata().get("Location").toString()).isEqualTo("[" + "/datasource/" + dto.getName() + "]");
 
     verify(projectMock, projectServiceMock, projectKeyStoreServiceMock);
   }
@@ -233,8 +227,8 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     Magma.DatasourceDto dto = (Magma.DatasourceDto) resource.get(null).getEntity();
 
-    assertNotNull(dto);
-    assertEquals(uid, dto.getName());
+    assertThat(dto).isNotNull();
+    assertThat(dto.getName()).isEqualTo(uid);
   }
 
   @Test
@@ -249,11 +243,11 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     Response response = resource.removeDatasource();
 
-    assertEquals(Status.OK.getStatusCode(), response.getStatus());
-    assertFalse(MagmaEngine.get().hasTransientDatasource(uid));
+    assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
+    assertThat((MagmaEngine.get().hasTransientDatasource(uid))).isFalse();
 
     response = resource.removeDatasource();
-    assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
   }
 
   @Test
@@ -262,12 +256,12 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     Magma.DatasourceDto dto = (Magma.DatasourceDto) resource.get(null).getEntity();
 
-    assertNotNull(dto);
-    assertEquals(DATASOURCE1, dto.getName());
+    assertThat(dto).isNotNull();
+    assertThat(dto.getName()).isEqualTo(DATASOURCE1);
     List<String> tableNames = dto.getTableList();
-    assertEquals(2, tableNames.size());
-    assertEquals("CIPreliminaryQuestionnaire", tableNames.get(0));
-    assertEquals("StandingHeight", tableNames.get(1));
+    assertThat(tableNames).hasSize(2);
+    assertThat(tableNames.get(0)).isEqualTo("CIPreliminaryQuestionnaire");
+    assertThat(tableNames.get(1)).isEqualTo("StandingHeight");
   }
 
   @Test
@@ -297,8 +291,9 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     DatasourceResource datasourceResource = createDatasource(datasourceMock.getName(), mockContext);
     Response response = datasourceResource.getTables().createTable(createTableDto());
 
-    assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
-    assertEquals("/datasource/testDatasource/table/table", response.getMetadata().getFirst("Location").toString());
+    assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
+    assertThat(response.getMetadata().getFirst("Location").toString())
+        .isEqualTo("/datasource/testDatasource/table/table");
 
     MagmaEngine.get().removeDatasource(datasourceMock);
 
@@ -326,8 +321,8 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     DatasourceResource datasourceResource = createDatasource(datasourceMock.getName(), mockContext);
     Response response = datasourceResource.getTables().createTable(createTableDto());
 
-    assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-    assertEquals("TableAlreadyExists", ((ClientErrorDto) response.getEntity()).getStatus());
+    assertThat(response.getStatus()).isEqualTo(Status.BAD_REQUEST.getStatusCode());
+    assertThat(((ClientErrorDto) response.getEntity()).getStatus()).isEqualTo("TableAlreadyExists");
 
     MagmaEngine.get().removeDatasource(datasourceMock);
 
@@ -377,7 +372,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     MagmaEngine.get().removeDatasource(mockDatasource);
 
     // Verify state
-    assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
 
     // Verify behaviour
     verify(mockViewManager, uriInfoMock);
@@ -433,7 +428,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     MagmaEngine.get().removeDatasource(mockDatasource);
 
     // Verify state
-    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
 
     // Verify behaviour
     verify(mockViewManager, mockContext);
@@ -477,7 +472,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     verify(mockViewManager, mockContext);
 
     // Verify state
-    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
   }
 
   @Test
@@ -508,7 +503,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     verify(mockViewManager, mockContext);
 
     // Verify state
-    assertEquals(viewName, ((AbstractValueTableResource) viewResource).getValueTable().getName());
+    assertThat(viewName).isEqualTo(((AbstractValueTableResource) viewResource).getValueTable().getName());
   }
 
   @Test(expected = NoSuchValueTableException.class)
@@ -542,11 +537,11 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     Iterable<LocaleDto> localeDtos = sut.getLocales(displayLocaleName);
 
     // Verify
-    assertNotNull(localeDtos);
+    assertThat(localeDtos).isNotNull();
     ImmutableList<LocaleDto> localeDtoList = ImmutableList.copyOf(localeDtos);
-    assertEquals(2, localeDtoList.size());
-    assertEqualsLocaleDto(localeDtoList, "en", displayLocaleName);
-    assertEqualsLocaleDto(localeDtoList, "fr", displayLocaleName);
+    assertThat(localeDtoList).hasSize(2);
+    assertThatLocaleDto(localeDtoList, "en", displayLocaleName);
+    assertThatLocaleDto(localeDtoList, "fr", displayLocaleName);
   }
 
   @Test
@@ -558,11 +553,11 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     Iterable<LocaleDto> localeDtos = sut.getLocales(null);
 
     // Verify
-    assertNotNull(localeDtos);
+    assertThat(localeDtos).isNotNull();
     ImmutableList<LocaleDto> localeDtoList = ImmutableList.copyOf(localeDtos);
-    assertEquals(2, localeDtoList.size());
-    assertEqualsLocaleDto(localeDtoList, "en", null);
-    assertEqualsLocaleDto(localeDtoList, "fr", null);
+    assertThat(localeDtoList).hasSize(2);
+    assertThatLocaleDto(localeDtoList, "en", null);
+    assertThatLocaleDto(localeDtoList, "fr", null);
   }
 
   private DatasourceFactoryRegistry newDatasourceFactoryRegistry() {
@@ -589,20 +584,20 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     return builder.build();
   }
 
-  private void assertEqualsLocaleDto(Iterable<LocaleDto> localeDto, String localeName, String displayLocaleName) {
+  private void assertThatLocaleDto(Iterable<LocaleDto> localeDto, String localeName, String displayLocaleName) {
     boolean found = false;
     for(LocaleDto dto : localeDto) {
       if(dto.getName().equals(localeName)) {
         found = true;
-        assertEquals(displayLocaleName != null, dto.hasDisplay());
+        assertThat(dto.hasDisplay()).isEqualTo(displayLocaleName != null);
         if(dto.hasDisplay()) {
-          assertEquals(new Locale(localeName).getDisplayName(new Locale(displayLocaleName)), dto.getDisplay());
+          assertThat(new Locale(localeName).getDisplayName(new Locale(displayLocaleName))).isEqualTo(dto.getDisplay());
         }
 
         break;
       }
     }
-    assertTrue(found);
+    assertThat(found).isTrue();
   }
 
   //

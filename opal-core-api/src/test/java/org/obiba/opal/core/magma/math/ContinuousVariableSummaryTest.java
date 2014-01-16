@@ -31,8 +31,7 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  *
@@ -54,10 +53,10 @@ public class ContinuousVariableSummaryTest {
     Variable mockVariable = Variable.Builder.newVariable("mock", IntegerType.get(), "mock").build();
     ContinuousVariableSummary summary = computeFromTable(mockVariable, Values.asValues(IntegerType.get(), 1, 2, 3));
     DescriptiveStatistics descriptiveStats = summary.getDescriptiveStats();
-    assertThat(descriptiveStats.getMin(), is(1.0));
-    assertThat(descriptiveStats.getMax(), is(3.0));
-    assertThat(descriptiveStats.getMean(), is(2.0));
-    assertThat(descriptiveStats.getN(), is(3l));
+    assertThat(descriptiveStats.getMin()).isEqualTo(1.0);
+    assertThat(descriptiveStats.getMax()).isEqualTo(3.0);
+    assertThat(descriptiveStats.getMean()).isEqualTo(2.0);
+    assertThat(descriptiveStats.getN()).isEqualTo(3l);
   }
 
   @Test
@@ -66,10 +65,10 @@ public class ContinuousVariableSummaryTest {
     ContinuousVariableSummary summary = computeFromTable(mockVariable,
         Values.asValues(IntegerType.get(), 1, 2, 3, null, null));
     DescriptiveStatistics descriptiveStats = summary.getDescriptiveStats();
-    assertThat(descriptiveStats.getMin(), is(1.0));
-    assertThat(descriptiveStats.getMax(), is(3.0));
-    assertThat(descriptiveStats.getMean(), is(2.0));
-    assertThat(descriptiveStats.getN(), is(3l));
+    assertThat(descriptiveStats.getMin()).isEqualTo(1.0);
+    assertThat(descriptiveStats.getMax()).isEqualTo(3.0);
+    assertThat(descriptiveStats.getMean()).isEqualTo(2.0);
+    assertThat(descriptiveStats.getN()).isEqualTo(3l);
   }
 
   @Test
@@ -79,10 +78,10 @@ public class ContinuousVariableSummaryTest {
     ContinuousVariableSummary summary = computeFromTable(mockVariable,
         Values.asValues(IntegerType.get(), 1, 2, 3, 888, 999));
     DescriptiveStatistics descriptiveStats = summary.getDescriptiveStats();
-    assertThat(descriptiveStats.getMin(), is(1.0));
-    assertThat(descriptiveStats.getMax(), is(3.0));
-    assertThat(descriptiveStats.getMean(), is(2.0));
-    assertThat(descriptiveStats.getN(), is(3l));
+    assertThat(descriptiveStats.getMin()).isEqualTo(1.0);
+    assertThat(descriptiveStats.getMax()).isEqualTo(3.0);
+    assertThat(descriptiveStats.getMean()).isEqualTo(2.0);
+    assertThat(descriptiveStats.getN()).isEqualTo(3l);
   }
 
   /*
@@ -90,28 +89,28 @@ public class ContinuousVariableSummaryTest {
     public void test_compute_withNullValue() {
       Variable mockVariable = Variable.Builder.newVariable("mock", TextType.get(), "mock").addCategories("YES", "NO", "DNK", "PNA").build();
       CategoricalSummaryDto categoricalDto = compute(mockVariable, Values.asValues(TextType.get(), "YES", "NO", null, null));
-      assertThat(categoricalDto.getMode(), is(CategoricalSummaryResource.NULL_NAME));
+      assertThat(categoricalDto.getMode()).isEqualTo(CategoricalSummaryResource.NULL_NAME));
     }
 
     @Test
     public void test_compute_withSequence() {
       Variable mockVariable = Variable.Builder.newVariable("mock", TextType.get(), "mock").addCategories("CAT1", "CAT2").build();
       CategoricalSummaryDto categoricalDto = compute(mockVariable, ImmutableList.of(Values.asSequence(TextType.get(), "CAT1", "CAT2"), Values.asSequence(TextType.get(), "CAT1")));
-      assertThat(categoricalDto.getMode(), is("CAT1"));
+      assertThat(categoricalDto.getMode()).isEqualTo("CAT1"));
     }
 
     @Test
     public void test_compute_withSequenceThatContainsNullValue() {
       Variable mockVariable = Variable.Builder.newVariable("mock", TextType.get(), "mock").addCategories("CAT1", "CAT2").build();
       CategoricalSummaryDto categoricalDto = compute(mockVariable, ImmutableList.of(Values.asSequence(TextType.get(), "CAT1", "CAT2"), Values.asSequence(TextType.get(), "CAT1", null)));
-      assertThat(categoricalDto.getMode(), is("CAT1"));
+      assertThat(categoricalDto.getMode()).isEqualTo("CAT1"));
     }
 
     @Test
     public void test_compute_withNullSequence() {
       Variable mockVariable = Variable.Builder.newVariable("mock", TextType.get(), "mock").addCategories("CAT1", "CAT2").build();
       CategoricalSummaryDto categoricalDto = compute(mockVariable, ImmutableList.of(TextType.get().nullSequence(), Values.asSequence(TextType.get(), "CAT1")));
-      assertThat(categoricalDto.getMode(), is("CAT1"));
+      assertThat(categoricalDto.getMode()).isEqualTo("CAT1"));
     }
   */
 

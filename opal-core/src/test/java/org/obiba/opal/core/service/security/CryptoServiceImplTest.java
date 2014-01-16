@@ -11,14 +11,11 @@
 package org.obiba.opal.core.service.security;
 
 import org.easymock.EasyMock;
-import org.hamcrest.core.Is;
-import org.hamcrest.core.IsNot;
-import org.hamcrest.core.IsNull;
 import org.junit.Test;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 
-import static org.junit.Assert.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class CryptoServiceImplTest {
 
@@ -38,11 +35,11 @@ public class CryptoServiceImplTest {
 
     String plain = "text to encrypt";
     String encrypt = cryptoService.encrypt(plain);
-    assertThat(encrypt, IsNull.notNullValue());
-    assertThat(encrypt, IsNot.not(plain));
+    assertThat(encrypt).isNotNull();
+    assertThat(encrypt).isNotEqualTo(plain);
 
     String decrypt = cryptoService.decrypt(encrypt);
-    assertThat(decrypt, Is.is(plain));
+    assertThat(decrypt).isEqualTo(plain);
   }
 
 }

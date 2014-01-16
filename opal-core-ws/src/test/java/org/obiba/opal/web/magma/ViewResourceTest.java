@@ -27,7 +27,7 @@ import com.google.common.collect.ImmutableSet;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.junit.Assert.assertEquals;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  * Unit tests for {@link ViewResourceImpl}.
@@ -56,7 +56,7 @@ public class ViewResourceTest {
     sut.setViewDtos(newViewDtos());
 
     // Verify
-    assertEquals(view, sut.getValueTable());
+    assertThat(sut.getValueTable()).isEqualTo(view);
   }
 
   @Test
@@ -81,7 +81,7 @@ public class ViewResourceTest {
     TableResource fromTableResource = viewResource.getFrom();
 
     // Verify state
-    assertEquals("fromTable", fromTableResource.getValueTable().getName());
+    assertThat(fromTableResource.getValueTable().getName()).isEqualTo("fromTable");
   }
 
   private ViewDtos newViewDtos() {

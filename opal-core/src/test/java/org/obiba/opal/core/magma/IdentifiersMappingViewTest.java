@@ -19,7 +19,6 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchValueSetException;
 import org.obiba.magma.ValueSet;
-import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.StaticValueTable;
 import org.obiba.magma.support.VariableEntityBean;
@@ -29,8 +28,7 @@ import org.obiba.opal.core.magma.IdentifiersMappingView.Policy;
 
 import com.google.common.collect.ImmutableSet;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  *
@@ -98,7 +96,7 @@ public class IdentifiersMappingViewTest {
     IdentifiersMappingView fuv = createViewOnOpalDataTable();
     Set<VariableEntity> entities = fuv.getVariableEntities();
     for(VariableEntity entity : entities) {
-      assertThat(entity.getIdentifier().contains("private"), is(true));
+      assertThat(entity.getIdentifier().contains("private")).isTrue();
     }
   }
 
@@ -107,46 +105,46 @@ public class IdentifiersMappingViewTest {
     IdentifiersMappingView fuv = createViewOnUnitDataTable();
     Set<VariableEntity> entities = fuv.getVariableEntities();
     for(VariableEntity entity : entities) {
-      assertThat(entity.getIdentifier().contains("private"), is(false));
+      assertThat(entity.getIdentifier().contains("private")).isFalse();
     }
   }
 
   @Test
   public void test_hasValueSet_returnsTrueForPrivateIdentifier() {
     IdentifiersMappingView fuv = createViewOnOpalDataTable();
-    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-1")), is(true));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-2")), is(true));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-3")), is(true));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-4")), is(true));
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-1"))).isTrue();
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-2"))).isTrue();
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-3"))).isTrue();
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-4"))).isTrue();
   }
 
   @Test
   public void test_hasValueSet_returnsFalseForPrivateIdentifier() {
     // Make unit identifiers private
     IdentifiersMappingView fuv = createViewOnUnitDataTable();
-    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-1")), is(false));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-2")), is(false));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-3")), is(false));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-4")), is(false));
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-1"))).isFalse();
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-2"))).isFalse();
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-3"))).isFalse();
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-4"))).isFalse();
   }
 
   @Test
   public void test_hasValueSet_returnsFalseForPublicIdentifier() {
     IdentifiersMappingView fuv = createViewOnOpalDataTable();
-    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "1")), is(false));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "2")), is(false));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "3")), is(false));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "4")), is(false));
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "1"))).isFalse();
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "2"))).isFalse();
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "3"))).isFalse();
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "4"))).isFalse();
   }
 
   @Test
   public void test_hasValueSet_returnsTrueForPublicIdentifier() {
     // Make unit identifiers private
     IdentifiersMappingView fuv = createViewOnUnitDataTable();
-    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "1")), is(true));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "2")), is(true));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "3")), is(true));
-    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "4")), is(true));
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "1"))).isTrue();
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "2"))).isTrue();
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "3"))).isTrue();
+    assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "4"))).isTrue();
   }
 
   @Test
@@ -154,8 +152,8 @@ public class IdentifiersMappingViewTest {
     IdentifiersMappingView fuv = createViewOnOpalDataTable();
     for(int i = 1; i < 5; i++) {
       ValueSet vs = fuv.getValueSet(new VariableEntityBean("Participant", "private-" + i));
-      assertThat(vs.getValueTable(), is((ValueTable) fuv));
-      assertThat(vs.getVariableEntity().getIdentifier(), is("private-" + i));
+      assertThat(vs.getValueTable()).isEqualTo(fuv);
+      assertThat(vs.getVariableEntity().getIdentifier()).isEqualTo("private-" + i);
     }
   }
 
@@ -165,8 +163,8 @@ public class IdentifiersMappingViewTest {
     IdentifiersMappingView fuv = createViewOnUnitDataTable();
     for(int i = 1; i < 5; i++) {
       ValueSet vs = fuv.getValueSet(new VariableEntityBean("Participant", "" + i));
-      assertThat(vs.getValueTable(), is((ValueTable) fuv));
-      assertThat(vs.getVariableEntity().getIdentifier(), is("" + i));
+      assertThat(vs.getValueTable()).isEqualTo(fuv);
+      assertThat(vs.getVariableEntity().getIdentifier()).isEqualTo("" + i);
     }
   }
 
@@ -177,7 +175,7 @@ public class IdentifiersMappingViewTest {
       try {
         fuv.getValueSet(new VariableEntityBean("", "" + i));
         // Must not reach this point
-        assertThat(true, is(false));
+        assertThat(true).isFalse();
       } catch(NoSuchValueSetException e) {
         // should reach this point
       }
@@ -192,7 +190,7 @@ public class IdentifiersMappingViewTest {
       try {
         fuv.getValueSet(new VariableEntityBean("", "private-" + i));
         // Must not reach this point
-        assertThat(true, is(false));
+        assertThat(true).isFalse();
       } catch(NoSuchValueSetException e) {
         // should reach this point
       }

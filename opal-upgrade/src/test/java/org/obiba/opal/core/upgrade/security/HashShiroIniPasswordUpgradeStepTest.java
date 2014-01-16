@@ -19,7 +19,6 @@ import org.apache.shiro.config.Ini;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.realm.text.IniRealm;
 import org.apache.shiro.util.StringUtils;
-import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.upgrade.v2_0_x.HashShiroIniPasswordUpgradeStep;
@@ -27,9 +26,7 @@ import org.springframework.util.ResourceUtils;
 
 import com.google.common.collect.ImmutableMap;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNot.not;
-import static org.junit.Assert.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class HashShiroIniPasswordUpgradeStepTest {
 
@@ -65,21 +62,21 @@ public class HashShiroIniPasswordUpgradeStepTest {
 
     upgradeStep.execute(null);
 
-    assertThat(iniBackup.exists(), is(true));
-    assertThat(new Md5Hash(iniBackup).toHex(), is(iniFileMd5));
-    assertThat(destIniFile.exists(), is(true));
-    assertThat(new Md5Hash(destIniFile).toHex(), not(iniFileMd5));
+    assertThat(iniBackup.exists()).isTrue();
+    assertThat(new Md5Hash(iniBackup).toHex()).isEqualTo(iniFileMd5);
+    assertThat(destIniFile.exists()).isTrue();
+    assertThat(new Md5Hash(destIniFile).toHex()).isNotEqualTo(iniFileMd5);
 
     Ini ini = new Ini();
     ini.loadFromPath(destIniFile.getAbsolutePath());
     Ini.Section section = ini.getSection(IniRealm.USERS_SECTION_NAME);
-    assertThat(section, IsNull.notNullValue());
-    assertThat(section.size(), is(3));
+    assertThat(section).isNotNull();
+    assertThat(section).hasSize(3);
     for(String username : usernamePassword.keySet()) {
-      assertThat(section.containsKey(username), is(true));
+      assertThat(section.containsKey(username)).isTrue();
       String[] passwordAndRolesArray = StringUtils.split(section.get(username));
       String encrypted = passwordAndRolesArray[0];
-      assertThat(passwordService.passwordsMatch(usernamePassword.get(username), encrypted), is(true));
+      assertThat(passwordService.passwordsMatch(usernamePassword.get(username), encrypted)).isTrue();
     }
 
   }

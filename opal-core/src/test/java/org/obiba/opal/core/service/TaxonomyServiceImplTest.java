@@ -31,15 +31,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
-import com.google.common.collect.Iterables;
-
-import static com.google.common.collect.Iterables.size;
 import static com.google.common.collect.Lists.newArrayList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 @ContextConfiguration(classes = TaxonomyServiceImplTest.Config.class)
 public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
@@ -72,13 +65,13 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     taxonomyService.saveTaxonomy(taxonomy, taxonomy);
 
     List<Taxonomy> taxonomies = newArrayList(taxonomyService.getTaxonomies());
-    assertEquals(1, taxonomies.size());
+    assertThat(taxonomies).hasSize(1);
 
     assertTaxonomyEquals(taxonomy, taxonomies.get(0));
     assertTaxonomyEquals(taxonomy, taxonomyService.getTaxonomy(taxonomy.getName()));
 
     List<Vocabulary> vocabularies = newArrayList(taxonomyService.getVocabularies(taxonomy.getName()));
-    assertEquals(1, vocabularies.size());
+    assertThat(vocabularies).hasSize(1);
 
     Vocabulary expected = new Vocabulary(taxonomy.getName(), "vocabulary 1");
     assertVocabularyEquals(expected, vocabularies.get(0));
@@ -96,7 +89,7 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     taxonomy.setName("new name");
     taxonomyService.saveTaxonomy(taxonomy, taxonomy);
 
-    assertEquals(2, size(taxonomyService.getTaxonomies()));
+    assertThat(taxonomyService.getTaxonomies()).hasSize(2);
   }
 
   @Test
@@ -107,7 +100,7 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     taxonomy.setName("new name");
     taxonomyService.saveTaxonomy(createTaxonomy(), taxonomy);
 
-    assertEquals(1, size(taxonomyService.getTaxonomies()));
+    assertThat(taxonomyService.getTaxonomies()).hasSize(1);
 
     assertTaxonomyEquals(taxonomy, taxonomyService.getTaxonomy(taxonomy.getName()));
   }
@@ -122,8 +115,8 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
 
     assertTaxonomyEquals(taxonomy, taxonomyService.getTaxonomy(taxonomy.getName()));
 
-    assertEquals(1, size(taxonomyService.getTaxonomies()));
-    assertEquals(2, size(taxonomyService.getVocabularies(taxonomy.getName())));
+    assertThat(taxonomyService.getTaxonomies()).hasSize(1);
+    assertThat(taxonomyService.getVocabularies(taxonomy.getName())).hasSize(2);
 
   }
 
@@ -131,29 +124,29 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
   public void test_delete_taxonomy() {
     Taxonomy taxonomy = createTaxonomy();
     taxonomyService.saveTaxonomy(taxonomy, taxonomy);
-    assertEquals(1, size(taxonomyService.getTaxonomies()));
+    assertThat(taxonomyService.getTaxonomies()).hasSize(1);
 
     taxonomyService.deleteTaxonomy(taxonomy.getName());
-    assertEquals(0, size(taxonomyService.getTaxonomies()));
-    assertEquals(0, size(orientDbService.list(Taxonomy.class, "select from " + Taxonomy.class.getSimpleName())));
-    assertEquals(0, orientDbService.count(Taxonomy.class));
+    assertThat(taxonomyService.getTaxonomies()).isEmpty();
+    assertThat(orientDbService.list(Taxonomy.class, "select from " + Taxonomy.class.getSimpleName())).isEmpty();
+    assertThat(orientDbService.count(Taxonomy.class)).isEqualTo(0);
   }
 
   @Test
   public void test_save_vocabulary() {
     Taxonomy taxonomy = createTaxonomy();
     taxonomyService.saveTaxonomy(taxonomy, taxonomy);
-    assertEquals(1, size(taxonomyService.getTaxonomies()));
+    assertThat(taxonomyService.getTaxonomies()).hasSize(1);
 
     Vocabulary vocabulary = createVocabulary(taxonomy);
     taxonomyService.saveVocabulary(null, vocabulary);
 
     Taxonomy foundTaxonomy = taxonomyService.getTaxonomy(taxonomy.getName());
-    assertNotNull(foundTaxonomy);
-    assertTrue(foundTaxonomy.hasVocabulary(vocabulary.getName()));
+    assertThat(foundTaxonomy).isNotNull();
+    assertThat(foundTaxonomy.hasVocabulary(vocabulary.getName())).isTrue();
 
     Vocabulary foundVocabulary = taxonomyService.getVocabulary(taxonomy.getName(), vocabulary.getName());
-    assertNotNull(foundVocabulary);
+    assertThat(foundVocabulary).isNotNull();
     assertVocabularyEquals(vocabulary, foundVocabulary);
 
     foundVocabulary.getTerms().clear();
@@ -161,7 +154,7 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     taxonomyService.saveVocabulary(foundVocabulary, foundVocabulary);
 
     Vocabulary foundVocabulary2 = taxonomyService.getVocabulary(taxonomy.getName(), foundVocabulary.getName());
-    assertNotNull(foundVocabulary2);
+    assertThat(foundVocabulary2).isNotNull();
     assertVocabularyEquals(foundVocabulary, foundVocabulary2);
   }
 
@@ -178,8 +171,8 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     taxonomyService.saveTaxonomy(foundTaxonomy, foundTaxonomy);
 
     foundTaxonomy = taxonomyService.getTaxonomy("new name");
-    assertNotNull(foundTaxonomy);
-    assertTrue(foundTaxonomy.hasVocabulary(vocabulary.getName()));
+    assertThat(foundTaxonomy).isNotNull();
+    assertThat(foundTaxonomy.hasVocabulary(vocabulary.getName())).isTrue();
   }
 
   @Test
@@ -201,11 +194,11 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     taxonomyService.deleteVocabulary(vocabulary);
 
     Taxonomy foundTaxonomy = taxonomyService.getTaxonomy(taxonomy.getName());
-    assertNotNull(foundTaxonomy);
-    assertFalse(foundTaxonomy.hasVocabulary(vocabulary.getName()));
+    assertThat(foundTaxonomy).isNotNull();
+    assertThat(foundTaxonomy.hasVocabulary(vocabulary.getName())).isFalse();
 
     Vocabulary foundVocabulary = taxonomyService.getVocabulary(taxonomy.getName(), vocabulary.getName());
-    assertNull(foundVocabulary);
+    assertThat(foundVocabulary).isNotNull();
   }
 
   @Test
@@ -217,8 +210,8 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     taxonomyService.saveTaxonomy(taxonomy, taxonomy);
 
     assertTaxonomyEquals(taxonomy, taxonomyService.getTaxonomy(taxonomy.getName()));
-    assertEquals(1, size(taxonomyService.getTaxonomies()));
-    assertTrue(Iterables.isEmpty(taxonomyService.getVocabularies(taxonomy.getName())));
+    assertThat(taxonomyService.getTaxonomies()).hasSize(1);
+    assertThat(taxonomyService.getVocabularies(taxonomy.getName())).isEmpty();
   }
 
   @Test
@@ -239,12 +232,12 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     taxonomyService.saveVocabulary(template, vocabulary);
 
     Taxonomy foundTaxonomy = taxonomyService.getTaxonomy(taxonomy.getName());
-    assertNotNull(foundTaxonomy);
-    assertFalse(foundTaxonomy.hasVocabulary(vocabulary.getName()));
+    assertThat(foundTaxonomy).isNotNull();
+    assertThat(foundTaxonomy.hasVocabulary(vocabulary.getName())).isFalse();
 
     Taxonomy foundTaxonomy1 = taxonomyService.getTaxonomy(taxonomy1.getName());
-    assertNotNull(foundTaxonomy1);
-    assertTrue(foundTaxonomy1.hasVocabulary(vocabulary.getName()));
+    assertThat(foundTaxonomy1).isNotNull();
+    assertThat(foundTaxonomy1.hasVocabulary(vocabulary.getName())).isTrue();
 
   }
 
@@ -261,13 +254,13 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     taxonomyService.saveVocabulary(vocabulary, vocabulary1);
 
     Vocabulary foundVocabulary = taxonomyService.getVocabulary(taxonomy.getName(), vocabulary1.getName());
-    assertNotNull(foundVocabulary);
+    assertThat(foundVocabulary).isNotNull();
 
     Taxonomy found = taxonomyService.getTaxonomy(taxonomy.getName());
-    assertNotNull(found);
-    assertFalse(found.hasVocabulary(vocabulary.getName()));
-    assertTrue(found.hasVocabulary(vocabulary1.getName()));
-    assertEquals(2, found.getVocabularies().size());
+    assertThat(found).isNotNull();
+    assertThat(found.hasVocabulary(vocabulary.getName())).isFalse();
+    assertThat(found.hasVocabulary(vocabulary1.getName())).isTrue();
+    assertThat(found.getVocabularies()).hasSize(2);
   }
 
   @Test
@@ -284,13 +277,13 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
 
     taxonomyService.deleteVocabulary(vocabulary);
 
-    assertNull(taxonomyService.getVocabulary(taxonomy.getName(), "vocabulary 1"));
+    assertThat(taxonomyService.getVocabulary(taxonomy.getName(), "vocabulary 1")).isNull();
 
     Vocabulary vocabulary3 = new Vocabulary(taxonomy.getName(), "vocabulary 1");
     taxonomyService.saveVocabulary(vocabulary2, vocabulary3);
 
     Vocabulary found = taxonomyService.getVocabulary(taxonomy.getName(), "vocabulary 1");
-    assertNotNull(found);
+    assertThat(found).isNotNull();
   }
 
   private Taxonomy createTaxonomy() {
@@ -321,22 +314,24 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
   }
 
   private void assertTaxonomyEquals(Taxonomy expected, Taxonomy found) {
-    assertNotNull(found);
-    assertEquals(expected, found);
-    assertEquals(expected.getTitles(), found.getTitles());
-    assertEquals(expected.getDescriptions(), found.getDescriptions());
-    assertEquals(expected.getVocabularies(), found.getVocabularies());
+    assertThat(found).isNotNull();
+
+    assertThat(expected).isEqualTo(found);
+    assertThat(expected.getTitles()).isEqualTo(found.getTitles());
+    assertThat(expected.getDescriptions()).isEqualTo(found.getDescriptions());
+    assertThat(expected.getVocabularies()).isEqualTo(found.getVocabularies());
     Asserts.assertCreatedTimestamps(expected, found);
   }
 
   private void assertVocabularyEquals(Vocabulary expected, Vocabulary found) {
-    assertNotNull(found);
-    assertEquals(expected, found);
-    assertEquals(expected.getTaxonomy(), found.getTaxonomy());
-    assertEquals(expected.isRepeatable(), found.isRepeatable());
-    assertEquals(expected.getTitles(), found.getTitles());
-    assertEquals(expected.getDescriptions(), found.getDescriptions());
-    assertEquals(expected.getTerms(), found.getTerms());
+    assertThat(found).isNotNull();
+
+    assertThat(expected).isEqualTo(found);
+    assertThat(expected.getTaxonomy()).isEqualTo(found.getTaxonomy());
+    assertThat(expected.isRepeatable()).isEqualTo(found.isRepeatable());
+    assertThat(expected.getTitles()).isEqualTo(found.getTitles());
+    assertThat(expected.getDescriptions()).isEqualTo(found.getDescriptions());
+    assertThat(expected.getTerms()).isEqualTo(found.getTerms());
     Asserts.assertCreatedTimestamps(expected, found);
   }
 

@@ -26,21 +26,14 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 import org.springframework.util.ResourceUtils;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 
-import static com.google.common.collect.Iterables.size;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 @ContextConfiguration(classes = SubjectCredentialsServiceImplTest.Config.class)
 public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringContextTests {
@@ -72,7 +65,7 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
 
     List<SubjectCredentials> list = newArrayList(
         subjectCredentialsService.getSubjectCredentials(SubjectCredentials.AuthenticationType.PASSWORD));
-    assertEquals(1, list.size());
+    assertThat(list).hasSize(1);
     assertSubjectEquals(subjectCredentials, list.get(0));
 
     SubjectCredentials found = subjectCredentialsService.getSubjectCredentials(subjectCredentials.getName());
@@ -88,15 +81,16 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
 
     List<SubjectCredentials> list = newArrayList(
         subjectCredentialsService.getSubjectCredentials(SubjectCredentials.AuthenticationType.CERTIFICATE));
-    assertEquals(1, list.size());
+    assertThat(list).hasSize(1);
     assertSubjectEquals(subjectCredentials, list.get(0));
 
     SubjectCredentials found = subjectCredentialsService.getSubjectCredentials(subjectCredentials.getName());
     assertSubjectEquals(subjectCredentials, found);
 
     OpalKeyStore keyStore = credentialsKeyStoreService.getKeyStore();
-    assertThat(keyStore.aliasExists(subjectCredentials.getCertificateAlias()), is(true));
-    assertThat(keyStore.getKeyType(subjectCredentials.getCertificateAlias()), is(OpalKeyStore.KeyType.CERTIFICATE));
+    assertThat(keyStore.aliasExists(subjectCredentials.getCertificateAlias())).isTrue();
+    assertThat(keyStore.getKeyType(subjectCredentials.getCertificateAlias()))
+        .isEqualTo(OpalKeyStore.KeyType.CERTIFICATE);
   }
 
   @Test
@@ -111,7 +105,7 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
 
     List<SubjectCredentials> list = newArrayList(
         subjectCredentialsService.getSubjectCredentials(SubjectCredentials.AuthenticationType.PASSWORD));
-    assertEquals(1, list.size());
+    assertThat(list).hasSize(1);
     assertSubjectEquals(subjectCredentials, list.get(0));
 
     SubjectCredentials found = subjectCredentialsService.getSubjectCredentials(subjectCredentials.getName());
@@ -130,7 +124,7 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
     subjectCredentialsService.createGroup(group.getName());
 
     List<Group> groups = newArrayList(subjectCredentialsService.getGroups());
-    assertEquals(1, groups.size());
+    assertThat(groups).hasSize(1);
     assertGroupEquals(group, groups.get(0));
 
     Group found = subjectCredentialsService.getGroup(group.getName());
@@ -145,17 +139,17 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
         .groups(Sets.newHashSet("group1", "group2")).build();
     subjectCredentialsService.save(subjectCredentials);
 
-    assertEquals(2, size(subjectCredentialsService.getGroups()));
+    assertThat(subjectCredentialsService.getGroups()).hasSize(2);
 
     Group group1 = subjectCredentialsService.getGroup("group1");
-    assertNotNull(group1);
-    assertEquals(1, group1.getSubjectCredentials().size());
-    assertTrue(group1.getSubjectCredentials().contains(subjectCredentials.getName()));
+    assertThat(group1).isNotNull();
+    assertThat(group1.getSubjectCredentials()).hasSize(1);
+    assertThat(group1.getSubjectCredentials()).contains(subjectCredentials.getName());
 
     Group group2 = subjectCredentialsService.getGroup("group2");
-    assertNotNull(group2);
-    assertEquals(1, group2.getSubjectCredentials().size());
-    assertTrue(group2.getSubjectCredentials().contains(subjectCredentials.getName()));
+    assertThat(group2).isNotNull();
+    assertThat(group2.getSubjectCredentials()).hasSize(1);
+    assertThat(group2.getSubjectCredentials()).contains(subjectCredentials.getName());
   }
 
   @Test
@@ -171,16 +165,16 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
     SubjectCredentials found = subjectCredentialsService.getSubjectCredentials(subjectCredentials.getName());
     assertSubjectEquals(subjectCredentials, found);
 
-    assertEquals(2, size(subjectCredentialsService.getGroups()));
+    assertThat(subjectCredentialsService.getGroups()).hasSize(2);
 
     Group group1 = subjectCredentialsService.getGroup("group1");
-    assertNotNull(group1);
-    assertEquals(0, group1.getSubjectCredentials().size());
+    assertThat(group1).isNotNull();
+    assertThat(group1.getSubjectCredentials()).isEmpty();
 
     Group group2 = subjectCredentialsService.getGroup("group2");
-    assertNotNull(group2);
-    assertEquals(1, group2.getSubjectCredentials().size());
-    assertTrue(group2.getSubjectCredentials().contains(subjectCredentials.getName()));
+    assertThat(group2).isNotNull();
+    assertThat(group2.getSubjectCredentials()).hasSize(1);
+    assertThat(group2.getSubjectCredentials()).contains(subjectCredentials.getName());
   }
 
   @Test
@@ -189,8 +183,8 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
         .authenticationType(SubjectCredentials.AuthenticationType.PASSWORD).name("user1").password("password").build();
     subjectCredentialsService.save(subjectCredentials);
     subjectCredentialsService.delete(subjectCredentials);
-    assertEquals(0,
-        size(subjectCredentialsService.getSubjectCredentials(SubjectCredentials.AuthenticationType.PASSWORD)));
+    assertThat(subjectCredentialsService.getSubjectCredentials(SubjectCredentials.AuthenticationType.PASSWORD))
+        .isEmpty();
   }
 
   @Test
@@ -201,11 +195,11 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
     subjectCredentialsService.save(subjectCredentials);
 
     subjectCredentialsService.delete(subjectCredentials);
-    assertEquals(0,
-        size(subjectCredentialsService.getSubjectCredentials(SubjectCredentials.AuthenticationType.CERTIFICATE)));
+    assertThat(subjectCredentialsService.getSubjectCredentials(SubjectCredentials.AuthenticationType.CERTIFICATE))
+        .isEmpty();
 
     OpalKeyStore keyStore = credentialsKeyStoreService.getKeyStore();
-    assertThat(keyStore.aliasExists(subjectCredentials.getName()), is(false));
+    assertThat(keyStore.aliasExists(subjectCredentials.getName())).isFalse();
   }
 
   @Test
@@ -217,14 +211,14 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
 
     subjectCredentialsService.delete(subjectCredentials);
 
-    assertEquals(0,
-        size(subjectCredentialsService.getSubjectCredentials(SubjectCredentials.AuthenticationType.PASSWORD)));
+    assertThat(subjectCredentialsService.getSubjectCredentials(SubjectCredentials.AuthenticationType.PASSWORD))
+        .isEmpty();
 
     Group group1 = subjectCredentialsService.getGroup("group1");
-    assertEquals(0, group1.getSubjectCredentials().size());
+    assertThat(group1.getSubjectCredentials()).isEmpty();
 
     Group group2 = subjectCredentialsService.getGroup("group2");
-    assertEquals(0, group2.getSubjectCredentials().size());
+    assertThat(group2.getSubjectCredentials()).isEmpty();
   }
 
   @Test
@@ -232,7 +226,7 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
     Group group = Group.Builder.create().name("group1").build();
     subjectCredentialsService.createGroup(group.getName());
     subjectCredentialsService.delete(group);
-    assertEquals(0, size(subjectCredentialsService.getGroups()));
+    assertThat(subjectCredentialsService.getGroups()).isEmpty();
   }
 
   @Test
@@ -241,22 +235,22 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
   }
 
   private void assertSubjectEquals(SubjectCredentials expected, SubjectCredentials found) {
-    assertThat(found, notNullValue());
-    assertThat(found, is(expected));
-    assertThat(found.getName(), is(expected.getName()));
-    assertThat(found.getAuthenticationType(), is(expected.getAuthenticationType()));
-    assertThat(found.getPassword(), is(expected.getPassword()));
-    assertThat(found.isEnabled(), is(expected.isEnabled()));
+    assertThat(found).isNotNull();
+    assertThat(found).isEqualTo(expected);
+    assertThat(found.getName()).isEqualTo(expected.getName());
+    assertThat(found.getAuthenticationType()).isEqualTo(expected.getAuthenticationType());
+    assertThat(found.getPassword()).isEqualTo(expected.getPassword());
+    assertThat(found.isEnabled()).isEqualTo(expected.isEnabled());
 
-    assertTrue(Iterables.elementsEqual(expected.getGroups(), found.getGroups()));
+    assertThat(expected.getGroups()).isEqualTo(found.getGroups());
     Asserts.assertCreatedTimestamps(expected, found);
   }
 
   private void assertGroupEquals(Group expected, Group found) {
-    assertThat(found, notNullValue());
-    assertThat(found, is(expected));
-    assertThat(found.getName(), is(expected.getName()));
-    assertTrue(Iterables.elementsEqual(expected.getSubjectCredentials(), found.getSubjectCredentials()));
+    assertThat(found).isNotNull();
+    assertThat(found).isEqualTo(expected);
+    assertThat(found.getName()).isEqualTo(expected.getName());
+    assertThat(expected.getSubjectCredentials()).isEqualTo(found.getSubjectCredentials());
     Asserts.assertCreatedTimestamps(expected, found);
   }
 

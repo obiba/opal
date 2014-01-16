@@ -26,7 +26,7 @@ import org.obiba.opal.core.service.OrientDbService;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class UniqueValidatorTest {
 
@@ -48,11 +48,11 @@ public class UniqueValidatorTest {
     Set<ConstraintViolation<UniqueCompoundStub>> constraintViolations = validator.validate(stub);
     verify(mockOrientDbService);
 
-    assertEquals(1, constraintViolations.size());
+    assertThat(constraintViolations).hasSize(1);
     ConstraintViolation<UniqueCompoundStub> constraintViolation = constraintViolations.iterator().next();
-    assertEquals("must be unique", constraintViolation.getMessage());
-    assertEquals("{org.obiba.opal.core.validator.Unique.message}", constraintViolation.getMessageTemplate());
-    assertEquals("unique prop", constraintViolation.getPropertyPath().toString());
+    assertThat(constraintViolation.getMessage()).isEqualTo("must be unique");
+    assertThat(constraintViolation.getMessageTemplate()).isEqualTo("{org.obiba.opal.core.validator.Unique.message}");
+    assertThat(constraintViolation.getPropertyPath().toString()).isEqualTo("unique prop");
   }
 
   private Validator getValidator(final OrientDbService orientDbService) {

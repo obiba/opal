@@ -35,6 +35,7 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class QueryTermConverterTest {
 
@@ -62,7 +63,7 @@ public class QueryTermConverterTest {
         "\"facets\":{\"0\":{\"terms\":{\"field\":\"opal-data-cipreliminaryquestionnaire-LAST_MEAL_WHEN\" } } } }");
 
     JSONObject jsonResult = converter.convert(dtoQuery);
-    Assert.assertNotNull(jsonResult);
+    assertThat(jsonResult).isNotNull();
     JsonAssert.assertEquals(jsonExpected, jsonResult);
   }
 
@@ -80,7 +81,7 @@ public class QueryTermConverterTest {
         "-standingheight-RES_FIRST_HEIGHT\"} } } }");
 
     JSONObject jsonResult = converter.convert(dtoQuery);
-    Assert.assertNotNull(jsonResult);
+    assertThat(jsonResult).isNotNull();
     JsonAssert.assertEquals(jsonExpected, jsonResult);
   }
 
@@ -166,37 +167,32 @@ public class QueryTermConverterTest {
     }
 
     @SuppressWarnings("unchecked")
-    public static void assertEquals(@NotNull JSONObject expected, @NotNull JSONObject target) {
+    public static void assertEquals(@NotNull JSONObject expected, @NotNull JSONObject target) throws JSONException {
 
-      try {
+      for(Iterator<String> iterator = expected.keys(); iterator.hasNext(); ) {
+        String key = iterator.next();
 
-        for(Iterator<String> iterator = expected.keys(); iterator.hasNext(); ) {
-          String key = iterator.next();
+        // match the key names
+        assertThat(target.get(key)).isNotNull();
 
-          // match the key names
-          Assert.assertNotNull(target.get(key));
+        Object expectedValue = expected.get(key);
+        Object targetValue = target.get(key);
 
-          Object expectedValue = expected.get(key);
-          Object targetValue = target.get(key);
+        // match the value class types
+        assertThat(expectedValue).isInstanceOf(targetValue.getClass());
 
-          // match the value class types
-          Assert.assertEquals(expectedValue.getClass(), targetValue.getClass());
-
-          if(expectedValue instanceof JSONObject) {
-            // For now, recurse only the JSON object
-            assertEquals(expected.getJSONObject(key), target.getJSONObject(key));
-          } else if(expectedValue instanceof JSONArray) {
-            // TODO handle JSONArray in the future
-            Assert.assertFalse(true);
-          } else {
-            // compare values
-            Assert.assertEquals(expectedValue, targetValue);
-          }
+        if(expectedValue instanceof JSONObject) {
+          // For now, recurse only the JSON object
+          assertThat(expected.getJSONObject(key)).isEqualTo(target.getJSONObject(key));
+        } else if(expectedValue instanceof JSONArray) {
+          // TODO handle JSONArray in the future
+          Assert.fail();
+        } else {
+          // compare values
+          assertThat(expectedValue).isEqualTo(targetValue);
         }
-
-      } catch(JSONException e) {
-        Assert.assertFalse(true);
       }
+
     }
 
   }

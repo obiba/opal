@@ -35,9 +35,7 @@ import org.apache.commons.vfs2.FileName;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
-import org.hamcrest.Matchers;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -51,7 +49,7 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
 public class FilesResourceTest {
@@ -83,7 +81,7 @@ public class FilesResourceTest {
     String rootDir = getClass().getResource("/test-file-system").toURI().toString();
     File emptyDir = new File(rootDir.replace("file:", ""), "folder4/folder41");
     if(!emptyDir.exists()) {
-      Assert.assertEquals(true, emptyDir.mkdirs());
+      assertThat(emptyDir.mkdirs()).isTrue();
     }
     fileSystem = new DefaultOpalFileSystem(rootDir);
     filesResource = new FilesResource();
@@ -118,9 +116,9 @@ public class FilesResourceTest {
     fsResource.setOpalRuntime(opalRuntimeMock);
     FileDto rootFileDto = fsResource.getFileSystem();
 
-    Assert.assertEquals("root", rootFileDto.getName());
-    Assert.assertEquals(FileDto.FileType.FOLDER, rootFileDto.getType());
-    Assert.assertEquals("/", rootFileDto.getPath());
+    assertThat(rootFileDto.getName()).isEqualTo("root");
+    assertThat(rootFileDto.getType()).isEqualTo(FileDto.FileType.FOLDER);
+    assertThat(rootFileDto.getPath()).isEqualTo("/");
 
   }
 
@@ -140,7 +138,7 @@ public class FilesResourceTest {
     childrenCounter = verifyThatChildrenExistInFileSystem(rootFileDto, childrenCounter);
 
     // File count in Dto structure should be the same as file count in file system.
-    Assert.assertEquals(20, childrenCounter);
+    assertThat(childrenCounter).isEqualTo(20);
 
     verify(opalRuntimeMock);
   }
@@ -151,7 +149,7 @@ public class FilesResourceTest {
     for(FileDto child : folder.getChildrenList()) {
       counter++;
       correspondingFileObj = fileSystem.getRoot().resolveFile(child.getPath());
-      Assert.assertTrue(correspondingFileObj.exists());
+      assertThat(correspondingFileObj.exists()).isTrue();
       if(child.getType() == FileDto.FileType.FOLDER) {
         counter = verifyThatChildrenExistInFileSystem(child, childrenCounter);
       }
@@ -186,7 +184,7 @@ public class FilesResourceTest {
     Response response = filesResource.getFileDetails(path);
 
     // Make sure response is OK
-    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
 
     FileDto folder = (FileDto) response.getEntity();
     List<FileDto> folderContent = folder.getChildrenList();
@@ -194,18 +192,17 @@ public class FilesResourceTest {
     // Check folder content recursively two levels down.
     checkFolderContent(expectedFolderContent, folderContent, 2);
 
-    Assert.assertTrue(expectedFolderContent.isEmpty());
+    assertThat(expectedFolderContent).isEmpty();
   }
 
   private void checkFolderContent(Set<String> expectedFolderContent, Iterable<FileDto> folderContent, int level) {
     // Make sure folder content is as expected.
     for(FileDto oneFileOrFolder : folderContent) {
-      Assert.assertTrue(expectedFolderContent.contains(oneFileOrFolder.getName()));
+      assertThat(expectedFolderContent).contains(oneFileOrFolder.getName());
       expectedFolderContent.remove(oneFileOrFolder.getName());
       if(level > 0 && oneFileOrFolder.getChildrenCount() > 0) {
         checkFolderContent(expectedFolderContent, oneFileOrFolder.getChildrenList(), level - 1);
       }
-
     }
   }
 
@@ -239,10 +236,8 @@ public class FilesResourceTest {
     ZipFile zipfile = new ZipFile(((File) response.getEntity()).getPath());
 
     // Check that all folders and files exist in the compressed archive that represents the folder.
-    ZipEntry zipEntry;
     for(String anExpectedFolderContentArray : expectedFolderContentArray) {
-      zipEntry = zipfile.getEntry(anExpectedFolderContentArray);
-      Assert.assertNotNull(zipEntry);
+      assertThat(zipfile.getEntry(anExpectedFolderContentArray)).isNotNull();
     }
 
     Enumeration<ZipEntry> zipEnum = (Enumeration<ZipEntry>) zipfile.entries();
@@ -254,7 +249,7 @@ public class FilesResourceTest {
     }
 
     // Make sure that they are no unexpected files in the compressed archive.
-    Assert.assertEquals(expectedFolderContentArray.length, count);
+    assertThat(expectedFolderContentArray.length).isEqualTo(count);
 
     zipfile.close();
   }
@@ -266,7 +261,7 @@ public class FilesResourceTest {
     replay(opalRuntimeMock);
 
     Response response = filesResource.getFileDetails("/folder1/folder2");
-    Assert.assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 
     verify(opalRuntimeMock);
 
@@ -298,12 +293,12 @@ public class FilesResourceTest {
     filesCreatedByTest.add(destinationPath);
 
     // Verify that the service response is CREATED.
-    Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
 
     verify(opalRuntimeMock, fileItemMock, uriInfoMock);
 
     // Verify that the file was uploaded at the right path in the file system.
-    Assert.assertTrue(fileSystem.getRoot().resolveFile("/folder1/folder11/folder111/fileToUpload.txt").exists());
+    assertThat(fileSystem.getRoot().resolveFile("/folder1/folder11/folder111/fileToUpload.txt").exists()).isTrue();
     // clean up
     fileSystem.getRoot().resolveFile("/folder1/folder11/folder111/fileToUpload.txt").delete();
   }
@@ -325,7 +320,7 @@ public class FilesResourceTest {
     fileResource.setSubjectAclService(subjectAclServiceMock);
 
     Response response = fileResource.uploadFile("/", uriInfoMock, null);
-    Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Status.BAD_REQUEST.getStatusCode());
 
     verify(opalRuntimeMock);
 
@@ -353,7 +348,7 @@ public class FilesResourceTest {
     filesCreatedByTest.add(destinationPath);
 
     // Verify that the service response is CREATED.
-    Assert.assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 
     verify(opalRuntimeMock, fileItemMock, uriInfoMock);
   }
@@ -365,7 +360,7 @@ public class FilesResourceTest {
     replay(opalRuntimeMock);
 
     Response response = filesResource.deleteFile("/folder1/folder2/filethatdoesnotexist.txt");
-    Assert.assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 
     verify(opalRuntimeMock);
   }
@@ -378,11 +373,9 @@ public class FilesResourceTest {
     replay(opalRuntimeMock);
 
     Response response = filesResource.deleteFile("/folder1");
-    Assert.assertEquals(Status.FORBIDDEN.getStatusCode(), response.getStatus());
-    Assert.assertEquals("cannotDeleteNotEmptyFolder", response.getEntity());
-
+    assertThat(response.getStatus()).isEqualTo(Status.FORBIDDEN.getStatusCode());
+    assertThat(response.getEntity()).isEqualTo("cannotDeleteNotEmptyFolder");
     verify(opalRuntimeMock);
-
   }
 
   @Test
@@ -395,11 +388,9 @@ public class FilesResourceTest {
     replay(fileObjectMock);
 
     Response response = getFileResource().deleteFile("path");
-    Assert.assertEquals(Status.FORBIDDEN.getStatusCode(), response.getStatus());
-    Assert.assertEquals("cannotDeleteReadOnlyFile", response.getEntity());
-
+    assertThat(response.getStatus()).isEqualTo(Status.FORBIDDEN.getStatusCode());
+    assertThat(response.getEntity()).isEqualTo("cannotDeleteReadOnlyFile");
     verify(fileObjectMock);
-
   }
 
   @Test
@@ -412,7 +403,7 @@ public class FilesResourceTest {
     replay(fileObjectMock);
 
     Response response = getFileResource().deleteFile("path");
-    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
 
     verify(fileObjectMock);
 
@@ -428,9 +419,8 @@ public class FilesResourceTest {
     replay(fileObjectMock);
 
     Response response = getFileResource().deleteFile("path");
-    Assert.assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
-    Assert.assertEquals("couldNotDeleteFileError", response.getEntity());
-
+    assertThat(response.getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
+    assertThat(response.getEntity()).isEqualTo("couldNotDeleteFileError");
     verify(fileObjectMock);
   }
 
@@ -456,9 +446,8 @@ public class FilesResourceTest {
     replay(fileObjectMock);
 
     Response response = getFileResource().createFolder("folder1", "folder11", uriInfoMock);
-    Assert.assertEquals(Status.FORBIDDEN.getStatusCode(), response.getStatus());
-    Assert.assertEquals("cannotCreateFolderPathAlreadyExist", response.getEntity());
-
+    assertThat(response.getStatus()).isEqualTo(Status.FORBIDDEN.getStatusCode());
+    assertThat(response.getEntity()).isEqualTo("cannotCreateFolderPathAlreadyExist");
     verify(fileObjectMock);
   }
 
@@ -476,9 +465,8 @@ public class FilesResourceTest {
     replay(fileObjectMock, parentFolderMock, childFolderMock);
 
     Response response = getFileResource().createFolder("folder1", "folder", uriInfoMock);
-    Assert.assertEquals(Status.FORBIDDEN.getStatusCode(), response.getStatus());
-    Assert.assertEquals("cannotCreateFolderParentIsReadOnly", response.getEntity());
-
+    assertThat(response.getStatus()).isEqualTo(Status.FORBIDDEN.getStatusCode());
+    assertThat(response.getEntity()).isEqualTo("cannotCreateFolderParentIsReadOnly");
     verify(fileObjectMock, parentFolderMock, childFolderMock);
   }
 
@@ -512,14 +500,13 @@ public class FilesResourceTest {
     replay(fileObjectMock, uriInfoMock, parentFolderMock, childFolderMock, fileNameMock, mockContent);
 
     Response response = getFileResource().createFolder("folder1", "folder", uriInfoMock);
-    Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
-
+    assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
     verify(fileObjectMock, uriInfoMock, parentFolderMock, childFolderMock, fileNameMock, mockContent);
   }
 
   @Test
   public void testCharsetsAvailable() throws Exception {
     Response charSets = filesResource.getAvailableCharsets();
-    assertThat(charSets.getEntity().toString(), Matchers.containsString("UTF-8"));
+    assertThat(charSets.getEntity().toString()).contains("UTF-8");
   }
 }

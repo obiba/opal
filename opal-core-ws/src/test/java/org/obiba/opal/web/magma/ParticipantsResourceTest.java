@@ -29,7 +29,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  *
@@ -95,8 +95,8 @@ public class ParticipantsResourceTest extends AbstractMagmaResourceTest {
     verify(mockDatasource);
 
     // Verify response
-    assertEquals(Status.OK.getStatusCode(), response.getStatus());
-    assertEquals(String.valueOf(expectedCount), response.getEntity());
+    assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
+    assertThat(response.getEntity()).isEqualTo(String.valueOf(expectedCount));
   }
 
   private ValueTable createMockTable(Set<VariableEntity> entities) {

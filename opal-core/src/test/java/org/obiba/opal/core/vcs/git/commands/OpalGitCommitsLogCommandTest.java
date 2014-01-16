@@ -11,18 +11,13 @@ package org.obiba.opal.core.vcs.git.commands;
 
 import java.util.List;
 
-import org.eclipse.jgit.diff.DiffEntry;
 import org.junit.Test;
 import org.obiba.opal.core.vcs.CommitInfo;
 import org.obiba.opal.core.vcs.git.OpalGitException;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.fest.assertions.api.Assertions.assertThat;
 
+@SuppressWarnings("ReuseOfLocalVariable")
 public class OpalGitCommitsLogCommandTest extends AbstractOpalGitCommandTest {
 
   @Test
@@ -31,9 +26,9 @@ public class OpalGitCommitsLogCommandTest extends AbstractOpalGitCommandTest {
         versionControlSystem.getRepository(DATASOURCE_NAME)).addDatasourceName(DATASOURCE_NAME).addPath("TestView")
         .build();
     List<CommitInfo> commitInfos = command.execute();
-    assertThat(commitInfos, not(is(nullValue())));
-    assertTrue(commitInfos.size() > 0);
-    assertThat(commitInfos.get(0).getCommitId(), not(is(nullValue())));
+    assertThat(commitInfos).isNotNull();
+    assertThat(commitInfos).isNotEmpty();
+    assertThat(commitInfos.get(0).getCommitId()).isNotNull();
   }
 
   @Test(expected = OpalGitException.class)
@@ -51,9 +46,9 @@ public class OpalGitCommitsLogCommandTest extends AbstractOpalGitCommandTest {
         .addPath("TestView/TOTO_VAR.js").build();
 
     List<CommitInfo> commitInfos = command.execute();
-    assertThat(commitInfos, not(is(nullValue())));
-    assertThat(commitInfos.size(), not(is(0)));
-    assertThat(commitInfos.get(0).getCommitId(), not(is(nullValue())));
+    assertThat(commitInfos).isNotNull();
+    assertThat(commitInfos).isNotEmpty();
+    assertThat(commitInfos.get(0).getCommitId()).isNotNull();
   }
 
   @Test(expected = OpalGitException.class)
@@ -69,8 +64,8 @@ public class OpalGitCommitsLogCommandTest extends AbstractOpalGitCommandTest {
     OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(
         versionControlSystem.getRepository(DATASOURCE_NAME)).addDatasourceName(DATASOURCE_NAME).build();
     List<CommitInfo> commitInfos = command.execute();
-    assertThat(commitInfos, not(is(nullValue())));
-    assertTrue(commitInfos.size() > 0);
+    assertThat(commitInfos).isNotNull();
+    assertThat(commitInfos).isNotEmpty();
   }
 
   /**
@@ -81,8 +76,8 @@ public class OpalGitCommitsLogCommandTest extends AbstractOpalGitCommandTest {
     OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(
         versionControlSystem.getRepository(DATASOURCE_NAME)).addDatasourceName(DATASOURCE_NAME).addPath("").build();
     List<CommitInfo> commitInfos = command.execute();
-    assertThat(commitInfos, not(is(nullValue())));
-    assertTrue(commitInfos.size() > 0);
+    assertThat(commitInfos).isNotNull();
+    assertThat(commitInfos).isNotEmpty();
   }
 
   @Test
@@ -92,12 +87,12 @@ public class OpalGitCommitsLogCommandTest extends AbstractOpalGitCommandTest {
         .addPath("TestView/TOTO_VAR.js").build();
 
     List<CommitInfo> commitInfos = command.execute();
-    assertThat(commitInfos, not(is(nullValue())));
-    assertThat(commitInfos.size(), not(is(0)));
+    assertThat(commitInfos).isNotNull();
+    assertThat(commitInfos).isNotEmpty();
     CommitInfo firstCommit = commitInfos.get(0);
-    assertThat(firstCommit.getCommitId(), not(is(nullValue())));
-    assertThat(firstCommit.getIsHead(), is(true));
-    assertThat(firstCommit.getIsCurrent(), is(true));
+    assertThat(firstCommit.getCommitId()).isNotNull();
+    assertThat(firstCommit.getIsHead()).isTrue();
+    assertThat(firstCommit.getIsCurrent()).isTrue();
   }
 
   @Test
@@ -107,12 +102,12 @@ public class OpalGitCommitsLogCommandTest extends AbstractOpalGitCommandTest {
         .addPath("TestView/PLACE_NAME.js").build();
 
     List<CommitInfo> commitInfos = command.execute();
-    assertThat(commitInfos, not(is(nullValue())));
-    assertThat(commitInfos.size(), not(is(0)));
+    assertThat(commitInfos).isNotNull();
+    assertThat(commitInfos).isNotEmpty();
     CommitInfo firstCommit = commitInfos.get(0);
-    assertThat(firstCommit.getCommitId(), not(is(nullValue())));
-    assertThat(firstCommit.getIsHead(), is(false));
-    assertThat(firstCommit.getIsCurrent(), is(true));
+    assertThat(firstCommit.getCommitId()).isNotNull();
+    assertThat(firstCommit.getIsHead()).isFalse();
+    assertThat(firstCommit.getIsCurrent()).isTrue();
   }
 
   @Test
@@ -122,12 +117,12 @@ public class OpalGitCommitsLogCommandTest extends AbstractOpalGitCommandTest {
         .build();
 
     List<CommitInfo> commitInfos = command.execute();
-    assertThat(commitInfos, not(is(nullValue())));
-    assertThat(commitInfos.size(), greaterThan(5));
+    assertThat(commitInfos).isNotNull();
+    assertThat(commitInfos.size()).isGreaterThan(5);
     CommitInfo firstCommit = commitInfos.get(5);
-    assertThat(firstCommit.getCommitId(), not(is(nullValue())));
-    assertThat(firstCommit.getIsHead(), is(false));
-    assertThat(firstCommit.getIsCurrent(), is(false));
+    assertThat(firstCommit.getCommitId()).isNotNull();
+    assertThat(firstCommit.getIsHead()).isFalse();
+    assertThat(firstCommit.getIsCurrent()).isFalse();
   }
 
   @Test
@@ -138,13 +133,12 @@ public class OpalGitCommitsLogCommandTest extends AbstractOpalGitCommandTest {
         versionControlSystem.getRepository(datasourceWithDeletions)).addDatasourceName(datasourceWithDeletions)
         .addPath(path).build();
     List<CommitInfo> commitInfos = command.execute();
-    assertThat(commitInfos.size(), is(3));
+    assertThat(commitInfos).hasSize(3);
 
-    command = new OpalGitCommitsLogCommand.Builder(
-        versionControlSystem.getRepository(datasourceWithDeletions)).addDatasourceName(datasourceWithDeletions)
-        .addPath(path).addExcludeDeletedRevisions(false).build();
+    command = new OpalGitCommitsLogCommand.Builder(versionControlSystem.getRepository(datasourceWithDeletions))
+        .addDatasourceName(datasourceWithDeletions).addPath(path).addExcludeDeletedRevisions(false).build();
     commitInfos = command.execute();
-    assertThat(commitInfos.size(), is(5));
+    assertThat(commitInfos).hasSize(5);
 
   }
 

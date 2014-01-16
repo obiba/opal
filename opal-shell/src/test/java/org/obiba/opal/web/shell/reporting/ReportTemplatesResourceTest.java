@@ -40,7 +40,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class ReportTemplatesResourceTest {
 
@@ -93,15 +93,15 @@ public class ReportTemplatesResourceTest {
     Set<ReportTemplateDto> reportTemplatesDtos = reportTemplateResource.getReportTemplates();
     ThreadContext.unbindSubject();
 
-    assertEquals(4, reportTemplates.size());
-    assertEquals(4, reportTemplatesDtos.size());
+    assertThat(reportTemplates).hasSize(4);
+    assertThat(reportTemplatesDtos).hasSize(4);
 
     ReportTemplateDto reportTemplateDto = (ReportTemplateDto) reportTemplatesDtos.toArray()[0];
-    assertEquals("template1", reportTemplateDto.getName());
-    assertEquals("design", reportTemplateDto.getDesign());
-    assertEquals("format", reportTemplateDto.getFormat());
-    assertEquals("schedule", reportTemplateDto.getCron());
-    assertEquals(2, reportTemplateDto.getParametersList().size());
+    assertThat(reportTemplateDto.getName()).isEqualTo("template1");
+    assertThat(reportTemplateDto.getDesign()).isEqualTo("design");
+    assertThat(reportTemplateDto.getFormat()).isEqualTo("format");
+    assertThat(reportTemplateDto.getCron()).isEqualTo("schedule");
+    assertThat(reportTemplateDto.getParametersList()).hasSize(2);
 
     verify(opalConfigurationServiceMock, mockSubject);
   }
@@ -139,8 +139,8 @@ public class ReportTemplatesResourceTest {
 
     Response response = reportTemplatesResource.createReportTemplate(Dtos.asDto(getReportTemplate("template9")));
 
-    assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-    assertEquals("/report-template/template9", response.getMetadata().get("location").get(0).toString());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
+    assertThat(response.getMetadata().get("location").get(0).toString()).isEqualTo("/report-template/template9");
 
     verify(opalConfigurationServiceMock, commandSchedulerServiceMock, commandRegistry);
   }

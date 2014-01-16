@@ -21,8 +21,7 @@ import com.thoughtworks.xstream.io.StreamException;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class OpalViewPersistenceStrategyTest {
 
@@ -49,25 +48,25 @@ public class OpalViewPersistenceStrategyTest {
     // Re-initialise to pick up the the OPAL_HOME specified for this test.
     viewPersistenceStrategy = new OpalViewPersistenceStrategy();
     Set<View> result = viewPersistenceStrategy.readViews("datasourceName");
-    assertThat(result.isEmpty(), is(true));
+    assertThat(result).isEmpty();
   }
 
   @Test
   public void testReadWithNoViewsFileReturnsEmptySet() throws Exception {
     Set<View> result = viewPersistenceStrategy.readViews("datasourceName");
-    assertThat(result.isEmpty(), is(true));
+    assertThat(result).isEmpty();
   }
 
   @Test
   public void testReadOfSimpleView() throws Exception {
     Set<View> result = viewPersistenceStrategy.readViews("simple-views");
-    assertThat(result.size(), is(1));
+    assertThat(result).hasSize(1);
   }
 
   @Test(expected = StreamException.class)
   public void testReadofEmptyViewFileThrowsStreamException() throws Exception {
     Set<View> result = viewPersistenceStrategy.readViews("empty-views");
-    assertThat(result.isEmpty(), is(true));
+    assertThat(result).isEmpty();
   }
 
   @Ignore
@@ -89,12 +88,12 @@ public class OpalViewPersistenceStrategyTest {
     viewPersistenceStrategy.writeViews("temporary-views", views, null);
     // Verify the temporary views file exists.
     Set<View> singleViewResult = viewPersistenceStrategy.readViews("temporary-views");
-    assertThat(singleViewResult.size(), is(1));
+    assertThat(singleViewResult).hasSize(1);
     // Write the temporary views file with an empty views set. This will remove the file.
     viewPersistenceStrategy.writeViews("temporary-views", ImmutableSet.<View>of(), null);
     // Verify that the temporary file has been removed, by ensuring that an empty set has been returned.
     Set<View> noViewsResult = viewPersistenceStrategy.readViews("temporary-views");
-    assertThat(noViewsResult.isEmpty(), is(true));
+    assertThat(noViewsResult).isEmpty();
   }
 
   @Ignore

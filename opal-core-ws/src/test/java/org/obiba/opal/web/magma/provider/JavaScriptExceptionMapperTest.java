@@ -16,9 +16,7 @@ import org.mozilla.javascript.JavaScriptException;
 import org.obiba.opal.web.model.Magma.JavaScriptErrorDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  * Unit tests for {@link JavaScriptExceptionMapper}.
@@ -38,7 +36,7 @@ public class JavaScriptExceptionMapperTest {
     Response response = sut.toResponse(exception);
 
     // Verify
-    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
   }
 
   @Test
@@ -52,12 +50,12 @@ public class JavaScriptExceptionMapperTest {
 
     // Verify
     Object entity = response.getEntity();
-    assertNotNull(entity);
-    assertTrue(entity instanceof ClientErrorDto);
+    assertThat(entity).isNotNull();
+    assertThat(entity).isInstanceOf(ClientErrorDto.class);
     ClientErrorDto clientErrorDto = (ClientErrorDto) entity;
-    assertEquals(1, clientErrorDto.getExtensionCount(JavaScriptErrorDto.errors));
+    assertThat(clientErrorDto.getExtensionCount(JavaScriptErrorDto.errors)).isEqualTo(1);
     JavaScriptErrorDto jsErrorDto = clientErrorDto.getExtension(JavaScriptErrorDto.errors, 0);
-    assertEquals("sourceName", jsErrorDto.getSourceName());
-    assertEquals(1, jsErrorDto.getLineNumber());
+    assertThat(jsErrorDto.getSourceName()).isEqualTo("sourceName");
+    assertThat(jsErrorDto.getLineNumber()).isEqualTo(1);
   }
 }

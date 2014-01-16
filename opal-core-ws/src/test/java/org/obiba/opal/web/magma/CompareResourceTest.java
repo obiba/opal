@@ -33,10 +33,7 @@ import org.obiba.magma.type.TextType;
 import org.obiba.opal.web.model.Magma.DatasourceCompareDto;
 import org.obiba.opal.web.model.Magma.TableCompareDto;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  * Unit tests for {@link CompareResourceImpl}.
@@ -76,15 +73,15 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
     Response response = sut.compare("dsWith.with");
 
     // Verify
-    assertNotNull(response);
-    assertTrue(response.getEntity() instanceof TableCompareDto);
+    assertThat(response).isNotNull();
+    assertThat(response.getEntity()).isInstanceOf(TableCompareDto.class);
     TableCompareDto dto = (TableCompareDto) response.getEntity();
-    assertEquals(1, dto.getUnmodifiedVariablesCount()); // one variable ("v1")
-    assertEquals(0, dto.getModifiedVariablesCount()); // no variable
-    assertEquals("v1", dto.getUnmodifiedVariables(0).getName());
-    assertEquals(0, dto.getNewVariablesCount()); // no new variables
-    assertEquals(0, dto.getMissingVariablesCount()); // no missing variables
-    assertEquals(0, dto.getConflictsCount()); // no conflicts
+    assertThat(1).isEqualTo(dto.getUnmodifiedVariablesCount()); // one variable ("v1")
+    assertThat(0).isEqualTo(dto.getModifiedVariablesCount()); // no variable
+    assertThat("v1").isEqualTo(dto.getUnmodifiedVariables(0).getName());
+    assertThat(0).isEqualTo(dto.getNewVariablesCount()); // no new variables
+    assertThat(0).isEqualTo(dto.getMissingVariablesCount()); // no missing variables
+    assertThat(0).isEqualTo(dto.getConflictsCount()); // no conflicts
   }
 
   @Test
@@ -100,15 +97,15 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
     Response response = sut.compare("dsWith.with");
 
     // Verify
-    assertNotNull(response);
-    assertTrue(response.getEntity() instanceof TableCompareDto);
+    assertThat(response).isNotNull();
+    assertThat(response.getEntity()).isInstanceOf(TableCompareDto.class);
     TableCompareDto dto = (TableCompareDto) response.getEntity();
-    assertEquals(0, dto.getUnmodifiedVariablesCount()); // one variable ("v1")
-    assertEquals(1, dto.getModifiedVariablesCount()); // one variable ("v1")
-    assertEquals("v1", dto.getModifiedVariables(0).getName());
-    assertEquals(0, dto.getNewVariablesCount()); // no new variables
-    assertEquals(0, dto.getMissingVariablesCount()); // no missing variables
-    assertEquals(0, dto.getConflictsCount()); // no conflicts
+    assertThat(0).isEqualTo(dto.getUnmodifiedVariablesCount()); // one variable ("v1")
+    assertThat(1).isEqualTo(dto.getModifiedVariablesCount()); // one variable ("v1")
+    assertThat("v1").isEqualTo(dto.getModifiedVariables(0).getName());
+    assertThat(0).isEqualTo(dto.getNewVariablesCount()); // no new variables
+    assertThat(0).isEqualTo(dto.getMissingVariablesCount()); // no missing variables
+    assertThat(0).isEqualTo(dto.getConflictsCount()); // no conflicts
   }
 
   @Test
@@ -124,15 +121,15 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
     Response response = sut.compare("dsWith.with");
 
     // Verify
-    assertNotNull(response);
-    assertTrue(response.getEntity() instanceof TableCompareDto);
+    assertThat(response).isNotNull();
+    assertThat(response.getEntity()).isInstanceOf(TableCompareDto.class);
     TableCompareDto dto = (TableCompareDto) response.getEntity();
-    assertEquals(0, dto.getUnmodifiedVariablesCount()); // one variable ("v1")
-    assertEquals(1, dto.getModifiedVariablesCount()); // one variable ("v1")
-    assertEquals("v1", dto.getModifiedVariables(0).getName());
-    assertEquals(0, dto.getNewVariablesCount()); // no new variables
-    assertEquals(0, dto.getMissingVariablesCount()); // no missing variables
-    assertEquals(0, dto.getConflictsCount()); // no conflicts
+    assertThat(0).isEqualTo(dto.getUnmodifiedVariablesCount()); // one variable ("v1")
+    assertThat(1).isEqualTo(dto.getModifiedVariablesCount()); // one variable ("v1")
+    assertThat("v1").isEqualTo(dto.getModifiedVariables(0).getName());
+    assertThat(0).isEqualTo(dto.getNewVariablesCount()); // no new variables
+    assertThat(0).isEqualTo(dto.getMissingVariablesCount()); // no missing variables
+    assertThat(0).isEqualTo(dto.getConflictsCount()); // no conflicts
   }
 
   @Test
@@ -148,16 +145,16 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
     Response response = sut.compare("dsWith.with");
 
     // Verify
-    assertNotNull(response);
-    assertTrue(response.getEntity() instanceof TableCompareDto);
+    assertThat(response).isNotNull();
+    assertThat(response.getEntity()).isInstanceOf(TableCompareDto.class);
     TableCompareDto dto = (TableCompareDto) response.getEntity();
-    assertEquals(1, dto.getUnmodifiedVariablesCount()); // one variable ("v1")
-    assertEquals(0, dto.getModifiedVariablesCount()); // no variable
-    assertEquals("v1", dto.getUnmodifiedVariables(0).getName());
-    assertEquals(1, dto.getNewVariablesCount()); // one new variable("v2")
-    assertEquals("v2", dto.getNewVariables(0).getName());
-    assertEquals(0, dto.getMissingVariablesCount()); // no missing variables
-    assertEquals(0, dto.getConflictsCount()); // no conflicts
+    assertThat(1).isEqualTo(dto.getUnmodifiedVariablesCount()); // one variable ("v1")
+    assertThat(0).isEqualTo(dto.getModifiedVariablesCount()); // no variable
+    assertThat("v1").isEqualTo(dto.getUnmodifiedVariables(0).getName());
+    assertThat(1).isEqualTo(dto.getNewVariablesCount()); // one new variable("v2")
+    assertThat("v2").isEqualTo(dto.getNewVariables(0).getName());
+    assertThat(0).isEqualTo(dto.getMissingVariablesCount()); // no missing variables
+    assertThat(0).isEqualTo(dto.getConflictsCount()); // no conflicts
   }
 
   @Test
@@ -173,16 +170,16 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
     Response response = sut.compare("dsWith.with");
 
     // Verify
-    assertNotNull(response);
-    assertTrue(response.getEntity() instanceof TableCompareDto);
+    assertThat(response).isNotNull();
+    assertThat(response.getEntity()).isInstanceOf(TableCompareDto.class);
     TableCompareDto dto = (TableCompareDto) response.getEntity();
-    assertEquals(1, dto.getUnmodifiedVariablesCount()); // one variable ("v1")
-    assertEquals(0, dto.getModifiedVariablesCount()); // no variable
-    assertEquals("v1", dto.getUnmodifiedVariables(0).getName());
-    assertEquals(0, dto.getNewVariablesCount()); // no new variables
-    assertEquals(1, dto.getMissingVariablesCount()); // one missing variable ("v2")
-    assertEquals("v2", dto.getMissingVariables(0).getName());
-    assertEquals(0, dto.getConflictsCount()); // no conflicts
+    assertThat(1).isEqualTo(dto.getUnmodifiedVariablesCount()); // one variable ("v1")
+    assertThat(0).isEqualTo(dto.getModifiedVariablesCount()); // no variable
+    assertThat("v1").isEqualTo(dto.getUnmodifiedVariables(0).getName());
+    assertThat(0).isEqualTo(dto.getNewVariablesCount()); // no new variables
+    assertThat(1).isEqualTo(dto.getMissingVariablesCount()); // one missing variable ("v2")
+    assertThat("v2").isEqualTo(dto.getMissingVariables(0).getName());
+    assertThat(0).isEqualTo(dto.getConflictsCount()); // no conflicts
   }
 
   @Test
@@ -198,17 +195,17 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
     Response response = sut.compare("dsWith.with");
 
     // Verify
-    assertNotNull(response);
-    assertTrue(response.getEntity() instanceof TableCompareDto);
+    assertThat(response).isNotNull();
+    assertThat(response.getEntity()).isInstanceOf(TableCompareDto.class);
     TableCompareDto dto = (TableCompareDto) response.getEntity();
-    assertEquals(0, dto.getUnmodifiedVariablesCount()); // no existing (non-conflicting) variables
-    assertEquals(0, dto.getNewVariablesCount()); // no new variables
-    assertEquals(0, dto.getMissingVariablesCount()); // no missing variables
-    assertEquals(1, dto.getConflictsCount()); // one conflict (entity type)
-    assertEquals("v1", dto.getConflicts(0).getVariable().getName());
-    assertEquals("IncompatibleEntityType", dto.getConflicts(0).getCode());
-    assertEquals("Participant", dto.getConflicts(0).getArguments(0));
-    assertEquals("Instrument", dto.getConflicts(0).getArguments(1));
+    assertThat(0).isEqualTo(dto.getUnmodifiedVariablesCount()); // no existing (non-conflicting) variables
+    assertThat(0).isEqualTo(dto.getNewVariablesCount()); // no new variables
+    assertThat(0).isEqualTo(dto.getMissingVariablesCount()); // no missing variables
+    assertThat(1).isEqualTo(dto.getConflictsCount()); // one conflict (entity type)
+    assertThat("v1").isEqualTo(dto.getConflicts(0).getVariable().getName());
+    assertThat("IncompatibleEntityType").isEqualTo(dto.getConflicts(0).getCode());
+    assertThat("Participant").isEqualTo(dto.getConflicts(0).getArguments(0));
+    assertThat("Instrument").isEqualTo(dto.getConflicts(0).getArguments(1));
   }
 
   @Test
@@ -224,18 +221,18 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
     Response response = sut.compare("dsWith.with");
 
     // Verify
-    assertNotNull(response);
-    assertTrue(response.getEntity() instanceof TableCompareDto);
+    assertThat(response).isNotNull();
+    assertThat(response.getEntity()).isInstanceOf(TableCompareDto.class);
     TableCompareDto dto = (TableCompareDto) response.getEntity();
-    assertEquals(0, dto.getUnmodifiedVariablesCount()); // no existing (non-conflicting) variables
-    assertEquals(0, dto.getNewVariablesCount()); // no new variables
-    assertEquals(0, dto.getMissingVariablesCount()); // no missing variables
-    assertEquals(1, dto.getConflictsCount()); // one conflict (value type)
-    assertEquals("v1", dto.getConflicts(0).getVariable().getName());
-    assertEquals("IncompatibleValueType", dto.getConflicts(0).getCode());
-    assertEquals(2, dto.getConflicts(0).getArgumentsCount());
-    assertEquals("text", dto.getConflicts(0).getArguments(0));
-    assertEquals("boolean", dto.getConflicts(0).getArguments(1));
+    assertThat(0).isEqualTo(dto.getUnmodifiedVariablesCount()); // no existing (non-conflicting) variables
+    assertThat(0).isEqualTo(dto.getNewVariablesCount()); // no new variables
+    assertThat(0).isEqualTo(dto.getMissingVariablesCount()); // no missing variables
+    assertThat(1).isEqualTo(dto.getConflictsCount()); // one conflict (value type)
+    assertThat("v1").isEqualTo(dto.getConflicts(0).getVariable().getName());
+    assertThat("IncompatibleValueType").isEqualTo(dto.getConflicts(0).getCode());
+    assertThat(2).isEqualTo(dto.getConflicts(0).getArgumentsCount());
+    assertThat("text").isEqualTo(dto.getConflicts(0).getArguments(0));
+    assertThat("boolean").isEqualTo(dto.getConflicts(0).getArguments(1));
   }
 
   //
@@ -261,19 +258,19 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
     Response response = sut.compare("with");
 
     // Verify
-    assertNotNull(response);
-    assertTrue(response.getEntity() instanceof DatasourceCompareDto);
+    assertThat(response).isNotNull();
+    assertThat(response.getEntity() instanceof DatasourceCompareDto).isTrue();
     DatasourceCompareDto dto = (DatasourceCompareDto) response.getEntity();
-    assertEquals("compared", dto.getCompared().getName());
-    assertEquals("with", dto.getWithDatasource().getName());
-    assertEquals(1, dto.getTableComparisonsCount());
-    assertEquals("vt1", dto.getTableComparisons(0).getCompared().getName());
-    assertEquals("vt1", dto.getTableComparisons(0).getWithTable().getName());
-    assertEquals(0, dto.getTableComparisons(0).getNewVariablesCount());
-    assertEquals(1, dto.getTableComparisons(0).getUnmodifiedVariablesCount());
-    assertEquals(0, dto.getTableComparisons(0).getModifiedVariablesCount());
-    assertEquals(0, dto.getTableComparisons(0).getMissingVariablesCount());
-    assertEquals(0, dto.getTableComparisons(0).getConflictsCount());
+    assertThat("compared").isEqualTo(dto.getCompared().getName());
+    assertThat("with").isEqualTo(dto.getWithDatasource().getName());
+    assertThat(1).isEqualTo(dto.getTableComparisonsCount());
+    assertThat("vt1").isEqualTo(dto.getTableComparisons(0).getCompared().getName());
+    assertThat("vt1").isEqualTo(dto.getTableComparisons(0).getWithTable().getName());
+    assertThat(0).isEqualTo(dto.getTableComparisons(0).getNewVariablesCount());
+    assertThat(1).isEqualTo(dto.getTableComparisons(0).getUnmodifiedVariablesCount());
+    assertThat(0).isEqualTo(dto.getTableComparisons(0).getModifiedVariablesCount());
+    assertThat(0).isEqualTo(dto.getTableComparisons(0).getMissingVariablesCount());
+    assertThat(0).isEqualTo(dto.getTableComparisons(0).getConflictsCount());
   }
 
   @Test
@@ -292,19 +289,19 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
     Response response = sut.compare("with");
 
     // Verify
-    assertNotNull(response);
-    assertTrue(response.getEntity() instanceof DatasourceCompareDto);
+    assertThat(response).isNotNull();
+    assertThat(response.getEntity()).isInstanceOf(DatasourceCompareDto.class);
     DatasourceCompareDto dto = (DatasourceCompareDto) response.getEntity();
-    assertEquals("compared", dto.getCompared().getName());
-    assertEquals("with", dto.getWithDatasource().getName());
-    assertEquals(1, dto.getTableComparisonsCount());
-    assertEquals("vt1", dto.getTableComparisons(0).getCompared().getName());
-    assertFalse(dto.getTableComparisons(0).hasWithTable());
-    assertEquals(1, dto.getTableComparisons(0).getNewVariablesCount());
-    assertEquals(0, dto.getTableComparisons(0).getUnmodifiedVariablesCount());
-    assertEquals(0, dto.getTableComparisons(0).getModifiedVariablesCount());
-    assertEquals(0, dto.getTableComparisons(0).getMissingVariablesCount());
-    assertEquals(0, dto.getTableComparisons(0).getConflictsCount());
+    assertThat("compared").isEqualTo(dto.getCompared().getName());
+    assertThat("with").isEqualTo(dto.getWithDatasource().getName());
+    assertThat(1).isEqualTo(dto.getTableComparisonsCount());
+    assertThat("vt1").isEqualTo(dto.getTableComparisons(0).getCompared().getName());
+    assertThat(dto.getTableComparisons(0).hasWithTable()).isFalse();
+    assertThat(1).isEqualTo(dto.getTableComparisons(0).getNewVariablesCount());
+    assertThat(0).isEqualTo(dto.getTableComparisons(0).getUnmodifiedVariablesCount());
+    assertThat(0).isEqualTo(dto.getTableComparisons(0).getModifiedVariablesCount());
+    assertThat(0).isEqualTo(dto.getTableComparisons(0).getMissingVariablesCount());
+    assertThat(0).isEqualTo(dto.getTableComparisons(0).getConflictsCount());
   }
 
   //

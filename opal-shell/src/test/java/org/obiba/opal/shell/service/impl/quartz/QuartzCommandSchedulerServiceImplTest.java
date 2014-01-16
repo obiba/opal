@@ -17,6 +17,7 @@ import org.easymock.IArgumentMatcher;
 import org.junit.Test;
 import org.obiba.opal.shell.OpalShell;
 import org.obiba.opal.shell.commands.Command;
+import org.obiba.opal.shell.service.CommandSchedulerService;
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
@@ -28,8 +29,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  * Unit tests for {@link QuartzCommandSchedulerServiceImpl}.
@@ -55,7 +55,7 @@ public class QuartzCommandSchedulerServiceImplTest {
     replay(schedulerMock, mockSubject);
 
     // Exercise
-    QuartzCommandSchedulerServiceImpl sut = new QuartzCommandSchedulerServiceImpl(schedulerMock);
+    CommandSchedulerService sut = new QuartzCommandSchedulerServiceImpl(schedulerMock);
     sut.addCommand("commandName", "reporting", new CommandStub("commandName", "commandLine"));
     ThreadContext.unbindSubject();
 
@@ -72,7 +72,7 @@ public class QuartzCommandSchedulerServiceImplTest {
     replay(schedulerMock);
 
     // Exercise
-    QuartzCommandSchedulerServiceImpl sut = new QuartzCommandSchedulerServiceImpl(schedulerMock);
+    CommandSchedulerService sut = new QuartzCommandSchedulerServiceImpl(schedulerMock);
     sut.deleteCommand("commandName", "reporting");
 
     // Verify behaviour
@@ -90,7 +90,7 @@ public class QuartzCommandSchedulerServiceImplTest {
     replay(schedulerMock);
 
     // Exercise
-    QuartzCommandSchedulerServiceImpl sut = new QuartzCommandSchedulerServiceImpl(schedulerMock);
+    CommandSchedulerService sut = new QuartzCommandSchedulerServiceImpl(schedulerMock);
     sut.scheduleCommand("commandName", "reporting", "0 * * * * ?");
 
     // Verify behaviour
@@ -109,7 +109,7 @@ public class QuartzCommandSchedulerServiceImplTest {
     replay(schedulerMock);
 
     // Exercise
-    QuartzCommandSchedulerServiceImpl sut = new QuartzCommandSchedulerServiceImpl(schedulerMock);
+    CommandSchedulerService sut = new QuartzCommandSchedulerServiceImpl(schedulerMock);
     sut.unscheduleCommand("commandName", "reporting");
 
     // Verify behaviour
@@ -128,12 +128,12 @@ public class QuartzCommandSchedulerServiceImplTest {
     replay(schedulerMock);
 
     // Exercise
-    QuartzCommandSchedulerServiceImpl sut = new QuartzCommandSchedulerServiceImpl(schedulerMock);
+    CommandSchedulerService sut = new QuartzCommandSchedulerServiceImpl(schedulerMock);
     String commandSchedule = sut.getCommandSchedule("commandName", "reporting");
 
     // Verify
-    assertNotNull(commandSchedule);
-    assertEquals("0 * * * * ?", commandSchedule);
+    assertThat(commandSchedule).isNotNull();
+    assertThat(commandSchedule).isEqualTo("0 * * * * ?");
   }
 
   @Test
@@ -150,12 +150,12 @@ public class QuartzCommandSchedulerServiceImplTest {
     replay(schedulerMock);
 
     // Exercise
-    QuartzCommandSchedulerServiceImpl sut = new QuartzCommandSchedulerServiceImpl(schedulerMock);
+    CommandSchedulerService sut = new QuartzCommandSchedulerServiceImpl(schedulerMock);
     String commandSchedule = sut.getCommandSchedule("commandName", "reporting");
 
     // Verify
-    assertNotNull(commandSchedule);
-    assertEquals("0 * * * * ?", commandSchedule);
+    assertThat(commandSchedule).isNotNull();
+    assertThat(commandSchedule).isEqualTo("0 * * * * ?");
   }
 
   @Test
@@ -167,11 +167,11 @@ public class QuartzCommandSchedulerServiceImplTest {
     replay(schedulerMock);
 
     // Exercise
-    QuartzCommandSchedulerServiceImpl sut = new QuartzCommandSchedulerServiceImpl(schedulerMock);
+    CommandSchedulerService sut = new QuartzCommandSchedulerServiceImpl(schedulerMock);
     String commandSchedule = sut.getCommandSchedule("commandName", "reporting");
 
     // Verify
-    assertEquals(null, commandSchedule);
+    assertThat(commandSchedule).isNull();
   }
 
   //

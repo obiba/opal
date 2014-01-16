@@ -15,8 +15,7 @@ import com.google.common.collect.Lists;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 @ContextConfiguration(classes = OpalGeneralConfigServiceImplTest.Config.class)
 public class OpalGeneralConfigServiceImplTest extends AbstractJUnit4SpringContextTests {
@@ -73,11 +72,11 @@ public class OpalGeneralConfigServiceImplTest extends AbstractJUnit4SpringContex
   }
 
   private void assertConfigEquals(OpalGeneralConfig config, OpalGeneralConfig found) {
-    assertNotNull(found);
-    assertEquals(config, found);
-    assertEquals(config.getName(), found.getName());
-    assertEquals(config.getDefaultCharacterSet(), found.getDefaultCharacterSet());
-    assertEquals(config.getLocalesAsString(), found.getLocalesAsString());
+    assertThat(found).isNotNull();
+    assertThat(config).isEqualTo(found);
+    assertThat(config.getName()).isEqualTo(found.getName());
+    assertThat(config.getDefaultCharacterSet()).isEqualTo(found.getDefaultCharacterSet());
+    assertThat(config.getLocalesAsString()).isEqualTo(found.getLocalesAsString());
     Asserts.assertCreatedTimestamps(config, found);
   }
 

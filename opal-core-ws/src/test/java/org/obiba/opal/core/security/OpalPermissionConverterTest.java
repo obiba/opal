@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.core.security;
 
-import org.junit.Assert;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  *
@@ -18,21 +18,21 @@ public abstract class OpalPermissionConverterTest<T> {
 
   protected void testConversion(String node, T perm, String... expected) {
     SubjectPermissionConverter converter = newConverter();
-    Assert.assertTrue(converter.canConvert("opal", perm.toString()));
-    Assert.assertNotNull(expected);
+    assertThat(converter.canConvert("opal", perm.toString())).isTrue();
+    assertThat(expected).isNotNull();
     Iterable<String> convertedIter = converter.convert("opal", node, perm.toString());
-    Assert.assertNotNull(convertedIter);
+    assertThat(convertedIter).isNotNull();
     System.out.println("opal:" + node + ":" + perm);
     for(String converted : convertedIter) {
       System.out.println("  " + converted);
     }
     int i = 0;
     for(String converted : convertedIter) {
-      Assert.assertTrue(i < expected.length);
-      Assert.assertEquals(expected[i], converted);
+      assertThat(expected.length).isGreaterThan(1);
+      assertThat(expected[i]).isEqualTo(converted);
       i++;
     }
-    Assert.assertEquals(expected.length, i);
+    assertThat(expected.length).isEqualTo(i);
   }
 
   protected abstract SubjectPermissionConverter newConverter();

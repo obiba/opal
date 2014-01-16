@@ -32,9 +32,7 @@ import com.google.common.collect.ImmutableList;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  *
@@ -57,7 +55,7 @@ public class CategoricalVariableSummaryTest {
         .addCategories("YES", "NO", "DNK", "PNA").build();
     CategoricalVariableSummary summary = computeFromTable(variable,
         Values.asValues(TextType.get(), "YES", "NO", "YES", "PNA", "DNK"));
-    assertThat(summary.getMode(), is("YES"));
+    assertThat(summary.getMode()).isEqualTo("YES");
   }
 
   @Test
@@ -66,7 +64,7 @@ public class CategoricalVariableSummaryTest {
         .addCategories("YES", "NO", "DNK", "PNA").build();
     CategoricalVariableSummary summary = computeFromTable(variable,
         Values.asValues(TextType.get(), "YES", "NO", null, null));
-    assertThat(summary.getMode(), is(CategoricalVariableSummary.NULL_NAME));
+    assertThat(summary.getMode()).isEqualTo(CategoricalVariableSummary.NULL_NAME);
   }
 
   @Test
@@ -75,7 +73,7 @@ public class CategoricalVariableSummaryTest {
         .build();
     CategoricalVariableSummary summary = computeFromTable(variable,
         ImmutableList.of(Values.asSequence(TextType.get(), "CAT1", "CAT2"), Values.asSequence(TextType.get(), "CAT1")));
-    assertThat(summary.getMode(), is("CAT1"));
+    assertThat(summary.getMode()).isEqualTo("CAT1");
   }
 
   @Test
@@ -84,7 +82,7 @@ public class CategoricalVariableSummaryTest {
         .build();
     CategoricalVariableSummary summary = computeFromTable(variable, ImmutableList
         .of(Values.asSequence(TextType.get(), "CAT1", "CAT2"), Values.asSequence(TextType.get(), "CAT1", null)));
-    assertThat(summary.getMode(), is("CAT1"));
+    assertThat(summary.getMode()).isEqualTo("CAT1");
   }
 
   @Test
@@ -93,7 +91,7 @@ public class CategoricalVariableSummaryTest {
         .build();
     CategoricalVariableSummary summary = computeFromTable(variable,
         ImmutableList.of(TextType.get().nullSequence(), Values.asSequence(TextType.get(), "CAT1")));
-    assertThat(summary.getMode(), is("CAT1"));
+    assertThat(summary.getMode()).isEqualTo("CAT1");
   }
 
   private CategoricalVariableSummary computeFromTable(Variable variable, Iterable<Value> values) {
@@ -113,7 +111,7 @@ public class CategoricalVariableSummaryTest {
 
     CategoricalVariableSummary summary = new CategoricalVariableSummary.Builder(variable)
         .addTable(table, table.getVariableValueSource(variable.getName())).build();
-    assertThat(summary, notNullValue());
+    assertThat(summary).isNotNull();
     return summary;
   }
 

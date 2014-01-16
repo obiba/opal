@@ -9,13 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.web.provider;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.obiba.opal.web.model.Magma.DatasourceDto;
 
 import com.googlecode.protobuf.format.JsonFormat;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class JsonFormatTest {
 
@@ -24,12 +23,12 @@ public class JsonFormatTest {
     String testValue = "ªºÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâäãåæçèéêëìíî";
 
     String json = JsonFormat.printToString(DatasourceDto.newBuilder().setName(testValue).setType("type").build());
-    Assert.assertThat(json, is("{\"name\": \"" + testValue + "\",\"type\": \"type\"}"));
+    assertThat(json).isEqualTo("{\"name\": \"" + testValue + "\",\"type\": \"type\"}");
 
     // Make sure we can read it back
     DatasourceDto.Builder builder = DatasourceDto.newBuilder();
     JsonFormat.merge(json, builder);
-    Assert.assertThat(builder.getName(), is(testValue));
+    assertThat(builder.getName()).isEqualTo(testValue);
   }
 
 }

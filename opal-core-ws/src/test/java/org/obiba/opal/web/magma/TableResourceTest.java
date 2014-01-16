@@ -45,10 +45,7 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  *
@@ -73,9 +70,9 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
 
     List<Magma.TableDto> dtos = resource.getTables(true, null);
     // alphabetical order
-    assertEquals(2, dtos.size());
-    assertEquals("Impedance418", dtos.get(0).getName());
-    assertEquals("Weight", dtos.get(1).getName());
+    assertThat(dtos).hasSize(2);
+    assertThat(dtos.get(0).getName()).isEqualTo("Impedance418");
+    assertThat(dtos.get(1).getName()).isEqualTo("Weight");
 
     checkWeightTableDto(dtos.get(1));
   }
@@ -138,40 +135,40 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     verify(segments.toArray());
 
     // alphabetical order
-    assertEquals(9, dtos.size());
-    assertEquals("InstrumentRun.Contraindication.code", dtos.get(0).getName());
-    assertEquals("InstrumentRun.Contraindication.type", dtos.get(1).getName());
-    assertEquals("InstrumentRun.instrumentBarcode", dtos.get(2).getName());
-    assertEquals("InstrumentRun.otherContraindication", dtos.get(3).getName());
-    assertEquals("InstrumentRun.timeEnd", dtos.get(4).getName());
-    assertEquals("InstrumentRun.timeStart", dtos.get(5).getName());
-    assertEquals("InstrumentRun.user", dtos.get(6).getName());
-    assertEquals("RES_WEIGHT", dtos.get(7).getName());
-    assertEquals("RES_WEIGHT.captureMethod", dtos.get(8).getName());
+    assertThat(dtos).hasSize(9);
+    assertThat("InstrumentRun.Contraindication.code").isEqualTo(dtos.get(0).getName());
+    assertThat("InstrumentRun.Contraindication.type").isEqualTo(dtos.get(1).getName());
+    assertThat("InstrumentRun.instrumentBarcode").isEqualTo(dtos.get(2).getName());
+    assertThat("InstrumentRun.otherContraindication").isEqualTo(dtos.get(3).getName());
+    assertThat("InstrumentRun.timeEnd").isEqualTo(dtos.get(4).getName());
+    assertThat("InstrumentRun.timeStart").isEqualTo(dtos.get(5).getName());
+    assertThat("InstrumentRun.user").isEqualTo(dtos.get(6).getName());
+    assertThat("RES_WEIGHT").isEqualTo(dtos.get(7).getName());
+    assertThat("RES_WEIGHT.captureMethod").isEqualTo(dtos.get(8).getName());
 
-    assertEquals("/datasource/" + DATASOURCE2 + "/table/Weight/variable/InstrumentRun.Contraindication.code",
-        dtos.get(0).getLink());
-    assertEquals("Weight", dtos.get(0).getParentLink().getRel());
-    assertEquals("/datasource/" + DATASOURCE2 + "/table/Weight", dtos.get(0).getParentLink().getLink());
+    assertThat("/datasource/" + DATASOURCE2 + "/table/Weight/variable/InstrumentRun.Contraindication.code")
+        .isEqualTo(dtos.get(0).getLink());
+    assertThat("Weight").isEqualTo(dtos.get(0).getParentLink().getRel());
+    assertThat("/datasource/" + DATASOURCE2 + "/table/Weight").isEqualTo(dtos.get(0).getParentLink().getLink());
 
-    assertEquals(3, dtos.get(8).getCategoriesCount());
-    assertEquals("MANUAL", dtos.get(8).getCategories(0).getName());
-    assertEquals("AUTOMATIC", dtos.get(8).getCategories(1).getName());
-    assertEquals("COMPUTED", dtos.get(8).getCategories(2).getName());
+    assertThat(3).isEqualTo(dtos.get(8).getCategoriesCount());
+    assertThat("MANUAL").isEqualTo(dtos.get(8).getCategories(0).getName());
+    assertThat("AUTOMATIC").isEqualTo(dtos.get(8).getCategories(1).getName());
+    assertThat("COMPUTED").isEqualTo(dtos.get(8).getCategories(2).getName());
 
-    assertEquals(5, dtos.get(7).getAttributesCount());
-    assertEquals(1, dtos.get(8).getAttributesCount());
-    assertEquals("stage", dtos.get(8).getAttributes(0).getName());
+    assertThat(5).isEqualTo(dtos.get(7).getAttributesCount());
+    assertThat(1).isEqualTo(dtos.get(8).getAttributesCount());
+    assertThat("stage").isEqualTo(dtos.get(8).getAttributes(0).getName());
   }
 
   private void checkWeightTableDto(Magma.TableDto dto) {
-    assertNotNull(dto);
-    assertEquals("Weight", dto.getName());
-    assertEquals(PARTICIPANT, dto.getEntityType());
-    assertEquals(9, dto.getVariableCount());
-    assertEquals(0, dto.getValueSetCount());
-    assertEquals(DATASOURCE2, dto.getDatasourceName());
-    assertEquals("/datasource/" + DATASOURCE2 + "/table/Weight", dto.getLink());
+    assertThat(dto).isNotNull();
+    assertThat("Weight").isEqualTo(dto.getName());
+    assertThat(PARTICIPANT).isEqualTo(dto.getEntityType());
+    assertThat(9).isEqualTo(dto.getVariableCount());
+    assertThat(0).isEqualTo(dto.getValueSetCount());
+    assertThat(DATASOURCE2).isEqualTo(dto.getDatasourceName());
+    assertThat("/datasource/" + DATASOURCE2 + "/table/Weight").isEqualTo(dto.getLink());
   }
 
   @Test
@@ -213,7 +210,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testAddOrUpdateVariables_InternalServerError() {
     Response response = new VariablesResourceImpl().addOrUpdateVariables(null, null);
-    assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
+    assertThat(Status.INTERNAL_SERVER_ERROR.getStatusCode()).isEqualTo(response.getStatus());
   }
 
   @Test
@@ -230,10 +227,10 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
 
     // Verify
     verify(mockContext);
-    assertNotNull(localeDtos);
-    assertEquals(tableResource.getLocales().size(), ImmutableSet.copyOf(localeDtos).size());
+    assertThat(localeDtos).isNotNull();
+    assertThat(tableResource.getLocales().size()).isEqualTo(ImmutableSet.copyOf(localeDtos).size());
     for(LocaleDto localeDto : localeDtos) {
-      assertFalse(localeDto.hasDisplay());
+      assertThat(localeDto.hasDisplay()).isFalse();
     }
   }
 
@@ -252,14 +249,14 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
 
     // Verify
     verify(mockContext);
-    assertNotNull(localeDtos);
-    assertEquals(tableResource.getLocales().size(), ImmutableSet.copyOf(localeDtos).size());
+    assertThat(localeDtos).isNotNull();
+    assertThat(tableResource.getLocales().size()).isEqualTo(ImmutableSet.copyOf(localeDtos).size());
     for(LocaleDto localeDto : localeDtos) {
-      assertTrue(localeDto.hasDisplay());
+      assertThat(localeDto.hasDisplay()).isTrue();
       if("en".equals(localeDto.getName())) {
-        assertEquals("English", localeDto.getDisplay());
+        assertThat(localeDto.getDisplay()).isEqualTo("English");
       } else if("fr".equals(localeDto.getName())) {
-        assertEquals("French", localeDto.getDisplay());
+        assertThat(localeDto.getDisplay()).isEqualTo("French");
       }
     }
   }
@@ -279,14 +276,14 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
 
     // Verify
     verify(mockContext);
-    assertNotNull(localeDtos);
-    assertEquals(tableResource.getLocales().size(), ImmutableSet.copyOf(localeDtos).size());
+    assertThat(localeDtos).isNotNull();
+    assertThat(tableResource.getLocales().size()).isEqualTo(ImmutableSet.copyOf(localeDtos).size());
     for(LocaleDto localeDto : localeDtos) {
-      assertTrue(localeDto.hasDisplay());
+      assertThat(localeDto.hasDisplay()).isTrue();
       if("en".equals(localeDto.getName())) {
-        assertEquals("anglais", localeDto.getDisplay());
+        assertThat("anglais").isEqualTo(localeDto.getDisplay());
       } else if("fr".equals(localeDto.getName())) {
-        assertEquals("fran\u00e7ais", localeDto.getDisplay());
+        assertThat("fran\u00e7ais").isEqualTo(localeDto.getDisplay());
       }
     }
   }
@@ -316,14 +313,13 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     Variable variable = variableResource.getVariableValueSource().getVariable();
 
     // Verify state
-    assertNotNull(variable);
-    assertEquals(PARTICIPANT, variable.getEntityType());
-    assertEquals(TextType.get(), variable.getValueType());
-    assertEquals(false, variable.isRepeatable());
-    assertEquals(script, variable.getAttributeStringValue("script"));
-    assertTrue(hasCategory(variable, "CAT1"));
-    assertTrue(hasCategory(variable, "CAT2"));
-
+    assertThat(variable).isNotNull();
+    assertThat(PARTICIPANT).isEqualTo(variable.getEntityType());
+    assertThat(TextType.get()).isEqualTo((TextType) variable.getValueType());
+    assertThat(variable.isRepeatable()).isFalse();
+    assertThat(script).isEqualTo(variable.getAttributeStringValue("script"));
+    assertThat(hasCategory(variable, "CAT1")).isTrue();
+    assertThat(hasCategory(variable, "CAT2")).isTrue();
   }
 
   private boolean hasCategory(Variable variable, String category) {

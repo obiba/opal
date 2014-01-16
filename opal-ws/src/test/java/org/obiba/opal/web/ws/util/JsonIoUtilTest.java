@@ -17,9 +17,7 @@ import java.util.Collection;
 import org.junit.Test;
 import org.obiba.opal.web.model.Magma.DatasourceDto;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  *
@@ -30,21 +28,21 @@ public class JsonIoUtilTest {
   public void test_printCollectionWithEmptyCollection() throws IOException {
     StringBuilder output = new StringBuilder();
     JsonIoUtil.printCollection(createDtos(), output);
-    assertThat(output.toString(), is("[]"));
+    assertThat(output.toString()).isEqualTo("[]");
   }
 
   @Test
   public void test_printCollectionWithSingletonCollection() throws IOException {
     StringBuilder output = new StringBuilder();
     JsonIoUtil.printCollection(createDtos("singleton"), output);
-    assertThat(output.toString(), is(createJs("singleton")));
+    assertThat(output.toString()).isEqualTo(createJs("singleton"));
   }
 
   @Test
   public void test_printCollectionWithTwoElements() throws IOException {
     StringBuilder output = new StringBuilder();
     JsonIoUtil.printCollection(createDtos("first", "second"), output);
-    assertThat(output.toString(), is(createJs("first", "second")));
+    assertThat(output.toString()).isEqualTo(createJs("first", "second"));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -60,24 +58,24 @@ public class JsonIoUtilTest {
   @Test
   public void test_mergeCollectionWithEmptyArray() throws IOException {
     Collection<DatasourceDto> msgs = JsonIoUtil.mergeCollection(new StringReader("[]"), DatasourceDto.newBuilder());
-    assertThat(msgs, notNullValue());
-    assertThat(msgs.size(), is(0));
+    assertThat(msgs).isNotNull();
+    assertThat(msgs).isEmpty();
   }
 
   @Test
   public void test_mergeCollectionSingleElement() throws IOException {
     Collection<DatasourceDto> msgs = JsonIoUtil
         .mergeCollection(new StringReader(createJs("singleton")), DatasourceDto.newBuilder());
-    assertThat(msgs, notNullValue());
-    assertThat(msgs, is(createDtos("singleton")));
+    assertThat(msgs).isNotNull();
+    assertThat(msgs).isEqualTo(createDtos("singleton"));
   }
 
   @Test
   public void test_mergeCollectionMultipleElements() throws IOException {
     Collection<DatasourceDto> msgs = JsonIoUtil
         .mergeCollection(new StringReader(createJs("first", "second")), DatasourceDto.newBuilder());
-    assertThat(msgs, notNullValue());
-    assertThat(msgs, is(createDtos("first", "second")));
+    assertThat(msgs).isNotNull();
+    assertThat(msgs).isEqualTo(createDtos("first", "second"));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -95,7 +93,7 @@ public class JsonIoUtilTest {
     JsonIoUtil.mergeCollection(new StringReader(""), null, DatasourceDto.newBuilder());
   }
 
-  private Collection<DatasourceDto> createDtos(String... names) {
+  private Iterable<DatasourceDto> createDtos(String... names) {
     Collection<DatasourceDto> dtos = new ArrayList<>(names.length);
     for(String name : names) {
       dtos.add(DatasourceDto.newBuilder().setName(name).setType("type").setLink("http://localhost/" + name).build());

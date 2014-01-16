@@ -10,7 +10,6 @@
 package org.obiba.opal.fs;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
@@ -18,7 +17,6 @@ import java.util.List;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockftpserver.fake.FakeFtpServer;
@@ -33,8 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.io.CharStreams;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assume.assumeTrue;
 
 public class OpalFileSystemTest {
@@ -82,22 +79,22 @@ public class OpalFileSystemTest {
   public void testLocalFile() throws FileSystemException {
     log.info("file: {}", fsLocal.getRoot().resolveFile("temp.pem"));
     fsLocal.getLocalFile(fsLocalRoot.resolveFile("temp.pem"));
-    Assert.assertTrue(fsLocal.isLocalFile(fsLocalRoot.resolveFile("temp.pem")));
+    assertThat(fsLocal.isLocalFile(fsLocalRoot.resolveFile("temp.pem"))).isTrue();
   }
 
   @Test
   public void testFtpFileNotLocalFile() throws FileSystemException {
     assumeTrue(runningOsIsWindows());
-    assertFalse(fsFtp.isLocalFile(fsFtpRoot.resolveFile("/temp/file2.txt")));
+    assertThat(fsFtp.isLocalFile(fsFtpRoot.resolveFile("/temp/file2.txt"))).isFalse();
   }
 
   @Test
-  public void getLocalFileFromFtp() throws FileNotFoundException, IOException {
+  public void getLocalFileFromFtp() throws IOException {
     assumeTrue(runningOsIsWindows());
-    assertFalse(fsFtp.isLocalFile(fsFtpRoot.resolveFile("/temp/file2.txt")));
+    assertThat(fsFtp.isLocalFile(fsFtpRoot.resolveFile("/temp/file2.txt"))).isFalse();
     File localFile = fsFtp.getLocalFile(fsFtpRoot.resolveFile("/temp/file2.txt"));
     List<String> lines = CharStreams.readLines(new FileReader(localFile));
-    assertEquals("this is the file content", lines.get(0));
+    assertThat(lines.get(0)).isEqualTo("this is the file content");
   }
 
   private boolean runningOsIsWindows() {
@@ -111,47 +108,46 @@ public class OpalFileSystemTest {
     FileObject file = fsLocalRoot.resolveFile("temp.pem");
 
     String obfuscatedFilePath = fsLocal.getObfuscatedPath(file);
-    assertEquals("227379988e6f2c3e9eb87b1f7d7bd055", obfuscatedFilePath);
+    assertThat(obfuscatedFilePath).isEqualTo("227379988e6f2c3e9eb87b1f7d7bd055");
 
     file = fsLocalRoot.resolveFile("/test2/test21/temp2.pem");
     obfuscatedFilePath = fsLocal.getObfuscatedPath(file);
-    assertEquals("269dd3644748e20182274c7a9de2ee6", obfuscatedFilePath);
+    assertThat(obfuscatedFilePath).isEqualTo("269dd3644748e20182274c7a9de2ee6");
 
     file = fsLocalRoot.resolveFile("/test2/test21/temp.pem");
     obfuscatedFilePath = fsLocal.getObfuscatedPath(file);
-    assertEquals("30aa4ab41dbfeecb9e92d223bcaccb4", obfuscatedFilePath);
+    assertThat(obfuscatedFilePath).isEqualTo("30aa4ab41dbfeecb9e92d223bcaccb4");
 
     file = fsLocalRoot.resolveFile("/test2/temp.pem");
     obfuscatedFilePath = fsLocal.getObfuscatedPath(file);
-    assertEquals("508e41fae4e3de7a3045c2c9108f7fec", obfuscatedFilePath);
+    assertThat(obfuscatedFilePath).isEqualTo("508e41fae4e3de7a3045c2c9108f7fec");
 
     file = fsLocalRoot.resolveFile("/reports/test2/test21/temp.pem");
     obfuscatedFilePath = fsLocal.getObfuscatedPath(file);
-    assertEquals("f5f0f7be20e4b7eadca209fb071292b", obfuscatedFilePath);
+    assertThat(obfuscatedFilePath).isEqualTo("f5f0f7be20e4b7eadca209fb071292b");
   }
 
   @SuppressWarnings("ReuseOfLocalVariable")
   @Test
   public void testResolveFileFromObfuscatedPath_PathIsResolved() throws FileSystemException {
     FileObject file = fsLocal.resolveFileFromObfuscatedPath(fsLocalRoot, "227379988e6f2c3e9eb87b1f7d7bd055");
-    assertEquals("/temp.pem", file.getName().getPath());
+    assertThat(file.getName().getPath()).isEqualTo("/temp.pem");
 
     file = fsLocal.resolveFileFromObfuscatedPath(fsLocalRoot, "269dd3644748e20182274c7a9de2ee6");
-    assertEquals("/test2/test21/temp2.pem", file.getName().getPath());
+    assertThat(file.getName().getPath()).isEqualTo("/test2/test21/temp2.pem");
 
     file = fsLocal.resolveFileFromObfuscatedPath(fsLocalRoot, "30aa4ab41dbfeecb9e92d223bcaccb4");
-    assertEquals("/test2/test21/temp.pem", file.getName().getPath());
+    assertThat(file.getName().getPath()).isEqualTo("/test2/test21/temp.pem");
 
     file = fsLocal.resolveFileFromObfuscatedPath(fsLocalRoot, "508e41fae4e3de7a3045c2c9108f7fec");
-    assertEquals("/test2/temp.pem", file.getName().getPath());
+    assertThat(file.getName().getPath()).isEqualTo("/test2/temp.pem");
 
   }
 
   @Test
   public void testResolveFileFromObfuscatedPath_PathIsNotResolved() throws FileSystemException {
     FileObject file = fsLocal.resolveFileFromObfuscatedPath(fsLocalRoot, "xxxx");
-    Assert.assertNull(file);
-
+    assertThat(file).isNull();
   }
 
   @After
