@@ -86,6 +86,7 @@ public class TasksView extends ViewImpl implements Display {
     pager.setVisible(rows.length() > 50); // OPAL-901
     pager.firstPage();
     dataProvider.setList(JsArrays.toList(rows));
+    pager.setVisible(dataProvider.getList().size() > pager.getPageSize());
   }
 
   @Override

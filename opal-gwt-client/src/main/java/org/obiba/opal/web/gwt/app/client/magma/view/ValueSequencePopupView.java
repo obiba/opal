@@ -138,6 +138,7 @@ public class ValueSequencePopupView extends ModalPopupViewWithUiHandlers<ValueSe
     dataProvider.setList(new ArrayList<ValueOccurrence>());
     dataProvider.refresh();
     fetcher.request(null);
+    pager.setVisible(dataProvider.getList().size() > pager.getPageSize());
   }
 
   @Override
@@ -169,6 +170,7 @@ public class ValueSequencePopupView extends ModalPopupViewWithUiHandlers<ValueSe
     dataProvider.setList(occurrences);
     dataProvider.refresh();
     valuesTable.setEmptyTableWidget(noValues);
+    pager.setVisible(dataProvider.getList().size() > pager.getPageSize());
   }
 
   //
