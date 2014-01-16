@@ -62,8 +62,6 @@ import static org.obiba.opal.web.gwt.app.client.magma.variable.presenter.Categor
 public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<CategoriesEditorModalUiHandlers>
     implements Display {
 
-  private static final int MIN_WIDTH = 780;
-
   private static final int MIN_HEIGHT = 500;
 
   private static final String LABEL = "label";
@@ -130,7 +128,6 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     initWidget(uiBinder.createAndBindUi(this));
     dialog.setTitle(translations.editCategories());
     dialog.setResizable(true);
-//    dialog.setMinWidth(MIN_WIDTH);
     dialog.setMinHeight(MIN_HEIGHT);
 
     table.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.DISABLED);
