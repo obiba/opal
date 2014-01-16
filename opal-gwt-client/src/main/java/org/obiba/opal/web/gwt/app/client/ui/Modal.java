@@ -82,7 +82,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     setMovePanel(getWidget(0));
     setAutoHide(false);
     setDraggable(true);
-    setResizable(false);
+    setResizable(true);
     History.addValueChangeHandler(new HistoryChangeValueHandler());
     add(alertPlace = new FlowPanel());
   }

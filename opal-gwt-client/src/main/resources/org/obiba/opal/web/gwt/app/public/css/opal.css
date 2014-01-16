@@ -141,6 +141,10 @@ li.no-icon > a {
   font-style: italic;
 }
 
+.almost-full-width {
+  width: 93%;
+}
+
 /* Suggest list box */
 
 ul.closeables {
@@ -200,19 +204,19 @@ ul.closeables li span {
 
 @media all and (max-width: 1189px) {
   ul.closeables li span {
-    max-width: 54px;
+    max-width: 50px;
   }
 }
 
 @media all and (max-width: 1529px) and (min-width: 1190px) {
   ul.closeables li span {
-    max-width: 124px;
+    max-width: 100px;
   }
 }
 
 @media all and (min-width: 1530px) {
   ul.closeables li span {
-    max-width: 234px;
+    max-width: 200px;
   }
 }
 

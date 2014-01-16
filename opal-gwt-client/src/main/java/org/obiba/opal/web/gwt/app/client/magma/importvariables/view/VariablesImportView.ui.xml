@@ -13,13 +13,13 @@
           <ui:msg description="Supported variables file format btn-information">Use the following Excel template to
             add new variables or update existing ones:
           </ui:msg>
-          <b:Button ui:field="downloadExcelTemplateButton" type="INFO">
-            <ui:msg description="Download Opal Variables Template button label">Download Opal Variables Template
-            </ui:msg>
-          </b:Button>
         </b:Paragraph>
+        <b:Button ui:field="downloadExcelTemplateButton" icon="DOWNLOAD" type="INFO" addStyleNames="large-bottom-margin">
+          <ui:msg description="Download Opal Variables Template button label">Download Opal Variables Template
+          </ui:msg>
+        </b:Button>
 
-        <b:ControlGroup ui:field="fileSelectionGroup">
+        <b:ControlGroup ui:field="fileSelectionGroup" addStyleNames="large-top-margin">
           <b:ControlLabel>
             <ui:msg description="Variables File label">Variables File</ui:msg>
           </b:ControlLabel>
