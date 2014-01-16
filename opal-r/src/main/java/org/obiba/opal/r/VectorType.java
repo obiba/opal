@@ -26,7 +26,10 @@ import org.obiba.magma.type.DateTimeType;
 import org.obiba.magma.type.DateType;
 import org.obiba.magma.type.DecimalType;
 import org.obiba.magma.type.IntegerType;
+import org.obiba.magma.type.LineStringType;
 import org.obiba.magma.type.LocaleType;
+import org.obiba.magma.type.PointType;
+import org.obiba.magma.type.PolygonType;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.domain.VariableNature;
 import org.rosuda.REngine.REXP;
@@ -120,7 +123,13 @@ public enum VectorType {
       }
       return new REXPList(new RList(raws));
     }
-  };
+  },
+
+  points(PointType.get()),
+
+  linestrings(LineStringType.get()),
+
+  polygons(PolygonType.get());
 
   private final ValueType type;
 
