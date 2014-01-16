@@ -137,6 +137,10 @@ li.no-icon > a {
   margin-top: 20px;
 }
 
+.italic {
+  font-style: italic;
+}
+
 /* Suggest list box */
 
 ul.closeables {
