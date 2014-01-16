@@ -21,7 +21,6 @@ import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.VariableEntity;
-import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
 import org.obiba.magma.views.View;
@@ -157,23 +156,17 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
 
       if(identifiersTableService.hasIdentifiersTable(valueTable.getEntityType())) {
         // Remove all entities that exist in the keys table. Whatever is left are the ones that don't exist...
-        Set<VariableEntity> entitiesInKeysTable = identifiersTableService.getIdentifiersTable(
-            valueTable.getEntityType())
-            .getVariableEntities();
+        Set<VariableEntity> entitiesInKeysTable = identifiersTableService
+            .getIdentifiersTable(valueTable.getEntityType()).getVariableEntities();
         nonExistentVariableEntities.removeAll(entitiesInKeysTable);
       }
 
       if(nonExistentVariableEntities.size() > 0) {
-        ValueTableWriter keysTableWriter = identifiersTableService.createIdentifiersTableWriter(
-            valueTable.getEntityType());
-        try {
+        try(ValueTableWriter keysTableWriter = identifiersTableService
+            .createIdentifiersTableWriter(valueTable.getEntityType())) {
           for(VariableEntity ve : nonExistentVariableEntities) {
             keysTableWriter.writeValueSet(ve).close();
           }
-        } catch(IOException e) {
-          throw new RuntimeException(e);
-        } finally {
-          Closeables.closeQuietly(keysTableWriter);
         }
       }
 
@@ -194,15 +187,14 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
       PrivateVariableEntityMap entityMap = publicView.getPrivateVariableEntityMap();
 
       // prepare for copying participant data
-      ValueTableWriter keysTableWriter = identifiersTableService.createIdentifiersTableWriter(table.getEntityType());
-      try {
+
+      try(ValueTableWriter keysTableWriter = identifiersTableService
+          .createIdentifiersTableWriter(table.getEntityType())) {
         DatasourceCopier.DatasourceCopyEventListener keysListener = createKeysListener(privateView, entityMap,
             keysTableWriter);
         // Copy participant's non-identifiable variables and data
         DatasourceCopier datasourceCopier = newCopierForParticipants().withListener(keysListener).build();
         datasourceCopier.copy(publicView, destination);
-      } finally {
-        Closeables.closeQuietly(keysTableWriter);
       }
     }
 

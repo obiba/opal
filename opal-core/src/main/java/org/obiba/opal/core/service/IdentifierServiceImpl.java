@@ -19,7 +19,6 @@ import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.js.views.JavascriptClause;
-import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.type.BooleanType;
 import org.obiba.magma.type.TextType;
@@ -51,21 +50,14 @@ public class IdentifierServiceImpl implements IdentifierService {
     Variable idVariable = Variable.Builder.newVariable(idsMapping.getName(), TextType.get(), idsMapping.getEntityType())
         .build();
 
-    ValueTableWriter identifiersTableWriter = identifiersTableService
+    try(ValueTableWriter identifiersTableWriter = identifiersTableService
         .createIdentifiersTableWriter(idsMapping.getEntityType());
-    try {
-      ValueTableWriter.VariableWriter variableWriter = identifiersTableWriter.writeVariables();
-      try {
-        // Create private variables
-        variableWriter.writeVariable(idVariable);
-        if(privateView != null) {
-          DatasourceCopier.Builder.newCopier().dontCopyValues().build().copyMetadata(privateView, variableWriter);
-        }
-      } finally {
-        Closeables.closeQuietly(variableWriter);
+        ValueTableWriter.VariableWriter variableWriter = identifiersTableWriter.writeVariables()) {
+      // Create private variables
+      variableWriter.writeVariable(idVariable);
+      if(privateView != null) {
+        DatasourceCopier.Builder.newCopier().dontCopyValues().build().copyMetadata(privateView, variableWriter);
       }
-    } finally {
-      Closeables.closeQuietly(identifiersTableWriter);
     }
     return idVariable;
   }
@@ -126,14 +118,11 @@ public class IdentifierServiceImpl implements IdentifierService {
       PrivateVariableEntityMap entityMap, ValueTableWriter keysTableWriter) {
     VariableEntity privateEntity = entityMap.privateEntity(publicEntity);
 
-    ValueTableWriter.ValueSetWriter valueSetWriter = keysTableWriter.writeValueSet(publicEntity);
-    try {
-      // Copy all other private variable values
+    // Copy all other private variable values
+    try(ValueTableWriter.ValueSetWriter valueSetWriter = keysTableWriter.writeValueSet(publicEntity)) {
       DatasourceCopier datasourceCopier = DatasourceCopier.Builder.newCopier().dontCopyMetadata().build();
       datasourceCopier.copyValues(privateView, privateView.getValueSet(privateEntity),
           identifiersTableService.getIdentifiersTable(privateView.getEntityType()).getName(), valueSetWriter);
-    } finally {
-      Closeables.closeQuietly(valueSetWriter);
     }
   }
 

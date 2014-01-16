@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.core.service;
 
-import java.io.IOException;
-
 import javax.annotation.Nullable;
 import javax.annotation.PreDestroy;
 import javax.validation.constraints.NotNull;
@@ -21,7 +19,6 @@ import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
-import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
@@ -120,11 +117,7 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
       datasource = datasourceFactory.create();
       Initialisables.initialise(datasource);
       if(!datasource.hasValueTable(getParticipantTableName())) {
-        try {
-          datasource.createWriter(getParticipantTableName(), getParticipantEntityType()).close();
-        } catch(IOException e) {
-          throw new RuntimeException(e);
-        }
+        datasource.createWriter(getParticipantTableName(), getParticipantEntityType()).close();
       }
     }
     return datasource;
@@ -159,7 +152,7 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
       try {
         vtw = getDatasource().createWriter(entityType, entityType);
       } finally {
-        Closeables.closeQuietly(vtw);
+        vtw.close();
       }
     }
     return getIdentifiersTable(entityType);
@@ -170,16 +163,11 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   public Variable ensureIdentifiersMapping(@NotNull IdentifiersMapping idMapping) {
     ValueTable table = ensureIdentifiersTable(idMapping.getEntityType());
     if(!table.hasVariable(idMapping.getName())) {
-      ValueTableWriter vtw = null;
-      ValueTableWriter.VariableWriter vw = null;
-      try {
-        vtw = getDatasource().createWriter(idMapping.getEntityType(), idMapping.getEntityType());
-        vw = vtw.writeVariables();
-        vw.writeVariable(
+      try(ValueTableWriter tableWriter = getDatasource()
+          .createWriter(idMapping.getEntityType(), idMapping.getEntityType());
+          ValueTableWriter.VariableWriter variableWriter = tableWriter.writeVariables()) {
+        variableWriter.writeVariable(
             Variable.Builder.newVariable(idMapping.getName(), TextType.get(), idMapping.getEntityType()).build());
-      } finally {
-        Closeables.closeQuietly(vw);
-        Closeables.closeQuietly(vtw);
       }
     }
     return getIdentifiersTable(idMapping.getEntityType()).getVariable(idMapping.getName());

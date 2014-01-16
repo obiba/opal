@@ -30,7 +30,6 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.js.JavascriptVariableBuilder;
 import org.obiba.magma.js.JavascriptVariableValueSource;
-import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.StaticDatasource;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.core.service.DataImportService;
@@ -269,19 +268,17 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
     try {
       for(ValueSetsDto.ValueSetDto valueSetDto : valueSetsDto.getValueSetsList()) {
         VariableEntity entity = new VariableEntityBean(valueSetsDto.getEntityType(), valueSetDto.getIdentifier());
-        ValueSetWriter writer = tableWriter.writeValueSet(entity);
-        try {
+
+        try(ValueSetWriter writer = tableWriter.writeValueSet(entity)) {
           for(int i = 0; i < valueSetsDto.getVariablesCount(); i++) {
             Variable variable = getValueTable().getVariable(valueSetsDto.getVariables(i));
             Value value = Dtos.fromDto(valueSetDto.getValues(i), variable.getValueType(), variable.isRepeatable());
             writer.writeValue(variable, value);
           }
-        } finally {
-          Closeables.closeQuietly(writer);
         }
       }
     } finally {
-      Closeables.closeQuietly(tableWriter);
+      tableWriter.close();
     }
   }
 

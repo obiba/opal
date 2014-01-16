@@ -40,14 +40,13 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.datasource.csv.support.CsvDatasourceFactory;
-import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.Disposables;
 import org.obiba.opal.core.identifiers.IdentifierGeneratorImpl;
 import org.obiba.opal.core.identifiers.IdentifiersMapping;
+import org.obiba.opal.core.identifiers.IdentifiersMaps;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersImportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
-import org.obiba.opal.core.identifiers.IdentifiersMaps;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
@@ -65,7 +64,6 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 
 import au.com.bytecode.opencsv.CSVWriter;
-import de.schlichtherle.io.File;
 
 @Component
 @Transactional
@@ -114,22 +112,14 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
   @ApiOperation(value = "Delete a specific identifiers mapping for an entity type")
   public Response delete(@QueryParam("type") String entityType) {
     ensureEntityType(entityType);
-    ValueTableWriter vtw = null;
-    ValueTableWriter.VariableWriter vw = null;
-    try {
-      ValueTable table = getValueTable(entityType);
-      // The variable must exist
-      Variable v = table.getVariable(name);
-      vtw = table.getDatasource().createWriter(table.getName(), table.getEntityType());
 
-      vw = vtw.writeVariables();
-      vw.removeVariable(v);
-
+    ValueTable table = getValueTable(entityType);
+    // The variable must exist
+    Variable v = table.getVariable(name);
+    try(ValueTableWriter tableWriter = table.getDatasource().createWriter(table.getName(), table.getEntityType());
+        ValueTableWriter.VariableWriter variableWriter = tableWriter.writeVariables()) {
+      variableWriter.removeVariable(v);
       return Response.ok().build();
-
-    } finally {
-      Closeables.closeQuietly(vw);
-      Closeables.closeQuietly(vtw);
     }
   }
 
@@ -153,6 +143,7 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
   /**
    * Copy the provided identifiers mapping into the corresponding identifiers table. New system identifiers will be
    * added, existing mapped identifiers will be overridden.
+   *
    * @param entityType
    * @param separator
    * @param identifiersMap
@@ -183,7 +174,7 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
           ClientErrorDtos.getErrorMessage(Response.Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", e))
           .build();
     } finally {
-      if (csvData!= null) csvData.delete();
+      if(csvData != null) csvData.delete();
     }
 
     return response;

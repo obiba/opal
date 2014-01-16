@@ -26,7 +26,6 @@ import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
-import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.opal.web.TimestampedResponses;
@@ -129,17 +128,12 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
   }
 
   void addOrUpdateTableVariables(Iterable<VariableDto> variables) {
-    ValueTableWriter tableWriter = null;
-    VariableWriter variableWriter = null;
-    try {
-      tableWriter = getValueTable().getDatasource()
-          .createWriter(getValueTable().getName(), getValueTable().getEntityType());
-      variableWriter = tableWriter.writeVariables();
+    try(ValueTableWriter tableWriter = getValueTable().getDatasource()
+        .createWriter(getValueTable().getName(), getValueTable().getEntityType());
+        VariableWriter variableWriter = tableWriter.writeVariables()) {
       for(VariableDto variable : variables) {
         variableWriter.writeVariable(Dtos.fromDto(variable));
       }
-    } finally {
-      Closeables.closeQuietly(variableWriter, tableWriter);
     }
   }
 
@@ -148,22 +142,15 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
 
     if(getValueTable().isView()) throw new InvalidRequestException("Derived variable must be deleted by the view");
 
-    ValueTableWriter tableWriter = null;
-    ValueTableWriter.VariableWriter variableWriter = null;
-    try {
-      tableWriter = getValueTable().getDatasource()
-          .createWriter(getValueTable().getName(), getValueTable().getEntityType());
-      variableWriter = tableWriter.writeVariables();
-
+    try(ValueTableWriter tableWriter = getValueTable().getDatasource()
+        .createWriter(getValueTable().getName(), getValueTable().getEntityType());
+        ValueTableWriter.VariableWriter variableWriter = tableWriter.writeVariables()) {
       for(String name : variables) {
         // The variable must exist
         Variable v = getValueTable().getVariable(name);
         variableWriter.removeVariable(v);
       }
-
       return Response.ok().build();
-    } finally {
-      Closeables.closeQuietly(variableWriter, tableWriter);
     }
   }
 

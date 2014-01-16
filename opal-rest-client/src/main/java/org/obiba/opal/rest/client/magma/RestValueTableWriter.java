@@ -41,8 +41,7 @@ class RestValueTableWriter implements ValueTableWriter {
   }
 
   @Override
-  public void close() throws IOException {
-
+  public void close() {
   }
 
   @Override
@@ -52,7 +51,7 @@ class RestValueTableWriter implements ValueTableWriter {
       private final List<Variable> variables = Lists.newArrayList();
 
       @Override
-      public void close() throws IOException {
+      public void close() {
         URI variablesResource = restValueTable.newReference("variables");
         Iterable<VariableDto> variableDtos = Iterables
             .transform(variables, Functions.compose(new Function<VariableDto.Builder, VariableDto>() {
@@ -63,7 +62,11 @@ class RestValueTableWriter implements ValueTableWriter {
               }
             }, Dtos.asDtoFunc(null)));
 
-        checkResponse(restValueTable.getOpalClient().post(variablesResource, variableDtos));
+        try {
+          checkResponse(restValueTable.getOpalClient().post(variablesResource, variableDtos));
+        } catch(IOException e) {
+          throw new RuntimeException(e);
+        }
         restValueTable.refresh();
       }
 
@@ -93,10 +96,14 @@ class RestValueTableWriter implements ValueTableWriter {
           .setIdentifier(entity.getIdentifier());
 
       @Override
-      public void close() throws IOException {
+      public void close() {
         valueSetsDtoBuilder.addValueSets(valueSetDtoBuilder);
         URI valueSetUri = restValueTable.newReference("valueSet");
-        checkResponse(restValueTable.getOpalClient().post(valueSetUri, valueSetsDtoBuilder.build()));
+        try {
+          checkResponse(restValueTable.getOpalClient().post(valueSetUri, valueSetsDtoBuilder.build()));
+        } catch(IOException e) {
+          throw new RuntimeException(e);
+        }
       }
 
       @Override

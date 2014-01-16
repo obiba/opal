@@ -17,7 +17,6 @@ import javax.ws.rs.core.Response.Status;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.VariableValueSource;
-import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.web.magma.view.ViewDtos;
@@ -65,38 +64,27 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
   }
 
   private void addOrUpdateViewVariables(Iterable<VariableDto> variables, @Nullable String comment) {
-    VariableWriter vw = null;
-    try {
-      View view = getValueTableAsView();
-      vw = view.getListClause().createWriter();
+    View view = getValueTableAsView();
+    try(VariableWriter variableWriter = view.getListClause().createWriter()) {
       for(VariableDto variable : variables) {
-        vw.writeVariable(Dtos.fromDto(variable));
+        variableWriter.writeVariable(Dtos.fromDto(variable));
       }
       viewManager.addView(getDatasource().getName(), view, comment);
-    } finally {
-      Closeables.closeQuietly(vw);
     }
   }
 
   @Override
   public Response deleteVariables(List<String> variables) {
-    ValueTableWriter.VariableWriter vw = null;
-    try {
-      View view = getValueTableAsView();
-      vw = view.getListClause().createWriter();
-
+    View view = getValueTableAsView();
+    try(ValueTableWriter.VariableWriter variableWriter = view.getListClause().createWriter()) {
       // Remove from listClause
       for(VariableValueSource v : view.getListClause().getVariableValueSources()) {
         if(variables.contains(v.getVariable().getName())) {
-          vw.removeVariable(v.getVariable());
+          variableWriter.removeVariable(v.getVariable());
           viewManager.addView(getDatasource().getName(), view, "Remove " + v.getVariable().getName());
         }
       }
-
-    } finally {
-      Closeables.closeQuietly(vw);
     }
-
     return Response.ok().build();
   }
 

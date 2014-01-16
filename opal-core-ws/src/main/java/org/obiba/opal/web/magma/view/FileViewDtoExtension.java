@@ -22,7 +22,6 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.js.views.VariablesClause;
-import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.views.View;
@@ -40,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Sets;
+import com.google.common.io.Closeables;
 
 /**
  * An implementation of {@Code ViewDtoExtension} that can create {@code View} instances by de-serializing an

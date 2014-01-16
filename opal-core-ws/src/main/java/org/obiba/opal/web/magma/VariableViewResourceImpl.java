@@ -23,7 +23,6 @@ import org.obiba.magma.ValueTableUpdateListener;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
-import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.web.model.Magma;
@@ -70,18 +69,17 @@ public class VariableViewResourceImpl extends AbstractValueTableResource impleme
 
   @Override
   public Response createOrUpdateVariable(VariableDto variableDto, @Nullable String comment) {
-    ValueTableWriter.VariableWriter variableWriter = null;
-    try {
-      // The variable must exist
-      ValueTable table = getValueTable();
-      Variable variable = table.getVariable(name);
+    // The variable must exist
+    ValueTable table = getValueTable();
+    Variable variable = table.getVariable(name);
 
-      if(!variable.getEntityType().equals(variableDto.getEntityType())) {
-        return Response.status(Response.Status.BAD_REQUEST).build();
-      }
+    if(!variable.getEntityType().equals(variableDto.getEntityType())) {
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
 
-      View view = getValueTableAsView();
-      variableWriter = view.getListClause().createWriter();
+    View view = getValueTableAsView();
+
+    try(ValueTableWriter.VariableWriter variableWriter = view.getListClause().createWriter()) {
 
       // Rename existing variable
       if(!variableDto.getName().equals(variable.getName())) {
@@ -92,8 +90,6 @@ public class VariableViewResourceImpl extends AbstractValueTableResource impleme
 
     } catch(NoSuchVariableException e) {
       return Response.status(Response.Status.NOT_FOUND).build();
-    } finally {
-      Closeables.closeQuietly(variableWriter);
     }
     return Response.ok().build();
   }
@@ -110,22 +106,17 @@ public class VariableViewResourceImpl extends AbstractValueTableResource impleme
 
   @Override
   public Response deleteVariable() {
-    ValueTableWriter.VariableWriter vw = null;
-    try {
-      View view = getValueTableAsView();
-      vw = view.getListClause().createWriter();
+    View view = getValueTableAsView();
+    try(ValueTableWriter.VariableWriter variableWriter = view.getListClause().createWriter()) {
 
       // Remove from listClause
       for(VariableValueSource v : view.getListClause().getVariableValueSources()) {
         if(v.getVariable().getName().equals(name)) {
-          vw.removeVariable(v.getVariable());
+          variableWriter.removeVariable(v.getVariable());
           viewManager.addView(getDatasource().getName(), view, "Remove " + name);
           break;
         }
       }
-
-    } finally {
-      Closeables.closeQuietly(vw);
     }
 
     return Response.ok().build();

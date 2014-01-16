@@ -21,13 +21,12 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
-import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.StaticValueTable;
 import org.obiba.opal.core.identifiers.IdentifierGenerator;
 import org.obiba.opal.core.identifiers.IdentifiersMapping;
-import org.obiba.opal.core.magma.PrivateVariableEntityMap;
 import org.obiba.opal.core.identifiers.IdentifiersMaps;
+import org.obiba.opal.core.magma.PrivateVariableEntityMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +53,6 @@ public class IdentifiersImportServiceImpl implements IdentifiersImportService {
 
   @Autowired
   private IdentifierService identifierService;
-
 
   @Override
   public int importIdentifiers(@NotNull IdentifiersMapping idMapping, @NotNull IdentifierGenerator pIdentifier) {
@@ -97,19 +95,20 @@ public class IdentifiersImportServiceImpl implements IdentifiersImportService {
       @Nullable String select) {
 
     Variable variable = identifiersTableService.ensureIdentifiersMapping(idMapping);
-    String selectScript = select == null ? (variable.hasAttribute("select")
-        ? variable.getAttributeStringValue("select")
-        : null) : select;
+    String selectScript = select == null //
+        ? variable.hasAttribute("select") ? variable.getAttributeStringValue("select") : null //
+        : select;
 
     ValueTable sourceIdentifiersTable = identifierService
         .createPrivateView(sourceTable.getName(), sourceTable, selectScript);
     Variable identifierVariable = identifierService.createIdentifierVariable(sourceIdentifiersTable, idMapping);
 
     PrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(
-        identifiersTableService.getIdentifiersTable(idMapping.getEntityType()), identifierVariable, participantIdentifier);
-    ValueTableWriter identifiersTableWriter = identifiersTableService.createIdentifiersTableWriter(
-        idMapping.getEntityType());
-    try {
+        identifiersTableService.getIdentifiersTable(idMapping.getEntityType()), identifierVariable,
+        participantIdentifier);
+
+    try(ValueTableWriter identifiersTableWriter = identifiersTableService
+        .createIdentifiersTableWriter(idMapping.getEntityType())) {
       for(VariableEntity privateEntity : sourceIdentifiersTable.getVariableEntities()) {
         if(entityMap.publicEntity(privateEntity) == null) {
           entityMap.createPublicEntity(privateEntity);
@@ -118,8 +117,6 @@ public class IdentifiersImportServiceImpl implements IdentifiersImportService {
             .copyParticipantIdentifiers(entityMap.publicEntity(privateEntity), sourceIdentifiersTable, entityMap,
                 identifiersTableWriter);
       }
-    } finally {
-      Closeables.closeQuietly(identifiersTableWriter);
     }
   }
 
@@ -145,11 +142,12 @@ public class IdentifiersImportServiceImpl implements IdentifiersImportService {
 
   @Override
   public void copyIdentifiers(ValueTable identifiersValueTable) throws IOException {
-    ValueTable destinationIdentifiersTable = identifiersTableService.ensureIdentifiersTable(identifiersValueTable.getEntityType());
+    ValueTable destinationIdentifiersTable = identifiersTableService
+        .ensureIdentifiersTable(identifiersValueTable.getEntityType());
     ValueTable sourceIdentifiersTable = identifiersValueTable;
 
-    if (!destinationIdentifiersTable.getName().equals(identifiersValueTable)) {
-        sourceIdentifiersTable = new RenameValueTable(destinationIdentifiersTable.getName(), identifiersValueTable);
+    if(!destinationIdentifiersTable.getName().equals(identifiersValueTable.getName())) {
+      sourceIdentifiersTable = new RenameValueTable(destinationIdentifiersTable.getName(), identifiersValueTable);
     }
 
     // Don't copy null values otherwise, we'll delete existing mappings

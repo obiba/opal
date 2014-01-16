@@ -33,7 +33,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
-import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
@@ -209,15 +208,11 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
   }
 
   private void writeVariablesToTable(TableDto table) {
-    VariableWriter vw = null;
-    try {
-      vw = datasource.createWriter(table.getName(), table.getEntityType()).writeVariables();
-
+    try(VariableWriter variableWriter = datasource.createWriter(table.getName(), table.getEntityType())
+        .writeVariables()) {
       for(VariableDto dto : table.getVariablesList()) {
-        vw.writeVariable(Dtos.fromDto(dto));
+        variableWriter.writeVariable(Dtos.fromDto(dto));
       }
-    } finally {
-      StreamUtil.silentSafeClose(vw);
     }
   }
 

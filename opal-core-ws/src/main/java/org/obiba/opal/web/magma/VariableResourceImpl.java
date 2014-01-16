@@ -21,7 +21,6 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
-import org.obiba.magma.lang.Closeables;
 import org.obiba.opal.core.domain.VariableNature;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.math.CategoricalSummaryResource;
@@ -94,16 +93,11 @@ public class VariableResourceImpl implements VariableResource {
       throw new InvalidRequestException("Variable cannot be renamed");
     }
 
-    ValueTableWriter tableWriter = null;
-    ValueTableWriter.VariableWriter variableWriter = null;
-    try {
-      tableWriter = getValueTable().getDatasource()
-          .createWriter(getValueTable().getName(), getValueTable().getEntityType());
-      variableWriter = tableWriter.writeVariables();
+    try(ValueTableWriter tableWriter = getValueTable().getDatasource()
+        .createWriter(getValueTable().getName(), getValueTable().getEntityType());
+        ValueTableWriter.VariableWriter variableWriter = tableWriter.writeVariables()) {
       variableWriter.writeVariable(Dtos.fromDto(dto));
       return Response.ok().build();
-    } finally {
-      Closeables.closeQuietly(variableWriter, tableWriter);
     }
   }
 
@@ -114,16 +108,11 @@ public class VariableResourceImpl implements VariableResource {
     // The variable must exist
     Variable v = getValueTable().getVariable(name);
 
-    ValueTableWriter tableWriter = null;
-    ValueTableWriter.VariableWriter variableWriter = null;
-    try {
-      tableWriter = getValueTable().getDatasource()
-          .createWriter(getValueTable().getName(), getValueTable().getEntityType());
-      variableWriter = tableWriter.writeVariables();
+    try(ValueTableWriter tableWriter = getValueTable().getDatasource()
+        .createWriter(getValueTable().getName(), getValueTable().getEntityType());
+        ValueTableWriter.VariableWriter variableWriter = tableWriter.writeVariables()) {
       variableWriter.removeVariable(v);
       return Response.ok().build();
-    } finally {
-      Closeables.closeQuietly(variableWriter, tableWriter);
     }
   }
 
