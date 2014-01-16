@@ -510,7 +510,8 @@ public interface Translations extends Constants {
       "DuplicateAclSubjectGroup", "Group '{0}' already exists, please choose a unique name.",//
       "InvalidCertificate", "Invalid certificate. Please Make sure to provide valid certificate keys.",//
       "InvalidKeypair", "Failed to create key pair. Please make sure to provide a valid algorithm name and size.",
-      "KeyEntryAlreadyExists", "A key with the same name exists, please choose a unique name."//
+      "KeyEntryAlreadyExists", "A key with the same name exists, please choose a unique name.",//
+      "GeneralKeystoreError", "Key pair storage failed. Please make sure to provide valid certificate information."//
   })
   Map<String, String> userMessageMap();
 
