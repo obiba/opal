@@ -284,7 +284,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
       @Override
       public String getValue(CategoryDto object) {
         AttributeDto label = VariableDtos.getAttribute(object, LABEL, locale.getName());
-        return Strings.nullToEmpty(label.getValue());
+        return label == null ? "" : Strings.nullToEmpty(label.getValue());
       }
     };
     labelCol.setFieldUpdater(new FieldUpdater<CategoryDto, String>() {
