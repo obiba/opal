@@ -12,7 +12,7 @@
       <b:Row addStyleNames="top-margin">
         <b:Column size="4" offset="4">
           <g:SimplePanel ui:field="alertPanel"/>
-          <b:Well>
+          <b:Well addStyleNames="large-top-margin">
             <b:ControlGroup>
               <b:ControlLabel>
                 <ui:msg description="User name field label">User Name</ui:msg>

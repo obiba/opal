@@ -425,3 +425,10 @@ td.row-actions span {
   font-weight: bold;
   text-align: center !important;
 }
+
+/*
+ * Attributes
+ */
+.attribute-value > .label {
+  margin-bottom: 2px;
+}

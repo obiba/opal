@@ -20,7 +20,7 @@
   <g:FlowPanel>
 
     <g:FlowPanel addStyleNames="clearfix">
-      <b:Label ui:field="namespaceLabel" addStyleNames="small-top-margin"/>
+      <b:Badge ui:field="namespaceLabel" type="SUCCESS" addStyleNames="small-top-margin"/>
       <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
     </g:FlowPanel>
 
