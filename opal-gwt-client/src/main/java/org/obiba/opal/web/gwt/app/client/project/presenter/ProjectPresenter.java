@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.project.event.ProjectHiddenEvent;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportsPresenter;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
@@ -158,7 +159,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   @Override
   protected void onHide() {
-    GWT.log("onProjectHide");
+    fireEvent(new ProjectHiddenEvent(project));
   }
 
   @Override

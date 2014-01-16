@@ -23,6 +23,8 @@ import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEven
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueMapPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.project.event.ProjectHidden;
+import org.obiba.opal.web.gwt.app.client.project.event.ProjectHiddenEvent;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.ui.HasUrl;
@@ -166,6 +168,13 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
         getView().clearSearch();
         getView().addSearchItem(event.getTable().getDatasourceName(), VariableSearchListItem.ItemType.DATASOURCE);
         getView().addSearchItem(event.getTable().getName(), VariableSearchListItem.ItemType.TABLE);
+      }
+    });
+
+    addRegisteredHandler(ProjectHiddenEvent.getType(), new ProjectHiddenEvent.ProjectHiddenHandler() {
+      @Override
+      public void onProjectHidden(ProjectHiddenEvent event) {
+        getView().clearSearch();
       }
     });
 
