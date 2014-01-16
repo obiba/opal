@@ -91,7 +91,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   TextBox url;
 
   @UiField
-  Label urlExample;
+  HasText urlExample;
 
   @UiField
   ListBox driver;

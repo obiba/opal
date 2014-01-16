@@ -69,7 +69,6 @@
   <inherits name='org.obiba.opal.web.model.Model'/>
 
   <!--  Opal css style sheets -->
-  <stylesheet src='css/bootstrap-min.css'/>
   <stylesheet src='css/opal.css'/>
 
   <!--  for ClientBundle -->
