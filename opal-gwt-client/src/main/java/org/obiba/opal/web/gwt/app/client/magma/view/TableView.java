@@ -316,6 +316,10 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     pager.setVisible(false);
     selectAllItemsAlert.setVisible(false);
     table.showLoadingIndicator(dataProvider);
+
+    if(checkColumn != null) {
+      checkColumn.clearSelection();
+    }
   }
 
   @Override
