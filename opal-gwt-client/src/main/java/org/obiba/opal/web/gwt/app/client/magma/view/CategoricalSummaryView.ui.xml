@@ -29,8 +29,15 @@
     <b:Heading size="4">
       <ui:msg description="Statistics label">Statistics</ui:msg>
     </b:Heading>
-    <o:DefaultFlexTable ui:field="stats" addStyleNames="span4"/>
-    <o:DefaultFlexTable ui:field="frequencies" addStyleNames="span4"/>
+    <b:Row>
+      <b:Column size="5">
+        <o:DefaultFlexTable ui:field="stats"/>
+      </b:Column>
+      <b:Column size="5">
+        <o:DefaultFlexTable ui:field="frequencies"/>
+      </b:Column>
+    </b:Row>
+
 
   </g:FlowPanel>
 

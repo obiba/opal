@@ -21,8 +21,11 @@
     <b:Heading size="4">
       <ui:msg description="Statistics label">Statistics</ui:msg>
     </b:Heading>
-    <o:DefaultFlexTable ui:field="grid" addStyleNames="span4"/>
-
+    <b:Row>
+      <b:Column size="6">
+        <o:DefaultFlexTable ui:field="grid"/>
+      </b:Column>
+    </b:Row>
   </g:FlowPanel>
 
 </ui:UiBinder>
