@@ -61,7 +61,6 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
@@ -435,6 +434,16 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     contingencyTablePanel.setVisible(false);
   }
 
+  @UiHandler("dictionnaryTab")
+  void onDictionnaryTabSelect(ClickEvent event) {
+    getUiHandlers().onShowDictionary();
+  }
+
+  @UiHandler("valuesTab")
+  void onValuesTabSelect(ClickEvent event) {
+    getUiHandlers().onShowValues();
+  }
+
   @UiHandler("downloadDictionary")
   void onDownloadDictionary(ClickEvent event) {
     getUiHandlers().onDownloadDictionary();
@@ -578,30 +587,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @Override
   public HasAuthorization getPermissionsAuthorizer() {
     return new TabPanelAuthorizer(tabPanel, PERMISSIONS_TAB_INDEX);
-  }
-
-  @Override
-  public void setValuesTabCommand(final Command cmd) {
-    tabPanel.addShownHandler(new TabPanel.ShownEvent.Handler() {
-      @Override
-      public void onShow(TabPanel.ShownEvent shownEvent) {
-        if(tabPanel.getSelectedTab() == VALUES_TAB_INDEX) {
-          cmd.execute();
-        }
-      }
-    });
-  }
-
-  @Override
-  public void setVariablesTabCommand(final Command cmd) {
-    tabPanel.addShownHandler(new TabPanel.ShownEvent.Handler() {
-      @Override
-      public void onShow(TabPanel.ShownEvent shownEvent) {
-        if(tabPanel.getSelectedTab() == VARIABLES_TAB_INDEX) {
-          cmd.execute();
-        }
-      }
-    });
   }
 
   @Override

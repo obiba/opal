@@ -66,7 +66,6 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -223,9 +222,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         }
       }
     });
-
-    getView().setValuesTabCommand(new ValuesCommand());
-    getView().setVariablesTabCommand(new VariablesCommand());
 
     registerHandler(getView().addVariableSortHandler(new VariableSortHandler()));
 
@@ -392,6 +388,24 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private boolean tableIsView() {
     return table.hasViewLink();
+  }
+
+  @Override
+  public void onShowDictionary() {
+    getView().getFilter().setText(valuesTablePresenter.getView().getFilterText());
+
+    // Fetch variables
+    if(valuesTablePresenter.getView().getFilterText().isEmpty()) {
+      updateVariables();
+    } else {
+      doFilterVariables();
+    }
+  }
+
+  @Override
+  public void onShowValues() {
+    valuesTablePresenter.setTable(table);
+    valuesTablePresenter.setFilter(getView().getFilter().getText());
   }
 
   @Override
@@ -610,30 +624,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     attributeEditorPresenter.initialize(table, selectedItems);
   }
 
-  private final class ValuesCommand implements Command {
-
-    @Override
-    public void execute() {
-      valuesTablePresenter.setTable(table);
-      valuesTablePresenter.setFilter(getView().getFilter().getText());
-    }
-  }
-
-  private final class VariablesCommand implements Command {
-
-    @Override
-    public void execute() {
-      getView().getFilter().setText(valuesTablePresenter.getView().getFilterText());
-
-      // Fetch variables
-      if(valuesTablePresenter.getView().getFilterText().isEmpty()) {
-        updateVariables();
-      } else {
-        doFilterVariables();
-      }
-    }
-  }
-
   private final class VariableSortHandler implements ColumnSortEvent.Handler {
 
     @Override
@@ -831,10 +821,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     HasAuthorization getTableIndexEditAuthorizer();
 
     HasAuthorization getPermissionsAuthorizer();
-
-    void setValuesTabCommand(Command cmd);
-
-    void setVariablesTabCommand(Command cmd);
 
     boolean isValuesTabSelected();
 

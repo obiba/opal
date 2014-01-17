@@ -64,7 +64,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
 
   private TableDto table;
 
-  private List<VariableDto> variables = new ArrayList<VariableDto>();
+  private final List<VariableDto> variables = new ArrayList<VariableDto>();
 
   private List<JsArray<AttributeDto>> selectedItems;
 
@@ -152,7 +152,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     String originalName = selectedItems.get(0).get(0).getName();
     String originalNamespace = selectedItems.get(0).get(0).getNamespace();
 
-//    // Update values and namespace
+    // Update values and namespace
     updateValuesAndNamespace(attributes, newAttributes, originalName, originalNamespace);
 
     // Add other attributes
