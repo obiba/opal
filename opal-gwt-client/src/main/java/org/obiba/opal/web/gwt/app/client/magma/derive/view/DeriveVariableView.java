@@ -10,26 +10,26 @@
 package org.obiba.opal.web.gwt.app.client.magma.derive.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveVariablePresenter;
+import org.obiba.opal.web.gwt.app.client.ui.ModalViewImpl;
 import org.obiba.opal.web.gwt.app.client.ui.WizardModalBox;
+import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.BranchingWizardStepController;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveVariablePresenter;
-import org.obiba.opal.web.gwt.app.client.ui.ModalViewImpl;
-import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 
 /**
  *
@@ -59,6 +59,8 @@ public class DeriveVariableView extends ModalViewImpl implements DeriveVariableP
   public DeriveVariableView(EventBus eventBus) {
     super(eventBus);
     dialog = uiBinder.createAndBindUi(this);
+    dialog.setMinHeight(650);
+    dialog.setMinWidth(800);
   }
 
   @Override
