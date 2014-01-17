@@ -27,6 +27,7 @@ import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.github.gwtbootstrap.client.ui.CodeBlock;
+import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -34,11 +35,9 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
@@ -79,9 +78,6 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
 
   @UiField
   NavTabsPanel tabs;
-
-  @UiField
-  Label valueType;
 
   @UiField
   CodeBlock script;
@@ -155,7 +151,6 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
 
   @Override
   public void setOriginalVariable(final VariableDto variable) {
-    valueType.setText(variable.getValueType());
     script.setText(VariableDtos.getScript(variable));
 
     commentBox.setValue(VariableDtos.getComment(variable));

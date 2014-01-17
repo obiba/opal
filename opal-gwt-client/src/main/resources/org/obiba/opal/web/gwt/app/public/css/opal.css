@@ -307,6 +307,11 @@ ul.closeables li a {
   font-size: 1em;
 }
 
+/* Ace editor in a wizard step */
+div.step > div > div > div.ace_editor {
+  height: 440px !important;
+}
+
 /*
  * Magma widget
  */
