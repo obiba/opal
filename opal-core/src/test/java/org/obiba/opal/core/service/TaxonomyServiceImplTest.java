@@ -198,7 +198,7 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     assertThat(foundTaxonomy.hasVocabulary(vocabulary.getName())).isFalse();
 
     Vocabulary foundVocabulary = taxonomyService.getVocabulary(taxonomy.getName(), vocabulary.getName());
-    assertThat(foundVocabulary).isNotNull();
+    assertThat(foundVocabulary).isNull();
   }
 
   @Test

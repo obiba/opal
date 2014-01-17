@@ -28,7 +28,7 @@ public abstract class OpalPermissionConverterTest<T> {
     }
     int i = 0;
     for(String converted : convertedIter) {
-      assertThat(expected.length).isGreaterThan(1);
+      assertThat(expected.length).isGreaterThan(i);
       assertThat(expected[i]).isEqualTo(converted);
       i++;
     }

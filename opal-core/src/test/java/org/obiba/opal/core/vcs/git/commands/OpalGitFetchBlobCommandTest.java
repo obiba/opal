@@ -12,8 +12,7 @@ package org.obiba.opal.core.vcs.git.commands;
 import org.junit.Test;
 import org.obiba.opal.core.vcs.git.OpalGitException;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class OpalGitFetchBlobCommandTest extends AbstractOpalGitCommandTest {
 
@@ -35,7 +34,7 @@ public class OpalGitFetchBlobCommandTest extends AbstractOpalGitCommandTest {
         versionControlSystem.getRepository(DATASOURCE_NAME), "TestView/PLACE_NAME.js", COMMIT_ID)
         .addDatasourceName(DATASOURCE_NAME).build();
     String blob = command.execute();
-    assertThat(blob, equalTo("$('PLACE_NAME')"));
+    assertThat(blob).isEqualTo("$('PLACE_NAME')");
   }
 
   @Test(expected = OpalGitException.class)
