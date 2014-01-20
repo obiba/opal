@@ -7,20 +7,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.profiles.view;
+package org.obiba.opal.web.gwt.app.client.administration.users.view;
 
 import java.util.Collections;
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.administration.profiles.presenter.SubjectProfilesAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectProfilesAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueRenderer;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
-import org.obiba.opal.web.model.client.opal.GroupDto;
-import org.obiba.opal.web.model.client.opal.SubjectCredentialsDto;
 import org.obiba.opal.web.model.client.opal.SubjectProfileDto;
 
 import com.github.gwtbootstrap.client.ui.CellTable;
@@ -37,7 +35,6 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
-import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 
 public class SubjectProfilesAdministrationView extends ViewImpl
     implements SubjectProfilesAdministrationPresenter.Display {
