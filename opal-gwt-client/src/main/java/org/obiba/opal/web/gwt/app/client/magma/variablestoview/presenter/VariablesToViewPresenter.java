@@ -17,26 +17,28 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.event.CopyVariablesToViewEvent;
+import org.obiba.opal.web.gwt.app.client.magma.derive.helper.CategoricalVariableDerivationHelper;
+import org.obiba.opal.web.gwt.app.client.magma.derive.helper.VariableDuplicationHelper;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
+import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
+import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsVariableCopyColumn;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsVariableCopyColumn;
-import org.obiba.opal.web.gwt.app.client.magma.derive.helper.CategoricalVariableDerivationHelper;
-import org.obiba.opal.web.gwt.app.client.magma.derive.helper.VariableDuplicationHelper;
+import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -46,15 +48,10 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -63,7 +60,8 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.PresenterWidget;
+
+import static org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter.Display.FormField;
 
 public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToViewPresenter.Display>
     implements VariablesToViewUiHandlers {
@@ -86,7 +84,9 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
 
   @Override
   public void saveVariable() {
-    variableCopyValidationHandler = new VariableCopyValidationHandler(getEventBus());
+    getView().clearErrors();
+
+    variableCopyValidationHandler = new VariableCopyValidationHandler();
     if(variableCopyValidationHandler.validate()) {
       createOrUpdateViewWithVariables();
     }
@@ -121,11 +121,9 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
       derivedVariables.push(new VariableDuplicationHelper(variable).getDerivedVariable());
     }
 
-    getView().clear();
     getView().renderRows(variables, derivedVariables, true);
     getView().showDialog();
   }
-
 
   @Override
   protected void onBind() {
@@ -229,8 +227,9 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
       uriBuilder.segment("datasource", getView().getDatasourceName(), "views");
       ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).post()
           .withResourceBody(ViewDto.stringify(view))//
-          .withCallback(callbackHandler, Response.SC_OK, Response.SC_CREATED, Response.SC_FORBIDDEN,
-              Response.SC_INTERNAL_SERVER_ERROR)//
+          .withCallback(callbackHandler, Response.SC_OK, Response.SC_CREATED)//
+          .withCallback(new ErrorResponseCallback(getView().asWidget()), Response.SC_FORBIDDEN,
+              Response.SC_INTERNAL_SERVER_ERROR, Response.SC_BAD_REQUEST)//
           .send();
     }
   }
@@ -310,23 +309,10 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_CREATED) {
-        getView().hideDialog();
-        getEventBus().fireEvent(NotificationEvent.newBuilder().info(message).build());
-        getEventBus().fireEvent(new DatasourceUpdatedEvent(view.getDatasourceName()));
-        if(getView().gotoView()) selectView();
-
-      } else if(response.getStatusCode() == Response.SC_FORBIDDEN) {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error("UnauthorizedOperation").build());
-      } else {
-        try {
-          ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
-          getEventBus().fireEvent(
-              NotificationEvent.newBuilder().error(errorDto.getStatus()).args(errorDto.getArgumentsArray()).build());
-        } catch(Exception nothing) {
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-        }
-      }
+      getView().hideDialog();
+      getEventBus().fireEvent(NotificationEvent.newBuilder().info(message).build());
+      getEventBus().fireEvent(new DatasourceUpdatedEvent(view.getDatasourceName()));
+      selectView();
     }
 
     private void selectView() {
@@ -352,7 +338,11 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
 
   public interface Display extends PopupView, HasUiHandlers<VariablesToViewUiHandlers> {
 
-    void clear();
+    enum FormField {
+      NAME,
+      VARIABLE,
+      VARIABLES
+    }
 
     void showDialog();
 
@@ -361,8 +351,6 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
     void setDatasources(JsArray<DatasourceDto> datasources, String name);
 
     void renderRows(List<VariableDto> originalVariables, JsArray<VariableDto> rows, boolean clearNames);
-
-//    void clear();
 
     ActionsVariableCopyColumn<VariableDto> getActions();
 
@@ -376,16 +364,14 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
 
     boolean isRenameSelected();
 
-    Boolean gotoView();
-
     void updateRenameCheckboxVisibility(List<VariableDto> originalVariables);
+
+    void clearErrors();
+
+    void showError(@Nullable FormField formField, String message);
   }
 
-  private class VariableCopyValidationHandler extends AbstractValidationHandler {
-
-    private VariableCopyValidationHandler(EventBus eventBus) {
-      super(eventBus);
-    }
+  private class VariableCopyValidationHandler extends ViewValidationHandler {
 
     private Set<FieldValidator> validators;
 
@@ -393,25 +379,27 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
     protected Set<FieldValidator> getValidators() {
       if(validators == null) {
         validators = new LinkedHashSet<FieldValidator>();
-        validators.add(new RequiredTextValidator(getView().getViewName(), "ViewNameRequired"));
+
+        validators.add(new RequiredTextValidator(getView().getViewName(), "ViewNameRequired", FormField.NAME.name()));
         validators.add(new ConditionValidator(
             viewNotCurrentCondition(getView().getDatasourceName(), getView().getViewName().getText()),
-            "CopyVariableCurrentView"));
+            "CopyVariableCurrentView", FormField.NAME.name()));
 
         List<VariableDto> list = getView().getVariables(true);
+        String variableGroupName = list.size() == 1 ? FormField.VARIABLE.name() : FormField.VARIABLES.name();
         for(VariableDto v : list) {
-          validators.add(new ConditionValidator(variableNameEmptyCondition(v.getName()), "CopyVariableNameRequired"));
+          validators.add(new ConditionValidator(variableNameEmptyCondition(v.getName()), "CopyVariableNameRequired",
+              variableGroupName));
 
           @SuppressWarnings("unchecked")
           List<String> args = new ArrayList();
           args.add(v.getName());
           validators.add(new ConditionValidator(variableNameColonCondition(v.getName()),
-              TranslationsUtils.replaceArguments(translations.userMessageMap().get("CopyVariableNameColon"), args)));
-
+              TranslationsUtils.replaceArguments(translations.userMessageMap().get("CopyVariableNameColon"), args),
+              variableGroupName));
         }
 
         validators.add(new VariableNameUniqueCondition(list));
-
       }
       return validators;
     }
@@ -441,6 +429,11 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
           return !name.contains(":");
         }
       };
+    }
+
+    @Override
+    protected void showMessage(String id, String message) {
+      getView().showError(FormField.valueOf(id), message);
     }
   }
 
