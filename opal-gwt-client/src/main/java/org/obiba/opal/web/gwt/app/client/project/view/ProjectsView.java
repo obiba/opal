@@ -283,7 +283,6 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     }
 
     Widget newProjectLink(final ProjectsUiHandlers handlers, final ProjectDto project) {
-      FlowPanel panel = new FlowPanel();
       NavLink link = new NavLink(project.getTitle());
       link.setTitle(project.getName());
       link.addClickHandler(new ClickHandler() {
