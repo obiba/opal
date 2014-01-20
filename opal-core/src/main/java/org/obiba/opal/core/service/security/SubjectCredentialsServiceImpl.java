@@ -213,7 +213,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
   }
 
   private void validateAuthenticationType(SubjectCredentials subjectCredentials, SubjectCredentials existing) {
-    if(existing.getAuthenticationType().equals(subjectCredentials.getAuthenticationType()))
+    if(!existing.getAuthenticationType().equals(subjectCredentials.getAuthenticationType()))
       throw new IllegalArgumentException("Authentication type cannot be changed");
   }
 
