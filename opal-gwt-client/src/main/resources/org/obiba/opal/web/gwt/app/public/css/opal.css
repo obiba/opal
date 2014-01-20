@@ -21,8 +21,8 @@ li {
  * Opal
  */
 
-.tags .label {
-  margin-right: 10px;
+.project-tag  {
+  margin-right: 2px;
 }
 
 .items .item {
@@ -119,6 +119,12 @@ li.no-icon > a {
 
 .extra-large-bottom-margin {
   margin-bottom: 40px;
+}
+
+.justified-paragraph {
+  font-size: 0.8em;
+  text-align:justify;
+  text-justify:inter-word;
 }
 
 .block {
@@ -401,6 +407,10 @@ td.row-actions span {
 
 .control-group .xlarge-indent {
   margin-left: 50px;
+}
+
+.project-timestamps {
+  color: #196BA1;
 }
 
 /*

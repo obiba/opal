@@ -28,7 +28,11 @@ import com.github.gwtbootstrap.client.ui.Column;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.FluidRow;
 import com.github.gwtbootstrap.client.ui.Heading;
+import com.github.gwtbootstrap.client.ui.Label;
 import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.Paragraph;
+import com.github.gwtbootstrap.client.ui.Well;
+import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
@@ -41,7 +45,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -55,7 +58,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
   private static final TranslationMessages translationMessages = GWT.create(TranslationMessages.class);
 
-  private static final int DEFAULT_GRID_COLUMNS = 3;
+  private static final int DEFAULT_GRID_COLUMNS = 1;
 
   @UiField
   Panel activePanel;
@@ -170,11 +173,13 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
       int col = 0;
       FluidRow row = new FluidRow();
       int size = projectList.size();
+      // for now there will be only one column until building cells with bootstrap 3 becomes easier
       int columns = size < DEFAULT_GRID_COLUMNS ? size : DEFAULT_GRID_COLUMNS;
 
       for(ProjectDto project : projectList) {
         Column column = new Column(12 / columns);
-        column.add(newProjectPanel(handlers, project));
+        Widget projectPanel = newProjectPanel(handlers, project, columns);
+        column.add(projectPanel);
         if (col == columns -1) column.addStyleName("pull-right");
         if (col == columns) {
           content.add(row);
@@ -198,21 +203,28 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
      */
     abstract void sort(ProjectsUiHandlers handlers, Panel content, JsArray<ProjectDto> projects);
 
-    protected Panel newProjectPanel(ProjectsUiHandlers handlers, ProjectDto project) {
+    protected Widget newProjectPanel(ProjectsUiHandlers handlers, ProjectDto project, int columns) {
+      Well w = new Well();
       FlowPanel panel = new FlowPanel();
-      panel.addStyleName("item");
       panel.add(newProjectLink(handlers, project));
-      addTags(project, panel);
-      addTableNames(handlers, project, panel);
-      addDescription(project, panel);
       addTimestamps(project, panel);
-      return panel;
+      addTableNames(handlers, project, panel);
+      addDescription(project, panel, columns);
+      addTags(project, panel);
+      w.add(panel);
+      return w;
     }
 
     private void addTableNames(final ProjectsUiHandlers handlers, final ProjectDto project, FlowPanel panel) {
       JsArrayString tableNames = JsArrays.toSafeArray(project.getDatasource().getTableArray());
       if(tableNames.length() > 0) {
-        Anchor countLabel = new Anchor(translationMessages.tableCount(tableNames.length()));
+        Anchor countLabel = new Anchor("[" + translationMessages.tableCount(tableNames.length()) + "]");
+        countLabel.addClickHandler(new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            handlers.onProjectTableSelection(project, null);
+          }
+        });
         countLabel.addClickHandler(new ClickHandler() {
           @Override
           public void onClick(ClickEvent event) {
@@ -233,35 +245,45 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
     private void addTimestamps(ProjectDto project, FlowPanel panel) {
       if(project.hasTimestamps() && project.getTimestamps().hasLastUpdate()) {
+        FlowPanel timestampsPanel = new FlowPanel();
+        timestampsPanel.addStyleName("pull-right");
         Moment lastUpdate = Moment.create(project.getTimestamps().getLastUpdate());
-        Label ago = new Label(
+        InlineLabel ago = new InlineLabel(
             TranslationsUtils.replaceArguments(translations.lastUpdateAgoLabel(), lastUpdate.fromNow()));
-        ago.addStyleName("help-block");
-        panel.add(ago);
-      }
-    }
-
-    private void addDescription(ProjectDto project, FlowPanel panel) {
-      if(project.hasDescription()) {
-        // find first phrase
-        String desc = project.getDescription();
-        int idx = desc.indexOf('.');
-        if(idx > 0) desc = desc.substring(0, idx) + "...";
-        Label descriptionLabel = new Label(desc);
-        panel.add(descriptionLabel);
+        ago.addStyleName("project-timestamps");
+        timestampsPanel.add(ago);
+        panel.add(timestampsPanel);
       }
     }
 
     private void addTags(ProjectDto project, FlowPanel panel) {
       FlowPanel tagsPanel = new FlowPanel();
-      tagsPanel.addStyleName("tags inline-block");
-      for(String tag : JsArrays.toIterable(JsArrays.toSafeArray(project.getTagsArray()))) {
-        tagsPanel.add(new com.github.gwtbootstrap.client.ui.Label(tag));
+      List<String> tagList = JsArrays.toList(project.getTagsArray());
+      if (tagList.isEmpty()) return;
+
+      tagsPanel.addStyleName("inline-block");
+      for(String tag : tagList) {
+        Label tagLabel = new Label(tag);
+        tagLabel.addStyleName("project-tag");
+        tagsPanel.add(tagLabel);
       }
       panel.add(tagsPanel);
     }
 
+    private void addDescription(ProjectDto project, FlowPanel panel, int columns) {
+      FlowPanel panelDescription = new FlowPanel();
+      if(project.hasDescription()) {
+        // find first phrase
+        String desc = project.getDescription();
+        Paragraph descriptionLabel = new Paragraph(desc);
+        panelDescription.add(descriptionLabel);
+      }
+      panelDescription.addStyleName("justified-paragraph");
+      panel.add(panelDescription);
+    }
+
     Widget newProjectLink(final ProjectsUiHandlers handlers, final ProjectDto project) {
+      FlowPanel panel = new FlowPanel();
       NavLink link = new NavLink(project.getTitle());
       link.setTitle(project.getName());
       link.addClickHandler(new ClickHandler() {
@@ -271,8 +293,8 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
         }
       });
 
-      Heading head = new Heading(4);
-      head.addStyleName("inline-block small-right-indent");
+      Heading head = new Heading(5);
+      head.addStyleName("inline-block small-right-indent no-top-margin");
       head.add(link);
 
       return head;
