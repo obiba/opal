@@ -60,6 +60,8 @@ import org.obiba.opal.web.gwt.app.client.administration.index.view.IndexView;
 import org.obiba.opal.web.gwt.app.client.administration.jvm.presenter.JVMPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.jvm.view.JVMView;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.profiles.presenter.SubjectProfilesAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.profiles.view.SubjectProfilesAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.view.RAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectCredentialsAdministrationPresenter;
@@ -94,6 +96,7 @@ public class AdministrationModule extends AbstractPresenterModule {
     configureIndexes();
     configureDatashield();
     configureUserGroups();
+    configureProfiles();
     configureSystemConfig();
     configureTaxonomies();
     configureIdentifiers();
@@ -127,6 +130,11 @@ public class AdministrationModule extends AbstractPresenterModule {
         SubjectCredentialsAdministrationPresenter.Proxy.class);
     bindPresenterWidget(SubjectCredentialsPresenter.class, SubjectCredentialsPresenter.Display.class,
         SubjectCredentialsView.class);
+  }
+
+  private void configureProfiles() {
+    bindPresenter(SubjectProfilesAdministrationPresenter.class, SubjectProfilesAdministrationPresenter.Display.class,
+        SubjectProfilesAdministrationView.class, SubjectProfilesAdministrationPresenter.Proxy.class);
   }
 
   private void configureDatashield() {

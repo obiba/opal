@@ -18,6 +18,9 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   OpalNavLink usersGroupsPlace;
 
   @UiField
+  OpalNavLink profilesPlace;
+
+  @UiField
   OpalNavLink identifiersPlace;
 
   @UiField
@@ -62,6 +65,11 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   @Override
   public void setUsersGroupsHistoryToken(String historyToken) {
     usersGroupsPlace.setHistoryToken(historyToken);
+  }
+
+  @Override
+  public void setProfilesHistoryToken(String historyToken) {
+    profilesPlace.setHistoryToken(historyToken);
   }
 
   @Override

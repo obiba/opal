@@ -325,6 +325,14 @@ public enum UriBuilders {
     }
   },
 
+  PROFILES {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "subject-profiles");
+
+    }
+  },
+
   GROUPS {
     @Override
     public UriBuilder create() {

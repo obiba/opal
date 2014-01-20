@@ -1366,6 +1366,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Last update {0}")
   String lastUpdateOnLabel();
 
+  @Description("Created label")
+  @DefaultStringValue("Created")
+  String createdLabel();
+
+  @Description("Last Update label")
+  @DefaultStringValue("Last updated")
+  String lastUpdatedLabel();
+
   @Description("Table last update")
   @DefaultStringValue("Table last update")
   String tableLastUpdateLabel();
@@ -1620,6 +1628,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Users and Groups")
   String pageUsersGroupsTitle();
 
+  @Description("Page Profiles title")
+  @DefaultStringValue("Profiles")
+  String pageProfilesTitle();
+
   @Description("Page Projects title")
   @DefaultStringValue("Projects")
   String pageProjectsTitle();
@@ -1651,6 +1663,10 @@ public interface Translations extends Constants {
   @Description("User Name label")
   @DefaultStringValue("Name")
   String userNameLabel();
+
+  @Description("Realm label")
+  @DefaultStringValue("Realm")
+  String realmLabel();
 
   @Description("User Groups label")
   @DefaultStringValue("Groups")

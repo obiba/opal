@@ -43,6 +43,8 @@ public final class Places {
 
   public static final String USERS = ADMINISTRATION + ".users";
 
+  public static final String PROFILES = "!profiles";
+
   public static final String DATABASES = "!databases";
 
   public static final String INDEX = ADMINISTRATION + ".index";

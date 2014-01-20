@@ -25,7 +25,10 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
   public interface Proxy extends ProxyPlace<AdministrationPresenter> {}
 
   public interface Display extends View {
+
     void setUsersGroupsHistoryToken(String historyToken);
+
+    void setProfilesHistoryToken(String historyToken);
 
     void setIdentifiersMappingsHistoryToken(String historyToken);
 
@@ -85,6 +88,7 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
 
   private void setHistoryTokens() {
     getView().setUsersGroupsHistoryToken(getHistoryToken(Places.USERS));
+    getView().setProfilesHistoryToken(getHistoryToken(Places.PROFILES));
     getView().setDatabasesHistoryToken(getHistoryToken(Places.DATABASES));
     getView().setIndexHistoryToken(getHistoryToken(Places.INDEX));
     getView().setRHistoryToken(getHistoryToken(Places.R));
