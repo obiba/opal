@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.support.DatasourceFileType;
@@ -56,7 +57,6 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -93,6 +93,8 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
   private final FileSelectionPresenter fileSelectionPresenter;
 
+  private final Translations translations;
+
   private String transientDatasourceName;
 
   private String datasourceName;
@@ -101,11 +103,13 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   @SuppressWarnings("PMD.ExcessiveParameterList")
   public VariablesImportPresenter(Display display, EventBus eventBus,
       ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter,
-      ConclusionStepPresenter conclusionPresenter, FileSelectionPresenter fileSelectionPresenter) {
+      ConclusionStepPresenter conclusionPresenter, FileSelectionPresenter fileSelectionPresenter,
+      Translations translations) {
     super(eventBus, display);
     this.comparedDatasourcesReportPresenter = comparedDatasourcesReportPresenter;
     this.conclusionPresenter = conclusionPresenter;
     this.fileSelectionPresenter = fileSelectionPresenter;
+    this.translations = translations;
     init();
   }
 
@@ -426,12 +430,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
-
-      Collection<String> errors = DatasourceParsingErrorDtos.getErrors(errorDto);
-      for (String error : errors) {
-        getView().showError(null, error);
-      }
+      getView().showError(null, translations.variableImportFailed());
       getView().disableCompletion();
     }
   }
