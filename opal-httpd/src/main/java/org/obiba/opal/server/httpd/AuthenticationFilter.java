@@ -97,7 +97,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
           Thread.currentThread().getId());
       ThreadContext.bind(subject);
       session.touch();
-      log.info("Successfully authenticated subject {}", SecurityUtils.getSubject().getPrincipal());
+      log.debug("Successfully authenticated subject {}", SecurityUtils.getSubject().getPrincipal());
     }
   }
 

@@ -121,6 +121,8 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     boolean newSubject = existing == null;
     if(newSubject) {
       validateProfile(subjectCredentials);
+    } else {
+      validateAuthenticationType(subjectCredentials, existing);
     }
     persist(subjectCredentials, ensureCredentials(subjectCredentials, existing));
     if(newSubject) {
@@ -208,6 +210,11 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     if(profile != null && !realm.equals(profile.getRealm())) {
       throw new DuplicateSubjectProfileException(profile);
     }
+  }
+
+  private void validateAuthenticationType(SubjectCredentials subjectCredentials, SubjectCredentials existing) {
+    if(existing.getAuthenticationType().equals(subjectCredentials.getAuthenticationType()))
+      throw new IllegalArgumentException("Authentication type cannot be changed");
   }
 
   private Iterable<Group> findImpactedGroups(final SubjectCredentials subjectCredentials) {
