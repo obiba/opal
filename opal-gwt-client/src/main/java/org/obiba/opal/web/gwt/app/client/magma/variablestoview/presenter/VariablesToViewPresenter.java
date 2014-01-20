@@ -48,12 +48,10 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -311,23 +309,10 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_CREATED) {
-        getView().hideDialog();
-        getEventBus().fireEvent(NotificationEvent.newBuilder().info(message).build());
-        getEventBus().fireEvent(new DatasourceUpdatedEvent(view.getDatasourceName()));
-        selectView();
-
-      } else if(response.getStatusCode() == Response.SC_FORBIDDEN) {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error("UnauthorizedOperation").build());
-      } else {
-        try {
-          ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
-          getEventBus().fireEvent(
-              NotificationEvent.newBuilder().error(errorDto.getStatus()).args(errorDto.getArgumentsArray()).build());
-        } catch(Exception nothing) {
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-        }
-      }
+      getView().hideDialog();
+      getEventBus().fireEvent(NotificationEvent.newBuilder().info(message).build());
+      getEventBus().fireEvent(new DatasourceUpdatedEvent(view.getDatasourceName()));
+      selectView();
     }
 
     private void selectView() {
