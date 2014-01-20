@@ -14,7 +14,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.magma.Datasource;
@@ -27,19 +26,14 @@ import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
-import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.DatasourceResource;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.model.Magma;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
 @Scope("request")
@@ -53,9 +47,6 @@ public class ProjectTransientDatasourcesResource {
 
   @PathParam("name")
   private String name;
-
-  @SuppressWarnings("unused")
-  private static final Logger log = LoggerFactory.getLogger(ProjectTransientDatasourcesResource.class);
 
   private DatasourceFactoryRegistry datasourceFactoryRegistry;
 
@@ -80,32 +71,27 @@ public class ProjectTransientDatasourcesResource {
 
   @POST
   public Response createDatasource(Magma.DatasourceFactoryDto factoryDto) {
-    DatasourceEncryptionStrategy encryptionStrategy = getDatasourceEncryptionStrategy();
     String uid = null;
-    ResponseBuilder response = null;
     try {
-      DatasourceFactory factory = datasourceFactoryRegistry.parse(factoryDto, encryptionStrategy);
+      DatasourceFactory factory = datasourceFactoryRegistry.parse(factoryDto, getDatasourceEncryptionStrategy());
       uid = MagmaEngine.get().addTransientDatasource(factory);
       Datasource ds = MagmaEngine.get().getTransientDatasourceInstance(uid);
-      response = Response.created(UriBuilder.fromPath("/").path(DatasourceResource.class).build(uid))
-          .entity(Dtos.asDto(ds).build());
+      return Response.created(UriBuilder.fromPath("/").path(DatasourceResource.class).build(uid))
+          .entity(Dtos.asDto(ds).build()).build();
     } catch(MagmaRuntimeException e) {
       MagmaEngine.get().removeTransientDatasource(uid);
-      response = Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", e));
+      throw e;
     }
-
-    return response.build();
   }
 
   @Nullable
   private DatasourceEncryptionStrategy getDatasourceEncryptionStrategy() {
     Project project = projectService.getProject(name);
-    OpalKeyStore ks = projectsKeyStoreService.getKeyStore(project);
+    OpalKeyStore keyStore = projectsKeyStoreService.getKeyStore(project);
     DatasourceEncryptionStrategy encryptionStrategy = null;
-    if(ks != null && !ks.listKeyPairs().isEmpty()) {
+    if(!keyStore.listKeyPairs().isEmpty()) {
       encryptionStrategy = new EncryptedSecretKeyDatasourceEncryptionStrategy();
-      encryptionStrategy.setKeyProvider(ks);
+      encryptionStrategy.setKeyProvider(keyStore);
     }
     return encryptionStrategy;
   }

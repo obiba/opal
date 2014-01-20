@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -41,6 +42,7 @@ import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.core.domain.OpalGeneralConfig;
 import org.obiba.opal.core.domain.Project;
+import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
@@ -192,15 +194,18 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     resource.setProjectsKeyStoreService(projectKeyStoreServiceMock);
     resource.setDatasourceFactoryRegistry(newDatasourceFactoryRegistry());
 
+    OpalKeyStore keyStore = createMock(OpalKeyStore.class);
+    expect(keyStore.listKeyPairs()).andReturn(Collections.<String>emptySet()).atLeastOnce();
+
     expect(projectServiceMock.getProject("patate")).andReturn(projectMock).atLeastOnce();
-    expect(projectKeyStoreServiceMock.getKeyStore(projectMock)).andReturn(null).atLeastOnce();
+    expect(projectKeyStoreServiceMock.getKeyStore(projectMock)).andReturn(keyStore).atLeastOnce();
 
     Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder()
         .setExtension(ExcelDatasourceFactoryDto.params,
             Magma.ExcelDatasourceFactoryDto.newBuilder().setFile(getDatasourcePath(DATASOURCE1)).setReadOnly(true)
                 .build()).build();
 
-    replay(projectMock, projectServiceMock, projectKeyStoreServiceMock);
+    replay(projectMock, projectServiceMock, projectKeyStoreServiceMock, keyStore);
     Response response = resource.createDatasource(factoryDto);
     assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
 
@@ -212,7 +217,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     assertThat(response.getMetadata().get("Location")).isNotNull();
     assertThat(response.getMetadata().get("Location").toString()).isEqualTo("[" + "/datasource/" + dto.getName() + "]");
 
-    verify(projectMock, projectServiceMock, projectKeyStoreServiceMock);
+    verify(projectMock, projectServiceMock, projectKeyStoreServiceMock, keyStore);
   }
 
   @Test
