@@ -1048,12 +1048,12 @@ public interface Translations extends Constants {
   Map<String, String> valueTypeMap();
 
   @Description("Subject Type map")
-  @DefaultStringMapValue({ "USER", "User", //
+  @DefaultStringMapValue({ "SUBJECT_CREDENTIALS", "User", //
       "GROUP", "Group" })
   Map<String, String> shortSubjectTypeMap();
 
   @Description("Add Subject Permission map")
-  @DefaultStringMapValue({ "USER.title", "Add User Permission", //
+  @DefaultStringMapValue({ "SUBJECT_CREDENTIALS.title", "Add User Permission", //
       "GROUP.title", "Add Group Permission" })
   Map<String, String> addSubjectPermissionMap();
 
@@ -2054,6 +2054,10 @@ public interface Translations extends Constants {
   @Description("Remove User label")
   @DefaultStringValue("Remove User")
   String removeUser();
+
+  @Description("Remove User Profile label")
+  @DefaultStringValue("Remove User Profile")
+  String removeUserProfile();
 
   @Description("Create Key Pair label")
   @DefaultStringValue("Create Key Pair")

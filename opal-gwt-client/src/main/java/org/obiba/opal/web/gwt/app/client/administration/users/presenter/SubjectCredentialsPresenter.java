@@ -101,7 +101,7 @@ public class SubjectCredentialsPresenter extends ModalPresenterWidget<SubjectCre
       switch(dialogMode) {
         case CREATE:
           ResourceRequestBuilderFactory.newBuilder() //
-              .forResource(UriBuilders.USER.create().build()) //
+              .forResource(UriBuilders.SUBJECT_CREDENTIALS.create().build()) //
               .withResourceBody(SubjectCredentialsDto.stringify(dto)) //
               .withCallback(SC_OK, successCallback) //
               .withCallback(SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //

@@ -50,13 +50,17 @@ public interface TranslationMessages extends Messages {
 
   @Description("Confirm remove group with users label")
   @DefaultMessage(
-      "Please confirm that you want to remove the group {0}.<br />" +
+      "Please confirm that you want to remove the group {0}. " +
           "The group {0} will be removed for users belonging to this group.")
   String confirmRemoveGroupWithUsers(String name);
 
   @Description("Confirm remove user label")
   @DefaultMessage("Please confirm that you want to remove the user {0}.")
   String confirmRemoveUser(String name);
+
+  @Description("Confirm remove user profile label")
+  @DefaultMessage("Please confirm that you want to remove the profile of user {0}. All its preferences will be lost.")
+  String confirmRemoveUserProfile(String name);
 
   @Description("Table count label")
   @DefaultMessage("{0} tables")

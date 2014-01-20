@@ -27,7 +27,7 @@
     <b:Paragraph>
       <ui:msg description="Profiles information">
         Each user who logged in has a profile. A realm is the user directory in which a user is defined. Logging in from
-        different realm with the same user name is forbidden for security reasons. If deleted, the user profile will be
+        different realm with the same user name is forbidden for security reasons. If removed, the user profile will be
         automatically recreated when the user logs in.
       </ui:msg>
     </b:Paragraph>

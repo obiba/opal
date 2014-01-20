@@ -317,18 +317,10 @@ public enum UriBuilders {
     }
   },
 
-  USER {
+  SUBJECT_CREDENTIALS {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "subject-credentials");
-
-    }
-  },
-
-  PROFILES {
-    @Override
-    public UriBuilder create() {
-      return UriBuilder.create().segment("system", "subject-profiles");
 
     }
   },
@@ -353,6 +345,22 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "group", "{}");
+
+    }
+  },
+
+  PROFILES {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "subject-profiles");
+
+    }
+  },
+
+  PROFILE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "subject-profile", "{}");
 
     }
   },

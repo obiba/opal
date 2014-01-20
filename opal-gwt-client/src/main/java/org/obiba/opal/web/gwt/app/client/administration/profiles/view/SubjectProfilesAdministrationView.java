@@ -14,8 +14,13 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.profiles.presenter.SubjectProfilesAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueRenderer;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
+import org.obiba.opal.web.model.client.opal.GroupDto;
+import org.obiba.opal.web.model.client.opal.SubjectCredentialsDto;
 import org.obiba.opal.web.model.client.opal.SubjectProfileDto;
 
 import com.github.gwtbootstrap.client.ui.CellTable;
@@ -30,6 +35,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
+
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 
 public class SubjectProfilesAdministrationView extends ViewImpl
     implements SubjectProfilesAdministrationPresenter.Display {
@@ -47,8 +55,9 @@ public class SubjectProfilesAdministrationView extends ViewImpl
 
   private final static Translations translations = GWT.create(Translations.class);
 
-  private final ListDataProvider<SubjectProfileDto> profilesDataProvider
-      = new ListDataProvider<SubjectProfileDto>();
+  private final ListDataProvider<SubjectProfileDto> profilesDataProvider = new ListDataProvider<SubjectProfileDto>();
+
+  private ActionsColumn<SubjectProfileDto> actionsColumn;
 
   @Inject
   public SubjectProfilesAdministrationView(Binder uiBinder) {
@@ -89,6 +98,19 @@ public class SubjectProfilesAdministrationView extends ViewImpl
       }
 
     }, translations.lastUpdatedLabel());
+    profilesTable.addColumn(actionsColumn = new ActionsColumn<SubjectProfileDto>(new ActionsProvider<SubjectProfileDto>() {
+
+      @Override
+      public String[] allActions() {
+        return new String[] { DELETE_ACTION };
+      }
+
+      @Override
+      public String[] getActions(SubjectProfileDto value) {
+        return new String[] { DELETE_ACTION };
+      }
+    }), translations.actionsLabel());
+
     profilesTable.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
     profilesPager.setDisplay(profilesTable);
     profilesDataProvider.addDataDisplay(profilesTable);
@@ -97,6 +119,11 @@ public class SubjectProfilesAdministrationView extends ViewImpl
   @Override
   public void renderProfiles(List<SubjectProfileDto> rows) {
     renderRows(rows, profilesDataProvider, profilesPager);
+  }
+
+  @Override
+  public HasActionHandler<SubjectProfileDto> getActions() {
+    return actionsColumn;
   }
 
   @Override

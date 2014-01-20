@@ -77,7 +77,7 @@ public class SubjectCredentialsAdministrationPresenter extends
   @Override
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.USER.create().build()) //
+        .forResource(UriBuilders.SUBJECT_CREDENTIALS.create().build()) //
         .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListUsersAuthorization())) //
         .get().send();
   }
@@ -96,7 +96,7 @@ public class SubjectCredentialsAdministrationPresenter extends
   @Override
   public void authorize(HasAuthorization authorizer) {
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.USER.create().build()).post().authorize(authorizer).send();
+        .forResource(UriBuilders.SUBJECT_CREDENTIALS.create().build()).post().authorize(authorizer).send();
   }
 
   @Override
@@ -202,7 +202,7 @@ public class SubjectCredentialsAdministrationPresenter extends
 
   private void refreshUsersAndApplications() {
     ResourceRequestBuilderFactory.<JsArray<SubjectCredentialsDto>>newBuilder() //
-        .forResource(UriBuilders.USER.create().build()) //
+        .forResource(UriBuilders.SUBJECT_CREDENTIALS.create().build()) //
         .withCallback(new ResourceCallback<JsArray<SubjectCredentialsDto>>() {
           @Override
           public void onResource(Response response, JsArray<SubjectCredentialsDto> resource) {
