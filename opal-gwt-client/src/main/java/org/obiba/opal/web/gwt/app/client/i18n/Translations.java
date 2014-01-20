@@ -2074,4 +2074,8 @@ public interface Translations extends Constants {
   @Description("Select another variable label")
   @DefaultStringValue("Select another variable...")
   String selectAnotherVariableLabel();
+
+  @Description("Variable Import Failed Error message")
+  @DefaultStringValue("Failed to import dictionary. Please make sure the file contains valid data.")
+  String variableImportFailed();
 }
