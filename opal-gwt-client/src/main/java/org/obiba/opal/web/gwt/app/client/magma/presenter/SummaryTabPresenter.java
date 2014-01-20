@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.magma.presenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.SummaryReceivedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.SummaryRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
@@ -68,6 +69,14 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
 
     // Summary: Refresh summary
     registerHandler(getView().getRefreshSummary().addClickHandler(new RefreshSummaryHandler()));
+
+    // Variable Script refreshed
+    addRegisteredHandler(VariableRefreshEvent.getType(), new VariableRefreshEvent.Handler() {
+      @Override
+      public void onVariableRefresh(VariableRefreshEvent event) {
+        requestSummary();
+      }
+    });
   }
 
   @Override
