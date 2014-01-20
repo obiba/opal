@@ -8,8 +8,6 @@ public interface VariableUiHandlers extends NamespacedAttributesTableUiHandlers 
 
   void onPreviousVariable();
 
-  void onEdit();
-
   void onHistory();
 
   void onEditScript();

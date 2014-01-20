@@ -36,6 +36,10 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
  */
 public class DeriveVariableView extends ModalViewImpl implements DeriveVariablePresenter.Display {
 
+  private static final int HEIGHT = 650;
+
+  private static final int WIDTH = 800;
+
   @UiTemplate("DeriveVariableView.ui.xml")
   interface ViewUiBinder extends UiBinder<WizardModalBox, DeriveVariableView> {}
 
@@ -59,8 +63,8 @@ public class DeriveVariableView extends ModalViewImpl implements DeriveVariableP
   public DeriveVariableView(EventBus eventBus) {
     super(eventBus);
     dialog = uiBinder.createAndBindUi(this);
-    dialog.setMinHeight(650);
-    dialog.setMinWidth(800);
+    dialog.setMinHeight(HEIGHT);
+    dialog.setMinWidth(WIDTH);
   }
 
   @Override
@@ -127,5 +131,4 @@ public class DeriveVariableView extends ModalViewImpl implements DeriveVariableP
     dialog.setNextEnabled(hasNextStep && success);
     dialog.setFinishEnabled(!hasNextStep && success);
   }
-
 }

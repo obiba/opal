@@ -14,24 +14,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.Skippable;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveConclusionPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.DropdownSuggestBox;
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.Skippable;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 
-import com.google.gwt.core.client.GWT;
+import com.github.gwtbootstrap.client.ui.Alert;
+import com.github.gwtbootstrap.client.ui.ControlGroup;
+import com.github.gwtbootstrap.client.ui.base.AlertBase;
+import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
+import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
+import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
-import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -51,9 +58,6 @@ public class DeriveConclusionView extends ViewImpl implements DeriveConclusionPr
   WizardStep conclusionStep;
 
   @UiField
-  CheckBox openEditor;
-
-  @UiField
   TextBox derivedNameBox;
 
   @UiField
@@ -67,6 +71,15 @@ public class DeriveConclusionView extends ViewImpl implements DeriveConclusionPr
 
   @UiField
   FlowPanel viewNameInput;
+
+  @UiField
+  ControlGroup viewGroup;
+
+  @UiField
+  ControlGroup nameGroup;
+
+  @UiField
+  FlowPanel alerts;
 
   private Map<String, List<String>> viewSuggestions;
 
@@ -126,8 +139,8 @@ public class DeriveConclusionView extends ViewImpl implements DeriveConclusionPr
   }
 
   @Override
-  public String getDerivedName() {
-    return derivedNameBox.getText();
+  public HasText getDerivedName() {
+    return derivedNameBox;
   }
 
   @Override
@@ -136,31 +149,44 @@ public class DeriveConclusionView extends ViewImpl implements DeriveConclusionPr
   }
 
   @Override
-  public String getViewName() {
-    return viewNameBox.getText();
+  public HasText getViewName() {
+    return viewNameBox;
   }
 
   @Override
-  public boolean isOpenEditorSelected() {
-    return openEditor.getValue();
+  public void clearErrors() {
+    alerts.setVisible(false);
+    alerts.clear();
   }
 
   @Override
-  public void setDerivedNameError(boolean error) {
-    if(error) {
-      derivedNameInput.addStyleName("error");
-    } else {
-      derivedNameInput.removeStyleName("error");
+  public void showError(@Nullable DeriveConclusionPresenter.Display.FormField formField, String message) {
+    ControlGroup group = null;
+    if(formField != null) {
+      switch(formField) {
+        case NAME:
+          group = nameGroup;
+          break;
+        case VIEW_NAME:
+          group = viewGroup;
+          break;
+      }
     }
-  }
 
-  @Override
-  public void setViewNameError(boolean error) {
-    if(error) {
-      viewNameInput.addStyleName("error");
-    } else {
-      viewNameInput.removeStyleName("error");
+    alerts.setVisible(true);
+    Alert alert = new Alert(message, AlertType.ERROR, true);
+
+    if(group != null) {
+      group.setType(ControlGroupType.ERROR);
+      final ControlGroup finalGroup = group;
+      alert.addClosedHandler(new ClosedHandler<AlertBase>() {
+        @Override
+        public void onClosed(ClosedEvent<AlertBase> event) {
+          finalGroup.setType(ControlGroupType.NONE);
+        }
+      });
     }
+    alerts.add(alert);
   }
 
 }

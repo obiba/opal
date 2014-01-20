@@ -8,12 +8,17 @@
 
   <g:FlowPanel>
     <o:WizardStep ui:field="conclusionStep">
+
+      <g:FlowPanel ui:field="alerts" visible="false"/>
+
       <g:FlowPanel>
         <g:FlowPanel ui:field="derivedNameInput" styleName="input">
-          <g:Label addStyleNames="key">
-            <ui:msg description="Derived Variable Name label">Derived Variable Name</ui:msg>
-          </g:Label>
-          <g:TextBox ui:field="derivedNameBox"/>
+          <b:ControlGroup ui:field="nameGroup">
+            <b:ControlLabel addStyleNames="key">
+              <ui:msg description="Derived Variable Name label">Derived Variable Name</ui:msg>
+            </b:ControlLabel>
+            <g:TextBox ui:field="derivedNameBox"/>
+          </b:ControlGroup>
         </g:FlowPanel>
 
         <g:FlowPanel styleName="input">
@@ -24,23 +29,19 @@
         </g:FlowPanel>
 
         <g:FlowPanel ui:field="viewNameInput" styleName="input">
-          <g:Label addStyleNames="key">
-            <ui:msg description="Destination View Name label">Destination View Name</ui:msg>
-          </g:Label>
-          <o:DropdownSuggestBox ui:field="viewNameBox"/>
-          <g:Label styleName="help-block">
-            <ui:msg description="Destination View Name help label">Select an existing view or provide a name for a new
-              view
-            </ui:msg>
-          </g:Label>
+          <b:ControlGroup ui:field="viewGroup">
+            <b:ControlLabel addStyleNames="key">
+              <ui:msg description="Destination View Name label">Destination View Name</ui:msg>
+            </b:ControlLabel>
+            <o:DropdownSuggestBox ui:field="viewNameBox"/>
+            <g:Label styleName="help-block">
+              <ui:msg description="Destination View Name help label">Select an existing view or provide a name for a new
+                view
+              </ui:msg>
+            </g:Label>
+          </b:ControlGroup>
         </g:FlowPanel>
 
-        <g:FlowPanel styleName="input">
-          <b:CheckBox value="true" ui:field="openEditor">
-            <ui:msg description="Open New Derived Variable Editor label">Open editor for this new derived variable
-            </ui:msg>
-          </b:CheckBox>
-        </g:FlowPanel>
       </g:FlowPanel>
     </o:WizardStep>
   </g:FlowPanel>
