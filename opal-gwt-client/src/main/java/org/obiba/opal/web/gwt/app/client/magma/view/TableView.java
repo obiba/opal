@@ -84,8 +84,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   interface Binder extends UiBinder<Widget, TableView> {}
 
-  private static final int VARIABLES_TAB_INDEX = 0;
-
   private static final int VALUES_TAB_INDEX = 2;
 
   private static final int PERMISSIONS_TAB_INDEX = 3;
