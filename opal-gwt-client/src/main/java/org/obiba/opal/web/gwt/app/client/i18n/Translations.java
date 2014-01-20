@@ -511,7 +511,10 @@ public interface Translations extends Constants {
       "InvalidCertificate", "Invalid certificate. Please Make sure to provide valid certificate keys.",//
       "InvalidKeypair", "Failed to create key pair. Please make sure to provide a valid algorithm name and size.",
       "KeyEntryAlreadyExists", "A key with the same name exists, please choose a unique name.",//
-      "GeneralKeystoreError", "Key pair storage failed. Please make sure to provide valid certificate information."//
+      "GeneralKeystoreError", "Key pair storage failed. Please make sure to provide valid certificate information.",
+      "DerivedVariableNameRequired", "Derived variable name is required.",//
+      "DestinationViewNameRequired", "Destination View Name Required label",//
+      "AddDerivedVariableToViewOnly", "A derived variable can only be added to a view."//
   })
   Map<String, String> userMessageMap();
 
@@ -1065,19 +1068,6 @@ public interface Translations extends Constants {
   @Description("Invalid Destination View label")
   @DefaultStringValue("Not a valid destination view.")
   String invalidDestinationView();
-
-  @Description("Derived Variable Name Required label")
-  @DefaultStringValue("Derived variable name is required.")
-  String derivedVariableNameRequired();
-
-  @Description("Destination View Name Required label")
-  @DefaultStringValue("Destination view name is required.")
-  String destinationViewNameRequired();
-
-  @Description("Add Derived Variable To View Only label")
-  @DefaultStringValue(
-      "A derived variable can only be added to a view.")
-  String addDerivedVariableToViewOnly();
 
   @Description("Derived Variable Evaluation label")
   @DefaultStringValue(

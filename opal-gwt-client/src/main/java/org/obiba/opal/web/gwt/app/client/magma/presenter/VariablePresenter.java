@@ -24,7 +24,6 @@ import org.obiba.opal.web.gwt.app.client.magma.event.SummaryRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VcsCommitInfoReceivedEvent;
-import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CategoriesEditorModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.NamespacedAttributesTableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalPresenter;
@@ -51,7 +50,6 @@ import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -293,10 +291,6 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
         .post().send();
   }
 
-  private String getViewLink() {
-    return variable.getParentLink().getLink().replaceFirst("/table/", "/view/");
-  }
-
   @Override
   public void onNextVariable() {
     placeManager.revealPlace(
@@ -307,18 +301,6 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   public void onPreviousVariable() {
     placeManager.revealPlace(
         ProjectPlacesHelper.getVariablePlace(table.getDatasourceName(), table.getName(), previousVariable.getName()));
-  }
-
-  @Override
-  public void onEdit() {
-    ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(getViewLink()).get()
-        .withCallback(new ResourceCallback<ViewDto>() {
-
-          @Override
-          public void onResource(Response response, ViewDto viewDto) {
-            fireEvent(new ViewConfigurationRequiredEvent(viewDto, variable));
-          }
-        }).send();
   }
 
   @Override
