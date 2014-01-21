@@ -21,7 +21,7 @@ li {
  * Opal
  */
 
-.project-tag  {
+.project-tag {
   margin-right: 2px;
 }
 
@@ -127,8 +127,8 @@ li.no-icon > a {
 
 .justified-paragraph {
   font-size: 0.8em;
-  text-align:justify;
-  text-justify:inter-word;
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 .block {
@@ -452,6 +452,15 @@ td.row-actions span {
   margin-bottom: 2px;
 }
 
+.dropdown-menu > li.controls > div ul {
+  color: #000000;
+}
+
+.datepicker-days,
+.datepicker-months,
+.datepicker-years {
+  background-color: #FFFFFF;
+}
 /*
  * Chosen listbox for facet values filter
  */

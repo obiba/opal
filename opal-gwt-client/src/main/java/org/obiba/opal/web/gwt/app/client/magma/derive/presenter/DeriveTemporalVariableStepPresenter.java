@@ -14,18 +14,19 @@ import java.util.Date;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.magma.derive.helper.DerivationHelper;
 import org.obiba.opal.web.gwt.app.client.magma.derive.helper.TemporalVariableDerivationHelper;
 import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.StepInHandler;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
-import com.google.web.bindery.event.shared.EventBus;
+import com.google.gwt.core.client.GWT;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.View;
 
 /**
@@ -86,6 +87,10 @@ public class DeriveTemporalVariableStepPresenter
   private final class DeriveTemporalVariableMapStepInHandler implements StepInHandler {
     @Override
     public void onStepIn() {
+      GWT.log("On step in");
+      if(derivationHelper != null) {
+        GWT.log(derivationHelper.getGroupMethod().toString() + " == " + getView().getGroupMethod());
+      }
       // do not re-populate if group method selection has not changed
       if(derivationHelper == null //
           || !derivationHelper.getGroupMethod().toString().equalsIgnoreCase(getView().getGroupMethod()) //
