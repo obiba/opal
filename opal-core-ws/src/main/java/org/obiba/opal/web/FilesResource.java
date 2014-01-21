@@ -112,10 +112,9 @@ public class FilesResource {
   @NoAuthorization
   public Response getFileDetails(@PathParam("path") String path) throws FileSystemException {
     FileObject file = resolveFileInFileSystem(path);
-    if(file.exists()) {
-      return file.getType() == FileType.FILE ? getFileDetails(file) : getFolderDetails(file);
-    }
-    return getPathNotExistResponse(path);
+    return file.exists()
+        ? file.getType() == FileType.FILE ? getFileDetails(file) : getFolderDetails(file)
+        : getPathNotExistResponse(path);
   }
 
   @GET
@@ -131,10 +130,9 @@ public class FilesResource {
   public Response getFile(@PathParam("path") String path, @QueryParam("file") List<String> children)
       throws IOException {
     FileObject file = resolveFileInFileSystem(path);
-    if(file.exists()) {
-      return file.getType() == FileType.FILE ? getFile(file) : getFolder(file, children);
-    }
-    return getPathNotExistResponse(path);
+    return file.exists()
+        ? file.getType() == FileType.FILE ? getFile(file) : getFolder(file, children)
+        : getPathNotExistResponse(path);
   }
 
   /**
@@ -185,10 +183,12 @@ public class FilesResource {
     for(String sourcePath : sourcesPath) {
       FileObject sourceFile = resolveFileInFileSystem(sourcePath);
       if(!sourceFile.exists()) getPathNotExistResponse(sourcePath);
-      if(!sourceFile.isReadable())
+      if(!sourceFile.isReadable()) {
         return Response.status(Status.FORBIDDEN).entity("Source file is not readable: " + sourcePath).build();
-      if(!sourceFile.isWriteable())
+      }
+      if(!sourceFile.isWriteable()) {
         return Response.status(Status.FORBIDDEN).entity("Source file cannot be moved: " + sourcePath).build();
+      }
     }
 
     // do action
@@ -211,8 +211,9 @@ public class FilesResource {
     for(String sourcePath : sourcesPath) {
       FileObject sourceFile = resolveFileInFileSystem(sourcePath);
       if(!sourceFile.exists()) getPathNotExistResponse(sourcePath);
-      if(!sourceFile.isReadable())
+      if(!sourceFile.isReadable()) {
         return Response.status(Status.FORBIDDEN).entity("Source file is not readable: " + sourcePath).build();
+      }
     }
 
     // do action
@@ -277,12 +278,11 @@ public class FilesResource {
 
     if(overwrite) {
       return Response.ok().build();
-    } else {
-      URI fileUri = uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(fileName).build();
-      return Response.created(fileUri)//
-          .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(fileUri, AclAction.FILES_ALL))//
-          .build();
     }
+    URI fileUri = uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(fileName).build();
+    return Response.created(fileUri)//
+        .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(fileUri, AclAction.FILES_ALL))//
+        .build();
   }
 
   @POST
@@ -540,30 +540,24 @@ public class FilesResource {
   }
 
   private void writeUploadedFileToFileSystem(FileItem uploadedFile, FileObject fileToWriteTo) {
-    OutputStream localFileStream = null;
-    InputStream uploadedFileStream = null;
-    try {
 
-      // OPAL-919: We need to wrap the OutputStream returned by commons-vfs into another OutputStream
-      // to force a call to flush() on every call to write() in order to prevent the system from running out of memory
-      // when copying large files.
-      localFileStream = new BufferedOutputStream(fileToWriteTo.getContent().getOutputStream()) {
-        @Override
-        public synchronized void write(byte[] b, int off, int len) throws IOException {
-          flush();
-          super.write(b, off, len);
-        }
+    // OPAL-919: We need to wrap the OutputStream returned by commons-vfs into another OutputStream
+    // to force a call to flush() on every call to write() in order to prevent the system from running out of memory
+    // when copying large files.
+    try(OutputStream localFileStream = new BufferedOutputStream(fileToWriteTo.getContent().getOutputStream()) {
+      @Override
+      public synchronized void write(byte[] b, int off, int len) throws IOException {
+        flush();
+        super.write(b, off, len);
+      }
 
-      };
-      uploadedFileStream = uploadedFile.getInputStream();
+    };
+        InputStream uploadedFileStream = uploadedFile.getInputStream()) {
+
       StreamUtil.copy(uploadedFileStream, localFileStream);
     } catch(IOException couldNotWriteUploadedFile) {
       throw new RuntimeException("Could not write uploaded file to Opal file system", couldNotWriteUploadedFile);
-    } finally {
-      StreamUtil.silentSafeClose(localFileStream);
-      StreamUtil.silentSafeClose(uploadedFileStream);
     }
-
   }
 
   private void compressFolder(File compressedFile, FileObject folder, Collection<String> children) throws IOException {

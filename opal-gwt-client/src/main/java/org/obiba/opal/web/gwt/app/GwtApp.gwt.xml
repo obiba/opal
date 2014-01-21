@@ -113,7 +113,10 @@
     </any>
   </replace-with>
 
-  <!-- This will limit the compile to a single browser: Firefox 3.x -->
+  <!-- This will limit the compile to a single browser: -->
+  <!-- Firefox 3.x -->
   <!--<set-property name='user.agent' value='gecko1_8'/>-->
+  <!-- Chrome -->
+  <!--<set-property name='user.agent' value='safari'/>-->
 
 </module>

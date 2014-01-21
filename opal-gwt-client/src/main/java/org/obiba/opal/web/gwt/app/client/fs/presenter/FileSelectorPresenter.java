@@ -199,6 +199,8 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
 
   @Override
   public void onUploadFile() {
+    FileUploadModalPresenter fileUploadModalPresenter = fileUploadModalProvider.get();
+    fileUploadModalPresenter.setCurrentFolder(folderDetailsPresenter.getCurrentFolder());
     fileUploadModalProvider.show();
   }
 
@@ -221,11 +223,7 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
     String newFolder = getView().getCreateFolderName().getText().trim();
     FileDto currentFolder = getCurrentFolder();
     if(currentFolder != null && newFolder.length() != 0) {
-      if("/".equals(currentFolder.getPath())) { // create under root
-        createFolder("/", newFolder);
-      } else {
-        createFolder(currentFolder.getPath(), newFolder);
-      }
+      createFolder(currentFolder.getPath(), newFolder);
     }
   }
 

@@ -32,14 +32,13 @@ public class FileResourceRequest {
   }
 
   public void send() {
-    String resource = "/files/_meta" + path + "/";
-    ResourceRequestBuilder<FileDto> builder = ResourceRequestBuilderFactory.<FileDto>newBuilder().forResource(resource)
-        .get()//
-        .withCallback(callback);
+    ResourceRequestBuilder<FileDto> builder = ResourceRequestBuilderFactory.<FileDto>newBuilder() //
+        .forResource("/files/_meta" + path + "/") //
+        .withCallback(callback) //
+        .get();
     if(codeCallback != null) {
       builder.withCallback(codeCallback, codes);
     }
-
     builder.send();
   }
 
@@ -47,6 +46,7 @@ public class FileResourceRequest {
     return new Builder(path);
   }
 
+  @SuppressWarnings("ParameterHidesMemberVariable")
   public static class Builder {
 
     private final FileResourceRequest request;

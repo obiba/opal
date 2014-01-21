@@ -84,9 +84,18 @@ public class FileUploadModalPresenter extends ModalPresenterWidget<FileUploadMod
 
   @Override
   public void onReveal() {
+    showRemoteFolderName();
+  }
+
+  private void showRemoteFolderName() {
     if(currentFolder != null) {
       getView().setRemoteFolderName(currentFolder.getPath());
     }
+  }
+
+  public void setCurrentFolder(FileDto currentFolder) {
+    this.currentFolder = currentFolder;
+    showRemoteFolderName();
   }
 
   private class ConfirmationEventHandler implements ConfirmationEvent.Handler {

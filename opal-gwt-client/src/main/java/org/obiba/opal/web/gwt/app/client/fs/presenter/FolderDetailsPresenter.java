@@ -133,14 +133,16 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            if(response.getStatusCode() == Response.SC_NOT_FOUND) {
-              fireEvent(NotificationEvent.newBuilder().error("FileNotFound").args(file.getPath()).build());
-            } else {
-              fireEvent(NotificationEvent.newBuilder().error("FileNotAccessible").args(file.getPath()).build());
-            }
+            fireEvent(NotificationEvent.newBuilder().error("FileNotFound").args(file.getPath()).build());
           }
-        }, Response.SC_NOT_FOUND, Response.SC_UNAUTHORIZED, Response.SC_INTERNAL_SERVER_ERROR).send();
-
+        }, Response.SC_NOT_FOUND) //
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            fireEvent(NotificationEvent.newBuilder().error("FileNotAccessible").args(file.getPath()).build());
+          }
+        }, Response.SC_UNAUTHORIZED, Response.SC_INTERNAL_SERVER_ERROR) //
+        .send();
   }
 
   public interface Display extends View, HasUiHandlers<FolderDetailsUiHandlers> {
