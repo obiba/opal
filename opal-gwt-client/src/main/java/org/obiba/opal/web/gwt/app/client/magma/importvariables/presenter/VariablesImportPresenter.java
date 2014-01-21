@@ -73,7 +73,6 @@ import static com.google.gwt.http.client.Response.SC_OK;
 public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImportPresenter.Display>
     implements VariablesImportUiHandlers {
 
-
   public static final WizardType WIZARD_TYPE = new WizardType();
 
   public static class Wizard extends WizardProxy<VariablesImportPresenter> {
@@ -117,13 +116,14 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     getView().setUiHandlers(this);
     setDefaultCharset();
 
-    getEventBus().addHandler(FileSelectionUpdatedEvent.getType(), new FileSelectionUpdatedEvent.Handler() {
-      @Override
-      public void onFileSelectionUpdated(FileSelectionUpdatedEvent event) {
-        String selectedFile = ((FileSelectionPresenter) event.getSource()).getSelectedFile();
-        getView().showSpssSpecificPanel(DatasourceFileType.isSpssFile(selectedFile));
-      }
-    });
+    getEventBus()
+        .addHandler(FileSelectionUpdatedEvent.getType(), new FileSelectionUpdatedEvent.FileSelectionUpdatedHandler() {
+          @Override
+          public void onFileSelectionUpdated(FileSelectionUpdatedEvent event) {
+            String selectedFile = ((FileSelectionPresenter) event.getSource()).getSelectedFile();
+            getView().showSpssSpecificPanel(DatasourceFileType.isSpssFile(selectedFile));
+          }
+        });
   }
 
   @Override
@@ -140,14 +140,14 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   @Override
   public void processVariablesFile() {
     getView().clearErrors();
-    if (!new ViewValidator().validate()) return;
+    if(!new ViewValidator().validate()) return;
     createTransientDatasource();
     getView().gotoPreview();
   }
 
   @Override
   public void createTable() {
-    if (!new ViewImportValidator().validate()) return;
+    if(!new ViewImportValidator().validate()) return;
     conclusionPresenter.sendResourceRequests();
     getView().hide();
   }
@@ -166,7 +166,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     fileSelectionPresenter.setFileSelectionType(FileSelectionType.FILE);
     fileSelectionPresenter.bind();
     getView().setFileSelectionDisplay(fileSelectionPresenter.getView());
-    addHandler(FileSelectionEvent.getType(), new FileSelectionEvent.Handler() {
+    addHandler(FileSelectionEvent.getType(), new FileSelectionEvent.FileSelectionHandler() {
       @Override
       public void onFileSelection(FileSelectionEvent event) {
         getView().clearErrors();
@@ -203,7 +203,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   }
 
   private void createTransientDatasource() {
-    if (!Strings.isNullOrEmpty(transientDatasourceName)) deleteTransientDatasource();
+    if(!Strings.isNullOrEmpty(transientDatasourceName)) deleteTransientDatasource();
 
     DatasourceFactoryDto factory = createDatasourceFactoryDto(getView().getSelectedFile());
     ResponseCodeCallback errorCallback = new TransientDatasourceFailureCallback();
@@ -218,7 +218,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   }
 
   private void deleteTransientDatasource() {
-    if (Strings.isNullOrEmpty(transientDatasourceName)) return;
+    if(Strings.isNullOrEmpty(transientDatasourceName)) return;
 
     UriBuilder builder = UriBuilder.create().segment("datasource", transientDatasourceName);
     ResourceRequestBuilderFactory.newBuilder() //
@@ -311,7 +311,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
       DatasourceFileType fileType = DatasourceFileType.getFileType(getView().getSelectedFile());
       validators.add(new FileTypeValidator(fileType, Display.FormField.FILE_SELECTION.name()));
 
-      if (DatasourceFileType.SAV == fileType) {
+      if(DatasourceFileType.SAV == fileType) {
         validators.add(createLocaleValidator());
         validators.add(createCharacterSetEncodingValidator());
       }
@@ -397,8 +397,8 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     @Override
     public void onResource(Response response, DatasourceDto resource) {
       if(response.getStatusCode() == SC_CREATED) {
-        comparedDatasourcesReportPresenter.compare(resource.getName(), datasourceName,
-            new DatasourceComparisonSuccessCallback(), factory, resource);
+        comparedDatasourcesReportPresenter
+            .compare(resource.getName(), datasourceName, new DatasourceComparisonSuccessCallback(), factory, resource);
       }
     }
 
@@ -414,7 +414,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
       public void onFailure(DatasourceFactoryDto factoryDto, ClientErrorDto errorDto) {
         // show client error
         Collection<String> errors = DatasourceParsingErrorDtos.getErrors(errorDto);
-        for (String error : errors) {
+        for(String error : errors) {
           getView().showError(null, error);
         }
         getView().disableCompletion();
@@ -434,7 +434,6 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
       getView().disableCompletion();
     }
   }
-
 
   public interface Display extends WizardView, CharacterSetDisplay, HasUiHandlers<VariablesImportUiHandlers> {
 
@@ -471,6 +470,5 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     void setConclusionDisplay(ConclusionStepPresenter.Display display);
 
   }
-
 
 }
