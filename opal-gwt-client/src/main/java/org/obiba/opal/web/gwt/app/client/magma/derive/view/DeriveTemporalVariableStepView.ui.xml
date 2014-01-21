@@ -46,8 +46,8 @@
               </ui:msg>
             </b:HelpBlock>
           </b:Column>
-          <b:Column size="6" ui:field="dateRangeColumn">
-            <g:Label>
+          <b:Column size="6" ui:field="dateRangeColumn" visible="false">
+          <g:Label>
               <ui:msg description="Date Range label">Date range definition (YYYY-MM-DD)</ui:msg>
             </g:Label>
 
