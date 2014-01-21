@@ -88,8 +88,7 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
     initWidget(uiBinder.createAndBindUi(this));
     modal.setTitle(translations.addAttribute());
 
-    @SuppressWarnings({ "UnusedDeclaration", "PMD.UnusedLocalVariable" })
-    ConstrainedModal constrainedModal = new ConstrainedModal(modal);
+    new ConstrainedModal(modal);
   }
 
   @UiHandler("saveButton")
