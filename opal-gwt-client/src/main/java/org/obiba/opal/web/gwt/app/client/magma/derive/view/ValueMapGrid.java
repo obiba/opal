@@ -14,11 +14,12 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry.ValueMapEntryType;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 
+import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.Cell.Context;
 import com.google.gwt.cell.client.CheckboxCell;
@@ -29,7 +30,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.AbstractCellTable;
 import com.google.gwt.user.cellview.client.Column;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.view.client.ListDataProvider;
 
@@ -61,9 +61,9 @@ public class ValueMapGrid extends FlowPanel {
   private double maxFrequency;
 
   public ValueMapGrid() {
-    pager = new SimplePager();
+    pager = new SimplePager(SimplePager.TextLocation.RIGHT);
     pager.setPageSize(DEFAULT_PAGE_SIZE);
-    pager.addStyleName("right-aligned");
+    pager.addStyleName("pull-right");
     pager.setVisible(false);
     add(pager);
   }
@@ -95,7 +95,7 @@ public class ValueMapGrid extends FlowPanel {
     pager.setVisible(valueMapEntries.size() > pager.getPageSize());
     dataProvider.refresh();
 
-    addStyleName("value-map");
+    //addStyleName("value-map");
   }
 
   public void refreshValuesMap() {
@@ -115,7 +115,8 @@ public class ValueMapGrid extends FlowPanel {
     table = new Table<ValueMapEntry>(pager.getPageSize());
     // not supposed to be empty except while being populated
     table.setEmptyTableWidget(table.getLoadingIndicator());
-    table.addStyleName("clear");
+    table.addStyleName("small-top-margin");
+    table.addStyleName("pull-left");
     table.setPageSize(pageSize);
     table.setWidth("100%");
     add(table);

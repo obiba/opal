@@ -20,8 +20,8 @@
       <g:InlineLabel ui:field="noValues">
         <ui:msg description="No Values label">No Values</ui:msg>
       </g:InlineLabel>
-      <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="right-aligned"/>
-      <o:Table width="100%" ui:field="valuesTable" addStyleNames="left-aligned"/>
+      <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
+      <o:Table width="100%" ui:field="valuesTable" addStyleNames="pull-left"/>
     </g:FlowPanel>
 
     <g:Anchor>
