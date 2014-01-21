@@ -20,6 +20,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
+import org.obiba.opal.web.gwt.app.client.support.VariableDtoNature;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.ui.CategoricalCriterionDropdown;
 import org.obiba.opal.web.gwt.app.client.ui.CriterionPanel;
@@ -69,6 +70,10 @@ import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
 import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 import static com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE;
+import static org.obiba.opal.web.gwt.app.client.support.VariableDtoNature.CATEGORICAL;
+import static org.obiba.opal.web.gwt.app.client.support.VariableDtoNature.CONTINUOUS;
+import static org.obiba.opal.web.gwt.app.client.support.VariableDtoNature.TEMPORAL;
+import static org.obiba.opal.web.gwt.app.client.support.VariableDtoNature.getNature;
 
 public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.Display>
     implements ValuesTableUiHandlers {
@@ -585,21 +590,19 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         List<String> keys = JsArrays.toList(opalMap.getKeysArray());
         String indexedFieldName = opalMap.getValues(keys.indexOf(resource.getName()));
 
-        if(JsArrays.toSafeArray(resource.getCategoriesArray()).length() > 0 ||
-            "integer".equals(resource.getValueType()) || "decimal".equals(resource.getValueType())) {
+        VariableDtoNature nature = getNature(resource);
+        if(nature == CONTINUOUS || nature == CATEGORICAL) {
           // Filter for Categorical variable OR Numerical variable
           ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(
               UriBuilders.DATASOURCE_TABLE_FACET_VARIABLE_SEARCH.create()
                   .build(originalTable.getDatasourceName(), originalTable.getName(), variableName))
-              .withCallback(new FacetVariableResourceCallback(resource, indexedFieldName)).get().send();
+              .withCallback(new FacetVariableResourceCallback(resource, indexedFieldName, nature)).get().send();
 
+        } else if(nature == TEMPORAL) {
+          addDateFilter(resource, indexedFieldName);
         } else {
-          if("date".equals(resource.getValueType()) || "datetime".equals(resource.getValueType())) {
-            addDateFilter(resource, indexedFieldName);
-          } else {
-            // Default filter variable
-            addDefaultFilter(resource, indexedFieldName);
-          }
+          // Default filter variable
+          addDefaultFilter(resource, indexedFieldName);
         }
       }
     }
@@ -634,14 +637,17 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     private final String fieldName;
 
-    FacetVariableResourceCallback(VariableDto variableDto, String indexedFieldName) {
+    private final VariableDtoNature nature;
+
+    FacetVariableResourceCallback(VariableDto variableDto, String indexedFieldName, VariableDtoNature nature) {
       this.variableDto = variableDto;
       fieldName = indexedFieldName;
+      this.nature = nature;
     }
 
     @Override
     public void onResource(Response response, QueryResultDto resource) {
-      if("integer".equals(variableDto.getValueType()) || "decimal".equals(variableDto.getValueType())) {
+      if(nature == CONTINUOUS) {
         addNumericalFilter(resource);
       } else {
         addCategoricalFilter(resource);

@@ -46,6 +46,7 @@ public class CriterionPanel extends FlowPanel {
 
     if(removeable) {
       w.addStyleName("input-append");
+      w.addStyleName("no-bottom-margin");
       IconAnchor remove = new IconAnchor();
       remove.setIcon(IconType.REMOVE);
       remove.setTitle(translations.removeLabel());

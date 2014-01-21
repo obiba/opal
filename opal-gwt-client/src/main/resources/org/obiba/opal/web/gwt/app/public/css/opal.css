@@ -447,3 +447,10 @@ td.row-actions span {
 .attribute-value > .label {
   margin-bottom: 2px;
 }
+
+/*
+ * Chosen listbox for facet values filter
+ */
+.dropdown-menu > li.controls > div ul {
+  color: #000000;
+}
