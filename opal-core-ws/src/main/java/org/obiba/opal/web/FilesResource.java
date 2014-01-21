@@ -588,10 +588,10 @@ public class FilesResource {
             addFolder(basePath, file, outputStream, null);
           } else {
             outputStream.putNextEntry(new ZipEntry(file.getName().getPath().substring(baseLength)));
-            FileInputStream inputStream = new FileInputStream(opalRuntime.getFileSystem().getLocalFile(file));
-            StreamUtil.copy(inputStream, outputStream);
-            outputStream.closeEntry();
-            StreamUtil.silentSafeClose(inputStream);
+            try(FileInputStream inputStream = new FileInputStream(opalRuntime.getFileSystem().getLocalFile(file))) {
+              StreamUtil.copy(inputStream, outputStream);
+              outputStream.closeEntry();
+            }
           }
         }
       }

@@ -16,6 +16,10 @@ public class InvalidConfigurationException extends RuntimeException {
 
   private static final long serialVersionUID = -5339727974864943590L;
 
+  public InvalidConfigurationException(String msg) {
+    super(msg);
+  }
+
   public InvalidConfigurationException(String msg, Throwable cause) {
     super(msg, cause);
   }

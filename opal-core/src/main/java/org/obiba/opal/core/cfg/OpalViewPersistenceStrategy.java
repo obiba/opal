@@ -193,7 +193,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     }
   }
 
-  private void serializeAllViewFiles(Iterable<View> views, File localRepo, List<String> varFilesToRemove,
+  private void serializeAllViewFiles(Iterable<View> views, File localRepo, Collection<String> varFilesToRemove,
       StringBuilder message) throws IOException {
     for(View view : views) {
       doWriteGitView(localRepo, view, varFilesToRemove);

@@ -71,8 +71,10 @@ public class UpgradeCommand {
    */
   private boolean hasVersionInConfigXml() {
     try {
-      Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-          .parse(new File(System.getenv().get("OPAL_HOME") + "/data/opal-config.xml"));
+      File opalConfig = new File(System.getenv().get("OPAL_HOME") + "/data/opal-config.xml");
+      if(!opalConfig.exists()) return false;
+
+      Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(opalConfig);
       XPath xPath = XPathFactory.newInstance().newXPath();
       Node node = (Node) xPath.compile("//version").evaluate(doc.getDocumentElement(), XPathConstants.NODE);
       return node != null;

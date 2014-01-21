@@ -27,7 +27,6 @@ import java.security.KeyPair;
 import org.apache.sshd.server.keyprovider.AbstractGeneratorHostKeyProvider;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PEMWriter;
-import org.obiba.core.util.StreamUtil;
 
 /**
  * TODO Add javadoc
@@ -59,11 +58,8 @@ public class PEMGeneratorHostKeyProvider extends AbstractGeneratorHostKeyProvide
 
   @Override
   protected void doWriteKeyPair(KeyPair kp, OutputStream os) throws Exception {
-    PEMWriter w = new PEMWriter(new OutputStreamWriter(os));
-    try {
-      w.writeObject(kp);
-    } finally {
-      StreamUtil.silentSafeClose(w);
+    try(PEMWriter writer = new PEMWriter(new OutputStreamWriter(os))) {
+      writer.writeObject(kp);
     }
   }
 

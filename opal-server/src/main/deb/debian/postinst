@@ -27,22 +27,29 @@ case "$1" in
       db_get opal-server/admin_password
 
       if [ "$RET" != "" ] ; then
-          echo Updating administrator password.
-          # hash the password and escape the possible '$/&' characters
-          adminpw=$(echo -n $RET | xargs java -jar /usr/share/opal-*/tools/lib/password-hasher-*-cli.jar | sed -e 's/\([\$\/\/]\)/\\\1/g' | cut -d ' ' -f 1)
-          tfile=`mktemp`
-          if [ ! -f "$tfile" ]; then
-            return 1
-          fi
-          cat /etc/opal/shiro.ini | sed \
-            -e "s/^administrator\s*=.*,/administrator=$adminpw,/" \
-              > $tfile && mv $tfile /etc/opal/shiro.ini
+        echo Updating administrator password.
+        # hash the password and escape the possible '$/&' characters
+        adminpw=$(echo -n $RET | xargs java -jar /usr/share/opal-*/tools/lib/password-hasher-*-cli.jar | sed -e 's/\([\$\/\/]\)/\\\1/g' | cut -d ' ' -f 1)
+        tfile=`mktemp`
+        if [ ! -f "$tfile" ]; then
+          return 1
+        fi
+        cat /etc/opal/shiro.ini | sed -e "s/^administrator\s*=.*,/administrator=$adminpw,/" > $tfile && \
+          mv $tfile /etc/opal/shiro.ini
+        # clear password in db_get so it won't be re-encoded during next upgrade
+        db_set opal-server/admin_password ""
       fi
 
     	# Create opal user if it doesn't exist.
       if ! id opal > /dev/null 2>&1 ; then
-          adduser --system --home /var/lib/opal --no-create-home --disabled-password opal
+        adduser --system --home /var/lib/opal --no-create-home --disabled-password opal
       fi
+
+      # Opal file structure on Debian
+      # /etc/opal: configuration
+      # /usr/share/opal: executable
+      # /var/lib/opal: data runtime
+      # /var/log: logs
 
       rm -f /usr/share/opal
       ln -s /usr/share/opal-* /usr/share/opal

@@ -58,14 +58,6 @@
       </includes>
     </fileSet>
 
-    <fileSet>
-      <directory>src/main/data</directory>
-      <outputDirectory>data</outputDirectory>
-      <includes>
-        <include>**/*.*</include>
-      </includes>
-    </fileSet>
-
   </fileSets>
   <dependencySets>
 

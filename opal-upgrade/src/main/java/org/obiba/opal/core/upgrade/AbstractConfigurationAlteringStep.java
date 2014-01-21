@@ -89,16 +89,12 @@ public abstract class AbstractConfigurationAlteringStep {
 
   protected Document getOpalConfigurationAsDocument() {
     String error = "Could not read Opal configuration file.";
-    InputStream inputStream = null;
-    try {
-      inputStream = new FileInputStream(opalConfigFile);
+    try(InputStream inputStream = new FileInputStream(opalConfigFile)) {
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       DocumentBuilder builder = factory.newDocumentBuilder();
       return builder.parse(inputStream);
     } catch(ParserConfigurationException | IOException | SAXException e) {
       throw new RuntimeException(error, e);
-    } finally {
-      StreamUtil.silentSafeClose(inputStream);
     }
   }
 

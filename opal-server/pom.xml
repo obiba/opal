@@ -181,11 +181,6 @@
                       <fileset dir="${deb.dir}/usr/share/opal-server-${project.version}/conf"/>
                     </move>
 
-                    <mkdir dir="${deb.dir}/var/lib/opal/data"/>
-                    <move todir="${deb.dir}/var/lib/opal/data">
-                      <fileset dir="${deb.dir}/usr/share/opal-server-${project.version}/data"/>
-                    </move>
-
                     <exec executable="debuild" dir="${deb.dir}" failonerror="true" osfamily="unix">
                       <arg value="-b"/>
                       <!-- Uncomment following options to package locally  -->
