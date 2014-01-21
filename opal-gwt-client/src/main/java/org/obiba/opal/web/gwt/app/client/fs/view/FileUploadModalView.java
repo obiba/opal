@@ -19,7 +19,6 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.FileUpload;
 import com.github.gwtbootstrap.client.ui.Form;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -32,13 +31,7 @@ import com.google.web.bindery.event.shared.EventBus;
 
 public class FileUploadModalView extends ModalPopupViewWithUiHandlers<FileUploadModalUiHandlers> implements Display {
 
-  interface FileUploadModalUiBinder extends UiBinder<Widget, FileUploadModalView> {}
-
-  private static final FileUploadModalUiBinder uiBinder = GWT.create(FileUploadModalUiBinder.class);
-
-  private static final Translations translations = GWT.create(Translations.class);
-
-  private final Widget widget;
+  interface Binder extends UiBinder<Widget, FileUploadModalView> {}
 
   @UiField
   Modal dialog;
@@ -65,15 +58,10 @@ public class FileUploadModalView extends ModalPopupViewWithUiHandlers<FileUpload
   Image uploadingText;
 
   @Inject
-  public FileUploadModalView(EventBus eventBus) {
+  public FileUploadModalView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
-    widget = uiBinder.createAndBindUi(this);
+    initWidget(uiBinder.createAndBindUi(this));
     dialog.setTitle(translations.uploadFileModalTitle());
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
   }
 
   @Override
@@ -96,7 +84,8 @@ public class FileUploadModalView extends ModalPopupViewWithUiHandlers<FileUpload
 
   @UiHandler("uploadButton")
   public void onUploadButton(ClickEvent event) {
-    getUiHandlers().uploadFile(fileToUpload.getFilename());
+    String filename = fileToUpload.getFilename();
+    getUiHandlers().uploadFile(filename);
   }
 
   @UiHandler("form")

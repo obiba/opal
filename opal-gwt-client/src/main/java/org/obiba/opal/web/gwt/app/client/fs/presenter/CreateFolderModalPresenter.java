@@ -20,10 +20,10 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
 import com.google.gwt.core.client.GWT;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 
@@ -46,7 +46,7 @@ public class CreateFolderModalPresenter extends ModalPresenterWidget<CreateFolde
 
   @Override
   protected void onBind() {
-    addRegisteredHandler(FolderUpdatedEvent.getType(), new FolderUpdatedEvent.Handler() {
+    addRegisteredHandler(FolderUpdatedEvent.getType(), new FolderUpdatedEvent.FolderUpdatedHandler() {
       @Override
       public void onFolderUpdated(FolderUpdatedEvent event) {
         currentFolder = event.getFolder();

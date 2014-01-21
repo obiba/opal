@@ -26,7 +26,8 @@ import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 /**
  *
  */
-public class FileSelectionView extends ViewWithUiHandlers<FileSelectionUiHandlers> implements FileSelectionPresenter.Display {
+public class FileSelectionView extends ViewWithUiHandlers<FileSelectionUiHandlers>
+    implements FileSelectionPresenter.Display {
 
   interface Binder extends UiBinder<Panel, FileSelectionView> {}
 

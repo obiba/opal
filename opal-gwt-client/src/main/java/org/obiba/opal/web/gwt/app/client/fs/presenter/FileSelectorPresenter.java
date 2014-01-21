@@ -102,7 +102,7 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
     for(SplitPaneWorkbenchPresenter.Slot slot : SplitPaneWorkbenchPresenter.Slot.values()) {
       setInSlot(slot, getDefaultPresenter(slot));
     }
-    addRegisteredHandler(FilesCheckedEvent.getType(), new FilesCheckedEvent.Handler() {
+    addRegisteredHandler(FilesCheckedEvent.getType(), new FilesCheckedEvent.FilesCheckedHandler() {
       @Override
       public void onFilesChecked(FilesCheckedEvent event) {
         checkedFiles = event.getCheckedFiles();
@@ -119,8 +119,9 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
         return folderDetailsPresenter;
       case LEFT:
         return filePlacesPresenter;
+      default:
+        return null;
     }
-    return null;
   }
 
   private void setDisplaysFiles(boolean displaysFiles) {
@@ -181,14 +182,17 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
     FileDto selectedFile = getSelectedFile();
     if(selectedFile == null) return null;
 
-    if(fileSelectionType == FileSelectionType.FILE_OR_FOLDER)
+    if(fileSelectionType == FileSelectionType.FILE_OR_FOLDER) {
       return new FileSelection(selectedFile.getPath(), fileSelectionType);
+    }
 
-    if(FileDtos.isFile(selectedFile) && (fileSelectionType == FileSelectionType.FILE))
+    if(FileDtos.isFile(selectedFile) && fileSelectionType == FileSelectionType.FILE) {
       return new FileSelection(selectedFile.getPath(), fileSelectionType);
+    }
 
-    if(FileDtos.isFolder(selectedFile) && (fileSelectionType == FileSelectionType.FOLDER))
+    if(FileDtos.isFolder(selectedFile) && fileSelectionType == FileSelectionType.FOLDER) {
       return new FileSelection(selectedFile.getPath(), fileSelectionType);
+    }
 
     return null;
   }

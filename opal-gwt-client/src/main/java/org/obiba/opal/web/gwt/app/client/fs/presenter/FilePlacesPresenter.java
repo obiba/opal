@@ -70,7 +70,7 @@ public class FilePlacesPresenter extends PresenterWidget<FilePlacesPresenter.Dis
     fireEvent(new FolderRequestEvent(FileDtos.reports()));
   }
 
-  public void showProject(String project) {
+  public void showProject(@SuppressWarnings("ParameterHidesMemberVariable") String project) {
     this.project = project;
     getView().showProjectHome(true);
   }

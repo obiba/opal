@@ -112,7 +112,7 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
   }
 
   private void addEventHandlers() {
-    addRegisteredHandler(FolderUpdatedEvent.getType(), new FolderUpdatedEvent.Handler() {
+    addRegisteredHandler(FolderUpdatedEvent.getType(), new FolderUpdatedEvent.FolderUpdatedHandler() {
 
       @Override
       public void onFolderUpdated(FolderUpdatedEvent event) {
@@ -124,7 +124,7 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
 
     addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler());
 
-    addRegisteredHandler(FilesCheckedEvent.getType(), new FilesCheckedEvent.Handler() {
+    addRegisteredHandler(FilesCheckedEvent.getType(), new FilesCheckedEvent.FilesCheckedHandler() {
       @Override
       public void onFilesChecked(FilesCheckedEvent event) {
         checkedFiles = null;
@@ -174,8 +174,11 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
       if(!allReadable) break;
       allReadable = file.getReadable();
     }
-    if(allReadable) getView().getFileDownloadAuthorizer().authorized();
-    else getView().getFileDownloadAuthorizer().unauthorized();
+    if(allReadable) {
+      getView().getFileDownloadAuthorizer().authorized();
+    } else {
+      getView().getFileDownloadAuthorizer().unauthorized();
+    }
   }
 
   /**
@@ -189,8 +192,11 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
       if(!allReadable) break;
       allReadable = file.getReadable();
     }
-    if(allReadable) getView().getFileCopyAuthorizer().authorized();
-    else getView().getFileCopyAuthorizer().unauthorized();
+    if(allReadable) {
+      getView().getFileCopyAuthorizer().authorized();
+    } else {
+      getView().getFileCopyAuthorizer().unauthorized();
+    }
   }
 
   /**
@@ -204,8 +210,11 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
       if(!allWritable) break;
       allWritable = file.getReadable() && file.getWritable();
     }
-    if(allWritable) getView().getFileCutAuthorizer().authorized();
-    else getView().getFileCutAuthorizer().unauthorized();
+    if(allWritable) {
+      getView().getFileCutAuthorizer().authorized();
+    } else {
+      getView().getFileCutAuthorizer().unauthorized();
+    }
   }
 
   /**
@@ -214,8 +223,9 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
   private void updateCurrentFolderPasteAuthorization() {
     boolean authorized = hasFilesInClipboard() && getCurrentFolder().getWritable();
     // destination must be writable and cannot be the same as the source
-    if(authorized && getCurrentFolder().getPath().equals(FileDtos.getParent(filesClipboard.get(0)).getPath()))
+    if(authorized && getCurrentFolder().getPath().equals(FileDtos.getParent(filesClipboard.get(0)).getPath())) {
       authorized = false;
+    }
 
     // cannot paste in a children
     if(authorized) {
@@ -227,8 +237,11 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
       }
     }
 
-    if(authorized) getView().getFilePasteAuthorizer().authorized();
-    else getView().getFilePasteAuthorizer().unauthorized();
+    if(authorized) {
+      getView().getFilePasteAuthorizer().authorized();
+    } else {
+      getView().getFilePasteAuthorizer().unauthorized();
+    }
   }
 
   /**
@@ -242,8 +255,11 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
       if(!allWritable) break;
       allWritable = file.getWritable();
     }
-    if(allWritable) getView().getFileDeleteAuthorizer().authorized();
-    else getView().getFileDeleteAuthorizer().unauthorized();
+    if(allWritable) {
+      getView().getFileDeleteAuthorizer().authorized();
+    } else {
+      getView().getFileDeleteAuthorizer().unauthorized();
+    }
   }
 
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {

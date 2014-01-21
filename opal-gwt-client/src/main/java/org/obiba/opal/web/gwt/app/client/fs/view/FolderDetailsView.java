@@ -36,7 +36,6 @@ import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -56,14 +55,14 @@ import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandlers> implements Display {
 
+  private final Translations translations;
+
   interface Binder extends UiBinder<Widget, FolderDetailsView> {}
 
   @UiField
   Table<FileDto> table;
 
   private CheckboxColumn<FileDto> checkColumn;
-
-  private final Translations translations = GWT.create(Translations.class);
 
   private final ListDataProvider<FileDto> dataProvider = new ListDataProvider<FileDto>();
 
@@ -72,7 +71,8 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
   private boolean singleSelectionModel;
 
   @Inject
-  public FolderDetailsView(Binder uiBinder) {
+  public FolderDetailsView(Binder uiBinder, Translations translations) {
+    this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
     initTable();
   }
@@ -102,8 +102,7 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
     table.setPageSize(fileCount);
     table.setRowCount(fileCount, true);
 
-    ColumnSortEvent.Handler columnSortHandler = new FolderColumnSortHandler(dataProvider.getList());
-    table.addColumnSortHandler(columnSortHandler);
+    table.addColumnSortHandler(new FolderColumnSortHandler(dataProvider.getList()));
 
     Collections.sort(dataProvider.getList(), FolderColumnSortHandler.ASCENDING_COMPARATOR);
   }

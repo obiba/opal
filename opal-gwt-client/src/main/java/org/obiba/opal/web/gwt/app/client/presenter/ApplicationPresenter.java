@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.presenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
+import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FilesDownloadRequestEvent;
@@ -23,7 +24,6 @@ import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEven
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueMapPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.project.event.ProjectHidden;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectHiddenEvent;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
@@ -109,14 +109,14 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   @Override
   protected void onBind() {
-    addRegisteredHandler(FileSelectionRequestEvent.getType(), new FileSelectionRequestEvent.Handler() {
-
-      @Override
-      public void onFileSelectionRequired(FileSelectionRequestEvent event) {
-        FileSelectorPresenter fsp = fileSelectorProvider.get();
-        fsp.handle(event);
-      }
-    });
+    addRegisteredHandler(FileSelectionRequestEvent.getType(),
+        new FileSelectionRequestEvent.FileSelectionRequestHandler() {
+          @Override
+          public void onFileSelectionRequest(FileSelectionRequestEvent event) {
+            FileSelectorPresenter fsp = fileSelectorProvider.get();
+            fsp.handle(event);
+          }
+        });
     addRegisteredHandler(GeoValueDisplayEvent.getType(), new GeoValueDisplayEvent.Handler() {
 
       @Override
@@ -125,23 +125,24 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
         vmp.handle(event);
       }
     });
-    addRegisteredHandler(FileDownloadRequestEvent.getType(), new FileDownloadRequestEvent.Handler() {
+    addRegisteredHandler(FileDownloadRequestEvent.getType(), new FileDownloadRequestEvent.FileDownloadRequestHandler() {
 
       @Override
       public void onFileDownloadRequest(FileDownloadRequestEvent event) {
         getView().getDownloader().setUrl(urlBuilder.buildAbsoluteUrl(event.getUrl()));
       }
     });
-    addRegisteredHandler(FilesDownloadRequestEvent.getType(), new FilesDownloadRequestEvent.Handler() {
-      @Override
-      public void onFilesDownloadRequest(FilesDownloadRequestEvent event) {
-        UriBuilder uriBuilder = UriBuilder.create().fromPath(event.getParentLink());
-        for(FileDto child : event.getChildren()) {
-          uriBuilder.query("file", child.getName());
-        }
-        getView().getDownloader().setUrl(urlBuilder.buildAbsoluteUrl(uriBuilder.build()));
-      }
-    });
+    addRegisteredHandler(FilesDownloadRequestEvent.getType(),
+        new FilesDownloadRequestEvent.FilesDownloadRequestHandler() {
+          @Override
+          public void onFilesDownloadRequest(FilesDownloadRequestEvent event) {
+            UriBuilder uriBuilder = UriBuilder.create().fromPath(FileDtos.getLink(event.getParent()));
+            for(FileDto child : event.getChildren()) {
+              uriBuilder.query("file", child.getName());
+            }
+            getView().getDownloader().setUrl(urlBuilder.buildAbsoluteUrl(uriBuilder.build()));
+          }
+        });
 
     // Update search box on event
     addRegisteredHandler(DatasourceSelectionChangeEvent.getType(),

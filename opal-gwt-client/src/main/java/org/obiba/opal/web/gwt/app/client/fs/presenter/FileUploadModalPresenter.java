@@ -9,41 +9,24 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileUploadedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.PresenterWidget;
 
 public class FileUploadModalPresenter extends ModalPresenterWidget<FileUploadModalPresenter.Display>
     implements FileUploadModalUiHandlers {
-
-  public interface Display extends PopupView, HasUiHandlers<FileUploadModalUiHandlers> {
-
-    void hideDialog();
-
-    void submit(String url);
-
-    void setRemoteFolderName(String folderName);
-  }
 
   private final Translations translations;
 
@@ -64,7 +47,7 @@ public class FileUploadModalPresenter extends ModalPresenterWidget<FileUploadMod
 
   @Override
   protected void onBind() {
-    addRegisteredHandler(FolderUpdatedEvent.getType(), new FolderUpdatedEvent.Handler() {
+    addRegisteredHandler(FolderUpdatedEvent.getType(), new FolderUpdatedEvent.FolderUpdatedHandler() {
       @Override
       public void onFolderUpdated(FolderUpdatedEvent event) {
         currentFolder = event.getFolder();
@@ -141,6 +124,15 @@ public class FileUploadModalPresenter extends ModalPresenterWidget<FileUploadMod
 
   private void submitFile() {
     getView().submit(urlBuilder.buildAbsoluteUrl("/files" + currentFolder.getPath()));
+  }
+
+  public interface Display extends PopupView, HasUiHandlers<FileUploadModalUiHandlers> {
+
+    void hideDialog();
+
+    void submit(String url);
+
+    void setRemoteFolderName(String folderName);
   }
 
 }

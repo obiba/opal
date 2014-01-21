@@ -17,7 +17,6 @@ import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.TextBox;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -28,13 +27,7 @@ import com.google.web.bindery.event.shared.EventBus;
 
 public class CreateFolderModalView extends ModalPopupViewWithUiHandlers<CreateFolderUiHandlers> implements Display {
 
-  interface CreateFolderModalUiBinder extends UiBinder<Widget, CreateFolderModalView> {}
-
-  private static final CreateFolderModalUiBinder uiBinder = GWT.create(CreateFolderModalUiBinder.class);
-
-  private static final Translations translations = GWT.create(Translations.class);
-
-  private final Widget widget;
+  interface Binder extends UiBinder<Widget, CreateFolderModalView> {}
 
   @UiField
   Modal dialog;
@@ -49,15 +42,10 @@ public class CreateFolderModalView extends ModalPopupViewWithUiHandlers<CreateFo
   TextBox folderToCreate;
 
   @Inject
-  public CreateFolderModalView(EventBus eventBus) {
+  public CreateFolderModalView(EventBus eventBus, Binder binder, Translations translations) {
     super(eventBus);
-    widget = uiBinder.createAndBindUi(this);
+    initWidget(binder.createAndBindUi(this));
     dialog.setTitle(translations.createFolderModalTitle());
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
   }
 
   @Override

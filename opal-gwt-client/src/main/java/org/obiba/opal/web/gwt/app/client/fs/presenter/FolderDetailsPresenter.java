@@ -13,10 +13,10 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileUploadedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FilesCheckedEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -30,11 +30,13 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
-public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresenter.Display> implements FolderDetailsUiHandlers {
+public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresenter.Display>
+    implements FolderDetailsUiHandlers {
 
   /**
-   * The folder currently being displayed. This is null until a request to the server succeeds (see {@code updateTable})
-   * after which, this attribute should never be null.
+   * The folder currently being displayed.
+   * This is null until a request to the server succeeds (see {@code updateTable}) after which,
+   * this attribute should never be null.
    */
   private FileDto currentFolder;
 
@@ -58,7 +60,7 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
 
   @Override
   protected void onBind() {
-    addRegisteredHandler(FolderRequestEvent.getType(), new FolderRequestEvent.Handler() {
+    addRegisteredHandler(FolderRequestEvent.getType(), new FolderRequestEvent.FolderRequestHandler() {
 
       @Override
       public void onFolderRequest(FolderRequestEvent event) {
@@ -66,7 +68,7 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
       }
     });
 
-    addRegisteredHandler(FileUploadedEvent.getType(), new FileUploadedEvent.Handler() {
+    addRegisteredHandler(FileUploadedEvent.getType(), new FileUploadedEvent.FileUploadedHandler() {
 
       @Override
       public void onFileUploaded(FileUploadedEvent event) {
@@ -75,7 +77,7 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
       }
     });
 
-    addRegisteredHandler(FolderCreatedEvent.getType(), new FolderCreatedEvent.Handler() {
+    addRegisteredHandler(FolderCreatedEvent.getType(), new FolderCreatedEvent.FolderCreatedHandler() {
 
       @Override
       public void onFolderCreated(FolderCreatedEvent event) {
@@ -84,7 +86,7 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
       }
     });
 
-    addRegisteredHandler(FileDeletedEvent.getType(), new FileDeletedEvent.Handler() {
+    addRegisteredHandler(FileDeletedEvent.getType(), new FileDeletedEvent.FileDeletedHandler() {
 
       @Override
       public void onFileDeleted(FileDeletedEvent event) {
@@ -111,7 +113,7 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
     this.currentFolder = currentFolder;
   }
 
-  private void updateTable(final FileDto file) {
+  private void updateTable(FileDto file) {
     currentFolder = file;
     if(!isVisible()) return;
     getAndUpdateTable(file);
@@ -119,23 +121,25 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
 
   private void getAndUpdateTable(final FileDto file) {
     getView().clearSelection();
-    FileResourceRequest.newBuilder(file.getPath()).withCallback(new ResourceCallback<FileDto>() {
-      @Override
-      public void onResource(Response response, FileDto resource) {
-        currentFolder = resource;
-        getView().renderRows(resource);
-        fireEvent(new FolderUpdatedEvent(currentFolder));
-      }
-    }).withCallback(new ResponseCodeCallback() {
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() == Response.SC_NOT_FOUND) {
-          fireEvent(NotificationEvent.newBuilder().error("FileNotFound").args(file.getPath()).build());
-        } else {
-          fireEvent(NotificationEvent.newBuilder().error("FileNotAccessible").args(file.getPath()).build());
-        }
-      }
-    }, Response.SC_NOT_FOUND, Response.SC_UNAUTHORIZED, Response.SC_INTERNAL_SERVER_ERROR).send();
+    FileResourceRequest.newBuilder(file.getPath()) //
+        .withCallback(new ResourceCallback<FileDto>() {
+          @Override
+          public void onResource(Response response, FileDto resource) {
+            currentFolder = resource;
+            getView().renderRows(resource);
+            fireEvent(new FolderUpdatedEvent(currentFolder));
+          }
+        }) //
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if(response.getStatusCode() == Response.SC_NOT_FOUND) {
+              fireEvent(NotificationEvent.newBuilder().error("FileNotFound").args(file.getPath()).build());
+            } else {
+              fireEvent(NotificationEvent.newBuilder().error("FileNotAccessible").args(file.getPath()).build());
+            }
+          }
+        }, Response.SC_NOT_FOUND, Response.SC_UNAUTHORIZED, Response.SC_INTERNAL_SERVER_ERROR).send();
 
   }
 

@@ -11,8 +11,6 @@ package org.obiba.opal.web.gwt.app.client.fs.view;
 
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FilePlacesPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FilePlacesUiHandler;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.model.client.opal.FileDto;
 
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -21,7 +19,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.ViewImpl;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 public class FilePlacesView extends ViewWithUiHandlers<FilePlacesUiHandler> implements Display {
@@ -45,26 +42,32 @@ public class FilePlacesView extends ViewWithUiHandlers<FilePlacesUiHandler> impl
   public void onUserHomeSelection(ClickEvent event) {
     getUiHandlers().onUserHomeSelection();
   }
+
   @UiHandler("projectHome")
   public void onProjectHomeSelection(ClickEvent event) {
     getUiHandlers().onProjectHomeSelection();
   }
+
   @UiHandler("root")
   public void onRootSelection(ClickEvent event) {
     getUiHandlers().onFileSystemSelection();
   }
+
   @UiHandler("users")
   public void onUsersSelection(ClickEvent event) {
     getUiHandlers().onUsersSelection();
   }
+
   @UiHandler("projects")
   public void onProjectsSelection(ClickEvent event) {
     getUiHandlers().onProjectsSelection();
   }
+
   @UiHandler("organizations")
   public void onOrganizationsSelection(ClickEvent event) {
     getUiHandlers().onOrganizationsSelection();
   }
+
   @UiHandler("reports")
   public void onReportsSelection(ClickEvent event) {
     getUiHandlers().onReportsSelection();

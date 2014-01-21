@@ -79,7 +79,7 @@ public class CsvFormatStepPresenter extends PresenterWidget<CsvFormatStepPresent
     csvFileSelectionPresenter.bind();
     getView().setCsvFileSelectorWidgetDisplay(csvFileSelectionPresenter.getView());
     getView().setCsvFileSelectorVisible(false);
-    addHandler(FileSelectionEvent.getType(), new FileSelectionEvent.Handler() {
+    addHandler(FileSelectionEvent.getType(), new FileSelectionEvent.FileSelectionHandler() {
       @Override
       public void onFileSelection(FileSelectionEvent event) {
         String selectionPath = event.getSelectedFile().getSelectionPath();

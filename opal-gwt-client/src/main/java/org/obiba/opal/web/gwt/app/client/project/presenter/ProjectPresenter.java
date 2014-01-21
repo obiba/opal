@@ -53,7 +53,7 @@ import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 
 public class ProjectPresenter extends Presenter<ProjectPresenter.Display, ProjectPresenter.Proxy>
-    implements ProjectUiHandlers, FolderUpdatedEvent.Handler {
+    implements ProjectUiHandlers, FolderUpdatedEvent.FolderUpdatedHandler {
 
   public interface Display extends View, HasUiHandlers<ProjectUiHandlers>, HasTabPanel {
 
@@ -107,8 +107,6 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   private final Provider<TasksPresenter> tasksPresenterProvider;
 
   private final Provider<ProjectPermissionsPresenter> projectResourcePermissionsProvider;
-
-
 
   private final Provider<ProjectAdministrationPresenter> projectAdministrationPresenterProvider;
 

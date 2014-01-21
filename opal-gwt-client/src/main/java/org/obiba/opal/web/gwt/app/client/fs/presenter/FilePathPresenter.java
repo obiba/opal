@@ -26,10 +26,10 @@ public class FilePathPresenter extends PresenterWidget<FilePathPresenter.Display
 
   @Override
   protected void onBind() {
-    addRegisteredHandler(FolderUpdatedEvent.getType(), new FolderUpdatedEvent.Handler() {
+    addRegisteredHandler(FolderUpdatedEvent.getType(), new FolderUpdatedEvent.FolderUpdatedHandler() {
       @Override
       public void onFolderUpdated(FolderUpdatedEvent event) {
-        if (!isVisible()) return;
+        if(!isVisible()) return;
 
         getView().setFile(event.getFolder());
       }

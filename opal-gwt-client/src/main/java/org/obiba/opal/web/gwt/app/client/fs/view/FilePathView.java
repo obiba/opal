@@ -45,7 +45,7 @@ public class FilePathView extends ViewImpl implements FilePathPresenter.Display 
   }
 
   @Override
-  public void setFile(final FileDto file) {
+  public void setFile(FileDto file) {
     filecrumbs.clear();
     List<FileDto> parents = FileDtos.getParents(file);
     if(parents.isEmpty()) {
@@ -55,7 +55,7 @@ public class FilePathView extends ViewImpl implements FilePathPresenter.Display 
       // need this otherwise root icon does not show up
       filecrumbs.add(new NavLink());
     } else {
-      for(final FileDto parent : parents) {
+      for(FileDto parent : parents) {
         addFileLink(parent);
       }
       addFileLink(file);

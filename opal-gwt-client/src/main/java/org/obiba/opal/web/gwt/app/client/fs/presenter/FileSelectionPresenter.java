@@ -13,12 +13,9 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionUpdatedEvent;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
@@ -26,7 +23,8 @@ import com.gwtplatform.mvp.client.View;
 /**
  *
  */
-public class FileSelectionPresenter extends PresenterWidget<FileSelectionPresenter.Display> implements FileSelectionUiHandlers {
+public class FileSelectionPresenter extends PresenterWidget<FileSelectionPresenter.Display>
+    implements FileSelectionUiHandlers {
 
   //
   // Instance Variables
@@ -81,18 +79,19 @@ public class FileSelectionPresenter extends PresenterWidget<FileSelectionPresent
   }
 
   private void addEventHandlers() {
-    registerHandler(getEventBus().addHandler(FileSelectionEvent.getType(), new FileSelectionEvent.Handler() {
+    registerHandler(
+        getEventBus().addHandler(FileSelectionEvent.getType(), new FileSelectionEvent.FileSelectionHandler() {
 
-      @Override
-      public void onFileSelection(FileSelectionEvent event) {
-        if(FileSelectionPresenter.this.equals(event.getSource())) {
-          fileTypeSelected = event.getSelectedFile().getSelectionType();
-          getView().setFile(event.getSelectedFile().getSelectionPath());
-          fireEvent(new FileSelectionUpdatedEvent(FileSelectionPresenter.this));
-        }
-      }
+          @Override
+          public void onFileSelection(FileSelectionEvent event) {
+            if(FileSelectionPresenter.this.equals(event.getSource())) {
+              fileTypeSelected = event.getSelectedFile().getSelectionType();
+              getView().setFile(event.getSelectedFile().getSelectionPath());
+              fireEvent(new FileSelectionUpdatedEvent(FileSelectionPresenter.this));
+            }
+          }
 
-    }));
+        }));
   }
 
   //
