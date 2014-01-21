@@ -29,7 +29,7 @@ public class TasksAdministrationPresenter
     extends ItemAdministrationPresenter<TasksAdministrationPresenter.Display, TasksAdministrationPresenter.Proxy> {
 
   @ProxyStandard
-  @NameToken(Places.JOBS)
+  @NameToken(Places.TASKS)
   public interface Proxy extends ProxyPlace<TasksAdministrationPresenter> {}
 
   private final DefaultBreadcrumbsBuilder breadcrumbsBuilder;

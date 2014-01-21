@@ -23,14 +23,13 @@
         </g:Label>
       </b:Column>
 
-      <b:Column size="3" ui:field="identifiers">
-        <g:Image url="image/48/units.png" addStyleNames="inline-block"/>
-        <b:NavLink ui:field="identifiersLink">
-          <ui:msg description="Units link label">Manage Participant Identifiers</ui:msg>
+      <b:Column size="3" ui:field="files">
+        <g:Image url="image/48/folder.png" addStyleNames="inline-block"/>
+        <b:NavLink ui:field="exploreFilesLink">
+          <ui:msg description="Manage Files link label">Manage Files</ui:msg>
         </b:NavLink>
         <g:Label addStyleNames="help-block">
-          <ui:msg description="Units link description">create and map identifiers of participants in different units,
-            manage encryption keys.
+          <ui:msg description="Manage Files link description">browse, upload and download files on the server.
           </ui:msg>
         </g:Label>
       </b:Column>
@@ -47,16 +46,18 @@
         </g:Label>
       </b:Column>
 
-      <b:Column size="3" ui:field="files">
-        <g:Image url="image/48/folder.png" addStyleNames="inline-block"/>
-        <b:NavLink ui:field="exploreFilesLink">
-          <ui:msg description="Manage Files link label">Manage Files</ui:msg>
+      <b:Column size="3" ui:field="identifiers">
+        <g:Image url="image/48/units.png" addStyleNames="inline-block"/>
+        <b:NavLink ui:field="identifiersLink">
+          <ui:msg description="Units link label">Manage Participant Identifiers</ui:msg>
         </b:NavLink>
         <g:Label addStyleNames="help-block">
-          <ui:msg description="Manage Files link description">browse, upload and download files on the server.
+          <ui:msg description="Units link description">create and map identifiers of participants in different units,
+            manage encryption keys.
           </ui:msg>
         </g:Label>
       </b:Column>
+
     </b:FluidRow>
 
   </g:FlowPanel>

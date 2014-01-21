@@ -27,43 +27,37 @@ public final class Places {
 
   public static final String IDENTIFIERS = "!identifiers";
 
-  public static final String UNITS = "!units";
-
-  public static final String UNIT = "!unit";
-
   public static final String FILES = "!files";
 
   public static final String REPORT_TEMPLATES = "!reports";
 
-  public static final String JOBS = "!jobs";
+  public static final String TASKS = "!tasks";
 
   public static final String ADMIN = "!adminpage";
 
   public static final String ADMINISTRATION = "!admin";
 
-  public static final String USERS = ADMINISTRATION + ".users";
+  public static final String USERS = "!users";
 
   public static final String PROFILES = "!profiles";
 
   public static final String DATABASES = "!databases";
 
-  public static final String INDEX = ADMINISTRATION + ".index";
+  public static final String INDEX = "!search";
 
-  public static final String DATASHIELD = ADMINISTRATION + ".datashield";
+  public static final String DATASHIELD = "!datashield";
 
-  public static final String R = ADMINISTRATION + ".r";
+  public static final String R = "!r";
 
-  public static final String JVM = ADMINISTRATION + ".jvm";
+  public static final String JVM = "!jvm";
 
-  public static final String SERVER = ADMINISTRATION + ".server";
+  public static final String SERVER = "!server";
 
-  public static final String TAXONOMIES = ADMINISTRATION + ".taxonomies";
+  public static final String TAXONOMIES = "!taxonomies";
 
-  public static final String TAXONOMY = ADMINISTRATION + ".taxonomy";
+  public static final String VOCABULARY = "!vocabulary";
 
-  public static final String VOCABULARY = ADMINISTRATION + ".vocabulary";
-
-  public static final String VOCABULARY_EDIT = ADMINISTRATION + ".vocabulary.edit";
+  public static final String VOCABULARY_EDIT = "!vocabulary.edit";
 
   private Places() {}
 

@@ -94,7 +94,7 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
     getView().setRHistoryToken(getHistoryToken(Places.R));
     getView().setIdentifiersMappingsHistoryToken(getHistoryToken(Places.IDENTIFIERS));
     getView().setFilesHistoryToken(getHistoryToken(Places.FILES));
-    getView().setTasksHistoryToken(getHistoryToken(Places.JOBS));
+    getView().setTasksHistoryToken(getHistoryToken(Places.TASKS));
     getView().setDataShieldHistoryToken(getHistoryToken(Places.DATASHIELD));
     getView().setReportsHistoryToken(getHistoryToken(Places.REPORT_TEMPLATES));
     getView().setJavaHistoryToken(getHistoryToken(Places.JVM));
