@@ -79,10 +79,9 @@ public class FileSelectionPresenter extends PresenterWidget<FileSelectionPresent
   }
 
   private void addEventHandlers() {
-    registerHandler(
-        getEventBus().addHandler(FileSelectionEvent.getType(), new FileSelectionEvent.FileSelectionHandler() {
+    registerHandler(getEventBus().addHandler(FileSelectionEvent.getType(), new FileSelectionEvent.Handler() {
 
-          @Override
+      @Override
           public void onFileSelection(FileSelectionEvent event) {
             if(FileSelectionPresenter.this.equals(event.getSource())) {
               fileTypeSelected = event.getSelectedFile().getSelectionType();

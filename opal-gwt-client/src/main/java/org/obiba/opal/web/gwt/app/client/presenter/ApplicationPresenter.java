@@ -109,11 +109,10 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   @Override
   protected void onBind() {
-    addRegisteredHandler(FileSelectionRequestEvent.getType(),
-        new FileSelectionRequestEvent.FileSelectionRequestHandler() {
-          @Override
-          public void onFileSelectionRequest(FileSelectionRequestEvent event) {
-            FileSelectorPresenter fsp = fileSelectorProvider.get();
+    addRegisteredHandler(FileSelectionRequestEvent.getType(), new FileSelectionRequestEvent.Handler() {
+      @Override
+      public void onFileSelectionRequired(FileSelectionRequestEvent event) {
+        FileSelectorPresenter fsp = fileSelectorProvider.get();
             fsp.handle(event);
           }
         });
