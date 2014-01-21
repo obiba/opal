@@ -116,14 +116,13 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     getView().setUiHandlers(this);
     setDefaultCharset();
 
-    getEventBus()
-        .addHandler(FileSelectionUpdatedEvent.getType(), new FileSelectionUpdatedEvent.FileSelectionUpdatedHandler() {
-          @Override
-          public void onFileSelectionUpdated(FileSelectionUpdatedEvent event) {
-            String selectedFile = ((FileSelectionPresenter) event.getSource()).getSelectedFile();
-            getView().showSpssSpecificPanel(DatasourceFileType.isSpssFile(selectedFile));
-          }
-        });
+    getEventBus().addHandler(FileSelectionUpdatedEvent.getType(), new FileSelectionUpdatedEvent.Handler() {
+      @Override
+      public void onFileSelectionUpdated(FileSelectionUpdatedEvent event) {
+        String selectedFile = ((FileSelectionPresenter) event.getSource()).getSelectedFile();
+        getView().showSpssSpecificPanel(DatasourceFileType.isSpssFile(selectedFile));
+      }
+    });
   }
 
   @Override
@@ -166,7 +165,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     fileSelectionPresenter.setFileSelectionType(FileSelectionType.FILE);
     fileSelectionPresenter.bind();
     getView().setFileSelectionDisplay(fileSelectionPresenter.getView());
-    addHandler(FileSelectionEvent.getType(), new FileSelectionEvent.FileSelectionHandler() {
+    addHandler(FileSelectionEvent.getType(), new FileSelectionEvent.Handler() {
       @Override
       public void onFileSelection(FileSelectionEvent event) {
         getView().clearErrors();
