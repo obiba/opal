@@ -594,7 +594,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         if(nature == CONTINUOUS || nature == CATEGORICAL) {
           // Filter for Categorical variable OR Numerical variable
           ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(
-              UriBuilders.DATASOURCE_TABLE_FACET_VARIABLE_SEARCH.create().query("field", "nature")
+              UriBuilders.DATASOURCE_TABLE_FACET_VARIABLE_SEARCH.create()
                   .build(originalTable.getDatasourceName(), originalTable.getName(), variableName))
               .withCallback(new FacetVariableResourceCallback(resource, indexedFieldName, nature)).get().send();
 
