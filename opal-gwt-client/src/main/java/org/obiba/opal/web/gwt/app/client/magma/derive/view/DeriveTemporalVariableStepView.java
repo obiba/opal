@@ -13,25 +13,23 @@ import java.util.Date;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.magma.derive.helper.TemporalVariableDerivationHelper.GroupMethod;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveTemporalVariableStepPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
 
+import com.github.gwtbootstrap.client.ui.Column;
+import com.github.gwtbootstrap.client.ui.RadioButton;
+import com.github.gwtbootstrap.datepicker.client.ui.DateBoxAppended;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.Panel;
-import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
-import com.google.gwt.user.datepicker.client.DateBox;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
@@ -70,17 +68,13 @@ public class DeriveTemporalVariableStepView extends ViewImpl implements DeriveTe
   ValueMapGrid valuesMapGrid;
 
   @UiField
-  Panel dates;
+  DateBoxAppended fromDate;
 
   @UiField
-  FlowPanel from;
+  DateBoxAppended toDate;
 
   @UiField
-  FlowPanel to;
-
-  private final DateBox fromDate;
-
-  private final DateBox toDate;
+  Column dateRangeColumn;
 
   //
   // Constructors
@@ -89,48 +83,34 @@ public class DeriveTemporalVariableStepView extends ViewImpl implements DeriveTe
   public DeriveTemporalVariableStepView() {
     widget = uiBinder.createAndBindUi(this);
 
-    DateTimeFormat dateFormat = DateTimeFormat.getFormat("yyyy-MM-dd");
-
-    fromDate = new DateBox();
-    fromDate.setFormat(new DateBox.DefaultFormat(dateFormat));
+    fromDate.setFormat("yyyy-mm-dd");
     Date now = new Date();
     CalendarUtil.addDaysToDate(now, -3650);
     CalendarUtil.setToFirstDayOfMonth(now);
     fromDate.setValue(now);
     fromDate.setWidth("6em");
-    from.insert(fromDate, 0);
 
-    toDate = new DateBox();
-    toDate.setFormat(new DateBox.DefaultFormat(dateFormat));
+    toDate.setFormat("yyyy-mm-dd");
     now = new Date();
     toDate.setValue(now);
     toDate.setWidth("6em");
-    to.insert(toDate, 0);
-
-    spanRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<Boolean> event) {
-        setSpanEnabled(true);
-      }
-    });
-
-    rangeRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<Boolean> event) {
-        setSpanEnabled(false);
-      }
-    });
-
     spanRadio.setValue(true, true);
   }
 
   private void setSpanEnabled(boolean enabled) {
     spanBox.setEnabled(enabled);
     rangeBox.setEnabled(!enabled);
-    fromDate.setEnabled(!enabled);
-    toDate.setEnabled(!enabled);
+    dateRangeColumn.setVisible(!enabled);
+  }
+
+  @UiHandler("spanRadio")
+  void onSpanClick(ClickEvent event) {
+    setSpanEnabled(spanRadio.getValue());
+  }
+
+  @UiHandler("rangeRadio")
+  void onRangeClick(ClickEvent event) {
+    setSpanEnabled(spanRadio.getValue());
   }
 
   @Override

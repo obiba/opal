@@ -3,6 +3,7 @@
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.magma.derive.view"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:b2="urn:import:com.github.gwtbootstrap.datepicker.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -11,65 +12,58 @@
     <o:WizardStep ui:field="methodStep">
       <g:FlowPanel>
 
-        <g:FlowPanel styleName="input">
-          <b:RadioButton name="method" ui:field="spanRadio">
-            <ui:msg description="Group by type of time span label">Group by type of time span</ui:msg>
-          </b:RadioButton>
+        <!-- type of time span -->
+        <b:FluidRow>
+          <b:Column size="6">
+            <b:RadioButton name="method" ui:field="spanRadio">
+              <ui:msg description="Group by type of time span label">Group by type of time span</ui:msg>
+            </b:RadioButton>
 
-          <g:Grid>
-            <g:row>
-              <g:customCell styleName="top">
-                <g:FlowPanel styleName="input block">
-                  <g:Label addStyleNames="key">
-                    <ui:msg description="Time span type label">Time span type</ui:msg>
-                  </g:Label>
-                  <o:Chooser ui:field="spanBox"/>
-                </g:FlowPanel>
-              </g:customCell>
-            </g:row>
-          </g:Grid>
+            <o:Chooser ui:field="spanBox"/>
+            <b:HelpBlock>
+              <ui:msg description="Time span type help label">
+                Select the unit of time that will be used to group values into the same category
+              </ui:msg>
+            </b:HelpBlock>
+          </b:Column>
+        </b:FluidRow>
 
-        </g:FlowPanel>
+        <!-- date ranges -->
+        <b:FluidRow>
+          <b:Column size="6">
+            <b:RadioButton name="method" ui:field="rangeRadio">
+              <ui:msg description="Group by date ranges label">Group by date ranges</ui:msg>
+            </b:RadioButton>
+          </b:Column>
+        </b:FluidRow>
 
-        <g:FlowPanel styleName="input" ui:field="range">
-          <b:RadioButton name="method" ui:field="rangeRadio">
-            <ui:msg description="Group by date ranges label">Group by date ranges</ui:msg>
-          </b:RadioButton>
+        <b:FluidRow>
+          <b:Column size="6">
+            <o:Chooser ui:field="rangeBox" enabled="false"/>
+            <b:HelpBlock>
+              <ui:msg description="Date ranges help label">
+                Select the period of time that will be used to group values into the same category
+              </ui:msg>
+            </b:HelpBlock>
+          </b:Column>
+          <b:Column size="6" ui:field="dateRangeColumn" visible="false">
+          <g:Label>
+              <ui:msg description="Date Range label">Date range definition (YYYY-MM-DD)</ui:msg>
+            </g:Label>
 
-          <g:Grid>
-            <g:row>
-              <g:customCell styleName="top">
-                <g:FlowPanel styleName="input block">
-                  <g:Label addStyleNames="key">
-                    <ui:msg description="Time span type label">Date range type</ui:msg>
-                  </g:Label>
-                  <o:Chooser ui:field="rangeBox" enabled="false"/>
-                </g:FlowPanel>
-              </g:customCell>
+            <b:ControlLabel>
+              <ui:msg description="From label">From</ui:msg>
+            </b:ControlLabel>
+            <b2:DateBoxAppended ui:field="fromDate" icon="CALENDAR"/>
 
-              <g:customCell styleName="top">
-                <g:FlowPanel styleName="input block">
-                  <g:Label addStyleNames="key">
-                    <ui:msg description="Date Range label">Date range definition (YYYY-MM-DD)</ui:msg>
-                  </g:Label>
-                  <g:FlowPanel ui:field="dates">
-                    <g:FlowPanel ui:field="from" addStyleNames="inline">
-                      <g:Label styleName="help-block">
-                        <ui:msg description="From label">From</ui:msg>
-                      </g:Label>
-                    </g:FlowPanel>
-                    <g:FlowPanel ui:field="to" addStyleNames="inline">
-                      <g:Label styleName="help-block">
-                        <ui:msg description="To label">To</ui:msg>
-                      </g:Label>
-                    </g:FlowPanel>
-                  </g:FlowPanel>
-                </g:FlowPanel>
-              </g:customCell>
-            </g:row>
-          </g:Grid>
+            <b:ControlLabel>
+              <ui:msg description="To label">To</ui:msg>
+            </b:ControlLabel>
+            <b2:DateBoxAppended ui:field="toDate" icon="CALENDAR"/>
 
-        </g:FlowPanel>
+          </b:Column>
+        </b:FluidRow>
+
       </g:FlowPanel>
     </o:WizardStep>
     <o:WizardStep ui:field="mapStep">
