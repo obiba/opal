@@ -73,14 +73,11 @@ public abstract class DerivedVariableGenerator {
     // set script in derived variable
     VariableDtos.setScript(derived, scriptBuilder.toString());
 
-    // set new categories if destination does not already exist
-    if(destination == null) {
-      if(derived.getCategoriesArray() == null) {
-        derived.setCategoriesArray((JsArray<CategoryDto>) JavaScriptObject.createArray());
-      }
-      for(CategoryDto cat : newCategoriesMap.values()) {
-        derived.getCategoriesArray().push(cat);
-      }
+    // Always reset categories based on newCategoriesMap to avoid the problem where we derive a variable,
+    // hit previous and change method
+    derived.setCategoriesArray((JsArray<CategoryDto>) JavaScriptObject.createArray());
+    for(CategoryDto cat : newCategoriesMap.values()) {
+      derived.getCategoriesArray().push(cat);
     }
 
     return derived;
@@ -137,7 +134,7 @@ public abstract class DerivedVariableGenerator {
   @Nullable
   private String normalize(String text) {
     return text == null
-        ? text
+        ? null
         : text.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n").replace("\r", "\\r");
   }
 
@@ -289,7 +286,7 @@ public abstract class DerivedVariableGenerator {
 
   protected static JsArray<CategoryDto> copyCategories(JsArray<CategoryDto> origCats) {
     JsArray<CategoryDto> cats = JsArrays.create();
-    for(CategoryDto origCat : toIterable(JsArrays.toSafeArray(origCats))) {
+    for(CategoryDto origCat : toIterable(origCats)) {
       cats.push(copyCategory(origCat));
     }
     return cats;
