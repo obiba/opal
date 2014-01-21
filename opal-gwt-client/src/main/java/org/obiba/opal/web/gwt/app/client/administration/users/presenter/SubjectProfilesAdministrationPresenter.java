@@ -118,7 +118,7 @@ public class SubjectProfilesAdministrationPresenter extends
   }
 
   private void refreshProfiles() {
-    // Fetch all groups
+    // Fetch all profiles
     ResourceRequestBuilderFactory.<JsArray<SubjectProfileDto>>newBuilder() //
         .forResource(UriBuilders.PROFILES.create().build()) //
         .withCallback(new ResourceCallback<JsArray<SubjectProfileDto>>() {

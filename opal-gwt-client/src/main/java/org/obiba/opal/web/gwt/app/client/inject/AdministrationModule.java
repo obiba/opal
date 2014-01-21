@@ -60,14 +60,8 @@ import org.obiba.opal.web.gwt.app.client.administration.index.view.IndexView;
 import org.obiba.opal.web.gwt.app.client.administration.jvm.presenter.JVMPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.jvm.view.JVMView;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectProfilesAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.users.view.SubjectProfilesAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.view.RAdministrationView;
-import org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectCredentialsAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectCredentialsPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.users.view.SubjectCredentialsAdministrationView;
-import org.obiba.opal.web.gwt.app.client.administration.users.view.SubjectCredentialsView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TaxonomiesPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TaxonomyEditModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.VocabularyEditPresenter;
@@ -76,6 +70,14 @@ import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.Taxonomi
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.TaxonomyEditModalView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.VocabularyEditView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.VocabularyView;
+import org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectCredentialsAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectCredentialsPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectProfilePresenter;
+import org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectProfilesAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.users.view.SubjectCredentialsAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.users.view.SubjectCredentialsView;
+import org.obiba.opal.web.gwt.app.client.administration.users.view.SubjectProfileView;
+import org.obiba.opal.web.gwt.app.client.administration.users.view.SubjectProfilesAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.view.AdministrationView;
 
 import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
@@ -135,6 +137,8 @@ public class AdministrationModule extends AbstractPresenterModule {
   private void configureProfiles() {
     bindPresenter(SubjectProfilesAdministrationPresenter.class, SubjectProfilesAdministrationPresenter.Display.class,
         SubjectProfilesAdministrationView.class, SubjectProfilesAdministrationPresenter.Proxy.class);
+    bindPresenter(SubjectProfilePresenter.class, SubjectProfilePresenter.Display.class,
+        SubjectProfileView.class, SubjectProfilePresenter.Proxy.class);
   }
 
   private void configureDatashield() {

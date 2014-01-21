@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.view;
 
+import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.CloseableList;
@@ -45,7 +46,13 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
   interface Binder extends UiBinder<Widget, ApplicationView> {}
 
   @UiField
+  NavLink dashboardItem;
+
+  @UiField
   NavLink administrationItem;
+
+  @UiField
+  NavLink profileItem;
 
   @UiField
   Dropdown username;
@@ -76,6 +83,15 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
     search = new SuggestListBox(oracle);
     initWidget(uiBinder.createAndBindUi(this));
 
+    dashboardItem.setHref("#" + Places.DASHBOARD);
+    projectsItem.setHref("#" + Places.PROJECTS);
+    administrationItem.setHref("#" + Places.ADMINISTRATION);
+    profileItem.setHref("#" + Places.PROFILE);
+
+    initSearchWidget();
+  }
+
+  private void initSearchWidget() {
     search.addItemRemovedHandler(new CloseableList.ItemRemovedHandler() {
       @Override
       public void onItemRemoved(ListItem item) {
@@ -155,21 +171,6 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
   @Override
   public void clearSearch() {
     search.clear();
-  }
-
-  @UiHandler("dashboardItem")
-  void onDashboard(ClickEvent event) {
-    getUiHandlers().onDashboard();
-  }
-
-  @UiHandler("projectsItem")
-  void onProjects(ClickEvent event) {
-    getUiHandlers().onProjects();
-  }
-
-  @UiHandler("administrationItem")
-  void onAdministration(ClickEvent event) {
-    getUiHandlers().onAdministration();
   }
 
   @UiHandler("quitItem")

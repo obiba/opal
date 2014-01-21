@@ -8,12 +8,6 @@ import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface ApplicationUiHandlers extends UiHandlers {
 
-  void onDashboard();
-
-  void onProjects();
-
-  void onAdministration();
-
   void onQuit();
 
   void onSelection(VariableSuggestOracle.VariableSuggestion suggestion);

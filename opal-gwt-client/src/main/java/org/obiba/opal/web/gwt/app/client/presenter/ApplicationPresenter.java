@@ -232,21 +232,6 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   }
 
   @Override
-  public void onDashboard() {
-    placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.DASHBOARD).build());
-  }
-
-  @Override
-  public void onProjects() {
-    placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.PROJECTS).build());
-  }
-
-  @Override
-  public void onAdministration() {
-    placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.ADMINISTRATION).build());
-  }
-
-  @Override
   public void onQuit() {
     fireEvent(new SessionEndedEvent());
   }

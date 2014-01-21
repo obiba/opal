@@ -27,8 +27,8 @@
         </b:NavLink>
         <b:Nav>
           <b:Dropdown icon="USER" rightDropdown="true" ui:field="username">
-            <b:NavLink icon="COG">
-              <ui:msg description="Profile text">Profile</ui:msg>
+            <b:NavLink icon="COG" ui:field="profileItem">
+              <ui:msg description="My Profile label">My Profile</ui:msg>
             </b:NavLink>
             <b:Divider/>
             <b:NavLink icon="SIGNOUT" ui:field="quitItem">
