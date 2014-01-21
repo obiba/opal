@@ -10,8 +10,8 @@
     <g:FlowPanel>
       <b:FluidRow>
         <b:Column size="6">
-          <g:FlowPanel addStyleNames="extra-large-bottom-margin">
-            <b:NavList addStyleNames="extra-large-bottom-margin">
+          <g:FlowPanel addStyleNames="xlarge-bottom-margin">
+            <b:NavList addStyleNames="xlarge-bottom-margin no-padding-left">
               <b:NavHeader>
                 <ui:msg description="Main Administration Data Access">Data Access</ui:msg>
               </b:NavHeader>
@@ -41,7 +41,7 @@
               </g:FlowPanel>
             </b:NavList>
 
-            <b:NavList addStyleNames="extra-large-bottom-margin">
+            <b:NavList addStyleNames="xlarge-bottom-margin no-padding-left">
               <b:NavHeader>
                 <ui:msg description="Main Administration Data Management">Data Management</ui:msg>
               </b:NavHeader>
@@ -91,8 +91,8 @@
         </b:Column>
 
         <b:Column size="6">
-          <g:FlowPanel addStyleNames="extra-large-bottom-margin">
-            <b:NavList addStyleNames="extra-large-bottom-margin">
+          <g:FlowPanel addStyleNames="xlarge-bottom-margin">
+            <b:NavList addStyleNames="xlarge-bottom-margin">
               <b:NavHeader>
                 <ui:msg description="Main Administration Data Analysis">Data Analysis</ui:msg>
               </b:NavHeader>
@@ -131,7 +131,7 @@
               </g:FlowPanel>
             </b:NavList>
 
-            <b:NavList addStyleNames="extra-large-bottom-margin">
+            <b:NavList addStyleNames="xlarge-bottom-margin">
               <b:NavHeader>
                 <ui:msg description="Main Administration System">System</ui:msg>
               </b:NavHeader>

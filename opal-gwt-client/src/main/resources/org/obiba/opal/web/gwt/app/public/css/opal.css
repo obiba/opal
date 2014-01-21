@@ -117,8 +117,12 @@ li.no-icon > a {
   margin-bottom: 15px;
 }
 
-.extra-large-bottom-margin {
+.xlarge-bottom-margin {
   margin-bottom: 40px;
+}
+
+.no-padding-left {
+  padding-left: 0;
 }
 
 .justified-paragraph {
