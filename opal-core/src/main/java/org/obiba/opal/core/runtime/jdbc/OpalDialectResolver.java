@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.MySQL5InnoDBDialect;
 import org.hibernate.service.jdbc.dialect.internal.AbstractDialectResolver;
+import org.obiba.magma.datasource.hibernate.cfg.MagmaHSQLDialect;
 
 /**
  * Ensures usage of InnoDB for MySQL databases and uses custom dialect for HSQLDB, otherwise, fallback to default

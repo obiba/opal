@@ -14,6 +14,7 @@ import java.util.Properties;
 
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.HSQLDialect;
+import org.obiba.magma.datasource.hibernate.cfg.MagmaHSQLDialect;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 
 public class HsqlDialectOverride extends PropertiesFactoryBean {
