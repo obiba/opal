@@ -24,6 +24,7 @@ import org.hibernate.service.classloading.internal.ClassLoaderServiceImpl;
 import org.hibernate.service.jdbc.dialect.internal.DialectFactoryImpl;
 import org.hibernate.service.jdbc.dialect.internal.StandardDialectResolver;
 import org.obiba.magma.datasource.hibernate.cfg.HibernateConfigurationHelper;
+import org.obiba.magma.datasource.hibernate.cfg.MagmaHSQLDialect;
 import org.obiba.magma.datasource.hibernate.cfg.MagmaNamingStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
