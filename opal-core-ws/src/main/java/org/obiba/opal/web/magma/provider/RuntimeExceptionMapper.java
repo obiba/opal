@@ -13,9 +13,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
 @Provider
@@ -26,7 +29,8 @@ public class RuntimeExceptionMapper implements ExceptionMapper<RuntimeException>
   @Override
   public Response toResponse(RuntimeException exception) {
     log.error("Unhandled exception", exception);
-    return Response.serverError().entity(exception.getMessage()).build();
+    return Response.status(BAD_REQUEST)
+        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "UnhandledException", exception.getMessage()).build()).build();
   }
 
 }

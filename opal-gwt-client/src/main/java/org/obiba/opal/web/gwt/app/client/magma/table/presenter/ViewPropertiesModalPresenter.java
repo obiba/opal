@@ -35,10 +35,12 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -101,7 +103,9 @@ public class ViewPropertiesModalPresenter extends ModalPresenterWidget<ViewPrope
           getView().hide();
           placeManager.revealPlace(ProjectPlacesHelper.getTablePlace(view.getDatasourceName(), name));
         } else {
-          getView().showError(response.getText(), null);
+          ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+          getView().showError(TranslationsUtils
+              .replaceArguments(translations.userMessageMap().get(error.getStatus()), error.getArgumentsArray()), null);
         }
       }
     }, Response.SC_OK, Response.SC_BAD_REQUEST).send();
