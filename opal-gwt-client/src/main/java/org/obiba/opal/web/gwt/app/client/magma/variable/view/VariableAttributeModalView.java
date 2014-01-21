@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttrib
 import org.obiba.opal.web.gwt.app.client.ui.LocalizedEditableText;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.validator.ConstrainedModal;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
@@ -86,6 +87,9 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
     modal.setTitle(translations.addAttribute());
+
+    @SuppressWarnings({ "UnusedDeclaration", "PMD.UnusedLocalVariable" })
+    ConstrainedModal constrainedModal = new ConstrainedModal(modal);
   }
 
   @UiHandler("saveButton")
