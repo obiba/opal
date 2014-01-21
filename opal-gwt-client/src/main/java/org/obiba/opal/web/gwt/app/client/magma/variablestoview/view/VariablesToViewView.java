@@ -152,8 +152,7 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
 
   private void addHandlers() {
     // Used to register the ErrorResponseCallback event
-    @SuppressWarnings({ "UnusedDeclaration", "PMD.UnusedLocalVariable" })
-    ConstrainedModal constrainedModal = new ConstrainedModal(dialog);
+    new ConstrainedModal(dialog);
 
     datasourceListBox.addChosenChangeHandler(new ChosenChangeEvent.ChosenChangeHandler() {
 
