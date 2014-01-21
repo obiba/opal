@@ -440,9 +440,12 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
     dto.setAttributesArray(filteredAttributes);
 
+    UriBuilder uriBuilder = table.hasViewLink()
+        ? UriBuilders.DATASOURCE_VIEW_VARIABLE.create()
+        : UriBuilders.DATASOURCE_TABLE_VARIABLE.create();
+
     ResourceRequestBuilderFactory.newBuilder() //
-        .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
-            .build(table.getDatasourceName(), table.getName(), variable.getName())) //
+        .forResource(uriBuilder.build(table.getDatasourceName(), table.getName(), variable.getName())) //
         .withResourceBody(VariableDto.stringify(dto)) //
         .withCallback(Response.SC_OK, new ResponseCodeCallback() {
           @Override

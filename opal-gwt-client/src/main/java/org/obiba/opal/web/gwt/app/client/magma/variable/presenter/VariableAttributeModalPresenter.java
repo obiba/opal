@@ -34,6 +34,7 @@ import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -106,9 +107,12 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
         variableDtos.push(VariableDto.stringify(dto));
       }
 
+      UriBuilder uriBuilder = table.hasViewLink()
+          ? UriBuilders.DATASOURCE_VIEW_VARIABLES.create()
+          : UriBuilders.DATASOURCE_TABLE_VARIABLES.create();
+
       ResourceRequestBuilderFactory.newBuilder() //
-          .forResource(
-              UriBuilders.DATASOURCE_TABLE_VARIABLES.create().build(table.getDatasourceName(), table.getName())) //
+          .forResource(uriBuilder.build(table.getDatasourceName(), table.getName())) //
           .withResourceBody("[" + variableDtos.toString() + "]") //
           .withCallback(Response.SC_OK, successCallback) //
           .withCallback(Response.SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
