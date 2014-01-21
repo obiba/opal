@@ -109,6 +109,10 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   public void setTable(TableDto table, VariableDto variable) {
+    if(originalTable == null || !originalTable.getLink().equals(table.getLink())) {
+      getView().getFiltersPanel().clear();
+    }
+
     originalTable = table;
 
     getView().setTable(table);
