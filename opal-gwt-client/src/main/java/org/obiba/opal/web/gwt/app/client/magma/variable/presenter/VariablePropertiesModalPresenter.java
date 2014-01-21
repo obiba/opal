@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -30,6 +31,7 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -83,9 +85,8 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
   public void initialize(VariableDto dto, TableDto table) {
     variable = dto;
     tableDto = table;
-
     getView().renderProperties(dto, variable == null || table.hasViewLink(),
-        table.hasViewLink() || table.hasValueSetCount() && table.getValueSetCount() == 0);
+        variable == null || table.hasViewLink() || (table.hasValueSetCount() && table.getValueSetCount() == 0));
   }
 
   @Override
@@ -231,8 +232,7 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
     }
 
     protected void onSuccess() {
-      placeManager.revealPlace(ProjectPlacesHelper
-          .getVariablePlace(tableDto.getDatasourceName(), tableDto.getName(), updatedVariable.getName()));
+      fireEvent(new VariableRefreshEvent());
     }
   }
 

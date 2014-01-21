@@ -39,7 +39,7 @@ public class ValueTypeChooser extends Chooser {
   private void addGroupItems(String label, String[] items) {
     addGroup(translations.valueTypeMap().get(label));
     for(String item : items) {
-      addItemToGroup(translations.valueTypeMap().get(item), item);
+      addItemToGroup(translations.valueTypeMap().get(item + ".type"), item);
     }
   }
 }

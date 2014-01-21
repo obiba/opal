@@ -1029,21 +1029,21 @@ public interface Translations extends Constants {
 
   @Description("Value Type map")
   @DefaultStringMapValue({ "TEXTUAL", "Textual", //
-      "text", "text",//
+      "text.type", "text",//
       "NUMERICAL", "Numerical", //
-      "integer", "integer",//
-      "decimal", "decimal",//
+      "integer.type", "integer",//
+      "decimal.type", "decimal",//
       "TEMPORAL", "Temporal",//
-      "date", "date",//
-      "datetime", "datetime",//
+      "date.type", "date",//
+      "datetime.type", "datetime",//
       "GEOSPATIAL", "Geospatial",//
-      "point", "point",//
-      "linestring", "linestring",//
-      "polygon", "polygon",//
+      "point.type", "point",//
+      "linestring.type", "linestring",//
+      "polygon.type", "polygon",//
       "OTHER", "Other",//
-      "binary", "binary",//
-      "boolean", "boolean",//
-      "locale", "locale"//
+      "binary.type", "binary",//
+      "boolean.type", "boolean",//
+      "locale.type", "locale"//
   })
   Map<String, String> valueTypeMap();
 
