@@ -16,10 +16,11 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.keystore.presenter.KeyPairDisplay;
 import org.obiba.opal.web.gwt.app.client.keystore.presenter.KeyPairModalSavedHandler;
-import org.obiba.opal.web.gwt.app.client.support.ClientErrorDtos;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 
@@ -49,8 +50,9 @@ public class KeyPairModalResponseCallback<T> implements ResponseCodeCallback {
       if(savedHandler != null) savedHandler.saved();
       keypairDisplay.close();
     } else {
+      ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
       keypairDisplay.showError(null, TranslationsUtils
-          .replaceArguments(translations.userMessageMap().get(ClientErrorDtos.getStatus(response.getText()))));
+          .replaceArguments(translations.userMessageMap().get(error.getStatus()), error.getArgumentsArray()));
     }
   }
 }

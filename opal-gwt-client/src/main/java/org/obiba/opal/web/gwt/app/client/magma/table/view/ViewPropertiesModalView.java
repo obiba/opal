@@ -100,6 +100,7 @@ public class ViewPropertiesModalView extends ModalPopupViewWithUiHandlers<ViewPr
   public void showError(String message, @Nullable FormField group) {
     if(Strings.isNullOrEmpty(message)) return;
 
+    dialog.closeAlerts();
     String msg = message;
     try {
       ClientErrorDto errorDto = JsonUtils.unsafeEval(message);
