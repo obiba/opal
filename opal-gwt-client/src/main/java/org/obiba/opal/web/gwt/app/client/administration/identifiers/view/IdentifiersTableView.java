@@ -172,7 +172,7 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
     identifiersPanel.clear();
 
     valueSetsPager = new SimplePager(SimplePager.TextLocation.RIGHT);
-    valueSetsPager.addStyleName("pull-right bottom-margin");
+    valueSetsPager.addStyleName("pull-right");
     identifiersPanel.add(valueSetsPager);
     createAndInitializeValueSetsTable(variables);
     identifiersPanel.add(valueSetsTable);
@@ -194,6 +194,7 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
       valueSetsTable.addColumn(new IdentifierColumn(variable), variable.getName());
     }
     valueSetsTable.addStyleName("pull-left");
+    valueSetsTable.addStyleName("small-top-margin");
     valueSetsPager.setDisplay(valueSetsTable);
     valueSetsTable.setRowCount(table.getValueSetCount());
     valueSetsTable.setPageStart(0);
@@ -211,6 +212,7 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
     variablesTable.addColumn(new VariableAttributeColumn("description"), translations.descriptionLabel());
     variablesTable.addColumn(new VariableActionsColumn(), translations.actionsLabel());
     variablesTable.addStyleName("pull-left");
+    variablesTable.addStyleName("small-top-margin");
     variablesPager.setDisplay(variablesTable);
     variablesTable.setPageStart(0);
   }
