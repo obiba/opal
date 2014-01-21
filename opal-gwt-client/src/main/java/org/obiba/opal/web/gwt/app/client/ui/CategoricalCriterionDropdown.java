@@ -91,12 +91,12 @@ public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
 
     // in
     if(((CheckBox) radioControls.getWidget(3)).getValue() && !selected.isEmpty()) {
-      return fieldName + ":(" + Joiner.on(" OR ").join(selected) + ")";
+      return fieldName + ":(\"" + Joiner.on("\" OR \"").join(selected) + "\")";
     }
 
     // not in
     if(((CheckBox) radioControls.getWidget(4)).getValue() && !selected.isEmpty()) {
-      return "NOT " + fieldName + ":(" + Joiner.on(" OR ").join(selected) + ")";
+      return "NOT " + fieldName + ":(\"" + Joiner.on("\" OR \"").join(selected) + "\")";
     }
 
     return null;
