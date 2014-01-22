@@ -461,9 +461,14 @@ td.row-actions span {
 .datepicker-years {
   background-color: #FFFFFF;
 }
+
 /*
  * Chosen listbox for facet values filter
  */
 .dropdown-menu > li.controls > div ul {
   color: #000000;
+}
+
+.database-url-example {
+  padding-left: 3px;
 }

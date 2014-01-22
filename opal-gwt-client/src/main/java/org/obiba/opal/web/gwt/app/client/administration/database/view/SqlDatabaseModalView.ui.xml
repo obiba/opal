@@ -75,7 +75,7 @@
         <b:HelpBlock addStyleNames="inline">
           <ui:msg description="Url help label">For example:</ui:msg>
         </b:HelpBlock>
-        <b:HelpBlock ui:field="urlExample" addStyleNames="inline italic"/>
+        <b:HelpBlock ui:field="urlExample" addStyleNames="database-url-example inline italic"/>
       </g:FlowPanel>
     </b:ControlGroup>
 
