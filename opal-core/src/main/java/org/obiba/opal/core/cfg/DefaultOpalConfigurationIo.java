@@ -23,6 +23,8 @@ import org.obiba.core.util.FileUtil;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -38,6 +40,8 @@ import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider
 @Component
 public class DefaultOpalConfigurationIo implements OpalConfigurationIo {
 
+  private static final Logger log = LoggerFactory.getLogger(DefaultOpalConfigurationIo.class);
+
   @Value("${OPAL_HOME}/data/opal-config.xml")
   private File configFile;
 
@@ -46,11 +50,15 @@ public class DefaultOpalConfigurationIo implements OpalConfigurationIo {
 
   @Override
   public OpalConfiguration readConfiguration() throws InvalidConfigurationException {
-    try {
-      return configFile.exists() ? readFromXml(new FileInputStream(configFile)) : readDefaultConfig();
-    } catch(FileNotFoundException e) {
-      throw new InvalidConfigurationException("Error reading Opal configuration file.", e);
+    if(configFile.exists()) {
+      log.debug("Read existing Opal Configuration");
+      try {
+        return readFromXml(new FileInputStream(configFile));
+      } catch(FileNotFoundException e) {
+        throw new InvalidConfigurationException("Error reading Opal configuration file.", e);
+      }
     }
+    return readDefaultConfig();
   }
 
   @Override
@@ -86,6 +94,7 @@ public class DefaultOpalConfigurationIo implements OpalConfigurationIo {
 
   @SuppressWarnings("ResultOfMethodCallIgnored")
   private OpalConfiguration readDefaultConfig() {
+    log.info("Read Opal Default Configuration");
     try {
       OpalConfiguration opalConfiguration = readFromXml(
           new DefaultResourceLoader().getResource("classpath:/opal-default-config.xml").getInputStream());

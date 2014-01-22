@@ -1,5 +1,7 @@
 package org.obiba.opal.server;
 
+import javax.validation.constraints.NotNull;
+
 import org.obiba.opal.server.httpd.OpalJettyServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +17,7 @@ public class OpalServer {
   private OpalServer() {
     setProperties();
     configureSLF4JBridgeHandler();
+    log.info("Starting Opal server!");
     upgrade();
     start();
   }
@@ -38,17 +41,17 @@ public class OpalServer {
   }
 
   private void upgrade() {
-    System.out.println("Upgrading Opal...");
+    logAndSystemOut("Upgrading Opal...");
     new UpgradeCommand().execute();
-    System.out.println("Upgrade successful.");
+    logAndSystemOut("Upgrade successful.");
   }
 
   private void start() {
-    System.out.println("Starting Opal...");
+    logAndSystemOut("Starting Opal...");
     jettyServer = new OpalJettyServer();
     try {
       jettyServer.start();
-      System.out.println("Opal Server successfully started.");
+      logAndSystemOut("Opal Server successfully started.");
     } catch(Exception e) {
       log.error("Exception while starting Opal", e);
       System.out.println(
@@ -63,7 +66,7 @@ public class OpalServer {
   }
 
   private void shutdown() {
-    System.out.println("Opal Server shutting down...");
+    logAndSystemOut("Opal Server shutting down...");
     try {
       jettyServer.stop();
     } catch(Exception e) {
@@ -71,7 +74,12 @@ public class OpalServer {
     }
   }
 
-  private static void checkSystemProperty(String... properties) {
+  private void logAndSystemOut(String msg) {
+    log.info(msg);
+    System.out.println(msg);
+  }
+
+  private static void checkSystemProperty(@NotNull String... properties) {
     for(String property : properties) {
       if(System.getProperty(property) == null) {
         throw new IllegalStateException("System property \"" + property + "\" must be defined.");

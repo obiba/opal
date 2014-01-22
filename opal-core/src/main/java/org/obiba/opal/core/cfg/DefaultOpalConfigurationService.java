@@ -26,6 +26,8 @@ import org.obiba.magma.js.MagmaJsExtension;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.core.magma.js.OpalGlobalMethodProvider;
 import org.obiba.opal.core.service.security.CryptoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +35,8 @@ import com.google.common.base.Strings;
 
 @Component
 public class DefaultOpalConfigurationService implements OpalConfigurationService {
+
+  private static final Logger log = LoggerFactory.getLogger(DefaultOpalConfigurationService.class);
 
   private static final int DATABASE_PASSWORD_LENGTH = 15;
 
@@ -73,6 +77,7 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
 
   private void configureSecretKey() {
     if(Strings.isNullOrEmpty(opalConfiguration.getSecretKey())) {
+      log.info("Generate new secret key");
       modifyConfiguration(new ConfigModificationTask() {
         @Override
         public void doWithConfig(OpalConfiguration config) {
@@ -84,6 +89,7 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
 
   private void configureDatabasePassword() {
     if(Strings.isNullOrEmpty(opalConfiguration.getDatabasePassword())) {
+      log.info("Generate new database password");
       modifyConfiguration(new ConfigModificationTask() {
         @Override
         public void doWithConfig(OpalConfiguration config) {
