@@ -186,7 +186,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
       git.add().addFilepattern(".").call();
       doCommitPush(git, Strings.isNullOrEmpty(comment) ? "Update " + message : comment);
 
-    } catch(Exception e) {
+    } catch(GitAPIException | IOException e) {
       throw new RuntimeException("Failed writing views in git for datasource: " + datasourceName, e);
     } finally {
       deleteLocalRepo(localRepo);
@@ -211,7 +211,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
       Git git = new Git(new FileRepository(new File(localRepo, ".git")));
       git.rm().addFilepattern(viewName).call();
       doCommitPush(git, "Remove " + viewName);
-    } catch(Exception e) {
+    } catch(GitAPIException | IOException e) {
       throw new RuntimeException("Failed removing view '" + viewName + "' from git for datasource: " + datasourceName,
           e);
     } finally {
@@ -239,7 +239,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     });
   }
 
-  private File cloneDatasourceViewsGit(String datasourceName) throws Exception {
+  private File cloneDatasourceViewsGit(String datasourceName) throws IOException, GitAPIException {
     File targetDir = getDatasourceViewsGit(datasourceName);
 
     // Create datasource views bare git repo
@@ -349,7 +349,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
           builder.add(view);
         }
       }
-    } catch(Exception e) {
+    } catch(GitAPIException | IOException e) {
       throw new RuntimeException("Failed reading views from git for datasource: " + datasourceName, e);
     } finally {
       deleteLocalRepo(localRepo);

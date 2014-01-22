@@ -180,7 +180,7 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     try {
       taxonomyService.saveVocabulary(null, new Vocabulary("none", "voc1"));
       Assert.fail("Should throw IllegalArgumentException");
-    } catch(Exception e) {
+    } catch(IllegalArgumentException e) {
     }
   }
 

@@ -51,14 +51,15 @@ public class TableVariablesSearchResource extends AbstractVariablesSearchResourc
   public Response search(@QueryParam("query") String query, @QueryParam("offset") @DefaultValue("0") int offset,
       @QueryParam("limit") @DefaultValue("10") int limit,
       @QueryParam("variable") @DefaultValue("false") boolean addVariableDto, @QueryParam("field") List<String> fields,
-      @QueryParam("facet") List<String> facets, @QueryParam("sortField") String sortField, @QueryParam("sortDir") String sortDir) {
+      @QueryParam("facet") List<String> facets, @QueryParam("sortField") String sortField,
+      @QueryParam("sortDir") String sortDir) {
 
     try {
       if(!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
       if(!variablesIndexManager.hasIndex(getValueTable())) return Response.status(Response.Status.NOT_FOUND).build();
       QuerySearchJsonBuilder jsonBuiler = buildQuerySearch(query, offset, limit, fields, facets, sortField, sortDir);
       JSONObject jsonResponse = executeQuery(jsonBuiler.build());
-      Search.QueryResultDto dtoResponse = convertResonse(jsonResponse, addVariableDto);
+      Search.QueryResultDto dtoResponse = convertResponse(jsonResponse, addVariableDto);
       return Response.ok().entity(dtoResponse).build();
     } catch(NoSuchValueSetException e) {
       return Response.status(Response.Status.NOT_FOUND).build();
@@ -74,7 +75,8 @@ public class TableVariablesSearchResource extends AbstractVariablesSearchResourc
     return variablesIndexManager.getIndex(getValueTable()).getRequestPath();
   }
 
-  protected Search.QueryResultDto convertResonse(JSONObject jsonResponse, boolean addVariableDto) throws JSONException {
+  protected Search.QueryResultDto convertResponse(JSONObject jsonResponse, boolean addVariableDto)
+      throws JSONException {
     EsResultConverter converter = new EsResultConverter();
     if(addVariableDto) converter.setStrategy(new ItemResultDtoStrategy(getValueTable()));
     return converter.convert(jsonResponse);

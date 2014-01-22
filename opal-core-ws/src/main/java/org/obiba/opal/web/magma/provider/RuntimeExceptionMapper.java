@@ -30,7 +30,8 @@ public class RuntimeExceptionMapper implements ExceptionMapper<RuntimeException>
   public Response toResponse(RuntimeException exception) {
     log.error("Unhandled exception", exception);
     return Response.status(BAD_REQUEST)
-        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "UnhandledException", exception.getMessage()).build()).build();
+        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "UnhandledException", exception.getMessage()).build())
+        .build();
   }
 
 }

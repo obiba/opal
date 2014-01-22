@@ -21,7 +21,6 @@ import javax.ws.rs.core.Response;
 import org.obiba.opal.core.vcs.CommitInfo;
 import org.obiba.opal.core.vcs.OpalVersionControlSystem;
 import org.obiba.opal.core.vcs.git.support.GitUtils;
-import org.obiba.opal.web.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -46,7 +45,7 @@ public class ViewVcsLogResource {
 
   @GET
   @Path("/commits")
-  public Response getCommitsInfo() {  
+  public Response getCommitsInfo() {
     List<CommitInfo> commitInfos = vcs.getCommitsInfo(datasource, GitUtils.getViewFilePath(view));
     return Response.ok().entity(Dtos.asDto(commitInfos)).build();
   }
