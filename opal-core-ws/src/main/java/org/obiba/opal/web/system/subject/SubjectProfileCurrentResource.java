@@ -11,6 +11,7 @@ package org.obiba.opal.web.system.subject;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.apache.shiro.SecurityUtils;
@@ -45,9 +46,18 @@ public class SubjectProfileCurrentResource {
 
   @GET
   @Path("/bookmarks")
-  public BookmarksResource getBookmarks() {
+  public BookmarksResource getBookmarksResource() {
     BookmarksResource resource = applicationContext.getBean("bookmarksResource", BookmarksResource.class);
     resource.setPrincipal(getPrincipal());
+    return resource;
+  }
+
+  @GET
+  @Path("/bookmark/{path:.*}")
+  public BookmarkResource getBookmarkResource(@PathParam("path") String path) {
+    BookmarkResource resource = applicationContext.getBean("bookmarkResource", BookmarkResource.class);
+    resource.setPrincipal(getPrincipal());
+    resource.setPath(path);
     return resource;
   }
 

@@ -22,7 +22,6 @@ import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -34,9 +33,6 @@ public class BookmarksResourceImpl implements BookmarksResource {
 
   @Autowired
   private SubjectProfileService subjectProfileService;
-
-  @Autowired
-  private ApplicationContext applicationContext;
 
   @Override
   public void setPrincipal(String principal) {
@@ -50,14 +46,6 @@ public class BookmarksResourceImpl implements BookmarksResource {
       dtos.add(Dtos.asDto(bookmark));
     }
     return dtos;
-  }
-
-  @Override
-  public BookmarkResource getBookmark(String path) {
-    BookmarkResource resource = applicationContext.getBean("bookmarkResource", BookmarkResource.class);
-    resource.setPrincipal(principal);
-    resource.setPath(path);
-    return resource;
   }
 
   @Override

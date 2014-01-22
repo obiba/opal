@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.magma.bookmark.presenter;
+package org.obiba.opal.web.gwt.app.client.bookmark.presenter;
 
 import com.gwtplatform.mvp.client.UiHandlers;
 

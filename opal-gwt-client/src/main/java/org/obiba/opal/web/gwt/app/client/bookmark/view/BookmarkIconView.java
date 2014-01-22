@@ -8,11 +8,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.magma.bookmark.view;
+package org.obiba.opal.web.gwt.app.client.bookmark.view;
 
+import org.obiba.opal.web.gwt.app.client.bookmark.presenter.BookmarkIconPresenter;
+import org.obiba.opal.web.gwt.app.client.bookmark.presenter.BookmarkIconUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.magma.bookmark.presenter.BookmarkIconPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.bookmark.presenter.BookmarkIconUiHandlers;
 
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.constants.IconType;

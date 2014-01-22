@@ -55,9 +55,9 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
 
   private String body;
 
-  private Collection<String> accept = new HashSet<String>();
+  private final Collection<String> accept = new HashSet<String>();
 
-  private HashMultimap<String, String> form = HashMultimap.create();
+  private final HashMultimap<String, String> form = HashMultimap.create();
 
   private ResourceCallback<T> resourceCallback;
 
