@@ -14,8 +14,6 @@ import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
@@ -27,10 +25,6 @@ public interface BookmarksResource {
 
   @GET
   List<Opal.BookmarkDto> getBookmarks();
-
-  @GET
-  @Path("/{path:.*}")
-  BookmarkResource getBookmark(@PathParam("path") String path);
 
   @POST
   Response addBookmarks(@QueryParam("resource") List<String> resources);

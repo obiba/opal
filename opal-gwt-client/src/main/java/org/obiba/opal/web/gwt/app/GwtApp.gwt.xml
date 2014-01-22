@@ -29,6 +29,8 @@
   <!-- For production, most teams prefer to set the default log level to `OFF`, development : DEBUG -->
   <inherits name="com.allen_sauer.gwt.log.gwt-log-OFF"/>
 
+  <inherits name='com.gwtplatform.dispatch.rest.DispatchRest'/>
+
   <!-- Specify the app entry point class. -->
   <inherits name='com.gwtplatform.mvp.MvpWithEntryPoint'/>
   <inherits name='com.gwtplatform.mvp.Mvp'/>
@@ -61,7 +63,8 @@
       value="org.obiba.opal.web.gwt.app.client.inject.PermissionsModule"/>
   <extend-configuration-property name="gin.ginjector.modules"
       value="org.obiba.opal.web.gwt.app.client.inject.KeystoreModule"/>
-
+  <extend-configuration-property name="gin.ginjector.modules"
+      value="org.obiba.opal.web.gwt.app.client.bookmark.BookmarkModule"/>
   <!-- Client-side REST framework -->
   <inherits name='org.obiba.opal.web.gwt.rest.Rest'/>
 

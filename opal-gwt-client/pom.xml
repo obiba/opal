@@ -51,6 +51,10 @@
       <artifactId>gwtp-processors</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.gwtplatform</groupId>
+      <artifactId>gwtp-dispatch-rest</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava-gwt</artifactId>
     </dependency>
