@@ -14,10 +14,10 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveCategoricalVariableStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry.ValueMapEntryType;
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
 
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.core.client.GWT;
@@ -129,11 +129,6 @@ public class DeriveCategoricalVariableStepView extends ViewImpl
   @Override
   public Widget asWidget() {
     return widget;
-  }
-
-  @Override
-  public void setMaxFrequency(double maxFrequency) {
-    valuesMapGrid.setMaxFrequency(maxFrequency);
   }
 
   @Override

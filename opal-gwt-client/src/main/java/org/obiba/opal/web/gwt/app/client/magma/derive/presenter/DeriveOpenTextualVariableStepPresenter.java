@@ -14,33 +14,30 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.magma.derive.helper.DerivationHelper;
 import org.obiba.opal.web.gwt.app.client.magma.derive.helper.OpenTextualVariableDerivationHelper;
 import org.obiba.opal.web.gwt.app.client.magma.derive.helper.OpenTextualVariableDerivationHelper.Method;
 import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry;
 import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry.Builder;
 import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapGrid;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.View;
 
 public class DeriveOpenTextualVariableStepPresenter
@@ -162,22 +159,8 @@ public class DeriveOpenTextualVariableStepPresenter
                     getView().addValueSuggestion(frequencyDto.getValue(), FREQ_FORMAT.format(frequencyDto.getFreq()));
                   }
                 }
-                getView().getValueMapGrid().setMaxFrequency(getMaxFrequency());
                 getView().populateValues(derivationHelper.getValueMapEntries(), destinationCategories);
               }
-
-              private Double getMaxFrequency() {
-                if(categoricalSummaryDto.getFrequenciesArray() == null) return 0d;
-                return Iterables
-                    .find(JsArrays.toList(categoricalSummaryDto.getFrequenciesArray()), new Predicate<FrequencyDto>() {
-
-                      @Override
-                      public boolean apply(FrequencyDto dto) {
-                        return dto.getValue().equals(categoricalSummaryDto.getMode());
-                      }
-                    }).getFreq();
-              }
-
             }).send();
       }
     }
