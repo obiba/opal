@@ -58,8 +58,6 @@ public class ValueMapGrid extends FlowPanel {
 
   private Column<ValueMapEntry, ValueMapEntry> frequencyColumn;
 
-  private double maxFrequency;
-
   public ValueMapGrid() {
     pager = new SimplePager(SimplePager.TextLocation.RIGHT);
     pager.setPageSize(DEFAULT_PAGE_SIZE);
@@ -169,10 +167,9 @@ public class ValueMapGrid extends FlowPanel {
   private void initializeFrequencyColumn() {
     if(allowFrequencyColumn) {
       if(frequencyColumn == null) {
-        frequencyColumn = new ValueMapColumn(new StatCell(maxFrequency));
+        frequencyColumn = new ValueMapColumn(new StatCell());
       }
       table.insertColumn(1, frequencyColumn, translations.frequency());
-      table.setColumnWidth(frequencyColumn, "120px");
     }
   }
 
@@ -245,7 +242,6 @@ public class ValueMapGrid extends FlowPanel {
     };
     missingColumn.setCellStyleNames("new-missing");
     table.addColumn(missingColumn, translations.missingLabel());
-    table.setColumnWidth(missingColumn, "8em");
     missingColumn.setFieldUpdater(new FieldUpdater<ValueMapEntry, Boolean>() {
       @Override
       public void update(int index, ValueMapEntry entry, Boolean value) {
@@ -264,17 +260,6 @@ public class ValueMapGrid extends FlowPanel {
     if(!allowFrequencyColumn) {
       table.removeColumn(frequencyColumn);
     } else if(table != null) {
-      initializeFrequencyColumn();
-    }
-  }
-
-  public void setMaxFrequency(double maxFrequency) {
-    this.maxFrequency = maxFrequency;
-    if(frequencyColumn != null) {
-      if(allowFrequencyColumn) {
-        table.removeColumn(frequencyColumn);
-        frequencyColumn = null;
-      }
       initializeFrequencyColumn();
     }
   }

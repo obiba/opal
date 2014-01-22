@@ -254,8 +254,8 @@ public class DeriveNumericalVariableStepPresenter
             public void onResource(Response response, SummaryStatisticsDto summaryStatisticsDto) {
               CategoricalSummaryDto categoricalSummaryDto = summaryStatisticsDto
                   .getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
-              double maxFreq = derivationHelper.addDistinctValues(categoricalSummaryDto);
-              getView().setMaxFrequency(maxFreq);
+              derivationHelper.addDistinctValues(categoricalSummaryDto);
+
               getView().enableFrequency(true);
               getView().populateValues(derivationHelper.getValueMapEntries(), derivedCategories);
             }
@@ -454,8 +454,6 @@ public class DeriveNumericalVariableStepPresenter
     DefaultWizardStepController.Builder getMethodStepBuilder();
 
     DefaultWizardStepController.Builder getMapStepBuilder();
-
-    void setMaxFrequency(double maxFreq);
 
     void setRangeCountError(boolean error);
 

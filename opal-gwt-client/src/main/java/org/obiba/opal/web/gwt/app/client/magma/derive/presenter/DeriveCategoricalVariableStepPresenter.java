@@ -14,19 +14,19 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController;
 import org.obiba.opal.web.gwt.app.client.magma.derive.helper.CategoricalVariableDerivationHelper;
 import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.View;
 
 /**
@@ -56,7 +56,6 @@ public class DeriveCategoricalVariableStepPresenter
             derivationHelper.initializeValueMapEntries();
 
             getView().enableFrequencyColumn(true);
-            getView().setMaxFrequency(derivationHelper.getMaxFrequency());
             getView()
                 .populateValues(derivationHelper.getValueMapEntries(), derivationHelper.getDestinationCategories());
           }
@@ -91,8 +90,6 @@ public class DeriveCategoricalVariableStepPresenter
   public interface Display extends View {
 
     DefaultWizardStepController.Builder getMapStepController();
-
-    void setMaxFrequency(double maxFrequency);
 
     void enableFrequencyColumn(boolean enableFrequencyColumn);
 
