@@ -44,6 +44,7 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
 
 import static org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig.ImportFormat;
+import static org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter.ImportDataStepHandler;
 
 @SuppressWarnings("OverlyCoupledClass")
 public class DataImportView extends ModalViewImpl implements DataImportPresenter.Display {
@@ -118,7 +119,7 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
 
   private StepInHandler unitSelectionStepInHandler;
 
-  private StepInHandler datasourceValuesStepInHandler;
+  private ImportDataStepHandler datasourceValuesStepInHandler;
 
   private ImportDataInputsHandler importDataInputsHandler;
 
@@ -189,7 +190,14 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
           public void onStepIn() {
             datasourceValuesStepInHandler.onStepIn();
           }
-        }).title(translations.dataImportValuesStep())//
+        })//
+        .onValidate(new ValidationHandler() {
+          @Override
+          public boolean validate() {
+            return datasourceValuesStepInHandler.isValid();
+          }
+        })
+        .title(translations.dataImportValuesStep())//
 
         .append(archiveStep, new Skippable() {
           @Override
@@ -323,7 +331,7 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
   }
 
   @Override
-  public void setDatasourceValuesStepInHandler(StepInHandler handler) {
+  public void setDatasourceValuesStepInHandler(ImportDataStepHandler handler) {
     datasourceValuesStepInHandler = handler;
   }
 

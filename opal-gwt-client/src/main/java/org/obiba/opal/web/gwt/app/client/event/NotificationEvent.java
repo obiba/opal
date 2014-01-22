@@ -47,6 +47,8 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
 
   private boolean sticky = false;
 
+  private boolean consumed = false;
+
   //
   // Constructors
   //
@@ -117,6 +119,14 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
   public NotificationEvent nonSticky() {
     sticky = false;
     return this;
+  }
+
+  public void setConsumed(boolean value) {
+    consumed = value;
+  }
+
+  public boolean isConsumed() {
+    return consumed;
   }
 
   public boolean isSticky() {
