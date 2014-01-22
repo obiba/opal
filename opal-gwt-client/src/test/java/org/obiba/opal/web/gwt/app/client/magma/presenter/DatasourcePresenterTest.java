@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.client.presenter;
+package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -17,16 +17,15 @@ import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.AddViewModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
-import com.google.gwt.event.shared.GwtEvent.Type;
 import com.google.gwt.event.shared.testing.CountingEventBus;
 import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.Event;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
@@ -60,15 +59,15 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
   @Ignore
   public void testThatEventHandlersAreAddedToUIComponents() throws Exception {
     HandlerRegistration handlerRegistrationMock = createMock(HandlerRegistration.class);
-    expect(eventBusMock.addHandler((Type<TableSelectionChangeEvent.Handler>) EasyMock.anyObject(),
+    expect(eventBusMock.addHandler((Event.Type<TableSelectionChangeEvent.Handler>) EasyMock.anyObject(),
         (TableSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
     expect(eventBusMock
-        .addHandler((Type<DatasourceSelectionChangeEvent.DatasourceSelectionChangeHandler>) EasyMock.anyObject(),
+        .addHandler((Event.Type<DatasourceSelectionChangeEvent.DatasourceSelectionChangeHandler>) EasyMock.anyObject(),
             (DatasourceSelectionChangeEvent.DatasourceSelectionChangeHandler) EasyMock.anyObject()))
         .andReturn(handlerRegistrationMock).once();
-    expect(eventBusMock.addHandler((Type<ConfirmationEvent.Handler>) EasyMock.anyObject(),
+    expect(eventBusMock.addHandler((Event.Type<ConfirmationEvent.Handler>) EasyMock.anyObject(),
         (ConfirmationEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
-    expect(eventBusMock.addHandler((Type<DatasourceUpdatedEvent.Handler>) EasyMock.anyObject(),
+    expect(eventBusMock.addHandler((Event.Type<DatasourceUpdatedEvent.Handler>) EasyMock.anyObject(),
         (DatasourceUpdatedEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
 
     replay(displayMock, eventBusMock);

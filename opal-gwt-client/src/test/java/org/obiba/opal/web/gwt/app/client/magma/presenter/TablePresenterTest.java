@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.client.presenter;
+package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -17,10 +17,6 @@ import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPre
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityModalPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueSequencePopupPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewPropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.ContingencyTablePresenter;
@@ -31,10 +27,10 @@ import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissio
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
-import com.google.gwt.event.shared.GwtEvent.Type;
 import com.google.gwt.event.shared.testing.CountingEventBus;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.Event;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
@@ -83,9 +79,9 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
   @Ignore
   public void testOnBind_RegistersHandlersAndBindsDependencies() {
     HandlerRegistration handlerRegistrationMock = createMock(HandlerRegistration.class);
-    expect(eventBusMock.addHandler((Type<TableSelectionChangeEvent.Handler>) EasyMock.anyObject(),
+    expect(eventBusMock.addHandler((Event.Type<TableSelectionChangeEvent.Handler>) EasyMock.anyObject(),
         (TableSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
-    expect(eventBusMock.addHandler((Type<ConfirmationEvent.Handler>) EasyMock.anyObject(),
+    expect(eventBusMock.addHandler((Event.Type<ConfirmationEvent.Handler>) EasyMock.anyObject(),
         (ConfirmationEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
     expect(displayMock.addVariableSortHandler((ColumnSortEvent.Handler) EasyMock.anyObject()))
         .andReturn(handlerRegistrationMock).once();
