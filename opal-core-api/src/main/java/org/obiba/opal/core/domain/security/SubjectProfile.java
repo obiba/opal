@@ -9,7 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.core.domain.security;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 
@@ -30,8 +32,9 @@ public class SubjectProfile extends AbstractTimestamped implements HasUniqueProp
   @NotBlank
   private String realm;
 
-  public SubjectProfile() {
+  private Set<Bookmark> bookmarks = new HashSet<>();
 
+  public SubjectProfile() {
   }
 
   public SubjectProfile(@NotNull String principal, @NotNull String realm) {
@@ -67,6 +70,24 @@ public class SubjectProfile extends AbstractTimestamped implements HasUniqueProp
     this.realm = realm;
   }
 
+  public Set<Bookmark> getBookmarks() {
+    return bookmarks;
+  }
+
+  public void setBookmarks(Set<Bookmark> bookmarks) {
+    this.bookmarks = bookmarks;
+  }
+
+  public void addBookmark(String resource) {
+    if(bookmarks == null) bookmarks = new HashSet<>();
+    bookmarks.add(new Bookmark(resource));
+  }
+
+  public void removeBookmark(String resource) {
+    if(bookmarks == null) return;
+    bookmarks.remove(new Bookmark(resource));
+  }
+
   @Override
   public int hashCode() {
     return Objects.hashCode(principal, realm);
@@ -86,7 +107,8 @@ public class SubjectProfile extends AbstractTimestamped implements HasUniqueProp
 
   @SuppressWarnings("ParameterHidesMemberVariable")
   public static class Builder {
-    SubjectProfile profile;
+
+    private SubjectProfile profile;
 
     private Builder() {
     }

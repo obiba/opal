@@ -2,6 +2,7 @@ package org.obiba.opal.web.security;
 
 import java.text.SimpleDateFormat;
 
+import org.obiba.opal.core.domain.security.Bookmark;
 import org.obiba.opal.core.domain.security.Group;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.domain.security.SubjectProfile;
@@ -61,7 +62,15 @@ public class Dtos {
         .setPrincipal(profile.getPrincipal()) //
         .setRealm(profile.getRealm()) //
         .setCreated(ISO_8601.format(profile.getCreated())) //
-        .setLastUpdate(ISO_8601.format(profile.getUpdated())).build();
+        .setLastUpdate(ISO_8601.format(profile.getUpdated())) //
+        .build();
+  }
+
+  public static Opal.BookmarkDto asDto(Bookmark bookmark) {
+    return Opal.BookmarkDto.newBuilder() //
+        .setResource(bookmark.getResource()) //
+        .setCreated(ISO_8601.format(bookmark.getCreated())) //
+        .build();
   }
 
 }
