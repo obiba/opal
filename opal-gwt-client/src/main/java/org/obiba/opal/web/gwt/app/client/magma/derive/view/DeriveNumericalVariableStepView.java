@@ -199,7 +199,7 @@ public class DeriveNumericalVariableStepView extends ViewImpl implements DeriveN
     addToBox.setText("");
     valueBox.setText("");
     newValueBox.setText("");
-//    addRangeRadio.setValue(true, true);
+    addRangeRadio.setValue(true, true);
     addPanel.setOpen(false);
     // populates
     valuesMapGrid.populate(valuesMap, derivedCategories);
