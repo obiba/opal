@@ -9,12 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.view;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
@@ -39,7 +39,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Sets;
-import com.google.common.io.Closeables;
 
 /**
  * An implementation of {@Code ViewDtoExtension} that can create {@code View} instances by de-serializing an
@@ -76,18 +75,16 @@ public class FileViewDtoExtension implements ViewDtoExtension {
   @Override
   public View fromDto(ViewDto viewDto, Builder viewBuilder) {
     FileViewDto fileDto = viewDto.getExtension(FileViewDto.view);
-    InputStream is = null;
     try {
       FileObject file = opalRuntime.getFileSystem().getRoot().resolveFile(fileDto.getFilename());
       if(file.exists()) {
-        is = file.getContent().getInputStream();
-        return makeViewFromFile(viewBuilder, fileDto, is);
+        try(InputStream is = file.getContent().getInputStream()) {
+          return makeViewFromFile(viewBuilder, fileDto, is);
+        }
       }
       throw new RuntimeException("cannot find file specified '" + fileDto.getFilename() + "'");
-    } catch(FileSystemException e) {
+    } catch(IOException e) {
       throw new RuntimeException(e);
-    } finally {
-      Closeables.closeQuietly(is);
     }
   }
 
@@ -125,18 +122,16 @@ public class FileViewDtoExtension implements ViewDtoExtension {
   @Override
   public TableDto asTableDto(ViewDto viewDto, Magma.TableDto.Builder tableDtoBuilder) {
     FileViewDto fileDto = viewDto.getExtension(FileViewDto.view);
-    InputStream is = null;
     try {
       FileObject file = opalRuntime.getFileSystem().getRoot().resolveFile(fileDto.getFilename());
       if(file.exists()) {
-        is = file.getContent().getInputStream();
-        return makeTableDtoFromFile(tableDtoBuilder, fileDto, is);
+        try(InputStream is = file.getContent().getInputStream()) {
+          return makeTableDtoFromFile(tableDtoBuilder, fileDto, is);
+        }
       }
       throw new RuntimeException("cannot find file specified '" + fileDto.getFilename() + "'");
-    } catch(FileSystemException e) {
+    } catch(IOException e) {
       throw new RuntimeException(e);
-    } finally {
-      Closeables.closeQuietly(is);
     }
   }
 
@@ -146,8 +141,9 @@ public class FileViewDtoExtension implements ViewDtoExtension {
         return makeTableDtoFromXMLFile(tableDtoBuilder, is);
       case EXCEL:
         return makeTableDtoFromExcelFile(tableDtoBuilder, is);
+      default:
+        throw new IllegalStateException("unknown view file type " + fileDto.getType());
     }
-    throw new IllegalStateException("unknown view file type " + fileDto.getType());
   }
 
   private TableDto makeTableDtoFromXMLFile(TableDto.Builder tableDtoBuilder, InputStream is) {
