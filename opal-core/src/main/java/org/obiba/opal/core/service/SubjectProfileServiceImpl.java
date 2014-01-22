@@ -17,6 +17,8 @@ import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
 import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.subject.Subject;
+import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.service.security.realm.BackgroundJobRealm;
@@ -27,9 +29,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DefaultSubjectProfileServiceImpl implements SubjectProfileService {
+public class SubjectProfileServiceImpl implements SubjectProfileService {
 
-  private static final Logger log = LoggerFactory.getLogger(DefaultSubjectProfileServiceImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(SubjectProfileServiceImpl.class);
 
   @Autowired
   private OrientDbService orientDbService;
@@ -41,9 +43,7 @@ public class DefaultSubjectProfileServiceImpl implements SubjectProfileService {
   }
 
   @Override
-  public void stop() {
-
-  }
+  public void stop() {}
 
   @Override
   public boolean supportProfile(@Nullable Object principal) {
@@ -58,8 +58,8 @@ public class DefaultSubjectProfileServiceImpl implements SubjectProfileService {
 
     SubjectProfile profile = getProfile(principal);
     if(profile == null) {
-      profile = new SubjectProfile(principal, realm);
-      orientDbService.save(profile, profile);
+      HasUniqueProperties newProfile = new SubjectProfile(principal, realm);
+      orientDbService.save(newProfile, newProfile);
     } else if(!profile.getRealm().equals(realm)) {
       throw new AuthenticationException(
           "Wrong realm for subject '" + principal + "': " + realm + " (" + profile.getRealm() +

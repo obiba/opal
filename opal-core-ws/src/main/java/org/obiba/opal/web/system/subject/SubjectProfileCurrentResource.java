@@ -19,6 +19,7 @@ import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.web.security.Dtos;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -30,6 +31,9 @@ public class SubjectProfileCurrentResource {
   @Autowired
   private SubjectProfileService subjectProfileService;
 
+  @Autowired
+  private ApplicationContext applicationContext;
+
   @GET
   @NoAuthorization
   public Response get() {
@@ -37,6 +41,14 @@ public class SubjectProfileCurrentResource {
     return (profile == null //
         ? Response.status(Response.Status.NOT_FOUND) //
         : Response.ok().entity(Dtos.asDto(profile))).build();
+  }
+
+  @GET
+  @Path("/bookmarks")
+  public BookmarksResource getBookmarks() {
+    BookmarksResource resource = applicationContext.getBean("bookmarksResource", BookmarksResource.class);
+    resource.setPrincipal(getPrincipal());
+    return resource;
   }
 
   private String getPrincipal() {

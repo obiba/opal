@@ -19,6 +19,7 @@ import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.web.security.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +34,9 @@ public class SubjectProfileResource {
   @Autowired
   private SubjectProfileService subjectProfileService;
 
+  @Autowired
+  private ApplicationContext applicationContext;
+
   @GET
   public Response get() {
     SubjectProfile profile = subjectProfileService.getProfile(principal);
@@ -46,4 +50,13 @@ public class SubjectProfileResource {
     subjectProfileService.deleteProfile(principal);
     return Response.ok().build();
   }
+
+  @GET
+  @Path("/bookmarks")
+  public BookmarksResource getBookmarks() {
+    BookmarksResource resource = applicationContext.getBean("bookmarksResource", BookmarksResource.class);
+    resource.setPrincipal(principal);
+    return resource;
+  }
+
 }

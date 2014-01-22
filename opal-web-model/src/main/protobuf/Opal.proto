@@ -245,6 +245,11 @@ message SubjectProfileDto {
   required string lastUpdate = 4;
 }
 
+message BookmarkDto {
+  required string resource = 1;
+  required string created = 2;
+}
+
 // Extracts from RuntimeMXBean
 message OpalEnv {
   required string version = 1; // opal version
