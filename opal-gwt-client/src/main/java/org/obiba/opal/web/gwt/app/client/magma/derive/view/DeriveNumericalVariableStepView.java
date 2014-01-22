@@ -28,7 +28,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.UIObject;
@@ -116,9 +115,6 @@ public class DeriveNumericalVariableStepView extends ViewImpl implements DeriveN
 
   @UiField
   FluidRow rangesRow;
-
-  @UiField
-  FlowPanel alertPanel;
 
   //
   // Constructors
