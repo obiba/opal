@@ -84,13 +84,12 @@ public class DefaultOpalConfigurationIo implements OpalConfigurationIo {
     }
   }
 
+  @SuppressWarnings("ResultOfMethodCallIgnored")
   private OpalConfiguration readDefaultConfig() {
     try {
       OpalConfiguration opalConfiguration = readFromXml(
           new DefaultResourceLoader().getResource("classpath:/opal-default-config.xml").getInputStream());
-      if(!configFile.getParentFile().mkdirs()) {
-        throw new InvalidConfigurationException("Error creating Opal default configuration file.");
-      }
+      configFile.getParentFile().mkdirs();
       Files.touch(new File(configFile.getParentFile(), configFile.getName()));
       writeConfiguration(opalConfiguration);
       return opalConfiguration;
