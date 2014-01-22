@@ -16,6 +16,8 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
@@ -94,6 +96,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   private final ArchiveStepPresenter archiveStepPresenter;
 
+  private final Translations translations;
+
   private TransientDatasourceHandler transientDatasourceHandler;
 
   private ImportConfig importConfig;
@@ -111,7 +115,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       IdentifiersMappingSelectionStepPresenter identifiersMappingSelectionStepPresenter, //
       ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter,
       ArchiveStepPresenter archiveStepPresenter, //
-      DatasourceValuesStepPresenter datasourceValuesStepPresenter) {
+      DatasourceValuesStepPresenter datasourceValuesStepPresenter,
+      Translations translations) {
     super(eventBus, display);
     this.csvFormatStepPresenter = csvFormatStepPresenter;
     this.xmlFormatStepPresenter = xmlFormatStepPresenter;
@@ -124,6 +129,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     this.comparedDatasourcesReportPresenter = comparedDatasourcesReportPresenter;
     this.archiveStepPresenter = archiveStepPresenter;
     this.datasourceValuesStepPresenter = datasourceValuesStepPresenter;
+    this.translations = translations;
   }
 
   @Override
@@ -140,6 +146,18 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
     addEventHandlers();
     updateFormatChooser();
+
+    getEventBus().addHandlerToSource(NotificationEvent.getType(), datasourceValuesStepPresenter,
+        new NotificationEvent.Handler() {
+          @Override
+          public void onUserMessage(NotificationEvent event) {
+            for(String message : event.getMessages()) {
+              getView().showError(TranslationsUtils
+                  .replaceArguments(translations.userMessageMap().get(message), event.getMessageArgs()), null);
+            }
+            event.setConsumed(true);
+          }
+        });
   }
 
   private void setInSlotPresenters() {
@@ -199,6 +217,10 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       }
     }));
     getView().setImportDataInputsHandler(new ImportDataInputsHandlerImpl());
+  }
+
+  public interface ImportDataStepHandler extends StepInHandler {
+    boolean isValid();
   }
 
   public interface ImportDataInputsHandler {
@@ -550,10 +572,15 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   }
 
-  private final class DatasourceValuesHandler implements StepInHandler {
+  private final class DatasourceValuesHandler implements ImportDataStepHandler {
     @Override
     public void onStepIn() {
       datasourceValuesStepPresenter.getView().hideErrors();
+    }
+
+    @Override
+    public boolean isValid() {
+      return datasourceValuesStepPresenter.isValid();
     }
   }
 
@@ -581,7 +608,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
     void setComparedDatasourcesReportDisplay(WizardStepDisplay display);
 
-    void setDatasourceValuesStepInHandler(StepInHandler handler);
+    void setDatasourceValuesStepInHandler(ImportDataStepHandler handler);
 
     HandlerRegistration addFormatChangeHandler(ChosenChangeEvent.ChosenChangeHandler handler);
 

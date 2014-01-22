@@ -11,9 +11,11 @@ package org.obiba.opal.web.gwt.app.client.magma.importdata.presenter;
 
 import java.util.Collection;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DatasourceValuesStepPresenter.Display.Slots;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -23,10 +25,10 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
 /**
@@ -34,18 +36,36 @@ import com.gwtplatform.mvp.client.PresenterWidget;
  */
 public class DatasourceValuesStepPresenter extends PresenterWidget<DatasourceValuesStepPresenter.Display> {
 
+  private enum State {
+    VALID,
+    INVALID
+  };
+
+
   private final ValuesTablePresenter valuesTablePresenter;
 
   private JsArray<TableDto> tables;
+
+  private State state = State.VALID;
 
   @Inject
   public DatasourceValuesStepPresenter(Display display, EventBus eventBus, ValuesTablePresenter valuesTablePresenter) {
     super(eventBus, display);
     this.valuesTablePresenter = valuesTablePresenter;
     valuesTablePresenter.setViewMode(ValuesTablePresenter.ViewMode.SIMPLE_MODE);
+    eventBus.addHandlerToSource(NotificationEvent.getType(), valuesTablePresenter, new NotificationEvent.Handler() {
+      @Override
+      public void onUserMessage(NotificationEvent event) {
+        if(event.getNotificationType() == NotificationPresenter.NotificationType.ERROR) {
+          state = State.INVALID;
+          fireEvent(event);
+        }
+      }
+    });
   }
 
   public void setDatasource(String datasource, final Collection<String> tableNames) {
+    state = State.VALID;
     ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder() //
         .forResource(UriBuilder.create().segment("datasource", datasource, "tables").build()) //
         .get() //
@@ -90,6 +110,10 @@ public class DatasourceValuesStepPresenter extends PresenterWidget<DatasourceVal
         valuesTablePresenter.setTable(table);
       }
     });
+  }
+
+  public boolean isValid() {
+    return state == State.VALID;
   }
 
   //

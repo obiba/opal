@@ -315,7 +315,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     protected void notifyError(Response response) {
       NotificationEvent notificationEvent = new JSErrorNotificationEventBuilder()
           .build((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));
-      getEventBus().fireEvent(notificationEvent);
+      fireEvent(notificationEvent);
     }
   }
 
@@ -419,13 +419,13 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     @Override
     public void requestBinaryValue(VariableDto variable, String entityIdentifier) {
-      getEventBus().fireEvent(new FileDownloadRequestEvent(
+      fireEvent(new FileDownloadRequestEvent(
           originalTable.getLink() + "/valueSet/" + entityIdentifier + "/variable/" + variable.getName() + "/value"));
     }
 
     @Override
     public void requestGeoValue(VariableDto variable, String entityIdentifier, ValueSetsDto.ValueDto value) {
-      getEventBus().fireEvent(new GeoValueDisplayEvent(variable, entityIdentifier, value));
+      fireEvent(new GeoValueDisplayEvent(variable, entityIdentifier, value));
     }
 
     @Override
