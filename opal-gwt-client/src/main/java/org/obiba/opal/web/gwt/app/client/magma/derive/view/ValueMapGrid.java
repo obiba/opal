@@ -31,6 +31,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.AbstractCellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.view.client.ListDataProvider;
 
 public class ValueMapGrid extends FlowPanel {
@@ -40,6 +41,8 @@ public class ValueMapGrid extends FlowPanel {
   private static final Translations translations = GWT.create(Translations.class);
 
   private final SimplePager pager;
+
+  private final Image loading;
 
   protected AbstractCellTable<ValueMapEntry> table;
 
@@ -59,6 +62,9 @@ public class ValueMapGrid extends FlowPanel {
   private Column<ValueMapEntry, ValueMapEntry> frequencyColumn;
 
   public ValueMapGrid() {
+    loading = new Image("image/loading.gif");
+    add(loading);
+
     pager = new SimplePager(SimplePager.TextLocation.RIGHT);
     pager.setPageSize(DEFAULT_PAGE_SIZE);
     pager.addStyleName("pull-right");
@@ -93,6 +99,8 @@ public class ValueMapGrid extends FlowPanel {
     pager.setVisible(valueMapEntries.size() > pager.getPageSize());
     dataProvider.refresh();
 
+    // remove loading
+    remove(loading);
     //addStyleName("value-map");
   }
 
