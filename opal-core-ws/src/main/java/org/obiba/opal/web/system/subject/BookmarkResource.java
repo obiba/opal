@@ -10,29 +10,19 @@
 
 package org.obiba.opal.web.system.subject;
 
-import java.util.List;
-
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.obiba.opal.web.model.Opal;
-
-public interface BookmarksResource {
+public interface BookmarkResource {
 
   void setPrincipal(String principal);
 
-  @GET
-  List<Opal.BookmarkDto> getBookmarks();
+  void setPath(String path);
 
   @GET
-  @Path("/{path:.*}")
-  BookmarkResource getBookmark(@PathParam("path") String path);
+  Response get();
 
-  @POST
-  Response addBookmarks(@QueryParam("resource") List<String> resources);
-
+  @DELETE
+  Response delete();
 }

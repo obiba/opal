@@ -10,33 +10,30 @@
 
 package org.obiba.opal.web.system.subject;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.security.Bookmark;
 import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.service.SubjectProfileService;
-import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class BookmarksResourceImpl implements BookmarksResource {
+public class BookmarkResourceImpl implements BookmarkResource {
 
   private String principal;
 
-  @Autowired
-  private SubjectProfileService subjectProfileService;
+  private String path;
 
   @Autowired
-  private ApplicationContext applicationContext;
+  private SubjectProfileService subjectProfileService;
 
   @Override
   public void setPrincipal(String principal) {
@@ -44,33 +41,47 @@ public class BookmarksResourceImpl implements BookmarksResource {
   }
 
   @Override
-  public List<Opal.BookmarkDto> getBookmarks() {
-    List<Opal.BookmarkDto> dtos = new ArrayList<>();
-    for(Bookmark bookmark : getSubjectProfile().getBookmarks()) {
-      dtos.add(Dtos.asDto(bookmark));
-    }
-    return dtos;
+  public void setPath(String path) {
+    this.path = path;
   }
 
   @Override
-  public BookmarkResource getBookmark(String path) {
-    BookmarkResource resource = applicationContext.getBean("bookmarkResource", BookmarkResource.class);
-    resource.setPrincipal(principal);
-    resource.setPath(path);
-    return resource;
+  public Response get() {
+    Bookmark bookmark = getBookmark();
+    return bookmark == null
+        ? Response.status(Response.Status.NOT_FOUND).build()
+        : Response.ok().entity(Dtos.asDto(bookmark)).build();
   }
 
   @Override
-  public Response addBookmarks(List<String> resources) {
+  public Response delete() {
     SubjectProfile subjectProfile = getSubjectProfile();
-    for(String resource : resources) {
-      subjectProfile.addBookmark(resource);
+    if(subjectProfile != null) {
+      for(Bookmark bookmark : subjectProfile.getBookmarks()) {
+        if(Objects.equals(bookmark.getResource(), path)) {
+          subjectProfile.getBookmarks().remove(bookmark);
+          //TODO save profile
+          break;
+        }
+      }
     }
-    //TODO save profile
+
     return Response.ok().build();
   }
 
+  @Nullable
   private SubjectProfile getSubjectProfile() {
     return subjectProfileService.getProfile(principal);
   }
+
+  @Nullable
+  private Bookmark getBookmark() {
+    SubjectProfile subjectProfile = getSubjectProfile();
+    if(subjectProfile == null) return null;
+    for(Bookmark bookmark : subjectProfile.getBookmarks()) {
+      if(Objects.equals(bookmark.getResource(), path)) return bookmark;
+    }
+    return null;
+  }
+
 }
