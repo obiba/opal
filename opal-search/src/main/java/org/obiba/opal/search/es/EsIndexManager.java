@@ -25,6 +25,7 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
+import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -97,7 +98,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
   @Override
   public boolean hasIndex(@NotNull ValueTable valueTable) {
     ClusterStateResponse resp = opalSearchService.getClient().admin().cluster().prepareState().execute().actionGet();
-    Map<String, MappingMetaData> mappings = resp.getState().metaData().index(getName()).mappings();
+    ImmutableOpenMap<String, MappingMetaData> mappings = resp.getState().metaData().index(getName()).mappings();
     return mappings.containsKey(getIndex(valueTable).getIndexName());
 
   }

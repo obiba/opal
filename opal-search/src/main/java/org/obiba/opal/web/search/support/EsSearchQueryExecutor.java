@@ -23,9 +23,9 @@ import org.codehaus.jettison.json.JSONObject;
 import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.collect.ImmutableMap;
+import org.elasticsearch.http.HttpRequest;
 import org.elasticsearch.rest.RestChannel;
 import org.elasticsearch.rest.RestResponse;
-import org.elasticsearch.rest.support.AbstractRestRequest;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.web.model.Search;
@@ -142,7 +142,7 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
     return queryJSON.toString();
   }
 
-  private static class EsRestRequest extends AbstractRestRequest {
+  private static class EsRestRequest extends HttpRequest {
 
     private final String body;
 
@@ -196,6 +196,11 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
     @Override
     public String header(String name) {
       return headers.get(name);
+    }
+
+    @Override
+    public Iterable<Map.Entry<String, String>> headers() {
+      return headers.entrySet();
     }
 
     @Override

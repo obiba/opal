@@ -29,9 +29,9 @@ import javax.ws.rs.core.UriBuilder;
 import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.collect.Maps;
+import org.elasticsearch.http.HttpRequest;
 import org.elasticsearch.rest.RestChannel;
 import org.elasticsearch.rest.RestResponse;
-import org.elasticsearch.rest.support.AbstractRestRequest;
 import org.elasticsearch.rest.support.RestUtils;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.ValueTable;
@@ -216,7 +216,7 @@ public class ValueTableIndexResource extends IndexResource {
     return Response.status(response.status().getStatus()).entity(entity).type(response.contentType()).build();
   }
 
-  private static class JaxRsRestRequest extends AbstractRestRequest {
+  private static class JaxRsRestRequest extends HttpRequest {
 
     private final String body;
 
@@ -280,6 +280,11 @@ public class ValueTableIndexResource extends IndexResource {
     @Override
     public String header(String name) {
       return headers.get(name);
+    }
+
+    @Override
+    public Iterable<Map.Entry<String, String>> headers() {
+      return headers.entrySet();
     }
 
     @Override

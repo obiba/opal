@@ -10,6 +10,7 @@
 package org.obiba.opal.web.search;
 
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
@@ -27,9 +28,9 @@ import javax.ws.rs.core.Response;
 import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.collect.Maps;
+import org.elasticsearch.http.HttpRequest;
 import org.elasticsearch.rest.RestChannel;
 import org.elasticsearch.rest.RestResponse;
-import org.elasticsearch.rest.support.AbstractRestRequest;
 import org.elasticsearch.rest.support.RestUtils;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +88,7 @@ public class EsResource {
     return Response.status(response.status().getStatus()).entity(entity).type(response.contentType()).build();
   }
 
-  private static class JaxRsRestRequest extends AbstractRestRequest {
+  private static class JaxRsRestRequest extends HttpRequest {
 
     private final String body;
 
@@ -144,6 +145,17 @@ public class EsResource {
     @Override
     public String header(String name) {
       return servletRequest.getHeader(name);
+    }
+
+    @Override
+    public Iterable<Map.Entry<String, String>> headers() {
+      Map<String, String> headers = Maps.newHashMap();
+      Enumeration<String> names = servletRequest.getHeaderNames();
+      while(names.hasMoreElements()) {
+        String name = names.nextElement();
+        headers.put(name, servletRequest.getHeader(name));
+      }
+      return headers.entrySet();
     }
 
     @Override
