@@ -9,52 +9,46 @@
 
   <g:FlowPanel>
     <o:WizardStep ui:field="methodStep">
-      <g:FlowPanel styleName="input">
-        <b:RadioButton ui:field="auto">
-          <ui:msg description="Automatically label">Automatically</ui:msg>
+      <g:FlowPanel>
+        <b:RadioButton ui:field="auto" name="method">
+        <ui:msg description="Automatically label">Automatically</ui:msg>
         </b:RadioButton>
-        <g:Label addStyleNames="small-top-margin indent">
-          <ui:msg description="Automatically description label">Similar distinct values will be grouped together.
+        <b:HelpBlock addStyleNames="small-top-margin indent">
+        <ui:msg description="Automatically description label">Similar distinct values will be grouped together.
           </ui:msg>
-        </g:Label>
+        </b:HelpBlock>
       </g:FlowPanel>
-      <g:FlowPanel styleName="input">
-        <b:RadioButton ui:field="manual">
-          <ui:msg description="Manually label">Manually</ui:msg>
+      <g:FlowPanel>
+        <b:RadioButton ui:field="manual" name="method">
+        <ui:msg description="Manually label">Manually</ui:msg>
         </b:RadioButton>
-        <g:Label addStyleNames="small-top-margin indent">
-          <ui:msg description="Manual value mapping description label">No predefined value mapping.</ui:msg>
-        </g:Label>
+        <b:HelpBlock addStyleNames="small-top-margin indent">
+        <ui:msg description="Manual value mapping description label">No predefined value mapping.</ui:msg>
+        </b:HelpBlock>
       </g:FlowPanel>
     </o:WizardStep>
     <o:WizardStep ui:field="mapStep">
       <g:FlowPanel>
         <o:CollapsiblePanel ui:field="addPanel">
-          <g:Grid>
-            <g:row>
-              <g:customCell styleName="top">
-                <g:FlowPanel styleName="input block">
-                  <g:Label addStyleNames="key">
-                    <ui:msg description="Original Value label">Original Value</ui:msg>
-                  </g:Label>
-                  <g:SuggestBox ui:field="value"/>
-                </g:FlowPanel>
-              </g:customCell>
-              <g:customCell styleName="top small-indent">
-                <g:FlowPanel styleName="input block">
-                  <g:Label addStyleNames="key">
-                    <ui:msg description="New Value label">New Value</ui:msg>
-                  </g:Label>
-                  <g:TextBox ui:field="newValue"/>
-                </g:FlowPanel>
-              </g:customCell>
-            </g:row>
-            <g:row>
-              <g:customCell>
-                <g:Button ui:field="addButton" styleName="btn btn-info"/>
-              </g:customCell>
-            </g:row>
-          </g:Grid>
+
+          <b:FluidRow>
+            <b:Column size="6">
+              <g:Label>
+                <ui:msg description="Original Value label">Original Value</ui:msg>
+              </g:Label>
+              <g:SuggestBox ui:field="value"/>
+            </b:Column>
+
+            <b:Column size="6">
+              <g:Label>
+                <ui:msg description="New Value label">New Value</ui:msg>
+              </g:Label>
+              <g:TextBox ui:field="newValue"/>
+            </b:Column>
+          </b:FluidRow>
+
+          <g:Button ui:field="addButton" styleName="btn btn-info"/>
+
         </o:CollapsiblePanel>
         <o2:ValueMapGrid width="100%" ui:field="valuesMapGrid" pageSize="100" addStyleNames="top-margin"/>
       </g:FlowPanel>

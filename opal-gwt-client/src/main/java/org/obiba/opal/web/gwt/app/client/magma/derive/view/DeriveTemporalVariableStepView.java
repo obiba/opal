@@ -103,13 +103,8 @@ public class DeriveTemporalVariableStepView extends ViewImpl implements DeriveTe
     dateRangeColumn.setVisible(!enabled);
   }
 
-  @UiHandler("spanRadio")
+  @UiHandler({ "spanRadio", "rangeRadio" })
   void onSpanClick(ClickEvent event) {
-    setSpanEnabled(spanRadio.getValue());
-  }
-
-  @UiHandler("rangeRadio")
-  void onRangeClick(ClickEvent event) {
     setSpanEnabled(spanRadio.getValue());
   }
 

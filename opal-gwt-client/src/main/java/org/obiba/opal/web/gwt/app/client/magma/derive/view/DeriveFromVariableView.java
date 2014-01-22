@@ -12,12 +12,12 @@ package org.obiba.opal.web.gwt.app.client.magma.derive.view;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.BranchingWizardStepController;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.Skippable;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveFromVariablePresenter;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.TableChooser;
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.BranchingWizardStepController;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.Skippable;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
@@ -26,7 +26,6 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.HasChangeHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
@@ -49,10 +48,13 @@ public class DeriveFromVariableView extends ViewImpl implements DeriveFromVariab
   @UiField
   Chooser variableBox;
 
-@Inject
+  @Inject
   public DeriveFromVariableView(Binder uiBinder) {
     tableChooser = new TableChooser(false); // Single-select
+    tableChooser.setWidth("50em");
     initWidget(uiBinder.createAndBindUi(this));
+
+    variableBox.setWidth("50em");
   }
 
   @Override

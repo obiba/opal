@@ -18,15 +18,17 @@ import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
 
+import com.github.gwtbootstrap.client.ui.FluidRow;
 import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.UIObject;
@@ -112,6 +114,12 @@ public class DeriveNumericalVariableStepView extends ViewImpl implements DeriveN
   @UiField
   Panel summary;
 
+  @UiField
+  FluidRow rangesRow;
+
+  @UiField
+  FlowPanel alertPanel;
+
   //
   // Constructors
   //
@@ -119,68 +127,16 @@ public class DeriveNumericalVariableStepView extends ViewImpl implements DeriveN
   public DeriveNumericalVariableStepView() {
     widget = uiBinder.createAndBindUi(this);
 
-    initializeMethodForm();
     initializeValueMapEntryForm();
+
+    lengthRadio.setValue(true, true);
+    rangeRadio.setValue(true, true);
+    addRangeRadio.setValue(true, true);
   }
 
   private void initializeValueMapEntryForm() {
-    addRangeRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<Boolean> event) {
-        setAddRangeEnabled(true);
-      }
-    });
-
-    addDiscreteRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<Boolean> event) {
-        setAddRangeEnabled(false);
-      }
-    });
-
-    addRangeRadio.setValue(true, true);
     valuesMapGrid.enableRowDeletion(true);
     addPanel.setText(translations.addValueMapping());
-  }
-
-  private void initializeMethodForm() {
-    rangeRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<Boolean> event) {
-        setRangeEnabled(true);
-      }
-    });
-
-    ValueChangeHandler<Boolean> rangeDisable = new ValueChangeHandler<Boolean>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<Boolean> event) {
-        setRangeEnabled(false);
-      }
-    };
-
-    discreteRadio.addValueChangeHandler(rangeDisable);
-    manualRadio.addValueChangeHandler(rangeDisable);
-
-    lengthRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-      @Override
-      public void onValueChange(ValueChangeEvent<Boolean> event) {
-        setLengthEnabled(true);
-      }
-    });
-
-    countRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-      @Override
-      public void onValueChange(ValueChangeEvent<Boolean> event) {
-        setLengthEnabled(false);
-      }
-    });
-
-    rangeRadio.setValue(true, true);
-    lengthRadio.setValue(true, true);
   }
 
   private void setAddRangeEnabled(boolean enabled) {
@@ -190,10 +146,7 @@ public class DeriveNumericalVariableStepView extends ViewImpl implements DeriveN
   }
 
   private void setRangeEnabled(boolean enabled) {
-    fromBox.setEnabled(enabled);
-    toBox.setEnabled(enabled);
-    lengthRadio.setEnabled(enabled);
-    countRadio.setEnabled(enabled);
+    rangesRow.setVisible(enabled);
     lengthBox.setEnabled(enabled && lengthRadio.getValue());
     countBox.setEnabled(enabled && countRadio.getValue());
   }
@@ -211,6 +164,21 @@ public class DeriveNumericalVariableStepView extends ViewImpl implements DeriveN
   @Override
   public DefaultWizardStepController.Builder getMapStepBuilder() {
     return DefaultWizardStepController.Builder.create(mapStep).title(translations.recodeNumericalMapStepTitle());
+  }
+
+  @UiHandler({ "rangeRadio", "discreteRadio", "manualRadio" })
+  void onRangeRadio(ClickEvent event) {
+    setRangeEnabled(rangeRadio.getValue());
+  }
+
+  @UiHandler({ "lengthRadio", "countRadio" })
+  void onLengthRadio(ClickEvent event) {
+    setLengthEnabled(lengthRadio.getValue());
+  }
+
+  @UiHandler({ "addRangeRadio", "addDiscreteRadio" })
+  void onAddRadio(ClickEvent event) {
+    setAddRangeEnabled(addRangeRadio.getValue());
   }
 
   //
@@ -235,7 +203,7 @@ public class DeriveNumericalVariableStepView extends ViewImpl implements DeriveN
     addToBox.setText("");
     valueBox.setText("");
     newValueBox.setText("");
-    addRangeRadio.setValue(true, true);
+//    addRangeRadio.setValue(true, true);
     addPanel.setOpen(false);
     // populates
     valuesMapGrid.populate(valuesMap, derivedCategories);

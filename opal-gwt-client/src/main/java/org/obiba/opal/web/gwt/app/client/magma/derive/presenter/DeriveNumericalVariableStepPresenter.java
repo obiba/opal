@@ -138,7 +138,7 @@ public class DeriveNumericalVariableStepPresenter
         validateRangeForm(errorMessages);
       }
       if(!errorMessages.isEmpty()) {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorMessages).build());
+        fireEvent(NotificationEvent.newBuilder().error(errorMessages).build());
       }
       return errorMessages.isEmpty();
     }
