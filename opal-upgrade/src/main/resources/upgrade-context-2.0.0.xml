@@ -46,7 +46,7 @@
 
   <bean id="subjectAclService" class="org.obiba.opal.core.service.security.DefaultSubjectAclService"/>
 
-  <bean id="subjectProfileService" class="org.obiba.opal.core.service.DefaultSubjectProfileServiceImpl"/>
+  <bean id="subjectProfileService" class="org.obiba.opal.core.service.SubjectProfileServiceImpl"/>
 
   <bean id="projectsKeyStoreService" class="org.obiba.opal.core.service.security.ProjectsKeyStoreServiceImpl"/>
 
