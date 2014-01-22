@@ -47,7 +47,7 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
   private DatabaseDto databaseDto;
 
   @Inject
-  public IdentifiersDatabasePresenter(Display display, EventBus eventBus,
+  public IdentifiersDatabasePresenter(EventBus eventBus, Display display,
       ModalProvider<SqlDatabaseModalPresenter> sqlDatabaseModalProvider,
       ModalProvider<MongoDatabaseModalPresenter> mongoDatabaseModalProvider) {
     super(eventBus, display);

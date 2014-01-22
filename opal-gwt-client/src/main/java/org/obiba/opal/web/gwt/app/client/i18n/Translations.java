@@ -333,7 +333,9 @@ public interface Translations extends Constants {
       "DuplicateDatasourceName", "The datasource name is already in use. Please choose another.", //
       "UnknownError", "An unknown error has occurred.", //
       "InternalError", "An internal error has occurred. Please contact technical support.", //
-      "UnhandledException", "An internal error has occurred. Please contact technical support and provide the following system error:<br /><br /><pre>{0}</pre>", //
+      "UnhandledException",
+      "An internal error has occurred. Please contact technical support and provide the following system error:<br /><br /><pre>{0}</pre>",
+      //
       "DatasourceNameDisallowedChars", "Datasource names cannot contain colon or period characters.", //
       "ViewNameDisallowedChars", "View names cannot contain colon or period characters.", //
       "CSVFileRequired", "A CSV file is required.", //
@@ -2110,4 +2112,12 @@ public interface Translations extends Constants {
   @Description("Variable Import Failed Error message")
   @DefaultStringValue("Failed to import dictionary. Please make sure the file contains valid data.")
   String variableImportFailed();
+
+  @Description("Click to remove it from your bookmarks label")
+  @DefaultStringValue("Click to remove it from your bookmarks")
+  String clickToRemoveFromBookmarks();
+
+  @Description("Click to add it to your bookmarks label")
+  @DefaultStringValue("Click to add it to your bookmarks")
+  String clickToAddToBookmarks();
 }
