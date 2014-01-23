@@ -10,6 +10,7 @@
 package org.obiba.opal.r;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -64,8 +65,7 @@ public class MagmaAssignROperation extends AbstractROperation {
   private final Set<MagmaRConverter> magmaRConverters = Sets
       .newHashSet(new DatasourceRConverter(), new ValueTableRConverter(), new VariableRConverter());
 
-  public MagmaAssignROperation(String symbol, String path, String variableFilter,
-      boolean withMissings) {
+  public MagmaAssignROperation(String symbol, String path, String variableFilter, boolean withMissings) {
     if(symbol == null) throw new IllegalArgumentException("symbol cannot be null");
     if(path == null) throw new IllegalArgumentException("path cannot be null");
     this.symbol = symbol;
@@ -94,7 +94,7 @@ public class MagmaAssignROperation extends AbstractROperation {
     return entities;
   }
 
-  private void setEntities(SortedSet<VariableEntity> entities) {
+  private void setEntities(Collection<VariableEntity> entities) {
     this.entities = ImmutableSortedSet.copyOf(entities);
   }
 

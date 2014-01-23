@@ -25,7 +25,6 @@ import org.obiba.opal.web.magma.DatasourceResource;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Projects;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 import static org.obiba.opal.web.model.Projects.ProjectDto;
@@ -91,7 +90,7 @@ public class Dtos {
     Set<String> ids = Sets.newHashSet();
     for(ValueTable table : project.getDatasource().getValueTables()) {
       tableCount++;
-      variablesCount = variablesCount + Iterables.size(table.getVariables());
+      variablesCount = variablesCount + table.getVariableCount();
       for(VariableEntity entity : table.getVariableEntities()) {
         ids.add(entity.getType() + ":" + entity.getIdentifier());
       }

@@ -174,7 +174,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
     protected EsIndexer(@NotNull ValueTable table, @NotNull EsValueTableIndex index) {
       valueTable = table;
       this.index = index;
-      total = valueTable.getVariableEntities().size();
+      total = valueTable.getVariableEntityCount();
     }
 
     @Override

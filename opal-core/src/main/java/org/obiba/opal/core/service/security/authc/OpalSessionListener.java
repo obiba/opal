@@ -38,20 +38,22 @@ public class OpalSessionListener implements SessionListener {
     Subject subject = SecurityUtils.getSubject();
     Object principal = subject.getPrincipal();
 
-    if(subjectProfileService.supportProfile(principal)) {
-      Session subjectSession = subject.getSession(false);
-      boolean ensuredProfile = subjectSession != null && subjectSession.getAttribute(ENSURED_PROFILE) != null;
-      if(!ensuredProfile) {
-        String username = principal.toString();
-        log.info("Ensure HOME folder for {}", username);
-        subjectProfileService.ensureProfile(subject.getPrincipals());
-        ensureUserHomeExists(username);
-        ensureFolderPermissions(username, "/home/" + username);
-        ensureFolderPermissions(username, "/tmp");
+    if(!subjectProfileService.supportProfile(principal)) {
+      return;
+    }
 
-        if(subjectSession != null) {
-          subjectSession.setAttribute(ENSURED_PROFILE, true);
-        }
+    Session subjectSession = subject.getSession(false);
+    boolean ensuredProfile = subjectSession != null && subjectSession.getAttribute(ENSURED_PROFILE) != null;
+    if(!ensuredProfile) {
+      String username = principal.toString();
+      log.info("Ensure HOME folder for {}", username);
+      subjectProfileService.ensureProfile(subject.getPrincipals());
+      ensureUserHomeExists(username);
+      ensureFolderPermissions(username, "/home/" + username);
+      ensureFolderPermissions(username, "/tmp");
+
+      if(subjectSession != null) {
+        subjectSession.setAttribute(ENSURED_PROFILE, true);
       }
     }
   }

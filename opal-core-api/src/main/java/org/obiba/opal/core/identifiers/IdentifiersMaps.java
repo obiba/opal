@@ -117,7 +117,7 @@ public class IdentifiersMaps implements Iterable<IdentifiersMaps.IdentifiersMap>
       private final Iterator<Value> privateIdentifiers;
 
       {
-        TreeSet<VariableEntity> entities = new TreeSet<VariableEntity>(identifiersTable.getVariableEntities());
+        TreeSet<VariableEntity> entities = new TreeSet<>(identifiersTable.getVariableEntities());
 
         privateIdentifiers = identifiersTable.hasVariable(idMapping)
             ? identifiersTable.getVariableValueSource(idMapping).asVectorSource().getValues(entities).iterator()

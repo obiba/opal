@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.core.magma;
 
-import java.util.Set;
-
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
@@ -94,8 +92,7 @@ public class IdentifiersMappingViewTest {
   @Test
   public void test_getVariableEntities_returnsPrivateIdentifiers() {
     IdentifiersMappingView fuv = createViewOnOpalDataTable();
-    Set<VariableEntity> entities = fuv.getVariableEntities();
-    for(VariableEntity entity : entities) {
+    for(VariableEntity entity : fuv.getVariableEntities()) {
       assertThat(entity.getIdentifier().contains("private")).isTrue();
     }
   }
@@ -103,8 +100,7 @@ public class IdentifiersMappingViewTest {
   @Test
   public void test_getVariableEntities_returnsPublicIdentifiers() {
     IdentifiersMappingView fuv = createViewOnUnitDataTable();
-    Set<VariableEntity> entities = fuv.getVariableEntities();
-    for(VariableEntity entity : entities) {
+    for(VariableEntity entity : fuv.getVariableEntities()) {
       assertThat(entity.getIdentifier().contains("private")).isFalse();
     }
   }

@@ -34,8 +34,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Iterables;
-
 /**
  *
  */
@@ -84,7 +82,7 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   @Override
   public boolean hasEntities() {
     for(ValueTable table : getDatasource().getValueTables()) {
-      if(!Iterables.isEmpty(table.getVariableEntities())) return true;
+      if(table.getVariableEntityCount() > 0) return true;
     }
     return false;
   }
