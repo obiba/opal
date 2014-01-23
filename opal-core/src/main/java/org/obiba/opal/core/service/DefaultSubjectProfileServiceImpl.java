@@ -17,8 +17,10 @@ import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
 import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.subject.Subject;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.obiba.opal.core.domain.security.SubjectProfile;
+import org.obiba.opal.core.service.security.realm.BackgroundJobRealm;
+import org.obiba.opal.core.service.security.realm.SudoRealm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +46,13 @@ public class DefaultSubjectProfileServiceImpl implements SubjectProfileService {
   }
 
   @Override
+  public boolean supportProfile(@Nullable Object principal) {
+    return principal != null && //
+        !(principal instanceof BackgroundJobRealm.SystemPrincipal) && //
+        !(principal instanceof SudoRealm.SudoPrincipal);
+  }
+
+  @Override
   public void ensureProfile(@NotNull String principal, @NotNull String realm) {
     log.debug("ensure profile of user {} from realm: {}", principal, realm);
 
@@ -59,9 +68,9 @@ public class DefaultSubjectProfileServiceImpl implements SubjectProfileService {
   }
 
   @Override
-  public void ensureProfile(@NotNull Subject subject) {
-    String principal = subject.getPrincipal().toString();
-    String realm = subject.getPrincipals().getRealmNames().iterator().next();
+  public void ensureProfile(@NotNull PrincipalCollection principalCollection) {
+    String principal = principalCollection.getPrimaryPrincipal().toString();
+    String realm = principalCollection.getRealmNames().iterator().next();
     ensureProfile(principal, realm);
   }
 

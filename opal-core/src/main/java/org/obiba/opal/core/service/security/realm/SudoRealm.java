@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.core.service.security.realm;
 
+import java.io.Serializable;
+
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -51,7 +53,7 @@ public class SudoRealm extends AuthorizingRealm {
   }
 
   @SuppressWarnings({ "ClassMayBeInterface", "EmptyClass" })
-  public static class SudoPrincipal {
-
+  public static class SudoPrincipal implements Serializable {
+    private static final long serialVersionUID = -5315801516710903139L;
   }
 }

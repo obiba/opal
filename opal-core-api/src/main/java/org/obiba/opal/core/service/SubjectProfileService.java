@@ -13,13 +13,15 @@ package org.obiba.opal.core.service;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-import org.apache.shiro.subject.Subject;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.obiba.opal.core.domain.security.SubjectProfile;
 
 /**
  * Service to handle the profile of subjects.
  */
 public interface SubjectProfileService extends SystemService {
+
+  boolean supportProfile(@Nullable Object principal);
 
   /**
    * Add or check profile of the subject: check will fail if a subject from a different realm has already a profile entry.
@@ -33,7 +35,7 @@ public interface SubjectProfileService extends SystemService {
    *
    * @param subject
    */
-  void ensureProfile(@NotNull Subject subject);
+  void ensureProfile(@NotNull PrincipalCollection principalCollection);
 
   /**
    * Delete profile.

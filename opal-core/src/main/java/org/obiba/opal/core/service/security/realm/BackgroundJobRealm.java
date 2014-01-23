@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.core.service.security.realm;
 
+import java.io.Serializable;
+
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -48,9 +50,11 @@ public class BackgroundJobRealm extends AuthorizingRealm {
     return info;
   }
 
-  public static class SystemPrincipal {
+  public static class SystemPrincipal implements Serializable {
 
     public static final String PRINCIPAL = "opal/system";
+
+    private static final long serialVersionUID = 7918271769058954770L;
 
     @Override
     public String toString() {

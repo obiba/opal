@@ -16,11 +16,11 @@ import org.obiba.opal.core.magma.math.ContinuousVariableSummary;
 import org.obiba.opal.core.magma.math.ContinuousVariableSummaryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
-import com.google.common.io.Resources;
 
 @Component
 public class CachedVariableStatsService implements VariableStatsService {
@@ -30,17 +30,14 @@ public class CachedVariableStatsService implements VariableStatsService {
   @org.springframework.beans.factory.annotation.Value("${org.obiba.opal.cache.variableSummaries}")
   private boolean cacheSummaries;
 
-  private final CacheManager cacheManager;
+  @Autowired
+  private CacheManager cacheManager;
 
-  private final ContinuousVariableSummaryCachedService continuousSummaryService;
+  private final ContinuousVariableSummaryCachedService continuousSummaryService
+      = new ContinuousVariableSummaryCachedService();
 
-  private final CategoricalVariableSummaryCachedService categoricalSummaryService;
-
-  public CachedVariableStatsService() {
-    cacheManager = CacheManager.create(Resources.getResource("ehcache.xml"));
-    continuousSummaryService = new ContinuousVariableSummaryCachedService();
-    categoricalSummaryService = new CategoricalVariableSummaryCachedService();
-  }
+  private final CategoricalVariableSummaryCachedService categoricalSummaryService
+      = new CategoricalVariableSummaryCachedService();
 
   @Override
   public void stackVariable(@NotNull ValueTable valueTable, @NotNull Variable variable, @NotNull Value value) {

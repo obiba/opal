@@ -14,6 +14,8 @@ import java.util.Set;
 
 import javax.annotation.PreDestroy;
 
+import net.sf.ehcache.CacheManager;
+
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AbstractAuthenticator;
 import org.apache.shiro.authc.AuthenticationListener;
@@ -23,7 +25,7 @@ import org.apache.shiro.authz.permission.PermissionResolver;
 import org.apache.shiro.authz.permission.PermissionResolverAware;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.authz.permission.RolePermissionResolverAware;
-import org.apache.shiro.cache.MemoryConstrainedCacheManager;
+import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.DefaultSecurityManager;
@@ -31,8 +33,9 @@ import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.text.IniRealm;
 import org.apache.shiro.session.SessionListener;
-import org.apache.shiro.session.mgt.AbstractNativeSessionManager;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
+import org.apache.shiro.session.mgt.ExecutorServiceSessionValidationScheduler;
+import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.util.LifecycleUtils;
 import org.obiba.opal.core.service.security.realm.OpalPermissionResolver;
 import org.springframework.beans.factory.FactoryBean;
@@ -46,6 +49,8 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
 
   public static final String INI_REALM = "opal-ini-realm";
 
+  private static final long SESSION_VALIDATION_INTERVAL = 3600000l; // 1 hour
+
   @Autowired
   private Set<Realm> realms;
 
@@ -58,7 +63,10 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
   @Autowired
   private RolePermissionResolver rolePermissionResolver;
 
-  private PermissionResolver permissionResolver = new OpalPermissionResolver();
+  @Autowired
+  private CacheManager cacheManager;
+
+  private final PermissionResolver permissionResolver = new OpalPermissionResolver();
 
   private SecurityManager securityManager;
 
@@ -100,15 +108,22 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
     }
 
     @Override
+    @SuppressWarnings("ChainOfInstanceofChecks")
     protected SecurityManager createDefaultInstance() {
       DefaultSecurityManager dsm = (DefaultSecurityManager) super.createDefaultInstance();
 
       if(dsm.getCacheManager() == null) {
-        dsm.setCacheManager(new MemoryConstrainedCacheManager());
+        EhCacheManager ehCacheManager = new EhCacheManager();
+        ehCacheManager.setCacheManager(cacheManager);
+        dsm.setCacheManager(ehCacheManager);
       }
 
       if(dsm.getSessionManager() instanceof DefaultSessionManager) {
-        ((AbstractNativeSessionManager) dsm.getSessionManager()).setSessionListeners(sessionListeners);
+        DefaultSessionManager sessionManager = (DefaultSessionManager) dsm.getSessionManager();
+        sessionManager.setSessionListeners(sessionListeners);
+        sessionManager.setSessionDAO(new EnterpriseCacheSessionDAO());
+        sessionManager.setSessionValidationScheduler(new ExecutorServiceSessionValidationScheduler());
+        sessionManager.setSessionValidationInterval(SESSION_VALIDATION_INTERVAL);
       }
 
       if(dsm.getAuthorizer() instanceof ModularRealmAuthorizer) {
@@ -122,7 +137,8 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
     }
 
     @Override
-    protected void applyRealmsToSecurityManager(Collection<Realm> shiroRealms, SecurityManager securityManager) {
+    protected void applyRealmsToSecurityManager(Collection<Realm> shiroRealms, @SuppressWarnings(
+        "ParameterHidesMemberVariable") SecurityManager securityManager) {
       super.applyRealmsToSecurityManager(ImmutableList.<Realm>builder().addAll(realms).addAll(shiroRealms).build(),
           securityManager);
     }

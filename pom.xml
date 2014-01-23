@@ -680,6 +680,11 @@
         <version>${shiro.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-ehcache</artifactId>
+        <version>${shiro.version}</version>
+      </dependency>
+      <dependency>
         <groupId>eu.flatwhite.shiro</groupId>
         <artifactId>shiro-extras</artifactId>
         <version>${shiro-extras.version}</version>

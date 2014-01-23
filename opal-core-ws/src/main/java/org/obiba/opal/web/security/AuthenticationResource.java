@@ -54,7 +54,6 @@ public class AuthenticationResource extends AbstractSecurityComponent {
       Subject subject = SecurityUtils.getSubject();
       subject.login(new UsernamePasswordToken(username, password));
       ThreadContext.bind(subject);
-      subjectProfileService.ensureProfile(subject);
     } catch(AuthenticationException e) {
       log.info("Authentication failure of user '{}' at ip: '{}': {}", username, servletRequest.getRemoteAddr(),
           e.getMessage());

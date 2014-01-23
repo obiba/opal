@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.core.domain.security;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
@@ -27,7 +28,7 @@ public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperti
 
     USER, GROUP;
 
-    public Subject subjectFor(String principal) {
+    public Subject subjectFor(@SuppressWarnings("ParameterHidesMemberVariable") String principal) {
       return new Subject(principal, this);
     }
   }
@@ -147,7 +148,9 @@ public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperti
         Objects.equal(permission, other.permission);
   }
 
-  public static class Subject implements Comparable<Subject> {
+  public static class Subject implements Comparable<Subject>, Serializable {
+
+    private static final long serialVersionUID = -4104563748622536925L;
 
     private final String principal;
 
@@ -186,14 +189,10 @@ public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperti
 
     @Override
     public boolean equals(Object obj) {
-      if(this == obj) {
-        return true;
-      }
-      if(obj == null || getClass() != obj.getClass()) {
-        return false;
-      }
-      final Subject other = (Subject) obj;
-      return Objects.equal(this.principal, other.principal) && Objects.equal(this.type, other.type);
+      if(this == obj) return true;
+      if(obj == null || getClass() != obj.getClass()) return false;
+      Subject other = (Subject) obj;
+      return Objects.equal(principal, other.principal) && Objects.equal(type, other.type);
     }
   }
 }
