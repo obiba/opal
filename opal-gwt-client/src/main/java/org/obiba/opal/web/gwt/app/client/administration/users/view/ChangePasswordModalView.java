@@ -10,10 +10,14 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.users.view;
 
+import java.util.Collection;
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.administration.users.presenter.ChangePasswordModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 
@@ -72,6 +76,12 @@ public class ChangePasswordModalView extends ModalPopupViewWithUiHandlers<Change
   @Override
   public void clearErrors() {
     modal.closeAlerts();
+  }
+
+  @Override
+  public void showError(String messageKey, List<String> args) {
+    modal.addAlert(TranslationsUtils.replaceArguments(translations.userMessageMap().get(messageKey), args),
+        AlertType.ERROR);
   }
 
   @Override
