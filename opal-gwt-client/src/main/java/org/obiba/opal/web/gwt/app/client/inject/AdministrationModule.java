@@ -70,10 +70,12 @@ import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.Taxonomi
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.TaxonomyEditModalView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.VocabularyEditView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.VocabularyView;
+import org.obiba.opal.web.gwt.app.client.administration.users.presenter.ChangePasswordModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectCredentialsAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectCredentialsPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectProfilePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectProfilesAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.users.view.ChangePasswordModalView;
 import org.obiba.opal.web.gwt.app.client.administration.users.view.SubjectCredentialsAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.users.view.SubjectCredentialsView;
 import org.obiba.opal.web.gwt.app.client.administration.users.view.SubjectProfileView;
@@ -139,6 +141,8 @@ public class AdministrationModule extends AbstractPresenterModule {
         SubjectProfilesAdministrationView.class, SubjectProfilesAdministrationPresenter.Proxy.class);
     bindPresenter(SubjectProfilePresenter.class, SubjectProfilePresenter.Display.class,
         SubjectProfileView.class, SubjectProfilePresenter.Proxy.class);
+    bindPresenterWidget(ChangePasswordModalPresenter.class, ChangePasswordModalPresenter.Display.class,
+        ChangePasswordModalView.class);
   }
 
   private void configureDatashield() {
