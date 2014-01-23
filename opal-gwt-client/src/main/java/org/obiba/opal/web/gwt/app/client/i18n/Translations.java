@@ -448,6 +448,8 @@ public interface Translations extends Constants {
       "IndexClearSelectAtLeastOne", "Select at least one index to clear.",//
       "IndexScheduleSelectAtLeastOne", "Select at least one index to schedule.",//
       "OldPasswordIsRequired", "Old password is required.",//
+      "OldPasswordMismatch", "Your old password is invalid.",//
+      "PasswordNotChanged", "You must choose a different password than your current password.",//
       "PasswordIsRequired", "A password is required.",//
       "CertificateIsRequired", "A certificate is required.",//
       "UsageIsRequired", "Database usage is required.",//
@@ -1951,10 +1953,6 @@ public interface Translations extends Constants {
   @Description("Password Changed message")
   @DefaultStringValue("Your password has been changed.")
   String passwordChanged();
-
-  @Description("Password Change Failed message")
-  @DefaultStringValue("Failed to change password. Please make sure to enter valid information. Contact your system administrator if the problem persists.")
-  String passwordChangeFailed();
 
   @Description("Default storage label")
   @DefaultStringValue("Default storage")
