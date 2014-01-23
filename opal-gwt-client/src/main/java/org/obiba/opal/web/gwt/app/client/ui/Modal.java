@@ -13,11 +13,11 @@ import com.github.gwtbootstrap.client.ui.base.HasType;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.BackdropType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
-import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
-import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
 import com.github.gwtbootstrap.client.ui.event.ShowEvent;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.DOM;
@@ -446,29 +446,29 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   }
 
   public void addAlert(String message, AlertType type) {
-    addAlert(message, type, (ClosedHandler<AlertBase>) null);
+    addAlert(message, type, (CloseHandler<AlertBase>) null);
   }
 
   public void addAlert(String message, AlertType type, final HasType<ControlGroupType> group) {
     group.setType(ControlGroupType.ERROR);
-    addAlert(message, type, new ClosedHandler<AlertBase>() {
+    addAlert(message, type, new CloseHandler<AlertBase>() {
       @Override
-      public void onClosed(ClosedEvent<AlertBase> event) {
+      public void onClose(CloseEvent<AlertBase> event) {
         group.setType(ControlGroupType.NONE);
       }
     });
   }
 
-  public void addAlert(String message, AlertType type, @Nullable final ClosedHandler<AlertBase> groupCloseHandler) {
+  public void addAlert(String message, AlertType type, @Nullable final CloseHandler<AlertBase> groupCloseHandler) {
     final Alert alert = new Alert(message);
     alert.setType(type);
     alert.setAnimation(true);
     alert.setClose(true);
-    alert.addClosedHandler(new ClosedHandler<AlertBase>() {
+    alert.addCloseHandler(new CloseHandler<AlertBase>() {
       @Override
-      public void onClosed(ClosedEvent<AlertBase> event) {
+      public void onClose(CloseEvent<AlertBase> event) {
         alert.removeFromParent();
-        if(groupCloseHandler != null) groupCloseHandler.onClosed(event);
+        if(groupCloseHandler != null) groupCloseHandler.onClose(event);
       }
     });
     addAlert(alert);

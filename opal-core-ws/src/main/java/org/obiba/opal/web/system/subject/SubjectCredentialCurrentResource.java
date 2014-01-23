@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.system.subject;
 
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -19,11 +20,12 @@ import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.service.security.SubjectCredentialsService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.Dtos;
-import org.obiba.opal.web.support.InvalidRequestException;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import com.google.common.base.Strings;
 
 @Component
 @Scope("request")
@@ -43,31 +45,24 @@ public class SubjectCredentialCurrentResource {
   }
 
   @PUT
+  @Path("/password")
   @NoAuthorization
-  public Response update(Opal.SubjectCredentialsDto dto) {
-    if(!getName().equals(dto.getName())) {
+  public Response updatePassword(@NotNull Opal.PasswordDto passwordDto) {
+
+    if(!getName().equals(passwordDto.getName())) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
     SubjectCredentials originalSubjectCredentials = getSubjectCredentials();
-    if (originalSubjectCredentials == null) return Response.status(Response.Status.NOT_FOUND).build();
+    if(originalSubjectCredentials == null) return Response.status(Response.Status.NOT_FOUND).build();
 
-    if (!dto.getAuthenticationType().toString().equals(originalSubjectCredentials.getAuthenticationType().name())) {
-      throw new InvalidRequestException("Authentication type cannot be changed");
-    }
+    String newPassword = Strings.nullToEmpty(passwordDto.getNewPassword());
 
-    switch(originalSubjectCredentials.getAuthenticationType()) {
-      case PASSWORD:
-        if(dto.hasPassword() && !dto.getPassword().isEmpty()) {
-          originalSubjectCredentials.setPassword(subjectCredentialsService.hashPassword(dto.getPassword()));
-        }
-        break;
-      case CERTIFICATE:
-        if(dto.hasCertificate() && !dto.getCertificate().isEmpty()) {
-          originalSubjectCredentials.setCertificate(dto.getCertificate().toByteArray());
-        }
-        break;
-    }
+    if(!isPasswordInfoValid(originalSubjectCredentials.getPassword(), Strings.nullToEmpty(passwordDto.getOldPassword()),
+        newPassword))
+      return Response.status(Response.Status.BAD_REQUEST).build();
+
+    originalSubjectCredentials.setPassword(subjectCredentialsService.hashPassword(newPassword));
     subjectCredentialsService.save(originalSubjectCredentials);
     return Response.ok().build();
   }
@@ -80,4 +75,9 @@ public class SubjectCredentialCurrentResource {
     return SecurityUtils.getSubject().getPrincipal().toString();
   }
 
+  private  boolean isPasswordInfoValid(String password, String oldPassword, String newPassword) {
+
+    return password.equals(subjectCredentialsService.hashPassword(oldPassword)) &&
+        !newPassword.isEmpty() && !oldPassword.equals(newPassword);
+  }
 }
