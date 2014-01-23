@@ -28,12 +28,10 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
-import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -41,9 +39,6 @@ import org.springframework.stereotype.Component;
 public class AuthenticationResource extends AbstractSecurityComponent {
 
   private static final Logger log = LoggerFactory.getLogger(AuthenticationResource.class);
-
-  @Autowired
-  private SubjectProfileService subjectProfileService;
 
   @POST
   @Path("/sessions")

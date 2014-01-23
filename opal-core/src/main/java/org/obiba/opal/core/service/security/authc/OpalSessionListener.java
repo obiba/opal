@@ -22,6 +22,8 @@ public class OpalSessionListener implements SessionListener {
 
   private static final String HOME_PERM = "FILES_SHARE";
 
+  private static final String ENSURED_PROFILE = "ensuredProfile";
+
   @Autowired
   private SubjectAclService subjectAclService;
 
@@ -35,14 +37,22 @@ public class OpalSessionListener implements SessionListener {
   public void onStart(Session session) {
     Subject subject = SecurityUtils.getSubject();
     Object principal = subject.getPrincipal();
-    //TODO add attribute in session to indicate we've already check profile in this session
+
     if(subjectProfileService.supportProfile(principal)) {
-      String username = principal.toString();
-      log.debug("Ensure HOME folder for {}", username);
-      subjectProfileService.ensureProfile(subject.getPrincipals());
-      ensureUserHomeExists(username);
-      ensureFolderPermissions(username, "/home/" + username);
-      ensureFolderPermissions(username, "/tmp");
+      Session subjectSession = subject.getSession(false);
+      boolean ensuredProfile = subjectSession != null && subjectSession.getAttribute(ENSURED_PROFILE) != null;
+      if(!ensuredProfile) {
+        String username = principal.toString();
+        log.info("Ensure HOME folder for {}", username);
+        subjectProfileService.ensureProfile(subject.getPrincipals());
+        ensureUserHomeExists(username);
+        ensureFolderPermissions(username, "/home/" + username);
+        ensureFolderPermissions(username, "/tmp");
+
+        if(subjectSession != null) {
+          subjectSession.setAttribute(ENSURED_PROFILE, true);
+        }
+      }
     }
   }
 
