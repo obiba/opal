@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.service.security.SubjectCredentialsService;
+import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.Dtos;
 import org.obiba.opal.web.ws.security.NoAuthorization;
@@ -27,10 +28,21 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
 
+import static org.obiba.opal.web.model.Ws.ClientErrorDto;
+
 @Component
 @Scope("request")
 @Path("/system/subject-credential/_current")
 public class SubjectCredentialCurrentResource {
+
+  private static final int MINIMUM_LEMGTH = 6;
+
+  private enum ValidationStatus {
+    PASSWORD_VALID,
+    OLD_PASSWORD_MISMATCH,
+    PASSWORD_NOT_CHANGED,
+    PASSWORD_TOO_SHORT
+  }
 
   @Autowired
   private SubjectCredentialsService subjectCredentialsService;
@@ -58,13 +70,35 @@ public class SubjectCredentialCurrentResource {
 
     String newPassword = Strings.nullToEmpty(passwordDto.getNewPassword());
 
-    if(!isPasswordInfoValid(originalSubjectCredentials.getPassword(), Strings.nullToEmpty(passwordDto.getOldPassword()),
-        newPassword))
-      return Response.status(Response.Status.BAD_REQUEST).build();
+    ValidationStatus status = validatePassword(originalSubjectCredentials.getPassword(),
+        Strings.nullToEmpty(passwordDto.getOldPassword()), newPassword);
 
-    originalSubjectCredentials.setPassword(subjectCredentialsService.hashPassword(newPassword));
-    subjectCredentialsService.save(originalSubjectCredentials);
-    return Response.ok().build();
+    if (ValidationStatus.PASSWORD_VALID == status) {
+      originalSubjectCredentials.setPassword(subjectCredentialsService.hashPassword(newPassword));
+      subjectCredentialsService.save(originalSubjectCredentials);
+      return Response.ok().build();
+    }
+
+    return Response.status(Response.Status.BAD_REQUEST).entity(createClientErrorDto(status)).build();
+  }
+
+  private ClientErrorDto createClientErrorDto(ValidationStatus status) {
+    ClientErrorDto dto = ClientErrorDto.getDefaultInstance();
+
+    switch (status) {
+      case OLD_PASSWORD_MISMATCH:
+        dto = ClientErrorDtos.getErrorMessage(Response.Status.BAD_REQUEST, "OldPasswordMismatch").build();
+        break;
+      case PASSWORD_TOO_SHORT:
+        dto = ClientErrorDtos.getErrorMessage(Response.Status.BAD_REQUEST, "PasswordLengthMin")
+            .addArguments(String.valueOf(MINIMUM_LEMGTH)).build();
+        break;
+      case PASSWORD_NOT_CHANGED:
+        dto = ClientErrorDtos.getErrorMessage(Response.Status.BAD_REQUEST, "PasswordNotChanged").build();
+        break;
+    }
+
+    return dto;
   }
 
   private SubjectCredentials getSubjectCredentials() {
@@ -75,9 +109,19 @@ public class SubjectCredentialCurrentResource {
     return SecurityUtils.getSubject().getPrincipal().toString();
   }
 
-  private  boolean isPasswordInfoValid(String password, String oldPassword, String newPassword) {
+  private ValidationStatus validatePassword(String password, String oldPassword, String newPassword) {
+    if (!password.equals(subjectCredentialsService.hashPassword(oldPassword))) {
+      return ValidationStatus.OLD_PASSWORD_MISMATCH;
+    }
 
-    return password.equals(subjectCredentialsService.hashPassword(oldPassword)) &&
-        !newPassword.isEmpty() && !oldPassword.equals(newPassword);
+    if (newPassword.length() < MINIMUM_LEMGTH) {
+      return ValidationStatus.PASSWORD_TOO_SHORT;
+    }
+
+    if (oldPassword.equals(newPassword)) {
+      return ValidationStatus.PASSWORD_NOT_CHANGED;
+    }
+
+    return ValidationStatus.PASSWORD_VALID;
   }
 }

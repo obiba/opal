@@ -11,6 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.administration.users.presenter;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -18,16 +19,18 @@ import javax.annotation.Nullable;
 import org.obiba.opal.web.gwt.app.client.administration.users.support.PasswordFieldValidators;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
-import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.PasswordDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -64,18 +67,18 @@ public class ChangePasswordModalPresenter extends ModalPresenterWidget<ChangePas
           .withCallback(SC_OK, new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
+              getView().close();
               fireEvent(NotificationEvent.newBuilder().info(translations.passwordChanged()).build());
             }
           }) //
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
-              fireEvent(NotificationEvent.newBuilder().error(translations.passwordChangeFailed()).build());
+              ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
+              getView().showError(errorDto.getStatus(), JsArrays.toList(errorDto.getArgumentsArray()));
             }
           }, SC_BAD_REQUEST, SC_BAD_REQUEST) //
           .put().send();
-
-      getView().close();
     }
   }
 
@@ -91,6 +94,7 @@ public class ChangePasswordModalPresenter extends ModalPresenterWidget<ChangePas
     }
 
     void clearErrors();
+    void showError(String messageKey, List<String> args);
     void showError(@Nullable FormField formField, String message);
     HasText getOldPassword();
     HasText getNewPassword();
