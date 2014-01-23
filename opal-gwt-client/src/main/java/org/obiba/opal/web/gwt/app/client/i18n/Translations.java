@@ -447,6 +447,7 @@ public interface Translations extends Constants {
       "IdentifiersImportationFailed", "Identifiers importation failed: {0}.",//
       "IndexClearSelectAtLeastOne", "Select at least one index to clear.",//
       "IndexScheduleSelectAtLeastOne", "Select at least one index to schedule.",//
+      "OldPasswordIsRequired", "Old password is required.",//
       "PasswordIsRequired", "A password is required.",//
       "CertificateIsRequired", "A certificate is required.",//
       "UsageIsRequired", "Database usage is required.",//
@@ -1713,6 +1714,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("File Upload")
   String uploadFileModalTitle();
 
+  @Description("Change Password Modal title")
+  @DefaultStringValue("Change Password")
+  String changePasswordModalTitle();
+
   @Description("Entity Details Modal title")
   @DefaultStringValue("Entity Details")
   String entityDetailsModalTitle();
@@ -1942,6 +1947,14 @@ public interface Translations extends Constants {
   @Description("Authentication Failed message")
   @DefaultStringValue("Authentication failed")
   String authFailed();
+
+  @Description("Password Changed message")
+  @DefaultStringValue("Your password has been changed.")
+  String passwordChanged();
+
+  @Description("Password Change Failed message")
+  @DefaultStringValue("Failed to change password. Please make sure to enter valid information. Contact your system administrator if the problem persists.")
+  String passwordChangeFailed();
 
   @Description("Default storage label")
   @DefaultStringValue("Default storage")

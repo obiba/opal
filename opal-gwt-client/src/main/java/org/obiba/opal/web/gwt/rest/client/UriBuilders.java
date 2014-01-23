@@ -325,6 +325,14 @@ public enum UriBuilders {
     }
   },
 
+  SUBJECT_CREDENTIAL_PASSWORD_UPDATE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "subject-credential", "_current", "password");
+
+    }
+  },
+
   GROUPS {
     @Override
     public UriBuilder create() {
