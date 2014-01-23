@@ -2,6 +2,7 @@ package org.obiba.opal.web.gwt.app.client.administration.users.presenter;
 
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -24,16 +25,19 @@ import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 public class SubjectProfilePresenter extends Presenter<SubjectProfilePresenter.Display, SubjectProfilePresenter.Proxy>
     implements SubjectProfileUiHandlers {
 
+  private SubjectProfileDto profile;
+
   @ProxyStandard
   @NameToken(Places.PROFILE)
   public interface Proxy extends ProxyPlace<SubjectProfilePresenter> {}
 
-  private final RequestCredentials credentials;
+  private final ModalProvider<ChangePasswordModalPresenter> changePasswordModalProvider;
 
   @Inject
-  public SubjectProfilePresenter(EventBus eventBus, Display display, Proxy proxy, RequestCredentials credentials) {
+  public SubjectProfilePresenter(EventBus eventBus, Display display, Proxy proxy,
+      ModalProvider<ChangePasswordModalPresenter> changePasswordProvider) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
-    this.credentials = credentials;
+    changePasswordModalProvider = changePasswordProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -45,6 +49,7 @@ public class SubjectProfilePresenter extends Presenter<SubjectProfilePresenter.D
           @Override
           public void onResource(Response response, SubjectProfileDto resource) {
             if(response.getStatusCode() == Response.SC_OK) {
+              profile = resource;
               getView().enableChangePassword("opal-user-realm".equals(resource.getRealm()), resource.getRealm());
             } else {
               getView().enableChangePassword(false, "?");
@@ -56,7 +61,7 @@ public class SubjectProfilePresenter extends Presenter<SubjectProfilePresenter.D
 
   @Override
   public void onChangePassword() {
-    //TODO
+    changePasswordModalProvider.get().setPrincipal(profile.getPrincipal());
   }
 
   public interface Display extends View, HasUiHandlers<SubjectProfileUiHandlers> {

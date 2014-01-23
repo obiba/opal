@@ -14,10 +14,10 @@ import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.base.AlertBase;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
-import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
-import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
 
 public class ConstrainedModal {
 
@@ -101,9 +101,9 @@ public class ConstrainedModal {
           final ControlGroup group = constrainedWidget.getGroup();
           if(group != null) group.setType(ControlGroupType.ERROR);
           modal.addAlert(constrainedWidget.getPropertyLabel() + " " +
-              validationMessageResolver.get(messageTemplate), AlertType.ERROR, new ClosedHandler<AlertBase>() {
+              validationMessageResolver.get(messageTemplate), AlertType.ERROR, new CloseHandler<AlertBase>() {
             @Override
-            public void onClosed(ClosedEvent<AlertBase> event) {
+            public void onClose(CloseEvent<AlertBase> event) {
               if(group != null) group.setType(ControlGroupType.NONE);
             }
           });
