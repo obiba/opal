@@ -40,6 +40,7 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 
 import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
+import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 import static com.google.gwt.http.client.Response.SC_OK;
 
 public class ChangePasswordModalPresenter extends ModalPresenterWidget<ChangePasswordModalPresenter.Display>
@@ -77,7 +78,7 @@ public class ChangePasswordModalPresenter extends ModalPresenterWidget<ChangePas
               ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
               getView().showError(errorDto.getStatus(), JsArrays.toList(errorDto.getArgumentsArray()));
             }
-          }, SC_BAD_REQUEST, SC_BAD_REQUEST) //
+          }, SC_BAD_REQUEST, SC_NOT_FOUND) //
           .put().send();
     }
   }
