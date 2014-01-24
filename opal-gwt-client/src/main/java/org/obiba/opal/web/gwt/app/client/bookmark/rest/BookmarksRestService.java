@@ -23,7 +23,7 @@ import com.gwtplatform.dispatch.rest.shared.RestAction;
 import com.gwtplatform.dispatch.rest.shared.RestService;
 
 @Path("/system/subject-profile/_current/bookmarks")
-public interface CurrentUserBookmarksRestService extends RestService {
+public interface BookmarksRestService extends RestService {
 
   @GET
   RestAction<List<BookmarkDto>> getBookmarks();
