@@ -13,7 +13,7 @@
       diskPersistent="false"/>
 
   <cache name="opal-variable-summary-categorical"
-      maxElementsInMemory="5"
+      maxElementsInMemory="1"
       eternal="true"
       timeToLiveSeconds="0"
       timeToIdleSeconds="0"
@@ -21,7 +21,7 @@
       diskPersistent="true"/>
 
   <cache name="opal-variable-summary-continuous"
-      maxElementsInMemory="5"
+      maxElementsInMemory="1"
       eternal="true"
       timeToLiveSeconds="0"
       timeToIdleSeconds="0"
