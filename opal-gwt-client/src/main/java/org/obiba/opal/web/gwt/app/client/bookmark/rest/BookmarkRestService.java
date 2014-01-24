@@ -21,14 +21,14 @@ import com.gwtplatform.dispatch.rest.shared.RestAction;
 import com.gwtplatform.dispatch.rest.shared.RestService;
 
 @Path("/system/subject-profile/_current/bookmark")
-public interface CurrentUserBookmarkRestService extends RestService {
+public interface BookmarkRestService extends RestService {
 
   @GET
-  @Path("/{path:.*}")
+  @Path("/{path}")
   RestAction<BookmarkDto> getBookmark(@PathParam("path") String path);
 
   @DELETE
-  @Path("/{path:.*}")
+  @Path("/{path}")
   RestAction<Void> deleteBookmark(@PathParam("path") String path);
 
 }
