@@ -54,6 +54,15 @@ public interface SubjectCredentialsService extends SystemService {
       throws ConstraintViolationException, DuplicateSubjectProfileException;
 
   /**
+   * Changes the principal's current password
+   * @param principal the subject principal
+   * @param oldPassword the current password
+   * @param newPassword the new password
+   */
+  void changePassword(String principal, String oldPassword, String newPassword)
+      throws PasswordException, SubjectPrincipalNotFoundException;
+
+  /**
    * Deletes a subjectCredentials from subjectCredentials table and from subject_acl
    *
    * @param subjectCredentials

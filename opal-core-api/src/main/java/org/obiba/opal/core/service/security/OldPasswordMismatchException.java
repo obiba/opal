@@ -8,14 +8,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.system.subject;
+package org.obiba.opal.core.service.security;
 
-public class PasswordNotChangedException extends PasswordException {
+public class OldPasswordMismatchException extends PasswordException {
 
-  private static final long serialVersionUID = -4112553326905000542L;
+  private static final long serialVersionUID = -5745417960893425559L;
 
-  public PasswordNotChangedException() {
-    super("New password is identical to the current password");
+  public OldPasswordMismatchException() {
+    super("Invalid old password has been provided.");
   }
 
 }

@@ -8,20 +8,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.system.subject;
+package org.obiba.opal.core.service.security;
 
 public class PasswordTooShortException extends PasswordException {
 
   private static final long serialVersionUID = -3241347108574583631L;
 
-  private final int requiredSize;
-
   public PasswordTooShortException(int minSize) {
     super(String.format("Password is shorter than the required %d characters", minSize));
-    requiredSize = minSize;
   }
 
-  public int getRequiredSize() {
-    return requiredSize;
-  }
 }

@@ -46,6 +46,7 @@ import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType.USER;
 public class SubjectCredentialsServiceImpl implements SubjectCredentialsService {
 
   private static final String OPAL_DOMAIN = "opal";
+  private static final int MINIMUM_LEMGTH = 6;
 
   /**
    * Number of times the user password is hashed for attack resiliency
@@ -128,6 +129,33 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     if(newSubject) {
       ensureProfile(subjectCredentials);
     }
+  }
+
+  @Override
+  public void changePassword(String principal, String oldPassword, String newPassword)
+      throws PasswordException, SubjectPrincipalNotFoundException {
+    SubjectCredentials subjectCredentials = getSubjectCredentials(principal);
+
+    if (subjectCredentials == null) {
+      throw new SubjectPrincipalNotFoundException(principal);
+    }
+
+    String currentPassword = subjectCredentials.getPassword();
+
+    if (!currentPassword.equals(hashPassword(oldPassword))) {
+      throw new OldPasswordMismatchException();
+    }
+
+    if (newPassword.length() < MINIMUM_LEMGTH) {
+      throw new PasswordTooShortException(MINIMUM_LEMGTH);
+    }
+
+    if (oldPassword.equals(newPassword)) {
+      throw new PasswordNotChangedException();
+    }
+
+    subjectCredentials.setPassword(hashPassword(newPassword));
+    save(subjectCredentials);
   }
 
   /**

@@ -234,6 +234,53 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
     // TODO
   }
 
+  @Test(expected = SubjectPrincipalNotFoundException.class)
+  public void test_change_password_with_wrong_principal() {
+    subjectCredentialsService.changePassword("kuser", "password", "password");
+  }
+
+  @Test(expected = PasswordTooShortException.class)
+  public void test_change_password_with_short_password() {
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().authenticationType(
+        SubjectCredentials.AuthenticationType.PASSWORD).name("user1").password(
+            subjectCredentialsService.hashPassword("password")).build();
+
+    subjectCredentialsService.save(subjectCredentials);
+    subjectCredentialsService.changePassword("user1", "password", "pass");
+  }
+
+  @Test(expected = OldPasswordMismatchException.class)
+  public void test_change_password_with_old_password_mismatch() {
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().authenticationType(
+        SubjectCredentials.AuthenticationType.PASSWORD).name("user1").password(
+        subjectCredentialsService.hashPassword("password")).build();
+
+    subjectCredentialsService.save(subjectCredentials);
+    subjectCredentialsService.changePassword("user1", "password2", "password1");
+  }
+
+  @Test(expected = PasswordNotChangedException.class)
+  public void test_change_password_with_password_unchanged() {
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().authenticationType(
+        SubjectCredentials.AuthenticationType.PASSWORD).name("user1").password(
+        subjectCredentialsService.hashPassword("password")).build();
+
+    subjectCredentialsService.save(subjectCredentials);
+    subjectCredentialsService.changePassword("user1", "password", "password");
+  }
+
+  @Test
+  public void test_change_password_with_password_changed() {
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().authenticationType(
+        SubjectCredentials.AuthenticationType.PASSWORD).name("user1").password(
+        subjectCredentialsService.hashPassword("password")).build();
+
+    subjectCredentialsService.save(subjectCredentials);
+    subjectCredentialsService.changePassword("user1", "password", "password1");
+    SubjectCredentials subjectCredentials1 = subjectCredentialsService.getSubjectCredentials("user1");
+    assertThat(subjectCredentials1.getPassword().equals(subjectCredentialsService.hashPassword("password1"))).isTrue();
+  }
+
   private void assertSubjectEquals(SubjectCredentials expected, SubjectCredentials found) {
     assertThat(found).isNotNull();
     assertThat(found).isEqualTo(expected);
