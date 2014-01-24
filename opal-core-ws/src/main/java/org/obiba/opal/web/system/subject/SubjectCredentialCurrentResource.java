@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.system.subject;
 
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -19,16 +20,20 @@ import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.service.security.SubjectCredentialsService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.Dtos;
-import org.obiba.opal.web.support.InvalidRequestException;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Strings;
+
 @Component
 @Scope("request")
 @Path("/system/subject-credential/_current")
 public class SubjectCredentialCurrentResource {
+
+  private static final int MINIMUM_LEMGTH = 6;
+
 
   @Autowired
   private SubjectCredentialsService subjectCredentialsService;
@@ -43,32 +48,19 @@ public class SubjectCredentialCurrentResource {
   }
 
   @PUT
+  @Path("/password")
   @NoAuthorization
-  public Response update(Opal.SubjectCredentialsDto dto) {
-    if(!getName().equals(dto.getName())) {
+  public Response updatePassword(@NotNull Opal.PasswordDto passwordDto) {
+
+    if(!getName().equals(passwordDto.getName())) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
     SubjectCredentials originalSubjectCredentials = getSubjectCredentials();
-    if (originalSubjectCredentials == null) return Response.status(Response.Status.NOT_FOUND).build();
+    if(originalSubjectCredentials == null) return Response.status(Response.Status.NOT_FOUND).build();
 
-    if (!dto.getAuthenticationType().toString().equals(originalSubjectCredentials.getAuthenticationType().name())) {
-      throw new InvalidRequestException("Authentication type cannot be changed");
-    }
+    changePassword(originalSubjectCredentials, passwordDto);
 
-    switch(originalSubjectCredentials.getAuthenticationType()) {
-      case PASSWORD:
-        if(dto.hasPassword() && !dto.getPassword().isEmpty()) {
-          originalSubjectCredentials.setPassword(subjectCredentialsService.hashPassword(dto.getPassword()));
-        }
-        break;
-      case CERTIFICATE:
-        if(dto.hasCertificate() && !dto.getCertificate().isEmpty()) {
-          originalSubjectCredentials.setCertificate(dto.getCertificate().toByteArray());
-        }
-        break;
-    }
-    subjectCredentialsService.save(originalSubjectCredentials);
     return Response.ok().build();
   }
 
@@ -80,4 +72,24 @@ public class SubjectCredentialCurrentResource {
     return SecurityUtils.getSubject().getPrincipal().toString();
   }
 
+  private void changePassword(SubjectCredentials subjectCredentials, Opal.PasswordDto passwordDto) {
+    String currentPassword = subjectCredentials.getPassword();
+    String oldPassword = Strings.nullToEmpty(passwordDto.getOldPassword());
+    String newPassword = Strings.nullToEmpty(passwordDto.getNewPassword());
+
+    if (!currentPassword.equals(subjectCredentialsService.hashPassword(oldPassword))) {
+      throw new OldPasswordMismatchException();
+    }
+
+    if (newPassword.length() < MINIMUM_LEMGTH) {
+      throw new PasswordTooShortException(MINIMUM_LEMGTH);
+    }
+
+    if (oldPassword.equals(newPassword)) {
+      throw new PasswordNotChangedException();
+    }
+
+    subjectCredentials.setPassword(subjectCredentialsService.hashPassword(newPassword));
+    subjectCredentialsService.save(subjectCredentials);
+  }
 }
