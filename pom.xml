@@ -1737,7 +1737,7 @@
     <resteasy.version>3.0.6.Final</resteasy.version>
     <rhino-js.version>1.7R4</rhino-js.version>
     <shiro.version>1.2.2</shiro.version>
-    <shiro-extras.version>1.0.1-obiba</shiro-extras.version>
+    <shiro-extras.version>1.0.2-obiba</shiro-extras.version>
     <slf4j.version>1.7.5</slf4j.version>
     <spring.version>3.2.5.RELEASE</spring.version>
     <spring-batch.version>2.0.3.RELEASE</spring-batch.version>
