@@ -12,6 +12,7 @@ package org.obiba.opal.web.system.subject;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.core.Response;
 
 public interface BookmarkResource {
@@ -21,6 +22,7 @@ public interface BookmarkResource {
   void setPath(String path);
 
   @GET
+  @OPTIONS
   Response get();
 
   @DELETE

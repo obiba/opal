@@ -7,26 +7,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.provider;
+
+package org.obiba.opal.web.system.subject;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import org.obiba.opal.core.service.DuplicateSubjectProfileException;
+import org.obiba.opal.core.service.security.SubjectPrincipalNotFoundException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.springframework.stereotype.Component;
 
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 @Component
 @Provider
-public class DuplicateSubjectProfileExceptionMapper implements ExceptionMapper<DuplicateSubjectProfileException> {
+public class SubjectPrincipalNotFoundExceptionMapper implements ExceptionMapper<SubjectPrincipalNotFoundException> {
 
   @Override
-  public Response toResponse(DuplicateSubjectProfileException exception) {
-    return Response.status(BAD_REQUEST)
-        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DuplicateSubjectProfile", exception)).build();
+  public Response toResponse(SubjectPrincipalNotFoundException exception) {
+    return Response.status(NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(NOT_FOUND, "UserNotFound", exception))
+        .build();
   }
 
 }
+

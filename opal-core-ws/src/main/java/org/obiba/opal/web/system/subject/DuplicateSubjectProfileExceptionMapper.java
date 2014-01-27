@@ -7,14 +7,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-package org.obiba.opal.web.provider;
+package org.obiba.opal.web.system.subject;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import org.obiba.opal.core.service.security.PasswordTooShortException;
+import org.obiba.opal.core.service.DuplicateSubjectProfileException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.springframework.stereotype.Component;
 
@@ -22,11 +21,12 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
 @Provider
-public class PasswordTooShortExceptionMapper implements ExceptionMapper<PasswordTooShortException> {
-  @Override
-  public Response toResponse(PasswordTooShortException exception) {
-    return Response.status(BAD_REQUEST)
-        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "PasswordLengthMin", exception)).build();
-  }
-}
+public class DuplicateSubjectProfileExceptionMapper implements ExceptionMapper<DuplicateSubjectProfileException> {
 
+  @Override
+  public Response toResponse(DuplicateSubjectProfileException exception) {
+    return Response.status(BAD_REQUEST)
+        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DuplicateSubjectProfile", exception)).build();
+  }
+
+}

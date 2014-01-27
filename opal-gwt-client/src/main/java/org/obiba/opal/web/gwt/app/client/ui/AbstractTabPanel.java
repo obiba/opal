@@ -56,7 +56,7 @@ public class AbstractTabPanel extends FlowPanel
   }
 
   public void setHeading(int size, String text, String subtext) {
-    if (heading != null) menuPanel.remove(heading);
+    if(heading != null) menuPanel.remove(heading);
     heading = new Heading(size, text);
     heading.setSubtext(subtext);
     heading.addStyleName("inline-block small-right-indent");
@@ -131,6 +131,7 @@ public class AbstractTabPanel extends FlowPanel
     });
   }
 
+  @SuppressWarnings("ChainOfInstanceofChecks")
   protected NavWidget newListItem(Widget item, int beforeIndex) {
     if(item instanceof NavWidget) {
       return (NavWidget) item;
@@ -145,12 +146,12 @@ public class AbstractTabPanel extends FlowPanel
     contentContainer.insert(content, beforeIndex);
   }
 
-  public void add(Widget w, String text) {
-    add(w, new NavLink(text));
+  public void add(Widget widget, String text) {
+    add(widget, new NavLink(text));
   }
 
-  public void add(Widget w, HasClickHandlers item) {
-    insert(w, item, menu.getWidgetCount());
+  public void add(Widget widget, HasClickHandlers item) {
+    insert(widget, item, menu.getWidgetCount());
   }
 
   public void insert(Widget content, HasClickHandlers tab, int beforeIndex) {

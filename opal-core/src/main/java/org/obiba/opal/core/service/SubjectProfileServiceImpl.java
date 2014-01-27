@@ -11,15 +11,17 @@
 package org.obiba.opal.core.service;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
 import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.subject.Subject;
-import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.obiba.opal.core.domain.HasUniqueProperties;
+import org.obiba.opal.core.domain.security.Bookmark;
 import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.service.security.realm.BackgroundJobRealm;
 import org.obiba.opal.core.service.security.realm.SudoRealm;
@@ -56,14 +58,16 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   public void ensureProfile(@NotNull String principal, @NotNull String realm) {
     log.debug("ensure profile of user {} from realm: {}", principal, realm);
 
-    SubjectProfile profile = getProfile(principal);
-    if(profile == null) {
+    try {
+      SubjectProfile profile = getProfile(principal);
+      if(!profile.getRealm().equals(realm)) {
+        throw new AuthenticationException(
+            "Wrong realm for subject '" + principal + "': " + realm + " (" + profile.getRealm() +
+                " expected). Make sure the same subject is not defined in several realms.");
+      }
+    } catch(SubjectProfileNotFoundException e) {
       HasUniqueProperties newProfile = new SubjectProfile(principal, realm);
       orientDbService.save(newProfile, newProfile);
-    } else if(!profile.getRealm().equals(realm)) {
-      throw new AuthenticationException(
-          "Wrong realm for subject '" + principal + "': " + realm + " (" + profile.getRealm() +
-              " expected). Make sure the same subject is not defined in several realms.");
     }
   }
 
@@ -76,29 +80,53 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
 
   @Override
   public void deleteProfile(@NotNull String principal) {
-    SubjectProfile profile = getProfile(principal);
-    if(profile != null) {
-      orientDbService.delete(profile);
+    try {
+      orientDbService.delete(getProfile(principal));
+    } catch(SubjectProfileNotFoundException ignored) {
+      // ignore
     }
   }
 
-  @Nullable
+  @NotNull
   @Override
-  public SubjectProfile getProfile(@NotNull String principal) {
-    return orientDbService.findUnique(SubjectProfile.Builder.create(principal).build());
+  public SubjectProfile getProfile(@NotNull String principal) throws SubjectProfileNotFoundException {
+    SubjectProfile subjectProfile = orientDbService.findUnique(SubjectProfile.Builder.create(principal).build());
+    if(subjectProfile == null) {
+      throw new SubjectProfileNotFoundException(principal);
+    }
+    return subjectProfile;
   }
 
   @Override
-  public void updateProfile(@NotNull String principal) {
+  public void updateProfile(@NotNull String principal) throws SubjectProfileNotFoundException {
     SubjectProfile profile = getProfile(principal);
-    if(profile != null) {
-      profile.setUpdated(new Date());
-      orientDbService.save(profile, profile);
-    }
+    profile.setUpdated(new Date());
+    orientDbService.save(profile, profile);
   }
 
   @Override
   public Iterable<SubjectProfile> getProfiles() {
     return orientDbService.list(SubjectProfile.class);
+  }
+
+  @Override
+  public void addBookmarks(String principal, List<String> resources) throws SubjectProfileNotFoundException {
+    SubjectProfile profile = getProfile(principal);
+    for(String resource : resources) {
+      profile.addBookmark(resource);
+    }
+    orientDbService.save(profile, profile);
+  }
+
+  @Override
+  public void deleteBookmark(String principal, String path) throws SubjectProfileNotFoundException {
+    SubjectProfile profile = getProfile(principal);
+    for(Bookmark bookmark : profile.getBookmarks()) {
+      if(Objects.equals(bookmark.getResource(), path)) {
+        profile.getBookmarks().remove(bookmark);
+        orientDbService.save(profile, profile);
+        return;
+      }
+    }
   }
 }

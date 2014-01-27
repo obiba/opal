@@ -16,7 +16,6 @@ import javax.annotation.Nullable;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.security.Bookmark;
-import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.web.security.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,30 +54,13 @@ public class BookmarkResourceImpl implements BookmarkResource {
 
   @Override
   public Response delete() {
-    SubjectProfile subjectProfile = getSubjectProfile();
-    if(subjectProfile != null) {
-      for(Bookmark bookmark : subjectProfile.getBookmarks()) {
-        if(Objects.equals(bookmark.getResource(), path)) {
-          subjectProfile.getBookmarks().remove(bookmark);
-          //TODO save profile
-          break;
-        }
-      }
-    }
-
+    subjectProfileService.deleteBookmark(principal, path);
     return Response.ok().build();
   }
 
   @Nullable
-  private SubjectProfile getSubjectProfile() {
-    return subjectProfileService.getProfile(principal);
-  }
-
-  @Nullable
   private Bookmark getBookmark() {
-    SubjectProfile subjectProfile = getSubjectProfile();
-    if(subjectProfile == null) return null;
-    for(Bookmark bookmark : subjectProfile.getBookmarks()) {
+    for(Bookmark bookmark : subjectProfileService.getProfile(principal).getBookmarks()) {
       if(Objects.equals(bookmark.getResource(), path)) return bookmark;
     }
     return null;

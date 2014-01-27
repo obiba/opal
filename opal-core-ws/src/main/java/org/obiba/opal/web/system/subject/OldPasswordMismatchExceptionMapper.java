@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.provider;
+package org.obiba.opal.web.system.subject;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -22,11 +22,13 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
 @Provider
-public class OldPasswordMistmatchExceptionMapper implements ExceptionMapper<OldPasswordMismatchException> {
+public class OldPasswordMismatchExceptionMapper implements ExceptionMapper<OldPasswordMismatchException> {
+
   @Override
   public Response toResponse(OldPasswordMismatchException exception) {
     return Response.status(BAD_REQUEST)
         .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "OldPasswordMismatch", exception)).build();
   }
+
 }
 
