@@ -7,18 +7,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.inject;
+package org.obiba.opal.web.gwt.app.client.permissions;
 
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.AddResourcePermissionModalPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.DeleteAllConfirmationModalPresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.UpdateResourcePermissionModalPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.view.AddResourcePermissionModalView;
 import org.obiba.opal.web.gwt.app.client.permissions.view.DeleteAllConfirmationModalView;
-import org.obiba.opal.web.gwt.app.client.project.view.ProjectPermissionsView;
 import org.obiba.opal.web.gwt.app.client.permissions.view.ResourcePermissionsView;
 import org.obiba.opal.web.gwt.app.client.permissions.view.UpdateResourcePermissionModalView;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.project.view.ProjectPermissionsView;
 
 import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 
@@ -33,8 +33,8 @@ public class PermissionsModule extends AbstractPresenterModule {
         ResourcePermissionsView.class);
     bindPresenterWidget(ProjectPermissionsPresenter.class, ProjectPermissionsPresenter.Display.class,
         ProjectPermissionsView.class);
-    bindPresenterWidget(UpdateResourcePermissionModalPresenter.class, UpdateResourcePermissionModalPresenter.Display.class,
-        UpdateResourcePermissionModalView.class);
+    bindPresenterWidget(UpdateResourcePermissionModalPresenter.class,
+        UpdateResourcePermissionModalPresenter.Display.class, UpdateResourcePermissionModalView.class);
     bindPresenterWidget(AddResourcePermissionModalPresenter.class, AddResourcePermissionModalPresenter.Display.class,
         AddResourcePermissionModalView.class);
     bindPresenterWidget(DeleteAllConfirmationModalPresenter.class, DeleteAllConfirmationModalPresenter.Display.class,

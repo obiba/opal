@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.inject;
+package org.obiba.opal.web.gwt.app.client.keystore;
 
 import org.obiba.opal.web.gwt.app.client.keystore.presenter.CreateKeyPairModalPresenter;
 import org.obiba.opal.web.gwt.app.client.keystore.presenter.EncryptionKeysPresenter;

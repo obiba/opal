@@ -1,5 +1,6 @@
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
+import org.obiba.opal.web.gwt.app.client.bookmark.presenter.BookmarkIconPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
@@ -33,13 +34,16 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
 
   private final VariablePresenter variablePresenter;
 
+  private final BookmarkIconPresenter bookmarkIconPresenter;
+
   @Inject
   public MagmaPresenter(EventBus eventBus, Display display, DatasourcePresenter datasourcePresenter,
-      TablePresenter tablePresenter, VariablePresenter variablePresenter) {
+      TablePresenter tablePresenter, VariablePresenter variablePresenter, BookmarkIconPresenter bookmarkIconPresenter) {
     super(eventBus, display);
     this.datasourcePresenter = datasourcePresenter;
     this.tablePresenter = tablePresenter;
     this.variablePresenter = variablePresenter;
+    this.bookmarkIconPresenter = bookmarkIconPresenter;
   }
 
   @Override
@@ -54,12 +58,14 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
     setInSlot(Display.Slot.DATASOURCE, datasourcePresenter);
     setInSlot(Display.Slot.TABLE, tablePresenter);
     setInSlot(Display.Slot.VARIABLE, variablePresenter);
+    setInSlot(Display.Slot.BOOKMARK, bookmarkIconPresenter);
   }
 
   @Override
   public void onDatasourceSelectionChange(DatasourceSelectionChangeEvent event) {
     if(!equals(event.getSource())) {
       getView().selectDatasource(event.getDatasource());
+      bookmarkIconPresenter.setBookmarkable(UriBuilders.DATASOURCE.create().build(event.getDatasource()));
     }
   }
 
@@ -67,12 +73,16 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
   public void onTableSelectionChanged(TableSelectionChangeEvent event) {
     if(!equals(event.getSource())) {
       getView().selectTable(event.getDatasourceName(), event.getTableName(), event.isView());
+      bookmarkIconPresenter.setBookmarkable(
+          UriBuilders.DATASOURCE_TABLE.create().build(event.getDatasourceName(), event.getTableName()));
     }
   }
 
   @Override
   public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
     getView().selectVariable(event.getDatasourceName(), event.getTableName(), event.getVariableName());
+    bookmarkIconPresenter.setBookmarkable(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
+        .build(event.getDatasourceName(), event.getTableName(), event.getVariableName()));
   }
 
   @Override
@@ -151,7 +161,8 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
     enum Slot {
       DATASOURCE,
       TABLE,
-      VARIABLE
+      VARIABLE,
+      BOOKMARK
     }
 
     void selectDatasource(String name);

@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.inject;
+package org.obiba.opal.web.gwt.app.client.report;
 
 import org.obiba.opal.web.gwt.app.client.administration.report.presenter.ReportsAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.report.view.ReportsAdministrationView;

@@ -7,8 +7,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.inject;
+package org.obiba.opal.web.gwt.app.client.magma;
 
+import org.obiba.opal.web.gwt.app.client.inject.AbstractOpalModule;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.AddViewModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.view.AddViewModalView;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
@@ -21,8 +22,7 @@ public class CreateViewWizardModule extends AbstractOpalModule {
 
   @Override
   protected void configure() {
-    bindPresenterWidget(AddViewModalPresenter.class, AddViewModalPresenter.Display.class,
-        AddViewModalView.class);
+    bindPresenterWidget(AddViewModalPresenter.class, AddViewModalPresenter.Display.class, AddViewModalView.class);
 
     bindPresenterWidget(VariablesToViewPresenter.class, VariablesToViewPresenter.Display.class,
         VariablesToViewView.class);

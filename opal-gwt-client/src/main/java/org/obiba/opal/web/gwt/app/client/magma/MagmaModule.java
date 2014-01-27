@@ -7,8 +7,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.inject;
+package org.obiba.opal.web.gwt.app.client.magma;
 
+import org.obiba.opal.web.gwt.app.client.inject.AbstractOpalModule;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.CsvDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.DatasourceFormPresenterSubscriber;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.ExcelDatasourceFormPresenter;
@@ -22,25 +23,6 @@ import org.obiba.opal.web.gwt.app.client.magma.datasource.view.FsDatasourceFormV
 import org.obiba.opal.web.gwt.app.client.magma.datasource.view.HibernateDatasourceFormView;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.view.JdbcDatasourceFormView;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.view.NullDatasourceFormView;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveBooleanVariableStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveCategoricalVariableStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveConclusionPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveCustomVariablePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveFromVariablePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveNumericalVariableStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveOpenTextualVariableStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveTemporalVariableStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveVariablePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.DeriveBooleanVariableStepView;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.DeriveCategoricalVariableStepView;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.DeriveConclusionView;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.DeriveCustomVariableStepView;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.DeriveFromVariableView;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.DeriveNumericalVariableStepView;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.DeriveOpenTextualVariableStepView;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.DeriveTemporalVariableStepView;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.DeriveVariableView;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.CodingViewModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
@@ -61,7 +43,6 @@ import org.obiba.opal.web.gwt.app.client.magma.variable.view.CategoriesEditorMod
 import org.obiba.opal.web.gwt.app.client.magma.variable.view.ContingencyTableView;
 import org.obiba.opal.web.gwt.app.client.magma.variable.view.VariableAttributeModalView;
 import org.obiba.opal.web.gwt.app.client.magma.variable.view.VariablePropertiesModalView;
-import org.obiba.opal.web.gwt.app.client.magma.view.CodingViewModalView;
 import org.obiba.opal.web.gwt.app.client.magma.view.DatasourceView;
 import org.obiba.opal.web.gwt.app.client.magma.view.EntityModalView;
 import org.obiba.opal.web.gwt.app.client.magma.view.MagmaView;
@@ -70,16 +51,6 @@ import org.obiba.opal.web.gwt.app.client.magma.view.ValuesTableView;
 import org.obiba.opal.web.gwt.app.client.magma.view.VariableVcsCommitHistoryView;
 import org.obiba.opal.web.gwt.app.client.magma.view.VariableView;
 import org.obiba.opal.web.gwt.app.client.magma.view.VcsCommitHistoryModalView;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectKeyStorePresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPropertiesModalPresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsPresenter;
-import org.obiba.opal.web.gwt.app.client.project.view.ProjectAdministrationView;
-import org.obiba.opal.web.gwt.app.client.project.view.ProjectKeyStoreView;
-import org.obiba.opal.web.gwt.app.client.project.view.ProjectPropertiesModalView;
-import org.obiba.opal.web.gwt.app.client.project.view.ProjectView;
-import org.obiba.opal.web.gwt.app.client.project.view.ProjectsView;
 
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
@@ -88,18 +59,12 @@ import com.gwtplatform.mvp.client.View;
  *
  */
 @SuppressWarnings("OverlyCoupledClass")
-public class NavigatorModule extends AbstractOpalModule {
-
-  public NavigatorModule() {
-  }
+public class MagmaModule extends AbstractOpalModule {
 
   @Override
   protected void configure() {
-    configureProject();
     configureMagma();
-    configureDeriveVariableWizard();
     configureDatasource();
-    configureDeriveVariablePresenters();
   }
 
   private void configureMagma() {
@@ -143,51 +108,10 @@ public class NavigatorModule extends AbstractOpalModule {
         NullDatasourceFormView.class, NullDatasourceFormPresenter.Subscriber.class);
   }
 
-  private void configureDeriveVariableWizard() {
-    bindWizardPresenterWidget(DeriveVariablePresenter.class, DeriveVariablePresenter.Display.class,
-        DeriveVariableView.class, DeriveVariablePresenter.CategorizeWizard.class);
-    // tricky case: one wizard presenter for 3 different types
-    bind(DeriveVariablePresenter.CustomWizard.class).asEagerSingleton();
-    bind(DeriveVariablePresenter.FromWizard.class).asEagerSingleton();
-  }
-
-  private void configureProject() {
-    bindPresenter(ProjectsPresenter.class, ProjectsPresenter.Display.class, ProjectsView.class,
-        ProjectsPresenter.Proxy.class);
-    bindPresenter(ProjectPresenter.class, ProjectPresenter.Display.class, ProjectView.class,
-        ProjectPresenter.Proxy.class);
-    bindPresenterWidget(ProjectAdministrationPresenter.class, ProjectAdministrationPresenter.Display.class,
-        ProjectAdministrationView.class);
-    bindPresenterWidget(ProjectPropertiesModalPresenter.class, ProjectPropertiesModalPresenter.Display.class,
-        ProjectPropertiesModalView.class);
-    bindPresenterWidget(ProjectKeyStorePresenter.class, ProjectKeyStorePresenter.Display.class,
-        ProjectKeyStoreView.class);
-  }
-
   private <V extends View> void bindDatasourceFormPresenter(Class<? extends PresenterWidget<V>> presenter,
       Class<V> display, Class<? extends V> view, Class<? extends DatasourceFormPresenterSubscriber> subscriber) {
     bind(subscriber).asEagerSingleton();
     bindPresenterWidget(presenter, display, view);
-  }
-
-  private void configureDeriveVariablePresenters() {
-    bindPresenterWidget(DeriveCategoricalVariableStepPresenter.class,
-        DeriveCategoricalVariableStepPresenter.Display.class, DeriveCategoricalVariableStepView.class);
-    bindPresenterWidget(DeriveNumericalVariableStepPresenter.class, DeriveNumericalVariableStepPresenter.Display.class,
-        DeriveNumericalVariableStepView.class);
-    bindPresenterWidget(DeriveBooleanVariableStepPresenter.class, DeriveBooleanVariableStepPresenter.Display.class,
-        DeriveBooleanVariableStepView.class);
-    bindPresenterWidget(DeriveTemporalVariableStepPresenter.class, DeriveTemporalVariableStepPresenter.Display.class,
-        DeriveTemporalVariableStepView.class);
-    bindPresenterWidget(DeriveOpenTextualVariableStepPresenter.class,
-        DeriveOpenTextualVariableStepPresenter.Display.class, DeriveOpenTextualVariableStepView.class);
-    bindPresenterWidget(DeriveCustomVariablePresenter.class, DeriveCustomVariablePresenter.Display.class,
-        DeriveCustomVariableStepView.class);
-    bindPresenterWidget(DeriveFromVariablePresenter.class, DeriveFromVariablePresenter.Display.class,
-        DeriveFromVariableView.class);
-    bindPresenterWidget(DeriveConclusionPresenter.class, DeriveConclusionPresenter.Display.class,
-        DeriveConclusionView.class);
-    bind(CodingViewModalPresenter.Display.class).to(CodingViewModalView.class);
   }
 
 }
