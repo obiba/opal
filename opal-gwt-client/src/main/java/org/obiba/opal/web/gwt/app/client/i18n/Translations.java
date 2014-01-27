@@ -2113,11 +2113,11 @@ public interface Translations extends Constants {
   @DefaultStringValue("Failed to import dictionary. Please make sure the file contains valid data.")
   String variableImportFailed();
 
-  @Description("Click to remove it from your bookmarks label")
-  @DefaultStringValue("Click to remove it from your bookmarks")
+  @Description("Click to remove this item from your bookmarks label")
+  @DefaultStringValue("Click to remove this item from your bookmarks")
   String clickToRemoveFromBookmarks();
 
-  @Description("Click to add it to your bookmarks label")
-  @DefaultStringValue("Click to add it to your bookmarks")
+  @Description("Click to add this item to your bookmarks label")
+  @DefaultStringValue("Click to add this item to your bookmarks")
   String clickToAddToBookmarks();
 }
