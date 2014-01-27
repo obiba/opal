@@ -16,7 +16,6 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -43,9 +42,7 @@ public class BookmarkIconView extends ViewWithUiHandlers<BookmarkIconUiHandlers>
 
   @UiHandler("icon")
   public void toggleBookmark(ClickEvent event) {
-    BookmarkIconUiHandlers uiHandlers = getUiHandlers();
-    GWT.log("uiHandlers: " + uiHandlers);
-    uiHandlers.toggleBookmark();
+    getUiHandlers().toggleBookmark();
   }
 
   @Override
@@ -53,9 +50,11 @@ public class BookmarkIconView extends ViewWithUiHandlers<BookmarkIconUiHandlers>
     if(isBookmarked) {
       icon.setTitle(translations.clickToRemoveFromBookmarks());
       icon.setIcon(IconType.STAR);
+      icon.addStyleDependentName("on");
     } else {
       icon.setTitle(translations.clickToAddToBookmarks());
       icon.setIcon(IconType.STAR_EMPTY);
+      icon.removeStyleDependentName("on");
     }
   }
 
