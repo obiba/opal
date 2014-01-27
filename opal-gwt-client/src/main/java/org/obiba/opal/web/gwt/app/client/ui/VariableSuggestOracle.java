@@ -24,6 +24,7 @@ import org.obiba.opal.web.model.client.opal.EntryDto;
 import org.obiba.opal.web.model.client.search.ItemFieldsDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
+import com.google.common.base.Joiner;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -35,10 +36,14 @@ public class VariableSuggestOracle extends SuggestOracle {
 
   private static final int LABEL_MAX_SIZE = 75;
 
+  private List<VariableSuggestion> suggestions;
+
   /**
    * Suggestion class for {@link MultiWordSuggestOracle}.
    */
   public static class VariableSuggestion implements Suggestion, IsSerializable {
+    private String id;
+
     private String displayString;
 
     private String replacementString;
@@ -72,6 +77,7 @@ public class VariableSuggestOracle extends SuggestOracle {
       this.datasource = datasource;
       this.table = table;
       this.variable = variable;
+      id = Joiner.on(".").join(datasource, table, variable);
     }
 
     @Override
@@ -95,9 +101,11 @@ public class VariableSuggestOracle extends SuggestOracle {
     public String getDatasource() {
       return datasource;
     }
-  }
 
-  private Response defaultResponse;
+    public String getId() {
+      return id;
+    }
+  }
 
   protected final EventBus eventBus;
 
@@ -131,11 +139,7 @@ public class VariableSuggestOracle extends SuggestOracle {
 
   @Override
   public void requestDefaultSuggestions(Request request, Callback callback) {
-    if(defaultResponse != null) {
-      callback.onSuggestionsReady(request, defaultResponse);
-    } else {
-      requestSuggestions(request, callback);
-    }
+    requestSuggestions(request, callback);
   }
 
   public void setDatasource(String datasource) {
@@ -186,7 +190,7 @@ public class VariableSuggestOracle extends SuggestOracle {
             if(response.getStatusCode() == com.google.gwt.http.client.Response.SC_OK) {
               QueryResultDto resultDto = JsonUtils.unsafeEval(response.getText());
 
-              List<VariableSuggestion> suggestions = new ArrayList<VariableSuggestion>();
+              suggestions = new ArrayList<VariableSuggestion>();
               if(resultDto.getHitsArray() != null && resultDto.getHitsArray().length() > 0) {
                 for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
                   ItemFieldsDto itemDto = (ItemFieldsDto) resultDto.getHitsArray().get(i)
@@ -227,12 +231,15 @@ public class VariableSuggestOracle extends SuggestOracle {
   protected VariableSuggestion convertToFormattedSuggestions(String query, Map<String, String> attributes) {
     SafeHtmlBuilder accum = new SafeHtmlBuilder();
 
-    accum.appendHtmlConstant("<span class='variable-search-suggest-box'>");
+    String prefix = attributes.get("datasource") + "." + attributes.get("table");
+
+    String name = attributes.get("name");
+    accum.appendHtmlConstant("<span class='variable-search-suggest-box' id='" + prefix + "." + name + "'>");
     accum.appendHtmlConstant("<strong>");
-    accum.appendEscaped(attributes.get("name"));
+    accum.appendEscaped(name);
     accum.appendHtmlConstant("</strong>");
     accum.appendHtmlConstant(" <i>");
-    accum.appendEscaped(attributes.get("datasource") + "." + attributes.get("table"));
+    accum.appendEscaped(prefix);
     accum.appendHtmlConstant("</i>");
 
     if(attributes.containsKey("label")) {
@@ -247,7 +254,7 @@ public class VariableSuggestOracle extends SuggestOracle {
     accum.appendHtmlConstant("</span>");
 
     return createSuggestion(query, accum.toSafeHtml().asString(), attributes.get("datasource"), attributes.get("table"),
-        attributes.get("name"));
+        name);
   }
 
   /**
@@ -260,9 +267,29 @@ public class VariableSuggestOracle extends SuggestOracle {
    */
   protected VariableSuggestion createSuggestion(String replacementString, String displayString, String datasource,
       String table, String variable) {
-    VariableSuggestion v = new VariableSuggestion(replacementString, displayString, datasource, table, variable);
 
-    return v;
+    return new VariableSuggestion(replacementString, displayString, datasource, table, variable);
   }
+
+  public VariableSuggestion getSelectedSuggestion() {
+    String activeItem = findActiveItem();
+    if(activeItem != null) {
+      for(VariableSuggestion suggestion : suggestions) {
+        if(activeItem.equals(suggestion.getId())) {
+          return suggestion;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * To deal with issue http://jira.obiba.org/jira/browse/OPAL-2269, we call this function onKeyPress ENTER.
+   *
+   * @return selected element that is currently highlighted
+   */
+  private static native String findActiveItem() /*-{
+      return $wnd.jQuery('li.active').find('.variable-search-suggest-box').attr('id');
+  }-*/;
 
 }

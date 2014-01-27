@@ -9,16 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.ui;
 
-import java.util.Collection;
-import java.util.List;
-
 import org.obiba.opal.web.gwt.app.client.ui.CloseableList.ItemRemovedHandler;
 
-import com.github.gwtbootstrap.client.ui.NavWidget;
-import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.github.gwtbootstrap.client.ui.TextBox;
-import com.github.gwtbootstrap.client.ui.base.UnorderedList;
-import com.github.gwtbootstrap.client.ui.constants.Constants;
+import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -32,8 +26,6 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle;
 
 /**
@@ -54,6 +46,8 @@ public class SuggestListBox extends FocusPanel {
   private final Anchor empty;
 
   private final SuggestOracle oracle;
+
+  private Typeahead.UpdaterCallback updaterCallback;
 
   public SuggestListBox(SuggestOracle oracle) {
     this.oracle = oracle;
@@ -103,23 +97,16 @@ public class SuggestListBox extends FocusPanel {
     add(content);
   }
 
-  public TextBox getTextBox() {
-    return textBox;
-  }
-
   public void setUpdaterCallback(final Typeahead.UpdaterCallback updaterCallback) {
-    aheadBox.setUpdaterCallback(new Typeahead.UpdaterCallback() {
+    this.updaterCallback = new Typeahead.UpdaterCallback() {
       @Override
       public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {
         String rval = updaterCallback.onSelection(selectedSuggestion);
         textBox.setFocus(true);
         return rval;
       }
-    });
-  }
-
-  public List<String> getSelectedItemsTexts() {
-    return closeables.getItemTexts();
+    };
+    aheadBox.setUpdaterCallback(this.updaterCallback);
   }
 
   private void rebuildSuggestBox() {
@@ -144,11 +131,24 @@ public class SuggestListBox extends FocusPanel {
             closeables.focusOrRemoveLastItem();
           }
         } else {
+
+          if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+            onEnterSelection();
+          }
+
           // remove focus
           closeables.removeLastItemFocus();
 
           // Lose focus on enter
           textBox.setFocus(event.getNativeKeyCode() != KeyCodes.KEY_ENTER);
+        }
+      }
+
+      public void onEnterSelection() {
+        VariableSuggestOracle.VariableSuggestion selectedSuggestion = ((VariableSuggestOracle) oracle)
+            .getSelectedSuggestion();
+        if(selectedSuggestion != null) {
+          updaterCallback.onSelection(selectedSuggestion);
         }
       }
     });
@@ -182,118 +182,6 @@ public class SuggestListBox extends FocusPanel {
 
   public void addItemRemovedHandler(ItemRemovedHandler handler) {
     closeables.addItemRemovedHandler(handler);
-  }
-
-  private static class SuggestionDisplayImpl extends SuggestBox.SuggestionDisplay {
-
-    private final UnorderedList suggestionMenu;
-
-    private Collection<? extends SuggestOracle.Suggestion> suggestions;
-
-    SuggestionDisplayImpl(UnorderedList suggestionMenu) {
-      this.suggestionMenu = suggestionMenu;
-      hideSuggestions();
-    }
-
-    @Override
-    protected SuggestOracle.Suggestion getCurrentSelection() {
-      int active = getActiveMenuItemIndex();
-      if(active >= 0) {
-        return ((NavSuggestion) suggestionMenu.getWidget(active)).getSuggestion();
-      }
-      if(suggestions != null && suggestions.size() > 0) {
-        return suggestions.iterator().next();
-      }
-      return null;
-    }
-
-    @Override
-    protected void hideSuggestions() {
-      suggestionMenu.setVisible(false);
-    }
-
-    @Override
-    protected void moveSelectionDown() {
-      if(suggestionMenu.isVisible()) {
-        if(suggestionMenu.isVisible()) {
-          int active = getActiveMenuItemIndex();
-          if(active >= 0 && active < suggestionMenu.getWidgetCount() - 1) {
-            setActiveMenuItem(active, active + 1);
-          }
-        }
-      }
-    }
-
-    @Override
-    protected void moveSelectionUp() {
-      if(suggestionMenu.isVisible()) {
-        int active = getActiveMenuItemIndex();
-        if(active > 0) {
-          setActiveMenuItem(active, active - 1);
-        }
-      }
-    }
-
-    private int getActiveMenuItemIndex() {
-      for(int i = 0; i < suggestionMenu.getWidgetCount(); i++) {
-        NavWidget menuItem = (NavWidget) suggestionMenu.getWidget(i);
-        if(menuItem.getElement().hasAttribute("class") &&
-            menuItem.getElement().getClassName().equals(Constants.ACTIVE)) {
-          return i;
-        }
-      }
-      return -1;
-    }
-
-    private void setActiveMenuItem(int currentIdx, int idx) {
-      suggestionMenu.getWidget(currentIdx).removeStyleName(Constants.ACTIVE);
-      suggestionMenu.getWidget(idx).addStyleName(Constants.ACTIVE);
-    }
-
-    @Override
-    protected void showSuggestions(SuggestBox suggestBox, Collection<? extends SuggestOracle.Suggestion> suggestions,
-        boolean isDisplayStringHTML, boolean isAutoSelectEnabled, final SuggestBox.SuggestionCallback callback) {
-      suggestionMenu.clear();
-      this.suggestions = suggestions;
-
-      // Hide the popup if there are no suggestions to display.
-      boolean anySuggestions = suggestions != null && suggestions.size() > 0;
-      if(!anySuggestions) {
-        hideSuggestions();
-        return;
-      }
-
-      for(final SuggestOracle.Suggestion curSuggestion : suggestions) {
-        NavWidget menuItem = new NavSuggestion(curSuggestion);
-        menuItem.addClickHandler(new ClickHandler() {
-          @Override
-          public void onClick(ClickEvent event) {
-            callback.onSuggestionSelected(curSuggestion);
-          }
-        });
-        suggestionMenu.add(menuItem);
-        if(suggestionMenu.getWidgetCount() == 1) {
-          menuItem.addStyleName(Constants.ACTIVE);
-        }
-      }
-
-      suggestionMenu.setVisible(true);
-    }
-
-  }
-
-  private static class NavSuggestion extends NavWidget {
-
-    private final SuggestOracle.Suggestion suggestion;
-
-    private NavSuggestion(SuggestOracle.Suggestion suggestion) {
-      super(new HTMLPanel(suggestion.getDisplayString()));
-      this.suggestion = suggestion;
-    }
-
-    private SuggestOracle.Suggestion getSuggestion() {
-      return suggestion;
-    }
   }
 
 }

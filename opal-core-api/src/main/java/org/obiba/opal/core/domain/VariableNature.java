@@ -25,6 +25,11 @@ public enum VariableNature {
   TEMPORAL,
 
   /**
+   * A geo variable: it's value is a point, line or polygon.
+   */
+  GEO,
+
+  /**
    * None of the above. Variables with {@code LocaleType} will be of this nature.
    */
   UNDETERMINED;
@@ -41,6 +46,9 @@ public enum VariableNature {
     }
     if(variable.getValueType().equals(BooleanType.get())) {
       return CATEGORICAL;
+    }
+    if(variable.getValueType().isGeo()) {
+      return GEO;
     }
     return UNDETERMINED;
   }

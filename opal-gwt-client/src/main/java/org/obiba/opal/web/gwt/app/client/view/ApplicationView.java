@@ -96,9 +96,9 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
       @Override
       public void onItemRemoved(ListItem item) {
         VariableSearchListItem.ItemType type = ((VariableSearchListItem) item).getType();
-        if(VariableSearchListItem.ItemType.DATASOURCE.equals(type)) {
+        if(VariableSearchListItem.ItemType.DATASOURCE == type) {
           oracle.setDatasource(null);
-        } else if(VariableSearchListItem.ItemType.TABLE.equals(type)) {
+        } else if(VariableSearchListItem.ItemType.TABLE == type) {
           oracle.setTable(null);
         }
       }
@@ -106,7 +106,8 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
 
     search.setUpdaterCallback(new Typeahead.UpdaterCallback() {
       @Override
-      public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {// Reset suggestBox text to user input text
+      public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {
+        // Reset suggestBox text to user input text
         String originalQuery = oracle.getOriginalQuery();
         // Forward selection event
         getUiHandlers().onSelection((VariableSuggestOracle.VariableSuggestion)selectedSuggestion);
@@ -155,10 +156,10 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
   @Override
   public void addSearchItem(String text, VariableSearchListItem.ItemType type) {
     String qText = quoteIfContainsSpace(text);
-    if(VariableSearchListItem.ItemType.DATASOURCE.equals(type)) {
+    if(VariableSearchListItem.ItemType.DATASOURCE == type) {
       oracle.setDatasource(qText);
     }
-    if(VariableSearchListItem.ItemType.TABLE.equals(type)) {
+    if(VariableSearchListItem.ItemType.TABLE == type) {
       oracle.setTable(qText);
     }
     search.addItem(qText, type);
