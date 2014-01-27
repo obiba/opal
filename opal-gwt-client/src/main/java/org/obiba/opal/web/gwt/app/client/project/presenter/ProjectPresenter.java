@@ -322,7 +322,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   @Override
   public void onFolderUpdated(FolderUpdatedEvent event) {
     if(fileExplorerPresenter == null || !fileExplorerPresenter.isVisible()) return;
-    updateHistory(event.getFolder().getPath());
+    if (tab == Display.ProjectTab.FILES) updateHistory(event.getFolder().getPath());
   }
 
   private void updateHistory(String queryPathParam) {
