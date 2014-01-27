@@ -26,13 +26,14 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.View;
 
 /**
  *
  */
 public class DeriveTemporalVariableStepPresenter
-    extends DerivationPresenter<DeriveTemporalVariableStepPresenter.Display> {
+    extends DerivationPresenter<DeriveTemporalVariableStepPresenter.Display> implements DerivationUiHandlers {
 
   private TemporalVariableDerivationHelper derivationHelper;
 
@@ -46,6 +47,7 @@ public class DeriveTemporalVariableStepPresenter
       VariableDto derivedVariable) {
     super.initialize(originalTable, destinationTable, originalVariable, derivedVariable);
     getView().setTimeType(originalVariable.getValueType());
+    getView().setUiHandlers(this);
   }
 
   @Override
@@ -83,6 +85,15 @@ public class DeriveTemporalVariableStepPresenter
     setDerivedVariable(derivationHelper.getDerivedVariable());
   }
 
+  @Override
+  public void onMethodChange() {
+    // We are in a "derived to" wizard
+    if(getDestinationTable() == null) {
+      // Reinitialize the destination variable
+      setDerivedVariable(null);
+    }
+  }
+
   private final class DeriveTemporalVariableMapStepInHandler implements StepInHandler {
     @Override
     public void onStepIn() {
@@ -103,7 +114,7 @@ public class DeriveTemporalVariableStepPresenter
   // Interfaces
   //
 
-  public interface Display extends View {
+  public interface Display extends View, HasUiHandlers<DerivationUiHandlers> {
 
     DefaultWizardStepController.Builder getMethodStepController();
 

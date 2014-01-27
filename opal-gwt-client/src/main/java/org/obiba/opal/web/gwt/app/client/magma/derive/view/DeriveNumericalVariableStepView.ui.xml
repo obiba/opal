@@ -129,7 +129,7 @@
     </o:WizardStep>
     <o:WizardStep ui:field="mapStep">
 
-    <g:FlowPanel>
+      <g:FlowPanel>
         <o:CollapsiblePanel ui:field="addPanel">
 
           <b:FluidRow addStyleNames="small-dual-indent">
@@ -137,7 +137,8 @@
               <ui:msg description="Original Value label">Original Value</ui:msg>
             </g:Label>
 
-            <b:RadioButton name="add" ui:field="addRangeRadio" inline="true" addStyleNames="small-dual-indent">
+            <b:RadioButton name="add" ui:field="addRangeRadio" inline="true"
+                addStyleNames="small-dual-indent bottom-margin">
               <ui:msg description="Range label">Range</ui:msg>
             </b:RadioButton>
 
@@ -147,7 +148,8 @@
             <o:NumericTextBox ui:field="addToBox" width="4em" minConstrained="false" maxConstrained="false"
                 addStyleNames="inline"/>
 
-            <b:RadioButton name="add" ui:field="addDiscreteRadio" inline="true" addStyleNames="small-dual-indent">
+            <b:RadioButton name="add" ui:field="addDiscreteRadio" inline="true"
+                addStyleNames="small-dual-indent bottom-margin">
               <ui:msg description="Value label">Value</ui:msg>
             </b:RadioButton>
             <o:NumericTextBox ui:field="valueBox" width="4em" enabled="false" minConstrained="false"
@@ -170,7 +172,7 @@
       </g:FlowPanel>
 
       <g:FlowPanel>
-      <o2:ValueMapGrid width="100%" ui:field="valuesMapGrid" pageSize="100" addStyleNames="top-margin"/>
+        <o2:ValueMapGrid width="100%" ui:field="valuesMapGrid" pageSize="100" addStyleNames="top-margin"/>
       </g:FlowPanel>
     </o:WizardStep>
   </g:FlowPanel>

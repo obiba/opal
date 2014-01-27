@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.derive.presenter;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -40,13 +42,14 @@ import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.View;
 
 /**
  *
  */
 public class DeriveNumericalVariableStepPresenter
-    extends DerivationPresenter<DeriveNumericalVariableStepPresenter.Display> {
+    extends DerivationPresenter<DeriveNumericalVariableStepPresenter.Display> implements DerivationUiHandlers {
 
   private final SummaryTabPresenter summaryTabPresenter;
 
@@ -59,6 +62,7 @@ public class DeriveNumericalVariableStepPresenter
       SummaryTabPresenter summaryTabPresenter) {
     super(eventBus, view);
     this.summaryTabPresenter = summaryTabPresenter;
+    getView().setUiHandlers(this);
   }
 
   @Override
@@ -125,6 +129,15 @@ public class DeriveNumericalVariableStepPresenter
     registerHandler(
         getEventBus().addHandler(SummaryReceivedEvent.getType(), new OriginalVariableSummaryReceivedHandler()));
     registerHandler(getView().addValueMapEntryHandler(new AddValueMapEntryHandler()));
+  }
+
+  @Override
+  public void onMethodChange() {
+    // We are in a "derived to" wizard
+    if(getDestinationTable() == null) {
+      // Reinitialize the destination variable
+      setDerivedVariable(null);
+    }
   }
 
   /**
@@ -389,8 +402,12 @@ public class DeriveNumericalVariableStepPresenter
       public boolean addValueMapEntry(NumericalVariableDerivationHelper<? extends Number> helper, Number lower,
           Number upper, String newValue) {
         NumericalVariableDerivationHelper<Double> h = (NumericalVariableDerivationHelper<Double>) helper;
-        Double l = lower == null ? null : lower.doubleValue();
-        Double u = upper == null ? null : upper.doubleValue();
+        Double l = lower == null
+            ? null
+            : new BigDecimal(lower.doubleValue()).setScale(5, RoundingMode.HALF_UP).doubleValue();
+        Double u = upper == null
+            ? null
+            : new BigDecimal(upper.doubleValue()).setScale(5, RoundingMode.HALF_UP).doubleValue();
         if(h.isRangeOverlap(l, u)) {
           return false;
         }
@@ -449,7 +466,7 @@ public class DeriveNumericalVariableStepPresenter
     }
   }
 
-  public interface Display extends View {
+  public interface Display extends View, HasUiHandlers<DerivationUiHandlers> {
 
     DefaultWizardStepController.Builder getMethodStepBuilder();
 
