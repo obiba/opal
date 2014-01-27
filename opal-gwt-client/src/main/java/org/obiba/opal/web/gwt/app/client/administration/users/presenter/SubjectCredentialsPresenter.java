@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.administration.users.presenter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,13 +18,12 @@ import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.administration.users.SubjectCredentialsDtos;
 import org.obiba.opal.web.gwt.app.client.administration.users.event.SubjectCredentialsRefreshedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.users.support.PasswordFieldValidators;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
-import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
@@ -41,7 +39,6 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.HasVisibility;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
