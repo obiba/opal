@@ -15,7 +15,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
-import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.web.security.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,10 +38,7 @@ public class SubjectProfileResource {
 
   @GET
   public Response get() {
-    SubjectProfile profile = subjectProfileService.getProfile(principal);
-    return (profile == null //
-        ? Response.status(Response.Status.NOT_FOUND) //
-        : Response.ok().entity(Dtos.asDto(profile))).build();
+    return Response.ok().entity(Dtos.asDto(subjectProfileService.getProfile(principal))).build();
   }
 
   @DELETE
@@ -51,10 +47,9 @@ public class SubjectProfileResource {
     return Response.ok().build();
   }
 
-  @GET
   @Path("/bookmarks")
   public BookmarksResource getBookmarks() {
-    BookmarksResource resource = applicationContext.getBean("bookmarksResource", BookmarksResource.class);
+    BookmarksResource resource = applicationContext.getBean(BookmarksResource.class);
     resource.setPrincipal(principal);
     return resource;
   }

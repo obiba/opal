@@ -121,9 +121,9 @@ public class DatabaseAdministrationPresenter extends
 
   static class TestConnectionSuccessCallback implements ResponseCodeCallback {
 
-    private EventBus eventBus;
+    private final EventBus eventBus;
 
-    private String database;
+    private final String database;
 
     TestConnectionSuccessCallback(EventBus eventBus, String database) {
       this.eventBus = eventBus;
@@ -138,7 +138,7 @@ public class DatabaseAdministrationPresenter extends
 
   static class TestConnectionFailCallback implements ResponseCodeCallback {
 
-    private EventBus eventBus;
+    private final EventBus eventBus;
 
     TestConnectionFailCallback(EventBus eventBus) {
       this.eventBus = eventBus;

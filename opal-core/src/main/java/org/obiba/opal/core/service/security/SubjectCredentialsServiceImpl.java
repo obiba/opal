@@ -46,6 +46,7 @@ import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType.USER;
 public class SubjectCredentialsServiceImpl implements SubjectCredentialsService {
 
   private static final String OPAL_DOMAIN = "opal";
+
   private static final int MINIMUM_LEMGTH = 6;
 
   /**
@@ -136,21 +137,21 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
       throws PasswordException, SubjectPrincipalNotFoundException {
     SubjectCredentials subjectCredentials = getSubjectCredentials(principal);
 
-    if (subjectCredentials == null) {
+    if(subjectCredentials == null) {
       throw new SubjectPrincipalNotFoundException(principal);
     }
 
     String currentPassword = subjectCredentials.getPassword();
 
-    if (!currentPassword.equals(hashPassword(oldPassword))) {
+    if(!currentPassword.equals(hashPassword(oldPassword))) {
       throw new OldPasswordMismatchException();
     }
 
-    if (newPassword.length() < MINIMUM_LEMGTH) {
+    if(newPassword.length() < MINIMUM_LEMGTH) {
       throw new PasswordTooShortException(MINIMUM_LEMGTH);
     }
 
-    if (oldPassword.equals(newPassword)) {
+    if(oldPassword.equals(newPassword)) {
       throw new PasswordNotChangedException();
     }
 
@@ -235,14 +236,15 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
   private void validateProfile(SubjectCredentials subjectCredentials) {
     String realm = getRealmFromType(subjectCredentials.getAuthenticationType());
     SubjectProfile profile = subjectProfileService.getProfile(subjectCredentials.getName());
-    if(profile != null && !realm.equals(profile.getRealm())) {
+    if(!realm.equals(profile.getRealm())) {
       throw new DuplicateSubjectProfileException(profile);
     }
   }
 
   private void validateAuthenticationType(SubjectCredentials subjectCredentials, SubjectCredentials existing) {
-    if(!existing.getAuthenticationType().equals(subjectCredentials.getAuthenticationType()))
+    if(existing.getAuthenticationType() != subjectCredentials.getAuthenticationType()) {
       throw new IllegalArgumentException("Authentication type cannot be changed");
+    }
   }
 
   private Iterable<Group> findImpactedGroups(final SubjectCredentials subjectCredentials) {

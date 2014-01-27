@@ -10,16 +10,16 @@
 
 package org.obiba.opal.web.gwt.app.client.bookmark.presenter;
 
-import org.obiba.opal.web.gwt.app.client.bookmark.rest.BookmarkRestService;
-import org.obiba.opal.web.gwt.app.client.bookmark.rest.BookmarksRestService;
-import org.obiba.opal.web.model.client.opal.BookmarkDto;
+import org.obiba.opal.web.gwt.app.client.bookmark.event.ToggleBookmarkEvent;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 
-import com.google.common.collect.Lists;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.dispatch.rest.shared.RestDispatch;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
@@ -27,23 +27,25 @@ import com.gwtplatform.mvp.client.View;
 public class BookmarkIconPresenter extends PresenterWidget<BookmarkIconPresenter.Display>
     implements BookmarkIconUiHandlers {
 
-  private final RestDispatch dispatcher;
-
-  private final BookmarksRestService bookmarksRestService;
-
-  private final BookmarkRestService bookmarkRestService;
-
   private String path;
 
   private boolean bookmarked;
 
   @Inject
-  public BookmarkIconPresenter(EventBus eventBus, Display view, RestDispatch dispatcher,
-      BookmarksRestService bookmarksRestService, BookmarkRestService bookmarkRestService) {
+  public BookmarkIconPresenter(EventBus eventBus, Display view) {
     super(eventBus, view);
-    this.dispatcher = dispatcher;
-    this.bookmarksRestService = bookmarksRestService;
-    this.bookmarkRestService = bookmarkRestService;
+    getView().setUiHandlers(this);
+  }
+
+  @Override
+  protected void onBind() {
+    addRegisteredHandler(ToggleBookmarkEvent.getType(), new ToggleBookmarkEvent.ToggleBookmarkHandler() {
+      @Override
+      public void onToggleBookmark(ToggleBookmarkEvent event) {
+        GWT.log("ToggleBookmarkEvent for " + path + ", isBookmarked: " + event.isBookmarked());
+        getView().setBookmark(bookmarked = event.isBookmarked());
+      }
+    });
   }
 
   @Override
@@ -52,60 +54,57 @@ public class BookmarkIconPresenter extends PresenterWidget<BookmarkIconPresenter
   }
 
   private void refresh() {
+    GWT.log("refresh for path: " + path);
     if(path == null) return;
 
-    dispatcher.execute(bookmarkRestService.getBookmark(path), new AsyncCallback<BookmarkDto>() {
-      @Override
-      public void onSuccess(BookmarkDto dto) {
-        setBookmarked(dto != null);
-      }
-
-      @Override
-      public void onFailure(Throwable caught) {
-        GWT.log("onFailure", caught);
-        //TODO display error
-      }
-    });
+    ResourceRequestBuilderFactory.newBuilder() //
+        .forResource(UriBuilders.BOOKMARK.create().build(path)) //
+        .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getEventBus().fireEvent(new ToggleBookmarkEvent(true));
+          }
+        }) //
+        .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getEventBus().fireEvent(new ToggleBookmarkEvent(false));
+          }
+        }) //
+        .get().send();
   }
 
   @Override
   public void toggleBookmark() {
+    GWT.log("toggleBookmark for path: " + path);
+
     if(bookmarked) {
-      dispatcher.execute(bookmarkRestService.deleteBookmark(path), new AsyncCallback<Void>() {
-        @Override
-        public void onSuccess(Void result) {
-          setBookmarked(false);
-        }
-
-        @Override
-        public void onFailure(Throwable caught) {
-          GWT.log("onFailure", caught);
-          //TODO display error
-        }
-      });
+      ResourceRequestBuilderFactory.newBuilder() //
+          .forResource(UriBuilders.BOOKMARK.create().build(path)) //
+          .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              getEventBus().fireEvent(new ToggleBookmarkEvent(false));
+            }
+          }) //
+          .delete().send();
     } else {
-      dispatcher.execute(bookmarksRestService.addBookmarks(Lists.newArrayList(path)), new AsyncCallback<Void>() {
-        @Override
-        public void onSuccess(Void result) {
-          setBookmarked(true);
-        }
-
-        @Override
-        public void onFailure(Throwable caught) {
-          GWT.log("onFailure", caught);
-          //TODO display error
-        }
-      });
+      String resource = UriBuilders.BOOKMARKS.create().query("resource", path).build();
+      ResourceRequestBuilderFactory.newBuilder() //
+          .forResource(resource) //
+          .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              getEventBus().fireEvent(new ToggleBookmarkEvent(true));
+            }
+          }) //
+          .post().send();
     }
-  }
-
-  private void setBookmarked(boolean bookmarked) {
-    this.bookmarked = bookmarked;
-    getView().setBookmark(bookmarked);
   }
 
   public void setBookmarkable(String path) {
     this.path = path;
+    refresh();
   }
 
   public interface Display extends View, HasUiHandlers<BookmarkIconUiHandlers> {

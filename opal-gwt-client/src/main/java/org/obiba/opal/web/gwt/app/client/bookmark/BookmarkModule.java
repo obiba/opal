@@ -13,16 +13,10 @@ import org.obiba.opal.web.gwt.app.client.bookmark.presenter.BookmarkIconPresente
 import org.obiba.opal.web.gwt.app.client.bookmark.view.BookmarkIconView;
 import org.obiba.opal.web.gwt.app.client.inject.AbstractOpalModule;
 
-import com.gwtplatform.dispatch.rest.client.RestApplicationPath;
-import com.gwtplatform.dispatch.rest.client.gin.RestDispatchAsyncModule;
-
 public class BookmarkModule extends AbstractOpalModule {
 
   @Override
   protected void configure() {
-    install(new RestDispatchAsyncModule.Builder().build());
-    bindConstant().annotatedWith(RestApplicationPath.class).to("/ws");
-
     bindPresenterWidget(BookmarkIconPresenter.class, BookmarkIconPresenter.Display.class, BookmarkIconView.class);
   }
 }

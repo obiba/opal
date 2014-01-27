@@ -16,7 +16,6 @@ import java.util.List;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.security.Bookmark;
-import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.Dtos;
@@ -42,7 +41,7 @@ public class BookmarksResourceImpl implements BookmarksResource {
   @Override
   public List<Opal.BookmarkDto> getBookmarks() {
     List<Opal.BookmarkDto> dtos = new ArrayList<>();
-    for(Bookmark bookmark : getSubjectProfile().getBookmarks()) {
+    for(Bookmark bookmark : subjectProfileService.getProfile(principal).getBookmarks()) {
       dtos.add(Dtos.asDto(bookmark));
     }
     return dtos;
@@ -50,15 +49,8 @@ public class BookmarksResourceImpl implements BookmarksResource {
 
   @Override
   public Response addBookmarks(List<String> resources) {
-    SubjectProfile subjectProfile = getSubjectProfile();
-    for(String resource : resources) {
-      subjectProfile.addBookmark(resource);
-    }
-    //TODO save profile
+    subjectProfileService.addBookmarks(principal, resources);
     return Response.ok().build();
   }
 
-  private SubjectProfile getSubjectProfile() {
-    return subjectProfileService.getProfile(principal);
-  }
 }

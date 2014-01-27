@@ -17,6 +17,8 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 
+import static com.google.common.base.Objects.toStringHelper;
+
 public class Bookmark {
 
   private Date created;
@@ -48,6 +50,11 @@ public class Bookmark {
 
   public void setResource(@NotNull String resource) {
     this.resource = resource;
+  }
+
+  @Override
+  public String toString() {
+    return toStringHelper(this).add("resource", resource).add("created", created).toString();
   }
 
   @Override

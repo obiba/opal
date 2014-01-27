@@ -10,6 +10,8 @@
 
 package org.obiba.opal.core.service;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
@@ -25,6 +27,7 @@ public interface SubjectProfileService extends SystemService {
 
   /**
    * Add or check profile of the subject: check will fail if a subject from a different realm has already a profile entry.
+   *
    * @param principal
    * @param realm
    */
@@ -50,18 +53,24 @@ public interface SubjectProfileService extends SystemService {
    * @param principal
    * @return
    */
-  @Nullable
-  SubjectProfile getProfile(@NotNull String principal);
+  @NotNull
+  SubjectProfile getProfile(@NotNull String principal) throws SubjectProfileNotFoundException;
 
   /**
    * Update profile timestamp.
+   *
    * @param principal
    */
-  void updateProfile(@NotNull String principal);
+  void updateProfile(@NotNull String principal) throws SubjectProfileNotFoundException;
 
   /**
    * Get all subject profiles.
+   *
    * @return
    */
   Iterable<SubjectProfile> getProfiles();
+
+  void addBookmarks(String principal, List<String> resources) throws SubjectProfileNotFoundException;
+
+  void deleteBookmark(String principal, String path) throws SubjectProfileNotFoundException;
 }

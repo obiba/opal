@@ -15,7 +15,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.apache.shiro.SecurityUtils;
-import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.web.security.Dtos;
 import org.obiba.opal.web.ws.security.NoAuthorization;
@@ -38,24 +37,19 @@ public class SubjectProfileCurrentResource {
   @GET
   @NoAuthorization
   public Response get() {
-    SubjectProfile profile = subjectProfileService.getProfile(getPrincipal());
-    return (profile == null //
-        ? Response.status(Response.Status.NOT_FOUND) //
-        : Response.ok().entity(Dtos.asDto(profile))).build();
+    return Response.ok().entity(Dtos.asDto(subjectProfileService.getProfile(getPrincipal()))).build();
   }
 
-  @GET
   @Path("/bookmarks")
   public BookmarksResource getBookmarksResource() {
-    BookmarksResource resource = applicationContext.getBean("bookmarksResource", BookmarksResource.class);
+    BookmarksResource resource = applicationContext.getBean(BookmarksResource.class);
     resource.setPrincipal(getPrincipal());
     return resource;
   }
 
-  @GET
   @Path("/bookmark/{path:.*}")
   public BookmarkResource getBookmarkResource(@PathParam("path") String path) {
-    BookmarkResource resource = applicationContext.getBean("bookmarkResource", BookmarkResource.class);
+    BookmarkResource resource = applicationContext.getBean(BookmarkResource.class);
     resource.setPrincipal(getPrincipal());
     resource.setPath(path);
     return resource;

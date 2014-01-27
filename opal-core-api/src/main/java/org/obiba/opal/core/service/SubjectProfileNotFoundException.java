@@ -8,13 +8,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.bookmark.event;
+package org.obiba.opal.core.service;
 
-import com.gwtplatform.dispatch.annotation.GenEvent;
+public class SubjectProfileNotFoundException extends RuntimeException {
 
-@GenEvent
-public class ToggleBookmark {
+  private static final long serialVersionUID = 8076327259073208897L;
 
-  boolean bookmarked;
-
+  public SubjectProfileNotFoundException(String principal) {
+    super("Subject profile not found for principal '" + principal + "'.");
+  }
 }

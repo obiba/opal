@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.provider;
+package org.obiba.opal.web.system.subject;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -23,10 +23,12 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 @Component
 @Provider
 public class PasswordNotChangedExceptionMapper implements ExceptionMapper<PasswordNotChangedException> {
+
   @Override
   public Response toResponse(PasswordNotChangedException exception) {
-    return Response.status(BAD_REQUEST).entity(
-        ClientErrorDtos.getErrorMessage(BAD_REQUEST, "PasswordNotChanged", exception)).build();
+    return Response.status(BAD_REQUEST)
+        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "PasswordNotChanged", exception)).build();
   }
+
 }
 
