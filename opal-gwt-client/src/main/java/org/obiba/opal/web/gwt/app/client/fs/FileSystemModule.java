@@ -7,24 +7,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.inject;
+package org.obiba.opal.web.gwt.app.client.fs;
 
 import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderModalPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FilePathPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FilePlacesPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadModalPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.view.CreateFolderModalView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FileExplorerView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FilePathView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FilePlacesView;
-import org.obiba.opal.web.gwt.app.client.fs.view.FileUploadModalView;
-import org.obiba.opal.web.gwt.app.client.fs.view.FolderDetailsView;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.view.FileSelectionView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FileSelectorView;
+import org.obiba.opal.web.gwt.app.client.fs.view.FileUploadModalView;
+import org.obiba.opal.web.gwt.app.client.fs.view.FolderDetailsView;
 
 import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 

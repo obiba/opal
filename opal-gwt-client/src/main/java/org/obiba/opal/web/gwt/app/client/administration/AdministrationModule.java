@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.inject;
+package org.obiba.opal.web.gwt.app.client.administration;
 
 import org.obiba.opal.web.gwt.app.client.administration.configuration.presenter.ConfigurationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.configuration.presenter.GeneralConfModalPresenter;
@@ -179,17 +179,18 @@ public class AdministrationModule extends AbstractPresenterModule {
     bindPresenterWidget(MongoDatabaseModalPresenter.class, MongoDatabaseModalPresenter.Display.class,
         MongoDatabaseModalView.class);
   }
+
   private void configureIdentifiers() {
-    bindPresenter(IdentifiersAdministrationPresenter.class, IdentifiersAdministrationPresenter.Display.class, IdentifiersAdministrationView.class,
-        IdentifiersAdministrationPresenter.Proxy.class);
+    bindPresenter(IdentifiersAdministrationPresenter.class, IdentifiersAdministrationPresenter.Display.class,
+        IdentifiersAdministrationView.class, IdentifiersAdministrationPresenter.Proxy.class);
     bindPresenterWidget(IdentifiersTablePresenter.class, IdentifiersTablePresenter.Display.class,
         IdentifiersTableView.class);
     bindPresenterWidget(IdentifiersTableModalPresenter.class, IdentifiersTableModalPresenter.Display.class,
         IdentifiersTableModalView.class);
-    bindPresenterWidget(ImportSystemIdentifiersModalPresenter.class, ImportSystemIdentifiersModalPresenter.Display.class,
-        ImportSystemIdentifiersModalView.class);
-    bindPresenterWidget(ImportIdentifiersMappingModalPresenter.class, ImportIdentifiersMappingModalPresenter.Display.class,
-        ImportIdentifiersMappingModalView.class);
+    bindPresenterWidget(ImportSystemIdentifiersModalPresenter.class,
+        ImportSystemIdentifiersModalPresenter.Display.class, ImportSystemIdentifiersModalView.class);
+    bindPresenterWidget(ImportIdentifiersMappingModalPresenter.class,
+        ImportIdentifiersMappingModalPresenter.Display.class, ImportIdentifiersMappingModalView.class);
     bindPresenterWidget(IdentifiersMappingModalPresenter.class, IdentifiersMappingModalPresenter.Display.class,
         IdentifiersMappingModalView.class);
     bindPresenterWidget(GenerateIdentifiersModalPresenter.class, GenerateIdentifiersModalPresenter.Display.class,

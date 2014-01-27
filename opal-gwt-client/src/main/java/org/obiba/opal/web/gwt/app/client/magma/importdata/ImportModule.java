@@ -7,8 +7,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.inject;
+package org.obiba.opal.web.gwt.app.client.magma.importdata;
 
+import org.obiba.opal.web.gwt.app.client.inject.AbstractOpalModule;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.ArchiveStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.CsvFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter;
@@ -42,8 +43,8 @@ public class ImportModule extends AbstractOpalModule {
   protected void configure() {
     bindWizardPresenterWidget(DataImportPresenter.class, DataImportPresenter.Display.class, DataImportView.class,
         DataImportPresenter.Wizard.class);
-    bindPresenterWidget(IdentifiersMappingSelectionStepPresenter.class, IdentifiersMappingSelectionStepPresenter.Display.class,
-        IdentifiersMappingSelectionStepView.class);
+    bindPresenterWidget(IdentifiersMappingSelectionStepPresenter.class,
+        IdentifiersMappingSelectionStepPresenter.Display.class, IdentifiersMappingSelectionStepView.class);
     bindPresenterWidget(DatasourceValuesStepPresenter.class, DatasourceValuesStepPresenter.Display.class,
         DatasourceValuesStepView.class);
     bindPresenterWidget(ArchiveStepPresenter.class, ArchiveStepPresenter.Display.class, ArchiveStepView.class);

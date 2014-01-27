@@ -7,8 +7,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.inject;
+package org.obiba.opal.web.gwt.app.client.magma.importvariables;
 
+import org.obiba.opal.web.gwt.app.client.inject.AbstractOpalModule;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.ConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportPresenter;
