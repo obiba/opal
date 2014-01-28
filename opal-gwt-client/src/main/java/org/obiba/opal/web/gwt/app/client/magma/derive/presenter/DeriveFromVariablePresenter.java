@@ -191,7 +191,7 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
           @Override
           public boolean validate() {
             if(wizardType == DeriveVariablePresenter.FromWizardType && getView().getSelectedVariable() == null) {
-              getEventBus().fireEvent(NotificationEvent.newBuilder().error("VariableSelectionIsRequired").build());
+              fireEvent(NotificationEvent.newBuilder().error("VariableSelectionIsRequired").build());
               return false;
             }
             return true;

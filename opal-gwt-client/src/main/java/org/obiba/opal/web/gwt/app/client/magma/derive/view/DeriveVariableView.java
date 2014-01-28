@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController;
 
+import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -94,6 +95,16 @@ public class DeriveVariableView extends ModalViewImpl implements DeriveVariableP
       BranchingWizardStepController.Condition condition) {
     ((BranchingWizardStepController.Builder) stepControllerBuilder).branch(stepController, condition);
     stepController.addSteps(stepsFlow);
+  }
+
+  @Override
+  public void clearErrors() {
+    dialog.closeAlerts();
+  }
+
+  @Override
+  public void showError(String errorMessage) {
+    dialog.addAlert(errorMessage, AlertType.ERROR);
   }
 
   @Override
