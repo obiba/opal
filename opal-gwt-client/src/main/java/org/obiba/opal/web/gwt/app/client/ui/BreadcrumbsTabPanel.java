@@ -32,7 +32,7 @@ public class BreadcrumbsTabPanel extends AbstractTabPanel {
         final int idx = event.getSelectedItem();
         if(isAnimationEnabled()) {
           // wait for the end of the animation before removing descendants
-          Timer t = new Timer() {
+          Timer timer = new Timer() {
             @Override
             public void run() {
               if(!isAnimationRunning()) {
@@ -41,7 +41,7 @@ public class BreadcrumbsTabPanel extends AbstractTabPanel {
               }
             }
           };
-          t.scheduleRepeating(10);
+          timer.scheduleRepeating(10);
         } else {
           removeDescendants(idx);
         }

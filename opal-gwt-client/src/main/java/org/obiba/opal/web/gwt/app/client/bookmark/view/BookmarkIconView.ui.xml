@@ -13,6 +13,6 @@
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <b2:IconAnchor ui:field="icon" icon="STAR_EMPTY" stylePrimaryName="bookmark"/>
+  <b2:IconAnchor ui:field="icon" icon="STAR_EMPTY" stylePrimaryName="bookmark" addStyleNames="inline-block"/>
 
 </ui:UiBinder>

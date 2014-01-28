@@ -78,23 +78,17 @@ public class SubjectProfile extends AbstractTimestamped implements HasUniqueProp
     this.bookmarks = bookmarks;
   }
 
-  public void addBookmark(String resource) {
+  public boolean addBookmark(String resource) {
     if(bookmarks == null) bookmarks = new HashSet<>();
-    bookmarks.add(new Bookmark(resource));
+    return bookmarks.add(new Bookmark(resource));
   }
 
-  public void removeBookmark(String resource) {
-    if(bookmarks == null) return;
-    bookmarks.remove(new Bookmark(resource));
+  public boolean removeBookmark(String resource) {
+    return bookmarks != null && bookmarks.remove(new Bookmark(resource));
   }
 
   public boolean hasBookmark(String resource) {
-    if(bookmarks != null) {
-      for(Bookmark bookmark : bookmarks) {
-        if(java.util.Objects.equals(bookmark.getResource(), resource)) return true;
-      }
-    }
-    return false;
+    return bookmarks != null && bookmarks.contains(new Bookmark(resource));
   }
 
   @Override
@@ -104,12 +98,8 @@ public class SubjectProfile extends AbstractTimestamped implements HasUniqueProp
 
   @Override
   public boolean equals(Object obj) {
-    if(this == obj) {
-      return true;
-    }
-    if(obj == null || getClass() != obj.getClass()) {
-      return false;
-    }
+    if(this == obj) return true;
+    if(obj == null || getClass() != obj.getClass()) return false;
     SubjectProfile other = (SubjectProfile) obj;
     return Objects.equal(principal, other.principal) && Objects.equal(realm, other.realm);
   }

@@ -18,7 +18,6 @@
 
   <g:FlowPanel addStyleNames="magma">
     <b:Heading size="3" ui:field="heading" addStyleNames="no-top-margin"/>
-    <g:FlowPanel ui:field="bookmarkIcon"/>
     <o:BreadcrumbsTabPanel animationEnabled="false" ui:field="tabPanel"/>
   </g:FlowPanel>
 

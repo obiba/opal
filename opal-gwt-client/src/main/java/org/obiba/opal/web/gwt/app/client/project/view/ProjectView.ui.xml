@@ -21,7 +21,7 @@
       <b:FluidRow>
         <b:Column size="9">
           <b:Breadcrumbs ui:field="titleCrumbs" addStyleNames="inline-block">
-          <b:NavLink ui:field="projects">
+            <b:NavLink ui:field="projects">
               <ui:msg description="Projects label">Projects</ui:msg>
             </b:NavLink>
           </b:Breadcrumbs>

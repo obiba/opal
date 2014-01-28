@@ -27,6 +27,7 @@ import com.google.gwt.uibinder.client.UiChild;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.IndexedPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -98,11 +99,11 @@ public class AbstractTabPanel extends FlowPanel
   }
 
   @Override
-  public void add(Widget w) {
+  public void add(Widget widget) {
     if(menu.getWidgetCount() == contentContainer.getWidgetCount()) {
-      addTabHeader(w);
+      addTabHeader(widget);
     } else {
-      addTabContent(w);
+      addTabContent(widget);
     }
   }
 
@@ -161,6 +162,10 @@ public class AbstractTabPanel extends FlowPanel
     if(selectedIndex < 0 || beforeIndex <= selectedIndex) {
       setSelectedIndex(beforeIndex);
     }
+  }
+
+  public void setBookmarkIcon(IsWidget bookmarkIconWidget) {
+    menuPanel.insert(bookmarkIconWidget, 1);
   }
 
   private void setSelectedIndex(int index) {

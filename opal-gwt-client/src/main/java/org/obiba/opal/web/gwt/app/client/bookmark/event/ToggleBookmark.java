@@ -11,10 +11,15 @@
 package org.obiba.opal.web.gwt.app.client.bookmark.event;
 
 import com.gwtplatform.dispatch.annotation.GenEvent;
+import com.gwtplatform.dispatch.annotation.Order;
 
 @GenEvent
 public class ToggleBookmark {
 
+  @Order(0)
+  String path;
+
+  @Order(1)
   boolean bookmarked;
 
 }

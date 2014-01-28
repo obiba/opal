@@ -15,7 +15,6 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -42,8 +41,9 @@ public class BookmarkIconPresenter extends PresenterWidget<BookmarkIconPresenter
     addRegisteredHandler(ToggleBookmarkEvent.getType(), new ToggleBookmarkEvent.ToggleBookmarkHandler() {
       @Override
       public void onToggleBookmark(ToggleBookmarkEvent event) {
-        GWT.log("ToggleBookmarkEvent for " + path + ", isBookmarked: " + event.isBookmarked());
-        getView().setBookmark(bookmarked = event.isBookmarked());
+        if(path != null && path.equals(event.getPath())) {
+          getView().setBookmark(bookmarked = event.isBookmarked());
+        }
       }
     });
   }
@@ -54,7 +54,6 @@ public class BookmarkIconPresenter extends PresenterWidget<BookmarkIconPresenter
   }
 
   private void refresh() {
-    GWT.log("refresh for path: " + path);
     if(path == null) return;
 
     ResourceRequestBuilderFactory.newBuilder() //
@@ -62,13 +61,13 @@ public class BookmarkIconPresenter extends PresenterWidget<BookmarkIconPresenter
         .withCallback(Response.SC_OK, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            getEventBus().fireEvent(new ToggleBookmarkEvent(true));
+            getEventBus().fireEvent(new ToggleBookmarkEvent(path, true));
           }
         }) //
         .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            getEventBus().fireEvent(new ToggleBookmarkEvent(false));
+            getEventBus().fireEvent(new ToggleBookmarkEvent(path, false));
           }
         }) //
         .get().send();
@@ -76,15 +75,13 @@ public class BookmarkIconPresenter extends PresenterWidget<BookmarkIconPresenter
 
   @Override
   public void toggleBookmark() {
-    GWT.log("toggleBookmark for path: " + path);
-
     if(bookmarked) {
       ResourceRequestBuilderFactory.newBuilder() //
           .forResource(UriBuilders.BOOKMARK.create().build(path)) //
           .withCallback(Response.SC_OK, new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
-              getEventBus().fireEvent(new ToggleBookmarkEvent(false));
+              getEventBus().fireEvent(new ToggleBookmarkEvent(path, false));
             }
           }) //
           .delete().send();
@@ -94,7 +91,7 @@ public class BookmarkIconPresenter extends PresenterWidget<BookmarkIconPresenter
           .withCallback(Response.SC_OK, new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
-              getEventBus().fireEvent(new ToggleBookmarkEvent(true));
+              getEventBus().fireEvent(new ToggleBookmarkEvent(path, true));
             }
           }) //
           .post().send();
