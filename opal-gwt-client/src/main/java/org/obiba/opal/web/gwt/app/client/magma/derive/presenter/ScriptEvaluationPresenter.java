@@ -273,7 +273,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
           break;
         default:
           getView().setValuesVisible(true);
-          getEventBus().fireEvent(new ScriptEvaluationFailedEvent(translations.scriptEvaluationFailed()));
+          fireEvent(new ScriptEvaluationFailedEvent(translations.scriptEvaluationFailed()));
           summaryTabPresenter.hideSummaryPreview();
           break;
       }
@@ -289,7 +289,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
           messageBuilder
               .append(translationMessages.errorAt(error.getLineNumber(), error.getColumnNumber(), error.getMessage()));
         }
-        getEventBus().fireEvent(new ScriptEvaluationFailedEvent(messageBuilder.toString()));
+        fireEvent(new ScriptEvaluationFailedEvent(messageBuilder.toString()));
       }
     }
 

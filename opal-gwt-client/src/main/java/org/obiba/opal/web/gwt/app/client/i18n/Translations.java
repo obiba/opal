@@ -408,7 +408,7 @@ public interface Translations extends Constants {
       "RConnectionFailed", "Connection with R server failed.", //
       "UnauthorizedOperation", "You are not allowed to perform this operation.",//
       "CannotWriteToView", "Cannot modify a View using this operation. Use the View editor.",//
-      "DatesRangeInvalid", "The range of dates is invalid.",//
+      "DatesRangeInvalid", "Date range is invalid. Please make sure 'From' date precedes 'To' date.",//
       "CouldNotCreateReportTemplate", "Could not create the Report Template.",//
       "ReportTemplateCannotBeFound", "The Report Template cannot be found.",//
       "DatasourceCreationFailed", "The datasource creation has failed: {0}",//
