@@ -509,6 +509,7 @@ public interface Translations extends Constants {
       "AttributeNameIsRequired", "An attribute name is required",//
       "AttributeValueIsRequired", "At least one value is required",//
       "AttributeAlreadyExists", "An attribute with this namespace and name already exists.",//
+      "AttributeConflictExists", "Setting to this namespace would conflict with an existing attribute",//
       "PermissionRequired", "You must select a at most one permission type.",//
       "DuplicateAclSubjectUser", "User '{0}' already exists, please choose a unique name.",//
       "DuplicateAclSubjectGroup", "Group '{0}' already exists, please choose a unique name.",//

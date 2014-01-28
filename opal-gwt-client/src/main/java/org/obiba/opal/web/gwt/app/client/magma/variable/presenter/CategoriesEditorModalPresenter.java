@@ -24,6 +24,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -86,15 +87,13 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
       }
     }
     VariableDto dto = getVariableDto(categories);
-    String uri = Strings.isNullOrEmpty(tableDto.getViewLink())
+    UriBuilder uri = Strings.isNullOrEmpty(tableDto.getViewLink())
         ? UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
-        .build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName())
-        : UriBuilder.create().segment("datasource", "{}", "view", "{}", "variable", "{}")
-            .query("comment", translationMessages.updateVariableCategories(variable.getName()))
-            .build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName());
+        : UriBuilders.DATASOURCE_VIEW_VARIABLE.create()
+            .query("comment", translationMessages.updateVariableCategories(variable.getName()));
 
     ResourceRequestBuilderFactory.newBuilder() //
-        .forResource(uri) //
+        .forResource(uri.build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName())) //
         .withResourceBody(VariableDto.stringify(dto)).accept("application/json") //
         .withCallback(new ResponseCodeCallback() {
           @Override
@@ -114,7 +113,6 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
   private VariableDto getVariableDto(JsArray<CategoryDto> categories) {
     VariableDto dto = VariableDto.create();
     dto.setLink(variable.getLink());
-    dto.setIndex(variable.getIndex());
     dto.setIsNewVariable(variable.getIsNewVariable());
     dto.setParentLink(variable.getParentLink());
     dto.setName(variable.getName());
@@ -125,9 +123,38 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
     dto.setReferencedEntityType(variable.getReferencedEntityType());
     dto.setMimeType(variable.getMimeType());
     dto.setOccurrenceGroup(variable.getOccurrenceGroup());
-    dto.setAttributesArray(JsArrays.toSafeArray(variable.getAttributesArray()));
-    dto.setCategoriesArray(categories);
+
+    dto.setAttributesArray(getAttributesDtoArray(variable.getAttributesArray()));
+    dto.setCategoriesArray(getCategoriesDtoArray(categories));
+
     return dto;
+  }
+
+  private JsArray<CategoryDto> getCategoriesDtoArray(JsArray<CategoryDto> modalCategories) {
+    JsArray<CategoryDto> categories = JsArrays.create().cast();
+    for(CategoryDto categoryDto : JsArrays.toIterable(modalCategories)) {
+      CategoryDto category = CategoryDto.create();
+      category.setName(categoryDto.getName());
+      category.setIsMissing(categoryDto.getIsMissing());
+      category.setAttributesArray(getAttributesDtoArray(categoryDto.getAttributesArray()));
+
+      categories.push(category);
+    }
+    return categories;
+  }
+
+  private JsArray<AttributeDto> getAttributesDtoArray(JsArray<AttributeDto> attributesArray) {
+    JsArray<AttributeDto> attributes = JsArrays.create().cast();
+    for(AttributeDto attributeDto : JsArrays.toIterable(attributesArray)) {
+      AttributeDto attribute = AttributeDto.create();
+      attribute.setName(attributeDto.getName());
+      attribute.setNamespace(attributeDto.getNamespace());
+      attribute.setValue(attributeDto.getValue());
+      attribute.setLocale(attributeDto.getLocale());
+
+      attributes.push(attribute);
+    }
+    return attributes;
   }
 
   public interface Display extends PopupView, HasUiHandlers<CategoriesEditorModalUiHandlers> {
