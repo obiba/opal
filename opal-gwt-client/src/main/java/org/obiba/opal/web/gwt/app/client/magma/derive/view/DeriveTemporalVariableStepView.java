@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.derive.helper.TemporalVariableDerivationHelper.GroupMethod;
+import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DerivationUiHandlers;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveTemporalVariableStepPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
@@ -22,6 +23,7 @@ import com.github.gwtbootstrap.client.ui.Column;
 import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.datepicker.client.ui.DateBoxAppended;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -30,12 +32,13 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
-import com.gwtplatform.mvp.client.ViewImpl;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 /**
  *
  */
-public class DeriveTemporalVariableStepView extends ViewImpl implements DeriveTemporalVariableStepPresenter.Display {
+public class DeriveTemporalVariableStepView extends ViewWithUiHandlers<DerivationUiHandlers>
+    implements DeriveTemporalVariableStepPresenter.Display {
 
   @UiTemplate("DeriveTemporalVariableStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DeriveTemporalVariableStepView> {}
@@ -101,6 +104,11 @@ public class DeriveTemporalVariableStepView extends ViewImpl implements DeriveTe
     spanBox.setEnabled(enabled);
     rangeBox.setEnabled(!enabled);
     dateRangeColumn.setVisible(!enabled);
+  }
+
+  @UiHandler({ "spanBox", "rangeBox" })
+  void onMethodChanged(ChangeEvent event) {
+    getUiHandlers().onMethodChange();
   }
 
   @UiHandler({ "spanRadio", "rangeRadio" })

@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.magma.derive.view;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DerivationUiHandlers;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveNumericalVariableStepPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
@@ -23,6 +24,7 @@ import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -34,12 +36,13 @@ import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.ViewImpl;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 /**
  *
  */
-public class DeriveNumericalVariableStepView extends ViewImpl implements DeriveNumericalVariableStepPresenter.Display {
+public class DeriveNumericalVariableStepView extends ViewWithUiHandlers<DerivationUiHandlers>
+    implements DeriveNumericalVariableStepPresenter.Display {
 
   @UiTemplate("DeriveNumericalVariableStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DeriveNumericalVariableStepView> {}
@@ -160,6 +163,16 @@ public class DeriveNumericalVariableStepView extends ViewImpl implements DeriveN
   @Override
   public DefaultWizardStepController.Builder getMapStepBuilder() {
     return DefaultWizardStepController.Builder.create(mapStep).title(translations.recodeNumericalMapStepTitle());
+  }
+
+  @UiHandler({ "rangeRadio", "discreteRadio", "manualRadio", "lengthRadio", "countRadio" })
+  void onMethodChanged(ClickEvent event) {
+    getUiHandlers().onMethodChange();
+  }
+
+  @UiHandler({ "lengthBox", "countBox", "addFromBox", "addToBox" })
+  void onMethodChanged(KeyUpEvent event) {
+    getUiHandlers().onMethodChange();
   }
 
   @UiHandler({ "rangeRadio", "discreteRadio", "manualRadio" })

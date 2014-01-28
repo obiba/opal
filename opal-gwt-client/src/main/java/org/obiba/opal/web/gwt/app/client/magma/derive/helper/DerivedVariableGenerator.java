@@ -73,11 +73,14 @@ public abstract class DerivedVariableGenerator {
     // set script in derived variable
     VariableDtos.setScript(derived, scriptBuilder.toString());
 
-    // Always reset categories based on newCategoriesMap to avoid the problem where we derive a variable,
-    // hit previous and change method
-    derived.setCategoriesArray((JsArray<CategoryDto>) JavaScriptObject.createArray());
-    for(CategoryDto cat : newCategoriesMap.values()) {
-      derived.getCategoriesArray().push(cat);
+    // set new categories if destination does not already exist
+    if(destination == null) {
+      if(derived.getCategoriesArray() == null) {
+        derived.setCategoriesArray((JsArray<CategoryDto>) JavaScriptObject.createArray());
+      }
+      for(CategoryDto cat : newCategoriesMap.values()) {
+        derived.getCategoriesArray().push(cat);
+      }
     }
 
     return derived;
