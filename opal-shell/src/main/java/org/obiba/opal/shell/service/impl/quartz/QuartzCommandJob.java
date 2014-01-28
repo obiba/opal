@@ -79,7 +79,8 @@ public class QuartzCommandJob implements Job {
     PrincipalCollection principals = (PrincipalCollection) context.getJobDetail().getJobDataMap().get("subject");
     if(principals == null) {
       // Login as background task user
-      principals = SecurityUtils.getSecurityManager().authenticate(new BackgroundJobServiceAuthToken()).getPrincipals();
+      principals = SecurityUtils.getSecurityManager().authenticate(BackgroundJobServiceAuthToken.INSTANCE)
+          .getPrincipals();
     }
     return new Subject.Builder().principals(principals).authenticated(true).buildSubject();
   }

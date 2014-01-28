@@ -15,6 +15,11 @@ public class BackgroundJobServiceAuthToken implements AuthenticationToken {
 
   private static final long serialVersionUID = 1598701332628205293L;
 
+  public static final AuthenticationToken INSTANCE = new BackgroundJobServiceAuthToken();
+
+  private BackgroundJobServiceAuthToken() {
+  }
+
   @Override
   public Object getPrincipal() {
     return null;

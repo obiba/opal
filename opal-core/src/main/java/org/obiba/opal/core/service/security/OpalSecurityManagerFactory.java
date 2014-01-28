@@ -29,6 +29,7 @@ import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.text.IniRealm;
@@ -124,6 +125,9 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
         sessionManager.setSessionDAO(new EnterpriseCacheSessionDAO());
         sessionManager.setSessionValidationScheduler(new ExecutorServiceSessionValidationScheduler());
         sessionManager.setSessionValidationInterval(SESSION_VALIDATION_INTERVAL);
+      }
+      if(dsm.getSubjectDAO() instanceof DefaultSubjectDAO) {
+        ((DefaultSubjectDAO) dsm.getSubjectDAO()).setSessionStorageEvaluator(new OpalSessionStorageEvaluator());
       }
 
       if(dsm.getAuthorizer() instanceof ModularRealmAuthorizer) {

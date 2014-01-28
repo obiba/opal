@@ -97,7 +97,7 @@ public class BackgroundJobService implements Service {
     // Login as background task user
     try {
       PrincipalCollection principals = SecurityUtils.getSecurityManager()
-          .authenticate(new BackgroundJobServiceAuthToken()).getPrincipals();
+          .authenticate(BackgroundJobServiceAuthToken.INSTANCE).getPrincipals();
       return new Subject.Builder().principals(principals).authenticated(true).buildSubject();
     } catch(AuthenticationException e) {
       log.warn("Failed to obtain system user credentials: {}", e.getMessage());

@@ -24,7 +24,6 @@ import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.core.service.security.SubjectAclService.SubjectAclChangeCallback;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,7 +145,7 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
     return null;
   }
 
-  private Iterable<String> loadSubjectPermissions(SubjectAcl.Subject subject) {
+  private Iterable<String> loadSubjectPermissions(Subject subject) {
     return subjectPermissionsConverterRegistry.convert(subjectAclService.getSubjectPermissions(subject));
   }
 
@@ -154,7 +153,7 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
     return loadSubjectPermissions(getSubject(principals));
   }
 
-  private SubjectAcl.Subject getSubject(PrincipalCollection principals) {
+  private Subject getSubject(PrincipalCollection principals) {
     return SubjectType.USER.subjectFor(principals.getPrimaryPrincipal().toString());
   }
 
@@ -198,6 +197,9 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
    * </pre>
    */
   static class RestSpace extends NodeSpace {
+
+    private static final long serialVersionUID = -9002715059388992984L;
+
     @Override
     protected double calculateDistance(Spatial s1, Spatial s2) {
       Double d = super.calculateDistance(s1, s2);

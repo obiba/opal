@@ -26,6 +26,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class BackgroundJobRealm extends AuthorizingRealm {
 
+  private final AuthenticationInfo simpleAccount = new SimpleAccount(SystemPrincipal.INSTANCE, null, getName());
+
   public BackgroundJobRealm() {
     setCredentialsMatcher(new AllowAllCredentialsMatcher());
   }
@@ -37,8 +39,7 @@ public class BackgroundJobRealm extends AuthorizingRealm {
 
   @Override
   protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
-    // BackgroundJobServiceAuthToken jobToken = (BackgroundJobServiceAuthToken) token;
-    return new SimpleAccount(new SystemPrincipal(), null, getName());
+    return simpleAccount;
   }
 
   @Override
@@ -50,15 +51,20 @@ public class BackgroundJobRealm extends AuthorizingRealm {
     return info;
   }
 
+  @SuppressWarnings("Singleton")
   public static class SystemPrincipal implements Serializable {
-
-    public static final String PRINCIPAL = "opal/system";
 
     private static final long serialVersionUID = 7918271769058954770L;
 
+    public static final SystemPrincipal INSTANCE = new SystemPrincipal();
+
+    private SystemPrincipal() {
+    }
+
     @Override
     public String toString() {
-      return PRINCIPAL;
+      return "opal/system";
     }
+
   }
 }
