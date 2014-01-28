@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.project.presenter;
 
 import java.util.Arrays;
 
+import org.obiba.opal.web.gwt.app.client.bookmark.presenter.BookmarkIconPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
@@ -79,6 +80,10 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   public interface Proxy extends ProxyPlace<ProjectPresenter> {}
 
   @ContentSlot
+  public static final GwtEvent.Type<RevealContentHandler<?>> BOOKMARK_ICON
+      = new GwtEvent.Type<RevealContentHandler<?>>();
+
+  @ContentSlot
   public static final GwtEvent.Type<RevealContentHandler<?>> TABLES_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
 
   @ContentSlot
@@ -130,13 +135,18 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private ProjectAdministrationPresenter projectAdministrationPresenter;
 
+  private final Provider<BookmarkIconPresenter> bookmarkIconPresenterProvider;
+
+  private BookmarkIconPresenter bookmarkIconPresenter;
+
   @Inject
   @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
   public ProjectPresenter(EventBus eventBus, Display display, Proxy proxy, PlaceManager placeManager,
       Provider<MagmaPresenter> magmaPresenterProvider, Provider<FileExplorerPresenter> fileExplorerPresenterProvider,
       Provider<ReportsPresenter> reportsPresenterProvider, Provider<TasksPresenter> tasksPresenterProvider,
       Provider<ProjectAdministrationPresenter> projectAdministrationPresenterProvider,
-      Provider<ProjectPermissionsPresenter> projectResourcePermissionsProvider) {
+      Provider<ProjectPermissionsPresenter> projectResourcePermissionsProvider,
+      Provider<BookmarkIconPresenter> bookmarkIconPresenterProvider) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
     this.placeManager = placeManager;
@@ -146,6 +156,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     this.tasksPresenterProvider = tasksPresenterProvider;
     this.projectAdministrationPresenterProvider = projectAdministrationPresenterProvider;
     this.projectResourcePermissionsProvider = projectResourcePermissionsProvider;
+    this.bookmarkIconPresenterProvider = bookmarkIconPresenterProvider;
   }
 
   @Override
@@ -192,7 +203,9 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     // TODO handle wrong or missing project name
     if(projectName == null) return;
     // reset
-    ResourceRequestBuilderFactory.<ProjectDto>newBuilder().forResource(UriBuilders.PROJECT.create().build(projectName))
+    final String projectUri = UriBuilders.PROJECT.create().build(projectName);
+    ResourceRequestBuilderFactory.<ProjectDto>newBuilder() //
+        .forResource(projectUri) //
         .withCallback(new ResourceCallback<ProjectDto>() {
           @Override
           public void onResource(Response response, ProjectDto resource) {
@@ -201,6 +214,11 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
             getView().setProject(project);
             onTabSelected(tab.ordinal());
             getView().selectTab(tab.ordinal());
+            if(bookmarkIconPresenter == null) {
+              bookmarkIconPresenter = bookmarkIconPresenterProvider.get();
+              setInSlot(BOOKMARK_ICON, bookmarkIconPresenter);
+            }
+            bookmarkIconPresenter.setBookmarkable(projectUri);
           }
         }).get().send();
     refreshSummary();
@@ -210,14 +228,15 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   private void refreshSummary() {
     // TODO handle wrong or missing project name
     if(projectName == null) return;
-    ResourceRequestBuilderFactory.<ProjectSummaryDto>newBuilder()
-        .forResource(UriBuilders.PROJECT_SUMMARY.create().build(projectName))
+    ResourceRequestBuilderFactory.<ProjectSummaryDto>newBuilder() //
+        .forResource(UriBuilders.PROJECT_SUMMARY.create().build(projectName)) //
         .withCallback(new ResourceCallback<ProjectSummaryDto>() {
           @Override
           public void onResource(Response response, ProjectSummaryDto resource) {
             getView().setProjectSummary(resource);
           }
-        }).get().send();
+        }) //
+        .get().send();
   }
 
   @Override
@@ -226,7 +245,6 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   }
 
   @Override
-  @SuppressWarnings("PMD.NcssMethodCount")
   public void onTabSelected(int index) {
     String queryPathParam = (String) getView().getTabData(index);
     selectTab(index, queryPathParam);
@@ -322,7 +340,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   @Override
   public void onFolderUpdated(FolderUpdatedEvent event) {
     if(fileExplorerPresenter == null || !fileExplorerPresenter.isVisible()) return;
-    if (tab == Display.ProjectTab.FILES) updateHistory(event.getFolder().getPath());
+    if(tab == Display.ProjectTab.FILES) updateHistory(event.getFolder().getPath());
   }
 
   private void updateHistory(String queryPathParam) {

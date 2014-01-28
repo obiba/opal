@@ -89,9 +89,8 @@ public class BookmarkIconPresenter extends PresenterWidget<BookmarkIconPresenter
           }) //
           .delete().send();
     } else {
-      String resource = UriBuilders.BOOKMARKS.create().query("resource", path).build();
       ResourceRequestBuilderFactory.newBuilder() //
-          .forResource(resource) //
+          .forResource(UriBuilders.BOOKMARKS.create().query("resource", path).build()) //
           .withCallback(Response.SC_OK, new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
