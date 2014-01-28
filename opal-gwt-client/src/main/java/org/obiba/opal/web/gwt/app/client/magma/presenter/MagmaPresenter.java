@@ -112,8 +112,9 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
   private void show(final String datasource, final String table, final String variable) {
     // table counts are required for having variable summary and values
     UriBuilder ub = UriBuilders.DATASOURCE_TABLE.create().query("counts", "true");
-    ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(datasource, table)).get()
-        .withCallback(new ResourceCallback<TableDto>() {
+    ResourceRequestBuilderFactory.<TableDto>newBuilder() //
+        .forResource(ub.build(datasource, table)) //
+        .get().withCallback(new ResourceCallback<TableDto>() {
           @Override
           public void onResource(Response response, final TableDto tableDto) {
             if(tableDto == null) return;
@@ -129,7 +130,8 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
                 VariableDto previous = null;
                 VariableDto selection = null;
                 VariableDto next = null;
-                for(int i = 0; i < variables.length(); i++) {
+                int nbVariables = variables.length();
+                for(int i = 0; i < nbVariables; i++) {
                   if(variables.get(i).getName().equals(variable)) {
                     selection = variables.get(i);
 
@@ -137,7 +139,7 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
                       previous = variables.get(i - 1);
                     }
 
-                    if(i < variables.length() - 1) {
+                    if(i < nbVariables - 1) {
                       next = variables.get(i + 1);
                     }
                   }

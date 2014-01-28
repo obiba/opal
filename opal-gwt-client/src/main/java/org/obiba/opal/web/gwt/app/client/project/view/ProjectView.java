@@ -39,7 +39,6 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
@@ -49,7 +48,10 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   interface Binder extends UiBinder<Widget, ProjectView> {}
 
   @UiField
-  Breadcrumbs titlecrumbs;
+  Breadcrumbs titleCrumbs;
+
+  @UiField
+  FlowPanel bookmarkIcon;
 
   @UiField
   Heading projectHeader;
@@ -93,7 +95,6 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   @UiField
   FlowPanel permissionsPanel;
 
-
   private ProjectDto project;
 
   private final Translations translations;
@@ -120,10 +121,10 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   @Override
   public void setProject(ProjectDto project) {
     this.project = project;
-    if(titlecrumbs.getWidgetCount() > 1) {
-      titlecrumbs.remove(1);
+    if(titleCrumbs.getWidgetCount() > 1) {
+      titleCrumbs.remove(1);
     }
-    titlecrumbs.add(new NavLink(project.getTitle()));
+    titleCrumbs.add(new NavLink(project.getTitle()));
 
     projectHeader.setText(project.getTitle());
     projectHeader.setSubtext("[" + project.getName() + "]");
@@ -221,7 +222,7 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   }
 
   @Override
-  @SuppressWarnings("PMD.NcssMethodCount")
+  @SuppressWarnings({ "PMD.NcssMethodCount", "IfStatementWithTooManyBranches", "OverlyLongMethod" })
   public void setInSlot(Object slot, IsWidget content) {
     if(slot == ProjectPresenter.TABLES_PANE) {
       tablesPanel.clear();
@@ -241,6 +242,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     } else if(slot == ProjectPresenter.ADMIN_PANE) {
       adminPanel.clear();
       adminPanel.add(content);
+    } else if(slot == ProjectPresenter.BOOKMARK_ICON) {
+      bookmarkIcon.clear();
+      bookmarkIcon.add(content);
     }
   }
 
