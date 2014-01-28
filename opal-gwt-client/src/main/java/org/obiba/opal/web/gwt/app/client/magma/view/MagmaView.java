@@ -13,6 +13,7 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -28,6 +29,9 @@ public class MagmaView extends ViewImpl implements MagmaPresenter.Display {
 
   @UiField
   BreadcrumbsTabPanel tabPanel;
+
+  @UiField
+  FlowPanel bookmarkIcon;
 
   private final PlaceManager placeManager;
 
@@ -72,6 +76,10 @@ public class MagmaView extends ViewImpl implements MagmaPresenter.Display {
         break;
       case VARIABLE:
         variableWidget = content.asWidget();
+        break;
+      case BOOKMARK:
+        bookmarkIcon.clear();
+        bookmarkIcon.add(content.asWidget());
         break;
     }
   }
