@@ -50,8 +50,8 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   @Override
   public boolean supportProfile(@Nullable Object principal) {
     return principal != null && //
-        !(principal instanceof BackgroundJobRealm.SystemPrincipal) && //
-        !(principal instanceof SudoRealm.SudoPrincipal);
+        !principal.equals(BackgroundJobRealm.SystemPrincipal.INSTANCE) && //
+        !principal.equals(SudoRealm.SudoPrincipal.INSTANCE);
   }
 
   @Override
