@@ -346,7 +346,7 @@ public interface Translations extends Constants {
       "ReportTemplateWasNotFound", "The specified report template could not be found.",//
       "ReportJobStarted", "Report task has been launched.  You can follow its progress in the task list.",//
       "ReportTemplateAlreadyExistForTheSpecifiedName", "A report template already exist with the specified name.",//
-      "BirtReportDesignFileIsRequired", "A BIRT Design File must be selected.",//
+      "RReportDesignFileIsRequired", "A R Markdown file must be selected (.Rmd).",//
       "CronExpressionIsRequired", "A schedule expression must be specified.",//
       "NotificationEmailsAreInvalid", "One or more of the notifications emails specified are invalid.",//
       "ReportTemplateNameIsRequired", "A name is required for the report template.",//

@@ -23,7 +23,7 @@
       </b:ControlLabel>
       <b:TextBox ui:field="name" b:id="name"/>
       <b:HelpBlock>
-        <ui:msg description="Project Name help">A project must have a unique name</ui:msg>
+        <ui:msg description="Project Name help">A project must have a unique name.</ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 
@@ -33,7 +33,7 @@
       </b:ControlLabel>
       <b:TextBox ui:field="title" b:id="title"/>
       <b:HelpBlock>
-        <ui:msg description="Project Title help">A project title for the human beings</ui:msg>
+        <ui:msg description="Project Title help">A project title for the human beings.</ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 
@@ -43,7 +43,7 @@
       </b:ControlLabel>
       <o:Chooser ui:field="database" name="database"/>
       <b:HelpBlock>
-        <ui:msg description="Database Title help">Optional database used to store data</ui:msg>
+        <ui:msg description="Database Title help">Optional database used to store data.</ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 
@@ -53,7 +53,7 @@
       </b:ControlLabel>
       <b:TextArea ui:field="description" alternateSize="XLARGE" visibleLines="3" b:id="description"/>
       <b:HelpBlock>
-        <ui:msg description="Project Description help">Optional description of the project</ui:msg>
+        <ui:msg description="Project Description help">Optional description of the project.</ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 

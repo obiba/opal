@@ -16,8 +16,11 @@ import org.obiba.opal.web.gwt.app.client.presenter.ItemSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ItemSelectorPresenter.EnterKeyHandler;
 import org.obiba.opal.web.gwt.app.client.presenter.ItemSelectorPresenter.ItemInputDisplay;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.constants.ButtonType;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.Image;
@@ -34,7 +37,6 @@ public class ItemSelectorView extends ViewImpl implements ItemSelectorPresenter.
 
   public ItemSelectorView() {
     itemGrid = new Grid(0, 2);
-    itemGrid.addStyleName("itemSelector");
   }
 
   @Override
@@ -56,7 +58,7 @@ public class ItemSelectorView extends ViewImpl implements ItemSelectorPresenter.
     itemGrid.setWidget(itemGrid.getRowCount() - 1, 0, itemInputDisplay.asWidget());
 
     // Put an "add" button in the second column.
-    Image addWidget = createAddWidget();
+    Button addWidget = createAddWidget();
     addWidget.addClickHandler(new ClickHandler() {
 
       @Override
@@ -83,7 +85,7 @@ public class ItemSelectorView extends ViewImpl implements ItemSelectorPresenter.
     itemGrid.setText(itemGrid.getRowCount() - 1, 0, item);
 
     // Put a "remove" button in the second column.
-    Image removeWidget = createRemoveWidget();
+    Button removeWidget = createRemoveWidget();
     removeWidget.addClickHandler(new ClickHandler() {
 
       @Override
@@ -125,7 +127,7 @@ public class ItemSelectorView extends ViewImpl implements ItemSelectorPresenter.
   public List<String> getItems() {
     List<String> items = new ArrayList<String>();
     for(int row = 1; row < itemGrid.getRowCount(); row++) { // start from 1 to skip the input widget row
-      items.add(itemGrid.getText(row, 0));
+      items.add(itemGrid.getText(row, 0).trim());
     }
 
     return items;
@@ -140,20 +142,16 @@ public class ItemSelectorView extends ViewImpl implements ItemSelectorPresenter.
   // Methods
   //
 
-  private Image createAddWidget() {
-    Image addWidget = new Image("image/20/list-add.png");
-    addWidget.addStyleName("clickable");
-    addWidget.addStyleName("button");
-
-    return addWidget;
+  private Button createAddWidget() {
+    Button btn = new Button("Add");
+    btn.setType(ButtonType.SUCCESS);
+    return btn;
   }
 
-  private Image createRemoveWidget() {
-    Image removeWidget = new Image("image/20/list-remove.png");
-    removeWidget.addStyleName("clickable");
-    removeWidget.addStyleName("button");
-
-    return removeWidget;
+  private Button createRemoveWidget() {
+    Button btn = new Button("Remove");
+    btn.setType(ButtonType.DANGER);
+    return btn;
   }
 
   private void addItemAndClear() {

@@ -67,9 +67,6 @@ public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<
   TextBox reportTemplateName;
 
   @UiField
-  ListBox format;
-
-  @UiField
   TextBox schedule;
 
   @UiField
@@ -178,11 +175,6 @@ public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<
   }
 
   @Override
-  public String getFormat() {
-    return format.getItemText(format.getSelectedIndex());
-  }
-
-  @Override
   public HasText getSchedule() {
     return schedule;
   }
@@ -190,7 +182,6 @@ public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<
   @Override
   public void clear() {
     setDesignFile("");
-    setFormat("");
     setName("");
     setSchedule("");
   }
@@ -198,7 +189,6 @@ public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<
   @Override
   public void setReportTemplate(ReportTemplateDto reportTemplate) {
     setDesignFile(reportTemplate.getDesign());
-    setFormat(reportTemplate.getFormat());
     setName(reportTemplate.getName());
     setSchedule(reportTemplate.getCron());
   }
@@ -217,18 +207,6 @@ public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<
 
   private void setDesignFile(String designFile) {
     fileSelection.setFile(designFile != null ? designFile : "");
-  }
-
-  private void setFormat(String format) {
-    int itemCount = this.format.getItemCount();
-    String item;
-    for(int i = 0; i < itemCount; i++) {
-      item = this.format.getItemText(i);
-      if(item.equals(format)) {
-        this.format.setSelectedIndex(i);
-        break;
-      }
-    }
   }
 
   private void setSchedule(String schedule) {
