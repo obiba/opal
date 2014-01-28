@@ -64,6 +64,8 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
   private static final int MIN_HEIGHT = 500;
 
+  private static final int MIN_WIDTH = 700;
+
   private static final String LABEL = "label";
 
   private static final int DEFAULT_PAGE_SIZE = 10;
@@ -129,6 +131,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     dialog.setTitle(translations.editCategories());
     dialog.setResizable(true);
     dialog.setMinHeight(MIN_HEIGHT);
+    dialog.setMinWidth(MIN_WIDTH);
 
     table.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.DISABLED);
     table.setSelectionModel(new SingleSelectionModel<CategoryDto>());
@@ -255,9 +258,11 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     });
     table.addColumn(nameCol, translations.nameLabel());
 
+    // Render no locale
+    renderLocalizedCategoryRows("");
     // prepare cells for each translations
     for(LocaleDto locale : locales) {
-      renderLocalizedCategoryRows(locale);
+      renderLocalizedCategoryRows(locale.getName());
     }
     renderMissingColumn();
   }
@@ -279,27 +284,33 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     table.addColumn(missingCol, translations.missingLabel());
   }
 
-  private void renderLocalizedCategoryRows(final LocaleDto locale) {
+  private void renderLocalizedCategoryRows(final String localeName) {
     Column<CategoryDto, String> labelCol = new EditableTabableColumn<CategoryDto>() {
       @Override
       public String getValue(CategoryDto object) {
-        AttributeDto label = VariableDtos.getAttribute(object, LABEL, locale.getName());
+        AttributeDto label = VariableDtos.getAttribute(object, LABEL, localeName);
         return label == null ? "" : Strings.nullToEmpty(label.getValue());
       }
     };
     labelCol.setFieldUpdater(new FieldUpdater<CategoryDto, String>() {
       @Override
       public void update(int index, CategoryDto object, String value) {
-        AttributeDto label = VariableDtos.getAttribute(object, LABEL, locale.getName());
+        AttributeDto label = VariableDtos.getAttribute(object, LABEL, localeName);
         if(label == null) {
           // Create new attribute
-          VariableDtos.createAttribute(object, LABEL, locale.getName(), value);
+          VariableDtos.createAttribute(object, LABEL, localeName, value);
         } else {
           label.setValue(value);
         }
       }
     });
-    table.addColumn(labelCol, translations.labelLabel() + " (" + translations.localeMap().get(locale.getName()) + ")");
+
+    String headerString = translations.labelLabel();
+    if(!localeName.isEmpty()) {
+      headerString += " (" + translations.localeMap().get(localeName) + ")";
+    }
+
+    table.addColumn(labelCol, headerString);
   }
 
   @Override

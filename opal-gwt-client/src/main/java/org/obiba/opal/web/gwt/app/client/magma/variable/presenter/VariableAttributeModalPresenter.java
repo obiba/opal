@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.magma.variable.presenter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -37,6 +38,7 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
+import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
@@ -103,7 +105,6 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
       JsArrayString variableDtos = JsArrays.create().cast();
       for(VariableDto variable : variables) {
         VariableDto dto = getVariableDto(variable);
-        dto.setAttributesArray(getAttributesArray(dto));
         variableDtos.push(VariableDto.stringify(dto));
       }
 
@@ -169,7 +170,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     return newAttributes;
   }
 
-  private void updateValuesAndNamespace(List<AttributeDto> attributes, JsArray<AttributeDto> newAttributes,
+  private void updateValuesAndNamespace(Iterable<AttributeDto> attributes, JsArray<AttributeDto> newAttributes,
       String originalName, String originalNamespace) {
 
     for(AttributeDto attribute : attributes) {
@@ -193,7 +194,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     return newAttribute;
   }
 
-  private JsArray<AttributeDto> addNewAttribute(List<AttributeDto> attributes) {
+  private JsArray<AttributeDto> addNewAttribute(Iterable<AttributeDto> attributes) {
     JsArray<AttributeDto> newAttributes = JsArrays.create().cast();
 
     // Add other attributed
@@ -226,9 +227,8 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     dto.setMimeType(variable.getMimeType());
     dto.setOccurrenceGroup(variable.getOccurrenceGroup());
 
-    if(variable.getAttributesArray() != null) {
-      dto.setAttributesArray(variable.getAttributesArray());
-    }
+    dto.setAttributesArray(getAttributesArray(variable));
+    dto.setCategoriesArray(getCategoriesDtoArray(variable.getCategoriesArray()));
 
     if(variable.getCategoriesArray() != null) {
       dto.setCategoriesArray(variable.getCategoriesArray());
@@ -237,14 +237,41 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     return dto;
   }
 
+  private JsArray<CategoryDto> getCategoriesDtoArray(JsArray<CategoryDto> modalCategories) {
+    JsArray<CategoryDto> categories = JsArrays.create().cast();
+    for(CategoryDto categoryDto : JsArrays.toIterable(modalCategories)) {
+      CategoryDto category = CategoryDto.create();
+      category.setName(categoryDto.getName());
+      category.setIsMissing(categoryDto.getIsMissing());
+      category.setAttributesArray(getAttributesDtoArray(categoryDto.getAttributesArray()));
+
+      categories.push(category);
+    }
+    return categories;
+  }
+
+  private JsArray<AttributeDto> getAttributesDtoArray(JsArray<AttributeDto> attributesArray) {
+    JsArray<AttributeDto> attributes = JsArrays.create().cast();
+    for(AttributeDto attributeDto : JsArrays.toIterable(attributesArray)) {
+      AttributeDto attribute = AttributeDto.create();
+      attribute.setName(attributeDto.getName());
+      attribute.setNamespace(attributeDto.getNamespace());
+      attribute.setValue(attributeDto.getValue());
+      attribute.setLocale(attributeDto.getLocale());
+
+      attributes.push(attribute);
+    }
+    return attributes;
+  }
+
   public void initialize(TableDto tableDto, VariableDto variableDto) {
-    List<VariableDto> variableDtos = new ArrayList<VariableDto>();
+    Collection<VariableDto> variableDtos = new ArrayList<VariableDto>();
     variableDtos.add(variableDto);
 
     initialize(tableDto, variableDtos);
   }
 
-  public void initialize(TableDto tableDto, List<VariableDto> variableDtos) {
+  public void initialize(TableDto tableDto, Collection<VariableDto> variableDtos) {
     table = tableDto;
     variables.addAll(variableDtos);
     getView().setNamespaceSuggestions(variables);
@@ -368,16 +395,14 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
       if(validators == null) {
         validators = new LinkedHashSet<FieldValidator>();
 
-        if(dialogMode != Mode.UPDATE_MULTIPLE) {
+        if(dialogMode == Mode.UPDATE_MULTIPLE) {
+          validators.add(new AttributeConflictValidator("AttributeConflictExists"));
+        } else {
           validators.add(
               new RequiredTextValidator(getView().getName(), "AttributeNameIsRequired", Display.FormField.NAME.name()));
           validators.add(
               new ConditionValidator(hasValue(getView().getLocalizedValues().getValue()), "AttributeValueIsRequired",
                   Display.FormField.VALUE.name()));
-        }
-
-        if(dialogMode == Mode.CREATE) {
-          // validate that namespace - name does not already exists
           validators.add(new UniqueAttributeNameValidator("AttributeAlreadyExists"));
         }
       }
@@ -389,7 +414,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
       getView().showError(id == null ? null : Display.FormField.valueOf(id), message);
     }
 
-    private HasValue<Boolean> hasValue(final List<LocalizedEditableText> localizedTexts) {
+    private HasValue<Boolean> hasValue(final Iterable<LocalizedEditableText> localizedTexts) {
       return new HasBooleanValue() {
         @Override
         public Boolean getValue() {
@@ -438,23 +463,46 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
 
     @Override
     protected boolean hasError() {
-      // Permitted when editing multiple variables
-      if(variables.size() == 1) {
+      for(VariableDto variableDto : variables) {
         String safeNamespace = Strings.nullToEmpty(getView().getNamespaceSuggestBox().getText());
         String safeName = Strings.nullToEmpty(getView().getName().getText());
 
         // Using the same safeNamespace/safeName as an existing attribute is not permitted.
-        JsArray<AttributeDto> attributesArray = JsArrays.toSafeArray(variables.get(0).getAttributesArray());
-        for(int i = 0; i < attributesArray.length(); i++) {
-          AttributeDto dto = attributesArray.get(i);
-          if(safeNamespace.equals(dto.getNamespace()) && safeName.equals(dto.getName())) {
+        for(AttributeDto attributeDto : JsArrays.toIterable(variableDto.getAttributesArray())) {
+          if(safeNamespace.equals(attributeDto.getNamespace()) && safeName.equals(attributeDto.getName())) {
             return true;
           }
         }
       }
+
       return false;
     }
+  }
 
+  public class AttributeConflictValidator extends AbstractFieldValidator {
+
+    public AttributeConflictValidator(String errorMessageKey) {
+      super(errorMessageKey);
+    }
+
+    @Override
+    protected boolean hasError() {
+      for(JsArray<AttributeDto> attributesArray : selectedItems) {
+        String safeNamespace = Strings.nullToEmpty(getView().getNamespaceSuggestBox().getText());
+        String existingName = attributesArray.get(0).getName();
+
+        for(VariableDto variable : variables) {
+          // Using the same safeNamespace/safeName as an existing attribute is not permitted.
+          for(AttributeDto attributeDto : JsArrays.toIterable(variable.getAttributesArray())) {
+            if(safeNamespace.equals(attributeDto.getNamespace()) && existingName.equals(attributeDto.getName())) {
+              return true;
+            }
+          }
+        }
+      }
+
+      return false;
+    }
   }
 
   private class AttributeSuccessCallback implements ResponseCodeCallback {
