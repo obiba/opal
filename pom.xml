@@ -969,22 +969,6 @@
         <version>${gwt-log.version}</version>
       </dependency>
 
-      <!-- BIRT dependencies -->
-      <dependency>
-        <groupId>org.obiba.opal.oda</groupId>
-        <artifactId>org.obiba.opal.oda.runtime</artifactId>
-        <version>${opal-oda.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.obiba.opal.oda</groupId>
-        <artifactId>update-site</artifactId>
-        <version>${opal-oda.version}</version>
-        <scope>provided</scope>
-        <type>zip</type>
-        <classifier>assembly</classifier>
-      </dependency>
-
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId>

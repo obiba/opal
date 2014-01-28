@@ -99,8 +99,6 @@ public class OpalJettyServer {
     handlers.addHandler(createDistFileHandler("/webapp"));
     // Add webapp extensions
     handlers.addHandler(createExtensionFileHandler(OpalRuntime.WEBAPP_EXTENSION));
-    // Add a file handler that points to the Opal BIRT extension update-site
-    handlers.addHandler(createDistFileHandler("/update-site"));
     handlers.addHandler(createServletHandler());
     jettyServer.setHandler(handlers);
   }

@@ -81,14 +81,6 @@
       <unpack>true</unpack>
     </dependencySet>
 
-    <!-- Unpack BIRT Report Engine distribution -->
-    <dependencySet>
-      <includes>
-        <include>org.obiba.opal:opal-reporting:zip:dist</include>
-      </includes>
-      <unpack>true</unpack>
-    </dependencySet>
-
     <!-- Tools -->
     <dependencySet>
       <outputDirectory>tools/lib</outputDirectory>
