@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.administration.users.support;
+package org.obiba.opal.web.gwt.app.client.administration.users;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -31,12 +31,12 @@ public class PasswordFieldValidators {
 
   private final HasText password;
 
-  private Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+  private final Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
-  public PasswordFieldValidators(HasText passwd, HasText conf, String form) {
-    password = passwd;
-    confirmation = conf;
-    passwordForm = form;
+  public PasswordFieldValidators(HasText password, HasText confirmation, String passwordForm) {
+    this.password = password;
+    this.confirmation = confirmation;
+    this.passwordForm = passwordForm;
     addValidators();
   }
 
@@ -46,31 +46,30 @@ public class PasswordFieldValidators {
 
   private void addValidators() {
 
-    validators.add(
-        new RequiredTextValidator(password, "PasswordIsRequired", passwordForm));
-    ConditionValidator minLength = new ConditionValidator(minLengthCondition(password),
-        "PasswordLengthMin", passwordForm);
+    validators.add(new RequiredTextValidator(password, "PasswordIsRequired", passwordForm));
+    ConditionValidator minLength = new ConditionValidator(minLengthCondition(password), "PasswordLengthMin",
+        passwordForm);
     minLength.setArgs(Arrays.asList(String.valueOf(MIN_PASSWORD_LENGTH)));
     validators.add(minLength);
     validators.add(
         new ConditionValidator(passwordsMatchCondition(password, confirmation), "PasswordsMustMatch", passwordForm));
   }
 
-  private HasValue<Boolean> minLengthCondition(final HasText password) {
+  private HasValue<Boolean> minLengthCondition(final HasText passwordHasText) {
     return new HasBooleanValue() {
       @Override
       public Boolean getValue() {
-        return password.getText().isEmpty() || password.getText().length() >= MIN_PASSWORD_LENGTH;
+        return passwordHasText.getText().isEmpty() || passwordHasText.getText().length() >= MIN_PASSWORD_LENGTH;
       }
     };
   }
 
-  private HasValue<Boolean> passwordsMatchCondition(final HasText password, final HasText confirmPassword) {
+  private HasValue<Boolean> passwordsMatchCondition(final HasText passwordHasText, final HasText confirmPassword) {
     return new HasBooleanValue() {
       @Override
       public Boolean getValue() {
-        return password.getText().isEmpty() && confirmPassword.getText().isEmpty() ||
-            password.getText().equals(confirmPassword.getText());
+        return passwordHasText.getText().isEmpty() && confirmPassword.getText().isEmpty() ||
+            passwordHasText.getText().equals(confirmPassword.getText());
       }
     };
   }

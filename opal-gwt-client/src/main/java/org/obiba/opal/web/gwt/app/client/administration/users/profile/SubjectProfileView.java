@@ -1,7 +1,5 @@
-package org.obiba.opal.web.gwt.app.client.administration.users.view;
+package org.obiba.opal.web.gwt.app.client.administration.users.profile;
 
-import org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectProfilePresenter;
-import org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectProfileUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 
 import com.github.gwtbootstrap.client.ui.Form;
@@ -14,7 +12,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
-public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandlers> implements SubjectProfilePresenter.Display {
+public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandlers>
+    implements SubjectProfilePresenter.Display {
 
   interface Binder extends UiBinder<Widget, SubjectProfileView> {}
 
@@ -35,7 +34,8 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
   @Override
   public void enableChangePassword(boolean enabled, String realm) {
     accountForm.setVisible(enabled);
-    accountText.setText(enabled ? translationMessages.accountEditable() : translationMessages.accountNotEditable(realm));
+    accountText
+        .setText(enabled ? translationMessages.accountEditable() : translationMessages.accountNotEditable(realm));
   }
 
   @UiHandler("changePassword")

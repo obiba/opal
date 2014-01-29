@@ -7,12 +7,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.users.view;
+package org.obiba.opal.web.gwt.app.client.administration.users.profile.admin;
 
 import java.util.Collections;
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectProfilesAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
@@ -95,18 +94,19 @@ public class SubjectProfilesAdministrationView extends ViewImpl
       }
 
     }, translations.lastUpdatedLabel());
-    profilesTable.addColumn(actionsColumn = new ActionsColumn<SubjectProfileDto>(new ActionsProvider<SubjectProfileDto>() {
+    profilesTable
+        .addColumn(actionsColumn = new ActionsColumn<SubjectProfileDto>(new ActionsProvider<SubjectProfileDto>() {
 
-      @Override
-      public String[] allActions() {
-        return new String[] { DELETE_ACTION };
-      }
+          @Override
+          public String[] allActions() {
+            return new String[] { DELETE_ACTION };
+          }
 
-      @Override
-      public String[] getActions(SubjectProfileDto value) {
-        return new String[] { DELETE_ACTION };
-      }
-    }), translations.actionsLabel());
+          @Override
+          public String[] getActions(SubjectProfileDto value) {
+            return new String[] { DELETE_ACTION };
+          }
+        }), translations.actionsLabel());
 
     profilesTable.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
     profilesPager.setDisplay(profilesTable);

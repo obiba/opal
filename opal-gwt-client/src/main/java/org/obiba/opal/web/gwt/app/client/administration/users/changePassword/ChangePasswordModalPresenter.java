@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.administration.users.presenter;
+package org.obiba.opal.web.gwt.app.client.administration.users.changePassword;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.administration.users.support.PasswordFieldValidators;
+import org.obiba.opal.web.gwt.app.client.administration.users.PasswordFieldValidators;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -46,7 +46,6 @@ import static com.google.gwt.http.client.Response.SC_OK;
 public class ChangePasswordModalPresenter extends ModalPresenterWidget<ChangePasswordModalPresenter.Display>
     implements ChangePasswordModalUiHandlers {
 
-
   private final Translations translations;
 
   private String principal;
@@ -59,9 +58,9 @@ public class ChangePasswordModalPresenter extends ModalPresenterWidget<ChangePas
   }
 
   @Override
-  public void save () {
+  public void save() {
     getView().clearErrors();
-    if (new ViewValidator().validate()) {
+    if(new ViewValidator().validate()) {
       ResourceRequestBuilderFactory.newBuilder() //
           .forResource(UriBuilders.SUBJECT_CREDENTIAL_PASSWORD_UPDATE.create().build()) //
           .withResourceBody(PasswordDto.stringify(getDto())) //
@@ -95,11 +94,17 @@ public class ChangePasswordModalPresenter extends ModalPresenterWidget<ChangePas
     }
 
     void clearErrors();
+
     void showError(String messageKey, List<String> args);
+
     void showError(@Nullable FormField formField, String message);
+
     HasText getOldPassword();
+
     HasText getNewPassword();
+
     HasText getConfirmPassword();
+
     void close();
   }
 

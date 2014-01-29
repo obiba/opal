@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.users.presenter;
+package org.obiba.opal.web.gwt.app.client.administration.users.edit;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -16,9 +16,8 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.administration.users.SubjectCredentialsDtos;
-import org.obiba.opal.web.gwt.app.client.administration.users.event.SubjectCredentialsRefreshedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.users.support.PasswordFieldValidators;
+import org.obiba.opal.web.gwt.app.client.administration.users.PasswordFieldValidators;
+import org.obiba.opal.web.gwt.app.client.administration.users.SubjectCredentialsRefreshedEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;

@@ -8,14 +8,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.administration.users.view;
+package org.obiba.opal.web.gwt.app.client.administration.users.changePassword;
 
-import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.administration.users.presenter.ChangePasswordModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
@@ -33,10 +31,10 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-import static org.obiba.opal.web.gwt.app.client.administration.users.presenter.ChangePasswordModalPresenter.Display;
+import static org.obiba.opal.web.gwt.app.client.administration.users.changePassword.ChangePasswordModalPresenter.Display;
 
-public class ChangePasswordModalView extends ModalPopupViewWithUiHandlers<ChangePasswordModalUiHandlers> implements
-    Display {
+public class ChangePasswordModalView extends ModalPopupViewWithUiHandlers<ChangePasswordModalUiHandlers>
+    implements Display {
 
   interface Binder extends UiBinder<Widget, ChangePasswordModalView> {}
 

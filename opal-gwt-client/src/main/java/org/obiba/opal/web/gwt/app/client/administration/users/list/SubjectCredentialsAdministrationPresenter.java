@@ -7,14 +7,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.users.presenter;
+package org.obiba.opal.web.gwt.app.client.administration.users.list;
 
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
-import org.obiba.opal.web.gwt.app.client.administration.users.event.GroupsRefreshedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.users.event.SubjectCredentialsRefreshedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.users.SubjectCredentialsRefreshedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.users.edit.SubjectCredentialsPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -76,8 +76,8 @@ public class SubjectCredentialsAdministrationPresenter extends
   @ProxyEvent
   @Override
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.SUBJECT_CREDENTIALS.create().build()) //
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(
+        UriBuilders.SUBJECT_CREDENTIALS.create().build()) //
         .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListUsersAuthorization())) //
         .get().send();
   }

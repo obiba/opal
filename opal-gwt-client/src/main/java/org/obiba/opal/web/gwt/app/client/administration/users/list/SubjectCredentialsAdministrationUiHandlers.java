@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.administration.users.presenter;
+package org.obiba.opal.web.gwt.app.client.administration.users.list;
 
 import com.gwtplatform.mvp.client.UiHandlers;
 

@@ -70,11 +70,11 @@ import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.Taxonomi
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.TaxonomyEditModalView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.VocabularyEditView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.VocabularyView;
-import org.obiba.opal.web.gwt.app.client.administration.users.presenter.ChangePasswordModalPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectCredentialsAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectCredentialsPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectProfilePresenter;
-import org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectProfilesAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.users.changePassword.ChangePasswordModalPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.users.edit.SubjectCredentialsPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.users.list.SubjectCredentialsAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.users.profile.SubjectProfilePresenter;
+import org.obiba.opal.web.gwt.app.client.administration.users.profile.admin.SubjectProfilesAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.users.view.ChangePasswordModalView;
 import org.obiba.opal.web.gwt.app.client.administration.users.view.SubjectCredentialsAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.users.view.SubjectCredentialsView;
@@ -139,8 +139,8 @@ public class AdministrationModule extends AbstractPresenterModule {
   private void configureProfiles() {
     bindPresenter(SubjectProfilesAdministrationPresenter.class, SubjectProfilesAdministrationPresenter.Display.class,
         SubjectProfilesAdministrationView.class, SubjectProfilesAdministrationPresenter.Proxy.class);
-    bindPresenter(SubjectProfilePresenter.class, SubjectProfilePresenter.Display.class,
-        SubjectProfileView.class, SubjectProfilePresenter.Proxy.class);
+    bindPresenter(SubjectProfilePresenter.class, SubjectProfilePresenter.Display.class, SubjectProfileView.class,
+        SubjectProfilePresenter.Proxy.class);
     bindPresenterWidget(ChangePasswordModalPresenter.class, ChangePasswordModalPresenter.Display.class,
         ChangePasswordModalView.class);
   }

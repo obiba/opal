@@ -37,7 +37,7 @@
     </b:Form>
 
     <!--<b:Heading size="4">-->
-      <!--<ui:msg description="Favorites label">Favorites</ui:msg>-->
+    <!--<ui:msg description="Favorites label">Favorites</ui:msg>-->
     <!--</b:Heading>-->
 
   </g:FlowPanel>

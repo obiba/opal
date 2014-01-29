@@ -7,12 +7,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.users.view;
+package org.obiba.opal.web.gwt.app.client.administration.users.list;
 
 import java.util.Collections;
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectCredentialsAdministrationUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
@@ -38,7 +37,7 @@ import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
-import static org.obiba.opal.web.gwt.app.client.administration.users.presenter.SubjectCredentialsAdministrationPresenter.Display;
+import static org.obiba.opal.web.gwt.app.client.administration.users.list.SubjectCredentialsAdministrationPresenter.Display;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 
