@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.app.client.bookmark;
 
 import org.obiba.opal.web.gwt.app.client.bookmark.icon.BookmarkIconPresenter;
 import org.obiba.opal.web.gwt.app.client.bookmark.icon.BookmarkIconView;
+import org.obiba.opal.web.gwt.app.client.bookmark.list.BookmarkListPresenter;
+import org.obiba.opal.web.gwt.app.client.bookmark.list.BookmarkListView;
 import org.obiba.opal.web.gwt.app.client.inject.AbstractOpalModule;
 
 public class BookmarkModule extends AbstractOpalModule {
@@ -18,5 +20,6 @@ public class BookmarkModule extends AbstractOpalModule {
   @Override
   protected void configure() {
     bindPresenterWidget(BookmarkIconPresenter.class, BookmarkIconPresenter.Display.class, BookmarkIconView.class);
+    bindPresenterWidget(BookmarkListPresenter.class, BookmarkListPresenter.Display.class, BookmarkListView.class);
   }
 }
