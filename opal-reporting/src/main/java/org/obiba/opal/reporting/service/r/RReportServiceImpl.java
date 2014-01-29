@@ -52,42 +52,13 @@ public class RReportServiceImpl implements ReportService {
       if(reportOutputDir.exists()) {
         FileUtil.delete(reportOutputDir);
       }
-      reportOutputDir.mkdirs();
-
-      StringBuilder script = new StringBuilder("require(opal);");
-
-      if(parameters.size() > 0) {
-        script.append("options(");
-        boolean appended = false;
-        for(Map.Entry<String, String> param : parameters.entrySet()) {
-          String value = param.getValue().trim();
-          if(!Pattern.matches("^T$|^TRUE$|^F$|^FALSE$", value)) {
-            value = "'" + value + "'";
-          }
-          if(appended) {
-            script.append(", ");
-          }
-          script.append(param.getKey().trim() + "=" + value);
-          appended = true;
-        }
-        script.append(");");
+      if (!reportOutputDir.mkdirs()) {
+        log.warn("Failed to create directory: {}", reportOutputDir.getAbsolutePath());
       }
-      script.append("opal.report('").append(reportDesign).append("'").append(", '")
-          .append(reportOutputDir.getAbsolutePath()).append("', progress=TRUE);");
 
-      List<String> args = Lists.newArrayList(exec, "--vanilla", "-e", script.toString());
-
-      Process rProcess = buildRProcess(args, reportOutputDir).start();
-      int rProcessStatus = rProcess.waitFor();
-      if(rProcessStatus == 0) {
-        log.info("R report done");
-        String reportName = new File(reportDesign).getName();
-        FileUtil.moveFile(new File(reportOutputDir, reportName.replace(".Rmd", ".html")), new File(reportOutput));
-        FileUtil.delete(reportOutputDir);
-      } else {
-        log.error("R report failed with status: {}", rProcessStatus);
-        throw new ReportException("R report failed with status: " + rProcessStatus);
-      }
+      String script = buildReportScript(parameters, reportDesign, reportOutputDir);
+      List<String> args = Lists.newArrayList(exec, "--vanilla", "-e", script);
+      launchRReportProcess(args, reportOutputDir, reportDesign, reportOutput);
 
     } catch(InterruptedException e) {
       log.error("Render R report interrupted", e);
@@ -132,15 +103,6 @@ public class RReportServiceImpl implements ReportService {
     return true;
   }
 
-  private ProcessBuilder buildRProcess(List<String> args, File workingDirectory) {
-    log.info("Starting R report: {}", StringUtil.collectionToString(args, " "));
-    ProcessBuilder pb = new ProcessBuilder(args);
-    pb.directory(workingDirectory);
-    pb.redirectErrorStream(true);
-    pb.redirectOutput(ProcessBuilder.Redirect.appendTo(getRreportLog()));
-    return pb;
-  }
-
   private File getWorkingDirectory() {
     File dir = new File(opalHomeFile, "work" + File.separator + "R" + "report");
     if(!dir.exists()) {
@@ -159,5 +121,54 @@ public class RReportServiceImpl implements ReportService {
       }
     }
     return logFile;
+  }
+
+  private void launchRReportProcess(List<String> args, File reportOutputDir, String reportDesign, String reportOutput)
+      throws IOException, InterruptedException, ReportException {
+    Process rProcess = buildRProcess(args, reportOutputDir).start();
+    int rProcessStatus = rProcess.waitFor();
+    if(rProcessStatus == 0) {
+      log.info("R report done");
+      String reportName = new File(reportDesign).getName();
+      FileUtil.moveFile(new File(reportOutputDir, reportName.replace(".Rmd", ".html")), new File(reportOutput));
+      FileUtil.delete(reportOutputDir);
+    } else {
+      log.error("R report failed with status: {}", rProcessStatus);
+      throw new ReportException("R report failed with status: " + rProcessStatus);
+    }
+  }
+
+  private ProcessBuilder buildRProcess(List<String> args, File workingDirectory) {
+    log.info("Starting R report: {}", StringUtil.collectionToString(args, " "));
+    ProcessBuilder pb = new ProcessBuilder(args);
+    pb.directory(workingDirectory);
+    pb.redirectErrorStream(true);
+    pb.redirectOutput(ProcessBuilder.Redirect.appendTo(getRreportLog()));
+    return pb;
+  }
+
+  private String buildReportScript(Map<String, String> parameters,String reportDesign, File reportOutputDir) {
+    StringBuilder script = new StringBuilder("require(opal);");
+
+    if(parameters.size() > 0) {
+      script.append("options(");
+      boolean appended = false;
+      for(Map.Entry<String, String> param : parameters.entrySet()) {
+        String value = param.getValue().trim();
+        if(!Pattern.matches("^T$|^TRUE$|^F$|^FALSE$", value)) {
+          value = "'" + value + "'";
+        }
+        if(appended) {
+          script.append(", ");
+        }
+        script.append(param.getKey().trim() + "=" + value);
+        appended = true;
+      }
+      script.append(");");
+    }
+    script.append("opal.report('").append(reportDesign).append("'").append(", '")
+        .append(reportOutputDir.getAbsolutePath()).append("', progress=TRUE);");
+
+    return script.toString();
   }
 }
