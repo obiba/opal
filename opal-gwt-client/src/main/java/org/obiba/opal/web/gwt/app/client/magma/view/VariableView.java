@@ -190,19 +190,19 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
     initWidget(uiBinder.createAndBindUi(this));
     initCategoryTable();
-
-    tabPanel.addShownHandler(new TabPanel.ShownEvent.Handler() {
-      @Override
-      public void onShow(TabPanel.ShownEvent event) {
-        if(tabPanel.getSelectedTab() == SUMMARY_TAB_INDEX) {
-          getUiHandlers().onShowSummary();
-        }
-        if(tabPanel.getSelectedTab() == VALUES_TAB_INDEX) {
-          getUiHandlers().onShowValues();
-        }
-      }
-    });
     scriptNavPanel.showWidget(0);
+  }
+
+  @UiHandler("tabPanel")
+  void onShown(TabPanel.ShownEvent shownEvent) {
+    if(shownEvent.getTarget() == null) return;
+
+    if(tabPanel.getSelectedTab() == SUMMARY_TAB_INDEX) {
+      getUiHandlers().onShowSummary();
+    }
+    if(tabPanel.getSelectedTab() == VALUES_TAB_INDEX) {
+      getUiHandlers().onShowValues();
+    }
   }
 
   @Override
