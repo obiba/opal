@@ -87,7 +87,7 @@ public class RReportServiceImpl implements ReportService {
 
   @Override
   public String getName() {
-    return "r-report";
+    return "report";
   }
 
   @Override
