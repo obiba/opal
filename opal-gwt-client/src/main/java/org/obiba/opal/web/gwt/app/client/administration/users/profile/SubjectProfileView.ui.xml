@@ -36,9 +36,7 @@
       </b:ButtonGroup>
     </b:Form>
 
-    <!--<b:Heading size="4">-->
-    <!--<ui:msg description="Favorites label">Favorites</ui:msg>-->
-    <!--</b:Heading>-->
+    <g:FlowPanel ui:field="bookmarks"/>
 
   </g:FlowPanel>
 

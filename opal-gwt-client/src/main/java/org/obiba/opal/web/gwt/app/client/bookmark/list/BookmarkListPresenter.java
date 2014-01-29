@@ -1,8 +1,15 @@
 package org.obiba.opal.web.gwt.app.client.bookmark.list;
 
+import java.util.List;
+
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.BookmarkDto;
 
-import com.google.gwt.view.client.HasData;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -18,9 +25,27 @@ public class BookmarkListPresenter extends PresenterWidget<BookmarkListPresenter
     getView().setUiHandlers(this);
   }
 
+  @Override
+  protected void onReveal() {
+    super.onReveal();
+    refreshTable();
+  }
+
+  private void refreshTable() {
+    ResourceRequestBuilderFactory.<JsArray<BookmarkDto>>newBuilder() //
+        .forResource(UriBuilders.BOOKMARKS.create().build()) //
+        .withCallback(new ResourceCallback<JsArray<BookmarkDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<BookmarkDto> resource) {
+            getView().renderRows(JsArrays.toList(resource));
+          }
+        }) //
+        .get().send();
+  }
+
   public interface Display extends View, HasUiHandlers<BookmarkListUiHandlers> {
 
-    HasData<BookmarkDto> getTable();
+    void renderRows(List<BookmarkDto> rows);
 
   }
 }

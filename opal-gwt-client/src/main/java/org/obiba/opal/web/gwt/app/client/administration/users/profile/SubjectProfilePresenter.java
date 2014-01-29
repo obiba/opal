@@ -1,6 +1,7 @@
 package org.obiba.opal.web.gwt.app.client.administration.users.profile;
 
 import org.obiba.opal.web.gwt.app.client.administration.users.changePassword.ChangePasswordModalPresenter;
+import org.obiba.opal.web.gwt.app.client.bookmark.list.BookmarkListPresenter;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
@@ -9,15 +10,18 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.SubjectProfileDto;
 
+import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.ContentSlot;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 
 /**
  * Current subject page.
@@ -25,19 +29,25 @@ import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 public class SubjectProfilePresenter extends Presenter<SubjectProfilePresenter.Display, SubjectProfilePresenter.Proxy>
     implements SubjectProfileUiHandlers {
 
-  private SubjectProfileDto profile;
-
   @ProxyStandard
   @NameToken(Places.PROFILE)
   public interface Proxy extends ProxyPlace<SubjectProfilePresenter> {}
 
+  @ContentSlot
+  public static final GwtEvent.Type<RevealContentHandler<?>> BOOKMARKS = new GwtEvent.Type<RevealContentHandler<?>>();
+
+  private SubjectProfileDto profile;
+
   private final ModalProvider<ChangePasswordModalPresenter> changePasswordModalProvider;
+
+  private final BookmarkListPresenter bookmarkListPresenter;
 
   @Inject
   public SubjectProfilePresenter(EventBus eventBus, Display display, Proxy proxy,
-      ModalProvider<ChangePasswordModalPresenter> changePasswordProvider) {
+      ModalProvider<ChangePasswordModalPresenter> changePasswordProvider, BookmarkListPresenter bookmarkListPresenter) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     changePasswordModalProvider = changePasswordProvider.setContainer(this);
+    this.bookmarkListPresenter = bookmarkListPresenter;
     getView().setUiHandlers(this);
   }
 
@@ -57,6 +67,7 @@ public class SubjectProfilePresenter extends Presenter<SubjectProfilePresenter.D
           }
         }) //
         .get().send();
+    setInSlot(BOOKMARKS, bookmarkListPresenter);
   }
 
   @Override

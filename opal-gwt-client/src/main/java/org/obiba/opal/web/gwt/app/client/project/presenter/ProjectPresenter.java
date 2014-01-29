@@ -203,9 +203,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     // TODO handle wrong or missing project name
     if(projectName == null) return;
     // reset
-    final String projectUri = UriBuilders.PROJECT.create().build(projectName);
     ResourceRequestBuilderFactory.<ProjectDto>newBuilder() //
-        .forResource(projectUri) //
+        .forResource(UriBuilders.PROJECT.create().build(projectName)) //
         .withCallback(new ResourceCallback<ProjectDto>() {
           @Override
           public void onResource(Response response, ProjectDto resource) {
@@ -219,7 +218,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
               bookmarkIconPresenter.addStyleName("small-indent");
               setInSlot(BOOKMARK_ICON, bookmarkIconPresenter);
             }
-            bookmarkIconPresenter.setBookmarkable(projectUri);
+            bookmarkIconPresenter.setBookmarkable(UriBuilders.DATASOURCE.create().build(projectName));
           }
         }).get().send();
     refreshSummary();
@@ -250,9 +249,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     String queryPathParam = (String) getView().getTabData(index);
     selectTab(index, queryPathParam);
 
-    PlaceRequest.Builder builder = PlaceRequestHelper
-        .createRequestBuilderWithParams(placeManager.getCurrentPlaceRequest(),
-            Arrays.asList(ParameterTokens.TOKEN_NAME)) //
+    PlaceRequest.Builder builder = PlaceRequestHelper.createRequestBuilderWithParams(
+        placeManager.getCurrentPlaceRequest(), Arrays.asList(ParameterTokens.TOKEN_NAME)) //
         .with(ParameterTokens.TOKEN_TAB, tab.toString());
     if(!Strings.isNullOrEmpty(queryPathParam)) {
       builder.with(ParameterTokens.TOKEN_PATH, queryPathParam);

@@ -8,6 +8,8 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
@@ -17,18 +19,21 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
 
   interface Binder extends UiBinder<Widget, SubjectProfileView> {}
 
-  private final TranslationMessages translationMessages;
-
   @UiField
   Paragraph accountText;
 
   @UiField
   Form accountForm;
 
+  @UiField
+  FlowPanel bookmarks;
+
+  private final TranslationMessages translationMessages;
+
   @Inject
   public SubjectProfileView(Binder uiBinder, TranslationMessages translationMessages) {
-    initWidget(uiBinder.createAndBindUi(this));
     this.translationMessages = translationMessages;
+    initWidget(uiBinder.createAndBindUi(this));
   }
 
   @Override
@@ -41,5 +46,13 @@ public class SubjectProfileView extends ViewWithUiHandlers<SubjectProfileUiHandl
   @UiHandler("changePassword")
   public void onChangePassword(ClickEvent event) {
     getUiHandlers().onChangePassword();
+  }
+
+  @Override
+  public void setInSlot(Object slot, IsWidget content) {
+    if(slot == SubjectProfilePresenter.BOOKMARKS) {
+      bookmarks.clear();
+      bookmarks.add(content);
+    }
   }
 }
