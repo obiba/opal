@@ -112,6 +112,13 @@
           <property name="configFile" value="file:${OPAL_HOME}/data/opal-config.xml"/>
         </bean>
 
+        <!-- 2.0.0 / remove BIRT report templates from config -->
+        <bean class="org.obiba.opal.core.upgrade.v2_0_x.RemoveBIRTReportTemplatesUpgradeStep">
+          <property name="description" value="Remove BIRT report templates from configuration"/>
+          <property name="appliesTo" value="2.0.0"/>
+          <property name="configFile" value="file:${OPAL_HOME}/data/opal-config.xml"/>
+        </bean>
+
         <!-- 2.0.0 / move version from table to opal-config.xml -->
         <bean class="org.obiba.opal.core.upgrade.v2_0_x.database.CopyVersionToOpalConfigurationUpgradeStep"/>
 
