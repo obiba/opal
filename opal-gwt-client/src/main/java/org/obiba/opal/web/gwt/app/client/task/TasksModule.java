@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.task;
 
-import org.obiba.opal.web.gwt.app.client.administration.task.presenter.TasksAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.task.view.TasksAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.task.TasksAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.task.TasksAdministrationView;
 import org.obiba.opal.web.gwt.app.client.task.presenter.TaskDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter;
 import org.obiba.opal.web.gwt.app.client.task.view.TaskDetailsView;

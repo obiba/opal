@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.report;
 
-import org.obiba.opal.web.gwt.app.client.administration.report.presenter.ReportsAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.report.view.ReportsAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.report.ReportsAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.report.ReportsAdministrationView;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateModalPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportsPresenter;

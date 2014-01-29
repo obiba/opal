@@ -11,7 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.permissions.support;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
 
 import org.obiba.opal.web.model.client.opal.AclAction;
 
@@ -31,10 +31,9 @@ public enum ResourcePermissionType {
   }
 
   public boolean hasPermission(String name) {
-    for(Iterator<AclAction> iterator = permissions.iterator(); iterator.hasNext(); ) {
-      if(iterator.next().getName().equals(name)) return true;
+    for(AclAction permission : permissions) {
+      if(permission.getName().equals(name)) return true;
     }
-
     return false;
   }
 
@@ -55,9 +54,7 @@ public enum ResourcePermissionType {
   }
 
   ResourcePermissionType(AclAction... permissions) {
-    for(AclAction permission : permissions) {
-      this.permissions.add(permission);
-    }
+    Collections.addAll(this.permissions, permissions);
   }
 
   private final ArrayList<AclAction> permissions = new ArrayList<AclAction>();
