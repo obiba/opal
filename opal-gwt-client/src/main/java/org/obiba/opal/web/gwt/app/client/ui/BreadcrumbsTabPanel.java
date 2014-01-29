@@ -55,6 +55,7 @@ public class BreadcrumbsTabPanel extends AbstractTabPanel {
     });
 
     setAnimationEnabled(true);
+    getMenu().addStyleName("inline-block");
   }
 
   @Override

@@ -25,7 +25,7 @@
               <ui:msg description="Projects label">Projects</ui:msg>
             </b:NavLink>
           </b:Breadcrumbs>
-          <g:FlowPanel ui:field="bookmarkIcon" addStyleNames="inline-block small-indent"/>
+          <g:FlowPanel ui:field="bookmarkIcon" addStyleNames="inline-block"/>
         </b:Column>
         <b:Column size="3">
         </b:Column>

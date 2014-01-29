@@ -65,6 +65,10 @@ public class AbstractTabPanel extends FlowPanel
     menu.addStyleName("inline");
   }
 
+  protected UnorderedList getMenu() {
+    return menu;
+  }
+
   @UiChild(tagname = "tab")
   public void addTabHeader(Widget tab) {
     insertItem((HasClickHandlers) tab, menu.getWidgetCount());
