@@ -13,6 +13,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.datashield.RestrictedRScriptROperation;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
 import org.obiba.opal.datashield.expr.DataShieldScriptValidator;
@@ -41,6 +42,9 @@ public class OpalDataShieldSessionResourceImpl extends OpalRSessionResourceImpl
 
   @Autowired
   private ApplicationContext applicationContext;
+
+  @Autowired
+  private IdentifiersTableService identifiersTableService;
 
   @Override
   public Response aggregate(String body) {
@@ -72,6 +76,7 @@ public class OpalDataShieldSessionResourceImpl extends OpalRSessionResourceImpl
         .getBean("dataShieldSymbolResource", DataShieldSymbolResource.class);
     resource.setName(name);
     resource.setOpalRSession(getOpalRSession());
+    resource.setIdentifiersTableService(identifiersTableService);
     return resource;
   }
 

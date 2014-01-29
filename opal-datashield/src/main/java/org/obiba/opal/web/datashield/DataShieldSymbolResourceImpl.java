@@ -36,9 +36,9 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
   private Supplier<DatashieldConfiguration> configSupplier;
 
   @Override
-  public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean missings) {
+  public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean missings, String identifiers) {
     DataShieldLog.userLog("creating symbol '{}' from opal data '{}'", getName(), path);
-    return super.putMagma(uri, path, variableFilter, missings);
+    return super.putMagma(uri, path, variableFilter, missings, identifiers);
   }
 
   @Override

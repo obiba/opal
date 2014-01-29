@@ -33,7 +33,7 @@ import com.google.common.collect.ImmutableSet;
 public class SecuredRSymbolResourceImpl extends AbstractRSymbolResourceImpl implements SecuredRSymbolResource {
 
   @Override
-  public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean missings) {
+  public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean missings, String identifiers) {
     if(path == null) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
@@ -44,7 +44,7 @@ public class SecuredRSymbolResourceImpl extends AbstractRSymbolResourceImpl impl
       }
     }
 
-    return super.putMagma(uri, path, variableFilter, missings);
+    return super.putMagma(uri, path, variableFilter, missings, identifiers);
   }
 
   private Iterable<ValueTable> getValueTables(String path) {

@@ -11,9 +11,11 @@ package org.obiba.opal.web.r;
 
 import java.net.URI;
 
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.r.MagmaAssignROperation;
 import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.StringAssignROperation;
@@ -29,6 +31,9 @@ public abstract class AbstractRSymbolResourceImpl extends AbstractOpalRSessionRe
 
   private OpalRSession rSession;
 
+  @NotNull
+  private IdentifiersTableService identifiersTableService;
+
   @Override
   public void setName(String name) {
     this.name = name;
@@ -37,6 +42,11 @@ public abstract class AbstractRSymbolResourceImpl extends AbstractOpalRSessionRe
   @Override
   public void setOpalRSession(OpalRSession rSession) {
     this.rSession = rSession;
+  }
+
+  @Override
+  public void setIdentifiersTableService(IdentifiersTableService identifiersTableService) {
+    this.identifiersTableService = identifiersTableService;
   }
 
   @Override
@@ -62,8 +72,8 @@ public abstract class AbstractRSymbolResourceImpl extends AbstractOpalRSessionRe
   }
 
   @Override
-  public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean missings) {
-    rSession.execute(new MagmaAssignROperation(name, path, variableFilter, missings));
+  public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean missings, String identifiers) {
+    rSession.execute(new MagmaAssignROperation(name, path, variableFilter, missings, identifiers, identifiersTableService));
     return Response.created(getSymbolURI(uri)).build();
   }
 
