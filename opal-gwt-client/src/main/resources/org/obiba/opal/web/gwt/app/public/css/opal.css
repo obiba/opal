@@ -473,6 +473,17 @@ td.row-actions span {
   padding-left: 3px;
 }
 
-.bookmark {
+a.bookmark,
+a.bookmark:visited,
+a.bookmark:hover,
+a.bookmark:focus {
+  color: #B4BCC2;
+  text-decoration: none;
+}
 
+a.bookmark-on,
+a.bookmark-on:visited,
+a.bookmark-on:hover,
+a.bookmark-on:focus {
+  color: #FFD76E;
 }
