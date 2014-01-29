@@ -161,7 +161,7 @@ public class RReportServiceImpl implements ReportService {
         if(appended) {
           script.append(", ");
         }
-        script.append(param.getKey().trim() + "=" + value);
+        script.append(param.getKey().trim()).append("=").append(value);
         appended = true;
       }
       script.append(");");
