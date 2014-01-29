@@ -149,7 +149,7 @@ public class RReportServiceImpl implements ReportService {
   }
 
   private ProcessBuilder buildRProcess(List<String> args, File workingDirectory) {
-    log.info("Starting R report: {}", StringUtil.collectionToString(args, " "));
+    log.debug("Starting R report: {}", StringUtil.collectionToString(args, " "));
     ProcessBuilder pb = new ProcessBuilder(args);
     pb.directory(workingDirectory);
     pb.redirectErrorStream(true);
