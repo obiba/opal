@@ -39,7 +39,7 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
-import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
+import static org.obiba.opal.web.gwt.app.client.administration.database.presenter.DataDatabasesPresenter.Display.UNREGISTER_ACTION;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 
 public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresenter.Display>
@@ -121,10 +121,10 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
       @Override
       public void doAction(DatabaseDto dto, String actionName) {
 
-        if(actionName.equalsIgnoreCase(DELETE_ACTION)) {
+        if(actionName.equalsIgnoreCase(UNREGISTER_ACTION)) {
 
           getEventBus().fireEvent(ConfirmationRequiredEvent
-              .createWithKeys(confirmedCommand = new DeleteDatabaseCommand(dto), "deleteDatabase",
+              .createWithKeys(confirmedCommand = new DeleteDatabaseCommand(dto), "unregisterDatabase",
                   "confirmDeleteDatabase"));
 
         } else if(actionName.equalsIgnoreCase(EDIT_ACTION)) {
@@ -160,6 +160,7 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
   public interface Display extends View, HasUiHandlers<DataDatabasesUiHandlers> {
 
     String TEST_ACTION = "Test";
+    String UNREGISTER_ACTION = "Unregister";
 
     HasActionHandler<DatabaseDto> getActions();
 

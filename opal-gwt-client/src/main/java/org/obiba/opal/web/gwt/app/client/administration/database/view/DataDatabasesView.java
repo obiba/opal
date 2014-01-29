@@ -174,7 +174,7 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
 
       @Override
       public String[] allActions() {
-        return new String[] { TEST_ACTION, EDIT_ACTION, DELETE_ACTION };
+        return new String[] { TEST_ACTION, EDIT_ACTION, UNREGISTER_ACTION };
       }
 
       @Override
