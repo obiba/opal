@@ -304,7 +304,7 @@ public class OpalRService implements Service, ROperationTemplate, HasServiceList
     if(isEnabled()) {
       String libDir = getLibDirectory().getAbsolutePath();
       try {
-        new RScriptROperation(".libPaths(\"" + libDir + "\")").doWithConnection(conn);
+        new RScriptROperation(".libPaths(append(\"" + libDir + "\", .libPaths()))").doWithConnection(conn);
       } catch(Exception e) {
         log.warn("Unable to set libPaths to '{}': {}", libDir, e.getMessage());
       }

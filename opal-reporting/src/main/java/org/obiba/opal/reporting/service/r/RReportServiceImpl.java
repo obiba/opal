@@ -113,6 +113,16 @@ public class RReportServiceImpl implements ReportService {
     return dir;
   }
 
+  private File getLibDirectory() {
+    File dir = new File(opalHomeFile, "data" + File.separator + "R" + File.separator + "library");
+    if(!dir.exists()) {
+      if (!dir.mkdirs()) {
+        log.error("Unable to create: {}", dir.getAbsolutePath());
+      }
+    }
+    return dir;
+  }
+
   private File getRreportLog() {
     File logFile = new File(opalHomeFile, "logs" + File.separator + "Rreport.log");
     if(!logFile.getParentFile().exists()) {
@@ -148,7 +158,9 @@ public class RReportServiceImpl implements ReportService {
   }
 
   private String buildReportScript(Map<String, String> parameters,String reportDesign, File reportOutputDir) {
-    StringBuilder script = new StringBuilder("require(opal);");
+    StringBuilder script = new StringBuilder();
+
+    script.append(".libPaths(append('").append(getLibDirectory().getAbsolutePath()).append("', .libPaths()));require(opal);");
 
     if(parameters.size() > 0) {
       script.append("options(");
