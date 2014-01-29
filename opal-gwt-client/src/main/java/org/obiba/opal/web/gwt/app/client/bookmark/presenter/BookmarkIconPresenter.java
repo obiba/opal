@@ -106,11 +106,17 @@ public class BookmarkIconPresenter extends PresenterWidget<BookmarkIconPresenter
     refresh();
   }
 
+  public void addStyleName(String style) {
+    getView().addStyleName(style);
+  }
+
   public interface Display extends View, HasUiHandlers<BookmarkIconUiHandlers> {
 
     void showIcon(boolean isBookmarked);
 
     void hideIcon();
+
+    void addStyleName(String style);
   }
 
 }

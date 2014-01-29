@@ -17,11 +17,13 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.obiba.opal.web.gwt.app.client.bookmark.presenter.BookmarkIconPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsUiHandlers;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.github.gwtbootstrap.client.ui.Column;
@@ -47,6 +49,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> implements ProjectsPresenter.Display {
@@ -75,8 +78,12 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
   private final TranslationMessages translationMessages;
 
+  private final Provider<BookmarkIconPresenter> bookmarkIconPresenterProvider;
+
   @Inject
-  public ProjectsView(Binder uiBinder, TranslationMessages translationMessages) {
+  public ProjectsView(Binder uiBinder, TranslationMessages translationMessages,
+      Provider<BookmarkIconPresenter> bookmarkIconPresenterProvider) {
+    this.bookmarkIconPresenterProvider = bookmarkIconPresenterProvider;
     initWidget(uiBinder.createAndBindUi(this));
     this.translationMessages = translationMessages;
   }
@@ -159,15 +166,15 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     FlowPanel panel = new FlowPanel();
     panel.add(newProjectLink(project));
 
-    FlowPanel timestamps = addTimestamps(project);
+    FlowPanel timestamps = getTimestampsWidget(project);
     if(timestamps != null) panel.add(timestamps);
 
-    Anchor tableNames = addTableNames(project);
+    Anchor tableNames = getTableNamesWidget(project);
     if(tableNames != null) panel.add(tableNames);
 
-    panel.add(addDescription(project));
+    panel.add(getDescriptionWidget(project));
 
-    FlowPanel tags = addTags(project);
+    FlowPanel tags = getTagsWidget(project);
     if(tags != null) panel.add(tags);
 
     Well well = new Well();
@@ -176,7 +183,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   }
 
   @Nullable
-  private Anchor addTableNames(final ProjectDto project) {
+  private Anchor getTableNamesWidget(final ProjectDto project) {
     JsArrayString tableNames = JsArrays.toSafeArray(project.getDatasource().getTableArray());
     if(tableNames.length() == 0) return null;
 
@@ -205,7 +212,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   }
 
   @Nullable
-  private FlowPanel addTimestamps(ProjectDto project) {
+  private FlowPanel getTimestampsWidget(ProjectDto project) {
     if(project.hasTimestamps() && project.getTimestamps().hasLastUpdate()) {
       FlowPanel timestampsPanel = new FlowPanel();
       timestampsPanel.addStyleName("pull-right");
@@ -219,7 +226,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   }
 
   @Nullable
-  private FlowPanel addTags(ProjectDto project) {
+  private FlowPanel getTagsWidget(ProjectDto project) {
     List<String> tagList = JsArrays.toList(project.getTagsArray());
     if(tagList.isEmpty()) return null;
 
@@ -233,7 +240,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     return tagsPanel;
   }
 
-  private FlowPanel addDescription(ProjectDto project) {
+  private FlowPanel getDescriptionWidget(ProjectDto project) {
     FlowPanel panelDescription = new FlowPanel();
     if(project.hasDescription()) {
       // find first phrase
@@ -246,7 +253,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   }
 
   private Widget newProjectLink(final ProjectDto project) {
-    NavLink link = new NavLink(project.getTitle());
+    Anchor link = new Anchor(project.getTitle());
     link.setTitle(project.getName());
     link.addClickHandler(new ClickHandler() {
       @Override
@@ -257,9 +264,16 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
     Heading head = new Heading(5);
     head.addStyleName("inline-block small-right-indent no-top-margin");
+    head.add(getBookmarkIconWidget(project));
     head.add(link);
-
     return head;
+  }
+
+  private Widget getBookmarkIconWidget(ProjectDto project) {
+    BookmarkIconPresenter bookmarkIconPresenter = bookmarkIconPresenterProvider.get();
+    bookmarkIconPresenter.setBookmarkable(UriBuilders.PROJECT.create().build(project.getName()));
+    bookmarkIconPresenter.addStyleName("small-right-indent");
+    return bookmarkIconPresenter.asWidget();
   }
 
   @SuppressWarnings("ParameterHidesMemberVariable")

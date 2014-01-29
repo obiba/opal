@@ -64,4 +64,9 @@ public class BookmarkIconView extends ViewWithUiHandlers<BookmarkIconUiHandlers>
     icon.setVisible(false);
   }
 
+  @Override
+  public void addStyleName(String style) {
+    icon.addStyleName(style);
+  }
+
 }

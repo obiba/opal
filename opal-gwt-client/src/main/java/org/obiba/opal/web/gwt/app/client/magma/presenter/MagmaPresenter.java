@@ -47,6 +47,7 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
     this.tablePresenter = tablePresenter;
     this.variablePresenter = variablePresenter;
     bookmarkIconPresenter = bookmarkIconPresenterProvider.get();
+    bookmarkIconPresenter.addStyleName("small-indent");
   }
 
   @Override

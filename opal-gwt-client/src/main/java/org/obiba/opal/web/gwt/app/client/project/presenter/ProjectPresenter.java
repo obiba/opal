@@ -216,6 +216,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
             getView().selectTab(tab.ordinal());
             if(bookmarkIconPresenter == null) {
               bookmarkIconPresenter = bookmarkIconPresenterProvider.get();
+              bookmarkIconPresenter.addStyleName("small-indent");
               setInSlot(BOOKMARK_ICON, bookmarkIconPresenter);
             }
             bookmarkIconPresenter.setBookmarkable(projectUri);
