@@ -17,7 +17,7 @@
           <ui:msg description="Explore variables link label">Explore Variables</ui:msg>
         </b:NavLink>
         <g:Label addStyleNames="help-block">
-          <ui:msg description="Explore variables link description">browse tables and variables, create views,
+          <ui:msg description="Explore variables link description">Browse tables and variables, create views,
             import/export data and dictionaries.
           </ui:msg>
         </g:Label>
@@ -29,7 +29,7 @@
           <ui:msg description="Manage Files link label">Manage Files</ui:msg>
         </b:NavLink>
         <g:Label addStyleNames="help-block">
-          <ui:msg description="Manage Files link description">browse, upload and download files on the server.
+          <ui:msg description="Manage Files link description">Browse, upload and download files on the server.
           </ui:msg>
         </g:Label>
       </b:Column>
@@ -40,7 +40,7 @@
           <ui:msg description="Reports link label">Run Reports</ui:msg>
         </b:NavLink>
         <g:Label addStyleNames="help-block">
-          <ui:msg description="Reports link description">design reports with BIRT over Opal data and schedule their
+          <ui:msg description="Reports link description">Design reports with R and schedule their
             execution.
           </ui:msg>
         </g:Label>
@@ -52,8 +52,7 @@
           <ui:msg description="Units link label">Manage Participant Identifiers</ui:msg>
         </b:NavLink>
         <g:Label addStyleNames="help-block">
-          <ui:msg description="Units link description">create and map identifiers of participants in different units,
-            manage encryption keys.
+          <ui:msg description="Identifiers link description">Create and map identifiers of participants.
           </ui:msg>
         </g:Label>
       </b:Column>

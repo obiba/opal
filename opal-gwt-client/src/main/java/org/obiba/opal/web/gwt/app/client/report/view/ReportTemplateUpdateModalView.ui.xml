@@ -60,13 +60,16 @@
           <ui:msg description="Run manually label">Run manually</ui:msg>
         </b:RadioButton>
         <b:ControlGroup ui:field="labelSchedule">
-          <b:RadioButton name="schedule" ui:field="scheduleRadio" checked="false">
+          <b:RadioButton name="schedule" ui:field="scheduleRadio" checked="false" addStyleNames="inline-block">
             <ui:msg description="Schedule plan label">Schedule plan</ui:msg>
           </b:RadioButton>
-          <b:TextBox name="schedule" ui:field="schedule"/>
-          <b2:IconAnchor icon="QUESTION_SIGN" target="_blank"
-              href="http://www.quartz-scheduler.org/docs/tutorials/crontrigger.html" addStyleNames="small-indent">
-          </b2:IconAnchor>
+          <b:TextBox name="schedule" ui:field="schedule" addStyleNames="small-indent"/>
+          <b:HelpBlock>
+            <ui:msg description="Report Schedule help">
+               See documentation about how to write a
+              <a href="http://www.quartz-scheduler.org/docs/tutorials/crontrigger.html" target="_blank">Cron trigger expression</a>.
+            </ui:msg>
+          </b:HelpBlock>
         </b:ControlGroup>
       </b:ControlGroup>
       <b:ControlGroup ui:field="emailsGroup">
@@ -74,6 +77,11 @@
           <ui:msg description="Notification Emails label">Notification Emails</ui:msg>
         </b:ControlLabel>
         <g:SimplePanel ui:field="notificationEmailsPanel"/>
+        <b:HelpBlock>
+          <ui:msg description="Report EMails help">
+            Each time a new report is available, an email will be sent to the listed email addresses.
+          </ui:msg>
+        </b:HelpBlock>
       </b:ControlGroup>
     </g:FlowPanel>
     <b:ModalFooter>

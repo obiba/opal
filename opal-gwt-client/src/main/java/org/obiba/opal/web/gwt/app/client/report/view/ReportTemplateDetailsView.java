@@ -29,11 +29,12 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.regexp.shared.MatchResult;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -103,9 +104,6 @@ public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplate
 
   @UiField
   Label schedule;
-
-  @UiField
-  Label format;
 
   @UiField
   Label parameters;
@@ -186,7 +184,6 @@ public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplate
     this.reportTemplate = reportTemplate;
     design.setText(reportTemplate.getDesign());
     schedule.setText(reportTemplate.getCron());
-    format.setText(reportTemplate.getFormat());
     parameters.setText(getReportParamsList(JsArrays.toSafeArray(reportTemplate.getParametersArray())));
     emails.setText(getEmailList(JsArrays.toSafeArray(reportTemplate.getEmailNotificationArray())));
     reportTemplateName.setText(reportTemplate.getName());
@@ -202,8 +199,24 @@ public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplate
 
   private String getReportParamsList(JsArray<ParameterDto> params) {
     StringBuilder paramList = new StringBuilder();
+    boolean appended = false;
     for(ParameterDto param : JsArrays.toIterable(params)) {
-      paramList.append(param.getKey()).append("=").append(param.getValue()).append(" ");
+      if (appended) {
+        paramList.append(", ");
+      }
+      String value = param.getValue();
+      RegExp regExp = RegExp.compile("password");
+      MatchResult matcher = regExp.exec(param.getKey());
+      if (matcher != null) {
+        value = "******";
+      }
+      regExp = RegExp.compile("^T$|^TRUE$|^F$|^FALSE$");
+      matcher = regExp.exec(value);
+      if (matcher == null) {
+        value = "\"" + value +"\"";
+      }
+      paramList.append(param.getKey()).append("=").append(value);
+      appended = true;
     }
     return paramList.toString();
   }
