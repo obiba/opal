@@ -1,5 +1,6 @@
-package org.obiba.opal.web.gwt.app.client.administration.configuration.presenter;
+package org.obiba.opal.web.gwt.app.client.administration.configuration.view;
 
+import org.obiba.opal.web.gwt.app.client.administration.configuration.edit.GeneralConfModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.configuration.event.GeneralConfigSavedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;

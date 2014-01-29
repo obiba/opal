@@ -7,10 +7,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.configuration.view;
+package org.obiba.opal.web.gwt.app.client.administration.configuration.edit;
 
-import org.obiba.opal.web.gwt.app.client.administration.configuration.presenter.GeneralConfModalPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.configuration.presenter.GeneralConfModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.CharacterSetView;
 import org.obiba.opal.web.gwt.app.client.ui.LocaleChooser;

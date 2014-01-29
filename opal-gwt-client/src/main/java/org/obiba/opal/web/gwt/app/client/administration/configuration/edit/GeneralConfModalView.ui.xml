@@ -22,7 +22,7 @@
         <ui:msg description="Name label">Name</ui:msg>
       </b:ControlLabel>
       <b:Controls>
-        <b:TextBox ui:field="name"></b:TextBox>
+        <b:TextBox ui:field="name"/>
         <b:HelpBlock>
           <ui:msg description="Name of organization help">Name of your organization
           </ui:msg>
@@ -50,7 +50,7 @@
         <ui:msg description="Default character set label">Default Character Set</ui:msg>
       </b:ControlLabel>
       <b:Controls>
-        <o:CharacterSetView ui:field="characterSet"></o:CharacterSetView>
+        <o:CharacterSetView ui:field="characterSet"/>
         <b:HelpBlock>
           <ui:msg description="Default Character set help">Default character set used when prompting dictionnaries
             data

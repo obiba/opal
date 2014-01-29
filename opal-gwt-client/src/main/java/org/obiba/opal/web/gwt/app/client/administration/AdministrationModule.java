@@ -9,10 +9,10 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration;
 
-import org.obiba.opal.web.gwt.app.client.administration.configuration.presenter.ConfigurationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.configuration.presenter.GeneralConfModalPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.configuration.edit.GeneralConfModalPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.configuration.edit.GeneralConfModalView;
+import org.obiba.opal.web.gwt.app.client.administration.configuration.view.ConfigurationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.configuration.view.ConfigurationView;
-import org.obiba.opal.web.gwt.app.client.administration.configuration.view.GeneralConfModalView;
 import org.obiba.opal.web.gwt.app.client.administration.database.edit.mongo.MongoDatabaseModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.edit.mongo.MongoDatabaseModalView;
 import org.obiba.opal.web.gwt.app.client.administration.database.edit.sql.SqlDatabaseModalPresenter;
