@@ -27,15 +27,11 @@ import javax.xml.xpath.XPathFactory;
 
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 public class RemoveBIRTReportTemplatesUpgradeStep extends AbstractUpgradeStep {
-
-  private static final Logger log = LoggerFactory.getLogger(RemoveBIRTReportTemplatesUpgradeStep.class);
 
   private File configFile;
 
