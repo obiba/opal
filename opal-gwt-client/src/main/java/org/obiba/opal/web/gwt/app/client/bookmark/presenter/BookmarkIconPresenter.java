@@ -42,7 +42,7 @@ public class BookmarkIconPresenter extends PresenterWidget<BookmarkIconPresenter
       @Override
       public void onToggleBookmark(ToggleBookmarkEvent event) {
         if(path != null && path.equals(event.getPath())) {
-          getView().setBookmark(bookmarked = event.isBookmarked());
+          getView().showIcon(bookmarked = event.isBookmarked());
         }
       }
     });
@@ -54,7 +54,10 @@ public class BookmarkIconPresenter extends PresenterWidget<BookmarkIconPresenter
   }
 
   private void refresh() {
-    if(path == null) return;
+    if(path == null) {
+      getView().hideIcon();
+      return;
+    }
 
     ResourceRequestBuilderFactory.newBuilder() //
         .forResource(UriBuilders.BOOKMARK.create().build(path)) //
@@ -105,8 +108,9 @@ public class BookmarkIconPresenter extends PresenterWidget<BookmarkIconPresenter
 
   public interface Display extends View, HasUiHandlers<BookmarkIconUiHandlers> {
 
-    void setBookmark(boolean isBookmarked);
+    void showIcon(boolean isBookmarked);
 
+    void hideIcon();
   }
 
 }

@@ -69,7 +69,6 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
   public void onDatasourceSelectionChange(DatasourceSelectionChangeEvent event) {
     if(!equals(event.getSource())) {
       getView().selectDatasource(event.getDatasource());
-      bookmarkIconPresenter.setBookmarkable(UriBuilders.DATASOURCE.create().build(event.getDatasource()));
     }
   }
 
@@ -77,16 +76,12 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
   public void onTableSelectionChanged(TableSelectionChangeEvent event) {
     if(!equals(event.getSource())) {
       getView().selectTable(event.getDatasourceName(), event.getTableName(), event.isView());
-      bookmarkIconPresenter.setBookmarkable(
-          UriBuilders.DATASOURCE_TABLE.create().build(event.getDatasourceName(), event.getTableName()));
     }
   }
 
   @Override
   public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
     getView().selectVariable(event.getDatasourceName(), event.getTableName(), event.getVariableName());
-    bookmarkIconPresenter.setBookmarkable(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
-        .build(event.getDatasourceName(), event.getTableName(), event.getVariableName()));
   }
 
   @Override
@@ -106,11 +101,13 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
   private void show(String datasource) {
     getView().selectDatasource(datasource);
     fireEvent(new DatasourceSelectionChangeEvent(this, datasource));
+    bookmarkIconPresenter.setBookmarkable(null);
   }
 
   private void show(String datasource, String table) {
     getView().selectTable(datasource, table, false);
     fireEvent(new TableSelectionChangeEvent(this, datasource, table));
+    bookmarkIconPresenter.setBookmarkable(UriBuilders.DATASOURCE_TABLE.create().build(datasource, table));
   }
 
   private void show(final String datasource, final String table, final String variable) {
@@ -161,6 +158,8 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
         }) //
         .get() //
         .send();
+    bookmarkIconPresenter
+        .setBookmarkable(UriBuilders.DATASOURCE_TABLE_VARIABLE.create().build(datasource, table, variable));
   }
 
   public interface Display extends View {

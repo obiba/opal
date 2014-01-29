@@ -46,7 +46,7 @@ public class BookmarkIconView extends ViewWithUiHandlers<BookmarkIconUiHandlers>
   }
 
   @Override
-  public void setBookmark(boolean isBookmarked) {
+  public void showIcon(boolean isBookmarked) {
     if(isBookmarked) {
       icon.setTitle(translations.clickToRemoveFromBookmarks());
       icon.setIcon(IconType.STAR);
@@ -56,6 +56,12 @@ public class BookmarkIconView extends ViewWithUiHandlers<BookmarkIconUiHandlers>
       icon.setIcon(IconType.STAR_EMPTY);
       icon.removeStyleDependentName("on");
     }
+    icon.setVisible(true);
+  }
+
+  @Override
+  public void hideIcon() {
+    icon.setVisible(false);
   }
 
 }
