@@ -59,7 +59,8 @@ case "$1" in
       fi
 
       chown -R opal:adm /var/lib/opal /var/log/opal /etc/opal /tmp/opal
-      chmod -R 750      /var/lib/opal /var/log/opal /etc/opal /tmp/opal
+      chmod -R 750      /var/lib/opal /var/log/opal /etc/opal/ /tmp/opal
+      find /etc/opal/ -type f | xargs chmod 640
 
       # if upgrading to 2.0, delete old log4j config
       if [ -f "/etc/opal/log4j.properties" ]; then
