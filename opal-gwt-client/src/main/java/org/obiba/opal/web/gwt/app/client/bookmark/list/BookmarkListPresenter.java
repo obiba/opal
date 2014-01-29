@@ -1,5 +1,8 @@
 package org.obiba.opal.web.gwt.app.client.bookmark.list;
 
+import org.obiba.opal.web.model.client.opal.BookmarkDto;
+
+import com.google.gwt.view.client.HasData;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -16,6 +19,8 @@ public class BookmarkListPresenter extends PresenterWidget<BookmarkListPresenter
   }
 
   public interface Display extends View, HasUiHandlers<BookmarkListUiHandlers> {
+
+    HasData<BookmarkDto> getTable();
 
   }
 }
