@@ -11,6 +11,7 @@
 package org.obiba.opal.web.system.subject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
@@ -19,6 +20,8 @@ import org.obiba.opal.core.domain.security.Bookmark;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.Dtos;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -27,6 +30,8 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class BookmarksResourceImpl implements BookmarksResource {
+
+  private static final Logger log = LoggerFactory.getLogger(BookmarksResourceImpl.class);
 
   private String principal;
 
@@ -40,8 +45,12 @@ public class BookmarksResourceImpl implements BookmarksResource {
 
   @Override
   public List<Opal.BookmarkDto> getBookmarks() {
+
+    List<Bookmark> bookmarks = new ArrayList<>(subjectProfileService.getProfile(principal).getBookmarks());
+    Collections.sort(bookmarks, Bookmark.RESOURCE_COMPARATOR);
+
     List<Opal.BookmarkDto> dtos = new ArrayList<>();
-    for(Bookmark bookmark : subjectProfileService.getProfile(principal).getBookmarks()) {
+    for(Bookmark bookmark : bookmarks) {
       dtos.add(Dtos.asDto(bookmark));
     }
     return dtos;

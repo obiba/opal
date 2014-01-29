@@ -10,6 +10,7 @@
 
 package org.obiba.opal.core.domain.security;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Objects;
 
@@ -20,6 +21,13 @@ import org.hibernate.validator.constraints.NotBlank;
 import static com.google.common.base.Objects.toStringHelper;
 
 public class Bookmark {
+
+  public static final Comparator<Bookmark> RESOURCE_COMPARATOR = new Comparator<Bookmark>() {
+    @Override
+    public int compare(Bookmark bookmark1, Bookmark bookmark2) {
+      return bookmark1.getResource().compareTo(bookmark2.getResource());
+    }
+  };
 
   private Date created;
 

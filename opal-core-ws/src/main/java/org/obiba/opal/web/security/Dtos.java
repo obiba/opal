@@ -7,8 +7,11 @@ import org.obiba.opal.core.domain.security.Group;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.web.model.Opal;
+import org.springframework.util.StringUtils;
 
 import com.google.common.collect.Sets;
+
+import static org.obiba.opal.web.model.Opal.BookmarkDto.ResourceType;
 
 public class Dtos {
 
@@ -67,10 +70,25 @@ public class Dtos {
   }
 
   public static Opal.BookmarkDto asDto(Bookmark bookmark) {
-    return Opal.BookmarkDto.newBuilder() //
+    Opal.BookmarkDto.Builder builder = Opal.BookmarkDto.newBuilder() //
         .setResource(bookmark.getResource()) //
-        .setCreated(ISO_8601.format(bookmark.getCreated())) //
-        .build();
-  }
+        .setCreated(ISO_8601.format(bookmark.getCreated()));
 
+    String[] fragments = StringUtils.tokenizeToStringArray(bookmark.getResource(), "/");
+    switch(fragments.length) {
+      case 2:
+        builder.setName(fragments[1]);
+        builder.setType(ResourceType.PROJECT);
+        break;
+      case 4:
+        builder.setName(fragments[3]);
+        builder.setType(ResourceType.TABLE);
+        break;
+      case 6:
+        builder.setName(fragments[5]);
+        builder.setType(ResourceType.VARIABLE);
+        break;
+    }
+    return builder.build();
+  }
 }

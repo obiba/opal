@@ -246,8 +246,15 @@ message SubjectProfileDto {
 }
 
 message BookmarkDto {
+  enum ResourceType {
+    PROJECT = 0;
+    TABLE = 1;
+    VARIABLE = 2;
+  }
   required string resource = 1;
-  required string created = 2;
+  required ResourceType type = 2;
+  required string name = 3;
+  required string created = 4;
 }
 
 // Extracts from RuntimeMXBean
@@ -308,15 +315,6 @@ message LocaleTextDto {
   required string text = 2;
 }
 
-//message Map {
-//  repeated KeyValue items = 1;
-//}
-
-//message TextDto {
-//  required string locale = 1 [default = "en"];
-//  required string text = 2;
-//}
-
 message TermDto {
   required string name = 1;
   repeated LocaleTextDto titles = 2;
@@ -344,7 +342,6 @@ message OpalConf {
   required GeneralConf general = 1;
   repeated TaxonomyDto taxonomies = 2;
 }
-
 
 message VcsCommitInfosDto {
   repeated VcsCommitInfoDto commitInfos = 1;
