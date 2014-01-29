@@ -2,7 +2,7 @@ package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
 import javax.inject.Provider;
 
-import org.obiba.opal.web.gwt.app.client.bookmark.presenter.BookmarkIconPresenter;
+import org.obiba.opal.web.gwt.app.client.bookmark.icon.BookmarkIconPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;

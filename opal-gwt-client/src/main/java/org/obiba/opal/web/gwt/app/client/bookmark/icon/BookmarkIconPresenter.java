@@ -8,9 +8,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.bookmark.presenter;
+package org.obiba.opal.web.gwt.app.client.bookmark.icon;
 
-import org.obiba.opal.web.gwt.app.client.bookmark.event.ToggleBookmarkEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;

@@ -17,7 +17,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.bookmark.presenter.BookmarkIconPresenter;
+import org.obiba.opal.web.gwt.app.client.bookmark.icon.BookmarkIconPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsPresenter;

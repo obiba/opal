@@ -9,8 +9,8 @@
  */
 package org.obiba.opal.web.gwt.app.client.bookmark;
 
-import org.obiba.opal.web.gwt.app.client.bookmark.presenter.BookmarkIconPresenter;
-import org.obiba.opal.web.gwt.app.client.bookmark.view.BookmarkIconView;
+import org.obiba.opal.web.gwt.app.client.bookmark.icon.BookmarkIconPresenter;
+import org.obiba.opal.web.gwt.app.client.bookmark.icon.BookmarkIconView;
 import org.obiba.opal.web.gwt.app.client.inject.AbstractOpalModule;
 
 public class BookmarkModule extends AbstractOpalModule {

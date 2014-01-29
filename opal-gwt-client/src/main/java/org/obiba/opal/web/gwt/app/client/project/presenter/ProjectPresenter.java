@@ -12,7 +12,7 @@ package org.obiba.opal.web.gwt.app.client.project.presenter;
 
 import java.util.Arrays;
 
-import org.obiba.opal.web.gwt.app.client.bookmark.presenter.BookmarkIconPresenter;
+import org.obiba.opal.web.gwt.app.client.bookmark.icon.BookmarkIconPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
