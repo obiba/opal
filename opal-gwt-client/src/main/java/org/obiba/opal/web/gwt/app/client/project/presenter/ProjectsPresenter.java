@@ -70,9 +70,7 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
   @Override
   public void onBind() {
     super.onBind();
-    ProjectUpdatedHandler projectUpdatedHandler = new ProjectUpdatedHandler();
-    addRegisteredHandler(ProjectCreatedEvent.getType(), projectUpdatedHandler);
-    //addRegisteredHandler(ProjectUpdatedEvent.getType(), projectUpdatedHandler);
+    addRegisteredHandler(ProjectCreatedEvent.getType(), new ProjectUpdatedHandler());
   }
 
   @Override

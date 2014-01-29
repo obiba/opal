@@ -1897,10 +1897,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Edit Identifiers Mapping")
   String editIdentifiersMapping();
 
-  @Description("Last Update Ago label")
-  @DefaultStringValue("Last update {0}")
-  String lastUpdateAgoLabel();
-
   @Description("Report templates header")
   @DefaultStringValue("{0} Reports")
   String reportTemplatesHeader();

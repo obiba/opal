@@ -21,9 +21,9 @@
       <ui:msg description="Projects label">Projects</ui:msg>
     </b:PageHeader>
     <b:Paragraph>
-      <ui:msg description="Projects text">A project is a repository of data and dictionaries. In a project, data can
-        be imported, exported, analysed and transformed. Projects also offer access controls to the dictionaries,
-        the summaries and the individual data.
+      <ui:msg description="Projects text">
+        A project is a repository of data and dictionaries. In a project, data can be imported, exported, analysed and
+        transformed. Projects also offer access controls to the dictionaries, the summaries and the individual data.
       </ui:msg>
     </b:Paragraph>
     <b:Form>
@@ -45,7 +45,6 @@
     </b:Form>
 
     <g:FlowPanel ui:field="activePanel" addStyleNames="items"/>
-
 
   </g:FlowPanel>
 

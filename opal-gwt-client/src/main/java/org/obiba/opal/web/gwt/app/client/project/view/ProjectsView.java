@@ -15,9 +15,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsUiHandlers;
@@ -35,7 +35,6 @@ import com.github.gwtbootstrap.client.ui.Well;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -52,13 +51,11 @@ import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> implements ProjectsPresenter.Display {
 
-  interface Binder extends UiBinder<Widget, ProjectsView> {}
-
-  private static final Translations translations = GWT.create(Translations.class);
-
-  private static final TranslationMessages translationMessages = GWT.create(TranslationMessages.class);
+  private static final int NB_GRID_COLUMNS = 12;
 
   private static final int DEFAULT_GRID_COLUMNS = 1;
+
+  interface Binder extends UiBinder<Widget, ProjectsView> {}
 
   @UiField
   Panel activePanel;
@@ -76,9 +73,12 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
   private JsArray<ProjectDto> projects;
 
+  private final TranslationMessages translationMessages;
+
   @Inject
-  public ProjectsView(Binder uiBinder) {
+  public ProjectsView(Binder uiBinder, TranslationMessages translationMessages) {
     initWidget(uiBinder.createAndBindUi(this));
+    this.translationMessages = translationMessages;
   }
 
   @Override
@@ -95,7 +95,6 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
       nameNav.removeStyleName("no-icon");
       lastUpdateNav.setIcon(null);
       lastUpdateNav.addStyleName("no-icon");
-
       redraw();
     }
   }
@@ -128,30 +127,161 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
         activeProjects.push(project);
       }
     }
-    sortBy.sort(getUiHandlers(), activePanel, activeProjects);
-    sort.setVisible(activeProjects.length()>0);
+    renderGrid(sortBy.sort(activeProjects));
+    sort.setVisible(activeProjects.length() > 0);
+  }
+
+  protected void renderGrid(Collection<ProjectDto> sortedProjects) {
+    int col = 0;
+    FluidRow row = new FluidRow();
+    int size = sortedProjects.size();
+    // for now there will be only one column until building cells with bootstrap 3 becomes easier
+    int columns = size < DEFAULT_GRID_COLUMNS ? size : DEFAULT_GRID_COLUMNS;
+
+    for(ProjectDto project : sortedProjects) {
+      Column column = new Column(NB_GRID_COLUMNS / columns);
+      column.add(newProjectPanel(project));
+      if(col == columns - 1) column.addStyleName("pull-right");
+      if(col == columns) {
+        activePanel.add(row);
+        row = new FluidRow();
+        col = 0;
+      }
+
+      row.add(column);
+      col++;
+    }
+
+    activePanel.add(row);
+  }
+
+  private Widget newProjectPanel(ProjectDto project) {
+    FlowPanel panel = new FlowPanel();
+    panel.add(newProjectLink(project));
+
+    FlowPanel timestamps = addTimestamps(project);
+    if(timestamps != null) panel.add(timestamps);
+
+    Anchor tableNames = addTableNames(project);
+    if(tableNames != null) panel.add(tableNames);
+
+    panel.add(addDescription(project));
+
+    FlowPanel tags = addTags(project);
+    if(tags != null) panel.add(tags);
+
+    Well well = new Well();
+    well.add(panel);
+    return well;
+  }
+
+  @Nullable
+  private Anchor addTableNames(final ProjectDto project) {
+    JsArrayString tableNames = JsArrays.toSafeArray(project.getDatasource().getTableArray());
+    if(tableNames.length() == 0) return null;
+
+    Anchor countLabel = new Anchor("[" + translationMessages.tableCount(tableNames.length()) + "]");
+    countLabel.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        getUiHandlers().onProjectTableSelection(project, null);
+      }
+    });
+    countLabel.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        getUiHandlers().onProjectTableSelection(project, null);
+      }
+    });
+
+    for(String table : JsArrays.toIterable(tableNames)) {
+      if(Strings.isNullOrEmpty(countLabel.getTitle())) {
+        countLabel.setTitle(table);
+      } else {
+        countLabel.setTitle(countLabel.getTitle() + ", " + table);
+      }
+    }
+    return countLabel;
+  }
+
+  @Nullable
+  private FlowPanel addTimestamps(ProjectDto project) {
+    if(project.hasTimestamps() && project.getTimestamps().hasLastUpdate()) {
+      FlowPanel timestampsPanel = new FlowPanel();
+      timestampsPanel.addStyleName("pull-right");
+      Moment lastUpdate = Moment.create(project.getTimestamps().getLastUpdate());
+      InlineLabel ago = new InlineLabel(translationMessages.lastUpdateAgoLabel(lastUpdate.fromNow()));
+      ago.addStyleName("project-timestamps");
+      timestampsPanel.add(ago);
+      return timestampsPanel;
+    }
+    return null;
+  }
+
+  @Nullable
+  private FlowPanel addTags(ProjectDto project) {
+    List<String> tagList = JsArrays.toList(project.getTagsArray());
+    if(tagList.isEmpty()) return null;
+
+    FlowPanel tagsPanel = new FlowPanel();
+    tagsPanel.addStyleName("inline-block");
+    for(String tag : tagList) {
+      Label tagLabel = new Label(tag);
+      tagLabel.addStyleName("project-tag");
+      tagsPanel.add(tagLabel);
+    }
+    return tagsPanel;
+  }
+
+  private FlowPanel addDescription(ProjectDto project) {
+    FlowPanel panelDescription = new FlowPanel();
+    if(project.hasDescription()) {
+      // find first phrase
+      String desc = project.getDescription();
+      Paragraph descriptionLabel = new Paragraph(desc);
+      panelDescription.add(descriptionLabel);
+    }
+    panelDescription.addStyleName("justified-paragraph");
+    return panelDescription;
+  }
+
+  private Widget newProjectLink(final ProjectDto project) {
+    NavLink link = new NavLink(project.getTitle());
+    link.setTitle(project.getName());
+    link.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        getUiHandlers().onProjectSelection(project);
+      }
+    });
+
+    Heading head = new Heading(5);
+    head.addStyleName("inline-block small-right-indent no-top-margin");
+    head.add(link);
+
+    return head;
   }
 
   @SuppressWarnings("ParameterHidesMemberVariable")
   private enum SortBy {
     NAME {
       @Override
-      void sort(ProjectsUiHandlers handlers, Panel content, JsArray<ProjectDto> projects) {
+      List<ProjectDto> sort(JsArray<ProjectDto> projects) {
         List<ProjectDto> projectList = JsArrays.toList(projects);
         Collections.sort(projectList, new Comparator<ProjectDto>() {
           @Override
           public int compare(ProjectDto o1, ProjectDto o2) {
             String m1 = o1.hasTitle() ? o1.getTitle() : o1.getName();
             String m2 = o2.hasTitle() ? o2.getTitle() : o2.getName();
-
             return m1.compareTo(m2);
           }
         });
-        renderGrid(content, JsArrays.toList(projects), handlers);
+        return projectList;
       }
-    }, LAST_UPDATE {
+    }, //
+    LAST_UPDATE {
       @Override
-      void sort(ProjectsUiHandlers handlers, Panel content, JsArray<ProjectDto> projects) {
+      List<ProjectDto> sort(JsArray<ProjectDto> projects) {
         List<ProjectDto> projectList = JsArrays.toList(projects);
         Collections.sort(projectList, new Comparator<ProjectDto>() {
           @Override
@@ -164,140 +294,12 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
             return m2 == null ? -1 : m2.unix() - m1.unix();
           }
         });
-
-        renderGrid(content, projectList, handlers);
+        return projectList;
       }
     };
 
-    protected void renderGrid(Panel content, Collection<ProjectDto> projectList, ProjectsUiHandlers handlers) {
-      int col = 0;
-      FluidRow row = new FluidRow();
-      int size = projectList.size();
-      // for now there will be only one column until building cells with bootstrap 3 becomes easier
-      int columns = size < DEFAULT_GRID_COLUMNS ? size : DEFAULT_GRID_COLUMNS;
+    abstract List<ProjectDto> sort(JsArray<ProjectDto> projects);
 
-      for(ProjectDto project : projectList) {
-        Column column = new Column(12 / columns);
-        Widget projectPanel = newProjectPanel(handlers, project, columns);
-        column.add(projectPanel);
-        if (col == columns -1) column.addStyleName("pull-right");
-        if (col == columns) {
-          content.add(row);
-          row = new FluidRow();
-          col = 0;
-        }
-
-        row.add(column);
-        col++;
-      }
-
-      content.add(row);
-    }
-
-    /**
-     * Perform the sort, add widgets to the panel and callback to project selection.
-     *
-     * @param handlers
-     * @param content
-     * @param projects
-     */
-    abstract void sort(ProjectsUiHandlers handlers, Panel content, JsArray<ProjectDto> projects);
-
-    protected Widget newProjectPanel(ProjectsUiHandlers handlers, ProjectDto project, int columns) {
-      Well w = new Well();
-      FlowPanel panel = new FlowPanel();
-      panel.add(newProjectLink(handlers, project));
-      addTimestamps(project, panel);
-      addTableNames(handlers, project, panel);
-      addDescription(project, panel, columns);
-      addTags(project, panel);
-      w.add(panel);
-      return w;
-    }
-
-    private void addTableNames(final ProjectsUiHandlers handlers, final ProjectDto project, FlowPanel panel) {
-      JsArrayString tableNames = JsArrays.toSafeArray(project.getDatasource().getTableArray());
-      if(tableNames.length() > 0) {
-        Anchor countLabel = new Anchor("[" + translationMessages.tableCount(tableNames.length()) + "]");
-        countLabel.addClickHandler(new ClickHandler() {
-          @Override
-          public void onClick(ClickEvent event) {
-            handlers.onProjectTableSelection(project, null);
-          }
-        });
-        countLabel.addClickHandler(new ClickHandler() {
-          @Override
-          public void onClick(ClickEvent event) {
-            handlers.onProjectTableSelection(project, null);
-          }
-        });
-
-        for(String table : JsArrays.toIterable(tableNames)) {
-          if(Strings.isNullOrEmpty(countLabel.getTitle())) {
-            countLabel.setTitle(table);
-          } else {
-            countLabel.setTitle(countLabel.getTitle() + ", " + table);
-          }
-        }
-        panel.add(countLabel);
-      }
-    }
-
-    private void addTimestamps(ProjectDto project, FlowPanel panel) {
-      if(project.hasTimestamps() && project.getTimestamps().hasLastUpdate()) {
-        FlowPanel timestampsPanel = new FlowPanel();
-        timestampsPanel.addStyleName("pull-right");
-        Moment lastUpdate = Moment.create(project.getTimestamps().getLastUpdate());
-        InlineLabel ago = new InlineLabel(
-            TranslationsUtils.replaceArguments(translations.lastUpdateAgoLabel(), lastUpdate.fromNow()));
-        ago.addStyleName("project-timestamps");
-        timestampsPanel.add(ago);
-        panel.add(timestampsPanel);
-      }
-    }
-
-    private void addTags(ProjectDto project, FlowPanel panel) {
-      FlowPanel tagsPanel = new FlowPanel();
-      List<String> tagList = JsArrays.toList(project.getTagsArray());
-      if (tagList.isEmpty()) return;
-
-      tagsPanel.addStyleName("inline-block");
-      for(String tag : tagList) {
-        Label tagLabel = new Label(tag);
-        tagLabel.addStyleName("project-tag");
-        tagsPanel.add(tagLabel);
-      }
-      panel.add(tagsPanel);
-    }
-
-    private void addDescription(ProjectDto project, FlowPanel panel, int columns) {
-      FlowPanel panelDescription = new FlowPanel();
-      if(project.hasDescription()) {
-        // find first phrase
-        String desc = project.getDescription();
-        Paragraph descriptionLabel = new Paragraph(desc);
-        panelDescription.add(descriptionLabel);
-      }
-      panelDescription.addStyleName("justified-paragraph");
-      panel.add(panelDescription);
-    }
-
-    Widget newProjectLink(final ProjectsUiHandlers handlers, final ProjectDto project) {
-      NavLink link = new NavLink(project.getTitle());
-      link.setTitle(project.getName());
-      link.addClickHandler(new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent event) {
-          handlers.onProjectSelection(project);
-        }
-      });
-
-      Heading head = new Heading(5);
-      head.addStyleName("inline-block small-right-indent no-top-margin");
-      head.add(link);
-
-      return head;
-    }
   }
 
 }
