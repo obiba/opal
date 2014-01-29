@@ -26,7 +26,7 @@
       <b:Paragraph>
         At least one storage database is required for importing data.
       </b:Paragraph>
-      <b:DropdownButton text="Create storage database" icon="PLUS" type="INFO">
+      <b:DropdownButton text="Register storage database" icon="PLUS" type="INFO">
         <b:NavLink ui:field="createSql">
           <ui:msg description="Create SQL database label">SQL</ui:msg>
         </b:NavLink>
@@ -37,7 +37,7 @@
     </g:FlowPanel>
 
     <g:FlowPanel ui:field="databasesPanel">
-      <b:DropdownButton text="Add database" icon="PLUS" type="INFO">
+      <b:DropdownButton text="Register database" icon="PLUS" type="INFO">
         <b:NavLink ui:field="addSQL">
           <ui:msg description="Create SQL database label">SQL</ui:msg>
         </b:NavLink>

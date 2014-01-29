@@ -30,7 +30,7 @@
               <ui:msg description="Test connection label">Test connection</ui:msg>
             </b:Button>
             <b:Button ui:field="deleteDatabase" type="DANGER" visible="false">
-              <ui:msg description="Test connection label">Delete Database</ui:msg>
+              <ui:msg description="Test connection label">Unregister Database</ui:msg>
             </b:Button>
           </b:Controls>
         </b:ControlGroup>
@@ -41,12 +41,12 @@
       <b:Paragraph>
         This database definition is required for importing data.
       </b:Paragraph>
-      <b:DropdownButton text="Create identifiers database" icon="PLUS" type="INFO">
+      <b:DropdownButton text="Register identifiers database" icon="PLUS" type="INFO">
         <b:NavLink ui:field="createSql">
-          <ui:msg description="Create SQL database label">SQL</ui:msg>
+          <ui:msg description="Register SQL database label">SQL</ui:msg>
         </b:NavLink>
         <b:NavLink ui:field="createMongo">
-          <ui:msg description="Create MongoDB database label">MongoDB</ui:msg>
+          <ui:msg description="Register MongoDB database label">MongoDB</ui:msg>
         </b:NavLink>
       </b:DropdownButton>
     </g:FlowPanel>

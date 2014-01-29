@@ -128,7 +128,8 @@ public interface Translations extends Constants {
       "Enable", "Enable",//
       "Disable", "Disable",//
       "Generate identifiers", "Generate identifiers",//
-      "Download identifiers", "Download identifiers"//
+      "Download identifiers", "Download identifiers",//
+      "Unregister", "Unregister"//
   })
   Map<String, String> actionMap();
 
@@ -616,7 +617,7 @@ public interface Translations extends Constants {
       "deleteDataShieldAssignMethod", "Delete Assigning Method",//
       "deleteDataShieldPackage", "Delete Package",//
       "publishDataShieldMethods", "Publish Package Methods",//
-      "deleteDatabase", "Delete Database",//
+      "unregisterDatabase", "Unregister Database",//
       "removeTaxonomy", "Remove Taxonomy",//
       "deleteVariables", "Delete Variables",//
       "deleteTables", "Delete Tables"//
@@ -672,7 +673,7 @@ public interface Translations extends Constants {
       "confirmDeleteDataShieldAggregateMethod", "Please confirm that you want to remove this aggregating method.",//
       "confirmDeleteDataShieldPackage", "Please confirm that you want to remove this package and all its methods.",//
       "confirmPublishDataShieldMethods", "Please confirm that you want to publish this package methods.",//
-      "confirmDeleteDatabase", "Please confirm that you want to remove this database.",//
+      "confirmDeleteDatabase", "Please confirm that you want to unregister this database.",//
 //
       "confirmRemoveTaxonomy", "Please confirm that you want to remove the taxonomy '{0}'.",//
       "confirmDeleteVariable", "Please confirm that you want to delete {0} variable",//
@@ -1300,7 +1301,7 @@ public interface Translations extends Constants {
   String hideLabel();
 
   @Description("Add SQL Database")
-  @DefaultStringValue("Add SQL Database")
+  @DefaultStringValue("Register SQL Database")
   String addSQLDatabase();
 
   @Description("Edit SQL Database")
@@ -1308,7 +1309,7 @@ public interface Translations extends Constants {
   String editSQLDatabase();
 
   @Description("Add MongoDB Database")
-  @DefaultStringValue("Add MongoDB Database")
+  @DefaultStringValue("Register MongoDB Database")
   String addMongoDatabase();
 
   @Description("Edit MongoDB Database")
