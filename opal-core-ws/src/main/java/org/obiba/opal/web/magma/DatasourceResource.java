@@ -188,26 +188,30 @@ public class DatasourceResource {
   @ApiResponses(@ApiResponse(code = 404, message = "If datasource is not found"))
   public Response createView(ViewDto viewDto, @Context UriInfo uriInfo,
       @Nullable @QueryParam("comment") String comment) {
-    if(!viewDto.hasName()) return Response.status(BAD_REQUEST).build();
+
+    if(!viewDto.hasName()) {
+      return Response.status(BAD_REQUEST).build();
+    }
 
     if(datasourceHasTable(viewDto.getName())) {
       return Response.status(BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "TableAlreadyExists").build()).build();
     }
-    View view = viewDtos.fromDto(viewDto);
 
+    View view = viewDtos.fromDto(viewDto);
     viewManager.addView(getDatasource().getName(), view, comment);
+    scheduleViewIndexation(view);
 
     URI viewUri = UriBuilder.fromUri(uriInfo.getBaseUri().toString()).path(DatasourceResource.class)
         .path(DatasourceResource.class, "getView").build(name, viewDto.getName());
-
-    ValueTable vt = getDatasource().getValueTable(view.getName());
-    Schedule schedule = new Schedule();
-    schedule.setType(Opal.ScheduleType.NOT_SCHEDULED);
-    indexManagerConfigService.update(vt, schedule);
-
     return Response.created(viewUri)
         .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(viewUri, AclAction.TABLE_ALL)).build();
+  }
+
+  private void scheduleViewIndexation(ValueTable view) {
+    Schedule schedule = new Schedule();
+    schedule.setType(Opal.ScheduleType.NOT_SCHEDULED);
+    indexManagerConfigService.update(getDatasource().getValueTable(view.getName()), schedule);
   }
 
   @Path("/view/{viewName}")
@@ -221,7 +225,7 @@ public class DatasourceResource {
   public Iterable<LocaleDto> getLocales(@QueryParam("locale") String displayLocale) {
     Collection<LocaleDto> localeDtos = new ArrayList<>();
     for(Locale locale : getLocales()) {
-      localeDtos.add(Dtos.asDto(locale, displayLocale != null ? new Locale(displayLocale) : null));
+      localeDtos.add(Dtos.asDto(locale, displayLocale == null ? null : new Locale(displayLocale)));
     }
     return localeDtos;
   }

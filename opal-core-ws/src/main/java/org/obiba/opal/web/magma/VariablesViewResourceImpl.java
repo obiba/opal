@@ -11,15 +11,14 @@ package org.obiba.opal.web.magma;
 
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
-import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -34,33 +33,18 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 @Transactional
 public class VariablesViewResourceImpl extends VariablesResourceImpl implements VariablesViewResource {
 
+  @NotNull
   @Autowired
   private ViewManager viewManager;
 
-  private ViewDtos viewDtos;
-
-  @Override
-  public void setViewDtos(ViewDtos viewDtos) {
-    this.viewDtos = viewDtos;
-  }
-
   @Override
   public Response addOrUpdateVariables(List<VariableDto> variables, @Nullable String comment) {
-    try {
-      if(!getValueTable().isView()) {
-        addOrUpdateTableVariables(variables);
-      } else if(viewManager != null || viewDtos == null) {
-        addOrUpdateViewVariables(variables, comment);
-      } else {
-        return Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "CannotWriteToView"))
-            .build();
-      }
-
-      return Response.ok().build();
-    } catch(Exception e) {
-      return Response.status(Status.INTERNAL_SERVER_ERROR)
-          .entity(getErrorMessage(Status.INTERNAL_SERVER_ERROR, e.toString())).build();
+    if(getValueTable().isView()) {
+      addOrUpdateViewVariables(variables, comment);
+    } else {
+      addOrUpdateTableVariables(variables);
     }
+    return Response.ok().build();
   }
 
   private void addOrUpdateViewVariables(Iterable<VariableDto> variables, @Nullable String comment) {
@@ -78,10 +62,11 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
     View view = getValueTableAsView();
     try(ValueTableWriter.VariableWriter variableWriter = view.getListClause().createWriter()) {
       // Remove from listClause
-      for(VariableValueSource v : view.getListClause().getVariableValueSources()) {
-        if(variables.contains(v.getVariable().getName())) {
-          variableWriter.removeVariable(v.getVariable());
-          viewManager.addView(getDatasource().getName(), view, "Remove " + v.getVariable().getName());
+      for(VariableValueSource variableSource : view.getListClause().getVariableValueSources()) {
+        String name = variableSource.getVariable().getName();
+        if(variables.contains(name)) {
+          variableWriter.removeVariable(variableSource.getVariable());
+          viewManager.addView(getDatasource().getName(), view, "Remove " + name);
         }
       }
     }

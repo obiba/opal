@@ -25,6 +25,7 @@ import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewAwareDatasource;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.magma.view.ViewDtos;
+import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.StaticDatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.TableDto;
@@ -71,14 +72,12 @@ public class StaticDatasourceFactoryDtoParser extends AbstractDatasourceFactoryD
     protected Datasource internalCreate() {
       StaticDatasourceFactoryDto staticDto = dto.getExtension(StaticDatasourceFactoryDto.params);
       StaticDatasource ds = new StaticDatasource(getName());
-
-      for(int i = 0; i < staticDto.getTablesCount(); i++) {
-        addValueTable(ds, staticDto.getTables(i));
+      for(TableDto tableDto : staticDto.getTablesList()) {
+        addValueTable(ds, tableDto);
       }
 
       Set<View> views = new LinkedHashSet<>();
-      for(int i = 0; i < staticDto.getViewsCount(); i++) {
-        ViewDto viewDto = staticDto.getViews(i);
+      for(ViewDto viewDto : staticDto.getViewsList()) {
         if(viewDto.getFromCount() == 0) {
           // cannot make a view from it, so make it a table
           addValueTable(ds, viewDtos.asTableDto(viewDto));
@@ -93,8 +92,8 @@ public class StaticDatasourceFactoryDtoParser extends AbstractDatasourceFactoryD
     private void addValueTable(StaticDatasource ds, TableDto tableDto) {
       StaticValueTable table = new StaticValueTable(ds, tableDto.getName(), new HashSet<String>(),
           tableDto.getEntityType());
-      for(int j = 0; j < tableDto.getVariablesCount(); j++) {
-        table.addVariable(Dtos.fromDto(tableDto.getVariables(j)));
+      for(Magma.VariableDto variableDto : tableDto.getVariablesList()) {
+        table.addVariable(Dtos.fromDto(variableDto));
       }
       ds.addValueTable(table);
     }

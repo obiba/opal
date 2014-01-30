@@ -9,9 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 import javax.ws.rs.core.Response;
@@ -137,7 +137,7 @@ public class ValueSetsResourceImpl extends AbstractValueTableResource implements
         .addAll(variableEntities).build();
     Iterable<Value> values = vector.getValues(sortedEntities);
 
-    HashMap<VariableEntity, Value> results = new LinkedHashMap<>();
+    Map<VariableEntity, Value> results = new LinkedHashMap<>();
     Iterator<VariableEntity> entitiesIterator = sortedEntities.iterator();
     for(Value value : values) {
       VariableEntity entity = entitiesIterator.next();

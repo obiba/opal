@@ -166,22 +166,15 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
   }
 
   private Response createTableInternal(TableDto table) {
-    try {
-      if(datasource.hasValueTable(table.getName())) {
-        return Response.status(Status.BAD_REQUEST)
-            .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists").build()).build();
-      } else {
-        writeVariablesToTable(table);
-        URI tableUri = UriBuilder.fromPath("/").path(DatasourceResource.class)
-            .path(DatasourceResource.class, "getTable").build(datasource.getName(), table.getName());
-        return Response.created(tableUri)//
-            .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(tableUri, AclAction.TABLE_ALL))
-            .build();
-      }
-    } catch(Exception e) {
-      return Response.status(Status.INTERNAL_SERVER_ERROR)
-          .entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, e.getMessage()).build()).build();
+    if(datasource.hasValueTable(table.getName())) {
+      return Response.status(Status.BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists").build()).build();
     }
+    writeVariablesToTable(table);
+    URI tableUri = UriBuilder.fromPath("/").path(DatasourceResource.class).path(DatasourceResource.class, "getTable")
+        .build(datasource.getName(), table.getName());
+    return Response.created(tableUri)//
+        .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(tableUri, AclAction.TABLE_ALL)).build();
   }
 
   @Override
