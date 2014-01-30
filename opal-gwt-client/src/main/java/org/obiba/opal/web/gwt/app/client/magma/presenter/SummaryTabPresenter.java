@@ -36,7 +36,7 @@ import com.gwtplatform.mvp.client.View;
  */
 public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Display> implements SummaryTabUiHandlers {
 
-  private final static int DEFAULT_LIMIT = 500;
+  public final static int DEFAULT_LIMIT = 500;
 
   private final static int MIN_LIMIT = 10;
 
@@ -85,7 +85,13 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     if(uri.indexOf("?") > 0) {
       uri = uri.substring(0, uri.indexOf("?"));
     }
-    resourceRequestBuilder.forResource(uri).get();
+    // If transient variable, the method is POST
+    if(uri.contains("/_transient/")) {
+      resourceRequestBuilder.forResource(uri).post();
+    } else {
+      resourceRequestBuilder.forResource(uri).get();
+    }
+
     limit = entitiesCount;
     onReset();
   }
@@ -107,9 +113,17 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     }
     String uri = resourceRequestBuilder.getResource();
     uri = uri.substring(0, uri.indexOf("?") > 0 ? uri.indexOf("?") : uri.length());
-    resourceRequestBuilder
-        .forResource(limit >= entitiesCount ? uri + "?resetCache=true" : uri + "?limit=" + limit + "&resetCache=true")
-        .get();
+
+    // If transient variable, the method is POST
+    if(uri.contains("/_transient/")) {
+      resourceRequestBuilder
+          .forResource(limit >= entitiesCount ? uri + "?resetCache=true" : uri + "?limit=" + limit + "&resetCache=true")
+          .post();
+    } else {
+      resourceRequestBuilder
+          .forResource(limit >= entitiesCount ? uri + "?resetCache=true" : uri + "?limit=" + limit + "&resetCache=true")
+          .get();
+    }
 
     onReset();
   }
@@ -137,8 +151,12 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     limit = Math.min(entitiesCount, limit);
   }
 
-  public void setRequestBuilder(ResourceRequestBuilder<SummaryStatisticsDto> resourceRequestBuilder) {
+  public void setRequestBuilder(ResourceRequestBuilder<SummaryStatisticsDto> resourceRequestBuilder,
+      int entitiesCount) {
     this.resourceRequestBuilder = resourceRequestBuilder;
+    this.entitiesCount = entitiesCount;
+
+    limit = Math.min(entitiesCount, limit);
   }
 
   private void requestSummary() {
@@ -180,6 +198,11 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
 
   private boolean hasSummaryOrPendingRequest() {
     return summary != null || summaryRequest != null && summaryRequest.isPending();
+  }
+
+  public void setLimit(int limit) {
+    this.limit = limit;
+    getView().setLimit(limit);
   }
 
   public void init() {
