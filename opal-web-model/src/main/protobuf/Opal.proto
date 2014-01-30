@@ -245,6 +245,11 @@ message SubjectProfileDto {
   required string lastUpdate = 4;
 }
 
+message LinkDto {
+  required string rel = 1;
+  required string link = 2;
+}
+
 message BookmarkDto {
   enum ResourceType {
     PROJECT = 0;
@@ -253,7 +258,7 @@ message BookmarkDto {
   }
   required string resource = 1;
   required ResourceType type = 2;
-  required string name = 3;
+  repeated LinkDto links = 3;
   required string created = 4;
 }
 

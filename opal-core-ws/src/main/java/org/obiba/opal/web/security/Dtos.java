@@ -75,20 +75,28 @@ public class Dtos {
         .setCreated(ISO_8601.format(bookmark.getCreated()));
 
     String[] fragments = StringUtils.tokenizeToStringArray(bookmark.getResource(), "/");
-    switch(fragments.length) {
-      case 2:
-        builder.setName(fragments[1]);
-        builder.setType(ResourceType.PROJECT);
-        break;
-      case 4:
-        builder.setName(fragments[3]);
-        builder.setType(ResourceType.TABLE);
-        break;
-      case 6:
-        builder.setName(fragments[5]);
-        builder.setType(ResourceType.VARIABLE);
-        break;
+    int nbFragments = fragments.length;
+    if(nbFragments >= 2) {
+      builder.addLinks(Opal.LinkDto.newBuilder().setRel(toUri(fragments[0], fragments[1])).setLink(fragments[1]));
+      builder.setType(ResourceType.PROJECT);
+    }
+    if(nbFragments >= 4) {
+      builder.addLinks(Opal.LinkDto.newBuilder().setRel(toUri(fragments[0], fragments[1], fragments[2], fragments[3]))
+          .setLink(fragments[3]));
+      builder.setType(ResourceType.TABLE);
+    }
+    if(nbFragments == 6) {
+      builder.addLinks(Opal.LinkDto.newBuilder().setRel(bookmark.getResource()).setLink(fragments[5]));
+      builder.setType(ResourceType.VARIABLE);
     }
     return builder.build();
+  }
+
+  private static String toUri(String... fragments) {
+    StringBuilder sb = new StringBuilder();
+    for(String fragment : fragments) {
+      sb.append("/").append(fragment);
+    }
+    return sb.toString();
   }
 }

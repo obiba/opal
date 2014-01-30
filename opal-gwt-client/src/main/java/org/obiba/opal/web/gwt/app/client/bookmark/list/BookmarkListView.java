@@ -2,6 +2,7 @@ package org.obiba.opal.web.gwt.app.client.bookmark.list;
 
 import java.util.List;
 
+import org.hibernate.annotations.Columns;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.model.client.opal.BookmarkDto;
 
@@ -9,8 +10,6 @@ import com.github.gwtbootstrap.client.ui.CellTable;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
@@ -54,15 +53,31 @@ public class BookmarkListView extends ViewWithUiHandlers<BookmarkListUiHandlers>
     dataProvider.refresh();
     pager.setVisible(dataProvider.getList().size() > pager.getPageSize());
   }
-
-  private static final class Columns {
-
-    final static Column<BookmarkDto, String> NAME = new TextColumn<BookmarkDto>() {
-      @Override
-      public String getValue(BookmarkDto dto) {
-        return dto.getName()/* + " (" + dto.getResource() + ")"*/;
-      }
-    };
-
-  }
+//
+//  private static class BreadcrumbsColumn extends Column<Iterable<LinkDto>, String> {
+//
+//    private BreadcrumbsColumn(Cell<String> cell) {
+//      super(cell);
+//    }
+//
+//    @Override
+//    public String getValue(Iterable<LinkDto> links) {
+//      return null;
+//    }
+//  }
+//
+//  private static final class Columns {
+//
+//    final static Column<BookmarkDto, Breadcrumbs> NAME = new Column<BookmarkDto, Breadcrumbs>() {
+//      @Override
+//      public Breadcrumbs getValue(BookmarkDto dto) {
+//        Breadcrumbs breadcrumbs = new Breadcrumbs();
+//        for(LinkDto linkDto : JsArrays.toIterable(dto.getLinksArray())) {
+//          breadcrumbs.add(new NavLink(linkDto.getLink(), linkDto.getRel()));
+//        }
+//        return breadcrumbs;
+//      }
+//    };
+//
+//  }
 }
