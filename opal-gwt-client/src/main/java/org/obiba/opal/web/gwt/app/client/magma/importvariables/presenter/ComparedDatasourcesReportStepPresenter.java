@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.DatasourceCompareDto;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -37,10 +38,10 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
@@ -138,16 +139,15 @@ public class ComparedDatasourcesReportStepPresenter
       return ResourceRequestBuilderFactory.newBuilder().post().forResource(ub.build())
           .withResourceBody(stringify(newTableDto));
     }
-    if(tableCompareDto.getWithTable().hasViewLink()) {
-      UriBuilder ub = UriBuilder.create()
-          .segment("datasource", targetDatasourceName, "view", compared.getName(), "variables");
-      return ResourceRequestBuilderFactory.newBuilder().post().forResource(ub.build())
-          .withResourceBody(stringify(variables));
-    }
-    UriBuilder ub = UriBuilder.create()
-        .segment("datasource", targetDatasourceName, "table", compared.getName(), "variables");
-    return ResourceRequestBuilderFactory.newBuilder().post().forResource(ub.build())
-        .withResourceBody(stringify(variables));
+
+    UriBuilder uriBuilder = tableCompareDto.getWithTable().hasViewLink()
+        ? UriBuilders.DATASOURCE_VIEW_VARIABLES.create()
+        : UriBuilders.DATASOURCE_TABLE_VARIABLES.create();
+
+    return ResourceRequestBuilderFactory.newBuilder() //
+        .forResource(uriBuilder.build(targetDatasourceName, compared.getName())) //
+        .withResourceBody(stringify(variables)) //
+        .post();
   }
 
   public static native String stringify(JavaScriptObject obj)
