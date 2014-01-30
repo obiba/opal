@@ -156,7 +156,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     addRegisteredHandler(VariableRefreshEvent.getType(), new VariableRefreshEvent.Handler() {
       @Override
       public void onVariableRefresh(VariableRefreshEvent event) {
-        if(variableUpdatePending) return;
+        if(variableUpdatePending || variable == null) return;
         ResourceRequestBuilderFactory.<VariableDto>newBuilder().forResource(variable.getLink()).get()
             .withCallback(new ResourceCallback<VariableDto>() {
               @Override
