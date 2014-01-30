@@ -27,8 +27,9 @@ import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.text.IniRealm;
 import org.apache.shiro.session.SessionListener;
-import org.apache.shiro.session.mgt.AbstractNativeSessionManager;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
+import org.apache.shiro.session.mgt.ExecutorServiceSessionValidationScheduler;
+import org.apache.shiro.session.mgt.SessionValidationScheduler;
 import org.apache.shiro.util.LifecycleUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,8 @@ import com.google.common.collect.ImmutableList;
 
 @Component
 public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> {
+
+  private static final long SESSION_VALIDATION_INTERVAL = 3600000l; // 1 hour
 
   private final Set<Realm> realms;
 
@@ -101,7 +104,12 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
       }
 
       if(dsm.getSessionManager() instanceof DefaultSessionManager) {
-        ((AbstractNativeSessionManager) dsm.getSessionManager()).setSessionListeners(sessionListeners);
+        DefaultSessionManager sessionManager = (DefaultSessionManager) dsm.getSessionManager();
+        sessionManager.setSessionListeners(sessionListeners);
+        SessionValidationScheduler sessionValidationScheduler = new ExecutorServiceSessionValidationScheduler();
+        sessionValidationScheduler.enableSessionValidation();
+        sessionManager.setSessionValidationScheduler(sessionValidationScheduler);
+        sessionManager.setSessionValidationInterval(SESSION_VALIDATION_INTERVAL);
       }
 
       if(dsm.getAuthorizer() instanceof ModularRealmAuthorizer) {
@@ -112,7 +120,8 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
     }
 
     @Override
-    protected void applyRealmsToSecurityManager(Collection<Realm> shiroRealms, SecurityManager securityManager) {
+    protected void applyRealmsToSecurityManager(Collection<Realm> shiroRealms, @SuppressWarnings(
+        "ParameterHidesMemberVariable") SecurityManager securityManager) {
       super.applyRealmsToSecurityManager(ImmutableList.<Realm>builder().addAll(realms).addAll(shiroRealms).build(),
           securityManager);
     }

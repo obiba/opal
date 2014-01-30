@@ -24,6 +24,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class SudoRealm extends AuthorizingRealm {
 
+  private final AuthenticationInfo simpleAccount = new SimpleAccount(SudoPrincipal.INSTANCE, null, getName());
+
   public SudoRealm() {
     setCredentialsMatcher(new AllowAllCredentialsMatcher());
   }
@@ -38,7 +40,7 @@ public class SudoRealm extends AuthorizingRealm {
     // SudoAuthToken sudoToken = (SudoAuthToken) token;
     // TODO: test some kind of permission to conditionally accept the sudo request:
     // SecurityUtils.getSecurityManager().isPermitted(sudoToken.getSudoer(), "sudo")
-    return new SimpleAccount(new SudoPrincipal(), null, getName());
+    return simpleAccount;
   }
 
   @Override
@@ -50,7 +52,12 @@ public class SudoRealm extends AuthorizingRealm {
     return info;
   }
 
+  @SuppressWarnings("Singleton")
   private static class SudoPrincipal {
 
+    private static final SudoPrincipal INSTANCE = new SudoPrincipal();
+
+    private SudoPrincipal() {
+    }
   }
 }
