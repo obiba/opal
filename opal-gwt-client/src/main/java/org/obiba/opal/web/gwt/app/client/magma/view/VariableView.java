@@ -197,11 +197,13 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   void onShown(TabPanel.ShownEvent shownEvent) {
     if(shownEvent.getTarget() == null) return;
 
-    if(tabPanel.getSelectedTab() == SUMMARY_TAB_INDEX) {
-      getUiHandlers().onShowSummary();
-    }
-    if(tabPanel.getSelectedTab() == VALUES_TAB_INDEX) {
-      getUiHandlers().onShowValues();
+    switch(tabPanel.getSelectedTab()) {
+      case SUMMARY_TAB_INDEX:
+        getUiHandlers().onShowSummary();
+        break;
+      case VALUES_TAB_INDEX:
+        getUiHandlers().onShowValues();
+        break;
     }
   }
 
