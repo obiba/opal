@@ -11,7 +11,6 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 
-import org.apache.commons.lang.BooleanUtils;
 import org.obiba.magma.Timestamped;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
@@ -80,7 +79,7 @@ public abstract class AbstractVariableSummaryCachedService< //
   }
 
   @NotNull
-  public TVariableSummary getSummary(@NotNull TVariableSummaryFactory summaryFactory, Boolean refreshCache) {
+  public TVariableSummary getSummary(@NotNull TVariableSummaryFactory summaryFactory, boolean refreshCache) {
     Variable variable = summaryFactory.getVariable();
     Preconditions.checkArgument(!BinaryType.get().equals(variable.getValueType()),
         "Cannot compute summary for binary variable " + variable.getName());
@@ -92,7 +91,7 @@ public abstract class AbstractVariableSummaryCachedService< //
       return summaryFactory.getSummary();
     }
 
-    if(BooleanUtils.isTrue(refreshCache)) {
+    if(refreshCache) {
       clearVariableSummaryCache(summaryFactory);
     }
 

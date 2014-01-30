@@ -37,7 +37,8 @@ public class CategoricalSummaryResourceImpl extends AbstractSummaryResource impl
         .variable(getVariable()).table(getValueTable()).valueSource(getVariableValueSource()).distinct(distinct)
         .offset(offset).limit(limit).build();
 
-    CategoricalVariableSummary summary = variableStatsService.getCategoricalSummary(summaryFactory, resetCache);
+    CategoricalVariableSummary summary = variableStatsService
+        .getCategoricalSummary(summaryFactory, resetCache != null && resetCache);
 
     SummaryStatisticsDto dto = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //
