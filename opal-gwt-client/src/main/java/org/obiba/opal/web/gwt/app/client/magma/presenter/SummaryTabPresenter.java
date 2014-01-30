@@ -22,7 +22,6 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -59,7 +58,6 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
 
   @Override
   protected void onBind() {
-    GWT.log("BOND");
     registerHandler(getEventBus().addHandler(SummaryRequiredEvent.getType(), new DeferredSummaryRequestHandler()));
 
     // Variable Script refreshed
@@ -80,7 +78,6 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
 
   @Override
   public void onFullSummary() {
-    GWT.log("On Full " + entitiesCount);
     getView().setLimit(entitiesCount);
     cancelPendingSummaryRequest();
     // Remove queries from the url
