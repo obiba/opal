@@ -32,10 +32,10 @@ public interface VariableStatsService {
 
   @NotNull
   ContinuousVariableSummary getContinuousSummary(@NotNull ContinuousVariableSummaryFactory summaryFactory,
-      Boolean refreshCache);
+      boolean refreshCache);
 
   @NotNull
   CategoricalVariableSummary getCategoricalSummary(@NotNull CategoricalVariableSummaryFactory summaryFactory,
-      Boolean refreshCache);
+      boolean refreshCache);
 
 }
