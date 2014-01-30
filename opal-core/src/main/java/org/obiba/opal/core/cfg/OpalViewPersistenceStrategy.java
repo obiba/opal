@@ -78,11 +78,11 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
 
   private final File gitViewsDirectory;
 
-  private final ReadWriteLock rwl = new ReentrantReadWriteLock(true);
+  private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
 
-  private final Lock r = rwl.readLock();
+  private final Lock readLock = readWriteLock.readLock();
 
-  private final Lock w = rwl.writeLock();
+  private final Lock writeLock = readWriteLock.writeLock();
 
   public OpalViewPersistenceStrategy() {
     this(null);
@@ -106,57 +106,60 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   }
 
   @Override
-  public void writeViews(@NotNull String datasourceName, @NotNull Set<View> views, @Nullable String comment) {
-    w.lock();
-    try {
-      doWriteGitViews(datasourceName, views, comment);
-    } finally {
-      w.unlock();
-    }
+  public void writeViews(@NotNull final String datasourceName, @NotNull final Set<View> views,
+      @Nullable final String comment) {
+    executeWithWriteLock(new Action() {
+      @Override
+      public void execute() {
+        doWriteGitViews(datasourceName, views, comment);
+      }
+    });
   }
 
   @Override
-  public void writeView(@NotNull String datasourceName, @NotNull View view, @Nullable String comment) {
-    w.lock();
-    try {
-      doWriteGitViews(datasourceName, ImmutableSet.of(view), comment);
-    } finally {
-      w.unlock();
-    }
+  public void writeView(@NotNull final String datasourceName, @NotNull final View view,
+      @Nullable final String comment) {
+    executeWithWriteLock(new Action() {
+      @Override
+      public void execute() {
+        doWriteGitViews(datasourceName, ImmutableSet.of(view), comment);
+      }
+    });
   }
 
   @Override
-  public void removeView(@NotNull String datasourceName, @NotNull String viewName) {
-    w.lock();
-    try {
-      doRemoveGitView(datasourceName, viewName);
-    } finally {
-      w.unlock();
-    }
+  public void removeView(@NotNull final String datasourceName, @NotNull final String viewName) {
+    executeWithWriteLock(new Action() {
+      @Override
+      public void execute() {
+        doRemoveGitView(datasourceName, viewName);
+      }
+    });
   }
 
   @Override
-  public void removeViews(String datasourceName) {
-    w.lock();
-    try {
-      File targetDir = getDatasourceViewsGit(datasourceName);
-      FileUtil.delete(targetDir);
-    } catch(IOException e) {
-      throw new RuntimeException("Failed deleting views in git for datasource: " + datasourceName, e);
-    } finally {
-      w.unlock();
-    }
+  public void removeViews(final String datasourceName) {
+    executeWithWriteLock(new Action() {
+      @Override
+      public void execute() {
+        try {
+          FileUtil.delete(getDatasourceViewsGit(datasourceName));
+        } catch(IOException e) {
+          throw new RuntimeException("Failed deleting views in git for datasource: " + datasourceName, e);
+        }
+      }
+    });
   }
 
   @Override
-  public Set<View> readViews(@NotNull String datasourceName) {
-    r.lock();
-    try {
-      File targetDir = getDatasourceViewsGit(datasourceName);
-      return targetDir.exists() ? doReadGitViews(datasourceName) : doReadViews(datasourceName);
-    } finally {
-      r.unlock();
-    }
+  public Set<View> readViews(@NotNull final String datasourceName) {
+    return executeWithReadLock(new ActionWithReturn<Set<View>>() {
+      @Override
+      public Set<View> execute() {
+        File gitDir = getDatasourceViewsGit(datasourceName);
+        return gitDir.exists() ? doReadGitViews(datasourceName) : doReadViews(datasourceName);
+      }
+    });
   }
 
   private void doCommitPush(Git git, String message) throws GitAPIException {
@@ -380,12 +383,37 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   }
 
   private String normalizeDatasourceName(@SuppressWarnings("TypeMayBeWeakened") String datasourceName) {
-    Pattern escaper = Pattern.compile("([^a-zA-Z0-9-_. ])");
-    return escaper.matcher(datasourceName).replaceAll("");
+    return Pattern.compile("([^a-zA-Z0-9-_. ])").matcher(datasourceName).replaceAll("");
   }
 
   private File getDatasourceViewsFile(String datasourceName) {
     return new File(viewsDirectory, normalizeDatasourceName(datasourceName) + ".xml");
+  }
+
+  private void executeWithWriteLock(Action action) {
+    writeLock.lock();
+    try {
+      action.execute();
+    } finally {
+      writeLock.unlock();
+    }
+  }
+
+  private <T> T executeWithReadLock(ActionWithReturn<T> action) {
+    readLock.lock();
+    try {
+      return action.execute();
+    } finally {
+      readLock.unlock();
+    }
+  }
+
+  private interface Action {
+    void execute();
+  }
+
+  private interface ActionWithReturn<T> {
+    T execute();
   }
 
 }
