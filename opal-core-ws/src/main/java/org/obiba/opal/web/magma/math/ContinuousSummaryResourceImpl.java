@@ -38,7 +38,8 @@ public class ContinuousSummaryResourceImpl extends AbstractSummaryResource imple
         .variable(getVariable()).table(getValueTable()).valueSource(getVariableValueSource()).distribution(distribution)
         .percentiles(percentiles).intervals(intervals).offset(offset).limit(limit).build();
 
-    ContinuousVariableSummary summary = variableStatsService.getContinuousSummary(summaryFactory, resetCache);
+    ContinuousVariableSummary summary = variableStatsService
+        .getContinuousSummary(summaryFactory, resetCache.booleanValue());
 
     SummaryStatisticsDto dto = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //
