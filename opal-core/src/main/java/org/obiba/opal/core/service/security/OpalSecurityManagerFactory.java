@@ -36,6 +36,7 @@ import org.apache.shiro.realm.text.IniRealm;
 import org.apache.shiro.session.SessionListener;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.session.mgt.ExecutorServiceSessionValidationScheduler;
+import org.apache.shiro.session.mgt.SessionValidationScheduler;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.util.LifecycleUtils;
 import org.obiba.opal.core.service.security.realm.OpalPermissionResolver;
@@ -123,7 +124,9 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
         DefaultSessionManager sessionManager = (DefaultSessionManager) dsm.getSessionManager();
         sessionManager.setSessionListeners(sessionListeners);
         sessionManager.setSessionDAO(new EnterpriseCacheSessionDAO());
-        sessionManager.setSessionValidationScheduler(new ExecutorServiceSessionValidationScheduler());
+        SessionValidationScheduler sessionValidationScheduler = new ExecutorServiceSessionValidationScheduler();
+        sessionValidationScheduler.enableSessionValidation();
+        sessionManager.setSessionValidationScheduler(sessionValidationScheduler);
         sessionManager.setSessionValidationInterval(SESSION_VALIDATION_INTERVAL);
       }
       if(dsm.getSubjectDAO() instanceof DefaultSubjectDAO) {
