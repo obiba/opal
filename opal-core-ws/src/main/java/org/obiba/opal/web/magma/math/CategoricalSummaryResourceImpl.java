@@ -31,13 +31,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class CategoricalSummaryResourceImpl extends AbstractSummaryResource implements CategoricalSummaryResource {
 
   @Override
-  public Response get(boolean distinct, Integer offset, Integer limit) {
+  public Response get(boolean distinct, Integer offset, Integer limit, Boolean resetCache) {
 
     CategoricalVariableSummaryFactory summaryFactory = new CategoricalVariableSummaryFactory.Builder()
         .variable(getVariable()).table(getValueTable()).valueSource(getVariableValueSource()).distinct(distinct)
         .offset(offset).limit(limit).build();
 
-    CategoricalVariableSummary summary = variableStatsService.getCategoricalSummary(summaryFactory);
+    CategoricalVariableSummary summary = variableStatsService.getCategoricalSummary(summaryFactory, resetCache);
 
     SummaryStatisticsDto dto = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //

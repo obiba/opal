@@ -10,14 +10,12 @@
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
 import org.obiba.opal.web.gwt.app.client.ui.AbstractTabPanel;
 import org.obiba.opal.web.gwt.app.client.ui.DefaultFlexTable;
 import org.obiba.opal.web.gwt.plot.client.FrequencyChartFactory;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 
-import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;

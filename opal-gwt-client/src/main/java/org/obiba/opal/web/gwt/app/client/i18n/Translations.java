@@ -334,7 +334,9 @@ public interface Translations extends Constants {
       "DuplicateDatasourceName", "The datasource name is already in use. Please choose another.", //
       "UnknownError", "An unknown error has occurred.", //
       "InternalError", "An internal error has occurred. Please contact technical support.", //
-      "UnhandledException", "An internal error has occurred. Please contact technical support and provide the following system error:<br /><br /><pre>{0}</pre>", //
+      "UnhandledException",
+      "An internal error has occurred. Please contact technical support and provide the following system error:<br /><br /><pre>{0}</pre>",
+      //
       "DatasourceNameDisallowedChars", "Datasource names cannot contain colon or period characters.", //
       "ViewNameDisallowedChars", "View names cannot contain colon or period characters.", //
       "CSVFileRequired", "A CSV file is required.", //
@@ -826,13 +828,18 @@ public interface Translations extends Constants {
   @DefaultStringValue("Full summary pending...")
   String summaryFullPendingLabel();
 
-  @Description("This is a summary preview on label")
-  @DefaultStringValue("This is a summary preview on")
-  String summaryPreviewOnLabel();
+  @Description("Variable summary on label")
+  @DefaultStringValue("Variable summary on")
+  String summaryOnLabel();
 
-  @Description("Fetch summary preview on label")
-  @DefaultStringValue("Fetch summary preview on")
+  @Description("Fetch variable summary on label")
+  @DefaultStringValue("Fetch variable summary on")
   String summaryFetchSummaryLabel();
+
+//  @Description("Variable summary label")
+//  @DefaultStringValue("Variable summary")
+//  String variableSummary();
+//
 
   @Description("Remove label")
   @DefaultStringValue("Remove")
