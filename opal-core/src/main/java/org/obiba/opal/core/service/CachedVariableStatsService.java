@@ -76,14 +76,16 @@ public class CachedVariableStatsService implements VariableStatsService {
 
   @NotNull
   @Override
-  public CategoricalVariableSummary getCategoricalSummary(@NotNull CategoricalVariableSummaryFactory summaryFactory) {
-    return categoricalSummaryService.getSummary(summaryFactory);
+  public CategoricalVariableSummary getCategoricalSummary(@NotNull CategoricalVariableSummaryFactory summaryFactory,
+      Boolean refreshCache) {
+    return categoricalSummaryService.getSummary(summaryFactory, refreshCache);
   }
 
   @NotNull
   @Override
-  public ContinuousVariableSummary getContinuousSummary(@NotNull ContinuousVariableSummaryFactory summaryFactory) {
-    return continuousSummaryService.getSummary(summaryFactory);
+  public ContinuousVariableSummary getContinuousSummary(@NotNull ContinuousVariableSummaryFactory summaryFactory,
+      Boolean refreshCache) {
+    return continuousSummaryService.getSummary(summaryFactory, refreshCache);
   }
 
   private class ContinuousVariableSummaryCachedService extends

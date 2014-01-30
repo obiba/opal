@@ -383,6 +383,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   @Override
   public void onShowSummary() {
     summaryTabPresenter.onReset();
+    fireSummaryRequiredEvent(variable);
   }
 
   @Override
@@ -634,15 +635,25 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     public void authorized() {
       requestSummary(variable);
       if(getView().isSummaryTabSelected()) {
-        summaryTabPresenter.onReset();
+        summaryTabPresenter.init();
       }
     }
 
-    private void requestSummary(VariableDto selection) {
-      fireEvent(
-          new SummaryRequiredEvent(UriBuilders.DATASOURCE_TABLE_VARIABLE_SUMMARY.create(), table.getDatasourceName(),
-              table.getName(), selection.getName()));
+    private void requestSummary(final VariableDto selection) {
+      fireSummaryRequiredEvent(selection);
     }
+  }
+
+  private void fireSummaryRequiredEvent(final VariableDto selection) {
+    ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(
+        UriBuilders.DATASOURCE_TABLE.create().query("counts", "true").build(table.getDatasourceName(), table.getName()))
+        .withCallback(new ResourceCallback<TableDto>() {
+          @Override
+          public void onResource(Response response, TableDto resource) {
+            fireEvent(new SummaryRequiredEvent(UriBuilders.DATASOURCE_TABLE_VARIABLE_SUMMARY.create(),
+                resource.getValueSetCount(), table.getDatasourceName(), table.getName(), selection.getName()));
+          }
+        }).get().send();
   }
 
   /**

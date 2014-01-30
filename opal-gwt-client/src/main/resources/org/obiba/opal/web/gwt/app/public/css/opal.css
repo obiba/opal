@@ -472,3 +472,10 @@ td.row-actions span {
 .database-url-example {
   padding-left: 3px;
 }
+
+/* for NumericTextBox in an alert box (variable summary)*/
+.summary-numeric-textbox {
+  margin-bottom: 0 !important;
+  padding: 2px 4px !important;
+  width: 4em;
+}

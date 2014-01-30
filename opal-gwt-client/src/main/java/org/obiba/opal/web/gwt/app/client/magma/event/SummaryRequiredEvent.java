@@ -33,11 +33,6 @@ public class SummaryRequiredEvent extends GwtEvent<SummaryRequiredEvent.Handler>
 
   private Integer max = null;
 
-  public SummaryRequiredEvent(UriBuilder uri, String... args) {
-    this.uri = uri;
-    this.args = args;
-  }
-
   public SummaryRequiredEvent(UriBuilder uri, Integer max, String... args) {
     this.uri = uri;
     this.max = max;

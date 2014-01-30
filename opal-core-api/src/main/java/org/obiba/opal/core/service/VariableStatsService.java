@@ -31,9 +31,11 @@ public interface VariableStatsService {
   void clearComputingSummaries(@NotNull ValueTable valueTable);
 
   @NotNull
-  ContinuousVariableSummary getContinuousSummary(@NotNull ContinuousVariableSummaryFactory summaryFactory);
+  ContinuousVariableSummary getContinuousSummary(@NotNull ContinuousVariableSummaryFactory summaryFactory,
+      Boolean refreshCache);
 
   @NotNull
-  CategoricalVariableSummary getCategoricalSummary(@NotNull CategoricalVariableSummaryFactory summaryFactory);
+  CategoricalVariableSummary getCategoricalSummary(@NotNull CategoricalVariableSummaryFactory summaryFactory,
+      Boolean refreshCache);
 
 }

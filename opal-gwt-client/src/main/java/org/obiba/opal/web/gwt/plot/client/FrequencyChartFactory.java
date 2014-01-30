@@ -17,12 +17,8 @@ import org.moxieapps.gwt.highcharts.client.Chart;
 import org.moxieapps.gwt.highcharts.client.Credits;
 import org.moxieapps.gwt.highcharts.client.Legend;
 import org.moxieapps.gwt.highcharts.client.Series;
-import org.moxieapps.gwt.highcharts.client.ToolTip;
-import org.moxieapps.gwt.highcharts.client.ToolTipData;
-import org.moxieapps.gwt.highcharts.client.ToolTipFormatter;
 import org.moxieapps.gwt.highcharts.client.labels.DataLabels;
 import org.moxieapps.gwt.highcharts.client.plotOptions.BarPlotOptions;
-import org.moxieapps.gwt.highcharts.client.plotOptions.PlotOptions;
 
 import com.google.common.collect.Lists;
 
@@ -59,15 +55,19 @@ public class FrequencyChartFactory {
 
   public Chart createValueChart(String title) {
     Chart chart = createChart(title, "Count");
-    chart.addSeries(chart.createSeries().setName("Count").setPoints(values.toArray(new Number[values.size()]))
+    if(values.size() > 0)
+      chart.addSeries(chart.createSeries().setName("Count").setPoints(values.toArray(new Number[values.size()]))
 
-    );
+      );
     return chart;
   }
 
   public Chart createPercentageChart(String title) {
     Chart chart = createChart(title, "%");
-    chart.addSeries(chart.createSeries().setName("%").setPoints(percentages.toArray(new Number[percentages.size()])));
+    if(values.size() > 0) {
+      chart.addSeries(chart.createSeries().setName("%").setPoints(percentages.toArray(new Number[percentages.size()])));
+    }
+
     return chart;
   }
 }
