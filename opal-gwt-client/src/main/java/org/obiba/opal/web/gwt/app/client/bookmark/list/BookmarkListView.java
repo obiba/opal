@@ -60,7 +60,7 @@ public class BookmarkListView extends ViewWithUiHandlers<BookmarkListUiHandlers>
     final static Column<BookmarkDto, String> NAME = new TextColumn<BookmarkDto>() {
       @Override
       public String getValue(BookmarkDto dto) {
-        return dto.getName() + " (" + dto.getResource() + ")";
+        return dto.getName()/* + " (" + dto.getResource() + ")"*/;
       }
     };
 

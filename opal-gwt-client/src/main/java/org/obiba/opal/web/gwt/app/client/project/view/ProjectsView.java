@@ -271,7 +271,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
   private Widget getBookmarkIconWidget(ProjectDto project) {
     BookmarkIconPresenter bookmarkIconPresenter = bookmarkIconPresenterProvider.get();
-    bookmarkIconPresenter.setBookmarkable(UriBuilders.PROJECT.create().build(project.getName()));
+    bookmarkIconPresenter.setBookmarkable(UriBuilders.DATASOURCE.create().build(project.getName()));
     bookmarkIconPresenter.addStyleName("small-right-indent");
     return bookmarkIconPresenter.asWidget();
   }

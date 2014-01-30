@@ -179,7 +179,7 @@ public class ProjectPermissionsView extends ViewWithUiHandlers<ProjectPermission
     groups.insert(new NavHeader(translations.subjectTypeGroups()), 0);
   }
 
-  private void createSubjectNavLink(final Subject subject) {
+  private void createSubjectNavLink(Subject subject) {
     NavList container = Subject.SubjectType.USER.isSubjectType(subject.getType()) ? users : groups;
     NavLink link = new NavLink(subject.getPrincipal());
     link.addClickHandler(new SubjectNavLinkClickHandler(subject, link));
