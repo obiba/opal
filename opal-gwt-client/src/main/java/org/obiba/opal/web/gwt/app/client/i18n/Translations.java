@@ -836,11 +836,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Fetch variable summary on")
   String summaryFetchSummaryLabel();
 
-//  @Description("Variable summary label")
-//  @DefaultStringValue("Variable summary")
-//  String variableSummary();
-//
-
   @Description("Remove label")
   @DefaultStringValue("Remove")
   String removeLabel();
