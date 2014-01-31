@@ -138,6 +138,15 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   /**
+   * When showing values from the VariablePresenter, we don't have to set/reset the filter
+   *
+   * @param select
+   */
+  public void updateValuesDisplay() {
+    updateValuesDisplay("");
+  }
+
+  /**
    * When showing values tab from the TablePresenter, we have to copy the filter that
    * may have been set on the TablePresenter
    *
@@ -149,21 +158,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
 
     fetcher.updateVariables(select);
-    currentVariablesFilterSelect = "";
-    fetchIndexSchema();
-  }
-
-  /**
-   * When showing values from the VariablePresenter, we don't have to set/reset the filter
-   *
-   * @param select
-   */
-  public void updateValuesDisplay() {
-    if(fetcher == null) {
-      getView().setValueSetsFetcher(fetcher = new DataFetcherImpl());
-    }
-
-    fetcher.updateVariables("");
     currentVariablesFilterSelect = "";
     fetchIndexSchema();
   }
