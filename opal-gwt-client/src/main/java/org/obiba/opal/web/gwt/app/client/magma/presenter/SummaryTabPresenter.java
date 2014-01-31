@@ -160,6 +160,7 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
   }
 
   private void requestSummary() {
+    if (resourceRequestBuilder == null) return;
     getView().requestingSummary(limit, entitiesCount);
     summaryRequest = resourceRequestBuilder //
         .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
