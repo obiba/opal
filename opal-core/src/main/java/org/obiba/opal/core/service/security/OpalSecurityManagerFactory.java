@@ -134,13 +134,7 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
 
     private void initializeSessionManager(DefaultSecurityManager dsm) {
       if(dsm.getSessionManager() instanceof DefaultSessionManager) {
-        DefaultSessionManager sessionManager = (DefaultSessionManager) dsm.getSessionManager();
-        sessionManager.setSessionListeners(sessionListeners);
-        sessionManager.setSessionDAO(new EnterpriseCacheSessionDAO());
-        SessionValidationScheduler sessionValidationScheduler = new ExecutorServiceSessionValidationScheduler();
-        sessionValidationScheduler.enableSessionValidation();
-        sessionManager.setSessionValidationScheduler(sessionValidationScheduler);
-        sessionManager.setSessionValidationInterval(SESSION_VALIDATION_INTERVAL);
+        setDefaultSessionManager(dsm);
       }
     }
 
@@ -176,5 +170,15 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
       realm.setCredentialsMatcher(new PasswordMatcher());
       return realm;
     }
+  }
+
+  private void setDefaultSessionManager(DefaultSecurityManager dsm) {
+    DefaultSessionManager sessionManager = (DefaultSessionManager) dsm.getSessionManager();
+    sessionManager.setSessionListeners(sessionListeners);
+    sessionManager.setSessionDAO(new EnterpriseCacheSessionDAO());
+    SessionValidationScheduler sessionValidationScheduler = new ExecutorServiceSessionValidationScheduler();
+    sessionValidationScheduler.enableSessionValidation();
+    sessionManager.setSessionValidationScheduler(sessionValidationScheduler);
+    sessionManager.setSessionValidationInterval(SESSION_VALIDATION_INTERVAL);
   }
 }
