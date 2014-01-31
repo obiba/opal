@@ -619,9 +619,9 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   }
 
   @Override
-  public void onAddAttribute(List<VariableDto> selectedItems) {
+  public void onApplyAttribute(List<VariableDto> selectedItems) {
     VariableAttributeModalPresenter attributeEditorPresenter = attributeModalProvider.get();
-    attributeEditorPresenter.setDialogMode(VariableAttributeModalPresenter.Mode.CREATE);
+    attributeEditorPresenter.setDialogMode(VariableAttributeModalPresenter.Mode.APPLY);
     attributeEditorPresenter.initialize(table, selectedItems);
   }
 

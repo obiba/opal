@@ -36,7 +36,7 @@ public interface TableUiHandlers extends UiHandlers {
 
   void onCrossVariables();
 
-  void onAddAttribute(List<VariableDto> selectedItems);
+  void onApplyAttribute(List<VariableDto> selectedItems);
 
   void onShowDictionary();
 

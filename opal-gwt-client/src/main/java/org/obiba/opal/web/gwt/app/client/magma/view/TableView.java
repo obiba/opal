@@ -513,9 +513,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     getUiHandlers().onCrossVariables();
   }
 
-  @UiHandler("addAttribute")
-  void onAddAttribute(ClickEvent event) {
-    getUiHandlers().onAddAttribute(checkColumn.getSelectedItems());
+  @UiHandler("applyAttribute")
+  void onApplyAttribute(ClickEvent event) {
+    getUiHandlers().onApplyAttribute(checkColumn.getSelectedItems());
   }
 
   @Override

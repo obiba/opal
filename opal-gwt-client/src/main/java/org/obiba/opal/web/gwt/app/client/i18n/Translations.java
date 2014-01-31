@@ -896,6 +896,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Script Evaluation")
   String scriptEvaluationLabel();
 
+  @Description("Apply attribute title")
+  @DefaultStringValue("Apply Attribute")
+  String applyAttribute();
+
   @Description("Add attribute title")
   @DefaultStringValue("Add Attribute")
   String addAttribute();
