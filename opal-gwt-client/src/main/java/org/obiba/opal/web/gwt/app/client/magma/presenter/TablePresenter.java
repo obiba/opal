@@ -321,6 +321,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
     if(getView().isValuesTabSelected()) {
       valuesTablePresenter.setTable(tableDto);
+      valuesTablePresenter.updateValuesDisplay("");
     }
 
     updateVariables();

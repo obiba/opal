@@ -151,6 +151,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     setInSlot(Display.Slots.Values, valuesTablePresenter);
     setInSlot(Display.Slots.ScriptEditor, scriptEditorPresenter);
     setInSlot(Display.Slots.History, variableVcsCommitHistoryPresenter);
+    setInSlot(Display.Slots.Summary, summaryTabPresenter);
 
     addRegisteredHandler(VariableSelectionChangeEvent.getType(), this);
     addRegisteredHandler(VariableRefreshEvent.getType(), new VariableRefreshEvent.Handler() {
@@ -170,8 +171,6 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     });
     addRegisteredHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler());
 
-    summaryTabPresenter.bind();
-    getView().setSummaryTabWidget(summaryTabPresenter.getView());
     addRegisteredHandler(VcsCommitInfoReceivedEvent.getType(), new VcsCommitInfoReceivedEvent.Handler() {
       @Override
       public void onVcsCommitInfoReceived(VcsCommitInfoReceivedEvent event) {
@@ -184,7 +183,6 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   @Override
   protected void onUnbind() {
     super.onUnbind();
-    summaryTabPresenter.unbind();
   }
 
   private void updateDisplay(String datasourceName, String tableName, String variableName) {
@@ -223,6 +221,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   private void updateValuesDisplay() {
     valuesTablePresenter.setTable(table, variable);
+    valuesTablePresenter.updateValuesDisplay("");
   }
 
   private void updateVariableDisplay(VariableDto variableDto) {
@@ -382,13 +381,13 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   @Override
   public void onShowSummary() {
-    summaryTabPresenter.onReset();
     fireSummaryRequiredEvent(variable);
   }
 
   @Override
   public void onShowValues() {
-    updateValuesDisplay();
+    valuesTablePresenter.setTable(table);
+    valuesTablePresenter.updateValuesDisplay();
   }
 
   @Override
@@ -639,7 +638,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
       }
     }
 
-    private void requestSummary(final VariableDto selection) {
+    private void requestSummary(VariableDto selection) {
       fireSummaryRequiredEvent(selection);
     }
   }
@@ -683,7 +682,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   public interface Display extends View, HasUiHandlers<VariableUiHandlers> {
 
     enum Slots {
-      Permissions, Values, ScriptEditor, History
+      Permissions, Values, ScriptEditor, Summary, History
     }
 
     void setVariable(VariableDto variable);
@@ -703,8 +702,6 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     String getComment();
 
     void backToViewScript();
-
-    void setSummaryTabWidget(View widget);
 
     boolean isSummaryTabSelected();
 

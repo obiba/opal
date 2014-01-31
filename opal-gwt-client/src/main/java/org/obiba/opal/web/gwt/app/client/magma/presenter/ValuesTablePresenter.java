@@ -104,10 +104,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     getView().setUiHandlers(this);
   }
 
-  public void setTable(TableDto table) {
-    setTable(table, "");
-  }
-
   public void setTable(TableDto table, VariableDto variable) {
     if(originalTable == null || !originalTable.getLink().equals(table.getLink())) {
       getView().getFiltersPanel().clear();
@@ -120,10 +116,9 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     variables.push(variable);
     getView().setVariables(variables);
     currentVariablesFilterSelect = "";
-    fetchIndexSchema();
   }
 
-  public void setTable(final TableDto table, String select) {
+  public void setTable(final TableDto table) {
     // Clear filters when table has changed
     if(originalTable == null || !originalTable.getLink().equals(table.getLink())) {
       getView().getFiltersPanel().clear();
@@ -140,6 +135,28 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
             .revealPlace(ProjectPlacesHelper.getVariablePlace(table.getDatasourceName(), table.getName(), value));
       }
     });
+  }
+
+  /**
+   * When showing values from the VariablePresenter, we don't have to set/reset the filter
+   *
+   * @param select
+   */
+  public void updateValuesDisplay() {
+    updateValuesDisplay("");
+  }
+
+  /**
+   * When showing values tab from the TablePresenter, we have to copy the filter that
+   * may have been set on the TablePresenter
+   *
+   * @param select
+   */
+  public void updateValuesDisplay(String select) {
+    if(fetcher == null) {
+      getView().setValueSetsFetcher(fetcher = new DataFetcherImpl());
+    }
+
     fetcher.updateVariables(select);
     currentVariablesFilterSelect = "";
     fetchIndexSchema();
@@ -152,8 +169,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   @Override
   protected void onBind() {
     super.onBind();
-    getView().setValueSetsFetcher(fetcher = new DataFetcherImpl());
-    getView().addEntitySearchHandler(new EntitySearchHandlerImpl());
 
     registerHandler(getView().getFilter().getClear().addClickHandler(new ClickHandler() {
       @Override
@@ -161,6 +176,11 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         fetcher.updateVariables(getView().getFilter().getTextBox().getText());
       }
     }));
+  }
+
+  @Override
+  protected void onReveal() {
+    getView().addEntitySearchHandler(new EntitySearchHandlerImpl());
   }
 
   public void setViewMode(ViewMode mode) {
@@ -488,6 +508,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
                     public void onResponseCode(Request request, Response response) {
                       notifyError(response);
                       setTable(originalTable);
+                      updateValuesDisplay(currentVariablesFilterSelect);
                     }
                   }).send();
             }
