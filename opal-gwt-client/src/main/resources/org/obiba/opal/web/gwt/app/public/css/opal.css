@@ -85,6 +85,10 @@ li.no-icon > a {
   margin-right: 30px;
 }
 
+.neg-top-margin {
+  margin-top: -10px;
+}
+
 .no-top-margin {
   margin-top: 0;
 }

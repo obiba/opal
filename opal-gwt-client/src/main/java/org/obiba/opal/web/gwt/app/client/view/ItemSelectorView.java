@@ -17,13 +17,16 @@ import org.obiba.opal.web.gwt.app.client.presenter.ItemSelectorPresenter.EnterKe
 import org.obiba.opal.web.gwt.app.client.presenter.ItemSelectorPresenter.ItemInputDisplay;
 
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.constants.ButtonType;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
 
@@ -36,7 +39,7 @@ public class ItemSelectorView extends ViewImpl implements ItemSelectorPresenter.
   private ItemInputDisplay itemInputDisplay;
 
   public ItemSelectorView() {
-    itemGrid = new Grid(0, 2);
+    itemGrid = new Grid(0, 1);
   }
 
   @Override
@@ -52,10 +55,12 @@ public class ItemSelectorView extends ViewImpl implements ItemSelectorPresenter.
     this.itemInputDisplay = itemInputDisplay;
 
     // Add a row for the input widget.
-    itemGrid.resize(1, 2);
+    itemGrid.resize(1, 1);
 
-    // Add the input widget in the first column.
-    itemGrid.setWidget(itemGrid.getRowCount() - 1, 0, itemInputDisplay.asWidget());
+    FlowPanel itemWidget = new FlowPanel();
+    Widget itemInputWidget = itemInputDisplay.asWidget();
+    itemInputWidget.addStyleName("inline-block");
+    itemWidget.add(itemInputWidget);
 
     // Put an "add" button in the second column.
     Button addWidget = createAddWidget();
@@ -66,7 +71,11 @@ public class ItemSelectorView extends ViewImpl implements ItemSelectorPresenter.
         addItemAndClear();
       }
     });
-    itemGrid.setWidget(itemGrid.getRowCount() - 1, 1, addWidget);
+    addWidget.addStyleName("small-indent neg-top-margin");
+    itemWidget.add(addWidget);
+
+    // Add the input widget in the first column.
+    itemGrid.setWidget(itemGrid.getRowCount() - 1, 0, itemWidget);
 
     // Put the Grid in a FlowPanel (so that it doesn't expand to fill its parent) and set that as the widget.
     FlowPanel container = new FlowPanel();
@@ -79,13 +88,15 @@ public class ItemSelectorView extends ViewImpl implements ItemSelectorPresenter.
   @Override
   public void addItem(final String item) {
     // Add a row for the new item.
-    itemGrid.resize(itemGrid.getRowCount() + 1, 2);
+    itemGrid.resize(itemGrid.getRowCount() + 1, 1);
 
-    // Put the item in the new row's first column.
-    itemGrid.setText(itemGrid.getRowCount() - 1, 0, item);
+    FlowPanel itemWidget = new FlowPanel();
+    Label label = new Label(item);
+    label.addStyleName("inline-block");
+    itemWidget.add(label);
 
     // Put a "remove" button in the second column.
-    Button removeWidget = createRemoveWidget();
+    IconAnchor removeWidget = createRemoveWidget();
     removeWidget.addClickHandler(new ClickHandler() {
 
       @Override
@@ -98,7 +109,9 @@ public class ItemSelectorView extends ViewImpl implements ItemSelectorPresenter.
         }
       }
     });
-    itemGrid.setWidget(itemGrid.getRowCount() - 1, 1, removeWidget);
+    removeWidget.addStyleName("small-indent");
+    itemWidget.add(removeWidget);
+    itemGrid.setWidget(itemGrid.getRowCount() - 1, 0, itemWidget);
   }
 
   /**
@@ -148,9 +161,9 @@ public class ItemSelectorView extends ViewImpl implements ItemSelectorPresenter.
     return btn;
   }
 
-  private Button createRemoveWidget() {
-    Button btn = new Button("Remove");
-    btn.setType(ButtonType.DANGER);
+  private IconAnchor createRemoveWidget() {
+    IconAnchor btn = new IconAnchor();
+    btn.setIcon(IconType.REMOVE);
     return btn;
   }
 
