@@ -115,9 +115,9 @@
                       <ui:msg description="Add variables to view label">Add variables to view</ui:msg>
                     </b2:IconAnchor>
 
-                    <b2:IconAnchor ui:field="addAttribute" icon="TAG"
+                    <b2:IconAnchor ui:field="applyAttribute" icon="TAG"
                         addStyleNames="inline xsmall-indent">
-                      <ui:msg description="Add attribute label">Add attribute</ui:msg>
+                      <ui:msg description="Apply attribute label">Apply attribute</ui:msg>
                     </b2:IconAnchor>
 
                     <b2:IconAnchor ui:field="deleteVariables" icon="TRASH" addStyleNames="inline xsmall-indent">

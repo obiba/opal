@@ -74,7 +74,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
   private List<String> locales;
 
   public enum Mode {
-    UPDATE_SINGLE, UPDATE_MULTIPLE, CREATE
+    APPLY, UPDATE_SINGLE, UPDATE_MULTIPLE, CREATE
   }
 
   @Inject
@@ -125,12 +125,17 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
   private JsArray<AttributeDto> getAttributesArray(VariableDto dto) {
     List<AttributeDto> attributes = JsArrays.toList(dto.getAttributesArray());
 
-    if(dialogMode == Mode.CREATE) return addNewAttribute(attributes);
+    switch(dialogMode){
+      case APPLY: // fall through
+      case CREATE:
+        return addNewAttribute(attributes);
 
-    if(dialogMode == Mode.UPDATE_SINGLE) return updateSingleAttribute(attributes);
+      case UPDATE_SINGLE:
+        return updateSingleAttribute(attributes);
 
-    return updateMultipleNamespace(attributes);
-
+      default:
+        return updateMultipleNamespace(attributes);
+    }
   }
 
   private JsArray<AttributeDto> updateMultipleNamespace(Iterable<AttributeDto> attributes) {
@@ -403,7 +408,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
           validators.add(
               new ConditionValidator(hasValue(getView().getLocalizedValues().getValue()), "AttributeValueIsRequired",
                   Display.FormField.VALUE.name()));
-          validators.add(new UniqueAttributeNameValidator("AttributeAlreadyExists"));
+          if (dialogMode == Mode.CREATE) validators.add(new UniqueAttributeNameValidator("AttributeAlreadyExists"));
         }
       }
       return validators;
