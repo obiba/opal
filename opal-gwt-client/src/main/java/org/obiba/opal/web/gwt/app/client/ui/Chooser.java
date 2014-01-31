@@ -52,6 +52,7 @@ public class Chooser extends ChosenListBox {
       public void onAttachOrDetach(AttachEvent event) {
         if(event.isAttached()) {
           getChosenElement().addClass("chooser");
+          getChosenElement().find("div > ul").last().addClass("chooser-options");
         }
       }
     });
