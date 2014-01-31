@@ -379,8 +379,24 @@ td.row-actions span {
 /*
  * Chooser
  */
-.chooser + div {
+.chooser {
   margin-bottom: 10px;
+}
+
+.chooser > ul {
+  background-image: none !important;
+  border: 2px solid #DCE4EC !important;
+  border-radius: 6px 6px 6px 6px;
+  box-shadow: none !important;
+  padding: 4px 6px !important;
+  text-indent: 1px;
+}
+
+.chooser > ul > li {
+  margin-top: 4px !important;
+  margin-right: 3px !important;
+  background-image: none !important;
+  box-shadow: none !important;
 }
 
 /*
@@ -478,4 +494,9 @@ td.row-actions span {
   margin-bottom: 0 !important;
   padding: 2px 4px !important;
   width: 4em;
+}
+
+/* Allow dialog elements to overflow the modal window (useful for listbox)*/
+.modal-body {
+  overflow: visible
 }

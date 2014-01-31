@@ -406,7 +406,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @Override
   public void onShowValues() {
     valuesTablePresenter.setTable(table);
-    valuesTablePresenter.setFilter(getView().getFilter().getText());
+    valuesTablePresenter.updateValuesDisplay(getView().getFilter().getText());
   }
 
   @Override

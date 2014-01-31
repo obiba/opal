@@ -105,6 +105,10 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   public void setTable(TableDto table, VariableDto variable) {
+    if(fetcher == null) {
+      getView().setValueSetsFetcher(fetcher = new DataFetcherImpl());
+    }
+
     if(originalTable == null || !originalTable.getLink().equals(table.getLink())) {
       getView().getFiltersPanel().clear();
     }
@@ -115,7 +119,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     JsArray<VariableDto> variables = JsArray.createArray().cast();
     variables.push(variable);
     getView().setVariables(variables);
-    currentVariablesFilterSelect = "";
+    fetchIndexSchema();
   }
 
   public void setTable(final TableDto table) {
@@ -155,6 +159,10 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   public void updateValuesDisplay(String select) {
     if(fetcher == null) {
       getView().setValueSetsFetcher(fetcher = new DataFetcherImpl());
+    }
+
+    if(!select.isEmpty()) {
+      getView().getFilter().setText(select);
     }
 
     fetcher.updateVariables(select);
