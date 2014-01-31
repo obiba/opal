@@ -74,8 +74,6 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
     expect(eventBusMock.addHandler((Type<VariableSelectionChangeEvent.Handler>) EasyMock.anyObject(),
         (VariableSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
 
-    displayMock.setSummaryTabWidget(summaryTabMock);
-
     replay(displayMock, eventBusMock);
     variablePresenter.bind();
 
