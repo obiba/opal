@@ -11,7 +11,7 @@
       <b:Heading size="4" addStyleNames="inline-block no-top-margin">
         <ui:msg description="Identifiers Database label">Identifiers Database</ui:msg>
       </b:Heading>
-      <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="edit"/>
+      <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="edit" visible="false"/>
 
     </g:FlowPanel>
     <b:Paragraph>
