@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.ui;
 
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.event.logical.shared.AttachEvent;
 import com.watopi.chosen.client.ChosenOptions;
 import com.watopi.chosen.client.gwt.ChosenListBox;
 
@@ -45,7 +46,15 @@ public class Chooser extends ChosenListBox {
   private void initWidget() {
     setDisableSearchThreshold(5);
     setSearchContains(true);
-    addStyleName("chooser");
+
+    addAttachHandler(new AttachEvent.Handler() {
+      @Override
+      public void onAttachOrDetach(AttachEvent event) {
+        if(event.isAttached()) {
+          getChosenElement().addClass("chooser");
+        }
+      }
+    });
   }
 
   @Override
