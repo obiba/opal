@@ -495,7 +495,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     if(text != null && !text.isEmpty()) {
       filter.setText(text);
 
-      fetcher.updateVariables(filter.getTextBox().getText());
+      fetcher.updateVariables(text);
       if(!text.isEmpty()) {
         addPanel.setOpen(true);
       }

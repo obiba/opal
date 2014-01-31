@@ -78,8 +78,8 @@
               </b:ControlGroup>
             </b:Well>
           </b:Column>
-          <b:Column size="2">
-            <b:Well addStyleNames="inline-block">
+          <b:Column size="3">
+          <b:Well addStyleNames="inline-block">
               <b:ControlGroup>
                 <b:ControlLabel>
                   <ui:msg description="Number of Rows label">Number of rows</ui:msg>

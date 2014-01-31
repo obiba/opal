@@ -51,7 +51,6 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
@@ -128,7 +127,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   FlowPanel attributesPanel;
 
   @UiField
-  Panel summary;
+  Panel summaryPanel;
 
   @UiField
   SimplePanel values;
@@ -222,6 +221,9 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
         break;
       case Permissions:
         panel = permissionsPanel;
+        break;
+      case Summary:
+        panel = summaryPanel;
         break;
     }
     if(panel != null) {
@@ -344,11 +346,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   @Override
   public boolean isSummaryTabSelected() {
     return tabPanel.getSelectedTab() == SUMMARY_TAB_INDEX;
-  }
-
-  @Override
-  public void setSummaryTabWidget(View widget) {
-    summary.add(widget.asWidget());
   }
 
   @Override
