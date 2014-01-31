@@ -206,6 +206,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     }
   }
 
+  @SuppressWarnings("PMD.NcssMethodCount")
   @Override
   public void setInSlot(Object slot, IsWidget content) {
     HasWidgets panel = null;
