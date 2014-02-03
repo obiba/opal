@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.view;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationUiHandlers;
@@ -21,9 +22,14 @@ import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.Dropdown;
+import com.github.gwtbootstrap.client.ui.FluidContainer;
 import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.Tooltip;
 import com.github.gwtbootstrap.client.ui.Typeahead;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -75,18 +81,35 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
   @UiField(provided = true)
   SuggestListBox search;
 
+  @UiField
+  Button resizeScreen;
+
+  @UiField
+  Tooltip resizeTooltip;
+
+  @UiField
+  FluidContainer workbenchContainer;
+
+  @UiField
+  FluidContainer footerContainer;
+
+  private final Translations translations;
+
   private final VariableSuggestOracle oracle;
 
   @Inject
-  public ApplicationView(EventBus eventBus, Binder uiBinder) {
+  public ApplicationView(EventBus eventBus, Binder uiBinder, Translations translations) {
     oracle = new VariableSuggestOracle(eventBus);
     search = new SuggestListBox(oracle);
     initWidget(uiBinder.createAndBindUi(this));
+    this.translations = translations;
 
     dashboardItem.setHref("#" + Places.DASHBOARD);
     projectsItem.setHref("#" + Places.PROJECTS);
     administrationItem.setHref("#" + Places.ADMINISTRATION);
     profileItem.setHref("#" + Places.PROFILE);
+
+    resizeTooltip.setText(translations.switchScreenDisplay());
 
     initSearchWidget();
   }
@@ -110,7 +133,7 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
         // Reset suggestBox text to user input text
         String originalQuery = oracle.getOriginalQuery();
         // Forward selection event
-        getUiHandlers().onSelection((VariableSuggestOracle.VariableSuggestion)selectedSuggestion);
+        getUiHandlers().onSelection((VariableSuggestOracle.VariableSuggestion) selectedSuggestion);
         return originalQuery;
       }
     });
@@ -177,6 +200,20 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
   @UiHandler("quitItem")
   void onQuit(ClickEvent event) {
     getUiHandlers().onQuit();
+  }
+
+  @UiHandler("resizeScreen")
+  void onResize(ClickEvent event) {
+    boolean isFullScreen = workbenchContainer.getStyleName().contains("almost-full-width");
+    if (isFullScreen) {
+      workbenchContainer.removeStyleName("almost-full-width");
+      footerContainer.removeStyleName("almost-full-width");
+      resizeScreen.setIcon(IconType.RESIZE_FULL);
+    } else {
+      workbenchContainer.addStyleName("almost-full-width");
+      footerContainer.addStyleName("almost-full-width");
+      resizeScreen.setIcon(IconType.RESIZE_SMALL);
+    }
   }
 
 }

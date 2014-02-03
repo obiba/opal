@@ -2118,4 +2118,9 @@ public interface Translations extends Constants {
   @Description("Variable Import Failed Error message")
   @DefaultStringValue("Failed to import dictionary. Please make sure the file contains valid data.")
   String variableImportFailed();
+
+  @Description("Full/normal screen tooltip")
+  @DefaultStringValue("Full/normal screen")
+  String switchScreenDisplay();
+
 }
