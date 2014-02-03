@@ -220,7 +220,9 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   }
 
   private void updateValuesDisplay() {
-    valuesTablePresenter.setTable(table, variable);
+    if(getView().isValuesTabSelected()) {
+      valuesTablePresenter.setTable(table, variable);
+    }
   }
 
   private void updateVariableDisplay(VariableDto variableDto) {
@@ -630,8 +632,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
     @Override
     public void authorized() {
-      requestSummary(variable);
       if(getView().isSummaryTabSelected()) {
+        requestSummary(variable);
         summaryTabPresenter.init();
       }
     }
@@ -702,6 +704,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     void backToViewScript();
 
     boolean isSummaryTabSelected();
+
+    boolean isValuesTabSelected();
 
     HasAuthorization getSummaryAuthorizer();
 
