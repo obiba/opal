@@ -350,6 +350,11 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   }
 
   @Override
+  public boolean isValuesTabSelected() {
+    return tabPanel.getSelectedTab() == VALUES_TAB_INDEX;
+  }
+
+  @Override
   public void setVariable(VariableDto variable) {
     name.setText(variable.getName());
     entityType.setText(variable.getEntityType());
