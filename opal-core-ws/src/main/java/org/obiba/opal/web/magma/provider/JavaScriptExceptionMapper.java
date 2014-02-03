@@ -21,9 +21,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Provider
 public class JavaScriptExceptionMapper implements ExceptionMapper<RhinoException> {
-  //
-  // ExceptionMapper Methods
-  //
 
   @Override
   public Response toResponse(RhinoException exception) {
