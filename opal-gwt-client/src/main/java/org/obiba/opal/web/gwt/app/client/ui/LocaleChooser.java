@@ -20,7 +20,6 @@ import org.obiba.opal.web.gwt.app.client.support.LanguageLocale;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
-import com.watopi.chosen.client.ChosenOptions;
 
 /**
  * Selector of locales.
@@ -31,14 +30,14 @@ public class LocaleChooser extends Chooser {
 
   private final Map<String, String> localeMap = new HashMap<String, String>();
 
-  public LocaleChooser() {
-    initWidget();
-  }
-
-  public LocaleChooser(ChosenOptions options) {
-    super(options);
-    initWidget();
-  }
+//  public LocaleChooser() {
+//    initWidget();
+//  }
+//
+//  public LocaleChooser(ChosenOptions options) {
+//    super(options);
+//    initWidget();
+//  }
 
   public LocaleChooser(boolean isMultipleSelect) {
     super(isMultipleSelect);

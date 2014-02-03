@@ -55,7 +55,9 @@ public class GeneralConfModalView extends ModalPopupViewWithUiHandlers<GeneralCo
   @Inject
   public GeneralConfModalView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
+
     locales = new LocaleChooser(true);
+
     initWidget(uiBinder.createAndBindUi(this));
     modal.setTitle(translations.editProperties());
   }

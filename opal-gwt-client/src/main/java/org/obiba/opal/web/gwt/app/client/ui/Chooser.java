@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import org.obiba.opal.web.gwt.app.client.ui.resources.ChooserResources;
+
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.watopi.chosen.client.ChosenOptions;
@@ -23,20 +26,21 @@ public class Chooser extends ChosenListBox {
     initWidget();
   }
 
-  public Chooser(ChosenOptions options) {
-    super(options);
-    initWidget();
-  }
+//  public Chooser(ChosenOptions options) {
+//    super(options);
+//    initWidget();
+//  }
 
   public Chooser(boolean isMultipleSelect) {
-    super(isMultipleSelect);
+    super(isMultipleSelect, new ChosenOptions().setResources(GWT.<ChooserResources>create(ChooserResources.class)));
     initWidget();
   }
 
-  public Chooser(boolean isMultipleSelect, ChosenOptions options) {
-    super(isMultipleSelect, options);
-    initWidget();
-  }
+//  public Chooser(boolean isMultipleSelect, ChosenOptions options) {
+//    super(isMultipleSelect, options);
+//
+//    initWidget();
+//  }
 
   public Chooser(Element element) {
     super(element);
