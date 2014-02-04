@@ -93,8 +93,6 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
   @UiField
   FluidContainer footerContainer;
 
-  private final Translations translations;
-
   private final VariableSuggestOracle oracle;
 
   @Inject
@@ -102,7 +100,6 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
     oracle = new VariableSuggestOracle(eventBus);
     search = new SuggestListBox(oracle);
     initWidget(uiBinder.createAndBindUi(this));
-    this.translations = translations;
 
     dashboardItem.setHref("#" + Places.DASHBOARD);
     projectsItem.setHref("#" + Places.PROJECTS);

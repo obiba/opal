@@ -21,6 +21,10 @@ li {
  * Opal
  */
 
+.sortable-header-column {
+  cursor: pointer;
+}
+
 .project-tag {
   margin-right: 2px;
 }
