@@ -18,16 +18,14 @@ public final class Strings {
 
   public static String abbreviate(String text, int max) {
 
-    if (textWidth(text) <= max)
-      return text;
+    if(textWidth(text) <= max) return text;
 
     // Start by chopping off at the word before max
     // This is an over-approximation due to thin-characters...
     int end = text.lastIndexOf(' ', max - 3);
 
     // Just one long word. Chop it off.
-    if (end == -1)
-      return text.substring(0, max-3) + "...";
+    if(end == -1) return text.substring(0, max - 3) + "...";
 
     // Step forward as long as textWidth allows.
     int newEnd = end;
@@ -36,10 +34,9 @@ public final class Strings {
       newEnd = text.indexOf(' ', end + 1);
 
       // No more spaces.
-      if (newEnd == -1)
-        newEnd = text.length();
+      if(newEnd == -1) newEnd = text.length();
 
-    } while (textWidth(text.substring(0, newEnd) + "...") < max);
+    } while(textWidth(text.substring(0, newEnd) + "...") < max);
 
     return text.substring(0, end) + "...";
   }
