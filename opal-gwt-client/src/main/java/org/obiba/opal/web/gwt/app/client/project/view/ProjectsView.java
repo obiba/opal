@@ -65,8 +65,6 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
   private ListHandler<ProjectDto> typeSortHandler;
 
-  private JsArray<ProjectDto> projects;
-
   @Inject
   public ProjectsView(Binder uiBinder, PlaceManager placeManager) {
     this.placeManager = placeManager;
@@ -76,8 +74,6 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
   @Override
   public void setProjects(JsArray<ProjectDto> projects) {
-    this.projects = projects;
-    redraw();
     renderProjectsTable(JsArrays.toList(projects));
   }
 
@@ -98,7 +94,8 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
     projectsTable.getHeader(SORTABLE_COLUMN_NAME).setHeaderStyleNames("sortable-header-column");
     projectsTable.getHeader(SORTABLE_COLUMN_LAST_UPDATED).setHeaderStyleNames("sortable-header-column");
-
+    projectsTable.getColumnSortList().push(projectsTable.getColumn(SORTABLE_COLUMN_LAST_UPDATED));
+    projectsTable.getColumnSortList().push(projectsTable.getColumn(SORTABLE_COLUMN_NAME));
     projectsTable.addColumnSortHandler(typeSortHandler);
   }
 
@@ -108,8 +105,6 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     projectsDataProvider.refresh();
     tablePager.setVisible(projectsDataProvider.getList().size() > tablePager.getPageSize());
     typeSortHandler.setList(projectsDataProvider.getList());
-    projectsTable.getColumnSortList().push(projectsTable.getColumn(SORTABLE_COLUMN_LAST_UPDATED));
-    projectsTable.getColumnSortList().push(projectsTable.getColumn(SORTABLE_COLUMN_NAME));
     ColumnSortEvent.fire(projectsTable, projectsTable.getColumnSortList());
   }
 
@@ -161,19 +156,11 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
     @Override
     public String getValue(ProjectDto projectDto) {
-      return Moment.create(projectDto.getTimestamps().getLastUpdate()).fromNow();
-    }
-  }
-
-  private void redraw() {
-    JsArray<ProjectDto> activeProjects = JsArrays.create();
-    JsArray<ProjectDto> archivedProjects = JsArrays.create();
-    for(ProjectDto project : JsArrays.toIterable(projects)) {
-      if(project.hasArchived() && project.getArchived()) {
-        archivedProjects.push(project);
-      } else {
-        activeProjects.push(project);
+      if(projectDto.hasTimestamps() && projectDto.getTimestamps().hasLastUpdate()) {
+        return Moment.create(projectDto.getTimestamps().getLastUpdate()).fromNow();
       }
+
+      return "";
     }
   }
 

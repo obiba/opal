@@ -35,9 +35,7 @@
       </b:ButtonGroup>
     </b:Form>
 
-    <g:FlowPanel>
-      <b:SimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
-    </g:FlowPanel>
+    <b:SimplePager ui:field="tablePager" location="RIGHT" addStyleNames="small-bottom-margin pull-right"/>
     <o:Table ui:field="projectsTable"/>
 
 
