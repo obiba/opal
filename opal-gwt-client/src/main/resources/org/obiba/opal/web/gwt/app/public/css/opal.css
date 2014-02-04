@@ -517,3 +517,8 @@ ul.chooser-options > li {
   width: 4em;
 }
 
+/* CollapsiblePanel table full width for derivation wizard*/
+.table-half-width > table {
+  width: 50%;
+}
+
