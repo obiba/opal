@@ -9,6 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.math;
 
+import javax.ws.rs.core.Response;
+
+import org.obiba.opal.core.magma.math.DefaultVariableSummary;
+import org.obiba.opal.core.magma.math.DefaultVariableSummaryFactory;
+import org.obiba.opal.web.TimestampedResponses;
+import org.obiba.opal.web.magma.Dtos;
+import org.obiba.opal.web.model.Math;
 import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -21,8 +28,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class DefaultSummaryResourceImpl extends AbstractSummaryResource implements DefaultSummaryResource {
 
   @Override
-  public SummaryStatisticsDto get() {
-    return SummaryStatisticsDto.newBuilder().setResource(getVariable().getName()).build();
+  public Response get(boolean distinct, Integer offset, Integer limit, Boolean resetCache) {
+    DefaultVariableSummaryFactory summaryFactory = new DefaultVariableSummaryFactory.Builder().variable(getVariable())
+        .table(getValueTable()).valueSource(getVariableValueSource()).distinct(distinct).offset(offset).limit(limit)
+        .build();
+
+    DefaultVariableSummary summary = variableStatsService
+        .getDefaultSummary(summaryFactory, resetCache != null && resetCache);
+
+    SummaryStatisticsDto dto = SummaryStatisticsDto.newBuilder() //
+        .setResource(getVariable().getName()) //
+        .setExtension(Math.DefaultSummaryDto.defaultSummary, Dtos.asDto(summary).build()) //
+        .build();
+
+    return offset == null && limit == null
+        ? TimestampedResponses.ok(getValueTable(), dto).build()
+        : Response.ok(dto).build();
   }
 
 }

@@ -18,6 +18,8 @@ import org.obiba.opal.core.magma.math.CategoricalVariableSummary;
 import org.obiba.opal.core.magma.math.CategoricalVariableSummaryFactory;
 import org.obiba.opal.core.magma.math.ContinuousVariableSummary;
 import org.obiba.opal.core.magma.math.ContinuousVariableSummaryFactory;
+import org.obiba.opal.core.magma.math.DefaultVariableSummary;
+import org.obiba.opal.core.magma.math.DefaultVariableSummaryFactory;
 
 /**
  *
@@ -38,4 +40,6 @@ public interface VariableStatsService {
   CategoricalVariableSummary getCategoricalSummary(@NotNull CategoricalVariableSummaryFactory summaryFactory,
       boolean refreshCache);
 
+  @NotNull
+  DefaultVariableSummary getDefaultSummary(@NotNull DefaultVariableSummaryFactory summaryFactory, boolean refreshCache);
 }

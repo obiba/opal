@@ -32,6 +32,7 @@ import org.obiba.magma.math.stat.IntervalFrequency;
 import org.obiba.magma.type.BinaryType;
 import org.obiba.opal.core.magma.math.CategoricalVariableSummary;
 import org.obiba.opal.core.magma.math.ContinuousVariableSummary;
+import org.obiba.opal.core.magma.math.DefaultVariableSummary;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.AttributeDto;
 import org.obiba.opal.web.model.Magma.CategoryDto;
@@ -400,6 +401,21 @@ public final class Dtos {
       continuousBuilder.addIntervalFrequency(freqBuilder);
     }
     return continuousBuilder.setSummary(descriptiveBuilder);
+  }
+
+  public static Math.DefaultSummaryDto.Builder asDto(DefaultVariableSummary summary) {
+    Math.DefaultSummaryDto.Builder dtoBuilder = Math.DefaultSummaryDto.newBuilder() //
+        .setMode(summary.getMode()) //
+        .setN(summary.getN());
+    for(DefaultVariableSummary.Frequency frequency : summary.getFrequencies()) {
+      Math.FrequencyDto.Builder freqBuilder = Math.FrequencyDto.newBuilder() //
+          .setValue(frequency.getValue()) //
+          .setFreq(frequency.getFreq())//
+          .setPct(frequency.getPct());
+      if(isNumeric(frequency.getPct())) freqBuilder.setPct(frequency.getPct());
+      dtoBuilder.addFrequencies(freqBuilder);
+    }
+    return dtoBuilder;
   }
 
   private static void addTimestamps(DatasourceDto.Builder builder, Datasource datasource) {
