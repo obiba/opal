@@ -522,7 +522,8 @@ public interface Translations extends Constants {
       "GeneralKeystoreError", "Key pair storage failed. Please make sure to provide valid certificate information.",
       "DerivedVariableNameRequired", "Derived variable name is required.",//
       "DestinationViewNameRequired", "Destination View Name Required label",//
-      "AddDerivedVariableToViewOnly", "A derived variable can only be added to a view."//
+      "AddDerivedVariableToViewOnly", "A derived variable can only be added to a view.",//
+      "NamespaceCannotBeEmptyChars", "A namespace cannot contain only blank characters."//
   })
   Map<String, String> userMessageMap();
 

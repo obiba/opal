@@ -81,6 +81,9 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
   @UiField
   FlowPanel valuesPanel;
 
+  @UiField
+  ControlGroup namespaceGroup;
+
   @Inject
   public VariableAttributeModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
     super(eventBus);
@@ -174,6 +177,9 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
     ControlGroup group = null;
     if(formField != null) {
       switch(formField) {
+        case NAMESPACE:
+          group = namespaceGroup;
+          break;
         case NAME:
           group = nameGroup;
           break;
@@ -191,6 +197,6 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
 
   @Override
   public void clearErrors() {
-    modal.clearAlert();
+    modal.closeAlerts();
   }
 }

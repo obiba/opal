@@ -397,19 +397,19 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      if(validators == null) {
-        validators = new LinkedHashSet<FieldValidator>();
+      validators = new LinkedHashSet<FieldValidator>();
 
-        if(dialogMode == Mode.UPDATE_MULTIPLE) {
-          validators.add(new AttributeConflictValidator("AttributeConflictExists"));
-        } else {
-          validators.add(
-              new RequiredTextValidator(getView().getName(), "AttributeNameIsRequired", Display.FormField.NAME.name()));
-          validators.add(
-              new ConditionValidator(hasValue(getView().getLocalizedValues().getValue()), "AttributeValueIsRequired",
-                  Display.FormField.VALUE.name()));
-          if (dialogMode == Mode.CREATE) validators.add(new UniqueAttributeNameValidator("AttributeAlreadyExists"));
-        }
+      if(dialogMode == Mode.UPDATE_MULTIPLE) {
+        validators.add(new AttributeConflictValidator("AttributeConflictExists"));
+      } else {
+        validators.add(
+            new RequiredTextValidator(getView().getName(), "AttributeNameIsRequired", Display.FormField.NAME.name()));
+        validators.add(
+            new ConditionValidator(hasValue(getView().getLocalizedValues().getValue()), "AttributeValueIsRequired",
+                Display.FormField.VALUE.name()));
+        validators.add(new ConditionValidator(hasValidNamespace(getView().getNamespaceSuggestBox().getText()),
+            "NamespaceCannotBeEmptyChars", Display.FormField.NAMESPACE.name()));
+        if (dialogMode == Mode.CREATE) validators.add(new UniqueAttributeNameValidator("AttributeAlreadyExists"));
       }
       return validators;
     }
@@ -424,12 +424,21 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
         @Override
         public Boolean getValue() {
           for(LocalizedEditableText localizedText : localizedTexts) {
-            if(!localizedText.getTextBox().getText().isEmpty()) {
+            if(!localizedText.getTextBox().getText().trim().isEmpty()) {
               return true;
             }
           }
 
           return false;
+        }
+      };
+    }
+
+    private HasValue<Boolean> hasValidNamespace(final String namespace) {
+      return new HasBooleanValue() {
+        @Override
+        public Boolean getValue() {
+          return Strings.isNullOrEmpty(namespace) || namespace.trim().length() > 0;
         }
       };
     }
@@ -442,6 +451,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     void setDialogMode(Mode mode);
 
     enum FormField {
+      NAMESPACE,
       NAME,
       VALUE
     }
