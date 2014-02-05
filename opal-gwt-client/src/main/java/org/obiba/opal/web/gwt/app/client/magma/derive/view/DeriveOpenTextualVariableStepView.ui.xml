@@ -50,11 +50,11 @@
             <b:FluidRow>
 
               <b:Column size="4">
-                <g:SuggestBox ui:field="value" width="5em"/>
+                <g:SuggestBox ui:field="value" addStyleNames="width-4em"/>
               </b:Column>
 
               <b:Column size="4">
-                <g:TextBox ui:field="newValue" width="5em"/>
+                <g:TextBox ui:field="newValue" addStyleNames="width-4em"/>
               </b:Column>
 
               <b:Column size="4">

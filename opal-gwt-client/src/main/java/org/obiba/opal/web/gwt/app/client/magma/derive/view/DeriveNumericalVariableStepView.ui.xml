@@ -72,7 +72,7 @@
                     </b:RadioButton>
                   </b:Column>
                   <b:Column size="4">
-                    <o:NumericTextBox ui:field="lengthBox" width="4em" value="10" maxConstrained="false"/>
+                    <o:NumericTextBox ui:field="lengthBox" value="10" maxConstrained="false" addStyleNames="width-4em"/>
                   </b:Column>
                 </b:FluidRow>
 
@@ -83,7 +83,7 @@
                     </b:RadioButton>
                   </b:Column>
                   <b:Column size="4">
-                    <o:NumericTextBox ui:field="countBox" width="4em" value="10" maxConstrained="false"/>
+                    <o:NumericTextBox ui:field="countBox" value="10" maxConstrained="false" addStyleNames="width-4em"/>
                   </b:Column>
                 </b:FluidRow>
               </b:Well>
@@ -156,11 +156,11 @@
                     addStyleNames="small-dual-indent bottom-margin">
                   <ui:msg description="Range label">Range</ui:msg>
                 </b:RadioButton>
-                <o:NumericTextBox ui:field="addFromBox" width="4em" minConstrained="false"
-                    maxConstrained="false" addStyleNames="inline"/>
+                <o:NumericTextBox ui:field="addFromBox" minConstrained="false"
+                    maxConstrained="false" addStyleNames="inline width-4em"/>
                 <g:InlineLabel addStyleNames="inline">-</g:InlineLabel>
-                <o:NumericTextBox ui:field="addToBox" width="4em" minConstrained="false" maxConstrained="false"
-                    addStyleNames="inline"/>
+                <o:NumericTextBox ui:field="addToBox" minConstrained="false" maxConstrained="false"
+                    addStyleNames="inline width-4em"/>
               </b:Column>
 
               <b:Column size="6">
@@ -178,8 +178,8 @@
                     addStyleNames="small-dual-indent bottom-margin" inline="true">
                   <ui:msg description="Value label">Value</ui:msg>
                 </b:RadioButton>
-                <o:NumericTextBox ui:field="valueBox" width="4em" enabled="false" minConstrained="false"
-                    maxConstrained="false" addStyleNames="inline"/>
+                <o:NumericTextBox ui:field="valueBox" enabled="false" minConstrained="false"
+                    maxConstrained="false" addStyleNames="inline width-4em"/>
               </b:Column>
 
             </b:FluidRow>
