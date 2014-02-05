@@ -41,6 +41,7 @@ import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.security.CredentialsKeyStoreService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
+import org.obiba.opal.core.service.security.realm.ApplicationRealm;
 import org.obiba.opal.core.service.security.realm.OpalUserRealm;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
@@ -169,7 +170,7 @@ public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
     }
     orientDbService.save(toSave);
 
-    subjectProfileService.ensureProfile(subjectCredentials.getName(), OpalUserRealm.OPAL_REALM);
+    subjectProfileService.ensureProfile(subjectCredentials.getName(), ApplicationRealm.APPLICATION_REALM);
   }
 
   private void changeUnitSubjectTypeToGroup(final String unit) {
