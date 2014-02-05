@@ -3,11 +3,14 @@ package org.obiba.opal.core.upgrade.v2_0_x.database;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
 import javax.annotation.Nullable;
+import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
@@ -27,6 +30,7 @@ import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.SqlSettings;
+import org.obiba.opal.core.runtime.jdbc.DataSourceFactoryBean;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.runtime.Version;
@@ -34,6 +38,7 @@ import org.obiba.runtime.upgrade.AbstractUpgradeStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -80,6 +85,9 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
 
   @Autowired
   private OrientDbService orientDbService;
+
+  @Autowired
+  private ApplicationContext applicationContext;
 
   @Override
   public void execute(Version currentVersion) {
@@ -243,19 +251,45 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
         .evaluate(doc.getDocumentElement(), XPathConstants.NODESET);
     for(int i = 0; i < nodeList.getLength(); i++) {
       Element element = (Element) nodeList.item(i);
+      String name = getChildTextContent(element, "name");
+      String url = getChildTextContent(element, "url");
+      String driverClass = getChildTextContent(element, "driverClass");
+      String username = getChildTextContent(element, "username");
+      String password = getChildTextContent(element, "password");
+      SqlSettings.SqlSchema schema = detectSchema(driverClass, url, username, password);
       Database sqlDatabase = Database.Builder.create() //
-          .name(getChildTextContent(element, "name")) //
+          .name(name) //
           .sqlSettings(SqlSettings.Builder.create() //
-              .url(getChildTextContent(element, "url")) //
-              .driverClass(getChildTextContent(element, "driverClass")) //
-              .username(getChildTextContent(element, "username")) //
-              .password(getChildTextContent(element, "password")) //
-              .sqlSchema(SqlSettings.SqlSchema.HIBERNATE)) //
-          .usage(Database.Usage.STORAGE) //
+              .url(url) //
+              .driverClass(driverClass) //
+              .username(username) //
+              .password(password) //
+              .sqlSchema(schema)) //
+          .usage(SqlSettings.SqlSchema.HIBERNATE.equals(schema) ? Database.Usage.STORAGE : Database.Usage.IMPORT) //
           .build();
       log.debug("Import database: {}", sqlDatabase);
       databaseRegistry.create(sqlDatabase);
     }
+  }
+
+  private SqlSettings.SqlSchema detectSchema(String driverClass, String url, String username, String password) {
+    DataSourceFactoryBean factory = applicationContext.getAutowireCapableBeanFactory()
+        .createBean(DataSourceFactoryBean.class);
+    factory.setDriverClass(driverClass);
+    factory.setUrl(url);
+    factory.setUsername(username);
+    factory.setPassword(password);
+    try {
+      DataSource ds = factory.getObject();
+      ResultSet res = ds.getConnection().getMetaData().getTables(null, null, null, new String[] { "TABLE" });
+      while(res.next()) {
+        if("value_set_value".equalsIgnoreCase(res.getString("TABLE_NAME"))) return SqlSettings.SqlSchema.HIBERNATE;
+        if("surveys".equalsIgnoreCase(res.getString("TABLE_NAME"))) return SqlSettings.SqlSchema.LIMESURVEY;
+      }
+    } catch(SQLException e) {
+      log.error("Cannot check database schema: " + url, e);
+    }
+    return SqlSettings.SqlSchema.JDBC;
   }
 
   @Nullable
