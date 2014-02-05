@@ -25,6 +25,7 @@ import com.github.gwtbootstrap.datepicker.client.ui.DateBoxAppended;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -108,6 +109,11 @@ public class DeriveTemporalVariableStepView extends ViewWithUiHandlers<Derivatio
 
   @UiHandler({ "spanBox", "rangeBox" })
   void onMethodChanged(ChangeEvent event) {
+    getUiHandlers().onMethodChange();
+  }
+
+  @UiHandler({ "fromDate", "toDate" })
+  void onDateChanged(ValueChangeEvent<Date> event) {
     getUiHandlers().onMethodChange();
   }
 
