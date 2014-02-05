@@ -30,8 +30,7 @@ public class DefaultSummaryResourceImpl extends AbstractSummaryResource implemen
   @Override
   public Response get(boolean distinct, Integer offset, Integer limit, Boolean resetCache) {
     DefaultVariableSummaryFactory summaryFactory = new DefaultVariableSummaryFactory.Builder().variable(getVariable())
-        .table(getValueTable()).valueSource(getVariableValueSource()).distinct(distinct).offset(offset).limit(limit)
-        .build();
+        .table(getValueTable()).valueSource(getVariableValueSource()).offset(offset).limit(limit).build();
 
     DefaultVariableSummary summary = variableStatsService
         .getDefaultSummary(summaryFactory, resetCache != null && resetCache);

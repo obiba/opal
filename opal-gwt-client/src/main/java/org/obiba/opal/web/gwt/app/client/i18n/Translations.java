@@ -1808,8 +1808,9 @@ public interface Translations extends Constants {
       "SAMPLE_QUANTILES", "Sample Quantiles",//
       "MODE", "Mode",//
       "CATEGORY", "Category",//
-      "FREQUENCY", "Frequency"//
-
+      "FREQUENCY", "Frequency",//
+      "NA", "N/A",//
+      "NOT_NULL", "Not empty"//
   })
   Map<String, String> statsMap();
 

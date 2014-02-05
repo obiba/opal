@@ -33,7 +33,6 @@ message ContinuousSummaryDto {
 
 message DefaultSummaryDto {
 
-  required string mode = 1;
   required int64 n = 2;
   repeated FrequencyDto frequencies = 3;
 

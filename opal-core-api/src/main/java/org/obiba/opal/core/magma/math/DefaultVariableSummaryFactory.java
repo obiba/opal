@@ -8,8 +8,6 @@ import org.obiba.magma.Variable;
 
 public class DefaultVariableSummaryFactory extends AbstractVariableSummaryFactory<DefaultVariableSummary> {
 
-  private boolean distinct;
-
   private Integer offset;
 
   private Integer limit;
@@ -17,13 +15,12 @@ public class DefaultVariableSummaryFactory extends AbstractVariableSummaryFactor
   @NotNull
   @Override
   public String getCacheKey() {
-    return getCacheKey(getVariable(), getTable(), distinct, offset, limit);
+    return getCacheKey(getVariable(), getTable(), offset, limit);
   }
 
   @SuppressWarnings("PMD.ExcessiveParameterList")
-  public static String getCacheKey(Variable variable, ValueTable table, boolean distinct, Integer offset,
-      Integer limit) {
-    String key = variable.getVariableReference(table) + "." + distinct;
+  public static String getCacheKey(Variable variable, ValueTable table, Integer offset, Integer limit) {
+    String key = variable.getVariableReference(table);
     if(offset != null) key += "." + offset;
     if(limit != null) key += "." + limit;
     return key;
@@ -33,7 +30,6 @@ public class DefaultVariableSummaryFactory extends AbstractVariableSummaryFactor
   @Override
   public DefaultVariableSummary getSummary() {
     return new DefaultVariableSummary.Builder(getVariable()) //
-        .distinct(distinct) //
         .filter(offset, limit) //
         .addTable(getTable(), getValueSource()) //
         .build();
@@ -82,11 +78,6 @@ public class DefaultVariableSummaryFactory extends AbstractVariableSummaryFactor
 
     public Builder limit(Integer limit) {
       factory.limit = limit;
-      return this;
-    }
-
-    public Builder distinct(boolean distinct) {
-      factory.distinct = distinct;
       return this;
     }
 

@@ -405,7 +405,6 @@ public final class Dtos {
 
   public static Math.DefaultSummaryDto.Builder asDto(DefaultVariableSummary summary) {
     Math.DefaultSummaryDto.Builder dtoBuilder = Math.DefaultSummaryDto.newBuilder() //
-        .setMode(summary.getMode()) //
         .setN(summary.getN());
     for(DefaultVariableSummary.Frequency frequency : summary.getFrequencies()) {
       Math.FrequencyDto.Builder freqBuilder = Math.FrequencyDto.newBuilder() //

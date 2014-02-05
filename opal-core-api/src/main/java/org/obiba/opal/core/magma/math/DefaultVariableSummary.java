@@ -16,20 +16,17 @@ import java.util.Iterator;
 
 import javax.validation.constraints.NotNull;
 
-import org.obiba.magma.Category;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VectorSource;
-import org.obiba.magma.type.BooleanType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 
 /**
@@ -43,16 +40,11 @@ public class DefaultVariableSummary extends AbstractVariableSummary implements S
 
   public static final String NULL_NAME = "N/A";
 
+  public static final String NOT_NULL_NAME = "NOT_NULL";
+
   private final org.apache.commons.math3.stat.Frequency frequencyDist = new org.apache.commons.math3.stat.Frequency();
 
-  /**
-   * Mode is the most frequent value
-   */
-  private String mode = NULL_NAME;
-
   private long n;
-
-  private boolean distinct;
 
   private boolean empty = true;
 
@@ -64,7 +56,7 @@ public class DefaultVariableSummary extends AbstractVariableSummary implements S
 
   @Override
   public String getCacheKey(ValueTable table) {
-    return DefaultVariableSummaryFactory.getCacheKey(variable, table, distinct, getOffset(), getLimit());
+    return DefaultVariableSummaryFactory.getCacheKey(variable, table, getOffset(), getLimit());
   }
 
   @NotNull
@@ -72,20 +64,9 @@ public class DefaultVariableSummary extends AbstractVariableSummary implements S
     return ImmutableList.copyOf(frequencies);
   }
 
-  public String getMode() {
-    return mode;
-  }
 
   public long getN() {
     return n;
-  }
-
-  public boolean isDistinct() {
-    return distinct;
-  }
-
-  public void setDistinct(boolean distinct) {
-    this.distinct = distinct;
   }
 
   public boolean isEmpty() {
@@ -182,7 +163,7 @@ public class DefaultVariableSummary extends AbstractVariableSummary implements S
           }
         }
       } else {
-        summary.frequencyDist.addValue(value.isNull() ? NULL_NAME : value.toString());
+        summary.frequencyDist.addValue(value.isNull() ? NULL_NAME : NOT_NULL_NAME);
       }
     }
 
@@ -199,26 +180,6 @@ public class DefaultVariableSummary extends AbstractVariableSummary implements S
       });
     }
 
-    /**
-     * Returns an iterator of category names
-     */
-    private Iterator<String> categoryNames() {
-      if(variable.getValueType().equals(BooleanType.get())) {
-        return ImmutableList.<String>builder() //
-            .add(BooleanType.get().trueValue().toString()) //
-            .add(BooleanType.get().falseValue().toString()).build().iterator();
-      }
-
-      return Iterables.transform(variable.getCategories(), new Function<Category, String>() {
-
-        @Override
-        public String apply(Category from) {
-          return from.getName();
-        }
-
-      }).iterator();
-    }
-
     private void compute() {
       log.trace("Start compute default summary {}", summary.variable);
       long max = 0;
@@ -231,17 +192,11 @@ public class DefaultVariableSummary extends AbstractVariableSummary implements S
         long count = summary.frequencyDist.getCount(value);
         if(count > max) {
           max = count;
-          summary.mode = value;
         }
         summary.frequencies.add(new Frequency(value, summary.frequencyDist.getCount(value),
             Double.isNaN(summary.frequencyDist.getPct(value)) ? 0.0 : summary.frequencyDist.getPct(value)));
       }
       summary.n = summary.frequencyDist.getSumFreq();
-    }
-
-    public Builder distinct(boolean distinct) {
-      summary.setDistinct(distinct);
-      return this;
     }
 
     public Builder filter(Integer offset, Integer limit) {
