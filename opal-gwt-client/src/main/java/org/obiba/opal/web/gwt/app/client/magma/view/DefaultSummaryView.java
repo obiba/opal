@@ -9,11 +9,18 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.DefaultFlexTable;
 import org.obiba.opal.web.model.client.math.DefaultSummaryDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Ordering;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -54,9 +61,16 @@ public class DefaultSummaryView extends Composite {
       frequencies.setHeader(1, translations.frequency());
       frequencies.setHeader(2, "%");
 
+      List<FrequencyDto> frequencyDtos = JsArrays.toList(summaryDto.getFrequenciesArray());
+      Collections.sort(frequencyDtos, new Comparator<FrequencyDto>() {
+        @Override
+        public int compare(FrequencyDto o1, FrequencyDto o2) {
+          return ComparisonChain.start().compare(o1.getValue(), o2.getValue(), Ordering.natural().reverse()).result();
+        }
+      });
       // Not empty before N/A,
       for(int i = 0; i < count; i++) {
-        FrequencyDto value = summaryDto.getFrequenciesArray().get(i);
+        FrequencyDto value = frequencyDtos.get(i);
         if(value.hasValue()) {
           frequencies.setWidget(i + 1, 0, new Label(value.getValue().equals("NOT_NULL") ? translations
               .notNullStatistics() : value.getValue())); // Translate N/A and NOT_NULL
