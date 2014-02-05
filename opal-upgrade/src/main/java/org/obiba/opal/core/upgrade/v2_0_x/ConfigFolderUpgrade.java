@@ -19,13 +19,13 @@ public class ConfigFolderUpgrade {
     String opalHome = System.getenv().get("OPAL_HOME");
 
     try {
-      FileUtil.delete(new File(opalHome + "/data/opal"));
+      FileUtil.delete(new File(opalHome, "data"+ File.separatorChar +"opal"));
     } catch(IOException e) {
       log.warn("Cannot delete 'data/opal' dir", e);
     }
 
     try {
-      FileUtil.delete(new File(opalHome + "/work"));
+      FileUtil.delete(new File(opalHome, "work"));
     } catch(IOException e) {
       log.warn("Cannot delete 'work' dir", e);
     }
