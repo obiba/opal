@@ -28,7 +28,6 @@ public class MoveQuartzTablesUpgradeStep extends AbstractUpgradeStep {
   @Override
   public void execute(Version currentVersion) {
     JdbcOperations dataJdbcTemplate = new JdbcTemplate(databaseRegistry.getDataSource("opal-data", null));
-    JdbcOperations configJdbcTemplate = new JdbcTemplate(configDataSource);
     // no need to copy data as BIRT reports are removed from config
     for(String table : DELETE_TABLES) {
       dataJdbcTemplate.execute("drop table " + table);
