@@ -9,23 +9,23 @@
     <b:Heading size="4">
       <ui:msg description="Plots label">Plots</ui:msg>
     </b:Heading>
-    <b:Row>
+    <b:FluidRow>
       <b:Column size="4" offset="1">
         <g:SimplePanel ui:field="histogramPanel"/>
       </b:Column>
-      <b:Column size="4" offset="1">
-        <g:SimplePanel ui:field="normalProbability"/>
+      <b:Column size="4" offset="2">
+      <g:SimplePanel ui:field="normalProbability"/>
       </b:Column>
-    </b:Row>
+    </b:FluidRow>
 
     <b:Heading size="4">
       <ui:msg description="Statistics label">Statistics</ui:msg>
     </b:Heading>
-    <b:Row>
-      <b:Column size="6">
-        <o:DefaultFlexTable ui:field="grid"/>
+    <b:FluidRow>
+      <b:Column size="10" offset="1">
+      <o:DefaultFlexTable ui:field="grid"/>
       </b:Column>
-    </b:Row>
+    </b:FluidRow>
   </g:FlowPanel>
 
 </ui:UiBinder>

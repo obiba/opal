@@ -11,32 +11,31 @@
     </b:Heading>
     <o:NavPillsPanel ui:field="chartsPanel">
       <b:NavLink active="true">Frequency</b:NavLink>
-      <b:Row>
-        <b:Row>
-          <b:Column size="6" offset="2" ui:field="freqPanel">
-          </b:Column>
-        </b:Row>
-      </b:Row>
+      <b:FluidRow>
+        <b:FluidRow>
+          <b:Column size="10" offset="1" ui:field="freqPanel"/>
+        </b:FluidRow>
+      </b:FluidRow>
       <b:NavLink>Percentage</b:NavLink>
-      <b:Row>
-        <b:Row>
-          <b:Column size="6" offset="2" ui:field="pctPanel">
-          </b:Column>
-        </b:Row>
-      </b:Row>
+      <b:FluidRow>
+        <b:FluidRow>
+          <b:Column size="10" offset="1" ui:field="pctPanel"/>
+        </b:FluidRow>
+      </b:FluidRow>
     </o:NavPillsPanel>
 
     <b:Heading size="4">
       <ui:msg description="Statistics label">Statistics</ui:msg>
     </b:Heading>
-    <b:Row>
-      <b:Column size="5">
-        <o:DefaultFlexTable ui:field="stats"/>
+
+    <b:FluidRow>
+      <b:Column size="4" offset="1">
+      <o:DefaultFlexTable ui:field="stats"/>
       </b:Column>
-      <b:Column size="5">
-        <o:DefaultFlexTable ui:field="frequencies"/>
+      <b:Column size="4" offset="2">
+      <o:DefaultFlexTable ui:field="frequencies"/>
       </b:Column>
-    </b:Row>
+    </b:FluidRow>
 
 
   </g:FlowPanel>

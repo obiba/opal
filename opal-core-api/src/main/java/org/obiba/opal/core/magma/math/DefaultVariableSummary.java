@@ -64,7 +64,7 @@ public class DefaultVariableSummary extends AbstractVariableSummary implements S
 
   @Override
   public String getCacheKey(ValueTable table) {
-    return CategoricalVariableSummaryFactory.getCacheKey(variable, table, distinct, getOffset(), getLimit());
+    return DefaultVariableSummaryFactory.getCacheKey(variable, table, distinct, getOffset(), getLimit());
   }
 
   @NotNull
@@ -222,9 +222,7 @@ public class DefaultVariableSummary extends AbstractVariableSummary implements S
     private void compute() {
       log.trace("Start compute default summary {}", summary.variable);
       long max = 0;
-      Iterator<String> concat = summary.distinct //
-          ? freqNames(summary.frequencyDist)  // category names, null values and distinct values
-          : Iterators.concat(categoryNames(), ImmutableList.of(NULL_NAME).iterator()); // category names and null values
+      Iterator<String> concat = freqNames(summary.frequencyDist);
 
       // Iterate over all category names including or not distinct values.
       // The loop will also determine the mode of the distribution (most frequent value)
