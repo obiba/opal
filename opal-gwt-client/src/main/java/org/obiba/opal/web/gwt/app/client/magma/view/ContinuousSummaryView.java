@@ -56,30 +56,30 @@ public class ContinuousSummaryView extends Composite {
     DescriptiveStatsDto descriptiveStats = continuous.getSummary();
 
     grid.clear();
-    grid.setHeader(0, translations.statsMap().get("DESC_STATISTICS"));
-    grid.setHeader(1, translations.statsMap().get("VALUE"));
+    grid.setHeader(0, translations.descriptiveStatistics());
+    grid.setHeader(1, translations.value());
     int row = 0;
-    grid.setWidget(row, 0, new Label(translations.statsMap().get("N")));
+    grid.setWidget(row, 0, new Label(translations.NLabel()));
     grid.setWidget(row++, 1, new Label("" + Math.round(descriptiveStats.getN())));
-    grid.setWidget(row, 0, new Label(translations.statsMap().get("MIN")));
+    grid.setWidget(row, 0, new Label(translations.min()));
     grid.setWidget(row++, 1, new Label("" + descriptiveStats.getMin()));
-    grid.setWidget(row, 0, new Label(translations.statsMap().get("MAX")));
+    grid.setWidget(row, 0, new Label(translations.max()));
     grid.setWidget(row++, 1, new Label("" + descriptiveStats.getMax()));
-    grid.setWidget(row, 0, new Label(translations.statsMap().get("MEAN")));
+    grid.setWidget(row, 0, new Label(translations.meanLabel()));
     grid.setWidget(row++, 1, new Label("" + descriptiveStats.getMean()));
-    grid.setWidget(row, 0, new Label(translations.statsMap().get("MEDIAN")));
+    grid.setWidget(row, 0, new Label(translations.median()));
     grid.setWidget(row++, 1, new Label("" + descriptiveStats.getMedian()));
-    grid.setWidget(row, 0, new Label(translations.statsMap().get("STD_DEVIATION")));
+    grid.setWidget(row, 0, new Label(translations.standardDeviationLabel()));
     grid.setWidget(row++, 1, new Label("" + descriptiveStats.getStdDev()));
-    grid.setWidget(row, 0, new Label(translations.statsMap().get("VARIANCE")));
+    grid.setWidget(row, 0, new Label(translations.variance()));
     grid.setWidget(row++, 1, new Label("" + descriptiveStats.getVariance()));
-    grid.setWidget(row, 0, new Label(translations.statsMap().get("SKEWNESS")));
+    grid.setWidget(row, 0, new Label(translations.skewness()));
     grid.setWidget(row++, 1, new Label("" + descriptiveStats.getSkewness()));
-    grid.setWidget(row, 0, new Label(translations.statsMap().get("KURTOSIS")));
+    grid.setWidget(row, 0, new Label(translations.kurtosis()));
     grid.setWidget(row++, 1, new Label("" + descriptiveStats.getKurtosis()));
-    grid.setWidget(row, 0, new Label(translations.statsMap().get("SUM")));
+    grid.setWidget(row, 0, new Label(translations.sum()));
     grid.setWidget(row++, 1, new Label("" + descriptiveStats.getSum()));
-    grid.setWidget(row, 0, new Label(translations.statsMap().get("SUM_OF_SQUARES")));
+    grid.setWidget(row, 0, new Label(translations.sumOfSquares()));
     grid.setWidget(row++, 1, new Label("" + descriptiveStats.getSumsq()));
 
     if(descriptiveStats.getVariance() > 0) {
@@ -104,13 +104,12 @@ public class ContinuousSummaryView extends Composite {
     super.onLoad();
     if(histogram != null) {
       histogramPanel.clear();
-      histogramPanel
-          .add(histogram.createChart(translations.statsMap().get("HISTOGRAM"), translations.statsMap().get("DENSITY")));
+      histogramPanel.add(histogram.createChart(translations.histogram(), translations.density()));
     }
     if(qqPlot != null) {
       normalProbability.clear();
-      normalProbability.add(qqPlot.createChart(translations.statsMap().get("NORMAL_PROB"),
-          translations.statsMap().get("THEORETHICAL_QUANTILES"), translations.statsMap().get("SAMPLE_QUANTILES")));
+      normalProbability.add(qqPlot.createChart(translations.normalProbability(), translations.theoreticalQuantiles(),
+          translations.sampleQuantiles()));
     }
   }
 

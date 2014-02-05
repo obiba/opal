@@ -41,26 +41,25 @@ public class DefaultSummaryView extends Composite {
   public DefaultSummaryView(DefaultSummaryDto summaryDto) {
     initWidget(uiBinder.createAndBindUi(this));
     stats.clear();
-    stats.setHeader(0, translations.statsMap().get("DESC_STATISTICS"));
-    stats.setHeader(1, translations.statsMap().get("VALUE"));
+    stats.setHeader(0, translations.descriptiveStatistics());
+    stats.setHeader(1, translations.value());
     int row = 0;
-    stats.setWidget(row, 0, new Label(translations.statsMap().get("N")));
+    stats.setWidget(row, 0, new Label(translations.NLabel()));
     stats.setWidget(row++, 1, new Label("" + Math.round(summaryDto.getN())));
 
     if(summaryDto.getFrequenciesArray() != null) {
       int count = summaryDto.getFrequenciesArray().length();
 
-      frequencies.setHeader(0, translations.statsMap().get("VALUE"));
-      frequencies.setHeader(1, translations.statsMap().get("FREQUENCY"));
+      frequencies.setHeader(0, translations.value());
+      frequencies.setHeader(1, translations.frequency());
       frequencies.setHeader(2, "%");
 
       // Not empty before N/A,
       for(int i = 0; i < count; i++) {
         FrequencyDto value = summaryDto.getFrequenciesArray().get(i);
         if(value.hasValue()) {
-          frequencies.setWidget(i + 1, 0, new Label(value.getValue().equals("NOT_NULL")
-              ? translations.statsMap().get("NOT_NULL")
-              : value.getValue())); // Translate N/A and NOT_NULL
+          frequencies.setWidget(i + 1, 0, new Label(value.getValue().equals("NOT_NULL") ? translations
+              .notNullStatistics() : value.getValue())); // Translate N/A and NOT_NULL
           frequencies.setWidget(i + 1, 1, new Label("" + Math.round(value.getFreq())));
           frequencies.setWidget(i + 1, 2, new Label("" + value.getPct() * 100));
         }
