@@ -223,9 +223,9 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
   }
 
   private AttributeDto findAttribute(Iterable<AttributeDto> attributes, LocalizedEditableText localizedText) {
-    String name = getView().getName().getText();
-    String namespace = getView().getNamespaceSuggestBox().getText();
-    String locale = localizedText.getValue().getLocale();
+    String name = getView().getName().getText().trim();
+    String namespace = getView().getNamespaceSuggestBox().getText().trim();
+    String locale = localizedText.getValue().getLocale().trim();
 
     for(AttributeDto attribute : attributes) {
       if(name.equals(attribute.getName()) &&
