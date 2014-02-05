@@ -34,6 +34,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import com.google.common.base.Strings;
+
 /**
  * Command to perform an upgrade (i.e., invoke the upgrade manager).
  */
@@ -77,7 +79,7 @@ public class UpgradeCommand {
       Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(opalConfig);
       XPath xPath = XPathFactory.newInstance().newXPath();
       Node node = (Node) xPath.compile("//version").evaluate(doc.getDocumentElement(), XPathConstants.NODE);
-      return node != null;
+      return node != null && !Strings.isNullOrEmpty(node.getNodeValue());
     } catch(SAXException | XPathExpressionException | ParserConfigurationException | IOException e) {
       throw new RuntimeException(e);
     }
