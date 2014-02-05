@@ -58,6 +58,12 @@ public class DeriveTemporalVariableStepPresenter
         .onValidate(new ValidationHandler() {
           @Override
           public boolean validate() {
+            // validate derivation method selected
+            if(!getView().spanSelected() && !getView().rangeSelected()) {
+              fireEvent(NotificationEvent.newBuilder().error("SelectDerivationMethod").build());
+              return false;
+            }
+
             Date from = getView().getFromDate();
             Date to = getView().getToDate();
             if(from != null && to != null && !from.after(to)) return true;
@@ -132,6 +138,9 @@ public class DeriveTemporalVariableStepPresenter
 
     Date getToDate();
 
+    boolean spanSelected();
+
+    boolean rangeSelected();
   }
 
 }
