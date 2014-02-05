@@ -522,3 +522,6 @@ ul.chooser-options > li {
   width: 50%;
 }
 
+.table-full-width > table {
+  width: 100%;
+}

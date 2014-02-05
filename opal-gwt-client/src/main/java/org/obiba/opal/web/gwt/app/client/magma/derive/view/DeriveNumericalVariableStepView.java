@@ -131,6 +131,7 @@ public class DeriveNumericalVariableStepView extends ViewWithUiHandlers<Derivati
     lengthRadio.setValue(true, true);
     rangeRadio.setValue(true, true);
     addRangeRadio.setValue(true, true);
+
   }
 
   private void initializeValueMapEntryForm() {
@@ -170,7 +171,7 @@ public class DeriveNumericalVariableStepView extends ViewWithUiHandlers<Derivati
     getUiHandlers().onMethodChange();
   }
 
-  @UiHandler({ "lengthBox", "countBox", "addFromBox", "addToBox" })
+  @UiHandler({ "lengthBox", "countBox", "fromBox", "toBox" })
   void onMethodChanged(KeyUpEvent event) {
     getUiHandlers().onMethodChange();
   }
