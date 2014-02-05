@@ -164,6 +164,16 @@ public class DeriveTemporalVariableStepView extends ViewWithUiHandlers<Derivatio
   }
 
   @Override
+  public boolean spanSelected() {
+    return spanRadio.getValue();
+  }
+
+  @Override
+  public boolean rangeSelected() {
+    return rangeRadio.getValue();
+  }
+
+  @Override
   public void setTimeType(String valueType) {
     spanBox.clear();
     rangeBox.clear();

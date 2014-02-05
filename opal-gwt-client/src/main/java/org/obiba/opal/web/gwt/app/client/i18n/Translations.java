@@ -412,6 +412,7 @@ public interface Translations extends Constants {
       "UnauthorizedOperation", "You are not allowed to perform this operation.",//
       "CannotWriteToView", "Cannot modify a View using this operation. Use the View editor.",//
       "DatesRangeInvalid", "Date range is invalid. Please make sure 'From' date precedes 'To' date.",//
+      "SelectDerivationMethod", "Select a derivation method.",//
       "CouldNotCreateReportTemplate", "Could not create the Report Template.",//
       "ReportTemplateCannotBeFound", "The Report Template cannot be found.",//
       "DatasourceCreationFailed", "The datasource creation has failed: {0}",//
@@ -2124,4 +2125,7 @@ public interface Translations extends Constants {
   @DefaultStringValue("Full/normal screen")
   String switchScreenDisplay();
 
+  @Description("Select a derivation method message")
+  @DefaultStringValue("Select a derivation method")
+  String selectDerivationMethod();
 }

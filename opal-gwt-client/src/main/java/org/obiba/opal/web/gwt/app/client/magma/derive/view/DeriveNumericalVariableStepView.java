@@ -306,6 +306,11 @@ public class DeriveNumericalVariableStepView extends ViewWithUiHandlers<Derivati
   }
 
   @Override
+  public boolean manualSelected() {
+    return manualRadio.getValue();
+  }
+
+  @Override
   public void enableFrequency(boolean enable) {
     valuesMapGrid.enableFrequencyColumn(enable);
   }

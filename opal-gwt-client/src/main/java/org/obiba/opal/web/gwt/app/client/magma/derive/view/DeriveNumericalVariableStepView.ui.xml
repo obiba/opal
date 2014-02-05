@@ -42,7 +42,8 @@
                     </g:Label>
                   </b:Column>
                   <b:Column size="8">
-                    <o:NumericTextBox ui:field="fromBox" width="6em" minConstrained="false" maxConstrained="false"/>
+                    <o:NumericTextBox ui:field="fromBox" minConstrained="false" maxConstrained="false"
+                        addStyleNames="width-4em"/>
                   </b:Column>
 
                 </b:FluidRow>
@@ -53,7 +54,8 @@
                     </g:Label>
                   </b:Column>
                   <b:Column size="8">
-                    <o:NumericTextBox ui:field="toBox" width="6em" minConstrained="false" maxConstrained="false"/>
+                    <o:NumericTextBox ui:field="toBox" minConstrained="false" maxConstrained="false"
+                        addStyleNames="width-4em"/>
                   </b:Column>
                 </b:FluidRow>
               </b:Well>
