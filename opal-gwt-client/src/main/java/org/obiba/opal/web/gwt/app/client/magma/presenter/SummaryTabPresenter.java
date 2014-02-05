@@ -27,6 +27,7 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
@@ -50,6 +51,8 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
 
   private int entitiesCount;
 
+  private HandlerRegistration handlerRegistration;
+
   @Inject
   public SummaryTabPresenter(EventBus eventBus, Display display) {
     super(eventBus, display);
@@ -57,8 +60,9 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
   }
 
   @Override
-  protected void onBind() {
-    registerHandler(getEventBus().addHandler(SummaryRequiredEvent.getType(), new DeferredSummaryRequestHandler()));
+  protected void onReveal() {
+    handlerRegistration = getEventBus().addHandler(SummaryRequiredEvent.getType(), new DeferredSummaryRequestHandler());
+    registerHandler(handlerRegistration);
 
     // Variable Script refreshed
     addRegisteredHandler(VariableRefreshEvent.getType(), new VariableRefreshEvent.Handler() {
@@ -67,6 +71,12 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
         requestSummary();
       }
     });
+  }
+
+  @Override
+  protected void onHide() {
+    super.onHide();
+    handlerRegistration.removeHandler();
   }
 
   @Override
