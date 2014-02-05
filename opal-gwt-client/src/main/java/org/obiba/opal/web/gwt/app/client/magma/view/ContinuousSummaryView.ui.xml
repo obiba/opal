@@ -14,7 +14,7 @@
         <g:SimplePanel ui:field="histogramPanel"/>
       </b:Column>
       <b:Column size="4" offset="2">
-      <g:SimplePanel ui:field="normalProbability"/>
+        <g:SimplePanel ui:field="normalProbability"/>
       </b:Column>
     </b:FluidRow>
 
@@ -23,7 +23,7 @@
     </b:Heading>
     <b:FluidRow>
       <b:Column size="10" offset="1">
-      <o:DefaultFlexTable ui:field="grid"/>
+        <o:DefaultFlexTable ui:field="grid"/>
       </b:Column>
     </b:FluidRow>
   </g:FlowPanel>
