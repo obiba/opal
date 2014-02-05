@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
+import org.obiba.opal.web.model.client.math.DefaultSummaryDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
@@ -108,6 +109,11 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
       CategoricalSummaryDto categorical = dto
           .getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
       summary.add(new CategoricalSummaryView(dto.getResource(), categorical));
+
+    } else if(dto.getExtension(DefaultSummaryDto.SummaryStatisticsDtoExtensions.defaultSummary) != null) {
+      DefaultSummaryDto defaultSummaryDto = dto
+          .getExtension(DefaultSummaryDto.SummaryStatisticsDtoExtensions.defaultSummary).cast();
+      summary.add(new DefaultSummaryView(defaultSummaryDto));
     } else {
       renderNoSummary();
     }

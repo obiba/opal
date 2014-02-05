@@ -9,42 +9,35 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.ui.AbstractTabPanel;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.DefaultFlexTable;
-import org.obiba.opal.web.gwt.plot.client.FrequencyChartFactory;
-import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
+import org.obiba.opal.web.model.client.math.DefaultSummaryDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Ordering;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
  *
  */
-public class CategoricalSummaryView extends Composite {
+public class DefaultSummaryView extends Composite {
 
-  interface CategoricalSummaryViewUiBinder extends UiBinder<Widget, CategoricalSummaryView> {}
+  interface CategoricalSummaryViewUiBinder extends UiBinder<Widget, DefaultSummaryView> {}
 
   private static final CategoricalSummaryViewUiBinder uiBinder = GWT.create(CategoricalSummaryViewUiBinder.class);
 
   private static final Translations translations = GWT.create(Translations.class);
-
-  @UiField
-  AbstractTabPanel chartsPanel;
-
-  @UiField
-  FlowPanel freqPanel;
-
-  @UiField
-  FlowPanel pctPanel;
 
   @UiField
   DefaultFlexTable stats;
@@ -52,48 +45,39 @@ public class CategoricalSummaryView extends Composite {
   @UiField
   DefaultFlexTable frequencies;
 
-  private FrequencyChartFactory chartFactory = null;
-
-  public CategoricalSummaryView(final String title, CategoricalSummaryDto categorical) {
+  public DefaultSummaryView(DefaultSummaryDto summaryDto) {
     initWidget(uiBinder.createAndBindUi(this));
     stats.clear();
     stats.setHeader(0, translations.descriptiveStatistics());
     stats.setHeader(1, translations.value());
     int row = 0;
     stats.setWidget(row, 0, new Label(translations.NLabel()));
-    stats.setWidget(row++, 1, new Label("" + Math.round(categorical.getN())));
-    stats.setWidget(row, 0, new Label(translations.mode()));
-    stats.setWidget(row++, 1, new Label(categorical.getMode()));
+    stats.setWidget(row++, 1, new Label("" + Math.round(summaryDto.getN())));
 
-    chartsPanel.addSelectionHandler(new SelectionHandler<Integer>() {
-      @Override
-      public void onSelection(SelectionEvent<Integer> event) {
-        if(event.getSelectedItem() == 1 && chartFactory != null && pctPanel.getWidgetCount() == 0) {
-          pctPanel.add(chartFactory.createPercentageChart(title));
-        }
-      }
-    });
+    if(summaryDto.getFrequenciesArray() != null) {
+      int count = summaryDto.getFrequenciesArray().length();
 
-    freqPanel.clear();
-    pctPanel.clear();
-    if(categorical.getFrequenciesArray() != null) {
-      int count = categorical.getFrequenciesArray().length();
-      chartFactory = new FrequencyChartFactory();
-      frequencies.clear();
-
-      frequencies.setHeader(0, translations.categoryLabel());
+      frequencies.setHeader(0, translations.value());
       frequencies.setHeader(1, translations.frequency());
       frequencies.setHeader(2, "%");
+
+      List<FrequencyDto> frequencyDtos = JsArrays.toList(summaryDto.getFrequenciesArray());
+      Collections.sort(frequencyDtos, new Comparator<FrequencyDto>() {
+        @Override
+        public int compare(FrequencyDto o1, FrequencyDto o2) {
+          return ComparisonChain.start().compare(o1.getValue(), o2.getValue(), Ordering.natural().reverse()).result();
+        }
+      });
+      // Not empty before N/A,
       for(int i = 0; i < count; i++) {
-        FrequencyDto value = categorical.getFrequenciesArray().get(i);
+        FrequencyDto value = frequencyDtos.get(i);
         if(value.hasValue()) {
-          chartFactory.push(value.getValue(), value.getFreq(), value.getPct() * 100);
-          frequencies.setWidget(i + 1, 0, new Label(value.getValue()));
+          frequencies.setWidget(i + 1, 0, new Label(value.getValue().equals("NOT_NULL") ? translations
+              .notNullStatistics() : value.getValue())); // Translate N/A and NOT_NULL
           frequencies.setWidget(i + 1, 1, new Label("" + Math.round(value.getFreq())));
           frequencies.setWidget(i + 1, 2, new Label("" + value.getPct() * 100));
         }
       }
-      freqPanel.add(chartFactory.createValueChart(title));
     } else {
       frequencies.clear();
     }

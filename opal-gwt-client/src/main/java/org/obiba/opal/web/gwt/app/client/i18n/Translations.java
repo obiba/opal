@@ -1785,34 +1785,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Server has been running for {0}.")
   String serverRunningFor();
 
-  @Description("Statistics Related Labels")
-  @DefaultStringMapValue({ "PLOT", "Plot",//
-      "STATISTICS", "Statistics",//
-      "DESC_STATISTICS", "Descriptive Statistic",//
-      "VALUE", "Value",//
-      "N", "N", //
-      "MIN", "Min", //
-      "MAX", "Max", //
-      "MEAN", "Mean", //
-      "MEDIAN", "Median", //
-      "STD_DEVIATION", "Standard Deviation", //
-      "VARIANCE", "Variance", //
-      "SKEWNESS", "Skewness", //
-      "KURTOSIS", "Kurtosis", //
-      "SUM", "Sum", //
-      "SUM_OF_SQUARES", "Sum of squares", //
-      "HISTOGRAM", "Histogram", //
-      "DENSITY", "Density",//
-      "NORMAL_PROB", "Normal Probability",//
-      "THEORETHICAL_QUANTILES", "Theroretical Quantiles",//
-      "SAMPLE_QUANTILES", "Sample Quantiles",//
-      "MODE", "Mode",//
-      "CATEGORY", "Category",//
-      "FREQUENCY", "Frequency"//
-
-  })
-  Map<String, String> statsMap();
-
   @Description("JVM Labels")
   @DefaultStringMapValue({ "OPAL_VERSION", "Opal Version",//
       "JAVA_VERSION", "Java Version", //
@@ -2124,6 +2096,70 @@ public interface Translations extends Constants {
   @Description("Full/normal screen tooltip")
   @DefaultStringValue("Full/normal screen")
   String switchScreenDisplay();
+
+  @Description("Descriptive statistics label")
+  @DefaultStringValue("Descriptive statistics")
+  String descriptiveStatistics();
+
+  @Description("Mode label")
+  @DefaultStringValue("Mode")
+  String mode();
+
+  @Description("Histogram")
+  @DefaultStringValue("Histogram")
+  String histogram();
+
+  @Description("Density")
+  @DefaultStringValue("Density")
+  String density();
+
+  @Description("Normal Probability")
+  @DefaultStringValue("Normal Probability")
+  String normalProbability();
+
+  @Description("Sample Quantiles")
+  @DefaultStringValue("Sample Quantiles")
+  String sampleQuantiles();
+
+  @Description("Theroretical Quantiles")
+  @DefaultStringValue("Theroretical Quantiles")
+  String theoreticalQuantiles();
+
+  @Description("Sum of squares")
+  @DefaultStringValue("Sum of squares")
+  String sumOfSquares();
+
+  @Description("Sum")
+  @DefaultStringValue("Sum")
+  String sum();
+
+  @Description("Kurtosis")
+  @DefaultStringValue("Kurtosis")
+  String kurtosis();
+
+  @Description("Skewness")
+  @DefaultStringValue("Skewness")
+  String skewness();
+
+  @Description("Variance")
+  @DefaultStringValue("Variance")
+  String variance();
+
+  @Description("Median")
+  @DefaultStringValue("Median")
+  String median();
+
+  @Description("Max")
+  @DefaultStringValue("Max")
+  String max();
+
+  @Description("Min")
+  @DefaultStringValue("Min")
+  String min();
+
+  @Description("Not null statistics label")
+  @DefaultStringValue("Not null")
+  String notNullStatistics();
 
   @Description("Select a derivation method message")
   @DefaultStringValue("Select a derivation method")
