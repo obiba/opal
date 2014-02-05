@@ -125,7 +125,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
   private JsArray<AttributeDto> getAttributesArray(VariableDto dto) {
     List<AttributeDto> attributes = JsArrays.toList(dto.getAttributesArray());
 
-    switch(dialogMode){
+    switch(dialogMode) {
       case APPLY: // fall through
       case CREATE:
         return addNewAttribute(attributes);
@@ -210,11 +210,35 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     // For each non-empty locale
     for(LocalizedEditableText localizedText : getView().getLocalizedValues().getValue()) {
       if(!localizedText.getTextBox().getText().isEmpty()) {
-        newAttributes.push(getNewAttribute(localizedText));
+        AttributeDto existingAttr = findAttribute(attributes, localizedText);
+        if (existingAttr != null) {
+          existingAttr.setValue(localizedText.getTextBox().getText());
+        } else {
+          newAttributes.push(getNewAttribute(localizedText));
+        }
       }
     }
 
     return newAttributes;
+  }
+
+  private AttributeDto findAttribute(Iterable<AttributeDto> attributes, LocalizedEditableText localizedText) {
+    String name = getView().getName().getText();
+    String namespace = getView().getNamespaceSuggestBox().getText();
+    String locale = localizedText.getValue().getLocale();
+
+    for(AttributeDto attribute : attributes) {
+      if(name.equals(attribute.getName()) &&
+          ((namespace.isEmpty() && !attribute.hasNamespace()) ||
+              (attribute.hasNamespace() && namespace.equals(attribute.getNamespace()))) &&
+          ((locale.isEmpty() && !attribute.hasLocale()) ||
+              (attribute.hasLocale() && locale.equals(attribute.getLocale())))) {
+
+        return attribute;
+      }
+    }
+
+    return null;
   }
 
   private VariableDto getVariableDto(VariableDto variable) {
@@ -409,7 +433,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
                 Display.FormField.VALUE.name()));
         validators.add(new ConditionValidator(hasValidNamespace(getView().getNamespaceSuggestBox().getText()),
             "NamespaceCannotBeEmptyChars", Display.FormField.NAMESPACE.name()));
-        if (dialogMode == Mode.CREATE) validators.add(new UniqueAttributeNameValidator("AttributeAlreadyExists"));
+        if(dialogMode == Mode.CREATE) validators.add(new UniqueAttributeNameValidator("AttributeAlreadyExists"));
       }
       return validators;
     }
