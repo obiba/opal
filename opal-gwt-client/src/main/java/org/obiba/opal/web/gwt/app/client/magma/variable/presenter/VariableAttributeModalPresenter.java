@@ -228,17 +228,22 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     String locale = localizedText.getValue().getLocale().trim();
 
     for(AttributeDto attribute : attributes) {
-      if(name.equals(attribute.getName()) &&
-          ((namespace.isEmpty() && !attribute.hasNamespace()) ||
-              (attribute.hasNamespace() && namespace.equals(attribute.getNamespace()))) &&
-          ((locale.isEmpty() && !attribute.hasLocale()) ||
-              (attribute.hasLocale() && locale.equals(attribute.getLocale())))) {
-
+      if(name.equals(attribute.getName()) && isSameNamespace(namespace, attribute) && isSameLocale(locale, attribute)) {
         return attribute;
       }
     }
 
     return null;
+  }
+
+  private boolean isSameLocale(String locale, AttributeDto attribute) {
+    return ((locale.isEmpty() && !attribute.hasLocale()) ||
+        (attribute.hasLocale() && locale.equals(attribute.getLocale())));
+  }
+
+  private boolean isSameNamespace(String namespace, AttributeDto attribute) {
+    return ((namespace.isEmpty() && !attribute.hasNamespace()) ||
+        (attribute.hasNamespace() && namespace.equals(attribute.getNamespace())));
   }
 
   private VariableDto getVariableDto(VariableDto variable) {
