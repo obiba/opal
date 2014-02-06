@@ -26,6 +26,7 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -163,6 +164,7 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
 
   @Override
   public void onDownloadIdentifiers(VariableDto variable) {
+    GWT.log("type" + variable.getEntityType());
     fireEvent(new FileDownloadRequestEvent(
         UriBuilder.create().segment("identifiers", "mapping", "{}", "_export").query("type", variable.getEntityType())
             .build(variable.getName())));
