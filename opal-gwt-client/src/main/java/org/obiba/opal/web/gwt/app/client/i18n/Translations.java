@@ -1242,6 +1242,10 @@ public interface Translations extends Constants {
   })
   Map<String, String> projectTabNameMap();
 
+  @Description("Discrete Value Required label")
+  @DefaultStringValue("A valid discrete value is required.")
+  String discreteValueRequired();
+
   @Description("Lower Value Limit Required label")
   @DefaultStringValue("Lower value limit is required.")
   String lowerValueLimitRequired();

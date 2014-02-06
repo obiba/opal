@@ -105,7 +105,7 @@ public class DeriveNumericalVariableStepPresenter
   @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private boolean addValueMapEntry(@Nullable String value, String newValue) {
     if(derivationHelper.hasValueMapEntryWithValue(value)) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.valueMapAlreadyAdded()).build());
+      fireEvent(NotificationEvent.newBuilder().error(translations.valueMapAlreadyAdded()).build());
       return false;
     }
     numberType.addValueMapEntry(derivationHelper, value, newValue);
@@ -114,7 +114,7 @@ public class DeriveNumericalVariableStepPresenter
 
   private boolean addValueMapEntry(@Nullable Number lower, @Nullable Number upper, String newValue) {
     if(!numberType.addValueMapEntry(derivationHelper, lower, upper, newValue)) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.rangeOverlap()).build());
+      fireEvent(NotificationEvent.newBuilder().error(translations.rangeOverlap()).build());
       return false;
     }
     return true;
@@ -482,11 +482,36 @@ public class DeriveNumericalVariableStepPresenter
   private final class AddValueMapEntryHandler implements ClickHandler {
     @Override
     public void onClick(ClickEvent event) {
-      boolean added = getView().addRangeSelected()
-          ? addValueMapEntry(getView().getLowerValue(), getView().getUpperValue(), getView().getNewValue())
-          : addValueMapEntry(numberType.formatNumber(getView().getDiscreteValue()), getView().getNewValue());
-      if(added) {
-        getView().refreshValuesMapDisplay();
+      List<String> errorMessages = new ArrayList<String>();
+      validateValueMappingValues(errorMessages);
+
+      if(errorMessages.isEmpty()) {
+        boolean added = getView().addRangeSelected()
+            ? addValueMapEntry(getView().getLowerValue(), getView().getUpperValue(), getView().getNewValue())
+            : addValueMapEntry(numberType.formatNumber(getView().getDiscreteValue()), getView().getNewValue());
+        if(added) {
+          getView().refreshValuesMapDisplay();
+        }
+      } else {
+        fireEvent(NotificationEvent.newBuilder().error(errorMessages).build());
+      }
+    }
+
+    private void validateValueMappingValues(Collection<String> errorMessages) {
+      if(getView().addRangeSelected()) {
+        Number lower = getView().getLowerValue();
+        Number upper = getView().getUpperValue();
+        if(lower == null) {
+          errorMessages.add(translations.lowerValueLimitRequired());
+        }
+        if(upper == null) {
+          errorMessages.add(translations.upperValueLimitRequired());
+        }
+        if(lower != null && upper != null && lower.doubleValue() > upper.doubleValue()) {
+          errorMessages.add(translations.lowerLimitGreaterThanUpperLimit());
+        }
+      } else if (getView().getDiscreteValue() == null) {
+        errorMessages.add(translations.discreteValueRequired());
       }
     }
   }
