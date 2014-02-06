@@ -64,7 +64,7 @@ message LocaleDto {
 message ReportTemplateDto {
   required string name = 1;
   required string design = 2;
-  required string format = 3;
+  required string format = 3 [default = "html"];
   repeated ParameterDto parameters = 4;
   optional string cron = 5;
   repeated string emailNotification = 6;

@@ -125,65 +125,6 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
     this.scriptEvaluationCallback = scriptEvaluationCallback;
   }
 
-  private void requestSummary() {
-    StringBuilder link = new StringBuilder();
-    appendTable(link);
-    link.append("/variable/_transient/summary?");
-    appendVariableSummaryArguments(link);
-
-    ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder = requestSummaryBuilder(link.toString());
-
-    summaryTabPresenter.setRequestBuilder(requestBuilder);
-    summaryTabPresenter.forgetSummary();
-    summaryTabPresenter.onReset();
-  }
-
-  private ResourceRequestBuilder<SummaryStatisticsDto> requestSummaryBuilder(String link) {
-    String script = VariableDtos.getScript(originalVariable);
-    ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder = ResourceRequestBuilderFactory
-        .<SummaryStatisticsDto>newBuilder() //
-        .forResource(link).withFormBody("script", script).post() //
-        .accept("application/x-protobuf+json");
-
-    if(originalVariable != null) {
-      JsArray<CategoryDto> cats = originalVariable.getCategoriesArray();
-      if(cats != null) {
-        for(int i = 0; i < cats.length(); i++) {
-          requestBuilder.withFormBody("category", cats.get(i).getName());
-        }
-      }
-    }
-
-    ResponseCodeCallback callback = new ResponseCodeCallback() {
-
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        if(scriptEvaluationCallback == null) return;
-        if(response.getStatusCode() == Response.SC_OK) {
-          scriptEvaluationCallback.onSuccess(originalVariable);
-        } else {
-          scriptEvaluationCallback.onFailure(originalVariable);
-        }
-      }
-    };
-
-    requestBuilder.withCallback(Response.SC_OK, callback)//
-        .withCallback(Response.SC_BAD_REQUEST, callback)//
-        .withCallback(Response.SC_FORBIDDEN, callback)//
-        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback);
-
-    return requestBuilder;
-  }
-
-  private void appendVariableSummaryArguments(StringBuilder link) {
-    appendVariableLimitArguments(link);
-
-    if(ValueType.TEXT.is(originalVariable.getValueType()) && VariableDtos.allCategoriesMissing(originalVariable)) {
-      link.append("&nature=categorical")//
-          .append("&distinct=true");
-    }
-  }
-
   private void appendVariableLimitArguments(StringBuilder link) {
     link.append("valueType=").append(originalVariable.getValueType()) //
         .append("&repeatable=").append(originalVariable.getIsRepeatable());
@@ -273,10 +214,70 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
           break;
         default:
           getView().setValuesVisible(true);
-          getEventBus().fireEvent(new ScriptEvaluationFailedEvent(translations.scriptEvaluationFailed()));
+          fireEvent(new ScriptEvaluationFailedEvent(translations.scriptEvaluationFailed()));
           summaryTabPresenter.hideSummaryPreview();
           break;
       }
+    }
+
+    private void requestSummary() {
+      StringBuilder link = new StringBuilder();
+      appendTable(link);
+      link.append("/variable/_transient/summary?");
+      appendVariableSummaryArguments(link);
+
+      ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder = requestSummaryBuilder(link.toString());
+
+      summaryTabPresenter.setRequestBuilder(requestBuilder, originalTable.getValueSetCount());
+      summaryTabPresenter.forgetSummary();
+      summaryTabPresenter.onReset();
+    }
+
+    private ResourceRequestBuilder<SummaryStatisticsDto> requestSummaryBuilder(String link) {
+      String script = VariableDtos.getScript(originalVariable);
+      ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder
+          = ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder() //
+          .forResource(link).withFormBody("script", script).post() //
+          .accept("application/x-protobuf+json");
+
+      if(originalVariable != null) {
+        JsArray<CategoryDto> cats = originalVariable.getCategoriesArray();
+        if(cats != null) {
+          for(int i = 0; i < cats.length(); i++) {
+            requestBuilder.withFormBody("category", cats.get(i).getName());
+          }
+        }
+      }
+
+      ResponseCodeCallback callback = new ResponseCodeCallback() {
+
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          if(scriptEvaluationCallback == null) return;
+          if(response.getStatusCode() == Response.SC_OK) {
+            scriptEvaluationCallback.onSuccess(originalVariable);
+          } else {
+            scriptEvaluationCallback.onFailure(originalVariable);
+          }
+        }
+      };
+
+      requestBuilder.withCallback(Response.SC_OK, callback)//
+          .withCallback(Response.SC_BAD_REQUEST, callback)//
+          .withCallback(Response.SC_FORBIDDEN, callback)//
+          .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback);
+
+      return requestBuilder;
+    }
+
+    private void appendVariableSummaryArguments(StringBuilder link) {
+      appendVariableLimitArguments(link);
+
+      if(ValueType.TEXT.is(originalVariable.getValueType()) && VariableDtos.allCategoriesMissing(originalVariable)) {
+        link.append("&nature=categorical")//
+            .append("&distinct=true");
+      }
+      link.append("&limit=500");
     }
 
     private void scriptInterpretationFail(Response response) {
@@ -289,7 +290,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
           messageBuilder
               .append(translationMessages.errorAt(error.getLineNumber(), error.getColumnNumber(), error.getMessage()));
         }
-        getEventBus().fireEvent(new ScriptEvaluationFailedEvent(messageBuilder.toString()));
+        fireEvent(new ScriptEvaluationFailedEvent(messageBuilder.toString()));
       }
     }
 

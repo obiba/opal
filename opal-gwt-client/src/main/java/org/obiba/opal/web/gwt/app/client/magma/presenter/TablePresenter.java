@@ -321,6 +321,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
     if(getView().isValuesTabSelected()) {
       valuesTablePresenter.setTable(tableDto);
+      valuesTablePresenter.updateValuesDisplay("");
     }
 
     updateVariables();
@@ -405,7 +406,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @Override
   public void onShowValues() {
     valuesTablePresenter.setTable(table);
-    valuesTablePresenter.setFilter(getView().getFilter().getText());
+    valuesTablePresenter.updateValuesDisplay(getView().getFilter().getText());
   }
 
   @Override
@@ -618,9 +619,9 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   }
 
   @Override
-  public void onAddAttribute(List<VariableDto> selectedItems) {
+  public void onApplyAttribute(List<VariableDto> selectedItems) {
     VariableAttributeModalPresenter attributeEditorPresenter = attributeModalProvider.get();
-    attributeEditorPresenter.setDialogMode(VariableAttributeModalPresenter.Mode.CREATE);
+    attributeEditorPresenter.setDialogMode(VariableAttributeModalPresenter.Mode.APPLY);
     attributeEditorPresenter.initialize(table, selectedItems);
   }
 

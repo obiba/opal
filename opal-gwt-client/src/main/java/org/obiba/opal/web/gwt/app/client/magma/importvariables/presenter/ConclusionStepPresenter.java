@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ResourceRequestPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ResourceRequestPresenter.ResourceClickHandler;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
@@ -133,6 +134,7 @@ public class ConclusionStepPresenter extends PresenterWidget<ConclusionStepPrese
         @Override
         public void onResource(Response response, DatasourceDto resource) {
           placeManager.revealPlace(ProjectPlacesHelper.getDatasourcePlace(resource.getName()));
+          fireEvent(new VariableRefreshEvent());
         }
       };
       UriBuilder ub = UriBuilder.create().segment("datasource", targetDatasourceName);

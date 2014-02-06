@@ -9,7 +9,6 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.users.edit;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,14 +25,11 @@ import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.model.client.opal.GroupDto;
 import org.obiba.opal.web.model.client.opal.SubjectCredentialsDto;
 
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.TakesValue;
@@ -72,20 +68,6 @@ public class SubjectCredentialsPresenter extends ModalPresenterWidget<SubjectCre
   @Override
   public void onBind() {
     validationHandler = new SubjectCredentialsValidationHandler();
-
-    ResourceRequestBuilderFactory.<JsArray<GroupDto>>newBuilder().forResource(UriBuilders.GROUPS.create().build()).get()
-        .withCallback(new ResourceCallback<JsArray<GroupDto>>() {
-          @Override
-          public void onResource(Response response, JsArray<GroupDto> resources) {
-            if(response.getStatusCode() == SC_OK) {
-              List<String> groups = new ArrayList<String>();
-              for(GroupDto groupDto : JsArrays.toIterable(resources)) {
-                groups.add(groupDto.getName());
-              }
-              getView().getGroups().setValue(groups);
-            }
-          }
-        }).send();
   }
 
   @Override

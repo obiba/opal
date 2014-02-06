@@ -102,8 +102,8 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
 
   @Override
   public void onProjectTableSelection(ProjectDto project, String table) {
-    PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.PROJECT)
-        .with(ParameterTokens.TOKEN_NAME, project.getName()) //
+    PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.PROJECT).with(ParameterTokens.TOKEN_NAME,
+        project.getName()) //
         .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString());
 
     if(!Strings.isNullOrEmpty(table)) {

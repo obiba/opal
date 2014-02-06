@@ -34,6 +34,8 @@ import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MagmaEngineVariableResolver;
 import org.obiba.magma.type.TextType;
+import org.obiba.opal.core.magma.IdentifiersMappingView;
+import org.obiba.opal.core.service.IdentifiersTableService;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPGenericVector;
 import org.rosuda.REngine.REXPList;
@@ -52,6 +54,9 @@ import com.google.common.collect.Sets;
  */
 public class MagmaAssignROperation extends AbstractROperation {
 
+  @NotNull
+  private final IdentifiersTableService identifiersTableService;
+
   private final String symbol;
 
   private final String path;
@@ -60,18 +65,24 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   private final boolean withMissings;
 
+  private final String identifiersMapping;
+
   private SortedSet<VariableEntity> entities;
 
   private final Set<MagmaRConverter> magmaRConverters = Sets
-      .newHashSet(new DatasourceRConverter(), new ValueTableRConverter(), new VariableRConverter());
+      .newHashSet((MagmaRConverter) new ValueTableRConverter(), (MagmaRConverter) new VariableRConverter());
 
-  public MagmaAssignROperation(String symbol, String path, String variableFilter, boolean withMissings) {
+  public MagmaAssignROperation(String symbol, String path, String variableFilter, boolean withMissings,
+      String identifiersMapping, IdentifiersTableService identifiersTableService) {
     if(symbol == null) throw new IllegalArgumentException("symbol cannot be null");
     if(path == null) throw new IllegalArgumentException("path cannot be null");
+    if(identifiersTableService == null) throw new IllegalArgumentException("identifiers table service cannot be null");
     this.symbol = symbol;
     this.path = path;
     this.variableFilter = variableFilter;
     this.withMissings = withMissings;
+    this.identifiersMapping = identifiersMapping;
+    this.identifiersTableService = identifiersTableService;
   }
 
   @Override
@@ -79,14 +90,14 @@ public class MagmaAssignROperation extends AbstractROperation {
     try {
       for(MagmaRConverter converter : magmaRConverters) {
         if(converter.canResolve(path)) {
-          assign(symbol, converter.asVector(path, withMissings));
+          assign(symbol, converter.asVector(path, withMissings, identifiersMapping));
           return;
         }
       }
     } catch(MagmaRuntimeException e) {
       throw new MagmaRRuntimeException("Failed resolving path '" + path + "'", e);
     }
-    throw new MagmaRRuntimeException("Failed resolving path '" + path + "'");
+    throw new MagmaRRuntimeException("No R converter found for path '" + path + "'");
   }
 
   private SortedSet<VariableEntity> getEntities() {
@@ -116,9 +127,10 @@ public class MagmaAssignROperation extends AbstractROperation {
      *
      * @param path
      * @param withMissings
+     * @param identifiersMapping
      * @return
      */
-    REXP asVector(String path, boolean withMissings);
+    REXP asVector(String path, boolean withMissings, String identifiersMapping);
 
     /**
      * Check if path can be resolved as a datasource, table or variable.
@@ -139,37 +151,17 @@ public class MagmaAssignROperation extends AbstractROperation {
       VectorType vt = VectorType.forValueType(vvs.getValueType());
       return vt.asVector(vvs, entities, withMissings);
     }
-  }
 
-  /**
-   * Build a R vector from a datasource: list of vectors of tables.
-   */
-  private class DatasourceRConverter implements MagmaRConverter {
-
-    @Override
-    public boolean canResolve(String path) {
-      return path != null && !path.contains(".") && !path.contains(":");
-    }
-
-    @Override
-    public REXP asVector(String path, boolean withMissings) {
-      Datasource datasource = MagmaEngine.get().getDatasource(path);
-
-      SortedSet<VariableEntity> entities = Sets.newTreeSet();
-      for(ValueTable vt : datasource.getValueTables()) {
-        entities.addAll(vt.getVariableEntities());
+    protected ValueTable applyIdentifiersMapping(ValueTable table, String idMapping) {
+      // If the table contains an entity that requires identifiers separation, create a "identifers view" of the table (replace
+      // public (system) identifiers with private identifiers).
+      if(!Strings.isNullOrEmpty(idMapping) &&
+          identifiersTableService.hasIdentifiersMapping(table.getEntityType(), idMapping)) {
+        // Make a view that converts opal identifiers to unit identifiers
+        return new IdentifiersMappingView(idMapping, IdentifiersMappingView.Policy.UNIT_IDENTIFIERS_ARE_PUBLIC, table,
+            identifiersTableService.getIdentifiersTable(table.getEntityType()));
       }
-      setEntities(entities);
-
-      // build a list of list of vectors
-      List<REXP> contents = Lists.newArrayList();
-      List<String> names = Lists.newArrayList();
-      for(ValueTable vt : datasource.getValueTables()) {
-        ValueTableRConverter vtv = new ValueTableRConverter(vt);
-        contents.add(vtv.asVector(withMissings));
-        names.add(vt.getName());
-      }
-      return new REXPList(new RList(contents, names));
+      return table;
     }
   }
 
@@ -182,21 +174,14 @@ public class MagmaAssignROperation extends AbstractROperation {
 
     private ValueTable table;
 
-    private ValueTableRConverter() {
-    }
-
-    private ValueTableRConverter(ValueTable table) {
-      this.table = table;
-    }
-
     @Override
     public boolean canResolve(String path) {
       return path != null && path.contains(".") && !path.contains(":");
     }
 
     @Override
-    public REXP asVector(String path, boolean withMissings) {
-      resolvePath(path);
+    public REXP asVector(String path, boolean withMissings, String identifiersMapping) {
+      resolvePath(path, identifiersMapping);
       return asVector(withMissings);
     }
 
@@ -264,7 +249,7 @@ public class MagmaAssignROperation extends AbstractROperation {
               "row.names" })));
     }
 
-    private void resolvePath(String path) {
+    private void resolvePath(String path, String idMapping) {
       MagmaEngineReferenceResolver resolver = MagmaEngineTableResolver.valueOf(path);
 
       if(resolver.getDatasourceName() == null) {
@@ -272,7 +257,7 @@ public class MagmaAssignROperation extends AbstractROperation {
       }
       Datasource ds = MagmaEngine.get().getDatasource(resolver.getDatasourceName());
 
-      table = ds.getValueTable(resolver.getTableName());
+      table = applyIdentifiersMapping(ds.getValueTable(resolver.getTableName()), idMapping);
     }
 
     /**
@@ -335,7 +320,7 @@ public class MagmaAssignROperation extends AbstractROperation {
       return path != null && path.contains(".") && path.contains(":");
     }
 
-    private void resolvePath(String path) {
+    private void resolvePath(String path, String idMapping) {
       MagmaEngineVariableResolver resolver = MagmaEngineVariableResolver.valueOf(path);
 
       if(resolver.getVariableName() == null) {
@@ -345,13 +330,14 @@ public class MagmaAssignROperation extends AbstractROperation {
       if(resolver.getDatasourceName() == null) {
         throw new MagmaRRuntimeException("Datasource is not defined in path: " + path);
       }
-      table = resolver.resolveTable((ValueTable) null);
-      variableValueSource = resolver.resolveSource();
+
+      table = applyIdentifiersMapping(resolver.resolveTable((ValueTable) null), idMapping);
+      variableValueSource = table.getVariableValueSource(resolver.getVariableName());
     }
 
     @Override
-    public REXP asVector(String path, boolean withMissings) {
-      resolvePath(path);
+    public REXP asVector(String path, boolean withMissings, String identifiersMapping) {
+      resolvePath(path, identifiersMapping);
       prepareEntities(table);
       return getVector(variableValueSource, getEntities(), withMissings);
     }

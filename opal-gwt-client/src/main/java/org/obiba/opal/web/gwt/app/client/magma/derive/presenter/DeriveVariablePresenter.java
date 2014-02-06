@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.ScriptEvaluationPresenter.ScriptEvaluationCallback;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceUpdatedEvent;
@@ -99,6 +100,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
   private String destinationView;
 
+  private StepErrorNotificationHandler stepErrorNotificationHandler;
+
   @Inject
   @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
   public DeriveVariablePresenter(EventBus eventBus, PlaceManager placeManager, Display view, Translations translations,
@@ -133,6 +136,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     variable = (VariableDto) eventParameters[0];
     table = (TableDto) eventParameters[1];
     wizardType = (WizardType) event.getAssociatedType();
+    stepErrorNotificationHandler = new StepErrorNotificationHandler();
 
     if(wizardType == CategorizeWizardType || wizardType == FromWizardType) {
       if("binary".equals(variable.getValueType())) {
@@ -184,6 +188,9 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     deriveFromVariablePresenter.setWizardType(wizardType);
     getView().setStartStep(deriveFromVariablePresenter.getWizardStepBuilders(null).get(0));
     setInSlot(Display.Slots.Derivation, deriveFromVariablePresenter);
+
+    getEventBus()
+        .addHandlerToSource(NotificationEvent.getType(), deriveFromVariablePresenter, stepErrorNotificationHandler);
   }
 
   private void prepareBooleanDerivation() {
@@ -230,6 +237,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
         return "date".equals(valueType) || "datetime".equals(valueType);
       }
     });
+
+    getEventBus().addHandlerToSource(NotificationEvent.getType(), temporalPresenter, stepErrorNotificationHandler);
   }
 
   private void prepareNumericalDerivation() {
@@ -246,6 +255,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
         return "integer".equals(valueType) || "decimal".equals(valueType);
       }
     });
+
+    getEventBus().addHandlerToSource(NotificationEvent.getType(), numericalPresenter, stepErrorNotificationHandler);
   }
 
   private void prepareOpenTextualDerivation() {
@@ -340,8 +351,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
       }
 
       UriBuilder ub = UriBuilder.create().segment("datasource", destinationDatasource, "view", destinationView);
-      ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(ub.build()).get()
-          .withCallback(new UpdateViewCallback(derived))//
+      ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(ub.build()).get().withCallback(
+          new UpdateViewCallback(derived))//
           .withCallback(new CreateViewCallback(), Response.SC_NOT_FOUND).send();
     }
 
@@ -360,8 +371,9 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
   private class ScriptEvaluationStepInHandler implements StepInHandler {
     @Override
     public void onStepIn() {
+      getView().clearErrors();
       derivationPresenter.generateDerivedVariable();
-      scriptEvaluationPresenter.setOriginalTable(derivationPresenter.getOriginalTable(), true);
+      scriptEvaluationPresenter.setOriginalTable(derivationPresenter.getOriginalTable(), false);
       scriptEvaluationPresenter.setOriginalVariable(derivationPresenter.getDerivedVariable());
     }
   }
@@ -376,6 +388,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
     @Override
     public void onStepIn() {
+      getView().clearErrors();
       presenter.initialize(deriveFromVariablePresenter.getOriginalTable(), derivationPresenter.getDestinationTable(),
           deriveFromVariablePresenter.getOriginalVariable(), derivationPresenter.getDerivedVariable());
 
@@ -392,6 +405,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
     @Override
     public void onStepIn() {
+      getView().clearErrors();
       deriveConclusionPresenter
           .initialize(derivationPresenter.getOriginalTable(), derivationPresenter.getDestinationTable(),
               derivationPresenter.getOriginalVariable(), derivationPresenter.getDerivedVariable());
@@ -515,7 +529,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
                 .createWithKeys(overwriteConfirmation, "overwriteVariable", "confirmOverwriteVariable"));
           }
         } else {
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.invalidDestinationView()).build());
+          getView().showError(translations.invalidDestinationView());
         }
       }
     }
@@ -628,11 +642,34 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     }
   }
 
+  private final class StepErrorNotificationHandler implements NotificationEvent.Handler {
+
+    private StepErrorNotificationHandler() {}
+
+    @Override
+    public void onUserMessage(NotificationEvent event) {
+      getView().clearErrors();
+      for(String message : event.getMessages()) {
+        if(translations.userMessageMap().containsKey(message)) {
+          getView().showError(
+              TranslationsUtils.replaceArguments(translations.userMessageMap().get(message), event.getMessageArgs()));
+        } else {
+          getView().showError(message);
+        }
+      }
+      event.setConsumed(true);
+    }
+  }
+
   public interface Display extends WizardView {
 
     enum Slots {
       Summary, Derivation
     }
+
+    void clearErrors();
+
+    void showError(String errorMessage);
 
     DefaultWizardStepController.Builder getScriptEvaluationStepBuilder(StepInHandler handler);
 

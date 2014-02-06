@@ -9,7 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.report.view;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
@@ -29,15 +32,20 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
-import com.google.gwt.core.client.GWT;
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Ordering;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.regexp.shared.MatchResult;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.InlineLabel;
@@ -105,9 +113,6 @@ public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplate
   Label schedule;
 
   @UiField
-  Label format;
-
-  @UiField
   Label parameters;
 
   @UiField
@@ -135,13 +140,16 @@ public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplate
   }
 
   private void initProducedReportsTable() {
-    producedReportsTable.addColumn(new TextColumn<ReportDto>() {
+    TextColumn<ReportDto> nameColumn;
+    producedReportsTable.addColumn(nameColumn = new TextColumn<ReportDto>() {
 
       @Override
       public String getValue(ReportDto object) {
         return object.getName();
       }
     }, translations.nameLabel());
+    nameColumn.setDefaultSortAscending(false);
+    nameColumn.setSortable(true);
 
     producedReportsTable.addColumn(new DateTimeColumn<ReportDto>() {
       @Override
@@ -172,6 +180,10 @@ public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplate
     dataProvider.setArray(reports);
     pager.firstPage();
     dataProvider.refresh();
+
+    producedReportsTable.addColumnSortHandler(new ReportColumnSortHandler(dataProvider.getList()));
+
+    Collections.sort(dataProvider.getList(), ReportColumnSortHandler.ASCENDING_COMPARATOR);
   }
 
   @Override
@@ -186,7 +198,6 @@ public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplate
     this.reportTemplate = reportTemplate;
     design.setText(reportTemplate.getDesign());
     schedule.setText(reportTemplate.getCron());
-    format.setText(reportTemplate.getFormat());
     parameters.setText(getReportParamsList(JsArrays.toSafeArray(reportTemplate.getParametersArray())));
     emails.setText(getEmailList(JsArrays.toSafeArray(reportTemplate.getEmailNotificationArray())));
     reportTemplateName.setText(reportTemplate.getName());
@@ -202,8 +213,24 @@ public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplate
 
   private String getReportParamsList(JsArray<ParameterDto> params) {
     StringBuilder paramList = new StringBuilder();
+    boolean appended = false;
     for(ParameterDto param : JsArrays.toIterable(params)) {
-      paramList.append(param.getKey()).append("=").append(param.getValue()).append(" ");
+      if(appended) {
+        paramList.append(", ");
+      }
+      String value = param.getValue();
+      RegExp regExp = RegExp.compile("password");
+      MatchResult matcher = regExp.exec(param.getKey());
+      if(matcher != null) {
+        value = "******";
+      }
+      regExp = RegExp.compile("^T$|^TRUE$|^F$|^FALSE$");
+      matcher = regExp.exec(value);
+      if(matcher == null) {
+        value = "\"" + value + "\"";
+      }
+      paramList.append(param.getKey()).append("=").append(value);
+      appended = true;
     }
     return paramList.toString();
   }
@@ -276,6 +303,38 @@ public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplate
   @UiHandler("execute")
   public void onExecute(ClickEvent event) {
     getUiHandlers().onExecute();
+  }
+
+  private static class ReportColumnSortHandler extends ColumnSortEvent.ListHandler<ReportDto> {
+
+    final static Comparator<ReportDto> ASCENDING_COMPARATOR = new Comparator<ReportDto>() {
+      @Override
+      public int compare(ReportDto o1, ReportDto o2) {
+        return ComparisonChain.start().compare(o1.getName(), o2.getName()).result();
+      }
+    };
+
+    final static Comparator<ReportDto> DESCENDING_COMPARATOR = new Comparator<ReportDto>() {
+      @Override
+      public int compare(ReportDto o1, ReportDto o2) {
+        return ComparisonChain.start().compare(o1.getName(), o2.getName(), Ordering.natural().reverse()).result();
+      }
+    };
+
+    private ReportColumnSortHandler(List<ReportDto> list) {
+      super(list);
+    }
+
+    @Override
+    public void onColumnSort(ColumnSortEvent event) {
+      // Get the sorted column.
+      Column<?, ?> column = event.getColumn();
+      if(column == null) {
+        return;
+      }
+
+      Collections.sort(getList(), event.isSortAscending() ? ASCENDING_COMPARATOR : DESCENDING_COMPARATOR);
+    }
   }
 
 }

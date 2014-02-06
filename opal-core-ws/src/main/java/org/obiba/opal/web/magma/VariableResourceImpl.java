@@ -142,6 +142,7 @@ public class VariableResourceImpl implements VariableResource {
         return applicationContext.getBean(ContinuousSummaryResource.class);
       case TEMPORAL:
       case UNDETERMINED:
+      case GEO:
       default:
         return applicationContext.getBean(DefaultSummaryResource.class);
     }

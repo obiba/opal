@@ -81,6 +81,9 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
   @UiField
   FlowPanel valuesPanel;
 
+  @UiField
+  ControlGroup namespaceGroup;
+
   @Inject
   public VariableAttributeModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
     super(eventBus);
@@ -129,13 +132,19 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
 
   @Override
   public void setDialogMode(VariableAttributeModalPresenter.Mode mode) {
-    if(mode == VariableAttributeModalPresenter.Mode.UPDATE_MULTIPLE) {
-      valuesGroup.setVisible(false);
-      nameGroup.setVisible(false);
+    switch(mode) {
+      case APPLY:
+        modal.setTitle(translations.applyAttribute());
+        break;
+      case UPDATE_MULTIPLE:
+        valuesGroup.setVisible(false);
+        nameGroup.setVisible(false);
 
-      modal.setTitle(translations.editAttributes());
-    } else if(mode == VariableAttributeModalPresenter.Mode.UPDATE_SINGLE) {
-      modal.setTitle(translations.editAttribute());
+        modal.setTitle(translations.editAttributes());
+        break;
+      case UPDATE_SINGLE:
+        modal.setTitle(translations.editAttribute());
+        break;
     }
   }
 
@@ -168,6 +177,9 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
     ControlGroup group = null;
     if(formField != null) {
       switch(formField) {
+        case NAMESPACE:
+          group = namespaceGroup;
+          break;
         case NAME:
           group = nameGroup;
           break;
@@ -185,6 +197,6 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
 
   @Override
   public void clearErrors() {
-    modal.clearAlert();
+    modal.closeAlerts();
   }
 }

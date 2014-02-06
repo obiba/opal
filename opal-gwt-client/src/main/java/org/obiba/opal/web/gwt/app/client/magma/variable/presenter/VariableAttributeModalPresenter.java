@@ -74,7 +74,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
   private List<String> locales;
 
   public enum Mode {
-    UPDATE_SINGLE, UPDATE_MULTIPLE, CREATE
+    APPLY, UPDATE_SINGLE, UPDATE_MULTIPLE, CREATE
   }
 
   @Inject
@@ -125,12 +125,17 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
   private JsArray<AttributeDto> getAttributesArray(VariableDto dto) {
     List<AttributeDto> attributes = JsArrays.toList(dto.getAttributesArray());
 
-    if(dialogMode == Mode.CREATE) return addNewAttribute(attributes);
+    switch(dialogMode) {
+      case APPLY: // fall through
+      case CREATE:
+        return addNewAttribute(attributes);
 
-    if(dialogMode == Mode.UPDATE_SINGLE) return updateSingleAttribute(attributes);
+      case UPDATE_SINGLE:
+        return updateSingleAttribute(attributes);
 
-    return updateMultipleNamespace(attributes);
-
+      default:
+        return updateMultipleNamespace(attributes);
+    }
   }
 
   private JsArray<AttributeDto> updateMultipleNamespace(Iterable<AttributeDto> attributes) {
@@ -383,7 +388,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
 
   public static native String stringify(JavaScriptObject obj)
   /*-{
-      return $wnd.JSON.stringify(obj);
+    return $wnd.JSON.stringify(obj);
   }-*/;
 
   private class AttributeValidationHandler extends ViewValidationHandler {
@@ -392,19 +397,19 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      if(validators == null) {
-        validators = new LinkedHashSet<FieldValidator>();
+      validators = new LinkedHashSet<FieldValidator>();
 
-        if(dialogMode == Mode.UPDATE_MULTIPLE) {
-          validators.add(new AttributeConflictValidator("AttributeConflictExists"));
-        } else {
-          validators.add(
-              new RequiredTextValidator(getView().getName(), "AttributeNameIsRequired", Display.FormField.NAME.name()));
-          validators.add(
-              new ConditionValidator(hasValue(getView().getLocalizedValues().getValue()), "AttributeValueIsRequired",
-                  Display.FormField.VALUE.name()));
-          validators.add(new UniqueAttributeNameValidator("AttributeAlreadyExists"));
-        }
+      if(dialogMode == Mode.UPDATE_MULTIPLE) {
+        validators.add(new AttributeConflictValidator("AttributeConflictExists"));
+      } else {
+        validators.add(
+            new RequiredTextValidator(getView().getName(), "AttributeNameIsRequired", Display.FormField.NAME.name()));
+        validators.add(
+            new ConditionValidator(hasValue(getView().getLocalizedValues().getValue()), "AttributeValueIsRequired",
+                Display.FormField.VALUE.name()));
+        validators.add(new ConditionValidator(hasValidNamespace(getView().getNamespaceSuggestBox().getText()),
+            "NamespaceCannotBeEmptyChars", Display.FormField.NAMESPACE.name()));
+        if(dialogMode == Mode.CREATE) validators.add(new UniqueAttributeNameValidator("AttributeAlreadyExists"));
       }
       return validators;
     }
@@ -419,12 +424,21 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
         @Override
         public Boolean getValue() {
           for(LocalizedEditableText localizedText : localizedTexts) {
-            if(!localizedText.getTextBox().getText().isEmpty()) {
+            if(!localizedText.getTextBox().getText().trim().isEmpty()) {
               return true;
             }
           }
 
           return false;
+        }
+      };
+    }
+
+    private HasValue<Boolean> hasValidNamespace(final String namespace) {
+      return new HasBooleanValue() {
+        @Override
+        public Boolean getValue() {
+          return Strings.isNullOrEmpty(namespace) || namespace.trim().length() > 0;
         }
       };
     }
@@ -437,6 +451,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     void setDialogMode(Mode mode);
 
     enum FormField {
+      NAMESPACE,
       NAME,
       VALUE
     }

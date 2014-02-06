@@ -51,7 +51,6 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
@@ -128,7 +127,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   FlowPanel attributesPanel;
 
   @UiField
-  Panel summary;
+  Panel summaryPanel;
 
   @UiField
   SimplePanel values;
@@ -190,21 +189,24 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
     initWidget(uiBinder.createAndBindUi(this));
     initCategoryTable();
-
-    tabPanel.addShownHandler(new TabPanel.ShownEvent.Handler() {
-      @Override
-      public void onShow(TabPanel.ShownEvent event) {
-        if(tabPanel.getSelectedTab() == SUMMARY_TAB_INDEX) {
-          getUiHandlers().onShowSummary();
-        }
-        if(tabPanel.getSelectedTab() == VALUES_TAB_INDEX) {
-          getUiHandlers().onShowValues();
-        }
-      }
-    });
     scriptNavPanel.showWidget(0);
   }
 
+  @UiHandler("tabPanel")
+  void onShown(TabPanel.ShownEvent shownEvent) {
+    if(shownEvent.getTarget() == null) return;
+
+    switch(tabPanel.getSelectedTab()) {
+      case SUMMARY_TAB_INDEX:
+        getUiHandlers().onShowSummary();
+        break;
+      case VALUES_TAB_INDEX:
+        getUiHandlers().onShowValues();
+        break;
+    }
+  }
+
+  @SuppressWarnings("PMD.NcssMethodCount")
   @Override
   public void setInSlot(Object slot, IsWidget content) {
     HasWidgets panel = null;
@@ -220,6 +222,9 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
         break;
       case Permissions:
         panel = permissionsPanel;
+        break;
+      case Summary:
+        panel = summaryPanel;
         break;
     }
     if(panel != null) {
@@ -345,8 +350,8 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   }
 
   @Override
-  public void setSummaryTabWidget(View widget) {
-    summary.add(widget.asWidget());
+  public boolean isValuesTabSelected() {
+    return tabPanel.getSelectedTab() == VALUES_TAB_INDEX;
   }
 
   @Override
@@ -438,6 +443,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   @Override
   public void setDerivedVariable(boolean derived, String value) {
     TabPanelHelper.setTabVisible(tabPanel, SCRIPT_TAB_INDEX, derived);
+    comment.setText("");
     scriptHeaderPanel.setVisible(derived);
     script.setVisible(derived && !value.isEmpty());
     script.setText(value);

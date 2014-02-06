@@ -36,13 +36,6 @@
     </dependency>
     <dependency>
       <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-reporting</artifactId>
-      <classifier>dist</classifier>
-      <scope>runtime</scope>
-      <type>zip</type>
-    </dependency>
-    <dependency>
-      <groupId>org.obiba.opal</groupId>
       <artifactId>opal-r</artifactId>
       <scope>runtime</scope>
     </dependency>

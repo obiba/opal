@@ -38,13 +38,16 @@
         </b:Nav>
       </b:Nav>
     </b:ResponsiveNavbar>
-    <b:FluidContainer addStyleNames="container">
+    <b:FluidContainer addStyleNames="container" ui:field="workbenchContainer">
       <g:SimplePanel ui:field="notification" addStyleNames="top-margin"/>
+      <b:Tooltip text="Full screen" placement="BOTTOM" ui:field="resizeTooltip">
+        <b:Button icon="RESIZE_FULL" size="SMALL" addStyleNames="pull-right" ui:field="resizeScreen"/>
+      </b:Tooltip>
       <g:FlowPanel ui:field="workbench">
       </g:FlowPanel>
     </b:FluidContainer>
     <b:Footer>
-      <b:FluidContainer addStyleNames="container">
+      <b:FluidContainer addStyleNames="container" ui:field="footerContainer">
         <b:FluidRow>
           <b:Column size="6">
             <b:NavLink target="_blank" href="http://obiba.org">© 2013 OBiBa</b:NavLink>

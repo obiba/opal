@@ -98,7 +98,8 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
   }
 
   @Override
-  public void enableDeletion(boolean value) {
+  public void enableEditionDeletion(boolean value) {
+    edit.setVisible(value);
     deleteDatabase.setVisible(value);
   }
 

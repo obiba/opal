@@ -11,28 +11,34 @@ package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
+import org.obiba.opal.web.model.client.math.DefaultSummaryDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
+import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
-import com.gwtplatform.mvp.client.ViewImpl;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 /**
  *
  */
-public class SummaryTabView extends ViewImpl implements SummaryTabPresenter.Display {
+public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> implements SummaryTabPresenter.Display {
 
   @UiTemplate("SummaryTabView.ui.xml")
   interface SummaryTabViewUiBinder extends UiBinder<Widget, SummaryTabView> {}
@@ -56,28 +62,31 @@ public class SummaryTabView extends ViewImpl implements SummaryTabPresenter.Disp
   NumericTextBox limitTextBox;
 
   @UiField
-  Panel refreshPanel;
+  IconAnchor refreshSummaryLink;
 
   @UiField
-  Anchor refreshSummaryLink;
+  IconAnchor fullSummaryLink;
 
   @UiField
-  Panel fullPanel;
-
-  @UiField
-  Anchor fullSummaryLink;
-
-  @UiField
-  Panel cancelPanel;
-
-  @UiField
-  Anchor cancelSummaryLink;
+  IconAnchor cancelSummaryLink;
 
   @UiField
   Panel summary;
 
   public SummaryTabView() {
     uiWidget = uiBinder.createAndBindUi(this);
+
+    limitTextBox.setMaxConstrained(true);
+    limitTextBox.setMaxConstrained(false);
+    limitTextBox.setMin(1);
+    limitTextBox.addKeyUpHandler(new KeyUpHandler() {
+      @Override
+      public void onKeyUp(KeyUpEvent event) {
+        if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+          getUiHandlers().onRefreshSummary();
+        }
+      }
+    });
   }
 
   @Override
@@ -100,6 +109,11 @@ public class SummaryTabView extends ViewImpl implements SummaryTabPresenter.Disp
       CategoricalSummaryDto categorical = dto
           .getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
       summary.add(new CategoricalSummaryView(dto.getResource(), categorical));
+
+    } else if(dto.getExtension(DefaultSummaryDto.SummaryStatisticsDtoExtensions.defaultSummary) != null) {
+      DefaultSummaryDto defaultSummaryDto = dto
+          .getExtension(DefaultSummaryDto.SummaryStatisticsDtoExtensions.defaultSummary).cast();
+      summary.add(new DefaultSummaryView(defaultSummaryDto));
     } else {
       renderNoSummary();
     }
@@ -116,9 +130,6 @@ public class SummaryTabView extends ViewImpl implements SummaryTabPresenter.Disp
     summary.clear();
     summary.add(new Image("image/loading.gif"));
 
-    limitTextBox.setMaxConstrained(true);
-    limitTextBox.setMaxConstrained(false);
-    limitTextBox.setMin(1);
     limitTextBox.setValue(String.valueOf(limit));
     if(limit < entitiesCount) {
       showLimitBox(entitiesCount);
@@ -126,14 +137,14 @@ public class SummaryTabView extends ViewImpl implements SummaryTabPresenter.Disp
       hideLimitBox();
     }
     previewSummary.setVisible(true);
-    cancelPanel.setVisible(true);
+    cancelSummaryLink.setVisible(true);
   }
 
   private void showLimitBox(int entitiesCount) {
     limitTextBox.setVisible(true);
     previewSummaryTextSuffix.setVisible(true);
-    fullPanel.setVisible(false);
-    refreshPanel.setVisible(false);
+    fullSummaryLink.setVisible(false);
+    refreshSummaryLink.setVisible(true);
     previewSummaryText.setText(translations.summaryPreviewPendingLabel());
     previewSummaryTextSuffix
         .setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(entitiesCount)));
@@ -142,26 +153,23 @@ public class SummaryTabView extends ViewImpl implements SummaryTabPresenter.Disp
   private void hideLimitBox() {
     limitTextBox.setVisible(false);
     previewSummaryTextSuffix.setVisible(false);
-    fullPanel.setVisible(false);
-    refreshPanel.setVisible(false);
+    fullSummaryLink.setVisible(false);
+    refreshSummaryLink.setVisible(false);
     previewSummaryText.setText(translations.summaryFullPendingLabel());
   }
 
   @Override
   public void renderSummaryLimit(int limit, int entitiesCount) {
-    if(limit < entitiesCount) {
-      limitTextBox.setValue(String.valueOf(limit));
-
-      previewSummary.setVisible(true);
-      cancelPanel.setVisible(false);
-      refreshPanel.setVisible(true);
-      fullPanel.setVisible(true);
-      previewSummaryText.setText(translations.summaryPreviewOnLabel());
-      previewSummaryTextSuffix
-          .setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(entitiesCount)));
-    } else {
-      previewSummary.setVisible(false);
-    }
+    limitTextBox.setVisible(true);
+    limitTextBox.setValue(String.valueOf(limit));
+    previewSummaryTextSuffix.setVisible(true);
+    previewSummary.setVisible(true);
+    cancelSummaryLink.setVisible(false);
+    refreshSummaryLink.setVisible(true);
+    fullSummaryLink.setVisible(limit < entitiesCount);
+    previewSummaryText.setText(translations.summaryOnLabel());
+    previewSummaryTextSuffix
+        .setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(entitiesCount)));
   }
 
   @Override
@@ -171,33 +179,38 @@ public class SummaryTabView extends ViewImpl implements SummaryTabPresenter.Disp
     limitTextBox.setVisible(true);
 
     previewSummary.setVisible(true);
-    cancelPanel.setVisible(false);
+    cancelSummaryLink.setVisible(false);
     previewSummaryTextSuffix.setVisible(true);
-    fullPanel.setVisible(true);
-    refreshPanel.setVisible(true);
+    fullSummaryLink.setVisible(true);
+    refreshSummaryLink.setVisible(true);
     previewSummaryText.setText(translations.summaryFetchSummaryLabel());
     previewSummaryTextSuffix
         .setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(entitiesCount)));
   }
 
-  @Override
-  public HasClickHandlers getFullSummary() {
-    return fullSummaryLink;
+  @UiHandler("fullSummaryLink")
+  public void onFullSummary(ClickEvent event) {
+    getUiHandlers().onFullSummary();
   }
 
-  @Override
-  public HasClickHandlers getCancelSummary() {
-    return cancelSummaryLink;
+  @UiHandler("cancelSummaryLink")
+  public void onCancelSummary(ClickEvent event) {
+    getUiHandlers().onCancelSummary();
   }
 
-  @Override
-  public HasClickHandlers getRefreshSummary() {
-    return refreshSummaryLink;
+  @UiHandler("refreshSummaryLink")
+  public void onRefreshSummary(ClickEvent event) {
+    getUiHandlers().onRefreshSummary();
   }
 
   @Override
   public Number getLimit() {
     return limitTextBox.getNumberValue();
+  }
+
+  @Override
+  public void setLimit(int limit) {
+    limitTextBox.setText(String.valueOf(limit));
   }
 
   @Override

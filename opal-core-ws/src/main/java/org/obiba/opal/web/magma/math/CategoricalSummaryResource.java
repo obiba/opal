@@ -10,5 +10,5 @@ public interface CategoricalSummaryResource extends SummaryResource {
   @GET
   @POST
   Response get(@QueryParam("distinct") boolean distinct, @QueryParam("offset") Integer offset,
-      @QueryParam("limit") Integer limit);
+      @QueryParam("limit") Integer limit, @QueryParam("resetCache") Boolean resetCache);
 }

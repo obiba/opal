@@ -42,7 +42,8 @@
                     </g:Label>
                   </b:Column>
                   <b:Column size="8">
-                    <o:NumericTextBox ui:field="fromBox" width="6em" minConstrained="false" maxConstrained="false"/>
+                    <o:NumericTextBox ui:field="fromBox" minConstrained="false" maxConstrained="false"
+                        addStyleNames="width-4em"/>
                   </b:Column>
 
                 </b:FluidRow>
@@ -53,7 +54,8 @@
                     </g:Label>
                   </b:Column>
                   <b:Column size="8">
-                    <o:NumericTextBox ui:field="toBox" width="6em" minConstrained="false" maxConstrained="false"/>
+                    <o:NumericTextBox ui:field="toBox" minConstrained="false" maxConstrained="false"
+                        addStyleNames="width-4em"/>
                   </b:Column>
                 </b:FluidRow>
               </b:Well>
@@ -72,7 +74,7 @@
                     </b:RadioButton>
                   </b:Column>
                   <b:Column size="4">
-                    <o:NumericTextBox ui:field="lengthBox" width="4em" value="10" maxConstrained="false"/>
+                    <o:NumericTextBox ui:field="lengthBox" value="10" maxConstrained="false" addStyleNames="width-4em"/>
                   </b:Column>
                 </b:FluidRow>
 
@@ -83,7 +85,7 @@
                     </b:RadioButton>
                   </b:Column>
                   <b:Column size="4">
-                    <o:NumericTextBox ui:field="countBox" width="4em" value="10" maxConstrained="false"/>
+                    <o:NumericTextBox ui:field="countBox" value="10" maxConstrained="false" addStyleNames="width-4em"/>
                   </b:Column>
                 </b:FluidRow>
               </b:Well>
@@ -130,43 +132,60 @@
     <o:WizardStep ui:field="mapStep">
 
       <g:FlowPanel>
-        <o:CollapsiblePanel ui:field="addPanel">
 
-          <b:FluidRow addStyleNames="small-dual-indent">
-            <g:Label>
-              <ui:msg description="Original Value label">Original Value</ui:msg>
-            </g:Label>
+        <o:CollapsiblePanel ui:field="addPanel" addStyleNames="table-full-width">
 
-            <b:RadioButton name="add" ui:field="addRangeRadio" inline="true"
-                addStyleNames="small-dual-indent bottom-margin">
-              <ui:msg description="Range label">Range</ui:msg>
-            </b:RadioButton>
+          <b:Well>
+            <b:FluidRow>
 
-            <o:NumericTextBox ui:field="addFromBox" width="4em" minConstrained="false"
-                maxConstrained="false" addStyleNames="inline"/>
-            <g:InlineLabel addStyleNames="inline">-</g:InlineLabel>
-            <o:NumericTextBox ui:field="addToBox" width="4em" minConstrained="false" maxConstrained="false"
-                addStyleNames="inline"/>
+              <b:Column size="6">
+                <g:Label>
+                  <ui:msg description="Original Value label">Original Value</ui:msg>
+                </g:Label>
+              </b:Column>
 
-            <b:RadioButton name="add" ui:field="addDiscreteRadio" inline="true"
-                addStyleNames="small-dual-indent bottom-margin">
-              <ui:msg description="Value label">Value</ui:msg>
-            </b:RadioButton>
-            <o:NumericTextBox ui:field="valueBox" width="4em" enabled="false" minConstrained="false"
-                maxConstrained="false" addStyleNames="inline"/>
+              <b:Column size="6">
+                <g:Label>
+                  <ui:msg description="New Value label">New Value</ui:msg>
+                </g:Label>
+              </b:Column>
 
-          </b:FluidRow>
-          <b:FluidRow addStyleNames="small-dual-indent">
-            <g:Label>
-              <ui:msg description="New Value label">New Value</ui:msg>
-            </g:Label>
-            <g:TextBox ui:field="newValueBox" width="6em"/>
+            </b:FluidRow>
+            <b:FluidRow>
 
-            <g:Button styleName="btn btn-info" ui:field="addButton" addStyleNames="small-dual-indent bottom-margin">
-              <ui:msg description="Add label">Add</ui:msg>
-            </g:Button>
+              <b:Column size="6">
+                <b:RadioButton name="add" ui:field="addRangeRadio" inline="true"
+                    addStyleNames="small-dual-indent bottom-margin">
+                  <ui:msg description="Range label">Range</ui:msg>
+                </b:RadioButton>
+                <o:NumericTextBox ui:field="addFromBox" minConstrained="false"
+                    maxConstrained="false" addStyleNames="inline width-4em"/>
+                <g:InlineLabel addStyleNames="inline">-</g:InlineLabel>
+                <o:NumericTextBox ui:field="addToBox" minConstrained="false" maxConstrained="false"
+                    addStyleNames="inline width-4em"/>
+              </b:Column>
 
-          </b:FluidRow>
+              <b:Column size="6">
+                <g:TextBox ui:field="newValueBox" width="6em"/>
+                <g:Button styleName="btn btn-info" ui:field="addButton" addStyleNames="small-dual-indent bottom-margin">
+                  <ui:msg description="Add label">Add</ui:msg>
+                </g:Button>
+              </b:Column>
+
+            </b:FluidRow>
+            <b:FluidRow>
+
+              <b:Column size="6">
+                <b:RadioButton name="add" ui:field="addDiscreteRadio"
+                    addStyleNames="small-dual-indent bottom-margin" inline="true">
+                  <ui:msg description="Value label">Value</ui:msg>
+                </b:RadioButton>
+                <o:NumericTextBox ui:field="valueBox" enabled="false" minConstrained="false"
+                    maxConstrained="false" addStyleNames="inline width-4em"/>
+              </b:Column>
+
+            </b:FluidRow>
+          </b:Well>
         </o:CollapsiblePanel>
 
       </g:FlowPanel>

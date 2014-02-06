@@ -12,6 +12,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.r.service.OpalRSession;
 
 public interface RSymbolResource {
@@ -19,6 +20,8 @@ public interface RSymbolResource {
   void setName(String name);
 
   void setOpalRSession(OpalRSession rSession);
+
+  void setIdentifiersTableService(IdentifiersTableService identifiersTableService);
 
   String getName();
 
@@ -37,7 +40,7 @@ public interface RSymbolResource {
   @PUT
   @Consumes("application/x-opal")
   Response putMagma(@Context UriInfo uri, String path, @QueryParam("variables") String variableFilter,
-      @QueryParam("missings") @DefaultValue("false") Boolean missings);
+      @QueryParam("missings") @DefaultValue("false") Boolean missings, @QueryParam("identifiers") String identifiers);
 
   @DELETE
   Response rm();

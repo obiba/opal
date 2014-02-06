@@ -23,22 +23,21 @@ import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
 /**
  *
  */
-public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Display> {
+public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Display> implements SummaryTabUiHandlers {
 
-  private final static int DEFAULT_LIMIT = 500;
+  public final static int DEFAULT_LIMIT = 500;
 
   private final static int MIN_LIMIT = 10;
 
@@ -52,23 +51,18 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
 
   private int entitiesCount;
 
+  private HandlerRegistration handlerRegistration;
+
   @Inject
   public SummaryTabPresenter(EventBus eventBus, Display display) {
     super(eventBus, display);
+    getView().setUiHandlers(this);
   }
 
   @Override
-  protected void onBind() {
-    registerHandler(getEventBus().addHandler(SummaryRequiredEvent.getType(), new DeferredSummaryRequestHandler()));
-
-    // Summary: Get full summary
-    registerHandler(getView().getFullSummary().addClickHandler(new FullSummaryHandler()));
-
-    // Summary: Cancel summary
-    registerHandler(getView().getCancelSummary().addClickHandler(new CancelSummaryHandler()));
-
-    // Summary: Refresh summary
-    registerHandler(getView().getRefreshSummary().addClickHandler(new RefreshSummaryHandler()));
+  protected void onReveal() {
+    handlerRegistration = getEventBus().addHandler(SummaryRequiredEvent.getType(), new DeferredSummaryRequestHandler());
+    registerHandler(handlerRegistration);
 
     // Variable Script refreshed
     addRegisteredHandler(VariableRefreshEvent.getType(), new VariableRefreshEvent.Handler() {
@@ -80,10 +74,68 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
   }
 
   @Override
+  protected void onHide() {
+    super.onHide();
+    handlerRegistration.removeHandler();
+  }
+
+  @Override
   public void onReset() {
     if(!hasSummaryOrPendingRequest()) {
       requestSummary();
     }
+  }
+
+  @Override
+  public void onFullSummary() {
+    getView().setLimit(entitiesCount);
+    cancelPendingSummaryRequest();
+    // Remove queries from the url
+    String uri = resourceRequestBuilder.getResource();
+    if(uri.indexOf("?") > 0) {
+      uri = uri.substring(0, uri.indexOf("?"));
+    }
+    // If transient variable, the method is POST
+    if(uri.contains("/_transient/")) {
+      resourceRequestBuilder.forResource(uri).post();
+    } else {
+      resourceRequestBuilder.forResource(uri).get();
+    }
+
+    limit = entitiesCount;
+    onReset();
+  }
+
+  @Override
+  public void onCancelSummary() {
+    cancelPendingSummaryRequest();
+    getView().renderCancelSummaryLimit(limit < entitiesCount ? limit : Math.min(DEFAULT_LIMIT, entitiesCount),
+        entitiesCount);
+  }
+
+  @Override
+  public void onRefreshSummary() {
+    cancelPendingSummaryRequest();
+
+    limit = getView().getLimit().intValue();
+    if(limit < Math.min(MIN_LIMIT, entitiesCount)) {
+      limit = Math.min(MIN_LIMIT, entitiesCount);
+    }
+    String uri = resourceRequestBuilder.getResource();
+    uri = uri.substring(0, uri.indexOf("?") > 0 ? uri.indexOf("?") : uri.length());
+
+    // If transient variable, the method is POST
+    if(uri.contains("/_transient/")) {
+      resourceRequestBuilder
+          .forResource(limit >= entitiesCount ? uri + "?resetCache=true" : uri + "?limit=" + limit + "&resetCache=true")
+          .post();
+    } else {
+      resourceRequestBuilder
+          .forResource(limit >= entitiesCount ? uri + "?resetCache=true" : uri + "?limit=" + limit + "&resetCache=true")
+          .get();
+    }
+
+    onReset();
   }
 
   public void forgetSummary() {
@@ -102,17 +154,23 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     if(limit < entitiesCount) {
       uri.query("limit", String.valueOf(limit));
     }
+
     resourceRequestBuilder = ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()
         .forResource(uri.build(args)).get();
 
     limit = Math.min(entitiesCount, limit);
   }
 
-  public void setRequestBuilder(ResourceRequestBuilder<SummaryStatisticsDto> resourceRequestBuilder) {
+  public void setRequestBuilder(ResourceRequestBuilder<SummaryStatisticsDto> resourceRequestBuilder,
+      int entitiesCount) {
     this.resourceRequestBuilder = resourceRequestBuilder;
+    this.entitiesCount = entitiesCount;
+
+    limit = Math.min(entitiesCount, limit);
   }
 
   private void requestSummary() {
+    if(resourceRequestBuilder == null) return;
     getView().requestingSummary(limit, entitiesCount);
     summaryRequest = resourceRequestBuilder //
         .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
@@ -153,8 +211,21 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     return summary != null || summaryRequest != null && summaryRequest.isPending();
   }
 
+  public void setLimit(int limit) {
+    this.limit = limit;
+    getView().setLimit(limit);
+  }
+
+  public void init() {
+    // Reset limit to the default limit only if it was the full summary
+    if(limit == entitiesCount) {
+      limit = DEFAULT_LIMIT;
+    }
+    onReset();
+  }
+
   @SuppressWarnings("ParameterHidesMemberVariable")
-  public interface Display extends View {
+  public interface Display extends View, HasUiHandlers<SummaryTabUiHandlers> {
 
     void requestingSummary(int limit, int entitiesCount);
 
@@ -166,13 +237,9 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
 
     void renderCancelSummaryLimit(int limit, int entitiesCount);
 
-    HasClickHandlers getFullSummary();
-
-    HasClickHandlers getCancelSummary();
-
-    HasClickHandlers getRefreshSummary();
-
     Number getLimit();
+
+    void setLimit(int limit);
 
     void hideSummaryPreview();
   }
@@ -181,58 +248,11 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
 
     @Override
     public void onSummaryRequest(SummaryRequiredEvent event) {
-      cancelPendingSummaryRequest();
+      getView().setLimit(DEFAULT_LIMIT);
       setResourceUri(event.getResourceUri(), event.getMax() == null ? DEFAULT_LIMIT : event.getMax(), event.getArgs());
+      requestSummary();
     }
 
   }
 
-  private final class FullSummaryHandler implements ClickHandler {
-    @Override
-    public void onClick(ClickEvent event) {
-      cancelPendingSummaryRequest();
-      // Remove queries from the url
-      String uri = resourceRequestBuilder.getResource();
-      if(uri.indexOf("?") > 0) {
-        uri = uri.substring(0, uri.indexOf("?"));
-      }
-      resourceRequestBuilder.forResource(uri).get();
-      limit = entitiesCount;
-      onReset();
-    }
-  }
-
-  private final class CancelSummaryHandler implements ClickHandler {
-    @Override
-    public void onClick(ClickEvent event) {
-      cancelPendingSummaryRequest();
-      getView().renderCancelSummaryLimit(limit < entitiesCount ? limit : Math.min(DEFAULT_LIMIT, entitiesCount),
-          entitiesCount);
-
-      // If canceling from a full summary, automatically fetch for limit, else, do nothing
-      if(!resourceRequestBuilder.getResource().contains("limit")) {
-        refreshSummary();
-      }
-    }
-  }
-
-  private final class RefreshSummaryHandler implements ClickHandler {
-    @Override
-    public void onClick(ClickEvent event) {
-      cancelPendingSummaryRequest();
-      refreshSummary();
-    }
-  }
-
-  private void refreshSummary() {
-    limit = getView().getLimit().intValue();
-    if(limit < Math.min(MIN_LIMIT, entitiesCount)) {
-      limit = Math.min(MIN_LIMIT, entitiesCount);
-    }
-    String uri = resourceRequestBuilder.getResource();
-    uri = uri.substring(0, uri.indexOf("?") > 0 ? uri.indexOf("?") : uri.length());
-    resourceRequestBuilder.forResource(limit >= entitiesCount ? uri : uri + "?limit=" + limit).get();
-
-    onReset();
-  }
 }

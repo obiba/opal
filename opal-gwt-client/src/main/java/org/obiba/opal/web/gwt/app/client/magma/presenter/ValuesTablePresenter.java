@@ -104,11 +104,11 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     getView().setUiHandlers(this);
   }
 
-  public void setTable(TableDto table) {
-    setTable(table, "");
-  }
-
   public void setTable(TableDto table, VariableDto variable) {
+    if(fetcher == null) {
+      getView().setValueSetsFetcher(fetcher = new DataFetcherImpl());
+    }
+
     if(originalTable == null || !originalTable.getLink().equals(table.getLink())) {
       getView().getFiltersPanel().clear();
     }
@@ -119,11 +119,10 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     JsArray<VariableDto> variables = JsArray.createArray().cast();
     variables.push(variable);
     getView().setVariables(variables);
-    currentVariablesFilterSelect = "";
     fetchIndexSchema();
   }
 
-  public void setTable(final TableDto table, String select) {
+  public void setTable(final TableDto table) {
     // Clear filters when table has changed
     if(originalTable == null || !originalTable.getLink().equals(table.getLink())) {
       getView().getFiltersPanel().clear();
@@ -140,6 +139,32 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
             .revealPlace(ProjectPlacesHelper.getVariablePlace(table.getDatasourceName(), table.getName(), value));
       }
     });
+  }
+
+  /**
+   * When showing values from the VariablePresenter, we don't have to set/reset the filter
+   *
+   * @param select
+   */
+  public void updateValuesDisplay() {
+    updateValuesDisplay("");
+  }
+
+  /**
+   * When showing values tab from the TablePresenter, we have to copy the filter that
+   * may have been set on the TablePresenter
+   *
+   * @param select
+   */
+  public void updateValuesDisplay(String select) {
+    if(fetcher == null) {
+      getView().setValueSetsFetcher(fetcher = new DataFetcherImpl());
+    }
+
+    if(!select.isEmpty()) {
+      getView().getFilter().setText(select);
+    }
+
     fetcher.updateVariables(select);
     currentVariablesFilterSelect = "";
     fetchIndexSchema();
@@ -152,8 +177,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   @Override
   protected void onBind() {
     super.onBind();
-    getView().setValueSetsFetcher(fetcher = new DataFetcherImpl());
-    getView().addEntitySearchHandler(new EntitySearchHandlerImpl());
 
     registerHandler(getView().getFilter().getClear().addClickHandler(new ClickHandler() {
       @Override
@@ -161,6 +184,11 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         fetcher.updateVariables(getView().getFilter().getTextBox().getText());
       }
     }));
+  }
+
+  @Override
+  protected void onReveal() {
+    getView().addEntitySearchHandler(new EntitySearchHandlerImpl());
   }
 
   public void setViewMode(ViewMode mode) {
@@ -210,8 +238,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
               .query("select", currentVariablesFilterSelect)//
               .query("offset", String.valueOf(offset))//
               .query("limit", String.valueOf(getView().getPageSize()))//
-              .build(originalTable.getDatasourceName(), originalTable.getName()))
-          .withCallback(new ResourceCallback<ValueSetsResultDto>() {
+              .build(originalTable.getDatasourceName(), originalTable.getName())).withCallback(
+          new ResourceCallback<ValueSetsResultDto>() {
             @Override
             public void onResource(Response response, ValueSetsResultDto resource) {
 
@@ -247,9 +275,9 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   private void fetchIndexSchema() {
     // Show Values Filter when ES is enabled
     ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder().forResource(
-        UriBuilders.DATASOURCE_TABLE_INDEX.create().build(originalTable.getDatasourceName(), originalTable.getName()))
-        .withCallback(new ESUnavailableCallback(), SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN, SC_NOT_FOUND,
-            SC_SERVICE_UNAVAILABLE)//
+        UriBuilders.DATASOURCE_TABLE_INDEX.create()
+            .build(originalTable.getDatasourceName(), originalTable.getName())).withCallback(
+        new ESUnavailableCallback(), SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN, SC_NOT_FOUND, SC_SERVICE_UNAVAILABLE)//
         .withCallback(new ESAvailableCallback()).get().send();
   }
 
@@ -480,14 +508,15 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
                 variablesRequest = null;
               }
               getView().clearTable();
-              variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(link)
-                  .get()//
+              variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder()
+                  .forResource(link).get()//
                   .withCallback(new VariablesDtoResourceCallback(originalTable.getLink()))
                   .withCallback(Response.SC_BAD_REQUEST, new BadRequestCallback() {
                     @Override
                     public void onResponseCode(Request request, Response response) {
                       notifyError(response);
                       setTable(originalTable);
+                      updateValuesDisplay(currentVariablesFilterSelect);
                     }
                   }).send();
             }

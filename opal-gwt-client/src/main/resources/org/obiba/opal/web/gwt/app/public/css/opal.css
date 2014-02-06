@@ -21,6 +21,10 @@ li {
  * Opal
  */
 
+.sortable-header-column {
+  cursor: pointer;
+}
+
 .project-tag {
   margin-right: 2px;
 }
@@ -83,6 +87,10 @@ li.no-icon > a {
 .large-dual-indent {
   margin-left: 30px;
   margin-right: 30px;
+}
+
+.neg-top-margin {
+  margin-top: -10px;
 }
 
 .no-top-margin {
@@ -379,8 +387,37 @@ td.row-actions span {
 /*
  * Chooser
  */
-.chooser + div {
+.chooser {
   margin-bottom: 10px;
+}
+
+.chooser > ul {
+  background-image: none !important;
+  border: 2px solid #DCE4EC !important;
+  border-radius: 6px 6px 6px 6px;
+  box-shadow: none !important;
+  padding: 4px 6px !important;
+  text-indent: 1px;
+}
+
+.chooser > ul > li {
+  margin-top: 4px !important;
+  margin-right: 3px !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+ul.chooser-options {
+  background-color: #2c3e50 !important;
+  margin-top: 2px;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+}
+
+ul.chooser-options > li {
+  color: #FFFFFF;
+  font-weight: bold;
 }
 
 /*
@@ -471,6 +508,28 @@ td.row-actions span {
 
 .database-url-example {
   padding-left: 3px;
+}
+
+/* for NumericTextBox in an alert box (variable summary)*/
+.summary-numeric-textbox {
+  margin-bottom: 0 !important;
+  padding: 2px 4px !important;
+  width: 4em;
+}
+
+/* CollapsiblePanel table full width for derivation wizard*/
+.table-half-width > table {
+  width: 50%;
+}
+
+.table-full-width > table {
+  width: 100%;
+}
+
+.width-4em {
+  width: 4em;
+}
+
 }
 
 a.bookmark,

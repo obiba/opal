@@ -31,12 +31,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class OpalGitVersionControlSystem implements OpalVersionControlSystem {
 
-  private static final String GIT_ROOT_PATH = "/data/git/views";
+  private static final String GIT_ROOT_PATH = "data" + File.separator + "git" + File.separator +
+      "views";
 
   private final File repoPath;
 
   public OpalGitVersionControlSystem() {
-    this(new File(System.getProperty("OPAL_HOME") + GIT_ROOT_PATH));
+    this(new File(System.getProperty("OPAL_HOME"), GIT_ROOT_PATH));
   }
 
   public OpalGitVersionControlSystem(File repoPath) {
@@ -74,6 +75,9 @@ public class OpalGitVersionControlSystem implements OpalVersionControlSystem {
 
   public Repository getRepository(String name) {
     File repo = GitUtils.getGitDirectoryName(repoPath, name);
+    if(!repo.exists()) {
+      throw new NoSuchGitRepositoryException(name);
+    }
     FileRepositoryBuilder builder = new FileRepositoryBuilder();
     try {
       return builder.setGitDir(repo).readEnvironment().findGitDir().build();

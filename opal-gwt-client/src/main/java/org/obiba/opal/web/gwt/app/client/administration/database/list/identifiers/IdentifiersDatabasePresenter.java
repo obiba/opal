@@ -80,7 +80,7 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
         if(dto.getUsedForIdentifiers()) {
           databaseDto = dto;
           getView().setDatabase(dto);
-          getView().enableDeletion(true);
+          getView().enableEditionDeletion(true);
         }
       }
     });
@@ -181,17 +181,17 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
           public void onResource(Response response, @Nullable JsArray<TableDto> tables) {
             for(TableDto table : JsArrays.toIterable(tables)) {
               if(table.getValueSetCount() > 0) {
-                getView().enableDeletion(false);
+                getView().enableEditionDeletion(false);
                 return;
               }
             }
-            getView().enableDeletion(false);
+            getView().enableEditionDeletion(true);
           }
         }) //
         .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            getView().enableDeletion(false);
+            getView().enableEditionDeletion(false);
           }
         }).get().send();
   }
@@ -200,7 +200,7 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
 
     void setDatabase(@Nullable DatabaseDto database);
 
-    void enableDeletion(boolean value);
+    void enableEditionDeletion(boolean value);
   }
 
 }

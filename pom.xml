@@ -975,47 +975,6 @@
         <version>${gwt-log.version}</version>
       </dependency>
 
-      <!-- BIRT dependencies -->
-      <dependency>
-        <groupId>org.obiba.opal.oda</groupId>
-        <artifactId>org.obiba.opal.oda.runtime</artifactId>
-        <version>${opal-oda.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.obiba.opal.oda</groupId>
-        <artifactId>update-site</artifactId>
-        <version>${opal-oda.version}</version>
-        <scope>provided</scope>
-        <type>zip</type>
-        <classifier>assembly</classifier>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.birt</groupId>
-        <artifactId>birt-coreapi</artifactId>
-        <version>${birt.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.birt</groupId>
-        <artifactId>birt-modelapi</artifactId>
-        <version>${birt.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.birt</groupId>
-        <artifactId>birt-engineapi</artifactId>
-        <version>${birt.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.birt</groupId>
-        <artifactId>birt-report-engine</artifactId>
-        <version>${birt.version}</version>
-        <scope>provided</scope>
-        <type>zip</type>
-      </dependency>
-
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId>
@@ -1670,7 +1629,6 @@
     <maven.compiler.source>1.7</maven.compiler.source>
     <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
 
-    <birt.version>2.6.2</birt.version>
     <bouncycastle.version>1.46</bouncycastle.version>
     <!-- don't upgrade to 3.0 or EasyMock & Spring will failed -->
     <cglib-nodep.version>2.2.2</cglib-nodep.version>

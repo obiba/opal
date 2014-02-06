@@ -8,9 +8,9 @@ import org.apache.commons.configuration.PropertiesConfigurationLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Opal2DatabaseConfigurator {
+public class Opal2PropertiesConfigurator {
 
-  private static final Logger log = LoggerFactory.getLogger(Opal2DatabaseConfigurator.class);
+  private static final Logger log = LoggerFactory.getLogger(Opal2PropertiesConfigurator.class);
 
   private static final String URL = "org.obiba.opal.datasource.url";
 
@@ -24,16 +24,19 @@ public class Opal2DatabaseConfigurator {
 
   private static final String DRIVER = "org.obiba.opal.datasource.driver";
 
+  private static final String R_EXEC = "org.obiba.opal.R.exec";
+
   @NotNull
   private final String propertiesFile;
 
-  public Opal2DatabaseConfigurator() {
+  public Opal2PropertiesConfigurator() {
     propertiesFile = getPropertiesFile();
   }
 
-  public void configureDatabase() {
+  public void upgrade() {
     try {
-      addOpalConfigProperties();
+      addOpalDatabaseConfigProperties();
+      addRServerConfigProperties();
     } catch(ConfigurationException e) {
       throw new RuntimeException(e);
     }
@@ -43,7 +46,18 @@ public class Opal2DatabaseConfigurator {
     return System.getenv().get("OPAL_HOME") + "/conf/opal-config.properties";
   }
 
-  private void addOpalConfigProperties() throws ConfigurationException {
+  private void addRServerConfigProperties() throws ConfigurationException {
+    log.debug("Configure R server");
+    PropertiesConfiguration config = new PropertiesConfiguration(propertiesFile);
+    PropertiesConfigurationLayout layout = config.getLayout();
+    layout.setFooterComment("\nR executable for starting Rserve\n" +
+        "Default is unix standard R executable path\n" +
+        "(set to blank or specify a Rserve host to disable R server process management)\n" +
+        R_EXEC + "=/usr/bin/R");
+    config.save(propertiesFile);
+  }
+
+  private void addOpalDatabaseConfigProperties() throws ConfigurationException {
     log.debug("Configure new opal-config database");
     PropertiesConfiguration config = new PropertiesConfiguration(propertiesFile);
     PropertiesConfigurationLayout layout = config.getLayout();

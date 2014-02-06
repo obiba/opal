@@ -39,7 +39,7 @@ public enum VariableDtoNature {
     if(JsArrays.toSafeArray(variable.getCategoriesArray()).length() > 0) {
       return areAllCategoriesMissing(variable) ? CONTINUOUS : CATEGORICAL;
     }
-    if("integer".equals(variable.getValueType()) || "double".equals(variable.getValueType())) {
+    if("integer".equals(variable.getValueType()) || "decimal".equals(variable.getValueType())) {
       return CONTINUOUS;
     }
     if("date".equals(variable.getValueType()) || "datetime".equals(variable.getValueType())) {
@@ -48,7 +48,7 @@ public enum VariableDtoNature {
     if("boolean".equals(variable.getValueType())) {
       return CATEGORICAL;
     }
-    if("polygon".equals(variable.getValueType()) || "line".equals(variable.getValueType()) ||
+    if("polygon".equals(variable.getValueType()) || "linestring".equals(variable.getValueType()) ||
         "point".equals(variable.getValueType())) {
       return GEO;
     }

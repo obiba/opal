@@ -75,6 +75,8 @@ public class ProjectPermissionsView extends ViewWithUiHandlers<ProjectPermission
   @UiField
   Paragraph emptyHelp;
 
+  private static final int SORTABLE_COLUMN_TYPE = 1;
+
   private final static Translations translations = GWT.create(Translations.class);
 
   private final ListDataProvider<Acl> permissionsDataProvider = new ListDataProvider<Acl>();
@@ -103,10 +105,10 @@ public class ProjectPermissionsView extends ViewWithUiHandlers<ProjectPermission
   @Override
   public void initializeTable(ProjectPermissionsPresenter.NodeToPlaceMapper nodeToPlaceMapper,
       ProjectPermissionsPresenter.NodeNameFormatter formatter,
-      ProjectPermissionsPresenter.NodeToTypeMapper nodeToTypeMappert, Comparator<Acl> resourceTypeComparator) {
+      ProjectPermissionsPresenter.NodeToTypeMapper nodeToTypeMapper, Comparator<Acl> resourceTypeComparator) {
 
     tablePager.setDisplay(permissionsTable);
-    typeColumn = new TypeColumn(nodeToTypeMappert);
+    typeColumn = new TypeColumn(nodeToTypeMapper);
     permissionsTable.addColumn(new ResourceColumn(nodeToPlaceMapper, formatter), translations.resourceLabel());
     permissionsTable.addColumn(typeColumn, translations.typeLabel());
     permissionsTable.addColumn(ProjectPermissionColumns.PERMISSION, translations.permissionLabel());
@@ -114,6 +116,7 @@ public class ProjectPermissionsView extends ViewWithUiHandlers<ProjectPermission
     permissionsDataProvider.addDataDisplay(permissionsTable);
     typeSortHandler = new ColumnSortEvent.ListHandler<Acl>(permissionsDataProvider.getList());
     typeSortHandler.setComparator(typeColumn, resourceTypeComparator);
+    permissionsTable.getHeader(SORTABLE_COLUMN_TYPE).setHeaderStyleNames("addColumnSortHandler");
     permissionsTable.addColumnSortHandler(typeSortHandler);
   }
 
@@ -156,7 +159,7 @@ public class ProjectPermissionsView extends ViewWithUiHandlers<ProjectPermission
       if(container.getWidget(i) instanceof NavLink) {
         NavLink link = (NavLink) container.getWidget(i);
         // must trim because NavLink adds some spaces
-        if (link.getText().trim().equals(subject.getPrincipal())) {
+        if(link.getText().trim().equals(subject.getPrincipal())) {
           link.setActive(true);
           return;
         }

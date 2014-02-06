@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.ui.CloseableList.ItemRemovedHandler;
 
 import com.github.gwtbootstrap.client.ui.TextBox;
@@ -97,6 +99,10 @@ public class SuggestListBox extends FocusPanel {
     add(content);
   }
 
+  public TextBox getTextBox() {
+    return textBox;
+  }
+
   public void setUpdaterCallback(final Typeahead.UpdaterCallback updaterCallback) {
     this.updaterCallback = new Typeahead.UpdaterCallback() {
       @Override
@@ -107,6 +113,10 @@ public class SuggestListBox extends FocusPanel {
       }
     };
     aheadBox.setUpdaterCallback(this.updaterCallback);
+  }
+
+  public List<String> getSelectedItemsTexts() {
+    return closeables.getItemTexts();
   }
 
   private void rebuildSuggestBox() {

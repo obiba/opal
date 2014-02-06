@@ -31,14 +31,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class ContinuousSummaryResourceImpl extends AbstractSummaryResource implements ContinuousSummaryResource {
 
   @Override
-  public Response get(Distribution distribution, List<Double> percentiles, int intervals, Integer offset,
-      Integer limit) {
+  public Response get(Distribution distribution, List<Double> percentiles, int intervals, Integer offset, Integer limit,
+      Boolean resetCache) {
 
     ContinuousVariableSummaryFactory summaryFactory = new ContinuousVariableSummaryFactory.Builder()
         .variable(getVariable()).table(getValueTable()).valueSource(getVariableValueSource()).distribution(distribution)
         .percentiles(percentiles).intervals(intervals).offset(offset).limit(limit).build();
 
-    ContinuousVariableSummary summary = variableStatsService.getContinuousSummary(summaryFactory);
+    ContinuousVariableSummary summary = variableStatsService
+        .getContinuousSummary(summaryFactory, resetCache != null && resetCache);
 
     SummaryStatisticsDto dto = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //

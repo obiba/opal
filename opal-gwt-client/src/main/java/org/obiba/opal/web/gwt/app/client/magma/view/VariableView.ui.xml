@@ -169,7 +169,7 @@
         <o:TabDeckPanel ui:field="scriptNavPanel" animationEnabled="false" addStyleNames="top-margin">
           <g:FlowPanel>
             <g:FlowPanel>
-              <b:CodeBlock ui:field="script"></b:CodeBlock>
+              <b:CodeBlock ui:field="script"/>
             </g:FlowPanel>
           </g:FlowPanel>
 
@@ -201,7 +201,7 @@
       </b:Tab>
 
       <b:Tab heading="Summary">
-        <g:SimplePanel ui:field="summary"/>
+        <g:SimplePanel ui:field="summaryPanel"/>
       </b:Tab>
 
       <b:Tab heading="Values">

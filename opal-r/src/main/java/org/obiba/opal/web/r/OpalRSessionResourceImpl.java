@@ -12,6 +12,7 @@ package org.obiba.opal.web.r;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.r.StringAssignROperation;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
@@ -38,6 +39,9 @@ public class OpalRSessionResourceImpl extends AbstractOpalRSessionResource imple
 
   @Autowired
   private ApplicationContext applicationContext;
+
+  @Autowired
+  private IdentifiersTableService identifiersTableService;
 
   private OpalRSession rSession;
 
@@ -93,6 +97,7 @@ public class OpalRSessionResourceImpl extends AbstractOpalRSessionResource imple
         .getBean("securedRSymbolResource", SecuredRSymbolResource.class);
     resource.setName(name);
     resource.setOpalRSession(rSession);
+    resource.setIdentifiersTableService(identifiersTableService);
     return resource;
   }
 

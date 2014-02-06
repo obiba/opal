@@ -59,7 +59,8 @@ case "$1" in
       fi
 
       chown -R opal:adm /var/lib/opal /var/log/opal /etc/opal /tmp/opal
-      chmod -R 750      /var/lib/opal /var/log/opal /etc/opal /tmp/opal
+      chmod -R 750      /var/lib/opal /var/log/opal /etc/opal/ /tmp/opal
+      find /etc/opal/ -type f | xargs chmod 640
 
       # if upgrading to 2.0, delete old log4j config
       if [ -f "/etc/opal/log4j.properties" ]; then
@@ -68,6 +69,7 @@ case "$1" in
 
       # if upgrading to 2.0, move opal-config.xml to data dir
       if [ -f "/etc/opal/opal-config.xml" ]; then
+        cp /etc/opal/opal-config.xml /etc/opal/opal-config.xml.opal1
         mv /etc/opal/opal-config.xml /var/lib/opal/data/opal-config.xml
       fi
 

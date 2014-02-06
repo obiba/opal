@@ -93,8 +93,6 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
 
     String getDesignFile();
 
-    String getFormat();
-
     HasText getSchedule();
 
     HasValue<Boolean> isScheduled();
@@ -135,7 +133,7 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
     validators.add(
         new RequiredTextValidator(getView().getName(), "ReportTemplateNameIsRequired", Display.FormField.NAME.name()));
 
-    validators.add(new ConditionValidator(fileExtensionCondition(), "BirtReportDesignFileIsRequired",
+    validators.add(new ConditionValidator(fileExtensionCondition(), "RReportDesignFileIsRequired",
         Display.FormField.TEMPLATE_FILE.name()));
 
     validators.add(new ConditionValidator(cronCondition(getView().isScheduled(), getView().getSchedule()),
@@ -149,7 +147,7 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
     return new HasBooleanValue() {
       @Override
       public Boolean getValue() {
-        return getView().getDesignFile().toLowerCase().endsWith(".rptdesign");
+        return getView().getDesignFile().endsWith(".Rmd");
       }
     };
   }
@@ -283,11 +281,11 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
     if(schedule != null && schedule.trim().length() > 0) {
       reportTemplate.setCron(getView().getSchedule().getText());
     }
-    reportTemplate.setFormat(getView().getFormat());
     reportTemplate.setDesign(getView().getDesignFile());
     for(String email : emailSelectorPresenter.getView().getItems()) {
       reportTemplate.addEmailNotification(email);
     }
+    reportTemplate.setFormat("html");
     ParameterDto parameterDto;
     for(String parameterStr : parametersSelectorPresenter.getView().getItems()) {
       parameterDto = ParameterDto.create();
@@ -299,11 +297,11 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
   }
 
   private String getParameterKey(String parameterStr) {
-    return parameterStr.split("=")[0];
+    return parameterStr.split("=")[0].trim();
   }
 
   private String getParameterValue(String parameterStr) {
-    return parameterStr.split("=")[1];
+    return parameterStr.split("=")[1].trim();
   }
 
   private void doUpdateReportTemplate() {
@@ -354,7 +352,7 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
       setDialogMode(Mode.CREATE);
     } else {
       setDialogMode(Mode.UPDATE);
-      if (reportTemplate.hasProject()) project = reportTemplate.getProject();
+      if(reportTemplate.hasProject()) project = reportTemplate.getProject();
       getView().setReportTemplate(reportTemplate);
       emailSelectorPresenter.getView().setItems(JsArrays.toIterable(reportTemplate.getEmailNotificationArray()));
       parametersSelectorPresenter.getView().setItems(Iterables

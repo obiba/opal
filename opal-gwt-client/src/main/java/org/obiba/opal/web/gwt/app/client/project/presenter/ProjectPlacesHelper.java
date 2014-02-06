@@ -57,6 +57,13 @@ public class ProjectPlacesHelper {
         .build();
   }
 
+  public static PlaceRequest getTablesPlace(String project) {
+    return new PlaceRequest.Builder().nameToken(Places.PROJECT) //
+        .with(ParameterTokens.TOKEN_NAME, project) //
+        .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString()) //
+        .build();
+  }
+
   public static PlaceRequest getReportsPlace(String project) {
     return new PlaceRequest.Builder().nameToken(Places.PROJECT) //
         .with(ParameterTokens.TOKEN_NAME, project) //

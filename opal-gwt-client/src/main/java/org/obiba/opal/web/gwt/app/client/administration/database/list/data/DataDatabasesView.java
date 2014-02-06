@@ -31,7 +31,6 @@ import com.google.gwt.view.client.RowCountChangeEvent;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
-import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 
 public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandlers>
@@ -172,7 +171,7 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
 
       @Override
       public String[] allActions() {
-        return new String[] { TEST_ACTION, EDIT_ACTION, DELETE_ACTION };
+        return new String[] { TEST_ACTION, EDIT_ACTION, UNREGISTER_ACTION };
       }
 
       @Override

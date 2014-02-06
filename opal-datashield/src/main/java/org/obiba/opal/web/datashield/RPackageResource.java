@@ -63,7 +63,7 @@ public abstract class RPackageResource {
 
   protected RScriptROperation getInstalledPackages(Iterable<String> fields) {
     Iterable<String> allFields = Iterables.concat(Arrays.asList(defaultFields), fields);
-    String fieldStr = StringUtils.collectionToDelimitedString(Lists.newArrayList(allFields), ",", "\"", "\"");
+    String fieldStr = StringUtils.collectionToDelimitedString(Lists.newArrayList(allFields), ",", "'", "'");
     String cmd = "installed.packages(fields=c(" + fieldStr + "))";
     return execute(cmd);
   }

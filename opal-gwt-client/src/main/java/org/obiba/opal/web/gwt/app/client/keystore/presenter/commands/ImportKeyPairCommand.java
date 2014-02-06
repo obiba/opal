@@ -43,15 +43,14 @@ public class ImportKeyPairCommand extends AbstractKeystoreCommand {
       ResourceRequestBuilderFactory.newBuilder() //
           .forResource(url) //
           .withResourceBody(KeyForm.stringify(keyForm)) //
-          .withCallback(SC_OK, success).withCallback(failure, SC_BAD_REQUEST, SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR)
-          .put().send();
+          .withCallback(SC_OK, success).withCallback(failure, SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR).put().send();
 
     } else {
       ResourceRequestBuilderFactory.newBuilder() //
           .forResource(url) //
           .withResourceBody(KeyForm.stringify(keyForm)) //
-          .withCallback(SC_CREATED, success).withCallback(failure, SC_BAD_REQUEST, SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR)
-          .post().send();
+          .withCallback(SC_CREATED, success).withCallback(failure, SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR).post()
+          .send();
 
     }
   }
