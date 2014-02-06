@@ -8,16 +8,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.project.view;
+package org.obiba.opal.web.gwt.app.client.project.list;
 
 import java.util.Comparator;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsPresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsUiHandlers;
+import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.Strings;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;

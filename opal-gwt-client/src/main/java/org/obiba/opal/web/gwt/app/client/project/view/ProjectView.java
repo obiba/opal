@@ -14,8 +14,6 @@ import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectUiHandlers;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalTabPanel;
 import org.obiba.opal.web.gwt.datetime.client.Moment;

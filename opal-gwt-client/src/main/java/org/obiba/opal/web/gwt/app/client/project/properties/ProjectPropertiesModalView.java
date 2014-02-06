@@ -1,11 +1,9 @@
-package org.obiba.opal.web.gwt.app.client.project.view;
+package org.obiba.opal.web.gwt.app.client.project.properties;
 
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPropertiesModalPresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPropertiesUiHandlers;
 import org.obiba.opal.web.gwt.app.client.support.DatasourceDtos;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;

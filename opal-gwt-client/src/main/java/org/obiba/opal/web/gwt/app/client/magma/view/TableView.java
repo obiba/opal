@@ -14,7 +14,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TableUiHandlers;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.ui.CategoricalVariableSuggestOracle;
 import org.obiba.opal.web.gwt.app.client.ui.CrossableVariableSuggestOracle;

@@ -1,4 +1,4 @@
-package org.obiba.opal.web.gwt.app.client.project.presenter;
+package org.obiba.opal.web.gwt.app.client.project.properties;
 
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 

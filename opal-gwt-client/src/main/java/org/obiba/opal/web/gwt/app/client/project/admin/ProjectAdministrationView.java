@@ -8,11 +8,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.project.view;
+package org.obiba.opal.web.gwt.app.client.project.admin;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectAdministrationUiHandlers;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.ProjectDto;

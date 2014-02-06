@@ -10,16 +10,16 @@
 package org.obiba.opal.web.gwt.app.client.project;
 
 import org.obiba.opal.web.gwt.app.client.inject.AbstractOpalModule;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectKeyStorePresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPropertiesModalPresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsPresenter;
-import org.obiba.opal.web.gwt.app.client.project.view.ProjectAdministrationView;
-import org.obiba.opal.web.gwt.app.client.project.view.ProjectKeyStoreView;
-import org.obiba.opal.web.gwt.app.client.project.view.ProjectPropertiesModalView;
+import org.obiba.opal.web.gwt.app.client.project.admin.ProjectAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.project.admin.ProjectAdministrationView;
+import org.obiba.opal.web.gwt.app.client.project.keystore.ProjectKeyStorePresenter;
+import org.obiba.opal.web.gwt.app.client.project.keystore.ProjectKeyStoreView;
+import org.obiba.opal.web.gwt.app.client.project.list.ProjectsPresenter;
+import org.obiba.opal.web.gwt.app.client.project.list.ProjectsView;
+import org.obiba.opal.web.gwt.app.client.project.properties.ProjectPropertiesModalPresenter;
+import org.obiba.opal.web.gwt.app.client.project.properties.ProjectPropertiesModalView;
+import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectView;
-import org.obiba.opal.web.gwt.app.client.project.view.ProjectsView;
 
 /**
  *

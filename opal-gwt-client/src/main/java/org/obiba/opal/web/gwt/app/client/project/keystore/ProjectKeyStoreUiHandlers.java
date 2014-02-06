@@ -8,14 +8,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.project.presenter;
+package org.obiba.opal.web.gwt.app.client.project.keystore;
 
 import com.gwtplatform.mvp.client.UiHandlers;
 
-public interface ProjectAdministrationUiHandlers extends UiHandlers {
-
-  void onEdit();
-
-  void onDelete();
+public interface ProjectKeyStoreUiHandlers extends UiHandlers {
 
 }

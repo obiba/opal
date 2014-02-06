@@ -8,10 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.project.view;
-
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectKeyStorePresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectKeyStoreUiHandlers;
+package org.obiba.opal.web.gwt.app.client.project.keystore;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -33,7 +30,6 @@ public class ProjectKeyStoreView extends ViewWithUiHandlers<ProjectKeyStoreUiHan
   public ProjectKeyStoreView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
   }
-
 
   @Override
   public void setInSlot(Object slot, IsWidget content) {

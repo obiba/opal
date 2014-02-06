@@ -8,17 +8,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.project.presenter;
-
-import org.obiba.opal.web.model.client.opal.ProjectDto;
+package org.obiba.opal.web.gwt.app.client.project.view;
 
 import com.gwtplatform.mvp.client.UiHandlers;
 
-public interface ProjectsUiHandlers extends UiHandlers {
+public interface ProjectUiHandlers extends UiHandlers {
 
-  void onProjectSelection(ProjectDto project);
+  void onProjectsSelection();
 
-  void onProjectTableSelection(ProjectDto project, String table);
-
-  void showAddProject();
+  void onTabSelected(int index);
 }

@@ -1,4 +1,4 @@
-package org.obiba.opal.web.gwt.app.client.project.presenter;
+package org.obiba.opal.web.gwt.app.client.project.properties;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -26,7 +26,6 @@ import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.ProjectFactoryDto;
 
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -93,7 +92,7 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
       // Validate database connection
       final String databaseName = getView().getDatabase().getText();
 
-      if (Strings.isNullOrEmpty(databaseName)) {
+      if(Strings.isNullOrEmpty(databaseName)) {
         createProject();
         return;
       }
@@ -109,13 +108,13 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
                 createProject();
               }
             }).withCallback(new ResponseCodeCallback() {
-              @Override
-              public void onResponseCode(Request request, Response response) {
-                getView().showError(Display.FormField.DATABASE, TranslationsUtils
-                    .replaceArguments(translations.userMessageMap().get("FailedToConnectToDatabase"), name));
-                getView().setBusy(false);
-              }
-            }, Response.SC_SERVICE_UNAVAILABLE, Response.SC_NOT_FOUND, Response.SC_BAD_REQUEST) //
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().showError(Display.FormField.DATABASE, TranslationsUtils
+                .replaceArguments(translations.userMessageMap().get("FailedToConnectToDatabase"), name));
+            getView().setBusy(false);
+          }
+        }, Response.SC_SERVICE_UNAVAILABLE, Response.SC_NOT_FOUND, Response.SC_BAD_REQUEST) //
             .post().send();
       }
     }
@@ -149,10 +148,10 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
     dto.setTitle(Strings.isNullOrEmpty(title) ? dto.getName() : title);
     dto.setDescription(getView().getDescription().getText());
     String tags = getView().getTags().getText();
-    if (!Strings.isNullOrEmpty(tags)) {
+    if(!Strings.isNullOrEmpty(tags)) {
       JsArrayString arr = JavaScriptObject.createArray().cast();
       dto.setTagsArray(arr);
-      for (String t : tags.split(" ")) {
+      for(String t : tags.split(" ")) {
         arr.push(t);
       }
     }
@@ -199,10 +198,10 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
     dto.setDescription(getView().getDescription().getText());
     dto.setDatabase(getView().getDatabase().getText());
     String tags = getView().getTags().getText();
-    if (!Strings.isNullOrEmpty(tags)) {
+    if(!Strings.isNullOrEmpty(tags)) {
       JsArrayString arr = JavaScriptObject.createArray().cast();
       dto.setTagsArray(arr);
-      for (String t : tags.split(" ")) {
+      for(String t : tags.split(" ")) {
         arr.push(t);
       }
     }

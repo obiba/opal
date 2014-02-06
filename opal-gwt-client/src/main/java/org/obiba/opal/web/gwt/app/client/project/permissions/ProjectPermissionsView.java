@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.project.view;
+package org.obiba.opal.web.gwt.app.client.project.permissions;
 
 import java.util.Comparator;
 import java.util.List;
@@ -16,8 +16,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPermissionsPresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPermissionsUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;

@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.project.presenter;
+package org.obiba.opal.web.gwt.app.client.project.permissions;
 
 import java.util.Comparator;
 import java.util.List;
@@ -24,6 +24,7 @@ import org.obiba.opal.web.gwt.app.client.permissions.support.AclResourceTokenize
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
@@ -53,7 +54,8 @@ public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissi
 
   @Inject
   public ProjectPermissionsPresenter(Display display, EventBus eventBus,
-      ModalProvider<DeleteAllConfirmationModalPresenter> deleteAllConfirmationModalProvider, Translations translations) {
+      ModalProvider<DeleteAllConfirmationModalPresenter> deleteAllConfirmationModalProvider,
+      Translations translations) {
     super(eventBus, display);
     this.deleteAllConfirmationModalProvider = deleteAllConfirmationModalProvider.setContainer(this);
     getView().setUiHandlers(this);
@@ -291,8 +293,8 @@ public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissi
           break;
 
         case VARIABLE:
-          name = tokenizer.getToken(AclResourceTokenizer.ResourceTokens.TABLE) + ":" + tokenizer
-            .getToken(AclResourceTokenizer.ResourceTokens.VARIABLE);
+          name = tokenizer.getToken(AclResourceTokenizer.ResourceTokens.TABLE) + ":" +
+              tokenizer.getToken(AclResourceTokenizer.ResourceTokens.VARIABLE);
           break;
 
         case REPORT_TEMPLATE:

@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.project.presenter;
+package org.obiba.opal.web.gwt.app.client.project.keystore;
 
 import org.obiba.opal.web.gwt.app.client.keystore.presenter.EncryptionKeysPresenter;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
@@ -25,7 +25,6 @@ public class ProjectKeyStorePresenter extends PresenterWidget<ProjectKeyStorePre
 
   // TODO use a provider once encryption key authorization is implemented
   private final EncryptionKeysPresenter encryptionKeysPresenter;
-
 
   @Inject
   public ProjectKeyStorePresenter(Display display, EventBus eventBus,
@@ -45,6 +44,5 @@ public class ProjectKeyStorePresenter extends PresenterWidget<ProjectKeyStorePre
     encryptionKeysPresenter.initialize(projectDto);
   }
 
-  public interface Display extends View, HasUiHandlers<ProjectKeyStoreUiHandlers> {
-  }
+  public interface Display extends View, HasUiHandlers<ProjectKeyStoreUiHandlers> {}
 }

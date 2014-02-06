@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.project.presenter;
+package org.obiba.opal.web.gwt.app.client.project.permissions;
 
 import org.obiba.opal.web.model.client.opal.Subject;
 
@@ -16,5 +16,6 @@ import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface ProjectPermissionsUiHandlers extends UiHandlers {
   void deleteAllPermissions(Subject subject);
+
   void selectSubject(Subject subject);
 }

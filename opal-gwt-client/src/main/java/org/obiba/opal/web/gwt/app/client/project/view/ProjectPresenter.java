@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.project.presenter;
+package org.obiba.opal.web.gwt.app.client.project.view;
 
 import java.util.Arrays;
 
@@ -22,7 +22,9 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.project.admin.ProjectAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectHiddenEvent;
+import org.obiba.opal.web.gwt.app.client.project.permissions.ProjectPermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportsPresenter;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
