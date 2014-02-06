@@ -54,7 +54,8 @@ public class ReportTemplatesResourceTest {
 
   @Before
   public void setUp() {
-    if(!MagmaEngine.isInstanciated()) new MagmaEngine();
+    MagmaEngine.get().shutdown();
+    new MagmaEngine();
     opalConfigurationServiceMock = createMock(OpalConfigurationService.class);
     OpalConfiguration opalConfiguration = new OpalConfiguration();
     commandRegistry = createMock(CommandRegistry.class);

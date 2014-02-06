@@ -140,8 +140,9 @@ public class ComparedDatasourcesReportStepPresenter
           .withResourceBody(stringify(newTableDto));
     }
 
-    UriBuilder uriBuilder = tableCompareDto.getWithTable().hasViewLink() ? UriBuilders.DATASOURCE_VIEW_VARIABLES
-        .create() : UriBuilders.DATASOURCE_TABLE_VARIABLES.create();
+    UriBuilder uriBuilder = tableCompareDto.getWithTable().hasViewLink() //
+        ? UriBuilders.DATASOURCE_VIEW_VARIABLES.create() //
+        : UriBuilders.DATASOURCE_TABLE_VARIABLES.create();
 
     return ResourceRequestBuilderFactory.newBuilder() //
         .forResource(uriBuilder.build(targetDatasourceName, compared.getName())) //

@@ -603,6 +603,13 @@
       </dependency>
 
       <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-all</artifactId>
+        <version>${mockito.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
         <groupId>org.easytesting</groupId>
         <artifactId>fest-assert-core</artifactId>
         <version>${fest.version}</version>
@@ -1272,6 +1279,10 @@
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.easytesting</groupId>
@@ -1686,6 +1697,7 @@
     <public-datasources.version>1.0.1</public-datasources.version>
     <mail.version>1.5.0-b01</mail.version>
     <mockftpserver.version>2.4</mockftpserver.version>
+    <mockito.version>1.9.5</mockito.version>
     <mongodb-driver.version>2.11.3</mongodb-driver.version>
     <mysql-connector-java.version>5.1.28</mysql-connector-java.version>
     <obiba-commons.version>1.5-SNAPSHOT</obiba-commons.version>

@@ -15,12 +15,12 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.util.EntityUtils;
+import org.obiba.magma.AbstractVariableValueSource;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.Initialisable;
 import org.obiba.magma.NoSuchValueSetException;
@@ -28,12 +28,13 @@ import org.obiba.magma.NoSuchVariableException;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
+import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
-import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.VectorSource;
+import org.obiba.magma.VectorSourceNotSupportedException;
 import org.obiba.magma.support.AbstractValueTable;
 import org.obiba.magma.support.ValueSetBean;
 import org.obiba.magma.support.VariableEntityBean;
@@ -54,7 +55,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
 
-@SuppressWarnings("OverlyCoupledClass")
 class RestValueTable extends AbstractValueTable {
 
 //  private static final Logger log = LoggerFactory.getLogger(RestValueTable.class);
@@ -65,7 +65,7 @@ class RestValueTable extends AbstractValueTable {
 
   private Timestamps tableTimestamps;
 
-  private Map<String, Timestamps> valueSetsTimestamps = Maps.newHashMap();
+  private final Map<String, Timestamps> valueSetsTimestamps = Maps.newHashMap();
 
   private boolean valueSetsTimestampsSupported = true;
 
@@ -91,31 +91,37 @@ class RestValueTable extends AbstractValueTable {
     Iterable<VariableDto> variables = getOpalClient()
         .getResources(VariableDto.class, newReference("variables"), VariableDto.newBuilder());
     for(final VariableDto dto : variables) {
-      addVariableValueSource(new VariableValueSource() {
+      addVariableValueSource(new AbstractVariableValueSource() {
 
-        private final Variable v = Dtos.fromDto(dto);
+        private final Variable variable = Dtos.fromDto(dto);
 
         @Override
         public Variable getVariable() {
-          return v;
+          return variable;
         }
 
         @NotNull
         @Override
         public Value getValue(ValueSet valueSet) {
-          return ((LazyValueSet) valueSet).get(v);
+          return ((LazyValueSet) valueSet).get(variable);
+        }
+
+        @Override
+        public boolean supportVectorSource() {
+          return false;
         }
 
         @NotNull
         @Override
         public ValueType getValueType() {
-          return v.getValueType();
+          return variable.getValueType();
         }
 
-        @Nullable
+        @NotNull
         @Override
+        @SuppressWarnings("unchecked")
         public VectorSource asVectorSource() {
-          return null;
+          throw new VectorSourceNotSupportedException((Class<? extends ValueSource>) getClass());
         }
 
       });

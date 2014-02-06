@@ -10,10 +10,10 @@
 package org.obiba.opal.web.shell.reporting;
 
 import java.security.Principal;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.NoSuchElementException;
-import java.util.Set;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -53,16 +53,14 @@ public class ReportTemplateResourceTest {
 
   private OpalConfigurationService opalConfigurationServiceMock;
 
-  Set<ReportTemplate> reportTemplates;
-
   @Before
   public void setUp() {
-    if(!MagmaEngine.isInstanciated()) new MagmaEngine();
+    new MagmaEngine();
     opalRuntimeMock = createMock(OpalRuntime.class);
     opalConfigurationServiceMock = createMock(OpalConfigurationService.class);
     OpalConfiguration opalConfiguration = new OpalConfiguration();
 
-    reportTemplates = new LinkedHashSet<>();
+    Collection<ReportTemplate> reportTemplates = new LinkedHashSet<>();
     reportTemplates.add(getReportTemplate("template1"));
     reportTemplates.add(getReportTemplate("template2"));
     reportTemplates.add(getReportTemplate("template3"));

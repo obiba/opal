@@ -20,7 +20,6 @@ import org.obiba.magma.Value;
 import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
-import org.obiba.magma.VectorSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -143,9 +142,8 @@ public class DefaultVariableSummary extends AbstractVariableSummary implements S
       Assert.notNull(table, "ValueTable cannot be null");
       Assert.notNull(variableValueSource, "variableValueSource cannot be null");
 
-      VectorSource vectorSource = variableValueSource.asVectorSource();
-      if(vectorSource == null) return;
-      for(Value value : vectorSource.getValues(summary.getVariableEntities(table))) {
+      if(!variableValueSource.supportVectorSource()) return;
+      for(Value value : variableValueSource.asVectorSource().getValues(summary.getVariableEntities(table))) {
         add(value);
       }
     }

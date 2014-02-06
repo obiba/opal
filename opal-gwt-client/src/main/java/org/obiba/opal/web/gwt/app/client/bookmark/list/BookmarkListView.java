@@ -2,7 +2,6 @@ package org.obiba.opal.web.gwt.app.client.bookmark.list;
 
 import java.util.List;
 
-import org.hibernate.annotations.Columns;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.model.client.opal.BookmarkDto;
 
@@ -40,7 +39,7 @@ public class BookmarkListView extends ViewWithUiHandlers<BookmarkListUiHandlers>
 
   private void initTable() {
     table.setVisibleRange(0, 10);
-    table.addColumn(Columns.NAME, translations.nameLabel());
+//    table.addColumn(Columns.NAME, translations.nameLabel());
     table.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
     pager.setDisplay(table);
     dataProvider.addDataDisplay(table);

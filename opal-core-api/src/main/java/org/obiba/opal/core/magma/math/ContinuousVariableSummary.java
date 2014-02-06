@@ -26,7 +26,6 @@ import org.obiba.magma.Value;
 import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
-import org.obiba.magma.VectorSource;
 import org.obiba.magma.math.stat.IntervalFrequency;
 import org.obiba.magma.type.IntegerType;
 import org.slf4j.Logger;
@@ -215,14 +214,12 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
       Assert.notNull(variable, "ValueTable cannot be null");
       Assert.notNull(variableValueSource, "VariableValueSource cannot be null");
 
-      VectorSource vectorSource = variableValueSource.asVectorSource();
-      if(vectorSource == null) return;
-      for(Value value : vectorSource.getValues(summary.getVariableEntities(table))) {
+      if(!variableValueSource.supportVectorSource()) return;
+      for(Value value : variableValueSource.asVectorSource().getValues(summary.getVariableEntities(table))) {
         add(value);
       }
     }
 
-    @SuppressWarnings("ConstantConditions")
     private void add(@NotNull Value value) {
       Assert.notNull(variable, "Value cannot be null");
       if(!value.isNull() && !summary.missing.contains(value)) {

@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
+import org.obiba.magma.AbstractVariableValueSource;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
@@ -57,8 +57,10 @@ public class MagmaAssignROperation extends AbstractROperation {
   @NotNull
   private final IdentifiersTableService identifiersTableService;
 
+  @NotNull
   private final String symbol;
 
+  @NotNull
   private final String path;
 
   private final String variableFilter;
@@ -72,8 +74,9 @@ public class MagmaAssignROperation extends AbstractROperation {
   private final Set<MagmaRConverter> magmaRConverters = Sets
       .newHashSet((MagmaRConverter) new ValueTableRConverter(), (MagmaRConverter) new VariableRConverter());
 
-  public MagmaAssignROperation(String symbol, String path, String variableFilter, boolean withMissings,
-      String identifiersMapping, IdentifiersTableService identifiersTableService) {
+  @SuppressWarnings("ConstantConditions")
+  public MagmaAssignROperation(@NotNull String symbol, @NotNull String path, String variableFilter,
+      boolean withMissings, String identifiersMapping, @NotNull IdentifiersTableService identifiersTableService) {
     if(symbol == null) throw new IllegalArgumentException("symbol cannot be null");
     if(path == null) throw new IllegalArgumentException("path cannot be null");
     if(identifiersTableService == null) throw new IllegalArgumentException("identifiers table service cannot be null");
@@ -263,7 +266,7 @@ public class MagmaAssignROperation extends AbstractROperation {
     /**
      * Represents the entity identifiers as values of a variable.
      */
-    private class VariableEntityValueSource implements VariableValueSource {
+    private class VariableEntityValueSource extends AbstractVariableValueSource implements VariableValueSource {
       @Override
       public Variable getVariable() {
         return Variable.Builder.newVariable(ENTITY_ID_SYMBOL, TextType.get(), table.getEntityType()).build();
@@ -281,7 +284,12 @@ public class MagmaAssignROperation extends AbstractROperation {
         return TextType.get().valueOf(valueSet.getVariableEntity().getIdentifier());
       }
 
-      @Nullable
+      @Override
+      public boolean supportVectorSource() {
+        return true;
+      }
+
+      @NotNull
       @Override
       public VectorSource asVectorSource() {
         return new VectorSource() {
@@ -291,7 +299,8 @@ public class MagmaAssignROperation extends AbstractROperation {
           }
 
           @Override
-          public Iterable<Value> getValues(SortedSet<VariableEntity> entities) {
+          public Iterable<Value> getValues(
+              @SuppressWarnings("ParameterHidesMemberVariable") SortedSet<VariableEntity> entities) {
             return Iterables.transform(getEntities(), new Function<VariableEntity, Value>() {
               @Override
               public Value apply(@NotNull VariableEntity input) {
