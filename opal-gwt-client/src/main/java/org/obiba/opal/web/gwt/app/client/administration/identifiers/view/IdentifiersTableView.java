@@ -24,6 +24,7 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.core.client.JsArray;
@@ -66,6 +67,9 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
 
   @UiField
   Panel identifiersPanel;
+
+  @UiField
+  Button downloadIdentifiers;
 
   private final Translations translations;
 

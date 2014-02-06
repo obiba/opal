@@ -1,6 +1,8 @@
 package org.obiba.opal.web.identifiers;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -13,12 +15,14 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
@@ -35,6 +39,7 @@ import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.model.Identifiers.IdentifiersMappingDto;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.support.InvalidRequestException;
+import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -50,6 +55,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+
+import au.com.bytecode.opencsv.CSVWriter;
 
 @Component
 @Transactional
@@ -231,6 +238,38 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
     return builder.build();
   }
 
+  /**
+   * Get the non-null values of all variable's type vector in CSV format.
+   *
+   * @return
+   * @throws org.obiba.magma.MagmaRuntimeException
+   * @throws java.io.IOException
+   */
+  @GET
+  @Path("/_export")
+  @Produces("text/csv")
+  @AuthenticatedByCookie
+  @ApiOperation(value = "Get identifiers mapping in CSV", produces = "text/csv")
+  public Response getVectorCSVValues(@QueryParam("type") String entityType) throws MagmaRuntimeException, IOException {
+    ensureEntityType(entityType);
+    ValueTable table = getValueTable(entityType);
+//    Variable variable = table.getVariable(name);
+
+    ByteArrayOutputStream values = new ByteArrayOutputStream();
+    CSVWriter writer = null;
+    try {
+      writer = new CSVWriter(new PrintWriter(values));
+
+      for(Variable variable : table.getVariables()) {
+        writeCSVValues(writer, table, variable);
+      }
+    } finally {
+      if(writer != null) writer.close();
+    }
+
+    return Response.ok(values.toByteArray(), "text/csv")
+        .header("Content-Disposition", "attachment; filename=\"" + table.getName() + ".csv\"").build();
+  }
   //
   // Private methods
   //
