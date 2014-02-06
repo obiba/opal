@@ -27,16 +27,15 @@
         the summaries and the individual data.
       </ui:msg>
     </b:Paragraph>
-    <b:Form>
-      <b:ButtonGroup>
-        <b:Button type="INFO" icon="PLUS" ui:field="add">
-          <ui:msg description="Add Project label">Add Project</ui:msg>
-        </b:Button>
-      </b:ButtonGroup>
-    </b:Form>
 
-    <b:SimplePager ui:field="tablePager" location="RIGHT" addStyleNames="small-bottom-margin pull-right"/>
-    <o:Table ui:field="projectsTable"/>
+    <b:ButtonGroup>
+      <b:Button type="INFO" icon="PLUS" ui:field="add">
+        <ui:msg description="Add Project label">Add Project</ui:msg>
+      </b:Button>
+    </b:ButtonGroup>
+
+    <b:SimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
+    <o:Table ui:field="projectsTable" addStyleNames="small-top-margin"/>
 
 
   </g:FlowPanel>
