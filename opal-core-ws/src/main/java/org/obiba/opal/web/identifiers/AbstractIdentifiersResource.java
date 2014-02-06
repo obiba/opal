@@ -19,9 +19,16 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
+import org.obiba.opal.core.identifiers.IdentifiersMaps;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.web.support.InvalidRequestException;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+
+import au.com.bytecode.opencsv.CSVWriter;
 
 public abstract class AbstractIdentifiersResource {
 
@@ -65,6 +72,24 @@ public abstract class AbstractIdentifiersResource {
 
   protected Datasource getDatasource() {
     return getIdentifiersTableService().getDatasource();
+  }
+
+  protected Iterable<IdentifiersMaps.IdentifiersMap> getUnitIdentifiers(String entityType, String name) {
+    return Iterables
+        .filter(new IdentifiersMaps(getValueTable(entityType), name), new Predicate<IdentifiersMaps.IdentifiersMap>() {
+          @Override
+          public boolean apply(@Nullable IdentifiersMaps.IdentifiersMap input) {
+            return input.hasPrivateIdentifier();
+          }
+        });
+  }
+
+  protected void writeCSVValues(CSVWriter writer, ValueTable table, Variable variable) {
+    // header
+    writer.writeNext(new String[] { table.getEntityType(), variable.getName() });
+    for(IdentifiersMaps.IdentifiersMap unitId : getUnitIdentifiers(table.getEntityType(), variable.getName())) {
+      writer.writeNext(new String[] { unitId.getSystemIdentifier(), unitId.getPrivateIdentifier() });
+    }
   }
 
 }
