@@ -125,7 +125,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
   private JsArray<AttributeDto> getAttributesArray(VariableDto dto) {
     List<AttributeDto> attributes = JsArrays.toList(dto.getAttributesArray());
 
-    switch(dialogMode){
+    switch(dialogMode) {
       case APPLY: // fall through
       case CREATE:
         return addNewAttribute(attributes);
@@ -210,11 +210,40 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     // For each non-empty locale
     for(LocalizedEditableText localizedText : getView().getLocalizedValues().getValue()) {
       if(!localizedText.getTextBox().getText().isEmpty()) {
-        newAttributes.push(getNewAttribute(localizedText));
+        AttributeDto existingAttr = findAttribute(attributes, localizedText);
+        if (existingAttr != null) {
+          existingAttr.setValue(localizedText.getTextBox().getText());
+        } else {
+          newAttributes.push(getNewAttribute(localizedText));
+        }
       }
     }
 
     return newAttributes;
+  }
+
+  private AttributeDto findAttribute(Iterable<AttributeDto> attributes, LocalizedEditableText localizedText) {
+    String name = getView().getName().getText().trim();
+    String namespace = getView().getNamespaceSuggestBox().getText().trim();
+    String locale = localizedText.getValue().getLocale().trim();
+
+    for(AttributeDto attribute : attributes) {
+      if(name.equals(attribute.getName()) && isSameNamespace(namespace, attribute) && isSameLocale(locale, attribute)) {
+        return attribute;
+      }
+    }
+
+    return null;
+  }
+
+  private boolean isSameLocale(String locale, AttributeDto attribute) {
+    return ((locale.isEmpty() && !attribute.hasLocale()) ||
+        (attribute.hasLocale() && locale.equals(attribute.getLocale())));
+  }
+
+  private boolean isSameNamespace(String namespace, AttributeDto attribute) {
+    return ((namespace.isEmpty() && !attribute.hasNamespace()) ||
+        (attribute.hasNamespace() && namespace.equals(attribute.getNamespace())));
   }
 
   private VariableDto getVariableDto(VariableDto variable) {
@@ -409,7 +438,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
                 Display.FormField.VALUE.name()));
         validators.add(new ConditionValidator(hasValidNamespace(getView().getNamespaceSuggestBox().getText()),
             "NamespaceCannotBeEmptyChars", Display.FormField.NAMESPACE.name()));
-        if (dialogMode == Mode.CREATE) validators.add(new UniqueAttributeNameValidator("AttributeAlreadyExists"));
+        if(dialogMode == Mode.CREATE) validators.add(new UniqueAttributeNameValidator("AttributeAlreadyExists"));
       }
       return validators;
     }
