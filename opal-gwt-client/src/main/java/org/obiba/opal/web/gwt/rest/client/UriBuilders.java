@@ -145,6 +145,13 @@ public enum UriBuilders {
     }
   },
 
+  DATASOURCE_TABLES_EXCEL {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasource", "{}", "tables", "excel");
+    }
+  },
+
   DATASOURCE_VIEWS {
     @Override
     public UriBuilder create() {
