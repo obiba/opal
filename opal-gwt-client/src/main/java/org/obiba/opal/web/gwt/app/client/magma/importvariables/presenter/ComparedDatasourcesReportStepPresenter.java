@@ -16,9 +16,9 @@ import java.util.TreeSet;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.ComparedDatasourcesReportStepPresenter.Display.ComparisonResult;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
