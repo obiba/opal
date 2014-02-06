@@ -35,7 +35,7 @@ public interface DatasourceTablesResource {
   @Produces("application/vnd.ms-excel")
   @AuthorizeResource
   @AuthenticatedByCookie
-  Response getExcelDictionary() throws MagmaRuntimeException, IOException;
+  Response getExcelDictionary(@QueryParam("table") List<String> tables) throws MagmaRuntimeException, IOException;
 
   @POST
   Response createTable(Magma.TableDto table);

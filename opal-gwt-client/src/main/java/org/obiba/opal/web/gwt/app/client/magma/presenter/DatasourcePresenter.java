@@ -111,7 +111,13 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
   }
 
   private void downloadMetadata() {
-    fireEvent(new FileDownloadRequestEvent("/datasource/" + datasourceName + "/tables/excel"));
+    // if some tables are selected
+    UriBuilder uriBuilder = UriBuilders.DATASOURCE_TABLES_EXCEL.create();
+    for(TableDto tableDto : getView().getSelectedTables()) {
+      uriBuilder.query("table", tableDto.getName());
+    }
+
+    fireEvent(new FileDownloadRequestEvent(uriBuilder.build(datasourceName)));
   }
 
   private void initDatasource() {
