@@ -21,6 +21,10 @@ li {
  * Opal
  */
 
+.sortable-header-column {
+  cursor: pointer;
+}
+
 .project-tag {
   margin-right: 2px;
 }
@@ -513,3 +517,32 @@ ul.chooser-options > li {
   width: 4em;
 }
 
+/* CollapsiblePanel table full width for derivation wizard*/
+.table-half-width > table {
+  width: 50%;
+}
+
+.table-full-width > table {
+  width: 100%;
+}
+
+.width-4em {
+  width: 4em;
+}
+
+}
+
+a.bookmark,
+a.bookmark:visited,
+a.bookmark:hover,
+a.bookmark:focus {
+  color: #B4BCC2;
+  text-decoration: none;
+}
+
+a.bookmark-on,
+a.bookmark-on:visited,
+a.bookmark-on:hover,
+a.bookmark-on:focus {
+  color: #FFD76E;
+}

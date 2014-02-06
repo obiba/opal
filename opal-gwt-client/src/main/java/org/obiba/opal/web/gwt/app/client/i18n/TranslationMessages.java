@@ -86,10 +86,15 @@ public interface TranslationMessages extends Messages {
   String updateVariableCategories(String name);
 
   @Description("Not editable account text")
-  @DefaultMessage("Your account was defined in the user directory \"{0}\". Please contact your system administrator to change the password in this directory.")
+  @DefaultMessage("Your account was defined in the user directory \"{0}\". " +
+      "Please contact your system administrator to change the password in this directory.")
   String accountNotEditable(String realm);
 
   @Description("Editable account text")
   @DefaultMessage("Your account password can be updated.")
   String accountEditable();
+
+  @Description("Last Update Ago label")
+  @DefaultMessage("Last update {0}")
+  String lastUpdateAgoLabel(String date);
 }

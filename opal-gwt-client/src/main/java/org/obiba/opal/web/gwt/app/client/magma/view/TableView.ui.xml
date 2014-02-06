@@ -45,7 +45,7 @@
     <b:TabPanel tabPosition="above" ui:field="tabPanel">
       <b:Tab heading="Dictionary" active="true" ui:field="dictionnaryTab">
 
-      <g:FlowPanel>
+        <g:FlowPanel>
           <b:Heading size="4" addStyleNames="inline-block large-top-margin">
             <ui:msg description="Properties label">Properties</ui:msg>
           </b:Heading>
@@ -230,7 +230,7 @@
       </b:Tab>
 
       <b:Tab heading="Values" ui:field="valuesTab">
-      <g:SimplePanel ui:field="valuesPanel"/>
+        <g:SimplePanel ui:field="valuesPanel"/>
       </b:Tab>
 
       <b:Tab heading="Permissions">

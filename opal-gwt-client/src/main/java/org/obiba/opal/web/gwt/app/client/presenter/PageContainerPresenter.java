@@ -37,15 +37,10 @@ public class PageContainerPresenter extends Presenter<PageContainerPresenter.Dis
 
   @Override
   public void setInSlot(Object slot, PresenterWidget<?> content) {
-
     if(CONTENT == slot && content instanceof HasPageTitle) {
       HasPageTitle pageHeader = (HasPageTitle) content;
-
-      if(pageHeader != null) {
-        getView().setPageTitle(pageHeader.getTitle());
-      }
+      getView().setPageTitle(pageHeader.getTitle());
     }
-
     super.setInSlot(slot, content);
   }
 

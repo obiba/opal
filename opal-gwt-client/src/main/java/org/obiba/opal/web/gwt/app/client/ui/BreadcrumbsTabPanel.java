@@ -10,7 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.ui;
 
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
-import com.github.gwtbootstrap.client.ui.NavLink;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.Timer;
@@ -32,7 +32,7 @@ public class BreadcrumbsTabPanel extends AbstractTabPanel {
         final int idx = event.getSelectedItem();
         if(isAnimationEnabled()) {
           // wait for the end of the animation before removing descendants
-          Timer t = new Timer() {
+          Timer timer = new Timer() {
             @Override
             public void run() {
               if(!isAnimationRunning()) {
@@ -41,7 +41,7 @@ public class BreadcrumbsTabPanel extends AbstractTabPanel {
               }
             }
           };
-          t.scheduleRepeating(10);
+          timer.scheduleRepeating(10);
         } else {
           removeDescendants(idx);
         }
@@ -55,6 +55,7 @@ public class BreadcrumbsTabPanel extends AbstractTabPanel {
     });
 
     setAnimationEnabled(true);
+    getMenu().addStyleName("inline-block");
   }
 
   @Override
@@ -67,16 +68,14 @@ public class BreadcrumbsTabPanel extends AbstractTabPanel {
     return super.isAnimationEnabled();
   }
 
-  public void addAndSelect(Widget w, String text) {
-    add(w, text);
-    selectTab(w);
+  public void addAndSelect(Widget widget, String text) {
+    add(widget, text);
+    selectTab(widget);
   }
 
-  public void addAndSelect(Widget w, NavLink link) {
-    add(w, link);
-    selectTab(w);
+  public void addAndSelect(Widget widget, HasClickHandlers link) {
+    add(widget, link);
+    selectTab(widget);
   }
-
-
 
 }

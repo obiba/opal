@@ -13,10 +13,10 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.easymock.EasyMock;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
@@ -27,11 +27,9 @@ import org.obiba.magma.VectorSource;
 import org.obiba.magma.support.Values;
 import org.obiba.magma.type.IntegerType;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
@@ -115,24 +113,18 @@ public class ContinuousVariableSummaryTest {
   */
 
   private ContinuousVariableSummary computeFromTable(Variable variable, Iterable<Value> values) {
-    ValueTable table = createMock(ValueTable.class);
-    VectorSource vectorSource = createMock(VectorSource.class);
-    VariableValueSource valueSource = createMock(VariableValueSource.class);
+    ValueTable table = mock(ValueTable.class);
+    VectorSource vectorSource = mock(VectorSource.class);
+    VariableValueSource valueSource = mock(VariableValueSource.class);
 
-    expect(vectorSource.getValues(EasyMock.<SortedSet<VariableEntity>>anyObject())).andReturn(values);
-    expect(valueSource.asVectorSource()).andReturn(vectorSource);
-    expect(table.getVariableEntities()).andReturn(new TreeSet<VariableEntity>());
-    expect(table.getVariableValueSource(variable.getName())).andReturn(valueSource);
+    when(vectorSource.getValues(Mockito.<SortedSet<VariableEntity>>any())).thenReturn(values);
+    when(valueSource.supportVectorSource()).thenReturn(true);
+    when(valueSource.asVectorSource()).thenReturn(vectorSource);
+    when(table.getVariableEntities()).thenReturn(new TreeSet<VariableEntity>());
+    when(table.getVariableValueSource(variable.getName())).thenReturn(valueSource);
 
-    replay(table, vectorSource, valueSource);
-
-    ContinuousVariableSummary summary = new ContinuousVariableSummary.Builder(variable,
-        ContinuousVariableSummary.Distribution.normal).addTable(table, table.getVariableValueSource(variable.getName()))
-        .build();
-
-    verify(table, vectorSource, valueSource);
-
-    return summary;
+    return new ContinuousVariableSummary.Builder(variable, ContinuousVariableSummary.Distribution.normal)
+        .addTable(table, table.getVariableValueSource(variable.getName())).build();
   }
 
 }

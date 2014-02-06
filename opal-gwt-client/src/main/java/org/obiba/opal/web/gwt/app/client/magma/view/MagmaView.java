@@ -2,12 +2,13 @@ package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.ui.BreadcrumbsTabPanel;
 
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -76,12 +77,16 @@ public class MagmaView extends ViewImpl implements MagmaPresenter.Display {
   }
 
   @Override
+  public void setBookmarkIcon(IsWidget widget) {
+    tabPanel.setBookmarkIcon(widget);
+  }
+
+  @Override
   public void selectDatasource(String name) {
     tabPanel.clear();
     tabPanel.addAndSelect(datasourceWidget, name);
     tabPanel.setMenuVisible(false);
     setHeading();
-
   }
 
   @Override
@@ -107,7 +112,7 @@ public class MagmaView extends ViewImpl implements MagmaPresenter.Display {
     heading.setText(translations.tablesLabel());
   }
 
-  private NavLink getDatasourceLink(String name) {
+  private HasClickHandlers getDatasourceLink(String name) {
     NavLink link = new NavLink();
     link.setIcon(IconType.TABLE);
     link.setHref("#" + placeManager.buildHistoryToken(ProjectPlacesHelper.getDatasourcePlace(name)));
@@ -115,7 +120,7 @@ public class MagmaView extends ViewImpl implements MagmaPresenter.Display {
     return link;
   }
 
-  private NavLink getTableLink(String datasource, String table) {
+  private HasClickHandlers getTableLink(String datasource, String table) {
     NavLink link = new NavLink(table);
     link.setHref("#" + placeManager.buildHistoryToken(ProjectPlacesHelper.getTablePlace(datasource, table)));
     return link;

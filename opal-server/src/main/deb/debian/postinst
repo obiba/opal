@@ -69,6 +69,7 @@ case "$1" in
 
       # if upgrading to 2.0, move opal-config.xml to data dir
       if [ -f "/etc/opal/opal-config.xml" ]; then
+        cp /etc/opal/opal-config.xml /etc/opal/opal-config.xml.opal1
         mv /etc/opal/opal-config.xml /var/lib/opal/data/opal-config.xml
       fi
 

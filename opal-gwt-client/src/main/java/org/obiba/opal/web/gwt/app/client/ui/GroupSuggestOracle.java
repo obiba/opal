@@ -107,15 +107,15 @@ public class GroupSuggestOracle extends SuggestOracle {
     final String query = originalQuery;
 
     // Get groups candidates from search words.
-    ResourceRequestBuilderFactory.<JsArray<GroupDto>>newBuilder().forResource(UriBuilders.GROUPS.create().build()).get()
-        .withCallback(com.google.gwt.http.client.Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
+    ResourceRequestBuilderFactory.<JsArray<GroupDto>>newBuilder().forResource(UriBuilders.GROUPS.create().build())
+        .get().withCallback(com.google.gwt.http.client.Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
 
-          @Override
-          public void onResponseCode(com.google.gwt.http.client.Request request,
-              com.google.gwt.http.client.Response response) {
-            // nothing
-          }
-        })//
+      @Override
+      public void onResponseCode(com.google.gwt.http.client.Request request,
+          com.google.gwt.http.client.Response response) {
+        // nothing
+      }
+    })//
         .withCallback(new ResourceCallback<JsArray<GroupDto>>() {
           @Override
           public void onResource(com.google.gwt.http.client.Response response, JsArray<GroupDto> resources) {

@@ -18,7 +18,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtoNature;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
@@ -238,8 +238,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
               .query("select", currentVariablesFilterSelect)//
               .query("offset", String.valueOf(offset))//
               .query("limit", String.valueOf(getView().getPageSize()))//
-              .build(originalTable.getDatasourceName(), originalTable.getName()))
-          .withCallback(new ResourceCallback<ValueSetsResultDto>() {
+              .build(originalTable.getDatasourceName(), originalTable.getName())).withCallback(
+          new ResourceCallback<ValueSetsResultDto>() {
             @Override
             public void onResource(Response response, ValueSetsResultDto resource) {
 
@@ -275,9 +275,9 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   private void fetchIndexSchema() {
     // Show Values Filter when ES is enabled
     ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder().forResource(
-        UriBuilders.DATASOURCE_TABLE_INDEX.create().build(originalTable.getDatasourceName(), originalTable.getName()))
-        .withCallback(new ESUnavailableCallback(), SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN, SC_NOT_FOUND,
-            SC_SERVICE_UNAVAILABLE)//
+        UriBuilders.DATASOURCE_TABLE_INDEX.create()
+            .build(originalTable.getDatasourceName(), originalTable.getName())).withCallback(
+        new ESUnavailableCallback(), SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN, SC_NOT_FOUND, SC_SERVICE_UNAVAILABLE)//
         .withCallback(new ESAvailableCallback()).get().send();
   }
 
@@ -508,8 +508,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
                 variablesRequest = null;
               }
               getView().clearTable();
-              variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(link)
-                  .get()//
+              variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder()
+                  .forResource(link).get()//
                   .withCallback(new VariablesDtoResourceCallback(originalTable.getLink()))
                   .withCallback(Response.SC_BAD_REQUEST, new BadRequestCallback() {
                     @Override

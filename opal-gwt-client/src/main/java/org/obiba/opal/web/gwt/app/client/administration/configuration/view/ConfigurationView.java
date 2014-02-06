@@ -1,7 +1,5 @@
 package org.obiba.opal.web.gwt.app.client.administration.configuration.view;
 
-import org.obiba.opal.web.gwt.app.client.administration.configuration.presenter.ConfigurationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.configuration.presenter.ConfigurationUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -98,10 +96,9 @@ public class ConfigurationView extends ViewWithUiHandlers<ConfigurationUiHandler
   }
 
   private Label getLanguages(GeneralConf resource) {
-    if(resource.getLanguagesArray().length() > 0) {
-      return new Label(resource.getLanguagesArray().join(", "));
-    }
-    return new Label("");
+    return resource.getLanguagesArray().length() > 0
+        ? new Label(resource.getLanguagesArray().join(", "))
+        : new Label("");
   }
 
 }

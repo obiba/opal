@@ -9,7 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.core.domain.security;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 
@@ -30,8 +32,9 @@ public class SubjectProfile extends AbstractTimestamped implements HasUniqueProp
   @NotBlank
   private String realm;
 
-  public SubjectProfile() {
+  private Set<Bookmark> bookmarks = new HashSet<>();
 
+  public SubjectProfile() {
   }
 
   public SubjectProfile(@NotNull String principal, @NotNull String realm) {
@@ -67,6 +70,27 @@ public class SubjectProfile extends AbstractTimestamped implements HasUniqueProp
     this.realm = realm;
   }
 
+  public Set<Bookmark> getBookmarks() {
+    return bookmarks;
+  }
+
+  public void setBookmarks(Set<Bookmark> bookmarks) {
+    this.bookmarks = bookmarks;
+  }
+
+  public boolean addBookmark(String resource) {
+    if(bookmarks == null) bookmarks = new HashSet<>();
+    return bookmarks.add(new Bookmark(resource));
+  }
+
+  public boolean removeBookmark(String resource) {
+    return bookmarks != null && bookmarks.remove(new Bookmark(resource));
+  }
+
+  public boolean hasBookmark(String resource) {
+    return bookmarks != null && bookmarks.contains(new Bookmark(resource));
+  }
+
   @Override
   public int hashCode() {
     return Objects.hashCode(principal, realm);
@@ -74,19 +98,16 @@ public class SubjectProfile extends AbstractTimestamped implements HasUniqueProp
 
   @Override
   public boolean equals(Object obj) {
-    if(this == obj) {
-      return true;
-    }
-    if(obj == null || getClass() != obj.getClass()) {
-      return false;
-    }
+    if(this == obj) return true;
+    if(obj == null || getClass() != obj.getClass()) return false;
     SubjectProfile other = (SubjectProfile) obj;
     return Objects.equal(principal, other.principal) && Objects.equal(realm, other.realm);
   }
 
   @SuppressWarnings("ParameterHidesMemberVariable")
   public static class Builder {
-    SubjectProfile profile;
+
+    private SubjectProfile profile;
 
     private Builder() {
     }

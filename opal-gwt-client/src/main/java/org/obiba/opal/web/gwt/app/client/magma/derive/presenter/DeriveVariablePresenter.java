@@ -21,7 +21,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.ScriptEvaluationPresenter.ScriptEvaluationCallback;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.BranchingWizardStepController;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
@@ -238,8 +238,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
       }
     });
 
-    getEventBus()
-        .addHandlerToSource(NotificationEvent.getType(), temporalPresenter, stepErrorNotificationHandler);
+    getEventBus().addHandlerToSource(NotificationEvent.getType(), temporalPresenter, stepErrorNotificationHandler);
   }
 
   private void prepareNumericalDerivation() {
@@ -257,8 +256,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
       }
     });
 
-    getEventBus()
-        .addHandlerToSource(NotificationEvent.getType(), numericalPresenter, stepErrorNotificationHandler);
+    getEventBus().addHandlerToSource(NotificationEvent.getType(), numericalPresenter, stepErrorNotificationHandler);
   }
 
   private void prepareOpenTextualDerivation() {
@@ -353,8 +351,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
       }
 
       UriBuilder ub = UriBuilder.create().segment("datasource", destinationDatasource, "view", destinationView);
-      ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(ub.build()).get()
-          .withCallback(new UpdateViewCallback(derived))//
+      ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(ub.build()).get().withCallback(
+          new UpdateViewCallback(derived))//
           .withCallback(new CreateViewCallback(), Response.SC_NOT_FOUND).send();
     }
 
@@ -375,7 +373,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     public void onStepIn() {
       getView().clearErrors();
       derivationPresenter.generateDerivedVariable();
-      scriptEvaluationPresenter.setOriginalTable(derivationPresenter.getOriginalTable(), true);
+      scriptEvaluationPresenter.setOriginalTable(derivationPresenter.getOriginalTable(), false);
       scriptEvaluationPresenter.setOriginalVariable(derivationPresenter.getDerivedVariable());
     }
   }
@@ -652,7 +650,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     public void onUserMessage(NotificationEvent event) {
       getView().clearErrors();
       for(String message : event.getMessages()) {
-        if (translations.userMessageMap().containsKey(message)) {
+        if(translations.userMessageMap().containsKey(message)) {
           getView().showError(
               TranslationsUtils.replaceArguments(translations.userMessageMap().get(message), event.getMessageArgs()));
         } else {

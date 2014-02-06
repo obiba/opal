@@ -13,6 +13,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 public class PageContainerView extends ViewImpl implements PageContainerPresenter.Display {
+
   @UiTemplate("PageContainerView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, PageContainerView> {}
 
@@ -29,12 +30,9 @@ public class PageContainerView extends ViewImpl implements PageContainerPresente
   @UiField
   Panel body;
 
-
-
   public PageContainerView() {
     uiWidget = uiBinder.createAndBindUi(this);
   }
-
 
   @Override
   public Widget asWidget() {
@@ -56,11 +54,10 @@ public class PageContainerView extends ViewImpl implements PageContainerPresente
 
   @Override
   public void setInSlot(Object slot, IsWidget content) {
-    if (PageContainerPresenter.HEADER == slot) {
+    if(PageContainerPresenter.HEADER == slot) {
       header.clear();
       header.add(content);
-    }
-    else if (PageContainerPresenter.CONTENT == slot) {
+    } else if(PageContainerPresenter.CONTENT == slot) {
       body.clear();
       body.add(content);
     }

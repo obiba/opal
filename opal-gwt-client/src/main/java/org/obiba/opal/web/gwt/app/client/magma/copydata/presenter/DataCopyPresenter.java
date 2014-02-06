@@ -59,6 +59,7 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
     getView().setUiHandlers(this);
   }
 
+  @Override
   protected void onUnbind() {
     super.onUnbind();
     datasourceName = null;

@@ -33,7 +33,7 @@ public class OpalViewPersistenceStrategyTest {
   public void setUp() throws Exception {
     System.setProperty(OpalViewPersistenceStrategy.OPAL_HOME_SYSTEM_PROPERTY_NAME, getTestFilesRoot());
     viewPersistenceStrategy = new OpalViewPersistenceStrategy();
-    if(!MagmaEngine.isInstanciated()) new MagmaEngine().extend(new MagmaXStreamExtension());
+    new MagmaEngine().extend(new MagmaXStreamExtension());
   }
 
   @After
@@ -82,7 +82,7 @@ public class OpalViewPersistenceStrategyTest {
     replay(datasourceMock, valueTableMock);
 
     // Write a temporary views file with a single view.
-    Set<View> views = Sets.<View>newHashSet();
+    Set<View> views = Sets.newHashSet();
     View view = new View("aView", valueTableMock);
     views.add(view);
     viewPersistenceStrategy.writeViews("temporary-views", views, null);
@@ -108,13 +108,13 @@ public class OpalViewPersistenceStrategyTest {
 
     replay(datasourceMock, valueTableMock);
 
-    Set<View> views = Sets.<View>newHashSet();
+    Set<View> views = Sets.newHashSet();
     View view = new View("aView", valueTableMock);
     views.add(view);
     viewPersistenceStrategy.writeViews("single-views", views, null);
   }
 
   private String getTestFilesRoot() {
-    return this.getClass().getResource("/" + this.getClass().getSimpleName()).getFile();
+    return getClass().getResource("/" + getClass().getSimpleName()).getFile();
   }
 }

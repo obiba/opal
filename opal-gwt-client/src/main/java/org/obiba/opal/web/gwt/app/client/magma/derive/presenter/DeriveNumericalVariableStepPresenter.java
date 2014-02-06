@@ -153,6 +153,10 @@ public class DeriveNumericalVariableStepPresenter
     @Override
     public boolean validate() {
       List<String> errorMessages = new ArrayList<String>();
+      // validate that 1 radio is selected
+      if(!getView().rangeSelected() && !getView().discreteSelected() && !getView().manualSelected()) {
+        errorMessages.add(translations.selectDerivationMethod());
+      }
       if(getView().rangeSelected()) {
         validateRangeForm(errorMessages);
       }
@@ -510,6 +514,8 @@ public class DeriveNumericalVariableStepPresenter
     boolean rangeSelected();
 
     boolean discreteSelected();
+
+    boolean manualSelected();
 
     void enableFrequency(boolean enable);
 

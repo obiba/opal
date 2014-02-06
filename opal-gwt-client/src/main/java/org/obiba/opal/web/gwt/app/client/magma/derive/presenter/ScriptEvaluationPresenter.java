@@ -235,8 +235,8 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
 
     private ResourceRequestBuilder<SummaryStatisticsDto> requestSummaryBuilder(String link) {
       String script = VariableDtos.getScript(originalVariable);
-      ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder = ResourceRequestBuilderFactory
-          .<SummaryStatisticsDto>newBuilder() //
+      ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder
+          = ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder() //
           .forResource(link).withFormBody("script", script).post() //
           .accept("application/x-protobuf+json");
 

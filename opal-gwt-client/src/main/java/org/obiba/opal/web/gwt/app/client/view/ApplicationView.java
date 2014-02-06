@@ -29,7 +29,6 @@ import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.Tooltip;
 import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -93,8 +92,6 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
   @UiField
   FluidContainer footerContainer;
 
-  private final Translations translations;
-
   private final VariableSuggestOracle oracle;
 
   @Inject
@@ -102,7 +99,6 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
     oracle = new VariableSuggestOracle(eventBus);
     search = new SuggestListBox(oracle);
     initWidget(uiBinder.createAndBindUi(this));
-    this.translations = translations;
 
     dashboardItem.setHref("#" + Places.DASHBOARD);
     projectsItem.setHref("#" + Places.PROJECTS);
@@ -205,7 +201,7 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
   @UiHandler("resizeScreen")
   void onResize(ClickEvent event) {
     boolean isFullScreen = workbenchContainer.getStyleName().contains("almost-full-width");
-    if (isFullScreen) {
+    if(isFullScreen) {
       workbenchContainer.removeStyleName("almost-full-width");
       footerContainer.removeStyleName("almost-full-width");
       resizeScreen.setIcon(IconType.RESIZE_FULL);

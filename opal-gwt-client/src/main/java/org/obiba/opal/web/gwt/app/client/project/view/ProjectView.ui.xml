@@ -20,14 +20,14 @@
     <g:FlowPanel addStyleNames="page-header">
       <b:FluidRow>
         <b:Column size="9">
-          <b:Breadcrumbs ui:field="titlecrumbs">
+          <b:Breadcrumbs ui:field="titleCrumbs" addStyleNames="inline-block">
             <b:NavLink ui:field="projects">
               <ui:msg description="Projects label">Projects</ui:msg>
             </b:NavLink>
           </b:Breadcrumbs>
+          <g:FlowPanel ui:field="bookmarkIcon" addStyleNames="inline-block"/>
         </b:Column>
         <b:Column size="3">
-
         </b:Column>
       </b:FluidRow>
     </g:FlowPanel>
@@ -35,7 +35,7 @@
       <b:Tab icon="HOME" active="true">
         <b:Heading size="3" ui:field="projectHeader" addStyleNames="inline-block no-top-margin">Project</b:Heading>
         <g:FlowPanel ui:field="tagsPanel" addStyleNames="inline-block small-indent"/>
-        <b:Paragraph ui:field="description"></b:Paragraph>
+        <b:Paragraph ui:field="description"/>
         <b:FluidRow addStyleNames="text-align-center">
           <b:Column size="3">
             <b:WellNavList>
@@ -76,14 +76,14 @@
       </b:Tab>
       <b:Tab icon="LOCK">
         <b:Heading size="3" addStyleNames="no-top-margin">Permissions</b:Heading>
-        <g:FlowPanel ui:field="permissionsPanel"></g:FlowPanel>
+        <g:FlowPanel ui:field="permissionsPanel"/>
       </b:Tab>
       <b:Tab icon="BOOK">
         <b:Heading size="3" addStyleNames="no-top-margin">Administration</b:Heading>
         <g:SimplePanel ui:field="adminPanel"/>
       </b:Tab>
     </o:OpalTabPanel>
-    <g:FlowPanel ui:field="content"></g:FlowPanel>
+    <g:FlowPanel ui:field="content"/>
   </g:FlowPanel>
 
 </ui:UiBinder>

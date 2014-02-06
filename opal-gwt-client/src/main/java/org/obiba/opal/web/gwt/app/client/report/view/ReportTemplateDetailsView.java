@@ -24,7 +24,6 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.DateTimeColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
-import org.obiba.opal.web.model.client.opal.ReportDto;
 import org.obiba.opal.web.model.client.opal.ParameterDto;
 import org.obiba.opal.web.model.client.opal.ReportDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
@@ -216,19 +215,19 @@ public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplate
     StringBuilder paramList = new StringBuilder();
     boolean appended = false;
     for(ParameterDto param : JsArrays.toIterable(params)) {
-      if (appended) {
+      if(appended) {
         paramList.append(", ");
       }
       String value = param.getValue();
       RegExp regExp = RegExp.compile("password");
       MatchResult matcher = regExp.exec(param.getKey());
-      if (matcher != null) {
+      if(matcher != null) {
         value = "******";
       }
       regExp = RegExp.compile("^T$|^TRUE$|^F$|^FALSE$");
       matcher = regExp.exec(value);
-      if (matcher == null) {
-        value = "\"" + value +"\"";
+      if(matcher == null) {
+        value = "\"" + value + "\"";
       }
       paramList.append(param.getKey()).append("=").append(value);
       appended = true;
@@ -311,17 +310,14 @@ public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplate
     final static Comparator<ReportDto> ASCENDING_COMPARATOR = new Comparator<ReportDto>() {
       @Override
       public int compare(ReportDto o1, ReportDto o2) {
-        return ComparisonChain.start()
-            .compare(o1.getName(), o2.getName()).result();
+        return ComparisonChain.start().compare(o1.getName(), o2.getName()).result();
       }
     };
 
     final static Comparator<ReportDto> DESCENDING_COMPARATOR = new Comparator<ReportDto>() {
       @Override
       public int compare(ReportDto o1, ReportDto o2) {
-        return ComparisonChain.start()
-            .compare(o1.getName(), o2.getName(), Ordering.natural().reverse())
-            .result();
+        return ComparisonChain.start().compare(o1.getName(), o2.getName(), Ordering.natural().reverse()).result();
       }
     };
 

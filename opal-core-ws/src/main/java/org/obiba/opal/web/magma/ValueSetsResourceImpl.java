@@ -114,8 +114,10 @@ public class ValueSetsResourceImpl extends AbstractValueTableResource implements
     ValueSetsDto.Builder builder = ValueSetsDto.newBuilder().setEntityType(variable.getEntityType())
         .addVariables(variable.getName());
 
-    VectorSource vector = variableValueSource.asVectorSource();
-    if(vector == null) {
+    if(variableValueSource.supportVectorSource()) {
+      addValueSetDtosFromVectorSource(uriInfo, variableEntities, variable, filterBinary,
+          variableValueSource.asVectorSource(), builder);
+    } else {
       builder.addAllValueSets(Iterables.transform(variableEntities, new Function<VariableEntity, ValueSetDto>() {
         @Override
         public ValueSetDto apply(VariableEntity fromEntity) {
@@ -124,8 +126,6 @@ public class ValueSetsResourceImpl extends AbstractValueTableResource implements
           return getValueSetDto(uriInfo, fromEntity, variable, filterBinary, value);
         }
       }));
-    } else {
-      addValueSetDtosFromVectorSource(uriInfo, variableEntities, variable, filterBinary, vector, builder);
     }
 
     return builder.build();

@@ -90,8 +90,8 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
         }
       };
 
-      ResourceRequestBuilderFactory.<VariableDto>newBuilder().forResource(derivedFromUri).get()
-          .withCallback(new ResourceCallback<VariableDto>() {
+      ResourceRequestBuilderFactory.<VariableDto>newBuilder().forResource(derivedFromUri).get().withCallback(
+          new ResourceCallback<VariableDto>() {
             @Override
             public void onResource(Response response, VariableDto derivedFromVariable) {
               preSelectedVariable = derivedFromVariable.getName();

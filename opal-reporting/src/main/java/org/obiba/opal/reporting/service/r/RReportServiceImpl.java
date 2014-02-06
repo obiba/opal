@@ -91,9 +91,7 @@ public class RReportServiceImpl implements ReportService {
 
   @Override
   public void start() {
-    log.info(isEnabled()
-        ? "R report service started."
-        : "R report service unavailable (R executable is missing)");
+    log.info(isEnabled() ? "R report service started." : "R report service unavailable (R executable is missing)");
   }
 
   @Override

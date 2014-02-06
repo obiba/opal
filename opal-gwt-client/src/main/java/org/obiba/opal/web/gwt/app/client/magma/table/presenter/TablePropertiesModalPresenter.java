@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
@@ -109,8 +109,8 @@ public class TablePropertiesModalPresenter extends ModalPresenterWidget<TablePro
 
   private void onCreate(final TableDto newTable) {
     // make sure it does not exist
-    ResourceRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.DATASOURCE_TABLE.create().build(datasource, newTable.getName())) //
+    ResourceRequestBuilderFactory.newBuilder().forResource(
+        UriBuilders.DATASOURCE_TABLE.create().build(datasource, newTable.getName())) //
         .get() //
         .withCallback(new ResponseCodeCallback() {
           @Override

@@ -18,7 +18,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
@@ -31,7 +31,6 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -109,8 +108,8 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
         : UriBuilders.DATASOURCE_VIEW_VARIABLE.create().query("comment",
             TranslationsUtils.replaceArguments(translations.updateVariableProperties(), variable.getName()));
 
-    ResourceRequestBuilderFactory.newBuilder()
-        .forResource(uriBuilder.build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName())) //
+    ResourceRequestBuilderFactory.newBuilder().forResource(
+        uriBuilder.build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName())) //
         .put() //
         .withResourceBody(VariableDto.stringify(updatedVariable)) //
         .withCallback(new VariableUpdateCallback(updatedVariable), Response.SC_BAD_REQUEST,
@@ -142,8 +141,8 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
         : UriBuilders.DATASOURCE_VIEW_VARIABLES.create()
             .query("comment", TranslationsUtils.replaceArguments(translations.createVariable(), newVariable.getName()));
 
-    ResourceRequestBuilderFactory.newBuilder()
-        .forResource(uriBuilder.build(tableDto.getDatasourceName(), tableDto.getName())) //
+    ResourceRequestBuilderFactory.newBuilder().forResource(
+        uriBuilder.build(tableDto.getDatasourceName(), tableDto.getName())) //
         .post() //
         .withResourceBody("[" + VariableDto.stringify(newVariable) + "]") //
         .withCallback(new VariableCreateCallback(newVariable), Response.SC_BAD_REQUEST,

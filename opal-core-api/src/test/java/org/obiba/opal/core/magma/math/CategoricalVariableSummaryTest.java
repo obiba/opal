@@ -12,10 +12,10 @@ package org.obiba.opal.core.magma.math;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.easymock.EasyMock;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
@@ -29,10 +29,9 @@ import org.obiba.magma.type.TextType;
 
 import com.google.common.collect.ImmutableList;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
@@ -96,18 +95,17 @@ public class CategoricalVariableSummaryTest {
 
   private CategoricalVariableSummary computeFromTable(Variable variable, Iterable<Value> values) {
 
-    VectorSource vectorSource = createMock(VectorSource.class);
-    expect(vectorSource.getValues(EasyMock.<SortedSet<VariableEntity>>anyObject())).andReturn(values);
+    VectorSource vectorSource = mock(VectorSource.class);
+    when(vectorSource.getValues(Mockito.<SortedSet<VariableEntity>>any())).thenReturn(values);
 
-    VariableValueSource valueSource = createMock(VariableValueSource.class);
-    expect(valueSource.asVectorSource()).andReturn(vectorSource);
+    VariableValueSource valueSource = mock(VariableValueSource.class);
+    when(valueSource.supportVectorSource()).thenReturn(true);
+    when(valueSource.asVectorSource()).thenReturn(vectorSource);
 
-    ValueTable table = createMock(ValueTable.class);
-    expect(table.getTimestamps()).andReturn(NullTimestamps.get());
-    expect(table.getVariableEntities()).andReturn(new TreeSet<VariableEntity>());
-    expect(table.getVariableValueSource(variable.getName())).andReturn(valueSource);
-
-    replay(table, vectorSource, valueSource);
+    ValueTable table = mock(ValueTable.class);
+    when(table.getTimestamps()).thenReturn(NullTimestamps.get());
+    when(table.getVariableEntities()).thenReturn(new TreeSet<VariableEntity>());
+    when(table.getVariableValueSource(variable.getName())).thenReturn(valueSource);
 
     CategoricalVariableSummary summary = new CategoricalVariableSummary.Builder(variable)
         .addTable(table, table.getVariableValueSource(variable.getName())).build();

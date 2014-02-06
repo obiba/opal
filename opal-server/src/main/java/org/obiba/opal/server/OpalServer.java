@@ -15,11 +15,24 @@ public class OpalServer {
   private OpalJettyServer jettyServer;
 
   private OpalServer() {
+    asciiArt();
     setProperties();
     configureSLF4JBridgeHandler();
     log.info("Starting Opal server!");
     upgrade();
     start();
+  }
+
+  // http://patorjk.com/software/taag/#p=display&f=Big&t=%3E%20%3E%20%3E%20OPAL
+  private void asciiArt() {
+    System.out.println(" __    __    __      ____  _____        _      \n" +
+        " \\ \\   \\ \\   \\ \\    / __ \\|  __ \\ /\\   | |     \n" +
+        "  \\ \\   \\ \\   \\ \\  | |  | | |__) /  \\  | |     \n" +
+        "   > >   > >   > > | |  | |  ___/ /\\ \\ | |     \n" +
+        "  / /   / /   / /  | |__| | |  / ____ \\| |____ \n" +
+        " /_/   /_/   /_/    \\____/|_| /_/    \\_\\______|\n" +
+        "                                               \n" +
+        "                                               ");
   }
 
   /**

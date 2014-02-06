@@ -71,13 +71,13 @@ public class OpalRService implements Service, ROperationTemplate, HasServiceList
   }
 
   private void notifyListenersOnStart() {
-    for (ServiceListener<OpalRService> listener : listeners) {
+    for(ServiceListener<OpalRService> listener : listeners) {
       listener.onServiceStart(this);
     }
   }
 
   private void notifyListenersOnStop() {
-    for (ServiceListener<OpalRService> listener : listeners) {
+    for(ServiceListener<OpalRService> listener : listeners) {
       listener.onServiceStop(this);
     }
   }
@@ -240,8 +240,8 @@ public class OpalRService implements Service, ROperationTemplate, HasServiceList
   private File getWorkingDirectory() {
     File dir = new File(opalHomeFile, "work" + File.separator + "R");
     if(!dir.exists()) {
-      if (!dir.mkdirs()) {
-       log.error("Unable to create: {}", dir.getAbsolutePath());
+      if(!dir.mkdirs()) {
+        log.error("Unable to create: {}", dir.getAbsolutePath());
       }
     }
     return dir;
@@ -250,7 +250,7 @@ public class OpalRService implements Service, ROperationTemplate, HasServiceList
   private File getLibDirectory() {
     File dir = new File(opalHomeFile, "data" + File.separator + "R" + File.separator + "library");
     if(!dir.exists()) {
-      if (!dir.mkdirs()) {
+      if(!dir.mkdirs()) {
         log.error("Unable to create: {}", dir.getAbsolutePath());
       }
     }
@@ -260,7 +260,7 @@ public class OpalRService implements Service, ROperationTemplate, HasServiceList
   private File getRserveLog() {
     File logFile = new File(opalHomeFile, "logs" + File.separator + "Rserve.log");
     if(!logFile.getParentFile().exists()) {
-      if (!logFile.getParentFile().mkdirs()) {
+      if(!logFile.getParentFile().mkdirs()) {
         log.error("Unable to create: {}", logFile.getParentFile().getAbsolutePath());
       }
     }
@@ -273,6 +273,7 @@ public class OpalRService implements Service, ROperationTemplate, HasServiceList
 
   /**
    * Create a new RConnection given the R server settings.
+   *
    * @return
    * @throws RserveException
    */
@@ -298,6 +299,7 @@ public class OpalRService implements Service, ROperationTemplate, HasServiceList
 
   /**
    * Set the lib paths in the given R connection. Applies only if the R server is locally managed.
+   *
    * @param conn
    */
   private void ensureLibPaths(RConnection conn) {

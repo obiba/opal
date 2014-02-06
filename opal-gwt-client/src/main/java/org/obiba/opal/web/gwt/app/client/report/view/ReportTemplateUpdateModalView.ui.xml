@@ -12,7 +12,6 @@
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
-    xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -35,7 +34,8 @@
         </b:ControlLabel>
         <g:SimplePanel ui:field="designFilePanel"/>
         <b:HelpBlock>
-          <ui:msg description="R Markdown File help">The main R Markdown file must ends with ".Rmd" suffix. R Markdown child
+          <ui:msg description="R Markdown File help">The main R Markdown file must ends with ".Rmd" suffix. R Markdown
+            child
             files will be automatically found relatively to this file.
           </ui:msg>
         </b:HelpBlock>
@@ -47,7 +47,8 @@
         <g:SimplePanel ui:field="reportParametersPanel"/>
         <b:HelpBlock>
           <ui:msg description="Report Parameters help">
-            <a href="http://stat.ethz.ch/R-manual/R-patched/library/base/html/options.html" target="_blank">R options</a>
+            <a href="http://stat.ethz.ch/R-manual/R-patched/library/base/html/options.html" target="_blank">R options
+            </a>
             that will be passed to R at report execution time.
           </ui:msg>
         </b:HelpBlock>
@@ -66,8 +67,9 @@
           <b:TextBox name="schedule" ui:field="schedule" addStyleNames="small-indent"/>
           <b:HelpBlock>
             <ui:msg description="Report Schedule help">
-               See documentation about how to write a
-              <a href="http://www.quartz-scheduler.org/docs/tutorials/crontrigger.html" target="_blank">Cron trigger expression</a>.
+              See documentation about how to write a
+              <a href="http://www.quartz-scheduler.org/docs/tutorials/crontrigger.html" target="_blank">Cron trigger
+                expression</a>.
             </ui:msg>
           </b:HelpBlock>
         </b:ControlGroup>

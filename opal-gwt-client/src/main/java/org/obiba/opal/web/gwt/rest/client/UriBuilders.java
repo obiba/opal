@@ -518,6 +518,20 @@ public enum UriBuilders {
       return UriBuilder.create().segment("datasource", "{}", "view", "{}", "vcs", "variable", "{}", "blob", "{}");
     }
 
+  },
+
+  BOOKMARK {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "subject-profile", "_current", "bookmark", "{}");
+    }
+  },
+
+  BOOKMARKS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "subject-profile", "_current", "bookmarks");
+    }
   };
 
   public abstract UriBuilder create();

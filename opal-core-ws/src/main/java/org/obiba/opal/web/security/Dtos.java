@@ -2,12 +2,16 @@ package org.obiba.opal.web.security;
 
 import java.text.SimpleDateFormat;
 
+import org.obiba.opal.core.domain.security.Bookmark;
 import org.obiba.opal.core.domain.security.Group;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.web.model.Opal;
+import org.springframework.util.StringUtils;
 
 import com.google.common.collect.Sets;
+
+import static org.obiba.opal.web.model.Opal.BookmarkDto.ResourceType;
 
 public class Dtos {
 
@@ -61,7 +65,38 @@ public class Dtos {
         .setPrincipal(profile.getPrincipal()) //
         .setRealm(profile.getRealm()) //
         .setCreated(ISO_8601.format(profile.getCreated())) //
-        .setLastUpdate(ISO_8601.format(profile.getUpdated())).build();
+        .setLastUpdate(ISO_8601.format(profile.getUpdated())) //
+        .build();
   }
 
+  public static Opal.BookmarkDto asDto(Bookmark bookmark) {
+    Opal.BookmarkDto.Builder builder = Opal.BookmarkDto.newBuilder() //
+        .setResource(bookmark.getResource()) //
+        .setCreated(ISO_8601.format(bookmark.getCreated()));
+
+    String[] fragments = StringUtils.tokenizeToStringArray(bookmark.getResource(), "/");
+    int nbFragments = fragments.length;
+    if(nbFragments >= 2) {
+      builder.addLinks(Opal.LinkDto.newBuilder().setRel(toUri(fragments[0], fragments[1])).setLink(fragments[1]));
+      builder.setType(ResourceType.PROJECT);
+    }
+    if(nbFragments >= 4) {
+      builder.addLinks(Opal.LinkDto.newBuilder().setRel(toUri(fragments[0], fragments[1], fragments[2], fragments[3]))
+          .setLink(fragments[3]));
+      builder.setType(ResourceType.TABLE);
+    }
+    if(nbFragments == 6) {
+      builder.addLinks(Opal.LinkDto.newBuilder().setRel(bookmark.getResource()).setLink(fragments[5]));
+      builder.setType(ResourceType.VARIABLE);
+    }
+    return builder.build();
+  }
+
+  private static String toUri(String... fragments) {
+    StringBuilder sb = new StringBuilder();
+    for(String fragment : fragments) {
+      sb.append("/").append(fragment);
+    }
+    return sb.toString();
+  }
 }

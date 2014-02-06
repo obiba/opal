@@ -57,12 +57,12 @@ public class CategoricalSummaryView extends Composite {
   public CategoricalSummaryView(final String title, CategoricalSummaryDto categorical) {
     initWidget(uiBinder.createAndBindUi(this));
     stats.clear();
-    stats.setHeader(0, translations.statsMap().get("DESC_STATISTICS"));
-    stats.setHeader(1, translations.statsMap().get("VALUE"));
+    stats.setHeader(0, translations.descriptiveStatistics());
+    stats.setHeader(1, translations.value());
     int row = 0;
-    stats.setWidget(row, 0, new Label(translations.statsMap().get("N")));
+    stats.setWidget(row, 0, new Label(translations.NLabel()));
     stats.setWidget(row++, 1, new Label("" + Math.round(categorical.getN())));
-    stats.setWidget(row, 0, new Label(translations.statsMap().get("MODE")));
+    stats.setWidget(row, 0, new Label(translations.mode()));
     stats.setWidget(row++, 1, new Label(categorical.getMode()));
 
     chartsPanel.addSelectionHandler(new SelectionHandler<Integer>() {
@@ -81,8 +81,8 @@ public class CategoricalSummaryView extends Composite {
       chartFactory = new FrequencyChartFactory();
       frequencies.clear();
 
-      frequencies.setHeader(0, translations.statsMap().get("CATEGORY"));
-      frequencies.setHeader(1, translations.statsMap().get("FREQUENCY"));
+      frequencies.setHeader(0, translations.categoryLabel());
+      frequencies.setHeader(1, translations.frequency());
       frequencies.setHeader(2, "%");
       for(int i = 0; i < count; i++) {
         FrequencyDto value = categorical.getFrequenciesArray().get(i);

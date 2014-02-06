@@ -9,14 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.core.service;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.validation.constraints.NotNull;
 
-import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueSource;
@@ -104,13 +102,9 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     for(int i = 0; i < 100; i++) {
       VariableEntity privateEntity = entityFor(participantIdentifier.generateIdentifier());
       if(!publicToPrivate.inverse().containsKey(privateEntity)) {
-        try {
-          writeEntities(keysValueTable, publicEntity, privateEntity);
-          log.debug("{} <--> ({}) added", publicEntity.getIdentifier(), privateEntity.getIdentifier());
-          publicToPrivate.put(entityFor(publicEntity.getIdentifier()), privateEntity);
-        } catch(IOException e) {
-          throw new MagmaRuntimeException(e);
-        }
+        writeEntities(keysValueTable, publicEntity, privateEntity);
+        log.debug("{} <--> ({}) added", publicEntity.getIdentifier(), privateEntity.getIdentifier());
+        publicToPrivate.put(entityFor(publicEntity.getIdentifier()), privateEntity);
         return privateEntity;
       }
     }
@@ -125,12 +119,8 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     for(int i = 0; i < 100; i++) {
       VariableEntity publicEntity = entityFor(participantIdentifier.generateIdentifier());
       if(!publicToPrivate.containsKey(publicEntity)) {
-        try {
-          writeEntities(keysValueTable, publicEntity, privateEntity);
-          publicToPrivate.put(publicEntity, entityFor(privateEntity.getIdentifier()));
-        } catch(IOException e) {
-          throw new MagmaRuntimeException(e);
-        }
+        writeEntities(keysValueTable, publicEntity, privateEntity);
+        publicToPrivate.put(publicEntity, entityFor(privateEntity.getIdentifier()));
         return publicEntity;
       }
     }
@@ -139,8 +129,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
             privateEntity.getIdentifier() + "]. One hundred attempts made.");
   }
 
-  private void writeEntities(ValueTable keyTable, VariableEntity publicEntity, VariableEntity privateEntity)
-      throws IOException {
+  private void writeEntities(ValueTable keyTable, VariableEntity publicEntity, VariableEntity privateEntity) {
     ValueTableWriter vtw = keyTable.getDatasource().createWriter(keyTable.getName(), keyTable.getEntityType());
     ValueSetWriter vsw = vtw.writeValueSet(publicEntity);
     vsw.writeValue(ownerVariable, TextType.get().valueOf(privateEntity.getIdentifier()));
@@ -157,10 +146,10 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     log.info("Constructing participant identifier cache for keysValueTable: {}, ownerVariable: {}",
         keysValueTable.getName(), ownerVariable.getName());
     VariableValueSource ownerVariableSource = keysValueTable.getVariableValueSource(ownerVariable.getName());
-    if(ownerVariableSource.asVectorSource() == null) {
-      constructCacheFromTable(keysValueTable, ownerVariableSource);
-    } else {
+    if(ownerVariableSource.supportVectorSource()) {
       constructCacheFromVector(keysValueTable, ownerVariableSource.asVectorSource());
+    } else {
+      constructCacheFromTable(keysValueTable, ownerVariableSource);
     }
     log.debug("Cache constructed: {}", publicToPrivate);
   }

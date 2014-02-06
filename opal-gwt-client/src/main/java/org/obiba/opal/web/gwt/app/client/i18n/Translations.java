@@ -412,6 +412,7 @@ public interface Translations extends Constants {
       "UnauthorizedOperation", "You are not allowed to perform this operation.",//
       "CannotWriteToView", "Cannot modify a View using this operation. Use the View editor.",//
       "DatesRangeInvalid", "Date range is invalid. Please make sure 'From' date precedes 'To' date.",//
+      "SelectDerivationMethod", "Select a derivation method.",//
       "CouldNotCreateReportTemplate", "Could not create the Report Template.",//
       "ReportTemplateCannotBeFound", "The Report Template cannot be found.",//
       "DatasourceCreationFailed", "The datasource creation has failed: {0}",//
@@ -522,7 +523,8 @@ public interface Translations extends Constants {
       "GeneralKeystoreError", "Key pair storage failed. Please make sure to provide valid certificate information.",
       "DerivedVariableNameRequired", "Derived variable name is required.",//
       "DestinationViewNameRequired", "Destination View Name Required label",//
-      "AddDerivedVariableToViewOnly", "A derived variable can only be added to a view."//
+      "AddDerivedVariableToViewOnly", "A derived variable can only be added to a view.",//
+      "NamespaceCannotBeEmptyChars", "A namespace cannot contain only blank characters."//
   })
   Map<String, String> userMessageMap();
 
@@ -1783,34 +1785,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Server has been running for {0}.")
   String serverRunningFor();
 
-  @Description("Statistics Related Labels")
-  @DefaultStringMapValue({ "PLOT", "Plot",//
-      "STATISTICS", "Statistics",//
-      "DESC_STATISTICS", "Descriptive Statistic",//
-      "VALUE", "Value",//
-      "N", "N", //
-      "MIN", "Min", //
-      "MAX", "Max", //
-      "MEAN", "Mean", //
-      "MEDIAN", "Median", //
-      "STD_DEVIATION", "Standard Deviation", //
-      "VARIANCE", "Variance", //
-      "SKEWNESS", "Skewness", //
-      "KURTOSIS", "Kurtosis", //
-      "SUM", "Sum", //
-      "SUM_OF_SQUARES", "Sum of squares", //
-      "HISTOGRAM", "Histogram", //
-      "DENSITY", "Density",//
-      "NORMAL_PROB", "Normal Probability",//
-      "THEORETHICAL_QUANTILES", "Theroretical Quantiles",//
-      "SAMPLE_QUANTILES", "Sample Quantiles",//
-      "MODE", "Mode",//
-      "CATEGORY", "Category",//
-      "FREQUENCY", "Frequency"//
-
-  })
-  Map<String, String> statsMap();
-
   @Description("JVM Labels")
   @DefaultStringMapValue({ "OPAL_VERSION", "Opal Version",//
       "JAVA_VERSION", "Java Version", //
@@ -1901,10 +1875,6 @@ public interface Translations extends Constants {
   @Description("Edit Identifiers Mapping label")
   @DefaultStringValue("Edit Identifiers Mapping")
   String editIdentifiersMapping();
-
-  @Description("Last Update Ago label")
-  @DefaultStringValue("Last update {0}")
-  String lastUpdateAgoLabel();
 
   @Description("Report templates header")
   @DefaultStringValue("{0} Reports")
@@ -2123,4 +2093,79 @@ public interface Translations extends Constants {
   @DefaultStringValue("Full/normal screen")
   String switchScreenDisplay();
 
+  @Description("Descriptive statistics label")
+  @DefaultStringValue("Descriptive statistics")
+  String descriptiveStatistics();
+
+  @Description("Mode label")
+  @DefaultStringValue("Mode")
+  String mode();
+
+  @Description("Histogram")
+  @DefaultStringValue("Histogram")
+  String histogram();
+
+  @Description("Density")
+  @DefaultStringValue("Density")
+  String density();
+
+  @Description("Normal Probability")
+  @DefaultStringValue("Normal Probability")
+  String normalProbability();
+
+  @Description("Sample Quantiles")
+  @DefaultStringValue("Sample Quantiles")
+  String sampleQuantiles();
+
+  @Description("Theroretical Quantiles")
+  @DefaultStringValue("Theroretical Quantiles")
+  String theoreticalQuantiles();
+
+  @Description("Sum of squares")
+  @DefaultStringValue("Sum of squares")
+  String sumOfSquares();
+
+  @Description("Sum")
+  @DefaultStringValue("Sum")
+  String sum();
+
+  @Description("Kurtosis")
+  @DefaultStringValue("Kurtosis")
+  String kurtosis();
+
+  @Description("Skewness")
+  @DefaultStringValue("Skewness")
+  String skewness();
+
+  @Description("Variance")
+  @DefaultStringValue("Variance")
+  String variance();
+
+  @Description("Median")
+  @DefaultStringValue("Median")
+  String median();
+
+  @Description("Max")
+  @DefaultStringValue("Max")
+  String max();
+
+  @Description("Min")
+  @DefaultStringValue("Min")
+  String min();
+
+  @Description("Not null statistics label")
+  @DefaultStringValue("Not null")
+  String notNullStatistics();
+
+  @Description("Select a derivation method message")
+  @DefaultStringValue("Select a derivation method")
+  String selectDerivationMethod();
+
+  @Description("Click to remove this item from your bookmarks label")
+  @DefaultStringValue("Click to remove this item from your bookmarks")
+  String clickToRemoveFromBookmarks();
+
+  @Description("Click to add this item to your bookmarks label")
+  @DefaultStringValue("Click to add this item to your bookmarks")
+  String clickToAddToBookmarks();
 }

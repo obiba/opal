@@ -1,5 +1,8 @@
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
+import javax.inject.Provider;
+
+import org.obiba.opal.web.gwt.app.client.bookmark.icon.BookmarkIconPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
@@ -10,7 +13,6 @@ import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -18,6 +20,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
@@ -33,13 +36,18 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
 
   private final VariablePresenter variablePresenter;
 
+  private final BookmarkIconPresenter bookmarkIconPresenter;
+
   @Inject
   public MagmaPresenter(EventBus eventBus, Display display, DatasourcePresenter datasourcePresenter,
-      TablePresenter tablePresenter, VariablePresenter variablePresenter) {
+      TablePresenter tablePresenter, VariablePresenter variablePresenter,
+      Provider<BookmarkIconPresenter> bookmarkIconPresenterProvider) {
     super(eventBus, display);
     this.datasourcePresenter = datasourcePresenter;
     this.tablePresenter = tablePresenter;
     this.variablePresenter = variablePresenter;
+    bookmarkIconPresenter = bookmarkIconPresenterProvider.get();
+    bookmarkIconPresenter.addStyleName("small-indent");
   }
 
   @Override
@@ -54,6 +62,8 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
     setInSlot(Display.Slot.DATASOURCE, datasourcePresenter);
     setInSlot(Display.Slot.TABLE, tablePresenter);
     setInSlot(Display.Slot.VARIABLE, variablePresenter);
+
+    getView().setBookmarkIcon(bookmarkIconPresenter);
   }
 
   @Override
@@ -92,58 +102,65 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
   private void show(String datasource) {
     getView().selectDatasource(datasource);
     fireEvent(new DatasourceSelectionChangeEvent(this, datasource));
+    bookmarkIconPresenter.setBookmarkable(null);
   }
 
   private void show(String datasource, String table) {
     getView().selectTable(datasource, table, false);
     fireEvent(new TableSelectionChangeEvent(this, datasource, table));
+    bookmarkIconPresenter.setBookmarkable(UriBuilders.DATASOURCE_TABLE.create().build(datasource, table));
   }
 
   private void show(final String datasource, final String table, final String variable) {
     // table counts are required for having variable summary and values
-    UriBuilder ub = UriBuilders.DATASOURCE_TABLE.create().query("counts", "true");
-    ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(datasource, table)).get()
+    ResourceRequestBuilderFactory.<TableDto>newBuilder() //
+        .forResource(UriBuilders.DATASOURCE_TABLE.create().query("counts", "true").build(datasource, table)) //
         .withCallback(new ResourceCallback<TableDto>() {
           @Override
           public void onResource(Response response, final TableDto tableDto) {
             if(tableDto == null) return;
 
-            UriBuilder ub = UriBuilders.DATASOURCE_TABLE_VARIABLES.create();
-            ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(ub.build(datasource, table))
-                .get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
+            ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder() //
+                .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLES.create().build(datasource, table)) //
+                .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
 
-              @Override
-              public void onResource(Response response, JsArray<VariableDto> resource) {
-                JsArray<VariableDto> variables = JsArrays.toSafeArray(resource);
-
-                VariableDto previous = null;
-                VariableDto selection = null;
-                VariableDto next = null;
-                for(int i = 0; i < variables.length(); i++) {
-                  if(variables.get(i).getName().equals(variable)) {
-                    selection = variables.get(i);
-
-                    if(i >= 0) {
-                      previous = variables.get(i - 1);
+                  @Override
+                  public void onResource(Response response, JsArray<VariableDto> resource) {
+                    JsArray<VariableDto> variables = JsArrays.toSafeArray(resource);
+                    VariableDto previous = null;
+                    VariableDto selection = null;
+                    VariableDto next = null;
+                    int nbVariables = variables.length();
+                    for(int i = 0; i < nbVariables; i++) {
+                      if(variables.get(i).getName().equals(variable)) {
+                        selection = variables.get(i);
+                        if(i >= 0) {
+                          previous = variables.get(i - 1);
+                        }
+                        if(i < nbVariables - 1) {
+                          next = variables.get(i + 1);
+                        }
+                        break;
+                      }
                     }
-
-                    if(i < variables.length() - 1) {
-                      next = variables.get(i + 1);
-                    }
+                    fireEvent(new VariableSelectionChangeEvent(tableDto, selection, previous, next));
                   }
-                }
-                fireEvent(new VariableSelectionChangeEvent(tableDto, selection, previous, next));
-              }
-            })//
+                })//
                 .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
                   @Override
                   public void onResponseCode(Request request, Response response) {
                     // TODO fix error message
                     getEventBus().fireEvent(NotificationEvent.newBuilder().error("SearchServiceUnavailable").build());
                   }
-                }).send();
+                }) //
+                .get() //
+                .send();
           }
-        }).send();
+        }) //
+        .get() //
+        .send();
+    bookmarkIconPresenter
+        .setBookmarkable(UriBuilders.DATASOURCE_TABLE_VARIABLE.create().build(datasource, table, variable));
   }
 
   public interface Display extends View {
@@ -151,8 +168,10 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
     enum Slot {
       DATASOURCE,
       TABLE,
-      VARIABLE
+      VARIABLE,
     }
+
+    void setBookmarkIcon(IsWidget widget);
 
     void selectDatasource(String name);
 

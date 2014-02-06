@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.obiba.opal.core.domain.security.Group;
 import org.obiba.opal.core.domain.security.KeyStoreState;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
+import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.AbstractOrientDbTestConfig;
 import org.obiba.opal.core.service.Asserts;
@@ -241,9 +242,9 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
 
   @Test(expected = PasswordTooShortException.class)
   public void test_change_password_with_short_password() {
-    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().authenticationType(
-        SubjectCredentials.AuthenticationType.PASSWORD).name("user1").password(
-            subjectCredentialsService.hashPassword("password")).build();
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
+        .authenticationType(SubjectCredentials.AuthenticationType.PASSWORD).name("user1")
+        .password(subjectCredentialsService.hashPassword("password")).build();
 
     subjectCredentialsService.save(subjectCredentials);
     subjectCredentialsService.changePassword("user1", "password", "pass");
@@ -251,9 +252,9 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
 
   @Test(expected = OldPasswordMismatchException.class)
   public void test_change_password_with_old_password_mismatch() {
-    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().authenticationType(
-        SubjectCredentials.AuthenticationType.PASSWORD).name("user1").password(
-        subjectCredentialsService.hashPassword("password")).build();
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
+        .authenticationType(SubjectCredentials.AuthenticationType.PASSWORD).name("user1")
+        .password(subjectCredentialsService.hashPassword("password")).build();
 
     subjectCredentialsService.save(subjectCredentials);
     subjectCredentialsService.changePassword("user1", "password2", "password1");
@@ -261,9 +262,9 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
 
   @Test(expected = PasswordNotChangedException.class)
   public void test_change_password_with_password_unchanged() {
-    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().authenticationType(
-        SubjectCredentials.AuthenticationType.PASSWORD).name("user1").password(
-        subjectCredentialsService.hashPassword("password")).build();
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
+        .authenticationType(SubjectCredentials.AuthenticationType.PASSWORD).name("user1")
+        .password(subjectCredentialsService.hashPassword("password")).build();
 
     subjectCredentialsService.save(subjectCredentials);
     subjectCredentialsService.changePassword("user1", "password", "password");
@@ -271,9 +272,9 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
 
   @Test
   public void test_change_password_with_password_changed() {
-    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().authenticationType(
-        SubjectCredentials.AuthenticationType.PASSWORD).name("user1").password(
-        subjectCredentialsService.hashPassword("password")).build();
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
+        .authenticationType(SubjectCredentials.AuthenticationType.PASSWORD).name("user1")
+        .password(subjectCredentialsService.hashPassword("password")).build();
 
     subjectCredentialsService.save(subjectCredentials);
     subjectCredentialsService.changePassword("user1", "password", "password1");
@@ -328,8 +329,10 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
     @Bean
     public SubjectProfileService subjectProfileService() {
       SubjectProfileService subjectProfileService = EasyMock.createMock(SubjectProfileService.class);
-      expect(subjectProfileService.getProfile("user1")).andReturn(null).anyTimes();
-      expect(subjectProfileService.getProfile("app1")).andReturn(null).anyTimes();
+      expect(subjectProfileService.getProfile("user1")).andReturn(new SubjectProfile("user1", OpalUserRealm.OPAL_REALM))
+          .anyTimes();
+      expect(subjectProfileService.getProfile("app1"))
+          .andReturn(new SubjectProfile("app1", ApplicationRealm.APPLICATION_REALM)).anyTimes();
       subjectProfileService.ensureProfile("user1", OpalUserRealm.OPAL_REALM);
       expectLastCall().anyTimes();
       subjectProfileService.ensureProfile("app1", ApplicationRealm.APPLICATION_REALM);

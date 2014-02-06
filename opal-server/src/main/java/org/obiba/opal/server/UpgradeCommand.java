@@ -20,8 +20,9 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.obiba.core.util.FileUtil;
 import org.obiba.opal.core.upgrade.v2_0_x.ConfigFolderUpgrade;
-import org.obiba.opal.core.upgrade.v2_0_x.database.Opal2DatabaseConfigurator;
+import org.obiba.opal.core.upgrade.v2_0_x.database.Opal2PropertiesConfigurator;
 import org.obiba.runtime.upgrade.UpgradeException;
 import org.obiba.runtime.upgrade.UpgradeManager;
 import org.slf4j.Logger;
@@ -33,6 +34,8 @@ import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+
+import com.google.common.base.Strings;
 
 /**
  * Command to perform an upgrade (i.e., invoke the upgrade manager).
@@ -71,13 +74,13 @@ public class UpgradeCommand {
    */
   private boolean hasVersionInConfigXml() {
     try {
-      File opalConfig = new File(System.getenv().get("OPAL_HOME") + "/data/opal-config.xml");
+      File opalConfig = new File(System.getenv().get("OPAL_HOME"), "data" + File.separatorChar + "opal-config.xml");
       if(!opalConfig.exists()) return false;
 
       Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(opalConfig);
       XPath xPath = XPathFactory.newInstance().newXPath();
       Node node = (Node) xPath.compile("//version").evaluate(doc.getDocumentElement(), XPathConstants.NODE);
-      return node != null;
+      return node != null && !Strings.isNullOrEmpty(node.getNodeValue());
     } catch(SAXException | XPathExpressionException | ParserConfigurationException | IOException e) {
       throw new RuntimeException(e);
     }
@@ -89,7 +92,8 @@ public class UpgradeCommand {
   private boolean hasDatasourceInConfigProperties() {
     try {
       Properties properties = PropertiesLoaderUtils.loadProperties(
-          new FileSystemResource(new File(System.getenv().get("OPAL_HOME") + "/conf/opal-config.properties")));
+          new FileSystemResource(new File(System.getenv().get("OPAL_HOME"), "conf" + File.separatorChar +
+              "opal-config.properties")));
       return properties.containsKey("org.obiba.opal.datasource.opal.driver");
     } catch(IOException e) {
       throw new RuntimeException(e);
@@ -99,8 +103,10 @@ public class UpgradeCommand {
   private void opal2Upgrade() {
     log.info("Prepare upgrade to Opal 2.0.0");
 
+    prepareConfigFiles();
+
     // need to be run out of Spring context
-    new Opal2DatabaseConfigurator().configureDatabase();
+    new Opal2PropertiesConfigurator().upgrade();
     ConfigFolderUpgrade.cleanDirectories();
 
     try(ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(OPAL2_CONTEXT_PATHS)) {
@@ -109,6 +115,45 @@ public class UpgradeCommand {
       } catch(UpgradeException upgradeFailed) {
         throw new RuntimeException("An error occurred while running the opal-2.0.0 upgrade manager", upgradeFailed);
       }
+    }
+  }
+
+  private void prepareConfigFiles() {
+    prepareOpalConfigFile();
+    prepareDistConfigFile("Rserv.conf");
+    prepareDistConfigFile("logback.xml");
+  }
+
+  private void prepareDistConfigFile(String name) {
+    File confFile = new File(System.getenv().get("OPAL_HOME"), "conf" + File.separatorChar +
+        name);
+    if(confFile.exists()) return;
+
+    // try to find conf file in opal distribution
+    if(!System.getenv().containsKey("OPAL_DIST")) return;
+    File distFile = new File(System.getenv().get("OPAL_DIST"), "conf" + File.separatorChar +
+        name);
+    if(!distFile.exists()) return;
+    try {
+      FileUtil.copyFile(distFile, confFile);
+    } catch(IOException e) {
+      throw new RuntimeException("Unable to prepare " + name + " configuration file before upgrade", e);
+    }
+  }
+
+  private void prepareOpalConfigFile() {
+    File originalConfig = new File(System.getenv().get("OPAL_HOME"), "conf" + File.separatorChar +
+        "opal-config.xml");
+    if(!originalConfig.exists()) return;
+
+    try {
+      File originalConfigCopy = new File(originalConfig.getAbsolutePath() + ".opal1");
+      if(!originalConfigCopy.exists()) FileUtil.copyFile(originalConfig, originalConfigCopy);
+      File dataDir = new File(System.getenv().get("OPAL_HOME"), "data");
+      if(!dataDir.exists()) dataDir.mkdirs();
+      FileUtil.moveFile(originalConfig, dataDir);
+    } catch(IOException e) {
+      throw new RuntimeException("Unable to change location of opal-config.xml before upgrade", e);
     }
   }
 

@@ -74,10 +74,12 @@ public class BaseMap extends Composite {
     contentPanel.add(mapWidget);
   }
 
+  @Override
   public void setHeight(String height) {
     mapWidget.setHeight(height);
   }
 
+  @Override
   public void setWidth(String width) {
     mapWidget.setWidth(width);
   }
