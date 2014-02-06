@@ -1,26 +1,3 @@
-/*@external chzn-container;*/
-/*@external .chzn-rtl;*/
-/*@external .chzn-drop;*/
-/*@external .chzn-container-single;*/
-/*@external .chzn-single;*/
-/*@external .chzn-default;*/
-/*@external .chzn-search;*/
-/*@external .chzn-container-single-nosearch;*/
-/*@external .chzn-container-multi;*/
-/*@external .chzn-choices;*/
-/*@external .search-field;*/
-/*@external .default;*/
-/*@external .search-choice-focus;*/
-/*@external .search-choice-close;*/
-/*@external .chzn-results;*/
-/*@external .no-results;*/
-/*@external .group-result;*/
-/*@external .group-option;*/
-/*@external .result-selected;*/
-/*@external .chzn-results-scroll;*/
-/*@external .chzn-results-scroll-down;*/
-/*@external .chzn-results-scroll-up;*/
-
 @noflip {
 /* @group Base */
   .chzn-container .chzn-results .highlighted {
@@ -30,7 +7,4 @@
   }
 /* @end */
 
-/*To make the gwt compiler happy*/
-  .chzn-done {
-  }
 }
