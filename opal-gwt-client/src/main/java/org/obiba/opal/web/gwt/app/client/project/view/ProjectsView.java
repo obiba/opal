@@ -66,10 +66,14 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
   private ListHandler<ProjectDto> typeSortHandler;
 
+//  private final Provider<BookmarkIconPresenter> bookmarkIconPresenterProvider;
+
   @Inject
-  public ProjectsView(Binder uiBinder, PlaceManager placeManager, Translations translations) {
+  public ProjectsView(Binder uiBinder, PlaceManager placeManager, Translations translations/*,
+      Provider<BookmarkIconPresenter> bookmarkIconPresenterProvider*/) {
     this.placeManager = placeManager;
     this.translations = translations;
+//    this.bookmarkIconPresenterProvider = bookmarkIconPresenterProvider;
     initWidget(uiBinder.createAndBindUi(this));
     initProjectsTable();
   }
@@ -91,7 +95,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     projectsTable.addColumn(new LastUpdatedColumn(), translations.lastUpdatedLabel());
     projectsDataProvider.addDataDisplay(projectsTable);
     typeSortHandler = new ListHandler<ProjectDto>(projectsDataProvider.getList());
-    typeSortHandler.setComparator(projectsTable.getColumn(SORTABLE_COLUMN_NAME), new NameComparator());
+    typeSortHandler.setComparator(projectsTable.getColumn(SORTABLE_COLUMN_NAME), new TitleOrNameComparator());
     typeSortHandler.setComparator(projectsTable.getColumn(SORTABLE_COLUMN_LAST_UPDATED), new LastUpdateComparator());
 
     projectsTable.getHeader(SORTABLE_COLUMN_NAME).setHeaderStyleNames("sortable-header-column");
@@ -131,6 +135,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
     private NameColumn(ProjectLinkCell cell) {
       super(cell);
+      //TODO render bookmark icon
       setSortable(true);
       setDefaultSortAscending(true);
     }
@@ -139,6 +144,30 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     public ProjectDto getValue(ProjectDto projectDto) {
       return projectDto;
     }
+
+//    private Widget newProjectLink(final ProjectDto project) {
+//      Anchor link = new Anchor(project.getTitle());
+//      link.setTitle(project.getName());
+//      link.addClickHandler(new ClickHandler() {
+//        @Override
+//        public void onClick(ClickEvent event) {
+//          getUiHandlers().onProjectSelection(project);
+//        }
+//      });
+//
+//      Heading head = new Heading(5);
+//      head.addStyleName("inline-block small-right-indent no-top-margin");
+//      head.add(getBookmarkIconWidget(project));
+//      head.add(link);
+//      return head;
+//    }
+//
+//    private Widget getBookmarkIconWidget(ProjectDto project) {
+//      BookmarkIconPresenter bookmarkIconPresenter = bookmarkIconPresenterProvider.get();
+//      bookmarkIconPresenter.setBookmarkable(UriBuilders.DATASOURCE.create().build(project.getName()));
+//      bookmarkIconPresenter.addStyleName("small-right-indent");
+//      return bookmarkIconPresenter.asWidget();
+//    }
   }
 
   private static final class DescriptionColumn extends TextColumn<ProjectDto> {
@@ -165,7 +194,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     }
   }
 
-  private static final class NameComparator implements Comparator<ProjectDto> {
+  private static final class TitleOrNameComparator implements Comparator<ProjectDto> {
     @Override
     public int compare(ProjectDto o1, ProjectDto o2) {
       String m1 = o1.hasTitle() ? o1.getTitle() : o1.getName();
