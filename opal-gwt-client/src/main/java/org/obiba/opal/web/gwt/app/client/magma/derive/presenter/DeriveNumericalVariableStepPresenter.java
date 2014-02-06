@@ -105,7 +105,7 @@ public class DeriveNumericalVariableStepPresenter
   @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private boolean addValueMapEntry(@Nullable String value, String newValue) {
     if(derivationHelper.hasValueMapEntryWithValue(value)) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.valueMapAlreadyAdded()).build());
+      fireEvent(NotificationEvent.newBuilder().error(translations.valueMapAlreadyAdded()).build());
       return false;
     }
     numberType.addValueMapEntry(derivationHelper, value, newValue);
@@ -114,7 +114,7 @@ public class DeriveNumericalVariableStepPresenter
 
   private boolean addValueMapEntry(@Nullable Number lower, @Nullable Number upper, String newValue) {
     if(!numberType.addValueMapEntry(derivationHelper, lower, upper, newValue)) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.rangeOverlap()).build());
+      fireEvent(NotificationEvent.newBuilder().error(translations.rangeOverlap()).build());
       return false;
     }
     return true;
