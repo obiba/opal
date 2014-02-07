@@ -1,12 +1,14 @@
 package org.obiba.opal.web.gwt.app.client.ui.resources;
 
-import com.google.gwt.resources.client.ClientBundle;
-import com.google.gwt.resources.client.CssResource;
+import com.google.gwt.resources.client.DataResource;
+import com.watopi.chosen.client.resources.ChozenCss;
 import com.watopi.chosen.client.resources.Resources;
 
 public interface ChooserResources extends Resources {
 
-  @ClientBundle.Source("chooser.css")
-  @CssResource.NotStrict
-  ChooserCss css();
+  @Source("chooser.css")
+  ChozenCss css();
+
+  @Source("chosen-sprite.png")
+  DataResource chosenSprite();
 }
