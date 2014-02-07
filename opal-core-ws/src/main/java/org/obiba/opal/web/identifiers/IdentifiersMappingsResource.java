@@ -257,19 +257,15 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
     ensureEntityType(entityType);
     ValueTable table = getValueTable(entityType);
 
-    ByteArrayOutputStream values = new ByteArrayOutputStream();
-    CSVWriter writer = null;
-    try {
-      writer = new CSVWriter(new PrintWriter(values));
+    try(ByteArrayOutputStream values = new ByteArrayOutputStream();
+        CSVWriter writer = new CSVWriter(new PrintWriter(values))) {
       writeCSVValues(writer, table);
-    } finally {
-      if(writer != null) writer.close();
+
+      String filename = "Ids" + (table != null ? "-" + table.getName() : "") + ".csv";
+
+      return Response.ok(values.toByteArray(), "text/csv")
+          .header("Content-Disposition", "attachment; filename=\"" + filename + "\"").build();
     }
-
-    String filename = "Ids" + (table != null ? "-" + table.getName() : "") + ".csv";
-
-    return Response.ok(values.toByteArray(), "text/csv")
-        .header("Content-Disposition", "attachment; filename=\"" + filename + "\"").build();
   }
   //
   // Private methods
