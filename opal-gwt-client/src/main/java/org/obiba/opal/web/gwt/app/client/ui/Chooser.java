@@ -26,21 +26,10 @@ public class Chooser extends ChosenListBox {
     initWidget();
   }
 
-//  public Chooser(ChosenOptions options) {
-//    super(options);
-//    initWidget();
-//  }
-
   public Chooser(boolean isMultipleSelect) {
     super(isMultipleSelect, new ChosenOptions().setResources(GWT.<ChooserResources>create(ChooserResources.class)));
     initWidget();
   }
-
-//  public Chooser(boolean isMultipleSelect, ChosenOptions options) {
-//    super(isMultipleSelect, options);
-//
-//    initWidget();
-//  }
 
   public Chooser(Element element) {
     super(element);
