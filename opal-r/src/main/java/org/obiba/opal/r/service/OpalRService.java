@@ -9,10 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.r.service;
 
-import java.io.File;
 import java.util.List;
 
-import org.obiba.core.util.StringUtil;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.HasServiceListener;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
@@ -21,15 +19,15 @@ import org.obiba.opal.core.runtime.ServiceListener;
 import org.obiba.opal.r.ROperation;
 import org.obiba.opal.r.ROperationTemplate;
 import org.obiba.opal.r.RRuntimeException;
-import org.obiba.opal.r.RScriptROperation;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 /**
@@ -40,11 +38,8 @@ public class OpalRService implements Service, ROperationTemplate, HasServiceList
 
   private static final Logger log = LoggerFactory.getLogger(OpalRService.class);
 
-  @Value("${OPAL_HOME}")
-  private File opalHomeFile;
-
-  @Value("${org.obiba.opal.R.exec}")
-  private String exec;
+  @Value("${org.obiba.rserver.port}")
+  private Integer rServerPort;
 
   @Value("${org.obiba.opal.Rserve.host}")
   private String host;
@@ -60,8 +55,6 @@ public class OpalRService implements Service, ROperationTemplate, HasServiceList
 
   @Value("${org.obiba.opal.Rserve.encoding}")
   private String encoding;
-
-  private int rserveStatus = -1;
 
   private final List<ServiceListener<OpalRService>> listeners = Lists.newArrayList();
 
@@ -93,8 +86,6 @@ public class OpalRService implements Service, ROperationTemplate, HasServiceList
 
     try {
       conn = newRConnection();
-      // make sure the environment is correctly configured each time a connection is created
-      ensureLibPaths(conn);
     } catch(RserveException e) {
       log.error("Error while connecting to R: {}", e.getMessage());
       throw new RRuntimeException(e);
@@ -138,61 +129,35 @@ public class OpalRService implements Service, ROperationTemplate, HasServiceList
 
   @Override
   public boolean isRunning() {
-    return !isEnabled() || rserveStatus == 0;
+    try {
+      RServerState state = getRServerState();
+      return state.isRunning();
+    } catch(RestClientException e) {
+      log.warn("Error when checking R server: " + e.getMessage());
+    }
+    return false;
   }
 
   @Override
   public void start() {
-    if(!isEnabled() || rserveStatus == 0) return;
-
-    // fresh start, try to kill any remains of R server
     try {
-      notifyListenersOnStop();
-      newRConnection().shutdown();
-    } catch(Exception e) {
-      // ignore
+      RestTemplate restTemplate = new RestTemplate();
+      restTemplate.put(getRServerResourceUrl(), null);
+    } catch(RestClientException e) {
+      log.warn("Error when starting R server: " + e.getMessage());
     }
-
-    try {
-      // launch the Rserve daemon and wait for it to complete
-      Process rserve = buildRProcess().start();
-      rserveStatus = rserve.waitFor();
-      if(rserveStatus == 0) {
-        log.info("R server started");
-        notifyListenersOnStart();
-      } else {
-        log.error("R server start failed with status: {}", rserveStatus);
-        rserveStatus = -1;
-      }
-    } catch(Exception e) {
-      log.warn("R server start failed", e);
-      rserveStatus = -1;
-    }
-  }
-
-  private ProcessBuilder buildRProcess() {
-    List<String> args = getArguments();
-    log.info("Starting R server: {}", StringUtil.collectionToString(args, " "));
-    ProcessBuilder pb = new ProcessBuilder(args);
-    pb.directory(getWorkingDirectory());
-    pb.redirectErrorStream(true);
-    pb.redirectOutput(ProcessBuilder.Redirect.appendTo(getRserveLog()));
-    return pb;
+    notifyListenersOnStart();
   }
 
   @Override
   public void stop() {
-    if(rserveStatus != 0) return;
-
     try {
-      notifyListenersOnStop();
-      log.info("Shutting down R server...");
-      newConnection().shutdown();
-      log.info("R server shut down");
-    } catch(Exception e) {
-      log.error("R server shutdown failed", e);
+      RestTemplate restTemplate = new RestTemplate();
+      restTemplate.delete(getRServerResourceUrl());
+    } catch(RestClientException e) {
+      log.warn("Error when stopping R server: " + e.getMessage());
     }
-    rserveStatus = -1;
+    notifyListenersOnStop();
   }
 
   @Override
@@ -205,70 +170,14 @@ public class OpalRService implements Service, ROperationTemplate, HasServiceList
     throw new NoSuchServiceConfigurationException(getName());
   }
 
-  /**
-   * True if the R server is controlled by Opal.
-   *
-   * @return
-   */
-  public boolean isEnabled() {
-    return !Strings.isNullOrEmpty(exec) && (Strings.isNullOrEmpty(host) || "localhost".equals(host));
+  public String getRServerResourceUrl() {
+    String hostname = host.trim().length() > 0 ? host.trim() : "localhost";
+    return "http://" + hostname +":" + rServerPort + "/rserver";
   }
 
-  private List<String> getArguments() {
-    List<String> args = Lists.newArrayList(exec, "CMD", "Rserve", "--vanilla");
-    if(port != null && port > 0) {
-      args.add("--RS-port");
-      args.add(port.toString());
-    }
-    if(!Strings.isNullOrEmpty(encoding)) {
-      args.add("--RS-encoding");
-      args.add(encoding);
-    }
-    File workDir = getWorkingDirectory();
-    args.add("--RS-workdir");
-    args.add(workDir.getAbsolutePath());
-
-    File conf = getRservConf();
-    if(conf.exists()) {
-      args.add("--RS-conf");
-      args.add(conf.getAbsolutePath());
-    }
-
-    return args;
-  }
-
-  private File getWorkingDirectory() {
-    File dir = new File(opalHomeFile, "work" + File.separator + "R");
-    if(!dir.exists()) {
-      if(!dir.mkdirs()) {
-        log.error("Unable to create: {}", dir.getAbsolutePath());
-      }
-    }
-    return dir;
-  }
-
-  private File getLibDirectory() {
-    File dir = new File(opalHomeFile, "data" + File.separator + "R" + File.separator + "library");
-    if(!dir.exists()) {
-      if(!dir.mkdirs()) {
-        log.error("Unable to create: {}", dir.getAbsolutePath());
-      }
-    }
-    return dir;
-  }
-
-  private File getRserveLog() {
-    File logFile = new File(opalHomeFile, "logs" + File.separator + "Rserve.log");
-    if(!logFile.getParentFile().exists()) {
-      if(!logFile.getParentFile().mkdirs()) {
-        log.error("Unable to create: {}", logFile.getParentFile().getAbsolutePath());
-      }
-    }
-    return logFile;
-  }
-
-  private File getRservConf() {
-    return new File(opalHomeFile, "conf" + File.separator + "Rserv.conf");
+  private RServerState getRServerState() {
+    RestTemplate restTemplate = new RestTemplate();
+    return restTemplate.getForObject(getRServerResourceUrl(), RServerState.class);
   }
 
   /**
@@ -297,19 +206,36 @@ public class OpalRService implements Service, ROperationTemplate, HasServiceList
     return conn;
   }
 
-  /**
-   * Set the lib paths in the given R connection. Applies only if the R server is locally managed.
-   *
-   * @param conn
-   */
-  private void ensureLibPaths(RConnection conn) {
-    if(isEnabled()) {
-      String libDir = getLibDirectory().getAbsolutePath();
-      try {
-        new RScriptROperation(".libPaths(append(\"" + libDir + "\", .libPaths()))").doWithConnection(conn);
-      } catch(Exception e) {
-        log.warn("Unable to set libPaths to '{}': {}", libDir, e.getMessage());
-      }
+  public static class RServerState {
+
+    private boolean isRunning;
+
+    private Integer port;
+
+    private String encoding;
+
+    public void setRunning(boolean running) {
+      isRunning = running;
+    }
+
+    public void setPort(Integer port) {
+      this.port = port;
+    }
+
+    public void setEncoding(String encoding) {
+      this.encoding = encoding;
+    }
+
+    public boolean isRunning() {
+      return isRunning;
+    }
+
+    public Integer getPort() {
+      return port;
+    }
+
+    public String getEncoding() {
+      return encoding;
     }
   }
 

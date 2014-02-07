@@ -411,6 +411,19 @@
           </exclusion>
         </exclusions>
       </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>org.springframework.web</artifactId>
+        <version>${spring.version}</version>
+        <scope>test</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
       <!-- Spring batch has a different release cycle than Spring itself -->
       <dependency>
         <groupId>org.springframework.batch</groupId>

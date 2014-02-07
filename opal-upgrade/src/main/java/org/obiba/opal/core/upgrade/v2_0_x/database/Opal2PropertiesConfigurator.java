@@ -24,7 +24,7 @@ public class Opal2PropertiesConfigurator {
 
   private static final String DRIVER = "org.obiba.opal.datasource.driver";
 
-  private static final String R_EXEC = "org.obiba.opal.R.exec";
+  private static final String R_SERVER_ADMIN_PORT = "org.obiba.rserver.port";
 
   @NotNull
   private final String propertiesFile;
@@ -50,10 +50,9 @@ public class Opal2PropertiesConfigurator {
     log.debug("Configure R server");
     PropertiesConfiguration config = new PropertiesConfiguration(propertiesFile);
     PropertiesConfigurationLayout layout = config.getLayout();
-    layout.setFooterComment("\nR executable for starting Rserve\n" +
-        "Default is unix standard R executable path\n" +
-        "(set to blank or specify a Rserve host to disable R server process management)\n" +
-        R_EXEC + "=/usr/bin/R");
+    layout.setFooterComment("\n# R server administration\n" +
+        "# Specify the port number of the R server controller.\n" +
+        "#" + R_SERVER_ADMIN_PORT + "=6312");
     config.save(propertiesFile);
   }
 
