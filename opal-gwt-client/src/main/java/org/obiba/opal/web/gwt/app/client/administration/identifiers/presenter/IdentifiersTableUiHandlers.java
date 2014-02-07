@@ -34,4 +34,6 @@ public interface IdentifiersTableUiHandlers extends UiHandlers {
   void onGenerateIdentifiersMapping(VariableDto variable);
 
   void onDownloadIdentifiers(VariableDto variable);
+
+  void onDownloadIdentifiers();
 }

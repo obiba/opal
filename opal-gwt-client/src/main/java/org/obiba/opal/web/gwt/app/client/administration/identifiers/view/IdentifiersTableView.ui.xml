@@ -20,7 +20,12 @@
       <b:Heading size="3" ui:field="title" addStyleNames="pull-left no-top-margin"/>
       <g:FlowPanel addStyleNames="pull-right">
         <b:ButtonGroup>
-          <b:DropdownButton text="Import Identifiers" icon="UPLOAD">
+          <b:Button icon="DOWNLOAD" ui:field="downloadIdentifiers">
+            <ui:msg description="Download identifiers label">Download identifiers</ui:msg>
+          </b:Button>
+        </b:ButtonGroup>
+        <b:ButtonGroup>
+        <b:DropdownButton text="Import Identifiers" icon="UPLOAD">
             <b:NavLink ui:field="importSystemId">
               <ui:msg description="Import System Identifiers label">Import system identifiers...</ui:msg>
             </b:NavLink>
@@ -30,8 +35,7 @@
           </b:DropdownButton>
         </b:ButtonGroup>
         <b:ButtonGroup>
-          <b:Button icon="TRASH" ui:field="deleteIdTable">
-          </b:Button>
+          <b:Button icon="TRASH" ui:field="deleteIdTable"/>
         </b:ButtonGroup>
       </g:FlowPanel>
     </g:FlowPanel>

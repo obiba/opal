@@ -1,8 +1,12 @@
 package org.obiba.opal.web.identifiers;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,12 +17,14 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
@@ -27,6 +33,7 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.StaticDatasource;
 import org.obiba.magma.support.StaticValueTable;
+import org.obiba.opal.core.identifiers.IdentifiersMaps;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersImportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
@@ -35,6 +42,7 @@ import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.model.Identifiers.IdentifiersMappingDto;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.support.InvalidRequestException;
+import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -50,6 +58,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+
+import au.com.bytecode.opencsv.CSVWriter;
 
 @Component
 @Transactional
@@ -92,7 +102,7 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
         public boolean apply(@Nullable String input) {
           if(entityTypes == null || entityTypes.isEmpty()) return true;
           for(String type : entityTypes) {
-            if(type.toLowerCase().equals(input.toLowerCase())) return true;
+            if(type.toLowerCase().equals(Strings.nullToEmpty(input).toLowerCase())) return true;
           }
           return false;
         }
@@ -231,6 +241,36 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
     return builder.build();
   }
 
+  /**
+   * Get the non-null values of all variable's type vector in CSV format.
+   *
+   * @return
+   * @throws org.obiba.magma.MagmaRuntimeException
+   * @throws java.io.IOException
+   */
+  @GET
+  @Path("/_export")
+  @Produces("text/csv")
+  @AuthenticatedByCookie
+  @ApiOperation(value = "Get identifiers mapping in CSV", produces = "text/csv")
+  public Response getVectorCSVValues(@QueryParam("type") String entityType) throws MagmaRuntimeException, IOException {
+    ensureEntityType(entityType);
+    ValueTable table = getValueTable(entityType);
+
+    ByteArrayOutputStream values = new ByteArrayOutputStream();
+    CSVWriter writer = null;
+    try {
+      writer = new CSVWriter(new PrintWriter(values));
+      writeCSVValues(writer, table);
+    } finally {
+      if(writer != null) writer.close();
+    }
+
+    String filename = "Ids" + (table != null ? "-" + table.getName() : "") + ".csv";
+
+    return Response.ok(values.toByteArray(), "text/csv")
+        .header("Content-Disposition", "attachment; filename=\"" + filename + "\"").build();
+  }
   //
   // Private methods
   //
@@ -301,4 +341,73 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
     return idsMappings;
   }
 
+  private void writeCSVValues(CSVWriter writer, ValueTable table) {
+
+    ImmutableList.Builder<String> builder = ImmutableList.builder();
+    builder.add("ID");
+    builder.addAll(Iterables.transform(table.getVariables(), new Function<Variable, String>() {
+
+      @Override
+      public String apply(Variable input) {
+        return input.getName();
+      }
+    }));
+
+    // header
+    ImmutableList<String> header = builder.build();
+    writer.writeNext(header.toArray(new String[header.size()]));
+
+    Map<String, Map<String, String>> mapIds = getSystemPrivateIdsMapping(table);
+
+    writeMappingValues(writer, header, mapIds);
+  }
+
+  private void writeMappingValues(CSVWriter writer, ImmutableList<String> header,
+      Map<String, Map<String, String>> mapIds) {
+    List<String> sysIds = new ArrayList<>(mapIds.keySet());
+    Collections.sort(sysIds);
+    for(String systemId : sysIds) {
+      List<String> ids = new ArrayList<>();
+      ids.add(systemId);
+      for(int i = 1; i < header.size(); i++) {
+        // do not export ids that have no private mappings
+        Map<String, String> privateMapping = mapIds.get(systemId);
+        if(privateMapping.size() > 0) {
+          ids.add(Strings.nullToEmpty(privateMapping.get(header.get(i))));
+        }
+      }
+
+      writer.writeNext(ids.toArray(new String[ids.size()]));
+    }
+  }
+
+  private Iterable<IdentifiersMaps.IdentifiersMap> getUnitIdentifiers(ValueTable valueTable, String name) {
+    return Iterables.filter(new IdentifiersMaps(valueTable, name), new Predicate<IdentifiersMaps.IdentifiersMap>() {
+      @Override
+      public boolean apply(@Nullable IdentifiersMaps.IdentifiersMap input) {
+        return input != null && input.hasPrivateIdentifier();
+      }
+    });
+  }
+
+  private Map<String, Map<String, String>> getSystemPrivateIdsMapping(ValueTable table) {
+    // Build map of id with private ids by variable
+    Map<String, Map<String, String>> mapIds = new HashMap<>();
+
+    for(Variable variable : table.getVariables()) {
+      String name = variable.getName();
+      for(IdentifiersMaps.IdentifiersMap unitId : getUnitIdentifiers(table, name)) {
+        if(!mapIds.containsKey(unitId.getSystemIdentifier())) {
+          Map<String, String> mappings = new HashMap<>();
+          mappings.put(name, null);
+          mapIds.put(unitId.getSystemIdentifier(), mappings);
+        }
+
+        if(unitId.hasPrivateIdentifier()) {
+          mapIds.get(unitId.getSystemIdentifier()).put(name, unitId.getPrivateIdentifier());
+        }
+      }
+    }
+    return mapIds;
+  }
 }
