@@ -47,6 +47,8 @@ import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiHandlers>
     implements IdentifiersTablePresenter.Display {
 
+  private static final int PAGE_SIZE = 20;
+
   interface Binder extends UiBinder<Widget, IdentifiersTableView> {}
 
   @UiField
@@ -135,6 +137,11 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
     getUiHandlers().onAddIdentifiersMapping();
   }
 
+  @UiHandler("downloadIdentifiers")
+  void onDownloadIdentifiersMapping(ClickEvent event) {
+    getUiHandlers().onDownloadIdentifiers();
+  }
+
   //
   // Private methods
   //
@@ -181,7 +188,7 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
 
   private void createAndInitializeValueSetsTable(JsArray<VariableDto> variables) {
     valueSetsTable = new Table<ValueSetsDto.ValueSetDto>();
-    valueSetsTable.setPageSize(20);
+    valueSetsTable.setPageSize(PAGE_SIZE);
     valueSetsTable.addColumn(new TextColumn<ValueSetsDto.ValueSetDto>() {
 
       @Override
@@ -202,7 +209,7 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
 
   private void createAndInitializeVariablesTable() {
     variablesTable = new Table<VariableDto>();
-    variablesTable.setPageSize(20);
+    variablesTable.setPageSize(PAGE_SIZE);
     variablesTable.addColumn(new TextColumn<VariableDto>() {
       @Override
       public String getValue(VariableDto object) {

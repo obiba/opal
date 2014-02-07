@@ -168,6 +168,13 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
             .build(variable.getName())));
   }
 
+  @Override
+  public void onDownloadIdentifiers() {
+    fireEvent(new FileDownloadRequestEvent(
+        UriBuilder.create().segment("identifiers", "mappings", "_export").query("type", table.getEntityType())
+            .build()));
+  }
+
   //
   // Private methods
   //
