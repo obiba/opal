@@ -22,8 +22,6 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.dom.client.Element;
-import com.watopi.chosen.client.ChosenOptions;
 
 /**
  * Selector of tables.
@@ -34,27 +32,8 @@ public class TableChooser extends Chooser {
 
   private final Map<String, TableDto> tableDtoMap = new HashMap<String, TableDto>();
 
-  public TableChooser() {
-    initWidget();
-  }
-
-  public TableChooser(ChosenOptions options) {
-    super(options);
-    initWidget();
-  }
-
   public TableChooser(boolean isMultipleSelect) {
     super(isMultipleSelect);
-    initWidget();
-  }
-
-  public TableChooser(boolean isMultipleSelect, ChosenOptions options) {
-    super(isMultipleSelect, options);
-    initWidget();
-  }
-
-  public TableChooser(Element element) {
-    super(element);
     initWidget();
   }
 
