@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.dashboard.presenter;
 
+import org.obiba.opal.web.gwt.app.client.bookmark.list.BookmarkListPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
@@ -16,13 +17,18 @@ import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
+import com.google.gwt.event.shared.GwtEvent;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.ContentSlot;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
+
+import static org.obiba.opal.web.gwt.app.client.bookmark.list.BookmarkListPresenter.Mode.VIEW_ONLY;
 
 public class DashboardPresenter extends Presenter<DashboardPresenter.Display, DashboardPresenter.Proxy>
     implements HasPageTitle {
@@ -31,12 +37,19 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
   @NameToken(Places.DASHBOARD)
   public interface Proxy extends ProxyPlace<DashboardPresenter> {}
 
+  private final BookmarkListPresenter bookmarkListPresenter;
+
   private final Translations translations;
 
+  @ContentSlot
+  public static final GwtEvent.Type<RevealContentHandler<?>> BOOKMARKS = new GwtEvent.Type<RevealContentHandler<?>>();
+
   @Inject
-  public DashboardPresenter(Display display, EventBus eventBus, Proxy proxy, Translations translations) {
+  public DashboardPresenter(Display display, EventBus eventBus, Proxy proxy, Translations translations,
+      BookmarkListPresenter bookmarkListPresenter) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     this.translations = translations;
+    this.bookmarkListPresenter = bookmarkListPresenter.setMode(VIEW_ONLY);
   }
 
   @Override
@@ -54,6 +67,7 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
         .authorize(getView().getIdentifiersAuthorizer()).send();
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").get()
         .authorize(getView().getReportsAuthorizer()).send();
+    setInSlot(BOOKMARKS, bookmarkListPresenter);
   }
 
   //

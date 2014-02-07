@@ -15,11 +15,12 @@ import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 
-import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.PageHeader;
+import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
@@ -33,16 +34,16 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   PageHeader pageTitle;
 
   @UiField
-  NavLink exploreVariablesLink;
+  IconAnchor exploreVariablesLink;
 
   @UiField
-  NavLink exploreFilesLink;
+  IconAnchor exploreFilesLink;
 
   @UiField
-  NavLink reportsLink;
+  IconAnchor reportsLink;
 
   @UiField
-  NavLink identifiersLink;
+  IconAnchor identifiersLink;
 
   @UiField
   Panel datasources;
@@ -55,6 +56,9 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
 
   @UiField
   Panel reports;
+
+  @UiField
+  FlowPanel bookmarks;
 
   @Inject
   public DashboardView(Binder uiBinder, Translations translations) {
@@ -76,21 +80,25 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
 
   @Override
   public void setInSlot(Object slot, IsWidget content) {
+    if(slot == DashboardPresenter.BOOKMARKS) {
+      bookmarks.clear();
+      bookmarks.add(content);
+    }
   }
 
-  public NavLink getDatasourcesLink() {
+  public IconAnchor getDatasourcesLink() {
     return exploreVariablesLink;
   }
 
-  public NavLink getFilesLink() {
+  public IconAnchor getFilesLink() {
     return exploreFilesLink;
   }
 
-  public NavLink getReportsLink() {
+  public IconAnchor getReportsLink() {
     return reportsLink;
   }
 
-  public NavLink getIdentifiersLink() {
+  public IconAnchor getIdentifiersLink() {
     return identifiersLink;
   }
 
