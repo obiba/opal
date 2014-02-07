@@ -250,7 +250,7 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
 
       JsArray<VariableDto> existingVariables = JsArrays.toSafeArray(derivedVariables.getVariablesArray());
       for(int i = 0; i < variables.length(); i++) {
-        int index = getVariableIndex(derivedVariables.getVariablesArray(), variables.get(i).getName());
+        int index = getVariableIndex(existingVariables, variables.get(i).getName());
         if(index == -1) {
           existingVariables.push(variables.get(i));
         } else {
