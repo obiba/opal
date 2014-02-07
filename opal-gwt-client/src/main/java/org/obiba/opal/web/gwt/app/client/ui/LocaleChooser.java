@@ -30,15 +30,6 @@ public class LocaleChooser extends Chooser {
 
   private final Map<String, String> localeMap = new HashMap<String, String>();
 
-//  public LocaleChooser() {
-//    initWidget();
-//  }
-//
-//  public LocaleChooser(ChosenOptions options) {
-//    super(options);
-//    initWidget();
-//  }
-
   public LocaleChooser(boolean isMultipleSelect) {
     super(isMultipleSelect);
     initWidget();
