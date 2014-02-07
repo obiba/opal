@@ -32,29 +32,10 @@ public class TableChooser extends Chooser {
 
   private final Map<String, TableDto> tableDtoMap = new HashMap<String, TableDto>();
 
-//  public TableChooser() {
-//    initWidget();
-//  }
-//
-//  public TableChooser(ChosenOptions options) {
-//    super(options);
-//    initWidget();
-//  }
-
   public TableChooser(boolean isMultipleSelect) {
     super(isMultipleSelect);
     initWidget();
   }
-
-//  public TableChooser(boolean isMultipleSelect, ChosenOptions options) {
-//    super(isMultipleSelect, options);
-//    initWidget();
-//  }
-
-//  public TableChooser(Element element) {
-//    super(element);
-//    initWidget();
-//  }
 
   private void initWidget() {
     setPlaceholderText(translations.selectSomeTables());
