@@ -385,6 +385,14 @@ td.row-actions span {
 }
 
 /*
+ * Bookmarks
+ */
+td.row-bookmarks span {
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+/*
  * Chooser
  */
 .chooser {
@@ -528,8 +536,6 @@ ul.chooser-options > li {
 
 .width-4em {
   width: 4em;
-}
-
 }
 
 a.bookmark,

@@ -3,6 +3,10 @@ package org.obiba.opal.web.gwt.app.client.bookmark.list;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.BookmarksColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.model.client.opal.BookmarkDto;
 
 import com.github.gwtbootstrap.client.ui.CellTable;
@@ -14,9 +18,12 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
 public class BookmarkListView extends ViewWithUiHandlers<BookmarkListUiHandlers>
     implements BookmarkListPresenter.Display {
+
+  private final PlaceManager placeManager;
 
   interface Binder extends UiBinder<Widget, BookmarkListView> {}
 
@@ -30,19 +37,14 @@ public class BookmarkListView extends ViewWithUiHandlers<BookmarkListUiHandlers>
 
   private final ListDataProvider<BookmarkDto> dataProvider = new ListDataProvider<BookmarkDto>();
 
+  private final TableColumns columns = new TableColumns();
+
   @Inject
-  public BookmarkListView(Binder uiBinder, Translations translations) {
+  public BookmarkListView(Binder uiBinder, Translations translations, PlaceManager placeManager) {
     this.translations = translations;
+    this.placeManager = placeManager;
     initWidget(uiBinder.createAndBindUi(this));
     initTable();
-  }
-
-  private void initTable() {
-    table.setVisibleRange(0, 10);
-//    table.addColumn(Columns.NAME, translations.nameLabel());
-    table.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
-    pager.setDisplay(table);
-    dataProvider.addDataDisplay(table);
   }
 
   @Override
@@ -52,31 +54,34 @@ public class BookmarkListView extends ViewWithUiHandlers<BookmarkListUiHandlers>
     dataProvider.refresh();
     pager.setVisible(dataProvider.getList().size() > pager.getPageSize());
   }
-//
-//  private static class BreadcrumbsColumn extends Column<Iterable<LinkDto>, String> {
-//
-//    private BreadcrumbsColumn(Cell<String> cell) {
-//      super(cell);
-//    }
-//
-//    @Override
-//    public String getValue(Iterable<LinkDto> links) {
-//      return null;
-//    }
-//  }
-//
-//  private static final class Columns {
-//
-//    final static Column<BookmarkDto, Breadcrumbs> NAME = new Column<BookmarkDto, Breadcrumbs>() {
-//      @Override
-//      public Breadcrumbs getValue(BookmarkDto dto) {
-//        Breadcrumbs breadcrumbs = new Breadcrumbs();
-//        for(LinkDto linkDto : JsArrays.toIterable(dto.getLinksArray())) {
-//          breadcrumbs.add(new NavLink(linkDto.getLink(), linkDto.getRel()));
-//        }
-//        return breadcrumbs;
-//      }
-//    };
-//
-//  }
+
+  @Override
+  public HasActionHandler<BookmarkDto> getActions() {
+    return columns.actions;
+  }
+
+  private void initTable() {
+    table.setVisibleRange(0, 10);
+    table.addColumn(new BookmarksColumn(placeManager), translations.favoritesLabel());
+    table.addColumn(columns.actions, translations.actionsLabel());
+    table.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
+    pager.setDisplay(table);
+    dataProvider.addDataDisplay(table);
+  }
+
+  private final class TableColumns {
+
+    final ActionsColumn<BookmarkDto> actions = new ActionsColumn<BookmarkDto>(new ActionsProvider<BookmarkDto>() {
+
+      @Override
+      public String[] allActions() {
+        return new String[] { ActionsColumn.DELETE_ACTION };
+      }
+
+      @Override
+      public String[] getActions(BookmarkDto value) {
+        return allActions();
+      }
+    });
+  }
 }
