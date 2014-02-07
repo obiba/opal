@@ -21,45 +21,56 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
+import static org.obiba.opal.web.gwt.app.client.bookmark.list.BookmarkListPresenter.Mode.VIEW_DELETE;
+
 public class BookmarkListPresenter extends PresenterWidget<BookmarkListPresenter.Display>
     implements BookmarkListUiHandlers {
+
+  public enum Mode {
+    VIEW_ONLY,
+    VIEW_DELETE
+  }
 
   @Inject
   public BookmarkListPresenter(EventBus eventBus, Display view) {
     super(eventBus, view);
     getView().setUiHandlers(this);
+    getView().setMode(VIEW_DELETE);
+  }
+
+  public BookmarkListPresenter setMode(Mode mode) {
+    getView().setMode(mode);
+    return this;
   }
 
   @Override
-  protected void onBind() {
-    super.onBind();
-    getView().getActions().setActionHandler(new ActionHandler<BookmarkDto>() {
-
+  public ActionHandler<BookmarkDto> getActionHandler() {
+    return new ActionHandler<BookmarkDto>() {
       @Override
       public void doAction(BookmarkDto bookmarkDto, String actionName) {
         if(ActionsColumn.DELETE_ACTION.equals(actionName)) {
           deleteBookmark(bookmarkDto);
         }
       }
-
-      private void deleteBookmark(BookmarkDto bookmarkDto) {
-        ResourceRequestBuilderFactory.newBuilder() //
-            .forResource(UriBuilders.BOOKMARK.create().build(bookmarkDto.getResource())) //
-            .withCallback(Response.SC_OK, new ResponseCodeCallback() {
-              @Override
-              public void onResponseCode(Request request, Response response) {
-                refreshTable();
-              }
-            }) //
-            .delete().send();
-      }
-    });
+    };
   }
 
   @Override
   protected void onReveal() {
     super.onReveal();
     refreshTable();
+  }
+
+  private void deleteBookmark(BookmarkDto bookmarkDto) {
+    ResourceRequestBuilderFactory.newBuilder() //
+        .forResource(UriBuilders.BOOKMARK.create().build(bookmarkDto.getResource())) //
+        .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            refreshTable();
+          }
+        }) //
+        .delete().send();
   }
 
   private void refreshTable() {
@@ -77,6 +88,9 @@ public class BookmarkListPresenter extends PresenterWidget<BookmarkListPresenter
   public interface Display extends View, HasUiHandlers<BookmarkListUiHandlers> {
 
     void renderRows(List<BookmarkDto> rows);
+
     HasActionHandler<BookmarkDto> getActions();
+
+    void setMode(Mode mode);
   }
 }

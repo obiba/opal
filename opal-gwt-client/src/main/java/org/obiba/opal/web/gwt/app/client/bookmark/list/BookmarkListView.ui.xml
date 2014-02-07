@@ -16,7 +16,7 @@
 
   <g:FlowPanel>
     <b:Heading size="4" addStyleNames="inline-block">
-      <ui:msg description="Bookmarks label">Bookmarks</ui:msg>
+      <ui:msg description="Favorites label">Favorites</ui:msg>
     </b:Heading>
     <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
     <o:Table ui:field="table" addStyleNames="small-top-margin"/>
