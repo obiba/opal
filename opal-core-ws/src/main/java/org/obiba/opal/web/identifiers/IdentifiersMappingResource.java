@@ -11,12 +11,14 @@
 package org.obiba.opal.web.identifiers;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -56,6 +58,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.wordnik.swagger.annotations.Api;
@@ -135,7 +138,7 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
   @Path("/_count")
   public String getEntitiesCount(@QueryParam("type") String entityType) {
     ensureEntityType(entityType);
-    return String.valueOf(Iterables.size(getUnitIdentifiers(entityType, name)));
+    return String.valueOf(Iterables.size(getUnitIdentifiers(entityType)));
   }
 
   /**
@@ -154,10 +157,10 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
       @QueryParam("separator") @DefaultValue(",") String separator, String identifiersMap) {
     ensureEntityType(entityType);
     Response response = null;
-    java.io.File csvData = null;
+    File csvData = null;
     try {
       CsvDatasourceFactory factory = new CsvDatasourceFactory();
-      csvData = java.io.File.createTempFile("opal", ".csv");
+      csvData = File.createTempFile("opal", ".csv");
       PrintWriter writer = new PrintWriter(csvData);
       writer.println("ID" + separator + name);
       writer.print(identifiersMap);
@@ -334,6 +337,16 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
     return MagmaEngine.get().getTransientDatasourceInstance(uid);
   }
 
+  private Iterable<IdentifiersMaps.IdentifiersMap> getUnitIdentifiers(String entityType) {
+    return Iterables
+        .filter(new IdentifiersMaps(getValueTable(entityType), name), new Predicate<IdentifiersMaps.IdentifiersMap>() {
+          @Override
+          public boolean apply(@Nullable IdentifiersMaps.IdentifiersMap input) {
+            return input.hasPrivateIdentifier();
+          }
+        });
+  }
+
   @Override
   @NotNull
   protected ValueTable getValueTable(String entityType) {
@@ -342,8 +355,16 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
     return table;
   }
 
+  private void writeCSVValues(CSVWriter writer, ValueTable table, Variable variable) {
+    // header
+    writer.writeNext(new String[] { table.getEntityType(), variable.getName() });
+    for(IdentifiersMaps.IdentifiersMap unitId : getUnitIdentifiers(table.getEntityType())) {
+      writer.writeNext(new String[] { unitId.getSystemIdentifier(), unitId.getPrivateIdentifier() });
+    }
+  }
+
   private void writePlainValues(Writer writer, ValueTable table) throws IOException {
-    for(IdentifiersMaps.IdentifiersMap unitId : getUnitIdentifiers(table.getEntityType(), name)) {
+    for(IdentifiersMaps.IdentifiersMap unitId : getUnitIdentifiers(table.getEntityType())) {
       writer.write(unitId.getPrivateIdentifier() + "\n");
     }
   }
