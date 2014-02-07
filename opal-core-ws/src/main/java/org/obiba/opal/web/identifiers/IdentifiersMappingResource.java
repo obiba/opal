@@ -11,6 +11,7 @@
 package org.obiba.opal.web.identifiers;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -156,10 +157,10 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
       @QueryParam("separator") @DefaultValue(",") String separator, String identifiersMap) {
     ensureEntityType(entityType);
     Response response = null;
-    java.io.File csvData = null;
+    File csvData = null;
     try {
       CsvDatasourceFactory factory = new CsvDatasourceFactory();
-      csvData = java.io.File.createTempFile("opal", ".csv");
+      csvData = File.createTempFile("opal", ".csv");
       PrintWriter writer = new PrintWriter(csvData);
       writer.println("ID" + separator + name);
       writer.print(identifiersMap);

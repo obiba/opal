@@ -134,14 +134,24 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
   @Produces("application/vnd.ms-excel")
   @AuthorizeResource
   @AuthenticatedByCookie
-  public Response getExcelDictionary() throws MagmaRuntimeException, IOException {
+  public Response getExcelDictionary(List<String> tables) throws MagmaRuntimeException, IOException {
     String destinationName = datasource.getName() + "-dictionary";
     ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
     Datasource destinationDatasource = new ExcelDatasource(destinationName, excelOutput);
     destinationDatasource.initialise();
     try {
       DatasourceCopier copier = DatasourceCopier.Builder.newCopier().dontCopyValues().build();
-      copier.copy(datasource, destinationDatasource);
+
+      if(tables == null || tables.isEmpty()) {
+        copier.copy(datasource, destinationDatasource);
+      } else {
+        for(ValueTable table : datasource.getValueTables()) {
+          if(tables.contains(table.getName())) {
+            copier.copy(table, destinationDatasource);
+          }
+        }
+      }
+
     } finally {
       Disposables.silentlyDispose(destinationDatasource);
     }
