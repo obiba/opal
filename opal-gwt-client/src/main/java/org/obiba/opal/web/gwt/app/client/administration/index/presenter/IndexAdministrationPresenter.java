@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.administration.index.event.TableIndices
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableIndexStatusRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
@@ -175,13 +176,21 @@ public class IndexAdministrationPresenter
             getEventBus().fireEvent(new TableIndexStatusRefreshEvent());
           }
         }) //
-        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, new ResponseCodeCallback() {
+        .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
             getView().setServiceStatus(Display.Status.Startable);
-            getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+
+            ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+            if(error.getStatus() != null) {
+              getEventBus().fireEvent(NotificationEvent.newBuilder()
+                  .error(TranslationsUtils.replaceArguments(translations.searchSettingsError(), error.getStatus()))
+                  .build());
+            } else {
+              getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+            }
           }
-        }) //
+        }, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_BAD_REQUEST) //
         .put().send();
   }
 
