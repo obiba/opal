@@ -128,6 +128,15 @@ public class SuggestListBox extends FocusPanel {
     textBox = new TextBox();
     aheadBox = new Typeahead(oracle);
     aheadBox.add(textBox);
+
+    // Set matchercallback to always return true so TypeHead does not filter values furthermore
+    aheadBox.setMatcherCallback(new Typeahead.MatcherCallback() {
+      @Override
+      public boolean compareQueryToItem(String query, String item) {
+        return true;
+      }
+    });
+
     content.add(aheadBox);
     addSuggestBoxHandlers();
   }
