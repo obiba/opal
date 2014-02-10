@@ -46,7 +46,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
   private static final int SORTABLE_COLUMN_NAME = 0;
 
-  private static final int SORTABLE_COLUMN_LAST_UPDATED = 2;
+  private static final int SORTABLE_COLUMN_LAST_UPDATED = 3;
 
   private static final short MAX_CHARACTERS = 100;
 
@@ -89,11 +89,12 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   private void initProjectsTable() {
     tablePager.setDisplay(projectsTable);
     projectsTable.addColumn(new NameColumn(new ProjectLinkCell(placeManager)), translations.nameLabel());
+    projectsTable.addColumn(new TitleColumn() , translations.titleLabel());
     projectsTable.addColumn(new DescriptionColumn(), translations.descriptionLabel());
     projectsTable.addColumn(new LastUpdatedColumn(), translations.lastUpdatedLabel());
     projectsDataProvider.addDataDisplay(projectsTable);
     typeSortHandler = new ListHandler<ProjectDto>(projectsDataProvider.getList());
-    typeSortHandler.setComparator(projectsTable.getColumn(SORTABLE_COLUMN_NAME), new TitleOrNameComparator());
+    typeSortHandler.setComparator(projectsTable.getColumn(SORTABLE_COLUMN_NAME), new NameComparator());
     typeSortHandler.setComparator(projectsTable.getColumn(SORTABLE_COLUMN_LAST_UPDATED), new LastUpdateComparator());
 
     projectsTable.getHeader(SORTABLE_COLUMN_NAME).setHeaderStyleNames("sortable-header-column");
@@ -125,7 +126,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
     @Override
     public String getText(ProjectDto projectDto) {
-      return projectDto.hasTitle() ? projectDto.getTitle() : projectDto.getName();
+      return projectDto.getName();
     }
   }
 
@@ -168,6 +169,14 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 //    }
   }
 
+  private static final class TitleColumn extends TextColumn<ProjectDto> {
+
+    @Override
+    public String getValue(ProjectDto projectDto) {
+      return projectDto.getTitle();
+    }
+  }
+
   private static final class DescriptionColumn extends TextColumn<ProjectDto> {
 
     @Override
@@ -192,12 +201,10 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     }
   }
 
-  private static final class TitleOrNameComparator implements Comparator<ProjectDto> {
+  private static final class NameComparator implements Comparator<ProjectDto> {
     @Override
     public int compare(ProjectDto o1, ProjectDto o2) {
-      String m1 = o1.hasTitle() ? o1.getTitle() : o1.getName();
-      String m2 = o2.hasTitle() ? o2.getTitle() : o2.getName();
-      return m1.compareTo(m2);
+      return o1.getName().compareTo(o2.getName());
     }
   }
 
