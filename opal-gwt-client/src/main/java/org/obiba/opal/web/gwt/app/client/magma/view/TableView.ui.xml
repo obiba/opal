@@ -120,6 +120,11 @@
                       <ui:msg description="Apply attribute label">Apply attribute</ui:msg>
                     </b2:IconAnchor>
 
+                    <b2:IconAnchor ui:field="deleteAttribute"
+                        addStyleNames="inline xsmall-indent">
+                      <ui:msg description="Delete attribute label">Delete attribute</ui:msg>
+                    </b2:IconAnchor>
+
                     <b2:IconAnchor ui:field="deleteVariables" icon="TRASH" addStyleNames="inline xsmall-indent">
                       <ui:msg description="Delete label">Delete</ui:msg>
                     </b2:IconAnchor>

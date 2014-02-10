@@ -625,6 +625,13 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     attributeEditorPresenter.initialize(table, selectedItems);
   }
 
+  @Override
+  public void onDeleteAttribute(List<VariableDto> selectedItems) {
+    VariableAttributeModalPresenter attributeEditorPresenter = attributeModalProvider.get();
+    attributeEditorPresenter.setDialogMode(VariableAttributeModalPresenter.Mode.DELETE);
+    attributeEditorPresenter.initialize(table, selectedItems);
+  }
+
   private final class VariableSortHandler implements ColumnSortEvent.Handler {
 
     @Override
