@@ -2173,10 +2173,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Click to add this item to your bookmarks")
   String clickToAddToBookmarks();
 
-  @Description("Favorites label")
-  @DefaultStringValue("Favorites")
-  String favoritesLabel();
-
   @Description("Failed to start search service: {0} label")
   @DefaultStringValue("Failed to start search service: {0}")
   String searchSettingsError();

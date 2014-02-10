@@ -20,6 +20,8 @@ public class BookmarksColumn extends Column<BookmarkDto, BookmarkDto> {
   public BookmarksColumn(PlaceManager placeManager) {
     super(new BookmarksCell(placeManager));
     setCellStyleNames("row-bookmarks");
+    setSortable(true);
+    setDefaultSortAscending(true);
   }
 
   @Override

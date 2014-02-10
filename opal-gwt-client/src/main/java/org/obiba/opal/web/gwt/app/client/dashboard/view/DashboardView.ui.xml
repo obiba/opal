@@ -1,6 +1,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -10,54 +11,44 @@
       <b:PageHeader ui:field="pageTitle"/>
     </g:FlowPanel>
 
+    <b:Heading size="4" addStyleNames="inline-block no-top-margin">
+      <ui:msg description="Actions label">Actions</ui:msg>
+    </b:Heading>
     <b:FluidRow>
-      <b:Column size="3" ui:field="datasources">
-        <g:Image url="image/48/table.png" addStyleNames="inline-block"/>
-        <b:NavLink ui:field="exploreVariablesLink">
-          <ui:msg description="Explore variables link label">Explore Variables</ui:msg>
-        </b:NavLink>
+      <b:Column size="6" ui:field="datasources">
+        <b2:IconAnchor icon="TABLE" text="Explore Variables" ui:field="exploreVariablesLink"/>
         <g:Label addStyleNames="help-block">
           <ui:msg description="Explore variables link description">Browse tables and variables, create views,
             import/export data and dictionaries.
           </ui:msg>
         </g:Label>
-      </b:Column>
-
-      <b:Column size="3" ui:field="files">
-        <g:Image url="image/48/folder.png" addStyleNames="inline-block"/>
-        <b:NavLink ui:field="exploreFilesLink">
-          <ui:msg description="Manage Files link label">Manage Files</ui:msg>
-        </b:NavLink>
+        <g:FlowPanel ui:field="files">
+        <b2:IconAnchor ui:field="exploreFilesLink" icon="FOLDER_CLOSE" text="Manage Files"/>
         <g:Label addStyleNames="help-block">
           <ui:msg description="Manage Files link description">Browse, upload and download files on the server.
           </ui:msg>
         </g:Label>
+        </g:FlowPanel>
       </b:Column>
 
-      <b:Column size="3" ui:field="reports">
-        <g:Image url="image/48/report.png" addStyleNames="inline-block"/>
-        <b:NavLink ui:field="reportsLink">
-          <ui:msg description="Reports link label">Run Reports</ui:msg>
-        </b:NavLink>
+      <b:Column size="6" ui:field="reports">
+        <b2:IconAnchor ui:field="reportsLink" icon="FILE_ALT" text="Run Reports"/>
         <g:Label addStyleNames="help-block">
           <ui:msg description="Reports link description">Design reports with R and schedule their
             execution.
           </ui:msg>
         </g:Label>
-      </b:Column>
-
-      <b:Column size="3" ui:field="identifiers">
-        <g:Image url="image/48/units.png" addStyleNames="inline-block"/>
-        <b:NavLink ui:field="identifiersLink">
-          <ui:msg description="Units link label">Manage Participant Identifiers</ui:msg>
-        </b:NavLink>
+        <g:FlowPanel ui:field="identifiers">
+        <b2:IconAnchor ui:field="identifiersLink" icon="EXCHANGE" text="Manage Participant Identifiers"/>
         <g:Label addStyleNames="help-block">
           <ui:msg description="Identifiers link description">Create and map identifiers of participants.
           </ui:msg>
         </g:Label>
+        </g:FlowPanel>
       </b:Column>
 
     </b:FluidRow>
+    <g:FlowPanel ui:field="bookmarks"/>
 
   </g:FlowPanel>
 </ui:UiBinder>
