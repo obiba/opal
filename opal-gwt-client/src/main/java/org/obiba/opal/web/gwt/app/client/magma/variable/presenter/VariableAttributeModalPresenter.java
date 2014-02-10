@@ -74,7 +74,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
   private List<String> locales;
 
   public enum Mode {
-    APPLY, UPDATE_SINGLE, UPDATE_MULTIPLE, CREATE
+    APPLY, UPDATE_SINGLE, UPDATE_MULTIPLE, DELETE, CREATE
   }
 
   @Inject
@@ -133,9 +133,26 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
       case UPDATE_SINGLE:
         return updateSingleAttribute(attributes);
 
+      case DELETE:
+        return deleteMultipleAttributes(dto);
+
       default:
         return updateMultipleNamespace(attributes);
     }
+  }
+
+  private JsArray<AttributeDto> deleteMultipleAttributes(VariableDto dto) {
+    JsArray<AttributeDto> newAttributes = JsArrays.create().cast();
+
+    for(AttributeDto attributeDto : JsArrays.toIterable(dto.getAttributesArray())) {
+      // Add attribute if its not for the specified namespace and name
+      if(!attributeDto.getNamespace().equals(getView().getNamespaceSuggestBox().getText()) &&
+          attributeDto.getName().equals(getView().getName().getText())) {
+        newAttributes.push(attributeDto);
+      }
+    }
+
+    return newAttributes;
   }
 
   private JsArray<AttributeDto> updateMultipleNamespace(Iterable<AttributeDto> attributes) {
@@ -211,7 +228,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     for(LocalizedEditableText localizedText : getView().getLocalizedValues().getValue()) {
       if(!localizedText.getTextBox().getText().isEmpty()) {
         AttributeDto existingAttr = findAttribute(attributes, localizedText);
-        if (existingAttr != null) {
+        if(existingAttr != null) {
           existingAttr.setValue(localizedText.getTextBox().getText());
         } else {
           newAttributes.push(getNewAttribute(localizedText));
@@ -237,13 +254,12 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
   }
 
   private boolean isSameLocale(String locale, AttributeDto attribute) {
-    return ((locale.isEmpty() && !attribute.hasLocale()) ||
-        (attribute.hasLocale() && locale.equals(attribute.getLocale())));
+    return locale.isEmpty() && !attribute.hasLocale() || attribute.hasLocale() && locale.equals(attribute.getLocale());
   }
 
   private boolean isSameNamespace(String namespace, AttributeDto attribute) {
-    return ((namespace.isEmpty() && !attribute.hasNamespace()) ||
-        (attribute.hasNamespace() && namespace.equals(attribute.getNamespace())));
+    return namespace.isEmpty() && !attribute.hasNamespace() ||
+        attribute.hasNamespace() && namespace.equals(attribute.getNamespace());
   }
 
   private VariableDto getVariableDto(VariableDto variable) {
@@ -417,7 +433,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
 
   public static native String stringify(JavaScriptObject obj)
   /*-{
-    return $wnd.JSON.stringify(obj);
+      return $wnd.JSON.stringify(obj);
   }-*/;
 
   private class AttributeValidationHandler extends ViewValidationHandler {
@@ -431,13 +447,16 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
       if(dialogMode == Mode.UPDATE_MULTIPLE) {
         validators.add(new AttributeConflictValidator("AttributeConflictExists"));
       } else {
-        validators.add(
-            new RequiredTextValidator(getView().getName(), "AttributeNameIsRequired", Display.FormField.NAME.name()));
-        validators.add(
-            new ConditionValidator(hasValue(getView().getLocalizedValues().getValue()), "AttributeValueIsRequired",
-                Display.FormField.VALUE.name()));
         validators.add(new ConditionValidator(hasValidNamespace(getView().getNamespaceSuggestBox().getText()),
             "NamespaceCannotBeEmptyChars", Display.FormField.NAMESPACE.name()));
+        validators.add(
+            new RequiredTextValidator(getView().getName(), "AttributeNameIsRequired", Display.FormField.NAME.name()));
+
+        if(dialogMode != Mode.DELETE) {
+          validators.add(
+              new ConditionValidator(hasValue(getView().getLocalizedValues().getValue()), "AttributeValueIsRequired",
+                  Display.FormField.VALUE.name()));
+        }
         if(dialogMode == Mode.CREATE) validators.add(new UniqueAttributeNameValidator("AttributeAlreadyExists"));
       }
       return validators;

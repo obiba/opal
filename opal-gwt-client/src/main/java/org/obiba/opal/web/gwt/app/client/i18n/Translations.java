@@ -914,6 +914,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Edit Attributes")
   String editAttributes();
 
+  @Description("Delete attributes title")
+  @DefaultStringValue("Delete Attributes")
+  String deleteAttributes();
+
   @Description("Generate Identifiers label")
   @DefaultStringValue("Generate Identifiers")
   String generateIdentifiers();

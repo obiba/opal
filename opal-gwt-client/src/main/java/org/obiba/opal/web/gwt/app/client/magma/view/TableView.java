@@ -199,6 +199,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiField
   FluidRow contingencyTablePanel;
 
+  @UiField
+  IconAnchor deleteAttribute;
+
   private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
 
   private final Translations translations;
@@ -516,6 +519,11 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiHandler("applyAttribute")
   void onApplyAttribute(ClickEvent event) {
     getUiHandlers().onApplyAttribute(checkColumn.getSelectedItems());
+  }
+
+  @UiHandler("deleteAttribute")
+  void onDeleteAttribute(ClickEvent event) {
+    getUiHandlers().onDeleteAttribute(checkColumn.getSelectedItems());
   }
 
   @Override
