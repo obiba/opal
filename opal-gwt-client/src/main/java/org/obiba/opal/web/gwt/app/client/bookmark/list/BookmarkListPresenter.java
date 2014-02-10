@@ -21,21 +21,21 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
-import static org.obiba.opal.web.gwt.app.client.bookmark.list.BookmarkListPresenter.Mode.VIEW_DELETE;
+import static org.obiba.opal.web.gwt.app.client.bookmark.list.BookmarkListPresenter.Mode.VIEW_AND_DELETE;
 
 public class BookmarkListPresenter extends PresenterWidget<BookmarkListPresenter.Display>
     implements BookmarkListUiHandlers {
 
   public enum Mode {
     VIEW_ONLY,
-    VIEW_DELETE
+    VIEW_AND_DELETE
   }
 
   @Inject
   public BookmarkListPresenter(EventBus eventBus, Display view) {
     super(eventBus, view);
     getView().setUiHandlers(this);
-    getView().setMode(VIEW_DELETE);
+    getView().setMode(VIEW_AND_DELETE);
   }
 
   public BookmarkListPresenter setMode(Mode mode) {

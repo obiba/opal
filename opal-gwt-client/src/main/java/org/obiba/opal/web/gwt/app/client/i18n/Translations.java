@@ -2172,8 +2172,4 @@ public interface Translations extends Constants {
   @Description("Click to add this item to your bookmarks label")
   @DefaultStringValue("Click to add this item to your bookmarks")
   String clickToAddToBookmarks();
-
-  @Description("Favorites label")
-  @DefaultStringValue("Favorites")
-  String favoritesLabel();
 }
