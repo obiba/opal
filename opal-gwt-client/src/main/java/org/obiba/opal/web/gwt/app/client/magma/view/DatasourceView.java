@@ -206,7 +206,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
       public String getText(TableDto value) {
         String name = value.getName();
         return value.hasViewLink()
-            ? "<i class=\"icon-cog\"></i>&nbsp;" + name
+            ? "<i class=\"icon-th-large\"></i>&nbsp;" + name
             : "<i class=\"icon-table\"></i>&nbsp;" + name;
       }
     }) {
