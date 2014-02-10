@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.support.DatasourceFileType;
@@ -46,6 +47,7 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto;
 import org.obiba.opal.web.model.client.magma.ExcelDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.FileViewDto;
 import org.obiba.opal.web.model.client.magma.FileViewDto.FileViewType;
@@ -57,6 +59,7 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -428,8 +431,23 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void onResponseCode(Request request, Response response) {
-      getView().showError(null, translations.variableImportFailed());
+      ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+
+      if(error.getExtension(DatasourceParsingErrorDto.ClientErrorDtoExtensions.errors) != null) {
+        JsArray<DatasourceParsingErrorDto> parsingErrors = (JsArray<DatasourceParsingErrorDto>) error
+            .getExtension(DatasourceParsingErrorDto.ClientErrorDtoExtensions.errors);
+
+        for(DatasourceParsingErrorDto datasourceParsingErrorDto : JsArrays.toIterable(parsingErrors)) {
+          getView().showError(null, TranslationsUtils
+              .replaceArguments(translations.datasourceParsingErrorMap().get(datasourceParsingErrorDto.getKey()),
+                  datasourceParsingErrorDto.getArgumentsArray()));
+        }
+      } else {
+        getView().showError(null, translations.variableImportFailed());
+      }
+
       getView().disableCompletion();
     }
   }
