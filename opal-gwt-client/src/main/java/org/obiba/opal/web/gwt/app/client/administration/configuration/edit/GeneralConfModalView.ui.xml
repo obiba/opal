@@ -14,7 +14,7 @@
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <o:Modal ui:field="modal" resizable="false" closeVisible="true" keyboard="true" animation="false">
+  <o:Modal ui:field="modal" resizable="true" closeVisible="true" keyboard="true" animation="false">
 
     <!-- Name -->
     <b:ControlGroup ui:field="nameGroup">
