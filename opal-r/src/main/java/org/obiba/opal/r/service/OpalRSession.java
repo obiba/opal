@@ -127,6 +127,7 @@ public class OpalRSession implements ROperationTemplate {
    * @return
    */
   private RConnection newConnection() {
+    if (rSession == null) throw new NoSuchRSessionException();
     try {
       return rSession.attach();
     } catch(RserveException e) {
