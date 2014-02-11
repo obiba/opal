@@ -22,6 +22,7 @@ import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.obiba.magma.Category;
+import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
@@ -93,7 +94,13 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
     if(variable.hasCategories()) {
       for(Category c : variable.getCategories()) {
         if(c.isMissing()) {
-          missing.add(variable.getValueType().valueOf(c.getName()));
+          try {
+            missing.add(variable.getValueType().valueOf(c.getName()));
+          } catch(MagmaRuntimeException e) {
+            // When valueOf expects a integer but get a string category, do not crash
+            log.warn("Variable {}, Category {}, ValueType ({}): {}", variable.getName(), c.getName(),
+                variable.getValueType().getName(), e.getMessage());
+          }
         }
       }
     }
