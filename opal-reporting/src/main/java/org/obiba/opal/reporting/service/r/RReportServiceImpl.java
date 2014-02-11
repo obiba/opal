@@ -43,6 +43,10 @@ public class RReportServiceImpl implements ReportService {
 
   private static final Logger log = LoggerFactory.getLogger(RReportServiceImpl.class);
 
+  private static final String REPORT_STYLE_OPTION = "opal.report.style";
+
+  private static final String DEFAULT_REPORT_STYLE = "Flatly";
+
   @Value("${OPAL_HOME}")
   private File opalHomeFile;
 
@@ -96,23 +100,30 @@ public class RReportServiceImpl implements ReportService {
    */
   private String buildOptions(Map<String, String> parameters) {
     StringBuilder script = new StringBuilder();
-    if(parameters.size() > 0) {
-      script.append("options(");
-      boolean appended = false;
+    script.append("options(");
+    boolean appended = false;
+    // set default style
+    if(parameters == null || !parameters.containsKey(REPORT_STYLE_OPTION)) {
+      script.append(REPORT_STYLE_OPTION).append("=").append(toOptionValue(DEFAULT_REPORT_STYLE));
+      appended = true;
+    }
+    // append other parameters as R options
+    if(parameters != null) {
       for(Map.Entry<String, String> param : parameters.entrySet()) {
         String value = param.getValue().trim();
-        if(!Pattern.matches("^T$|^TRUE$|^F$|^FALSE$|^NULL$", value)) {
-          value = "'" + value + "'";
-        }
         if(appended) {
           script.append(", ");
         }
-        script.append(param.getKey().trim()).append("=").append(value);
+        script.append(param.getKey().trim()).append("=").append(toOptionValue(value));
         appended = true;
       }
-      script.append(")");
     }
+    script.append(")");
     return script.toString();
+  }
+
+  private String toOptionValue(String value) {
+    return Pattern.matches("^T$|^TRUE$|^F$|^FALSE$|^NULL$", value) ? value : "'" + value + "'";
   }
 
   //
@@ -140,7 +151,7 @@ public class RReportServiceImpl implements ReportService {
   private void prepareRSession(OpalRSession rSession, Map<String, String> parameters, File reportDesignFile)
       throws IOException {
     // copy all Rmd files to the work directory of the R server
-    for (File file : reportDesignFile.getParentFile().listFiles(new FileFilter() {
+    for(File file : reportDesignFile.getParentFile().listFiles(new FileFilter() {
       @Override
       public boolean accept(File pathname) {
         return pathname.getName().endsWith(".Rmd");
@@ -157,7 +168,8 @@ public class RReportServiceImpl implements ReportService {
 
   private RScriptROperation runReport(OpalRSession rSession, String reportDesign) {
     StringBuilder script = new StringBuilder();
-    script.append("opal.report('").append(reportDesign).append("', boot_style=getOption('opal.report.style'),  progress=TRUE)");
+    script.append("opal.report('").append(reportDesign).append("', boot_style=getOption('").append(REPORT_STYLE_OPTION)
+        .append("'),  progress=TRUE)");
     return execute(rSession, script.toString());
   }
 
@@ -170,6 +182,7 @@ public class RReportServiceImpl implements ReportService {
 
   /**
    * Write file content to R side.
+   *
    * @param rSession
    * @param file
    * @throws IOException
@@ -177,13 +190,14 @@ public class RReportServiceImpl implements ReportService {
   private void writeFileToR(OpalRSession rSession, File file) throws IOException {
     StringBuffer script = new StringBuffer("writeLines(");
     String content = readFileInString(file.getAbsolutePath());
-    script.append("'").append(content.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n")).append("', '").append(file.getName())
-        .append("')");
+    script.append("'").append(content.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n")).append("', '")
+        .append(file.getName()).append("')");
     execute(rSession, script.toString());
   }
 
   /**
    * Read file from R side.
+   *
    * @param rSession
    * @param name
    * @return
@@ -202,12 +216,13 @@ public class RReportServiceImpl implements ReportService {
   }
 
   private void cleanRWorkDir(OpalRSession rSession, String workDir) {
-    String script = "unlink('"+workDir+"', recursive=TRUE)";
+    String script = "unlink('" + workDir + "', recursive=TRUE)";
     execute(rSession, script);
   }
 
   /**
    * Read local file content in a string.
+   *
    * @param path
    * @return
    * @throws IOException

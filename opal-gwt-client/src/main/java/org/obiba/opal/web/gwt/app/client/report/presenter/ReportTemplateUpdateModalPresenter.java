@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
@@ -38,6 +39,8 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -114,7 +117,11 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
     fileSelectionPresenter = fileSelectionPresenterProvider.get();
     emailSelectorPresenter = itemSelectorPresenterProvider.get();
     parametersSelectorPresenter = itemSelectorPresenterProvider.get();
-    parametersSelectorPresenter.getView().setItemInputDisplay(new KeyValueItemInputView());
+    Map<String, List<String>> suggestions = Maps.newLinkedHashMap();
+    suggestions.put("opal.report.style", Lists
+        .newArrayList("NULL", "Default", "Amelia", "Cerulean", "Cosmo", "Cyborg", "Flatly", "Journal", "Readable",
+            "Simplex", "Slate", "Spacelab", "United"));
+    parametersSelectorPresenter.getView().setItemInputDisplay(new KeyValueItemInputView(suggestions));
     emailSelectorPresenter.getView().setItemInputDisplay(new TextBoxItemInputView());
     getView().setUiHandlers(this);
   }

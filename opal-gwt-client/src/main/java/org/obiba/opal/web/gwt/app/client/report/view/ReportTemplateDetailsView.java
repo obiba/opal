@@ -224,7 +224,7 @@ public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplate
       if(matcher != null) {
         value = "******";
       }
-      regExp = RegExp.compile("^T$|^TRUE$|^F$|^FALSE$");
+      regExp = RegExp.compile("^T$|^TRUE$|^F$|^FALSE$|^NULL$");
       matcher = regExp.exec(value);
       if(matcher == null) {
         value = "\"" + value + "\"";
