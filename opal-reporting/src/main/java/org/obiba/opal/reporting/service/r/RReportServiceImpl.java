@@ -56,14 +56,8 @@ public class RReportServiceImpl implements ReportService {
   public void render(String format, Map<String, String> parameters, String reportDesign, String reportOutput)
       throws ReportException {
     try {
-      // prepare the working directory
-      String reportOutputName = new File(reportOutput).getName();
-
-      // R server is running locally
       String report = renderWithRServer(parameters, reportDesign);
-
       Files.write(Paths.get(reportOutput), report.getBytes());
-
       log.info("R report done");
     } catch(IOException | REXPMismatchException e) {
       log.error("Unable to render R report", e);
@@ -107,7 +101,7 @@ public class RReportServiceImpl implements ReportService {
       boolean appended = false;
       for(Map.Entry<String, String> param : parameters.entrySet()) {
         String value = param.getValue().trim();
-        if(!Pattern.matches("^T$|^TRUE$|^F$|^FALSE$", value)) {
+        if(!Pattern.matches("^T$|^TRUE$|^F$|^FALSE$|^NULL$", value)) {
           value = "'" + value + "'";
         }
         if(appended) {
@@ -121,29 +115,6 @@ public class RReportServiceImpl implements ReportService {
     return script.toString();
   }
 
-  /**
-   * Move the produced report to the output directory and delete the working directory.
-   *
-   * @param reportDesign
-   * @param reportOutput
-   * @param reportWorkingDir
-   * @throws ReportException
-   */
-  private void cleanFiles(String reportDesign, String reportOutput, File reportWorkingDir) throws ReportException {
-    if(reportWorkingDir != null && reportWorkingDir.exists()) {
-      try {
-        String reportName = new File(reportDesign).getName();
-        File report = new File(reportWorkingDir, reportName.replace(".Rmd", ".html"));
-        if(report.exists()) {
-          FileUtil.moveFile(report, new File(reportOutput));
-        }
-        FileUtil.delete(reportWorkingDir);
-      } catch(IOException e) {
-        throw new ReportException(e);
-      }
-    }
-  }
-
   //
   // Render on R server
   //
@@ -155,10 +126,11 @@ public class RReportServiceImpl implements ReportService {
     try {
       File reportDesignFile = new File(reportDesign);
       rSession = opalRSessionManager.newSubjectCurrentRSession();
+      String originalWorkDir = getRWorkDir(rSession);
       prepareRSession(rSession, parameters, reportDesignFile);
       runReport(rSession, reportDesignFile.getName());
-      report = readFile(rSession, reportDesignFile.getName().replace(".Rmd", ".html"));
-      // TODO remote clean working directory
+      report = readFileFromR(rSession, reportDesignFile.getName().replace(".Rmd", ".html"));
+      cleanRWorkDir(rSession, originalWorkDir);
     } finally {
       if(rSession != null) rSession.close();
     }
@@ -174,7 +146,7 @@ public class RReportServiceImpl implements ReportService {
         return pathname.getName().endsWith(".Rmd");
       }
     })) {
-      writeFile(rSession, file);
+      writeFileToR(rSession, file);
     }
     execute(rSession, "require(opal)");
     String options = buildOptions(parameters);
@@ -185,12 +157,12 @@ public class RReportServiceImpl implements ReportService {
 
   private RScriptROperation runReport(OpalRSession rSession, String reportDesign) {
     StringBuilder script = new StringBuilder();
-    script.append("opal.report('").append(reportDesign).append("', progress=TRUE)");
+    script.append("opal.report('").append(reportDesign).append("', boot_style=getOption('opal.report.style'),  progress=TRUE)");
     return execute(rSession, script.toString());
   }
 
   private RScriptROperation execute(OpalRSession rSession, String rscript) {
-    log.info(rscript);
+    log.debug(rscript);
     RScriptROperation rop = new RScriptROperation(rscript, false);
     rSession.execute(rop);
     return rop;
@@ -202,7 +174,7 @@ public class RReportServiceImpl implements ReportService {
    * @param file
    * @throws IOException
    */
-  private void writeFile(OpalRSession rSession, File file) throws IOException {
+  private void writeFileToR(OpalRSession rSession, File file) throws IOException {
     StringBuffer script = new StringBuffer("writeLines(");
     String content = readFileInString(file.getAbsolutePath());
     script.append("'").append(content.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n")).append("', '").append(file.getName())
@@ -217,10 +189,21 @@ public class RReportServiceImpl implements ReportService {
    * @return
    * @throws REXPMismatchException
    */
-  private String readFile(OpalRSession rSession, String name) throws REXPMismatchException {
+  private String readFileFromR(OpalRSession rSession, String name) throws REXPMismatchException {
     String script = "readChar('" + name + "', file.info('" + name + "')$size)";
     RScriptROperation rop = execute(rSession, script);
     return rop.getResult().asString();
+  }
+
+  private String getRWorkDir(OpalRSession rSession) throws REXPMismatchException {
+    String script = "getwd()";
+    RScriptROperation rop = execute(rSession, script);
+    return rop.getResult().asString();
+  }
+
+  private void cleanRWorkDir(OpalRSession rSession, String workDir) {
+    String script = "unlink('"+workDir+"', recursive=TRUE)";
+    execute(rSession, script);
   }
 
   /**
