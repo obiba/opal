@@ -145,9 +145,9 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     JsArray<AttributeDto> newAttributes = JsArrays.create().cast();
 
     for(AttributeDto attributeDto : JsArrays.toIterable(dto.getAttributesArray())) {
-      // Add attribute if its not for the specified namespace and name
-      if(!attributeDto.getNamespace().equals(getView().getNamespaceSuggestBox().getText()) &&
-          attributeDto.getName().equals(getView().getName().getText())) {
+      // Add attribute if its not for the specified namespace or name
+      if(!attributeDto.getNamespace().equals(getView().getNamespaceSuggestBox().getText()) ||
+          !attributeDto.getName().equals(getView().getName().getText())) {
         newAttributes.push(attributeDto);
       }
     }
