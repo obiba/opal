@@ -10,26 +10,16 @@
 
 package org.obiba.opal.web.gwt.app.client.project.view;
 
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalTabPanel;
-import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
-import org.obiba.opal.web.model.client.magma.TimestampsDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
-import org.obiba.opal.web.model.client.opal.ProjectSummaryDto;
 
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
-import com.github.gwtbootstrap.client.ui.Heading;
-import com.github.gwtbootstrap.client.ui.Label;
 import com.github.gwtbootstrap.client.ui.NavLink;
-import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.github.gwtbootstrap.client.ui.TabPanel;
-import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -52,25 +42,7 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   FlowPanel bookmarkIcon;
 
   @UiField
-  Heading projectHeader;
-
-  @UiField
-  Paragraph description;
-
-  @UiField
   FlowPanel tagsPanel;
-
-  @UiField
-  NavLink timestamps;
-
-  @UiField
-  NavLink tableCount;
-
-  @UiField
-  NavLink variableCount;
-
-  @UiField
-  NavLink entityCount;
 
   @UiField
   OpalTabPanel tabPanel;
@@ -93,16 +65,11 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   @UiField
   FlowPanel permissionsPanel;
 
-  private ProjectDto project;
-
   private final Translations translations;
 
-  private final TranslationMessages translationMessages;
-
   @Inject
-  ProjectView(Binder uiBinder, Translations translations, TranslationMessages translationMessages) {
+  ProjectView(Binder uiBinder, Translations translations) {
     this.translations = translations;
-    this.translationMessages = translationMessages;
     initWidget(uiBinder.createAndBindUi(this));
     for(ProjectTab tab : ProjectTab.values()) {
       String title = translations.projectTabNameMap().get(tab.toString());
@@ -117,46 +84,27 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   }
 
   @Override
-  public void setProject(ProjectDto project) {
-    this.project = project;
+  public void   setProject(ProjectDto project) {
     if(titleCrumbs.getWidgetCount() > 1) {
       titleCrumbs.remove(1);
     }
     titleCrumbs.add(new NavLink(project.getTitle()));
 
-    projectHeader.setText(project.getTitle());
-    projectHeader.setSubtext("[" + project.getName() + "]");
-    description.setText(project.getDescription());
-
-    setTags();
-    if(project.hasTimestamps()) setTimestamps(project.getTimestamps());
+    //TODO until a better layout is found do not set the tags
+//    setTags();
   }
 
-  private void setTags() {
-    tagsPanel.clear();
-    JsArrayString tagsArray = JsArrays.toSafeArray(project.getTagsArray());
-    if(tagsArray.length() > 0) {
-      for(String tag : JsArrays.toIterable(tagsArray)) {
-        Label tagLabel = new Label(tag);
-        tagLabel.addStyleName("small-indent");
-        tagsPanel.add(tagLabel);
-      }
-    }
-  }
-
-  private void setTimestamps(TimestampsDto ts) {
-    String lastUpdateOn = "?";
-    if(ts.hasLastUpdate()) lastUpdateOn = Moment.create(ts.getLastUpdate()).fromNow();
-    timestamps.setText(TranslationsUtils.replaceArguments(translations.lastUpdateOnLabel(), lastUpdateOn));
-  }
-
-  @Override
-  public void setProjectSummary(ProjectSummaryDto projectSummary) {
-    tableCount.setText(translationMessages.tableCount(projectSummary.getTableCount()));
-    variableCount.setText(translationMessages.variableCount(projectSummary.getVariableCount()));
-    entityCount.setText(translationMessages.entityCount(projectSummary.getEntityCount()));
-    if(projectSummary.hasTimestamps()) setTimestamps(projectSummary.getTimestamps());
-  }
+//  private void setTags() {
+//    tagsPanel.clear();
+//    JsArrayString tagsArray = JsArrays.toSafeArray(project.getTagsArray());
+//    if(tagsArray.length() > 0) {
+//      for(String tag : JsArrays.toIterable(tagsArray)) {
+//        Label tagLabel = new Label(tag);
+//        tagLabel.addStyleName("small-indent");
+//        tagsPanel.add(tagLabel);
+//      }
+//    }
+//  }
 
   @Override
   public void selectTab(int tab) {
@@ -181,26 +129,6 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   @UiHandler("projects")
   void onProjectsSelection(ClickEvent event) {
     getUiHandlers().onProjectsSelection();
-  }
-
-  @UiHandler("timestamps")
-  void onTimestamps(ClickEvent event) {
-    tabPanel.selectTab(ProjectTab.TABLES.ordinal());
-  }
-
-  @UiHandler("tableCount")
-  void onTableCount(ClickEvent event) {
-    tabPanel.selectTab(ProjectTab.TABLES.ordinal());
-  }
-
-  @UiHandler("variableCount")
-  void onVariableCount(ClickEvent event) {
-    tabPanel.selectTab(ProjectTab.TABLES.ordinal());
-  }
-
-  @UiHandler("entityCount")
-  void onEntityCount(ClickEvent event) {
-    tabPanel.selectTab(ProjectTab.TABLES.ordinal());
   }
 
   @UiHandler("tabPanel")
