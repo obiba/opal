@@ -61,11 +61,6 @@ public class FilePlacesPresenter extends PresenterWidget<FilePlacesPresenter.Dis
   }
 
   @Override
-  public void onOrganizationsSelection() {
-    fireEvent(new FolderRequestEvent(FileDtos.units()));
-  }
-
-  @Override
   public void onReportsSelection() {
     fireEvent(new FolderRequestEvent(FileDtos.reports()));
   }

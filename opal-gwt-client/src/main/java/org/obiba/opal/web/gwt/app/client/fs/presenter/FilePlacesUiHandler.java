@@ -24,8 +24,6 @@ public interface FilePlacesUiHandler extends UiHandlers {
 
   void onProjectsSelection();
 
-  void onOrganizationsSelection();
-
   void onReportsSelection();
 
 }

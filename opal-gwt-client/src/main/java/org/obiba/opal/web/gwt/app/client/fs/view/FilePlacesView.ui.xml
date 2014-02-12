@@ -27,9 +27,6 @@
     <b:NavLink icon="BRIEFCASE" ui:field="projects">
       <ui:msg description="Projects label">Projects</ui:msg>
     </b:NavLink>
-    <b:NavLink icon="EXCHANGE" ui:field="organizations">
-      <ui:msg description="Organizations label">Organizations</ui:msg>
-    </b:NavLink>
     <b:NavLink icon="FILE_ALT" ui:field="reports">
       <ui:msg description="Reports label">Reports</ui:msg>
     </b:NavLink>

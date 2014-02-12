@@ -62,12 +62,7 @@ public class FilePlacesView extends ViewWithUiHandlers<FilePlacesUiHandler> impl
   public void onProjectsSelection(ClickEvent event) {
     getUiHandlers().onProjectsSelection();
   }
-
-  @UiHandler("organizations")
-  public void onOrganizationsSelection(ClickEvent event) {
-    getUiHandlers().onOrganizationsSelection();
-  }
-
+  
   @UiHandler("reports")
   public void onReportsSelection(ClickEvent event) {
     getUiHandlers().onReportsSelection();
