@@ -22,7 +22,7 @@
         <b:NavLink ui:field="administrationItem">
           <ui:msg description="Administration label">Administration</ui:msg>
         </b:NavLink>
-        <b:NavLink target="_blank" href="http://wiki.obiba.org/display/OPALDOC">
+        <b:NavLink target="_blank" href="http://wiki.obiba.org/display/OPALDOC/Opal+Web+Application+User+Guide">
           <ui:msg description="Help link text">Help</ui:msg>
         </b:NavLink>
         <b:Nav>

@@ -13,7 +13,8 @@ package org.obiba.opal.web.gwt.app.client.view;
 import org.obiba.opal.web.gwt.app.client.presenter.PostInstallPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.PostInstallUiHandlers;
 
-import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.Dropdown;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -29,7 +30,7 @@ public class PostInstallView extends ViewWithUiHandlers<PostInstallUiHandlers> i
   interface Binder extends UiBinder<Widget, PostInstallView> {}
 
   @UiField
-  NavLink username;
+  Dropdown username;
 
   @UiField
   Panel notification;
@@ -41,7 +42,7 @@ public class PostInstallView extends ViewWithUiHandlers<PostInstallUiHandlers> i
   Panel dataPanel;
 
   @UiField
-  Panel gotoMain;
+  Button gotoMain;
 
   @Inject
   public PostInstallView(Binder uiBinder) {
@@ -70,11 +71,6 @@ public class PostInstallView extends ViewWithUiHandlers<PostInstallUiHandlers> i
   @Override
   public void enablePageExit(boolean value) {
     gotoMain.setVisible(value);
-  }
-
-  @UiHandler("helpItem")
-  void onHelp(ClickEvent event) {
-    getUiHandlers().onHelp();
   }
 
   @UiHandler("quitItem")

@@ -14,8 +14,6 @@ import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface PostInstallUiHandlers extends UiHandlers {
 
-  void onHelp();
-
   void onQuit();
 
   void onGoToMain();

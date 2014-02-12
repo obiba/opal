@@ -15,29 +15,38 @@
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <g:FlowPanel>
-    <b:ResponsiveNavbar position="TOP" scrollspy="false" inverse="true">
+    <b:ResponsiveNavbar position="TOP" scrollspy="false">
       <b:Brand href="#!install">Opal</b:Brand>
 
       <b:Nav alignment="RIGHT">
-        <b:NavLink ui:field="username"></b:NavLink>
-        <b:NavLink ui:field="helpItem">
+        <b:NavLink target="_blank" href="http://wiki.obiba.org/display/OPALDOC/Opal+Web+Application+User+Guide">
           <ui:msg description="Help link text">Help</ui:msg>
         </b:NavLink>
-        <b:NavLink ui:field="quitItem">
-          <ui:msg description="Quit link text">Quit</ui:msg>
-        </b:NavLink>
+        <b:Nav>
+          <b:Dropdown icon="USER" rightDropdown="true" ui:field="username">
+            <b:NavLink icon="COG" disabled="true">
+              <ui:msg description="My Profile label">My Profile</ui:msg>
+            </b:NavLink>
+            <b:Divider/>
+            <b:NavLink icon="SIGNOUT" ui:field="quitItem">
+              <ui:msg description="Logout text">Logout</ui:msg>
+            </b:NavLink>
+          </b:Dropdown>
+        </b:Nav>
       </b:Nav>
     </b:ResponsiveNavbar>
     <g:FlowPanel addStyleNames="container">
-      <g:SimplePanel ui:field="notification"/>
+      <g:SimplePanel ui:field="notification" addStyleNames="top-margin"/>
       <g:FlowPanel addStyleNames="page-header">
         <b:Heading size="3">
           <ui:msg description="Install label">Post-Install Configuration</ui:msg>
         </b:Heading>
       </g:FlowPanel>
       <b:Paragraph>
-        Congratulations! You have just installed Opal server and now it is time to set up the minimum requirements for
-        having a fully functional server.
+        <ui:msg description="Post install text">
+          Congratulations! You have just installed Opal server. Now it is time to set up the minimum requirements for
+          having a fully functional server.
+        </ui:msg>
       </b:Paragraph>
       <b:Button ui:field="gotoMain" type="SUCCESS" icon="CHEVRON_RIGHT" iconPosition="RIGHT">
         <ui:msg description="Continue to main site label">Continue to main site</ui:msg>

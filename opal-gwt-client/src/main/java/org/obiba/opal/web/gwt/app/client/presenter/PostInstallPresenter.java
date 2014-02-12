@@ -137,11 +137,6 @@ public class PostInstallPresenter extends Presenter<PostInstallPresenter.Display
   }
 
   @Override
-  public void onHelp() {
-    HelpUtil.openPage();
-  }
-
-  @Override
   public void onQuit() {
     fireEvent(new SessionEndedEvent());
   }
