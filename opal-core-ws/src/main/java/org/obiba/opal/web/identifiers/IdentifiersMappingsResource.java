@@ -261,7 +261,10 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
         CSVWriter writer = new CSVWriter(new PrintWriter(values))) {
       writeCSVValues(writer, table);
 
-      String filename = "Ids" + (table != null ? "-" + table.getName() : "") + ".csv";
+      String filename = "IDs" + (table != null ? "-" + table.getEntityType() : "") + ".csv";
+
+      writer.flush();
+      values.flush();
 
       return Response.ok(values.toByteArray(), "text/csv")
           .header("Content-Disposition", "attachment; filename=\"" + filename + "\"").build();
