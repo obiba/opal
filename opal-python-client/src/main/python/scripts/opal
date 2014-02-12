@@ -12,6 +12,8 @@ import opal.import_csv
 import opal.import_xml
 import opal.import_limesurvey
 import opal.import_spss
+import opal.import_ids
+import opal.import_idsmap
 import opal.export_xml
 import opal.export_csv
 import opal.user
@@ -64,6 +66,10 @@ add_subcommand('import-limesurvey', 'Import data from a LimeSurvey database.', o
                opal.import_limesurvey.do_command)
 add_subcommand('import-spss', 'Import data from a SPSS file.', opal.import_spss.add_arguments,
                opal.import_spss.do_command)
+add_subcommand('import-ids', 'Import system identifiers.', opal.import_ids.add_arguments,
+               opal.import_ids.do_command)
+add_subcommand('import-ids-map', 'Import identifiers mappings.', opal.import_idsmap.add_arguments,
+               opal.import_idsmap.do_command)
 add_subcommand('export-xml', 'Export data to a zip of Opal XML files.', opal.export_xml.add_arguments,
                opal.export_xml.do_command)
 add_subcommand('export-csv', 'Export data to a folder of CSV files.', opal.export_csv.add_arguments,

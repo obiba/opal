@@ -417,7 +417,7 @@ class UriBuilder:
         return self
 
     def query(self, key, value):
-        self.params.update(key, value)
+        self.params.update([(key, value),])
         return self
 
     def __str__(self):
