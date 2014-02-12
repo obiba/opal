@@ -57,9 +57,10 @@
     <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
       <maxFileSize>10MB</maxFileSize>
     </triggeringPolicy>
-    <encoder>
-      <pattern>%date - %level - %message%n</pattern>
-    </encoder>
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+    <!--encoder>
+      <pattern>%date - %level - %X{username} - %X{status} - %X{method} - %message - %X{created}%n</pattern>
+    </encoder-->
   </appender>
 
   <logger name="datashield" additivity="false" level="info">

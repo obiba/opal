@@ -26,6 +26,7 @@ import org.obiba.opal.web.ws.cfg.OpalWsConfig;
 import org.obiba.opal.web.ws.intercept.RequestCyclePostProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +37,7 @@ public class AuditInterceptor implements RequestCyclePostProcess {
 
   private static final Logger log = LoggerFactory.getLogger(AuditInterceptor.class);
 
-  private static final String LOG_FORMAT = "{} - {} - {} - {}";
+  private static final String LOG_FORMAT = "{}";
 
   @Autowired
   private OpalUserProvider opalUserProvider;
@@ -46,13 +47,15 @@ public class AuditInterceptor implements RequestCyclePostProcess {
     logServerError(request, response);
     logClientError(request, response);
     logInfo(request, response);
-    logHeaders(request);
   }
 
-  private Object[] getArguments(HttpRequest request, ServerResponse response) {
+  private String getArguments(HttpRequest request, ServerResponse response) {
+    MDC.put("username", opalUserProvider.getUsername());
+    MDC.put("status", response.getStatus() + "");
+    MDC.put("method", request.getHttpMethod());
+
     // TODO get the remote IP
-    return new Object[] { opalUserProvider.getUsername(), response.getStatus(), request.getHttpMethod(),
-        request.getUri().getPath(true) };
+    return request.getUri().getPath(true);
   }
 
   private void logServerError(HttpRequest request, ServerResponse response) {
@@ -79,9 +82,8 @@ public class AuditInterceptor implements RequestCyclePostProcess {
       URI resourceUri = (URI) response.getMetadata().getFirst(HttpHeaders.LOCATION);
       if(resourceUri != null) {
         String path = resourceUri.getPath().substring(OpalWsConfig.WS_ROOT.length());
-        List<Object> args = Lists.newArrayList(getArguments(request, response));
-        args.add(path);
-        log.info(LOG_FORMAT + " - {}", args.toArray());
+        MDC.put("created", path);
+        log.info(LOG_FORMAT, getArguments(request, response));
         logged = true;
       }
     }
@@ -91,14 +93,4 @@ public class AuditInterceptor implements RequestCyclePostProcess {
     }
   }
 
-  private void logHeaders(HttpRequest request) {
-    if(!log.isTraceEnabled()) return;
-
-    MultivaluedMap<String, String> headers = request.getHttpHeaders().getRequestHeaders();
-    for(Map.Entry<String, List<String>> entry : headers.entrySet()) {
-      for(String value : entry.getValue()) {
-        log.trace("{}={}", entry.getKey(), value);
-      }
-    }
-  }
 }
