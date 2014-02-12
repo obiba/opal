@@ -212,7 +212,9 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
   @Override
   public Response compileTransientVariable(String valueTypeName, Boolean repeatable, String scriptQP,
       List<String> categoriesQP, String scriptFP, List<String> categoriesFP) {
-    getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP, categoriesFP);
+    JavascriptVariableValueSource variableValueSource = getJavascriptVariableValueSource(valueTypeName, repeatable,
+        scriptQP, categoriesQP, scriptFP, categoriesFP);
+    variableValueSource.validateScript();
     return Response.ok().build();
   }
 
@@ -298,7 +300,7 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
     return resource;
   }
 
-  private VariableValueSource getJavascriptVariableValueSource(String valueTypeName, Boolean repeatable,
+  private JavascriptVariableValueSource getJavascriptVariableValueSource(String valueTypeName, Boolean repeatable,
       String scriptQP, List<String> categoriesQP, String scriptFP, List<String> categoriesFP) {
     String script = scriptQP;
     List<String> categories = categoriesQP;
