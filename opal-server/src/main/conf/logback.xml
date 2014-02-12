@@ -17,7 +17,7 @@
   <appender name="opal" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${OPAL_LOG}/opal.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-      <fileNamePattern>opal-%i.log</fileNamePattern>
+      <fileNamePattern>${OPAL_LOG}/opal-%i.log</fileNamePattern>
       <maxIndex>10</maxIndex>
     </rollingPolicy>
     <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
@@ -34,7 +34,7 @@
       <level>INFO</level>
     </filter>
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-      <fileNamePattern>datashield-%i.log</fileNamePattern>
+      <fileNamePattern>${OPAL_LOG}/datashield-%i.log</fileNamePattern>
       <maxIndex>10</maxIndex>
     </rollingPolicy>
     <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
@@ -51,7 +51,7 @@
       <level>INFO</level>
     </filter>
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-      <fileNamePattern>rest-%i.log</fileNamePattern>
+      <fileNamePattern>${OPAL_LOG}/rest-%i.log</fileNamePattern>
       <maxIndex>10</maxIndex>
     </rollingPolicy>
     <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
