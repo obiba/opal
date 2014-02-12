@@ -24,7 +24,12 @@ public final class BookmarkPlaceRequestBuilder {
 
   public static PlaceRequest create(@NotNull LinkDto linkDto) {
     Preconditions.checkArgument(linkDto != null);
-    Tokenizer tokenizer = Tokenizer.newTokenizer().tokenize(linkDto.getRel());
+    return create(linkDto.getRel());
+  }
+
+  public static PlaceRequest create(@NotNull String path) {
+    Preconditions.checkArgument(path != null);
+    Tokenizer tokenizer = Tokenizer.newTokenizer().tokenize(path);
     if(tokenizer.hasVariable()) {
       return ProjectPlacesHelper
           .getVariablePlace(tokenizer.getProject(), tokenizer.getTable(), tokenizer.getVariable());

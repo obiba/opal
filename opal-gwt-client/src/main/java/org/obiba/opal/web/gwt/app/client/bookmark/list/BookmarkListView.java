@@ -4,10 +4,11 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.support.BookmarkPlaceRequestBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.BookmarksColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.model.client.opal.BookmarkDto;
 
@@ -15,6 +16,7 @@ import com.github.gwtbootstrap.client.ui.CellTable;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Label;
@@ -23,6 +25,7 @@ import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 import static org.obiba.opal.web.gwt.app.client.bookmark.list.BookmarkListPresenter.Mode;
 
@@ -92,7 +95,8 @@ public class BookmarkListView extends ViewWithUiHandlers<BookmarkListUiHandlers>
 
   private void initTable() {
     table.setVisibleRange(0, 10);
-    table.addColumn(new BookmarksColumn(placeManager), translations.resourceLabel());
+    table.addColumn(new BookmarkColumn(placeManager), translations.resourceLabel());
+    table.addColumn(new TypeColumn(), translations.typeLabel());
     table.addColumn(new CreateColumn(), translations.createdLabel());
     dataProvider.addDataDisplay(table);
     table.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
@@ -105,6 +109,30 @@ public class BookmarkListView extends ViewWithUiHandlers<BookmarkListUiHandlers>
     table.getColumnSortList().push(table.getColumn(SORTABLE_COLUMN_CREATED));
     table.getColumnSortList().push(table.getColumn(SORTABLE_COLUMN_RESOURCE));
     table.addColumnSortHandler(typeSortHandler);
+  }
+
+
+  private static class BookmarkColumn extends Column<BookmarkDto, BookmarkDto> {
+
+    private BookmarkColumn(final PlaceManager placeManager) {
+
+      super(new PlaceRequestCell<BookmarkDto>(placeManager) {
+        @Override
+        public PlaceRequest getPlaceRequest(BookmarkDto bookmarkDto) {
+          return BookmarkPlaceRequestBuilder.create(bookmarkDto.getResource());
+        }
+
+        @Override
+        public String getText(BookmarkDto bookmarkDto) {
+          return bookmarkDto.getLinks(bookmarkDto.getLinksCount()-1).getLink();
+        }
+      });
+    }
+
+    @Override
+    public BookmarkDto getValue(BookmarkDto object) {
+      return object;
+    }
   }
 
   private static final class ResourceComparator implements Comparator<BookmarkDto> {
@@ -123,6 +151,14 @@ public class BookmarkListView extends ViewWithUiHandlers<BookmarkListUiHandlers>
         return m2 == null ? 0 : 1;
       }
       return m2 == null ? -1 : m2.unix() - m1.unix();
+    }
+  }
+
+  private static final class TypeColumn extends TextColumn<BookmarkDto> {
+
+    @Override
+    public String getValue(BookmarkDto bookmarkDto) {
+      return bookmarkDto.getType().getName();
     }
   }
 
