@@ -61,7 +61,6 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   public interface Display extends View, HasUiHandlers<ProjectUiHandlers>, HasTabPanel {
 
     enum ProjectTab {
-      HOME,
       TABLES,
       FILES,
       REPORTS,
@@ -71,8 +70,6 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     }
 
     void setProject(ProjectDto project);
-
-    void setProjectSummary(ProjectSummaryDto projectSummary);
 
     HasAuthorization getPermissionsAuthorizer();
   }
@@ -223,22 +220,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
             bookmarkIconPresenter.setBookmarkable(UriBuilders.DATASOURCE.create().build(projectName));
           }
         }).get().send();
-    refreshSummary();
     authorize();
-  }
-
-  private void refreshSummary() {
-    // TODO handle wrong or missing project name
-    if(projectName == null) return;
-    ResourceRequestBuilderFactory.<ProjectSummaryDto>newBuilder() //
-        .forResource(UriBuilders.PROJECT_SUMMARY.create().build(projectName)) //
-        .withCallback(new ResourceCallback<ProjectSummaryDto>() {
-          @Override
-          public void onResource(Response response, ProjectSummaryDto resource) {
-            getView().setProjectSummary(resource);
-          }
-        }) //
-        .get().send();
   }
 
   @Override
@@ -364,7 +346,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       } catch(IllegalArgumentException ignored) {
       }
     }
-    return Display.ProjectTab.HOME;
+    return Display.ProjectTab.TABLES;
   }
 
   private String validatePath(String name, String path) {

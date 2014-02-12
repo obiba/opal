@@ -32,35 +32,10 @@
       </b:FluidRow>
     </g:FlowPanel>
     <o:OpalTabPanel tabPosition="right" ui:field="tabPanel">
-      <b:Tab icon="HOME" active="true">
-        <b:Heading size="3" ui:field="projectHeader" addStyleNames="inline-block no-top-margin">Project</b:Heading>
-        <g:FlowPanel ui:field="tagsPanel" addStyleNames="inline-block small-indent"/>
-        <b:Paragraph ui:field="description"/>
-        <b:FluidRow addStyleNames="text-align-center">
-          <b:Column size="3">
-            <b:WellNavList>
-              <b:NavLink icon="TIME" ui:field="timestamps">?</b:NavLink>
-            </b:WellNavList>
-          </b:Column>
-          <b:Column size="3">
-            <b:WellNavList>
-              <b:NavLink icon="TABLE" ui:field="tableCount">? tables</b:NavLink>
-            </b:WellNavList>
-          </b:Column>
-          <b:Column size="3">
-            <b:WellNavList>
-              <b:NavLink icon="COLUMNS" ui:field="variableCount">? variables</b:NavLink>
-            </b:WellNavList>
-          </b:Column>
-          <b:Column size="3">
-            <b:WellNavList>
-              <b:NavLink icon="USER" ui:field="entityCount">? entities</b:NavLink>
-            </b:WellNavList>
-          </b:Column>
-        </b:FluidRow>
-      </b:Tab>
       <b:Tab icon="TABLE">
+        <g:FlowPanel ui:field="tagsPanel" addStyleNames="inline-block small-indent"/>
         <g:SimplePanel ui:field="tablesPanel"/>
+
       </b:Tab>
       <b:Tab icon="HDD">
         <b:Heading size="3" addStyleNames="no-top-margin">Files</b:Heading>
