@@ -353,7 +353,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
       @Override
       public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {
         categoricalVariable.setText(((VariableSuggestOracle.VariableSuggestion) selectedSuggestion).getVariable());
-        getUiHandlers().onCrossVariables();
         return ((VariableSuggestOracle.VariableSuggestion) selectedSuggestion).getVariable();
       }
     });
@@ -362,7 +361,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
       @Override
       public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {
         crossWithVariable.setText(((VariableSuggestOracle.VariableSuggestion) selectedSuggestion).getVariable());
-        getUiHandlers().onCrossVariables();
         return ((VariableSuggestOracle.VariableSuggestion) selectedSuggestion).getVariable();
       }
     });
