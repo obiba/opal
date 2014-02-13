@@ -61,31 +61,10 @@ public class DataShieldPackageCreatePresenter extends ModalPresenterWidget<DataS
     return UriBuilder.create().segment("datashield", "package", "{name}").build(name);
   }
 
-  private String packagesR(String name) {
-    return UriBuilder.create().segment("datashield", "packages").query("name", name).build(name);
-  }
-
-  private String packagesR(String name, String reference) {
-    return UriBuilder.create().segment("datashield", "packages").query("name", name).query("ref", reference)
-        .build(name, reference);
-  }
-
-
-
-
-
-  private RPackageDto getDataShieldPackageDto() {
-    RPackageDto dto = RPackageDto.create();
-    dto.setName(getView().getName().getText());
-
-    return dto;
-  }
-
   @Override
   public void installPackage() {
     if(packageValidationHandler.validate()) {
-      getView().setInstallButtonEnabled(false);
-      getView().setCancelButtonEnabled(false);
+      getView().setLoading();
       ResponseCodeCallback createCallback = new CreatePackageCallBack();
       ResourceCallback alreadyExistCallback = new AlreadyExistMethodCallBack();
       ResourceRequestBuilderFactory.<RPackageDto>newBuilder().forResource(packageR(getView().getName().getText()))
@@ -156,6 +135,22 @@ public class DataShieldPackageCreatePresenter extends ModalPresenterWidget<DataS
             .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
       }
     }
+
+    private String packagesR(String name) {
+      return UriBuilder.create().segment("datashield", "packages").query("name", name).build(name);
+    }
+
+    private String packagesR(String name, String reference) {
+      return UriBuilder.create().segment("datashield", "packages").query("name", name).query("ref", reference)
+          .build(name, reference);
+    }
+
+    private RPackageDto getDataShieldPackageDto() {
+      RPackageDto dto = RPackageDto.create();
+      dto.setName(getView().getName().getText());
+
+      return dto;
+    }
   }
 
   private class CreateOrUpdatePackageCallBack implements ResponseCodeCallback {
@@ -198,6 +193,7 @@ public class DataShieldPackageCreatePresenter extends ModalPresenterWidget<DataS
 
     void setCancelButtonEnabled(boolean b);
 
+    void setLoading();
   }
 
 }

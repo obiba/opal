@@ -146,15 +146,17 @@ public class DataShieldPackageCreateView extends ModalPopupViewWithUiHandlers<Da
   @Override
   public void setInstallButtonEnabled(boolean b) {
     installButton.setEnabled(b);
-    if(b) {
-      dialog.removeStyleName("progress");
-    } else {
-      dialog.addStyleName("progress");
-    }
   }
 
   @Override
   public void setCancelButtonEnabled(boolean b) {
     cancelButton.setEnabled(b);
+  }
+
+  @Override
+  public void setLoading() {
+    // Disable buttons and show loading indicator
+    installButton.setEnabled(false);
+    cancelButton.setEnabled(false);
   }
 }
