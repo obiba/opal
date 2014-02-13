@@ -2201,11 +2201,15 @@ public interface Translations extends Constants {
   @DefaultStringValue("N/A (total: {0})")
   String NATotalLabel();
 
-  @Description("Register the identifiers database label")
-  @DefaultStringValue("Register the identifiers database")
-  String registerIdentifiersDatabase();
+  @Description("Register label")
+  @DefaultStringValue("Register")
+  String register();
 
-  @Description("Register a data database label")
-  @DefaultStringValue("Register a data database")
-  String registerDataDatabase();
+  @Description("At least one storage database is required for importing data label")
+  @DefaultStringValue("At least one storage database is required for importing data.")
+  String dataDatabaseRequiredLabel();
+
+  @Description("This database definition is required for importing data label")
+  @DefaultStringValue("This database definition is required for importing data.")
+  String identifiersDatabaseRequiredLabel();
 }

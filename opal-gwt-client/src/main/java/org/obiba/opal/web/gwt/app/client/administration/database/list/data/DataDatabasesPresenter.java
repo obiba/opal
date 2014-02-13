@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseC
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.list.DatabaseAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.database.list.DatabaseListColumns;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
@@ -123,7 +124,7 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
       @Override
       public void doAction(DatabaseDto dto, String actionName) {
 
-        if(actionName.equalsIgnoreCase(Display.UNREGISTER_ACTION)) {
+        if(actionName.equalsIgnoreCase(DatabaseListColumns.UNREGISTER_ACTION)) {
 
           getEventBus().fireEvent(ConfirmationRequiredEvent
               .createWithKeys(confirmedCommand = new DeleteDatabaseCommand(dto), "unregisterDatabase",
@@ -137,7 +138,7 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
             mongoDatabaseModalProvider.get().editDatabase(dto);
           }
 
-        } else if(actionName.equalsIgnoreCase(Display.TEST_ACTION)) {
+        } else if(actionName.equalsIgnoreCase(DatabaseListColumns.TEST_ACTION)) {
           DatabaseAdministrationPresenter.testConnection(getEventBus(), dto.getName());
         }
       }
@@ -160,9 +161,6 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
   }
 
   public interface Display extends View, HasUiHandlers<DataDatabasesUiHandlers> {
-
-    String TEST_ACTION = "Test";
-    String UNREGISTER_ACTION = "Unregister";
 
     HasActionHandler<DatabaseDto> getActions();
 
