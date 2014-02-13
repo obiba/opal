@@ -51,7 +51,7 @@ public class EsResultConverter {
     Search.QueryResultDto.Builder dtoResultsBuilder = Search.QueryResultDto.newBuilder()
         .setTotalHits(jsonHits.getInt("total"));
 
-    if (hits.length() > 0) {
+    if(hits.length() > 0) {
       HitsConverter hitsConverter = new HitsConverter();
       hitsConverter.setStrategy(itemResultStrategy);
       dtoResultsBuilder.addAllHits(hitsConverter.convert(jsonHits.getJSONArray("hits")));
@@ -84,6 +84,8 @@ public class EsResultConverter {
         Search.FacetResultDto.Builder dtoFacetResultBuilder = Search.FacetResultDto.newBuilder().setFacet(facet);
 
         if("terms".equals(jsonFacet.get("_type"))) {
+          dtoFacetResultBuilder.setMissing(jsonFacet.getInt("missing"));
+          dtoFacetResultBuilder.setTotal(jsonFacet.getInt("total"));
           convertTerms(jsonFacet.getJSONArray("terms"), dtoFacetResultBuilder);
         } else if("statistical".equals(jsonFacet.get("_type"))) {
           convertStatistical(jsonFacet, dtoFacetResultBuilder);

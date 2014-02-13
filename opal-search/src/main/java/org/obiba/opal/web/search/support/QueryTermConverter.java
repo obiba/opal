@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.obiba.opal.core.domain.VariableNature;
 import org.obiba.opal.web.model.Search;
 import org.springframework.util.Assert;
 
@@ -53,7 +54,7 @@ public class QueryTermConverter {
         convertLogicalFilter("filter", dtoQuery.getExtension(Search.LogicalTermDto.filter), jsonFacet);
       } else {
         if(dtoQuery.hasExtension(Search.VariableTermDto.field)) {
-          convertField(dtoQuery.getExtension(Search.VariableTermDto.field), jsonFacet);
+          convertField(dtoQuery, jsonFacet);
         }
 
         if(dtoQuery.hasExtension(Search.LogicalTermDto.facetFilter)) {
@@ -81,35 +82,47 @@ public class QueryTermConverter {
 
     List<Search.FilterDto> filters = dtoLogicalFilter.getExtension(Search.FilterDto.filters);
 
-    if(filters.size() > 1) {
-      for(Search.FilterDto filter : filters) {
-        jsonOperator.accumulate(operatorName, convertFilterType(filter));
-      }
+    if(!filters.isEmpty()) {
+      if(filters.size() > 1) {
+        for(Search.FilterDto filter : filters) {
+          jsonOperator.accumulate(operatorName, convertFilterType(filter));
+        }
 
-      jsonFacet.put(filterName, jsonOperator);
-    } else {
-      jsonFacet.put(filterName, convertFilterType(filters.get(0)));
+        jsonFacet.put(filterName, jsonOperator);
+      } else {
+        jsonFacet.put(filterName, convertFilterType(filters.get(0)));
+      }
+    }
+
+    if(dtoLogicalFilter.hasExtension(Search.MissingDto.missing)) {
+      Search.MissingDto missing = dtoLogicalFilter.getExtension(Search.MissingDto.missing);
+      jsonFacet.put(filterName, convertFilterType(missing));
     }
   }
 
-  private void convertField(Search.VariableTermDto dtoVariable, JSONObject jsonFacet)
+  private void convertField(Search.QueryTermDto dtoQuery, JSONObject jsonFacet)
       throws JSONException, UnsupportedOperationException {
+
+    Search.VariableTermDto dtoVariable = dtoQuery.getExtension(Search.VariableTermDto.field);
 
     String variable = dtoVariable.getVariable();
     JSONObject jsonField = new JSONObject();
     jsonField.put("field", variableFieldName(variable));
 
-    switch(indexManagerHelper.getVariableNature(variable)) {
-      case CATEGORICAL:
-        jsonFacet.put("terms", jsonField);
-        break;
+    // Missing facetFilter should always be treated as terms so they can return "missings" values
+    boolean hasMissing = dtoQuery.hasExtension(Search.LogicalTermDto.facetFilter) &&
+        dtoQuery.getExtension(Search.LogicalTermDto.facetFilter).hasExtension(Search.MissingDto.missing);
 
-      case CONTINUOUS:
-        jsonFacet.put("statistical", jsonField);
-        break;
+    if(indexManagerHelper.getVariableNature(variable) == VariableNature.CATEGORICAL || hasMissing) {
+      if(dtoQuery.hasSize()) {
+        jsonField.put("size", dtoQuery.getSize());
+      }
 
-      default:
-        throw new UnsupportedOperationException("Variable nature not supported");
+      jsonFacet.put("terms", jsonField);
+    } else if(indexManagerHelper.getVariableNature(variable) == VariableNature.CONTINUOUS) {
+      jsonFacet.put("statistical", jsonField);
+    } else {
+      throw new UnsupportedOperationException("Variable nature not supported");
     }
   }
 
@@ -129,6 +142,14 @@ public class QueryTermConverter {
     if(dtoFilter.hasNot()) {
       jsonFilter = new JSONObject().put("not", jsonFilter);
     }
+
+    return jsonFilter;
+  }
+
+  private JSONObject convertFilterType(Search.MissingDto dtoFilter) throws JSONException {
+    JSONObject jsonFilter = new JSONObject();
+    String variable = dtoFilter.getVariable();
+    convertMissingFilter(jsonFilter, variable);
 
     return jsonFilter;
   }
@@ -172,6 +193,10 @@ public class QueryTermConverter {
     } else {
       jsonFilter.put("terms", new JSONObject().put(variableFieldName(variable), values));
     }
+  }
+
+  private void convertMissingFilter(JSONObject jsonFilter, String variable) throws JSONException {
+    jsonFilter.put("missing", new JSONObject().put("field", variableFieldName(variable)));
   }
 
   private String variableFieldName(String variable) {

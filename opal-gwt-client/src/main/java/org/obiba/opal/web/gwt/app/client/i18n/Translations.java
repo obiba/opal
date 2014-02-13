@@ -2065,8 +2065,8 @@ public interface Translations extends Constants {
   @DefaultStringMapValue({ "PASSWORD", "Password", "CERTIFICATE", "Certificate" })
   Map<String, String> authenticationTypeMap();
 
-  @Description("Totals label")
-  @DefaultStringValue("Totals")
+  @Description("Total label")
+  @DefaultStringValue("Total")
   String totalLabel();
 
   @Description("No results found label")
@@ -2180,4 +2180,12 @@ public interface Translations extends Constants {
   @Description("Failed to start search service: {0} label")
   @DefaultStringValue("Failed to start search service: {0}")
   String searchSettingsError();
+
+  @Description("N/A label")
+  @DefaultStringValue("N/A")
+  String NALabel();
+
+  @Description("Total M/A label")
+  @DefaultStringValue("Total N/A")
+  String NATotalLabel();
 }
