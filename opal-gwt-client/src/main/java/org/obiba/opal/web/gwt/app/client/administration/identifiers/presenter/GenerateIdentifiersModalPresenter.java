@@ -55,7 +55,7 @@ public class GenerateIdentifiersModalPresenter extends ModalPresenterWidget<Gene
     this.table = table;
 
     String prefix = variable.getName().toUpperCase() + "-";
-    int size = (table.getValueSetCount() +"").length();
+    int size = (table.getValueSetCount() + "").length();
     getView().setDefault(size, prefix);
 
     UriBuilder ub = UriBuilder.create().segment("identifiers", "mapping", "{}", "_count")
@@ -70,7 +70,7 @@ public class GenerateIdentifiersModalPresenter extends ModalPresenterWidget<Gene
               GWT.log("Unable to get identifiers mapping count: " + e.getMessage());
             }
           }
-        }, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_NOT_FOUND).send();
+        }, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_NOT_FOUND, Response.SC_BAD_REQUEST).send();
   }
 
   @Override
@@ -107,9 +107,10 @@ public class GenerateIdentifiersModalPresenter extends ModalPresenterWidget<Gene
         .query("type", table.getEntityType(), "size", String.valueOf(size), "zeros", String.valueOf(allowZeros),
             "prefix", prefix);
     ResourceRequestBuilderFactory.newBuilder().forResource(ub.build(variable.getName())).post()//
-        .withCallback(Response.SC_OK, callbackHandler) //
-        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
-        .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+        .withCallback(callbackHandler,
+            Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR,//
+            Response.SC_NOT_FOUND) //
+        .send();
   }
 
   //
