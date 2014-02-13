@@ -56,6 +56,6 @@ public class SubjectProfileCurrentResource {
   }
 
   private String getPrincipal() {
-    return SecurityUtils.getSubject().getPrincipal().toString();
+    return (String)SecurityUtils.getSubject().getPrincipal();
   }
 }

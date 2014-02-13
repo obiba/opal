@@ -54,7 +54,7 @@ public interface SubjectProfileService extends SystemService {
    * @return
    */
   @NotNull
-  SubjectProfile getProfile(@NotNull String principal) throws SubjectProfileNotFoundException;
+  SubjectProfile getProfile(@Nullable String principal) throws SubjectProfileNotFoundException;
 
   /**
    * Update profile timestamp.
