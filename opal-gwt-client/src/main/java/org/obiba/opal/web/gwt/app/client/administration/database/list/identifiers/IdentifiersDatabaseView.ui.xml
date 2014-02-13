@@ -41,8 +41,8 @@
       <b:Paragraph>
         This database definition is required for importing data.
       </b:Paragraph>
-      <b:DropdownButton text="Register identifiers database" icon="PLUS" type="INFO">
-        <b:NavLink ui:field="createSql">
+      <b:DropdownButton ui:field="registerIdentifersDB" icon="PLUS" type="INFO">
+      <b:NavLink ui:field="createSql">
           <ui:msg description="Register SQL database label">SQL</ui:msg>
         </b:NavLink>
         <b:NavLink ui:field="createMongo">

@@ -19,6 +19,7 @@ import org.obiba.opal.web.model.client.database.MongoDbSettingsDto;
 import org.obiba.opal.web.model.client.database.SqlSettingsDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -49,6 +50,9 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
   @UiField
   Button deleteDatabase;
 
+  @UiField
+  DropdownButton registerIdentifersDB;
+
   private final Translations translations;
 
   @Inject
@@ -56,6 +60,7 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
     edit.setTitle(translations.editLabel());
+    registerIdentifersDB.setText(translations.registerIdentifiersDatabase());
     databasePanel.setVisible(true);
   }
 
