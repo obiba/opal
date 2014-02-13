@@ -177,7 +177,8 @@ public class IndexSynchronizationManager {
      */
     private void submitTask(IndexManager indexManager, ValueTable vt) {
       ValueTableIndex index = indexManager.getIndex(vt);
-      if(currentTask != null && currentTask.getValueTableIndex().getIndexName().equals(index.getIndexName())) return;
+      if(currentTask != null && currentTask.getIndexManager().getName().equals(indexManager.getName()) &&
+          currentTask.getValueTableIndex().getIndexName().equals(index.getIndexName())) return;
 
       if(!isAlreadyQueued(indexManager, index)) {
         log.trace("Queueing for indexing {} in {}", index.getIndexName(), indexManager.getName());
