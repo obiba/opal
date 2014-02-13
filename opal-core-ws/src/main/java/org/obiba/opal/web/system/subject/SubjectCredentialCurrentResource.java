@@ -62,7 +62,7 @@ public class SubjectCredentialCurrentResource {
   }
 
   private String getName() {
-    return SecurityUtils.getSubject().getPrincipal().toString();
+    return (String)SecurityUtils.getSubject().getPrincipal();
   }
 
 }
