@@ -17,6 +17,7 @@ import org.obiba.opal.search.IndexSynchronizationManager;
 import org.obiba.opal.search.Schedule;
 import org.obiba.opal.search.ValueTableValuesIndex;
 import org.obiba.opal.search.ValuesIndexManager;
+import org.obiba.opal.search.VariablesIndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class IndexResource {
 
   @Autowired
-  protected ValuesIndexManager indexManager;
+  protected ValuesIndexManager valuesIndexManager;
+
+  @Autowired
+  protected VariablesIndexManager variablesIndexManager;
 
   @Autowired
   protected IndexManagerConfigurationService configService;
@@ -66,7 +70,7 @@ public abstract class IndexResource {
       return synchroManager.getCurrentTask().getProgress();
     }
 
-    return synchroManager.isAlreadyQueued(indexManager, getValueTableIndex(datasource, table)) ? 0f : null;
+    return synchroManager.isAlreadyQueued(valuesIndexManager, getValueTableIndex(datasource, table)) ? 0f : null;
   }
 
   protected boolean isInProgress(String datasource, String table) {
@@ -74,7 +78,7 @@ public abstract class IndexResource {
   }
 
   protected ValueTableValuesIndex getValueTableIndex(String datasource, String table) {
-    return indexManager.getIndex(getValueTable(datasource, table));
+    return valuesIndexManager.getIndex(getValueTable(datasource, table));
   }
 
   protected Opal.TableIndexationStatus getTableIndexationStatus(String datasource, String table) {
@@ -82,13 +86,13 @@ public abstract class IndexResource {
 
     // Set Indexation status
     boolean upToDate = getValueTableIndex(datasource, table).isUpToDate();
-    if(indexManager.isReady() && !upToDate && !inProgress) {
+    if(valuesIndexManager.isReady() && !upToDate && !inProgress) {
       return Opal.TableIndexationStatus.OUTDATED;
     }
-    if(indexManager.isReady() && inProgress) {
+    if(valuesIndexManager.isReady() && inProgress) {
       return Opal.TableIndexationStatus.IN_PROGRESS;
     }
-    if(indexManager.isReady() && upToDate) {
+    if(valuesIndexManager.isReady() && upToDate) {
       return Opal.TableIndexationStatus.UPTODATE;
     }
     return Opal.TableIndexationStatus.NOT_INDEXED;

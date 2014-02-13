@@ -83,7 +83,7 @@ public class ValueTableIndexResource extends IndexResource {
       dtoBuilder.setTableLastUpdate(valueTable.getTimestamps().getLastUpdate().toString());
     }
 
-    Timestamps indexTimestamps = indexManager.getIndex(valueTable).getTimestamps();
+    Timestamps indexTimestamps = valuesIndexManager.getIndex(valueTable).getTimestamps();
     if(!indexTimestamps.getCreated().isNull()) {
       dtoBuilder.setIndexCreated(indexTimestamps.getCreated().toString());
     }
@@ -102,7 +102,9 @@ public class ValueTableIndexResource extends IndexResource {
 
     ValueTable valueTable = getValueTable(datasource, table);
     if(!isInProgress(datasource, table)) {
-      synchroManager.synchronizeIndex(indexManager, valueTable, 0);
+      // synchonize variable index and values index
+      synchroManager.synchronizeIndex(variablesIndexManager, valueTable, 0);
+      synchroManager.synchronizeIndex(valuesIndexManager, valueTable, 0);
     }
     return Response.ok().build();
   }

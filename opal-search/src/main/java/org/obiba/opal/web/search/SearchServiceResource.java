@@ -88,13 +88,13 @@ public class SearchServiceResource extends IndexResource {
       tableStatusDto = tableStatusDto.toBuilder().setTableLastUpdate(timestamps.getLastUpdate().toString()).build();
     }
 
-    if(!indexManager.getIndex(valueTable).getTimestamps().getCreated().isNull()) {
+    if(!valuesIndexManager.getIndex(valueTable).getTimestamps().getCreated().isNull()) {
       tableStatusDto = tableStatusDto.toBuilder()
-          .setIndexCreated(indexManager.getIndex(valueTable).getTimestamps().getCreated().toString()).build();
+          .setIndexCreated(valuesIndexManager.getIndex(valueTable).getTimestamps().getCreated().toString()).build();
     }
-    if(!indexManager.getIndex(valueTable).getTimestamps().getLastUpdate().isNull()) {
+    if(!valuesIndexManager.getIndex(valueTable).getTimestamps().getLastUpdate().isNull()) {
       tableStatusDto = tableStatusDto.toBuilder()
-          .setIndexLastUpdate(indexManager.getIndex(valueTable).getTimestamps().getLastUpdate().toString()).build();
+          .setIndexLastUpdate(valuesIndexManager.getIndex(valueTable).getTimestamps().getLastUpdate().toString()).build();
     }
 
     return tableStatusDto;
