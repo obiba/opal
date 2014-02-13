@@ -4,6 +4,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 
 import com.github.gwtbootstrap.client.ui.Alert;
+import com.github.gwtbootstrap.client.ui.Brand;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.HelpBlock;
@@ -47,6 +48,9 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
 
   @UiField
   HelpBlock passwordHelp;
+
+  @UiField
+  Brand applicationName;
 
   private final Translations translations;
 
@@ -115,6 +119,11 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
     return userName;
   }
 
+  @Override
+  public void setApplicationName(String text) {
+    applicationName.setText(text);
+  }
+
   private void clearPassword() {
     getPassword().setValue("");
   }
@@ -124,14 +133,15 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
     @Override
     public void onKeyPress(KeyPressEvent event) {
       int code = event.getUnicodeCharCode();
-      if ((!event.isShiftKeyDown() && (code >= 65 && code <= 90)) ||
+      if((!event.isShiftKeyDown() && (code >= 65 && code <= 90)) ||
           (event.isShiftKeyDown() && (code >= 97 && code <= 122))) {
         passwordGroup.setType(ControlGroupType.WARNING);
         passwordHelp.setVisible(true);
       } else {
         passwordGroup.setType(ControlGroupType.NONE);
         passwordHelp.setVisible(false);
-      }    }
+      }
+    }
   }
 
 }

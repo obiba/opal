@@ -9,9 +9,21 @@
 */
 package org.obiba.opal.web.gwt.app.client.administration.configuration.edit;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.administration.configuration.event.GeneralConfigSavedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
+import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.GeneralConf;
@@ -20,39 +32,48 @@ import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 
+import static org.obiba.opal.web.gwt.app.client.administration.configuration.edit.GeneralConfModalPresenter.Display.FormField;
+
 public class GeneralConfModalPresenter extends ModalPresenterWidget<GeneralConfModalPresenter.Display>
     implements GeneralConfModalUiHandlers {
+
+  protected ValidationHandler validationHandler;
 
   @Inject
   public GeneralConfModalPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
     getView().setUiHandlers(this);
+    validationHandler = new GeneralConfValidationHandler();
   }
 
   @Override
   public void save() {
-    GeneralConf dto = GeneralConf.create();
-    dto.setName(getView().getName().getText());
-    dto.setDefaultCharSet(getView().getDefaultCharSet().getText());
-    dto.setLanguagesArray(getView().getLanguages());
+    getView().clearErrors();
+    if(validationHandler.validate()) {
+      GeneralConf dto = GeneralConf.create();
+      dto.setName(getView().getName().getText());
+      dto.setDefaultCharSet(getView().getDefaultCharSet().getText());
+      dto.setLanguagesArray(getView().getLanguages());
 
-    ResourceRequestBuilderFactory.<GeneralConf>newBuilder().forResource("/system/conf/general")
-        .withResourceBody(GeneralConf.stringify(dto)).withCallback(new ResponseCodeCallback() {
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() == Response.SC_OK) {
-          getView().hide();
-          fireEvent(new GeneralConfigSavedEvent());
-        } else {
-          fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+      ResourceRequestBuilderFactory.<GeneralConf>newBuilder().forResource("/system/conf/general")
+          .withResourceBody(GeneralConf.stringify(dto)).withCallback(new ResponseCodeCallback() {
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          if(response.getStatusCode() == Response.SC_OK) {
+            getView().hide();
+            fireEvent(new GeneralConfigSavedEvent());
+          } else {
+            fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+          }
         }
-      }
-    }, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_NOT_FOUND).put().send();
+      }, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_NOT_FOUND).put().send();
+    }
   }
 
   public void setGeneralConf(GeneralConf conf) {
@@ -61,7 +82,46 @@ public class GeneralConfModalPresenter extends ModalPresenterWidget<GeneralConfM
     getView().setSelectedLanguages(conf.getLanguagesArray());
   }
 
+  private class GeneralConfValidationHandler extends ViewValidationHandler {
+
+    private Set<FieldValidator> validators;
+
+    @Override
+    protected Set<FieldValidator> getValidators() {
+      if(validators == null) {
+        validators = new LinkedHashSet<FieldValidator>();
+        validators.add(new RequiredTextValidator(getView().getName(), "NameIsRequired", FormField.NAME.name()));
+        validators.add(
+            new ConditionValidator(languagesSizeCondition(), "LanguageIsRequired", Display.FormField.LANGUAGES.name()));
+        validators.add(new RequiredTextValidator(getView().getDefaultCharSet(), "DefaultCharSetIsRequired",
+            FormField.DEFAULT_CHARSET.name()));
+      }
+      return validators;
+    }
+
+    private HasValue<Boolean> languagesSizeCondition() {
+      return new HasBooleanValue() {
+        @Override
+        public Boolean getValue() {
+          return JsArrays.toSafeArray(getView().getLanguages()).length() > 0;
+        }
+      };
+    }
+
+    @Override
+    protected void showMessage(String id, String message) {
+      getView().showError(FormField.valueOf(id), message);
+    }
+
+  }
+
   public interface Display extends PopupView, HasUiHandlers<GeneralConfModalUiHandlers> {
+
+    enum FormField {
+      NAME,
+      DEFAULT_CHARSET,
+      LANGUAGES,
+    }
 
     HasText getName();
 
@@ -73,5 +133,8 @@ public class GeneralConfModalPresenter extends ModalPresenterWidget<GeneralConfM
 
     void setSelectedLanguages(JsArrayString languages);
 
+    void showError(@Nullable FormField formField, String message);
+
+    void clearErrors();
   }
 }

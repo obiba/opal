@@ -303,6 +303,14 @@ public enum UriBuilders {
     }
   },
 
+  SYSTEM_NAME {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "name");
+
+    }
+  },
+
   PROJECT_KEYSTORE {
     @Override
     public UriBuilder create() {

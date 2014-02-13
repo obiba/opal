@@ -9,12 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.presenter;
 
+import org.obiba.opal.web.gwt.app.client.administration.configuration.event.GeneralConfigSavedEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -55,6 +58,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
 
     HasKeyUpHandlers getPasswordTextBox();
 
+    void setApplicationName(String text);
   }
 
   @ProxyStandard
@@ -98,6 +102,30 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
         }
       }
     });
+
+    addRegisteredHandler(GeneralConfigSavedEvent.getType(), new GeneralConfigSavedEvent.GeneralConfigSavedHandler() {
+      @Override
+      public void onGeneralConfigSaved(GeneralConfigSavedEvent event) {
+        refreshApplicationName();
+      }
+    });
+  }
+
+  @Override
+  protected void onReveal() {
+    refreshApplicationName();
+  }
+
+  private void refreshApplicationName() {
+    ResourceRequestBuilderFactory.<QueryResultDto>newBuilder() //
+        .forResource(UriBuilders.SYSTEM_NAME.create().build()) //
+        .get() //
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().setApplicationName(response.getText());
+          }
+        }, Response.SC_OK).send();
   }
 
   private void createSecurityResource() {
@@ -122,21 +150,22 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
       }
     };
 
-    ResourceRequestBuilderFactory.newBuilder().forResource("/auth/sessions").post().withCallback(Response.SC_FORBIDDEN, authError)
-        .withCallback(Response.SC_UNAUTHORIZED, authError).withCallback(Response.SC_CREATED, new ResponseCodeCallback() {
+    ResourceRequestBuilderFactory.newBuilder().forResource("/auth/sessions").post()
+        .withCallback(Response.SC_FORBIDDEN, authError).withCallback(Response.SC_UNAUTHORIZED, authError)
+        .withCallback(Response.SC_CREATED, new ResponseCodeCallback() {
 
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        // When a 201 happens, we should have credentials, but we'll test anyway.
-        if(credentials.hasCredentials()) {
-          getView().clear();
-          credentials.setUsername(username);
-          getEventBus().fireEvent(new SessionCreatedEvent(response.getHeader("Location")));
-        } else {
-          getView().showErrorMessageAndClearPassword();
-        }
-      }
-    }).withFormBody("username", username, "password", password).send();
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            // When a 201 happens, we should have credentials, but we'll test anyway.
+            if(credentials.hasCredentials()) {
+              getView().clear();
+              credentials.setUsername(username);
+              getEventBus().fireEvent(new SessionCreatedEvent(response.getHeader("Location")));
+            } else {
+              getView().showErrorMessageAndClearPassword();
+            }
+          }
+        }).withFormBody("username", username, "password", password).send();
   }
 
 }

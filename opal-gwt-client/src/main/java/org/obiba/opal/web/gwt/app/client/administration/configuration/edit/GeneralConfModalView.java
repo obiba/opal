@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.configuration.edit;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.CharacterSetView;
 import org.obiba.opal.web.gwt.app.client.ui.LocaleChooser;
@@ -16,7 +18,9 @@ import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -51,6 +55,15 @@ public class GeneralConfModalView extends ModalPopupViewWithUiHandlers<GeneralCo
 
   @UiField
   CharacterSetView characterSet;
+
+  @UiField
+  ControlGroup nameGroup;
+
+  @UiField
+  ControlGroup languagesGroup;
+
+  @UiField
+  ControlGroup defaultCharsetGroup;
 
   @Inject
   public GeneralConfModalView(EventBus eventBus, Binder uiBinder, Translations translations) {
@@ -101,6 +114,34 @@ public class GeneralConfModalView extends ModalPopupViewWithUiHandlers<GeneralCo
     int length = languages.length();
     for(int i = 0; i < length; i++) {
       locales.setSelectedValue(languages.get(i));
+    }
+  }
+
+  @Override
+  public void clearErrors() {
+    modal.closeAlerts();
+  }
+
+  @Override
+  public void showError(@Nullable GeneralConfModalPresenter.Display.FormField formField, String message) {
+    ControlGroup group = null;
+    if(formField != null) {
+      switch(formField) {
+        case NAME:
+          group = nameGroup;
+          break;
+        case DEFAULT_CHARSET:
+          group = defaultCharsetGroup;
+          break;
+        case LANGUAGES:
+          group = languagesGroup;
+          break;
+      }
+    }
+    if(group == null) {
+      modal.addAlert(message, AlertType.ERROR);
+    } else {
+      modal.addAlert(message, AlertType.ERROR, group);
     }
   }
 }

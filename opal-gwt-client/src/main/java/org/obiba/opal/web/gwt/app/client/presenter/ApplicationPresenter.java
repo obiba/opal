@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.presenter;
 
+import org.obiba.opal.web.gwt.app.client.administration.configuration.event.GeneralConfigSavedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
@@ -33,13 +34,17 @@ import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 import org.obiba.opal.web.model.client.opal.FileDto;
+import org.obiba.opal.web.model.client.search.QueryResultDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -178,6 +183,13 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       }
     });
 
+    addRegisteredHandler(GeneralConfigSavedEvent.getType(), new GeneralConfigSavedEvent.GeneralConfigSavedHandler() {
+      @Override
+      public void onGeneralConfigSaved(GeneralConfigSavedEvent event) {
+        refreshApplicationName();
+      }
+    });
+
     registerUserMessageEventHandler();
   }
 
@@ -185,7 +197,22 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   protected void onReveal() {
     getView().setUsername(credentials.getUsername());
     getView().setVersion(ResourceRequestBuilderFactory.newBuilder().getVersion());
+
+    refreshApplicationName();
+
     authorize();
+  }
+
+  private void refreshApplicationName() {
+    ResourceRequestBuilderFactory.<QueryResultDto>newBuilder() //
+        .forResource(UriBuilders.SYSTEM_NAME.create().build()) //
+        .get() //
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().setApplicationName(response.getText());
+          }
+        }, Response.SC_OK).send();
   }
 
   private void authorize() {
@@ -243,14 +270,12 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     String tableName = suggestion.getTable();
     String variableName = suggestion.getVariable();
 
-    GWT.log(datasourceName + "." + tableName + ":" + variableName);
-
     getView().clearSearch();
 
     String path = MagmaPath.Builder.datasource(datasourceName).table(tableName).variable(variableName).build();
 
-    PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.PROJECT).with(ParameterTokens.TOKEN_NAME,
-        datasourceName) //
+    PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.PROJECT)
+        .with(ParameterTokens.TOKEN_NAME, datasourceName) //
         .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString()) //
         .with(ParameterTokens.TOKEN_PATH, path);
     placeManager.revealPlace(builder.build());
@@ -269,5 +294,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     void addSearchItem(String text, VariableSearchListItem.ItemType type);
 
     void clearSearch();
+
+    void setApplicationName(String text);
   }
 }

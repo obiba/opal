@@ -190,6 +190,14 @@ public class SystemResource {
     return Response.ok().build();
   }
 
+  @GET
+  @Path("/name")
+  @NotAuthenticated
+  public Response getApplicationName() {
+    OpalGeneralConfig conf = serverService.getConfig();
+    return Response.ok().entity(conf.getName()).build();
+  }
+
   @Path("/keystore")
   public KeyStoreResource getKeyStoreResource() {
     KeyStoreResource resource = applicationContext.getBean(KeyStoreResource.class);

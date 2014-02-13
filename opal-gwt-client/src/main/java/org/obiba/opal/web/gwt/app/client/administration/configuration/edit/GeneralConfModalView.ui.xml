@@ -17,7 +17,7 @@
   <o:Modal ui:field="modal" resizable="false" closeVisible="true" keyboard="true" animation="false">
 
     <!-- Name -->
-    <b:ControlGroup>
+    <b:ControlGroup ui:field="nameGroup">
       <b:ControlLabel>
         <ui:msg description="Name label">Name</ui:msg>
       </b:ControlLabel>
@@ -31,7 +31,7 @@
     </b:ControlGroup>
 
     <!-- Languages -->
-    <b:ControlGroup>
+    <b:ControlGroup ui:field="languagesGroup">
       <b:ControlLabel>
         <ui:msg description="Languages label">Languages</ui:msg>
       </b:ControlLabel>
@@ -45,7 +45,7 @@
     </b:ControlGroup>
 
     <!-- Default Character Set -->
-    <b:ControlGroup>
+    <b:ControlGroup ui:field="defaultCharsetGroup">
       <b:ControlLabel>
         <ui:msg description="Default character set label">Default Character Set</ui:msg>
       </b:ControlLabel>
