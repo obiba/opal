@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
 
+import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -50,6 +51,9 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
   @UiField
   Table<DatabaseDto> table;
 
+  @UiField
+  DropdownButton registerDataDatabase;
+
   private final Translations translations;
 
   private final Columns columns = new Columns();
@@ -59,6 +63,7 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
     databasesPanel.setVisible(false);
+    registerDataDatabase.setText(translations.registerDataDatabase());
     initTable();
   }
 

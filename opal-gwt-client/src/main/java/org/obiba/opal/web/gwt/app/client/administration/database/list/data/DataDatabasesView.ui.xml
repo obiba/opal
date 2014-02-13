@@ -26,8 +26,8 @@
       <b:Paragraph>
         At least one storage database is required for importing data.
       </b:Paragraph>
-      <b:DropdownButton text="Register storage database" icon="PLUS" type="INFO">
-        <b:NavLink ui:field="createSql">
+      <b:DropdownButton ui:field="registerDataDatabase" icon="PLUS" type="INFO">
+      <b:NavLink ui:field="createSql">
           <ui:msg description="Create SQL database label">SQL</ui:msg>
         </b:NavLink>
         <b:NavLink ui:field="createMongo">
