@@ -2138,6 +2138,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("N/A")
   String NALabel();
 
+  @Description("Total M/A label")
+  @DefaultStringValue("Total N/A")
+  String NATotalLabel();
+
+  @Description("N/A label")
+  @DefaultStringValue("N/A")
+  String NALabel();
+
   @Description("Variable not found label")
   @DefaultStringValue("Variable not found: {0}")
   String variableNotFound();
