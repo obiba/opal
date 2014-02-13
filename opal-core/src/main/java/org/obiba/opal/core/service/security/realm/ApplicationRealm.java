@@ -12,7 +12,10 @@ package org.obiba.opal.core.service.security.realm;
 import java.security.GeneralSecurityException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -20,6 +23,7 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
@@ -86,7 +90,23 @@ public class ApplicationRealm extends AuthorizingRealm {
 
   @Override
   protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-    return null;
+    Collection<?> thisPrincipals = principals.fromRealm(getName());
+    if(thisPrincipals != null && !thisPrincipals.isEmpty()) {
+      Object primary = thisPrincipals.iterator().next();
+      PrincipalCollection simplePrincipals = new SimplePrincipalCollection(primary, getName());
+
+      Set<String> roleNames = new HashSet<>();
+      String username = (String) getAvailablePrincipal(simplePrincipals);
+      SubjectCredentials subjectCredentials = subjectCredentialsService.getSubjectCredentials(username);
+      if(subjectCredentials != null) {
+        for(String group : subjectCredentials.getGroups()) {
+          roleNames.add(group);
+        }
+      }
+      return new SimpleAuthorizationInfo(roleNames);
+
+    }
+    return new SimpleAuthorizationInfo();
   }
 
 }
