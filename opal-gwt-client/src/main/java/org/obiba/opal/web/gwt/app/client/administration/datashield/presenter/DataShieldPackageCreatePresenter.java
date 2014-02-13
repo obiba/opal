@@ -64,7 +64,8 @@ public class DataShieldPackageCreatePresenter extends ModalPresenterWidget<DataS
   @Override
   public void installPackage() {
     if(packageValidationHandler.validate()) {
-      getView().setLoading();
+      getView().setInstallButtonEnabled(false);
+      getView().setCancelButtonEnabled(false);
       ResponseCodeCallback createCallback = new CreatePackageCallBack();
       ResourceCallback alreadyExistCallback = new AlreadyExistMethodCallBack();
       ResourceRequestBuilderFactory.<RPackageDto>newBuilder().forResource(packageR(getView().getName().getText()))
@@ -192,8 +193,6 @@ public class DataShieldPackageCreatePresenter extends ModalPresenterWidget<DataS
     void setInstallButtonEnabled(boolean b);
 
     void setCancelButtonEnabled(boolean b);
-
-    void setLoading();
   }
 
 }
