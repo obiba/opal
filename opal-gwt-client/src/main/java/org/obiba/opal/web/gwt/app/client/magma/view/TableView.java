@@ -202,6 +202,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiField
   IconAnchor deleteAttribute;
 
+  @UiField
+  Button clearCrossVariables;
+
   private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
 
   private final Translations translations;
@@ -353,7 +356,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
       @Override
       public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {
         categoricalVariable.setText(((VariableSuggestOracle.VariableSuggestion) selectedSuggestion).getVariable());
-        getUiHandlers().onCrossVariables();
         return ((VariableSuggestOracle.VariableSuggestion) selectedSuggestion).getVariable();
       }
     });
@@ -362,7 +364,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
       @Override
       public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {
         crossWithVariable.setText(((VariableSuggestOracle.VariableSuggestion) selectedSuggestion).getVariable());
-        getUiHandlers().onCrossVariables();
         return ((VariableSuggestOracle.VariableSuggestion) selectedSuggestion).getVariable();
       }
     });
@@ -514,6 +515,13 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   void onCrossVariables(ClickEvent event) {
     crossResultsPanel.clear();
     getUiHandlers().onCrossVariables();
+  }
+
+  @UiHandler("clearCrossVariables")
+  void onClearCrossVariables(ClickEvent event) {
+    crossResultsPanel.clear();
+    categoricalVariable.setText("");
+    crossWithVariable.setText("");
   }
 
   @UiHandler("applyAttribute")

@@ -15,6 +15,7 @@ message QueryTermsDto {
 message QueryTermDto {
   optional bool global = 1;
   optional string facet = 2; // name of the facet, if not provided no facet is returned for this term
+  optional int32 size = 3; // Maximum number of values to return
 
   extensions 1000 to max;
 }
@@ -33,6 +34,16 @@ message FilterDto {
 
   extend LogicalTermDto {
     repeated FilterDto filters = 1001;
+  }
+
+  extensions 1000 to max;
+}
+
+message MissingDto {
+  required string variable = 1;
+
+  extend LogicalTermDto {
+    optional MissingDto missing = 1002;
   }
 
   extensions 1000 to max;
@@ -103,10 +114,12 @@ message FacetResultDto {
   }
 
   required string facet = 1;
+  optional int32 missing = 2;
+  optional int32 total = 3;
 
-  repeated TermFrequencyResultDto frequencies = 2;
-  optional StatisticalResultDto statistics = 3;
-  repeated FilterResultDto filters = 4;
+  repeated TermFrequencyResultDto frequencies = 4;
+  optional StatisticalResultDto statistics = 5;
+  repeated FilterResultDto filters = 6;
 }
 
 message ItemResultDto {

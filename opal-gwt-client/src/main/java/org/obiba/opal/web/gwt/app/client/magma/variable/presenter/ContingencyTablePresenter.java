@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.support.VariableDtoNature;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
@@ -23,6 +24,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.FilterDto;
 import org.obiba.opal.web.model.client.search.InTermDto;
 import org.obiba.opal.web.model.client.search.LogicalTermDto;
+import org.obiba.opal.web.model.client.search.MissingDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 import org.obiba.opal.web.model.client.search.QueryTermDto;
 import org.obiba.opal.web.model.client.search.QueryTermsDto;
@@ -42,6 +44,10 @@ public class ContingencyTablePresenter extends PresenterWidget<ContingencyTableP
 
   public static final String TOTAL_FACET = "total";
 
+  public static final String MISSING_FACET = "missings";
+
+  public static final String MISSING_BY_CATEGORY_FACET = "missings_by_category";
+
   @Inject
   public ContingencyTablePresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
@@ -57,6 +63,14 @@ public class ContingencyTablePresenter extends PresenterWidget<ContingencyTableP
 
     addFacetTerms(variableDto.getName(), variableCategories, crossWithVariable.getName(), terms);
     addTotalTerm(variableDto.getName(), variableCategories, crossWithVariable.getName(), terms);
+
+    boolean isContinuous = VariableDtoNature.getNature(crossWithVariable) == VariableDtoNature.CONTINUOUS;
+    addMissingTerm(MISSING_FACET, variableDto.getName(), crossWithVariable.getName(), terms, isContinuous);
+
+    // add extra facet if continuous variable
+    if(isContinuous) {
+      addMissingTerm(MISSING_BY_CATEGORY_FACET, crossWithVariable.getName(), variableDto.getName(), terms, false);
+    }
 
     queries.setQueriesArray(terms);
 
@@ -90,6 +104,26 @@ public class ContingencyTablePresenter extends PresenterWidget<ContingencyTableP
     terms.push(query);
   }
 
+  private void addMissingTerm(String facetName, String variableName, String crossWithVariableName,
+      JsArray<QueryTermDto> terms, boolean limitSize) {
+
+    QueryTermDto query = QueryTermDto.create();
+    query.setFacet(facetName);
+
+    if(limitSize) {
+      query.setSize(0);
+    }
+
+    VariableTermDto variableTerm = VariableTermDto.create();
+    variableTerm.setVariable(crossWithVariableName);
+    query.setExtension("Search.VariableTermDto.field", variableTerm);
+
+    LogicalTermDto missingTerm = getLogicalTermDto(variableName);
+    query.setExtension("Search.LogicalTermDto.facetFilter", missingTerm);
+
+    terms.push(query);
+  }
+
   private LogicalTermDto getLogicalTermDto(String variableName, List<String> variableCategories) {
     LogicalTermDto logicalTerm = LogicalTermDto.create();
     logicalTerm.setOperator(TermOperator.AND_OP);
@@ -107,6 +141,16 @@ public class ContingencyTablePresenter extends PresenterWidget<ContingencyTableP
 
     filter.setExtension("Search.InTermDto.terms", inTerm);
     logicalTerm.setExtension("Search.FilterDto.filters", filter);
+    return logicalTerm;
+  }
+
+  private LogicalTermDto getLogicalTermDto(String variableName) {
+    LogicalTermDto logicalTerm = LogicalTermDto.create();
+    logicalTerm.setOperator(TermOperator.AND_OP);
+    MissingDto missing = MissingDto.create();
+    missing.setVariable(variableName);
+
+    logicalTerm.setExtension("Search.MissingDto.missing", missing);
     return logicalTerm;
   }
 

@@ -612,9 +612,11 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
                       crossVariablePresenter.initialize(table, variableDto, crossWithVariable);
                       setInSlot(Display.Slots.ContingencyTable, crossVariablePresenter);
                     }//
-                  }).send();
+                  }).withCallback(new VariableNotFoundCallback(crossWithVariableName), Response.SC_NOT_FOUND)//
+                  .send();
             }//
-          }).send();
+          }).withCallback(new VariableNotFoundCallback(selectedVariableName), Response.SC_NOT_FOUND)//
+          .send();
     }
   }
 
@@ -985,4 +987,20 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     }
   }
 
+  private class VariableNotFoundCallback implements ResponseCodeCallback {
+
+    String name;
+
+    protected VariableNotFoundCallback(String name) {
+      this.name = name;
+    }
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      fireEvent(NotificationEvent.newBuilder()
+          .error(TranslationsUtils.replaceArguments(translations.variableNotFound(), name)).build());
+    }
+  }
+
+  ;
 }
