@@ -8,8 +8,8 @@
 
   <g:FlowPanel>
     <g:FlowPanel>
-      <b:Heading size="4" addStyleNames="inline-block no-top-margin">
-        <ui:msg description="Identifiers Database label">Identifiers Database</ui:msg>
+      <b:Heading size="4" addStyleNames="inline-block">
+      <ui:msg description="Identifiers Database label">Identifiers Database</ui:msg>
       </b:Heading>
       <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="edit" visible="false"/>
 
@@ -26,8 +26,8 @@
       <b:Column size="6">
         <b:ControlGroup>
           <b:Controls>
-            <b:Button ui:field="testConnection" type="SUCCESS">
-              <ui:msg description="Test connection label">Test connection</ui:msg>
+            <b:Button ui:field="testConnection">
+            <ui:msg description="Test connection label">Test connection</ui:msg>
             </b:Button>
             <b:Button ui:field="deleteDatabase" type="DANGER" visible="false">
               <ui:msg description="Test connection label">Unregister Database</ui:msg>
