@@ -104,7 +104,7 @@ public class ContinuousContingencyTable extends ContingencyTable {
     int variableCategoriesSize = variableCategories.size();
 
     // Empty row
-    parentTable.getFlexCellFormatter().setColSpan(5, 0, variableCategories.size() + 4);
+    parentTable.getFlexCellFormatter().setColSpan(5, 0, variableCategoriesSize + 4);
     parentTable.getFlexCellFormatter().addStyleName(5, 0, "empty-row");
 
     int totalMissings = 0;

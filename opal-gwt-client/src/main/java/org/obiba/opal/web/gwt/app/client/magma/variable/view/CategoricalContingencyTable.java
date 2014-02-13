@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.ContingencyTablePresenter;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -75,12 +76,12 @@ public class CategoricalContingencyTable extends ContingencyTable {
       }
 
       // Total COL
-      addValue(i + 2, variableCategoriesSize + 1,
-          crossFacetTotals.containsKey(crossName) ? crossFacetTotals.get(crossName) : 0, total);
+      parentTable.setWidget(i + 2, variableCategoriesSize + 1,
+          getLabel(crossFacetTotals.containsKey(crossName) ? crossFacetTotals.get(crossName) : 0, total));
 
       // N/A COL
       int count = crossFacetMissings.containsKey(crossName) ? crossFacetMissings.get(crossName) : 0;
-      addValue(i + 2, variableCategoriesSize + 2, count, total);
+      parentTable.setWidget(i + 2, variableCategoriesSize + 2, getLabel(count, total));
       totalMissings += count;
     }
 
@@ -94,35 +95,35 @@ public class CategoricalContingencyTable extends ContingencyTable {
     int totalNA = totalMissings;
 
     // Empty row
-    parentTable.getFlexCellFormatter().setColSpan(crossCategoriesSize + 3, 0, variableCategoriesSize + 2);
+    parentTable.getFlexCellFormatter().setColSpan(crossCategoriesSize + 3, 0, variableCategoriesSize + 4);
     parentTable.getFlexCellFormatter().addStyleName(crossCategoriesSize + 3, 0, "empty-row");
 
     for(int i = 0; i < variableCategoriesSize; i++) {
       String key = variableCategories.get(i);
       int count = variableFacetMissings.containsKey(key) ? variableFacetMissings.get(key) : 0;
-      addValue(crossCategoriesSize + 4, i + 1, count, total);
+      parentTable.setWidget(crossCategoriesSize + 4, i + 1, getLabel(count, total));
 
       totalNA += count;
     }
 
-    parentTable.setWidget(crossCategoriesSize + 3, 1, new Label(""));
     parentTable.setWidget(crossCategoriesSize + 4, variableCategoriesSize + 1, new Label("-"));
     Integer count = variableFacetMissings.get(ContingencyTablePresenter.MISSING_FACET);
-    addValue(crossCategoriesSize + 4, variableCategoriesSize + 2, count, total);
+    parentTable.setWidget(crossCategoriesSize + 4, variableCategoriesSize + 2, getLabel(count, total));
 
     totalNA += count;
     // N/A - ROW
     parentTable.setWidget(crossCategoriesSize + 4, 0,
-        new Label(translations.NALabel() + " (" + translations.totalLabel().toLowerCase() + ": " + totalNA + ")"));
+        new Label(TranslationsUtils.replaceArguments(translations.NATotalLabel(), getLabelString(totalNA, total))));
   }
 
   private void populateTotalRow(Map<String, Integer> variableFacetTotals, int variableCategoriesSize,
       int crossCategoriesSize, Integer total) {// Totals ROW
     parentTable.setWidget(crossCategoriesSize + 2, 0, new Label(translations.totalLabel()));
     for(int i = 0; i < variableCategoriesSize; i++) {
-      addValue(crossCategoriesSize + 2, i + 1, variableFacetTotals.get(variableCategories.get(i)), total);
+      parentTable.setWidget(crossCategoriesSize + 2, i + 1,
+          getLabel(variableFacetTotals.get(variableCategories.get(i)), total));
     }
-    addValue(crossCategoriesSize + 2, variableCategoriesSize + 1, total, total);
+    parentTable.setWidget(crossCategoriesSize + 2, variableCategoriesSize + 1, getLabel(total, total));
     parentTable.setWidget(crossCategoriesSize + 2, variableCategoriesSize + 2, new Label("-"));
   }
 
@@ -131,10 +132,11 @@ public class CategoricalContingencyTable extends ContingencyTable {
 
     if(facets.containsKey(categoryName)) {
       FacetResultDto.TermFrequencyResultDto termFrequencyResultDto = facets.get(categoryName).get(crossName);
-      addValue(i + 2, j + 1, termFrequencyResultDto == null ? 0 : termFrequencyResultDto.getCount(),
-          crossFacetTotals.get(crossName));
+      parentTable.setWidget(i + 2, j + 1,
+          getLabel(termFrequencyResultDto == null ? 0 : termFrequencyResultDto.getCount(),
+              crossFacetTotals.get(crossName)));
     } else {
-      addValue(i + 2, j + 1, 0, crossFacetTotals.get(crossName));
+      parentTable.setWidget(i + 2, j + 1, getLabel(0, crossFacetTotals.get(crossName)));
     }
   }
 
@@ -168,12 +170,15 @@ public class CategoricalContingencyTable extends ContingencyTable {
     }
   }
 
-  private void addValue(int row, int column, int count, Integer total) {
+  private Label getLabel(int count, Integer total) {
+    return new Label(getLabelString(count, total));
+  }
+
+  private String getLabelString(int count, Integer total) {
     if(showFrequencies) {
-      parentTable.setWidget(row, column, new Label(String.valueOf(count)));
+      return String.valueOf(count);
     } else {
-      parentTable.setWidget(row, column,
-          new Label(total == null ? "0 %" : formatDecimal((double) count / total * 100) + " %"));
+      return total == null ? "0 %" : formatDecimal((double) count / total * 100) + " %";
     }
   }
 }
