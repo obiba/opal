@@ -223,6 +223,10 @@
                     <ui:msg description="Submit label">Submit</ui:msg>
                   </b:Button>
 
+                  <b:Button ui:field="clearCrossVariables" addStyleNames="bottom-margin small-indent">
+                    <ui:msg description="Clear label">Clear</ui:msg>
+                  </b:Button>
+
                   <b:HelpBlock>Displays the multivariate frequency distribution of selected variables.</b:HelpBlock>
                 </g:FlowPanel>
               </b:Well>
