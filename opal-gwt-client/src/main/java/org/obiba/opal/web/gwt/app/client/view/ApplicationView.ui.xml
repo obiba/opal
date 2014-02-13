@@ -7,7 +7,7 @@
 
   <g:FlowPanel>
     <b:ResponsiveNavbar position="TOP" scrollspy="false">
-      <b:Brand href="#">Opal</b:Brand>
+      <b:Brand href="#" ui:field="applicationName">Opal</b:Brand>
       <b:Nav>
         <b:NavLink ui:field="dashboardItem">
           <ui:msg description="Dashboard menu item">Dashboard</ui:msg>

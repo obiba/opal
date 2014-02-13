@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 
+import com.github.gwtbootstrap.client.ui.Brand;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.Dropdown;
 import com.github.gwtbootstrap.client.ui.FluidContainer;
@@ -91,6 +92,9 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
 
   @UiField
   FluidContainer footerContainer;
+
+  @UiField
+  Brand applicationName;
 
   private final VariableSuggestOracle oracle;
 
@@ -191,6 +195,11 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
   @Override
   public void clearSearch() {
     search.clear();
+  }
+
+  @Override
+  public void setApplicationName(String text) {
+    applicationName.setText(text);
   }
 
   @UiHandler("quitItem")
