@@ -88,7 +88,7 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   @NotNull
   @Override
   public SubjectProfile getProfile(@Nullable String principal) throws SubjectProfileNotFoundException {
-    if (principal == null) throw new SubjectProfileNotFoundException("");
+    if (principal == null) throw new SubjectProfileNotFoundException(principal);
     SubjectProfile subjectProfile = orientDbService.findUnique(SubjectProfile.Builder.create(principal).build());
     if(subjectProfile == null) {
       throw new SubjectProfileNotFoundException(principal);
