@@ -17,7 +17,7 @@
 
   <g:FlowPanel>
     <b:Heading size="4" addStyleNames="inline-block">
-      <ui:msg description="Databases label">Databases</ui:msg>
+      <ui:msg description="Databases label">Data Databases</ui:msg>
     </b:Heading>
     <b:Paragraph>
       Databases can have different purposes: storage, import, export.
