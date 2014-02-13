@@ -97,4 +97,12 @@ public interface TranslationMessages extends Messages {
   @Description("Last Update Ago label")
   @DefaultMessage("Last update {0}")
   String lastUpdateAgoLabel(String date);
+
+  @Description("You must select a file folder message")
+  @DefaultMessage("You must select a {0}.")
+  String mustSelectFileFolder(String name);
+
+  @Description("You must select at least one file folder message")
+  @DefaultMessage("You must select at least one {0}.")
+  String mustSelectAtLeastFileFolder(String name);
 }

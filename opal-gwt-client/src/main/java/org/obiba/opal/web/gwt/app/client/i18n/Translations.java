@@ -1233,6 +1233,13 @@ public interface Translations extends Constants {
   })
   Map<String, String> dataShieldLabelsMap();
 
+  @Description("Files Folders selection")
+  @DefaultStringMapValue({ "FILE", "file", //
+      "FOLDER", "folder", //
+      "FILE_OR_FOLDER", "file or folder" //
+  })
+  Map<String, String> fileFolderTypeMap();
+
   @Description("Project Tab Names")
   @DefaultStringMapValue({ "HOME", "Home", //
       "TABLES", "Tables", //

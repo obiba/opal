@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -130,5 +131,15 @@ public class FileSelectorView extends ModalPopupViewWithUiHandlers<FileSelectorU
   @Override
   public void clearNewFolderName() {
     createFolderName.setText("");
+  }
+
+  @Override
+  public void clearErrors() {
+    dialog.closeAlerts();
+  }
+
+  @Override
+  public void showError(String errorMessage) {
+    dialog.addAlert(errorMessage, AlertType.ERROR);
   }
 }
