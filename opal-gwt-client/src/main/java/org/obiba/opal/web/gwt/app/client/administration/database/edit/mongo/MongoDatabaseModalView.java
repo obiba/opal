@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.database.edit.mongo;
 
+import java.util.Collection;
+
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.edit.AbstractDatabaseModalPresenter;
@@ -107,8 +109,6 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
     url.getElement().setAttribute("placeholder", "mongodb://{host}:{port}/{databaseName}");
     properties.getElement().setAttribute("placeholder", translations.keyValueLabel());
 
-    setAvailableUsages();
-
     // used to support ConstraintViolation exceptions
     ConstrainedModal constrainedModal = new ConstrainedModal(modal);
     constrainedModal.registerWidget("name", translations.nameLabel(), nameGroup);
@@ -191,11 +191,13 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
     return nameGroup;
   }
 
-  private void setAvailableUsages() {
-    for(Usage usageType : Usage.values()) {
+  @Override
+  public  void setAvailableUsages(Collection<Usage> usages) {
+    for(Usage usageType : usages) {
       usage.addItem(usageType.getLabel(), usageType.name());
     }
     getUsage().setValue(Usage.STORAGE);
+    usage.setEnabled(usages.size() > 1);
   }
 
   @Override

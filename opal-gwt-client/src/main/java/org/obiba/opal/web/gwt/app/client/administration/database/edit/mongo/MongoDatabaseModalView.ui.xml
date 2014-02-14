@@ -24,7 +24,7 @@
       <o:Chooser ui:field="usage" name="usage"/>
       <b:HelpBlock>
         <ui:msg description="Database usage help label">
-          Determine if this database will be proposed at import/export time or as a project's data storage
+          This database will be proposed as a project's data storage.
         </ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
