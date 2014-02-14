@@ -95,7 +95,7 @@
               <o:RequiredIcon/>
             </b:ControlLabel>
             <b:Controls>
-              <b:TextBox ui:field="algorithm" text="RSA"/>
+              <b:TextBox ui:field="algorithm"/>
             </b:Controls>
           </b:ControlGroup>
 

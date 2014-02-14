@@ -58,7 +58,7 @@
             <ui:msg description="Refresh indices label">Refresh</ui:msg>
           </b:Button>
         </b:ButtonGroup>
-        <b:DropdownButton ui:field="actionsDropdown" text="Actions">
+        <b:DropdownButton ui:field="actionsDropdown">
           <b:NavLink ui:field="scheduleLink">
             <ui:msg description="Index Action Schedule Indexing">Schedule indexing</ui:msg>
           </b:NavLink>

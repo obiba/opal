@@ -60,7 +60,7 @@ public class EncryptionKeysView extends ViewWithUiHandlers<EncryptionKeysUiHandl
   public EncryptionKeysView(Binder uiBinder, Translations translations) {
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
-    addDropdown.setText(translations.addKeyPairLabel());
+    addDropdown.setText(translations.addKeyLabel());
     initializeTable();
   }
 

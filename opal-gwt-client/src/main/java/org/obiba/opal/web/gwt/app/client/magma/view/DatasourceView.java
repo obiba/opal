@@ -128,6 +128,9 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     this.translations = translations;
     this.placeManager = placeManager;
     initWidget(uiBinder.createAndBindUi(this));
+
+    tasksBtn.setText(translations.tasks());
+    addBtn.setText(translations.addTable());
     addTableColumns();
   }
 

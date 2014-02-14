@@ -25,6 +25,7 @@ import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.core.client.JsArray;
@@ -73,6 +74,9 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
   @UiField
   Button downloadIdentifiers;
 
+  @UiField
+  DropdownButton importIdentifiers;
+
   private final Translations translations;
 
   private final ListDataProvider<VariableDto> variablesProvider;
@@ -97,6 +101,8 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
     valueSetsProvider = new ValueSetsDataProvider();
     variablesProvider = new ListDataProvider<VariableDto>();
     this.translations = translations;
+
+    importIdentifiers.setText(translations.importIdentifiers());
   }
 
   @Override

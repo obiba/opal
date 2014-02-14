@@ -31,7 +31,7 @@
       <b:Tab heading="Dictionary" active="true">
         <g:FlowPanel addStyleNames="small-bottom-margin">
           <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right small-top-margin small-indent"/>
-          <b:DropdownButton text="Add Table" type="INFO" icon="PLUS" ui:field="addBtn"
+          <b:DropdownButton type="INFO" icon="PLUS" ui:field="addBtn"
               addStyleNames="small-top-margin">
             <b:NavLink icon="TABLE" ui:field="addTable">
               <ui:msg description="Add Table label">Add table...</ui:msg>

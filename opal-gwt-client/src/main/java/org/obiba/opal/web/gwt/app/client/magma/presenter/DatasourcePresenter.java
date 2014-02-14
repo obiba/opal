@@ -208,7 +208,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       }
 
       deleteConfirmation = new RemoveRunnable(tableNames);
-//
+
       fireEvent(ConfirmationRequiredEvent
           .createWithMessages(deleteConfirmation, translations.confirmationTitleMap().get("deleteTables"),
               TranslationsUtils.replaceArguments(translations.confirmationMessageMap()

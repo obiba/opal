@@ -21,6 +21,7 @@ import org.obiba.opal.web.model.client.opal.GroupDto;
 import org.obiba.opal.web.model.client.opal.SubjectCredentialsDto;
 
 import com.github.gwtbootstrap.client.ui.CellTable;
+import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.core.client.GWT;
@@ -61,6 +62,9 @@ public class SubjectCredentialsAdministrationView extends ViewWithUiHandlers<Sub
   @UiField
   HasWidgets breadcrumbs;
 
+  @UiField
+  DropdownButton addUserButton;
+
   private final static Translations translations = GWT.create(Translations.class);
 
   private final ListDataProvider<SubjectCredentialsDto> userDataProvider
@@ -71,6 +75,8 @@ public class SubjectCredentialsAdministrationView extends ViewWithUiHandlers<Sub
   @Inject
   public SubjectCredentialsAdministrationView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
+
+    addUserButton.setText(translations.addUser());
     usersTable.setVisibleRange(0, 10);
     groupsTable.setVisibleRange(0, 10);
     configUserTable();

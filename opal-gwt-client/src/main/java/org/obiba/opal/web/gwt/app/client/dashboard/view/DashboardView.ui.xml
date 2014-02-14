@@ -16,34 +16,34 @@
     </b:Heading>
     <b:FluidRow>
       <b:Column size="6" ui:field="datasources">
-        <b2:IconAnchor icon="TABLE" text="Explore Variables" ui:field="exploreVariablesLink"/>
+        <b2:IconAnchor icon="TABLE" ui:field="exploreVariablesLink"/>
         <g:Label addStyleNames="help-block">
           <ui:msg description="Explore variables link description">Browse tables and variables, create views,
             import/export data and dictionaries.
           </ui:msg>
         </g:Label>
         <g:FlowPanel ui:field="files">
-        <b2:IconAnchor ui:field="exploreFilesLink" icon="FOLDER_CLOSE" text="Manage Files"/>
-        <g:Label addStyleNames="help-block">
-          <ui:msg description="Manage Files link description">Browse, upload and download files on the server.
-          </ui:msg>
-        </g:Label>
+          <b2:IconAnchor ui:field="exploreFilesLink" icon="FOLDER_CLOSE"/>
+          <g:Label addStyleNames="help-block">
+            <ui:msg description="Manage Files link description">Browse, upload and download files on the server.
+            </ui:msg>
+          </g:Label>
         </g:FlowPanel>
       </b:Column>
 
       <b:Column size="6" ui:field="reports">
-        <b2:IconAnchor ui:field="reportsLink" icon="FILE_ALT" text="Run Reports"/>
+        <b2:IconAnchor ui:field="reportsLink" icon="FILE_ALT"/>
         <g:Label addStyleNames="help-block">
           <ui:msg description="Reports link description">Design reports with R and schedule their
             execution.
           </ui:msg>
         </g:Label>
         <g:FlowPanel ui:field="identifiers">
-        <b2:IconAnchor ui:field="identifiersLink" icon="EXCHANGE" text="Manage Participant Identifiers"/>
-        <g:Label addStyleNames="help-block">
-          <ui:msg description="Identifiers link description">Create and map identifiers of participants.
-          </ui:msg>
-        </g:Label>
+          <b2:IconAnchor ui:field="identifiersLink" icon="EXCHANGE"/>
+          <g:Label addStyleNames="help-block">
+            <ui:msg description="Identifiers link description">Create and map identifiers of participants.
+            </ui:msg>
+          </g:Label>
         </g:FlowPanel>
       </b:Column>
 

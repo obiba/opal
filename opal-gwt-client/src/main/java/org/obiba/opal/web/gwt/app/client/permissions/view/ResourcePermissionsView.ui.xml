@@ -19,7 +19,7 @@
 
   <g:FlowPanel>
     <g:FlowPanel>
-      <b:DropdownButton ui:field="addDropdown" text="Add Permission" type="INFO" icon="PLUS">
+      <b:DropdownButton ui:field="addDropdown" type="INFO" icon="PLUS">
         <b:NavLink ui:field="addUserPermission">
           <ui:msg description="Add user Permission label">Add user permission...</ui:msg>
         </b:NavLink>

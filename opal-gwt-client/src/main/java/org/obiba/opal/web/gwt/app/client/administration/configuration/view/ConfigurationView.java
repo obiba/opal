@@ -7,6 +7,7 @@ import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.GeneralConf;
 
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
+import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -42,10 +43,15 @@ public class ConfigurationView extends ViewWithUiHandlers<ConfigurationUiHandler
   @UiField
   Panel permissions;
 
+  @UiField
+  DropdownButton keyPairButton;
+
   @Inject
   public ConfigurationView(Binder uiBinder, Translations translations) {
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
+
+    keyPairButton.setText(translations.setKeyPair());
   }
 
   @Override

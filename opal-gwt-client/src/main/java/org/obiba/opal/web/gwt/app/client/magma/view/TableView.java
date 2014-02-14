@@ -39,6 +39,7 @@ import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.FluidRow;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.ProgressBar;
@@ -205,6 +206,12 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiField
   Button clearCrossVariables;
 
+  @UiField
+  DropdownButton downloadBtn;
+
+  @UiField
+  DropdownButton tasksBtn;
+
   private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
 
   private final Translations translations;
@@ -231,6 +238,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     crossWithVariables = new Typeahead(new CrossableVariableSuggestOracle(this.eventBus));
 
     initWidget(uiBinder.createAndBindUi(this));
+
+    tasksBtn.setText(translations.tasks());
+    downloadBtn.setText(translations.downloadLabel());
     addTableColumns();
     initializeAnchorTexts();
     initializeFilter();

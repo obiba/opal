@@ -68,6 +68,11 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
     getReportsLink().setHref("#" + Places.ADMINISTRATION + "/" + Places.REPORT_TEMPLATES);
     getFilesLink().setHref("#" + Places.ADMINISTRATION + "/" + Places.FILES);
     pageTitle.setText(translations.pageDashboardTitle());
+
+    exploreVariablesLink.setText(translations.exploreVariables());
+    exploreFilesLink.setText(translations.manageFiles());
+    reportsLink.setText(translations.runReports());
+    identifiersLink.setText(translations.manageParticipantIdentifiers());
   }
 
   @Override

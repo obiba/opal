@@ -115,6 +115,8 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
   public IndexAdministrationView(Binder uiBinder, PlaceManager placeManager) {
     this.placeManager = placeManager;
     initWidget(uiBinder.createAndBindUi(this));
+
+    actionsDropdown.setText(translations.actionsLabel());
     indexTablePager.setDisplay(indexTable);
 
     checkboxColumn = new CheckboxColumn<TableIndexStatusDto>(new TableIndexStatusDtoDisplay());
