@@ -2200,4 +2200,12 @@ public interface Translations extends Constants {
   @Description("NA (total: {N}) label")
   @DefaultStringValue("N/A (total: {0})")
   String NATotalLabel();
+
+  @Description("Register the identifiers database label")
+  @DefaultStringValue("Register the identifiers database")
+  String registerIdentifiersDatabase();
+
+  @Description("Register a data database label")
+  @DefaultStringValue("Register a data database")
+  String registerDataDatabase();
 }
