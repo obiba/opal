@@ -18,16 +18,16 @@ import org.obiba.opal.web.model.client.opal.LinkDto;
 import com.google.common.base.Preconditions;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
-public final class BookmarkPlaceRequestBuilder {
+public final class BookmarkHelper {
 
-  private BookmarkPlaceRequestBuilder() {}
+  private BookmarkHelper() {}
 
-  public static PlaceRequest create(@NotNull LinkDto linkDto) {
+  public static PlaceRequest createPlaceRequest(@NotNull LinkDto linkDto) {
     Preconditions.checkArgument(linkDto != null);
-    return create(linkDto.getRel());
+    return createPlaceRequest(linkDto.getRel());
   }
 
-  public static PlaceRequest create(@NotNull String path) {
+  public static PlaceRequest createPlaceRequest(@NotNull String path) {
     Preconditions.checkArgument(path != null);
     Tokenizer tokenizer = Tokenizer.newTokenizer().tokenize(path);
     if(tokenizer.hasVariable()) {
@@ -40,6 +40,13 @@ public final class BookmarkPlaceRequestBuilder {
     }
 
     throw new IllegalArgumentException("LinkDto argument contains invalid resource link");
+  }
+
+  public static String createMagmaPath(@NotNull String path) {
+    Preconditions.checkArgument(path != null);
+    Tokenizer tokenizer = Tokenizer.newTokenizer().tokenize(path);
+    return MagmaPath.Builder.datasource(tokenizer.getProject()).table(tokenizer.getTable())
+        .variable(tokenizer.getVariable()).build();
   }
 
   private static class Tokenizer {
