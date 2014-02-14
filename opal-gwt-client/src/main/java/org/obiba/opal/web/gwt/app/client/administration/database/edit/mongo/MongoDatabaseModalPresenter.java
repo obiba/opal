@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.database.edit.mongo;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -41,6 +43,7 @@ public class MongoDatabaseModalPresenter extends AbstractDatabaseModalPresenter<
   protected void onBind() {
     super.onBind();
 
+    getView().setAvailableUsages(Arrays.asList(Usage.STORAGE));
     getView().getUsageChangeHandlers().addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent event) {
@@ -116,6 +119,8 @@ public class MongoDatabaseModalPresenter extends AbstractDatabaseModalPresenter<
   }
 
   public interface Display extends AbstractDatabaseModalPresenter.Display {
+
+    void setAvailableUsages(Collection<Usage> usages);
 
     enum FormField {
       NAME,
