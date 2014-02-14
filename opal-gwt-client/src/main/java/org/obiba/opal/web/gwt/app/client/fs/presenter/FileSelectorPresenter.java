@@ -19,6 +19,8 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FilesCheckedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
@@ -50,6 +52,10 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
 
   private final ModalProvider<FileUploadModalPresenter> fileUploadModalProvider;
 
+  private final Translations translations;
+
+  private final TranslationMessages translationMessages;
+
   private Object fileSelectionSource;
 
   private FileSelectionType fileSelectionType = FileSelectionType.FILE;
@@ -59,13 +65,16 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
   @Inject
   public FileSelectorPresenter(Display display, EventBus eventBus, FilePathPresenter filePathPresenter,
       FilePlacesPresenter filePlacesPresenter, FolderDetailsPresenter folderDetailsPresenter,
-      ModalProvider<FileUploadModalPresenter> fileUploadModalProvider, RequestCredentials credentials) {
+      ModalProvider<FileUploadModalPresenter> fileUploadModalProvider, RequestCredentials credentials,
+      Translations translations, TranslationMessages translationMessages) {
     super(eventBus, display);
     this.filePathPresenter = filePathPresenter;
     this.filePlacesPresenter = filePlacesPresenter;
     this.folderDetailsPresenter = folderDetailsPresenter;
     this.fileUploadModalProvider = fileUploadModalProvider.setContainer(this);
     this.credentials = credentials;
+    this.translations = translations;
+    this.translationMessages = translationMessages;
 
     getView().setUiHandlers(this);
   }
@@ -207,7 +216,10 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
   @Override
   public void onSelect() {
     FileSelection selection = getSelection();
-    if(selection != null) {
+    if(selection == null) {
+      getView().clearErrors();
+      getView().showError(getNoSelectionErrorMessage());
+    } else {
       fireEvent(new FileSelectionEvent(fileSelectionSource, selection));
       getView().hideDialog();
     }
@@ -227,6 +239,15 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
     }
   }
 
+  public String getNoSelectionErrorMessage() {
+    if(folderDetailsPresenter.isSingleSelectionModel()) {
+      return translationMessages.mustSelectFileFolder(translations.fileFolderTypeMap().get(fileSelectionType.name()));
+    }
+
+    return translationMessages
+        .mustSelectAtLeastFileFolder(translations.fileFolderTypeMap().get(fileSelectionType.name()));
+  }
+
   public enum FileSelectionType {
     FILE, FOLDER, FILE_OR_FOLDER
   }
@@ -238,6 +259,10 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
     HasText getCreateFolderName();
 
     void clearNewFolderName();
+
+    void clearErrors();
+
+    void showError(String errorMessage);
   }
 
   public static class FileSelection {

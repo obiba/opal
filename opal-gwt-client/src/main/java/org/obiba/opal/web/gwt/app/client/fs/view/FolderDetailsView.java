@@ -113,6 +113,11 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
     addCheckColumn();
   }
 
+  @Override
+  public boolean isSingleSelectionModel() {
+    return singleSelectionModel;
+  }
+
   @SuppressWarnings("unchecked")
   private JsArray<FileDto> filterChildren(JsArray<FileDto> children) {
     if(displaysFiles) {
