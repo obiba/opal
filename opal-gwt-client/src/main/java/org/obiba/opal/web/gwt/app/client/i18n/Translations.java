@@ -698,7 +698,7 @@ public interface Translations extends Constants {
 
   @Description("Data import Compared Datasources Report instructions")
   @DefaultStringValue(
-      "Review the data dictionary that will be imported.")
+      "Review and select the data dictionaries that you wish to import.")
   String dataImportComparedDatasourcesReportStep();
 
   @Description("Data import Values instructions")
