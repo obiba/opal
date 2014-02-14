@@ -18,7 +18,7 @@
     <b:NavHeader>
       <ui:msg description="System label">System</ui:msg>
     </b:NavHeader>
-    <b:NavLink icon="HDD" ui:field="root">
+    <b:NavLink icon="FOLDER_CLOSE" ui:field="root">
       <ui:msg description="File System label">File System</ui:msg>
     </b:NavLink>
     <b:NavLink icon="GROUP" ui:field="users">

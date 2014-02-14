@@ -10,7 +10,7 @@ public class OpalTabPanel extends TabPanel {
   private Map<Integer, Object> data = new HashMap<Integer, Object>();
 
   public OpalTabPanel setData(int index, Object value) {
-    this.data.put(index, value);
+    data.put(index, value);
     return this;
   }
 
