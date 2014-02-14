@@ -4,10 +4,11 @@
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <o:Modal ui:field="dialog" resizable="false" closeVisible="true" keyboard="true" animation="false">
+  <o:Modal ui:field="dialog" resizable="false" closeVisible="true" keyboard="true" animation="false"
+      addStyleNames="progress">
 
-    <g:FlowPanel styleName="input">
-      <b:RadioButton name="pkg" ui:field="allPkg">
+    <g:FlowPanel>
+    <b:RadioButton name="pkg" ui:field="allPkg">
         <ui:msg description="Install all Datashield Packages label">Install all DataSHIELD packages</ui:msg>
       </b:RadioButton>
       <b:RadioButton name="pkg" ui:field="namedPkg">
