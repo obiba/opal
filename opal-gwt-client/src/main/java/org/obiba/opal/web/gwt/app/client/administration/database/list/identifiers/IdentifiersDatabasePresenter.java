@@ -160,6 +160,7 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
           public void onResource(Response response, @Nullable DatabaseDto dto) {
             databaseDto = dto;
             getView().setDatabase(dto);
+
           }
         }) //
         .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {

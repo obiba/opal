@@ -24,6 +24,7 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.database.DatabasesStatusDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -160,6 +161,8 @@ public class PostInstallPresenter extends Presenter<PostInstallPresenter.Display
   private class DatabasesStatusResourceCallback implements ResourceCallback<DatabasesStatusDto> {
     @Override
     public void onResource(Response response, DatabasesStatusDto resource) {
+      GWT.log(resource.getHasIdentifiers() + "");
+      GWT.log(resource.getHasStorage() + "");
       getView().enablePageExit(resource.getHasIdentifiers() && resource.getHasStorage());
     }
   }

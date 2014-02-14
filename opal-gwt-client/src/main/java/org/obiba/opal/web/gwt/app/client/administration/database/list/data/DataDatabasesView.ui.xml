@@ -16,35 +16,32 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <b:Heading size="4" addStyleNames="inline-block">
-      <ui:msg description="Databases label">Data Databases</ui:msg>
-    </b:Heading>
-    <b:Paragraph>
+    <b:FluidRow addStyleNames="bottom-margin">
+
+      <b:Column size="4">
+        <b:Heading size="4" addStyleNames="inline-block top-margin">
+          <ui:msg description="Databases label">Data Databases</ui:msg>
+        </b:Heading>
+      </b:Column>
+
+      <b:Column size="2">
+        <b:DropdownButton ui:field="registerDataDatabase" addStyleNames="small-top-margin" icon="PLUS" type="INFO">
+          <b:NavLink ui:field="createSql">
+            <ui:msg description="Create SQL database label">SQL</ui:msg>
+          </b:NavLink>
+          <b:NavLink ui:field="createMongo">
+            <ui:msg description="Create MongoDB database label">MongoDB</ui:msg>
+          </b:NavLink>
+        </b:DropdownButton>
+      </b:Column>
+
+    </b:FluidRow>
+
+    <b:HelpBlock>
       Databases can have different purposes: storage, import, export.
-    </b:Paragraph>
-    <g:FlowPanel ui:field="createPanel">
-      <b:Paragraph>
-        At least one storage database is required for importing data.
-      </b:Paragraph>
-      <b:DropdownButton ui:field="registerDataDatabase" icon="PLUS" type="INFO">
-      <b:NavLink ui:field="createSql">
-          <ui:msg description="Create SQL database label">SQL</ui:msg>
-        </b:NavLink>
-        <b:NavLink ui:field="createMongo">
-          <ui:msg description="Create MongoDB database label">MongoDB</ui:msg>
-        </b:NavLink>
-      </b:DropdownButton>
-    </g:FlowPanel>
+    </b:HelpBlock>
 
     <g:FlowPanel ui:field="databasesPanel">
-      <b:DropdownButton text="Register database" icon="PLUS" type="INFO">
-        <b:NavLink ui:field="addSQL">
-          <ui:msg description="Create SQL database label">SQL</ui:msg>
-        </b:NavLink>
-        <b:NavLink ui:field="addMongo">
-          <ui:msg description="Create MongoDB database label">MongoDB</ui:msg>
-        </b:NavLink>
-      </b:DropdownButton>
       <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
       <o:Table ui:field="table" addStyleNames="small-top-margin"/>
     </g:FlowPanel>
