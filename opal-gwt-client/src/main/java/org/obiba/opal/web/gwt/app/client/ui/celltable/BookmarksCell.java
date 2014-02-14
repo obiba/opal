@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.support.BookmarkPlaceRequestBuilder;
+import org.obiba.opal.web.gwt.app.client.support.BookmarkHelper;
 import org.obiba.opal.web.model.client.opal.BookmarkDto;
 import org.obiba.opal.web.model.client.opal.LinkDto;
 
@@ -88,7 +88,7 @@ public class BookmarksCell extends AbstractCell<BookmarkDto> {
       return new PlaceRequestCell<String>(placeManager) {
         @Override
         public PlaceRequest getPlaceRequest(String value) {
-          return BookmarkPlaceRequestBuilder.create(link);
+          return BookmarkHelper.createPlaceRequest(link);
         }
       };
     }

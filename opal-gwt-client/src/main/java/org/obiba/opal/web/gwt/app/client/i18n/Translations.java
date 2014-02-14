@@ -1250,6 +1250,13 @@ public interface Translations extends Constants {
   })
   Map<String, String> projectTabNameMap();
 
+  @Description("Bookmark Type name")
+  @DefaultStringMapValue({ "PROJECT", "Project", //
+      "TABLE", "Table", //
+      "VARIABLE", "Variable" //
+  })
+  Map<String, String> bookmarkTypeMap();
+
   @Description("Discrete Value Required label")
   @DefaultStringValue("A valid discrete value is required.")
   String discreteValueRequired();
