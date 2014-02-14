@@ -442,6 +442,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   }
 
   public void addAlert(Alert alert) {
+    scrollTop(getBodyWidget().getElement());
     alertPlace.add(alert);
   }
 
@@ -531,6 +532,10 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
       }
     }
   }
+
+  private native void scrollTop(Element e) /*-{
+      $wnd.jQuery(e).scrollTop(0);
+  }-*/;
 
   private native void setBoddyPadding(Element e, int padding) /*-{
       $wnd.jQuery(e).css("padding", padding + "px");
