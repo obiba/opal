@@ -25,7 +25,7 @@
           </b:Button>
         </b:ButtonGroup>
         <b:ButtonGroup>
-        <b:DropdownButton text="Import Identifiers" icon="UPLOAD">
+          <b:DropdownButton ui:field="importIdentifiers" icon="UPLOAD">
             <b:NavLink ui:field="importSystemId">
               <ui:msg description="Import System Identifiers label">Import system identifiers...</ui:msg>
             </b:NavLink>

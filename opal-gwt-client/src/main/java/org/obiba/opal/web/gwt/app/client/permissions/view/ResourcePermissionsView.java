@@ -24,6 +24,7 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.model.client.opal.Acl;
 
 import com.github.gwtbootstrap.client.ui.CellTable;
+import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -37,8 +38,8 @@ import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
-public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissionsUiHandlers> implements
-    ResourcePermissionsPresenter.Display {
+public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissionsUiHandlers>
+    implements ResourcePermissionsPresenter.Display {
 
   interface Binder extends UiBinder<Widget, ResourcePermissionsView> {}
 
@@ -48,6 +49,9 @@ public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissi
   @UiField
   SimplePager tablePager;
 
+  @UiField
+  DropdownButton addDropdown;
+
   private final static Translations translations = GWT.create(Translations.class);
 
   private final ListDataProvider<Acl> permissionsDataProvider = new ListDataProvider<Acl>();
@@ -55,6 +59,8 @@ public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissi
   @Inject
   public ResourcePermissionsView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
+
+    addDropdown.setText(translations.addPermission());
     initSubjectsPermissionTable();
   }
 
@@ -137,7 +143,7 @@ public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissi
         String action = value.getActions(0);
         if(ResourcePermissionType.PROJECT.hasPermission(action) ||
             ResourcePermissionType.VARIABLE.hasPermission(action)) {
-          return new String[] {ActionsColumn.DELETE_ACTION };
+          return new String[] { ActionsColumn.DELETE_ACTION };
         }
 
         return allActions();

@@ -875,10 +875,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Add table...")
   String addTableLabel();
 
-  @Description("Add Key Pair label")
-  @DefaultStringValue("Add Key")
-  String addKeyPairLabel();
-
   @Description("Add Table no storage label")
   @DefaultStringValue("Add table (no storage)")
   String addTableNoStorageLabel();
@@ -2205,6 +2201,58 @@ public interface Translations extends Constants {
   @DefaultStringValue("Register")
   String register();
 
+  @Description("Register a data database label")
+  @DefaultStringValue("Register a data database")
+  String registerDataDatabase();
+
+  @Description("Set Key pair label")
+  @DefaultStringValue("Set Key Pair")
+  String setKeyPair();
+
+  @Description("Import Identifiers label")
+  @DefaultStringValue("Import Identifiers")
+  String importIdentifiers();
+
+  @Description("Add User label")
+  @DefaultStringValue("Add User")
+  String addUser();
+
+  @Description("Tasks label")
+  @DefaultStringValue("Tasks")
+  String tasks();
+
+  @Description("Derive label")
+  @DefaultStringValue("Derive")
+  String derive();
+
+  @Description("Explore Variables label")
+  @DefaultStringValue("Explore Variables")
+  String exploreVariables();
+
+  @Description("Manage Files label")
+  @DefaultStringValue("Manage Files")
+  String manageFiles();
+
+  @Description("Run Reports label")
+  @DefaultStringValue("Run Reports")
+  String runReports();
+
+  @Description("Manage Participant Identifiers label")
+  @DefaultStringValue("Manage Participant Identifiers")
+  String manageParticipantIdentifiers();
+
+  @Description("RSA label")
+  @DefaultStringValue("RSA")
+  String rsa();
+
+  @Description("Add Key label")
+  @DefaultStringValue("Add Key")
+  String addKeyLabel();
+
+  @Description("Add Permission label")
+  @DefaultStringValue("Add Permission")
+  String addPermission();
+
   @Description("At least one storage database is required for importing data label")
   @DefaultStringValue("At least one storage database is required for importing data.")
   String dataDatabaseRequiredLabel();
@@ -2212,4 +2260,8 @@ public interface Translations extends Constants {
   @Description("This database definition is required for importing data label")
   @DefaultStringValue("This database definition is required for importing data.")
   String identifiersDatabaseRequiredLabel();
+
+  @Description("Add Table label")
+  @DefaultStringValue("Add Table")
+  String addTable();
 }

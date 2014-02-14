@@ -32,6 +32,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CodeBlock;
+import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TabPanel;
@@ -180,6 +181,9 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   @UiField
   Panel permissionsPanel;
 
+  @UiField
+  DropdownButton deriveBtn;
+
   private final Translations translations;
 
   @Inject
@@ -188,6 +192,8 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     categoryTable = new CategoriesTable();
 
     initWidget(uiBinder.createAndBindUi(this));
+
+    deriveBtn.setText(translations.derive());
     initCategoryTable();
     scriptNavPanel.showWidget(0);
   }

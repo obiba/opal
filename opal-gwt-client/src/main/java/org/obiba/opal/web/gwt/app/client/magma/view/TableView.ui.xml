@@ -175,7 +175,7 @@
         <b:FluidRow addStyleNames="text-align-center">
           <b:Column size="4">
             <b:Well>
-              <b:Icon type="TIME"></b:Icon>
+              <b:Icon type="TIME"/>
               <g:Label addStyleNames="xsmall-indent inline-block">
                 <ui:msg description="Last update label">Last update</ui:msg>
               </g:Label>
@@ -184,7 +184,7 @@
           </b:Column>
           <b:Column size="4">
             <b:Well>
-              <b:Icon type="COLUMNS"></b:Icon>
+              <b:Icon type="COLUMNS"/>
               <g:Label addStyleNames="xsmall-indent inline-block">
                 <ui:msg description="Number of variables label">Number of variables</ui:msg>
               </g:Label>
@@ -193,7 +193,7 @@
           </b:Column>
           <b:Column size="4">
             <b:Well>
-              <b:Icon type="ALIGN_JUSTIFY"></b:Icon>
+              <b:Icon type="ALIGN_JUSTIFY"/>
               <g:Label addStyleNames="xsmall-indent inline-block">
                 <ui:msg description="Number of entities label">Number of entities</ui:msg>
               </g:Label>

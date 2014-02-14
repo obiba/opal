@@ -32,7 +32,7 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
 public class CreateKeyPairModalView extends ModalPopupViewWithUiHandlers<KeyPairModalUiHandlers>
-implements CreateKeyPairModalPresenter.Display {
+    implements CreateKeyPairModalPresenter.Display {
 
   @UiField
   Modal modal;
@@ -86,6 +86,7 @@ implements CreateKeyPairModalPresenter.Display {
     super(eventBus);
     initWidget(uiBinder.createAndBindUi(this));
     modal.setTitle(translations.createKeyPairLabel());
+    algorithm.setText(translations.rsa());
   }
 
   @Override

@@ -19,7 +19,7 @@
   <g:FlowPanel>
     <b:FluidRow addStyleNames="no-bottom-margin">
       <b:Column size="3">
-        <b:DropdownButton ui:field="addDropdown" text="Add Key" type="INFO" icon="PLUS">
+        <b:DropdownButton ui:field="addDropdown" type="INFO" icon="PLUS">
           <b:NavLink ui:field="importKeyPair">
             <ui:msg description="Import Key Pair label">Import key pair...</ui:msg>
           </b:NavLink>
