@@ -14,7 +14,7 @@
     <b:Heading size="4" addStyleNames="inline-block no-top-margin">
       <ui:msg description="Actions label">Actions</ui:msg>
     </b:Heading>
-    <b:FluidRow>
+    <b:FluidRow addStyleNames="top-margin">
       <b:Column size="6" ui:field="datasources">
         <b2:IconAnchor icon="TABLE" ui:field="exploreVariablesLink"/>
         <g:Label addStyleNames="help-block">
