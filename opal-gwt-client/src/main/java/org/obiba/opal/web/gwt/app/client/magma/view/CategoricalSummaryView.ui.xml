@@ -25,10 +25,10 @@
     </b:Heading>
 
     <b:FluidRow>
-      <b:Column size="4" offset="1">
+      <b:Column size="5">
         <o:DefaultFlexTable ui:field="stats"/>
       </b:Column>
-      <b:Column size="4" offset="2">
+      <b:Column size="5" offset="2">
         <o:DefaultFlexTable ui:field="frequencies"/>
       </b:Column>
     </b:FluidRow>
