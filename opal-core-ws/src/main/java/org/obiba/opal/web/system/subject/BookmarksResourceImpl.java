@@ -31,8 +31,6 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class BookmarksResourceImpl implements BookmarksResource {
 
-  private static final Logger log = LoggerFactory.getLogger(BookmarksResourceImpl.class);
-
   private String principal;
 
   @Autowired

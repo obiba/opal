@@ -68,11 +68,8 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   @UiField
   FlowPanel permissionsPanel;
 
-  private final Translations translations;
-
   @Inject
   ProjectView(Binder uiBinder, Translations translations) {
-    this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
     for(ProjectTab tab : ProjectTab.values()) {
       String title = translations.projectTabNameMap().get(tab.toString());
