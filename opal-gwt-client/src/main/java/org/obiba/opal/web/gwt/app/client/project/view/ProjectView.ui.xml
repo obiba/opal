@@ -26,18 +26,17 @@
             </b:NavLink>
           </b:Breadcrumbs>
           <g:FlowPanel ui:field="bookmarkIcon" addStyleNames="inline-block"/>
+          <g:FlowPanel ui:field="tagsPanel" addStyleNames="inline-block small-indent"/>
         </b:Column>
         <b:Column size="3">
         </b:Column>
       </b:FluidRow>
     </g:FlowPanel>
-    <o:OpalTabPanel tabPosition="right" ui:field="tabPanel">
+    <o:OpalTabPanel tabPosition="left" ui:field="tabPanel">
       <b:Tab icon="TABLE">
-        <g:FlowPanel ui:field="tagsPanel" addStyleNames="inline-block small-indent"/>
         <g:SimplePanel ui:field="tablesPanel"/>
-
       </b:Tab>
-      <b:Tab icon="HDD">
+      <b:Tab icon="FOLDER_CLOSE">
         <b:Heading size="3" addStyleNames="no-top-margin">Files</b:Heading>
         <g:SimplePanel ui:field="filesPanel"/>
       </b:Tab>

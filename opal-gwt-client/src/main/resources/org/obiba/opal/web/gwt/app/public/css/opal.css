@@ -21,6 +21,14 @@ li {
  * Opal
  */
 
+.main {
+  padding: 0 40px;
+}
+
+.tabs-left.off-content {
+  margin-left: -60px;
+}
+
 .sortable-header-column {
   cursor: pointer;
 }

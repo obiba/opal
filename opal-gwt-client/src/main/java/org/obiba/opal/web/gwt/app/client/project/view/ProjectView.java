@@ -11,6 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.project.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalTabPanel;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -18,8 +19,10 @@ import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
+import com.github.gwtbootstrap.client.ui.Label;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.TabPanel;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -74,8 +77,8 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     for(ProjectTab tab : ProjectTab.values()) {
       String title = translations.projectTabNameMap().get(tab.toString());
       TabPanelHelper.setTabTitle(tabPanel, tab.ordinal(), title);
-      TabPanelHelper.setTabText(tabPanel, tab.ordinal(), title);
     }
+    tabPanel.addStyleName("off-content");
   }
 
   @Override
@@ -89,22 +92,21 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
       titleCrumbs.remove(1);
     }
     titleCrumbs.add(new NavLink(project.getTitle()));
-
-    //TODO until a better layout is found do not set the tags
-//    setTags();
+    setTags(project);
   }
 
-//  private void setTags() {
-//    tagsPanel.clear();
-//    JsArrayString tagsArray = JsArrays.toSafeArray(project.getTagsArray());
-//    if(tagsArray.length() > 0) {
-//      for(String tag : JsArrays.toIterable(tagsArray)) {
-//        Label tagLabel = new Label(tag);
-//        tagLabel.addStyleName("small-indent");
-//        tagsPanel.add(tagLabel);
-//      }
-//    }
-//  }
+  private void setTags(ProjectDto project) {
+    tagsPanel.clear();
+    JsArrayString tagsArray = JsArrays.toSafeArray(project.getTagsArray());
+    tagsPanel.setVisible(tagsArray.length() > 0);
+    if(tagsArray.length() > 0) {
+      for(String tag : JsArrays.toIterable(tagsArray)) {
+        Label tagLabel = new Label(tag);
+        tagLabel.addStyleName("small-indent");
+        tagsPanel.add(tagLabel);
+      }
+    }
+  }
 
   @Override
   public void selectTab(int tab) {
@@ -134,18 +136,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   @UiHandler("tabPanel")
   void onShown(TabPanel.ShownEvent shownEvent) {
     if(shownEvent.getTarget() == null) return;
-
-    showTabTexts(tabPanel.getSelectedTab() == 0);
-
     getUiHandlers().onTabSelected(tabPanel.getSelectedTab());
   }
 
-  private void showTabTexts(boolean show) {
-    for(ProjectTab tab : ProjectTab.values()) {
-      TabPanelHelper
-          .setTabText(tabPanel, tab.ordinal(), show ? translations.projectTabNameMap().get(tab.toString()) : "");
-    }
-  }
 
   @Override
   @SuppressWarnings({ "PMD.NcssMethodCount", "IfStatementWithTooManyBranches", "OverlyLongMethod" })
