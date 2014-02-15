@@ -1063,12 +1063,12 @@ public interface Translations extends Constants {
   Map<String, String> valueTypeMap();
 
   @Description("Subject Type map")
-  @DefaultStringMapValue({ "SUBJECT_CREDENTIALS", "User", //
+  @DefaultStringMapValue({ "USER", "User", //
       "GROUP", "Group" })
   Map<String, String> shortSubjectTypeMap();
 
   @Description("Add Subject Permission map")
-  @DefaultStringMapValue({ "SUBJECT_CREDENTIALS.title", "Add User Permission", //
+  @DefaultStringMapValue({ "USER.title", "Add User Permission", //
       "GROUP.title", "Add Group Permission" })
   Map<String, String> addSubjectPermissionMap();
 
