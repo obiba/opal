@@ -16,7 +16,7 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <g:FlowPanel addStyleNames="page-header">
+    <g:FlowPanel addStyleNames="section-header xlarge-bottom-margin">
       <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
 

@@ -9,7 +9,7 @@
 
   <g:FlowPanel>
     <g:FlowPanel>
-      <b:Heading size="4" addStyleNames="inline-block">
+      <b:Heading size="4" addStyleNames="inline-block small-top-margin">
         <ui:msg description="Properties label">Properties</ui:msg>
       </b:Heading>
       <b2:IconAnchor ui:field="editProperties" icon="EDIT" addStyleNames="small-indent">

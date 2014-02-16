@@ -158,8 +158,12 @@ li.no-icon > a {
   display: inline-block;
 }
 
-.section {
+.section-header {
   margin-top: 20px;
+}
+
+.section-header .breadcrumb {
+  font-size: 28px;
 }
 
 .italic {

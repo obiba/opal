@@ -7,36 +7,28 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <b:FluidRow addStyleNames="bottom-margin">
+    <b:Heading size="4" addStyleNames="inline-block top-margin">
+      <ui:msg description="Identifiers Database label">Identifiers Database</ui:msg>
+    </b:Heading>
+    <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="edit" visible="false"/>
 
-      <b:Column size="4">
-        <b:Heading size="4" addStyleNames="inline-block top-margin">
-          <ui:msg description="Identifiers Database label">Identifiers Database</ui:msg>
-        </b:Heading>
-        <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="edit" visible="false"/>
-      </b:Column>
-
-      <b:Column size="2">
-        <b:DropdownButton ui:field="registerIdentifersDB" icon="PLUS" type="INFO" addStyleNames="small-top-margin">
-          <b:NavLink ui:field="createSql">
-            <ui:msg description="Register SQL database label">SQL</ui:msg>
-          </b:NavLink>
-          <b:NavLink ui:field="createMongo">
-            <ui:msg description="Register MongoDB database label">MongoDB</ui:msg>
-          </b:NavLink>
-        </b:DropdownButton>
-      </b:Column>
-
-    </b:FluidRow>
-
-    <b:HelpBlock>
+    <b:Paragraph>
       For security reasons the participant identifiers are stored in a database which is distinct from the databases
       used to store participant data. One identifiers database is required for importing data in Opal. See
       <a href="http://wiki.obiba.org/display/OPALDOC/Functional+Units" target="_blank">
         documentation about participant identifier
       </a>
       for more details.
-    </b:HelpBlock>
+    </b:Paragraph>
+
+    <b:DropdownButton ui:field="registerIdentifersDB" icon="PLUS" type="INFO" addStyleNames="small-top-margin">
+      <b:NavLink ui:field="createSql">
+        <ui:msg description="Register SQL database label">SQL</ui:msg>
+      </b:NavLink>
+      <b:NavLink ui:field="createMongo">
+        <ui:msg description="Register MongoDB database label">MongoDB</ui:msg>
+      </b:NavLink>
+    </b:DropdownButton>
 
     <b:FluidRow ui:field="databasePanel">
 

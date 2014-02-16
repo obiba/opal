@@ -16,30 +16,22 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <b:FluidRow addStyleNames="bottom-margin">
+    <b:Heading size="4" addStyleNames="inline-block top-margin">
+      <ui:msg description="Databases label">Data Databases</ui:msg>
+    </b:Heading>
 
-      <b:Column size="4">
-        <b:Heading size="4" addStyleNames="inline-block top-margin">
-          <ui:msg description="Databases label">Data Databases</ui:msg>
-        </b:Heading>
-      </b:Column>
+    <b:Paragraph>
+      Databases can have different purposes: storage or import.
+    </b:Paragraph>
 
-      <b:Column size="2">
-        <b:DropdownButton ui:field="registerDataDatabase" addStyleNames="small-top-margin" icon="PLUS" type="INFO">
-          <b:NavLink ui:field="createSql">
-            <ui:msg description="Create SQL database label">SQL</ui:msg>
-          </b:NavLink>
-          <b:NavLink ui:field="createMongo">
-            <ui:msg description="Create MongoDB database label">MongoDB</ui:msg>
-          </b:NavLink>
-        </b:DropdownButton>
-      </b:Column>
-
-    </b:FluidRow>
-
-    <b:HelpBlock>
-      Databases can have different purposes: storage, import, export.
-    </b:HelpBlock>
+    <b:DropdownButton ui:field="registerDataDatabase" addStyleNames="small-top-margin" icon="PLUS" type="INFO">
+      <b:NavLink ui:field="createSql">
+        <ui:msg description="Create SQL database label">SQL</ui:msg>
+      </b:NavLink>
+      <b:NavLink ui:field="createMongo">
+        <ui:msg description="Create MongoDB database label">MongoDB</ui:msg>
+      </b:NavLink>
+    </b:DropdownButton>
 
     <g:FlowPanel ui:field="databasesPanel">
       <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
