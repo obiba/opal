@@ -26,8 +26,8 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.derive.helper.CategoricalVariableDerivationHelper;
 import org.obiba.opal.web.gwt.app.client.magma.derive.helper.VariableDuplicationHelper;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
@@ -60,6 +60,7 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
 import static org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter.Display.FormField;
 
@@ -67,6 +68,8 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
     implements VariablesToViewUiHandlers {
 
   private static final Translations translations = GWT.create(Translations.class);
+
+  private final PlaceManager placeManager;
 
   private TableDto table;
 
@@ -77,8 +80,9 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
   JsArray<DatasourceDto> datasources;
 
   @Inject
-  public VariablesToViewPresenter(Display display, EventBus eventBus) {
+  public VariablesToViewPresenter(Display display, EventBus eventBus, PlaceManager placeManager) {
     super(eventBus, display);
+    this.placeManager = placeManager;
     getView().setUiHandlers(this);
   }
 
@@ -316,7 +320,7 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
     }
 
     private void selectView() {
-      getEventBus().fireEvent(new TableSelectionChangeEvent(this, getView().getDatasourceName(), view.getName()));
+      placeManager.revealPlace(ProjectPlacesHelper.getTablePlace(getView().getDatasourceName(), view.getName()));
     }
   }
 
