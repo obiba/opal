@@ -137,19 +137,15 @@ public class DataShieldPackageCreateView extends ModalPopupViewWithUiHandlers<Da
   public void clear() {
     name.setText("");
     reference.setText("");
-    setInstallButtonEnabled(true);
-    setCancelButtonEnabled(true);
+    setInProgress(false);
     allPkg.setValue(true, true);
     namedPkg.setValue(false, true);
   }
 
   @Override
-  public void setInstallButtonEnabled(boolean b) {
-    installButton.setEnabled(b);
-  }
-
-  @Override
-  public void setCancelButtonEnabled(boolean b) {
-    cancelButton.setEnabled(b);
+  public void setInProgress(boolean progress) {
+    dialog.setBusy(progress);
+    installButton.setEnabled(!progress);
+    cancelButton.setEnabled(!progress);
   }
 }
