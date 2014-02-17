@@ -73,7 +73,6 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
   }
 
   private void initTable() {
-    table.addColumn(columns.name, translations.nameLabel());
     table.addColumn(columns.url, translations.urlLabel());
     table.addColumn(columns.type, translations.typeLabel());
     table.addColumn(columns.usage, translations.usageLabel());
@@ -89,8 +88,7 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
   }
 
   private void initColumnsWidth() {
-    table.setColumnWidth(columns.name, 25, Style.Unit.PCT);
-    table.setColumnWidth(columns.url, 25, Style.Unit.PCT);
+    table.setColumnWidth(columns.url, 50, Style.Unit.PCT);
     table.setColumnWidth(columns.type, 9, Style.Unit.PCT);
     table.setColumnWidth(columns.usage, 9, Style.Unit.PCT);
     table.setColumnWidth(columns.schema, 9, Style.Unit.PCT);
@@ -153,7 +151,7 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
       }
     });
 
-    table.removeColumn(6);
+    table.removeColumn(5);
     table.addColumn(columns.actions, translations.actionsLabel());
     registerActionsHandlers();
   }
