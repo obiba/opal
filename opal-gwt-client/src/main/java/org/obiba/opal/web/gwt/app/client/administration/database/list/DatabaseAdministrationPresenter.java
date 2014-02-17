@@ -129,7 +129,7 @@ public class DatabaseAdministrationPresenter extends
 
     TestConnectionSuccessCallback(EventBus eventBus, String database) {
       this.eventBus = eventBus;
-      this.database = database;
+      this.database = "_identifiers".equals(database) ? "identifiers" : database;
     }
 
     @Override

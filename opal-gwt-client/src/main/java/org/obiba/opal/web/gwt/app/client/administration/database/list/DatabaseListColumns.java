@@ -27,7 +27,7 @@ public final class DatabaseListColumns {
   public final Column<DatabaseDto, String> name = new TextColumn<DatabaseDto>() {
     @Override
     public String getValue(DatabaseDto dto) {
-      String value = dto.getName();
+      String value = "_identifiers".equals(dto.getName()) ? "identifiers" : dto.getName();
       if(dto.getDefaultStorage()) value += " (" + translations.defaultStorage().toLowerCase() + ")";
       return value;
     }

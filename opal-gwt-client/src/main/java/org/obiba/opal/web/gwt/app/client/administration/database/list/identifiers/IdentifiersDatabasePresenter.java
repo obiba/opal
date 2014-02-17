@@ -41,7 +41,7 @@ import com.gwtplatform.mvp.client.View;
 public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDatabasePresenter.Display>
     implements IdentifiersDatabaseUiHandlers, RequestAdministrationPermissionEvent.Handler {
 
-  public static final String IDENTIFIERS_DATABASE_NAME = "identifiers";
+  public static final String IDENTIFIERS_DATABASE_NAME = "_identifiers";
 
   private final ModalProvider<SqlDatabaseModalPresenter> sqlDatabaseModalProvider;
 
