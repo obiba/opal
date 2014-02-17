@@ -20,7 +20,6 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.obiba.core.util.FileUtil;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.r.RScriptROperation;
@@ -33,7 +32,6 @@ import org.rosuda.REngine.REXPMismatchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
@@ -46,9 +44,6 @@ public class RReportServiceImpl implements ReportService {
   private static final String REPORT_STYLE_OPTION = "opal.report.style";
 
   private static final String DEFAULT_REPORT_STYLE = "Flatly";
-
-  @Value("${OPAL_HOME}")
-  private File opalHomeFile;
 
   @Autowired
   private OpalRSessionManager opalRSessionManager;
