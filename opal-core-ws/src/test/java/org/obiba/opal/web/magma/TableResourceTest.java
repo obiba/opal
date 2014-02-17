@@ -18,12 +18,10 @@ import java.util.Set;
 
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.obiba.magma.Category;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
@@ -43,6 +41,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -60,6 +59,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
 //  private static final Logger log = LoggerFactory.getLogger(TableResourceTest.class);
 
   @BeforeClass
+  @SuppressWarnings("MethodOverridesStaticMethodOfSuperclass")
   public static void before() {
     AbstractMagmaResourceTest.before();
     addDatasource(DATASOURCE2);
@@ -194,13 +194,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     variablesResource.setValueTable(valueTable);
     variablesResource.addOrUpdateVariables(variablesDto, null);
 
-    verify(variableWriter, times(5)).writeVariable(Mockito.any(Variable.class));
-  }
-
-  @Test
-  public void testAddOrUpdateVariables_InternalServerError() {
-    Response response = new VariablesResourceImpl().addOrUpdateVariables(null, null);
-    assertThat(Status.INTERNAL_SERVER_ERROR.getStatusCode()).isEqualTo(response.getStatus());
+    verify(variableWriter, times(5)).writeVariable(any(Variable.class));
   }
 
   @Test
@@ -283,7 +277,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     when(valueTable.getEntityType()).thenReturn(PARTICIPANT);
 
     ApplicationContext applicationContext = mock(ApplicationContext.class);
-    when(applicationContext.getBean(VariableResource.class)).thenReturn(new VariableResourceImpl());
+    when(applicationContext.getBean("variableResource", VariableResource.class)).thenReturn(new VariableResourceImpl());
 
     VariableValueSource variableValueSource = mock(VariableValueSource.class);
     when(variableValueSource.getVariable()).thenReturn(mock(Variable.class));
@@ -295,11 +289,11 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     // Exercise
     ImmutableList<String> categories = ImmutableList.of("CAT1", "CAT2");
     VariableResource variableResource = tableResource
-        .getTransientVariable(TextType.get().getName(), false, script, categories, script, categories);
+        .getTransientVariable(null, TextType.get().getName(), false, script, categories, script, categories);
 
     // Verify behaviour
     verify(valueTable).getEntityType();
-    verify(applicationContext).getBean(VariableResource.class);
+    verify(applicationContext).getBean("variableResource", VariableResource.class);
 
     Variable variable = variableResource.getVariableValueSource().getVariable();
 

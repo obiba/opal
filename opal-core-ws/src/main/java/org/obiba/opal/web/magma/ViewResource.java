@@ -1,8 +1,5 @@
 package org.obiba.opal.web.magma;
 
-import java.util.Locale;
-import java.util.Set;
-
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -12,27 +9,19 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.obiba.magma.ValueTable;
 import org.obiba.opal.web.model.Magma;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
 
-public interface ViewResource {
-
-  void setLocales(Set<Locale> locales);
-
-  void setValueTable(ValueTable valueTable);
+public interface ViewResource extends TableResource {
 
   @GET
   Magma.ViewDto getView();
 
   @PUT
   Response updateView(Magma.ViewDto viewDto, @Nullable @QueryParam("comment") String comment);
-
-  @Path("/variables")
-  VariablesViewResource getVariables();
 
   @DELETE
   Response removeView();
@@ -46,9 +35,6 @@ public interface ViewResource {
   @Bean
   @Scope("request")
   TableResource getFrom();
-
-  @Path("/locales")
-  LocalesResource getLocalesResource();
 
   /**
    * Get variable resource.

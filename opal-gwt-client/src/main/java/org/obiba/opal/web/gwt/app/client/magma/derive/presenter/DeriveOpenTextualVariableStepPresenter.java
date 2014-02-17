@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
@@ -61,7 +62,7 @@ public class DeriveOpenTextualVariableStepPresenter
 
   @Override
   List<DefaultWizardStepController.Builder> getWizardStepBuilders(WizardStepController.StepInHandler stepInHandler) {
-    List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<DefaultWizardStepController.Builder>();
+    List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<>();
     stepBuilders.add(getView().getMethodStepController().onStepIn(stepInHandler));
     stepBuilders.add(getView().getMapStepController() //
         .onStepIn(new DeriveOpenTextualVariableMapStepInHandler()) //
@@ -133,16 +134,14 @@ public class DeriveOpenTextualVariableStepPresenter
     @Override
     public void onStepIn() {
       if(derivationHelper == null || derivationHelper.getMethod() != getView().getMethod()) {
-        String link = getOriginalVariable().getLink() //
-            + "/summary" //
-            + "?nature=categorical" //
-            + "&distinct=true";
 
         final List<String> destinationCategories = DerivationHelper.getDestinationCategories(getDerivedVariable());
         getView().populateValues(new ArrayList<ValueMapEntry>(), destinationCategories);
 
-        ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()//
-            .forResource(link).get()//
+        String uri = UriBuilder.create().fromPath(getOriginalVariable().getLink()).segment("summary")
+            .query("nature", "categorical", "distinct", "true").build();
+        ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder() //
+            .forResource(uri) //
             .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
 
               @Override
@@ -161,7 +160,8 @@ public class DeriveOpenTextualVariableStepPresenter
                 }
                 getView().populateValues(derivationHelper.getValueMapEntries(), destinationCategories);
               }
-            }).send();
+            }) //
+            .get().send();
       }
     }
 

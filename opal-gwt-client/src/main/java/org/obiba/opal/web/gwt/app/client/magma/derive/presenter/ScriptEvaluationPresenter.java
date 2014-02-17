@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueColumn.ValueSelection
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.JavaScriptErrorDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -33,7 +34,6 @@ import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
@@ -45,16 +45,21 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
+import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
+import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
+import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
+import static com.google.gwt.http.client.Response.SC_OK;
+
 /**
  *
  */
 public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationPresenter.Display> {
 
-  private static final Translations translations = GWT.create(Translations.class);
-
-  private static final TranslationMessages translationMessages = GWT.create(TranslationMessages.class);
-
   private final SummaryTabPresenter summaryTabPresenter;
+
+  private final Translations translations;
+
+  private final TranslationMessages translationMessages;
 
   private VariableDto originalVariable;
 
@@ -64,26 +69,25 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
 
   private ScriptEvaluationCallback scriptEvaluationCallback;
 
-  //
-  // Constructors
-  //
-
   @Inject
-  public ScriptEvaluationPresenter(EventBus eventBus, Display view, SummaryTabPresenter summaryTabPresenter) {
+  public ScriptEvaluationPresenter(EventBus eventBus, Display view, SummaryTabPresenter summaryTabPresenter,
+      Translations translations, TranslationMessages translationMessages) {
     super(eventBus, view);
     this.summaryTabPresenter = summaryTabPresenter;
+    this.translations = translations;
+    this.translationMessages = translationMessages;
 
     getView().setValueSelectionHandler(new ValueSelectionHandler() {
 
       @Override
       public void onBinaryValueSelection(VariableDto variable, int row, int column, ValueSetDto valueSet) {
-        StringBuilder link = new StringBuilder(valueSet.getValuesArray().get(column).getLink());
-        link.append("?");
-        appendVariableLimitArguments(link);
+        UriBuilder uriBuilder = UriBuilder.create();
+        uriBuilder.fromPath(valueSet.getValuesArray().get(column).getLink());
+        appendVariableLimitArguments(uriBuilder);
         // TODO won't work with long script
         // OPAL-1346 encode script
-        link.append("&script=").append(URL.encodePathSegment(VariableDtos.getScript(variable)));
-        getEventBus().fireEvent(new FileDownloadRequestEvent(link.toString()));
+        uriBuilder.query("script", URL.encodePathSegment(VariableDtos.getScript(variable)));
+        getEventBus().fireEvent(new FileDownloadRequestEvent(uriBuilder.build()));
       }
 
       @Override
@@ -125,20 +129,18 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
     this.scriptEvaluationCallback = scriptEvaluationCallback;
   }
 
-  private void appendVariableLimitArguments(StringBuilder link) {
-    link.append("valueType=").append(originalVariable.getValueType()) //
-        .append("&repeatable=").append(originalVariable.getIsRepeatable());
+  private void appendVariableLimitArguments(UriBuilder uriBuilder) {
+    uriBuilder.query("valueType", originalVariable.getValueType(), //
+        "repeatable", String.valueOf(originalVariable.getIsRepeatable()));
   }
 
-  private void appendTable(StringBuilder link) {
+  private void appendTable(UriBuilder uriBuilder) {
     if(!Strings.isNullOrEmpty(originalTable.getViewLink()) && !asTable) {
-      // OPAL-879
-      link.append(originalTable.getViewLink()).append("/from");
+      uriBuilder.fromPath(originalTable.getViewLink());
     } else if(!Strings.isNullOrEmpty(originalTable.getLink())) {
-      link.append(originalTable.getLink());
+      uriBuilder.fromPath(originalTable.getLink());
     } else {
-      link.append("/datasource/").append(originalTable.getDatasourceName()).append("/table/")
-          .append(originalTable.getName());
+      uriBuilder.segment("datasource", originalTable.getDatasourceName(), "table", originalTable.getName());
     }
   }
 
@@ -164,24 +166,22 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
   private final class ValueSetFetcherImpl implements ValueSetFetcher {
     @Override
     public void request(int offset, int limit) {
-      String script = VariableDtos.getScript(originalVariable);
 
-      StringBuilder link = new StringBuilder();
-      appendTable(link);
-      link.append("/valueSets/variable/_transient?limit=").append(limit)//
-          .append("&offset=").append(offset).append("&");
-      appendVariableLimitArguments(link);
+      UriBuilder uriBuilder = UriBuilder.create();
+      appendTable(uriBuilder);
+      uriBuilder.segment("valueSets", "variable", "_transient");
+      uriBuilder.query("limit", String.valueOf(limit), //
+          "name", originalVariable.getName(), //
+          "offset", String.valueOf(offset));
+      appendVariableLimitArguments(uriBuilder);
 
-      ResponseCodeCallback callback = new ValuesRequestCallback(offset);
-
-      ResourceRequestBuilder<ValueSetsDto> requestBuilder = ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder() //
-          .forResource(link.toString()).post().withFormBody("script", script) //
-          .withCallback(Response.SC_OK, callback)//
-          .withCallback(Response.SC_BAD_REQUEST, callback)//
-          .withCallback(Response.SC_FORBIDDEN, callback)//
-          .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback)//
-          .accept("application/x-protobuf+json");
-      requestBuilder.send();
+      ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder() //
+          .forResource(uriBuilder.build()) //
+          .withFormBody("script", VariableDtos.getScript(originalVariable)) //
+          .withCallback(new ValuesRequestCallback(offset), SC_OK, SC_BAD_REQUEST, SC_FORBIDDEN,
+              SC_INTERNAL_SERVER_ERROR) //
+          .accept("application/x-protobuf+json") //
+          .post().send();
     }
   }
 
@@ -197,7 +197,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
     @SuppressWarnings("PMD.NcssMethodCount")
     public void onResponseCode(Request request, Response response) {
       switch(response.getStatusCode()) {
-        case Response.SC_OK:
+        case SC_OK:
           if(response.getText() != null) {
             getView().setValuesVisible(true);
             getView().getValueSetsProvider()
@@ -205,10 +205,10 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
             requestSummary();
           }
           break;
-        case Response.SC_FORBIDDEN:
+        case SC_FORBIDDEN:
           getView().setValuesVisible(false);
           break;
-        case Response.SC_BAD_REQUEST:
+        case SC_BAD_REQUEST:
           getView().setValuesVisible(true);
           scriptInterpretationFail(response);
           break;
@@ -221,12 +221,13 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
     }
 
     private void requestSummary() {
-      StringBuilder link = new StringBuilder();
-      appendTable(link);
-      link.append("/variable/_transient/summary?");
-      appendVariableSummaryArguments(link);
+      UriBuilder uriBuilder = UriBuilder.create();
+      appendTable(uriBuilder);
+      uriBuilder.segment("variable", "_transient", "summary");
 
-      ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder = requestSummaryBuilder(link.toString());
+      appendVariableSummaryArguments(uriBuilder);
+
+      ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder = requestSummaryBuilder(uriBuilder.build());
 
       summaryTabPresenter.setRequestBuilder(requestBuilder, originalTable.getValueSetCount());
       summaryTabPresenter.forgetSummary();
@@ -254,7 +255,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
         @Override
         public void onResponseCode(Request request, Response response) {
           if(scriptEvaluationCallback == null) return;
-          if(response.getStatusCode() == Response.SC_OK) {
+          if(response.getStatusCode() == SC_OK) {
             scriptEvaluationCallback.onSuccess(originalVariable);
           } else {
             scriptEvaluationCallback.onFailure(originalVariable);
@@ -262,22 +263,18 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
         }
       };
 
-      requestBuilder.withCallback(Response.SC_OK, callback)//
-          .withCallback(Response.SC_BAD_REQUEST, callback)//
-          .withCallback(Response.SC_FORBIDDEN, callback)//
-          .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback);
-
+      requestBuilder.withCallback(callback, SC_OK, SC_BAD_REQUEST, SC_FORBIDDEN, SC_INTERNAL_SERVER_ERROR);
       return requestBuilder;
     }
 
-    private void appendVariableSummaryArguments(StringBuilder link) {
-      appendVariableLimitArguments(link);
+    private void appendVariableSummaryArguments(UriBuilder uriBuilder) {
+      uriBuilder.query("name", originalVariable.getName());
+      appendVariableLimitArguments(uriBuilder);
 
       if(ValueType.TEXT.is(originalVariable.getValueType()) && VariableDtos.allCategoriesMissing(originalVariable)) {
-        link.append("&nature=categorical")//
-            .append("&distinct=true");
+        uriBuilder.query("nature", "categorical", "distinct", "true");
       }
-      link.append("&limit=500");
+      uriBuilder.query("limit", "500");
     }
 
     private void scriptInterpretationFail(Response response) {
@@ -296,7 +293,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
 
     @SuppressWarnings("unchecked")
     private List<JavaScriptErrorDto> extractJavaScriptErrors(ClientErrorDto errorDto) {
-      List<JavaScriptErrorDto> javaScriptErrors = new ArrayList<JavaScriptErrorDto>();
+      List<JavaScriptErrorDto> javaScriptErrors = new ArrayList<>();
 
       JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) errorDto
           .getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);

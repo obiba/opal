@@ -17,7 +17,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.obiba.magma.NoSuchVariableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableUpdateListener;
 import org.obiba.magma.ValueTableWriter;
@@ -35,10 +34,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
 
-@Component
+@Component("variableViewResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Transactional
-public class VariableViewResourceImpl extends AbstractValueTableResource implements VariableViewResource {
+public class VariableViewResourceImpl extends VariableResourceImpl implements VariableViewResource {
 
   @Autowired
   private ViewManager viewManager;
@@ -46,13 +45,6 @@ public class VariableViewResourceImpl extends AbstractValueTableResource impleme
   @Autowired
   @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
   private Collection<ValueTableUpdateListener> tableListeners;
-
-  private String name;
-
-  @Override
-  public void setName(String name) {
-    this.name = name;
-  }
 
   @Override
   public VariableDto get(UriInfo uriInfo) {
@@ -64,14 +56,14 @@ public class VariableViewResourceImpl extends AbstractValueTableResource impleme
     String tableUri = uriBuilder.build().toString();
     Magma.LinkDto linkDto = Magma.LinkDto.newBuilder().setLink(tableUri).setRel(getValueTable().getName()).build();
 
-    return Dtos.asDto(linkDto, getValueTable().getVariable(name)).build();
+    return Dtos.asDto(linkDto, getValueTable().getVariable(getName())).build();
   }
 
   @Override
   public Response createOrUpdateVariable(VariableDto variableDto, @Nullable String comment) {
     // The variable must exist
     ValueTable table = getValueTable();
-    Variable variable = table.getVariable(name);
+    Variable variable = table.getVariable(getName());
 
     if(!variable.getEntityType().equals(variableDto.getEntityType())) {
       return Response.status(Response.Status.BAD_REQUEST).build();
@@ -87,9 +79,6 @@ public class VariableViewResourceImpl extends AbstractValueTableResource impleme
       }
       variableWriter.writeVariable(Dtos.fromDto(variableDto));
       viewManager.addView(getDatasource().getName(), view, comment);
-
-    } catch(NoSuchVariableException e) {
-      return Response.status(Response.Status.NOT_FOUND).build();
     }
     return Response.ok().build();
   }
@@ -111,9 +100,9 @@ public class VariableViewResourceImpl extends AbstractValueTableResource impleme
 
       // Remove from listClause
       for(VariableValueSource v : view.getListClause().getVariableValueSources()) {
-        if(v.getVariable().getName().equals(name)) {
+        if(v.getVariable().getName().equals(getName())) {
           variableWriter.removeVariable(v.getVariable());
-          viewManager.addView(getDatasource().getName(), view, "Remove " + name);
+          viewManager.addView(getDatasource().getName(), view, "Remove " + getName());
           break;
         }
       }

@@ -20,6 +20,7 @@ import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
@@ -46,8 +47,11 @@ public class DeriveCategoricalVariableStepPresenter
   void initialize(TableDto originalTable, TableDto destinationTable, final VariableDto originalVariable,
       final VariableDto derivedVariable) {
     super.initialize(originalTable, destinationTable, originalVariable, derivedVariable);
-    ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()
-        .forResource(getOriginalVariable().getLink() + "/summary?nature=categorical&distinct=true").get()
+
+    String uri = UriBuilder.create().fromPath(getOriginalVariable().getLink()).segment("summary")
+        .query("nature", "categorical", "distinct", "true").build();
+    ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder() //
+        .forResource(uri) //
         .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
           @Override
           public void onResource(Response response, SummaryStatisticsDto statisticsDto) {
@@ -59,7 +63,7 @@ public class DeriveCategoricalVariableStepPresenter
             getView()
                 .populateValues(derivationHelper.getValueMapEntries(), derivationHelper.getDestinationCategories());
           }
-        }).send();
+        }).get().send();
   }
 
   @Override
@@ -69,7 +73,7 @@ public class DeriveCategoricalVariableStepPresenter
 
   @Override
   List<DefaultWizardStepController.Builder> getWizardStepBuilders(WizardStepController.StepInHandler stepInHandler) {
-    List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<DefaultWizardStepController.Builder>();
+    List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<>();
     stepBuilders.add(getView().getMapStepController() //
         .onStepIn(stepInHandler) //
         .onValidate(new MapStepValidationHandler() {

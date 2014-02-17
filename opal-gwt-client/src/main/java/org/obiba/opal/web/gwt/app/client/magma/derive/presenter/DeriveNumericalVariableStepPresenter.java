@@ -29,6 +29,7 @@ import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.StepInHa
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -81,7 +82,7 @@ public class DeriveNumericalVariableStepPresenter
 
   @Override
   List<DefaultWizardStepController.Builder> getWizardStepBuilders(WizardStepController.StepInHandler stepInHandler) {
-    List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<DefaultWizardStepController.Builder>();
+    List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<>();
     stepBuilders.add(getView().getMethodStepBuilder() //
         .onStepIn(stepInHandler) //
         .onValidate(new MethodStepValidationHandler()));
@@ -152,7 +153,7 @@ public class DeriveNumericalVariableStepPresenter
   private final class MethodStepValidationHandler implements ValidationHandler {
     @Override
     public boolean validate() {
-      List<String> errorMessages = new ArrayList<String>();
+      List<String> errorMessages = new ArrayList<>();
       // validate that 1 radio is selected
       if(!getView().rangeSelected() && !getView().discreteSelected() && !getView().manualSelected()) {
         errorMessages.add(translations.selectDerivationMethod());
@@ -261,16 +262,14 @@ public class DeriveNumericalVariableStepPresenter
     }
 
     private void addDistinctValuesMapping() {
-      String link = getOriginalVariable().getLink() //
-          + "/summary" //
-          + "?nature=categorical" //
-          + "&distinct=true";
 
       final List<String> derivedCategories = DerivationHelper.getDestinationCategories(getDerivedVariable());
       getView().populateValues(new ArrayList<ValueMapEntry>(), derivedCategories);
 
-      ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()//
-          .forResource(link).get()//
+      String uri = UriBuilder.create().fromPath(getOriginalVariable().getLink()).segment("summary")
+          .query("nature", "categorical", "distinct", "true").build();
+      ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder() //
+          .forResource(uri) //
           .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
 
             @Override
@@ -282,7 +281,8 @@ public class DeriveNumericalVariableStepPresenter
               getView().enableFrequency(true);
               getView().populateValues(derivationHelper.getValueMapEntries(), derivedCategories);
             }
-          }).send();
+          }) //
+          .get().send();
     }
 
     private void addRangesByCountMapping() {
@@ -482,7 +482,7 @@ public class DeriveNumericalVariableStepPresenter
   private final class AddValueMapEntryHandler implements ClickHandler {
     @Override
     public void onClick(ClickEvent event) {
-      List<String> errorMessages = new ArrayList<String>();
+      List<String> errorMessages = new ArrayList<>();
       validateValueMappingValues(errorMessages);
 
       if(errorMessages.isEmpty()) {
@@ -510,7 +510,7 @@ public class DeriveNumericalVariableStepPresenter
         if(lower != null && upper != null && lower.doubleValue() > upper.doubleValue()) {
           errorMessages.add(translations.lowerLimitGreaterThanUpperLimit());
         }
-      } else if (getView().getDiscreteValue() == null) {
+      } else if(getView().getDiscreteValue() == null) {
         errorMessages.add(translations.discreteValueRequired());
       }
     }

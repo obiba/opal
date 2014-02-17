@@ -17,7 +17,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
@@ -30,35 +29,23 @@ import org.obiba.opal.web.magma.math.SummaryResource;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.support.InvalidRequestException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Component
+@Component("variableResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Transactional
-public class VariableResourceImpl implements VariableResource {
+public class VariableResourceImpl extends AbstractValueTableResource implements VariableResource {
 
   private String name;
 
-  private ValueTable valueTable;
-
   private VariableValueSource variableValueSource;
-
-  @Autowired
-  private ApplicationContext applicationContext;
 
   @Override
   public void setName(String name) {
     this.name = name;
-  }
-
-  @Override
-  public void setValueTable(ValueTable valueTable) {
-    this.valueTable = valueTable;
   }
 
   @Override
@@ -74,7 +61,7 @@ public class VariableResourceImpl implements VariableResource {
       uriBuilder.segment(pathSegments.get(i).getPath());
     }
     String tableUri = uriBuilder.build().toString();
-    Magma.LinkDto linkDto = Magma.LinkDto.newBuilder().setLink(tableUri).setRel(valueTable.getName()).build();
+    Magma.LinkDto linkDto = Magma.LinkDto.newBuilder().setLink(tableUri).setRel(getValueTable().getName()).build();
     return Dtos.asDto(linkDto, variableValueSource.getVariable()).build();
   }
 
@@ -153,8 +140,7 @@ public class VariableResourceImpl implements VariableResource {
     return variableValueSource;
   }
 
-  ValueTable getValueTable() {
-    return valueTable;
+  String getName() {
+    return name;
   }
-
 }

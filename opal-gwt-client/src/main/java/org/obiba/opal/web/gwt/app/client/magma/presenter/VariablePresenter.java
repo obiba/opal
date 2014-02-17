@@ -110,8 +110,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   private Runnable removeConfirmation;
 
-  @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
   @Inject
+  @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
   public VariablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
       ValuesTablePresenter valuesTablePresenter, SummaryTabPresenter summaryTabPresenter,
       ScriptEditorPresenter scriptEditorPresenter, Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
@@ -162,7 +162,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
       @Override
       public void onVariableRefresh(VariableRefreshEvent event) {
         if(variableUpdatePending || variable == null) return;
-        ResourceRequestBuilderFactory.<VariableDto>newBuilder().forResource(variable.getLink()).get()
+        ResourceRequestBuilderFactory.<VariableDto>newBuilder() //
+            .forResource(variable.getLink()) //
             .withCallback(new ResourceCallback<VariableDto>() {
               @Override
               public void onResource(Response response, VariableDto resource) {
@@ -170,7 +171,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
                 updateDerivedVariableDisplay();
                 variableUpdatePending = false;
               }
-            }).send();
+            }) //
+            .get().send();
       }
     });
     addRegisteredHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler());
@@ -182,11 +184,6 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
         scriptEditorPresenter.setScript(event.getCommitInfoDto().getBlob());
       }
     });
-  }
-
-  @Override
-  protected void onUnbind() {
-    super.onUnbind();
   }
 
   private void updateDisplay(String datasourceName, String tableName, String variableName) {
@@ -261,6 +258,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     String script = VariableDtos.getScript(variable);
     getView().setDerivedVariable(true, script);
     scriptEditorPresenter.setTable(table);
+    scriptEditorPresenter.setVariableName(variable.getName());
     scriptEditorPresenter.setScript(script);
     scriptEditorPresenter.setRepeatable(variable.getIsRepeatable());
     scriptEditorPresenter.setValueEntityType(variable.getValueType());
@@ -326,21 +324,26 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   private void compileScript(final VariableDto newVariable) {
     UriBuilder ub = UriBuilder.create().segment("datasource", table.getDatasourceName(), "table", table.getName())
         .query("counts", "false");
-    ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build()).get()
+    ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build()) //
         .withCallback(new ResourceCallback<TableDto>() {
           @Override
           public void onResource(Response response, TableDto resource) {
-            String script = VariableDtos.getScript(newVariable);
-            String uri = resource.getViewLink() + "/from/variable/_transient/_compile?valueType=" +
-                newVariable.getValueType() + "&repeatable=" + newVariable.getIsRepeatable();
+            String uri = UriBuilder.create().fromPath(resource.getViewLink()) //
+                .segment("variable", "_transient", "_compile") //
+                .query("name", newVariable.getName(), //
+                    "valueType", newVariable.getValueType(), //
+                    "repeatable", String.valueOf(newVariable.getIsRepeatable())) //
+                .build();
+
             ResourceRequestBuilderFactory.newBuilder().forResource(uri) //
-                .post() //
-                .withFormBody("script", script) //
+                .withFormBody("script", VariableDtos.getScript(newVariable)) //
                 .withCallback(new ScriptEvaluationCallback(newVariable), SC_BAD_REQUEST, SC_OK) //
+                .post() //
                 .send();
 
           }
-        }).send();
+        }) //
+        .get().send();
   }
 
   @Override
@@ -364,7 +367,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   @Override
   public void onAddToView() {
-    List<VariableDto> variables = new ArrayList<VariableDto>();
+    List<VariableDto> variables = new ArrayList<>();
     variables.add(variable);
     VariablesToViewPresenter variablesToViewPresenter = variablesToViewProvider.get();
     variablesToViewPresenter.initialize(table, variables);
@@ -531,11 +534,11 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
         }
       };
 
-      String uri = UriBuilders.DATASOURCE_VIEW_VARIABLE.create()
-          .build(table.getDatasourceName(), table.getName(), variable.getName());
-      ResourceRequestBuilderFactory.newBuilder().forResource(uri).delete().withCallback(SC_OK, callbackHandler)
-          .withCallback(SC_FORBIDDEN, callbackHandler).withCallback(SC_INTERNAL_SERVER_ERROR, callbackHandler)
-          .withCallback(SC_NOT_FOUND, callbackHandler).send();
+      ResourceRequestBuilderFactory.newBuilder() //
+          .forResource(UriBuilders.DATASOURCE_VIEW_VARIABLE.create()
+              .build(table.getDatasourceName(), table.getName(), variable.getName())) //
+          .withCallback(callbackHandler, SC_OK, SC_FORBIDDEN, SC_INTERNAL_SERVER_ERROR, SC_NOT_FOUND) //
+          .delete().send();
     }
 
     private void removeVariable() {
@@ -553,11 +556,11 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
         }
       };
 
-      String uri = UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
-          .build(table.getDatasourceName(), table.getName(), variable.getName());
-      ResourceRequestBuilderFactory.newBuilder().forResource(uri).delete().withCallback(SC_OK, callbackHandler)
-          .withCallback(SC_FORBIDDEN, callbackHandler).withCallback(SC_INTERNAL_SERVER_ERROR, callbackHandler)
-          .withCallback(SC_NOT_FOUND, callbackHandler).send();
+      ResourceRequestBuilderFactory.newBuilder() //
+          .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
+              .build(table.getDatasourceName(), table.getName(), variable.getName())) //
+          .withCallback(callbackHandler, SC_OK, SC_FORBIDDEN, SC_INTERNAL_SERVER_ERROR, SC_NOT_FOUND) //
+          .delete().send();
     }
 
   }
@@ -587,16 +590,15 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     @Override
     public void onResponseCode(Request request, Response response) {
       if(response.getStatusCode() == SC_OK) {
-        ResponseCodeCallback updateVariableCallbackHandler = new UpdateVariableCallbackHandler();
-
         String uri = UriBuilder.create().segment("datasource", "{}", "view", "{}", "variable", "{}")
             .query("comment", getView().getComment())
             .build(table.getDatasourceName(), table.getName(), variable.getName());
 
-        ResourceRequestBuilderFactory.newBuilder().forResource(uri).put()
-            .withResourceBody(VariableDto.stringify(newVariable))
-            .withCallback(Response.SC_OK, updateVariableCallbackHandler)
-            .withCallback(Response.SC_BAD_REQUEST, updateVariableCallbackHandler).send();
+        ResourceRequestBuilderFactory.newBuilder() //
+            .forResource(uri) //
+            .withResourceBody(VariableDto.stringify(newVariable)) //
+            .withCallback(new UpdateVariableCallbackHandler(), SC_OK, SC_BAD_REQUEST) //
+            .put().send();
       } else {
         NotificationEvent notificationEvent = new JSErrorNotificationEventBuilder()
             .build((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));

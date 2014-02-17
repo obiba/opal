@@ -47,7 +47,6 @@ import com.google.common.collect.Lists;
 import edu.umd.cs.findbugs.annotations.Nullable;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
-import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 
 @Component("variablesResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -110,21 +109,16 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
 
   @Override
   public Response addOrUpdateVariables(List<VariableDto> variables, @Nullable String comment) {
-    try {
 
-      // @TODO Check if table can be modified and respond with "IllegalTableModification"
-      // (it seems like this cannot be done with the current Magma implementation).
+    // @TODO Check if table can be modified and respond with "IllegalTableModification"
+    // (it seems like this cannot be done with the current Magma implementation).
 
-      if(getValueTable().isView()) {
-        return Response.status(BAD_REQUEST).entity(getErrorMessage(BAD_REQUEST, "CannotWriteToView")).build();
-      }
-      addOrUpdateTableVariables(variables);
-
-      return Response.ok().build();
-    } catch(Exception e) {
-      return Response.status(INTERNAL_SERVER_ERROR).entity(getErrorMessage(INTERNAL_SERVER_ERROR, e.toString()))
-          .build();
+    if(getValueTable().isView()) {
+      return Response.status(BAD_REQUEST).entity(getErrorMessage(BAD_REQUEST, "CannotWriteToView")).build();
     }
+    addOrUpdateTableVariables(variables);
+
+    return Response.ok().build();
   }
 
   void addOrUpdateTableVariables(Iterable<VariableDto> variables) {

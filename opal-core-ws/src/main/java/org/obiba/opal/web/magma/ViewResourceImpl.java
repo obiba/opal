@@ -33,7 +33,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Transactional
-public class ViewResourceImpl extends AbstractValueTableResource implements ViewResource {
+public class ViewResourceImpl extends TableResourceImpl implements ViewResource {
 
   private ViewManager viewManager;
 
@@ -107,16 +107,12 @@ public class ViewResourceImpl extends AbstractValueTableResource implements View
   }
 
   @Override
-  public LocalesResource getLocalesResource() {
-    return super.getLocalesResource();
-  }
-
-  @Override
   public VariableViewResource getVariable(String name) {
     VariableViewResource resource = applicationContext.getBean(VariableViewResource.class);
     resource.setName(name);
     resource.setValueTable(getValueTable());
     resource.setLocales(getLocales());
+    resource.setVariableValueSource(getValueTable().getVariableValueSource(name));
     return resource;
   }
 

@@ -11,6 +11,7 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 
+import org.obiba.magma.AttributeAware;
 import org.obiba.magma.Timestamped;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
@@ -87,7 +88,7 @@ public abstract class AbstractVariableSummaryCachedService< //
     log.debug("Get summary for {}", variable.getName());
 
     // don't cache transient variable summary
-    if("_transient".equals(variable.getName())) {
+    if(isTransientVariable(variable)) {
       return summaryFactory.getSummary();
     }
 
@@ -96,6 +97,11 @@ public abstract class AbstractVariableSummaryCachedService< //
     }
 
     return getCached(summaryFactory);
+  }
+
+  private boolean isTransientVariable(AttributeAware variable) {
+    return variable.hasAttribute("opal", "transient") &&
+        (boolean) variable.getAttribute("opal", "transient").getValue().getValue();
   }
 
   private void clearVariableSummaryCache(@NotNull TVariableSummaryFactory summaryFactory) {
