@@ -29,11 +29,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of {@code X509KeyManager} on {@code OpalKeyStore}. This implementation will list all available key
- * pairs in the unit keystore and select the first one that matches the requested algorithm.
+ * pairs in the system keystore and select the first one that matches the requested algorithm.
  */
-public class UnitKeyManager extends X509ExtendedKeyManager {
+public class OpalKeyManager extends X509ExtendedKeyManager {
 
-  private static final Logger log = LoggerFactory.getLogger(UnitKeyManager.class);
+  private static final Logger log = LoggerFactory.getLogger(OpalKeyManager.class);
 
   /**
    * The key alias to use first when looking up keypairs for serving HTTPs.
@@ -42,7 +42,7 @@ public class UnitKeyManager extends X509ExtendedKeyManager {
 
   private final OpalKeyStore opalKeyStore;
 
-  public UnitKeyManager(OpalKeyStore opalKeyStore) {
+  public OpalKeyManager(OpalKeyStore opalKeyStore) {
     if(opalKeyStore == null) throw new IllegalArgumentException("opalKeyStore cannot be null");
     this.opalKeyStore = opalKeyStore;
   }
@@ -76,7 +76,7 @@ public class UnitKeyManager extends X509ExtendedKeyManager {
         return alias;
       }
     }
-    log.warn("No appropriate key pair found for SSL.");
+    log.debug("No appropriate key pair found for SSL.");
     return null;
   }
 

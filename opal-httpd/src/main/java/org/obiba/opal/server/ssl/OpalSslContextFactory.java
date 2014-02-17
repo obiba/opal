@@ -41,7 +41,7 @@ public class OpalSslContextFactory implements SslContextFactory {
     OpalKeyStore opalKeystore = prepareServerKeystore();
     try {
       SSLContext ctx = SSLContext.getInstance("TLSv1");
-      ctx.init(new KeyManager[] { new UnitKeyManager(opalKeystore) }, new TrustManager[] { credentialsTrustManager },
+      ctx.init(new KeyManager[] { new OpalKeyManager(opalKeystore) }, new TrustManager[] { credentialsTrustManager },
           null);
       return ctx;
     } catch(Exception e) {
@@ -57,8 +57,8 @@ public class OpalSslContextFactory implements SslContextFactory {
    */
   private OpalKeyStore prepareServerKeystore() {
     OpalKeyStore keystore = systemKeyStoreService.getKeyStore();
-    if(!systemKeyStoreService.aliasExists(UnitKeyManager.HTTPS_ALIAS)) {
-      keystore.createOrUpdateKey(UnitKeyManager.HTTPS_ALIAS, "RSA", 2048, generateCertificateInfo());
+    if(!systemKeyStoreService.aliasExists(OpalKeyManager.HTTPS_ALIAS)) {
+      keystore.createOrUpdateKey(OpalKeyManager.HTTPS_ALIAS, "RSA", 2048, generateCertificateInfo());
       systemKeyStoreService.saveKeyStore(keystore);
     }
     return keystore;
