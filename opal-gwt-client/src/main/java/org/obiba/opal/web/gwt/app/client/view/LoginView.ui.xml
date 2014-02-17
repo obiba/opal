@@ -6,7 +6,7 @@
 
   <g:FlowPanel>
     <b:ResponsiveNavbar position="TOP" scrollspy="false">
-      <b:Brand href="#!login" ui:field="applicationName">Opal</b:Brand>
+      <b:Brand ui:field="applicationName">Opal</b:Brand>
     </b:ResponsiveNavbar>
     <g:FlowPanel addStyleNames="container">
       <b:Row addStyleNames="top-margin">
