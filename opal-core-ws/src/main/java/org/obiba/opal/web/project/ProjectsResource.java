@@ -19,15 +19,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.obiba.magma.DuplicateDatasourceNameException;
-import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.NoSuchDatasourceException;
-import org.obiba.magma.support.DatasourceParsingException;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.security.OpalPermissions;
 import org.obiba.opal.core.service.ProjectService;
-import org.obiba.opal.web.magma.ClientErrorDtos;
-import org.obiba.opal.web.magma.support.NoSuchDatasourceFactoryException;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.security.AuthorizationInterceptor;
@@ -37,8 +32,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Lists;
-
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
 @Path("/projects")
@@ -64,30 +57,12 @@ public class ProjectsResource {
 
   @POST
   public Response createProject(@Context UriInfo uriInfo, Projects.ProjectFactoryDto projectFactoryDto) {
-    Response.ResponseBuilder response;
-    try {
-
-      Project project = Dtos.fromDto(projectFactoryDto);
-      projectService.save(project);
-      URI projectUri = uriInfo.getBaseUriBuilder().path("project").path(project.getName()).build();
-      //Projects.ProjectDto projectDto = Dtos.asDto(project, projectService.getProjectDirectoryPath(project));
-      response = Response.created(projectUri).header(AuthorizationInterceptor.ALT_PERMISSIONS,
-          new OpalPermissions(projectUri, Opal.AclAction.PROJECT_ALL));
-
-    } catch(NoSuchDatasourceFactoryException e) {
-      response = Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "UnidentifiedDatasourceFactory").build());
-    } catch(DuplicateDatasourceNameException e) {
-      response = Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DuplicateDatasourceName").build());
-    } catch(DatasourceParsingException e) {
-      response = Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", e));
-    } catch(MagmaRuntimeException e) {
-      response = Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", e));
-    }
-    return response.build();
+    Project project = Dtos.fromDto(projectFactoryDto);
+    projectService.save(project);
+    URI projectUri = uriInfo.getBaseUriBuilder().path("project").path(project.getName()).build();
+    return Response.created(projectUri)
+        .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(projectUri, Opal.AclAction.PROJECT_ALL))
+        .build();
   }
 
 }

@@ -21,9 +21,10 @@ public class UnsatisfiedPreconditionException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
 
-  private final ResponseBuilder builder;
+  private final transient ResponseBuilder builder;
 
   public UnsatisfiedPreconditionException(@NotNull ResponseBuilder builder) {
+    //noinspection ConstantConditions
     Preconditions.checkArgument(builder != null, "builder cannot be null");
     this.builder = builder;
   }

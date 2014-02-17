@@ -23,7 +23,7 @@ public class NoSuchVariableExceptionMapper implements ExceptionMapper<NoSuchVari
 
   @Override
   public Response toResponse(NoSuchVariableException exception) {
-    return Response.status(Status.NOT_FOUND).build();
+    return Response.status(Status.NOT_FOUND).entity(exception.getMessage()).build();
   }
 
 }

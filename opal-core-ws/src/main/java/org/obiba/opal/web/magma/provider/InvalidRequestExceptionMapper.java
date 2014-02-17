@@ -21,9 +21,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Provider
 public class InvalidRequestExceptionMapper implements ExceptionMapper<InvalidRequestException> {
-  //
-  // ExceptionMapper Methods
-  //
 
   @Override
   public Response toResponse(InvalidRequestException exception) {

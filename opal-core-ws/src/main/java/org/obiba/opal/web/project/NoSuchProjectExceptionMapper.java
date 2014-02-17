@@ -22,6 +22,6 @@ public class NoSuchProjectExceptionMapper implements ExceptionMapper<NoSuchProje
 
   @Override
   public Response toResponse(NoSuchProjectException exception) {
-    return Response.status(Response.Status.NOT_FOUND).build();
+    return Response.status(Response.Status.NOT_FOUND).entity(exception.getMessage()).build();
   }
 }

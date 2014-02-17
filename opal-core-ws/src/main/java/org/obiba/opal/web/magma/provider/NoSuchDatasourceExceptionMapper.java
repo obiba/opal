@@ -23,7 +23,7 @@ public class NoSuchDatasourceExceptionMapper implements ExceptionMapper<NoSuchDa
 
   @Override
   public Response toResponse(NoSuchDatasourceException exception) {
-    return Response.status(Status.NOT_FOUND).build();
+    return Response.status(Status.NOT_FOUND).entity(exception.getMessage()).build();
   }
 
 }

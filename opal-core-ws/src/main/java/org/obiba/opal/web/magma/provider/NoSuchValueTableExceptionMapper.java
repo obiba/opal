@@ -23,7 +23,7 @@ public class NoSuchValueTableExceptionMapper implements ExceptionMapper<NoSuchVa
 
   @Override
   public Response toResponse(NoSuchValueTableException exception) {
-    return Response.status(Status.NOT_FOUND).build();
+    return Response.status(Status.NOT_FOUND).entity(exception.getMessage()).build();
   }
 
 }

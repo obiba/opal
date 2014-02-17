@@ -23,7 +23,7 @@ public class NoIdentifiersMappingExceptionMapper implements ExceptionMapper<NoSu
 
   @Override
   public Response toResponse(NoSuchIdentifiersMappingException exception) {
-    return Response.status(Status.NOT_FOUND).build();
+    return Response.status(Status.NOT_FOUND).entity(exception.getMessage()).build();
   }
 
 }

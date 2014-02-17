@@ -23,7 +23,7 @@ public class NoSuchValueSetExceptionMapper implements ExceptionMapper<NoSuchValu
 
   @Override
   public Response toResponse(NoSuchValueSetException exception) {
-    return Response.status(Status.NOT_FOUND).build();
+    return Response.status(Status.NOT_FOUND).entity(exception.getMessage()).build();
   }
 
 }
