@@ -120,7 +120,6 @@ public class UpgradeCommand {
 
   private void prepareConfigFiles() {
     prepareOpalConfigFile();
-    prepareDistConfigFile("Rserv.conf");
     prepareDistConfigFile("logback.xml");
   }
 
