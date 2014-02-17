@@ -9,9 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.presenter;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 
 import com.google.gwt.core.client.GWT;
 import com.google.inject.Inject;
@@ -92,12 +92,8 @@ public class ConfirmationPresenter extends PresenterWidget<ConfirmationPresenter
     @Override
     public void onConfirmationRequired(ConfirmationRequiredEvent event) {
       confirmationRequiredSource = event.getSource();
-      getView().setConfirmationTitle(event.getTitleKey() == null
-          ? event.getTitle()
-          : translations.confirmationTitleMap().get(event.getTitleKey()));
-      getView().setConfirmationMessage(event.getMessageKey() == null
-          ? event.getMessage()
-          : translations.confirmationMessageMap().get(event.getMessageKey()));
+      getView().setConfirmationTitle(event.getTitle());
+      getView().setConfirmationMessage(event.getMessage());
       onReveal();
     }
   }

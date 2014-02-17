@@ -4,11 +4,12 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShi
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageRemovedEvent;
-import org.obiba.opal.web.gwt.app.client.permissions.support.AclRequest;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.permissions.support.AclRequest;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsPackageRColumn;
@@ -48,11 +49,15 @@ public class DataShieldPackageAdministrationPresenter
 
   private final ModalProvider<DataShieldPackagePresenter> dataShieldPackageModalProvider;
 
+  private TranslationMessages translationMessages;
+
   @Inject
   public DataShieldPackageAdministrationPresenter(Display display, EventBus eventBus,
       ModalProvider<DataShieldPackageCreatePresenter> dataShieldPackageCreateModalProvider,
-      ModalProvider<DataShieldPackagePresenter> dataShieldPackageModalProvider) {
+      ModalProvider<DataShieldPackagePresenter> dataShieldPackageModalProvider,
+      TranslationMessages translationMessages) {
     super(eventBus, display);
+    this.translationMessages = translationMessages;
     this.dataShieldPackageCreateModalProvider = dataShieldPackageCreateModalProvider.setContainer(this);
     this.dataShieldPackageModalProvider = dataShieldPackageModalProvider.setContainer(this);
   }
@@ -187,8 +192,8 @@ public class DataShieldPackageAdministrationPresenter
         public void authorized() {
           publishMethodsConfirmation = new PublishMethodsRunnable(dto);
           getEventBus().fireEvent(ConfirmationRequiredEvent
-              .createWithKeys(publishMethodsConfirmation, "publishDataShieldMethods",
-                  "confirmPublishDataShieldMethods"));
+              .createWithMessages(publishMethodsConfirmation, translationMessages.publishDataShieldMethods(),
+                  translationMessages.confirmPublishDataShieldMethods()));
         }
       });
 
@@ -198,7 +203,8 @@ public class DataShieldPackageAdministrationPresenter
         public void authorized() {
           removePackageConfirmation = new RemovePackageRunnable(dto);
           getEventBus().fireEvent(ConfirmationRequiredEvent
-              .createWithKeys(removePackageConfirmation, "deleteDataShieldPackage", "confirmDeleteDataShieldPackage"));
+              .createWithMessages(removePackageConfirmation, translationMessages.deleteDataShieldPackage(),
+                  translationMessages.confirmDeleteDataShieldPackage()));
         }
       });
     }

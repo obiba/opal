@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -121,6 +122,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final Translations translations;
 
+  private TranslationMessages translationMessages;
+
   private Runnable removeConfirmation;
 
   private Runnable deleteVariablesConfirmation;
@@ -144,12 +147,14 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider,
       ModalProvider<DataExportPresenter> dataExportModalProvider,
       ModalProvider<DataCopyPresenter> dataCopyModalProvider,
-      ModalProvider<VariableAttributeModalPresenter> attributeModalProvider, Translations translations) {
+      ModalProvider<VariableAttributeModalPresenter> attributeModalProvider, Translations translations,
+      TranslationMessages translationMessages) {
     super(eventBus, display);
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.translations = translations;
+    this.translationMessages = translationMessages;
     this.indexPresenter = indexPresenter.setContainer(this);
     this.variablesToViewProvider = variablesToViewProvider.setContainer(this);
     this.variablePropertiesModalProvider = variablePropertiesModalProvider.setContainer(this);
@@ -469,10 +474,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       deleteVariablesConfirmation = new RemoveVariablesRunnable(variableNames);
 
       fireEvent(ConfirmationRequiredEvent
-          .createWithMessages(deleteVariablesConfirmation, translations.confirmationTitleMap().get("deleteVariables"),
-              TranslationsUtils.replaceArguments(translations.confirmationMessageMap()
-                  .get(variableNames.length() > 1 ? "confirmDeleteVariables" : "confirmDeleteVariable"),
-                  String.valueOf(variableNames.length()))));
+          .createWithMessages(deleteVariablesConfirmation, translationMessages.deleteVariables(),
+              translationMessages.confirmDeleteVariables(variableNames.length())));
     }
   }
 
@@ -501,8 +504,10 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
     ConfirmationRequiredEvent event;
     event = tableIsView()
-        ? ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "removeView", "confirmRemoveView")
-        : ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "removeTable", "confirmRemoveTable");
+        ? ConfirmationRequiredEvent.createWithMessages(removeConfirmation, translationMessages.removeView(),
+        translationMessages.confirmRemoveView())
+        : ConfirmationRequiredEvent.createWithMessages(removeConfirmation, translationMessages.removeTable(),
+            translationMessages.confirmRemoveTable());
 
     fireEvent(event);
   }

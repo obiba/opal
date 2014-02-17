@@ -11,13 +11,14 @@ package org.obiba.opal.web.gwt.app.client.report.presenter;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.permissions.support.AclRequest;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.support.AclRequest;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
@@ -68,11 +69,15 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
   private ReportTemplateDto reportTemplate;
 
+  private TranslationMessages translationMessages;
+
   @Inject
   public ReportTemplateDetailsPresenter(Display display, EventBus eventBus,
       Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
-      ModalProvider<ReportTemplateUpdateModalPresenter> reportTemplateUpdateModalPresenterProvider) {
+      ModalProvider<ReportTemplateUpdateModalPresenter> reportTemplateUpdateModalPresenterProvider,
+      TranslationMessages translationMessages) {
     super(eventBus, display);
+    this.translationMessages = translationMessages;
     this.reportTemplateUpdateModalPresenterProvider = reportTemplateUpdateModalPresenterProvider.setContainer(this);
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     getView().setUiHandlers(this);
@@ -144,7 +149,8 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
       }
     };
     fireEvent(ConfirmationRequiredEvent
-        .createWithKeys(actionRequiringConfirmation, "removeReportTemplate", "confirmDeleteReportTemplate"));
+        .createWithMessages(actionRequiringConfirmation, translationMessages.removeReportTemplate(),
+            translationMessages.confirmDeleteReportTemplate()));
   }
 
   //
@@ -272,8 +278,9 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
                   .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
             }
           };
-          fireEvent(
-              ConfirmationRequiredEvent.createWithKeys(actionRequiringConfirmation, "deleteFile", "confirmDeleteFile"));
+          fireEvent(ConfirmationRequiredEvent
+              .createWithMessages(actionRequiringConfirmation, translationMessages.deleteFile(),
+                  translationMessages.confirmDeleteFile()));
         }
       });
     }

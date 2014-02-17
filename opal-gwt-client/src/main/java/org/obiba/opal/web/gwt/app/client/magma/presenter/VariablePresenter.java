@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.derive.helper.VariableDuplicationHelper;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveVariablePresenter;
@@ -83,6 +84,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   private final ScriptEditorPresenter scriptEditorPresenter;
 
+  private TranslationMessages translationMessages;
+
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
   private final ModalProvider<VariablesToViewPresenter> variablesToViewProvider;
@@ -116,7 +119,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
       ModalProvider<CategoriesEditorModalPresenter> categoriesEditorModalProvider,
       ModalProvider<VariablePropertiesModalPresenter> propertiesEditorModalProvider,
-      ModalProvider<VariableAttributeModalPresenter> attributeModalProvider) {
+      ModalProvider<VariableAttributeModalPresenter> attributeModalProvider, TranslationMessages translationMessages) {
     super(eventBus, display);
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
@@ -124,6 +127,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.variableVcsCommitHistoryPresenter = variableVcsCommitHistoryPresenter;
     this.scriptEditorPresenter = scriptEditorPresenter;
+    this.translationMessages = translationMessages;
     this.variablesToViewProvider = variablesToViewProvider.setContainer(this);
     this.categoriesEditorModalProvider = categoriesEditorModalProvider.setContainer(this);
     this.propertiesEditorModalProvider = propertiesEditorModalProvider.setContainer(this);
@@ -350,9 +354,10 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
     ConfirmationRequiredEvent event;
     event = table.hasViewLink()
-        ? ConfirmationRequiredEvent
-        .createWithKeys(removeConfirmation, "removeDerivedVariable", "confirmRemoveDerivedVariable")
-        : ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "removeVariable", "confirmRemoveVariable");
+        ? ConfirmationRequiredEvent.createWithMessages(removeConfirmation, translationMessages.removeDerivedVariable(),
+        translationMessages.confirmRemoveDerivedVariable())
+        : ConfirmationRequiredEvent.createWithMessages(removeConfirmation, translationMessages.removeVariable(),
+            translationMessages.confirmRemoveVariable());
 
     fireEvent(event);
   }

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -61,6 +62,8 @@ import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_
  *
  */
 public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> implements VariablePresenter.Display {
+
+  private TranslationMessages translationMessages;
 
   interface Binder extends UiBinder<Widget, VariableView> {}
 
@@ -503,7 +506,8 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
       Collections.sort(namespaces);
       for(String namespace : namespaces) {
-        NamespacedAttributesTable child = new NamespacedAttributesTable(attributesArray, namespace);
+        NamespacedAttributesTable child = new NamespacedAttributesTable(attributesArray, namespace,
+            translationMessages);
         child.setUiHandlers(getUiHandlers());
         attributesTables.add(child);
       }

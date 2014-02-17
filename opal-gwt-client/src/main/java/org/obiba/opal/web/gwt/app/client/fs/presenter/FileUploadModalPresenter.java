@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileUploadedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
@@ -36,12 +37,15 @@ public class FileUploadModalPresenter extends ModalPresenterWidget<FileUploadMod
 
   private final RequestUrlBuilder urlBuilder;
 
+  private TranslationMessages translationMessages;
+
   @Inject
   public FileUploadModalPresenter(Display display, EventBus eventBus, RequestUrlBuilder urlBuilder,
-      Translations translations) {
+      Translations translations, TranslationMessages translationMessages) {
     super(eventBus, display);
     this.translations = translations;
     this.urlBuilder = urlBuilder;
+    this.translationMessages = translationMessages;
     getView().setUiHandlers(this);
   }
 
@@ -70,7 +74,8 @@ public class FileUploadModalPresenter extends ModalPresenterWidget<FileUploadMod
       fireEvent(NotificationEvent.newBuilder().error(translations.fileMustBeSelected()).build());
     } else if(fileExist(fileName)) {
       fireEvent(ConfirmationRequiredEvent
-          .createWithKeys(actionRequiringConfirmation, "replaceExistingFile", "confirmReplaceExistingFile"));
+          .createWithMessages(actionRequiringConfirmation, translationMessages.replaceExistingFile(),
+              translationMessages.confirmReplaceExistingFile()));
     } else {
       submitFile();
     }

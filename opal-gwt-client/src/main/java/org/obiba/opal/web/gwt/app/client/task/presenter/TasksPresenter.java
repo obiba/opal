@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.task.presenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
@@ -49,10 +50,13 @@ public class TasksPresenter extends PresenterWidget<TasksPresenter.Display> {
 
   private Runnable actionRequiringConfirmation;
 
+  private TranslationMessages translationMessages;
+
   @Inject
-  public TasksPresenter(Display display, EventBus eventBus,
-      ModalProvider<TaskDetailsPresenter> jobDetailsModalProvider) {
+  public TasksPresenter(Display display, EventBus eventBus, ModalProvider<TaskDetailsPresenter> jobDetailsModalProvider,
+      TranslationMessages translationMessages) {
     super(eventBus, display);
+    this.translationMessages = translationMessages;
     this.jobDetailsModalProvider = jobDetailsModalProvider.setContainer(this);
     getView().getActionsColumn().setActionHandler(new ActionHandler<CommandStateDto>() {
       @Override
@@ -91,10 +95,10 @@ public class TasksPresenter extends PresenterWidget<TasksPresenter.Display> {
 
   private void updateTable() {
     UriBuilder uriBuilder = UriBuilder.create();
-    if (project != null && !project.isEmpty()) {
-      uriBuilder.segment("project", project,"commands");
+    if(project != null && !project.isEmpty()) {
+      uriBuilder.segment("project", project, "commands");
     } else {
-      uriBuilder.segment("shell","commands");
+      uriBuilder.segment("shell", "commands");
     }
     ResourceRequestBuilderFactory.<JsArray<CommandStateDto>>newBuilder().forResource(uriBuilder.build()).get()
         .withCallback(new ResourceCallback<JsArray<CommandStateDto>>() {
@@ -156,8 +160,9 @@ public class TasksPresenter extends PresenterWidget<TasksPresenter.Display> {
       }
     };
 
-    getEventBus().fireEvent(
-        ConfirmationRequiredEvent.createWithKeys(actionRequiringConfirmation, "cancelJob", "confirmCancelJob"));
+    getEventBus().fireEvent(ConfirmationRequiredEvent
+        .createWithMessages(actionRequiringConfirmation, translationMessages.cancelJob(),
+            translationMessages.confirmCancelJob()));
   }
 
   private void deleteCompletedJobs() {
@@ -177,8 +182,9 @@ public class TasksPresenter extends PresenterWidget<TasksPresenter.Display> {
       }
     };
 
-    getEventBus().fireEvent(
-        ConfirmationRequiredEvent.createWithKeys(actionRequiringConfirmation, "clearJobsList", "confirmClearJobsList"));
+    getEventBus().fireEvent(ConfirmationRequiredEvent
+        .createWithMessages(actionRequiringConfirmation, translationMessages.clearJobsList(),
+            translationMessages.confirmClearJobsList()));
   }
 
   public void showProject(String project) {

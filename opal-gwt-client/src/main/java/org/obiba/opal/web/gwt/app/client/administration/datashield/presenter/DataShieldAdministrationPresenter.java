@@ -3,11 +3,12 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageRemovedEvent;
-import org.obiba.opal.web.gwt.app.client.permissions.support.AclRequest;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.permissions.support.AclRequest;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
@@ -45,10 +46,13 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
 
   private final ModalProvider<DataShieldMethodPresenter> datashieldModalProvider;
 
+  private TranslationMessages translationMessages;
+
   @Inject
   public DataShieldAdministrationPresenter(Display display, EventBus eventBus,
-      ModalProvider<DataShieldMethodPresenter> datashieldModalProvider) {
+      ModalProvider<DataShieldMethodPresenter> datashieldModalProvider, TranslationMessages translationMessages) {
     super(eventBus, display);
+    this.translationMessages = translationMessages;
     this.datashieldModalProvider = datashieldModalProvider.setContainer(this);
   }
 
@@ -191,12 +195,12 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
           };
           if(DataShieldConfigPresenter.DataShieldEnvironment.ASSIGN.equals(env)) {
             getEventBus().fireEvent(ConfirmationRequiredEvent
-                .createWithKeys(removeMethodConfirmation, "deleteDataShieldAssignMethod",
-                    "confirmDeleteDataShieldAssignMethod"));
+                .createWithMessages(removeMethodConfirmation, translationMessages.deleteDataShieldAssignMethod(),
+                    translationMessages.confirmDeleteDataShieldAssignMethod()));
           } else {
             getEventBus().fireEvent(ConfirmationRequiredEvent
-                .createWithKeys(removeMethodConfirmation, "deleteDataShieldAggregateMethod",
-                    "confirmDeleteDataShieldAggregateMethod"));
+                .createWithMessages(removeMethodConfirmation, translationMessages.deleteDataShieldAggregateMethod(),
+                    translationMessages.confirmDeleteDataShieldAggregateMethod()));
           }
         }
       });

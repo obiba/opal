@@ -384,13 +384,8 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     }
 
     @Override
-    public String getItemNamePlural() {
-      return translations.tablesLabel().toLowerCase();
-    }
-
-    @Override
-    public String getItemNameSingular() {
-      return translations.tableLabel().toLowerCase();
+    public String getItemName(int nb) {
+      return translationMessages.tablesLabel(nb).toLowerCase();
     }
 
     @Override

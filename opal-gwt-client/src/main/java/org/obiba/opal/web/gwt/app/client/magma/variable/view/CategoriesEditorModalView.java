@@ -15,6 +15,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CategoriesEditorModalUiHandlers;
@@ -72,6 +73,8 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
   private final Translations translations;
 
+  private TranslationMessages translationMessages;
+
   interface Binder extends UiBinder<Widget, CategoriesEditorModalView> {}
 
   private final ListDataProvider<CategoryDto> dataProvider = new ListDataProvider<CategoryDto>();
@@ -124,9 +127,11 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   IconAnchor moveDownLink;
 
   @Inject
-  public CategoriesEditorModalView(EventBus eventBus, Binder uiBinder, Translations translations) {
+  public CategoriesEditorModalView(EventBus eventBus, Binder uiBinder, Translations translations,
+      TranslationMessages translationMessages) {
     super(eventBus);
     this.translations = translations;
+    this.translationMessages = translationMessages;
     initWidget(uiBinder.createAndBindUi(this));
     dialog.setTitle(translations.editCategories());
     dialog.setResizable(true);
@@ -398,13 +403,8 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     }
 
     @Override
-    public String getItemNamePlural() {
-      return translations.categoriesLabel().toLowerCase();
-    }
-
-    @Override
-    public String getItemNameSingular() {
-      return translations.categoryLabel().toLowerCase();
+    public String getItemName(int nb) {
+      return translationMessages.categoriesLabel(nb).toLowerCase();
     }
 
     @Override

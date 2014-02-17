@@ -28,10 +28,6 @@ public class ConfirmationRequiredEvent extends GwtEvent<ConfirmationRequiredEven
 
   private final Object source;
 
-  private final String titleKey;
-
-  private final String messageKey;
-
   private final String title;
 
   private final String message;
@@ -40,10 +36,8 @@ public class ConfirmationRequiredEvent extends GwtEvent<ConfirmationRequiredEven
   // Constructors
   //
 
-  private ConfirmationRequiredEvent(Object source, String titleKey, String messageKey, String title, String message) {
+  private ConfirmationRequiredEvent(Object source, String title, String message) {
     this.source = source;
-    this.titleKey = titleKey;
-    this.messageKey = messageKey;
     this.title = title;
     this.message = message;
   }
@@ -75,14 +69,6 @@ public class ConfirmationRequiredEvent extends GwtEvent<ConfirmationRequiredEven
     return source;
   }
 
-  public String getTitleKey() {
-    return titleKey;
-  }
-
-  public String getMessageKey() {
-    return messageKey;
-  }
-
   public String getTitle() {
     return title;
   }
@@ -95,22 +81,11 @@ public class ConfirmationRequiredEvent extends GwtEvent<ConfirmationRequiredEven
    * Creates a {@link ConfirmationRequiredEvent}.
    *
    * @param source the source of the event
-   * @param titleKey the unlocalized confirmation title
-   * @param messageKey the unlocalized confirmation message
-   */
-  public static ConfirmationRequiredEvent createWithKeys(Object source, String titleKey, String messageKey) {
-    return new ConfirmationRequiredEvent(source, titleKey, messageKey, null, null);
-  }
-
-  /**
-   * Creates a {@link ConfirmationRequiredEvent}.
-   *
-   * @param source the source of the event
    * @param title the localized confirmation title
    * @param message the localized confirmation message
    */
   public static ConfirmationRequiredEvent createWithMessages(Object source, String title, String message) {
-    return new ConfirmationRequiredEvent(source, null, null, title, message);
+    return new ConfirmationRequiredEvent(source, title, message);
   }
 
   //

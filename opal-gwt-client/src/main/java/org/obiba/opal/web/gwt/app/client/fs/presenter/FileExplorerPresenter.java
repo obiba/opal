@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FilesCheckedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FilesDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -52,6 +53,8 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
 
   private final FolderDetailsPresenter folderDetailsPresenter;
 
+  private TranslationMessages translationMessages;
+
   private final ModalProvider<FileUploadModalPresenter> fileUploadModalProvider;
 
   private final ModalProvider<CreateFolderModalPresenter> createFolderModalProvider;
@@ -69,11 +72,12 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
   public FileExplorerPresenter(Display display, EventBus eventBus, FilePathPresenter filePathPresenter,
       FilePlacesPresenter filePlacesPresenter, FolderDetailsPresenter folderDetailsPresenter,
       ModalProvider<FileUploadModalPresenter> fileUploadModalProvider,
-      ModalProvider<CreateFolderModalPresenter> createFolderModalProvider) {
+      ModalProvider<CreateFolderModalPresenter> createFolderModalProvider, TranslationMessages translationMessages) {
     super(eventBus, display);
     this.filePathPresenter = filePathPresenter;
     this.filePlacesPresenter = filePlacesPresenter;
     this.folderDetailsPresenter = folderDetailsPresenter;
+    this.translationMessages = translationMessages;
     this.fileUploadModalProvider = fileUploadModalProvider.setContainer(this);
     this.createFolderModalProvider = createFolderModalProvider.setContainer(this);
     getView().setUiHandlers(this);
@@ -317,8 +321,9 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
       }
     };
 
-    getEventBus().fireEvent(
-        ConfirmationRequiredEvent.createWithKeys(actionRequiringConfirmation, "deleteFile", "confirmDeleteFile"));
+    getEventBus().fireEvent(ConfirmationRequiredEvent
+        .createWithMessages(actionRequiringConfirmation, translationMessages.deleteFile(),
+            translationMessages.confirmDeleteFile()));
   }
 
   @Override

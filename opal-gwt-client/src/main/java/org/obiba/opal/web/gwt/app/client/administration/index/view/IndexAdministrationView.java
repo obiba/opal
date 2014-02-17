@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdministrationUiHandlers;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
@@ -63,6 +64,8 @@ import static org.obiba.opal.web.model.client.opal.ScheduleType.WEEKLY;
 
 public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrationUiHandlers>
     implements IndexAdministrationPresenter.Display {
+
+  private TranslationMessages translationMessages;
 
   interface Binder extends UiBinder<Widget, IndexAdministrationView> {}
 
@@ -286,13 +289,8 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     }
 
     @Override
-    public String getItemNamePlural() {
-      return translations.indicesLabel().toLowerCase();
-    }
-
-    @Override
-    public String getItemNameSingular() {
-      return translations.indiceLabel().toLowerCase();
+    public String getItemName(int nb) {
+      return translationMessages.indicesLabel(nb).toLowerCase();
     }
 
     @Override

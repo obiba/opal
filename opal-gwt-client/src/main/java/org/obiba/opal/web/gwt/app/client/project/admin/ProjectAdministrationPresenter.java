@@ -13,6 +13,7 @@ package org.obiba.opal.web.gwt.app.client.project.admin;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
@@ -61,12 +62,15 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
 
   private Runnable removeConfirmation;
 
+  private TranslationMessages translationMessages;
+
   @Inject
   public ProjectAdministrationPresenter(EventBus eventBus, Display view, PlaceManager placeManager,
       ModalProvider<ProjectPropertiesModalPresenter> projectPropertiesModalProvider,
       Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
-      Provider<ProjectKeyStorePresenter> projectDataExchangeProvider) {
+      Provider<ProjectKeyStorePresenter> projectDataExchangeProvider, TranslationMessages translationMessages) {
     super(eventBus, view);
+    this.translationMessages = translationMessages;
     getView().setUiHandlers(this);
     this.placeManager = placeManager;
     this.projectPropertiesModalProvider = projectPropertiesModalProvider.setContainer(this);
@@ -122,7 +126,8 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
   @Override
   public void onDelete() {
     removeConfirmation = new RemoveRunnable(project);
-    fireEvent(ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "removeProject", "confirmRemoveProject"));
+    fireEvent(ConfirmationRequiredEvent.createWithMessages(removeConfirmation, translationMessages.removeProject(),
+        translationMessages.confirmRemoveProject()));
   }
 
   private class RemoveConfirmationEventHandler implements ConfirmationEvent.Handler {

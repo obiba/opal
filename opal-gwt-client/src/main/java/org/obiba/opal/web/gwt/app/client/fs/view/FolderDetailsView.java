@@ -281,12 +281,7 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
     }
 
     @Override
-    public String getItemNamePlural() {
-      return "";
-    }
-
-    @Override
-    public String getItemNameSingular() {
+    public String getItemName(int nb) {
       return "";
     }
 

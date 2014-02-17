@@ -705,13 +705,8 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     }
 
     @Override
-    public String getItemNamePlural() {
-      return translations.variablesLabel().toLowerCase();
-    }
-
-    @Override
-    public String getItemNameSingular() {
-      return translations.variableLabel().toLowerCase();
+    public String getItemName(int nb) {
+      return translationMessages.variablesLabel(nb).toLowerCase();
     }
 
     @Override
