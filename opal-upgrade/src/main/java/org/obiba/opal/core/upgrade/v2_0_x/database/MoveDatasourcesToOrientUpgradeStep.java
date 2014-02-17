@@ -126,7 +126,7 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
           .save(null, Project.Builder.create().name("opal-data").title("opal-data").database("opal-data").build());
 
       Database opalKey = Database.Builder.create() //
-          .name("_identifiers") //
+          .name("identifiers") //
           .sqlSettings(SqlSettings.Builder.create() //
               .url(prop.getProperty(KEY_URL)) //
               .driverClass(prop.getProperty(KEY_DRIVER)) //
