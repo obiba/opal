@@ -75,7 +75,7 @@ public final class DatabaseListColumns {
     }
   };
 
-  public final ActionsColumn<DatabaseDto> actions = new ActionsColumn<DatabaseDto>(new ActionsProvider<DatabaseDto>() {
+  public ActionsColumn<DatabaseDto> actions = new ActionsColumn<DatabaseDto>(new ActionsProvider<DatabaseDto>() {
 
     @Override
     public String[] allActions() {

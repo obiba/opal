@@ -19,12 +19,10 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
-import org.obiba.opal.web.model.client.database.MongoDbSettingsDto;
-import org.obiba.opal.web.model.client.database.SqlSettingsDto;
 
 import com.github.gwtbootstrap.client.ui.DropdownButton;
-import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -36,6 +34,10 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+
+import static org.obiba.opal.web.gwt.app.client.administration.database.list.DatabaseListColumns.TEST_ACTION;
+import static org.obiba.opal.web.gwt.app.client.administration.database.list.DatabaseListColumns.UNREGISTER_ACTION;
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 
 public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatabaseUiHandlers>
     implements IdentifiersDatabasePresenter.Display {
@@ -49,19 +51,13 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
   Table<DatabaseDto> table;
 
   @UiField
-  IconAnchor edit;
-
-//  @UiField
-//  Button deleteDatabase;
-
-  @UiField
   DropdownButton registerIdentifersDB;
 
   private final Translations translations;
 
   private final DatabaseListColumns columns;
 
-  private ListDataProvider<DatabaseDto> dataProvider = new ListDataProvider<DatabaseDto>();
+  private final ListDataProvider<DatabaseDto> dataProvider = new ListDataProvider<DatabaseDto>();
 
   @Inject
   public IdentifiersDatabaseView(Binder uiBinder, Translations translations) {
@@ -72,7 +68,6 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
     columns = new DatabaseListColumns(translations);
     initTable();
 
-    edit.setTitle(translations.editLabel());
     registerIdentifersDB.setText(translations.register());
     databasePanel.setVisible(true);
   }
@@ -107,12 +102,16 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
     columns.actions.setActionHandler(new ActionHandler<DatabaseDto>() {
       @Override
       public void doAction(DatabaseDto object, String actionName) {
-        if(actionName.equals(DatabaseListColumns.TEST_ACTION)) {
-          getUiHandlers().testConnection();
-        } else if(actionName.equals(DatabaseListColumns.UNREGISTER_ACTION)) {
-          getUiHandlers().deleteDatabase();
-        } else if(actionName.equals(ActionsColumn.EDIT_ACTION)) {
-          getUiHandlers().edit();
+        switch(actionName) {
+          case TEST_ACTION:
+            getUiHandlers().testConnection();
+            break;
+          case UNREGISTER_ACTION:
+            getUiHandlers().deleteDatabase();
+            break;
+          case EDIT_ACTION:
+            getUiHandlers().edit();
+            break;
         }
       }
     });
@@ -128,50 +127,35 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
     getUiHandlers().createMongo();
   }
 
-  @UiHandler("edit")
-  void edit(ClickEvent event) {
-    getUiHandlers().edit();
-  }
-
   @Override
   public void setDatabase(@Nullable DatabaseDto database) {
-//    properties.clearProperties();
     List<DatabaseDto> list = new ArrayList<DatabaseDto>();
     if(database != null) list.add(database);
     dataProvider.setList(list);
-
-    boolean hasDatabase = database != null;
-
-    edit.setVisible(hasDatabase);
-    if(hasDatabase) {
-      showSqlProperties(database.getSqlSettings());
-      showMongoProperties(database.getMongoDbSettings());
-    }
+    registerIdentifersDB.setVisible(list.isEmpty());
   }
 
   @Override
-  public void enableEditionDeletion(boolean value) {
-    edit.setVisible(value);
-//    deleteDatabase.setVisible(value);
-  }
+  public void enableEditionDeletion(final boolean value) {
+    // Expose ActionsProvider so we could inject a new one when the value of enableEditionDeletion changes...
+    columns.actions = new ActionsColumn<DatabaseDto>(new ActionsProvider<DatabaseDto>() {
+      @Override
+      public String[] allActions() {
+        return new String[] { TEST_ACTION, EDIT_ACTION, UNREGISTER_ACTION };
+      }
 
-  private void showSqlProperties(@Nullable SqlSettingsDto sqlDatabase) {
-    if(sqlDatabase == null) return;
-//    properties.addProperty(translations.typeLabel(), translations.sqlLabel());
-//    properties.addProperty(translations.sqlSchemaLabel(),
-//        AbstractDatabaseModalPresenter.SqlSchema.valueOf(sqlDatabase.getSqlSchema().getName()).getLabel());
-//    properties.addProperty(translations.urlLabel(), sqlDatabase.getUrl());
-//    properties.addProperty(translations.driverLabel(), sqlDatabase.getDriverClass());
-//    properties.addProperty(translations.usernameLabel(), sqlDatabase.getUsername());
-//    properties.addProperty(translations.propertiesLabel(), sqlDatabase.getProperties());
-  }
+      @Override
+      public String[] getActions(DatabaseDto dto) {
+        if(value) {
+          return dto.getHasEntities() ? new String[] { EDIT_ACTION, TEST_ACTION } : allActions();
+        }
+        return dto.getHasDatasource() ? new String[] { EDIT_ACTION, TEST_ACTION } : allActions();
+      }
+    });
 
-  private void showMongoProperties(@Nullable MongoDbSettingsDto mongoDatabase) {
-    if(mongoDatabase == null) return;
-//    properties.addProperty(translations.typeLabel(), translations.mongoDbLabel());
-//    properties.addProperty(translations.urlLabel(), mongoDatabase.getUrl());
-//    properties.addProperty(translations.usernameLabel(), mongoDatabase.getUsername());
-//    properties.addProperty(translations.propertiesLabel(), mongoDatabase.getProperties());
+    table.removeColumn(6);
+    table.addColumn(columns.actions, translations.actionsLabel());
+    registerActionsHandlers();
   }
 
 }
