@@ -34,11 +34,6 @@
       <b:CheckBox ui:field="defaultStorage" b:id="defaultStorage">
         <ui:msg description="Default storage label">Project default storage</ui:msg>
       </b:CheckBox>
-      <b:HelpBlock>
-        <ui:msg description="Default storage help label">
-          If checked, this database will be used for new project's data storage
-        </ui:msg>
-      </b:HelpBlock>
     </b:ControlGroup>
 
     <b:ControlGroup ui:field="sqlSchemaGroup">
