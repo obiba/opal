@@ -5,10 +5,8 @@
 # Required-Stop:     $remote_fs
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: <Enter a short description of the sortware>
-# Description:       <Enter a long description of the software>
-#                    <...>
-#                    <...>
+# Short-Description: Opal server
+# Description:       Start/stop Opal server.
 ### END INIT INFO
 
 # Author: OBiBa <info@obiba.org>
