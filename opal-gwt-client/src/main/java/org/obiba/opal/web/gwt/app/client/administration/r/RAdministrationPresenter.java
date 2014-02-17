@@ -74,6 +74,10 @@ public class RAdministrationPresenter
     AclRequest.newResourceAuthorizationRequestBuilder()
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
 
+    refreshStatus();
+  }
+
+  private void refreshStatus() {
     // stop start R service
     ResourceRequestBuilderFactory.<ServiceDto>newBuilder().forResource("/service/r") //
         .withCallback(new ResourceCallback<ServiceDto>() {
@@ -96,8 +100,11 @@ public class RAdministrationPresenter
     ResourceRequestBuilderFactory.newBuilder().forResource("/service/r").put().withCallback(new ResponseCodeCallback() {
       @Override
       public void onResponseCode(Request request, Response response) {
-        getView().setServiceStatus(
-            response.getStatusCode() == Response.SC_OK ? Display.Status.Stoppable : Display.Status.Startable);
+        if (response.getStatusCode() == Response.SC_OK) {
+          refreshStatus();
+        } else {
+          getView().setServiceStatus(Display.Status.Startable);
+        }
       }
     }, Response.SC_OK).send();
   }
