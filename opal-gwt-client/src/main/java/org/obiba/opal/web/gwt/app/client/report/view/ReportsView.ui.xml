@@ -10,7 +10,7 @@
     <b:Paragraph>
       <ui:msg description="Report Templates text">Reports can be produced from
         <a href="http://www.rstudio.com/ide/docs/authoring/using_markdown" target="_blank">R Markdown files</a>. See the
-        <a href="http://wiki.obiba.org/display/OPALDOC/Opal+Report+User+Guide" target="_blank">
+        <a href="http://wiki.obiba.org/display/OPALDOC/Opal+Reporting+User+Guide" target="_blank">
           Report User Guide
         </a>
         for more details.
