@@ -17,6 +17,7 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.report.presenter.ROptionsHelper;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
@@ -38,8 +39,6 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.regexp.shared.MatchResult;
-import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -218,18 +217,8 @@ public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplate
       if(appended) {
         paramList.append(", ");
       }
-      String value = param.getValue();
-      RegExp regExp = RegExp.compile("password");
-      MatchResult matcher = regExp.exec(param.getKey());
-      if(matcher != null) {
-        value = "******";
-      }
-      regExp = RegExp.compile("^T$|^TRUE$|^F$|^FALSE$|^NULL$");
-      matcher = regExp.exec(value);
-      if(matcher == null) {
-        value = "\"" + value + "\"";
-      }
-      paramList.append(param.getKey()).append("=").append(value);
+      paramList.append(param.getKey()).append("=")
+          .append(ROptionsHelper.renderROptionValue(param.getKey(), param.getValue()));
       appended = true;
     }
     return paramList.toString();

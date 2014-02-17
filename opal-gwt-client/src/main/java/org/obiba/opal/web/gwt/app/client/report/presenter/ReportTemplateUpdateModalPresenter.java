@@ -118,10 +118,23 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
     emailSelectorPresenter = itemSelectorPresenterProvider.get();
     parametersSelectorPresenter = itemSelectorPresenterProvider.get();
     Map<String, List<String>> suggestions = Maps.newLinkedHashMap();
+    suggestions.put("opal.username", new ArrayList<String>());
+    suggestions.put("opal.password", new ArrayList<String>());
+    suggestions.put("opal.url", new ArrayList<String>());
     suggestions.put("opal.report.style", Lists
         .newArrayList("NULL", "Default", "Amelia", "Cerulean", "Cosmo", "Cyborg", "Flatly", "Journal", "Readable",
             "Simplex", "Slate", "Spacelab", "United"));
-    parametersSelectorPresenter.getView().setItemInputDisplay(new KeyValueItemInputView(suggestions));
+    parametersSelectorPresenter.getView().setItemInputDisplay(new KeyValueItemInputView(suggestions) {
+      @Override
+      public String renderItem(String item) {
+        String option = super.renderItem(item);
+        String[] parts = option.split("=");
+        if (parts.length == 2) {
+        return parts[0] + "=" + ROptionsHelper.renderROptionValue(parts[0],parts[1]);
+        }
+        return option;
+      }
+    });
     emailSelectorPresenter.getView().setItemInputDisplay(new TextBoxItemInputView());
     getView().setUiHandlers(this);
   }

@@ -83,7 +83,12 @@ public class KeyValueItemInputView implements ItemInputDisplay {
     String key = keyTextBox.getText().trim();
     String value = valueTextBox.getText().trim();
 
-    return key.length() != 0 && value.length() != 0 ? keyTextBox.getText() + " = " + valueTextBox.getText() : "";
+    return key.length() != 0 && value.length() != 0 ? keyTextBox.getText() + "=" + valueTextBox.getText() : "";
+  }
+
+  @Override
+  public String renderItem(String item) {
+    return item;
   }
 
   @Override

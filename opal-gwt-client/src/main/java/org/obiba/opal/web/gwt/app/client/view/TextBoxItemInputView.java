@@ -26,8 +26,6 @@ public class TextBoxItemInputView implements ItemInputDisplay {
 
   public TextBoxItemInputView() {
     textBox = new TextBox();
-    textBox.addStyleName("itemInput");
-    textBox.addStyleName("textBox");
 
     addEnterKeyHandler();
   }
@@ -40,6 +38,11 @@ public class TextBoxItemInputView implements ItemInputDisplay {
   @Override
   public String getItem() {
     return textBox.getText();
+  }
+
+  @Override
+  public String renderItem(String item) {
+    return item;
   }
 
   @Override

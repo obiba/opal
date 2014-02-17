@@ -50,6 +50,8 @@ public class ItemSelectorPresenter extends PresenterWidget<ItemSelectorPresenter
 
     String getItem();
 
+    String renderItem(String item);
+
     Widget asWidget();
 
     void setEnterKeyHandler(EnterKeyHandler handler);

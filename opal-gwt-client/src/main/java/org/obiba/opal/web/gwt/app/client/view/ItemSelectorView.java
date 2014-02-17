@@ -20,6 +20,8 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.constants.ButtonType;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.common.collect.Lists;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -35,6 +37,8 @@ public class ItemSelectorView extends ViewImpl implements ItemSelectorPresenter.
   private final Grid itemGrid;
 
   private ItemInputDisplay itemInputDisplay;
+
+  private List<String> itemList = Lists.newArrayList();
 
   public ItemSelectorView() {
     itemGrid = new Grid(0, 1);
@@ -88,8 +92,9 @@ public class ItemSelectorView extends ViewImpl implements ItemSelectorPresenter.
     // Add a row for the new item.
     itemGrid.resize(itemGrid.getRowCount() + 1, 1);
 
+    itemList.add(item);
     FlowPanel itemWidget = new FlowPanel();
-    Label label = new Label(item);
+    Label label = new Label(itemInputDisplay.renderItem(item));
     label.addStyleName("inline-block");
     itemWidget.add(label);
 
@@ -99,9 +104,9 @@ public class ItemSelectorView extends ViewImpl implements ItemSelectorPresenter.
 
       @Override
       public void onClick(ClickEvent event) {
-        for(int i = 1; i < itemGrid.getRowCount(); i++) { // start from 1 to skip the input widget row
-          if(itemGrid.getText(i, 0).equals(item)) {
-            removeItem(i - 1);
+        for(int i = 0; i < itemList.size(); i++) {
+          if(itemList.get(i).equals(item)) {
+            removeItem(i);
             break;
           }
         }
@@ -119,11 +124,13 @@ public class ItemSelectorView extends ViewImpl implements ItemSelectorPresenter.
    */
   @Override
   public void removeItem(int row) {
+    itemList.remove(row);
     itemGrid.removeRow(row + 1); // +1 to skip the input widget row
   }
 
   @Override
   public void clear() {
+    itemList.clear();
     while(itemGrid.getRowCount() > 1) { // 1 is for the input widget
       removeItem(0);
     }
@@ -131,17 +138,12 @@ public class ItemSelectorView extends ViewImpl implements ItemSelectorPresenter.
 
   @Override
   public int getItemCount() {
-    return Math.max(0, itemGrid.getRowCount() - 1);
+    return itemList.size();
   }
 
   @Override
   public List<String> getItems() {
-    List<String> items = new ArrayList<String>();
-    for(int row = 1; row < itemGrid.getRowCount(); row++) { // start from 1 to skip the input widget row
-      items.add(itemGrid.getText(row, 0).trim());
-    }
-
-    return items;
+    return itemList;
   }
 
   @Override
