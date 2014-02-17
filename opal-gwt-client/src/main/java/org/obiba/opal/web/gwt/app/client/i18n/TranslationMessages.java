@@ -44,6 +44,114 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Edit user {0}")
   String editUserLabel(String name);
 
+  @Description("Delete Variable label")
+  @DefaultMessage("Delete Variable")
+  String deleteVariableTitle();
+
+  @Description("Delete Table label")
+  @DefaultMessage("Delete Table")
+  String deleteTable();
+
+  @Description("Clear Jobs List label")
+  @DefaultMessage("Clear Jobs List")
+  String clearJobsList();
+
+  @Description("Cancel Job label")
+  @DefaultMessage("Cancel Job")
+  String cancelJob();
+
+  @Description("Replace File label")
+  @DefaultMessage("Replace File")
+  String replaceExistingFile();
+
+  @Description("Delete File label")
+  @DefaultMessage("Delete File")
+  String deleteFile();
+
+  @Description("Delete Key Pair label")
+  @DefaultMessage("Delete Key Pair")
+  String deleteKeyPair();
+
+  @Description("Remove Project label")
+  @DefaultMessage("Remove Project")
+  String removeProject();
+
+  @Description("Remove Datasource label")
+  @DefaultMessage("Remove Datasource")
+  String removeDatasource();
+
+  @Description("Remove Report Template label")
+  @DefaultMessage("Remove Report Template")
+  String removeReportTemplate();
+
+  @Description("Overwrite Variable label")
+  @DefaultMessage("Overwrite Variable")
+  String overwriteVariable();
+
+  @Description("Overwrite View label")
+  @DefaultMessage("Overwrite View")
+  String overwriteView();
+
+  @Description("Create View label")
+  @DefaultMessage("Create View")
+  String createView();
+
+  @Description("Remove View label")
+  @DefaultMessage("Remove View")
+  String removeView();
+
+  @Description("Remove Table label")
+  @DefaultMessage("Remove Table")
+  String removeTable();
+
+  @Description("Remove Identifiers Table label")
+  @DefaultMessage("Remove Identifiers Table")
+  String removeIdentifiersTable();
+
+  @Description("Remove Identifiers Mapping label")
+  @DefaultMessage("Remove Identifiers Mapping")
+  String removeIdentifiersMapping();
+
+  @Description("Remove Derived Variable label")
+  @DefaultMessage("Remove Derived Variable")
+  String removeDerivedVariable();
+
+  @Description("Remove Variable label")
+  @DefaultMessage("Remove Variable")
+  String removeVariable();
+
+  @Description("Delete Aggregating Method label")
+  @DefaultMessage("Delete Aggregating Method")
+  String deleteDataShieldAggregateMethod();
+
+  @Description("Delete Assigning Method label")
+  @DefaultMessage("Delete Assigning Method")
+  String deleteDataShieldAssignMethod();
+
+  @Description("Delete Package label")
+  @DefaultMessage("Delete Package")
+  String deleteDataShieldPackage();
+
+  @Description("Publish Package Methods label")
+  @DefaultMessage("Publish Package Methods")
+  String publishDataShieldMethods();
+
+  @Description("Unregister Database label")
+  @DefaultMessage("Unregister Database")
+  String unregisterDatabase();
+
+  @Description("Remove Taxonomy label")
+  @DefaultMessage("Remove Taxonomy")
+  String removeTaxonomy();
+
+  @Description("Delete Variables label")
+  @DefaultMessage("Delete Variables")
+  String deleteVariables();
+
+  @Description("Delete Tables label")
+  @DefaultMessage("Delete Tables")
+  String deleteTables();
+
   @Description("Confirm remove group label")
   @DefaultMessage("Please confirm that you want to remove the group {0}.")
   String confirmRemoveGroup(String name);
@@ -105,4 +213,169 @@ public interface TranslationMessages extends Messages {
   @Description("You must select at least one file folder message")
   @DefaultMessage("You must select at least one {0}.")
   String mustSelectAtLeastFileFolder(String name);
+
+  @Description("Delete the currently displayed variable message")
+  @DefaultMessage("Delete the currently displayed variable?")
+  String confirmVariableDelete();
+
+  @Description("Removing tables from the view will have an impact on which Variables can be defined message.")
+  @DefaultMessage("Removing tables from the view will have an impact on which variables can be defined.")
+  String removingTablesFromViewMayAffectVariables();
+
+  @Description(
+      "All the completed jobs(succeeded, failed or cancelled )will be removed from the jobs list. Currently running jobs will be unaffected.<br/><br/>Please confirm that you want to clear the jobs list message")
+  @DefaultMessage(
+      "All the completed jobs(succeeded, failed or cancelled) will be removed from the jobs list. Currently running jobs will be unaffected.<br/><br/>Please confirm that you want to clear the jobs list")
+  String confirmClearJobsList();
+
+  @Description(
+      "The task will be cancelled. Changes will be rolled back as much as possible:although cancelled, a task might be partially completed.<br/><br/>Please confirm that you want cancel this task message")
+  @DefaultMessage(
+      "The task will be cancelled. Changes will be rolled back as much as possible:although cancelled, a task might be partially completed.<br/><br/>Please confirm that you want cancel this task")
+  String confirmCancelJob();
+
+  @Description(
+      "The file that you are uploading already exist in the file system.<br/><br/>Please confirm that you want to replace the existing file message")
+  @DefaultMessage(
+      "The file that you are uploading already exist in the file system.<br/><br/>Please confirm that you want to replace the existing file")
+  String confirmReplaceExistingFile();
+
+  @Description("The file(s) will be removed from the file system. Please confirm message.")
+  @DefaultMessage("The file(s) will be removed from the file system. Please confirm.")
+  String confirmDeleteFile();
+
+  @Description(
+      "Please confirm that you want to remove the Key Pair. All associated encrypted material will not be accessible anymore message")
+  @DefaultMessage(
+      "Please confirm that you want to remove the Key Pair. All associated encrypted material will not be accessible anymore")
+  String confirmDeleteKeyPair();
+
+  @Description(
+      "Please confirm that you want to remove permanently the current project and all associated data message.")
+  @DefaultMessage("Please confirm that you want to remove permanently the current project and all associated data.")
+  String confirmRemoveProject();
+
+  @Description("Please confirm that you want to remove the current datasource from Opal configuration message")
+  @DefaultMessage("Please confirm that you want to remove the current datasource from Opal configuration")
+  String confirmRemoveDatasource();
+
+  @Description(
+      "Please confirm that you want to remove the current Report Template from Opal configuration(report design and generated reports will not be affected) message")
+  @DefaultMessage(
+      "Please confirm that you want to remove the current Report Template from Opal configuration(report design and generated reports will not be affected).")
+  String confirmDeleteReportTemplate();
+
+  @Description(
+      "A variable with the same name already exists. Please confirm that you want to overwrite this variable message")
+  @DefaultMessage(
+      "A variable with the same name already exists. Please confirm that you want to overwrite this variable.")
+  String confirmOverwriteVariable();
+
+  @Description("A view with the same name already exists. Please confirm that you want to overwrite this view message")
+  @DefaultMessage("A view with the same name already exists. Please confirm that you want to overwrite this view.")
+  String confirmOverwriteView();
+
+  @Description("Please confirm that you want to create a new view message")
+  @DefaultMessage("Please confirm that you want to create a new view.")
+  String confirmCreateView();
+
+  @Description("Please confirm that you want to remove the current view message")
+  @DefaultMessage("Please confirm that you want to remove the current view.")
+  String confirmRemoveView();
+
+  @Description(
+      "Please confirm that you want to remove the current table. This cannot be undone and all data associated with " +
+          "this table will be lost message")
+  @DefaultMessage(
+      "Please confirm that you want to remove the current table. This cannot be undone and all data associated with " +
+          "this table will be lost.")
+  String confirmRemoveTable();
+
+  @Description(
+      "Please confirm that you want to remove the current identifiers table. This cannot be undone and all identifiers " +
+          "of this table will be lost message")
+  @DefaultMessage(
+      "Please confirm that you want to remove the current identifiers table. This cannot be undone and all identifiers " +
+          "of this table will be lost.")
+  String confirmRemoveIdentifiersTable();
+
+  @Description(
+      "Please confirm that you want to remove this identifiers mapping. This cannot be undone and all identifiers of " +
+          "this mapping will be lost message")
+  @DefaultMessage(
+      "Please confirm that you want to remove this identifiers mapping. This cannot be undone and all identifiers of " +
+          "this mapping will be lost.")
+  String confirmRemoveIdentifiersMapping();
+
+  @Description("Please confirm that you want to remove the current derived variable message")
+  @DefaultMessage("Please confirm that you want to remove the current derived variable.")
+  String confirmRemoveDerivedVariable();
+
+  @Description(
+      "Please confirm that you want to remove the current variable. This cannot be undone and all data associated with " +
+          "this variable will be lost message")
+  @DefaultMessage(
+      "Please confirm that you want to remove the current variable. This cannot be undone and all data associated with " +
+          "this variable will be lost.")
+  String confirmRemoveVariable();
+
+  @Description("Please confirm that you want to remove this assigning method message")
+  @DefaultMessage("Please confirm that you want to remove this assigning method.")
+  String confirmDeleteDataShieldAssignMethod();
+
+  @Description("Please confirm that you want to remove this aggregating method message")
+  @DefaultMessage("Please confirm that you want to remove this aggregating method.")
+  String confirmDeleteDataShieldAggregateMethod();
+
+  @Description("Please confirm that you want to remove this package and all its methods message")
+  @DefaultMessage("Please confirm that you want to remove this package and all its methods.")
+  String confirmDeleteDataShieldPackage();
+
+  @Description("Please confirm that you want to publish this package methods message")
+  @DefaultMessage("Please confirm that you want to publish this package methods.")
+  String confirmPublishDataShieldMethods();
+
+  @Description("Please confirm that you want to unregister this database message")
+  @DefaultMessage("Please confirm that you want to unregister this database.")
+  String confirmDeleteDatabase();
+
+  @Description("Please confirm that you want to remove the taxonomy {0) message")
+  @DefaultMessage("Please confirm that you want to remove the taxonomy {0}.")
+  String confirmRemoveTaxonomy(String name);
+
+  @Description("Please confirm that you want to delete {0} variables message")
+  @DefaultMessage("Please confirm that you want to delete {0} variables.")
+  @AlternateMessage({ "one", "Please confirm that you want to delete {0} variable." })
+  String confirmDeleteVariables(@PluralCount int nb);
+
+  @Description("Please confirm that you want to delete {0} tables message")
+  @DefaultMessage("Please confirm that you want to delete {0} tables.")
+  @AlternateMessage({ "one", "Please confirm that you want to delete {0} table." })
+  String confirmDeleteTables(@PluralCount int nb);
+
+  @Description("Categories label")
+  @DefaultMessage("{0}")
+  @AlternateMessage({ "one", "Category", "other", "Category" })
+  String categoriesLabel(@PluralCount int nb);
+
+  @Description("Attributes label")
+  @DefaultMessage("{0}")
+  @AlternateMessage({ "one", "Attribute", "other", "Attributes" })
+  String attributesLabel(@PluralCount int nb);
+
+  @Description("Tables label")
+  @DefaultMessage("{0}")
+  @AlternateMessage({ "one", "Table", "other", "Tables" })
+  String tablesLabel(@PluralCount int nb);
+
+  @Description("Indices label")
+  @DefaultMessage("{0}")
+  @AlternateMessage({ "one", "Index", "other", "Indices" })
+  String indicesLabel(@PluralCount int nb);
+
+  @Description("Variables label")
+  @DefaultMessage("{0}")
+  @AlternateMessage({ "one", "Variable", "other", "Variables" })
+  String variablesLabel(@PluralCount int nb);
+
 }

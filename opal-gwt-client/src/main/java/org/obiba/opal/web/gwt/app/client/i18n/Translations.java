@@ -597,97 +597,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Delete Category")
   String deleteCategory();
 
-  @Description("Confirmation title map")
-  @DefaultStringMapValue({ //
-      "deleteVariableTitle", "Delete Variable", //
-      "deleteTable", "Delete Table", //
-      "clearJobsList", "Clear Jobs List", //
-      "cancelJob", "Cancel Job", //
-      "replaceExistingFile", "Replace File", //
-      "deleteFile", "Delete File", //
-      "deleteKeyPair", "Delete Key Pair", //
-      "removeProject", "Remove Project",//
-      "removeDatasource", "Remove Datasource",//
-      "removeReportTemplate", "Remove Report Template",//
-      "overwriteVariable", "Overwrite Variable",//
-      "overwriteView", "Overwrite View",//
-      "createView", "Create View",//
-      "removeView", "Remove View",//
-      "removeTable", "Remove Table",//
-      "removeIdentifiersTable", "Remove Identifiers Table",//
-      "removeIdentifiersMapping", "Remove Identifiers Mapping",//
-      "removeDerivedVariable", "Remove Derived Variable",//
-      "removeVariable", "Remove Variable",//
-      "deleteDataShieldAggregateMethod", "Delete Aggregating Method",//
-      "deleteDataShieldAssignMethod", "Delete Assigning Method",//
-      "deleteDataShieldPackage", "Delete Package",//
-      "publishDataShieldMethods", "Publish Package Methods",//
-      "unregisterDatabase", "Unregister Database",//
-      "removeTaxonomy", "Remove Taxonomy",//
-      "deleteVariables", "Delete Variables",//
-      "deleteTables", "Delete Tables"//
-  })
-  Map<String, String> confirmationTitleMap();
-
-  //TODO move all these messages to translationMessages
-  @Description("Confirmation message map")
-  @DefaultStringMapValue({ //
-      "confirmVariableDelete", "Delete the currently displayed variable?", //
-      "removingTablesFromViewMayAffectVariables",
-      "Removing tables from the view will have an impact on which Variables can be defined.", //
-      "confirmClearJobsList",
-      "All the completed jobs (succeeded, failed or cancelled) will be removed from the jobs list. Currently running jobs will be unaffected.<br /><br />Please confirm that you want to clear the jobs list.",
-      //
-      "confirmCancelJob",
-      "The task will be cancelled. Changes will be rolled back as much as possible: although cancelled, a task might be partially completed.<br /><br />Please confirm that you want cancel this task.",
-      //
-      "confirmReplaceExistingFile",
-      "The file that you are uploading already exist in the file system.<br /><br />Please confirm that you want to replace the existing file.",
-      //
-      "confirmDeleteFile", "The file(s) will be removed from the file system. Please confirm.", //
-      "confirmDeleteKeyPair",
-      "Please confirm that you want to remove the Key Pair. All associated encrypted material will not be accessible anymore",
-//
-      "confirmRemoveProject",
-      "Please confirm that you want to remove permanently the current project and all associated data.", //
-      "confirmRemoveDatasource",
-      "Please confirm that you want to remove the current datasource from Opal configuration.",//
-      "confirmDeleteReportTemplate",
-      "Please confirm that you want to remove the current Report Template from Opal configuration (report design and generated reports will not be affected).",
-//
-      "confirmOverwriteVariable",
-      "A variable with the same name already exists. Please confirm that you want to overwrite this variable.",//
-      "confirmOverwriteView",
-      "A view with the same name already exists. Please confirm that you want to overwrite this view.",//
-      "confirmCreateView", "Please confirm that you want to create a new view.",//
-      "confirmRemoveView", "Please confirm that you want to remove the current view.",//
-      "confirmRemoveTable",
-      "Please confirm that you want to remove the current table. This cannot be undone and all data associated with this table will be lost.",
-      //
-      "confirmRemoveIdentifiersTable",
-      "Please confirm that you want to remove the current identifiers table. This cannot be undone and all identifiers of this table will be lost.",
-      //
-      "confirmRemoveIdentifiersMapping",
-      "Please confirm that you want to remove this identifiers mapping. This cannot be undone and all identifiers of this mapping will be lost.",
-      //
-      "confirmRemoveDerivedVariable", "Please confirm that you want to remove the current derived variable.",//
-      "confirmRemoveVariable",
-      "Please confirm that you want to remove the current variable. This cannot be undone and all data associated with this variable will be lost.",
-      //
-      "confirmDeleteDataShieldAssignMethod", "Please confirm that you want to remove this assigning method.",//
-      "confirmDeleteDataShieldAggregateMethod", "Please confirm that you want to remove this aggregating method.",//
-      "confirmDeleteDataShieldPackage", "Please confirm that you want to remove this package and all its methods.",//
-      "confirmPublishDataShieldMethods", "Please confirm that you want to publish this package methods.",//
-      "confirmDeleteDatabase", "Please confirm that you want to unregister this database.",//
-//
-      "confirmRemoveTaxonomy", "Please confirm that you want to remove the taxonomy '{0}'.",//
-      "confirmDeleteVariable", "Please confirm that you want to delete {0} variable",//
-      "confirmDeleteVariables", "Please confirm that you want to delete {0} variables",//
-      "confirmDeleteTable", "Please confirm that you want to delete {0} table",//
-      "confirmDeleteTables", "Please confirm that you want to delete {0} tables"//
-  })
-  Map<String, String> confirmationMessageMap();
-
   @Description("A name is required when creating a new folder")
   @DefaultStringValue("You must specify a folder name")
   String folderNameIsRequired();
@@ -1502,10 +1411,6 @@ public interface Translations extends Constants {
   @Description("Table index is up-to-date")
   @DefaultStringValue("Indices")
   String indicesLabel();
-
-  @Description("Indice label")
-  @DefaultStringValue("Indice")
-  String indiceLabel();
 
   @Description("Indices label")
   @DefaultStringValue("Table index is up-to-date")

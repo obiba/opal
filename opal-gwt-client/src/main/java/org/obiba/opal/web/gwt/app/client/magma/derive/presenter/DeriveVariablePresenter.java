@@ -15,6 +15,7 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -84,6 +85,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
 
   private final DeriveConclusionPresenter deriveConclusionPresenter;
 
+  private TranslationMessages translationMessages;
+
   private VariableDto variable;
 
   private TableDto table;
@@ -113,7 +116,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
       DeriveCustomVariablePresenter deriveCustomVariablePresenter, //
       DeriveFromVariablePresenter deriveFromVariablePresenter, //
       ScriptEvaluationPresenter scriptEvaluationPresenter, //
-      DeriveConclusionPresenter deriveConclusionPresenter) {
+      DeriveConclusionPresenter deriveConclusionPresenter, TranslationMessages translationMessages) {
     super(eventBus, view);
     this.placeManager = placeManager;
     this.translations = translations;
@@ -126,6 +129,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     this.deriveFromVariablePresenter = deriveFromVariablePresenter;
     this.scriptEvaluationPresenter = scriptEvaluationPresenter;
     this.deriveConclusionPresenter = deriveConclusionPresenter;
+    this.translationMessages = translationMessages;
   }
 
   @Override
@@ -351,8 +355,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
       }
 
       UriBuilder ub = UriBuilder.create().segment("datasource", destinationDatasource, "view", destinationView);
-      ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(ub.build()).get().withCallback(
-          new UpdateViewCallback(derived))//
+      ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(ub.build()).get()
+          .withCallback(new UpdateViewCallback(derived))//
           .withCallback(new CreateViewCallback(), Response.SC_NOT_FOUND).send();
     }
 
@@ -440,8 +444,9 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
           saveVariable();
         }
       };
-      getEventBus().fireEvent(
-          ConfirmationRequiredEvent.createWithKeys(viewCreationConfirmation, "createView", "confirmCreateView"));
+      getEventBus().fireEvent(ConfirmationRequiredEvent
+          .createWithMessages(viewCreationConfirmation, translationMessages.createView(),
+              translationMessages.confirmCreateView()));
     }
 
     /**
@@ -526,7 +531,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
               }
             };
             getEventBus().fireEvent(ConfirmationRequiredEvent
-                .createWithKeys(overwriteConfirmation, "overwriteVariable", "confirmOverwriteVariable"));
+                .createWithMessages(overwriteConfirmation, translationMessages.overwriteVariable(),
+                    translationMessages.confirmOverwriteVariable()));
           }
         } else {
           getView().showError(translations.invalidDestinationView());

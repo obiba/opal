@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -55,13 +56,17 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
 
   private Runnable removeConfirmation;
 
+  private TranslationMessages translationMessages;
+
   @Inject
   public IdentifiersTablePresenter(EventBus eventBus, Display view,
       ModalProvider<ImportSystemIdentifiersModalPresenter> importSystemIdentifiersModalProvider,
       ModalProvider<ImportIdentifiersMappingModalPresenter> importIdentifiersMappingModalProvider,
       ModalProvider<IdentifiersMappingModalPresenter> identifiersMappingModalProvider,
-      ModalProvider<GenerateIdentifiersModalPresenter> generateIdentifiersModalProvider) {
+      ModalProvider<GenerateIdentifiersModalPresenter> generateIdentifiersModalProvider,
+      TranslationMessages translationMessages) {
     super(eventBus, view);
+    this.translationMessages = translationMessages;
     this.importSystemIdentifiersModalProvider = importSystemIdentifiersModalProvider.setContainer(this);
     this.importIdentifiersMappingModalProvider = importIdentifiersMappingModalProvider.setContainer(this);
     this.identifiersMappingModalProvider = identifiersMappingModalProvider.setContainer(this);
@@ -110,7 +115,8 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
     removeConfirmation = new RemoveIdentifiersTableRunnable();
 
     ConfirmationRequiredEvent event = ConfirmationRequiredEvent
-        .createWithKeys(removeConfirmation, "removeIdentifiersTable", "confirmRemoveIdentifiersTable");
+        .createWithMessages(removeConfirmation, translationMessages.removeIdentifiersTable(),
+            translationMessages.confirmRemoveIdentifiersTable());
 
     fireEvent(event);
   }
@@ -150,7 +156,8 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
     removeConfirmation = new RemoveIdentifiersMappingRunnable(variable);
 
     ConfirmationRequiredEvent event = ConfirmationRequiredEvent
-        .createWithKeys(removeConfirmation, "removeIdentifiersMapping", "confirmRemoveIdentifiersMapping");
+        .createWithMessages(removeConfirmation, translationMessages.removeIdentifiersMapping(),
+            translationMessages.confirmRemoveIdentifiersMapping());
 
     fireEvent(event);
   }

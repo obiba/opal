@@ -17,8 +17,8 @@ import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
@@ -76,6 +76,8 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   private final Translations translations;
 
+  private TranslationMessages translationMessages;
+
   private String datasourceName;
 
   private JsArray<TableDto> tables;
@@ -90,9 +92,11 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       ModalProvider<DataExportPresenter> dataExportModalProvider,
       ModalProvider<AddViewModalPresenter> createViewModalProvider,
       ModalProvider<DataCopyPresenter> dataCopyModalProvider,
-      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, Translations translations) {
+      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, Translations translations,
+      TranslationMessages translationMessages) {
     super(eventBus, display);
     this.translations = translations;
+    this.translationMessages = translationMessages;
     this.tablePropertiesModalProvider = tablePropertiesModalProvider.setContainer(this);
     this.dataExportModalProvider = dataExportModalProvider.setContainer(this);
     this.createViewModalProvider = createViewModalProvider.setContainer(this);
@@ -209,11 +213,8 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
       deleteConfirmation = new RemoveRunnable(tableNames);
 
-      fireEvent(ConfirmationRequiredEvent
-          .createWithMessages(deleteConfirmation, translations.confirmationTitleMap().get("deleteTables"),
-              TranslationsUtils.replaceArguments(translations.confirmationMessageMap()
-                  .get(tableNames.length() > 1 ? "confirmDeleteTables" : "confirmDeleteTable"),
-                  String.valueOf(tableNames.length()))));
+      fireEvent(ConfirmationRequiredEvent.createWithMessages(deleteConfirmation, translationMessages.deleteTables(),
+          translationMessages.confirmDeleteTables(tableNames.length())));
     }
   }
 

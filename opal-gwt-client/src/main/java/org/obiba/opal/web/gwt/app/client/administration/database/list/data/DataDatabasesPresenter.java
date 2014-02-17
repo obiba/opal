@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.administration.database.list.DatabaseLi
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
@@ -57,11 +58,14 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
 
   private Command confirmedCommand;
 
+  private TranslationMessages translationMessages;
+
   @Inject
   public DataDatabasesPresenter(Display display, EventBus eventBus,
       ModalProvider<SqlDatabaseModalPresenter> sqlDatabaseModalProvider,
-      ModalProvider<MongoDatabaseModalPresenter> mongoDatabaseModalProvider) {
+      ModalProvider<MongoDatabaseModalPresenter> mongoDatabaseModalProvider, TranslationMessages translationMessages) {
     super(eventBus, display);
+    this.translationMessages = translationMessages;
     this.sqlDatabaseModalProvider = sqlDatabaseModalProvider.setContainer(this);
     this.mongoDatabaseModalProvider = mongoDatabaseModalProvider.setContainer(this);
     getView().setUiHandlers(this);
@@ -127,8 +131,8 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
         if(actionName.equalsIgnoreCase(DatabaseListColumns.UNREGISTER_ACTION)) {
 
           getEventBus().fireEvent(ConfirmationRequiredEvent
-              .createWithKeys(confirmedCommand = new DeleteDatabaseCommand(dto), "unregisterDatabase",
-                  "confirmDeleteDatabase"));
+              .createWithMessages(confirmedCommand = new DeleteDatabaseCommand(dto),
+                  translationMessages.unregisterDatabase(), translationMessages.confirmDeleteDatabase()));
 
         } else if(actionName.equalsIgnoreCase(EDIT_ACTION)) {
 

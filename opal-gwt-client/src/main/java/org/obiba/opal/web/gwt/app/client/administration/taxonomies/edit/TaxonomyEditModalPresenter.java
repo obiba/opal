@@ -4,8 +4,8 @@ import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.Taxonom
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -34,6 +34,8 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
 
   private final Translations translations;
 
+  private final TranslationMessages translationMessages;
+
   private TaxonomyDto originalTaxonomy;
 
   private RemoveRunnable removeConfirmation;
@@ -46,9 +48,11 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
   }
 
   @Inject
-  public TaxonomyEditModalPresenter(EventBus eventBus, Display display, Translations translations) {
+  public TaxonomyEditModalPresenter(EventBus eventBus, Display display, Translations translations,
+      TranslationMessages translationMessages) {
     super(eventBus, display);
     this.translations = translations;
+    this.translationMessages = translationMessages;
     getView().setUiHandlers(this);
   }
 
@@ -67,8 +71,8 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
     dto.setVocabulariesArray(originalTaxonomy.getVocabulariesArray());
 
     if(mode == EDIT_MODE.EDIT) {
-      ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder().forResource(
-          UriBuilders.SYSTEM_CONF_TAXONOMY.create().build(originalTaxonomy.getName()))//
+      ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder()
+          .forResource(UriBuilders.SYSTEM_CONF_TAXONOMY.create().build(originalTaxonomy.getName()))//
           .withResourceBody(TaxonomyDto.stringify(dto))//
           .withCallback(new ResponseCodeCallback() {
             @Override
@@ -87,8 +91,8 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
           }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR)//
           .put().send();
     } else {
-      ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder().forResource(
-          UriBuilders.SYSTEM_CONF_TAXONOMIES.create().build())//
+      ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder()
+          .forResource(UriBuilders.SYSTEM_CONF_TAXONOMIES.create().build())//
           .withResourceBody(TaxonomyDto.stringify(dto))//
           .withCallback(new ResponseCodeCallback() {
             @Override
@@ -113,10 +117,8 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
   public void onDeleteTaxonomy() {
     removeConfirmation = new RemoveRunnable(originalTaxonomy.getName());
 
-    fireEvent(ConfirmationRequiredEvent
-        .createWithMessages(removeConfirmation, translations.confirmationTitleMap().get("removeTaxonomy"),
-            TranslationsUtils.replaceArguments(translations.confirmationMessageMap().get("confirmRemoveTaxonomy"),
-                originalTaxonomy.getName())));
+    fireEvent(ConfirmationRequiredEvent.createWithMessages(removeConfirmation, translationMessages.removeTaxonomy(),
+        translationMessages.confirmRemoveTaxonomy(originalTaxonomy.getName())));
   }
 
   @Override

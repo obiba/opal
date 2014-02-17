@@ -259,11 +259,10 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     List<String> args = Lists.newArrayList();
     args.add(String.valueOf(display.getDataProvider().getList().size()));
 
+    args.add(display.getItemName(currentSelected));
     if(currentSelected > 1) {
-      args.add(display.getItemNamePlural());
       display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.allItemsSelected(), args));
     } else {
-      args.add(display.getItemNameSingular());
       display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.NItemSelected(), args));
     }
 
@@ -275,18 +274,17 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     List<String> args = Lists.newArrayList();
     args.add(String.valueOf(currentSelected));
 
+    args.add(display.getItemName(currentSelected));
     if(currentSelected > 1) {
-      args.add(display.getItemNamePlural());
       display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.NItemsSelected(), args));
     } else {
-      args.add(display.getItemNameSingular());
       display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.NItemSelected(), args));
     }
     display.getSelectAll().setVisible(true);
 
     args.clear();
     args.add(String.valueOf(display.getDataProvider().getList().size()));
-    args.add(display.getItemNamePlural());
+    args.add(display.getItemName(currentSelected));
     display.getSelectAll().setText(TranslationsUtils.replaceArguments(translations.selectAllNItems(), args));
     display.getClearSelection().setVisible(true);
   }
@@ -342,14 +340,9 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     ListDataProvider<T> getDataProvider();
 
     /**
-     * @return The type name of items
-     */
-    String getItemNamePlural();
-
-    /**
      * @return The type name of item
      */
-    String getItemNameSingular();
+    String getItemName(int nb);
 
     Alert getAlert();
   }

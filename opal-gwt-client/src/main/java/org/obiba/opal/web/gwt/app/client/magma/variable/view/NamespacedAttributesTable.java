@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.NamespacedAttributesTableUiHandlers;
@@ -56,6 +57,8 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
 
   private ActionsColumn<JsArray<AttributeDto>> actionsColumn;
 
+  private TranslationMessages translationMessages;
+
   interface NamespacedAttributesTableViewUiBinder extends UiBinder<Widget, NamespacedAttributesTable> {}
 
   private static final NamespacedAttributesTableViewUiBinder uiBinder = GWT
@@ -90,7 +93,9 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
 
   private final Map<String, JsArray<AttributeDto>> attributesMap = new HashMap<String, JsArray<AttributeDto>>();
 
-  public NamespacedAttributesTable(JsArray<AttributeDto> attributes, String namespace) {
+  public NamespacedAttributesTable(JsArray<AttributeDto> attributes, String namespace,
+      TranslationMessages translationMessages) {
+    this.translationMessages = translationMessages;
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -239,13 +244,8 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
     }
 
     @Override
-    public String getItemNamePlural() {
-      return translations.attributesLabel().toLowerCase();
-    }
-
-    @Override
-    public String getItemNameSingular() {
-      return translations.attributeLabel().toLowerCase();
+    public String getItemName(int nb) {
+      return translationMessages.attributesLabel(nb).toLowerCase();
     }
 
     @Override
