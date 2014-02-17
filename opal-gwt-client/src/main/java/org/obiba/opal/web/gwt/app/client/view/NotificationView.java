@@ -105,7 +105,7 @@ public class NotificationView extends ViewImpl implements NotificationPresenter.
     }
 
     if(translatedMessages.size() == 1) {
-      alert.setText(translatedMessages.get(0));
+      alert.setHTML(translatedMessages.get(0));
     } else {
       UnorderedList list = new UnorderedList();
       for(String translatedMessage : translatedMessages) {
