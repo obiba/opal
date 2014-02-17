@@ -13,11 +13,15 @@ package org.obiba.opal.core.service;
 import java.util.Set;
 
 import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.domain.security.Bookmark;
+import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.domain.security.SubjectProfile;
+import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.core.service.security.realm.OpalUserRealm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -26,6 +30,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -145,6 +150,28 @@ public class SubjectProfileServiceImplTest extends AbstractJUnit4SpringContextTe
     @Bean
     public SubjectProfileService subjectProfileService() {
       return new SubjectProfileServiceImpl();
+    }
+
+    @Bean
+    public SubjectAclService subjectAclService() {
+      SubjectAclService mock = EasyMock.createMock(SubjectAclService.class);
+      SubjectAclService.Permissions permsMock = EasyMock.createMock(SubjectAclService.Permissions.class);
+      EasyMock.expect(permsMock.getPermissions()).andReturn(Sets.newHashSet(SubjectProfileServiceImpl.FILES_SHARE_PERM))
+          .anyTimes();
+      EasyMock.expect(mock.getNodePermissions("opal", "/files/home/principal", SubjectAcl.SubjectType.USER))
+          .andReturn(Sets.newHashSet(permsMock)).anyTimes();
+      EasyMock.expect(mock.getNodePermissions("opal", "/files/tmp", SubjectAcl.SubjectType.USER))
+          .andReturn(Sets.newHashSet(permsMock)).anyTimes();
+      EasyMock.replay(mock, permsMock);
+      return mock;
+    }
+
+    @Bean
+    public OpalRuntime opalRuntime() {
+      OpalRuntime mock = EasyMock.createMock(OpalRuntime.class);
+      EasyMock.expect(mock.hasFileSystem()).andReturn(false).anyTimes();
+      EasyMock.replay(mock);
+      return mock;
     }
 
   }

@@ -17,10 +17,15 @@ import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.obiba.opal.core.domain.HasUniqueProperties;
+import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.domain.security.SubjectProfile;
+import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.core.service.security.realm.BackgroundJobRealm;
 import org.obiba.opal.core.service.security.realm.SudoRealm;
 import org.slf4j.Logger;
@@ -33,8 +38,16 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
 
   private static final Logger log = LoggerFactory.getLogger(SubjectProfileServiceImpl.class);
 
+  static final String FILES_SHARE_PERM = "FILES_SHARE";
+
   @Autowired
   private OrientDbService orientDbService;
+
+  @Autowired
+  private SubjectAclService subjectAclService;
+
+  @Autowired
+  private OpalRuntime opalRuntime;
 
   @Override
   @PostConstruct
@@ -74,6 +87,9 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
     String principal = principalCollection.getPrimaryPrincipal().toString();
     String realm = principalCollection.getRealmNames().iterator().next();
     ensureProfile(principal, realm);
+    ensureUserHomeExists(principal);
+    ensureFolderPermissions(principal, "/home/" + principal);
+    ensureFolderPermissions(principal, "/tmp");
   }
 
   @Override
@@ -88,7 +104,7 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   @NotNull
   @Override
   public SubjectProfile getProfile(@Nullable String principal) throws SubjectProfileNotFoundException {
-    if (principal == null) throw new SubjectProfileNotFoundException(principal);
+    if(principal == null) throw new SubjectProfileNotFoundException(principal);
     SubjectProfile subjectProfile = orientDbService.findUnique(SubjectProfile.Builder.create(principal).build());
     if(subjectProfile == null) {
       throw new SubjectProfileNotFoundException(principal);
@@ -123,5 +139,43 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
     if(profile.removeBookmark(path)) {
       orientDbService.save(profile, profile);
     }
+  }
+
+  private void ensureUserHomeExists(String username) {
+    try {
+      if (!opalRuntime.hasFileSystem()) return;
+      FileObject home = opalRuntime.getFileSystem().getRoot().resolveFile("/home/" + username);
+      if(!home.exists()) {
+        log.info("Creating user home: /home/{}", username);
+        home.createFolder();
+      }
+    } catch(FileSystemException e) {
+      log.error("Failed creating user home.", e);
+    }
+  }
+
+  private void ensureFolderPermissions(String username, String path) {
+    String folderNode = "/files" + path;
+    boolean found = false;
+    for(SubjectAclService.Permissions acl : subjectAclService
+        .getNodePermissions("opal", folderNode, SubjectAcl.SubjectType.USER)) {
+      found = findPermission(acl, FILES_SHARE_PERM);
+      if(found) break;
+    }
+    if(!found) {
+      subjectAclService
+          .addSubjectPermission("opal", folderNode, SubjectAcl.SubjectType.USER.subjectFor(username), FILES_SHARE_PERM);
+    }
+  }
+
+  private boolean findPermission(SubjectAclService.Permissions acl, String permission) {
+    boolean found = false;
+    for(String perm : acl.getPermissions()) {
+      if(perm.equals(permission)) {
+        found = true;
+        break;
+      }
+    }
+    return found;
   }
 }

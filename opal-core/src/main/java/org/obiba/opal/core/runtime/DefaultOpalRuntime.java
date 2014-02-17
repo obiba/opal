@@ -126,6 +126,11 @@ public class DefaultOpalRuntime implements OpalRuntime {
   }
 
   @Override
+  public boolean hasFileSystem() {
+    return true;
+  }
+
+  @Override
   public OpalFileSystem getFileSystem() {
     synchronized(syncFs) {
       while(opalFileSystem == null) {

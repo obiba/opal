@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
 import org.apache.sshd.SshServer;
 import org.apache.sshd.common.Factory;
 import org.apache.sshd.common.NamedFactory;
@@ -23,6 +24,7 @@ import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
+import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.OpalShell;
 import org.obiba.opal.shell.OpalShellExitCallback;
@@ -53,6 +55,9 @@ public class OpalSshServer implements Service {
   @Autowired
   private OpalRuntime opalRuntime;
 
+  @Autowired
+  private SubjectProfileService subjectProfileService;
+
   private boolean isRunning = false;
 
   @Autowired
@@ -79,14 +84,25 @@ public class OpalSshServer implements Service {
       @Override
       public boolean authenticate(String username, String password, ServerSession session) {
         try {
-          SecurityUtils.getSubject().login(new UsernamePasswordToken(username, password.toCharArray(),
+          Subject subject = SecurityUtils.getSubject();
+          subject.login(new UsernamePasswordToken(username, password.toCharArray(),
               session.getIoSession().getRemoteAddress().toString()));
+          ensureProfile(subject);
           // Sessions don't expire automatically
           SecurityUtils.getSubject().getSession().setTimeout(-1);
         } catch(AuthenticationException ae) {
           return false;
         }
         return SecurityUtils.getSubject().isAuthenticated();
+      }
+
+      private void ensureProfile(Subject subject) {
+        Object principal = subject.getPrincipal();
+
+        if(!subjectProfileService.supportProfile(principal)) {
+          return;
+        }
+        subjectProfileService.ensureProfile(subject.getPrincipals());
       }
     });
     sshd.setFileSystemFactory(new FileSystemFactory() {

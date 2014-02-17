@@ -26,6 +26,12 @@ public interface OpalRuntime extends SystemService {
 
   Set<Service> getServices();
 
+  /**
+   * For test purpose.
+   * @return
+   */
+  boolean hasFileSystem();
+
   OpalFileSystem getFileSystem();
 
   /**
