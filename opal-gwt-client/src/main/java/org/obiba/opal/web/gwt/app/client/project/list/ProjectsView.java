@@ -17,12 +17,12 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.Strings;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -51,7 +51,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   private static final short MAX_CHARACTERS = 100;
 
   @UiField
-  SimplePager tablePager;
+  OpalSimplePager tablePager;
 
   @UiField
   Table<ProjectDto> projectsTable;
@@ -108,7 +108,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     projectsDataProvider.setList(projectDtos);
     tablePager.firstPage();
     projectsDataProvider.refresh();
-    tablePager.setVisible(projectsDataProvider.getList().size() > tablePager.getPageSize());
+    tablePager.setPagerVisible(projectsDataProvider.getList().size() > tablePager.getPageSize());
     typeSortHandler.setList(projectsDataProvider.getList());
     ColumnSortEvent.fire(projectsTable, projectsTable.getColumnSortList());
   }

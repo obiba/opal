@@ -82,7 +82,7 @@
         <g:InlineLabel ui:field="noReports">
           <ui:msg description="No Reports label">No Reports</ui:msg>
         </g:InlineLabel>
-        <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
+        <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
         <o:Table ui:field="producedReportsTable"/>
       </g:FlowPanel>
     </g:FlowPanel>

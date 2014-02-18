@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
 import org.obiba.opal.web.gwt.app.client.ui.CriterionPanel;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TableVariableSuggestOracle;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
@@ -36,7 +37,6 @@ import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
@@ -105,7 +105,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   ControlGroup valuesFilterGroup;
 
   @UiField
-  SimplePager pager;
+  OpalSimplePager pager;
 
   @UiField
   InlineLabel noValues;
@@ -243,7 +243,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   @Override
   public void clearTable() {
     valuesTable.setVisible(false);
-    pager.setVisible(false);
+    pager.setPagerVisible(false);
     setRefreshing(true);
   }
 
@@ -397,7 +397,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     valuesTable.setPageSize(pageSize.getNumberValue().intValue());
     dataProvider = new ValueSetsDataProvider(isExactMatch);
     dataProvider.addDataDisplay(valuesTable);
-    pager.setVisible(valuesTable.getRowCount() > pager.getPageSize());
+    pager.setPagerVisible(valuesTable.getRowCount() > pager.getPageSize());
   }
 
   private void insertColumns(List<VariableDto> variables) {

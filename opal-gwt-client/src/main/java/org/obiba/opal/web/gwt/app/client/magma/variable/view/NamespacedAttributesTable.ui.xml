@@ -21,7 +21,7 @@
 
     <g:FlowPanel addStyleNames="clearfix">
       <b:Badge ui:field="namespaceLabel" type="SUCCESS" addStyleNames="small-top-margin"/>
-      <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
+      <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
     </g:FlowPanel>
 
     <g:FlowPanel addStyleNames="small-top-margin">

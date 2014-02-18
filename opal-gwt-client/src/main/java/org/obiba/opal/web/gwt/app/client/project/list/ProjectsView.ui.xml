@@ -34,7 +34,7 @@
       </b:Button>
     </b:ButtonGroup>
 
-    <b:SimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
+    <o:OpalSimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
     <o:Table ui:field="projectsTable" addStyleNames="small-top-margin"/>
 
   </g:FlowPanel>

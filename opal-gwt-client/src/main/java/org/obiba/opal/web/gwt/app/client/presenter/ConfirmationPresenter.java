@@ -26,8 +26,6 @@ import com.gwtplatform.mvp.client.View;
 public class ConfirmationPresenter extends PresenterWidget<ConfirmationPresenter.Display>
     implements ConfirmationUiHandlers {
 
-  private static final Translations translations = GWT.create(Translations.class);
-
   //
   // Instance Variables
   //

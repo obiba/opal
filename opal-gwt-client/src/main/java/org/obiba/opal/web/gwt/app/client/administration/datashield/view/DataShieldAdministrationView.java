@@ -13,6 +13,7 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.Dat
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ConstantActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
@@ -23,7 +24,6 @@ import org.obiba.opal.web.model.client.datashield.RFunctionDataShieldMethodDto;
 import org.obiba.opal.web.model.client.datashield.RScriptDataShieldMethodDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -61,7 +61,7 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
   CellTable<DataShieldMethodDto> methodsTable;
 
   @UiField
-  SimplePager methodsTablePager;
+  OpalSimplePager methodsTablePager;
 
   @UiField
   FlowPanel aggregateMethods;
@@ -94,7 +94,7 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
     methodsTablePager.firstPage();
     methodsTable.setVisible(size > 0);
     methodsDataProvider.refresh();
-    methodsTablePager.setVisible(size > methodsTablePager.getPageSize());
+    methodsTablePager.setPagerVisible(size > methodsTablePager.getPageSize());
   }
 
   @Override

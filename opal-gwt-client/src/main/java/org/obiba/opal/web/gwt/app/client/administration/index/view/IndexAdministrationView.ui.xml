@@ -68,7 +68,7 @@
         </b:DropdownButton>
       </g:FlowPanel>
 
-      <b:SimplePager ui:field="indexTablePager" location="RIGHT" addStyleNames="pull-right"/>
+      <o:OpalSimplePager ui:field="indexTablePager" location="RIGHT" addStyleNames="pull-right"/>
     </g:FlowPanel>
 
     <b:Alert ui:field="selectAllAlert" close="false" visible="false" addStyleNames="select">

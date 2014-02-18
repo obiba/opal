@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.ui.CategoricalVariableSuggestOracle;
 import org.obiba.opal.web.gwt.app.client.ui.CrossableVariableSuggestOracle;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
@@ -43,7 +44,6 @@ import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.FluidRow;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.ProgressBar;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.Typeahead;
@@ -150,7 +150,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   Panel valuesPanel;
 
   @UiField
-  SimplePager pager;
+  OpalSimplePager pager;
 
   @UiField
   TextBoxClearable filter;
@@ -326,7 +326,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @Override
   public void beforeRenderRows() {
-    pager.setVisible(false);
+    pager.setPagerVisible(false);
     selectAllItemsAlert.setVisible(false);
     table.showLoadingIndicator(dataProvider);
 
@@ -338,7 +338,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @Override
   public void afterRenderRows() {
     boolean enableItem = dataProvider.getList().size() > 0;
-    pager.setVisible(dataProvider.getList().size() > Table.DEFAULT_PAGESIZE);
+    pager.setPagerVisible(dataProvider.getList().size() > Table.DEFAULT_PAGESIZE);
     downloadDictionary.setDisabled(!enableItem);
     exportData.setDisabled(!enableItem);
     copyData.setDisabled(!enableItem);

@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.task.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
@@ -21,7 +22,6 @@ import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.model.client.opal.CommandStateDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -59,7 +59,7 @@ public class TasksView extends ViewImpl implements Display {
   Button clearButton;
 
   @UiField
-  SimplePager pager;
+  OpalSimplePager pager;
 
   ListDataProvider<CommandStateDto> dataProvider;
 
@@ -83,10 +83,9 @@ public class TasksView extends ViewImpl implements Display {
 
   @Override
   public void renderRows(JsArray<CommandStateDto> rows) {
-    pager.setVisible(rows.length() > 50); // OPAL-901
     pager.firstPage();
     dataProvider.setList(JsArrays.toList(rows));
-    pager.setVisible(dataProvider.getList().size() > pager.getPageSize());
+    pager.setPagerVisible(dataProvider.getList().size() > pager.getPageSize());
   }
 
   @Override

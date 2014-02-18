@@ -34,7 +34,7 @@
       <g:InlineLabel ui:field="noJobs">
         <ui:msg description="No Jobs label">No Jobs</ui:msg>
       </g:InlineLabel>
-      <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
+      <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
       <o:Table ui:field="table"/>
     </g:FlowPanel>
 

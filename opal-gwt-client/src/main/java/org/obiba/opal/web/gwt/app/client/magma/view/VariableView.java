@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.magma.variable.view.NamespacedAttributesTable;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.TabDeckPanel;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
@@ -35,7 +36,6 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CodeBlock;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.NavLink;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
@@ -123,7 +123,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   CategoriesTable categoryTable;
 
   @UiField
-  SimplePager categoryTablePager;
+  OpalSimplePager categoryTablePager;
 
   JsArrayDataProvider<CategoryDto> categoryProvider = new JsArrayDataProvider<CategoryDto>();
 
@@ -342,7 +342,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   public void renderCategoryRows(JsArray<CategoryDto> rows) {
     categoryProvider.setArray(rows);
     categoryTablePager.firstPage();
-    categoryTablePager.setVisible(categoryProvider.getList().size() > Table.DEFAULT_PAGESIZE);
+    categoryTablePager.setPagerVisible(categoryProvider.getList().size() > Table.DEFAULT_PAGESIZE);
     categoryProvider.refresh();
   }
 

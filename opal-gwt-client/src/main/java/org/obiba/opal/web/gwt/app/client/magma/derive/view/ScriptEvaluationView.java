@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.ScriptEvaluation
 import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.ui.NavTabsPanel;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueColumn.ValueSelectionHandler;
@@ -27,7 +28,6 @@ import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.github.gwtbootstrap.client.ui.CodeBlock;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -71,7 +71,7 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
   Table<ValueSetsDto.ValueSetDto> valuesTable;
 
   @UiField
-  SimplePager pager;
+  OpalSimplePager pager;
 
   @UiField
   InlineLabel noValues;
@@ -175,7 +175,7 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
 
     dataProvider = new ValueSetsDataProvider();
     dataProvider.addDataDisplay(valuesTable);
-    pager.setVisible(valuesTable.getRowCount() > pager.getPageSize());
+    pager.setPagerVisible(valuesTable.getRowCount() > pager.getPageSize());
   }
 
   @Override

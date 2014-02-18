@@ -130,7 +130,7 @@
           </b2:IconAnchor>
         </g:FlowPanel>
 
-        <b:SimplePager ui:field="categoryTablePager" location="RIGHT" addStyleNames="pull-right"/>
+        <o:OpalSimplePager ui:field="categoryTablePager" location="RIGHT" addStyleNames="pull-right"/>
         <o:Table ui:field="categoryTable" addStyleNames="pull-left small-top-margin"/>
 
         <g:FlowPanel>

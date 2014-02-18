@@ -24,6 +24,7 @@ import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.EditableListBox;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsVariableCopyColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ConstantActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.EditableColumn;
@@ -34,7 +35,6 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.cell.client.TextInputCell;
@@ -88,7 +88,7 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
   Panel multipleVariablePanel;
 
   @UiField
-  SimplePager pager;
+  OpalSimplePager pager;
 
   @UiField
   VariableEditableTable table;
@@ -215,7 +215,7 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
 
     dataProvider.setList(JsArrays.toList(rows));
 
-    pager.setVisible(dataProvider.getList().size() > PAGE_SIZE);
+    pager.setPagerVisible(dataProvider.getList().size() > PAGE_SIZE);
     if(dataProvider.getList().size() > 1) {
       singleVariablePanel.setVisible(false);
       multipleVariablePanel.setVisible(true);

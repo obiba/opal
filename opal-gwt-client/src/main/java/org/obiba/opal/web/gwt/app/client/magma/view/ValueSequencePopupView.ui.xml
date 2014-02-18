@@ -23,7 +23,7 @@
         <g:InlineLabel ui:field="noValues">
           <ui:msg description="No Variables label">No Values</ui:msg>
         </g:InlineLabel>
-        <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="top-margin right-aligned"></b:SimplePager>
+        <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="top-margin right-aligned" />
         <o:Table width="100%" ui:field="valuesTable" addStyleNames="left-aligned"/>
       </g:FlowPanel>
     </g:FlowPanel>

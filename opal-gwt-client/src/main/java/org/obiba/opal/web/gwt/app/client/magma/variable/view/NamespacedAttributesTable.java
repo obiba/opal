@@ -20,6 +20,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.NamespacedAttributesTableUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
@@ -30,7 +31,6 @@ import org.obiba.opal.web.model.client.magma.AttributeDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Badge;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -84,7 +84,7 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
   IconAnchor clearSelectionAnchor;
 
   @UiField
-  SimplePager pager;
+  OpalSimplePager pager;
 
   @UiField
   Table<JsArray<AttributeDto>> table;
@@ -163,11 +163,11 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
       rows.push(attributesMap.get(key));
     }
 
-    pager.firstPage();
-    pager.setVisible(rows.length() > Table.DEFAULT_PAGESIZE);
-
     provider.setList(JsArrays.toList(rows));
     provider.refresh();
+    pager.firstPage();
+    pager.setPagerVisible(rows.length() > Table.DEFAULT_PAGESIZE);
+
   }
 
   public void addEditableColumns() {

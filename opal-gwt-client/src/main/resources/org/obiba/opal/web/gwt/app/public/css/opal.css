@@ -133,6 +133,10 @@ li.no-icon > a {
   margin-bottom: 15px;
 }
 
+.very-large-top-margin {
+  margin-top: 30px;
+}
+
 .xlarge-bottom-margin {
   margin-bottom: 40px;
 }
@@ -172,6 +176,11 @@ li.no-icon > a {
 
 .almost-full-width {
   width: 93%;
+}
+
+.celltable-total-count {
+  font-family: Arial Unicode MS,Arial,sans-serif;
+  font-size: small;
 }
 
 /* Suggest list box */

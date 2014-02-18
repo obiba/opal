@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourceUiHandlers;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
@@ -31,7 +32,6 @@ import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.NavLink;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.core.client.JsArray;
@@ -106,7 +106,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   Table<TableDto> table;
 
   @UiField
-  SimplePager pager;
+  OpalSimplePager pager;
 
   @UiField
   Panel permissionsPanel;
@@ -252,7 +252,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
 
   @Override
   public void beforeRenderRows() {
-    pager.setVisible(false);
+    pager.setPagerVisible(false);
     table.showLoadingIndicator(dataProvider);
   }
 
@@ -260,7 +260,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   public void afterRenderRows() {
     dataProvider.refresh();
     boolean enableItem = table.getRowCount() > 0;
-    pager.setVisible(table.getRowCount() > Table.DEFAULT_PAGESIZE);
+    pager.setPagerVisible(table.getRowCount() > Table.DEFAULT_PAGESIZE);
     downloadDictionary.setEnabled(enableItem);
     exportData.setDisabled(!enableItem);
     copyData.setDisabled(!enableItem);

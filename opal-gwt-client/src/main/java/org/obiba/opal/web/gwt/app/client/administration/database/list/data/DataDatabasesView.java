@@ -11,19 +11,18 @@ package org.obiba.opal.web.gwt.app.client.administration.database.list.data;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.list.DatabaseListColumns;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
 
 import com.github.gwtbootstrap.client.ui.DropdownButton;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.RowCountChangeEvent;
@@ -36,10 +35,7 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
   interface Binder extends UiBinder<Widget, DataDatabasesView> {}
 
   @UiField
-  Panel databasesPanel;
-
-  @UiField
-  SimplePager pager;
+  OpalSimplePager pager;
 
   @UiField
   Table<DatabaseDto> table;
@@ -98,7 +94,7 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
 
   @UiHandler("table")
   public void onTableChange(RowCountChangeEvent event) {
-    pager.setVisible(table.getRowCount() > pager.getPageSize());
+    pager.setPagerVisible(table.getRowCount() > pager.getPageSize());
   }
 
   @Override
