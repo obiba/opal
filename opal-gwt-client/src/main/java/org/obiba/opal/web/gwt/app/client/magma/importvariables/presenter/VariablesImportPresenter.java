@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -87,6 +88,8 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
   }
 
+  private static final short MAX_ERROR_ALERTS = 5;
+
   private static final String EXCEL_TEMPLATE = "/opalVariableTemplate.xls";
 
   private final ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter;
@@ -97,6 +100,8 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
   private final Translations translations;
 
+  private final TranslationMessages translationMessages;
+
   private String transientDatasourceName;
 
   private String datasourceName;
@@ -106,12 +111,13 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   public VariablesImportPresenter(Display display, EventBus eventBus,
       ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter,
       ConclusionStepPresenter conclusionPresenter, FileSelectionPresenter fileSelectionPresenter,
-      Translations translations) {
+      Translations translations, TranslationMessages translationMessages) {
     super(eventBus, display);
     this.comparedDatasourcesReportPresenter = comparedDatasourcesReportPresenter;
     this.conclusionPresenter = conclusionPresenter;
     this.fileSelectionPresenter = fileSelectionPresenter;
     this.translations = translations;
+    this.translationMessages = translationMessages;
     init();
   }
 
@@ -438,11 +444,17 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
       if(error.getExtension(DatasourceParsingErrorDto.ClientErrorDtoExtensions.errors) != null) {
         JsArray<DatasourceParsingErrorDto> parsingErrors = (JsArray<DatasourceParsingErrorDto>) error
             .getExtension(DatasourceParsingErrorDto.ClientErrorDtoExtensions.errors);
-
+        short count = 0;
         for(DatasourceParsingErrorDto datasourceParsingErrorDto : JsArrays.toIterable(parsingErrors)) {
+          int actualErrors = parsingErrors.length();
           getView().showError(null, TranslationsUtils
               .replaceArguments(translations.datasourceParsingErrorMap().get(datasourceParsingErrorDto.getKey()),
                   datasourceParsingErrorDto.getArgumentsArray()));
+
+          if (++count >= MAX_ERROR_ALERTS && actualErrors != MAX_ERROR_ALERTS) {
+            getView().showError(null, translationMessages.errorsRemainingMessage(actualErrors- MAX_ERROR_ALERTS));
+            break;
+          }
         }
       } else {
         getView().showError(null, translations.variableImportFailed());

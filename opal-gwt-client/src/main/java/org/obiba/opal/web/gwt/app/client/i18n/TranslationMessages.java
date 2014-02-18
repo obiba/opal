@@ -382,4 +382,8 @@ public interface TranslationMessages extends Messages {
   @AlternateMessage({ "one", "Variable", "other", "Variables" })
   String variablesLabel(@PluralCount int nb);
 
+  @Description("Errors remaining message")
+  @DefaultMessage("There are still {0} errors remaining. Please contact your administrator for further help.")
+  String errorsRemainingMessage(int nb);
+
 }
