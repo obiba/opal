@@ -148,6 +148,11 @@ public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperti
         Objects.equal(permission, other.permission);
   }
 
+  @Override
+  public String toString() {
+    return "[" + domain + ", " + node + ", " + principal + ", " + type + ", " + permission + "]";
+  }
+
   public static class Subject implements Comparable<Subject>, Serializable {
 
     private static final long serialVersionUID = -4104563748622536925L;

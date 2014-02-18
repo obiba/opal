@@ -9,6 +9,8 @@ import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -17,6 +19,8 @@ import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 
 public class MoveSubjectAclToOrientUpgradeStep extends AbstractUpgradeStep {
+
+  private static final Logger log = LoggerFactory.getLogger(MoveSubjectAclToOrientUpgradeStep.class);
 
   @Autowired
   private DatabaseRegistry databaseRegistry;
@@ -36,7 +40,11 @@ public class MoveSubjectAclToOrientUpgradeStep extends AbstractUpgradeStep {
     List<SubjectAcl> list = dataJdbcTemplate.query("select * from subject_acl", new SubjectAclRowMapper());
     for(SubjectAcl acl : list) {
       if(!acl.getNode().startsWith("/auth/session/") && !"FILES_META".equals(acl.getPermission())) {
+        try {
         orientDbService.save(null, acl);
+        } catch(Exception e) {
+          log.error("Unable to save SubjectAcl: {}", acl, e);
+        }
       }
     }
     dataJdbcTemplate.execute("drop table subject_acl");

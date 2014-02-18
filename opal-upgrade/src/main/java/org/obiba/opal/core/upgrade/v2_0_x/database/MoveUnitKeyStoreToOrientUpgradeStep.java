@@ -57,6 +57,7 @@ import org.xml.sax.SAXException;
 import com.google.common.collect.Maps;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
+import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 
 @SuppressWarnings({ "SpringJavaAutowiringInspection", "MethodOnlyUsedFromInnerClass" })
 public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
@@ -104,8 +105,9 @@ public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
             opalKeyStore.setCallbackHandler(upgradePasswordCallbackHandler);
             importCertificates(unit, opalKeyStore);
             importKeyPairs(unit, opalKeyStore);
-          } catch(GeneralSecurityException | UnsupportedCallbackException | IOException e) {
-            throw new RuntimeException(e);
+          } catch(Exception e) {
+            // do not break the upgrade
+            log.error("Unable to import certificate/key pair for unit: {}", unit, e);
           }
         }
       }
@@ -146,8 +148,13 @@ public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
           .authenticationType(SubjectCredentials.AuthenticationType.CERTIFICATE) //
           .enabled(true) //
           .group(unit);
-      saveSubjectCredentials(builder.build(), certificate);
-      changeUnitSubjectTypeToGroup(unit);
+      try {
+        saveSubjectCredentials(builder.build(), certificate);
+        changeUnitSubjectTypeToGroup(unit);
+      } catch(Exception e) {
+        // do not break the upgrade
+        log.error("Unable to save user credentials: {}-{}", unit, alias, e);
+      }
     }
   }
 
@@ -176,8 +183,16 @@ public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
     orientDbService.execute(new OrientDbService.WithinDocumentTxCallbackWithoutResult() {
       @Override
       protected void withinDocumentTxWithoutResult(ODatabaseDocumentTx db) {
-        db.command(new OCommandSQL("update " + SubjectAcl.class.getSimpleName() + " set type = ? where principal = ?"))
-            .execute(SubjectAcl.SubjectType.GROUP, unit);
+        try {
+          db.command(
+              new OCommandSQL("update " + SubjectAcl.class.getSimpleName() + " set type = ? where principal = ?"))
+              .execute(SubjectAcl.SubjectType.GROUP, unit);
+        } catch (ORecordDuplicatedException e1) {
+          // ignore
+        } catch(Exception e) {
+          // do not break the upgrade
+          log.error("Unable to change permission's subject type for principal: {}", unit, e);
+        }
       }
     });
   }

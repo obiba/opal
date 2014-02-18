@@ -20,6 +20,8 @@
     <property name="configFile" value="file:${OPAL_HOME}/data/opal-config.xml"/>
   </bean>
 
+  <bean id="opalRuntime" class="org.obiba.opal.core.upgrade.support.OpalRuntimeMock"/>
+
   <bean id="upgradeOpalConfigurationIo" class="org.obiba.opal.core.upgrade.v2_0_x.UpgradeOpalConfigurationIo"/>
 
   <bean id="cryptoService" class="org.obiba.opal.core.service.security.CryptoServiceImpl"/>
