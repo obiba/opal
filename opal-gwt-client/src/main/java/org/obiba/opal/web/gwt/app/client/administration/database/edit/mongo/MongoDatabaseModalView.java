@@ -106,7 +106,6 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
 
   private void init() {
     modal.hide();
-//    url.getElement().setAttribute("placeholder", "mongodb://{host}:{port}/{databaseName}");
     properties.getElement().setAttribute("placeholder", translations.keyValueLabel());
 
     // used to support ConstraintViolation exceptions
@@ -118,7 +117,7 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
 
   @Override
   public void initUrl(boolean isIdentifiers) {
-    url.setText(isIdentifiers ? "mongodb://localhost:3306/opal_ids": "mongodb://localhost:3306/opal_data");
+    url.setText(isIdentifiers ? "mongodb://localhost:3306/opal_ids" : "mongodb://localhost:3306/opal_data");
   }
 
   @Override
@@ -197,7 +196,7 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
   }
 
   @Override
-  public  void setAvailableUsages(Collection<Usage> usages) {
+  public void setAvailableUsages(Collection<Usage> usages) {
     for(Usage usageType : usages) {
       usage.addItem(usageType.getLabel(), usageType.name());
     }
