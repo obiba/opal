@@ -98,6 +98,30 @@ th input[type="checkbox"], td input[type="checkbox"] {
     width: 90%;
   }
 
+  /*
+ * Diff widget
+ */
+  td.diff-rm {
+    background-color: #FDD;
+  }
+
+  td.diff-add {
+    background-color: #DFD;
+  }
+
+  td.diff-hunk {
+    color: #999;
+    background-color: #f8f8ff;
+  }
+
+  td.diff-line-num {
+    color: #999;
+  }
+
+  td.diff-line-code {
+    font-family: Consolas, "Liberation Mono", Courier, monospace;
+  }
+
 }
 
 .typeahead {
@@ -112,13 +136,26 @@ th input[type="checkbox"], td input[type="checkbox"] {
   margin-bottom: 10px;
 }
 
-.dropdown-menu > li.controls {
-  padding: 3px 20px;
-  color: #FFFFFF;
-}
+.dropdown-menu {
 
-.dropdown-menu > li.active > a, .dropdown-menu > li.active > a:hover {
-  color: #FFFFFF;
+  & > li.controls {
+    padding: 3px 20px;
+    color: @white;
+  }
+
+  & > li.active > a,
+  & > li.active > a:hover {
+    color: @white;
+  }
+
+  & > li.controls > div ul {
+    color: @black;
+  }
+
+  & > li.controls > div ul {
+    color: @black;
+  }
+
 }
 
 .input-append .add-on, .input-prepend .add-on {
@@ -127,7 +164,7 @@ th input[type="checkbox"], td input[type="checkbox"] {
 
 .alert {
   a {
-    color: #FFFFFF;
+    color: @white;
     font-weight: bold;
   }
   .select {
@@ -139,10 +176,6 @@ th input[type="checkbox"], td input[type="checkbox"] {
 .gwt-DialogBox {
   z-index: 1050;
 }
-
-/*
- * Opal
- */
 
 .main {
   padding: 0 40px;
@@ -301,7 +334,7 @@ li.no-icon > a {
 }
 
 .celltable-total-count {
-  font-family: Arial Unicode MS,Arial,sans-serif;
+  font-family: Arial Unicode MS, Arial, sans-serif;
   font-size: small;
 }
 
@@ -476,30 +509,6 @@ div.step > div > div > div.ace_editor {
   min-height: 200px;
 }
 
-/*
- * Diff widget
- */
-.table td.diff-rm {
-  background-color: #FDD;
-}
-
-.table td.diff-add {
-  background-color: #DFD;
-}
-
-.table td.diff-hunk {
-  color: #999;
-  background-color: #f8f8ff;
-}
-
-.table td.diff-line-num {
-  color: #999;
-}
-
-.table td.diff-line-code {
-  font-family: Consolas, "Liberation Mono", Courier, monospace;
-}
-
 input.database-url {
   width: 450px;
 }
@@ -609,36 +618,19 @@ ul.chooser-options {
   border-top: 0;
 }
 
-/*
- * Cross table header
- */
 .cross-table-header {
   font-weight: bold;
   text-align: center !important;
 }
 
-/*
- * Attributes
- */
 .attribute-value > .label {
   margin-bottom: 2px;
-}
-
-.dropdown-menu > li.controls > div ul {
-  color: #000000;
 }
 
 .datepicker-days,
 .datepicker-months,
 .datepicker-years {
-  background-color: #FFFFFF;
-}
-
-/*
- * Chosen listbox for facet values filter
- */
-.dropdown-menu > li.controls > div ul {
-  color: #000000;
+  background-color: @white;
 }
 
 .database-url-example {
@@ -669,7 +661,7 @@ a.bookmark,
 a.bookmark:visited,
 a.bookmark:hover,
 a.bookmark:focus {
-  color: #B4BCC2;
+  color: @grayLight;
   text-decoration: none;
 }
 
