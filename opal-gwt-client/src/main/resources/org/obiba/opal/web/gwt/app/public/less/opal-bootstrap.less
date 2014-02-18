@@ -1,26 +1,41 @@
 a:visited {
-  color: #1ABC9C;
+  color: @linkColor;
+}
+
+a:hover {
+  cursor: pointer;
+}
+
+h4 {
+  margin-top: 30px;
+}
+
+li {
+  list-style-type: none;
 }
 
 footer.footer {
   margin-top: 40px;
   font-size: 0.8em;
+
+  .container > div {
+    border-top: 1px solid #E5E5E5;
+    padding-top: 20px;
+  }
 }
 
-footer.footer .container > div {
-  border-top: 1px solid #E5E5E5;
-  padding-top: 20px;
-}
+.page-header {
 
-.page-header .btn-group {
-  margin-top: 10px;
-}
+  .btn-group {
+    margin-top: 10px;
+  }
 
-.page-header .breadcrumb {
-  background: none;
-  font-size: 2em;
-  margin: 0;
-  padding: 0;
+  .breadcrumb {
+    background: none;
+    font-size: 2em;
+    margin: 0;
+    padding: 0;
+  }
 }
 
 .breadcrumb {
@@ -58,30 +73,30 @@ th input[type="checkbox"], td input[type="checkbox"] {
   background-color: #bfc6cb;
 }
 
-.table thead {
-  background-color: #EEEEEE;
-  border-top: 1px solid #CCCCCC;
-  border-bottom: 1px solid #CCCCCC;
-}
+.table {
 
-.table thead th {
-  vertical-align: middle;
-}
+  thead {
+    background-color: #EEEEEE;
+    border-top: 1px solid #CCCCCC;
+    border-bottom: 1px solid #CCCCCC;
 
-.table th, .table td {
-  border-bottom-color: #EEEEEE;
-}
+    th {
+      vertical-align: middle;
+    }
+  }
 
-a:hover {
-  cursor: pointer;
-}
+  th, td {
+    border-bottom-color: #EEEEEE;
+  }
 
-.table select, .table textarea, .table input {
-  margin-bottom: 0;
-}
+  .table select, .table textarea, .table input {
+    margin-bottom: 0;
+  }
 
-.table textarea, .table input[type="text"] {
-  width: 90%;
+  textarea, input[type="text"] {
+    width: 90%;
+  }
+
 }
 
 .typeahead {

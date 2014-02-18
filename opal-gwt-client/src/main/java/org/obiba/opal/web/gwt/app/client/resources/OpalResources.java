@@ -11,7 +11,6 @@ package org.obiba.opal.web.gwt.app.client.resources;
 
 import com.github.gwtbootstrap.client.ui.resources.Resources;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.CssResource;
 import com.google.gwt.resources.client.CssResource.NotStrict;
 import com.google.gwt.resources.client.TextResource;
@@ -19,6 +18,7 @@ import com.google.gwt.resources.client.TextResource;
 /**
  *
  */
+@SuppressWarnings("UnusedDeclaration")
 public interface OpalResources extends Resources {
 
   OpalResources INSTANCE = GWT.create(OpalResources.class);
@@ -28,7 +28,7 @@ public interface OpalResources extends Resources {
   CssResource css();
 
   @Override
-  @Source("org/obiba/opal/web/gwt/app/public/css/bootstrap.min.css")
+  @Source("org/obiba/opal/web/gwt/app/public/css/bootstrap.css")
   TextResource bootstrapCss();
 
 }

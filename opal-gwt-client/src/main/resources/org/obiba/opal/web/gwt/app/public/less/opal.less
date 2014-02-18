@@ -1,25 +1,6 @@
-@import "opal-gwt.css";
-@import "opal-bootstrap.css";
-
-body {
-  background-color: #fefefe;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 500;
-}
-
-h4 {
-  margin-top: 30px;
-}
-
-li {
-  list-style-type: none;
-}
-
-/*
- * Opal
- */
+@import "variables.less";
+@import "opal-gwt.less";
+@import "opal-bootstrap.less";
 
 .main {
   padding: 0 40px;
@@ -164,10 +145,9 @@ li.no-icon > a {
 
 .section-header {
   margin-top: 20px;
-}
-
-.section-header .breadcrumb {
-  font-size: 28px;
+  .breadcrumb {
+    font-size: 28px;
+  }
 }
 
 .italic {
@@ -190,36 +170,51 @@ ul.closeables {
   margin-bottom: 0;
   margin-left: 0;
   margin-top: 1px;
-}
 
-/* Truncate labels depending on screen resolution */
-ul.closeables li {
-  float: left;
-  list-style: none outside none;
-  border-radius: 2px 2px 2px 2px;
-  -moz-border-radius: 2px 2px 2px 2px;
-  -webkit-border-radius: 2px 2px 2px 2px;
-  margin-left: 4px;
-  padding: 0px 6px 0 0;
-  background-color: #B4BCC2;
-  margin-top: -4px;
-  color: #FFFFFF;
-  font-weight: bold;
-  vertical-align: baseline;
-  white-space: nowrap;
-  line-height: 14px;
-  font-size: 1.1em;
-}
+  /* Truncate labels depending on screen resolution */
+  li {
+    float: left;
+    list-style: none outside none;
+    border-radius: 2px 2px 2px 2px;
+    -moz-border-radius: 2px 2px 2px 2px;
+    -webkit-border-radius: 2px 2px 2px 2px;
+    margin-left: 4px;
+    padding: 0px 6px 0 0;
+    background-color: #B4BCC2;
+    margin-top: -4px;
+    color: #FFFFFF;
+    font-weight: bold;
+    vertical-align: baseline;
+    white-space: nowrap;
+    line-height: 14px;
+    font-size: 1.1em;
 
-/* Truncate labels depending on screen resolution */
-ul.closeables li span {
-  display: inline-block;
-  vertical-align: middle;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  -o-text-overflow: ellipsis;
-  -ms-text-overflow: ellipsis;
+    /* Truncate labels depending on screen resolution */
+    span {
+      display: inline-block;
+      vertical-align: middle;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      -o-text-overflow: ellipsis;
+      -ms-text-overflow: ellipsis;
+    }
+
+    a {
+      display: inline-block;
+      color: #FFFFFF;
+      text-decoration: none;
+    }
+
+    .focus {
+      background: #d4d4d4;
+      .label {
+        background: #d4d4d4;
+      }
+    }
+
+  }
+
 }
 
 @media all and (max-width: 1189px) {
@@ -258,36 +253,40 @@ ul.closeables li span {
   }
 }
 
-ul.closeables li.focus, ul.closeables li.focus .label {
-  background: #d4d4d4;
-}
-
-ul.closeables li a {
-  display: inline-block;
-  color: #FFFFFF;
-  text-decoration: none;
-}
-
 .obiba-SuggestListBox {
-  border: 1px solid #CCCCCC;
-  border-radius: 3px 3px 3px 3px;
   -moz-border-radius: 3px 3px 3px 3px;
   -webkit-border-radius: 3px 3px 3px 3px;
   -moz-transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
-}
-
-.obiba-SuggestListBox > div {
-  margin: 0;
-  padding: 4px 6px;
-  height: 20px;
-}
-
-.obiba-SuggestListBox input {
-  border: none;
+  border: 2px solid #DCE4EC;
+  border-radius: 6px;
   box-shadow: none;
-  margin: 0px 0px 0px 4px;
-  padding: 0px;
+  padding: 3px;
+  background-color: #FFFFFF;
+  display: inline-block;
+  vertical-align: middle;
+
+  & > div {
+    margin: 0;
+    padding: 4px 6px;
+    height: 20px;
+  }
+
+  input {
+    border: none;
+    box-shadow: none;
+    margin: 0px 0px 0px 4px;
+    padding: 0px;
+
+    &:focus {
+      border: none;
+      box-shadow: none;
+    }
+  }
+
+  .navbar-search {
+    margin-top: 7px;
+  }
+
 }
 
 /* Width is dependent of screen resolution */
@@ -297,29 +296,10 @@ ul.closeables li a {
   }
 }
 
-@media all and (max-width: 1529px)and (min-width: 1190px) {
+@media all and (max-width: 1529px) and (min-width: 1190px) {
   .obiba-SuggestListBox input {
     width: 250px;
   }
-}
-
-.obiba-SuggestListBox input:focus {
-  border: none;
-  box-shadow: none;
-}
-
-.obiba-SuggestListBox {
-  border: 2px solid #DCE4EC;
-  border-radius: 6px;
-  box-shadow: none;
-  padding: 3px;
-  background-color: #FFFFFF;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.obiba-SuggestListBox.navbar-search {
-  margin-top: 7px;
 }
 
 .textbox-clearable-anchor {
@@ -360,25 +340,23 @@ div.step > div > div > div.ace_editor {
 /*
  * Diff widget
  */
-.table td.diff-rm {
-  background-color: #FDD;
-}
-
-.table td.diff-add {
-  background-color: #DFD;
-}
-
-.table td.diff-hunk {
-  color: #999;
-  background-color: #f8f8ff;
-}
-
-.table td.diff-line-num {
-  color: #999;
-}
-
-.table td.diff-line-code {
-  font-family: Consolas, "Liberation Mono", Courier, monospace;
+.table {
+  td.diff-rm {
+    background-color: #FDD;
+  }
+  td.diff-add {
+    background-color: #DFD;
+  }
+  td.diff-hunk {
+    color: #999;
+    background-color: #f8f8ff;
+  }
+  td.diff-line-num {
+    color: #999;
+  }
+  td.diff-line-code {
+    font-family: Consolas, "Liberation Mono", Courier, monospace;
+  }
 }
 
 input.database-url {
@@ -417,18 +395,16 @@ td.row-bookmarks span {
  */
 .chooser {
   margin-bottom: 10px;
-}
-
-.chooser > ul {
-  border: 2px solid #DCE4EC !important;
-  border-radius: 6px 6px 6px 6px;
-  padding: 4px 6px !important;
-  text-indent: 1px;
-}
-
-.chooser > ul > li {
-  margin-top: 4px !important;
-  margin-right: 3px !important;
+  & > ul {
+    border: 2px solid #DCE4EC !important;
+    border-radius: 6px 6px 6px 6px;
+    padding: 4px 6px !important;
+    text-indent: 1px;
+    & > li {
+      margin-top: 4px !important;
+      margin-right: 3px !important;
+    }
+  }
 }
 
 ul.chooser-options {
@@ -437,11 +413,10 @@ ul.chooser-options {
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
   border-radius: 6px;
-}
-
-ul.chooser-options > li {
-  color: #FFFFFF;
-  font-weight: bold;
+  & > li {
+    color: #FFFFFF;
+    font-weight: bold;
+  }
 }
 
 /*

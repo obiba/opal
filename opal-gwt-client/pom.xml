@@ -210,6 +210,31 @@
         </executions>
       </plugin>
 
+      <plugin>
+        <groupId>org.lesscss</groupId>
+        <artifactId>lesscss-maven-plugin</artifactId>
+        <configuration>
+          <sourceDirectory>
+            ${project.basedir}/src/main/resources/org/obiba/opal/web/gwt/app/public/less
+          </sourceDirectory>
+          <outputDirectory>
+            ${project.build.directory}/${project.build.finalName}/WEB-INF/classes/org/obiba/opal/web/gwt/app/public/css
+          </outputDirectory>
+          <compress>true</compress>
+          <includes>
+            <include>bootstrap.less</include>
+            <include>opal.less</include>
+          </includes>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
 
