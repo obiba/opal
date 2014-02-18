@@ -26,6 +26,8 @@ import org.obiba.magma.ValueTable;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.QuerySearchJsonBuilder;
 import org.obiba.opal.web.ws.SortDir;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Path("/datasources/variables")
 public class DatasourcesVariablesSearchResource extends AbstractVariablesSearchResource {
 
-//  private static final Logger log = LoggerFactory.getLogger(DatasourcesVariablesSearchResource.class);
+  private static final Logger log = LoggerFactory.getLogger(DatasourcesVariablesSearchResource.class);
 
   @GET
   @POST
@@ -54,6 +56,7 @@ public class DatasourcesVariablesSearchResource extends AbstractVariablesSearchR
       Search.QueryResultDto dtoResponse = convertResponse(executeQuery(jsonBuilder.build()));
       return Response.ok().entity(dtoResponse).build();
     } catch(Exception e) {
+      log.error("Unable to perform variables search", e);
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
   }

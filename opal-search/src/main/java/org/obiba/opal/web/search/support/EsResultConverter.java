@@ -162,7 +162,7 @@ public class EsResultConverter {
         Search.ItemResultDto.Builder dtoItemResultBuilder = Search.ItemResultDto.newBuilder();
         JSONObject jsonHit = jsonHits.getJSONObject(i);
         dtoItemResultBuilder.setIdentifier(jsonHit.getString("_id"));
-        JSONObject fields = jsonHit.getJSONObject("fields").getJSONObject("partial");
+        JSONObject fields = jsonHit.getJSONObject("fields").getJSONArray("partial").getJSONObject(0);
 
         int tableIndex = fields.getInt("index");
         fields.remove("index"); // no longer needed

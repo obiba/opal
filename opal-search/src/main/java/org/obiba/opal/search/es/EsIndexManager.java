@@ -137,7 +137,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
       log.info("Creating index [{}]", getName());
       idxAdmin.prepareCreate(getName()).setSettings(getIndexSettings()).execute().actionGet();
     }
-    return opalSearchService.getClient().admin().cluster().prepareState().setFilterIndices(getName()).execute()
+    return opalSearchService.getClient().admin().cluster().prepareState().setIndices(getName()).execute()
         .actionGet().getState().getMetaData().index(getName());
   }
 
@@ -405,7 +405,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
     private IndexMetaData getIndexMetaData() {
       if(opalSearchService.getClient() == null) return null;
 
-      IndexMetaData imd = opalSearchService.getClient().admin().cluster().prepareState().setFilterIndices(getName())
+      IndexMetaData imd = opalSearchService.getClient().admin().cluster().prepareState().setIndices(getName())
           .execute().actionGet().getState().getMetaData().index(getName());
       return imd == null ? createIndex() : imd;
     }
