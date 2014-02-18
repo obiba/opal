@@ -59,7 +59,7 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
     variablePresenter = new VariablePresenter(displayMock, new CountingEventBus(), null, null,
         new SummaryTabPresenter(eventBusMock, summaryTabMock), null, mockResourcePermissionProvider,
         variableVcsCommitHistoryPresenterMock, variablesToViewProvider, categoriesEditorModalProvider,
-        propertiesEditorModalProvider, varAttributeModalProvider);
+        propertiesEditorModalProvider, varAttributeModalProvider, null);
   }
 
   @SuppressWarnings("unchecked")
