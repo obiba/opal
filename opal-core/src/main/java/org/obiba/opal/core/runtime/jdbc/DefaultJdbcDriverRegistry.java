@@ -31,15 +31,15 @@ public class DefaultJdbcDriverRegistry implements JdbcDriverRegistry {
 
   private static final Map<String, String> SUPPORTED_DRIVER_CLASS_TO_NAME = ImmutableMap
       .of("com.mysql.jdbc.Driver", "MySQL", //
-          "org.hsqldb.jdbcDriver", "HSQLDB");
+          "org.hsqldb.jdbc.JDBCDriver", "HSQLDB");
 
   private static final Map<String, String> DRIVER_CLASS_TO_URL_TEMPLATE = ImmutableMap
       .of("com.mysql.jdbc.Driver", "jdbc:mysql://{hostname}:{port}/{databaseName}", //
-          "org.hsqldb.jdbcDriver", "jdbc:hsqldb:file:{databaseName};shutdown=true;hsqldb.tx=mvcc");
+          "org.hsqldb.jdbc.JDBCDriver", "jdbc:hsqldb:file:{databaseName};shutdown=true;hsqldb.tx=mvcc");
 
   private static final Map<String, String> DRIVER_CLASS_TO_URL_EXAMPLE = ImmutableMap
       .of("com.mysql.jdbc.Driver", "jdbc:mysql://localhost:3306/opal", //
-          "org.hsqldb.jdbcDriver", "jdbc:hsqldb:file:opal;shutdown=true;hsqldb.tx=mvcc");
+          "org.hsqldb.jdbc.JDBCDriver", "jdbc:hsqldb:file:opal;shutdown=true;hsqldb.tx=mvcc");
 
   @Override
   public Iterable<Driver> listDrivers() {

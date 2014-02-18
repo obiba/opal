@@ -28,7 +28,6 @@ import com.github.gwtbootstrap.client.ui.TextArea;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -188,18 +187,16 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   public void initUrl(boolean isIdentifiers) {
     this.isIdentifiers = isIdentifiers;
 
-    GWT.log("initUrl" + getDriver().getText());
     String text = "";
     if(getDriver().getText() == null || "com.mysql.jdbc.Driver".equals(getDriver().getText())) {
       text += "jdbc:mysql://localhost:3306/";
-    } else if("org.hsqldb.jdbc.JDBCDriver".equals(getDriver().getText()))   {
+    } else if("org.hsqldb.jdbcDriver".equals(getDriver().getText())) {
       text += "jdbc:hsqldb:mem:";
     }
 
     if(!text.isEmpty()) {
       url.setText(isIdentifiers ? text + "opal_ids" : text + "opal_data");
     }
-
   }
 
   @Override

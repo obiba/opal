@@ -1,7 +1,8 @@
 package org.obiba.opal.web.system.database;
 
 import java.io.IOException;
-import java.sql.Driver;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -24,9 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-
 @Component
 @Transactional
 @Path("/system/databases/jdbc-drivers")
@@ -37,17 +35,19 @@ public class JdbcDriversResource {
 
   @GET
   public Iterable<Database.JdbcDriverDto> getJdbcDrivers() {
-    return Iterables.transform(jdbcDriverRegistry.listDrivers(), new Function<Driver, Database.JdbcDriverDto>() {
-      @Override
-      public Database.JdbcDriverDto apply(Driver driver) {
-        return Database.JdbcDriverDto.newBuilder() //
-            .setDriverName(jdbcDriverRegistry.getDriverName(driver)) //
-            .setDriverClass(driver.getClass().getName()) //
-            .setJdbcUrlTemplate(jdbcDriverRegistry.getJdbcUrlTemplate(driver)) //
-            .setJdbcUrlExample(jdbcDriverRegistry.getJdbcUrlExample(driver)) //
-            .setVersion(driver.getMajorVersion() + "." + driver.getMinorVersion()).build();
-      }
-    });
+    List<Database.JdbcDriverDto> drivers = new ArrayList<>();
+    drivers.add(Database.JdbcDriverDto.newBuilder() //
+        .setDriverName("MySQL") //
+        .setDriverClass("com.mysql.jdbc.Driver") //
+        .setJdbcUrlTemplate("jdbc:mysql://{hostname}:{port}/{databaseName}") //
+        .setJdbcUrlExample("jdbc:mysql://localhost:3306/opal").build());
+    drivers.add(Database.JdbcDriverDto.newBuilder() //
+        .setDriverName("HSQLDB") //
+        .setDriverClass("org.hsqldb.jdbcDriver") //
+        .setJdbcUrlTemplate("jdbc:hsqldb:file:{databaseName};shutdown=true;hsqldb.tx=mvcc") //
+        .setJdbcUrlExample("jdbc:hsqldb:file:opal;shutdown=true;hsqldb.tx=mvcc").build());
+
+    return drivers;
   }
 
   @POST

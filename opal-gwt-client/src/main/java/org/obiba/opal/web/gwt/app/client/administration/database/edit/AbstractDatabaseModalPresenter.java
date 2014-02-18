@@ -137,7 +137,7 @@ public abstract class AbstractDatabaseModalPresenter<TView extends AbstractDatab
   public void createNewIdentifierDatabase(DatabaseDto dto) {
     setDialogMode(Mode.CREATE);
     displayDatabase(dto);
-
+    getView().initUrl(true);
     hideNonEditableIdentifiersDatabaseFields();
     usedForIdentifiers = true;
   }
