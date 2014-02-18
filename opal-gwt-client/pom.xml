@@ -218,11 +218,12 @@
             ${project.basedir}/src/main/resources/org/obiba/opal/web/gwt/app/public/less
           </sourceDirectory>
           <outputDirectory>
-            ${project.build.directory}/${project.build.finalName}/WEB-INF/classes/org/obiba/opal/web/gwt/app/public/css
+            ${project.basedir}/src/main/resources/org/obiba/opal/web/gwt/app/public/css
           </outputDirectory>
           <compress>true</compress>
           <includes>
-            <include>bootstrap.less</include>
+            <!-- files need to be renamed with the named expected by gwt-bootstrap -->
+            <include>bootstrap.min.less</include>
             <include>opal.less</include>
           </includes>
         </configuration>
