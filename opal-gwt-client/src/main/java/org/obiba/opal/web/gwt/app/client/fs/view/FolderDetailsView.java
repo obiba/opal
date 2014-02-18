@@ -201,14 +201,22 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
         public SafeHtml render(String object) {
           FileDto file = FileDto.parse(object);
           String icon = "icon-file";
-          if(file.getType().getName().equals(FileType.FOLDER.getName())) {
+          boolean isFolder = file.getType().getName().equals(FileType.FOLDER.getName());
+          if(isFolder) {
             icon = "icon-folder-close";
           }
           if(!file.getReadable()) {
             icon = "icon-lock";
           }
-          return new SafeHtmlBuilder().appendHtmlConstant("<i class=\"" + icon + "\"></i> <a>")
-              .appendEscaped(file.getName()).appendHtmlConstant("</a>").toSafeHtml();
+          SafeHtmlBuilder builder = new SafeHtmlBuilder().appendHtmlConstant("<i class=\"" + icon + "\"></i> ");
+
+          if(isFolder && file.getReadable()) {
+            builder.appendHtmlConstant("<a>").appendEscaped(file.getName()).appendHtmlConstant("</a>");
+          } else {
+            builder.appendEscaped(file.getName());
+          }
+
+          return builder.toSafeHtml();
         }
       }));
 
