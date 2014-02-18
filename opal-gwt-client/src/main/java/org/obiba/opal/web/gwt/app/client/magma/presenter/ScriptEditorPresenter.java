@@ -34,8 +34,6 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
 
   private TableDto table;
 
-  private String variableName;
-
   private final ModalProvider<ScriptEvaluationPopupPresenter> scriptEvaluationPopupProvider;
 
   private VariableDtoFactory variableDtoFactory = new DefaultVariableDtoFactory();
@@ -68,7 +66,6 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
           @Override
           public void onResource(Response response, TableDto resource) {
             setTable(resource);
-            setVariableName(variableName);
           }
 
         }).send();
@@ -76,10 +73,6 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
 
   public void setTable(TableDto table) {
     this.table = table;
-  }
-
-  public void setVariableName(String variableName) {
-    this.variableName = variableName;
   }
 
   public void setRepeatable(boolean repeatable) {
@@ -138,7 +131,6 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
     public VariableDto create() {
       String selectedScript = getView().getSelectedScript();
       VariableDto derived = VariableDto.create();
-      derived.setName(variableName);
       String script = null;
 
       if(Strings.isNullOrEmpty(selectedScript)) {

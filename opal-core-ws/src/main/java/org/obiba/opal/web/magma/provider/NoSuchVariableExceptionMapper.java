@@ -10,12 +10,17 @@
 package org.obiba.opal.web.magma.provider;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.magma.NoSuchVariableException;
+import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.model.Ws;
 import org.springframework.stereotype.Component;
+
+import com.google.common.base.Strings;
+
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 @Component
 @Provider
@@ -23,7 +28,11 @@ public class NoSuchVariableExceptionMapper implements ExceptionMapper<NoSuchVari
 
   @Override
   public Response toResponse(NoSuchVariableException exception) {
-    return Response.status(Status.NOT_FOUND).entity(exception.getMessage()).build();
+    Ws.ClientErrorDto errorDto = Strings.isNullOrEmpty(exception.getValueTableName())
+        ? ClientErrorDtos.getErrorMessage(NOT_FOUND, "NoSuchVariable").addArguments(exception.getName()).build()
+        : ClientErrorDtos.getErrorMessage(NOT_FOUND, "NoSuchVariableInTable").addArguments(exception.getName())
+            .addArguments(exception.getValueTableName()).build();
+    return Response.status(NOT_FOUND).entity(errorDto).build();
   }
 
 }

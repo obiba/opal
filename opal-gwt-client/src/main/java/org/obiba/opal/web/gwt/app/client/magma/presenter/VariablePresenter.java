@@ -258,7 +258,6 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     String script = VariableDtos.getScript(variable);
     getView().setDerivedVariable(true, script);
     scriptEditorPresenter.setTable(table);
-    scriptEditorPresenter.setVariableName(variable.getName());
     scriptEditorPresenter.setScript(script);
     scriptEditorPresenter.setRepeatable(variable.getIsRepeatable());
     scriptEditorPresenter.setValueEntityType(variable.getValueType());
@@ -330,8 +329,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
           public void onResource(Response response, TableDto resource) {
             String uri = UriBuilder.create().fromPath(resource.getViewLink()) //
                 .segment("variable", "_transient", "_compile") //
-                .query("name", newVariable.getName(), //
-                    "valueType", newVariable.getValueType(), //
+                .query("valueType", newVariable.getValueType(), //
                     "repeatable", String.valueOf(newVariable.getIsRepeatable())) //
                 .build();
 

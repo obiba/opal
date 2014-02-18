@@ -15,9 +15,13 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.magma.js.validation.VariableScriptValidationException;
+import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.model.Ws;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
 @Provider
@@ -28,6 +32,8 @@ public class VariableScriptValidationExceptionMapper implements ExceptionMapper<
   @Override
   public Response toResponse(VariableScriptValidationException exception) {
     log.debug("VariableScriptValidationException", exception);
-    return Response.status(Response.Status.BAD_REQUEST).entity(exception.getMessage()).build();
+    Ws.ClientErrorDto errorDto = ClientErrorDtos.getErrorMessage(BAD_REQUEST, "InvalidVariableScript")
+        .addArguments(exception.getCause().getMessage()).build();
+    return Response.status(BAD_REQUEST).entity(errorDto).build();
   }
 }

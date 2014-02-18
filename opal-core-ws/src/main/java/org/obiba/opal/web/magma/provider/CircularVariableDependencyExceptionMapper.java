@@ -15,6 +15,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.magma.js.validation.CircularVariableDependencyException;
+import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.model.Ws;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,9 +31,9 @@ public class CircularVariableDependencyExceptionMapper implements ExceptionMappe
 
   @Override
   public Response toResponse(CircularVariableDependencyException exception) {
-    log.error("CircularVariableDependencyRuntimeException", exception);
-    return Response.status(BAD_REQUEST).entity(
-        Ws.ClientErrorDto.newBuilder().setCode(Response.Status.BAD_REQUEST.getStatusCode())
-            .setStatus(exception.getMessage()).build()).build();
+    log.debug("CircularVariableDependencyException", exception);
+    Ws.ClientErrorDto errorDto = ClientErrorDtos.getErrorMessage(BAD_REQUEST, "CircularVariableDependency")
+        .addArguments(exception.getVariableRef()).addArguments(exception.getHierarchy()).build();
+    return Response.status(BAD_REQUEST).entity(errorDto).build();
   }
 }

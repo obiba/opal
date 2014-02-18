@@ -203,31 +203,30 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
   }
 
   @Override
-  public VariableResource getTransientVariable(String name, String valueTypeName, Boolean repeatable, String scriptQP,
+  public VariableResource getTransientVariable(String valueTypeName, Boolean repeatable, String scriptQP,
       List<String> categoriesQP, String scriptFP, List<String> categoriesFP) {
     return getVariableResource(
-        getJavascriptVariableValueSource(name, valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP,
-            categoriesFP), null);
+        getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP, categoriesFP),
+        null);
   }
 
   @Override
-  public Response compileTransientVariable(String name, String valueTypeName, Boolean repeatable, String scriptQP,
+  public Response compileTransientVariable(String valueTypeName, Boolean repeatable, String scriptQP,
       List<String> categoriesQP, String scriptFP, List<String> categoriesFP) {
-    JavascriptVariableValueSource variableValueSource = getJavascriptVariableValueSource(name, valueTypeName,
-        repeatable, scriptQP, categoriesQP, scriptFP, categoriesFP);
+    JavascriptVariableValueSource variableValueSource = getJavascriptVariableValueSource(valueTypeName, repeatable,
+        scriptQP, categoriesQP, scriptFP, categoriesFP);
     variableValueSource.validateScript();
     return Response.ok().build();
   }
 
   @Override
-  public ValueSetsResource getTransientVariableValueSets(String name, String valueTypeName, Boolean repeatable,
-      String scriptQP, List<String> categoriesQP, String scriptFP, List<String> categoriesFP) {
+  public ValueSetsResource getTransientVariableValueSets(String valueTypeName, Boolean repeatable, String scriptQP,
+      List<String> categoriesQP, String scriptFP, List<String> categoriesFP) {
 
     ValueSetsResource resource = applicationContext.getBean(ValueSetsResource.class);
     resource.setValueTable(getValueTable());
     resource.setVariableValueSource(
-        getJavascriptVariableValueSource(name, valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP,
-            categoriesFP));
+        getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP, categoriesFP));
     return resource;
   }
 
@@ -236,7 +235,7 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
   public ValueSetResource getTransientVariableValueSet( //
       Request request, //
       String identifier, //
-      String name, Boolean filterBinary, //
+      Boolean filterBinary, //
       String valueTypeName, //
       Boolean repeatable, //
       String scriptQP, //
@@ -247,8 +246,7 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
     ValueSetResource resource = applicationContext.getBean(ValueSetResource.class);
     resource.setValueTable(getValueTable());
     resource.setVariableValueSource(
-        getJavascriptVariableValueSource(name, valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP,
-            categoriesFP));
+        getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP, categoriesFP));
     resource.setEntity(new VariableEntityBean(getValueTable().getEntityType(), identifier));
     return resource;
   }
@@ -303,8 +301,8 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
     return resource;
   }
 
-  private JavascriptVariableValueSource getJavascriptVariableValueSource(String name, String valueTypeName,
-      Boolean repeatable, String scriptQP, List<String> categoriesQP, String scriptFP, List<String> categoriesFP) {
+  private JavascriptVariableValueSource getJavascriptVariableValueSource(String valueTypeName, Boolean repeatable,
+      String scriptQP, List<String> categoriesQP, String scriptFP, List<String> categoriesFP) {
     String script = scriptQP;
     List<String> categories = categoriesQP;
     if(Strings.isNullOrEmpty(script)) {
@@ -316,24 +314,24 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
     if(categories == null || categories.isEmpty()) {
       categories = categoriesFP;
     }
-    Variable transientVariable = buildTransientVariable(name, resolveValueType(valueTypeName), repeatable, script,
+    Variable transientVariable = buildTransientVariable(resolveValueType(valueTypeName), repeatable, script,
         categories);
     JavascriptVariableValueSource valueSource = new JavascriptVariableValueSource(transientVariable, getValueTable());
     valueSource.initialise();
     return valueSource;
   }
 
-  private Variable buildTransientVariable(@Nullable String name, ValueType valueType, boolean repeatable, String script,
+  private Variable buildTransientVariable(ValueType valueType, boolean repeatable, String script,
       @Nullable List<String> categories) {
-    //noinspection ConstantConditions
-    Variable.Builder builder = new Variable.Builder(Strings.isNullOrEmpty(name) ? "_transient" : name, valueType,
-        getValueTable().getEntityType()).extend(JavascriptVariableBuilder.class).setScript(script);
+    Variable.Builder builder = new Variable.Builder("_transient", valueType, getValueTable().getEntityType())
+        .extend(JavascriptVariableBuilder.class).setScript(script);
     if(repeatable) {
       builder.repeatable();
     }
     if(categories != null) {
       builder.addCategories(categories.toArray(new String[categories.size()]));
     }
+    // use attribute to detect transient variables as we may need to set the name of the variable
     builder.addAttribute(
         newAttribute().withNamespace("opal").withName("transient").withValue(BooleanType.get().trueValue()).build());
     return builder.build();

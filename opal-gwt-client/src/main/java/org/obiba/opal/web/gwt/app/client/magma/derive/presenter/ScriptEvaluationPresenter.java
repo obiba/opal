@@ -171,7 +171,6 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
       appendTable(uriBuilder);
       uriBuilder.segment("valueSets", "variable", "_transient");
       uriBuilder.query("limit", String.valueOf(limit), //
-          "name", originalVariable.getName(), //
           "offset", String.valueOf(offset));
       appendVariableLimitArguments(uriBuilder);
 
@@ -268,9 +267,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
     }
 
     private void appendVariableSummaryArguments(UriBuilder uriBuilder) {
-      uriBuilder.query("name", originalVariable.getName());
       appendVariableLimitArguments(uriBuilder);
-
       if(ValueType.TEXT.is(originalVariable.getValueType()) && VariableDtos.allCategoriesMissing(originalVariable)) {
         uriBuilder.query("nature", "categorical", "distinct", "true");
       }

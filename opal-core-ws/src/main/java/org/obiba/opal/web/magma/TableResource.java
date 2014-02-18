@@ -115,8 +115,7 @@ public interface TableResource {
    * Get transient derived variable.
    */
   @Path("/variable/_transient")
-  VariableResource getTransientVariable(@QueryParam("name") String name,
-      @QueryParam("valueType") @DefaultValue("text") String valueTypeName,
+  VariableResource getTransientVariable(@QueryParam("valueType") @DefaultValue("text") String valueTypeName,
       @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP,
       @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP,
       @FormParam("category") List<String> categoriesFP);
@@ -127,8 +126,7 @@ public interface TableResource {
   @GET
   @POST
   @Path("/variable/_transient/_compile")
-  Response compileTransientVariable(@QueryParam("name") String name,
-      @QueryParam("valueType") @DefaultValue("text") String valueTypeName,
+  Response compileTransientVariable(@QueryParam("valueType") @DefaultValue("text") String valueTypeName,
       @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP,
       @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP,
       @FormParam("category") List<String> categoriesFP);
@@ -137,8 +135,7 @@ public interface TableResource {
    * Get value sets resource for the transient derived variable.
    */
   @Path("/valueSets/variable/_transient")
-  ValueSetsResource getTransientVariableValueSets(@QueryParam("name") String name,
-      @QueryParam("valueType") @DefaultValue("text") String valueTypeName,
+  ValueSetsResource getTransientVariableValueSets(@QueryParam("valueType") @DefaultValue("text") String valueTypeName,
       @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP,
       @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP,
       @FormParam("category") List<String> categoriesFP);
@@ -151,7 +148,6 @@ public interface TableResource {
   ValueSetResource getTransientVariableValueSet( //
       @Context Request request, //
       @PathParam("identifier") String identifier, //
-      @QueryParam("name") String name, //
       @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary, //
       @QueryParam("valueType") @DefaultValue("text") String valueTypeName, //
       @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, //

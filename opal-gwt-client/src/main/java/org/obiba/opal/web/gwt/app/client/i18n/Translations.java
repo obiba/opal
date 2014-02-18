@@ -422,6 +422,9 @@ public interface Translations extends Constants {
       "DatasourceCreationFailed", "The datasource creation has failed: {0}",//
       "DatasourceReadFailed", "The datasource cannot be read: {0}",//
       "CircularVariableDependency", "Circular dependency for variable '{0}'.:<br /><br /><pre>{1}</pre>",//
+      "NoSuchVariable", "No such variable '{0}'",//
+      "NoSuchVariableInTable", "No such variable '{0}' in table '{1}'",//
+      "InvalidVariableScript", "Invalid variable script:<br /><br /><pre>{0}</pre>",//
       "DestinationTableRequired", "The destination table is required.",//
       "DestinationTableNameInvalid", "The destination table name is not valid (must not contain '.' or ':').",//
       "DestinationTableEntityTypeRequired", "The destination table entity type is required.",//
