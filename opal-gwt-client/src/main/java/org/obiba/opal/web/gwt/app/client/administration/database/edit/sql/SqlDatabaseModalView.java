@@ -28,6 +28,7 @@ import com.github.gwtbootstrap.client.ui.TextArea;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -56,6 +57,8 @@ import static org.obiba.opal.web.gwt.app.client.administration.database.edit.Abs
  */
 public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseUiHandlers>
     implements SqlDatabaseModalPresenter.Display {
+
+  private boolean isIdentifiers= false;
 
   interface Binder extends UiBinder<Widget, SqlDatabaseModalView> {}
 
@@ -88,9 +91,6 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
 
   @UiField
   TextBox url;
-
-  @UiField
-  HasText urlExample;
 
   @UiField
   ListBox driver;
@@ -163,7 +163,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
     driver.addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent event) {
-        setDriverContextualInfo();
+        initUrl(isIdentifiers);
       }
     });
 
@@ -184,10 +184,22 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
     jdbcOptions.setText(translations.jdbcOptionsLabel());
   }
 
-  private void setDriverContextualInfo() {
-    JdbcDriverDto jdbcDriver = getDriver(getDriver().getText());
-    url.getElement().setAttribute("placeholder", jdbcDriver == null ? "" : jdbcDriver.getJdbcUrlTemplate());
-    urlExample.setText(jdbcDriver == null ? "" : jdbcDriver.getJdbcUrlExample());
+  @Override
+  public void initUrl(boolean isIdentifiers) {
+    this.isIdentifiers = isIdentifiers;
+
+    GWT.log("initUrl" + getDriver().getText());
+    String text = "";
+    if(getDriver().getText() == null || "com.mysql.jdbc.Driver".equals(getDriver().getText())) {
+      text += "jdbc:mysql://localhost:3306/";
+    } else if("org.hsqldb.jdbc.JDBCDriver".equals(getDriver().getText()))   {
+      text += "jdbc:hsqldb:mem:";
+    }
+
+    if(!text.isEmpty()) {
+      url.setText(isIdentifiers ? text + "opal_ids" : text + "opal_data");
+    }
+
   }
 
   @Override
@@ -409,7 +421,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
             break;
           }
         }
-        setDriverContextualInfo();
+//        setDriverContextualInfo();
       }
     };
   }

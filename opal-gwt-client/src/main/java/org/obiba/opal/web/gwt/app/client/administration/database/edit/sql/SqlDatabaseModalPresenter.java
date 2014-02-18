@@ -30,6 +30,7 @@ import org.obiba.opal.web.model.client.database.SqlSettingsDto;
 import org.obiba.opal.web.model.client.magma.JdbcDatasourceSettingsDto;
 
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -89,6 +90,7 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
   @Override
   @SuppressWarnings("PMD.NcssMethodCount")
   protected void displayDatabase(DatabaseDto dto) {
+    GWT.log("dto"+dto.getName());
     getView().getName().setText(dto.getName());
     getView().getUsage().setValue(Usage.valueOf(dto.getUsage().getName()));
     getView().getDefaultStorage().setValue(dto.getDefaultStorage());

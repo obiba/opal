@@ -126,22 +126,24 @@ public abstract class AbstractDatabaseModalPresenter<TView extends AbstractDatab
   }
 
   /**
-   * Setup the dialog for creating a method
+   * Setup the dialog for creating a database
    */
   public void createNewDatabase(boolean storageOnly) {
     setDialogMode(Mode.CREATE);
     getView().getUsageGroupVisibility().setVisible(!storageOnly);
+    getView().initUrl(false);
   }
 
   public void createNewIdentifierDatabase(DatabaseDto dto) {
     setDialogMode(Mode.CREATE);
     displayDatabase(dto);
+
     hideNonEditableIdentifiersDatabaseFields();
     usedForIdentifiers = true;
   }
 
   /**
-   * Setup the dialog for updating an existing method
+   * Setup the dialog for updating an existing database
    *
    * @param dto method to update
    */
@@ -258,6 +260,7 @@ public abstract class AbstractDatabaseModalPresenter<TView extends AbstractDatab
 
     void toggleDefaultStorage(boolean show);
 
+    void initUrl(boolean b);
   }
 
 }
