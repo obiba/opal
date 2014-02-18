@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsUiHandlers;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
@@ -25,7 +26,6 @@ import org.obiba.opal.web.model.client.opal.Acl;
 
 import com.github.gwtbootstrap.client.ui.CellTable;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -47,7 +47,7 @@ public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissi
   CellTable<Acl> permissionsTable;
 
   @UiField
-  SimplePager tablePager;
+  OpalSimplePager tablePager;
 
   @UiField
   DropdownButton addDropdown;
@@ -93,7 +93,7 @@ public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissi
     permissionsDataProvider.setList(acls);
     tablePager.firstPage();
     permissionsDataProvider.refresh();
-    tablePager.setVisible(permissionsDataProvider.getList().size() > tablePager.getPageSize());
+    tablePager.setPagerVisible(permissionsDataProvider.getList().size() > tablePager.getPageSize());
   }
 
   private void initSubjectsPermissionTable() {

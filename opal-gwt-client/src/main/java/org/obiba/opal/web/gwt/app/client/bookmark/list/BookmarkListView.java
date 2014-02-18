@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.support.BookmarkHelper;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
@@ -13,7 +14,6 @@ import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.model.client.opal.BookmarkDto;
 
 import com.github.gwtbootstrap.client.ui.CellTable;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.Column;
@@ -42,7 +42,7 @@ public class BookmarkListView extends ViewWithUiHandlers<BookmarkListUiHandlers>
   interface Binder extends UiBinder<Widget, BookmarkListView> {}
 
   @UiField
-  SimplePager pager;
+  OpalSimplePager pager;
 
   @UiField
   CellTable<BookmarkDto> table;
@@ -66,7 +66,7 @@ public class BookmarkListView extends ViewWithUiHandlers<BookmarkListUiHandlers>
     dataProvider.setList(rows);
     pager.firstPage();
     dataProvider.refresh();
-    pager.setVisible(dataProvider.getList().size() > pager.getPageSize());
+    pager.setPagerVisible(dataProvider.getList().size() > pager.getPageSize());
     typeSortHandler.setList(dataProvider.getList());
     ColumnSortEvent.fire(table, table.getColumnSortList());
   }

@@ -16,11 +16,13 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.client.opal.Acl;
 import org.obiba.opal.web.model.client.opal.Subject;
 
@@ -62,7 +64,7 @@ public class ProjectPermissionsView extends ViewWithUiHandlers<ProjectPermission
   Heading principal;
 
   @UiField
-  SimplePager tablePager;
+  OpalSimplePager tablePager;
 
   @UiField
   Table<Acl> permissionsTable;
@@ -145,7 +147,7 @@ public class ProjectPermissionsView extends ViewWithUiHandlers<ProjectPermission
     permissionsDataProvider.setList(subjectAcls);
     tablePager.firstPage();
     permissionsDataProvider.refresh();
-    tablePager.setVisible(permissionsDataProvider.getList().size() > tablePager.getPageSize());
+    tablePager.setPagerVisible(permissionsDataProvider.getList().size() > tablePager.getPageSize());
     typeSortHandler.setList(permissionsDataProvider.getList());
     permissionsTable.getColumnSortList().push(typeColumn);
     ColumnSortEvent.fire(permissionsTable, permissionsTable.getColumnSortList());

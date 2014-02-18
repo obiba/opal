@@ -48,7 +48,7 @@
                 <b:Button icon="TRASH" ui:field="deleteAll" addStyleNames="pull-right small-top-margin">
                   <ui:msg description="Delete all permissions label">Delete all permissions</ui:msg>
                 </b:Button>
-                <b:SimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
+                <o:OpalSimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
               </b:Column>
             </b:FluidRow>
           </b:Controls>

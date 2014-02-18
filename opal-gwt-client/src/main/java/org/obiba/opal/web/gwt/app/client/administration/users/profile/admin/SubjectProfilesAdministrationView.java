@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
@@ -41,7 +42,7 @@ public class SubjectProfilesAdministrationView extends ViewImpl
   interface Binder extends UiBinder<Widget, SubjectProfilesAdministrationView> {}
 
   @UiField
-  SimplePager profilesPager;
+  OpalSimplePager profilesPager;
 
   @UiField
   CellTable<SubjectProfileDto> profilesTable;
@@ -128,11 +129,11 @@ public class SubjectProfilesAdministrationView extends ViewImpl
     renderProfiles(Collections.<SubjectProfileDto>emptyList());
   }
 
-  private <T> void renderRows(List<T> rows, ListDataProvider<T> dataProvider, SimplePager pager) {
+  private <T> void renderRows(List<T> rows, ListDataProvider<T> dataProvider, OpalSimplePager pager) {
     dataProvider.setList(rows);
     pager.firstPage();
     dataProvider.refresh();
-    pager.setVisible(dataProvider.getList().size() > pager.getPageSize());
+    pager.setPagerVisible(dataProvider.getList().size() > pager.getPageSize());
   }
 
   @Override

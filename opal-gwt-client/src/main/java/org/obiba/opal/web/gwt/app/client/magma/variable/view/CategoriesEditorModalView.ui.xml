@@ -31,7 +31,7 @@
     </b:Form>
 
     <g:FlowPanel addStyleNames="clearfix">
-      <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
+      <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
     </g:FlowPanel>
 
     <g:FlowPanel addStyleNames="small-top-margin">

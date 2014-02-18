@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableVcsCommitHistoryPresenter;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
@@ -23,7 +24,6 @@ import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.model.client.opal.VcsCommitInfoDto;
 
 import com.github.gwtbootstrap.client.ui.CellTable;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -51,7 +51,7 @@ public class VariableVcsCommitHistoryView extends ViewWithUiHandlers<UiHandlers>
   CellTable<VcsCommitInfoDto> commitInfoTable;
 
   @UiField
-  SimplePager commitInfoTablePager;
+  OpalSimplePager commitInfoTablePager;
 
   private final ListDataProvider<VcsCommitInfoDto> commitInfoDataProvider = new ListDataProvider<VcsCommitInfoDto>();
 
@@ -67,7 +67,7 @@ public class VariableVcsCommitHistoryView extends ViewWithUiHandlers<UiHandlers>
     commitInfoDataProvider.setList(JsArrays.toList(commitInfos));
     commitInfoTablePager.firstPage();
     commitInfoDataProvider.refresh();
-    commitInfoTablePager.setVisible(commitInfoDataProvider.getList().size() > commitInfoTablePager.getPageSize());
+    commitInfoTablePager.setPagerVisible(commitInfoDataProvider.getList().size() > commitInfoTablePager.getPageSize());
   }
 
   @Override

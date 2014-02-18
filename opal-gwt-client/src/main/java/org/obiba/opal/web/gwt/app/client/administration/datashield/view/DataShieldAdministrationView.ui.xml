@@ -84,7 +84,7 @@
       <b:Button ui:field="addMethodButton" icon="PLUS" type="INFO">
         <ui:msg description="Add DataSHIELD method label">Add Method</ui:msg>
       </b:Button>
-      <b:SimplePager ui:field="methodsTablePager" location="RIGHT" addStyleNames="pull-right" visible="false"/>
+      <o:OpalSimplePager ui:field="methodsTablePager" location="RIGHT" addStyleNames="pull-right"/>
     </g:FlowPanel>
     <o:Table ui:field="methodsTable" visible="false"/>
 

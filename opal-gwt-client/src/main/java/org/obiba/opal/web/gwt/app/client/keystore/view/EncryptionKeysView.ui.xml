@@ -32,7 +32,7 @@
         </b:DropdownButton>
       </b:Column>
       <b:Column size="9">
-        <b:SimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
+        <o:OpalSimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
       </b:Column>
     </b:FluidRow>
     <o:Table ui:field="encryptionKeysTable" addStyleNames="small-top-margin"/>

@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsIndexColumn;
@@ -30,7 +31,6 @@ import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -84,7 +84,7 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
   DropdownButton actionsDropdown;
 
   @UiField
-  SimplePager indexTablePager;
+  OpalSimplePager indexTablePager;
 
   @UiField
   Alert selectAllAlert;
@@ -194,7 +194,7 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     dataProvider.setList(JsArrays.toList(rows));
     indexTablePager.firstPage();
     dataProvider.refresh();
-    indexTablePager.setVisible(dataProvider.getList().size() > indexTablePager.getPageSize());
+    indexTablePager.setPagerVisible(dataProvider.getList().size() > indexTablePager.getPageSize());
   }
 
   @SuppressWarnings("unchecked")

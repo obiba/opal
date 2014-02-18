@@ -33,10 +33,8 @@
       </b:NavLink>
     </b:DropdownButton>
 
-    <g:FlowPanel ui:field="databasesPanel">
-      <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
-      <o:Table ui:field="table" addStyleNames="small-top-margin"/>
-    </g:FlowPanel>
+    <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right small-top-margin"/>
+    <o:Table ui:field="table" addStyleNames="small-top-margin"/>
 
   </g:FlowPanel>
 </ui:UiBinder>

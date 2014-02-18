@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.TableChooser;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueRenderer;
@@ -23,7 +24,6 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.github.gwtbootstrap.client.ui.Icon;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.constants.IconSize;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.cell.client.AbstractSafeHtmlCell;
@@ -79,7 +79,7 @@ public class EntityModalView extends ModalPopupViewWithUiHandlers<EntityModalUiH
   CellTable<EntityModalPresenter.VariableValueRow> table;
 
   @UiField
-  SimplePager pager;
+  OpalSimplePager pager;
 
   @UiField
   InlineLabel noTables;
@@ -169,7 +169,7 @@ public class EntityModalView extends ModalPopupViewWithUiHandlers<EntityModalUiH
     dataProvider.setList(rows);
     pager.firstPage();
     dataProvider.refresh();
-    pager.setVisible(dataProvider.getList().size() > pager.getPageSize());
+    pager.setPagerVisible(dataProvider.getList().size() > pager.getPageSize());
   }
 
   @UiHandler("filter")

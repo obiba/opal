@@ -31,7 +31,7 @@
         automatically recreated when the user logs in.
       </ui:msg>
     </b:Paragraph>
-    <b:SimplePager ui:field="profilesPager" location="RIGHT" addStyleNames="pull-right"/>
+    <o:OpalSimplePager ui:field="profilesPager" location="RIGHT" addStyleNames="pull-right bottom-margin"/>
     <o:Table ui:field="profilesTable" addStyleNames="small-top-margin"/>
 
   </g:FlowPanel>

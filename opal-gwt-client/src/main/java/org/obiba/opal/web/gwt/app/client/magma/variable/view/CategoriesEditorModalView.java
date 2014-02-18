@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.magma.view.CategoryEditableTable;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.EditableTabableColumn;
@@ -33,7 +34,6 @@ import org.obiba.opal.web.model.client.opal.LocaleDto;
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
@@ -88,7 +88,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   ControlGroup nameGroup;
 
   @UiField
-  SimplePager pager;
+  OpalSimplePager pager;
 
   @UiField
   CategoryEditableTable table;
@@ -173,7 +173,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
     dataProvider.setList(categories);
     dataProvider.refresh();
-    pager.setVisible(dataProvider.getList().size() >= DEFAULT_PAGE_SIZE);
+    pager.setPagerVisible(dataProvider.getList().size() >= DEFAULT_PAGE_SIZE);
   }
 
   @UiHandler("closeButton")
@@ -241,7 +241,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
     dataProvider.setList(JsArrays.toList(rows));
     dataProvider.refresh();
-    pager.setVisible(dataProvider.getList().size() >= DEFAULT_PAGE_SIZE);
+    pager.setPagerVisible(dataProvider.getList().size() >= DEFAULT_PAGE_SIZE);
   }
 
   private void addEditableColumns(Iterable<LocaleDto> locales) {
@@ -351,7 +351,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
     dataProvider.setList(existingCat);
     dataProvider.refresh();
-    pager.setVisible(dataProvider.getList().size() >= DEFAULT_PAGE_SIZE);
+    pager.setPagerVisible(dataProvider.getList().size() >= DEFAULT_PAGE_SIZE);
     pager.setPage(dataProvider.getList().size() / table.getPageSize());
     addCategoryName.setText("");
   }

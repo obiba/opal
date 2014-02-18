@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
@@ -48,13 +49,13 @@ public class SubjectCredentialsAdministrationView extends ViewWithUiHandlers<Sub
   interface Binder extends UiBinder<Widget, SubjectCredentialsAdministrationView> {}
 
   @UiField
-  SimplePager usersTablePager;
+  OpalSimplePager usersTablePager;
 
   @UiField
   CellTable<SubjectCredentialsDto> usersTable;
 
   @UiField
-  SimplePager groupsTablePager;
+  OpalSimplePager groupsTablePager;
 
   @UiField
   CellTable<GroupDto> groupsTable;
@@ -129,11 +130,11 @@ public class SubjectCredentialsAdministrationView extends ViewWithUiHandlers<Sub
     renderRows(rows, groupDataProvider, groupsTablePager);
   }
 
-  private <T> void renderRows(List<T> rows, ListDataProvider<T> dataProvider, SimplePager pager) {
+  private <T> void renderRows(List<T> rows, ListDataProvider<T> dataProvider, OpalSimplePager pager) {
     dataProvider.setList(rows);
     pager.firstPage();
     dataProvider.refresh();
-    pager.setVisible(dataProvider.getList().size() > pager.getPageSize());
+    pager.setPagerVisible(dataProvider.getList().size() > pager.getPageSize());
   }
 
   @Override

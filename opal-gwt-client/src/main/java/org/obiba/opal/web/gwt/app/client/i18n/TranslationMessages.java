@@ -214,6 +214,10 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("You must select at least one {0}.")
   String mustSelectAtLeastFileFolder(String name);
 
+  @Description("CellTable total count message")
+  @DefaultMessage("Total: {0}")
+  String cellTableTotalCount(int count);
+
   @Description("Delete the currently displayed variable message")
   @DefaultMessage("Delete the currently displayed variable?")
   String confirmVariableDelete();

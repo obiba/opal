@@ -30,7 +30,7 @@
     <b:TabPanel tabPosition="above" ui:field="tabPanel">
       <b:Tab heading="Dictionary" active="true">
         <g:FlowPanel addStyleNames="small-bottom-margin">
-          <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right small-top-margin small-indent"/>
+          <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right small-top-margin small-indent"/>
           <b:DropdownButton type="INFO" icon="PLUS" ui:field="addBtn"
               addStyleNames="small-top-margin">
             <b:NavLink icon="TABLE" ui:field="addTable">

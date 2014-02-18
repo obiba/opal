@@ -74,8 +74,6 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
-  private final Translations translations;
-
   private TranslationMessages translationMessages;
 
   private String datasourceName;
@@ -92,10 +90,8 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       ModalProvider<DataExportPresenter> dataExportModalProvider,
       ModalProvider<AddViewModalPresenter> createViewModalProvider,
       ModalProvider<DataCopyPresenter> dataCopyModalProvider,
-      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, Translations translations,
-      TranslationMessages translationMessages) {
+      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, TranslationMessages translationMessages) {
     super(eventBus, display);
-    this.translations = translations;
     this.translationMessages = translationMessages;
     this.tablePropertiesModalProvider = tablePropertiesModalProvider.setContainer(this);
     this.dataExportModalProvider = dataExportModalProvider.setContainer(this);

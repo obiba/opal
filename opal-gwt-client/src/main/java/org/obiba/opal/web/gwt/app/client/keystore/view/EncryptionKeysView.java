@@ -17,9 +17,11 @@ import javax.annotation.Nonnull;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.keystore.presenter.EncryptionKeysPresenter;
 import org.obiba.opal.web.gwt.app.client.keystore.presenter.EncryptionKeysUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.client.opal.KeyDto;
 
 import com.github.gwtbootstrap.client.ui.CellTable;
@@ -40,7 +42,7 @@ public class EncryptionKeysView extends ViewWithUiHandlers<EncryptionKeysUiHandl
     implements EncryptionKeysPresenter.Display {
 
   @UiField
-  SimplePager tablePager;
+  OpalSimplePager tablePager;
 
   @UiField
   CellTable<KeyDto> encryptionKeysTable;
@@ -93,7 +95,7 @@ public class EncryptionKeysView extends ViewWithUiHandlers<EncryptionKeysUiHandl
     keyPairsDataProvider.setList(keyPairs);
     tablePager.firstPage();
     keyPairsDataProvider.refresh();
-    tablePager.setVisible(keyPairsDataProvider.getList().size() > tablePager.getPageSize());
+    tablePager.setPagerVisible(keyPairsDataProvider.getList().size() > tablePager.getPageSize());
   }
 
   private void initializeTable() {

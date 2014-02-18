@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueSequencePopupPrese
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueSequencePopupUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.ToggleAnchor;
 import org.obiba.opal.web.gwt.app.client.ui.ToggleAnchor.Delegate;
@@ -30,7 +31,6 @@ import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -78,7 +78,7 @@ public class ValueSequencePopupView extends ModalPopupViewWithUiHandlers<ValueSe
   Label noValues;
 
   @UiField
-  SimplePager pager;
+  OpalSimplePager pager;
 
   @UiField
   Button closeButton;
@@ -138,7 +138,7 @@ public class ValueSequencePopupView extends ModalPopupViewWithUiHandlers<ValueSe
     dataProvider.setList(new ArrayList<ValueOccurrence>());
     dataProvider.refresh();
     fetcher.request(null);
-    pager.setVisible(dataProvider.getList().size() > pager.getPageSize());
+    pager.setPagerVisible(dataProvider.getList().size() > pager.getPageSize());
   }
 
   @Override
@@ -170,7 +170,7 @@ public class ValueSequencePopupView extends ModalPopupViewWithUiHandlers<ValueSe
     dataProvider.setList(occurrences);
     dataProvider.refresh();
     valuesTable.setEmptyTableWidget(noValues);
-    pager.setVisible(dataProvider.getList().size() > pager.getPageSize());
+    pager.setPagerVisible(dataProvider.getList().size() > pager.getPageSize());
   }
 
   //

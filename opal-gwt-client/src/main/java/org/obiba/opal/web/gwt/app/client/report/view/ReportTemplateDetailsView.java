@@ -20,6 +20,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ROptionsHelper;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.DateTimeColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
@@ -31,7 +32,6 @@ import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.Heading;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
@@ -100,7 +100,7 @@ public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplate
   Panel permissions;
 
   @UiField
-  SimplePager pager;
+  OpalSimplePager pager;
 
   @UiField
   InlineLabel noReports;
@@ -171,7 +171,7 @@ public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplate
 
   @Override
   public void setProducedReports(JsArray<ReportDto> reports) {
-    pager.setVisible(reports.length() > 10); // OPAL-901
+    pager.setPagerVisible(reports.length() > 10); // OPAL-901
     renderProducedReports(reports);
   }
 

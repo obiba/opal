@@ -27,7 +27,7 @@
           <ui:msg description="Add Group Permission label">Add group permission...</ui:msg>
         </b:NavLink>
       </b:DropdownButton>
-      <b:SimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
+      <o:OpalSimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
       <o:Table ui:field="permissionsTable" addStyleNames="small-top-margin"/>
     </g:FlowPanel>
 
