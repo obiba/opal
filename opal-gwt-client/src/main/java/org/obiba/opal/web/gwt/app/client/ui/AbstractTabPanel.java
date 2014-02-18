@@ -168,8 +168,12 @@ public class AbstractTabPanel extends FlowPanel
     }
   }
 
-  public void setBookmarkIcon(IsWidget bookmarkIconWidget) {
-    menuPanel.insert(bookmarkIconWidget, 1);
+  public void appendMenuWidget(IsWidget widget) {
+    menuPanel.add(widget);
+  }
+
+  public void prependMenuWidget(IsWidget widget) {
+    menuPanel.insert(widget,0);
   }
 
   private void setSelectedIndex(int index) {

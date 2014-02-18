@@ -245,6 +245,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Tables")
   String tablesLabel();
 
+  @Description("Datasource label")
+  @DefaultStringValue("Datasource")
+  String datasourceLabel();
+
   @Description("Table label")
   @DefaultStringValue("Table")
   String tableLabel();

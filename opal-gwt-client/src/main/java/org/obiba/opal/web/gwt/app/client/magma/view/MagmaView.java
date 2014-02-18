@@ -5,9 +5,11 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.ui.BreadcrumbsTabPanel;
 
+import com.github.gwtbootstrap.client.ui.Badge;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.NavLink;
-import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.github.gwtbootstrap.client.ui.NavPills;
+import com.github.gwtbootstrap.client.ui.constants.BadgeType;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -39,6 +41,8 @@ public class MagmaView extends ViewImpl implements MagmaPresenter.Display {
 
   private Widget variableWidget;
 
+  private Badge badge;
+
   @Inject
   public MagmaView(Binder uiBinder, PlaceManager placeManager, Translations translations) {
     this.placeManager = placeManager;
@@ -59,6 +63,8 @@ public class MagmaView extends ViewImpl implements MagmaPresenter.Display {
         }
       }
     });
+    badge = new Badge();
+    badge.addStyleName("small-right-indent");
   }
 
   @Override
@@ -78,14 +84,18 @@ public class MagmaView extends ViewImpl implements MagmaPresenter.Display {
 
   @Override
   public void setBookmarkIcon(IsWidget widget) {
-    tabPanel.setBookmarkIcon(widget);
+    tabPanel.prependMenuWidget(badge);
+    tabPanel.appendMenuWidget(widget);
   }
 
   @Override
   public void selectDatasource(String name) {
     tabPanel.clear();
     tabPanel.addAndSelect(datasourceWidget, name);
-    tabPanel.setMenuVisible(false);
+    //tabPanel.setMenuVisible(false);
+    badge.setType(BadgeType.INFO);
+    badge.setText("D");
+    badge.setTitle(translations.datasourceLabel());
     setHeading();
   }
 
@@ -93,8 +103,11 @@ public class MagmaView extends ViewImpl implements MagmaPresenter.Display {
   public void selectTable(String datasource, String table, boolean isView) {
     tabPanel.clear();
     tabPanel.add(datasourceWidget, getDatasourceLink(datasource));
-    tabPanel.addAndSelect(tableWidget, getTableLink(datasource, table));
+    tabPanel.addAndSelect(tableWidget, table);
     tabPanel.setMenuVisible(true);
+    badge.setType(BadgeType.WARNING);
+    badge.setText("T");
+    badge.setTitle(translations.tableLabel());
     setHeading();
   }
 
@@ -105,6 +118,9 @@ public class MagmaView extends ViewImpl implements MagmaPresenter.Display {
     tabPanel.add(tableWidget, getTableLink(datasource, table));
     tabPanel.addAndSelect(variableWidget, variable);
     tabPanel.setMenuVisible(true);
+    badge.setType(BadgeType.IMPORTANT);
+    badge.setText("V");
+    badge.setTitle(translations.variableLabel());
     setHeading();
   }
 
@@ -113,8 +129,8 @@ public class MagmaView extends ViewImpl implements MagmaPresenter.Display {
   }
 
   private HasClickHandlers getDatasourceLink(String name) {
-    NavLink link = new NavLink();
-    link.setIcon(IconType.TABLE);
+    NavLink link = new NavLink(name);
+//    link.setIcon(IconType.TABLE);
     link.setHref("#" + placeManager.buildHistoryToken(ProjectPlacesHelper.getDatasourcePlace(name)));
     link.setTitle(translations.allTablesLabel());
     return link;
