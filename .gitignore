@@ -14,4 +14,4 @@ opal-gwt-client/war/ui/
 opal-gwt-client/war/org.obiba.opal.web.gwt.*
 *.pyc
 *.log
-opal-gwt-client/src/main/resources/org/obiba/opal/web/gwt/app/public/css/
+opal-gwt-client/src/main/resources/org/obiba/opal/web/gwt/app/public/css/*.css
