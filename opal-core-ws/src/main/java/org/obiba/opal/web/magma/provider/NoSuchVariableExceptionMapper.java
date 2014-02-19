@@ -32,7 +32,7 @@ public class NoSuchVariableExceptionMapper implements ExceptionMapper<NoSuchVari
         ? ClientErrorDtos.getErrorMessage(NOT_FOUND, "NoSuchVariable").addArguments(exception.getName()).build()
         : ClientErrorDtos.getErrorMessage(NOT_FOUND, "NoSuchVariableInTable").addArguments(exception.getName())
             .addArguments(exception.getValueTableName()).build();
-    return Response.status(NOT_FOUND).entity(errorDto).build();
+    return Response.status(NOT_FOUND).entity(errorDto).type("application/x-protobuf+json").build();
   }
 
 }
