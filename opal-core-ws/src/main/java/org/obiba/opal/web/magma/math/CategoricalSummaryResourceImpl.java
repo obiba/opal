@@ -11,8 +11,8 @@ package org.obiba.opal.web.magma.math;
 
 import javax.ws.rs.core.Response;
 
-import org.obiba.opal.core.magma.math.CategoricalVariableSummary;
-import org.obiba.opal.core.magma.math.CategoricalVariableSummaryFactory;
+import org.obiba.magma.math.summary.CategoricalVariableSummary;
+import org.obiba.magma.math.summary.CategoricalVariableSummaryFactory;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Math.CategoricalSummaryDto;

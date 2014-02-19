@@ -16,16 +16,16 @@ import org.obiba.magma.Timestamped;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
+import org.obiba.magma.math.summary.VariableSummary;
+import org.obiba.magma.math.summary.VariableSummaryFactory;
 import org.obiba.magma.type.BinaryType;
-import org.obiba.opal.core.magma.math.VariableSummary;
-import org.obiba.opal.core.magma.math.VariableSummaryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
-import static org.obiba.opal.core.magma.math.AbstractVariableSummary.VariableSummaryBuilder;
+import static org.obiba.magma.math.summary.AbstractVariableSummary.VariableSummaryBuilder;
 
 public abstract class AbstractVariableSummaryCachedService< //
     TVariableSummary extends VariableSummary, //

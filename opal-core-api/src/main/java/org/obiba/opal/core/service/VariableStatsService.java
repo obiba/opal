@@ -14,12 +14,12 @@ import javax.validation.constraints.NotNull;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
-import org.obiba.opal.core.magma.math.CategoricalVariableSummary;
-import org.obiba.opal.core.magma.math.CategoricalVariableSummaryFactory;
-import org.obiba.opal.core.magma.math.ContinuousVariableSummary;
-import org.obiba.opal.core.magma.math.ContinuousVariableSummaryFactory;
-import org.obiba.opal.core.magma.math.DefaultVariableSummary;
-import org.obiba.opal.core.magma.math.DefaultVariableSummaryFactory;
+import org.obiba.magma.math.summary.CategoricalVariableSummary;
+import org.obiba.magma.math.summary.CategoricalVariableSummaryFactory;
+import org.obiba.magma.math.summary.ContinuousVariableSummary;
+import org.obiba.magma.math.summary.ContinuousVariableSummaryFactory;
+import org.obiba.magma.math.summary.DefaultVariableSummary;
+import org.obiba.magma.math.summary.DefaultVariableSummaryFactory;
 
 /**
  *

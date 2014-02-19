@@ -13,9 +13,8 @@ import java.util.List;
 
 import javax.ws.rs.core.Response;
 
-import org.obiba.opal.core.magma.math.ContinuousVariableSummary;
-import org.obiba.opal.core.magma.math.ContinuousVariableSummary.Distribution;
-import org.obiba.opal.core.magma.math.ContinuousVariableSummaryFactory;
+import org.obiba.magma.math.summary.ContinuousVariableSummary;
+import org.obiba.magma.math.summary.ContinuousVariableSummaryFactory;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Math.ContinuousSummaryDto;
@@ -31,8 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ContinuousSummaryResourceImpl extends AbstractSummaryResource implements ContinuousSummaryResource {
 
   @Override
-  public Response get(Distribution distribution, List<Double> percentiles, int intervals, Integer offset, Integer limit,
-      Boolean resetCache) {
+  public Response get(ContinuousVariableSummary.Distribution distribution, List<Double> percentiles, int intervals,
+      Integer offset, Integer limit, Boolean resetCache) {
 
     ContinuousVariableSummaryFactory summaryFactory = new ContinuousVariableSummaryFactory.Builder()
         .variable(getVariable()).table(getValueTable()).valueSource(getVariableValueSource()).distribution(distribution)

@@ -11,8 +11,8 @@ package org.obiba.opal.web.magma.math;
 
 import javax.ws.rs.core.Response;
 
-import org.obiba.opal.core.magma.math.DefaultVariableSummary;
-import org.obiba.opal.core.magma.math.DefaultVariableSummaryFactory;
+import org.obiba.magma.math.summary.DefaultVariableSummary;
+import org.obiba.magma.math.summary.DefaultVariableSummaryFactory;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Math;
