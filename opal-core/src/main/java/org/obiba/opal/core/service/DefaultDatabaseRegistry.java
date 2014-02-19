@@ -57,7 +57,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
-import com.google.common.collect.Sets;
 
 @Component
 @SuppressWarnings("OverlyCoupledClass")
@@ -178,6 +177,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
     Preconditions.checkArgument(orientDbService.findUnique(database) != null,
         "Cannot update non existing Database " + database.getName());
 
+    dataSourceCache.invalidate(database.getName());
     persist(database);
 
     // Destroy if has no datasource
