@@ -104,6 +104,7 @@ public class ModalProvider<TPresenter extends ModalPresenterWidget<?>> implement
         modalListData.getCloseHandler().removeHandler();
         container.removeFromPopupSlot(modalToClose);
         modals.remove(modalToClose);
+        if (modal == modalToClose) modal = null;
       }
     }
   }

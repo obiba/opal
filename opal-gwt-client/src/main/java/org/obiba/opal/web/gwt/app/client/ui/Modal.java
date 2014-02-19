@@ -113,7 +113,9 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     MODAL_STACK.push(this);
 
     super.show();
-    DOM.setStyleAttribute(getElement(), "marginTop", "0px");
+    getElement().getStyle().setProperty("marginTop", "0px");
+    // in case the last position was cached
+    scrollTop(getBodyWidget().getElement());
   }
 
   @Override
@@ -274,8 +276,8 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     } else if(draggable && isCursorMove(event)) {
       DOM.setCapture(getElement());
       move = true;
-      moveStartX = DOM.eventGetClientX(event);
-      moveStartY = DOM.eventGetClientY(event);
+      moveStartX = event.getClientX();
+      moveStartY = event.getClientY();
     }
   }
 
@@ -290,8 +292,8 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   }
 
   private void doResize(Event event) {
-    int absX = DOM.eventGetClientX(event);
-    int absY = DOM.eventGetClientY(event);
+    int absX = event.getClientX();
+    int absY = event.getClientY();
     int originalX = getAbsoluteLeft();
     int originalY = getAbsoluteTop();
     //do not allow mirror-functionality
@@ -333,8 +335,8 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   }
 
   private void doMove(Event event) {
-    int absX = DOM.eventGetClientX(event);
-    int absY = DOM.eventGetClientY(event);
+    int absX = event.getClientX();
+    int absY = event.getClientY();
     int originalX = getAbsoluteLeft();
     int originalY = getAbsoluteTop();
 
@@ -350,8 +352,8 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
 
     RootPanel.get().setWidgetPosition(this, newX >= 0 ? newX : originalX, newY >= 0 ? newY : originalY);
     // override modal bootstrap rules
-    DOM.setStyleAttribute(getElement(), "marginLeft", "0px");
-    DOM.setStyleAttribute(getElement(), "marginTop", "0px");
+    getElement().getStyle().setProperty("marginLeft", "0px");
+    getElement().getStyle().setProperty("marginTop", "0px");
   }
 
   private void onMouseUpEvent() {
@@ -379,8 +381,8 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
    * @return true if in region
    */
   protected boolean isCursorResize(Event event) {
-    int cursorY = DOM.eventGetClientY(event);
-    int cursorX = DOM.eventGetClientX(event);
+    int cursorY = event.getClientY();
+    int cursorX = event.getClientX();
     int xBound = getAbsoluteLeft() + getOffsetWidth();
     int yBound = getAbsoluteTop() + getOffsetHeight();
 
@@ -405,10 +407,10 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
    */
   protected boolean isCursorMove(Event event) {
     if(movePanel != null) {
-      int cursorY = DOM.eventGetClientY(event);
+      int cursorY = event.getClientY();
       int initialY = movePanel.getAbsoluteTop();
       int height = movePanel.getOffsetHeight();
-      int cursorX = DOM.eventGetClientX(event);
+      int cursorX = event.getClientX();
       int initialX = movePanel.getAbsoluteLeft();
       int width = movePanel.getOffsetWidth();
 
@@ -502,7 +504,6 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     private void push(Modal modal) {
       if(!modal.hiddenOnStack && currentlyShown.search(modal) == -1) {
         currentlyShown.push(modal);
-        //GWT.log("push() :: " + currentlyShown.size());
       }
     }
 
@@ -514,7 +515,6 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
       }
 
       currentlyShown.pop();
-      //GWT.log("pop() :: " + currentlyShown.size());
     }
 
     public void hideCurrent() {
