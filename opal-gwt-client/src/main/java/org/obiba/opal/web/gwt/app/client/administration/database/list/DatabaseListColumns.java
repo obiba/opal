@@ -71,19 +71,4 @@ public final class DatabaseListColumns {
     }
   };
 
-//  public ActionsColumn<DatabaseDto> actions = new ActionsColumn<DatabaseDto>(new ActionsProvider<DatabaseDto>() {
-//
-//    @Override
-//    public String[] allActions() {
-//      return new String[] { TEST_ACTION, EDIT_ACTION, UNREGISTER_ACTION };
-//    }
-//
-//    @Override
-//    public String[] getActions(DatabaseDto dto) {
-////      if(dto.getUsedForIdentifiers()) {
-//////        return dto.getHasEntities() ? new String[] { EDIT_ACTION, TEST_ACTION } : allActions();
-////      }
-//      return dto.getHasDatasource() ? new String[] { EDIT_ACTION, TEST_ACTION } : allActions();
-//    }
-//  });
 }
