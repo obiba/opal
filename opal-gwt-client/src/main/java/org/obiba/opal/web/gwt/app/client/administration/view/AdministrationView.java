@@ -2,9 +2,13 @@ package org.obiba.opal.web.gwt.app.client.administration.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.OpalNavLink;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 
+import com.github.gwtbootstrap.client.ui.NavList;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -53,6 +57,18 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   @UiField
   OpalNavLink taxonomiesPlace;
 
+  @UiField
+  NavList dataAccessAuthorizable;
+
+  @UiField
+  FlowPanel identifiersAuthorizable;
+
+  @UiField
+  NavList dataAnalysisAuthorizable;
+
+  @UiField
+  NavList systemAuthorizable;
+
   @Inject
   public AdministrationView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
@@ -60,6 +76,26 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
 
   @Override
   public void setInSlot(Object slot, IsWidget content) {
+  }
+
+  @Override
+  public HasAuthorization getDataAccessAuthorizer() {
+    return new WidgetAuthorizer(dataAccessAuthorizable);
+  }
+
+  @Override
+  public HasAuthorization getDataAnalysisAuthorizer() {
+    return new WidgetAuthorizer(dataAnalysisAuthorizable);
+  }
+
+  @Override
+  public HasAuthorization getSystemAuthorizer() {
+    return new WidgetAuthorizer(systemAuthorizable);
+  }
+
+  @Override
+  public HasAuthorization getIdentifiersAuthorizer() {
+    return new WidgetAuthorizer(identifiersAuthorizable);
   }
 
   @Override

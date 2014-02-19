@@ -4,6 +4,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
 import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -15,7 +16,6 @@ import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
-import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
 public class AdministrationPresenter extends Presenter<AdministrationPresenter.Display, AdministrationPresenter.Proxy>
     implements HasPageTitle {
@@ -25,6 +25,14 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
   public interface Proxy extends ProxyPlace<AdministrationPresenter> {}
 
   public interface Display extends View {
+
+    HasAuthorization getDataAccessAuthorizer();
+
+    HasAuthorization getDataAnalysisAuthorizer();
+
+    HasAuthorization getSystemAuthorizer();
+
+    HasAuthorization getIdentifiersAuthorizer();
 
     void setUsersGroupsHistoryToken(String historyToken);
 
@@ -65,7 +73,7 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
   @Inject
   public AdministrationPresenter(Display display, EventBus eventBus, Proxy proxy, PlaceManager placeManager,
       Translations translations) {
-    super(eventBus, display, proxy);
+    super(eventBus, display, proxy, PageContainerPresenter.CONTENT);
     this.placeManager = placeManager;
     this.translations = translations;
     setHistoryTokens();
@@ -78,13 +86,35 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
   }
 
   @Override
-  protected void revealInParent() {
-    RevealContentEvent.fire(this, PageContainerPresenter.CONTENT, this);
+  protected void onReveal() {
+    super.onReveal();
+    authorize();
   }
 
-  //
-  // Private Methods
-  //
+  private void authorize() {
+    fireEvent(new RequestAdministrationPermissionEvent(new HasAuthorization() {
+
+      @Override
+      public void unauthorized() {
+      }
+
+      @Override
+      public void beforeAuthorization() {
+        getView().getDataAccessAuthorizer().beforeAuthorization();
+        getView().getDataAnalysisAuthorizer().beforeAuthorization();
+        getView().getSystemAuthorizer().beforeAuthorization();
+        getView().getIdentifiersAuthorizer().beforeAuthorization();
+      }
+
+      @Override
+      public void authorized() {
+        getView().getDataAccessAuthorizer().authorized();
+        getView().getDataAnalysisAuthorizer().authorized();
+        getView().getSystemAuthorizer().authorized();
+        getView().getIdentifiersAuthorizer().authorized();
+      }
+    }));
+  }
 
   private void setHistoryTokens() {
     getView().setUsersGroupsHistoryToken(getHistoryToken(Places.USERS));
