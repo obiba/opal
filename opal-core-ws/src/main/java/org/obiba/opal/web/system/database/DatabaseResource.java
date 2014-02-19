@@ -70,9 +70,9 @@ public class DatabaseResource {
     try {
       Database existing = databaseRegistry.getDatabase(name);
       if(databaseRegistry.hasDatasource(existing)) {
-        // restrict edition to certain fields when database has datasource
-        database = existing;
-        database.setDefaultStorage(dto.getDefaultStorage());
+        // Allow edition of all fields except database name
+        database = Dtos.fromDto(dto);
+        database.setName(existing.getName());
       } else {
         database = Dtos.fromDto(dto);
       }
