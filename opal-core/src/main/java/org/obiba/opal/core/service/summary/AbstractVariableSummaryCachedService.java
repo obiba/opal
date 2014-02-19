@@ -1,4 +1,4 @@
-package org.obiba.opal.core.service;
+package org.obiba.opal.core.service.summary;
 
 import java.util.Collections;
 import java.util.Date;
@@ -67,10 +67,11 @@ public abstract class AbstractVariableSummaryCachedService< //
   protected void computeAndCacheSummaries(ValueTable table) {
     Cache cache = getCache();
     for(TVariableSummaryBuilder summaryBuilder : getSummaryBuilders(table)) {
-      log.debug("Compute {} summary", summaryBuilder.getVariable());
+      String variableName = summaryBuilder.getVariable().getName();
+      log.debug("Compute {} summary", variableName);
       TVariableSummary summary = summaryBuilder.build();
       String key = summary.getCacheKey(table);
-      log.debug("Add to cache {}", key);
+      log.trace("Cache {} summary with key {}", variableName, key);
       cache.put(new Element(key, summary));
     }
   }
@@ -89,10 +90,12 @@ public abstract class AbstractVariableSummaryCachedService< //
 
     // don't cache transient variable summary
     if(isTransientVariable(variable)) {
+      log.trace("Don't cache transient variable summary for {}", variable.getName());
       return summaryFactory.getSummary();
     }
 
     if(refreshCache) {
+      log.trace("Force summary cache refresh for {}", variable.getName());
       clearVariableSummaryCache(summaryFactory);
     }
 
@@ -115,23 +118,27 @@ public abstract class AbstractVariableSummaryCachedService< //
     Cache cache = getCache();
     String key = summaryFactory.getCacheKey();
     Element element = cache.get(key);
-    log.debug("Cache for {}: {}", key, element);
+    log.trace("Cache for {} --> {}", key, element);
 
+    String variableName = summaryFactory.getVariable().getName();
     if(element == null) {
+      log.debug("No summary in cache for {} ({})", variableName, key);
       return cacheSummary(summaryFactory, cache, key);
     }
 
     // check timestamps
     if(isCacheObsolete(element, summaryFactory.getTable())) {
+      log.trace("Cache is obsolete for {} ({})", variableName, key);
       return cacheSummary(summaryFactory, cache, key);
     }
+    log.debug("Use cached summary for {} ({})", variableName, key);
     return (TVariableSummary) element.getObjectValue();
   }
 
   private TVariableSummary cacheSummary(TVariableSummaryFactory summaryFactory, Ehcache cache, String key) {
     TVariableSummary summary = summaryFactory.getSummary();
 
-    log.debug("New cache entry for : {}", key);
+    log.trace("Add new summary to cache for {} ({})", summary.getVariableName(), key);
     cache.put(new Element(key, summary));
     return summary;
   }

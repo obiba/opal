@@ -1,4 +1,4 @@
-package org.obiba.opal.core.service;
+package org.obiba.opal.core.service.summary;
 
 import javax.validation.constraints.NotNull;
 
@@ -16,6 +16,7 @@ import org.obiba.magma.math.summary.DefaultVariableSummary;
 import org.obiba.magma.math.summary.DefaultVariableSummaryFactory;
 import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.TextType;
+import org.obiba.opal.core.service.VariableStatsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
