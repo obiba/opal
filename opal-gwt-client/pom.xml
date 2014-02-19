@@ -218,7 +218,7 @@
             ${project.basedir}/src/main/resources/org/obiba/opal/web/gwt/app/public/less
           </sourceDirectory>
           <outputDirectory>
-            ${project.basedir}/src/main/resources/org/obiba/opal/web/gwt/app/public/css
+            ${project.build.directory}/generated-sources/resources/org/obiba/opal/web/gwt/app/public/css
           </outputDirectory>
           <compress>true</compress>
           <includes>
@@ -232,6 +232,25 @@
             <goals>
               <goal>compile</goal>
             </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${project.build.directory}/generated-sources/resources</source>
+              </sources>
+            </configuration>
           </execution>
         </executions>
       </plugin>
