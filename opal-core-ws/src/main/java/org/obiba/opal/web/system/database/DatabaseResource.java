@@ -54,7 +54,7 @@ public class DatabaseResource {
   @GET
   public DatabaseDto get() {
     Database database = getDatabase();
-    return Dtos.asDto(database, databaseRegistry.hasDatasource(database), databaseRegistry.hasEntities(database));
+    return Dtos.asDto(database, databaseRegistry.hasDatasource(database));
   }
 
   @DELETE
@@ -100,7 +100,7 @@ public class DatabaseResource {
   @GET
   @Path("/hasEntities")
   @ApiOperation(value = "Returns true if the database has entities")
-  public Response getHasIdentifiers() {
+  public Response getHasEntities() {
     Database database = databaseRegistry.getDatabase(name);
 
     return Response.ok().entity(String.valueOf(databaseRegistry.hasEntities(database))).build();

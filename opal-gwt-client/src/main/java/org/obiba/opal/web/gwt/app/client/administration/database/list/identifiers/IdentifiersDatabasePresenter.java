@@ -185,7 +185,8 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
           public void onResponseCode(Request request, Response response) {
             getView().enableEditionDeletion(true);
           }
-        }, Response.SC_BAD_REQUEST, Response.SC_SERVICE_UNAVAILABLE, Response.SC_INTERNAL_SERVER_ERROR).get().send();
+        }, Response.SC_BAD_REQUEST, Response.SC_SERVICE_UNAVAILABLE, Response.SC_INTERNAL_SERVER_ERROR,
+            Response.SC_NOT_FOUND).get().send();
   }
 
   public interface Display extends View, HasUiHandlers<IdentifiersDatabaseUiHandlers> {
