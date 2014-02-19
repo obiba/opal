@@ -57,7 +57,9 @@ import static org.obiba.opal.web.gwt.app.client.administration.database.edit.Abs
 public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseUiHandlers>
     implements SqlDatabaseModalPresenter.Display {
 
-  private boolean isIdentifiers= false;
+  private boolean isIdentifiers = false;
+
+  private String selectedDriver;
 
   interface Binder extends UiBinder<Widget, SqlDatabaseModalView> {}
 
@@ -407,6 +409,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
 
       @Override
       public void setText(@Nullable String text) {
+        selectedDriver = text;
         int count = driver.getItemCount();
         for(int i = 0; i < count; i++) {
           if(driver.getValue(i).equals(text)) {
@@ -414,7 +417,6 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
             break;
           }
         }
-//        setDriverContextualInfo();
       }
     };
   }
@@ -533,8 +535,8 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
     for(JdbcDriverDto driverDto : JsArrays.toIterable(availableDrivers)) {
       driver.addItem(driverDto.getDriverName(), driverDto.getDriverClass());
     }
-    // select MySQL by default
-    getDriver().setText("com.mysql.jdbc.Driver");
+    // select MySQL by default but do not override previously selected driver if any
+    getDriver().setText(selectedDriver == null ? "com.mysql.jdbc.Driver" : selectedDriver);
   }
 
   @Nullable

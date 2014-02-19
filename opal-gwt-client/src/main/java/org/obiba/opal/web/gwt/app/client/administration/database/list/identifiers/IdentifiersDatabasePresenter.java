@@ -29,6 +29,7 @@ import org.obiba.opal.web.model.client.database.MongoDbSettingsDto;
 import org.obiba.opal.web.model.client.database.SqlSettingsDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -175,26 +176,16 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
   }
 
   private void refreshDeletionCapability() {
+    // Check hasEntities
     ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder() //
-        .forResource("/identifiers/tables?counts=true") //
-        .withCallback(new ResourceCallback<JsArray<TableDto>>() {
-          @Override
-          public void onResource(Response response, @Nullable JsArray<TableDto> tables) {
-            for(TableDto table : JsArrays.toIterable(tables)) {
-              if(table.getValueSetCount() > 0) {
-                getView().enableEditionDeletion(false);
-                return;
-              }
-            }
-            getView().enableEditionDeletion(true);
-          }
-        }) //
-        .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
+        .forResource(UriBuilders.DATABASE_IDENTIFIERS_HASENTITIES.create().build()) //
+        .withCallback(new HasEntitiesCallback(), Response.SC_OK)//
+        .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            getView().enableEditionDeletion(false);
+            getView().enableEditionDeletion(true);
           }
-        }).get().send();
+        }, Response.SC_BAD_REQUEST, Response.SC_SERVICE_UNAVAILABLE, Response.SC_INTERNAL_SERVER_ERROR).get().send();
   }
 
   public interface Display extends View, HasUiHandlers<IdentifiersDatabaseUiHandlers> {
@@ -204,4 +195,30 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
     void enableEditionDeletion(boolean value);
   }
 
+  private class HasEntitiesCallback implements ResponseCodeCallback {
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      GWT.log(response.getText());
+      ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder() //
+          .forResource("/identifiers/tables?counts=true") //
+          .withCallback(new ResourceCallback<JsArray<TableDto>>() {
+            @Override
+            public void onResource(Response response, @Nullable JsArray<TableDto> tables) {
+              for(TableDto table : JsArrays.toIterable(tables)) {
+                if(table.getValueSetCount() > 0) {
+                  getView().enableEditionDeletion(false);
+                  return;
+                }
+              }
+              getView().enableEditionDeletion(true);
+            }
+          }) //
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              getView().enableEditionDeletion(false);
+            }
+          }, Response.SC_NOT_FOUND, Response.SC_BAD_REQUEST).get().send();
+    }
+  }
 }

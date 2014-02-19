@@ -468,6 +468,29 @@ public enum UriBuilders {
     }
   },
 
+  DATABASE_IDENTIFIERS_CONNECTIONS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "database", "_identifiers", "connections");
+
+    }
+  },
+  DATABASE_IDENTIFIERS_HASENTITIES {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "database", "_identifiers", "hasEntities");
+
+    }
+  },
+
+  SYSTEM_STATUS_DATABASES {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "status", "databases");
+
+    }
+  },
+
   JDBC_DRIVERS {
     @Override
     public UriBuilder create() {

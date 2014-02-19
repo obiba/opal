@@ -21,8 +21,8 @@ import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.database.DatabasesStatusDto;
 
 import com.google.gwt.http.client.Request;
@@ -100,6 +100,7 @@ public class PostInstallPresenter extends Presenter<PostInstallPresenter.Display
       @Override
       public void onDatabaseCreated(DatabaseCreatedEvent event) {
         updateView();
+        testConnection(event.getDto());
       }
     });
 
@@ -107,6 +108,7 @@ public class PostInstallPresenter extends Presenter<PostInstallPresenter.Display
       @Override
       public void onDatabaseUpdated(DatabaseUpdatedEvent event) {
         updateView();
+        testConnection(event.getDto());
       }
     });
 
@@ -118,6 +120,14 @@ public class PostInstallPresenter extends Presenter<PostInstallPresenter.Display
     });
   }
 
+  private void testConnection(DatabaseDto dto) {
+    if(dto.getUsedForIdentifiers()) {
+      identifiersDatabasePresenter.testConnection();
+    } else {
+      dataDatabasesPresenter.testConnection(dto);
+    }
+  }
+
   @Override
   protected void onReveal() {
     getView().setUsername(credentials.getUsername());
@@ -126,7 +136,7 @@ public class PostInstallPresenter extends Presenter<PostInstallPresenter.Display
 
   private void updateView() {
     ResourceRequestBuilderFactory.<DatabasesStatusDto>newBuilder()
-        .forResource(UriBuilder.create().segment("system", "status", "databases").build()).get()
+        .forResource(UriBuilders.SYSTEM_STATUS_DATABASES.create().build()).get()
         .withCallback(new DatabasesStatusResourceCallback())//
         .withCallback(new ResponseCodeCallback() {
           @Override
@@ -146,7 +156,7 @@ public class PostInstallPresenter extends Presenter<PostInstallPresenter.Display
   @Override
   public void onGoToMain() {
     ResourceRequestBuilderFactory.<DatabasesStatusDto>newBuilder()
-        .forResource(UriBuilder.create().segment("system", "status", "databases").build()).get()
+        .forResource(UriBuilders.SYSTEM_STATUS_DATABASES.create().build()).get()
         .withCallback(new ResourceCallback<DatabasesStatusDto>() {
           @Override
           public void onResource(Response response, DatabasesStatusDto resource) {
@@ -164,14 +174,15 @@ public class PostInstallPresenter extends Presenter<PostInstallPresenter.Display
     public void onResource(Response response, final DatabasesStatusDto statusDto) {
       // Test the connection to identifiers database
       ResourceRequestBuilderFactory.<DatabasesStatusDto>newBuilder()
-          .forResource(UriBuilders.DATABASE_IDENTIFIERS.create().build()).get()
+          .forResource(UriBuilders.DATABASE_IDENTIFIERS_CONNECTIONS.create().build()).post()
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
               getView().enablePageExit(statusDto.getHasIdentifiers() && statusDto.getHasStorage() &&
                   response.getStatusCode() == Response.SC_OK);
             }
-          }, Response.SC_OK, Response.SC_BAD_REQUEST, Response.SC_NOT_FOUND, Response.SC_INTERNAL_SERVER_ERROR)//
+          }, Response.SC_OK, Response.SC_BAD_REQUEST, Response.SC_NOT_FOUND, Response.SC_INTERNAL_SERVER_ERROR,
+              Response.SC_SERVICE_UNAVAILABLE)//
           .send();
     }
   }

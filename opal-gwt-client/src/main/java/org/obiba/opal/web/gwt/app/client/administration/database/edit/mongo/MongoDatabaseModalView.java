@@ -117,7 +117,7 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
 
   @Override
   public void initUrl(boolean isIdentifiers) {
-    url.setText(isIdentifiers ? "mongodb://localhost:3306/opal_ids" : "mongodb://localhost:3306/opal_data");
+    url.setText(isIdentifiers ? "mongodb://localhost:27017/opal_ids" : "mongodb://localhost:27017/opal_data");
   }
 
   @Override

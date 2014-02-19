@@ -158,9 +158,6 @@ public abstract class AbstractDatabaseModalPresenter<TView extends AbstractDatab
   protected void disableFieldsForDatabaseWithDatasource() {
     getView().getNameEnabled().setEnabled(false);
     getView().getUsageEnabled().setEnabled(false);
-    getView().getUrlEnabled().setEnabled(false);
-    getView().getUsernameEnabled().setEnabled(false);
-    getView().getPasswordEnabled().setEnabled(false);
     getView().getPropertiesEnabled().setEnabled(false);
   }
 

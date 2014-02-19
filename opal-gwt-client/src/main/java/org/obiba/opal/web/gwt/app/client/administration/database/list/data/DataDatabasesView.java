@@ -13,7 +13,9 @@ import org.obiba.opal.web.gwt.app.client.administration.database.list.DatabaseLi
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
 
 import com.github.gwtbootstrap.client.ui.DropdownButton;
@@ -29,8 +31,14 @@ import com.google.gwt.view.client.RowCountChangeEvent;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
+import static org.obiba.opal.web.gwt.app.client.administration.database.list.DatabaseListColumns.TEST_ACTION;
+import static org.obiba.opal.web.gwt.app.client.administration.database.list.DatabaseListColumns.UNREGISTER_ACTION;
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
+
 public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandlers>
     implements DataDatabasesPresenter.Display {
+
+  private ActionsColumn<DatabaseDto> actions;
 
   interface Binder extends UiBinder<Widget, DataDatabasesView> {}
 
@@ -56,9 +64,13 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
 
     registerDataDatabase.setText(translations.register());
     initTable();
+    registerActionsHandlers();
   }
 
   private void initTable() {
+
+    initActionsColumn();
+
     pager.setDisplay(table);
     table.addColumn(columns.name, translations.nameLabel());
     table.addColumn(columns.url, translations.urlLabel());
@@ -66,10 +78,24 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
     table.addColumn(columns.usage, translations.usageLabel());
     table.addColumn(columns.schema, translations.schemaLabel());
     table.addColumn(columns.username, translations.usernameLabel());
-    table.addColumn(columns.actions, translations.actionsLabel());
+    table.addColumn(actions, translations.actionsLabel());
     initColumnsWidth();
 
     table.setEmptyTableWidget(new Label(translations.dataDatabaseRequiredLabel()));
+  }
+
+  private void initActionsColumn() {
+    actions = new ActionsColumn<DatabaseDto>(new ActionsProvider<DatabaseDto>() {
+      @Override
+      public String[] allActions() {
+        return new String[] { TEST_ACTION, EDIT_ACTION, UNREGISTER_ACTION };
+      }
+
+      @Override
+      public String[] getActions(DatabaseDto dto) {
+        return dto.getHasDatasource() ? new String[] { EDIT_ACTION, TEST_ACTION } : allActions();
+      }
+    });
   }
 
   private void initColumnsWidth() {
@@ -79,7 +105,26 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
     table.setColumnWidth(columns.usage, 9, Style.Unit.PCT);
     table.setColumnWidth(columns.schema, 9, Style.Unit.PCT);
     table.setColumnWidth(columns.username, 9, Style.Unit.PCT);
-    table.setColumnWidth(columns.actions, 15, Style.Unit.PCT);
+    table.setColumnWidth(actions, 15, Style.Unit.PCT);
+  }
+
+  private void registerActionsHandlers() {
+    actions.setActionHandler(new ActionHandler<DatabaseDto>() {
+      @Override
+      public void doAction(DatabaseDto object, String actionName) {
+        switch(actionName) {
+          case TEST_ACTION:
+            getUiHandlers().testConnection(object);
+            break;
+          case UNREGISTER_ACTION:
+            getUiHandlers().deleteDatabase(object);
+            break;
+          case EDIT_ACTION:
+            getUiHandlers().edit(object);
+            break;
+        }
+      }
+    });
   }
 
   @UiHandler("createSql")
@@ -95,11 +140,6 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
   @UiHandler("table")
   public void onTableChange(RowCountChangeEvent event) {
     pager.setPagerVisible(table.getRowCount() > pager.getPageSize());
-  }
-
-  @Override
-  public HasActionHandler<DatabaseDto> getActions() {
-    return columns.actions;
   }
 
   @Override

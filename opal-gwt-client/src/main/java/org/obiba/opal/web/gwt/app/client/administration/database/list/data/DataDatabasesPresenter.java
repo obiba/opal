@@ -15,14 +15,11 @@ import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseC
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.list.DatabaseAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.database.list.DatabaseListColumns;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceDataProvider;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -43,8 +40,6 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
-
-import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 
 public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresenter.Display>
     implements RequestAdministrationPermissionEvent.Handler, DataDatabasesUiHandlers {
@@ -122,32 +117,6 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
         }
       }
     });
-
-    getView().getActions().setActionHandler(new ActionHandler<DatabaseDto>() {
-
-      @Override
-      public void doAction(DatabaseDto dto, String actionName) {
-
-        if(actionName.equalsIgnoreCase(DatabaseListColumns.UNREGISTER_ACTION)) {
-
-          getEventBus().fireEvent(ConfirmationRequiredEvent
-              .createWithMessages(confirmedCommand = new DeleteDatabaseCommand(dto),
-                  translationMessages.unregisterDatabase(), translationMessages.confirmDeleteDatabase()));
-
-        } else if(actionName.equalsIgnoreCase(EDIT_ACTION)) {
-
-          if(dto.hasSqlSettings()) {
-            sqlDatabaseModalProvider.get().editDatabase(dto);
-          } else if(dto.hasMongoDbSettings()) {
-            mongoDatabaseModalProvider.get().editDatabase(dto);
-          }
-
-        } else if(actionName.equalsIgnoreCase(DatabaseListColumns.TEST_ACTION)) {
-          DatabaseAdministrationPresenter.testConnection(getEventBus(), dto.getName());
-        }
-      }
-
-    });
   }
 
   private void refresh() {
@@ -164,9 +133,28 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
     mongoDatabaseModalProvider.get().createNewDatabase(storageOnly);
   }
 
-  public interface Display extends View, HasUiHandlers<DataDatabasesUiHandlers> {
+  @Override
+  public void edit(DatabaseDto dto) {
+    if(dto.hasSqlSettings()) {
+      sqlDatabaseModalProvider.get().editDatabase(dto);
+    } else if(dto.hasMongoDbSettings()) {
+      mongoDatabaseModalProvider.get().editDatabase(dto);
+    }
+  }
 
-    HasActionHandler<DatabaseDto> getActions();
+  @Override
+  public void testConnection(DatabaseDto dto) {
+    DatabaseAdministrationPresenter.testConnection(getEventBus(), dto.getName());
+  }
+
+  @Override
+  public void deleteDatabase(DatabaseDto dto) {
+    getEventBus().fireEvent(ConfirmationRequiredEvent
+        .createWithMessages(confirmedCommand = new DeleteDatabaseCommand(dto), translationMessages.unregisterDatabase(),
+            translationMessages.confirmDeleteDatabase()));
+  }
+
+  public interface Display extends View, HasUiHandlers<DataDatabasesUiHandlers> {
 
     HasData<DatabaseDto> getTable();
   }

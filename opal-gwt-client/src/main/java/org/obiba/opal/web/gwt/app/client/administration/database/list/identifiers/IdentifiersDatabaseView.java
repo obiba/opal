@@ -42,6 +42,8 @@ import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_
 public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatabaseUiHandlers>
     implements IdentifiersDatabasePresenter.Display {
 
+  private ActionsColumn<DatabaseDto> actions;
+
   interface Binder extends UiBinder<Widget, IdentifiersDatabaseView> {}
 
   @UiField
@@ -73,12 +75,15 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
   }
 
   private void initTable() {
+
+    initActionsColumn();
+
     table.addColumn(columns.url, translations.urlLabel());
     table.addColumn(columns.type, translations.typeLabel());
     table.addColumn(columns.usage, translations.usageLabel());
     table.addColumn(columns.schema, translations.schemaLabel());
     table.addColumn(columns.username, translations.usernameLabel());
-    table.addColumn(columns.actions, translations.actionsLabel());
+    table.addColumn(actions, translations.actionsLabel());
     initColumnsWidth();
 
     table.setEmptyTableWidget(new Label(translations.identifiersDatabaseRequiredLabel()));
@@ -87,17 +92,32 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
     registerActionsHandlers();
   }
 
+  private void initActionsColumn() {
+    actions = new ActionsColumn<DatabaseDto>(new ActionsProvider<DatabaseDto>() {
+      @Override
+      public String[] allActions() {
+        return new String[] { TEST_ACTION, EDIT_ACTION, UNREGISTER_ACTION };
+      }
+
+      @Override
+      public String[] getActions(DatabaseDto dto) {
+        return dto.getHasDatasource() ? new String[] { EDIT_ACTION, TEST_ACTION } : allActions();
+
+      }
+    });
+  }
+
   private void initColumnsWidth() {
     table.setColumnWidth(columns.url, 50, Style.Unit.PCT);
     table.setColumnWidth(columns.type, 9, Style.Unit.PCT);
     table.setColumnWidth(columns.usage, 9, Style.Unit.PCT);
     table.setColumnWidth(columns.schema, 9, Style.Unit.PCT);
     table.setColumnWidth(columns.username, 9, Style.Unit.PCT);
-    table.setColumnWidth(columns.actions, 15, Style.Unit.PCT);
+    table.setColumnWidth(actions, 15, Style.Unit.PCT);
   }
 
   private void registerActionsHandlers() {
-    columns.actions.setActionHandler(new ActionHandler<DatabaseDto>() {
+    actions.setActionHandler(new ActionHandler<DatabaseDto>() {
       @Override
       public void doAction(DatabaseDto object, String actionName) {
         switch(actionName) {
@@ -136,7 +156,7 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
   @Override
   public void enableEditionDeletion(final boolean value) {
     // Expose ActionsProvider so we could inject a new one when the value of enableEditionDeletion changes...
-    columns.actions = new ActionsColumn<DatabaseDto>(new ActionsProvider<DatabaseDto>() {
+    actions = new ActionsColumn<DatabaseDto>(new ActionsProvider<DatabaseDto>() {
       @Override
       public String[] allActions() {
         return new String[] { TEST_ACTION, EDIT_ACTION, UNREGISTER_ACTION };
@@ -144,15 +164,13 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
 
       @Override
       public String[] getActions(DatabaseDto dto) {
-        if(value) {
-          return dto.getHasEntities() ? new String[] { EDIT_ACTION, TEST_ACTION } : allActions();
-        }
-        return dto.getHasDatasource() ? new String[] { EDIT_ACTION, TEST_ACTION } : allActions();
+        return value || dto.getHasDatasource() ? allActions() : new String[] { TEST_ACTION };
+
       }
     });
 
     table.removeColumn(5);
-    table.addColumn(columns.actions, translations.actionsLabel());
+    table.addColumn(actions, translations.actionsLabel());
     registerActionsHandlers();
   }
 

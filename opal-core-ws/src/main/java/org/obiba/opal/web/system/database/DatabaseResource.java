@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mongodb.DB;
+import com.wordnik.swagger.annotations.ApiOperation;
 
 import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
 import static org.obiba.opal.web.model.Database.DatabaseDto;
@@ -94,6 +95,15 @@ public class DatabaseResource {
       return testMongoConnection(database.getMongoDbSettings());
     }
     throw new RuntimeException("Connection test not yet implemented for database " + database.getClass());
+  }
+
+  @GET
+  @Path("/hasEntities")
+  @ApiOperation(value = "Returns true if the database has entities")
+  public Response getHasIdentifiers() {
+    Database database = databaseRegistry.getDatabase(name);
+
+    return Response.ok().entity(String.valueOf(databaseRegistry.hasEntities(database))).build();
   }
 
   private Database getDatabase() {

@@ -54,7 +54,7 @@
       <g:SimplePanel ui:field="dataPanel"/>
 
       <b:Button ui:field="gotoMain" type="SUCCESS" icon="CHEVRON_RIGHT" iconPosition="RIGHT"
-          addStyleNames="pull-right top-margin">
+          addStyleNames="pull-right top-margin" visible="false">
         <ui:msg description="Continue to main site label">Continue to main site</ui:msg>
       </b:Button>
 

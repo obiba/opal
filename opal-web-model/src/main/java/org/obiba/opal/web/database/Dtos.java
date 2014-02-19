@@ -74,16 +74,15 @@ public class Dtos {
     return settings;
   }
 
-  public static DatabaseDto asDto(Database db, boolean hasDatasource, boolean hasEntities) {
-    return asDto(db, hasDatasource, hasEntities, true);
+  public static DatabaseDto asDto(Database db, boolean hasDatasource) {
+    return asDto(db, hasDatasource, true);
   }
 
-  public static DatabaseDto asDto(Database db, boolean hasDatasource, boolean hasEntities, boolean withSettings) {
+  public static DatabaseDto asDto(Database db, boolean hasDatasource, boolean withSettings) {
     DatabaseDto.Builder builder = DatabaseDto.newBuilder();
     builder.setName(db.getName());
     builder.setDefaultStorage(db.isDefaultStorage());
     builder.setHasDatasource(hasDatasource);
-    builder.setHasEntities(hasEntities);
     builder.setUsedForIdentifiers(db.isUsedForIdentifiers());
     builder.setUsage(DatabaseDto.Usage.valueOf(db.getUsage().name()));
 
