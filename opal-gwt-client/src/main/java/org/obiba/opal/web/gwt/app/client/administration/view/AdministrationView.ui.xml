@@ -11,11 +11,11 @@
       <b:FluidRow>
         <b:Column size="6">
           <g:FlowPanel addStyleNames="xlarge-bottom-margin">
-            <b:NavList addStyleNames="xlarge-bottom-margin no-padding-left">
+            <b:NavList addStyleNames="xlarge-bottom-margin no-padding-left" ui:field="dataAccessAuthorizable">
               <b:NavHeader>
                 <ui:msg description="Main Administration Data Access">Data Access</ui:msg>
               </b:NavHeader>
-              
+
               <o:OpalNavLink ui:field="usersGroupsPlace" icon="COG">
                 <ui:msg description="Main Administration Users and Groups title">
                   Users and Groups
@@ -28,7 +28,7 @@
                   </ui:msg>
                 </g:Label>
               </g:FlowPanel>
-              
+
               <o:OpalNavLink ui:field="profilesPlace" icon="COG">
                 <ui:msg description="Main Administration Profiles title">Profiles</ui:msg>
               </o:OpalNavLink>
@@ -45,7 +45,7 @@
               <b:NavHeader>
                 <ui:msg description="Main Administration Data Management">Data Management</ui:msg>
               </b:NavHeader>
-              
+
               <o:OpalNavLink ui:field="filesPlace" icon="COG">
                 <ui:msg description="Main Administration Files title">Files</ui:msg>
               </o:OpalNavLink>
@@ -54,7 +54,7 @@
                   <ui:msg description="Main Administration Files help">Manage file system</ui:msg>
                 </g:Label>
               </g:FlowPanel>
-              
+
               <o:OpalNavLink ui:field="tasksPlace" icon="COG">
                 <ui:msg description="Main Administration Tasks title">Tasks</ui:msg>
               </o:OpalNavLink>
@@ -63,7 +63,7 @@
                   <ui:msg description="Main Administration Tasks help">Monitor and schedule tasks</ui:msg>
                 </g:Label>
               </g:FlowPanel>
-              
+
               <o:OpalNavLink ui:field="reportsPlace" icon="COG">
                 <ui:msg description="Main Administration Reports title">Reports</ui:msg>
               </o:OpalNavLink>
@@ -72,18 +72,20 @@
                   <ui:msg description="Main Administration Reports help">Configure and schedule reports</ui:msg>
                 </g:Label>
               </g:FlowPanel>
-              
-              <o:OpalNavLink ui:field="identifiersPlace" icon="COG">
-                <ui:msg description="Main Administration Identifiers title">
-                  Identifiers Mappings
-                </ui:msg>
-              </o:OpalNavLink>
-              <g:FlowPanel>
-                <g:Label styleName="help-block">
+
+              <g:FlowPanel ui:field="identifiersAuthorizable">
+                <o:OpalNavLink ui:field="identifiersPlace" icon="COG">
                   <ui:msg description="Main Administration Identifiers title">
-                    Manage identifiers mappings
+                    Identifiers Mappings
                   </ui:msg>
-                </g:Label>
+                </o:OpalNavLink>
+                <g:FlowPanel>
+                  <g:Label styleName="help-block">
+                    <ui:msg description="Main Administration Identifiers title">
+                      Manage identifiers mappings
+                    </ui:msg>
+                  </g:Label>
+                </g:FlowPanel>
               </g:FlowPanel>
             </b:NavList>
 
@@ -92,11 +94,11 @@
 
         <b:Column size="6">
           <g:FlowPanel addStyleNames="xlarge-bottom-margin">
-            <b:NavList addStyleNames="xlarge-bottom-margin">
+            <b:NavList addStyleNames="xlarge-bottom-margin" ui:field="dataAnalysisAuthorizable">
               <b:NavHeader>
                 <ui:msg description="Main Administration Data Analysis">Data Analysis</ui:msg>
               </b:NavHeader>
-              
+
               <o:OpalNavLink ui:field="rPlace" icon="COG">
                 <ui:msg description="Main Administration R title">R</ui:msg>
               </o:OpalNavLink>
@@ -107,7 +109,7 @@
                   </ui:msg>
                 </g:Label>
               </g:FlowPanel>
-              
+
               <o:OpalNavLink ui:field="dataShieldPlace" icon="COG">
                 <ui:msg description="Main Administration DataSHIELD title">DataSHIELD</ui:msg>
               </o:OpalNavLink>
@@ -118,7 +120,7 @@
                   </ui:msg>
                 </g:Label>
               </g:FlowPanel>
-              
+
               <o:OpalNavLink ui:field="searchPlace" icon="COG">
                 <ui:msg description="Main Administration Index title">Search</ui:msg>
               </o:OpalNavLink>
@@ -131,11 +133,11 @@
               </g:FlowPanel>
             </b:NavList>
 
-            <b:NavList addStyleNames="xlarge-bottom-margin">
+            <b:NavList addStyleNames="xlarge-bottom-margin" ui:field="systemAuthorizable">
               <b:NavHeader>
                 <ui:msg description="Main Administration System">System</ui:msg>
               </b:NavHeader>
-              
+
               <o:OpalNavLink ui:field="serverPlace" icon="COG">
                 <ui:msg description="Main Administration General Settings title">General Settings</ui:msg>
               </o:OpalNavLink>
@@ -157,7 +159,7 @@
                   </ui:msg>
                 </g:Label>
               </g:FlowPanel>
-              
+
               <o:OpalNavLink ui:field="databasesPlace" icon="COG">
                 <ui:msg description="Main Administration Databases title">Databases</ui:msg>
               </o:OpalNavLink>
@@ -168,7 +170,7 @@
                   </ui:msg>
                 </g:Label>
               </g:FlowPanel>
-              
+
               <o:OpalNavLink ui:field="javaPlace" icon="COG">
                 <ui:msg description="Main Administration JVM title">Java Virtual Machine</ui:msg>
               </o:OpalNavLink>
