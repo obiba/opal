@@ -17,31 +17,46 @@ import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Math;
 import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
+
 @Component
-@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@Scope(SCOPE_PROTOTYPE)
 @Transactional
 public class DefaultSummaryResourceImpl extends AbstractSummaryResource implements DefaultSummaryResource {
 
   @Override
-  public Response get(boolean distinct, Integer offset, Integer limit, Boolean resetCache) {
-    DefaultVariableSummaryFactory summaryFactory = new DefaultVariableSummaryFactory.Builder().variable(getVariable())
-        .table(getValueTable()).valueSource(getVariableValueSource()).offset(offset).limit(limit).build();
+  public Response get(Integer offset, Integer limit, boolean resetCache) {
+    DefaultVariableSummaryFactory summaryFactory = getBuilder(offset).limit(limit).build();
+    return toResponse(variableSummaryService.getSummary(summaryFactory, resetCache));
+  }
 
-    DefaultVariableSummary summary = variableStatsService
-        .getDefaultSummary(summaryFactory, resetCache != null && resetCache);
+  @Override
+  public Response getCachedFullOrComputeLimit(Integer offset, Integer limit) {
+    DefaultVariableSummaryFactory summaryFactory = getBuilder(offset).build();
+    return variableSummaryService.isSummaryCached(summaryFactory) //
+        ? toResponse(variableSummaryService.getSummary(summaryFactory, false)) //
+        : get(offset, limit, false);
+  }
 
+  private DefaultVariableSummaryFactory.Builder getBuilder(Integer offset) {
+    return new DefaultVariableSummaryFactory.Builder() //
+        .variable(getVariable()) //
+        .table(getValueTable()) //
+        .valueSource(getVariableValueSource()) //
+        .offset(offset);
+  }
+
+  private Response toResponse(DefaultVariableSummary summary) {
     SummaryStatisticsDto dto = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //
         .setExtension(Math.DefaultSummaryDto.defaultSummary, Dtos.asDto(summary).build()) //
         .build();
-
-    return offset == null && limit == null
-        ? TimestampedResponses.ok(getValueTable(), dto).build()
+    return summary.getOffset() == null && summary.getLimit() == null //
+        ? TimestampedResponses.ok(getValueTable(), dto).build() //
         : Response.ok(dto).build();
   }
 

@@ -31,7 +31,7 @@ import org.obiba.magma.concurrent.ConcurrentValueTableReader.ConcurrentReaderCal
 import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.DateType;
 import org.obiba.opal.core.domain.VariableNature;
-import org.obiba.opal.core.service.VariableStatsService;
+import org.obiba.opal.core.service.VariableSummaryService;
 import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.ValueTableValuesIndex;
@@ -58,7 +58,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
   private ThreadFactory threadFactory;
 
   @Autowired
-  private VariableStatsService variableStatsService;
+  private VariableSummaryService variableSummaryService;
 
   @NotNull
   @Override
@@ -160,7 +160,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
         } else {
           xcb.field(fieldName, esValue(variable, value));
         }
-        variableStatsService.stackVariable(getValueTable(), variable, value);
+        variableSummaryService.stackVariable(getValueTable(), variable, value);
       }
 
       @Override
@@ -168,13 +168,13 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
         stopwatch.stop();
         if(stop) {
           index.delete();
-          variableStatsService.clearComputingSummaries(getValueTable());
+          variableSummaryService.clearComputingSummaries(getValueTable());
         } else {
           sendAndCheck(bulkRequest);
           index.updateTimestamps();
           log.info("Indexed table {} in {}", getValueTable().getTableReference(), stopwatch);
 
-          variableStatsService.computeSummaries(getValueTable());
+          variableSummaryService.computeSummaries(getValueTable());
         }
       }
 

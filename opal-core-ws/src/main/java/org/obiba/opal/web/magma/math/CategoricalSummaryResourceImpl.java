@@ -17,36 +17,50 @@ import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 /**
  *
  */
 @Component
-@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@Scope(SCOPE_PROTOTYPE)
 @Transactional
 public class CategoricalSummaryResourceImpl extends AbstractSummaryResource implements CategoricalSummaryResource {
 
   @Override
-  public Response get(boolean distinct, Integer offset, Integer limit, Boolean resetCache) {
+  public Response get(boolean distinct, Integer offset, Integer limit, boolean resetCache) {
+    CategoricalVariableSummaryFactory summaryFactory = getBuilder(distinct, offset).limit(limit).build();
+    return toResponse(variableSummaryService.getSummary(summaryFactory, resetCache));
+  }
 
-    CategoricalVariableSummaryFactory summaryFactory = new CategoricalVariableSummaryFactory.Builder()
-        .variable(getVariable()).table(getValueTable()).valueSource(getVariableValueSource()).distinct(distinct)
-        .offset(offset).limit(limit).build();
+  @Override
+  public Response getCachedFullOrComputeLimit(boolean distinct, Integer offset, Integer limit) {
+    CategoricalVariableSummaryFactory summaryFactory = getBuilder(distinct, offset).build();
+    return variableSummaryService.isSummaryCached(summaryFactory) //
+        ? toResponse(variableSummaryService.getSummary(summaryFactory, false)) //
+        : get(distinct, offset, limit, false);
+  }
 
-    CategoricalVariableSummary summary = variableStatsService
-        .getCategoricalSummary(summaryFactory, resetCache != null && resetCache);
+  private CategoricalVariableSummaryFactory.Builder getBuilder(boolean distinct, Integer offset) {
+    return new CategoricalVariableSummaryFactory.Builder() //
+        .variable(getVariable()) //
+        .table(getValueTable()) //
+        .valueSource(getVariableValueSource()) //
+        .distinct(distinct) //
+        .offset(offset);
+  }
 
+  private Response toResponse(CategoricalVariableSummary summary) {
     SummaryStatisticsDto dto = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //
         .setExtension(CategoricalSummaryDto.categorical, Dtos.asDto(summary).build()) //
         .build();
-
-    return offset == null && limit == null
-        ? TimestampedResponses.ok(getValueTable(), dto).build()
+    return summary.getOffset() == null && summary.getLimit() == null //
+        ? TimestampedResponses.ok(getValueTable(), dto).build() //
         : Response.ok(dto).build();
   }
 

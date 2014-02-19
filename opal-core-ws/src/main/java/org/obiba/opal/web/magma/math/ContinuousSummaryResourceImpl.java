@@ -19,36 +19,52 @@ import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Math.ContinuousSummaryDto;
 import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.obiba.magma.math.summary.ContinuousVariableSummary.Distribution;
+import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
+
 @Component
-@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@Scope(SCOPE_PROTOTYPE)
 @Transactional
 public class ContinuousSummaryResourceImpl extends AbstractSummaryResource implements ContinuousSummaryResource {
 
   @Override
-  public Response get(ContinuousVariableSummary.Distribution distribution, List<Double> percentiles, int intervals,
-      Integer offset, Integer limit, Boolean resetCache) {
+  public Response get(Distribution distribution, List<Double> percentiles, int intervals, Integer offset, Integer limit,
+      boolean resetCache) {
+    ContinuousVariableSummaryFactory summaryFactory = getBuilder(distribution, percentiles, intervals, offset)
+        .limit(limit).build();
+    return toResponse(variableSummaryService.getSummary(summaryFactory, resetCache));
 
-    ContinuousVariableSummaryFactory summaryFactory = new ContinuousVariableSummaryFactory.Builder()
-        .variable(getVariable()).table(getValueTable()).valueSource(getVariableValueSource()).distribution(distribution)
-        .percentiles(percentiles).intervals(intervals).offset(offset).limit(limit).build();
+  }
 
-    ContinuousVariableSummary summary = variableStatsService
-        .getContinuousSummary(summaryFactory, resetCache != null && resetCache);
+  @Override
+  public Response getCachedFullOrComputeLimit(Distribution distribution, List<Double> percentiles, int intervals,
+      Integer offset, Integer limit) {
 
+    ContinuousVariableSummaryFactory summaryFactory = getBuilder(distribution, percentiles, intervals, offset).build();
+    return variableSummaryService.isSummaryCached(summaryFactory) //
+        ? toResponse(variableSummaryService.getSummary(summaryFactory, false)) //
+        : get(distribution, percentiles, intervals, offset, limit, false);
+  }
+
+  private ContinuousVariableSummaryFactory.Builder getBuilder(Distribution distribution, List<Double> percentiles,
+      int intervals, Integer offset) {
+    return new ContinuousVariableSummaryFactory.Builder().variable(getVariable()).table(getValueTable())
+        .valueSource(getVariableValueSource()).distribution(distribution).percentiles(percentiles).intervals(intervals)
+        .offset(offset);
+  }
+
+  private Response toResponse(ContinuousVariableSummary summary) {
     SummaryStatisticsDto dto = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //
         .setExtension(ContinuousSummaryDto.continuous, Dtos.asDto(summary).build()) //
         .build();
-
-    return offset == null && limit == null
-        ? TimestampedResponses.ok(getValueTable(), dto).build()
+    return summary.getOffset() == null && summary.getLimit() == null //
+        ? TimestampedResponses.ok(getValueTable(), dto).build() //
         : Response.ok(dto).build();
-
   }
 
 }

@@ -1,5 +1,8 @@
 package org.obiba.opal.core.service.summary;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.validation.constraints.NotNull;
 
 import net.sf.ehcache.Cache;
@@ -8,15 +11,18 @@ import net.sf.ehcache.CacheManager;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
+import org.obiba.magma.math.summary.AbstractVariableSummary;
 import org.obiba.magma.math.summary.CategoricalVariableSummary;
 import org.obiba.magma.math.summary.CategoricalVariableSummaryFactory;
 import org.obiba.magma.math.summary.ContinuousVariableSummary;
 import org.obiba.magma.math.summary.ContinuousVariableSummaryFactory;
 import org.obiba.magma.math.summary.DefaultVariableSummary;
 import org.obiba.magma.math.summary.DefaultVariableSummaryFactory;
+import org.obiba.magma.math.summary.VariableSummary;
+import org.obiba.magma.math.summary.VariableSummaryFactory;
 import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.TextType;
-import org.obiba.opal.core.service.VariableStatsService;
+import org.obiba.opal.core.service.VariableSummaryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +32,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 
 @Component
-public class CachedVariableStatsService implements VariableStatsService {
+public class CachedVariableSummaryService implements VariableSummaryService {
 
-  private static final Logger log = LoggerFactory.getLogger(CachedVariableStatsService.class);
+  private static final Logger log = LoggerFactory.getLogger(CachedVariableSummaryService.class);
 
   @org.springframework.beans.factory.annotation.Value("${org.obiba.opal.cache.variableSummaries}")
   private boolean cacheSummaries;
@@ -36,13 +42,24 @@ public class CachedVariableStatsService implements VariableStatsService {
   @Autowired
   private CacheManager cacheManager;
 
-  private final ContinuousVariableSummaryCachedService continuousSummaryService
-      = new ContinuousVariableSummaryCachedService();
+  private final Map<Class<? extends VariableSummaryFactory<?>>, AbstractVariableSummaryCachedService<?, ?, ?>>
+      summaryServices = new HashMap<>();
 
-  private final CategoricalVariableSummaryCachedService categoricalSummaryService
-      = new CategoricalVariableSummaryCachedService();
+  public CachedVariableSummaryService() {
+    summaryServices.put(ContinuousVariableSummaryFactory.class, new ContinuousVariableSummaryCachedService());
+    summaryServices.put(CategoricalVariableSummaryFactory.class, new CategoricalVariableSummaryCachedService());
+    summaryServices.put(DefaultVariableSummaryFactory.class, new DefaultVariableSummaryCachedService());
+  }
 
-  private final DefaultVariableSummaryCachedService defaultSummaryService = new DefaultVariableSummaryCachedService();
+  @SuppressWarnings("unchecked")
+  private <TVariableSummary extends VariableSummary, //
+      TVariableSummaryFactory extends VariableSummaryFactory<TVariableSummary>, //
+      TVariableSummaryBuilder extends AbstractVariableSummary.VariableSummaryBuilder<TVariableSummary, TVariableSummaryBuilder>> //
+  AbstractVariableSummaryCachedService<TVariableSummary, TVariableSummaryFactory, TVariableSummaryBuilder> //
+  getService(Class<? extends VariableSummaryFactory<TVariableSummary>> factoryClass) {
+    return (AbstractVariableSummaryCachedService<TVariableSummary, TVariableSummaryFactory, TVariableSummaryBuilder>) summaryServices
+        .get(factoryClass);
+  }
 
   @Override
   public void stackVariable(@NotNull ValueTable valueTable, @NotNull Variable variable, @NotNull Value value) {
@@ -52,12 +69,12 @@ public class CachedVariableStatsService implements VariableStatsService {
     Preconditions.checkArgument(!BinaryType.get().equals(variable.getValueType()),
         "Cannot compute summary for binary variable " + variable.getName());
 
-    categoricalSummaryService.getSummaryBuilder(valueTable, variable).addValue(value);
+    getService(CategoricalVariableSummaryFactory.class).getSummaryBuilder(valueTable, variable).addValue(value);
 
     if(variable.getValueType().isNumeric()) {
-      continuousSummaryService.getSummaryBuilder(valueTable, variable).addValue(value);
+      getService(ContinuousVariableSummaryFactory.class).getSummaryBuilder(valueTable, variable).addValue(value);
     } else {
-      defaultSummaryService.getSummaryBuilder(valueTable, variable).addValue(value);
+      getService(DefaultVariableSummaryFactory.class).getSummaryBuilder(valueTable, variable).addValue(value);
     }
   }
 
@@ -68,9 +85,9 @@ public class CachedVariableStatsService implements VariableStatsService {
       return;
     }
     Stopwatch stopwatch = Stopwatch.createStarted();
-    continuousSummaryService.computeAndCacheSummaries(table);
-    categoricalSummaryService.computeAndCacheSummaries(table);
-    defaultSummaryService.computeAndCacheSummaries(table);
+    for(AbstractVariableSummaryCachedService<?, ?, ?> summaryService : summaryServices.values()) {
+      summaryService.computeAndCacheSummaries(table);
+    }
     clearComputingSummaries(table);
     log.info("Variables summaries for {} computed in {}", table.getTableReference(), stopwatch.stop());
   }
@@ -78,41 +95,36 @@ public class CachedVariableStatsService implements VariableStatsService {
   @Override
   public void clearComputingSummaries(@NotNull ValueTable valueTable) {
     if(!cacheSummaries) return;
-    continuousSummaryService.clearComputingSummaries(valueTable);
-    categoricalSummaryService.clearComputingSummaries(valueTable);
-    defaultSummaryService.clearComputingSummaries(valueTable);
+    for(AbstractVariableSummaryCachedService<?, ?, ?> summaryService : summaryServices.values()) {
+      summaryService.clearComputingSummaries(valueTable);
+    }
   }
 
   @NotNull
   @Override
-  public CategoricalVariableSummary getCategoricalSummary(@NotNull CategoricalVariableSummaryFactory summaryFactory,
-      boolean refreshCache) {
-    return categoricalSummaryService.getSummary(summaryFactory, refreshCache);
+  @SuppressWarnings("unchecked")
+  public <TVariableSummary extends VariableSummary, //
+      TVariableSummaryFactory extends VariableSummaryFactory<TVariableSummary>> TVariableSummary getSummary(
+      @NotNull VariableSummaryFactory<TVariableSummary> summaryFactory, boolean refreshCache) {
+    return getService((Class<TVariableSummaryFactory>) summaryFactory.getClass())
+        .getSummary(summaryFactory, refreshCache);
   }
 
-  @NotNull
   @Override
-  public ContinuousVariableSummary getContinuousSummary(@NotNull ContinuousVariableSummaryFactory summaryFactory,
-      boolean refreshCache) {
-    return continuousSummaryService.getSummary(summaryFactory, refreshCache);
-  }
-
-  @NotNull
-  @Override
-  public DefaultVariableSummary getDefaultSummary(@NotNull DefaultVariableSummaryFactory summaryFactory,
-      boolean refreshCache) {
-    return defaultSummaryService.getSummary(summaryFactory, refreshCache);
+  @SuppressWarnings("unchecked")
+  public <TVariableSummary extends VariableSummary, //
+      TVariableSummaryFactory extends VariableSummaryFactory<TVariableSummary>> boolean isSummaryCached(
+      @NotNull VariableSummaryFactory<TVariableSummary> summaryFactory) {
+    return getService((Class<TVariableSummaryFactory>) summaryFactory.getClass()).isSummaryCached(summaryFactory);
   }
 
   private class ContinuousVariableSummaryCachedService extends
       AbstractVariableSummaryCachedService<ContinuousVariableSummary, ContinuousVariableSummaryFactory, ContinuousVariableSummary.Builder> {
 
-    private static final String CACHE_NAME = "opal-variable-summary-continuous";
-
     @NotNull
     @Override
     protected Cache getCache() {
-      return cacheManager.getCache(CACHE_NAME);
+      return cacheManager.getCache("opal-variable-summary-continuous");
     }
 
     @NotNull
@@ -125,12 +137,10 @@ public class CachedVariableStatsService implements VariableStatsService {
   private class CategoricalVariableSummaryCachedService extends
       AbstractVariableSummaryCachedService<CategoricalVariableSummary, CategoricalVariableSummaryFactory, CategoricalVariableSummary.Builder> {
 
-    private static final String CACHE_NAME = "opal-variable-summary-categorical";
-
     @NotNull
     @Override
     protected Cache getCache() {
-      return cacheManager.getCache(CACHE_NAME);
+      return cacheManager.getCache("opal-variable-summary-categorical");
     }
 
     @NotNull
@@ -144,12 +154,10 @@ public class CachedVariableStatsService implements VariableStatsService {
   private class DefaultVariableSummaryCachedService extends
       AbstractVariableSummaryCachedService<DefaultVariableSummary, DefaultVariableSummaryFactory, DefaultVariableSummary.Builder> {
 
-    private static final String CACHE_NAME = "opal-variable-summary-default";
-
     @NotNull
     @Override
     protected Cache getCache() {
-      return cacheManager.getCache(CACHE_NAME);
+      return cacheManager.getCache("opal-variable-summary-default");
     }
 
     @NotNull

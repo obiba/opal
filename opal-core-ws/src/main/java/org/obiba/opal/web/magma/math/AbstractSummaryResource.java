@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
-import org.obiba.opal.core.service.VariableStatsService;
+import org.obiba.opal.core.service.VariableSummaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractSummaryResource implements SummaryResource {
@@ -29,7 +29,7 @@ public abstract class AbstractSummaryResource implements SummaryResource {
   private ValueSource variableValueSource;
 
   @Autowired
-  protected VariableStatsService variableStatsService;
+  protected VariableSummaryService variableSummaryService;
 
   @Override
   public void setValueTable(@NotNull ValueTable valueTable) {

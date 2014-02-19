@@ -30,7 +30,7 @@ import static org.obiba.magma.math.summary.AbstractVariableSummary.VariableSumma
 public abstract class AbstractVariableSummaryCachedService< //
     TVariableSummary extends VariableSummary, //
     TVariableSummaryFactory extends VariableSummaryFactory<TVariableSummary>, //
-    TVariableSummaryBuilder extends VariableSummaryBuilder<TVariableSummary>> {
+    TVariableSummaryBuilder extends VariableSummaryBuilder<TVariableSummary, TVariableSummaryBuilder>> {
 
   private static final Logger log = LoggerFactory.getLogger(AbstractVariableSummaryCachedService.class);
 
@@ -66,12 +66,13 @@ public abstract class AbstractVariableSummaryCachedService< //
 
   protected void computeAndCacheSummaries(ValueTable table) {
     Cache cache = getCache();
-    for(TVariableSummaryBuilder summaryBuilder : getSummaryBuilders(table)) {
+    Iterable<TVariableSummaryBuilder> variableSummaryBuilders = getSummaryBuilders(table);
+    for(TVariableSummaryBuilder summaryBuilder : variableSummaryBuilders) {
       String variableName = summaryBuilder.getVariable().getName();
       log.debug("Compute {} summary", variableName);
       TVariableSummary summary = summaryBuilder.build();
       String key = summary.getCacheKey(table);
-      log.trace("Cache {} summary with key {}", variableName, key);
+      log.trace("Cache {} summary with key '{}'", variableName, key);
       cache.put(new Element(key, summary));
     }
   }
@@ -102,6 +103,10 @@ public abstract class AbstractVariableSummaryCachedService< //
     return getCached(summaryFactory);
   }
 
+  public boolean isSummaryCached(@NotNull TVariableSummaryFactory summaryFactory) {
+    return getCache().isKeyInCache(summaryFactory.getCacheKey());
+  }
+
   private boolean isTransientVariable(AttributeAware variable) {
     return variable.hasAttribute("opal", "transient") &&
         (boolean) variable.getAttribute("opal", "transient").getValue().getValue();
@@ -118,9 +123,8 @@ public abstract class AbstractVariableSummaryCachedService< //
     Cache cache = getCache();
     String key = summaryFactory.getCacheKey();
     Element element = cache.get(key);
-    log.trace("Cache for {} --> {}", key, element);
-
     String variableName = summaryFactory.getVariable().getName();
+
     if(element == null) {
       log.debug("No summary in cache for {} ({})", variableName, key);
       return cacheSummary(summaryFactory, cache, key);
