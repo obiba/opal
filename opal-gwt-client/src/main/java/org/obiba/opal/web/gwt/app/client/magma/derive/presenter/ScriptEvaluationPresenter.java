@@ -15,6 +15,7 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.magma.event.ScriptEvaluationFailedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
@@ -48,6 +49,7 @@ import com.gwtplatform.mvp.client.View;
 import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
 import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
+import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 import static com.google.gwt.http.client.Response.SC_OK;
 
 /**
@@ -177,7 +179,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
       ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder() //
           .forResource(uriBuilder.build()) //
           .withFormBody("script", VariableDtos.getScript(originalVariable)) //
-          .withCallback(new ValuesRequestCallback(offset), SC_OK, SC_BAD_REQUEST, SC_FORBIDDEN,
+          .withCallback(new ValuesRequestCallback(offset), SC_OK, SC_NOT_FOUND, SC_BAD_REQUEST, SC_FORBIDDEN,
               SC_INTERNAL_SERVER_ERROR) //
           .accept("application/x-protobuf+json") //
           .post().send();
@@ -207,14 +209,10 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
         case SC_FORBIDDEN:
           getView().setValuesVisible(false);
           break;
+        case SC_NOT_FOUND:
         case SC_BAD_REQUEST:
-          getView().setValuesVisible(true);
-          scriptInterpretationFail(response);
-          break;
         default:
-          getView().setValuesVisible(true);
-          fireEvent(new ScriptEvaluationFailedEvent(translations.scriptEvaluationFailed()));
-          summaryTabPresenter.hideSummaryPreview();
+          processClientError(response);
           break;
       }
     }
@@ -274,18 +272,41 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
       uriBuilder.query("limit", "500");
     }
 
-    private void scriptInterpretationFail(Response response) {
+    private void processClientError(Response response) {
+      getView().setValuesVisible(false);
       summaryTabPresenter.hideSummaryPreview();
+
       ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
-      if(errorDto.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors) != null) {
-        List<JavaScriptErrorDto> errors = extractJavaScriptErrors(errorDto);
-        StringBuilder messageBuilder = new StringBuilder();
-        for(JavaScriptErrorDto error : errors) {
-          messageBuilder
-              .append(translationMessages.errorAt(error.getLineNumber(), error.getColumnNumber(), error.getMessage()));
+      String errorMessage = "";
+
+      if (errorDto != null) {
+
+        if(errorDto.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors) != null) {
+          errorMessage = getScriptInterpretationFailureMessage(extractJavaScriptErrors(errorDto));
+        } else {
+          errorMessage = getClientErrorMessage(errorDto);
         }
-        fireEvent(new ScriptEvaluationFailedEvent(messageBuilder.toString()));
       }
+
+      fireEvent(new ScriptEvaluationFailedEvent(
+          Strings.isNullOrEmpty(errorMessage) ? translations.scriptEvaluationFailed() : errorMessage));
+    }
+
+    private String getClientErrorMessage(ClientErrorDto errorDto) {
+      String messageKey = errorDto.getStatus();
+      assert translations.userMessageMap().containsKey(messageKey);
+      return TranslationsUtils
+          .replaceArguments(translations.userMessageMap().get(messageKey), errorDto.getArgumentsArray());
+    }
+
+    private String getScriptInterpretationFailureMessage(List<JavaScriptErrorDto> errors) {
+      StringBuilder messageBuilder = new StringBuilder();
+      for(JavaScriptErrorDto error : errors) {
+        messageBuilder
+            .append(translationMessages.errorAt(error.getLineNumber(), error.getColumnNumber(), error.getMessage()));
+      }
+
+      return messageBuilder.toString();
     }
 
     @SuppressWarnings("unchecked")
