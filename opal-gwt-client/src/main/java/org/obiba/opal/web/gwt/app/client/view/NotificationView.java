@@ -64,7 +64,7 @@ public class NotificationView extends ViewImpl implements NotificationPresenter.
     Alert alert = createAlert(type, title, handler);
     addMessages(alert, messages, messageArgs == null ? new ArrayList<String>() : messageArgs);
     alertPanel.add(alert);
-    if(!isSticky) runSticky(alert);
+    if(NotificationType.ERROR != type && !isSticky) runSticky(alert);
   }
 
   private Alert createAlert(NotificationType type, @Nullable String title, @Nullable ClosedHandler handler) {
