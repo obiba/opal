@@ -108,6 +108,7 @@ public class DatasourceValuesStepPresenter extends PresenterWidget<DatasourceVal
       @Override
       public void onTableSelection(TableDto table) {
         valuesTablePresenter.setTable(table);
+        valuesTablePresenter.updateValuesDisplay("");
       }
     });
   }
