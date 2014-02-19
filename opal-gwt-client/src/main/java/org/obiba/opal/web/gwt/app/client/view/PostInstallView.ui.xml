@@ -43,6 +43,7 @@
       </b:Heading>
 
       <b:Well>
+        <b:Icon type="OK_SIGN"/>
         <ui:msg description="Post install text">
           Congratulations! You have just installed Opal server. Now it is time to set up the minimum requirements for
           having a fully functional server.
