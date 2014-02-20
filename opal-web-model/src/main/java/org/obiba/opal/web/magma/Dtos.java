@@ -29,6 +29,7 @@ import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.math.stat.IntervalFrequency;
+import org.obiba.magma.math.summary.BinaryVariableSummary;
 import org.obiba.magma.math.summary.CategoricalVariableSummary;
 import org.obiba.magma.math.summary.ContinuousVariableSummary;
 import org.obiba.magma.math.summary.DefaultVariableSummary;
@@ -407,6 +408,20 @@ public final class Dtos {
     Math.DefaultSummaryDto.Builder dtoBuilder = Math.DefaultSummaryDto.newBuilder() //
         .setN(summary.getN());
     for(DefaultVariableSummary.Frequency frequency : summary.getFrequencies()) {
+      Math.FrequencyDto.Builder freqBuilder = Math.FrequencyDto.newBuilder() //
+          .setValue(frequency.getValue()) //
+          .setFreq(frequency.getFreq())//
+          .setPct(frequency.getPct());
+      if(isNumeric(frequency.getPct())) freqBuilder.setPct(frequency.getPct());
+      dtoBuilder.addFrequencies(freqBuilder);
+    }
+    return dtoBuilder;
+  }
+
+  public static Math.BinarySummaryDto.Builder asDto(BinaryVariableSummary summary) {
+    Math.BinarySummaryDto.Builder dtoBuilder = Math.BinarySummaryDto.newBuilder() //
+        .setN(summary.getN());
+    for(BinaryVariableSummary.Frequency frequency : summary.getFrequencies()) {
       Math.FrequencyDto.Builder freqBuilder = Math.FrequencyDto.newBuilder() //
           .setValue(frequency.getValue()) //
           .setFreq(frequency.getFreq())//

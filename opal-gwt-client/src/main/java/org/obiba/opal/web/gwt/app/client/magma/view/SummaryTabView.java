@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
+import org.obiba.opal.web.model.client.math.BinarySummaryDto;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
 import org.obiba.opal.web.model.client.math.DefaultSummaryDto;
@@ -101,6 +102,8 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
       renderCategoricalSummary(dto);
     } else if(dto.getExtension(DefaultSummaryDto.SummaryStatisticsDtoExtensions.defaultSummary) != null) {
       renderDefaultSummary(dto);
+    } else if(dto.getExtension(BinarySummaryDto.SummaryStatisticsDtoExtensions.binarySummary) != null) {
+      renderBinarySummary(dto);
     } else {
       renderNoSummary();
     }
@@ -126,6 +129,12 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
     DefaultSummaryDto defaultSummaryDto = dto
         .getExtension(DefaultSummaryDto.SummaryStatisticsDtoExtensions.defaultSummary).cast();
     summary.add(new DefaultSummaryView(defaultSummaryDto));
+  }
+
+  private void renderBinarySummary(SummaryStatisticsDto dto) {
+    BinarySummaryDto binarySummaryDto = dto.getExtension(BinarySummaryDto.SummaryStatisticsDtoExtensions.binarySummary)
+        .cast();
+    summary.add(new BinarySummaryView(binarySummaryDto));
   }
 
   @Override

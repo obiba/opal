@@ -1,12 +1,12 @@
-/*******************************************************************************
- * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
+/*
+ * Copyright (c) 2014 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ */
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import java.util.Collections;
@@ -16,7 +16,7 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.DefaultFlexTable;
-import org.obiba.opal.web.model.client.math.DefaultSummaryDto;
+import org.obiba.opal.web.model.client.math.BinarySummaryDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 
 import com.google.common.collect.ComparisonChain;
@@ -32,11 +32,11 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  *
  */
-public class DefaultSummaryView extends Composite {
+public class BinarySummaryView extends Composite {
 
-  interface DefaultSummaryViewUiBinder extends UiBinder<Widget, DefaultSummaryView> {}
+  interface BinarySummaryViewUiBinder extends UiBinder<Widget, BinarySummaryView> {}
 
-  private static final DefaultSummaryViewUiBinder uiBinder = GWT.create(DefaultSummaryViewUiBinder.class);
+  private static final BinarySummaryViewUiBinder uiBinder = GWT.create(BinarySummaryViewUiBinder.class);
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -46,7 +46,7 @@ public class DefaultSummaryView extends Composite {
   @UiField
   DefaultFlexTable frequencies;
 
-  public DefaultSummaryView(DefaultSummaryDto summaryDto) {
+  public BinarySummaryView(BinarySummaryDto summaryDto) {
     initWidget(uiBinder.createAndBindUi(this));
     stats.clear();
     stats.setHeader(0, translations.descriptiveStatistics());
