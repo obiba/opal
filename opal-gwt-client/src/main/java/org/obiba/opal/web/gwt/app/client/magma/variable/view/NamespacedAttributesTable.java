@@ -244,8 +244,8 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
     }
 
     @Override
-    public String getItemName(int nb) {
-      return translationMessages.attributesLabel(nb).toLowerCase();
+    public String getNItemLabel(int nb) {
+      return translationMessages.nAttributesLabel(nb).toLowerCase();
     }
 
     @Override

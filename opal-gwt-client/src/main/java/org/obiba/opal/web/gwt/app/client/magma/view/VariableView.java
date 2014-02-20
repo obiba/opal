@@ -190,8 +190,9 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   private final Translations translations;
 
   @Inject
-  public VariableView(Binder uiBinder, Translations translations) {
+  public VariableView(Binder uiBinder, Translations translations, TranslationMessages translationMessages) {
     this.translations = translations;
+    this.translationMessages = translationMessages;
     categoryTable = new CategoriesTable();
 
     initWidget(uiBinder.createAndBindUi(this));

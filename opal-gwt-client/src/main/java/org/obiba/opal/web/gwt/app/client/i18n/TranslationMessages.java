@@ -357,30 +357,30 @@ public interface TranslationMessages extends Messages {
   @AlternateMessage({ "one", "Please confirm that you want to delete {0} table." })
   String confirmDeleteTables(@PluralCount int nb);
 
-  @Description("Categories label")
-  @DefaultMessage("{0}")
-  @AlternateMessage({ "one", "Category", "other", "Category" })
-  String categoriesLabel(@PluralCount int nb);
+  @Description("N Categories label")
+  @DefaultMessage("{0} Categories")
+  @AlternateMessage({ "one", "1 Category" })
+  String nCategoriesLabel(@PluralCount int nb);
 
-  @Description("Attributes label")
-  @DefaultMessage("{0}")
-  @AlternateMessage({ "one", "Attribute", "other", "Attributes" })
-  String attributesLabel(@PluralCount int nb);
+  @Description("N Attributes label")
+  @DefaultMessage("{0} Attributes")
+  @AlternateMessage({ "one", "1 Attribute" })
+  String nAttributesLabel(@PluralCount int nb);
 
-  @Description("Tables label")
-  @DefaultMessage("{0}")
-  @AlternateMessage({ "one", "Table", "other", "Tables" })
-  String tablesLabel(@PluralCount int nb);
+  @Description("N Tables label")
+  @DefaultMessage("{0} Tables")
+  @AlternateMessage({ "one", "1 Table" })
+  String nTablesLabel(@PluralCount int nb);
 
-  @Description("Indices label")
-  @DefaultMessage("{0}")
-  @AlternateMessage({ "one", "Index", "other", "Indices" })
-  String indicesLabel(@PluralCount int nb);
+  @Description("N Indices label")
+  @DefaultMessage("{0} Indices")
+  @AlternateMessage({ "one", "1 Index" })
+  String nIndicesLabel(@PluralCount int nb);
 
-  @Description("Variables label")
-  @DefaultMessage("{0}")
-  @AlternateMessage({ "one", "Variable", "other", "Variables" })
-  String variablesLabel(@PluralCount int nb);
+  @Description("N Variables label")
+  @DefaultMessage("{0} Variables")
+  @AlternateMessage({ "one", "Variable" })
+  String nVariablesLabel(@PluralCount int nb);
 
   @Description("Errors remaining message")
   @DefaultMessage("There are still {0} errors remaining. Please contact your administrator for further help.")
