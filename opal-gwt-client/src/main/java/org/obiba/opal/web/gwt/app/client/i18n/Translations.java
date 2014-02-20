@@ -2180,4 +2180,8 @@ public interface Translations extends Constants {
   @Description("Add Table label")
   @DefaultStringValue("Add Table")
   String addTable();
+
+  @Description("No items label")
+  @DefaultStringValue("No items.")
+  String noItems();
 }

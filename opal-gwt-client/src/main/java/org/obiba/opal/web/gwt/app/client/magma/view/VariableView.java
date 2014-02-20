@@ -170,7 +170,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   NavLink deriveCustom;
 
   @UiField
-  IconAnchor editCategories;
+  Button editCategories;
 
   @UiField
   Button addAttribute;

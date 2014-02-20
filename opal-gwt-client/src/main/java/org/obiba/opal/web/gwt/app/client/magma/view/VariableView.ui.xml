@@ -122,25 +122,23 @@
           </b:Column>
         </b:FluidRow>
 
-        <g:FlowPanel>
-          <b:Heading size="4" addStyleNames="inline-block">
-            <ui:msg description="Categories label">Categories</ui:msg>
-          </b:Heading>
-          <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="editCategories">
-          </b2:IconAnchor>
-        </g:FlowPanel>
-
-        <o:OpalSimplePager ui:field="categoryTablePager" location="RIGHT" addStyleNames="pull-right"/>
-        <o:Table ui:field="categoryTable" addStyleNames="pull-left small-top-margin"/>
-
-        <g:FlowPanel>
-          <b:Heading size="4">
-            <ui:msg description="Attributes label">Attributes</ui:msg>
-          </b:Heading>
-          <b:Button type="INFO" icon="PLUS" ui:field="addAttribute">
-            <ui:msg description="Add Attribute label">Add Attribute</ui:msg>
+        <b:Heading size="4">
+          <ui:msg description="Categories label">Categories</ui:msg>
+        </b:Heading>
+        <g:FlowPanel addStyleNames="clearfix">
+          <b:Button type="INFO" icon="EDIT" ui:field="editCategories" addStyleNames="pull-left">
+            <ui:msg description="Edit Categories label">Edit Categories</ui:msg>
           </b:Button>
+          <o:OpalSimplePager ui:field="categoryTablePager" location="RIGHT" addStyleNames="pull-right"/>
+          <o:Table ui:field="categoryTable" addStyleNames="pull-left small-top-margin"/>
         </g:FlowPanel>
+
+        <b:Heading size="4">
+          <ui:msg description="Attributes label">Attributes</ui:msg>
+        </b:Heading>
+        <b:Button type="INFO" icon="PLUS" ui:field="addAttribute" addStyleNames="pull-left">
+          <ui:msg description="Add Attribute label">Add Attribute</ui:msg>
+        </b:Button>
         <g:FlowPanel ui:field="attributesPanel"/>
 
       </b:Tab>

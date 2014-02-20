@@ -59,7 +59,7 @@ public class EntityModalView extends ModalPopupViewWithUiHandlers<EntityModalUiH
     implements EntityModalPresenter.Display {
 
   private static final int PAGE_SIZE = 20;
-  private static final int MIN_WIDTH = 580;
+  private static final int MIN_WIDTH = 700;
   private static final int MIN_HEIGHT = 500;
 
   interface EntityViewUiBinder extends UiBinder<Widget, EntityModalView> {}
@@ -82,7 +82,7 @@ public class EntityModalView extends ModalPopupViewWithUiHandlers<EntityModalUiH
   OpalSimplePager pager;
 
   @UiField
-  InlineLabel noTables;
+  InlineLabel noValues;
 
   @UiField(provided = true)
   TableChooser tableChooser;
@@ -225,7 +225,7 @@ public class EntityModalView extends ModalPopupViewWithUiHandlers<EntityModalUiH
   private void initializeTable() {
     dataProvider.addDataDisplay(table);
     table.setPageSize(PAGE_SIZE);
-    table.setEmptyTableWidget(noTables);
+    table.setEmptyTableWidget(noValues);
     pager.setDisplay(table);
   }
 

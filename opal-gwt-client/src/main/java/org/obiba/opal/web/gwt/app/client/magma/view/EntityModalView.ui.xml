@@ -7,7 +7,7 @@
     ui:generateLocales="default">
 
   <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false">
-    <g:FlowPanel addStyleNames="main">
+    <g:FlowPanel>
       <o:PropertiesTable keyStyleNames="span2">
         <g:FlowPanel>
           <g:Label>
@@ -22,26 +22,27 @@
           <g:Label ui:field="entityId"/>
         </g:FlowPanel>
       </o:PropertiesTable>
-      <g:FlowPanel styleName="input" addStyleNames="full-width">
-        <g:Label addStyleNames="key">
+
+      <b:ControlGroup>
+        <b:ControlLabel>
           <ui:msg description="Table label">Table</ui:msg>
-        </g:Label>
+        </b:ControlLabel>
         <o:TableChooser ui:field="tableChooser"/>
-      </g:FlowPanel>
+      </b:ControlGroup>
 
       <g:FlowPanel>
-        <g:InlineLabel ui:field="noTables">
-          <ui:msg description="No Tables label">No Tables</ui:msg>
+        <g:InlineLabel ui:field="noValues">
+          <ui:msg description="No Values label">No values.</ui:msg>
         </g:InlineLabel>
 
-        <b:Controls addStyleNames="left-aligned">
+        <b:Controls addStyleNames="pull-left">
           <b:InputAddOn prependIcon="FILTER">
             <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"></o:TextBoxClearable>
           </b:InputAddOn>
         </b:Controls>
 
-        <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="right-aligned"/>
-        <o:Table ui:field="table" width="100%" addStyleNames="left-aligned"/>
+        <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
+        <o:Table ui:field="table" width="100%" addStyleNames="pull-left"/>
       </g:FlowPanel>
     </g:FlowPanel>
 
