@@ -47,40 +47,31 @@
 
         <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false"
             addStyleNames="select">
-          <g:Grid>
-            <g:row>
-              <g:customCell>
-                <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
-              </g:customCell>
-              <g:customCell>
-                <b2:IconAnchor ui:field="selectAllAnchor" addStyleNames="inline xsmall-indent"/>
-              </g:customCell>
-              <g:customCell>
-                <g:FlowPanel>
 
-                  <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE"
-                      addStyleNames="inline xsmall-indent">
-                    <ui:msg description="Clear label">Clear</ui:msg>
-                  </b2:IconAnchor>
+          <g:FlowPanel addStyleNames="pull-left">
+            <b2:IconAnchor ui:field="exportSelectionAnchor" icon="SIGNOUT"
+                addStyleNames="inline">
+              <ui:msg description="Export label">Export</ui:msg>
+            </b2:IconAnchor>
 
-                  <b2:IconAnchor ui:field="exportSelectionAnchor" icon="SIGNOUT"
-                      addStyleNames="inline xsmall-indent">
-                    <ui:msg description="Export label">Export</ui:msg>
-                  </b2:IconAnchor>
+            <b2:IconAnchor ui:field="copySelectionAnchor" icon="COPY"
+                addStyleNames="inline small-indent">
+              <ui:msg description="Copy label">Copy</ui:msg>
+            </b2:IconAnchor>
 
-                  <b2:IconAnchor ui:field="copySelectionAnchor" icon="COPY"
-                      addStyleNames="inline xsmall-indent">
-                    <ui:msg description="Copy label">Copy</ui:msg>
-                  </b2:IconAnchor>
+            <b2:IconAnchor icon="TRASH" ui:field="deleteTables" addStyleNames="inline small-indent">
+              <ui:msg description="Delete label">Delete</ui:msg>
+            </b2:IconAnchor>
+          </g:FlowPanel>
 
-                  <b2:IconAnchor icon="TRASH" ui:field="deleteTables" addStyleNames="inline xsmall-indent">
-                    <ui:msg description="Delete label">Delete</ui:msg>
-                  </b2:IconAnchor>
-
-                </g:FlowPanel>
-              </g:customCell>
-            </g:row>
-          </g:Grid>
+          <g:FlowPanel addStyleNames="pull-right">
+            <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
+            <b2:IconAnchor ui:field="selectAllAnchor" icon="CHECK" addStyleNames="inline small-indent"/>
+            <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE"
+                addStyleNames="inline small-indent">
+              <ui:msg description="Clear label">Clear</ui:msg>
+            </b2:IconAnchor>
+          </g:FlowPanel>
         </b:Alert>
 
         <o:Table ui:field="table"/>
