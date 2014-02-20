@@ -166,11 +166,11 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     summaryRequest = resourceRequestBuilder //
         .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
           @Override
-          public void onResource(Response response, SummaryStatisticsDto resource) {
-            summary = resource;
-            getView().renderSummary(resource);
-            getView().renderSummaryLimit(limit, entitiesCount);
-            getEventBus().fireEvent(new SummaryReceivedEvent(resourceRequestBuilder.getResource(), resource));
+          public void onResource(Response response, SummaryStatisticsDto dto) {
+            summary = dto;
+            getView().renderSummary(dto);
+            getView().renderSummaryLimit(dto.hasLimit() ? dto.getLimit() : entitiesCount, entitiesCount);
+            getEventBus().fireEvent(new SummaryReceivedEvent(resourceRequestBuilder.getResource(), dto));
           }
         }) //
         .withCallback(Response.SC_BAD_REQUEST, new ResponseCodeCallback() {

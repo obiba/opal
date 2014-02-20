@@ -386,4 +386,9 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("There are still {0} errors remaining. Please contact your administrator for further help.")
   String errorsRemainingMessage(int nb);
 
+  @Description("/{0} entities label")
+  @DefaultMessage("/{0} entities")
+  @AlternateMessage({ "one", "/1 entity" })
+  String summaryTotalEntitiesLabel(@PluralCount int nb);
+
 }

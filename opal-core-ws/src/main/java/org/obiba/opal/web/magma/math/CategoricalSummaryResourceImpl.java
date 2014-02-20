@@ -47,10 +47,11 @@ public class CategoricalSummaryResourceImpl extends AbstractSummaryResource impl
       summaryFactory.setLimit(limit);
       summary = variableSummaryService.getSummary(summaryFactory, resetCache);
     }
-    SummaryStatisticsDto dto = SummaryStatisticsDto.newBuilder() //
+    SummaryStatisticsDto.Builder dtoBuilder = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //
-        .setExtension(CategoricalSummaryDto.categorical, Dtos.asDto(summary).build()) //
-        .build();
+        .setExtension(CategoricalSummaryDto.categorical, Dtos.asDto(summary).build());
+    if(summary.getLimit() != null) dtoBuilder.setLimit(summary.getLimit());
+    SummaryStatisticsDto dto = dtoBuilder.build();
     return summary.getOffset() == null && summary.getLimit() == null //
         ? TimestampedResponses.ok(getValueTable(), dto).build() //
         : Response.ok(dto).build();

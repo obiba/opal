@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabUiHandlers;
@@ -20,7 +21,6 @@ import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
@@ -33,6 +33,7 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 /**
@@ -41,13 +42,7 @@ import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> implements SummaryTabPresenter.Display {
 
   @UiTemplate("SummaryTabView.ui.xml")
-  interface SummaryTabViewUiBinder extends UiBinder<Widget, SummaryTabView> {}
-
-  private static final SummaryTabViewUiBinder uiBinder = GWT.create(SummaryTabViewUiBinder.class);
-
-  private static final Translations translations = GWT.create(Translations.class);
-
-  private final Widget uiWidget;
+  interface Binder extends UiBinder<Widget, SummaryTabView> {}
 
   @UiField
   Alert previewSummary;
@@ -73,8 +68,15 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
   @UiField
   Panel summary;
 
-  public SummaryTabView() {
-    uiWidget = uiBinder.createAndBindUi(this);
+  private final Translations translations;
+
+  private final TranslationMessages translationMessages;
+
+  @Inject
+  public SummaryTabView(Binder uiBinder, Translations translations, TranslationMessages translationMessages) {
+    this.translations = translations;
+    this.translationMessages = translationMessages;
+    initWidget(uiBinder.createAndBindUi(this));
 
     limitTextBox.setMaxConstrained(true);
     limitTextBox.setMaxConstrained(false);
@@ -90,33 +92,40 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
   }
 
   @Override
-  public Widget asWidget() {
-    return uiWidget;
-  }
-
-  @Override
+  @SuppressWarnings("IfStatementWithTooManyBranches")
   public void renderSummary(SummaryStatisticsDto dto) {
     summary.clear();
     if(dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous) != null) {
-      ContinuousSummaryDto continuous = dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous)
-          .cast();
-      if(continuous.getSummary().getN() > 0) {
-        summary.add(new ContinuousSummaryView(continuous));
-      } else {
-        renderNoSummary();
-      }
+      renderContinuousSummary(dto);
     } else if(dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical) != null) {
-      CategoricalSummaryDto categorical = dto
-          .getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
-      summary.add(new CategoricalSummaryView(dto.getResource(), categorical));
-
+      renderCategoricalSummary(dto);
     } else if(dto.getExtension(DefaultSummaryDto.SummaryStatisticsDtoExtensions.defaultSummary) != null) {
-      DefaultSummaryDto defaultSummaryDto = dto
-          .getExtension(DefaultSummaryDto.SummaryStatisticsDtoExtensions.defaultSummary).cast();
-      summary.add(new DefaultSummaryView(defaultSummaryDto));
+      renderDefaultSummary(dto);
     } else {
       renderNoSummary();
     }
+  }
+
+  private void renderContinuousSummary(SummaryStatisticsDto dto) {
+    ContinuousSummaryDto continuous = dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous)
+        .cast();
+    if(continuous.getSummary().getN() > 0) {
+      summary.add(new ContinuousSummaryView(continuous));
+    } else {
+      renderNoSummary();
+    }
+  }
+
+  private void renderCategoricalSummary(SummaryStatisticsDto dto) {
+    CategoricalSummaryDto categorical = dto
+        .getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
+    summary.add(new CategoricalSummaryView(dto.getResource(), categorical));
+  }
+
+  private void renderDefaultSummary(SummaryStatisticsDto dto) {
+    DefaultSummaryDto defaultSummaryDto = dto
+        .getExtension(DefaultSummaryDto.SummaryStatisticsDtoExtensions.defaultSummary).cast();
+    summary.add(new DefaultSummaryView(defaultSummaryDto));
   }
 
   @Override
@@ -146,8 +155,7 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
     fullSummaryLink.setVisible(false);
     refreshSummaryLink.setVisible(true);
     previewSummaryText.setText(translations.summaryPreviewPendingLabel());
-    previewSummaryTextSuffix
-        .setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(entitiesCount)));
+    previewSummaryTextSuffix.setText(translationMessages.summaryTotalEntitiesLabel(entitiesCount));
   }
 
   private void hideLimitBox() {
@@ -168,8 +176,7 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
     refreshSummaryLink.setVisible(true);
     fullSummaryLink.setVisible(limit < entitiesCount);
     previewSummaryText.setText(translations.summaryOnLabel());
-    previewSummaryTextSuffix
-        .setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(entitiesCount)));
+    previewSummaryTextSuffix.setText(translationMessages.summaryTotalEntitiesLabel(entitiesCount));
   }
 
   @Override
@@ -184,8 +191,7 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
     fullSummaryLink.setVisible(true);
     refreshSummaryLink.setVisible(true);
     previewSummaryText.setText(translations.summaryFetchSummaryLabel());
-    previewSummaryTextSuffix
-        .setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(entitiesCount)));
+    previewSummaryTextSuffix.setText(translationMessages.summaryTotalEntitiesLabel(entitiesCount));
   }
 
   @UiHandler("fullSummaryLink")

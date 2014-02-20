@@ -6,6 +6,7 @@ option java_package = "org.obiba.opal.web.model";
 
 message SummaryStatisticsDto {
   required string resource = 1;
+  optional int32 limit = 2;
   extensions 1000 to max;
 }
 

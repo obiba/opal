@@ -740,10 +740,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Summary preview pending on")
   String summaryPreviewPendingLabel();
 
-  @Description("/{0} entities label")
-  @DefaultStringValue("/{0} entities")
-  String summaryTotalEntitiesLabel();
-
   @Description("Full summary pending... label")
   @DefaultStringValue("Full summary pending...")
   String summaryFullPendingLabel();
