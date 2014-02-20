@@ -160,7 +160,7 @@ public class CachedVariableSummaryService implements VariableSummaryService {
     @NotNull
     @Override
     protected Cache getCache() {
-      return cacheManager.getCache("opal-variable-summary-binary");
+      return cacheManager.getCache("opal-variable-summary-default");
     }
 
     @NotNull
@@ -176,7 +176,7 @@ public class CachedVariableSummaryService implements VariableSummaryService {
     @NotNull
     @Override
     protected Cache getCache() {
-      return cacheManager.getCache("opal-variable-summary-default");
+      return cacheManager.getCache("opal-variable-summary-binary");
     }
 
     @NotNull
