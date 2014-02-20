@@ -102,7 +102,7 @@ public class ValueTableIndexResource extends IndexResource {
 
     ValueTable valueTable = getValueTable(datasource, table);
     if(!isInProgress(datasource, table)) {
-      // synchonize variable index and values index
+      // synchronize variable index and values index
       synchroManager.synchronizeIndex(variablesIndexManager, valueTable, 0);
       synchroManager.synchronizeIndex(valuesIndexManager, valueTable, 0);
     }
@@ -241,9 +241,9 @@ public class ValueTableIndexResource extends IndexResource {
 
       // Reconstruct the uri
       String queryString = servletRequest.getQueryString();
-      esUri = rawPath + (queryString != null ? '?' + queryString : "");
+      esUri = rawPath + (queryString == null ? "" : '?' + queryString);
 
-      RestUtils.decodeQueryString(queryString != null ? queryString : "", 0, params);
+      RestUtils.decodeQueryString(queryString == null ? "" : queryString, 0, params);
 
       // headers
       String cType = servletRequest.getHeader("Content-Type");

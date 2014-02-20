@@ -51,6 +51,7 @@ public class ProjectResource {
   private ProjectService projectService;
 
   @Autowired
+  @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
   private Set<DatasourceUpdateListener> datasourceUpdateListeners;
 
   @Autowired

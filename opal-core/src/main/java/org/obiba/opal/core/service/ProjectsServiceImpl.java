@@ -39,6 +39,8 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import static com.google.common.base.Strings.nullToEmpty;
+
 @Component
 public class ProjectsServiceImpl implements ProjectService {
 
@@ -128,8 +130,8 @@ public class ProjectsServiceImpl implements ProjectService {
   public void save(@NotNull final Project project) throws ConstraintViolationException {
     try {
       Project original = getProject(project.getName());
-      String originalDb = original.getDatabase() == null ? "" : original.getDatabase();
-      String newDb = project.getDatabase() == null ? "" : project.getDatabase();
+      String originalDb = nullToEmpty(original.getDatabase());
+      String newDb = nullToEmpty(project.getDatabase());
       if(!newDb.equals(originalDb)) {
         transactionTemplate.execute(new TransactionCallbackWithoutResult() {
           @Override
