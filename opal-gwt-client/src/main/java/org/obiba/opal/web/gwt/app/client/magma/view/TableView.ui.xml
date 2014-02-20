@@ -19,20 +19,8 @@
 
   <g:FlowPanel>
 
-    <g:FlowPanel>
-      <b:ButtonGroup addStyleNames="pull-right">
-        <b:Button icon="TRASH" ui:field="remove">
-        </b:Button>
-      </b:ButtonGroup>
-      <b:DropdownButton text="Tasks" icon="TASKS" ui:field="tasksBtn" addStyleNames="pull-right">
-        <b:NavLink icon="SIGNOUT" ui:field="exportData">
-          <ui:msg description="Export data label">Export data...</ui:msg>
-        </b:NavLink>
-        <b:NavLink icon="COPY" ui:field="copyData">
-          <ui:msg description="Copy data label">Copy data...</ui:msg>
-        </b:NavLink>
-      </b:DropdownButton>
-      <b:DropdownButton text="Download" icon="DOWNLOAD" ui:field="downloadBtn" addStyleNames="pull-right">
+    <g:FlowPanel addStyleNames="pull-right">
+      <b:DropdownButton text="Download" icon="DOWNLOAD" ui:field="downloadBtn">
         <b:NavLink ui:field="downloadDictionary">
           <ui:msg description="Download dictionary label">Download dictionary</ui:msg>
         </b:NavLink>
@@ -40,6 +28,20 @@
           <ui:msg description="Download view label">Download view</ui:msg>
         </b:NavLink>
       </b:DropdownButton>
+      <b:ButtonGroup>
+        <b:Button icon="SIGNOUT" ui:field="exportData">
+          <ui:msg description="Export data label">Export data</ui:msg>
+        </b:Button>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:Button icon="COPY" ui:field="copyData">
+          <ui:msg description="Copy data label">Copy data</ui:msg>
+        </b:Button>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:Button icon="TRASH" ui:field="remove">
+        </b:Button>
+      </b:ButtonGroup>
     </g:FlowPanel>
 
     <b:TabPanel tabPosition="above" ui:field="tabPanel">

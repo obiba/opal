@@ -31,7 +31,7 @@
         </b:Button>
       </b:ButtonGroup>
       <b:DropdownButton text="Derive" icon="COG" ui:field="deriveBtn" addStyleNames="pull-right">
-        <b:NavLink icon="PLUS" ui:field="addToView">
+        <b:NavLink ui:field="addToView">
           <ui:msg description="Add variable to view label">Add variable to view...</ui:msg>
         </b:NavLink>
         <b:NavLink ui:field="categorizeToAnother">
@@ -41,7 +41,7 @@
           <ui:msg description="Categorize another to this label">Categorize another variable to this...</ui:msg>
         </b:NavLink>
         <b:NavLink ui:field="deriveCustom">
-          <ui:msg description="Derive custom label">Custom...</ui:msg>
+          <ui:msg description="Custom derivation label">Custom derivation...</ui:msg>
         </b:NavLink>
       </b:DropdownButton>
     </g:FlowPanel>
