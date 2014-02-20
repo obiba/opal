@@ -90,8 +90,6 @@ public abstract class AbstractVariableSummaryCachedService< //
   @NotNull
   public TVariableSummary getSummary(@NotNull TVariableSummaryFactory summaryFactory, boolean refreshCache) {
     Variable variable = summaryFactory.getVariable();
-//    Preconditions.checkArgument(!BinaryType.get().equals(variable.getValueType()),
-//        "Cannot compute summary for binary variable " + variable.getName());
 
     log.debug("Get {} summary for {}", getSummaryType(summaryFactory), variable.getName());
 
