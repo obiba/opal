@@ -22,6 +22,7 @@ import org.obiba.opal.web.model.client.math.FrequencyDto;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -76,7 +77,7 @@ public class DefaultSummaryView extends Composite {
               ? translations.notNullStatistics()
               : value.getValue())); // Translate N/A and NOT_NULL
           frequencies.setWidget(i + 1, 1, new Label("" + Math.round(value.getFreq())));
-          frequencies.setWidget(i + 1, 2, new Label("" + value.getPct() * 100));
+          frequencies.setWidget(i + 1, 2, new Label("" + formatDecimal(value.getPct() * 100)));
         }
       }
     } else {
@@ -84,4 +85,8 @@ public class DefaultSummaryView extends Composite {
     }
   }
 
+  private String formatDecimal(double number) {
+    NumberFormat nf = NumberFormat.getFormat("#.##");
+    return nf.format(number);
+  }
 }
