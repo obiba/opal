@@ -42,6 +42,16 @@ message DefaultSummaryDto {
   }
 }
 
+message BinarySummaryDto {
+
+  required int64 n = 2;
+  repeated FrequencyDto frequencies = 3;
+
+  extend SummaryStatisticsDto {
+    optional BinarySummaryDto binarySummary = 1003;
+  }
+}
+
 message FrequencyDto {
   required string value = 1;
   required int64 freq = 2;

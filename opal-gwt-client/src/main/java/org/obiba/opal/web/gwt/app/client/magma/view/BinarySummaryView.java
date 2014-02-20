@@ -16,7 +16,7 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.DefaultFlexTable;
-import org.obiba.opal.web.model.client.math.DefaultSummaryDto;
+import org.obiba.opal.web.model.client.math.BinarySummaryDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 
 import com.google.common.collect.ComparisonChain;
@@ -32,11 +32,11 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  *
  */
-public class DefaultSummaryView extends Composite {
+public class BinarySummaryView extends Composite {
 
-  interface DefaultSummaryViewUiBinder extends UiBinder<Widget, DefaultSummaryView> {}
+  interface BinarySummaryViewUiBinder extends UiBinder<Widget, BinarySummaryView> {}
 
-  private static final DefaultSummaryViewUiBinder uiBinder = GWT.create(DefaultSummaryViewUiBinder.class);
+  private static final BinarySummaryViewUiBinder uiBinder = GWT.create(BinarySummaryViewUiBinder.class);
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -46,7 +46,7 @@ public class DefaultSummaryView extends Composite {
   @UiField
   DefaultFlexTable frequencies;
 
-  public DefaultSummaryView(DefaultSummaryDto summaryDto) {
+  public BinarySummaryView(BinarySummaryDto summaryDto) {
     initWidget(uiBinder.createAndBindUi(this));
     stats.clear();
     stats.setHeader(0, translations.descriptiveStatistics());

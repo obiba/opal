@@ -16,6 +16,7 @@ import org.obiba.magma.Timestamped;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
+import org.obiba.magma.math.summary.BinaryVariableSummaryFactory;
 import org.obiba.magma.math.summary.CategoricalVariableSummary;
 import org.obiba.magma.math.summary.CategoricalVariableSummaryFactory;
 import org.obiba.magma.math.summary.ContinuousVariableSummary;
@@ -24,12 +25,10 @@ import org.obiba.magma.math.summary.DefaultVariableSummary;
 import org.obiba.magma.math.summary.DefaultVariableSummaryFactory;
 import org.obiba.magma.math.summary.VariableSummary;
 import org.obiba.magma.math.summary.VariableSummaryFactory;
-import org.obiba.magma.type.BinaryType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
 import static org.obiba.magma.math.summary.AbstractVariableSummary.VariableSummaryBuilder;
@@ -91,8 +90,8 @@ public abstract class AbstractVariableSummaryCachedService< //
   @NotNull
   public TVariableSummary getSummary(@NotNull TVariableSummaryFactory summaryFactory, boolean refreshCache) {
     Variable variable = summaryFactory.getVariable();
-    Preconditions.checkArgument(!BinaryType.get().equals(variable.getValueType()),
-        "Cannot compute summary for binary variable " + variable.getName());
+//    Preconditions.checkArgument(!BinaryType.get().equals(variable.getValueType()),
+//        "Cannot compute summary for binary variable " + variable.getName());
 
     log.debug("Get {} summary for {}", getSummaryType(summaryFactory), variable.getName());
 
@@ -189,6 +188,9 @@ public abstract class AbstractVariableSummaryCachedService< //
     }
     if(summaryFactory instanceof DefaultVariableSummaryFactory) {
       return "default";
+    }
+    if(summaryFactory instanceof BinaryVariableSummaryFactory) {
+      return "binary";
     }
     throw new IllegalArgumentException("Unsupported factory class " + summaryFactory.getClass());
   }

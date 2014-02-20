@@ -30,6 +30,11 @@ public enum VariableNature {
   GEO,
 
   /**
+   * A binary variable: it's a binary file
+   */
+  BINARY,
+
+  /**
    * None of the above. Variables with {@code LocaleType} will be of this nature.
    */
   UNDETERMINED;
@@ -50,6 +55,10 @@ public enum VariableNature {
     if(variable.getValueType().isGeo()) {
       return GEO;
     }
+    if(variable.getValueType().isBinary()) {
+      return BINARY;
+    }
+
     return UNDETERMINED;
   }
 
