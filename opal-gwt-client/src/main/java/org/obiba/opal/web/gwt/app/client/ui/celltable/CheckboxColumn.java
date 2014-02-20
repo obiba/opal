@@ -257,9 +257,8 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
 
   private void updateStatusAlertWhenAllSelected(int currentSelected) {
     List<String> args = Lists.newArrayList();
-    args.add(String.valueOf(display.getDataProvider().getList().size()));
 
-    args.add(display.getItemName(currentSelected));
+    args.add(display.getNItemLabel(currentSelected));
     if(currentSelected > 1) {
       display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.allItemsSelected(), args));
     } else {
@@ -272,9 +271,8 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
 
   private void updateStatusAlertWhenNotAllSelected(int currentSelected) {
     List<String> args = Lists.newArrayList();
-    args.add(String.valueOf(currentSelected));
 
-    args.add(display.getItemName(currentSelected));
+    args.add(display.getNItemLabel(currentSelected));
     if(currentSelected > 1) {
       display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.NItemsSelected(), args));
     } else {
@@ -283,8 +281,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     display.getSelectAll().setVisible(true);
 
     args.clear();
-    args.add(String.valueOf(display.getDataProvider().getList().size()));
-    args.add(display.getItemName(currentSelected));
+    args.add(display.getNItemLabel(currentSelected));
     display.getSelectAll().setText(TranslationsUtils.replaceArguments(translations.selectAllNItems(), args));
     display.getClearSelection().setVisible(true);
   }
@@ -342,7 +339,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     /**
      * @return The type name of item
      */
-    String getItemName(int nb);
+    String getNItemLabel(int nb);
 
     Alert getAlert();
   }

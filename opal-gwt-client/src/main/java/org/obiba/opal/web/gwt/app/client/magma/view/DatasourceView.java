@@ -384,8 +384,8 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     }
 
     @Override
-    public String getItemName(int nb) {
-      return translationMessages.tablesLabel(nb).toLowerCase();
+    public String getNItemLabel(int nb) {
+      return translationMessages.nTablesLabel(nb).toLowerCase();
     }
 
     @Override

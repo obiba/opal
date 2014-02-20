@@ -289,7 +289,7 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
     }
 
     @Override
-    public String getItemName(int nb) {
+    public String getNItemLabel(int nb) {
       return "";
     }
 

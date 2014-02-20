@@ -1475,15 +1475,15 @@ public interface Translations extends Constants {
   String versionLabel();
 
   @Description("N item is selected label")
-  @DefaultStringValue("{0} {1} is selected.")
+  @DefaultStringValue("{0} is selected.")
   String NItemSelected();
 
   @Description("N items are selected label")
-  @DefaultStringValue("{0} {1} are selected.")
+  @DefaultStringValue("{0} are selected.")
   String NItemsSelected();
 
   @Description("Select all N items label")
-  @DefaultStringValue("Select all {0} {1}")
+  @DefaultStringValue("Select all {0}")
   String selectAllNItems();
 
   @Description("Clear selection label")
@@ -1491,7 +1491,7 @@ public interface Translations extends Constants {
   String clearSelection();
 
   @Description("All N items are selected label")
-  @DefaultStringValue("All {0} {1} are selected.")
+  @DefaultStringValue("All {0} are selected.")
   String allItemsSelected();
 
   @Description("Add selected variables to view label")

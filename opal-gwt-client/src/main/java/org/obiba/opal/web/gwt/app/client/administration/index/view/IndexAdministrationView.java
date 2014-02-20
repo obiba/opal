@@ -115,8 +115,9 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
   private Status status;
 
   @Inject
-  public IndexAdministrationView(Binder uiBinder, PlaceManager placeManager) {
+  public IndexAdministrationView(Binder uiBinder, PlaceManager placeManager, TranslationMessages translationMessages) {
     this.placeManager = placeManager;
+    this.translationMessages = translationMessages;
     initWidget(uiBinder.createAndBindUi(this));
 
     actionsDropdown.setText(translations.actionsLabel());
@@ -289,8 +290,8 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     }
 
     @Override
-    public String getItemName(int nb) {
-      return translationMessages.indicesLabel(nb).toLowerCase();
+    public String getNItemLabel(int nb) {
+      return translationMessages.nIndicesLabel(nb).toLowerCase();
     }
 
     @Override

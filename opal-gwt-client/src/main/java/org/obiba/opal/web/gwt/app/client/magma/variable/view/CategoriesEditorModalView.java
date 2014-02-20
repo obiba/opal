@@ -403,8 +403,8 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     }
 
     @Override
-    public String getItemName(int nb) {
-      return translationMessages.categoriesLabel(nb).toLowerCase();
+    public String getNItemLabel(int nb) {
+      return translationMessages.nCategoriesLabel(nb).toLowerCase();
     }
 
     @Override
