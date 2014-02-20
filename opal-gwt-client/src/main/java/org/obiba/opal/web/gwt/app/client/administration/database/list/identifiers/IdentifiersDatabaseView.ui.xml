@@ -15,7 +15,7 @@
     <b:Paragraph>
       For security reasons the participant identifiers are stored in a database which is distinct from the databases
       used to store participant data. One identifiers database is required for importing data in Opal. See
-      <a href="http://wiki.obiba.org/display/OPALDOC/Functional+Units" target="_blank">
+      <a href="http://wiki.obiba.org/display/OPALDOC/Identifiers+Mappings" target="_blank">
         documentation about participant identifier
       </a>
       for more details.
