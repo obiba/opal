@@ -1,5 +1,7 @@
 package org.obiba.opal.web.gwt.app.client.administration.view;
 
+import java.util.Iterator;
+
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.OpalNavLink;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -58,16 +60,46 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   OpalNavLink taxonomiesPlace;
 
   @UiField
-  NavList dataAccessAuthorizable;
+  NavList dataAccess;
 
   @UiField
   FlowPanel identifiersAuthorizable;
 
   @UiField
-  NavList dataAnalysisAuthorizable;
+  NavList dataAnalysis;
 
   @UiField
-  NavList systemAuthorizable;
+  NavList system;
+
+  @UiField
+  FlowPanel usersGroupsAuthorizable;
+
+  @UiField
+  FlowPanel profilesAuthorizable;
+
+  @UiField
+  FlowPanel rAuthorizable;
+
+  @UiField
+  FlowPanel dataShieldAuthorizable;
+
+  @UiField
+  FlowPanel searchAuthorizable;
+
+  @UiField
+  FlowPanel databasesAuthorizable;
+
+  @UiField
+  FlowPanel jvmAuthorizable;
+
+  @UiField
+  FlowPanel reportsAuthorizable;
+
+  @UiField
+  FlowPanel tasksAuthorizable;
+
+  @UiField
+  FlowPanel generalSettingsAuthorizable;
 
   @Inject
   public AdministrationView(Binder uiBinder) {
@@ -79,18 +111,53 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   }
 
   @Override
-  public HasAuthorization getDataAccessAuthorizer() {
-    return new WidgetAuthorizer(dataAccessAuthorizable);
+  public HasAuthorization getGeneralSettingsAuthorizer() {
+    return new WidgetAuthorizer(generalSettingsAuthorizable);
   }
 
   @Override
-  public HasAuthorization getDataAnalysisAuthorizer() {
-    return new WidgetAuthorizer(dataAnalysisAuthorizable);
+  public HasAuthorization getTasksAuthorizer() {
+    return new WidgetAuthorizer(tasksAuthorizable);
   }
 
   @Override
-  public HasAuthorization getSystemAuthorizer() {
-    return new WidgetAuthorizer(systemAuthorizable);
+  public HasAuthorization getReportsAuthorizer() {
+    return new WidgetAuthorizer(reportsAuthorizable);
+  }
+
+  @Override
+  public HasAuthorization getJVMAuthorizer() {
+    return new WidgetAuthorizer(jvmAuthorizable);
+  }
+
+  @Override
+  public HasAuthorization getDatabasesAuthorizer() {
+    return new WidgetAuthorizer(databasesAuthorizable);
+  }
+
+  @Override
+  public HasAuthorization getSearchAuthorizer() {
+    return new WidgetAuthorizer(searchAuthorizable);
+  }
+
+  @Override
+  public HasAuthorization getDataShieldAuthorizer() {
+    return new WidgetAuthorizer(dataShieldAuthorizable);
+  }
+
+  @Override
+  public HasAuthorization getRAuthorizer() {
+    return new WidgetAuthorizer(rAuthorizable);
+  }
+
+  @Override
+  public HasAuthorization getProfilesAuthorizer() {
+    return new WidgetAuthorizer(profilesAuthorizable);
+  }
+
+  @Override
+  public HasAuthorization getUsersGroupsAuthorizer() {
+    return new WidgetAuthorizer(usersGroupsAuthorizable);
   }
 
   @Override
@@ -161,6 +228,22 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   @Override
   public void setTaxonomiesHistoryToken(String historyToken) {
     taxonomiesPlace.setHistoryToken(historyToken);
+  }
+
+  @Override
+  public void postAutorizationUpdate() {
+    dataAnalysis.setVisible(hasVisibleChild(dataAnalysis.iterator()));
+    dataAccess.setVisible(hasVisibleChild(dataAccess.iterator()));
+    system.setVisible(hasVisibleChild(system.iterator()));
+  }
+
+  private boolean hasVisibleChild(Iterator<Widget> iterator) {
+    while (iterator.hasNext()) {
+      Widget w = iterator.next();
+      if ((w instanceof FlowPanel) && w.isVisible()) return true;
+    }
+
+    return false;
   }
 
 }
