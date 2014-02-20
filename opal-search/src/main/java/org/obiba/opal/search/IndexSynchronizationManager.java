@@ -81,8 +81,8 @@ public class IndexSynchronizationManager {
     getSubject().execute(syncProducer);
   }
 
-  public void synchronizeIndex(IndexManager indexManager, ValueTable vt, int gracePeriod) {
-    syncProducer.index(indexManager, vt, gracePeriod);
+  public void synchronizeIndex(IndexManager indexManager, ValueTable table, int gracePeriod) {
+    syncProducer.index(indexManager, table, gracePeriod);
   }
 
   public IndexSynchronization getCurrentTask() {
@@ -121,37 +121,37 @@ public class IndexSynchronizationManager {
 
     @Override
     public void run() {
-      for(Datasource ds : MagmaEngine.get().getDatasources()) {
-        for(ValueTable vt : ds.getValueTables()) {
-          try {
-            log.debug("Check index for table: {}.{}", ds.getName(), vt.getName());
+      try {
+        for(Datasource ds : MagmaEngine.get().getDatasources()) {
+          for(ValueTable table : ds.getValueTables()) {
+            log.debug("Check index for table: {}.{}", ds.getName(), table.getName());
             for(IndexManager indexManager : indexManagers) {
-              checkIndexable(indexManager, vt);
+              checkIndexable(indexManager, table);
             }
-          } catch(Exception ignored) {
-            log.debug("Error while checking indexable", ignored);
           }
         }
+      } catch(Exception ignored) {
+        log.debug("Error while checking indexable", ignored);
       }
     }
 
-    private void checkIndexable(IndexManager indexManager, ValueTable vt) {
-      if(indexManager.isReady() && indexManager.isIndexable(vt)) {
-        ValueTableIndex index = indexManager.getIndex(vt);
+    private void checkIndexable(IndexManager indexManager, ValueTable table) {
+      if(indexManager.isReady() && indexManager.isIndexable(table)) {
+        ValueTableIndex index = indexManager.getIndex(table);
         // Check that the index is older than the ValueTable
         if(index.requiresUpgrade() || !index.isUpToDate()) {
-          index(indexManager, vt, GRACE_PERIOD);
+          index(indexManager, table, GRACE_PERIOD);
         }
       }
     }
 
-    private void index(IndexManager indexManager, ValueTable vt, int seconds) {
+    private void index(IndexManager indexManager, ValueTable table, int seconds) {
       // The index needs to be updated
-      Value value = vt.getTimestamps().getLastUpdate();
+      Value value = table.getTimestamps().getLastUpdate();
       // Check that the last modification to the ValueTable is older than the gracePeriod
       // If we don't know (null value), reindex
       if(value.isNull() || value.compareTo(gracePeriod(seconds)) < 0) {
-        submitTask(indexManager, vt);
+        submitTask(indexManager, table);
       }
     }
 
@@ -173,16 +173,16 @@ public class IndexSynchronizationManager {
      * Check if the index is not the current task, or in the queue before adding it to the indexation queue.
      *
      * @param indexManager
-     * @param vt
+     * @param table
      */
-    private void submitTask(IndexManager indexManager, ValueTable vt) {
-      ValueTableIndex index = indexManager.getIndex(vt);
+    private void submitTask(IndexManager indexManager, ValueTable table) {
+      ValueTableIndex index = indexManager.getIndex(table);
       if(currentTask != null && currentTask.getIndexManager().getName().equals(indexManager.getName()) &&
           currentTask.getValueTableIndex().getIndexName().equals(index.getIndexName())) return;
 
       if(!isAlreadyQueued(indexManager, index)) {
         log.trace("Queueing for indexing {} in {}", index.getIndexName(), indexManager.getName());
-        indexSyncQueue.offer(indexManager.createSyncTask(vt, index));
+        indexSyncQueue.offer(indexManager.createSyncTask(table, index));
       }
     }
 
