@@ -1,30 +1,57 @@
 package org.obiba.opal.web.gwt.app.client.administration.presenter;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
 import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
-import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
 public class AdministrationPresenter extends Presenter<AdministrationPresenter.Display, AdministrationPresenter.Proxy>
-    implements HasPageTitle {
+    implements HasPageTitle, RequestAdministrationPermissionEvent.Handler {
 
   @ProxyStandard
   @NameToken(Places.ADMINISTRATION)
   public interface Proxy extends ProxyPlace<AdministrationPresenter> {}
 
   public interface Display extends View {
+
+    HasAuthorization getGeneralSettingsAuthorizer();
+
+    HasAuthorization getTasksAuthorizer();
+
+    HasAuthorization getReportsAuthorizer();
+
+    HasAuthorization getJVMAuthorizer();
+
+    HasAuthorization getDatabasesAuthorizer();
+
+    HasAuthorization getSearchAuthorizer();
+
+    HasAuthorization getDataShieldAuthorizer();
+
+    HasAuthorization getRAuthorizer();
+
+    HasAuthorization getProfilesAuthorizer();
+
+    HasAuthorization getUsersGroupsAuthorizer();
+
+    HasAuthorization getIdentifiersAuthorizer();
 
     void setUsersGroupsHistoryToken(String historyToken);
 
@@ -52,6 +79,7 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
 
     void setTaxonomiesHistoryToken(String historyToken);
 
+    void postAutorizationUpdate();
   }
 
   //
@@ -65,7 +93,7 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
   @Inject
   public AdministrationPresenter(Display display, EventBus eventBus, Proxy proxy, PlaceManager placeManager,
       Translations translations) {
-    super(eventBus, display, proxy);
+    super(eventBus, display, proxy, PageContainerPresenter.CONTENT);
     this.placeManager = placeManager;
     this.translations = translations;
     setHistoryTokens();
@@ -77,14 +105,60 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
     return translations.pageAdministrationTitle();
   }
 
+
+  @ProxyEvent
   @Override
-  protected void revealInParent() {
-    RevealContentEvent.fire(this, PageContainerPresenter.CONTENT, this);
+  public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.SUBJECT_CREDENTIALS.create().build()).get()
+        .authorize(getView().getUsersGroupsAuthorizer()).send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.PROFILES.create().build()).get()
+        .authorize(getView().getProfilesAuthorizer()).send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(ResourcePermissionRequestPaths.UriBuilders.SYSTEM_PERMISSIONS_R.create().build()).get()
+        .authorize(getView().getRAuthorizer()).send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(ResourcePermissionRequestPaths.UriBuilders.SYSTEM_PERMISSIONS_DATASHIELD.create().build()).get()
+        .authorize(getView().getDataShieldAuthorizer()).send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.SERVICE_SEARCH_INDICES.create().build()).get()
+        .authorize(getView().getSearchAuthorizer()).send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.SYSTEM_ENV.create().build()).get()
+        .authorize(getView().getGeneralSettingsAuthorizer()).send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.DATABASES.create().build()).get()
+        .authorize(getView().getDatabasesAuthorizer()).send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.SYSTEM_ENV.create().build()).get()
+        .authorize(getView().getJVMAuthorizer()).send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.IDENTIFIERS_TABLES.create().build()).get()
+        .authorize(getView().getIdentifiersAuthorizer()).send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.REPORT_TEMPLATES.create().build())
+        .get().authorize(getView().getReportsAuthorizer()).send();
+
+    // Must use a CompositeAuthorizer and include ViewAuthorization to update the group widgets
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.SHELL_COMMANDS.create().build())
+        .get().authorize(new CompositeAuthorizer(getView().getTasksAuthorizer(), new ViewAuthorization())).send();
   }
 
-  //
-  // Private Methods
-  //
+  @Override
+  protected void onReveal() {
+    super.onReveal();
+  }
 
   private void setHistoryTokens() {
     getView().setUsersGroupsHistoryToken(getHistoryToken(Places.USERS));
@@ -110,4 +184,22 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
     return new PlaceRequest.Builder().nameToken(nameToken).build();
   }
 
+
+  private final class ViewAuthorization implements HasAuthorization {
+
+    @Override
+    public void beforeAuthorization() {
+    }
+
+    @Override
+    public void authorized() {
+      getView().postAutorizationUpdate();
+
+    }
+
+    @Override
+    public void unauthorized() {
+      getView().postAutorizationUpdate();
+    }
+  }
 }

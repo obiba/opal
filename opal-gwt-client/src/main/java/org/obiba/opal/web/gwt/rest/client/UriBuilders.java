@@ -570,6 +570,29 @@ public enum UriBuilders {
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "subject-profile", "_current", "bookmarks");
     }
+  },
+
+  SERVICE_SEARCH_INDICES {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("service", "search", "indices");
+    }
+  },
+
+  SYSTEM_ENV {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "env");
+
+    }
+  },
+
+  SHELL_COMMANDS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("shell", "commands");
+
+    }
   };
 
   public abstract UriBuilder create();
