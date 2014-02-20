@@ -31,7 +31,7 @@ public interface ResourceRequestBuilder<T extends JavaScriptObject> {
 
   ResourceRequestBuilder<T> withBody(String contentType, String body);
 
-  ResourceRequestBuilder<T> withResourceBody(/* T.stringify() */String dto);
+  ResourceRequestBuilder<T> withResourceBody(String dto);
 
   ResourceRequestBuilder<T> withFormBody(String... keyValues);
 

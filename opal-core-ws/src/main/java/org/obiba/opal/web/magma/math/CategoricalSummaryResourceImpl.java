@@ -32,29 +32,21 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 public class CategoricalSummaryResourceImpl extends AbstractSummaryResource implements CategoricalSummaryResource {
 
   @Override
-  public Response get(boolean distinct, Integer offset, Integer limit, boolean resetCache) {
-    CategoricalVariableSummaryFactory summaryFactory = getBuilder(distinct, offset).limit(limit).build();
-    return toResponse(variableSummaryService.getSummary(summaryFactory, resetCache));
-  }
-
-  @Override
-  public Response getCachedFullOrComputeLimit(boolean distinct, Integer offset, Integer limit) {
-    CategoricalVariableSummaryFactory summaryFactory = getBuilder(distinct, offset).build();
-    return variableSummaryService.isSummaryCached(summaryFactory) //
-        ? toResponse(variableSummaryService.getSummary(summaryFactory, false)) //
-        : get(distinct, offset, limit, false);
-  }
-
-  private CategoricalVariableSummaryFactory.Builder getBuilder(boolean distinct, Integer offset) {
-    return new CategoricalVariableSummaryFactory.Builder() //
+  public Response get(boolean distinct, Integer offset, Integer limit, boolean fullIfCached, boolean resetCache) {
+    CategoricalVariableSummaryFactory summaryFactory = new CategoricalVariableSummaryFactory.Builder() //
         .variable(getVariable()) //
         .table(getValueTable()) //
         .valueSource(getVariableValueSource()) //
         .distinct(distinct) //
-        .offset(offset);
-  }
+        .offset(offset).build();
 
-  private Response toResponse(CategoricalVariableSummary summary) {
+    CategoricalVariableSummary summary;
+    if(fullIfCached && variableSummaryService.isSummaryCached(summaryFactory)) {
+      summary = variableSummaryService.getSummary(summaryFactory, false);
+    } else {
+      summaryFactory.setLimit(limit);
+      summary = variableSummaryService.getSummary(summaryFactory, resetCache);
+    }
     SummaryStatisticsDto dto = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //
         .setExtension(CategoricalSummaryDto.categorical, Dtos.asDto(summary).build()) //

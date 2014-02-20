@@ -84,7 +84,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   private final ScriptEditorPresenter scriptEditorPresenter;
 
-  private TranslationMessages translationMessages;
+  private final TranslationMessages translationMessages;
 
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
@@ -649,15 +649,18 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   }
 
   private void fireSummaryRequiredEvent(final VariableDto selection) {
-    ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(
-        UriBuilders.DATASOURCE_TABLE.create().query("counts", "true").build(table.getDatasourceName(), table.getName()))
+    String tableUri = UriBuilders.DATASOURCE_TABLE.create().query("counts", "true")
+        .build(table.getDatasourceName(), table.getName());
+    ResourceRequestBuilderFactory.<TableDto>newBuilder() //
+        .forResource(tableUri) //
         .withCallback(new ResourceCallback<TableDto>() {
           @Override
           public void onResource(Response response, TableDto resource) {
             fireEvent(new SummaryRequiredEvent(UriBuilders.DATASOURCE_TABLE_VARIABLE_SUMMARY.create(),
                 resource.getValueSetCount(), table.getDatasourceName(), table.getName(), selection.getName()));
           }
-        }).get().send();
+        }) //
+        .get().send();
   }
 
   /**

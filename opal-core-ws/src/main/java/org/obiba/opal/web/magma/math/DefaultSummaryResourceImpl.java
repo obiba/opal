@@ -29,28 +29,20 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 public class DefaultSummaryResourceImpl extends AbstractSummaryResource implements DefaultSummaryResource {
 
   @Override
-  public Response get(Integer offset, Integer limit, boolean resetCache) {
-    DefaultVariableSummaryFactory summaryFactory = getBuilder(offset).limit(limit).build();
-    return toResponse(variableSummaryService.getSummary(summaryFactory, resetCache));
-  }
-
-  @Override
-  public Response getCachedFullOrComputeLimit(Integer offset, Integer limit) {
-    DefaultVariableSummaryFactory summaryFactory = getBuilder(offset).build();
-    return variableSummaryService.isSummaryCached(summaryFactory) //
-        ? toResponse(variableSummaryService.getSummary(summaryFactory, false)) //
-        : get(offset, limit, false);
-  }
-
-  private DefaultVariableSummaryFactory.Builder getBuilder(Integer offset) {
-    return new DefaultVariableSummaryFactory.Builder() //
+  public Response get(Integer offset, Integer limit, boolean fullIfCached, boolean resetCache) {
+    DefaultVariableSummaryFactory summaryFactory = new DefaultVariableSummaryFactory.Builder() //
         .variable(getVariable()) //
         .table(getValueTable()) //
         .valueSource(getVariableValueSource()) //
-        .offset(offset);
-  }
+        .offset(offset).build();
 
-  private Response toResponse(DefaultVariableSummary summary) {
+    DefaultVariableSummary summary;
+    if(fullIfCached && variableSummaryService.isSummaryCached(summaryFactory)) {
+      summary = variableSummaryService.getSummary(summaryFactory, false);
+    } else {
+      summaryFactory.setLimit(limit);
+      summary = variableSummaryService.getSummary(summaryFactory, resetCache);
+    }
     SummaryStatisticsDto dto = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //
         .setExtension(Math.DefaultSummaryDto.defaultSummary, Dtos.asDto(summary).build()) //

@@ -16,11 +16,18 @@ import org.obiba.magma.Timestamped;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
+import org.obiba.magma.math.summary.CategoricalVariableSummary;
+import org.obiba.magma.math.summary.CategoricalVariableSummaryFactory;
+import org.obiba.magma.math.summary.ContinuousVariableSummary;
+import org.obiba.magma.math.summary.ContinuousVariableSummaryFactory;
+import org.obiba.magma.math.summary.DefaultVariableSummary;
+import org.obiba.magma.math.summary.DefaultVariableSummaryFactory;
 import org.obiba.magma.math.summary.VariableSummary;
 import org.obiba.magma.math.summary.VariableSummaryFactory;
 import org.obiba.magma.type.BinaryType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
@@ -69,10 +76,10 @@ public abstract class AbstractVariableSummaryCachedService< //
     Iterable<TVariableSummaryBuilder> variableSummaryBuilders = getSummaryBuilders(table);
     for(TVariableSummaryBuilder summaryBuilder : variableSummaryBuilders) {
       String variableName = summaryBuilder.getVariable().getName();
-      log.debug("Compute {} summary", variableName);
+      log.debug("Compute {}  summary", variableName);
       TVariableSummary summary = summaryBuilder.build();
       String key = summary.getCacheKey(table);
-      log.trace("Cache {} summary with key '{}'", variableName, key);
+      log.trace("Cache {} {} summary with key '{}'", variableName, getSummaryType(summary), key);
       cache.put(new Element(key, summary));
     }
   }
@@ -87,7 +94,7 @@ public abstract class AbstractVariableSummaryCachedService< //
     Preconditions.checkArgument(!BinaryType.get().equals(variable.getValueType()),
         "Cannot compute summary for binary variable " + variable.getName());
 
-    log.debug("Get summary for {}", variable.getName());
+    log.debug("Get {} summary for {}", getSummaryType(summaryFactory), variable.getName());
 
     // don't cache transient variable summary
     if(isTransientVariable(variable)) {
@@ -104,7 +111,11 @@ public abstract class AbstractVariableSummaryCachedService< //
   }
 
   public boolean isSummaryCached(@NotNull TVariableSummaryFactory summaryFactory) {
-    return getCache().isKeyInCache(summaryFactory.getCacheKey());
+    String key = summaryFactory.getCacheKey();
+    boolean inCache = getCache().get(key) != null;
+    log.trace("{} summary {} cache {} ({})", StringUtils.capitalize(getSummaryType(summaryFactory)),
+        inCache ? "IN" : "NOT IN", summaryFactory.getVariable().getName(), key);
+    return inCache;
   }
 
   private boolean isTransientVariable(AttributeAware variable) {
@@ -125,8 +136,9 @@ public abstract class AbstractVariableSummaryCachedService< //
     Element element = cache.get(key);
     String variableName = summaryFactory.getVariable().getName();
 
+    String summaryType = getSummaryType(summaryFactory);
     if(element == null) {
-      log.debug("No summary in cache for {} ({})", variableName, key);
+      log.debug("No {} summary in cache for {} ({})", summaryType, variableName, key);
       return cacheSummary(summaryFactory, cache, key);
     }
 
@@ -135,14 +147,14 @@ public abstract class AbstractVariableSummaryCachedService< //
       log.trace("Cache is obsolete for {} ({})", variableName, key);
       return cacheSummary(summaryFactory, cache, key);
     }
-    log.debug("Use cached summary for {} ({})", variableName, key);
+    log.debug("Use cached {} summary for {} ({})", summaryType, variableName, key);
     return (TVariableSummary) element.getObjectValue();
   }
 
   private TVariableSummary cacheSummary(TVariableSummaryFactory summaryFactory, Ehcache cache, String key) {
     TVariableSummary summary = summaryFactory.getSummary();
 
-    log.trace("Add new summary to cache for {} ({})", summary.getVariableName(), key);
+    log.trace("Cache {} summary for {} ({})", getSummaryType(summaryFactory), summary.getVariableName(), key);
     cache.put(new Element(key, summary));
     return summary;
   }
@@ -152,4 +164,33 @@ public abstract class AbstractVariableSummaryCachedService< //
     Value lastUpdate = table.getTimestamps().getLastUpdate();
     return !lastUpdate.isNull() && ((Date) lastUpdate.getValue()).after(creationTime);
   }
+
+  @SuppressWarnings("ChainOfInstanceofChecks")
+  private String getSummaryType(TVariableSummary summary) {
+    if(summary instanceof ContinuousVariableSummary) {
+      return "continuous";
+    }
+    if(summary instanceof CategoricalVariableSummary) {
+      return "categorical";
+    }
+    if(summary instanceof DefaultVariableSummary) {
+      return "default";
+    }
+    throw new IllegalArgumentException("Unsupported summary class " + summary.getClass());
+  }
+
+  @SuppressWarnings("ChainOfInstanceofChecks")
+  private String getSummaryType(TVariableSummaryFactory summaryFactory) {
+    if(summaryFactory instanceof ContinuousVariableSummaryFactory) {
+      return "continuous";
+    }
+    if(summaryFactory instanceof CategoricalVariableSummaryFactory) {
+      return "categorical";
+    }
+    if(summaryFactory instanceof DefaultVariableSummaryFactory) {
+      return "default";
+    }
+    throw new IllegalArgumentException("Unsupported factory class " + summaryFactory.getClass());
+  }
+
 }

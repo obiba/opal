@@ -64,7 +64,6 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     handlerRegistration = getEventBus().addHandler(SummaryRequiredEvent.getType(), new DeferredSummaryRequestHandler());
     registerHandler(handlerRegistration);
 
-    // Variable Script refreshed
     addRegisteredHandler(VariableRefreshEvent.getType(), new VariableRefreshEvent.Handler() {
       @Override
       public void onVariableRefresh(VariableRefreshEvent event) {
@@ -92,16 +91,10 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     cancelPendingSummaryRequest();
     // Remove queries from the url
     String uri = resourceRequestBuilder.getResource();
-    if(uri.indexOf("?") > 0) {
+    if(uri.contains("?")) {
       uri = uri.substring(0, uri.indexOf("?"));
     }
-    // If transient variable, the method is POST
-    if(uri.contains("/_transient/")) {
-      resourceRequestBuilder.forResource(uri).post();
-    } else {
-      resourceRequestBuilder.forResource(uri).get();
-    }
-
+    resourceRequestBuilder.forResource(uri).get();
     limit = entitiesCount;
     onReset();
   }
@@ -117,23 +110,20 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
   public void onRefreshSummary() {
     cancelPendingSummaryRequest();
 
-    limit = getView().getLimit().intValue();
-    if(limit < Math.min(MIN_LIMIT, entitiesCount)) {
-      limit = Math.min(MIN_LIMIT, entitiesCount);
-    }
     String uri = resourceRequestBuilder.getResource();
-    uri = uri.substring(0, uri.indexOf("?") > 0 ? uri.indexOf("?") : uri.length());
-
-    // If transient variable, the method is POST
-    if(uri.contains("/_transient/")) {
-      resourceRequestBuilder
-          .forResource(limit >= entitiesCount ? uri + "?resetCache=true" : uri + "?limit=" + limit + "&resetCache=true")
-          .post();
-    } else {
-      resourceRequestBuilder
-          .forResource(limit >= entitiesCount ? uri + "?resetCache=true" : uri + "?limit=" + limit + "&resetCache=true")
-          .get();
+    // Remove queries from the url
+    if(uri.contains("?")) {
+      uri = uri.substring(0, uri.indexOf("?"));
     }
+
+    UriBuilder uriBuilder = UriBuilder.create().fromPath(uri);
+    uriBuilder.query("resetCache", "true");
+
+    limit = Math.min(getView().getLimit().intValue(), Math.min(MIN_LIMIT, entitiesCount));
+    if(limit < entitiesCount) {
+      uriBuilder.query("limit", String.valueOf(limit));
+    }
+    resourceRequestBuilder.forResource(uriBuilder.build()).get();
 
     onReset();
   }
@@ -147,16 +137,17 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     getView().hideSummaryPreview();
   }
 
-  public void setResourceUri(UriBuilder uri, int entitiesCount, String... args) {
+  @SuppressWarnings("ParameterHidesMemberVariable")
+  public void configureSummaryRequest(UriBuilder uriBuilder, int entitiesCount, String... args) {
     cancelPendingSummaryRequest();
 
     this.entitiesCount = entitiesCount;
     if(limit < entitiesCount) {
-      uri.query("limit", String.valueOf(limit));
+      uriBuilder.query("limit", String.valueOf(limit));
     }
 
     resourceRequestBuilder = ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()
-        .forResource(uri.build(args)).get();
+        .forResource(uriBuilder.build(args)).get();
 
     limit = Math.min(entitiesCount, limit);
   }
@@ -182,15 +173,10 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
             getEventBus().fireEvent(new SummaryReceivedEvent(resourceRequestBuilder.getResource(), resource));
           }
         }) //
-        .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            getView().renderNoSummary();
-          }
-        }) //
         .withCallback(Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
+            getView().renderNoSummary();
             NotificationEvent notificationEvent = new JSErrorNotificationEventBuilder()
                 .build((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));
             getEventBus().fireEvent(notificationEvent);
@@ -249,7 +235,9 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     @Override
     public void onSummaryRequest(SummaryRequiredEvent event) {
       getView().setLimit(DEFAULT_LIMIT);
-      setResourceUri(event.getResourceUri(), event.getMax() == null ? DEFAULT_LIMIT : event.getMax(), event.getArgs());
+      UriBuilder resourceUri = event.getResourceUri();
+      resourceUri.query("fullIfCached", "true");
+      configureSummaryRequest(resourceUri, event.getMax(), event.getArgs());
       requestSummary();
     }
 

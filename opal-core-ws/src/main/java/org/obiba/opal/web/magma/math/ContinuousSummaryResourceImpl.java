@@ -33,31 +33,25 @@ public class ContinuousSummaryResourceImpl extends AbstractSummaryResource imple
 
   @Override
   public Response get(Distribution distribution, List<Double> percentiles, int intervals, Integer offset, Integer limit,
-      boolean resetCache) {
-    ContinuousVariableSummaryFactory summaryFactory = getBuilder(distribution, percentiles, intervals, offset)
-        .limit(limit).build();
-    return toResponse(variableSummaryService.getSummary(summaryFactory, resetCache));
+      boolean fullIfCached, boolean resetCache) {
 
-  }
+    ContinuousVariableSummaryFactory summaryFactory = new ContinuousVariableSummaryFactory.Builder() //
+        .variable(getVariable()) //
+        .table(getValueTable()) //
+        .valueSource(getVariableValueSource()) //
+        .distribution(distribution) //
+        .percentiles(percentiles) //
+        .intervals(intervals) //
+        .offset(offset).build();
 
-  @Override
-  public Response getCachedFullOrComputeLimit(Distribution distribution, List<Double> percentiles, int intervals,
-      Integer offset, Integer limit) {
+    ContinuousVariableSummary summary;
+    if(fullIfCached && variableSummaryService.isSummaryCached(summaryFactory)) {
+      summary = variableSummaryService.getSummary(summaryFactory, false);
+    } else {
+      summaryFactory.setLimit(limit);
+      summary = variableSummaryService.getSummary(summaryFactory, resetCache);
+    }
 
-    ContinuousVariableSummaryFactory summaryFactory = getBuilder(distribution, percentiles, intervals, offset).build();
-    return variableSummaryService.isSummaryCached(summaryFactory) //
-        ? toResponse(variableSummaryService.getSummary(summaryFactory, false)) //
-        : get(distribution, percentiles, intervals, offset, limit, false);
-  }
-
-  private ContinuousVariableSummaryFactory.Builder getBuilder(Distribution distribution, List<Double> percentiles,
-      int intervals, Integer offset) {
-    return new ContinuousVariableSummaryFactory.Builder().variable(getVariable()).table(getValueTable())
-        .valueSource(getVariableValueSource()).distribution(distribution).percentiles(percentiles).intervals(intervals)
-        .offset(offset);
-  }
-
-  private Response toResponse(ContinuousVariableSummary summary) {
     SummaryStatisticsDto dto = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //
         .setExtension(ContinuousSummaryDto.continuous, Dtos.asDto(summary).build()) //
@@ -65,6 +59,7 @@ public class ContinuousSummaryResourceImpl extends AbstractSummaryResource imple
     return summary.getOffset() == null && summary.getLimit() == null //
         ? TimestampedResponses.ok(getValueTable(), dto).build() //
         : Response.ok(dto).build();
+
   }
 
 }
