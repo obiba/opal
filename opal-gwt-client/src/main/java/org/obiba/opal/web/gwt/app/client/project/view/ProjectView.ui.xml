@@ -52,7 +52,7 @@
         <b:Heading size="3" addStyleNames="no-top-margin">Permissions</b:Heading>
         <g:FlowPanel ui:field="permissionsPanel"/>
       </b:Tab>
-      <b:Tab icon="BOOK">
+      <b:Tab icon="GEAR">
         <b:Heading size="3" addStyleNames="no-top-margin">Administration</b:Heading>
         <g:SimplePanel ui:field="adminPanel"/>
       </b:Tab>
