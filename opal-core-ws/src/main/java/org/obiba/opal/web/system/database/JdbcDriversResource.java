@@ -39,7 +39,7 @@ public class JdbcDriversResource {
     drivers.add(Database.JdbcDriverDto.newBuilder() //
         .setDriverName("MySQL") //
         .setDriverClass("com.mysql.jdbc.Driver") //
-        .setJdbcUrlTemplate("jdbc:mysql://{hostname}:{port}/{databaseName}") //
+        .setJdbcUrlTemplate("jdbc:mysql://{hostname}:{port}/{databaseName}?characterEncoding={encoding}") //
         .setJdbcUrlExample("jdbc:mysql://localhost:3306/opal?characterEncoding=UTF-8").build());
     drivers.add(Database.JdbcDriverDto.newBuilder() //
         .setDriverName("HSQLDB") //
