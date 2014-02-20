@@ -174,7 +174,13 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
           index.updateTimestamps();
           log.info("Indexed table {} in {}", getValueTable().getTableReference(), stopwatch);
 
-          variableSummaryService.computeSummaries(getValueTable());
+          // compute summaries in a new thread
+          new Thread(new Runnable() {
+            @Override
+            public void run() {
+              variableSummaryService.computeSummaries(getValueTable());
+            }
+          }).start();
         }
       }
 
