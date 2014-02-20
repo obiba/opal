@@ -2,14 +2,10 @@ package org.obiba.opal.web.gwt.app.client.administration.database.list;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.edit.sql.SqlDatabaseModalPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
 
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
-
-import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 
 public final class DatabaseListColumns {
 
@@ -75,19 +71,4 @@ public final class DatabaseListColumns {
     }
   };
 
-  public ActionsColumn<DatabaseDto> actions = new ActionsColumn<DatabaseDto>(new ActionsProvider<DatabaseDto>() {
-
-    @Override
-    public String[] allActions() {
-      return new String[] { TEST_ACTION, EDIT_ACTION, UNREGISTER_ACTION };
-    }
-
-    @Override
-    public String[] getActions(DatabaseDto dto) {
-      if(dto.getUsedForIdentifiers()) {
-        return dto.getHasEntities() ? new String[] { EDIT_ACTION, TEST_ACTION } : allActions();
-      }
-      return dto.getHasDatasource() ? new String[] { EDIT_ACTION, TEST_ACTION } : allActions();
-    }
-  });
 }

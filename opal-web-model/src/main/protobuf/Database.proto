@@ -26,12 +26,11 @@ message DatabaseDto {
   }
   required string name = 1;
   optional bool hasDatasource = 2 [default = false];
-  optional bool hasEntities = 3 [default = false];
-  required bool defaultStorage = 4 [default = false];
-  required Usage usage = 5;
-  optional bool usedForIdentifiers = 6;
-  optional SqlSettingsDto sqlSettings = 7;
-  optional MongoDbSettingsDto mongoDbSettings = 8;
+  required bool defaultStorage = 3 [default = false];
+  required Usage usage = 4;
+  optional bool usedForIdentifiers = 5;
+  optional SqlSettingsDto sqlSettings = 6;
+  optional MongoDbSettingsDto mongoDbSettings = 7;
 }
 
 message SqlSettingsDto {

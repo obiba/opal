@@ -57,7 +57,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
-import com.google.common.collect.Sets;
 
 @Component
 @SuppressWarnings("OverlyCoupledClass")
@@ -178,12 +177,8 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
     Preconditions.checkArgument(orientDbService.findUnique(database) != null,
         "Cannot update non existing Database " + database.getName());
 
+    destroyCache(database.getName());
     persist(database);
-
-    // Destroy if has no datasource
-    if(!hasDatasource(database)) {
-      destroyDataSource(database.getName());
-    }
   }
 
   private void persist(Database database) {
@@ -263,10 +258,10 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
       unregister(database.getName(), identifiersTableService.getDatasourceName());
     }
     orientDbService.delete(database);
-    destroyDataSource(database.getName());
+    destroyCache(database.getName());
   }
 
-  private void destroyDataSource(String name) {
+  private void destroyCache(String name) {
     sessionFactoryCache.invalidate(name);
     dataSourceCache.invalidate(name);
   }
@@ -280,7 +275,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
   @Transactional(propagation = Propagation.NEVER)
   public void unregister(@NotNull String databaseName, String usedByDatasource) {
     // close SessionFactory or JDBC dataSource
-    destroyDataSource(databaseName);
+    destroyCache(databaseName);
     registrations.remove(databaseName, usedByDatasource);
   }
 

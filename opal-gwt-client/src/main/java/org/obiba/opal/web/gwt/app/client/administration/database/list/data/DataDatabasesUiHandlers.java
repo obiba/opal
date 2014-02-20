@@ -10,6 +10,8 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.database.list.data;
 
+import org.obiba.opal.web.model.client.database.DatabaseDto;
+
 import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface DataDatabasesUiHandlers extends UiHandlers {
@@ -18,4 +20,9 @@ public interface DataDatabasesUiHandlers extends UiHandlers {
 
   void createMongo(boolean storageOnly);
 
+  void edit(DatabaseDto dto);
+
+  void testConnection(DatabaseDto dto);
+
+  void deleteDatabase(DatabaseDto dto);
 }

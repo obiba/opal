@@ -57,6 +57,10 @@ import static org.obiba.opal.web.gwt.app.client.administration.database.edit.Abs
 public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseUiHandlers>
     implements SqlDatabaseModalPresenter.Display {
 
+  private boolean isIdentifiers = false;
+
+  private String selectedDriver;
+
   interface Binder extends UiBinder<Widget, SqlDatabaseModalView> {}
 
   @UiField
@@ -88,9 +92,6 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
 
   @UiField
   TextBox url;
-
-  @UiField
-  HasText urlExample;
 
   @UiField
   ListBox driver;
@@ -163,7 +164,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
     driver.addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent event) {
-        setDriverContextualInfo();
+        initUrl(isIdentifiers);
       }
     });
 
@@ -184,10 +185,16 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
     jdbcOptions.setText(translations.jdbcOptionsLabel());
   }
 
-  private void setDriverContextualInfo() {
-    JdbcDriverDto jdbcDriver = getDriver(getDriver().getText());
-    url.getElement().setAttribute("placeholder", jdbcDriver == null ? "" : jdbcDriver.getJdbcUrlTemplate());
-    urlExample.setText(jdbcDriver == null ? "" : jdbcDriver.getJdbcUrlExample());
+  @Override
+  public void initUrl(boolean isIdentifiers) {
+    this.isIdentifiers = isIdentifiers;
+
+    String name = isIdentifiers ? "opal_ids" : "opal_data";
+    if(getDriver().getText() == null || "com.mysql.jdbc.Driver".equals(getDriver().getText())) {
+      url.setText("jdbc:mysql://localhost:3306/" + name + "?characterEncoding=UTF-8");
+    } else if("org.hsqldb.jdbcDriver".equals(getDriver().getText())) {
+      url.setText("jdbc:hsqldb:file:" + name + ";shutdown=true;hsqldb.tx=mvcc");
+    }
   }
 
   @Override
@@ -402,6 +409,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
 
       @Override
       public void setText(@Nullable String text) {
+        selectedDriver = text;
         int count = driver.getItemCount();
         for(int i = 0; i < count; i++) {
           if(driver.getValue(i).equals(text)) {
@@ -409,7 +417,6 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
             break;
           }
         }
-        setDriverContextualInfo();
       }
     };
   }
@@ -528,8 +535,8 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
     for(JdbcDriverDto driverDto : JsArrays.toIterable(availableDrivers)) {
       driver.addItem(driverDto.getDriverName(), driverDto.getDriverClass());
     }
-    // select MySQL by default
-    getDriver().setText("com.mysql.jdbc.Driver");
+    // select MySQL by default but do not override previously selected driver if any
+    getDriver().setText(selectedDriver == null ? "com.mysql.jdbc.Driver" : selectedDriver);
   }
 
   @Nullable

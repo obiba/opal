@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mongodb.DB;
+import com.wordnik.swagger.annotations.ApiOperation;
 
 import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
 import static org.obiba.opal.web.model.Database.DatabaseDto;
@@ -53,7 +54,7 @@ public class DatabaseResource {
   @GET
   public DatabaseDto get() {
     Database database = getDatabase();
-    return Dtos.asDto(database, databaseRegistry.hasDatasource(database), databaseRegistry.hasEntities(database));
+    return Dtos.asDto(database, databaseRegistry.hasDatasource(database));
   }
 
   @DELETE
@@ -69,9 +70,9 @@ public class DatabaseResource {
     try {
       Database existing = databaseRegistry.getDatabase(name);
       if(databaseRegistry.hasDatasource(existing)) {
-        // restrict edition to certain fields when database has datasource
-        database = existing;
-        database.setDefaultStorage(dto.getDefaultStorage());
+        // Allow edition of all fields except database name
+        database = Dtos.fromDto(dto);
+        database.setName(existing.getName());
       } else {
         database = Dtos.fromDto(dto);
       }
@@ -94,6 +95,15 @@ public class DatabaseResource {
       return testMongoConnection(database.getMongoDbSettings());
     }
     throw new RuntimeException("Connection test not yet implemented for database " + database.getClass());
+  }
+
+  @GET
+  @Path("/hasEntities")
+  @ApiOperation(value = "Returns true if the database has entities")
+  public Response getHasEntities() {
+    Database database = databaseRegistry.getDatabase(name);
+
+    return Response.ok().entity(String.valueOf(databaseRegistry.hasEntities(database))).build();
   }
 
   private Database getDatabase() {

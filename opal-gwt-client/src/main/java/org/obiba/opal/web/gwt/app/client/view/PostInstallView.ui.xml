@@ -43,6 +43,7 @@
       </b:Heading>
 
       <b:Well>
+        <b:Icon type="OK_SIGN"/>
         <ui:msg description="Post install text">
           Congratulations! You have just installed Opal server. Now it is time to set up the minimum requirements for
           having a fully functional server.
@@ -53,7 +54,7 @@
       <g:SimplePanel ui:field="dataPanel"/>
 
       <b:Button ui:field="gotoMain" type="SUCCESS" icon="CHEVRON_RIGHT" iconPosition="RIGHT"
-          addStyleNames="pull-right top-margin">
+          addStyleNames="pull-right top-margin" visible="false">
         <ui:msg description="Continue to main site label">Continue to main site</ui:msg>
       </b:Button>
 

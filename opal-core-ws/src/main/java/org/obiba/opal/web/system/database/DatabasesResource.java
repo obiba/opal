@@ -72,14 +72,13 @@ public class DatabasesResource {
   @ApiResponses(@ApiResponse(code = 404, message = "Identifiers database not found"))
   public DatabaseDto getIdentifiersDatabase() {
     Database database = databaseRegistry.getIdentifiersDatabase();
-    return Dtos.asDto(database, databaseRegistry.hasDatasource(database), databaseRegistry.hasEntities(database));
+    return Dtos.asDto(database, databaseRegistry.hasDatasource(database));
   }
 
   private List<DatabaseDto> asDto(Iterable<? extends Database> databases, boolean withSettings) {
     List<DatabaseDto> dtos = new ArrayList<>();
     for(Database database : databases) {
-      dtos.add(Dtos.asDto(database, databaseRegistry.hasDatasource(database), databaseRegistry.hasEntities(database),
-          withSettings));
+      dtos.add(Dtos.asDto(database, databaseRegistry.hasDatasource(database), withSettings));
     }
     return dtos;
   }
