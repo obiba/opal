@@ -281,7 +281,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     display.getSelectAll().setVisible(true);
 
     args.clear();
-    args.add(display.getNItemLabel(currentSelected));
+    args.add(display.getNItemLabel(display.getDataProvider().getList().size()));
     display.getSelectAll().setText(TranslationsUtils.replaceArguments(translations.selectAllNItems(), args));
     display.getClearSelection().setVisible(true);
   }
