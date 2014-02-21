@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.project.event.ProjectUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RegExValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
@@ -219,6 +220,8 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
         validators = new LinkedHashSet<FieldValidator>();
         validators.add(new RequiredTextValidator(getView().getName(), "NameIsRequired", Display.FormField.NAME.name()));
         validators.add(new UniqueProjectNameValidator());
+        validators.add(new RegExValidator(getView().getName(), "^[\\w _-]*$", "NameHasInvalidCharacters",
+            Display.FormField.NAME.name()));
       }
       return validators;
     }

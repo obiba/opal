@@ -534,7 +534,9 @@ public interface Translations extends Constants {
       "AddDerivedVariableToViewOnly", "A derived variable can only be added to a view.",//
       "NamespaceCannotBeEmptyChars", "A namespace cannot contain only blank characters.",//
       "DefaultCharSetIsRequired", "A default character set is required.",//
-      "LanguageIsRequired", "At least one language is required." })
+      "LanguageIsRequired", "At least one language is required.",//
+      "NameHasInvalidCharacters",
+      "Name contains invalid characters. Characters must be alphanumeric, space, hyphen or underscore." })
   Map<String, String> userMessageMap();
 
   @Description("Missing label")
