@@ -32,6 +32,8 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceUpdateListener;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.security.MagmaSecurityExtension;
+import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.security.OpalPermissions;
@@ -198,14 +200,33 @@ public class DatasourceResource {
           .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "TableAlreadyExists").build()).build();
     }
 
-    View view = viewDtos.fromDto(viewDto);
+    // check the permissions and if table exists for the user
+    AclAction action = getAction(viewDto);
+
+        View view = viewDtos.fromDto(viewDto);
     viewManager.addView(getDatasource().getName(), view, comment);
     scheduleViewIndexation(view);
 
     URI viewUri = UriBuilder.fromUri(uriInfo.getBaseUri().toString()).path(DatasourceResource.class)
         .path(DatasourceResource.class, "getView").build(name, viewDto.getName());
     return Response.created(viewUri)
-        .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(viewUri, AclAction.TABLE_ALL)).build();
+        .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(viewUri, action)).build();
+  }
+
+  private AclAction getAction(ViewDto viewDto) {
+    AclAction action = AclAction.TABLE_ALL;
+    if (!MagmaEngine.get().hasExtension(MagmaSecurityExtension.class)) return action;
+
+    for(String tableName : viewDto.getFromList()) {
+      MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
+      ValueTable table = resolver.resolveTable();
+      if(!MagmaEngine.get().getExtension(MagmaSecurityExtension.class).getAuthorizer().isPermitted(
+          "rest:/datasource/" + table.getDatasource().getName() + "/table/" + table.getName() + "/valueSet:GET")) {
+        action = AclAction.TABLE_EDIT;
+        break;
+      }
+    }
+    return action;
   }
 
   private void scheduleViewIndexation(ValueTable view) {
