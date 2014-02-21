@@ -41,6 +41,7 @@ import org.obiba.opal.web.model.client.opal.ReportCommandOptionsDto;
 import org.obiba.opal.web.model.client.opal.ReportDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -212,6 +213,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
     if(reportTemplate.hasProject()) {
       uri = "/project/" + reportTemplate.getProject() + "/commands/_report";
     }
+    GWT.log(uri);
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(uri).post()
         .authorize(getView().getExecuteReportAuthorizer()).send();
 

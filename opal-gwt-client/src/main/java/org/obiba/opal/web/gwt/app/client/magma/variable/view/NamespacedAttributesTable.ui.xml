@@ -26,34 +26,25 @@
 
     <g:FlowPanel addStyleNames="small-top-margin">
       <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false" addStyleNames="select">
-        <g:Grid>
-          <g:row>
-            <g:customCell>
-              <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
-            </g:customCell>
-            <g:customCell>
-              <b2:IconAnchor ui:field="selectAllAnchor" addStyleNames="inline xsmall-indent"/>
-            </g:customCell>
-            <g:customCell>
-              <g:FlowPanel>
 
-                <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" visible="false"
-                    addStyleNames="inline xsmall-indent">
-                  <ui:msg description="Clear selection label">Clear</ui:msg>
-                </b2:IconAnchor>
+        <g:FlowPanel addStyleNames="pull-left">
+          <b2:IconAnchor ui:field="editLink" icon="PENCIL" addStyleNames="inline xsmall-indent">
+            <ui:msg description="Edit attribute label">Edit</ui:msg>
+          </b2:IconAnchor>
 
-                <b2:IconAnchor ui:field="editLink" icon="PENCIL" addStyleNames="inline xsmall-indent">
-                  <ui:msg description="Edit attribute label">Edit</ui:msg>
-                </b2:IconAnchor>
+          <b2:IconAnchor ui:field="deleteLink" icon="TRASH" addStyleNames="inline xsmall-indent">
+            <ui:msg description="Delete attribute label">Delete</ui:msg>
+          </b2:IconAnchor>
+        </g:FlowPanel>
 
-                <b2:IconAnchor ui:field="deleteLink" icon="TRASH" addStyleNames="inline xsmall-indent">
-                  <ui:msg description="Delete attribute label">Delete</ui:msg>
-                </b2:IconAnchor>
-
-              </g:FlowPanel>
-            </g:customCell>
-          </g:row>
-        </g:Grid>
+        <g:FlowPanel addStyleNames="pull-right">
+          <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
+          <b2:IconAnchor ui:field="selectAllAnchor" addStyleNames="inline xsmall-indent"/>
+          <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" visible="false"
+              addStyleNames="inline xsmall-indent">
+            <ui:msg description="Clear selection label">Clear</ui:msg>
+          </b2:IconAnchor>
+        </g:FlowPanel>
       </b:Alert>
     </g:FlowPanel>
 

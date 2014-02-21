@@ -211,7 +211,7 @@ public class DatasourceResource {
   private void scheduleViewIndexation(ValueTable view) {
     Schedule schedule = new Schedule();
     schedule.setType(Opal.ScheduleType.NOT_SCHEDULED);
-    indexManagerConfigService.update(getDatasource().getValueTable(view.getName()), schedule);
+    indexManagerConfigService.update(view, schedule);
   }
 
   @Path("/view/{viewName}")

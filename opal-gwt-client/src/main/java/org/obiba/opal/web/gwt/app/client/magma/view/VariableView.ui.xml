@@ -136,7 +136,7 @@
         <b:Heading size="4">
           <ui:msg description="Attributes label">Attributes</ui:msg>
         </b:Heading>
-        <b:Button type="INFO" icon="PLUS" ui:field="addAttribute" addStyleNames="pull-left">
+        <b:Button type="INFO" icon="PLUS" ui:field="addAttribute">
           <ui:msg description="Add Attribute label">Add Attribute</ui:msg>
         </b:Button>
         <g:FlowPanel ui:field="attributesPanel"/>

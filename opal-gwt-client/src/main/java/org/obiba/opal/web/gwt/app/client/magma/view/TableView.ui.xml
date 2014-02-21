@@ -20,7 +20,7 @@
   <g:FlowPanel>
 
     <g:FlowPanel addStyleNames="pull-right">
-      <b:DropdownButton text="Download" icon="DOWNLOAD" ui:field="downloadBtn">
+      <b:DropdownButton text="Download" icon="DOWNLOAD" ui:field="downloadBtn" rightDropdown="true">
         <b:NavLink ui:field="downloadDictionary">
           <ui:msg description="Download dictionary label">Download dictionary</ui:msg>
         </b:NavLink>
@@ -128,7 +128,7 @@
             </g:FlowPanel>
 
           </b:Alert>
-          <o:Table ui:field="table"/>
+          <o:Table ui:field="table" addStyleNames="pull-left"/>
         </g:FlowPanel>
       </b:Tab>
 

@@ -122,7 +122,7 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
 
   @Override
   public HasAuthorization getPermissionsAuthorizer() {
-    return new TabPanelAuthorizer(tabPanel, 5);
+    return new TabPanelAuthorizer(tabPanel, 4);
   }
 
   @UiHandler("projects")

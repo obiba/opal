@@ -28,7 +28,7 @@
       </ui:msg>
     </b:Paragraph>
 
-    <b:ButtonGroup>
+    <b:ButtonGroup ui:field="addGroup">
       <b:Button type="INFO" icon="PLUS" ui:field="add">
         <ui:msg description="Add Project label">Add Project</ui:msg>
       </b:Button>

@@ -236,8 +236,11 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     getView().renderCategoryRows(variable.getCategoriesArray());
 
     // Attributes editable depending on authorization
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
-        .build(table.getDatasourceName(), table.getName(), variable.getName())).put()
+    UriBuilder builder = table.hasViewLink()
+        ? UriBuilders.DATASOURCE_VIEW_VARIABLE.create()
+        : UriBuilders.DATASOURCE_TABLE_VARIABLE.create();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(builder.build(table.getDatasourceName(), table.getName(), variable.getName())).put()
         .authorize(getView().getVariableAttributesAuthorizer(variable)).send();
   }
 

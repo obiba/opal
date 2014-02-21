@@ -20,8 +20,11 @@ import org.obiba.opal.web.gwt.app.client.project.edit.EditProjectModalPresenter;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.google.common.base.Strings;
@@ -81,6 +84,14 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
     refresh();
   }
 
+  private void authorize() {
+    // add project
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.PROJECTS.create().build()).post()//
+        .authorize(getView().getAddProjectAuthorizer())//
+        .send();
+  }
+
   private void refresh() {
     ResourceRequestBuilderFactory.<JsArray<ProjectDto>>newBuilder() //
         .forResource("/projects") //
@@ -92,6 +103,7 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
           }
         }) //
         .get().send();
+    authorize();
   }
 
   @Override
@@ -123,6 +135,8 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
 
   public interface Display extends View, HasUiHandlers<ProjectsUiHandlers> {
     void setProjects(JsArray<ProjectDto> projects);
+
+    HasAuthorization getAddProjectAuthorizer();
   }
 
   private class ProjectUpdatedHandler

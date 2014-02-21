@@ -21,8 +21,12 @@ import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.ButtonGroup;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -56,6 +60,9 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   @UiField
   Table<ProjectDto> projectsTable;
 
+  @UiField
+  ButtonGroup addGroup;
+
   private final ListDataProvider<ProjectDto> projectsDataProvider = new ListDataProvider<ProjectDto>();
 
   private final PlaceManager placeManager;
@@ -79,6 +86,11 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   @Override
   public void setProjects(JsArray<ProjectDto> projects) {
     renderProjectsTable(JsArrays.toList(projects));
+  }
+
+  @Override
+  public HasAuthorization getAddProjectAuthorizer() {
+    return new WidgetAuthorizer(addGroup);
   }
 
   @UiHandler("add")

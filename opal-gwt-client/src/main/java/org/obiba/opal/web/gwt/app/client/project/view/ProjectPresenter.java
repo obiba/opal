@@ -193,7 +193,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
     // permissions tab
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.PROJECT_PERMISSIONS_ALL.create().build(projectName)).get()//
+        .forResource(UriBuilders.PROJECT_PERMISSIONS_SUBJECTS.create().build(projectName)).get()//
         .authorize(getView().getPermissionsAuthorizer())//
         .send();
   }
