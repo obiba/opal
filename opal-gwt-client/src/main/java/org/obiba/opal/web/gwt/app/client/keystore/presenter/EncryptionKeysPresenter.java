@@ -81,12 +81,10 @@ public class EncryptionKeysPresenter extends PresenterWidget<EncryptionKeysPrese
       }
     };
 
-    UriBuilder ub = UriBuilder.create()
-        .fromPath(UriBuilders.PROJECT_KEYSTORE_ALIAS.create().build(project.getName(), keyPair.getAlias()));
-    ResourceRequestBuilderFactory.<JsArray<KeyDto>>newBuilder().forResource(ub.build()).delete().withCallback(
-        Response.SC_OK, callbackHandler) //
-        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
-        .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+    ResourceRequestBuilderFactory.<JsArray<KeyDto>>newBuilder()
+        .forResource(UriBuilders.PROJECT_KEYSTORE_ALIAS.create().build(project.getName(), keyPair.getAlias())).delete()
+        .withCallback(callbackHandler, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_NOT_FOUND) //
+        .send();
 
   }
 
@@ -102,9 +100,8 @@ public class EncryptionKeysPresenter extends PresenterWidget<EncryptionKeysPrese
   }
 
   private void retrieveKeyPairs() {
-    UriBuilder ub = UriBuilder.create().fromPath(UriBuilders.PROJECT_KEYSTORE.create().build(project.getName()));
     ResourceRequestBuilderFactory.<JsArray<KeyDto>>newBuilder() //
-        .forResource(ub.build()) //
+        .forResource(UriBuilders.PROJECT_KEYSTORE.create().build(project.getName())) //
         .withCallback(new ResourceCallback<JsArray<KeyDto>>() {
           @Override
           public void onResource(Response response, JsArray<KeyDto> resource) {
