@@ -24,6 +24,7 @@ import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RegExValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
@@ -69,7 +70,7 @@ public class CreateKeyPairModalPresenter extends ModalPresenterWidget<CreateKeyP
           .setCountry(getView().getCountry().getText())//
           .setUpdate(updateKeyPair).build();
 
-      KeyPairModalResponseCallback callback = new KeyPairModalResponseCallback(getView(), savedHandler);
+      ResponseCodeCallback callback = new KeyPairModalResponseCallback(getView(), savedHandler);
       command.execute(callback, callback);
     }
   }

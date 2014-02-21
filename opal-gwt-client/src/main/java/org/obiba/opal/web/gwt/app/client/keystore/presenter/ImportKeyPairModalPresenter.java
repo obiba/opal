@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.KeyType;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
@@ -58,12 +59,13 @@ public class ImportKeyPairModalPresenter extends ModalPresenterWidget<ImportKeyP
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public void save() {
     getView().clearErrors();
 
     if(new ViewValidator().validate()) {
       KeystoreCommand command = createCommand();
-      KeyPairModalResponseCallback callback = new KeyPairModalResponseCallback(getView(), savedHandler);
+      ResponseCodeCallback callback = new KeyPairModalResponseCallback(getView(), savedHandler);
       command.execute(callback, callback);
     }
   }
@@ -114,7 +116,7 @@ public class ImportKeyPairModalPresenter extends ModalPresenterWidget<ImportKeyP
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+      Set<FieldValidator> validators = new LinkedHashSet<>();
 
       if(keystoreType == KeystoreType.PROJECT) {
         validators.add(

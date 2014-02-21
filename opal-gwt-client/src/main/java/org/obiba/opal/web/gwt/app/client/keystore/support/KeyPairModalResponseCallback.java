@@ -27,19 +27,18 @@ import com.google.gwt.http.client.Response;
 import static com.google.gwt.http.client.Response.SC_CREATED;
 import static com.google.gwt.http.client.Response.SC_OK;
 
-/**
- * Created by rhaeri on 16/12/13.
-*/
 public class KeyPairModalResponseCallback<T> implements ResponseCodeCallback {
 
+  @Nonnull
   private final KeyPairModalSavedHandler savedHandler;
 
-  private KeyPairDisplay<T> keypairDisplay;
+  @Nonnull
+  private final KeyPairDisplay<T> keyPairDisplay;
 
   private static final Translations translations = GWT.create(Translations.class);
 
   public KeyPairModalResponseCallback(@Nonnull KeyPairDisplay<T> display, @Nonnull KeyPairModalSavedHandler handler) {
-    keypairDisplay = display;
+    keyPairDisplay = display;
     savedHandler = handler;
   }
 
@@ -47,11 +46,11 @@ public class KeyPairModalResponseCallback<T> implements ResponseCodeCallback {
   public void onResponseCode(Request request, Response response) {
     int statusCode = response.getStatusCode();
     if(statusCode == SC_OK || statusCode == SC_CREATED) {
-      if(savedHandler != null) savedHandler.saved();
-      keypairDisplay.close();
+      savedHandler.saved();
+      keyPairDisplay.close();
     } else {
       ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-      keypairDisplay.showError(null, TranslationsUtils
+      keyPairDisplay.showError(null, TranslationsUtils
           .replaceArguments(translations.userMessageMap().get(error.getStatus()), error.getArgumentsArray()));
     }
   }
