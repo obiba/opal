@@ -12,12 +12,12 @@ package org.obiba.opal.web.gwt.app.client.project;
 import org.obiba.opal.web.gwt.app.client.inject.AbstractOpalModule;
 import org.obiba.opal.web.gwt.app.client.project.admin.ProjectAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.project.admin.ProjectAdministrationView;
+import org.obiba.opal.web.gwt.app.client.project.edit.EditProjectModalPresenter;
+import org.obiba.opal.web.gwt.app.client.project.edit.EditProjectModalView;
 import org.obiba.opal.web.gwt.app.client.project.keystore.ProjectKeyStorePresenter;
 import org.obiba.opal.web.gwt.app.client.project.keystore.ProjectKeyStoreView;
 import org.obiba.opal.web.gwt.app.client.project.list.ProjectsPresenter;
 import org.obiba.opal.web.gwt.app.client.project.list.ProjectsView;
-import org.obiba.opal.web.gwt.app.client.project.properties.ProjectPropertiesModalPresenter;
-import org.obiba.opal.web.gwt.app.client.project.properties.ProjectPropertiesModalView;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectView;
 
@@ -35,8 +35,8 @@ public class ProjectModule extends AbstractOpalModule {
         ProjectPresenter.Proxy.class);
     bindPresenterWidget(ProjectAdministrationPresenter.class, ProjectAdministrationPresenter.Display.class,
         ProjectAdministrationView.class);
-    bindPresenterWidget(ProjectPropertiesModalPresenter.class, ProjectPropertiesModalPresenter.Display.class,
-        ProjectPropertiesModalView.class);
+    bindPresenterWidget(EditProjectModalPresenter.class, EditProjectModalPresenter.Display.class,
+        EditProjectModalView.class);
     bindPresenterWidget(ProjectKeyStorePresenter.class, ProjectKeyStorePresenter.Display.class,
         ProjectKeyStoreView.class);
   }

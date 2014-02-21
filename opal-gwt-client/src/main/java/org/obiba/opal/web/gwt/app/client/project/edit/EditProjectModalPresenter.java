@@ -1,4 +1,4 @@
-package org.obiba.opal.web.gwt.app.client.project.properties;
+package org.obiba.opal.web.gwt.app.client.project.edit;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -38,9 +38,18 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 
-public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<ProjectPropertiesModalPresenter.Display>
-    implements ProjectPropertiesUiHandlers {
+import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
+import static com.google.gwt.http.client.Response.SC_CREATED;
+import static com.google.gwt.http.client.Response.SC_OK;
+import static com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE;
 
+public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectModalPresenter.Display>
+    implements EditProjectUiHandlers {
+
+  @Nullable
+  private String projectName;
+
+  @Nullable
   private ProjectDto project;
 
   private JsArray<ProjectDto> projects;
@@ -50,15 +59,26 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
   private final Translations translations;
 
   @Inject
-  public ProjectPropertiesModalPresenter(EventBus eventBus, Display display, Translations translations) {
+  public EditProjectModalPresenter(EventBus eventBus, Display display, Translations translations) {
     super(eventBus, display);
     this.translations = translations;
     getView().setUiHandlers(this);
   }
 
-  public void initialize(ProjectDto projectDto) {
-    project = projectDto;
-    getView().setProject(project);
+  public void setProjectName(@Nullable String projectName) {
+    this.projectName = projectName;
+    if(!Strings.isNullOrEmpty(projectName)) {
+      ResourceRequestBuilderFactory.<ProjectDto>newBuilder() //
+          .forResource(UriBuilders.PROJECT.create().build(projectName)) //
+          .withCallback(new ResourceCallback<ProjectDto>() {
+            @Override
+            public void onResource(Response response, ProjectDto projectDto) {
+              project = projectDto;
+              getView().setProject(project);
+              getView().getDatabase().setText(project.getDatabase());
+            }
+          }).get().send();
+    }
   }
 
   @Override
@@ -73,8 +93,7 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
             getView().setAvailableDatabases(databases);
             if(project != null) getView().getDatabase().setText(project.getDatabase());
           }
-        }) //
-        .get().send();
+        }).get().send();
   }
 
   @Override
@@ -91,8 +110,7 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
   private void create() {
     if(validationHandler.validate()) {
       // Validate database connection
-      final String databaseName = getView().getDatabase().getText();
-
+      String databaseName = getView().getDatabase().getText();
       if(Strings.isNullOrEmpty(databaseName)) {
         createProject();
         return;
@@ -103,19 +121,20 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
         final String name = getView().getDatabase().getText();
         ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
             .forResource(UriBuilders.DATABASE_CONNECTIONS.create().build(name)) //
-            .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+            .withCallback(SC_OK, new ResponseCodeCallback() {
               @Override
               public void onResponseCode(Request request, Response response) {
                 createProject();
               }
-            }).withCallback(new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            getView().showError(Display.FormField.DATABASE, TranslationsUtils
-                .replaceArguments(translations.userMessageMap().get("FailedToConnectToDatabase"), name));
-            getView().setBusy(false);
-          }
-        }, Response.SC_SERVICE_UNAVAILABLE, Response.SC_NOT_FOUND, Response.SC_BAD_REQUEST) //
+            }) //
+            .withCallback(SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                getView().showError(Display.FormField.DATABASE, TranslationsUtils
+                    .replaceArguments(translations.userMessageMap().get("FailedToConnectToDatabase"), name));
+                getView().setBusy(false);
+              }
+            }) //
             .post().send();
       }
     }
@@ -123,16 +142,16 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
 
   private void update() {
     ResourceRequestBuilderFactory.<ProjectFactoryDto>newBuilder() //
-        .forResource(UriBuilders.PROJECT.create().build(project.getName()))  //
+        .forResource(UriBuilders.PROJECT.create().build(projectName))  //
         .withResourceBody(ProjectDto.stringify(getProjectDto())) //
-        .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+        .withCallback(SC_OK, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
             getView().hideDialog();
             fireEvent(new ProjectUpdatedEvent(project));
           }
         }) //
-        .withCallback(Response.SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget()) {
+        .withCallback(SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget()) {
           @Override
           public void onResponseCode(Request request, Response response) {
             getView().setBusy(false);
@@ -157,7 +176,7 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
       }
     }
     dto.setDatabase(getView().getDatabase().getText());
-    dto.setArchived(project.getArchived());
+    if(project != null) dto.setArchived(project.getArchived());
     return dto;
   }
 
@@ -174,14 +193,14 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
     ResourceRequestBuilderFactory.<ProjectFactoryDto>newBuilder() //
         .forResource("/projects")  //
         .withResourceBody(ProjectFactoryDto.stringify(getProjectFactoryDto())) //
-        .withCallback(Response.SC_CREATED, new ResponseCodeCallback() {
+        .withCallback(SC_CREATED, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
             getView().hideDialog();
             fireEvent(new ProjectCreatedEvent.Builder().build());
           }
         }) //
-        .withCallback(Response.SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget()) {
+        .withCallback(SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget()) {
           @Override
           public void onResponseCode(Request request, Response response) {
             getView().setBusy(false);
@@ -200,13 +219,12 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
     dto.setDatabase(getView().getDatabase().getText());
     String tags = getView().getTags().getText();
     if(!Strings.isNullOrEmpty(tags)) {
-      JsArrayString arr = JavaScriptObject.createArray().cast();
-      dto.setTagsArray(arr);
-      for(String t : tags.split(" ")) {
-        arr.push(t);
+      JsArrayString tagsArray = JavaScriptObject.createArray().cast();
+      dto.setTagsArray(tagsArray);
+      for(String tag : tags.split(" ")) {
+        tagsArray.push(tag);
       }
     }
-
     return dto;
   }
 
@@ -217,7 +235,7 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
     @Override
     protected Set<FieldValidator> getValidators() {
       if(validators == null) {
-        validators = new LinkedHashSet<FieldValidator>();
+        validators = new LinkedHashSet<>();
         validators.add(new RequiredTextValidator(getView().getName(), "NameIsRequired", Display.FormField.NAME.name()));
         validators.add(new UniqueProjectNameValidator());
         validators.add(new RegExValidator(getView().getName(), "^[\\w _-]*$", "NameHasInvalidCharacters",
@@ -252,7 +270,7 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
 
   }
 
-  public interface Display extends PopupView, HasUiHandlers<ProjectPropertiesUiHandlers> {
+  public interface Display extends PopupView, HasUiHandlers<EditProjectUiHandlers> {
 
     enum FormField {
       NAME,

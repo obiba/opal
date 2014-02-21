@@ -16,9 +16,9 @@ import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.project.edit.EditProjectModalPresenter;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.project.properties.ProjectPropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -52,11 +52,11 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
 
   private final Translations translations;
 
-  private final ModalProvider<ProjectPropertiesModalPresenter> addProjectModalProvider;
+  private final ModalProvider<EditProjectModalPresenter> addProjectModalProvider;
 
   @Inject
   public ProjectsPresenter(EventBus eventBus, Display display, Proxy proxy, Translations translations,
-      PlaceManager placeManager, ModalProvider<ProjectPropertiesModalPresenter> addProjectModalProvider) {
+      PlaceManager placeManager, ModalProvider<EditProjectModalPresenter> addProjectModalProvider) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     this.translations = translations;
     this.placeManager = placeManager;
@@ -117,7 +117,7 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
 
   @Override
   public void showAddProject() {
-    ProjectPropertiesModalPresenter presenter = addProjectModalProvider.get();
+    EditProjectModalPresenter presenter = addProjectModalProvider.get();
     presenter.setProjects(projects);
   }
 

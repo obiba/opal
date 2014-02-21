@@ -1,4 +1,4 @@
-package org.obiba.opal.web.gwt.app.client.project.properties;
+package org.obiba.opal.web.gwt.app.client.project.edit;
 
 import javax.annotation.Nullable;
 
@@ -17,7 +17,6 @@ import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -28,12 +27,12 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-public class ProjectPropertiesModalView extends ModalPopupViewWithUiHandlers<ProjectPropertiesUiHandlers>
-    implements ProjectPropertiesModalPresenter.Display {
+public class EditProjectModalView extends ModalPopupViewWithUiHandlers<EditProjectUiHandlers>
+    implements EditProjectModalPresenter.Display {
 
   private static final String DATABASE_NONE = "_none";
 
-  interface Binder extends UiBinder<Widget, ProjectPropertiesModalView> {}
+  interface Binder extends UiBinder<Widget, EditProjectModalView> {}
 
   @UiField
   Modal modal;
@@ -68,7 +67,7 @@ public class ProjectPropertiesModalView extends ModalPopupViewWithUiHandlers<Pro
   private final Translations translations;
 
   @Inject
-  public ProjectPropertiesModalView(EventBus eventBus, Binder uiBinder, Translations translations) {
+  public EditProjectModalView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -155,22 +154,14 @@ public class ProjectPropertiesModalView extends ModalPopupViewWithUiHandlers<Pro
       database.addItem(label.toString(), databaseDto.getName());
     }
     getDatabase().setText(defaultStorageDatabase);
-    GWT.log("  db.item.count=" + database.getItemCount());
   }
 
   @Override
   public void setBusy(boolean busy) {
-    if(busy) {
-      modal.setBusy(busy);
-      modal.setCloseVisible(false);
-      saveButton.setEnabled(false);
-      cancelButton.setEnabled(false);
-    } else {
-      modal.setBusy(busy);
-      modal.setCloseVisible(true);
-      saveButton.setEnabled(true);
-      cancelButton.setEnabled(true);
-    }
+    modal.setBusy(busy);
+    modal.setCloseVisible(!busy);
+    saveButton.setEnabled(!busy);
+    cancelButton.setEnabled(!busy);
   }
 
   @Override
