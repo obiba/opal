@@ -79,7 +79,7 @@ public class ConfirmationView extends ViewWithUiHandlers<ConfirmationUiHandlers>
 
   @Override
   public void setConfirmationMessage(String message) {
-    this.message.setText(message);
+    this.message.getElement().setInnerHTML(message);
   }
 
   @UiHandler("yesButton")
