@@ -29,6 +29,7 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
@@ -39,6 +40,8 @@ import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
 public class PostInstallPresenter extends Presenter<PostInstallPresenter.Display, PostInstallPresenter.Proxy>
     implements PostInstallUiHandlers {
+
+  private HandlerRegistration notificationRegistration;
 
   public interface Display extends View, HasUiHandlers<PostInstallUiHandlers> {
 
@@ -85,16 +88,7 @@ public class PostInstallPresenter extends Presenter<PostInstallPresenter.Display
     setInSlot(Slot.DATA, dataDatabasesPresenter);
     dataDatabasesPresenter.onAdministrationPermissionRequest(null);
 
-    addRegisteredHandler(NotificationEvent.getType(), new NotificationEvent.Handler() {
-
-      @Override
-      public void onUserMessage(NotificationEvent event) {
-        if(isVisible()) {
-          messageDialog.setNotification(event);
-          setInSlot(Slot.NOTIFICATION, messageDialog);
-        }
-      }
-    });
+    addNotificationHandler();
 
     addRegisteredHandler(DatabaseCreatedEvent.getType(), new DatabaseCreatedEvent.DatabaseCreatedHandler() {
       @Override
@@ -118,6 +112,25 @@ public class PostInstallPresenter extends Presenter<PostInstallPresenter.Display
         updateView();
       }
     });
+  }
+
+  private void addNotificationHandler() {
+    notificationRegistration = getEventBus().addHandler(NotificationEvent.getType(), new NotificationEvent.Handler() {
+
+      @Override
+      public void onUserMessage(NotificationEvent event) {
+        if(isVisible()) {
+          messageDialog.setNotification(event);
+          setInSlot(Slot.NOTIFICATION, messageDialog);
+        }
+      }
+    });
+  }
+
+  @Override
+  protected void onHide() {
+    super.onHide();
+    notificationRegistration.removeHandler();
   }
 
   private void testConnection(DatabaseDto dto) {

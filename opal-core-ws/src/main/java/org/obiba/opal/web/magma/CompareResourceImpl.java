@@ -288,7 +288,8 @@ public class CompareResourceImpl implements CompareResource {
   private boolean isModified(@Nullable String compared, @Nullable String with) {
     if(compared == null && with == null) return false;
     if((compared == null || compared.isEmpty()) && (with == null || with.isEmpty())) return false;
-    return !(compared != null && compared.equals(with));
+    if(compared != null && with == null) return true;
+    return !(compared != null && compared.equals(with.replace("\r", "")));
   }
 
   @SuppressWarnings("PMD.NcssMethodCount")
