@@ -83,8 +83,8 @@ public class EncryptionKeysPresenter extends PresenterWidget<EncryptionKeysPrese
 
     UriBuilder ub = UriBuilder.create()
         .fromPath(UriBuilders.PROJECT_KEYSTORE_ALIAS.create().build(project.getName(), keyPair.getAlias()));
-    ResourceRequestBuilderFactory.<JsArray<KeyDto>>newBuilder().forResource(ub.build()).delete().withCallback(
-        Response.SC_OK, callbackHandler) //
+    ResourceRequestBuilderFactory.<JsArray<KeyDto>>newBuilder().forResource(ub.build()).delete()
+        .withCallback(Response.SC_OK, callbackHandler) //
         .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
         .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
 
