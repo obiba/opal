@@ -536,7 +536,8 @@ public interface Translations extends Constants {
       "DefaultCharSetIsRequired", "A default character set is required.",//
       "LanguageIsRequired", "At least one language is required.",//
       "NameHasInvalidCharacters",
-      "Name contains invalid characters. Characters must be alphanumeric, space, hyphen or underscore." })
+      "Name contains invalid characters. Characters must be alphanumeric, space, hyphen or underscore.",
+      "UnsupportedEncoding", "An unsupported encoding was detected. Please contact your administrator."})
   Map<String, String> userMessageMap();
 
   @Description("Missing label")
