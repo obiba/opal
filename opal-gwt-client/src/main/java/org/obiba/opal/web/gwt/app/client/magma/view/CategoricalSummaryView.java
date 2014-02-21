@@ -19,6 +19,7 @@ import org.obiba.opal.web.model.client.math.FrequencyDto;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -90,7 +91,7 @@ public class CategoricalSummaryView extends Composite {
           chartFactory.push(value.getValue(), value.getFreq(), value.getPct() * 100);
           frequencies.setWidget(i + 1, 0, new Label(value.getValue()));
           frequencies.setWidget(i + 1, 1, new Label("" + Math.round(value.getFreq())));
-          frequencies.setWidget(i + 1, 2, new Label("" + value.getPct() * 100));
+          frequencies.setWidget(i + 1, 2, new Label("" + formatDecimal(value.getPct() * 100)));
         }
       }
       freqPanel.add(chartFactory.createValueChart(title));
@@ -99,4 +100,8 @@ public class CategoricalSummaryView extends Composite {
     }
   }
 
+  private String formatDecimal(double number) {
+    NumberFormat nf = NumberFormat.getFormat("#.##");
+    return nf.format(number);
+  }
 }

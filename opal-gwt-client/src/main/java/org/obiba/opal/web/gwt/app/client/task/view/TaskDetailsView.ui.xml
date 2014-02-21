@@ -9,7 +9,7 @@
 
   <o:Modal ui:field="dialogBox" resizable="true" closeVisible="true" keyboard="true" animation="false">
     <g:FlowPanel>
-        <o:Table ui:field="table" addStyleNames="main"/>
+        <o:Table ui:field="table"/>
     </g:FlowPanel>
 
     <b:ModalFooter>

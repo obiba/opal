@@ -64,16 +64,13 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   Button downloadDictionary;
 
   @UiField
-  DropdownButton tasksBtn;
+  Button importData;
 
   @UiField
-  NavLink importData;
+  Button exportData;
 
   @UiField
-  NavLink exportData;
-
-  @UiField
-  NavLink copyData;
+  Button copyData;
 
   @UiField
   TabPanel tabPanel;
@@ -129,7 +126,6 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     this.placeManager = placeManager;
     initWidget(uiBinder.createAndBindUi(this));
 
-    tasksBtn.setText(translations.tasks());
     addBtn.setText(translations.addTable());
     addTableColumns();
   }
@@ -262,8 +258,8 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     boolean enableItem = table.getRowCount() > 0;
     pager.setPagerVisible(table.getRowCount() > Table.DEFAULT_PAGESIZE);
     downloadDictionary.setEnabled(enableItem);
-    exportData.setDisabled(!enableItem);
-    copyData.setDisabled(!enableItem);
+    exportData.setEnabled(enableItem);
+    copyData.setEnabled(enableItem);
     table.hideLoadingIndicator();
   }
 
@@ -277,12 +273,9 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   public void setDatasource(DatasourceDto dto) {
     addBtn.setVisible(false);
     boolean isNull = "null".equals(dto.getType());
-    importData.setDisabled(isNull);
+    importData.setEnabled(!isNull);
     addTable.setDisabled(isNull);
     addUpdateTables.setDisabled(isNull);
-
-    if(isNull) importData.setText(translations.importDataNoStorageLabel());
-    else importData.setText(translations.importDataLabel());
 
     if(isNull) addTable.setText(translations.addTableNoStorageLabel());
     else addTable.setText(translations.addTableLabel());

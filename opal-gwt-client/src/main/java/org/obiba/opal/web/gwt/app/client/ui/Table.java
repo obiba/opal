@@ -9,9 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+
 import com.github.gwtbootstrap.client.ui.CellTable;
 
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
@@ -23,6 +26,8 @@ import com.google.gwt.view.client.ProvidesKey;
 public class Table<T> extends CellTable<T> {
 
   public static final int DEFAULT_PAGESIZE = 50;
+
+  protected static final Translations translations = GWT.create(Translations.class);
 
   private Widget emptyTableWidget;
 
@@ -39,7 +44,7 @@ public class Table<T> extends CellTable<T> {
     setStriped(true);
     setCondensed(true);
     setBordered(true);
-    setEmptyTableWidget(new InlineLabel("No items."));
+    setEmptyTableWidget(new InlineLabel(translations.noItems()));
   }
 
   public Table(int pageSize, ProvidesKey<T> keyProvider) {
@@ -65,8 +70,10 @@ public class Table<T> extends CellTable<T> {
    */
   public void showLoadingIndicator(ListDataProvider<?> listDataProvider) {
     super.setEmptyTableWidget(getLoadingIndicator());
+    setRowCount(0);
     listDataProvider.getList().clear();
     listDataProvider.flush();
+    listDataProvider.refresh();
   }
 
   /**

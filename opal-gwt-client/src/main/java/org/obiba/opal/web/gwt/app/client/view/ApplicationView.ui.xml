@@ -49,10 +49,17 @@
     <b:Footer>
       <b:FluidContainer addStyleNames="container" ui:field="footerContainer">
         <b:FluidRow>
-          <b:Column size="6">
-            <b:NavLink target="_blank" href="http://obiba.org">© 2013 OBiBa</b:NavLink>
+          <b:Column size="9">
+            <g:InlineLabel>© 2014</g:InlineLabel>
+            <b:NavLink target="_blank" href="http://obiba.org" addStyleNames="inline-block xsmall-indent">OBiBa</b:NavLink>
+            <b:NavLink target="_blank" href="http://wiki.obiba.org/display/OPALDOC" addStyleNames="inline-block small-indent">
+              <ui:msg description="Documentation label">Documentation</ui:msg>
+            </b:NavLink>
+            <b:NavLink target="_blank" href="https://github.com/obiba/opal" addStyleNames="inline-block small-indent">
+              <ui:msg description="Sources label">Sources</ui:msg>
+            </b:NavLink>
           </b:Column>
-          <b:Column size="6">
+          <b:Column size="3">
             <g:Label ui:field="version" addStyleNames="pull-right"/>
           </b:Column>
         </b:FluidRow>

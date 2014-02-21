@@ -225,9 +225,9 @@ public interface Translations extends Constants {
   @DefaultStringValue("Message")
   String messageLabel();
 
-  @Description("Job label")
-  @DefaultStringValue("Job")
-  String jobLabel();
+  @Description("Task label")
+  @DefaultStringValue("Task")
+  String taskLabel();
 
   @Description("Entity type label")
   @DefaultStringValue("Entity Type")
@@ -2180,4 +2180,8 @@ public interface Translations extends Constants {
   @Description("Add Table label")
   @DefaultStringValue("Add Table")
   String addTable();
+
+  @Description("No items label")
+  @DefaultStringValue("No items.")
+  String noItems();
 }

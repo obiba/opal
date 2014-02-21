@@ -17,7 +17,7 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <g:FlowPanel addStyleNames="bottom-margin">
+    <g:FlowPanel addStyleNames="pull-left">
       <b:ButtonGroup>
         <b:Button ui:field="refreshButton" icon="REFRESH">
           <ui:msg description="Refresh jobs list">Refresh</ui:msg>
@@ -32,10 +32,10 @@
 
     <g:FlowPanel>
       <g:InlineLabel ui:field="noJobs">
-        <ui:msg description="No Jobs label">No Jobs</ui:msg>
+        <ui:msg description="No tasks label">No tasks.</ui:msg>
       </g:InlineLabel>
       <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
-      <o:Table ui:field="table"/>
+      <o:Table ui:field="table" addStyleNames="pull-left small-top-margin"/>
     </g:FlowPanel>
 
   </g:FlowPanel>

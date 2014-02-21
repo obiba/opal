@@ -159,10 +159,10 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   TabPanel tabPanel;
 
   @UiField
-  NavLink exportData;
+  Button exportData;
 
   @UiField
-  NavLink copyData;
+  Button copyData;
 
   @UiField
   NavLink downloadDictionary;
@@ -209,9 +209,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiField
   DropdownButton downloadBtn;
 
-  @UiField
-  DropdownButton tasksBtn;
-
   private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
 
   private final Translations translations;
@@ -239,7 +236,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    tasksBtn.setText(translations.tasks());
     downloadBtn.setText(translations.downloadLabel());
     addTableColumns();
     initializeAnchorTexts();
@@ -340,8 +336,8 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     boolean enableItem = dataProvider.getList().size() > 0;
     pager.setPagerVisible(dataProvider.getList().size() > Table.DEFAULT_PAGESIZE);
     downloadDictionary.setDisabled(!enableItem);
-    exportData.setDisabled(!enableItem);
-    copyData.setDisabled(!enableItem);
+    exportData.setEnabled(enableItem);
+    copyData.setEnabled(enableItem);
     table.hideLoadingIndicator();
   }
 

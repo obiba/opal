@@ -357,7 +357,19 @@ input[type="file"] {
 .input-prepend .add-on {
   border: none;
   background: none;
-  padding: 8px 5px;
+  padding: 6px 5px;
+}
+
+.input-prepend {
+  input {
+    .border-radius(0 6px 6px 0);
+  }
+}
+
+.input-append {
+  input {
+    .border-radius(6px 0 0 6px);
+  }
 }
 
 legend {

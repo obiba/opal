@@ -65,7 +65,7 @@ public class TaskDetailsView extends ModalPopupViewWithUiHandlers<ModalUiHandler
 
   @Override
   public void setJob(CommandStateDto commandStateDto) {
-    dialogBox.setTitle(translations.jobLabel() + " #" + commandStateDto.getId());
+    dialogBox.setTitle(translations.taskLabel() + " #" + commandStateDto.getId());
 
     JsArray<Message> jobMessages = JsArrays.toSafeArray(commandStateDto.getMessagesArray());
 
