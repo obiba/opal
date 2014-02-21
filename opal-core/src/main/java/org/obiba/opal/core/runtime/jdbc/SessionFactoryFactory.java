@@ -17,7 +17,7 @@ import javax.sql.DataSource;
 import javax.transaction.TransactionManager;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.cache.ehcache.EhCacheRegionFactory;
+import org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.HSQLDialect;
 import org.hibernate.service.classloading.internal.ClassLoaderServiceImpl;
@@ -69,7 +69,8 @@ public class SessionFactoryFactory {
     factory.getHibernateProperties().setProperty(USE_STRUCTURED_CACHE, "true");
     factory.getHibernateProperties().setProperty(USE_QUERY_CACHE, "true");
     factory.getHibernateProperties().setProperty(USE_SECOND_LEVEL_CACHE, "true");
-    factory.getHibernateProperties().setProperty(CACHE_REGION_FACTORY, EhCacheRegionFactory.class.getName());
+//    factory.getHibernateProperties().setProperty(CACHE_REGION_FACTORY, EhCacheRegionFactory.class.getName());
+    factory.getHibernateProperties().setProperty(CACHE_REGION_FACTORY, SingletonEhCacheRegionFactory.class.getName());
     factory.getHibernateProperties().setProperty(CURRENT_SESSION_CONTEXT_CLASS, "jta");
     factory.getHibernateProperties().setProperty(AUTO_CLOSE_SESSION, "true");
     factory.getHibernateProperties().setProperty(FLUSH_BEFORE_COMPLETION, "true");
