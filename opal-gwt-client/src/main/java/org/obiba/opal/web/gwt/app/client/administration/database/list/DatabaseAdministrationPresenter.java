@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.database.list;
 
-import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.list.data.DataDatabasesPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.list.identifiers.IdentifiersDatabasePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
@@ -109,20 +107,6 @@ public class DatabaseAdministrationPresenter extends
     breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs());
     setInSlot(Slot.IDENTIFIERS, identifiersDatabasePresenter);
     setInSlot(Slot.DATA, dataDatabasesPresenter);
-
-    addRegisteredHandler(DatabaseCreatedEvent.getType(), new DatabaseCreatedEvent.DatabaseCreatedHandler() {
-      @Override
-      public void onDatabaseCreated(DatabaseCreatedEvent event) {
-        testConnection(getEventBus(), event.getDto().getName());
-      }
-    });
-
-    addRegisteredHandler(DatabaseUpdatedEvent.getType(), new DatabaseUpdatedEvent.DatabaseUpdatedHandler() {
-      @Override
-      public void onDatabaseUpdated(DatabaseUpdatedEvent event) {
-        testConnection(getEventBus(), event.getDto().getName());
-      }
-    });
   }
 
   public static void testConnection(EventBus eventBus, String database) {
