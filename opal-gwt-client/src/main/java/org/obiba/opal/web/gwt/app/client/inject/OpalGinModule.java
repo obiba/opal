@@ -30,7 +30,6 @@ import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ConfirmationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ItemSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
@@ -38,7 +37,6 @@ import org.obiba.opal.web.gwt.app.client.view.ApplicationView;
 import org.obiba.opal.web.gwt.app.client.view.ConfirmationView;
 import org.obiba.opal.web.gwt.app.client.view.ItemSelectorView;
 import org.obiba.opal.web.gwt.app.client.view.NotificationView;
-import org.obiba.opal.web.gwt.app.client.view.PageContainerView;
 import org.obiba.opal.web.gwt.app.client.view.UnhandledResponseNotificationView;
 import org.obiba.opal.web.gwt.rest.client.DefaultRequestUrlBuilder;
 import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
@@ -87,9 +85,6 @@ public class OpalGinModule extends AbstractPresenterModule {
     bindPresenterWidget(ValueMapPopupPresenter.class, ValueMapPopupPresenter.Display.class, ValueMapPopupView.class);
     bindPresenterWidget(ValueSequencePopupPresenter.class, ValueSequencePopupPresenter.Display.class,
         ValueSequencePopupView.class);
-
-    bindPresenter(PageContainerPresenter.class, PageContainerPresenter.Display.class, PageContainerView.class,
-        PageContainerPresenter.Proxy.class);
   }
 
 }
