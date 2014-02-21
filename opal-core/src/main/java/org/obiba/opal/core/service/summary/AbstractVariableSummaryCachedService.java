@@ -76,7 +76,7 @@ public abstract class AbstractVariableSummaryCachedService< //
     Iterable<TVariableSummaryBuilder> variableSummaryBuilders = getSummaryBuilders(table);
     for(TVariableSummaryBuilder summaryBuilder : variableSummaryBuilders) {
       String variableName = summaryBuilder.getVariable().getName();
-      log.debug("Compute {}  summary", variableName);
+      log.debug("Compute {} summary", variableName);
       TVariableSummary summary = summaryBuilder.build();
       String key = summary.getCacheKey(table);
       log.trace("Cache {} {} summary with key '{}'", variableName, getSummaryType(summary), key);
