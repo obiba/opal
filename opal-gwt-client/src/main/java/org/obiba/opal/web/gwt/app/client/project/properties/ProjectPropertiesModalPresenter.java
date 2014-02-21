@@ -27,7 +27,6 @@ import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.ProjectFactoryDto;
 
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -221,8 +220,6 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
         validators = new LinkedHashSet<FieldValidator>();
         validators.add(new RequiredTextValidator(getView().getName(), "NameIsRequired", Display.FormField.NAME.name()));
         validators.add(new UniqueProjectNameValidator());
-
-        GWT.log("REGEX");
         validators.add(new RegExValidator(getView().getName(), "^[\\w _-]*$", "NameHasInvalidCharacters",
             Display.FormField.NAME.name()));
       }
