@@ -7,6 +7,11 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
+
+    <b:PageHeader>
+      <ui:msg description="Administration label">Administration</ui:msg>
+    </b:PageHeader>
+
     <g:FlowPanel>
       <b:FluidRow>
         <b:Column size="6">

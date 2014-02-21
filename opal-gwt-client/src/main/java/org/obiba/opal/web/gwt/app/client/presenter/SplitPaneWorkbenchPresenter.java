@@ -10,15 +10,12 @@
 package org.obiba.opal.web.gwt.app.client.presenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.proxy.Proxy;
-import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
 @SuppressWarnings("rawtypes")
 public abstract class SplitPaneWorkbenchPresenter<D extends View, P extends Proxy<? extends Presenter<?, ?>>>

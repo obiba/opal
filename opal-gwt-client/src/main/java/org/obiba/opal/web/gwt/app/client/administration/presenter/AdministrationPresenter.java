@@ -1,10 +1,12 @@
 package org.obiba.opal.web.gwt.app.client.administration.presenter;
 
+import java.util.Arrays;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
-import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
@@ -18,9 +20,9 @@ import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TitleFunction;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import com.gwtplatform.mvp.client.proxy.TokenFormatter;
 
 public class AdministrationPresenter extends Presenter<AdministrationPresenter.Display, AdministrationPresenter.Proxy>
     implements HasPageTitle, RequestAdministrationPermissionEvent.Handler {
@@ -82,21 +84,14 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
     void postAutorizationUpdate();
   }
 
-  //
-  // Data members
-  //
-
-  private final PlaceManager placeManager;
-
   private final Translations translations;
 
   @Inject
-  public AdministrationPresenter(Display display, EventBus eventBus, Proxy proxy, PlaceManager placeManager,
-      Translations translations) {
-    super(eventBus, display, proxy, PageContainerPresenter.CONTENT);
-    this.placeManager = placeManager;
+  public AdministrationPresenter(Display display, EventBus eventBus, Proxy proxy, Translations translations,
+      TokenFormatter tokenFormatter) {
+    super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     this.translations = translations;
-    setHistoryTokens();
+    setHistoryTokens(tokenFormatter);
   }
 
   @Override
@@ -104,7 +99,6 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
   public String getTitle() {
     return translations.pageAdministrationTitle();
   }
-
 
   @ProxyEvent
   @Override
@@ -155,29 +149,25 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
         .get().authorize(new CompositeAuthorizer(getView().getTasksAuthorizer(), new ViewAuthorization())).send();
   }
 
-  @Override
-  protected void onReveal() {
-    super.onReveal();
+  private void setHistoryTokens(TokenFormatter tokenFormatter) {
+    PlaceRequest adminPlace = createRequest(Places.ADMINISTRATION);
+    getView().setUsersGroupsHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.USERS));
+    getView().setProfilesHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.PROFILES));
+    getView().setDatabasesHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.DATABASES));
+    getView().setIndexHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.INDEX));
+    getView().setRHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.R));
+    getView().setIdentifiersMappingsHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.IDENTIFIERS));
+    getView().setFilesHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.FILES));
+    getView().setTasksHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.TASKS));
+    getView().setDataShieldHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.DATASHIELD));
+    getView().setReportsHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.REPORT_TEMPLATES));
+    getView().setJavaHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.JVM));
+    getView().setServerHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.SERVER));
+    getView().setTaxonomiesHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.TAXONOMIES));
   }
 
-  private void setHistoryTokens() {
-    getView().setUsersGroupsHistoryToken(getHistoryToken(Places.USERS));
-    getView().setProfilesHistoryToken(getHistoryToken(Places.PROFILES));
-    getView().setDatabasesHistoryToken(getHistoryToken(Places.DATABASES));
-    getView().setIndexHistoryToken(getHistoryToken(Places.INDEX));
-    getView().setRHistoryToken(getHistoryToken(Places.R));
-    getView().setIdentifiersMappingsHistoryToken(getHistoryToken(Places.IDENTIFIERS));
-    getView().setFilesHistoryToken(getHistoryToken(Places.FILES));
-    getView().setTasksHistoryToken(getHistoryToken(Places.TASKS));
-    getView().setDataShieldHistoryToken(getHistoryToken(Places.DATASHIELD));
-    getView().setReportsHistoryToken(getHistoryToken(Places.REPORT_TEMPLATES));
-    getView().setJavaHistoryToken(getHistoryToken(Places.JVM));
-    getView().setServerHistoryToken(getHistoryToken(Places.SERVER));
-    getView().setTaxonomiesHistoryToken(getHistoryToken(Places.TAXONOMIES));
-  }
-
-  private String getHistoryToken(String place) {
-    return placeManager.buildRelativeHistoryToken(createRequest(place), 1);
+  private String getHistoryToken(TokenFormatter tokenFormatter, PlaceRequest adminPlace, String place) {
+    return tokenFormatter.toHistoryToken(Arrays.asList(adminPlace, createRequest(place)));
   }
 
   private PlaceRequest createRequest(String nameToken) {
