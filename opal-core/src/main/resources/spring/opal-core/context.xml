@@ -19,6 +19,8 @@
 
   <bean class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
 
+  <bean class="org.obiba.opal.core.service.ApplicationContextProvider"/>
+
   <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
     <property name="cacheManagerName" value="opal"/>
     <property name="configLocation" value="classpath:ehcache.xml"/>

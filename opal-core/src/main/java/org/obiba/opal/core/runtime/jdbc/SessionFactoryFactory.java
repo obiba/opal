@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.core.runtime.jdbc;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
@@ -20,13 +18,10 @@ import javax.sql.DataSource;
 import javax.transaction.TransactionManager;
 
 import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.config.Configuration;
-import net.sf.ehcache.config.ConfigurationFactory;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cache.CacheException;
 import org.hibernate.cache.ehcache.EhCacheRegionFactory;
-import org.hibernate.cache.ehcache.internal.util.HibernateUtil;
 import org.hibernate.cfg.Settings;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.HSQLDialect;
@@ -36,6 +31,7 @@ import org.hibernate.service.jdbc.dialect.internal.StandardDialectResolver;
 import org.obiba.magma.datasource.hibernate.cfg.HibernateConfigurationHelper;
 import org.obiba.magma.datasource.hibernate.cfg.MagmaHSQLDialect;
 import org.obiba.magma.datasource.hibernate.cfg.MagmaNamingStrategy;
+import org.obiba.opal.core.service.ApplicationContextProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +79,8 @@ public class SessionFactoryFactory {
     factory.getHibernateProperties().setProperty(USE_STRUCTURED_CACHE, "true");
     factory.getHibernateProperties().setProperty(USE_QUERY_CACHE, "true");
     factory.getHibernateProperties().setProperty(USE_SECOND_LEVEL_CACHE, "true");
-    factory.getHibernateProperties().setProperty(CACHE_REGION_FACTORY, NamedEhCacheRegionFactory.class.getName());
+    factory.getHibernateProperties()
+        .setProperty(CACHE_REGION_FACTORY, ApplicationContextEhCacheRegionFactory.class.getName());
     factory.getHibernateProperties().setProperty(CURRENT_SESSION_CONTEXT_CLASS, "jta");
     factory.getHibernateProperties().setProperty(AUTO_CLOSE_SESSION, "true");
     factory.getHibernateProperties().setProperty(FLUSH_BEFORE_COMPLETION, "true");
@@ -113,7 +110,7 @@ public class SessionFactoryFactory {
    * <p/>
    * See https://hibernate.atlassian.net/browse/HHH-7809
    */
-  public static class NamedEhCacheRegionFactory extends EhCacheRegionFactory {
+  public static class ApplicationContextEhCacheRegionFactory extends EhCacheRegionFactory {
 
     private static final long serialVersionUID = -906012674778107555L;
 
@@ -128,37 +125,8 @@ public class SessionFactoryFactory {
                 "using net.sf.ehcache.hibernate.SingletonEhCacheProvider.");
         return;
       }
-
-      try {
-        String configurationResourceName = null;
-        if(properties != null) {
-          configurationResourceName = (String) properties.get(NET_SF_EHCACHE_CONFIGURATION_RESOURCE_NAME);
-        }
-        if(configurationResourceName == null || configurationResourceName.isEmpty()) {
-          Configuration configuration = ConfigurationFactory.parseConfiguration();
-          // give the CacheManager some unique name. we could also use UUID or whatever
-          configuration.setName(toString());
-          manager = new CacheManager(configuration);
-        } else {
-          URL url;
-          try {
-            url = new URL(configurationResourceName);
-          } catch(MalformedURLException e) {
-            url = loadResource(configurationResourceName);
-          }
-          Configuration configuration = HibernateUtil.loadAndCorrectConfiguration(url);
-          manager = new CacheManager(configuration);
-        }
-        mbeanRegistrationHelper.registerMBean(manager, properties);
-      } catch(net.sf.ehcache.CacheException e) {
-        if(e.getMessage().startsWith("Cannot parseConfiguration CacheManager. Attempt to create a new instance of " +
-            "CacheManager using the diskStorePath")) {
-          throw new CacheException("Attempt to restart an already started EhCacheRegionFactory. " +
-              "Use sessionFactory.close() between repeated calls to buildSessionFactory. " +
-              "Consider using SingletonEhCacheRegionFactory. Error from ehcache was: " + e.getMessage());
-        }
-        throw new CacheException(e);
-      }
+      manager = ApplicationContextProvider.getApplicationContext().getBean(CacheManager.class);
+      mbeanRegistrationHelper.registerMBean(manager, properties);
     }
   }
 
