@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.system.subject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.DELETE;
@@ -20,8 +23,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.apache.shiro.SecurityUtils;
+import org.obiba.opal.core.domain.OpalGeneralConfig;
+import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.SubjectProfileService;
-import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.Dtos;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +46,9 @@ public class SubjectProfileCurrentResource {
   @Autowired
   private ApplicationContext applicationContext;
 
+  @Autowired
+  private OpalGeneralConfigService opalGeneralConfigService;
+
   @GET
   @NoAuthorization
   public Response get() {
@@ -60,33 +67,45 @@ public class SubjectProfileCurrentResource {
   @Path("/bookmark/{path:.*}")
   @GET
   @NoAuthorization
-  public Response getBookmark(@PathParam("path") String path) {
+  public Response getBookmark(@PathParam("path") String path) throws UnsupportedEncodingException {
     BookmarkResource resource = applicationContext.getBean(BookmarkResource.class);
     resource.setPrincipal(getPrincipal());
-    resource.setPath(path);
+    resource.setPath(URLDecoder.decode(path, opalGeneralConfigService.getConfig().getDefaultCharacterSet()));
     return resource.get();
   }
 
   @Path("/bookmarks")
   @POST
   @NoAuthorization
-  public Response addBookmarks(@QueryParam("resource") List<String> resources) {
+  public Response addBookmarks(@QueryParam("resource") List<String> resources) throws UnsupportedEncodingException {
     BookmarksResource resource = applicationContext.getBean(BookmarksResource.class);
     resource.setPrincipal(getPrincipal());
-    return resource.addBookmarks(resources);
+    return resource.addBookmarks(decodeResources(resources));
   }
 
   @Path("/bookmark/{path:.*}")
   @DELETE
   @NoAuthorization
-  public Response deleteBookmark(@PathParam("path") String path) {
+  public Response deleteBookmark(@PathParam("path") String path) throws UnsupportedEncodingException {
     BookmarkResource resource = applicationContext.getBean(BookmarkResource.class);
     resource.setPrincipal(getPrincipal());
-    resource.setPath(path);
+    resource.setPath(URLDecoder.decode(path, opalGeneralConfigService.getConfig().getDefaultCharacterSet()));
     return resource.delete();
   }
 
   private String getPrincipal() {
     return (String)SecurityUtils.getSubject().getPrincipal();
   }
+
+  private List<String> decodeResources(Iterable<String> resourceIterator) throws UnsupportedEncodingException {
+    OpalGeneralConfig config = opalGeneralConfigService.getConfig();
+
+    List<String> decodedResources = new ArrayList<>();
+    for (String resource : resourceIterator) {
+      decodedResources.add(URLDecoder.decode(resource, config.getDefaultCharacterSet()));
+    }
+
+    return decodedResources;
+  }
+
 }
