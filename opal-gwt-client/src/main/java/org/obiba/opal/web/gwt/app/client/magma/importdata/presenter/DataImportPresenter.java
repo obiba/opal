@@ -436,6 +436,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
     @Override
     public boolean validateComparedDatasourcesReport() {
+      getView().clearError();
       if(comparedDatasourcesReportPresenter.getSelectedTables().isEmpty()) {
         getView().showError("TableSelectionIsRequired");
         return false;
