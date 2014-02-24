@@ -2187,4 +2187,8 @@ public interface Translations extends Constants {
   @Description("No items label")
   @DefaultStringValue("No items.")
   String noItems();
+
+  @Description("System Error label")
+  @DefaultStringValue("System Error")
+  String systemErrorLablel();
 }
