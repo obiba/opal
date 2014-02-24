@@ -681,6 +681,11 @@
         <artifactId>logstash-logback-encoder</artifactId>
         <version>${logstash-logback.version}</version>
       </dependency>
+      <dependency>
+        <groupId>janino</groupId>
+        <artifactId>janino</artifactId>
+        <version>${janino.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>org.liquibase</groupId>
@@ -1287,6 +1292,10 @@
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
     </dependency>
+    <dependency>
+      <groupId>janino</groupId>
+      <artifactId>janino</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>junit</groupId>
@@ -1701,6 +1710,7 @@
     <hibernate-validator.version>5.0.1.Final</hibernate-validator.version>
     <hsqldb.version>2.3.1</hsqldb.version>
     <httpclient.version>4.3.2</httpclient.version>
+    <janino.version>2.5.10</janino.version>
     <javassist.version>3.18.1-GA</javassist.version>
     <javax-el.version>2.2.4</javax-el.version>
     <jetty.version>8.1.14.v20131031</jetty.version>

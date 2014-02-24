@@ -146,12 +146,7 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   @Override
   public ValueTable ensureIdentifiersTable(@NotNull String entityType) {
     if(!hasIdentifiersTable(entityType)) {
-      ValueTableWriter vtw = null;
-      try {
-        vtw = getDatasource().createWriter(entityType, entityType);
-      } finally {
-        vtw.close();
-      }
+      getDatasource().createWriter(entityType, entityType).close();
     }
     return getIdentifiersTable(entityType);
   }

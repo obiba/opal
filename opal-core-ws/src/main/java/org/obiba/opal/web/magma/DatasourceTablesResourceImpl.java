@@ -101,6 +101,7 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
     TimestampedResponses.evaluate(request, datasource);
 
     // The use of "GenericEntity" is required because otherwise JAX-RS can't determine the type using reflection.
+    //noinspection EmptyClass
     return TimestampedResponses.ok(datasource, new GenericEntity<List<TableDto>>(getTables(counts, entityType)) {
       // Nothing to implement. Subclassed to keep generic information at runtime.
     }).build();

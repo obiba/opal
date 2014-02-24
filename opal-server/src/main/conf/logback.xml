@@ -10,7 +10,7 @@
       <level>ERROR</level>
     </filter>
     <encoder>
-      <pattern>%date - %-5level - %logger - %message%n</pattern>
+      <pattern>%date %-5level %logger - %message%n</pattern>
     </encoder>
   </appender>
 
@@ -24,7 +24,7 @@
       <maxFileSize>10MB</maxFileSize>
     </triggeringPolicy>
     <encoder>
-      <pattern>%date - %-5level - %logger - %message%n</pattern>
+      <pattern>%date [%thread] %-5level %logger - %message%n</pattern>
     </encoder>
   </appender>
 
@@ -41,7 +41,7 @@
       <maxFileSize>10MB</maxFileSize>
     </triggeringPolicy>
     <encoder>
-      <pattern>%date - %-5level - %logger - %message%n</pattern>
+      <pattern>%date %-5level %logger - %message%n</pattern>
     </encoder>
   </appender>
 
@@ -57,7 +57,7 @@
     <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
       <maxFileSize>10MB</maxFileSize>
     </triggeringPolicy>
-    <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     <!--encoder>
       <pattern>%date - %level - %X{username} - %X{status} - %X{method} - %message - %X{created}%n</pattern>
     </encoder-->
@@ -82,7 +82,7 @@
   <!--<logger name="org.hibernate.SQL" level="debug"/>-->
 
   <!--Uncomment this to show the values used for replacement in Hibernate's prepared statements-->
-  <!--<logger name="org.hibernate.type" level="debug"/>-->
+  <!--<logger name="org.hibernate.type" level="trace"/>-->
 
   <!--dev-->
   <!--<logger name="org.obiba" level="debug"/>-->

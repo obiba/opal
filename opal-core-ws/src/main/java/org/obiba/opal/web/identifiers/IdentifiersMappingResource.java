@@ -342,14 +342,14 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
         .filter(new IdentifiersMaps(getValueTable(entityType), name), new Predicate<IdentifiersMaps.IdentifiersMap>() {
           @Override
           public boolean apply(@Nullable IdentifiersMaps.IdentifiersMap input) {
-            return input.hasPrivateIdentifier();
+            return input != null && input.hasPrivateIdentifier();
           }
         });
   }
 
   @Override
   @NotNull
-  protected ValueTable getValueTable(String entityType) {
+  protected ValueTable getValueTable(@NotNull String entityType) {
     ValueTable table = super.getValueTable(entityType);
     if(table == null) throw new NoSuchElementException("No identifiers mapping found for entity type: " + entityType);
     return table;

@@ -59,8 +59,9 @@ public abstract class AbstractIdentifiersResource {
   }
 
   protected void ensureEntityType(String entityType) {
-    if(entityType == null || !getIdentifiersTableService().hasIdentifiersTable(entityType))
+    if(entityType == null || !getIdentifiersTableService().hasIdentifiersTable(entityType)) {
       throw new InvalidRequestException("No such identifiers table for entity type: " + entityType);
+    }
   }
 
   protected Datasource getDatasource() {

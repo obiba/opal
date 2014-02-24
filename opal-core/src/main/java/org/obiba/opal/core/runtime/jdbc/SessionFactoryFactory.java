@@ -156,9 +156,8 @@ public class SessionFactoryFactory {
           throw new CacheException("Attempt to restart an already started EhCacheRegionFactory. " +
               "Use sessionFactory.close() between repeated calls to buildSessionFactory. " +
               "Consider using SingletonEhCacheRegionFactory. Error from ehcache was: " + e.getMessage());
-        } else {
-          throw new CacheException(e);
         }
+        throw new CacheException(e);
       }
     }
   }
