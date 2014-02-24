@@ -16,19 +16,30 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.model.Ws;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Strings;
+
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 @Component
 @Provider
 public class UnsupportedEncodingExceptionMapper implements ExceptionMapper<UnsupportedEncodingException> {
+  @Autowired
+  private OpalGeneralConfigService opalGeneralConfigService;
+
 
   @Override
   public Response toResponse(UnsupportedEncodingException exception) {
-    return Response.status(BAD_REQUEST).entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "UnsupportedEncoding", exception))
-        .build();
+    Ws.ClientErrorDto errorDto = ClientErrorDtos.getErrorMessage(BAD_REQUEST, "UnsupportedEncoding")
+        .addArguments(opalGeneralConfigService.getConfig().getDefaultCharacterSet()).build();
+
+    return Response.status(BAD_REQUEST).entity(errorDto).type("application/x-protobuf+json").build();
   }
 
 }

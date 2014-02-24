@@ -537,7 +537,7 @@ public interface Translations extends Constants {
       "LanguageIsRequired", "At least one language is required.",//
       "NameHasInvalidCharacters",
       "Name contains invalid characters. Characters must be alphanumeric, space, hyphen or underscore.",
-      "UnsupportedEncoding", "An unsupported encoding was detected. Please contact your administrator."})
+      "UnsupportedEncoding", "An unsupported encoding other than Opal's current encoding '{0}' was detected. Please contact your administrator for further assisstance."})
   Map<String, String> userMessageMap();
 
   @Description("Missing label")
