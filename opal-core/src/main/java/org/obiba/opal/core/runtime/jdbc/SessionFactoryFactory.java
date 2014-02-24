@@ -57,6 +57,11 @@ public class SessionFactoryFactory {
   @Autowired
   private TransactionManager jtaTransactionManager;
 
+  // required to ensure that ApplicationContextProvider is ready to be used by ApplicationContextEhCacheRegionFactory
+  @Autowired
+  @SuppressWarnings("UnusedDeclaration")
+  private ApplicationContextProvider applicationContextProvider;
+
   private final DialectFactoryImpl dialectFactory;
 
   public SessionFactoryFactory() {
@@ -128,6 +133,19 @@ public class SessionFactoryFactory {
       manager = ApplicationContextProvider.getApplicationContext().getBean(CacheManager.class);
       mbeanRegistrationHelper.registerMBean(manager, properties);
     }
+
+    @Override
+    public void stop() {
+      try {
+        if(manager != null) {
+          mbeanRegistrationHelper.unregisterMBean();
+          manager = null;
+        }
+      } catch(net.sf.ehcache.CacheException e) {
+        throw new CacheException(e);
+      }
+    }
+
   }
 
 }

@@ -10,6 +10,8 @@
   <import resource="spring/opal-core/tx.xml"/>
   <import resource="spring/opal-core/version.xml"/>
 
+  <bean id="applicationContextProvider" class="org.obiba.opal.core.service.ApplicationContextProvider"/>
+
   <bean id="configDataSource" class="org.obiba.opal.core.cfg.ConfigDataSourceFactoryBean"/>
 
   <bean id="dataSourceFactory" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactory"/>

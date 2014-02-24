@@ -8,6 +8,8 @@
   <import resource="spring/opal-core/tx.xml"/>
   <import resource="spring/opal-core/version.xml"/>
 
+  <bean id="applicationContextProvider" class="org.obiba.opal.core.service.ApplicationContextProvider"/>
+
   <bean id="dataSource" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactoryBean">
     <property name="jtaTransactionManager" ref="jtaTransactionManager"/>
     <property name="driverClass" value="${org.obiba.opal.datasource.opal.driver}"/>
