@@ -191,7 +191,9 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
 
     String name = isIdentifiers ? "opal_ids" : "opal_data";
     if(getDriver().getText() == null || "com.mysql.jdbc.Driver".equals(getDriver().getText())) {
-      url.setText("jdbc:mysql://localhost:3306/" + name + "?characterEncoding=UTF-8");
+      url.setText("jdbc:mysql://localhost:3306/" + name);
+      advancedOptions.setOpen(true);
+      properties.setText("characterEncoding=utf8");
     } else if("org.hsqldb.jdbcDriver".equals(getDriver().getText())) {
       url.setText("jdbc:hsqldb:file:" + name + ";shutdown=true;hsqldb.tx=mvcc");
     }
