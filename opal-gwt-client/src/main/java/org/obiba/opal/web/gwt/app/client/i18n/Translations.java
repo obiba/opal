@@ -1927,13 +1927,9 @@ public interface Translations extends Constants {
   @DefaultStringValue("All tables are selected for being exported.")
   String exportAllTables();
 
-  @Description("X tables are selected for being for being exported.")
-  @DefaultStringValue("{0} tables are selected for being exported.")
-  String exportNTables();
-
-  @Description("1 table is selected for being exported.")
-  @DefaultStringValue("1 table is selected for being exported.")
-  String export1Table();
+  @Description("All tables are selected for being copied label")
+  @DefaultStringValue("All tables are selected for being copied.")
+  String copyAllTables();
 
   @Description("Opal identifiers label")
   @DefaultStringValue("[None]")

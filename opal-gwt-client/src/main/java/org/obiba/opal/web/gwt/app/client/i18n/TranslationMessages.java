@@ -391,4 +391,14 @@ public interface TranslationMessages extends Messages {
   @AlternateMessage({ "one", "/1 entity" })
   String summaryTotalEntitiesLabel(@PluralCount int nb);
 
+  @Description("X tables are selected for being for being exported.")
+  @DefaultMessage("{0} tables are selected for being exported.")
+  @AlternateMessage({ "one", "1 table is selected for being exported." })
+  String exportNTables(@PluralCount int nb);
+
+  @Description("X tables are selected for being for being copied.")
+  @DefaultMessage("{0} tables are selected for being copied.")
+  @AlternateMessage({ "one", "1 table is selected for being copied." })
+  String copyNTables(@PluralCount int nb);
+
 }
