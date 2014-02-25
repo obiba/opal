@@ -9,36 +9,18 @@
  ******************************************************************************/
 package org.obiba.opal.core.runtime.jdbc;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.sql.DataSource;
 import javax.transaction.TransactionManager;
 
-import net.sf.ehcache.CacheManager;
-
 import org.hibernate.SessionFactory;
-import org.hibernate.cache.CacheException;
-import org.hibernate.cache.ehcache.EhCacheRegionFactory;
-import org.hibernate.cfg.Settings;
-import org.hibernate.dialect.Dialect;
-import org.hibernate.dialect.HSQLDialect;
-import org.hibernate.service.classloading.internal.ClassLoaderServiceImpl;
-import org.hibernate.service.jdbc.dialect.internal.DialectFactoryImpl;
-import org.hibernate.service.jdbc.dialect.internal.StandardDialectResolver;
+import org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory;
 import org.obiba.magma.datasource.hibernate.cfg.HibernateConfigurationHelper;
-import org.obiba.magma.datasource.hibernate.cfg.MagmaHSQLDialect;
+import org.obiba.magma.datasource.hibernate.cfg.MagmaDialectResolver;
 import org.obiba.magma.datasource.hibernate.cfg.MagmaNamingStrategy;
-import org.obiba.opal.core.service.ApplicationContextProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ConnectionCallback;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -49,26 +31,11 @@ import static org.hibernate.cfg.AvailableSettings.*;
 @Component
 public class SessionFactoryFactory {
 
-  private static final Logger log = LoggerFactory.getLogger(SessionFactoryFactory.class);
-
   @Autowired
   private ApplicationContext applicationContext;
 
   @Autowired
   private TransactionManager jtaTransactionManager;
-
-  // required to ensure that ApplicationContextProvider is ready to be used by ApplicationContextEhCacheRegionFactory
-  @Autowired
-  @SuppressWarnings("UnusedDeclaration")
-  private ApplicationContextProvider applicationContextProvider;
-
-  private final DialectFactoryImpl dialectFactory;
-
-  public SessionFactoryFactory() {
-    dialectFactory = new DialectFactoryImpl();
-    dialectFactory.setClassLoaderService(new ClassLoaderServiceImpl(getClass().getClassLoader()));
-    dialectFactory.setDialectResolver(new StandardDialectResolver());
-  }
 
   // need to run outside the transaction so HBM2DDL_AUTO can change auto-commit to update schema
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -84,68 +51,13 @@ public class SessionFactoryFactory {
     factory.getHibernateProperties().setProperty(USE_STRUCTURED_CACHE, "true");
     factory.getHibernateProperties().setProperty(USE_QUERY_CACHE, "true");
     factory.getHibernateProperties().setProperty(USE_SECOND_LEVEL_CACHE, "true");
-    factory.getHibernateProperties()
-        .setProperty(CACHE_REGION_FACTORY, ApplicationContextEhCacheRegionFactory.class.getName());
+    factory.getHibernateProperties().setProperty(CACHE_REGION_FACTORY, SingletonEhCacheRegionFactory.class.getName());
     factory.getHibernateProperties().setProperty(CURRENT_SESSION_CONTEXT_CLASS, "jta");
     factory.getHibernateProperties().setProperty(AUTO_CLOSE_SESSION, "true");
     factory.getHibernateProperties().setProperty(FLUSH_BEFORE_COMPLETION, "true");
-    factory.getHibernateProperties().setProperty(DIALECT, guessDialect(dataSource, factory));
+    factory.getHibernateProperties().setProperty(DIALECT_RESOLVERS, MagmaDialectResolver.class.getName());
     return ((LocalSessionFactoryBean) applicationContext.getAutowireCapableBeanFactory()
         .initializeBean(factory, dataSource.hashCode() + "-sessionFactory")).getObject();
-  }
-
-  private String guessDialect(DataSource dataSource, final LocalSessionFactoryBean factory) {
-    Dialect dialect = new JdbcTemplate(dataSource).execute(new ConnectionCallback<Dialect>() {
-      @Override
-      public Dialect doInConnection(Connection connection) throws SQLException, DataAccessException {
-        return dialectFactory.buildDialect(factory.getHibernateProperties(), connection);
-      }
-    });
-    return dialect instanceof HSQLDialect ? MagmaHSQLDialect.class.getName() : dialect.getClass().getName();
-  }
-
-  /**
-   * Used to set name to cache manager to avoid net.sf.ehcache.CacheException:
-   * <pre>
-   *   net.sf.ehcache.CacheException:
-   *   Another unnamed CacheManager already exists in the same VM. Please provide unique names for each CacheManager in the config or do one of following:
-   *    1. Use one of the CacheManager.create() static factory methods to reuse same CacheManager with same name or create one if necessary
-   *    2. Shutdown the earlier cacheManager before creating new one with same name.
-   * </pre>
-   * <p/>
-   * See https://hibernate.atlassian.net/browse/HHH-7809
-   */
-  public static class ApplicationContextEhCacheRegionFactory extends EhCacheRegionFactory {
-
-    private static final long serialVersionUID = -906012674778107555L;
-
-    @Override
-    @SuppressWarnings({ "ParameterHidesMemberVariable", "OverlyLongMethod", "PMD.NcssMethodCount" })
-    public void start(Settings settings, Properties properties) throws CacheException {
-      this.settings = settings;
-      if(manager != null) {
-        log.warn(
-            "Attempt to restart an already started EhCacheProvider. Use sessionFactory.close() between repeated calls to " +
-                "buildSessionFactory. Using previously created EhCacheProvider. If this behaviour is required, consider " +
-                "using net.sf.ehcache.hibernate.SingletonEhCacheProvider.");
-        return;
-      }
-      manager = ApplicationContextProvider.getApplicationContext().getBean(CacheManager.class);
-      mbeanRegistrationHelper.registerMBean(manager, properties);
-    }
-
-    @Override
-    public void stop() {
-      try {
-        if(manager != null) {
-          mbeanRegistrationHelper.unregisterMBean();
-          manager = null;
-        }
-      } catch(net.sf.ehcache.CacheException e) {
-        throw new CacheException(e);
-      }
-    }
-
   }
 
 }

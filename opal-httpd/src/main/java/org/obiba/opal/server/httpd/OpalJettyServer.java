@@ -18,6 +18,7 @@ import java.util.EnumSet;
 import java.util.Properties;
 
 import javax.annotation.Nullable;
+import javax.servlet.ServletContext;
 
 import org.eclipse.jetty.ajp.Ajp13SocketConnector;
 import org.eclipse.jetty.server.Connector;
@@ -33,11 +34,13 @@ import org.eclipse.jetty.util.resource.FileResource;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
 import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
-import org.jboss.resteasy.plugins.spring.SpringContextLoaderListener;
+import org.jboss.resteasy.plugins.spring.SpringContextLoaderSupport;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
+import org.springframework.web.context.ConfigurableWebApplicationContext;
+import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.filter.DelegatingFilterProxy;
@@ -165,7 +168,7 @@ public class OpalJettyServer {
     servletContextHandler.setContextPath("/");
 
     servletContextHandler.addEventListener(new ResteasyBootstrap());
-    servletContextHandler.addEventListener(new SpringContextLoaderListener());
+    servletContextHandler.addEventListener(new Spring4ContextLoaderListener());
     servletContextHandler.addEventListener(new RequestContextListener());
 
     servletContextHandler.addFilter(OpalVersionFilter.class, "/*", EnumSet.of(REQUEST));
@@ -186,10 +189,8 @@ public class OpalJettyServer {
 
   private Handler createExtensionFileHandler(String filePath) throws IOException, URISyntaxException {
     File file = new File(filePath);
-    if(!file.exists()) {
-      if(!file.mkdirs()) {
-        throw new RuntimeException("Cannot create extensions directory: " + file.getAbsolutePath());
-      }
+    if(!file.exists() && !file.mkdirs()) {
+      throw new RuntimeException("Cannot create extensions directory: " + file.getAbsolutePath());
     }
     return createFileHandler("file://" + filePath);
   }
@@ -200,6 +201,19 @@ public class OpalJettyServer {
     resourceHandler.setBaseResource(new FileResource(new URL(fileUrl)));
     resourceHandler.setAliases(true);
     return resourceHandler;
+  }
+
+  // https://issues.jboss.org/browse/RESTEASY-1012
+  public static class Spring4ContextLoaderListener extends ContextLoaderListener {
+
+    private final SpringContextLoaderSupport springContextLoaderSupport = new SpringContextLoaderSupport();
+
+    @Override
+    protected void customizeContext(ServletContext servletContext,
+        ConfigurableWebApplicationContext configurableWebApplicationContext) {
+      super.customizeContext(servletContext, configurableWebApplicationContext);
+      springContextLoaderSupport.customizeContext(servletContext, configurableWebApplicationContext);
+    }
   }
 
 }
