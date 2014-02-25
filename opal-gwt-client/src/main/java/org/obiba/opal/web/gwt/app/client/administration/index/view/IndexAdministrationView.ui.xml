@@ -72,22 +72,14 @@
     </g:FlowPanel>
 
     <b:Alert ui:field="selectAllAlert" close="false" visible="false" addStyleNames="select">
-      <g:Grid>
-        <g:row>
-          <g:customCell>
-            <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
-          </g:customCell>
-          <g:customCell>
-            <b2:IconAnchor ui:field="selectAllAnchor" addStyleNames="inline xsmall-indent"/>
-          </g:customCell>
-          <g:customCell>
-            <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" visible="false"
-                addStyleNames="inline xsmall-indent">
-              <ui:msg description="Clear selection label">Clear</ui:msg>
-            </b2:IconAnchor>
-          </g:customCell>
-        </g:row>
-      </g:Grid>
+      <g:FlowPanel addStyleNames="pull-right">
+        <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
+        <b2:IconAnchor ui:field="selectAllAnchor" icon="CHECK" addStyleNames="inline small-indent"/>
+        <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" visible="false"
+            addStyleNames="inline small-indent">
+          <ui:msg description="Clear label">Clear</ui:msg>
+        </b2:IconAnchor>
+      </g:FlowPanel>
     </b:Alert>
     <o:Table ui:field="indexTable" addStyleNames="small-top-margin"/>
 
