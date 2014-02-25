@@ -103,7 +103,7 @@ public class MongoDatabaseModalPresenter extends AbstractDatabaseModalPresenter<
     @Override
     protected Set<FieldValidator> getValidators() {
       if(validators == null) {
-        validators = new LinkedHashSet<FieldValidator>();
+        validators = new LinkedHashSet<>();
         validators.add(new RequiredTextValidator(getView().getName(), "NameIsRequired", FormField.NAME.name()));
         validators.add(new RequiredTextValidator(getView().getUrl(), "UrlIsRequired", FormField.URL.name()));
         validators.add(new RequiredValueValidator(getView().getUsage(), "UsageIsRequired", FormField.USAGE.name()));

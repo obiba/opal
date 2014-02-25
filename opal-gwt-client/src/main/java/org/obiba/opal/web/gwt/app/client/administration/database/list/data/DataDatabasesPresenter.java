@@ -48,12 +48,12 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
 
   private final ModalProvider<MongoDatabaseModalPresenter> mongoDatabaseModalProvider;
 
-  private final ResourceDataProvider<DatabaseDto> resourceDatabasesProvider = new ResourceDataProvider<DatabaseDto>(
+  private final ResourceDataProvider<DatabaseDto> resourceDatabasesProvider = new ResourceDataProvider<>(
       UriBuilders.DATABASES_WITH_SETTINGS.create().build());
 
   private Command confirmedCommand;
 
-  private TranslationMessages translationMessages;
+  private final TranslationMessages translationMessages;
 
   @Inject
   public DataDatabasesPresenter(Display display, EventBus eventBus,

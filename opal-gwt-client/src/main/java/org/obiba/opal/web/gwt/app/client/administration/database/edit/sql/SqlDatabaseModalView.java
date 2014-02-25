@@ -57,10 +57,6 @@ import static org.obiba.opal.web.gwt.app.client.administration.database.edit.Abs
 public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseUiHandlers>
     implements SqlDatabaseModalPresenter.Display {
 
-  private boolean isIdentifiers = false;
-
-  private String selectedDriver;
-
   interface Binder extends UiBinder<Widget, SqlDatabaseModalView> {}
 
   @UiField
@@ -144,9 +140,11 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   @UiField
   ControlGroup defaultEntityTypeGroup;
 
-  private JsArray<JdbcDriverDto> availableDrivers;
-
   private final Translations translations;
+
+  private boolean isIdentifiers;
+
+  private String selectedDriver;
 
   @Inject
   public SqlDatabaseModalView(EventBus eventBus, Binder uiBinder, Translations translations) {
@@ -186,16 +184,13 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   }
 
   @Override
-  public void initUrl(boolean isIdentifiers) {
+  public void initUrl(@SuppressWarnings("ParameterHidesMemberVariable") boolean isIdentifiers) {
     this.isIdentifiers = isIdentifiers;
-
-    String name = isIdentifiers ? "opal_ids" : "opal_data";
+    String defaultName = isIdentifiers ? "opal_ids" : "opal_data";
     if(getDriver().getText() == null || "com.mysql.jdbc.Driver".equals(getDriver().getText())) {
-      url.setText("jdbc:mysql://localhost:3306/" + name);
-      advancedOptions.setOpen(true);
-      properties.setText("characterEncoding=utf8");
+      url.setText("jdbc:mysql://localhost:3306/" + defaultName);
     } else if("org.hsqldb.jdbcDriver".equals(getDriver().getText())) {
-      url.setText("jdbc:hsqldb:file:" + name + ";shutdown=true;hsqldb.tx=mvcc");
+      url.setText("jdbc:hsqldb:file:" + defaultName + ";shutdown=true;hsqldb.tx=mvcc");
     }
   }
 
@@ -533,23 +528,11 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
 
   @Override
   public void setAvailableDrivers(JsArray<JdbcDriverDto> availableDrivers) {
-    this.availableDrivers = availableDrivers;
     for(JdbcDriverDto driverDto : JsArrays.toIterable(availableDrivers)) {
       driver.addItem(driverDto.getDriverName(), driverDto.getDriverClass());
     }
     // select MySQL by default but do not override previously selected driver if any
     getDriver().setText(selectedDriver == null ? "com.mysql.jdbc.Driver" : selectedDriver);
-  }
-
-  @Nullable
-  private JdbcDriverDto getDriver(@Nullable String driverClass) {
-    if(Strings.isNullOrEmpty(driverClass)) return null;
-    for(JdbcDriverDto driverDto : JsArrays.toIterable(availableDrivers)) {
-      if(driverDto.getDriverClass().equals(driverClass)) {
-        return driverDto;
-      }
-    }
-    return null;
   }
 
   @Override

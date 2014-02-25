@@ -204,7 +204,7 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
     @Override
     protected Set<FieldValidator> getValidators() {
       if(validators == null) {
-        validators = new LinkedHashSet<FieldValidator>();
+        validators = new LinkedHashSet<>();
         validators.add(new RequiredTextValidator(getView().getName(), "NameIsRequired", FormField.NAME.name()));
         validators.add(new RequiredTextValidator(getView().getUrl(), "UrlIsRequired", FormField.URL.name()));
         validators

@@ -85,7 +85,7 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
   }
 
   private void initActionsColumn() {
-    actions = new ActionsColumn<DatabaseDto>(new ActionsProvider<DatabaseDto>() {
+    actions = new ActionsColumn<>(new ActionsProvider<DatabaseDto>() {
       @Override
       public String[] allActions() {
         return new String[] { TEST_ACTION, EDIT_ACTION, UNREGISTER_ACTION };
@@ -98,6 +98,7 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
     });
   }
 
+  @SuppressWarnings("MagicNumber")
   private void initColumnsWidth() {
     table.setColumnWidth(columns.name, 25, Style.Unit.PCT);
     table.setColumnWidth(columns.url, 25, Style.Unit.PCT);

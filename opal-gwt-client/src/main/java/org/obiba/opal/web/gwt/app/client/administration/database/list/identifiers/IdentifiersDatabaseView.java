@@ -93,7 +93,7 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
   }
 
   private void initActionsColumn() {
-    actions = new ActionsColumn<DatabaseDto>(new ActionsProvider<DatabaseDto>() {
+    actions = new ActionsColumn<>(new ActionsProvider<DatabaseDto>() {
       @Override
       public String[] allActions() {
         return new String[] { TEST_ACTION, EDIT_ACTION, UNREGISTER_ACTION };
@@ -147,7 +147,7 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
 
   @Override
   public void setDatabase(@Nullable DatabaseDto database) {
-    List<DatabaseDto> list = new ArrayList<DatabaseDto>();
+    List<DatabaseDto> list = new ArrayList<>();
     if(database != null) list.add(database);
     dataProvider.setList(list);
     registerIdentifersDB.setVisible(list.isEmpty());
@@ -156,7 +156,7 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
   @Override
   public void enableEditionDeletion(final boolean value) {
     // Expose ActionsProvider so we could inject a new one when the value of enableEditionDeletion changes...
-    actions = new ActionsColumn<DatabaseDto>(new ActionsProvider<DatabaseDto>() {
+    actions = new ActionsColumn<>(new ActionsProvider<DatabaseDto>() {
       @Override
       public String[] allActions() {
         return new String[] { TEST_ACTION, EDIT_ACTION, UNREGISTER_ACTION };
