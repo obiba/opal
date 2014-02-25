@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.common.base.Strings;
+
 public class DataSourceFactoryBean implements FactoryBean<DataSource> {
 
   private static final Logger log = LoggerFactory.getLogger(DataSourceFactoryBean.class);
@@ -36,6 +38,8 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
 
   protected String password;
 
+  protected String connectionProperties;
+
   private TransactionManager jtaTransactionManager;
 
   @Autowired
@@ -50,6 +54,7 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
     dataSource.setTransactionManager(jtaTransactionManager);
     dataSource.setDriverClassName(driverClass);
     dataSource.setUrl(url);
+    setConnectionProperties(dataSource);
     dataSource.setUsername(username);
     dataSource.setPassword(password);
     dataSource.setInitialSize(MIN_POOL_SIZE);
@@ -72,6 +77,19 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
     }
     //TODO validation query for PostgreSQL
     throw new IllegalArgumentException("Unsupported JDBC driver: " + driverClass);
+  }
+
+  private void setConnectionProperties(BasicManagedDataSource dataSource) {
+    if("com.mysql.jdbc.Driver".equals(driverClass)) {
+      if(Strings.isNullOrEmpty(connectionProperties)) {
+        connectionProperties = "characterEncoding=UTF-8";
+      } else {
+        connectionProperties += ";characterEncoding=UTF-8";
+      }
+    }
+    if(!Strings.isNullOrEmpty(connectionProperties)) {
+      dataSource.setConnectionProperties(connectionProperties);
+    }
   }
 
   @Override
@@ -98,6 +116,10 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
 
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  public void setConnectionProperties(String connectionProperties) {
+    this.connectionProperties = connectionProperties;
   }
 
 }

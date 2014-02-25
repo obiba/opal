@@ -35,6 +35,7 @@ public class DataSourceFactory {
     factoryBean.setUrl(sqlSettings.getUrl());
     factoryBean.setUsername(sqlSettings.getUsername());
     factoryBean.setPassword(sqlSettings.getPassword());
+    factoryBean.setConnectionProperties(sqlSettings.getProperties());
     return factoryBean.getObject();
   }
 
