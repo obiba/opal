@@ -362,7 +362,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
       return false;
     }
     for(CategoryDto categoryDto : existingCat) {
-      if(categoryDto.getName().equalsIgnoreCase(addCategoryName.getText())) {
+      if(categoryDto.getName().equals(addCategoryName.getText())) {
         showError(translations.categoryNameAlreadyExists(), nameGroup);
         return false;
       }
