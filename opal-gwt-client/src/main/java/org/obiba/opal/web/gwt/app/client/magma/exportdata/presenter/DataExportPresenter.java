@@ -14,8 +14,8 @@ import java.util.Set;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
@@ -49,15 +49,18 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
 
   private final Translations translations;
 
+  private TranslationMessages translationMessages;
+
   private final FileSelectionPresenter fileSelectionPresenter;
 
   private String datasourceName;
 
   @Inject
   public DataExportPresenter(Display display, EventBus eventBus, Translations translations,
-      FileSelectionPresenter fileSelectionPresenter, RequestCredentials credentials) {
+      TranslationMessages translationMessages, FileSelectionPresenter fileSelectionPresenter, RequestCredentials credentials) {
     super(eventBus, display);
     this.translations = translations;
+    this.translationMessages = translationMessages;
     this.fileSelectionPresenter = fileSelectionPresenter;
     this.credentials = credentials;
 
@@ -104,11 +107,8 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
 
     if(allTables) {
       getView().showExportNAlert(translations.exportAllTables());
-    } else if(exportTables.size() == 1) {
-      getView().showExportNAlert(translations.export1Table());
     } else {
-      getView().showExportNAlert(
-          TranslationsUtils.replaceArguments(translations.exportNTables(), String.valueOf(exportTables.size())));
+      getView().showExportNAlert(translationMessages.exportNTables(exportTables.size()));
     }
   }
 

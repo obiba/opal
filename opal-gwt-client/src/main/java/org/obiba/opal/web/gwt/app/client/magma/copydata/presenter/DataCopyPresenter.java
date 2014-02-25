@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -47,14 +47,18 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
 
   private final Translations translations;
 
+  private TranslationMessages translationMessages;
+
   /**
    * @param display
    * @param eventBus
    */
   @Inject
-  public DataCopyPresenter(Display display, EventBus eventBus, Translations translations) {
+  public DataCopyPresenter(Display display, EventBus eventBus, Translations translations,
+      TranslationMessages translationMessages) {
     super(eventBus, display);
     this.translations = translations;
+    this.translationMessages = translationMessages;
 
     getView().setUiHandlers(this);
   }
@@ -163,13 +167,12 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
     copyTables = tables;
 
     if(allTables) {
-      getView().showCopyNAlert(translations.exportAllTables());
+      getView().showCopyNAlert(translations.copyAllTables());
     } else if(copyTables.size() == 1) {
-      getView().showCopyNAlert(translations.export1Table());
+      getView().showCopyNAlert(translationMessages.copyNTables(copyTables.size()));
       getView().showNewName(tables.iterator().next().getName());
     } else {
-      getView().showCopyNAlert(
-          TranslationsUtils.replaceArguments(translations.exportNTables(), String.valueOf(copyTables.size())));
+      getView().showCopyNAlert(translationMessages.copyNTables(copyTables.size()));
     }
   }
 
