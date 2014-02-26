@@ -15,6 +15,8 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
@@ -84,6 +86,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private final PlaceManager placeManager;
 
+  private Translations translations;
+
   private final ModalProvider<ValueSequencePopupPresenter> valueSequencePopupProvider;
 
   private final ModalProvider<EntityModalPresenter> entityModalProvider;
@@ -95,9 +99,10 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   @Inject
   public ValuesTablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
       ModalProvider<ValueSequencePopupPresenter> valueSequencePopupProvider,
-      ModalProvider<EntityModalPresenter> entityModalProvider) {
+      ModalProvider<EntityModalPresenter> entityModalProvider, Translations translations) {
     super(eventBus, display);
     this.placeManager = placeManager;
+    this.translations = translations;
     this.valueSequencePopupProvider = valueSequencePopupProvider.setContainer(this);
     this.entityModalProvider = entityModalProvider.setContainer(this);
 
@@ -238,8 +243,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
               .query("select", currentVariablesFilterSelect)//
               .query("offset", String.valueOf(offset))//
               .query("limit", String.valueOf(getView().getPageSize()))//
-              .build(originalTable.getDatasourceName(), originalTable.getName())).withCallback(
-          new ResourceCallback<ValueSetsResultDto>() {
+              .build(originalTable.getDatasourceName(), originalTable.getName()))
+          .withCallback(new ResourceCallback<ValueSetsResultDto>() {
             @Override
             public void onResource(Response response, ValueSetsResultDto resource) {
 
@@ -250,7 +255,14 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
-              // nothing
+              ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
+
+              // Do not show "SearchQueryIsInvalid" errors: the query might be invalid because it is being typed in
+              if(errorDto != null && !"SearchQueryIsInvalid".equals(errorDto.getStatus())) {
+                fireEvent(NotificationEvent.newBuilder().error(TranslationsUtils
+                    .replaceArguments(translations.userMessageMap().get(errorDto.getStatus()),
+                        errorDto.getArgumentsArray())).build());
+              }
             }
           }, Response.SC_BAD_REQUEST)//
           .get().send();
@@ -275,9 +287,9 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   private void fetchIndexSchema() {
     // Show Values Filter when ES is enabled
     ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder().forResource(
-        UriBuilders.DATASOURCE_TABLE_INDEX.create()
-            .build(originalTable.getDatasourceName(), originalTable.getName())).withCallback(
-        new ESUnavailableCallback(), SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN, SC_NOT_FOUND, SC_SERVICE_UNAVAILABLE)//
+        UriBuilders.DATASOURCE_TABLE_INDEX.create().build(originalTable.getDatasourceName(), originalTable.getName()))
+        .withCallback(new ESUnavailableCallback(), SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN, SC_NOT_FOUND,
+            SC_SERVICE_UNAVAILABLE)//
         .withCallback(new ESAvailableCallback()).get().send();
   }
 
@@ -508,8 +520,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
                 variablesRequest = null;
               }
               getView().clearTable();
-              variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder()
-                  .forResource(link).get()//
+              variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(link)
+                  .get()//
                   .withCallback(new VariablesDtoResourceCallback(originalTable.getLink()))
                   .withCallback(Response.SC_BAD_REQUEST, new BadRequestCallback() {
                     @Override

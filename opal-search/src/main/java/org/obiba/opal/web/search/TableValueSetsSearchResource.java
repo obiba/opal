@@ -28,13 +28,12 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.NoSuchDatasourceException;
-import org.obiba.magma.NoSuchValueSetException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.VariableEntityBean;
+import org.obiba.opal.search.SearchQueryException;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.VariableEntityValueSetDtoFunction;
@@ -72,25 +71,22 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
   @ApiOperation("Returns a list of valueSets corresponding to specified query")
   public Response search(@Context UriInfo uriInfo, @QueryParam("query") String query,
       @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("10") int limit,
-      @QueryParam("select") String select) {
+      @QueryParam("select") String select) throws JSONException {
 
-    try {
-      if(!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-      if(!valuesIndexManager.hasIndex(getValueTable())) return Response.status(Response.Status.NOT_FOUND).build();
+    if(!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+    if(!valuesIndexManager.hasIndex(getValueTable())) return Response.status(Response.Status.NOT_FOUND).build();
 
-      JSONObject jsonResponse = executeQuery(buildQuerySearch(query, offset, limit, null, null, null, null).build());
+    JSONObject jsonResponse = executeQuery(buildQuerySearch(query, offset, limit, null, null, null, null).build());
 
-      Search.ValueSetsResultDto.Builder dtoResponseBuilder = getvalueSetsDtoBuilder(uriInfo, select, jsonResponse);
-
-      // filter entities
-      return Response.ok().entity(dtoResponseBuilder.build()).build();
-    } catch(NoSuchValueSetException e) {
-      return Response.status(Response.Status.NOT_FOUND).build();
-    } catch(NoSuchDatasourceException e) {
-      return Response.status(Response.Status.NOT_FOUND).build();
-    } catch(Exception e) {
-      return Response.status(Response.Status.BAD_REQUEST).build();
+    if(!jsonResponse.isNull("error")) {
+      throw new SearchQueryException(jsonResponse.get("error").toString());
     }
+
+    Search.ValueSetsResultDto.Builder dtoResponseBuilder = getvalueSetsDtoBuilder(uriInfo, select, jsonResponse);
+
+    // filter entities
+    return Response.ok().entity(dtoResponseBuilder.build()).build();
+
   }
 
   private Search.ValueSetsResultDto.Builder getvalueSetsDtoBuilder(UriInfo uriInfo, String select,
