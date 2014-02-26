@@ -68,6 +68,7 @@ public class PostInstallPresenter extends Presenter<PostInstallPresenter.Display
 
   private final DataDatabasesPresenter dataDatabasesPresenter;
 
+  @SuppressWarnings("ConstructorWithTooManyParameters")
   @Inject
   public PostInstallPresenter(Display display, EventBus eventBus, Proxy proxy, PlaceManager placeManager,
       RequestCredentials credentials, NotificationPresenter messageDialog,
@@ -131,6 +132,7 @@ public class PostInstallPresenter extends Presenter<PostInstallPresenter.Display
   protected void onHide() {
     super.onHide();
     notificationRegistration.removeHandler();
+    messageDialog.close();
   }
 
   private void testConnection(DatabaseDto dto) {
