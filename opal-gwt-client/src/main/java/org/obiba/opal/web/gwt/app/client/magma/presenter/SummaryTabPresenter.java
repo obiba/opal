@@ -25,6 +25,7 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
@@ -116,7 +117,7 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
       uri = uri.substring(0, uri.indexOf("?"));
     }
 
-    UriBuilder uriBuilder = UriBuilder.create().fromPath(uri);
+    UriBuilder uriBuilder = UriBuilder.create().fromPath(URL.decodeQueryString(uri));
     uriBuilder.query("resetCache", "true");
 
     limit = Math.max(getView().getLimit().intValue(), Math.min(MIN_LIMIT, entitiesCount));
