@@ -17,7 +17,9 @@ import com.google.gwt.user.client.ui.HasText;
 public class CharacterSetView extends EditableListBox implements CharacterSetDisplay {
 
   public CharacterSetView() {
-    addAllItems(CharacterSetEncoding.getCharacterSetEncodings());
+    for(CharacterSetEncoding characterSetEncoding : CharacterSetEncoding.values()) {
+      addItem(characterSetEncoding.getName());
+    }
   }
 
   @Override

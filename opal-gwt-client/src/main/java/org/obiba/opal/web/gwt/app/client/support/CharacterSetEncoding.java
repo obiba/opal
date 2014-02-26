@@ -10,10 +10,8 @@
 
 package org.obiba.opal.web.gwt.app.client.support;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 public enum CharacterSetEncoding {
+
   ISO_8859_1("ISO-8859-1"),
   ISO_8859_2("ISO-8859-2"),
   ISO_8859_3("ISO-8859-3"),
@@ -29,8 +27,10 @@ public enum CharacterSetEncoding {
   UTF_16("UTF-16"),
   UTF_32("UTF-32");
 
-  public static Collection<String> getCharacterSetEncodings() {
-    return characterSetEncodings;
+  private final String name;
+
+  CharacterSetEncoding(String name) {
+    this.name = name;
   }
 
   public String getName() {
@@ -38,26 +38,10 @@ public enum CharacterSetEncoding {
   }
 
   public static boolean isValid(String encoding) {
-    return characterSetEncodings.contains(encoding);
-  }
-
-
-  //
-  // Private Members
-  //
-
-  private final static Collection<String> characterSetEncodings = new ArrayList<String>();
-
-  static {
-    for(CharacterSetEncoding encoding : CharacterSetEncoding.values()) {
-      characterSetEncodings.add(encoding.name);
+    for(CharacterSetEncoding characterSetEncoding : values()) {
+      if(characterSetEncoding.getName().equals(encoding)) return true;
     }
-  }
-
-  private final String name;
-
-  CharacterSetEncoding(String name) {
-    this.name = name;
+    return false;
   }
 
 }

@@ -33,6 +33,7 @@ import com.google.gwt.core.client.JsArray;
 /**
  *
  */
+@SuppressWarnings({ "StaticMethodOnlyUsedInOneClass", "OverlyCoupledClass" })
 public class DatasourceDtos {
 
   private DatasourceDtos() {
