@@ -61,7 +61,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   interface Binder extends UiBinder<Widget, DatasourceView> {}
 
   @UiField
-  Button downloadDictionary;
+  NavLink downloadDictionary;
 
   @UiField
   Button importData;
@@ -257,7 +257,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     dataProvider.refresh();
     boolean enableItem = table.getRowCount() > 0;
     pager.setPagerVisible(table.getRowCount() > Table.DEFAULT_PAGESIZE);
-    downloadDictionary.setEnabled(enableItem);
+    downloadDictionary.setDisabled(!enableItem);
     exportData.setEnabled(enableItem);
     copyData.setEnabled(enableItem);
     table.hideLoadingIndicator();

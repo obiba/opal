@@ -1956,7 +1956,7 @@ public interface Translations extends Constants {
       "custom_match_query", "Custom match query",//
       "like", "Like", //
       "not_like", "Not like",//
-      "wildcards_help", "use the * wildcard character<br/>to replace one or more characters",//
+      "wildcards_help", "Use the * wildcard character<br/>to replace one or more characters.",//
       "from", "From",//
       "to", "To",//
       "date", "Date",//
