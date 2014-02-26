@@ -696,14 +696,16 @@ public interface Translations extends Constants {
       "File contains invalid characters at row '{0}' in string '{1}'. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.",
 //
       "InvalidCategoryCharsetCharacter",
-      "File contains invalid characters at row '{0}' for variable category '{1}' in string '{2}'. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.",
+      "File contains invalid characters at variable row '{0}' for category '{1}' in string '{2}'. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.",
 //
       "SpssFailedToLoadMetadata",
       "Failed to load metadata from file '{0}'. Please make sure you have chosen the correct character set. ",//
       "SpssFailedToLoadData",
       "Failed to load data from file '{0}'. Please make sure you have chosen the correct character set.",//
       "SpssDuplicateEntity",
-      "Duplicate entity identifier '{0}' at row '{1}'. Please make sure that the variable '{2}' representing entities has unique values.",
+      "Duplicate entity identifier '{0}' at data row '{1}'. Please make sure that the variable '{2}' representing entities has unique values.",
+      "SpssFailedToCreateVariable",
+      "Failed to create variablle '{0}' at data row '{1}'. Please make sure that the file is a valid SPSS file.",
 //
       "FailedToOpenFile", "Failed to open file '{0}'. Please make sure you have chosen the correct character set.",
       "LimeUnknownQuestionType",
