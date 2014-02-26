@@ -55,7 +55,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
 
   private String body;
 
-  private final Collection<String> accept = new HashSet<String>();
+  private final Collection<String> accept = new HashSet<>();
 
   private final HashMultimap<String, String> form = HashMultimap.create();
 
@@ -315,7 +315,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
     }
 
     private Set<HttpMethod> getAllowedMethods(Response response) {
-      Set<HttpMethod> allowed = new LinkedHashSet<HttpMethod>();
+      Set<HttpMethod> allowed = new LinkedHashSet<>();
       String header = response.getHeader("Allow");
       if(header != null && header.length() > 0) {
         for(String string : header.split(",")) {

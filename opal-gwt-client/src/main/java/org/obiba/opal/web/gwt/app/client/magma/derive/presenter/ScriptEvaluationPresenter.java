@@ -235,7 +235,8 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
       String script = VariableDtos.getScript(originalVariable);
       ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder
           = ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder() //
-          .forResource(link).withFormBody("script", script).post() //
+          .forResource(link) //
+          .withFormBody("script", script).post() //
           .accept("application/x-protobuf+json");
 
       if(originalVariable != null) {
@@ -279,7 +280,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
       ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
       String errorMessage = "";
 
-      if (errorDto != null) {
+      if(errorDto != null) {
 
         if(errorDto.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors) != null) {
           errorMessage = getScriptInterpretationFailureMessage(extractJavaScriptErrors(errorDto));
