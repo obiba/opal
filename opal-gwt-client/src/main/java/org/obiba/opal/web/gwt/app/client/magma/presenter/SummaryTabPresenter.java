@@ -119,7 +119,7 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     UriBuilder uriBuilder = UriBuilder.create().fromPath(uri);
     uriBuilder.query("resetCache", "true");
 
-    limit = Math.min(getView().getLimit().intValue(), Math.min(MIN_LIMIT, entitiesCount));
+    limit = Math.max(getView().getLimit().intValue(), Math.min(MIN_LIMIT, entitiesCount));
     if(limit < entitiesCount) {
       uriBuilder.query("limit", String.valueOf(limit));
     }
