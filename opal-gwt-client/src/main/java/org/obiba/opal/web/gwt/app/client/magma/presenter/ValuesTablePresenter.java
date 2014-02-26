@@ -250,7 +250,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
-              getEventBus().fireEvent(NotificationEvent.newBuilder().error("ESQueryBadRequest").build());
+              // nothing
             }
           }, Response.SC_BAD_REQUEST)//
           .get().send();
