@@ -12,6 +12,7 @@ package org.obiba.opal.shell.commands;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -43,8 +44,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 /**
  * Provides ability to copy Magma tables to an existing datasource or a file based datasource.
@@ -90,7 +95,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
             throw new IllegalArgumentException("Cannot copy a table into itself: " + table.getName());
           }
         }
-        getShell().printf("Copying %d tables to %s.\n", tables.size(), destinationDatasource.getName());
+        getShell().printf("Copying tables [%s] to %s.\n", getTableNames(), destinationDatasource.getName());
         dataExportService
             .exportTablesToDatasource(options.isUnit() ? options.getUnit() : null, tables, destinationDatasource,
                 buildDatasourceCopier(destinationDatasource), !options.getNonIncremental());
@@ -108,6 +113,30 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     }
 
     return errorCode;
+  }
+
+  private String getTableNames() {
+    List<String> names = Lists.newArrayList();
+
+    if(options.isSource()) {
+      for(ValueTable table : getDatasourceByName(options.getSource()).getValueTables()) {
+        names.add(table.getName());
+      }
+    }
+
+    if(options.getTables() != null) {
+      for(String name : options.getTables()) {
+        names.add(name);
+      }
+    }
+
+    return Joiner.on(", ").join(Iterables.transform(names, new Function<String, String>() {
+
+      @Override
+      public String apply(String input) {
+        return input.substring(input.indexOf('.') + 1);
+      }
+    }));
   }
 
   public String toString() {
