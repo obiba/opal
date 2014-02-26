@@ -29,7 +29,6 @@ import static com.google.gwt.http.client.Response.SC_OK;
 
 public class KeyPairModalResponseCallback<T> implements ResponseCodeCallback {
 
-  @Nonnull
   private final KeyPairModalSavedHandler savedHandler;
 
   @Nonnull
@@ -37,7 +36,7 @@ public class KeyPairModalResponseCallback<T> implements ResponseCodeCallback {
 
   private static final Translations translations = GWT.create(Translations.class);
 
-  public KeyPairModalResponseCallback(@Nonnull KeyPairDisplay<T> display, @Nonnull KeyPairModalSavedHandler handler) {
+  public KeyPairModalResponseCallback(@Nonnull KeyPairDisplay<T> display, KeyPairModalSavedHandler handler) {
     keyPairDisplay = display;
     savedHandler = handler;
   }
@@ -46,7 +45,9 @@ public class KeyPairModalResponseCallback<T> implements ResponseCodeCallback {
   public void onResponseCode(Request request, Response response) {
     int statusCode = response.getStatusCode();
     if(statusCode == SC_OK || statusCode == SC_CREATED) {
-      savedHandler.saved();
+      if(savedHandler != null) {
+        savedHandler.saved();
+      }
       keyPairDisplay.close();
     } else {
       ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
