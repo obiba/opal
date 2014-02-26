@@ -58,7 +58,7 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   Panel reports;
 
   @UiField
-  FlowPanel bookmarks;
+  Panel bookmarks;
 
   @Inject
   public DashboardView(Binder uiBinder, Translations translations) {

@@ -15,11 +15,8 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <b:Heading size="4" addStyleNames="inline-block">
-      <ui:msg description="Bookmarks label">Bookmarks</ui:msg>
-    </b:Heading>
-    <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right very-large-top-margin"/>
-    <o:Table ui:field="table" addStyleNames="small-top-margin"/>
+    <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
+    <o:Table ui:field="table" addStyleNames="small-top-margin pull-left"/>
   </g:FlowPanel>
 
 </ui:UiBinder>

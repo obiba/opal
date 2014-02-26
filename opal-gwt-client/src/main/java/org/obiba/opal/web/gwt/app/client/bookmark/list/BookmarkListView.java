@@ -51,6 +51,8 @@ public class BookmarkListView extends ViewWithUiHandlers<BookmarkListUiHandlers>
 
   private final ListDataProvider<BookmarkDto> dataProvider = new ListDataProvider<BookmarkDto>();
 
+  private CreateColumn createColumn;
+
   private DeleteActionColumn deleteActionColumn;
 
   @Inject
@@ -80,6 +82,10 @@ public class BookmarkListView extends ViewWithUiHandlers<BookmarkListUiHandlers>
   public void setMode(Mode mode) {
     switch (mode) {
       case VIEW_ONLY:
+        if (createColumn != null) {
+          table.removeColumn(createColumn);
+          createColumn = null;
+        }
         if (deleteActionColumn != null) {
           table.removeColumn(deleteActionColumn);
           deleteActionColumn = null;
@@ -97,9 +103,9 @@ public class BookmarkListView extends ViewWithUiHandlers<BookmarkListUiHandlers>
     table.setVisibleRange(0, 10);
     table.addColumn(new BookmarkColumn(placeManager), translations.resourceLabel());
     table.addColumn(new TypeColumn(translations), translations.typeLabel());
-    table.addColumn(new CreateColumn(), translations.createdLabel());
+    table.addColumn(createColumn = new CreateColumn(), translations.createdLabel());
     dataProvider.addDataDisplay(table);
-    table.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
+    //table.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
     pager.setDisplay(table);
     typeSortHandler = new ColumnSortEvent.ListHandler<BookmarkDto>(dataProvider.getList());
     typeSortHandler.setComparator(table.getColumn(SORTABLE_COLUMN_RESOURCE), new ResourceComparator());
