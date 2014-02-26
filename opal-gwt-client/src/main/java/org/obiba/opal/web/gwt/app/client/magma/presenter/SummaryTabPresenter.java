@@ -117,6 +117,8 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
       uri = uri.substring(0, uri.indexOf("?"));
     }
 
+    // We have to decode the uri only because we rebuild a uri through uribuilder to truncate query paramaters
+    // and add new ones... Ideally, we would have access to the UriBuilder directly.
     UriBuilder uriBuilder = UriBuilder.create().fromPath(URL.decodeQueryString(uri));
     uriBuilder.query("resetCache", "true");
 
