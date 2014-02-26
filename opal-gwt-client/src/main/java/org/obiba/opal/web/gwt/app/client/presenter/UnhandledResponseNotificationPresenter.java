@@ -54,7 +54,7 @@ public class UnhandledResponseNotificationPresenter
 
     Response response = event.getResponse();
 
-    if (response != null) {
+    if(response != null && !response.getText().isEmpty()) {
       ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
 
       if (errorDto != null) {
