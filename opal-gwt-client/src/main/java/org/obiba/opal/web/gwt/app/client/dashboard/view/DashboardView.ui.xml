@@ -57,7 +57,7 @@
         </b:Column>
 
         <b:Column size="6">
-          <b:NavList addStyleNames="no-padding-left">
+          <b:NavList addStyleNames="no-padding-left no-padding-right">
             <b:NavHeader>
               <ui:msg description="Bookmarks label">Bookmarks</ui:msg>
             </b:NavHeader>

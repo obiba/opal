@@ -67,9 +67,9 @@ public class TableCompareVariablePanel extends FlowPanel {
     FlowPanel panel = new FlowPanel();
     SimplePager pager = new SimplePager();
     pager.setDisplay(table);
-    pager.addStyleName("right-aligned");
+    pager.addStyleName("pull-right");
     panel.add(pager);
-    table.addStyleName("left-aligned");
+    table.addStyleName("pull-left");
     table.setWidth("100%");
     panel.add(table);
     return panel;

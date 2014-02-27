@@ -115,11 +115,11 @@ public class TableComparePanel extends FlowPanel {
       CellTable<T> table) {
     FlowPanel panel = new FlowPanel();
     SimplePager pager = new SimplePager();
-    pager.addStyleName("right-aligned");
+    pager.addStyleName("pull-right");
     pager.setDisplay(table);
     panel.add(pager);
 
-    table.addStyleName("left-aligned");
+    table.addStyleName("pull-left");
     table.setWidth("100%");
     panel.add(table);
     tabs.add(panel, tabTitle);
