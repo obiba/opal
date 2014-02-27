@@ -164,8 +164,7 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
 
       @Override
       public String[] getActions(DatabaseDto dto) {
-        return value || dto.getHasDatasource() ? allActions() : new String[] { TEST_ACTION };
-
+        return value ? allActions() : new String[] { TEST_ACTION };
       }
     });
 

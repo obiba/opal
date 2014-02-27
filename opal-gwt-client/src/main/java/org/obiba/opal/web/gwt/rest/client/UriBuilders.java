@@ -482,7 +482,7 @@ public enum UriBuilders {
 
     }
   },
-  DATABASE_IDENTIFIERS_HASENTITIES {
+  DATABASE_IDENTIFIERS_HAS_ENTITIES {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "database", "_identifiers", "hasEntities");

@@ -18,7 +18,6 @@ import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseD
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.list.DatabaseAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -29,7 +28,6 @@ import org.obiba.opal.web.model.client.database.MongoDbSettingsDto;
 import org.obiba.opal.web.model.client.database.SqlSettingsDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -178,15 +176,20 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
   private void refreshDeletionCapability() {
     // Check hasEntities
     ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder() //
-        .forResource(UriBuilders.DATABASE_IDENTIFIERS_HASENTITIES.create().build()) //
-        .withCallback(new HasEntitiesCallback(), Response.SC_OK)//
+        .forResource(UriBuilders.DATABASE_IDENTIFIERS_HAS_ENTITIES.create().build()) //
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            getView().enableEditionDeletion(true);
+            getView().enableEditionDeletion(!Boolean.parseBoolean(response.getText()));
           }
-        }, Response.SC_BAD_REQUEST, Response.SC_SERVICE_UNAVAILABLE, Response.SC_INTERNAL_SERVER_ERROR,
-            Response.SC_NOT_FOUND).get().send();
+        }, Response.SC_OK)//
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            // Nothing, when installing Opal, there is no identifiers database so it would return 400: NOT_FOUND
+          }
+        }, Response.SC_NOT_FOUND)//
+        .get().send();
   }
 
   public interface Display extends View, HasUiHandlers<IdentifiersDatabaseUiHandlers> {
@@ -194,32 +197,5 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
     void setDatabase(@Nullable DatabaseDto database);
 
     void enableEditionDeletion(boolean value);
-  }
-
-  private class HasEntitiesCallback implements ResponseCodeCallback {
-    @Override
-    public void onResponseCode(Request request, Response response) {
-      GWT.log(response.getText());
-      ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder() //
-          .forResource("/identifiers/tables?counts=true") //
-          .withCallback(new ResourceCallback<JsArray<TableDto>>() {
-            @Override
-            public void onResource(Response response, @Nullable JsArray<TableDto> tables) {
-              for(TableDto table : JsArrays.toIterable(tables)) {
-                if(table.getValueSetCount() > 0) {
-                  getView().enableEditionDeletion(false);
-                  return;
-                }
-              }
-              getView().enableEditionDeletion(true);
-            }
-          }) //
-          .withCallback(new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              getView().enableEditionDeletion(false);
-            }
-          }, Response.SC_NOT_FOUND, Response.SC_BAD_REQUEST).get().send();
-    }
   }
 }
