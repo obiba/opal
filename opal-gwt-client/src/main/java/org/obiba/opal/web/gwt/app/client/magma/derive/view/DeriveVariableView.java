@@ -11,7 +11,8 @@ package org.obiba.opal.web.gwt.app.client.magma.derive.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveVariablePresenter;
-import org.obiba.opal.web.gwt.app.client.ui.ModalViewImpl;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.WizardModalBox;
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.BranchingWizardStepController;
@@ -35,7 +36,8 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
 /**
  *
  */
-public class DeriveVariableView extends ModalViewImpl implements DeriveVariablePresenter.Display {
+public class DeriveVariableView extends ModalPopupViewWithUiHandlers<ModalUiHandlers>
+    implements DeriveVariablePresenter.Display {
 
   private static final int HEIGHT = 650;
 

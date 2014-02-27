@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
 import org.obiba.opal.web.gwt.app.client.support.DatasourceDtos;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardProxy;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.StepInHandler;
@@ -55,6 +56,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
 
 import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
@@ -130,6 +132,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     this.archiveStepPresenter = archiveStepPresenter;
     this.datasourceValuesStepPresenter = datasourceValuesStepPresenter;
     this.translations = translations;
+    getView().setUiHandlers(this);
   }
 
   @Override
@@ -585,7 +588,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     }
   }
 
-  public interface Display extends WizardView {
+  public interface Display extends WizardView, HasUiHandlers<ModalUiHandlers> {
 
     enum Slots {
       Destination, Unit, Values, Archive, Limesurvey, Jdbc, Rest

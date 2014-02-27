@@ -11,7 +11,6 @@ package org.obiba.opal.web.gwt.app.client.magma.importvariables.view;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.event.ModalClosedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -24,21 +23,17 @@ import org.obiba.opal.web.gwt.app.client.ui.CharacterSetView;
 import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
 import org.obiba.opal.web.gwt.app.client.ui.DatasourceParsingErrorPanel;
 import org.obiba.opal.web.gwt.app.client.ui.DropdownSuggestBox;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.WizardModalBox;
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.ResetHandler;
-import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
-import com.github.gwtbootstrap.client.ui.Modal;
 import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
-import com.github.gwtbootstrap.client.ui.event.HiddenEvent;
-import com.github.gwtbootstrap.client.ui.event.HiddenHandler;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -123,13 +118,6 @@ public class VariablesImportView extends ModalPopupViewWithUiHandlers<VariablesI
       @Override
       public void onClick(ClickEvent evt) {
         getUiHandlers().processVariablesFile();
-      }
-    });
-
-    dialog.addHiddenHandler(new HiddenHandler() {
-      @Override
-      public void onHidden(HiddenEvent hiddenEvent) {
-        getUiHandlers().onModalHidden();
       }
     });
   }

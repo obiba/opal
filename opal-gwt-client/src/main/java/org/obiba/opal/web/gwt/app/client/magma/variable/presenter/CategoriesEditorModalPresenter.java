@@ -56,13 +56,12 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
   public CategoriesEditorModalPresenter(EventBus eventBus, Display display, TranslationMessages translationMessages) {
     super(eventBus, display);
     this.translationMessages = translationMessages;
+    getView().setUiHandlers(this);
   }
 
   public void initialize(@SuppressWarnings("ParameterHidesMemberVariable") final VariableDto variable, TableDto table) {
     this.variable = variable;
     tableDto = table;
-
-    getView().setUiHandlers(this);
 
     // Fetch locales and render categories
     ResourceRequestBuilderFactory.<JsArray<LocaleDto>>newBuilder()
