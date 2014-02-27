@@ -29,7 +29,6 @@ import org.obiba.opal.web.model.client.database.MongoDbSettingsDto;
 import org.obiba.opal.web.model.client.database.SqlSettingsDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -199,27 +198,31 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
   private class HasEntitiesCallback implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      GWT.log(response.getText());
-      ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder() //
-          .forResource("/identifiers/tables?counts=true") //
-          .withCallback(new ResourceCallback<JsArray<TableDto>>() {
-            @Override
-            public void onResource(Response response, @Nullable JsArray<TableDto> tables) {
-              for(TableDto table : JsArrays.toIterable(tables)) {
-                if(table.getValueSetCount() > 0) {
-                  getView().enableEditionDeletion(false);
-                  return;
+
+      if(Boolean.parseBoolean(response.getText())) {
+        getView().enableEditionDeletion(false);
+      } else {
+        ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder() //
+            .forResource("/identifiers/tables?counts=true") //
+            .withCallback(new ResourceCallback<JsArray<TableDto>>() {
+              @Override
+              public void onResource(Response response, @Nullable JsArray<TableDto> tables) {
+                for(TableDto table : JsArrays.toIterable(tables)) {
+                  if(table.getValueSetCount() > 0) {
+                    getView().enableEditionDeletion(false);
+                    return;
+                  }
                 }
+                getView().enableEditionDeletion(true);
               }
-              getView().enableEditionDeletion(true);
-            }
-          }) //
-          .withCallback(new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              getView().enableEditionDeletion(false);
-            }
-          }, Response.SC_NOT_FOUND, Response.SC_BAD_REQUEST).get().send();
+            }) //
+            .withCallback(new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                getView().enableEditionDeletion(false);
+              }
+            }, Response.SC_NOT_FOUND, Response.SC_BAD_REQUEST).get().send();
+      }
     }
   }
 }
