@@ -18,7 +18,6 @@ import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
@@ -229,7 +228,6 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       getView().setDatasource(datasourceDto);
       updateTables();
       authorize();
-      getView().afterRenderRows();
     }
 
     private void updateTables() {
