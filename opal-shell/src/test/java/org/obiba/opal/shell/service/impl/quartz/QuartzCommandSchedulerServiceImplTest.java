@@ -9,19 +9,28 @@
  ******************************************************************************/
 package org.obiba.opal.shell.service.impl.quartz;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.easymock.EasyMock;
 import org.easymock.IArgumentMatcher;
+import org.fest.util.Lists;
 import org.junit.Test;
 import org.obiba.opal.shell.OpalShell;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.service.CommandSchedulerService;
+import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;
+import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.eq;
@@ -35,16 +44,13 @@ import static org.fest.assertions.api.Assertions.assertThat;
  * Unit tests for {@link QuartzCommandSchedulerServiceImpl}.
  */
 public class QuartzCommandSchedulerServiceImplTest {
-  //
-  // Test Methods
-  //
 
   @Test
   public void testAddCommand() throws Exception {
     // Setup
     Scheduler schedulerMock = createMock(Scheduler.class);
-    JobDetail expectedJobDetail = new JobDetail("commandName", "reporting", QuartzCommandJob.class);
-    expectedJobDetail.getJobDataMap().put("command", "commandLine");
+    JobDetail expectedJobDetail = JobBuilder.newJob(QuartzCommandJob.class).withIdentity("commandName", "reporting")
+        .usingJobData("command", "commandLine").build();
     schedulerMock.addJob(eqJobDetail(expectedJobDetail), eq(true));
     expectLastCall().once();
 
@@ -67,7 +73,7 @@ public class QuartzCommandSchedulerServiceImplTest {
   public void testDeleteCommand() throws Exception {
     // Setup
     Scheduler schedulerMock = createMock(Scheduler.class);
-    expect(schedulerMock.deleteJob("commandName", "reporting")).andReturn(true).once();
+    expect(schedulerMock.deleteJob(new JobKey("commandName", "reporting"))).andReturn(true).once();
 
     replay(schedulerMock);
 
@@ -83,8 +89,11 @@ public class QuartzCommandSchedulerServiceImplTest {
   public void testScheduleCommand() throws Exception {
     // Setup
     Scheduler schedulerMock = createMock(Scheduler.class);
-    CronTrigger expectedCronTrigger = new CronTrigger("commandName-trigger", "reporting", "commandName", "reporting",
-        "0 * * * * ?");
+    CronTrigger expectedCronTrigger = TriggerBuilder.newTrigger() //
+        .withIdentity("commandName-trigger", "reporting") //
+        .forJob("commandName", "reporting") //
+        .withSchedule(CronScheduleBuilder.cronSchedule("0 * * * * ?")) //
+        .build();
     expect(schedulerMock.scheduleJob(eqCronTrigger(expectedCronTrigger))).andReturn(null).once();
 
     replay(schedulerMock);
@@ -98,13 +107,19 @@ public class QuartzCommandSchedulerServiceImplTest {
   }
 
   @Test
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public void testUnscheduleCommand() throws Exception {
     // Setup
     Scheduler schedulerMock = createMock(Scheduler.class);
-    CronTrigger cronTrigger = new CronTrigger("commandName-trigger", "reporting", "commandName", "reporting",
-        "0 * * * * ?");
-    expect(schedulerMock.getTriggersOfJob("commandName", "reporting")).andReturn(new Trigger[] { cronTrigger }).once();
-    expect(schedulerMock.unscheduleJob("commandName-trigger", "reporting")).andReturn(true).once();
+    Trigger cronTrigger = TriggerBuilder.newTrigger() //
+        .withIdentity("commandName-trigger", "reporting") //
+        .forJob("commandName", "reporting") //
+        .withSchedule(CronScheduleBuilder.cronSchedule("0 * * * * ?")) //
+        .build();
+
+    expect(schedulerMock.getTriggersOfJob(new JobKey("commandName", "reporting")))
+        .andReturn((List) Lists.newArrayList(cronTrigger)).once();
+    expect(schedulerMock.unscheduleJob(new TriggerKey("commandName-trigger", "reporting"))).andReturn(true).once();
 
     replay(schedulerMock);
 
@@ -118,12 +133,17 @@ public class QuartzCommandSchedulerServiceImplTest {
   }
 
   @Test
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public void testGetCommandSchedule() throws Exception {
     // Setup
     Scheduler schedulerMock = createMock(Scheduler.class);
-    CronTrigger cronTrigger = new CronTrigger("commandName-trigger", "reporting", "commandName", "reporting",
-        "0 * * * * ?");
-    expect(schedulerMock.getTriggersOfJob("commandName", "reporting")).andReturn(new Trigger[] { cronTrigger }).once();
+    CronTrigger cronTrigger = TriggerBuilder.newTrigger() //
+        .withIdentity("commandName-trigger", "reporting") //
+        .forJob("commandName", "reporting") //
+        .withSchedule(CronScheduleBuilder.cronSchedule("0 * * * * ?")) //
+        .build();
+    expect(schedulerMock.getTriggersOfJob(new JobKey("commandName", "reporting")))
+        .andReturn((List) Lists.newArrayList(cronTrigger)).once();
 
     replay(schedulerMock);
 
@@ -137,15 +157,23 @@ public class QuartzCommandSchedulerServiceImplTest {
   }
 
   @Test
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public void testGetCommandSchedule_ReturnsFirstScheduleIfCommandHasMultipleSchedules() throws Exception {
     // Setup
     Scheduler schedulerMock = createMock(Scheduler.class);
-    CronTrigger cronTrigger1 = new CronTrigger("commandName-trigger1", "reporting", "commandName", "reporting",
-        "0 * * * * ?");
-    CronTrigger cronTrigger2 = new CronTrigger("commandName-trigger2", "reporting", "commandName", "reporting",
-        "0 0/2 * * * ?");
-    expect(schedulerMock.getTriggersOfJob("commandName", "reporting"))
-        .andReturn(new Trigger[] { cronTrigger1, cronTrigger2 }).once();
+    CronTrigger cronTrigger1 = TriggerBuilder.newTrigger() //
+        .withIdentity("commandName-trigger1", "reporting") //
+        .forJob("commandName", "reporting") //
+        .withSchedule(CronScheduleBuilder.cronSchedule("0 * * * * ?")) //
+        .build();
+    CronTrigger cronTrigger2 = TriggerBuilder.newTrigger() //
+        .withIdentity("commandName-trigger2", "reporting") //
+        .forJob("commandName", "reporting") //
+        .withSchedule(CronScheduleBuilder.cronSchedule("0 0/2 * * * ?")) //
+        .build();
+
+    expect(schedulerMock.getTriggersOfJob(new JobKey("commandName", "reporting")))
+        .andReturn((List) Lists.newArrayList(cronTrigger1, cronTrigger2)).once();
 
     replay(schedulerMock);
 
@@ -159,10 +187,12 @@ public class QuartzCommandSchedulerServiceImplTest {
   }
 
   @Test
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public void testGetCommandSchedule_ReturnsNullIfCommandNotScheduled() throws Exception {
     // Setup
     Scheduler schedulerMock = createMock(Scheduler.class);
-    expect(schedulerMock.getTriggersOfJob("commandName", "reporting")).andReturn(new Trigger[] { }).once();
+    expect(schedulerMock.getTriggersOfJob(new JobKey("commandName", "reporting")))
+        .andReturn((List) Collections.emptyList()).once();
 
     replay(schedulerMock);
 
@@ -230,18 +260,11 @@ public class QuartzCommandSchedulerServiceImplTest {
     public boolean matches(Object actual) {
       if(actual instanceof JobDetail) {
         JobDetail actualJobDetail = (JobDetail) actual;
-
-        boolean matches = true;
-        matches &= actualJobDetail.getName().equals(expected.getName());
-        matches &= actualJobDetail.getGroup().equals(expected.getGroup());
-        matches &= actualJobDetail.getJobClass().getName().equals(expected.getJobClass().getName());
-        matches &= actualJobDetail.getJobDataMap().getString("command")
-            .equals(expected.getJobDataMap().getString("command"));
-
-        return matches;
-      } else {
-        return false;
+        return actualJobDetail.getKey().equals(expected.getKey()) &&
+            actualJobDetail.getJobClass().getName().equals(expected.getJobClass().getName()) &&
+            actualJobDetail.getJobDataMap().getString("command").equals(expected.getJobDataMap().getString("command"));
       }
+      return false;
     }
 
     @Override
@@ -249,9 +272,9 @@ public class QuartzCommandSchedulerServiceImplTest {
       buffer.append("eqJobDetail(");
       buffer.append(expected.getClass().getName());
       buffer.append(" with name \"");
-      buffer.append(expected.getName());
+      buffer.append(expected.getKey().getName());
       buffer.append("\", group \"");
-      buffer.append(expected.getGroup());
+      buffer.append(expected.getKey().getGroup());
       buffer.append("\", jobClass \"");
       buffer.append(expected.getJobClass().getName());
       buffer.append("\", jobDataMap.getString(\"command\") \"");
@@ -278,18 +301,11 @@ public class QuartzCommandSchedulerServiceImplTest {
     public boolean matches(Object actual) {
       if(actual instanceof CronTrigger) {
         CronTrigger actualCronTrigger = (CronTrigger) actual;
-
-        boolean matches = true;
-        matches &= actualCronTrigger.getName().equals(expected.getName());
-        matches &= actualCronTrigger.getGroup().equals(expected.getGroup());
-        matches &= actualCronTrigger.getJobName().equals(expected.getJobName());
-        matches &= actualCronTrigger.getJobGroup().equals(expected.getJobGroup());
-        matches &= actualCronTrigger.getCronExpression().equals(expected.getCronExpression());
-
-        return matches;
-      } else {
-        return false;
+        return actualCronTrigger.getKey().equals(expected.getKey()) &&
+            actualCronTrigger.getJobKey().equals(expected.getJobKey()) &&
+            actualCronTrigger.getCronExpression().equals(expected.getCronExpression());
       }
+      return false;
     }
 
     @Override
@@ -297,13 +313,13 @@ public class QuartzCommandSchedulerServiceImplTest {
       buffer.append("eqCronTrigger(");
       buffer.append(expected.getClass().getName());
       buffer.append(" with name \"");
-      buffer.append(expected.getName());
+      buffer.append(expected.getKey().getName());
       buffer.append("\", group \"");
-      buffer.append(expected.getGroup());
+      buffer.append(expected.getKey().getGroup());
       buffer.append("\", jobName \"");
-      buffer.append(expected.getJobName());
+      buffer.append(expected.getJobKey().getName());
       buffer.append("\", jobGroup \"");
-      buffer.append(expected.getJobGroup());
+      buffer.append(expected.getJobKey().getGroup());
       buffer.append("\", cronExpression \"");
       buffer.append(expected.getCronExpression());
       buffer.append("\")");

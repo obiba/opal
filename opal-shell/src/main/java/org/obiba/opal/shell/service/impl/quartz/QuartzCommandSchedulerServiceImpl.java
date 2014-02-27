@@ -9,17 +9,21 @@
  ******************************************************************************/
 package org.obiba.opal.shell.service.impl.quartz;
 
-import java.text.ParseException;
+import java.util.List;
 
 import org.apache.shiro.SecurityUtils;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.service.CommandSchedulerService;
 import org.obiba.opal.shell.service.CommandSchedulerServiceException;
+import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;
+import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,33 +32,23 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerService {
-  //
-  // Instance Variables
-  //
 
   private final Scheduler scheduler;
-
-  //
-  // Constructors
-  //
 
   @Autowired
   public QuartzCommandSchedulerServiceImpl(Scheduler scheduler) {
     this.scheduler = scheduler;
   }
 
-  //
-  // CommandSchedulerService Methods
-  //
-
   @Override
   public void addCommand(String name, String group, Command<?> command) {
-    JobDetail jobDetail = new JobDetail(name, group, QuartzCommandJob.class);
-    jobDetail.setDurability(true); // OPAL-917
-    jobDetail.getJobDataMap().put("command", command.toString());
-    jobDetail.getJobDataMap().put("subject", SecurityUtils.getSubject().getPrincipals());
-
     try {
+      JobDetail jobDetail = JobBuilder.newJob(QuartzCommandJob.class) //
+          .withIdentity(name, group) //
+          .storeDurably(true) // OPAL-917
+          .usingJobData("command", command.toString()) //
+          .usingJobData("subject", SecurityUtils.getSubject().getPrincipals().toString()) //
+          .build();
       scheduler.addJob(jobDetail, true);
     } catch(SchedulerException ex) {
       throw new CommandSchedulerServiceException(ex);
@@ -64,7 +58,7 @@ public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerServic
   @Override
   public void deleteCommand(String name, String group) {
     try {
-      scheduler.deleteJob(name, group);
+      scheduler.deleteJob(new JobKey(name, group));
     } catch(SchedulerException ex) {
       throw new CommandSchedulerServiceException(ex);
     }
@@ -73,8 +67,13 @@ public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerServic
   @Override
   public void scheduleCommand(String name, String group, String cronExpression) {
     try {
-      scheduler.scheduleJob(new CronTrigger(name + "-trigger", group, name, group, cronExpression));
-    } catch(SchedulerException | ParseException ex) {
+      Trigger trigger = TriggerBuilder.newTrigger() //
+          .withIdentity(name + "-trigger", group) //
+          .forJob(name, group) //
+          .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression)) //
+          .build();
+      scheduler.scheduleJob(trigger);
+    } catch(SchedulerException ex) {
       throw new CommandSchedulerServiceException(ex);
     }
   }
@@ -82,9 +81,8 @@ public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerServic
   @Override
   public void unscheduleCommand(String name, String group) {
     try {
-      Trigger[] triggers = scheduler.getTriggersOfJob(name, group);
-      for(Trigger trigger : triggers) {
-        scheduler.unscheduleJob(trigger.getName(), trigger.getGroup());
+      for(Trigger trigger : scheduler.getTriggersOfJob(new JobKey(name, group))) {
+        scheduler.unscheduleJob(trigger.getKey());
       }
     } catch(SchedulerException ex) {
       throw new CommandSchedulerServiceException(ex);
@@ -94,9 +92,10 @@ public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerServic
   @Override
   public String getCommandSchedule(String name, String group) {
     try {
-      Trigger[] triggers = scheduler.getTriggersOfJob(name, group);
-      return triggers.length != 0 && triggers[0] instanceof CronTrigger ? ((CronTrigger) triggers[0])
-          .getCronExpression() : null;
+      List<? extends Trigger> triggers = scheduler.getTriggersOfJob(new JobKey(name, group));
+      return triggers != null && !triggers.isEmpty() && triggers.get(0) instanceof CronTrigger //
+          ? ((CronTrigger) triggers.get(0)).getCronExpression() //
+          : null;
     } catch(SchedulerException ex) {
       throw new CommandSchedulerServiceException(ex);
     }

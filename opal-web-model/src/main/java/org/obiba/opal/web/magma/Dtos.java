@@ -21,6 +21,7 @@ import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.obiba.magma.Attribute;
 import org.obiba.magma.Category;
 import org.obiba.magma.Datasource;
+import org.obiba.magma.Timestamped;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
@@ -214,7 +215,7 @@ public final class Dtos {
         .setEntityType(valueTable.getEntityType());
 
     if(withVariableCounts) {
-      builder.setVariableCount(Iterables.size(valueTable.getVariables()));
+      builder.setVariableCount(valueTable.getVariableCount());
     }
 
     if(withValueSetCount) {
@@ -432,7 +433,7 @@ public final class Dtos {
     return dtoBuilder;
   }
 
-  private static void addTimestamps(DatasourceDto.Builder builder, Datasource datasource) {
+  private static void addTimestamps(DatasourceDto.Builder builder, Timestamped datasource) {
     Timestamps ts = datasource.getTimestamps();
     Magma.TimestampsDto.Builder tsBuilder = Magma.TimestampsDto.newBuilder();
     if(!ts.getCreated().isNull()) {

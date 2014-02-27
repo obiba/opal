@@ -1739,7 +1739,7 @@
     <protobuf-java-format.version>1.2.1-obiba</protobuf-java-format.version>
     <protobuf.version>2.3.0</protobuf.version>
     <protostuff.version>1.0.1</protostuff.version>
-    <quartz.version>1.8.3</quartz.version>
+    <quartz.version>2.2.1</quartz.version>
     <REngine.version>0.6-8.1</REngine.version>
     <resteasy.version>3.0.6.Final</resteasy.version>
     <rhino-js.version>1.7R4</rhino-js.version>

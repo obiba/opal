@@ -20,13 +20,11 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nullable;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -95,9 +93,7 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
    * @return
    */
   @Override
-  @GET
-  public Response getTables(@Context Request request, @QueryParam("counts") @DefaultValue("false") Boolean counts,
-      @Nullable @QueryParam("entityType") String entityType) {
+  public Response getTables(Request request, boolean counts, @Nullable String entityType) {
     TimestampedResponses.evaluate(request, datasource);
 
     // The use of "GenericEntity" is required because otherwise JAX-RS can't determine the type using reflection.
