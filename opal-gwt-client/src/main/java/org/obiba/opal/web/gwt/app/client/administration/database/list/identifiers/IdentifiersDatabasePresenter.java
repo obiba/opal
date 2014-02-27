@@ -177,13 +177,14 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
     // Check hasEntities
     ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder() //
         .forResource(UriBuilders.DATABASE_IDENTIFIERS_HAS_ENTITIES.create().build()) //
-        .withCallback(new HasEntitiesCallback(), Response.SC_OK)//
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            getView().enableEditionDeletion(true);
+            getView().enableEditionDeletion(
+                response.getStatusCode() == Response.SC_NOT_FOUND || !Boolean.parseBoolean(response.getText()));
           }
-        }, Response.SC_NOT_FOUND).get().send();
+        }, Response.SC_OK, Response.SC_NOT_FOUND)//
+        .get().send();
   }
 
   public interface Display extends View, HasUiHandlers<IdentifiersDatabaseUiHandlers> {
@@ -191,12 +192,5 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
     void setDatabase(@Nullable DatabaseDto database);
 
     void enableEditionDeletion(boolean value);
-  }
-
-  private class HasEntitiesCallback implements ResponseCodeCallback {
-    @Override
-    public void onResponseCode(Request request, Response response) {
-      getView().enableEditionDeletion(!Boolean.parseBoolean(response.getText()));
-    }
   }
 }
