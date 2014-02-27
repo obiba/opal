@@ -18,7 +18,6 @@ import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseD
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.list.DatabaseAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -177,15 +176,14 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
   private void refreshDeletionCapability() {
     // Check hasEntities
     ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder() //
-        .forResource(UriBuilders.DATABASE_IDENTIFIERS_HASENTITIES.create().build()) //
+        .forResource(UriBuilders.DATABASE_IDENTIFIERS_HAS_ENTITIES.create().build()) //
         .withCallback(new HasEntitiesCallback(), Response.SC_OK)//
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
             getView().enableEditionDeletion(true);
           }
-        }, Response.SC_BAD_REQUEST, Response.SC_SERVICE_UNAVAILABLE, Response.SC_INTERNAL_SERVER_ERROR,
-            Response.SC_NOT_FOUND).get().send();
+        }, Response.SC_NOT_FOUND).get().send();
   }
 
   public interface Display extends View, HasUiHandlers<IdentifiersDatabaseUiHandlers> {
@@ -198,31 +196,7 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
   private class HasEntitiesCallback implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-
-      if(Boolean.parseBoolean(response.getText())) {
-        getView().enableEditionDeletion(false);
-      } else {
-        ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder() //
-            .forResource("/identifiers/tables?counts=true") //
-            .withCallback(new ResourceCallback<JsArray<TableDto>>() {
-              @Override
-              public void onResource(Response response, @Nullable JsArray<TableDto> tables) {
-                for(TableDto table : JsArrays.toIterable(tables)) {
-                  if(table.getValueSetCount() > 0) {
-                    getView().enableEditionDeletion(false);
-                    return;
-                  }
-                }
-                getView().enableEditionDeletion(true);
-              }
-            }) //
-            .withCallback(new ResponseCodeCallback() {
-              @Override
-              public void onResponseCode(Request request, Response response) {
-                getView().enableEditionDeletion(false);
-              }
-            }, Response.SC_NOT_FOUND, Response.SC_BAD_REQUEST).get().send();
-      }
+      getView().enableEditionDeletion(!Boolean.parseBoolean(response.getText()));
     }
   }
 }
