@@ -31,7 +31,7 @@
       <g:Label addStyleNames="key">
         <ui:msg description="Table prefix label">Table prefix</ui:msg>
       </g:Label>
-      <g:TextBox ui:field="tablePrefix"></g:TextBox>
+      <g:TextBox ui:field="tablePrefix"/>
       <g:Label
           styleName="help-block">
         <ui:msg description="Table prefix Description label">At LimeSurvey install, SQL tables can be optionally
