@@ -72,7 +72,8 @@ public class QuartzTablesCreator {
   }
 
   /**
-   * See org.springframework.test.jdbc.JdbcTestUtils.executeSqlScript
+   * Copied from {@link org.springframework.test.jdbc.JdbcTestUtils.executeSqlScript}
+   * to avoid dependency on spring-test at runtime
    */
   public static void executeSqlScript(JdbcOperations jdbcTemplate, EncodedResource resource, boolean continueOnError)
       throws DataAccessException {
@@ -207,6 +208,7 @@ public class QuartzTablesCreator {
    * @param commentPrefix the prefix that identifies line comments in the SQL script &mdash; typically "--"
    * @param statements the List that will contain the individual statements
    */
+  @SuppressWarnings("AssignmentToForLoopParameter")
   private static void splitSqlScript(String script, String delim, String commentPrefix, Collection<String> statements) {
     StringBuilder sb = new StringBuilder();
     boolean inLiteral = false;
