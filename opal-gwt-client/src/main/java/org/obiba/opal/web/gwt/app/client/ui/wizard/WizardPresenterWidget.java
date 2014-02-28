@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.ui.wizard;
 
+import org.obiba.opal.web.gwt.app.client.event.ModalClosedEvent;
+import org.obiba.opal.web.gwt.app.client.event.ModalShownEvent;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -17,7 +20,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
 public abstract class WizardPresenterWidget<V extends WizardView> extends PresenterWidget<V>
-    implements WizardRequiredEvent.Handler {
+    implements WizardRequiredEvent.Handler, ModalUiHandlers {
 
   protected WizardPresenterWidget(EventBus eventBus, V view) {
     super(eventBus, view);
@@ -25,6 +28,16 @@ public abstract class WizardPresenterWidget<V extends WizardView> extends Presen
 
   @Override
   public void onWizardRequired(WizardRequiredEvent event) {
+  }
+
+  @Override
+  public void onModalShown() {
+    getEventBus().fireEventFromSource(new ModalShownEvent(), this);
+  }
+
+  @Override
+  public void onModalHidden() {
+    getEventBus().fireEventFromSource(new ModalClosedEvent(this), this);
   }
 
   /**

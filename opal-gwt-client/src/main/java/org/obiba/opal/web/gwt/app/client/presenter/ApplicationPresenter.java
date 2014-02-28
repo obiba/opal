@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.app.client.presenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.configuration.event.GeneralConfigSavedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
+import org.obiba.opal.web.gwt.app.client.event.ModalClosedEvent;
+import org.obiba.opal.web.gwt.app.client.event.ModalShownEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
@@ -87,6 +89,8 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   private final RequestUrlBuilder urlBuilder;
 
   private final PlaceManager placeManager;
+
+  private int activeModals = 0;
 
   @Inject
   @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
@@ -191,6 +195,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     });
 
     registerUserMessageEventHandler();
+    registerModalEvents();
   }
 
   @Override
@@ -237,6 +242,23 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     }));
   }
 
+  private void registerModalEvents() {
+    getEventBus().addHandler(ModalShownEvent.getType(), new ModalShownEvent.ModalShownHandler() {
+      @Override
+      public void onModalShown(ModalShownEvent event) {
+        activeModals++;
+      }
+    });
+
+    getEventBus().addHandler(ModalClosedEvent.getType(), new ModalClosedEvent.Handler() {
+      @Override
+      public void onModalClosed(ModalClosedEvent event) {
+        activeModals--;
+        if (activeModals < 0) throw new IllegalStateException("Active modal count is invalid: " + activeModals);
+      }
+    });
+  }
+
   private void registerUserMessageEventHandler() {
     addRegisteredHandler(NotificationEvent.getType(), new NotificationEvent.Handler() {
 
@@ -252,6 +274,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     addRegisteredHandler(UnhandledResponseEvent.getType(), new UnhandledResponseEvent.Handler() {
       @Override
       public void onUnhandledResponse(UnhandledResponseEvent e) {
+        if(e.isConsumed() || activeModals > 0) return;
         unhandledResponseNotificationPresenter.withResponseEvent(e);
         setInSlot(NOTIFICATION, unhandledResponseNotificationPresenter);
       }

@@ -13,7 +13,6 @@ import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 
 /**
@@ -32,6 +31,8 @@ public class UnhandledResponseEvent extends GwtEvent<UnhandledResponseEvent.Hand
   private final String uri;
 
   private final Response response;
+
+  private boolean consumed = false;
 
   public UnhandledResponseEvent(HttpMethod method, String uri, Response response) {
     this.method = method;
@@ -61,4 +62,11 @@ public class UnhandledResponseEvent extends GwtEvent<UnhandledResponseEvent.Hand
     return getType();
   }
 
+  public void setConsumed(boolean value) {
+    consumed = value;
+  }
+
+  public boolean isConsumed() {
+    return consumed;
+  }
 }

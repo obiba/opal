@@ -16,8 +16,6 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
-import com.github.gwtbootstrap.client.ui.Modal;
-import com.github.gwtbootstrap.client.ui.event.HiddenEvent;
 import com.github.gwtbootstrap.client.ui.event.HiddenHandler;
 import com.github.gwtbootstrap.client.ui.event.HideHandler;
 import com.google.web.bindery.event.shared.EventBus;
@@ -55,6 +53,10 @@ public abstract class ModalViewImpl extends ViewImpl implements PopupView {
    */
   protected ModalViewImpl(EventBus eventBus) {
     this.eventBus = eventBus;
+  }
+
+  protected EventBus getEventBus() {
+    return eventBus;
   }
 
   @Override

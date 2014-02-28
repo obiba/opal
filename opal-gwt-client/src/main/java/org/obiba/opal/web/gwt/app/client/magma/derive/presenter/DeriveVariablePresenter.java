@@ -24,6 +24,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.BranchingWizardStepController;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardPresenterWidget;
@@ -48,6 +49,7 @@ import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
 import static org.obiba.opal.web.gwt.app.client.support.VariableDtos.allCategoriesMissing;
@@ -130,6 +132,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     this.scriptEvaluationPresenter = scriptEvaluationPresenter;
     this.deriveConclusionPresenter = deriveConclusionPresenter;
     this.translationMessages = translationMessages;
+    getView().setUiHandlers(this);
   }
 
   @Override
@@ -667,7 +670,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     }
   }
 
-  public interface Display extends WizardView {
+  public interface Display extends WizardView, HasUiHandlers<ModalUiHandlers> {
 
     enum Slots {
       Summary, Derivation

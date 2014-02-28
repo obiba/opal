@@ -15,7 +15,8 @@ import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPr
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter.ImportDataInputsHandler;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.DatasourceParsingErrorPanel;
-import org.obiba.opal.web.gwt.app.client.ui.ModalViewImpl;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.WizardModalBox;
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.Skippable;
@@ -47,7 +48,7 @@ import static org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig.Im
 import static org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter.ImportDataStepHandler;
 
 @SuppressWarnings("OverlyCoupledClass")
-public class DataImportView extends ModalViewImpl implements DataImportPresenter.Display {
+public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers> implements DataImportPresenter.Display {
 
   interface Binder extends UiBinder<Widget, DataImportView> {}
 

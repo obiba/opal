@@ -1,6 +1,7 @@
 package org.obiba.opal.web.gwt.app.client.presenter;
 
 import org.obiba.opal.web.gwt.app.client.event.ModalClosedEvent;
+import org.obiba.opal.web.gwt.app.client.event.ModalShownEvent;
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
 import com.google.web.bindery.event.shared.EventBus;
@@ -11,6 +12,11 @@ public class ModalPresenterWidget<V extends PopupView> extends PresenterWidget<V
 
   public ModalPresenterWidget(EventBus eventBus, V view) {
     super(eventBus, view);
+  }
+
+  @Override
+  public void onModalShown() {
+    getEventBus().fireEventFromSource(new ModalShownEvent(), this);
   }
 
   @Override

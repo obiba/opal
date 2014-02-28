@@ -10,12 +10,9 @@
 package org.obiba.opal.web.gwt.app.client.presenter;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.support.UnhandledResponseEventMessageBuilder;
 import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
@@ -28,6 +25,7 @@ public class UnhandledResponseNotificationPresenter
 
   public interface Display extends View {
     void clearErrorMessages();
+
     void setErrorMessage(String title, String msg);
   }
 
@@ -38,46 +36,10 @@ public class UnhandledResponseNotificationPresenter
   }
 
   public UnhandledResponseNotificationPresenter withResponseEvent(UnhandledResponseEvent event) {
-    String message = getClientErrorMessage(event);
-
-    if (message == null) {
-      message = getDefaultMessage(event);
-    }
-
     getView().clearErrorMessages();
-    getView().setErrorMessage(translations.systemErrorLablel(), message);
-
+    getView()
+        .setErrorMessage(translations.systemErrorLablel(), UnhandledResponseEventMessageBuilder.get(event).build());
     return this;
   }
-
-  private String getClientErrorMessage(UnhandledResponseEvent event) {
-
-    Response response = event.getResponse();
-
-    if(response != null && !response.getText().isEmpty()) {
-      ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
-
-      if (errorDto != null) {
-        String messageKey = errorDto.getStatus();
-        assert translations.userMessageMap().containsKey(messageKey);
-        return TranslationsUtils
-            .replaceArguments(translations.userMessageMap().get(messageKey), errorDto.getArgumentsArray());
-      }
-    }
-
-    return null;
-  }
-
-  private String getDefaultMessage(UnhandledResponseEvent event) {
-
-    String message = event.getShortMessage();
-
-    if(!event.getResponse().getText().isEmpty()) {
-      message += ": " + event.getResponse().getText();
-    }
-
-    return message;
-  }
-
 }
 

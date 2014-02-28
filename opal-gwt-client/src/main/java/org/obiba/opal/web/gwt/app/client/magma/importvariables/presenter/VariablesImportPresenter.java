@@ -142,6 +142,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
   @Override
   public void onModalHidden() {
+    super.onModalHidden();
     deleteTransientDatasource();
   }
 

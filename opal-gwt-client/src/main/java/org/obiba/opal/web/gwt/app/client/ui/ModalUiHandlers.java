@@ -4,5 +4,6 @@ import com.gwtplatform.mvp.client.UiHandlers;
 
 
 public interface ModalUiHandlers extends UiHandlers {
+  void onModalShown();
   void onModalHidden();
 }

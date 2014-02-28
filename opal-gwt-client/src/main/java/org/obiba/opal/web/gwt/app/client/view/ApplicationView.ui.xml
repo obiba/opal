@@ -36,13 +36,16 @@
             </b:NavLink>
           </b:Dropdown>
         </b:Nav>
+        <b:Nav>
+          <b:Tooltip placement="BOTTOM" ui:field="resizeTooltip">
+            <b:Button icon="RESIZE_FULL" size="SMALL" addStyleNames="pull-right" ui:field="resizeScreen"/>
+          </b:Tooltip>
+        </b:Nav>
       </b:Nav>
+
     </b:ResponsiveNavbar>
     <b:FluidContainer addStyleNames="container" ui:field="workbenchContainer">
       <g:SimplePanel ui:field="notification" addStyleNames="top-margin"/>
-      <b:Tooltip placement="BOTTOM" ui:field="resizeTooltip">
-        <b:Button icon="RESIZE_FULL" size="SMALL" addStyleNames="pull-right" ui:field="resizeScreen"/>
-      </b:Tooltip>
       <g:FlowPanel ui:field="workbench">
       </g:FlowPanel>
     </b:FluidContainer>

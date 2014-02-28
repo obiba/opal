@@ -331,7 +331,6 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
 
   private void renderLocalizableTexts() {
     locales = new ArrayList<String>();
-    getView().setUiHandlers(this);
 
     // Fetch locales and render categories
     ResourceRequestBuilderFactory.<JsArray<LocaleDto>>newBuilder()
