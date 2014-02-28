@@ -21,12 +21,10 @@ import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
-import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.client.opal.KeyDto;
 
 import com.github.gwtbootstrap.client.ui.CellTable;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -130,7 +128,7 @@ public class EncryptionKeysView extends ViewWithUiHandlers<EncryptionKeysUiHandl
 
       @Override
       public String[] allActions() {
-        return new String[] { DOWNLOAD_CERTIFICATE_ACTION, ActionsColumn.DELETE_ACTION };
+        return new String[] { DOWNLOAD_CERTIFICATE_ACTION, ActionsColumn.REMOVE_ACTION };
       }
 
       @Override

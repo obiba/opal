@@ -76,8 +76,8 @@ public class SubjectCredentialsAdministrationPresenter extends
   @ProxyEvent
   @Override
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(
-        UriBuilders.SUBJECT_CREDENTIALS.create().build()) //
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.SUBJECT_CREDENTIALS.create().build()) //
         .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListUsersAuthorization())) //
         .get().send();
   }
@@ -154,7 +154,7 @@ public class SubjectCredentialsAdministrationPresenter extends
           dialog.setDialogMode(SubjectCredentialsPresenter.Mode.UPDATE);
           dialog.setSubjectCredentials(dto);
 
-        } else if(ActionsColumn.DELETE_ACTION.equals(actionName)) {
+        } else if(ActionsColumn.REMOVE_ACTION.equals(actionName)) {
 
           removeConfirmation = new RemoveRunnable(dto.getName(), true);
           String title = translations.removeUser();
@@ -183,7 +183,7 @@ public class SubjectCredentialsAdministrationPresenter extends
 
       @Override
       public void doAction(GroupDto dto, String actionName) {
-        if(ActionsColumn.DELETE_ACTION.equals(actionName)) {
+        if(ActionsColumn.REMOVE_ACTION.equals(actionName)) {
           String name = dto.getName();
           removeConfirmation = new RemoveRunnable(name, false);
           fireEvent(ConfirmationRequiredEvent.createWithMessages(removeConfirmation, translations.removeGroup(),

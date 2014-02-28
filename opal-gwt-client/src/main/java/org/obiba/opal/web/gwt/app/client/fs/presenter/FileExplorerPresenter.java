@@ -322,7 +322,7 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
     };
 
     getEventBus().fireEvent(ConfirmationRequiredEvent
-        .createWithMessages(actionRequiringConfirmation, translationMessages.deleteFile(),
+        .createWithMessages(actionRequiringConfirmation, translationMessages.removeFile(),
             translationMessages.confirmDeleteFile()));
   }
 

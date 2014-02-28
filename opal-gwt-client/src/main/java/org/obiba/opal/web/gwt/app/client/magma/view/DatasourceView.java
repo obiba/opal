@@ -191,7 +191,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   private void addTableColumns() {
     checkColumn = new CheckboxColumn<TableDto>(new DatasourceCheckStatusDisplay());
 
-    table.addColumn(checkColumn, checkColumn.getTableListCheckColumnHeader());
+    table.addColumn(checkColumn, checkColumn.getCheckColumnHeader());
     table.setColumnWidth(checkColumn, 1, Style.Unit.PX);
 
     table.addColumn(new Column<TableDto, TableDto>(new PlaceRequestCell<TableDto>(placeManager) {

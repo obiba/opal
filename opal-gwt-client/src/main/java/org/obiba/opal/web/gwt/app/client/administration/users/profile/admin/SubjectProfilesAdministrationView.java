@@ -22,7 +22,6 @@ import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.model.client.opal.SubjectProfileDto;
 
 import com.github.gwtbootstrap.client.ui.CellTable;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -34,7 +33,7 @@ import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
 
-import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOVE_ACTION;
 
 public class SubjectProfilesAdministrationView extends ViewImpl
     implements SubjectProfilesAdministrationPresenter.Display {
@@ -100,12 +99,12 @@ public class SubjectProfilesAdministrationView extends ViewImpl
 
           @Override
           public String[] allActions() {
-            return new String[] { DELETE_ACTION };
+            return new String[] { REMOVE_ACTION };
           }
 
           @Override
           public String[] getActions(SubjectProfileDto value) {
-            return new String[] { DELETE_ACTION };
+            return new String[] { REMOVE_ACTION };
           }
         }), translations.actionsLabel());
 

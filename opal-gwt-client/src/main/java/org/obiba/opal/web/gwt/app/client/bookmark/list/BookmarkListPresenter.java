@@ -48,7 +48,7 @@ public class BookmarkListPresenter extends PresenterWidget<BookmarkListPresenter
     return new ActionHandler<BookmarkDto>() {
       @Override
       public void doAction(BookmarkDto bookmarkDto, String actionName) {
-        if(ActionsColumn.DELETE_ACTION.equals(actionName)) {
+        if(ActionsColumn.REMOVE_ACTION.equals(actionName)) {
           deleteBookmark(bookmarkDto);
         }
       }

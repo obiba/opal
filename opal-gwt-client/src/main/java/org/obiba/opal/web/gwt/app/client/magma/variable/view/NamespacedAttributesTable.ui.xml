@@ -33,7 +33,7 @@
           </b2:IconAnchor>
 
           <b2:IconAnchor ui:field="deleteLink" icon="TRASH" addStyleNames="inline xsmall-indent">
-            <ui:msg description="Delete attribute label">Delete</ui:msg>
+            <ui:msg description="Remove attribute label">Remove</ui:msg>
           </b2:IconAnchor>
         </g:FlowPanel>
 

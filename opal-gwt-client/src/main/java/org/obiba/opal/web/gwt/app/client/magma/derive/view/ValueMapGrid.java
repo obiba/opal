@@ -133,7 +133,7 @@ public class ValueMapGrid extends FlowPanel {
   }
 
   private ActionsColumn<ValueMapEntry> createDeletionColumn() {
-    ActionsColumn<ValueMapEntry> deleteColumn = new ActionsColumn<ValueMapEntry>(ActionsColumn.DELETE_ACTION) {
+    ActionsColumn<ValueMapEntry> deleteColumn = new ActionsColumn<ValueMapEntry>(ActionsColumn.REMOVE_ACTION) {
       @Override
       public void render(Context context, ValueMapEntry entry, SafeHtmlBuilder sb) {
         // do not allow removing special rows

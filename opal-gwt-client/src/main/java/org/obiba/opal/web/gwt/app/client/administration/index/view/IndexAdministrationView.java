@@ -116,8 +116,6 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
   private final CheckboxColumn<TableIndexStatusDto> checkboxColumn;
 
-  private final ActionsIndexColumn<TableIndexStatusDto> actionsColumn;
-
   private Status status;
 
   @Inject
@@ -129,22 +127,23 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     indexTablePager.setDisplay(indexTable);
 
     checkboxColumn = new CheckboxColumn<TableIndexStatusDto>(new TableIndexStatusDtoDisplay());
-    actionsColumn = new ActionsIndexColumn<TableIndexStatusDto>(new ActionsProvider<TableIndexStatusDto>() {
+    ActionsIndexColumn<TableIndexStatusDto> actionsColumn = new ActionsIndexColumn<TableIndexStatusDto>(
+        new ActionsProvider<TableIndexStatusDto>() {
 
-      private final String[] all = new String[] { DELETE_ACTION, INDEX_ACTION };
+          private final String[] all = new String[] { REMOVE_ACTION, INDEX_ACTION };
 
-      @Override
-      public String[] allActions() {
-        return all;
-      }
+          @Override
+          public String[] allActions() {
+            return all;
+          }
 
-      @Override
-      public String[] getActions(TableIndexStatusDto value) {
-        return allActions();
-      }
-    });
+          @Override
+          public String[] getActions(TableIndexStatusDto value) {
+            return allActions();
+          }
+        });
 
-    indexTable.addColumn(checkboxColumn, checkboxColumn.getTableListCheckColumnHeader());
+    indexTable.addColumn(checkboxColumn, checkboxColumn.getCheckColumnHeader());
     indexTable.addColumn(new DatasourceColumn(), translations.projectLabel());
     indexTable.addColumn(new TableColumn(), translations.tableLabel());
     indexTable.addColumn(new TableLastUpdateColumn(), translations.tableLastUpdateLabel());
@@ -159,11 +158,11 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
     actionsColumn.setActionHandler(new ActionHandler<TableIndexStatusDto>() {
       @Override
-      public void doAction(TableIndexStatusDto object, String actionName) {
-        if(actionName.trim().equalsIgnoreCase(DELETE_ACTION)) {
-          getUiHandlers().delete(Arrays.asList(object));
+      public void doAction(TableIndexStatusDto statusDto, String actionName) {
+        if(actionName.trim().equalsIgnoreCase(REMOVE_ACTION)) {
+          getUiHandlers().delete(Arrays.asList(statusDto));
         } else if(actionName.trim().equalsIgnoreCase(INDEX_ACTION)) {
-          getUiHandlers().indexNow(Arrays.asList(object));
+          getUiHandlers().indexNow(Arrays.asList(statusDto));
         }
       }
     });
@@ -310,7 +309,7 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
   }
 
   private class DatasourceColumn extends Column<TableIndexStatusDto, String> {
-    public DatasourceColumn() {
+    private DatasourceColumn() {
       super(new PlaceRequestCell<String>(placeManager) {
         @Override
         public PlaceRequest getPlaceRequest(String value) {
@@ -347,7 +346,7 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     }
   }
 
-  private class TableLastUpdateColumn extends TextColumn<TableIndexStatusDto> {
+  private static class TableLastUpdateColumn extends TextColumn<TableIndexStatusDto> {
 
     @Override
     public String getValue(TableIndexStatusDto object) {
@@ -355,7 +354,7 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     }
   }
 
-  private class IndexLastUpdateColumn extends TextColumn<TableIndexStatusDto> {
+  private static class IndexLastUpdateColumn extends TextColumn<TableIndexStatusDto> {
 
     @Override
     public String getValue(TableIndexStatusDto object) {
@@ -363,7 +362,7 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     }
   }
 
-  private class ScheduleTypeColumn extends TextColumn<TableIndexStatusDto> {
+  private static class ScheduleTypeColumn extends TextColumn<TableIndexStatusDto> {
 
     @Override
     public String getValue(TableIndexStatusDto object) {
@@ -399,9 +398,9 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     }
   }
 
-  private class StatusColumn extends Column<TableIndexStatusDto, String> {
+  private static class StatusColumn extends Column<TableIndexStatusDto, String> {
 
-    public StatusColumn() {super(new IndexStatusImageCell());}
+    private StatusColumn() {super(new IndexStatusImageCell());}
 
     @Override
     public String getValue(TableIndexStatusDto tableIndexStatusDto) {

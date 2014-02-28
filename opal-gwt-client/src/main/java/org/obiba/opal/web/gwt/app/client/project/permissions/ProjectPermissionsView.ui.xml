@@ -41,7 +41,7 @@
         <b:Heading size="3" ui:field="principal" addStyleNames="no-top-margin"/>
         <o:OpalSimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right small-indent"/>
         <b:Button icon="TRASH" ui:field="deleteAll" addStyleNames="pull-right">
-          <ui:msg description="Delete all permissions label">Delete all permissions</ui:msg>
+          <ui:msg description="Remove all permissions label">Remove all permissions</ui:msg>
         </b:Button>
         <o:Table ui:field="permissionsTable" addStyleNames="small-top-margin pull-left"/>
       </b:Column>

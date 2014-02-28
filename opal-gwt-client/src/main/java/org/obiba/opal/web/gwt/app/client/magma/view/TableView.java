@@ -316,7 +316,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   private void addCheckColumn() {
     checkColumn = new CheckboxColumn<VariableDto>(new VariableDtoDisplay());
 
-    table.addColumn(checkColumn, checkColumn.getTableListCheckColumnHeader());
+    table.addColumn(checkColumn, checkColumn.getCheckColumnHeader());
     table.setColumnWidth(checkColumn, 1, Unit.PX);
   }
 

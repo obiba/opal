@@ -186,7 +186,7 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
     if(singleSelectionModel) {
       table.insertColumn(0, checkColumn);
     } else {
-      table.insertColumn(0, checkColumn, checkColumn.getTableListCheckColumnHeader());
+      table.insertColumn(0, checkColumn, checkColumn.getCheckColumnHeader());
     }
     table.setColumnWidth(checkColumn, 1, Style.Unit.PX);
   }

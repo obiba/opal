@@ -55,8 +55,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
-import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOVE_ACTION;
 
 /**
  *
@@ -524,7 +524,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
             ArrayList<JsArray<AttributeDto>> selectedItems = new ArrayList<JsArray<AttributeDto>>();
             selectedItems.add(object);
 
-            if(actionName.equalsIgnoreCase(DELETE_ACTION)) {
+            if(actionName.equalsIgnoreCase(REMOVE_ACTION)) {
               getUiHandlers().onDeleteAttribute(selectedItems);
             } else if(actionName.equalsIgnoreCase(EDIT_ACTION)) {
               getUiHandlers().onEditAttributes(selectedItems);

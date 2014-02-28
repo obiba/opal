@@ -135,7 +135,7 @@ public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissi
 
       @Override
       public String[] allActions() {
-        return new String[] { ActionsColumn.EDIT_ACTION, ActionsColumn.DELETE_ACTION };
+        return new String[] { ActionsColumn.EDIT_ACTION, ActionsColumn.REMOVE_ACTION };
       }
 
       @Override
@@ -143,7 +143,7 @@ public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissi
         String action = value.getActions(0);
         if(ResourcePermissionType.PROJECT.hasPermission(action) ||
             ResourcePermissionType.VARIABLE.hasPermission(action)) {
-          return new String[] { ActionsColumn.DELETE_ACTION };
+          return new String[] { ActionsColumn.REMOVE_ACTION };
         }
 
         return allActions();

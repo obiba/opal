@@ -63,7 +63,7 @@
         <ui:msg description="Save label">Save</ui:msg>
       </b:Button>
       <b:Button type="DANGER" ui:field="delete">
-        <ui:msg description="Delete label">Delete</ui:msg>
+        <ui:msg description="Remove label">Remove</ui:msg>
       </b:Button>
       <b:Button ui:field="cancel">
         <ui:msg description="Cancel label">Cancel</ui:msg>

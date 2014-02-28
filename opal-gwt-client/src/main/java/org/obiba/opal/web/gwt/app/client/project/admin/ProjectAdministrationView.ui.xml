@@ -103,11 +103,11 @@
         <b:Button type="WARNING" ui:field="archiveProject">Archive Project</b:Button>
       </b:Form-->
       <b:Paragraph>
-        <ui:msg description="Delete Project text">Deleting a project destroys all associated data and files. It can be a
+        <ui:msg description="Remove Project text">Removing a project destroys all associated data and files. It can be a
           long running task and there is no going back.
         </ui:msg>
       </b:Paragraph>
-      <b:Button type="DANGER" ui:field="deleteProject">Delete Project</b:Button>
+      <b:Button type="DANGER" ui:field="deleteProject">Remove Project</b:Button>
     </g:FlowPanel>
 
   </g:FlowPanel>
