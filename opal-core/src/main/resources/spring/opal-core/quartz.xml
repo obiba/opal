@@ -11,4 +11,9 @@
     <property name="applicationContextSchedulerContextKey" value="applicationContext"/>
   </bean>
 
+  <bean class="org.obiba.opal.core.service.QuartzTablesCreator">
+    <property name="dataSource" ref="configDataSource"/>
+    <property name="script" value="classpath:/META-INF/opal/install-scripts/quartz/tables_hsql.sql"/>
+  </bean>
+
 </beans>
