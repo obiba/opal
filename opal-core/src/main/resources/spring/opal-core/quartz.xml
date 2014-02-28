@@ -2,6 +2,7 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+    <property name="schedulerName" value="Opal Scheduler"/>
     <property name="transactionManager" ref="transactionManager"/>
     <property name="dataSource" ref="configDataSource"/>
     <property name="jobFactory">

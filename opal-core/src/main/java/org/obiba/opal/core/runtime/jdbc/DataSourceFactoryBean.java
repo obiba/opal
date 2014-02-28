@@ -122,4 +122,7 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
     this.connectionProperties = connectionProperties;
   }
 
+  protected String getUrl() {
+    return url;
+  }
 }

@@ -4,11 +4,15 @@ import javax.sql.DataSource;
 
 import org.obiba.opal.core.runtime.jdbc.DataSourceFactoryBean;
 import org.obiba.opal.core.service.security.CryptoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component("configDataSource")
 public class ConfigDataSourceFactoryBean extends DataSourceFactoryBean {
+
+  private static final Logger log = LoggerFactory.getLogger(ConfigDataSourceFactoryBean.class);
 
   public static final String DB_PATH = System.getProperty("OPAL_HOME") + "/data/hsql/opal_config";
 
@@ -28,6 +32,7 @@ public class ConfigDataSourceFactoryBean extends DataSourceFactoryBean {
 
   @Override
   public DataSource getObject() {
+    log.debug("Get DataSource {}", getUrl());
     if(password == null) {
       setPassword(cryptoService.decrypt(opalConfigurationService.getOpalConfiguration().getDatabasePassword()));
     }
