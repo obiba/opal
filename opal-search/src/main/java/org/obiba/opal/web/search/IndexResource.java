@@ -20,9 +20,13 @@ import org.obiba.opal.search.ValuesIndexManager;
 import org.obiba.opal.search.VariablesIndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.web.model.Opal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class IndexResource {
+
+  private static final Logger log = LoggerFactory.getLogger(IndexResource.class);
 
   @Autowired
   protected ValuesIndexManager valuesIndexManager;
@@ -67,6 +71,7 @@ public abstract class IndexResource {
     IndexSynchronization currentTask = synchroManager.getCurrentTask();
     if(currentTask != null && currentTask.getValueTable().getName().equals(table) &&
         currentTask.getValueTable().getDatasource().getName().equals(datasource)) {
+      log.trace("Indexation is in progress...");
       return synchroManager.getCurrentTask().getProgress();
     }
 
@@ -82,6 +87,7 @@ public abstract class IndexResource {
   }
 
   protected Opal.TableIndexationStatus getTableIndexationStatus(String datasource, String table) {
+    log.trace("Checking indexation status for {}.{}", datasource, table);
     boolean inProgress = isInProgress(datasource, table);
 
     // Set Indexation status

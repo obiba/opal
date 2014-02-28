@@ -10,6 +10,8 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.index.presenter;
 
+import java.util.List;
+
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 
 import com.gwtplatform.mvp.client.UiHandlers;
@@ -23,11 +25,9 @@ public interface IndexAdministrationUiHandlers extends UiHandlers {
 
   void configure();
 
-  void clear();
+  void delete(List<TableIndexStatusDto> statusDtos);
 
-  void clear(TableIndexStatusDto table);
+  void schedule(List<TableIndexStatusDto> statusDtos);
 
-  void schedule();
-
-  void indexNow(TableIndexStatusDto table);
+  void indexNow(List<TableIndexStatusDto> statusDtos);
 }

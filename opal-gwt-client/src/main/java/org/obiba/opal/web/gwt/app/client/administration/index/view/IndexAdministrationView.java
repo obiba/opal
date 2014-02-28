@@ -19,9 +19,6 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsIndexColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.IndexStatusImageCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
@@ -30,7 +27,6 @@ import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -65,7 +61,7 @@ import static org.obiba.opal.web.model.client.opal.ScheduleType.WEEKLY;
 public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrationUiHandlers>
     implements IndexAdministrationPresenter.Display {
 
-  private TranslationMessages translationMessages;
+  private final TranslationMessages translationMessages;
 
   interface Binder extends UiBinder<Widget, IndexAdministrationView> {}
 
@@ -79,9 +75,6 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
   @UiField
   Button refreshIndicesButton;
-
-  @UiField
-  DropdownButton actionsDropdown;
 
   @UiField
   OpalSimplePager indexTablePager;
@@ -104,13 +97,20 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
   @UiField
   Panel breadcrumbs;
 
+  @UiField
+  IconAnchor indexNow;
+
+  @UiField
+  IconAnchor deleteIndex;
+
+  @UiField
+  IconAnchor scheduleIndex;
+
   private final PlaceManager placeManager;
 
   private final ListDataProvider<TableIndexStatusDto> dataProvider = new ListDataProvider<TableIndexStatusDto>();
 
   private final CheckboxColumn<TableIndexStatusDto> checkboxColumn;
-
-  private final ActionsIndexColumn<TableIndexStatusDto> actionsColumn;
 
   private Status status;
 
@@ -120,24 +120,9 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     this.translationMessages = translationMessages;
     initWidget(uiBinder.createAndBindUi(this));
 
-    actionsDropdown.setText(translations.actionsLabel());
     indexTablePager.setDisplay(indexTable);
 
     checkboxColumn = new CheckboxColumn<TableIndexStatusDto>(new TableIndexStatusDtoDisplay());
-    actionsColumn = new ActionsIndexColumn<TableIndexStatusDto>(new ActionsProvider<TableIndexStatusDto>() {
-
-      private final String[] all = new String[] { CLEAR_ACTION, INDEX_ACTION };
-
-      @Override
-      public String[] allActions() {
-        return all;
-      }
-
-      @Override
-      public String[] getActions(TableIndexStatusDto value) {
-        return allActions();
-      }
-    });
 
     indexTable.addColumn(checkboxColumn, checkboxColumn.getTableListCheckColumnHeader());
     indexTable.addColumn(new DatasourceColumn(), translations.projectLabel());
@@ -146,22 +131,10 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     indexTable.addColumn(new IndexLastUpdateColumn(), translations.indexLastUpdateLabel());
     indexTable.addColumn(new ScheduleTypeColumn(), translations.scheduleLabel());
     indexTable.addColumn(new StatusColumn(), translations.statusLabel());
-    indexTable.addColumn(actionsColumn, translations.actionsLabel());
     indexTable.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
     indexTable.setColumnWidth(checkboxColumn, 1, Style.Unit.PX);
 
     dataProvider.addDataDisplay(indexTable);
-
-    actionsColumn.setActionHandler(new ActionHandler<TableIndexStatusDto>() {
-      @Override
-      public void doAction(TableIndexStatusDto object, String actionName) {
-        if(actionName.trim().equalsIgnoreCase(CLEAR_ACTION)) {
-          getUiHandlers().clear(object);
-        } else if(actionName.trim().equalsIgnoreCase(INDEX_ACTION)) {
-          getUiHandlers().indexNow(object);
-        }
-      }
-    });
   }
 
   @UiHandler("startStopButton")
@@ -180,14 +153,19 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     getUiHandlers().configure();
   }
 
-  @UiHandler("clearLink")
-  public void onClear(ClickEvent event) {
-    getUiHandlers().clear();
+  @UiHandler("deleteIndex")
+  public void onDelete(ClickEvent event) {
+    getUiHandlers().delete(checkboxColumn.getSelectedItems());
   }
 
-  @UiHandler("scheduleLink")
+  @UiHandler("scheduleIndex")
   public void onSchedule(ClickEvent event) {
-    getUiHandlers().schedule();
+    getUiHandlers().schedule(checkboxColumn.getSelectedItems());
+  }
+
+  @UiHandler("indexNow")
+  public void onIndexNow(ClickEvent event) {
+    getUiHandlers().indexNow(checkboxColumn.getSelectedItems());
   }
 
   @Override
@@ -234,7 +212,6 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
   private void enableActions(boolean enable) {
     refreshIndicesButton.setEnabled(enable);
-    actionsDropdown.setVisible(enable);
   }
 
   @Override

@@ -79,7 +79,8 @@
         </b:Heading>
 
         <g:FlowPanel addStyleNames="small-bottom-margin">
-          <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right small-top-margin small-indent"/>
+          <o:OpalSimplePager ui:field="pager" location="RIGHT"
+              addStyleNames="pull-right small-top-margin small-indent"/>
           <b:Controls addStyleNames="pull-right small-top-margin">
             <b:InputAddOn prependIcon="FILTER">
               <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
@@ -141,25 +142,33 @@
                 <g:customCell>
                   <g:Label ui:field="indexStatusText" addStyleNames="inline"/>
                 </g:customCell>
-                <g:customCell>
 
+                <g:customCell>
                   <b:ProgressBar ui:field="progress" addStyleNames="xsmall-indent progress no-bottom-margin"/>
                 </g:customCell>
-                <g:customCell>
 
-                  <g:Anchor ui:field="clearIndexLink" addStyleNames="inline xsmall-indent">Clear</g:Anchor>
-                </g:customCell>
                 <g:customCell>
+                  <b2:IconAnchor icon="TRASH" ui:field="clearIndexLink" addStyleNames="inline small-indent">
+                    <ui:msg description="Delete label">Delete</ui:msg>
+                  </b2:IconAnchor>
+                </g:customCell>
 
-                  <g:Anchor ui:field="indexNowLink" addStyleNames="inline xsmall-indent">Index now</g:Anchor>
-                </g:customCell>
                 <g:customCell>
+                  <b2:IconAnchor icon="PLAY" ui:field="indexNowLink" addStyleNames="inline small-indent">
+                    <ui:msg description="Index Now label">Index Now</ui:msg>
+                  </b2:IconAnchor>
+                </g:customCell>
 
-                  <g:Anchor ui:field="scheduleLink" addStyleNames="inline xsmall-indent">Schedule indexing
-                  </g:Anchor>
-                </g:customCell>
                 <g:customCell>
-                  <g:Anchor ui:field="cancelLink" addStyleNames="inline xsmall-indent">Cancel</g:Anchor>
+                  <b2:IconAnchor icon="TIME" ui:field="scheduleLink" addStyleNames="inline small-indent">
+                    <ui:msg description="Schedule label">Schedule</ui:msg>
+                  </b2:IconAnchor>
+                </g:customCell>
+
+                <g:customCell>
+                  <b2:IconAnchor icon="PAUSE" ui:field="cancelLink" addStyleNames="inline small-indent">
+                    <ui:msg description="Cancel label">Cancel</ui:msg>
+                  </b2:IconAnchor>
                 </g:customCell>
               </g:row>
             </g:Grid>

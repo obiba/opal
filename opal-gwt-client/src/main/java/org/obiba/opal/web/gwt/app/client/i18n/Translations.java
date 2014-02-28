@@ -1517,13 +1517,13 @@ public interface Translations extends Constants {
   @Constants.DefaultStringValue("Index now")
   String indexActionIndexNow();
 
-  @Description("Index Action Clear")
-  @Constants.DefaultStringValue("Clear")
-  String indexActionClear();
+  @Description("Index Action Delete")
+  @Constants.DefaultStringValue("Delete")
+  String indexActionDelete();
 
-  @Description("Index Action Schedule Indexing")
-  @Constants.DefaultStringValue("Schedule indexing")
-  String indexActionScheduleIndexing();
+  @Description("Index Action Schedule")
+  @Constants.DefaultStringValue("Schedule")
+  String indexActionSchedule();
 
   @Description("Filter Variable label")
   @Constants.DefaultStringValue("Filter variables...")

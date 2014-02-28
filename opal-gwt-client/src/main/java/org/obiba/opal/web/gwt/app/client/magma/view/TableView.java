@@ -117,16 +117,16 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   Alert indexStatusAlert;
 
   @UiField
-  Anchor clearIndexLink;
+  IconAnchor clearIndexLink;
 
   @UiField
-  Anchor indexNowLink;
+  IconAnchor indexNowLink;
 
   @UiField
-  Anchor scheduleLink;
+  IconAnchor scheduleLink;
 
   @UiField
-  Anchor cancelLink;
+  IconAnchor cancelLink;
 
   @UiField
   ProgressBar progress;
@@ -664,9 +664,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   }
 
   private void initializeAnchorTexts() {
-    clearIndexLink.setText(translations.indexActionClear());
+    clearIndexLink.setText(translations.indexActionDelete());
     indexNowLink.setText(translations.indexActionIndexNow());
-    scheduleLink.setText(translations.indexActionScheduleIndexing());
+    scheduleLink.setText(translations.indexActionSchedule());
   }
 
   private class VariableDtoDisplay implements CheckboxColumn.Display<VariableDto> {

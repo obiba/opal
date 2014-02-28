@@ -58,26 +58,29 @@
             <ui:msg description="Refresh indices label">Refresh</ui:msg>
           </b:Button>
         </b:ButtonGroup>
-        <b:DropdownButton ui:field="actionsDropdown">
-          <b:NavLink ui:field="scheduleLink">
-            <ui:msg description="Index Action Schedule Indexing">Schedule indexing</ui:msg>
-          </b:NavLink>
-          <b:NavLink ui:field="clearLink">
-            <ui:msg description="Index Action Clear">Clear</ui:msg>
-          </b:NavLink>
-        </b:DropdownButton>
       </g:FlowPanel>
 
       <o:OpalSimplePager ui:field="indexTablePager" location="RIGHT" addStyleNames="pull-right"/>
     </g:FlowPanel>
 
     <b:Alert ui:field="selectAllAlert" close="false" visible="false" addStyleNames="select">
+      <b2:IconAnchor icon="PLAY" ui:field="indexNow" addStyleNames="inline small-indent">
+        <ui:msg description="Index Now label">Index Now</ui:msg>
+      </b2:IconAnchor>
+
+      <b2:IconAnchor icon="TRASH" ui:field="deleteIndex" addStyleNames="inline small-indent">
+        <ui:msg description="Delete label">Delete</ui:msg>
+      </b2:IconAnchor>
+
+      <b2:IconAnchor icon="TIME" ui:field="scheduleIndex" addStyleNames="inline small-indent">
+        <ui:msg description="Schedule label">Schedule</ui:msg>
+      </b2:IconAnchor>
+
       <g:FlowPanel addStyleNames="pull-right">
         <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
         <b2:IconAnchor ui:field="selectAllAnchor" icon="CHECK" addStyleNames="inline small-indent"/>
-        <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" visible="false"
-            addStyleNames="inline small-indent">
-          <ui:msg description="Clear label">Clear</ui:msg>
+        <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" addStyleNames="inline small-indent">
+        <ui:msg description="Clear label">Clear</ui:msg>
         </b2:IconAnchor>
       </g:FlowPanel>
     </b:Alert>

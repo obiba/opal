@@ -193,15 +193,15 @@ public class IndexSynchronizationManager {
   }
 
   public boolean isAlreadyQueued(IndexManager indexManager, ValueTableIndex index) {
-    boolean alreadyQueued = false;
     for(IndexSynchronization s : indexSyncQueue) {
       if(s.getValueTableIndex().getIndexName().equals(index.getIndexName()) &&
           s.getIndexManager().getName().equals(indexManager.getName())) {
-        alreadyQueued = true;
-        break;
+        log.trace("Indexation is already queued...");
+        return true;
       }
     }
-    return alreadyQueued;
+    log.trace("Indexation is not queued...");
+    return false;
   }
 
   private class SyncConsumer implements Runnable {
