@@ -71,7 +71,7 @@ public class IndexAdministrationPresenter
 
     String INDEX_ACTION = "Index now";
 
-    String DELETE_ACTION = "Delete";
+    String DELETE_ACTION = "Delete Index";
 
     void setServiceStatus(Status status);
 

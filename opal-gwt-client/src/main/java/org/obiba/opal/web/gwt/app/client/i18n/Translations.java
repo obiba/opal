@@ -111,6 +111,7 @@ public interface Translations extends Constants {
   @DefaultStringMapValue({ "Log", "Log", //
       "Cancel", "Cancel", //
       "Delete", "Delete", //
+      "Delete Index", "Delete Index",//
       "Edit", "Edit", //
       "Copy", "Copy", //
       "Test", "Test", //

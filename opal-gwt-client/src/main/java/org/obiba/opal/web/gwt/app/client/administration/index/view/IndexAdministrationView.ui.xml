@@ -68,12 +68,12 @@
         <ui:msg description="Index Now label">Index Now</ui:msg>
       </b2:IconAnchor>
 
-      <b2:IconAnchor icon="TRASH" ui:field="deleteIndex" addStyleNames="inline small-indent">
-        <ui:msg description="Delete label">Delete</ui:msg>
-      </b2:IconAnchor>
-
       <b2:IconAnchor icon="TIME" ui:field="scheduleIndex" addStyleNames="inline small-indent">
         <ui:msg description="Schedule label">Schedule</ui:msg>
+      </b2:IconAnchor>
+
+      <b2:IconAnchor icon="TRASH" ui:field="deleteIndex" addStyleNames="inline small-indent">
+        <ui:msg description="Delete Index label">Delete Index</ui:msg>
       </b2:IconAnchor>
 
       <g:FlowPanel addStyleNames="pull-right">
