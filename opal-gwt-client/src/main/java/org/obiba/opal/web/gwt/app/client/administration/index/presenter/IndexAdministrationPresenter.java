@@ -244,8 +244,7 @@ public class IndexAdministrationPresenter
       ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
           .forResource(Resources.index(statusDto.getDatasource(), statusDto.getTable())) //
           .accept("application/json") //
-          .withCallback(Response.SC_OK, callback) //
-          .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback) //
+          .withCallback(callback, Response.SC_OK, Response.SC_SERVICE_UNAVAILABLE) //
           .delete().send();
       getView().unselectIndex(statusDto);
     }
