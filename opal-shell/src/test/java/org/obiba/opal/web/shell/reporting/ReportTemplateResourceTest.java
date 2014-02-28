@@ -35,7 +35,6 @@ import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.service.CommandSchedulerService;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
-import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.reporting.Dtos;
 
 import static org.easymock.EasyMock.createMock;
@@ -44,6 +43,7 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.fail;
 
 public class ReportTemplateResourceTest {
 
@@ -226,10 +226,14 @@ public class ReportTemplateResourceTest {
     reportTemplateResource.setName("template1");
     reportTemplateResource.setConfigService(opalConfigurationServiceMock);
 
-    Response response = reportTemplateResource.updateReportTemplate(Dtos.asDto(getReportTemplate("template2")));
-
-    assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
-    assertThat(((ClientErrorDto) response.getEntity()).getStatus()).isEqualTo("CouldNotUpdateTheReportTemplate");
+    try {
+      reportTemplateResource.updateReportTemplate(Dtos.asDto(getReportTemplate("template2")));
+      fail("Should throw IllegalArgumentException");
+    } catch(Exception e) {
+      assertThat(e) //
+          .isInstanceOf(IllegalArgumentException.class) //
+          .hasMessage("The report template name in the URI does not match the name given in the request body DTO.");
+    }
 
     verify(opalRuntimeMock, opalConfigurationServiceMock);
   }
