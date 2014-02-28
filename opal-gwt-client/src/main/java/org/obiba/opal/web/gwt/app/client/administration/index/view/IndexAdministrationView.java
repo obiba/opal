@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.index.view;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdministrationPresenter;
@@ -19,6 +20,9 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsIndexColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.IndexStatusImageCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
@@ -112,6 +116,8 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
   private final CheckboxColumn<TableIndexStatusDto> checkboxColumn;
 
+  private final ActionsIndexColumn<TableIndexStatusDto> actionsColumn;
+
   private Status status;
 
   @Inject
@@ -123,6 +129,20 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     indexTablePager.setDisplay(indexTable);
 
     checkboxColumn = new CheckboxColumn<TableIndexStatusDto>(new TableIndexStatusDtoDisplay());
+    actionsColumn = new ActionsIndexColumn<TableIndexStatusDto>(new ActionsProvider<TableIndexStatusDto>() {
+
+      private final String[] all = new String[] { DELETE_ACTION, INDEX_ACTION };
+
+      @Override
+      public String[] allActions() {
+        return all;
+      }
+
+      @Override
+      public String[] getActions(TableIndexStatusDto value) {
+        return allActions();
+      }
+    });
 
     indexTable.addColumn(checkboxColumn, checkboxColumn.getTableListCheckColumnHeader());
     indexTable.addColumn(new DatasourceColumn(), translations.projectLabel());
@@ -131,10 +151,22 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     indexTable.addColumn(new IndexLastUpdateColumn(), translations.indexLastUpdateLabel());
     indexTable.addColumn(new ScheduleTypeColumn(), translations.scheduleLabel());
     indexTable.addColumn(new StatusColumn(), translations.statusLabel());
+    indexTable.addColumn(actionsColumn, translations.actionsLabel());
     indexTable.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
     indexTable.setColumnWidth(checkboxColumn, 1, Style.Unit.PX);
 
     dataProvider.addDataDisplay(indexTable);
+
+    actionsColumn.setActionHandler(new ActionHandler<TableIndexStatusDto>() {
+      @Override
+      public void doAction(TableIndexStatusDto object, String actionName) {
+        if(actionName.trim().equalsIgnoreCase(DELETE_ACTION)) {
+          getUiHandlers().delete(Arrays.asList(object));
+        } else if(actionName.trim().equalsIgnoreCase(INDEX_ACTION)) {
+          getUiHandlers().indexNow(Arrays.asList(object));
+        }
+      }
+    });
   }
 
   @UiHandler("startStopButton")
@@ -295,7 +327,7 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
   private class TableColumn extends Column<TableIndexStatusDto, TableIndexStatusDto> {
 
-    public TableColumn() {
+    private TableColumn() {
       super(new PlaceRequestCell<TableIndexStatusDto>(placeManager) {
         @Override
         public PlaceRequest getPlaceRequest(TableIndexStatusDto value) {

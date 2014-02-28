@@ -69,6 +69,10 @@ public class IndexAdministrationPresenter
       Startable, Stoppable, Pending
     }
 
+    String INDEX_ACTION = "Index now";
+
+    String DELETE_ACTION = "Delete";
+
     void setServiceStatus(Status status);
 
     void unselectIndex(TableIndexStatusDto object);
