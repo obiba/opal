@@ -32,7 +32,7 @@
         </b:Button>
       </b:ButtonGroup>
       <b:ButtonGroup>
-        <b:Button icon="TRASH" title="Delete" ui:field="remove">
+        <b:Button icon="TRASH" title="Remove" ui:field="remove">
         </b:Button>
       </b:ButtonGroup>
       <b:ButtonGroup visible="false">

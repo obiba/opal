@@ -76,7 +76,7 @@ public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissi
 
       @Override
       public void doAction(Acl acl, String actionName) {
-        if(ActionsColumn.DELETE_ACTION.equals(actionName)) {
+        if(ActionsColumn.REMOVE_ACTION.equals(actionName)) {
           deletePermission(acl);
         }
       }

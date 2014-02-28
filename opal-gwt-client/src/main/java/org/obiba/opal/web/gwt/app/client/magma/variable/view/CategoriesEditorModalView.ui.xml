@@ -39,7 +39,7 @@
 
         <g:FlowPanel addStyleNames="pull-left">
           <b2:IconAnchor ui:field="deleteLink" icon="TRASH" addStyleNames="inline xsmall-indent">
-            <ui:msg description="Delete category label">Delete</ui:msg>
+            <ui:msg description="Remove category label">Remove</ui:msg>
           </b2:IconAnchor>
 
           <b2:IconAnchor ui:field="moveUpLink" icon="ARROW_UP" addStyleNames="inline xsmall-indent">

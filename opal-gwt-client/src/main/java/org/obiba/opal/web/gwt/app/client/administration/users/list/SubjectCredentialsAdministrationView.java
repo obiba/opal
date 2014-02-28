@@ -23,7 +23,6 @@ import org.obiba.opal.web.model.client.opal.SubjectCredentialsDto;
 
 import com.github.gwtbootstrap.client.ui.CellTable;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -40,8 +39,8 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 import static org.obiba.opal.web.gwt.app.client.administration.users.list.SubjectCredentialsAdministrationPresenter.Display;
-import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOVE_ACTION;
 
 public class SubjectCredentialsAdministrationView extends ViewWithUiHandlers<SubjectCredentialsAdministrationUiHandlers>
     implements Display {
@@ -195,15 +194,15 @@ public class SubjectCredentialsAdministrationView extends ViewWithUiHandlers<Sub
 
           @Override
           public String[] allActions() {
-            return new String[] { EDIT_ACTION, DELETE_ACTION, ENABLE_ACTION, DISABLE_ACTION };
+            return new String[] { EDIT_ACTION, REMOVE_ACTION, ENABLE_ACTION, DISABLE_ACTION };
           }
 
           @Override
           public String[] getActions(SubjectCredentialsDto value) {
             if(value.getEnabled()) {
-              return new String[] { EDIT_ACTION, DELETE_ACTION, DISABLE_ACTION };
+              return new String[] { EDIT_ACTION, REMOVE_ACTION, DISABLE_ACTION };
             }
-            return new String[] { EDIT_ACTION, DELETE_ACTION, ENABLE_ACTION };
+            return new String[] { EDIT_ACTION, REMOVE_ACTION, ENABLE_ACTION };
           }
         });
 
@@ -231,7 +230,7 @@ public class SubjectCredentialsAdministrationView extends ViewWithUiHandlers<Sub
 
       @Override
       public String[] allActions() {
-        return new String[] { DELETE_ACTION };
+        return new String[] { REMOVE_ACTION };
       }
 
       @Override

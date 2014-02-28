@@ -19,7 +19,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
@@ -33,6 +32,7 @@ public class BookmarkListView extends ViewWithUiHandlers<BookmarkListUiHandlers>
     implements BookmarkListPresenter.Display {
 
   private static final int SORTABLE_COLUMN_RESOURCE = 0;
+
   private static final int SORTABLE_COLUMN_CREATED = 2;
 
   private final PlaceManager placeManager;
@@ -80,13 +80,13 @@ public class BookmarkListView extends ViewWithUiHandlers<BookmarkListUiHandlers>
 
   @Override
   public void setMode(Mode mode) {
-    switch (mode) {
+    switch(mode) {
       case VIEW_ONLY:
-        if (createColumn != null) {
+        if(createColumn != null) {
           table.removeColumn(createColumn);
           createColumn = null;
         }
-        if (deleteActionColumn != null) {
+        if(deleteActionColumn != null) {
           table.removeColumn(deleteActionColumn);
           deleteActionColumn = null;
         }
@@ -117,10 +117,9 @@ public class BookmarkListView extends ViewWithUiHandlers<BookmarkListUiHandlers>
     table.addColumnSortHandler(typeSortHandler);
   }
 
-
   private static class BookmarkColumn extends Column<BookmarkDto, BookmarkDto> {
 
-    private BookmarkColumn(final PlaceManager placeManager) {
+    private BookmarkColumn(PlaceManager placeManager) {
       super(new PlaceRequestCell<BookmarkDto>(placeManager) {
         @Override
         public PlaceRequest getPlaceRequest(BookmarkDto bookmarkDto) {
@@ -166,7 +165,7 @@ public class BookmarkListView extends ViewWithUiHandlers<BookmarkListUiHandlers>
 
     private final Translations translations;
 
-    public TypeColumn(Translations translations) {
+    private TypeColumn(Translations translations) {
       this.translations = translations;
     }
 
@@ -192,13 +191,13 @@ public class BookmarkListView extends ViewWithUiHandlers<BookmarkListUiHandlers>
     }
   }
 
-  private final class DeleteActionColumn extends ActionsColumn<BookmarkDto> {
+  private static final class DeleteActionColumn extends ActionsColumn<BookmarkDto> {
 
-    public DeleteActionColumn() {
+    private DeleteActionColumn() {
       super(new ActionsProvider<BookmarkDto>() {
         @Override
         public String[] allActions() {
-          return new String[] { ActionsColumn.DELETE_ACTION };
+          return new String[] { ActionsColumn.REMOVE_ACTION };
         }
 
         @Override

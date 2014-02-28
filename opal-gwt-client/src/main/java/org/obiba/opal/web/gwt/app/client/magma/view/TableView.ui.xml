@@ -111,11 +111,11 @@
 
               <b2:IconAnchor ui:field="deleteAttribute" icon="ERASER"
                   addStyleNames="inline small-indent">
-                <ui:msg description="Delete attribute label">Delete attribute</ui:msg>
+                <ui:msg description="Remove attribute label">Remove attribute</ui:msg>
               </b2:IconAnchor>
 
               <b2:IconAnchor ui:field="deleteVariables" icon="TRASH" addStyleNames="inline small-indent">
-                <ui:msg description="Delete label">Delete</ui:msg>
+                <ui:msg description="Remove label">Remove</ui:msg>
               </b2:IconAnchor>
             </g:FlowPanel>
 
@@ -149,7 +149,7 @@
 
                 <g:customCell>
                   <b2:IconAnchor icon="TRASH" ui:field="clearIndexLink" addStyleNames="inline small-indent">
-                    <ui:msg description="Delete label">Delete</ui:msg>
+                    <ui:msg description="Remove label">Remove</ui:msg>
                   </b2:IconAnchor>
                 </g:customCell>
 

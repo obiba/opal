@@ -208,8 +208,8 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
       deleteConfirmation = new RemoveRunnable(tableNames);
 
-      fireEvent(ConfirmationRequiredEvent.createWithMessages(deleteConfirmation, translationMessages.deleteTables(),
-          translationMessages.confirmDeleteTables(tableNames.length())));
+      fireEvent(ConfirmationRequiredEvent.createWithMessages(deleteConfirmation, translationMessages.removeTables(),
+          translationMessages.confirmRemoveTables(tableNames.length())));
     }
   }
 

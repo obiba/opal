@@ -22,7 +22,6 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
-import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.client.opal.Acl;
 import org.obiba.opal.web.model.client.opal.Subject;
 
@@ -32,7 +31,6 @@ import com.github.gwtbootstrap.client.ui.NavHeader;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.NavList;
 import com.github.gwtbootstrap.client.ui.Paragraph;
-import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -243,7 +241,7 @@ public class ProjectPermissionsView extends ViewWithUiHandlers<ProjectPermission
 
       @Override
       public String[] allActions() {
-        return new String[] { ActionsColumn.DELETE_ACTION };
+        return new String[] { ActionsColumn.REMOVE_ACTION };
       }
 
       @Override

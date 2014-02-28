@@ -47,8 +47,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
-import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOVE_ACTION;
 
 /**
  *
@@ -173,14 +173,14 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
   public void addEditableColumns() {
     // Add checkcolumn
     checkColumn = new CheckboxColumn<JsArray<AttributeDto>>(new CheckAttributesDisplay());
-    table.insertColumn(0, checkColumn, checkColumn.getTableListCheckColumnHeader());
+    table.insertColumn(0, checkColumn, checkColumn.getCheckColumnHeader());
     table.setColumnWidth(checkColumn, 1, Style.Unit.PX);
 
     actionsColumn = new ActionsColumn<JsArray<AttributeDto>>(new ActionsProvider<JsArray<AttributeDto>>() {
 
       @Override
       public String[] allActions() {
-        return new String[] { EDIT_ACTION, DELETE_ACTION };
+        return new String[] { EDIT_ACTION, REMOVE_ACTION };
       }
 
       @Override

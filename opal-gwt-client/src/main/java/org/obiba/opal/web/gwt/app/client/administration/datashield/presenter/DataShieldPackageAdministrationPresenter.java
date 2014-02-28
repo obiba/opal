@@ -203,7 +203,7 @@ public class DataShieldPackageAdministrationPresenter
         public void authorized() {
           removePackageConfirmation = new RemovePackageRunnable(dto);
           getEventBus().fireEvent(ConfirmationRequiredEvent
-              .createWithMessages(removePackageConfirmation, translationMessages.deleteDataShieldPackage(),
+              .createWithMessages(removePackageConfirmation, translationMessages.removeDataShieldPackage(),
                   translationMessages.confirmDeleteDataShieldPackage()));
         }
       });

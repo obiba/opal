@@ -110,8 +110,7 @@ public interface Translations extends Constants {
   @Description("Action map")
   @DefaultStringMapValue({ "Log", "Log", //
       "Cancel", "Cancel", //
-      "Delete", "Delete", //
-      "Delete Index", "Delete Index",//
+      "Remove Index", "Remove Index",//
       "Edit", "Edit", //
       "Copy", "Copy", //
       "Test", "Test", //
@@ -306,21 +305,21 @@ public interface Translations extends Constants {
   @DefaultStringMapValue({ //
       "VariableNameNotUnique", "The specified variable name already exists.", //
       "jobCancelled", "Job cancelled.", //
-      "jobDeleted", "Job deleted.", //
-      "completedJobsDeleted", "All completed jobs deleted.", //
+      "jobDeleted", "Job removed.", //
+      "completedJobsDeleted", "All completed jobs removed.", //
       "SetCommandStatus_NotFound", "Job could not be cancelled (not found).", //
       "SetCommandStatus_BadRequest_IllegalStatus", "Job status cannot be set to the specified value.", //
       "SetCommandStatus_BadRequest_NotCancellable", "Job has completed and has already been cancelled.", //
-      "DeleteCommand_NotFound", "Job could not be deleted (not found).", //
-      "DeleteCommand_BadRequest_NotDeletable", "Job is currently running and therefore cannot be deleted at this time.",
+      "DeleteCommand_NotFound", "Job could not be removed (not found).", //
+      "DeleteCommand_BadRequest_NotDeletable", "Job is currently running and therefore cannot be removed at this time.",
       //
       "cannotCreateFolderPathAlreadyExist",
       "Could not create the folder, a folder or a file exist with that name at the specified path.", //
       "cannotCreateFolderParentIsReadOnly", "Could create the following folder because its parent folder is read-only.",
       //
       "cannotCreateFolderUnexpectedError", "There was an unexpected error while creating the folder.", //
-      "cannotDeleteNotEmptyFolder", "This folder contains one or many file(s) and as a result cannot be deleted.", //
-      "cannotDeleteReadOnlyFile", "Could delete the  file or folder because it is read-only.", //
+      "cannotDeleteNotEmptyFolder", "This folder contains one or many file(s) and as a result cannot be removed.", //
+      "cannotDeleteReadOnlyFile", "Could not remove the  file or folder because it is read-only.", //
       "couldNotDeleteFileError", "There was an error while deleting the file or folder.", //
       "datasourceMustBeSelected", "You must select a datasource.", //
       "fileReadError", "The file could not be read.", //
@@ -490,16 +489,16 @@ public interface Translations extends Constants {
       "CopyVariableNameColon", "Variable name '{0}' cannot contain ':'.",//
       "CopyVariableNameAlreadyExists", "Duplicate variable name: {0}.",//
       "CopyVariableIncompatibleEntityType", "Incompatible entity types: {0} / {1}",//
-      "DeleteVariableSelectAtLeastOne", "Select at least one variable to delete",//
+      "DeleteVariableSelectAtLeastOne", "Select at least one variable to remove",//
       "SearchServiceUnavailable", "Search operation failed. Please make sure the service is started.",//
       "UserStatusChangedOk", "User {0} has been successfully {1}.",//
       "UserUpdatedOk", "User {0} has been successfully updated.",//
       "UserCreatedOk", "User {0} has been successfully added.",//
-      "UserDeletedOk", "User {0} has been successfully deleted.", //
+      "UserDeletedOk", "User {0} has been successfully removed.", //
       "UserAlreadyExists", "User name already exists.", //
       "PasswordLengthMin", "Password must contain at least {0} characters.",//
       "PasswordsMustMatch", "Passwords do not match.",//
-      "GroupDeletedOk", "Group {0} has been successfully deleted.", //
+      "GroupDeletedOk", "Group {0} has been successfully removed.", //
       "GroupAlreadyExists", "Group already exists.", //
       "ProjectNameRequired", "Project name is required.", //
       "ProjectNameMustBeUnique", "A project already exists with this name.",//
@@ -514,7 +513,7 @@ public interface Translations extends Constants {
       "PostInstallNotCompleted", "Post-install configuration not completed.",//
       "TermNameMustBeUnique", "Term name must be unique",//
       "VocabularyNameMustBeUnique", "Vocabulary name must be unique",//
-      "DeleteTableSelectAtLeastOne", "Select at least one table to delete",//
+      "DeleteTableSelectAtLeastOne", "Select at least one table to remove",//
       "XMLOrExcelFileRequired", "An Excel or a XML file is required.",//
       "CreateViewFailed", "Failed to create view. Make sure the view file is valid.",//
       "SPSSOrExcelFileRequired", "An Excel or a SPSS file is required.",//
@@ -604,13 +603,13 @@ public interface Translations extends Constants {
   @DefaultStringValue("File Selector")
   String fileSelectorTitle();
 
-  @Description("Delete attribute label")
-  @DefaultStringValue("Delete Attribute")
-  String deleteAttribute();
+  @Description("Remove attribute label")
+  @DefaultStringValue("Remove Attribute")
+  String removeAttribute();
 
-  @Description("Delete category label")
-  @DefaultStringValue("Delete Category")
-  String deleteCategory();
+  @Description("Remove category label")
+  @DefaultStringValue("Remove Category")
+  String removeCategory();
 
   @Description("A name is required when creating a new folder")
   @DefaultStringValue("You must specify a folder name")
@@ -1520,7 +1519,7 @@ public interface Translations extends Constants {
   String indexActionIndexNow();
 
   @Description("Index Action Delete")
-  @Constants.DefaultStringValue("Delete")
+  @Constants.DefaultStringValue("Remove")
   String indexActionDelete();
 
   @Description("Index Action Schedule")
@@ -1683,13 +1682,13 @@ public interface Translations extends Constants {
   @DefaultStringValue("Add Permission")
   String addResourcePermissionsModalTile();
 
-  @Description("Delete All Subject Permissions Modal title")
-  @DefaultStringValue("Delete Permissions")
-  String deleteAllSubjectPermissionsModalTile();
+  @Description("Remove All Subject Permissions Modal title")
+  @DefaultStringValue("Remove Permissions")
+  String removeAllSubjectPermissionsModalTile();
 
-  @Description("Delete All Subject Permissions message label")
-  @DefaultStringValue("All permissions of {0} '{1}' will be permanently deleted, are you sure you want to continue?")
-  String deleteAllSubjectPermissionsModalMessage();
+  @Description("Remove All Subject Permissions message label")
+  @DefaultStringValue("All permissions of {0} '{1}' will be permanently removed, are you sure you want to continue?")
+  String removeAllSubjectPermissionsModalMessage();
 
   @Description("Vcs Commit History Empty")
   @DefaultStringValue("No comment history available")

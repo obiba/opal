@@ -28,13 +28,9 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Error at line {0}, column {1}: {2}.")
   String errorAt(int lineNumber, int columnNumber, String message);
 
-  @Description("Confirm delete category label")
+  @Description("Confirm remove category label")
   @DefaultMessage("Please confirm that you want to remove this category:<br />{0}")
   String confirmDeleteCategory(String name);
-
-  @Description("Confirm delete attribute label")
-  @DefaultMessage("Please confirm that you want to remove this attribute:<br />{0}")
-  String confirmDeleteAttribute(String name);
 
   @Description("Unknown Response")
   @DefaultMessage("[{0}] {1}")
@@ -43,14 +39,6 @@ public interface TranslationMessages extends Messages {
   @Description("Edit User label")
   @DefaultMessage("Edit user {0}")
   String editUserLabel(String name);
-
-  @Description("Delete Variable label")
-  @DefaultMessage("Delete Variable")
-  String deleteVariableTitle();
-
-  @Description("Delete Table label")
-  @DefaultMessage("Delete Table")
-  String deleteTable();
 
   @Description("Clear Jobs List label")
   @DefaultMessage("Clear Jobs List")
@@ -64,13 +52,13 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Replace File")
   String replaceExistingFile();
 
-  @Description("Delete File label")
-  @DefaultMessage("Delete File")
-  String deleteFile();
+  @Description("Remove File label")
+  @DefaultMessage("Remove File")
+  String removeFile();
 
-  @Description("Delete Key Pair label")
-  @DefaultMessage("Delete Key Pair")
-  String deleteKeyPair();
+  @Description("Remove Key Pair label")
+  @DefaultMessage("Remove Key Pair")
+  String removeKeyPair();
 
   @Description("Remove Project label")
   @DefaultMessage("Remove Project")
@@ -120,17 +108,17 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Remove Variable")
   String removeVariable();
 
-  @Description("Delete Aggregating Method label")
-  @DefaultMessage("Delete Aggregating Method")
-  String deleteDataShieldAggregateMethod();
+  @Description("Remove Aggregating Method label")
+  @DefaultMessage("Remove Aggregating Method")
+  String removeDataShieldAggregateMethod();
 
-  @Description("Delete Assigning Method label")
-  @DefaultMessage("Delete Assigning Method")
-  String deleteDataShieldAssignMethod();
+  @Description("Remove Assigning Method label")
+  @DefaultMessage("Remove Assigning Method")
+  String removeDataShieldAssignMethod();
 
-  @Description("Delete Package label")
-  @DefaultMessage("Delete Package")
-  String deleteDataShieldPackage();
+  @Description("Remove Package label")
+  @DefaultMessage("Remove Package")
+  String removeDataShieldPackage();
 
   @Description("Publish Package Methods label")
   @DefaultMessage("Publish Package Methods")
@@ -144,13 +132,13 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Remove Taxonomy")
   String removeTaxonomy();
 
-  @Description("Delete Variables label")
-  @DefaultMessage("Delete Variables")
-  String deleteVariables();
+  @Description("Remove Variables label")
+  @DefaultMessage("Remove Variables")
+  String removeVariables();
 
-  @Description("Delete Tables label")
-  @DefaultMessage("Delete Tables")
-  String deleteTables();
+  @Description("Remove Tables label")
+  @DefaultMessage("Remove Tables")
+  String removeTables();
 
   @Description("Confirm remove group label")
   @DefaultMessage("Please confirm that you want to remove the group {0}.")
@@ -218,8 +206,8 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Total: {0}")
   String cellTableTotalCount(int count);
 
-  @Description("Delete the currently displayed variable message")
-  @DefaultMessage("Delete the currently displayed variable?")
+  @Description("Remove the currently displayed variable message")
+  @DefaultMessage("Remove the currently displayed variable?")
   String confirmVariableDelete();
 
   @Description("Removing tables from the view will have an impact on which Variables can be defined message.")
@@ -347,15 +335,15 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Please confirm that you want to remove the taxonomy {0}.")
   String confirmRemoveTaxonomy(String name);
 
-  @Description("Please confirm that you want to delete {0} variables message")
-  @DefaultMessage("Please confirm that you want to delete {0} variables.")
-  @AlternateMessage({ "one", "Please confirm that you want to delete {0} variable." })
-  String confirmDeleteVariables(@PluralCount int nb);
+  @Description("Please confirm that you want to remove {0} variables message")
+  @DefaultMessage("Please confirm that you want to remove {0} variables.")
+  @AlternateMessage({ "one", "Please confirm that you want to remove {0} variable." })
+  String confirmRemoveVariables(@PluralCount int nb);
 
-  @Description("Please confirm that you want to delete {0} tables message")
-  @DefaultMessage("Please confirm that you want to delete {0} tables.")
-  @AlternateMessage({ "one", "Please confirm that you want to delete {0} table." })
-  String confirmDeleteTables(@PluralCount int nb);
+  @Description("Please confirm that you want to remove {0} tables message")
+  @DefaultMessage("Please confirm that you want to remove {0} tables.")
+  @AlternateMessage({ "one", "Please confirm that you want to remove {0} table." })
+  String confirmRemoveTables(@PluralCount int nb);
 
   @Description("N Categories label")
   @DefaultMessage("{0} Categories")
@@ -379,7 +367,7 @@ public interface TranslationMessages extends Messages {
 
   @Description("N Variables label")
   @DefaultMessage("{0} Variables")
-  @AlternateMessage({ "one", "Variable" })
+  @AlternateMessage({ "one", "1 Variable" })
   String nVariablesLabel(@PluralCount int nb);
 
   @Description("Errors remaining message")
@@ -401,4 +389,8 @@ public interface TranslationMessages extends Messages {
   @AlternateMessage({ "one", "1 table is selected for being copied." })
   String copyNTables(@PluralCount int nb);
 
+  @Description("N Bookmarks label")
+  @DefaultMessage("{0} Bookmarks")
+  @AlternateMessage({ "one", "1 Bookmark" })
+  String nBookmarksLabel(@PluralCount int nb);
 }

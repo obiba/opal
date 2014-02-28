@@ -4,7 +4,7 @@ import com.google.gwt.user.cellview.client.Column;
 
 public class ActionsColumn<T> extends Column<T, T> implements HasActionHandler<T> {
 
-  public static final String DELETE_ACTION = "Delete";
+  public static final String REMOVE_ACTION = "Remove";
 
   public static final String EDIT_ACTION = "Edit";
 

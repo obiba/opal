@@ -474,8 +474,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       deleteVariablesConfirmation = new RemoveVariablesRunnable(variableNames);
 
       fireEvent(ConfirmationRequiredEvent
-          .createWithMessages(deleteVariablesConfirmation, translationMessages.deleteVariables(),
-              translationMessages.confirmDeleteVariables(variableNames.length())));
+          .createWithMessages(deleteVariablesConfirmation, translationMessages.removeVariables(),
+              translationMessages.confirmRemoveVariables(variableNames.length())));
     }
   }
 

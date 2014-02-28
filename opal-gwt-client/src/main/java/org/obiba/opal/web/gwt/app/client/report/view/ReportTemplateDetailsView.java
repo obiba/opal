@@ -56,7 +56,6 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
-import static org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter.DOWNLOAD_ACTION;
 
 public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplateDetailsUiHandlers>
@@ -157,7 +156,7 @@ public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplate
       }
     }, translations.lastModifiedLabel());
 
-    actionsColumn = new ActionsColumn<ReportDto>(DOWNLOAD_ACTION, DELETE_ACTION);
+    actionsColumn = new ActionsColumn<ReportDto>(DOWNLOAD_ACTION, ActionsColumn.REMOVE_ACTION);
     producedReportsTable.addColumn((ActionsColumn) actionsColumn, translations.actionsLabel());
     producedReportsTable.setEmptyTableWidget(noReports);
     dataProvider.addDataDisplay(producedReportsTable);

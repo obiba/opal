@@ -23,7 +23,6 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.KeyDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
@@ -65,7 +64,7 @@ public class EncryptionKeysPresenter extends PresenterWidget<EncryptionKeysPrese
       public void doAction(KeyDto keyPair, String actionName) {
         if(Display.DOWNLOAD_CERTIFICATE_ACTION.equals(actionName)) {
           downloadCertificate(keyPair);
-        } else if(ActionsColumn.DELETE_ACTION.equals(actionName)) {
+        } else if(ActionsColumn.REMOVE_ACTION.equals(actionName)) {
           deleteKey(keyPair);
         }
       }

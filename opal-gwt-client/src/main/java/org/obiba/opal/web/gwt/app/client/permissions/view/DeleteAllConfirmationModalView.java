@@ -45,12 +45,12 @@ public class DeleteAllConfirmationModalView extends ModalPopupViewWithUiHandlers
     super(eventBus);
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
-    dialog.setTitle(translations.deleteAllSubjectPermissionsModalTile());
+    dialog.setTitle(translations.removeAllSubjectPermissionsModalTile());
   }
 
   @Override
   public void setData(Subject subject) {
-    message.setText(TranslationsUtils.replaceArguments(translations.deleteAllSubjectPermissionsModalMessage(),
+    message.setText(TranslationsUtils.replaceArguments(translations.removeAllSubjectPermissionsModalMessage(),
         translations.shortSubjectTypeMap().get(subject.getType().getName()).toLowerCase(), subject.getPrincipal()));
   }
 

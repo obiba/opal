@@ -27,6 +27,7 @@ import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateDeletedEvent
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -57,8 +58,6 @@ import com.gwtplatform.mvp.client.View;
 
 public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTemplateDetailsPresenter.Display>
     implements ReportTemplateDetailsUiHandlers {
-
-  public static final String DELETE_ACTION = "Delete";
 
   public static final String DOWNLOAD_ACTION = "Download";
 
@@ -254,7 +253,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
           fireEvent(new FileDownloadRequestEvent(dto.getLink()));
         }
       });
-    } else if(actionName.equals(DELETE_ACTION)) {
+    } else if(actionName.equals(ActionsColumn.REMOVE_ACTION)) {
       authorizeDeleteReport(dto, new Authorizer(getEventBus()) {
 
         @Override
@@ -281,7 +280,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
             }
           };
           fireEvent(ConfirmationRequiredEvent
-              .createWithMessages(actionRequiringConfirmation, translationMessages.deleteFile(),
+              .createWithMessages(actionRequiringConfirmation, translationMessages.removeFile(),
                   translationMessages.confirmDeleteFile()));
         }
       });

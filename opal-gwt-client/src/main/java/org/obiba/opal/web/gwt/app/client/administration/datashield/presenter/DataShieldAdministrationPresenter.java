@@ -35,8 +35,8 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
-import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOVE_ACTION;
 
 public class DataShieldAdministrationPresenter extends PresenterWidget<DataShieldAdministrationPresenter.Display> {
 
@@ -183,7 +183,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
         }
       });
 
-    } else if(actionName.equals(DELETE_ACTION)) {
+    } else if(actionName.equals(REMOVE_ACTION)) {
       authorizeDeleteMethod(dto, new Authorizer(getEventBus()) {
         @Override
         public void authorized() {
@@ -195,11 +195,11 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
           };
           if(DataShieldConfigPresenter.DataShieldEnvironment.ASSIGN.equals(env)) {
             getEventBus().fireEvent(ConfirmationRequiredEvent
-                .createWithMessages(removeMethodConfirmation, translationMessages.deleteDataShieldAssignMethod(),
+                .createWithMessages(removeMethodConfirmation, translationMessages.removeDataShieldAssignMethod(),
                     translationMessages.confirmDeleteDataShieldAssignMethod()));
           } else {
             getEventBus().fireEvent(ConfirmationRequiredEvent
-                .createWithMessages(removeMethodConfirmation, translationMessages.deleteDataShieldAggregateMethod(),
+                .createWithMessages(removeMethodConfirmation, translationMessages.removeDataShieldAggregateMethod(),
                     translationMessages.confirmDeleteDataShieldAggregateMethod()));
           }
         }

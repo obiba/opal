@@ -245,7 +245,7 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
 
         @Override
         public String[] allActions() {
-          return new String[] { EDIT_ACTION, DELETE_ACTION, GENERATE_IDS_ACTION, DOWNLOAD_IDS_ACTION };
+          return new String[] { EDIT_ACTION, REMOVE_ACTION, GENERATE_IDS_ACTION, DOWNLOAD_IDS_ACTION };
         }
 
         @Override
@@ -257,7 +257,7 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
         @Override
         public void doAction(VariableDto object, String actionName) {
 
-          if(actionName.equalsIgnoreCase(DELETE_ACTION)) {
+          if(actionName.equalsIgnoreCase(REMOVE_ACTION)) {
             getUiHandlers().onDeleteIdentifiersMapping(object);
           } else if(actionName.equalsIgnoreCase(EDIT_ACTION)) {
             getUiHandlers().onEditIdentifiersMapping(object);

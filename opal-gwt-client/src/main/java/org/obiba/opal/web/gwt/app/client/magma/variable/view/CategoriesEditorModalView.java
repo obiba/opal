@@ -246,7 +246,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
   private void addEditableColumns(Iterable<LocaleDto> locales) {
     checkActionCol = new CheckboxColumn<CategoryDto>(new CategoryDtoDisplay());
-    table.addColumn(checkActionCol, checkActionCol.getTableListCheckColumnHeader());
+    table.addColumn(checkActionCol, checkActionCol.getCheckColumnHeader());
     table.setColumnWidth(checkActionCol, 1, Style.Unit.PX);
 
     Column<CategoryDto, String> nameCol = new EditableTabableColumn<CategoryDto>() {

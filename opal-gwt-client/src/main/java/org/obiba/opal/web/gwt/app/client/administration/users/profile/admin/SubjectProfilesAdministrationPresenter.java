@@ -90,7 +90,7 @@ public class SubjectProfilesAdministrationPresenter extends
     getView().getActions().setActionHandler(new ActionHandler<SubjectProfileDto>() {
       @Override
       public void doAction(SubjectProfileDto object, String actionName) {
-        if(ActionsColumn.DELETE_ACTION.equals(actionName)) {
+        if(ActionsColumn.REMOVE_ACTION.equals(actionName)) {
           removeConfirmation = new RemoveRunnable(object);
           String title = translations.removeUserProfile();
           String message = translationMessages.confirmRemoveUserProfile(object.getPrincipal());

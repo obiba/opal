@@ -186,7 +186,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     return selectionModel.isSelected(object);
   }
 
-  public Header<Boolean> getTableListCheckColumnHeader() {
+  public Header<Boolean> getCheckColumnHeader() {
     Header<Boolean> checkHeader = new Header<Boolean>(new CheckboxCell(true, true) {
       @Override
       public void render(Context context, Boolean value, SafeHtmlBuilder sb) {

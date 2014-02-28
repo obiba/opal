@@ -37,8 +37,8 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewImpl;
 
-import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOVE_ACTION;
 
 /**
  *
@@ -147,7 +147,7 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
     }, translations.versionLabel());
 
     actionsColumn = new ActionsColumn<DataShieldMethodDto>(
-        new ConstantActionsProvider<DataShieldMethodDto>(EDIT_ACTION, DELETE_ACTION));
+        new ConstantActionsProvider<DataShieldMethodDto>(EDIT_ACTION, REMOVE_ACTION));
     methodsTable.addColumn(actionsColumn, translations.actionsLabel());
   }
 
