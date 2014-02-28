@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.index.view;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdministrationPresenter;
@@ -30,7 +31,6 @@ import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -65,7 +65,7 @@ import static org.obiba.opal.web.model.client.opal.ScheduleType.WEEKLY;
 public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrationUiHandlers>
     implements IndexAdministrationPresenter.Display {
 
-  private TranslationMessages translationMessages;
+  private final TranslationMessages translationMessages;
 
   interface Binder extends UiBinder<Widget, IndexAdministrationView> {}
 
@@ -79,9 +79,6 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
   @UiField
   Button refreshIndicesButton;
-
-  @UiField
-  DropdownButton actionsDropdown;
 
   @UiField
   OpalSimplePager indexTablePager;
@@ -104,6 +101,15 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
   @UiField
   Panel breadcrumbs;
 
+  @UiField
+  IconAnchor indexNow;
+
+  @UiField
+  IconAnchor deleteIndex;
+
+  @UiField
+  IconAnchor scheduleIndex;
+
   private final PlaceManager placeManager;
 
   private final ListDataProvider<TableIndexStatusDto> dataProvider = new ListDataProvider<TableIndexStatusDto>();
@@ -120,13 +126,12 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     this.translationMessages = translationMessages;
     initWidget(uiBinder.createAndBindUi(this));
 
-    actionsDropdown.setText(translations.actionsLabel());
     indexTablePager.setDisplay(indexTable);
 
     checkboxColumn = new CheckboxColumn<TableIndexStatusDto>(new TableIndexStatusDtoDisplay());
     actionsColumn = new ActionsIndexColumn<TableIndexStatusDto>(new ActionsProvider<TableIndexStatusDto>() {
 
-      private final String[] all = new String[] { CLEAR_ACTION, INDEX_ACTION };
+      private final String[] all = new String[] { DELETE_ACTION, INDEX_ACTION };
 
       @Override
       public String[] allActions() {
@@ -155,10 +160,10 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     actionsColumn.setActionHandler(new ActionHandler<TableIndexStatusDto>() {
       @Override
       public void doAction(TableIndexStatusDto object, String actionName) {
-        if(actionName.trim().equalsIgnoreCase(CLEAR_ACTION)) {
-          getUiHandlers().clear(object);
+        if(actionName.trim().equalsIgnoreCase(DELETE_ACTION)) {
+          getUiHandlers().delete(Arrays.asList(object));
         } else if(actionName.trim().equalsIgnoreCase(INDEX_ACTION)) {
-          getUiHandlers().indexNow(object);
+          getUiHandlers().indexNow(Arrays.asList(object));
         }
       }
     });
@@ -180,14 +185,19 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     getUiHandlers().configure();
   }
 
-  @UiHandler("clearLink")
-  public void onClear(ClickEvent event) {
-    getUiHandlers().clear();
+  @UiHandler("deleteIndex")
+  public void onDelete(ClickEvent event) {
+    getUiHandlers().delete(checkboxColumn.getSelectedItems());
   }
 
-  @UiHandler("scheduleLink")
+  @UiHandler("scheduleIndex")
   public void onSchedule(ClickEvent event) {
-    getUiHandlers().schedule();
+    getUiHandlers().schedule(checkboxColumn.getSelectedItems());
+  }
+
+  @UiHandler("indexNow")
+  public void onIndexNow(ClickEvent event) {
+    getUiHandlers().indexNow(checkboxColumn.getSelectedItems());
   }
 
   @Override
@@ -234,7 +244,6 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
   private void enableActions(boolean enable) {
     refreshIndicesButton.setEnabled(enable);
-    actionsDropdown.setVisible(enable);
   }
 
   @Override
@@ -318,7 +327,7 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
   private class TableColumn extends Column<TableIndexStatusDto, TableIndexStatusDto> {
 
-    public TableColumn() {
+    private TableColumn() {
       super(new PlaceRequestCell<TableIndexStatusDto>(placeManager) {
         @Override
         public PlaceRequest getPlaceRequest(TableIndexStatusDto value) {

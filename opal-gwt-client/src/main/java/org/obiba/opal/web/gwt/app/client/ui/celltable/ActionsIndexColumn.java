@@ -13,12 +13,6 @@ import com.google.gwt.user.cellview.client.Column;
 
 public class ActionsIndexColumn<T> extends Column<T, T> implements HasActionHandler<T> {
 
-  public static final String CANCEL_ACTION = "Cancel";
-
-  public static final String INDEX_ACTION = "Index now";
-
-  public static final String CLEAR_ACTION = "Clear";
-
   public ActionsIndexColumn(String... actions) {
     this(new ConstantActionsProvider<T>(actions));
   }

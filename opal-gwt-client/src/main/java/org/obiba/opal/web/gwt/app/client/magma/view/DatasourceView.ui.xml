@@ -34,7 +34,8 @@
     <b:TabPanel tabPosition="above" ui:field="tabPanel">
       <b:Tab heading="Dictionary" active="true">
         <g:FlowPanel addStyleNames="small-bottom-margin">
-          <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right small-top-margin small-indent"/>
+          <o:OpalSimplePager ui:field="pager" location="RIGHT"
+              addStyleNames="pull-right small-top-margin small-indent"/>
           <b:DropdownButton type="INFO" icon="PLUS" ui:field="addBtn"
               addStyleNames="small-top-margin">
             <b:NavLink icon="TABLE" ui:field="addTable">
@@ -44,7 +45,7 @@
               <ui:msg description="Add Update Tables label">Add/update tables from dictionary...</ui:msg>
             </b:NavLink>
             <b:NavLink icon="TH_LARGE" ui:field="addView">
-            <ui:msg description="Add view label">Add view...</ui:msg>
+              <ui:msg description="Add view label">Add view...</ui:msg>
             </b:NavLink>
           </b:DropdownButton>
         </g:FlowPanel>
@@ -71,8 +72,7 @@
           <g:FlowPanel addStyleNames="pull-right">
             <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
             <b2:IconAnchor ui:field="selectAllAnchor" icon="CHECK" addStyleNames="inline small-indent"/>
-            <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE"
-                addStyleNames="inline small-indent">
+            <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" addStyleNames="inline small-indent">
               <ui:msg description="Clear label">Clear</ui:msg>
             </b2:IconAnchor>
           </g:FlowPanel>

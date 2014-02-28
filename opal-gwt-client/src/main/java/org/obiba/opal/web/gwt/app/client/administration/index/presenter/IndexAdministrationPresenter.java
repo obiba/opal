@@ -9,7 +9,6 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.index.presenter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.event.TableIndicesRefreshEvent;
@@ -72,7 +71,7 @@ public class IndexAdministrationPresenter
 
     String INDEX_ACTION = "Index now";
 
-    String CLEAR_ACTION = "Clear";
+    String DELETE_ACTION = "Delete Index";
 
     void setServiceStatus(Status status);
 
@@ -232,96 +231,52 @@ public class IndexAdministrationPresenter
   }
 
   @Override
-  public void clear() {
-    if(getView().getSelectedIndices().isEmpty()) {
-      fireEvent(NotificationEvent.newBuilder().error("IndexClearSelectAtLeastOne").build());
-    } else {
-      for(TableIndexStatusDto object : getView().getSelectedIndices()) {
-        ResponseCodeCallback callback = new ResponseCodeCallback() {
+  public void delete(List<TableIndexStatusDto> statusDtos) {
+    for(TableIndexStatusDto statusDto : statusDtos) {
+      ResponseCodeCallback callback = new ResponseCodeCallback() {
 
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            refresh();
-          }
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          refresh();
+        }
 
-        };
-        ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-            .forResource(Resources.index(object.getDatasource(), object.getTable())) //
-            .accept("application/json") //
-            .withCallback(Response.SC_OK, callback) //
-            .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback) //
-            .delete().send();
-        getView().unselectIndex(object);
-      }
+      };
+      ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
+          .forResource(Resources.index(statusDto.getDatasource(), statusDto.getTable())) //
+          .accept("application/json") //
+          .withCallback(callback, Response.SC_OK, Response.SC_SERVICE_UNAVAILABLE) //
+          .delete().send();
+      getView().unselectIndex(statusDto);
     }
   }
 
   @Override
-  public void clear(TableIndexStatusDto table) {
-    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder() //
-        .forResource(Resources.index(table.getDatasource(), table.getTable())) //
-        .accept("application/json") //
-        .withCallback(Response.SC_OK, new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            refresh();
-          }
-        }) //
-        .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-            getEventBus().fireEvent(
-                NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray()).build());
-          }
-        }) //
-        .delete().send();
+  public void schedule(List<TableIndexStatusDto> statusDtos) {
+    IndexPresenter dialog = indexModalProvider.get();
+    dialog.updateSchedules(statusDtos);
   }
 
   @Override
-  public void schedule() {
-    if(getView().getSelectedIndices().isEmpty()) {
-      fireEvent(NotificationEvent.newBuilder().error("IndexScheduleSelectAtLeastOne").build());
-    } else {
-      List<TableIndexStatusDto> objects = new ArrayList<TableIndexStatusDto>();
-      for(TableIndexStatusDto object : getView().getSelectedIndices()) {
-        objects.add(object);
-      }
-
-      IndexPresenter dialog = indexModalProvider.get();
-      dialog.updateSchedules(objects);
+  public void indexNow(List<TableIndexStatusDto> statusDtos) {
+    for(TableIndexStatusDto statusDto : statusDtos) {
+      ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder() //
+          .forResource(Resources.index(statusDto.getDatasource(), statusDto.getTable())) //
+          .accept("application/json") //
+          .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              // Wait a few seconds for the task to launch before checking its status
+              Timer t = new Timer() {
+                @Override
+                public void run() {
+                  refresh(false);
+                }
+              };
+              // Schedule the timer to run once in X seconds.
+              t.schedule(DELAY_MILLIS);
+            }
+          }).put().send();
     }
-  }
-
-  @Override
-  public void indexNow(TableIndexStatusDto table) {
-
-    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder() //
-        .forResource(Resources.index(table.getDatasource(), table.getTable())) //
-        .accept("application/json") //
-        .withCallback(Response.SC_OK, new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            // Wait a few seconds for the task to launch before checking its status
-            Timer t = new Timer() {
-              @Override
-              public void run() {
-                refresh(false);
-              }
-            };
-            // Schedule the timer to run once in X seconds.
-            t.schedule(DELAY_MILLIS);
-          }
-        }) //
-        .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-            getEventBus().fireEvent(
-                NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray()).build());
-          }
-        }) //
-        .put().send();
   }
 
   private void refresh(boolean clearIndices) {
