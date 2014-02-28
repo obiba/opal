@@ -24,6 +24,8 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +34,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerService {
+
+  private static final Logger log = LoggerFactory.getLogger(QuartzCommandSchedulerServiceImpl.class);
 
   private final Scheduler scheduler;
 
@@ -49,6 +53,7 @@ public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerServic
           .usingJobData("command", command.toString()) //
           .usingJobData("subject", SecurityUtils.getSubject().getPrincipals().toString()) //
           .build();
+      log.debug("Add job {}", jobDetail);
       scheduler.addJob(jobDetail, true);
     } catch(SchedulerException ex) {
       throw new CommandSchedulerServiceException(ex);
@@ -58,7 +63,9 @@ public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerServic
   @Override
   public void deleteCommand(String name, String group) {
     try {
-      scheduler.deleteJob(new JobKey(name, group));
+      JobKey jobKey = new JobKey(name, group);
+      log.debug("Delete job {}", jobKey);
+      scheduler.deleteJob(jobKey);
     } catch(SchedulerException ex) {
       throw new CommandSchedulerServiceException(ex);
     }
@@ -72,6 +79,7 @@ public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerServic
           .forJob(name, group) //
           .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression)) //
           .build();
+      log.debug("Schedule job {} ({}): {}", trigger.getKey(), cronExpression, trigger);
       scheduler.scheduleJob(trigger);
     } catch(SchedulerException ex) {
       throw new CommandSchedulerServiceException(ex);
@@ -82,6 +90,7 @@ public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerServic
   public void unscheduleCommand(String name, String group) {
     try {
       for(Trigger trigger : scheduler.getTriggersOfJob(new JobKey(name, group))) {
+        log.debug("Unschedule job {}", trigger);
         scheduler.unscheduleJob(trigger.getKey());
       }
     } catch(SchedulerException ex) {

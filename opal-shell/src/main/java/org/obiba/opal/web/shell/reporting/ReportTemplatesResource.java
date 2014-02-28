@@ -80,18 +80,15 @@ public class ReportTemplatesResource extends AbstractReportTemplateResource {
   public Response createReportTemplate(ReportTemplateDto reportTemplateDto) {
     if(reportTemplateDto == null || reportTemplateDto.getName().isEmpty() ||
         reportTemplateExists(reportTemplateDto.getName())) {
-      return Response.status(Status.BAD_REQUEST).build();
-    }
-
-    try {
-      updateOpalConfiguration(reportTemplateDto);
-      addCommand(reportTemplateDto.getName());
-      updateSchedule(reportTemplateDto);
-    } catch(Exception e) {
       return Response.status(Response.Status.BAD_REQUEST).entity(
           ClientErrorDto.newBuilder().setCode(Status.BAD_REQUEST.getStatusCode())
-              .setStatus("CouldNotCreateReportTemplate").build()).build();
+              .setStatus("ReportTemplateAlreadyExists").build()).build();
     }
+
+    updateOpalConfiguration(reportTemplateDto);
+    addCommand(reportTemplateDto.getName());
+    updateSchedule(reportTemplateDto);
+
     URI reportUri = getReportTemplateURI(reportTemplateDto);
     return Response.created(reportUri) //
         .header("X-Alt-Permissions", new ReportPermissions(reportUri, AclAction.REPORT_TEMPLATE_ALL)) //

@@ -33,14 +33,13 @@ import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.shell.service.CommandSchedulerService;
 import org.obiba.opal.web.model.Opal.ReportDto;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
-import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.reporting.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 @Component
@@ -118,17 +117,11 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   public Response updateReportTemplate(ReportTemplateDto reportTemplateDto) {
     loadReportTemplate();
 
-    try {
-      Assert.isTrue(reportTemplateDto.getName().equals(name),
-          "The report template name in the URI does not match the name given in the request body DTO.");
+    Preconditions.checkArgument(reportTemplateDto.getName().equals(name),
+        "The report template name in the URI does not match the name given in the request body DTO.");
 
-      updateOpalConfiguration(reportTemplateDto);
-      updateSchedule(reportTemplateDto);
-    } catch(Exception e) {
-      return Response.status(Response.Status.BAD_REQUEST).entity(
-          ClientErrorDto.newBuilder().setCode(Status.BAD_REQUEST.getStatusCode())
-              .setStatus("CouldNotUpdateTheReportTemplate").build()).build();
-    }
+    updateOpalConfiguration(reportTemplateDto);
+    updateSchedule(reportTemplateDto);
 
     return Response.ok().build();
   }
