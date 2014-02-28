@@ -29,7 +29,7 @@
         </b:NavLink>
       </b:DropdownButton>
       <b:ButtonGroup>
-        <b:Button icon="SIGNOUT" ui:field="exportData">
+        <b:Button icon="DOWNLOAD_ALT" ui:field="exportData">
           <ui:msg description="Export data label">Export data</ui:msg>
         </b:Button>
       </b:ButtonGroup>

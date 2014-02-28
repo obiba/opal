@@ -15,12 +15,12 @@
         </b:NavLink>
       </b:DropdownButton>
       <b:ButtonGroup>
-        <b:Button icon="SIGNIN" ui:field="importData">
+        <b:Button icon="UPLOAD_ALT" ui:field="importData">
           <ui:msg description="Import data label">Import Data</ui:msg>
         </b:Button>
       </b:ButtonGroup>
       <b:ButtonGroup>
-        <b:Button icon="SIGNOUT" ui:field="exportData">
+        <b:Button icon="DOWNLOAD_ALT" ui:field="exportData">
           <ui:msg description="Export data label">Export Data</ui:msg>
         </b:Button>
       </b:ButtonGroup>
