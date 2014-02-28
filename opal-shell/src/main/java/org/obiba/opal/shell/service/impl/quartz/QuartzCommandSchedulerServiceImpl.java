@@ -51,8 +51,8 @@ public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerServic
           .withIdentity(name, group) //
           .storeDurably(true) // OPAL-917
           .usingJobData("command", command.toString()) //
-          .usingJobData("subject", SecurityUtils.getSubject().getPrincipals().toString()) //
           .build();
+      jobDetail.getJobDataMap().put("subject", SecurityUtils.getSubject().getPrincipals());
       log.debug("Add job {}", jobDetail);
       scheduler.addJob(jobDetail, true);
     } catch(SchedulerException ex) {
