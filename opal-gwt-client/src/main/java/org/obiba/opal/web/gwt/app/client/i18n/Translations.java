@@ -425,6 +425,7 @@ public interface Translations extends Constants {
       "CircularVariableDependency", "Circular dependency for variable '{0}'.:<br /><br /><pre>{1}</pre>",//
       "NoSuchVariable", "No such variable '{0}'",//
       "NoSuchVariableInTable", "No such variable '{0}' in table '{1}'",//
+      "NoSuchReportTemplate", "No such report template '{0}' in project '{1}'",//
       "InvalidVariableScript", "Invalid variable script:<br /><br /><pre>{0}</pre>",//
       "DestinationTableRequired", "The destination table is required.",//
       "DestinationTableNameInvalid", "The destination table name is not valid (must not contain '.' or ':').",//

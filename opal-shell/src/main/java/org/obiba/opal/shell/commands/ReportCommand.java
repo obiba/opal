@@ -17,7 +17,7 @@ import java.util.Map;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.velocity.app.VelocityEngine;
-import org.obiba.opal.core.cfg.ReportTemplate;
+import org.obiba.opal.core.domain.ReportTemplate;
 import org.obiba.opal.reporting.service.ReportException;
 import org.obiba.opal.reporting.service.ReportService;
 import org.obiba.opal.shell.commands.options.ReportCommandOptions;

@@ -30,7 +30,7 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
-import org.obiba.opal.core.cfg.ReportTemplate;
+import org.obiba.opal.core.domain.ReportTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.service.CommandSchedulerService;

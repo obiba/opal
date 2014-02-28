@@ -23,7 +23,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.cfg.OpalConfigurationService;
-import org.obiba.opal.core.cfg.ReportTemplate;
+import org.obiba.opal.core.domain.ReportTemplate;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.AbstractPermissionsResource;

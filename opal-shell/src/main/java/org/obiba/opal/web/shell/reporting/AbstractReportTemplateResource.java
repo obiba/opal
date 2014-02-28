@@ -9,18 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.web.shell.reporting;
 
-import org.apache.commons.vfs2.FileObject;
-import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.security.Authorizer;
-import org.obiba.magma.security.MagmaSecurityExtension;
 import org.obiba.magma.security.shiro.ShiroAuthorizer;
-import org.obiba.opal.core.cfg.OpalConfiguration;
-import org.obiba.opal.core.cfg.OpalConfigurationService;
-import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
-import org.obiba.opal.core.cfg.ReportTemplate;
+import org.obiba.opal.core.domain.ReportTemplate;
+import org.obiba.opal.core.service.ReportTemplateService;
 import org.obiba.opal.shell.service.CommandSchedulerService;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
 import org.obiba.opal.web.reporting.Dtos;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -29,36 +25,25 @@ public abstract class AbstractReportTemplateResource {
 
   protected static final String REPORT_SCHEDULING_GROUP = "reports";
 
-  protected abstract OpalConfigurationService getOpalConfigurationService();
+  protected CommandSchedulerService commandSchedulerService;
 
-  protected abstract CommandSchedulerService getCommandSchedulerService();
+  protected ReportTemplateService reportTemplateService;
 
   private final Authorizer authorizer = new ShiroAuthorizer();
 
-  protected boolean reportTemplateExists(String name) {
-    return name != null && getOpalConfigurationService().getOpalConfiguration().hasReportTemplate(name);
+  protected boolean reportTemplateExists(String name, String project) {
+    return reportTemplateService.hasReportTemplate(name, project);
   }
 
-  protected void updateOpalConfiguration(final ReportTemplateDto dto) {
-    getOpalConfigurationService().modifyConfiguration(new ConfigModificationTask() {
-
-      @Override
-      public void doWithConfig(OpalConfiguration config) {
-        OpalConfiguration opalConfig = getOpalConfigurationService().getOpalConfiguration();
-
-        if(opalConfig.hasReportTemplate(dto.getName())) opalConfig.removeReportTemplate(dto.getName());
-
-        opalConfig.addReportTemplate(Dtos.fromDto(dto));
-      }
-    });
-
+  protected void save(ReportTemplateDto dto) {
+    reportTemplateService.save(Dtos.fromDto(dto));
   }
 
   protected void updateSchedule(ReportTemplateDto reportTemplateDto) {
     String name = reportTemplateDto.getName();
-    getCommandSchedulerService().unscheduleCommand(name, REPORT_SCHEDULING_GROUP);
+    commandSchedulerService.unscheduleCommand(name, REPORT_SCHEDULING_GROUP);
     if(reportTemplateDto.hasCron()) {
-      getCommandSchedulerService().scheduleCommand(name, REPORT_SCHEDULING_GROUP, reportTemplateDto.getCron());
+      commandSchedulerService.scheduleCommand(name, REPORT_SCHEDULING_GROUP, reportTemplateDto.getCron());
     }
   }
 
@@ -70,4 +55,13 @@ public abstract class AbstractReportTemplateResource {
     return authorizer.isPermitted("rest:/report-template/" + template.getName() + ":GET");
   }
 
+  @Autowired
+  public void setCommandSchedulerService(CommandSchedulerService commandSchedulerService) {
+    this.commandSchedulerService = commandSchedulerService;
+  }
+
+  @Autowired
+  public void setReportTemplateService(ReportTemplateService reportTemplateService) {
+    this.reportTemplateService = reportTemplateService;
+  }
 }

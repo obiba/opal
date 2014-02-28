@@ -11,7 +11,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.opal.core.cfg.OpalConfigurationService;
-import org.obiba.opal.core.cfg.ReportTemplate;
+import org.obiba.opal.core.domain.ReportTemplate;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.shell.CommandRegistry;
@@ -85,7 +85,7 @@ public class ReportTemplatesResource extends AbstractReportTemplateResource {
               .setStatus("ReportTemplateAlreadyExists").build()).build();
     }
 
-    updateOpalConfiguration(reportTemplateDto);
+    save(reportTemplateDto);
     addCommand(reportTemplateDto.getName());
     updateSchedule(reportTemplateDto);
 

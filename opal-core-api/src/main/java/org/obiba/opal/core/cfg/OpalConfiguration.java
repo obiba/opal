@@ -9,20 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.core.cfg;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
-
-import javax.annotation.Nullable;
 
 import org.obiba.magma.support.MagmaEngineFactory;
 import org.obiba.runtime.Version;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 public class OpalConfiguration {
 
@@ -39,14 +33,7 @@ public class OpalConfiguration {
 
   private MagmaEngineFactory magmaEngineFactory;
 
-  private final Set<ReportTemplate> reportTemplates;
-
-  private final List<OpalConfigurationExtension> extensions;
-
-  public OpalConfiguration() {
-    reportTemplates = Sets.newLinkedHashSet();
-    extensions = Lists.newArrayList();
-  }
+  private final Collection<OpalConfigurationExtension> extensions = new ArrayList<>();
 
   public Version getVersion() {
     return version;
@@ -96,46 +83,6 @@ public class OpalConfiguration {
 
   public <T extends OpalConfigurationExtension> boolean hasExtension(Class<T> type) {
     return Iterables.size(Iterables.filter(extensions, type)) == 1;
-  }
-
-  public Set<ReportTemplate> getReportTemplates() {
-    return Collections.unmodifiableSet(reportTemplates);
-  }
-
-  public void setReportTemplates(Collection<ReportTemplate> reportTemplates) {
-    this.reportTemplates.clear();
-    if(reportTemplates != null) {
-      this.reportTemplates.addAll(reportTemplates);
-    }
-  }
-
-  @Nullable
-  public ReportTemplate getReportTemplate(String name) {
-    for(ReportTemplate reportTemplate : reportTemplates) {
-      if(reportTemplate.getName().equals(name)) {
-        return reportTemplate;
-      }
-    }
-    return null;
-  }
-
-  public boolean hasReportTemplate(String name) {
-    return getReportTemplate(name) != null;
-  }
-
-  public void removeReportTemplate(String name) {
-    ReportTemplate reportTemplateToRemove = getReportTemplate(name);
-    if(reportTemplateToRemove != null) {
-      reportTemplates.remove(reportTemplateToRemove);
-    }
-  }
-
-  public void addReportTemplate(ReportTemplate reportTemplate) {
-    reportTemplates.add(reportTemplate);
-  }
-
-  public boolean hasReportTemplates() {
-    return reportTemplates.size() > 0;
   }
 
   /**
