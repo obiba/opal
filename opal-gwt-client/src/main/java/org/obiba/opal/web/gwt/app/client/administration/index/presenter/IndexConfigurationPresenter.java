@@ -9,9 +9,19 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.index.presenter;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.administration.index.event.TableIndicesRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -20,36 +30,22 @@ import org.obiba.opal.web.model.client.opal.ServiceCfgDto;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 
+import static org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexConfigurationPresenter.Display.FormField.CLUSTER_NAME;
+import static org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexConfigurationPresenter.Display.FormField.REPLICAS;
+import static org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexConfigurationPresenter.Display.FormField.SHARDS;
+import static org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexConfigurationPresenter.Display.FormField.valueOf;
+
 public class IndexConfigurationPresenter extends ModalPresenterWidget<IndexConfigurationPresenter.Display>
     implements IndexConfigurationUiHandlers {
 
-  public interface Display extends PopupView, HasUiHandlers<IndexConfigurationUiHandlers> {
-
-    void hideDialog();
-
-    void setDialogMode(Mode dialogMode);
-
-    void setClusterName(String clusterName);
-
-    String getClusterName();
-
-    void setSettings(String settings);
-
-    String getSettings();
-
-    Number getNbShards();
-
-    void setNbShards(int nb);
-
-    Number getNbReplicas();
-
-    void setNbReplicas(int nb);
-  }
+  private final IndexConfValidationHandler validationHandler;
 
   private Mode dialogMode;
 
@@ -67,6 +63,7 @@ public class IndexConfigurationPresenter extends ModalPresenterWidget<IndexConfi
   public IndexConfigurationPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
     getView().setUiHandlers(this);
+    validationHandler = new IndexConfValidationHandler();
   }
 
   @Override
@@ -89,10 +86,10 @@ public class IndexConfigurationPresenter extends ModalPresenterWidget<IndexConfi
             dataNode = cfg.getDataNode();
             indexName = cfg.getIndexName();
 
-            getView().setClusterName(cfg.getClusterName());
+            getView().getClusterName().setText(cfg.getClusterName());
             getView().setNbShards(cfg.getShards());
             getView().setNbReplicas(cfg.getReplicas());
-            getView().setSettings(cfg.getSettings());
+            getView().getSettings().setText(cfg.getSettings());
           }
         }).get().send();
   }
@@ -108,23 +105,26 @@ public class IndexConfigurationPresenter extends ModalPresenterWidget<IndexConfi
   }
 
   private void updateConfig() {
-    ServiceCfgDto dto = ServiceCfgDto.create();
+    getView().clearErrors();
+    if(validationHandler.validate()) {
 
-    dto.setName("search");
+      ServiceCfgDto dto = ServiceCfgDto.create();
 
-    ESCfgDto config = ESCfgDto.create();
-    config.setEnabled(isEnabled);
-    config.setClusterName(getView().getClusterName());
-    config.setIndexName(indexName);
-    config.setDataNode(dataNode);
-    config.setShards(getView().getNbShards().intValue());
-    config.setReplicas(getView().getNbReplicas().intValue());
-    config.setSettings(getView().getSettings());
+      dto.setName("search");
 
-    dto.setExtension("Opal.ESCfgDto.params", config);
+      ESCfgDto config = ESCfgDto.create();
+      config.setEnabled(isEnabled);
+      config.setClusterName(getView().getClusterName().getText());
+      config.setIndexName(indexName);
+      config.setDataNode(dataNode);
+      config.setShards(getView().getNbShards().intValue());
+      config.setReplicas(getView().getNbReplicas().intValue());
+      config.setSettings(getView().getSettings().getText());
 
-    putESCfg(dto);
+      dto.setExtension("Opal.ESCfgDto.params", config);
 
+      putESCfg(dto);
+    }
   }
 
   private void putESCfg(ServiceCfgDto dto) {
@@ -146,6 +146,76 @@ public class IndexConfigurationPresenter extends ModalPresenterWidget<IndexConfi
           }
         }) //
         .put().send();
+  }
+
+  public interface Display extends PopupView, HasUiHandlers<IndexConfigurationUiHandlers> {
+
+    enum FormField {
+      CLUSTER_NAME,
+      SHARDS,
+      REPLICAS,
+    }
+
+    void hideDialog();
+
+    void setDialogMode(Mode dialogMode);
+
+    HasText getClusterName();
+
+    HasText getSettings();
+
+    Number getNbShards();
+
+    void setNbShards(int nb);
+
+    Number getNbReplicas();
+
+    void setNbReplicas(int nb);
+
+    void clearErrors();
+
+    void showError(@Nullable FormField formField, String message);
+  }
+
+  private class IndexConfValidationHandler extends ViewValidationHandler {
+
+    private Set<FieldValidator> validators;
+
+    @Override
+    protected Set<FieldValidator> getValidators() {
+      if(validators == null) {
+        validators = new LinkedHashSet<FieldValidator>();
+        validators
+            .add(new RequiredTextValidator(getView().getClusterName(), "ClusterNameIsRequired", CLUSTER_NAME.name()));
+        validators.add(new ConditionValidator(nbShardsIsNotEmpty(), "ShardsIsRequired", SHARDS.name()));
+        validators.add(new ConditionValidator(nbReplicasIsNotEmpty(), "ReplicasIsRequired", REPLICAS.name()));
+      }
+      return validators;
+    }
+
+    private HasValue<Boolean> nbShardsIsNotEmpty() {
+      return new HasBooleanValue() {
+        @Override
+        public Boolean getValue() {
+          return getView().getNbShards() != null && getView().getNbShards().intValue() >= 0;
+        }
+      };
+    }
+
+    private HasValue<Boolean> nbReplicasIsNotEmpty() {
+      return new HasBooleanValue() {
+        @Override
+        public Boolean getValue() {
+          return getView().getNbReplicas() != null && getView().getNbReplicas().intValue() >= 0;
+        }
+      };
+    }
+
+    @Override
+    protected void showMessage(String id, String message) {
+      getView().showError(valueOf(id), message);
+    }
+
   }
 
 }
