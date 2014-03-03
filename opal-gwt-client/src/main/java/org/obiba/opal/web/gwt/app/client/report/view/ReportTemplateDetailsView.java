@@ -17,9 +17,7 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.report.presenter.ROptionsHelper;
-import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter;
-import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsUiHandlers;
+import org.obiba.opal.web.gwt.app.client.report.ROptionsHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.DateTimeColumn;
@@ -56,7 +54,8 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
-import static org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter.DOWNLOAD_ACTION;
+import static org.obiba.opal.web.gwt.app.client.report.view.ReportTemplateDetailsPresenter.DELETE_ACTION;
+import static org.obiba.opal.web.gwt.app.client.report.view.ReportTemplateDetailsPresenter.DOWNLOAD_ACTION;
 
 public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplateDetailsUiHandlers>
     implements ReportTemplateDetailsPresenter.Display {

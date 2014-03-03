@@ -7,13 +7,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.report.view;
+package org.obiba.opal.web.gwt.app.client.report.list;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.report.presenter.ReportsPresenter;
-import org.obiba.opal.web.gwt.app.client.report.presenter.ReportsUiHandlers;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
@@ -39,7 +37,7 @@ import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 public class ReportsView extends ViewWithUiHandlers<ReportsUiHandlers> implements ReportsPresenter.Display {
 
-  private final Translations translations;
+  interface Binder extends UiBinder<Widget, ReportsView> {}
 
   @UiField
   Button add;
@@ -52,7 +50,7 @@ public class ReportsView extends ViewWithUiHandlers<ReportsUiHandlers> implement
 
   private NavLink currentLink;
 
-  interface Binder extends UiBinder<Widget, ReportsView> {}
+  private final Translations translations;
 
   @Inject
   public ReportsView(Binder uiBinder, Translations translations) {

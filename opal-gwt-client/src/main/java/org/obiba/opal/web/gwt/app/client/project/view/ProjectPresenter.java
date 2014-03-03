@@ -25,7 +25,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.project.admin.ProjectAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectHiddenEvent;
 import org.obiba.opal.web.gwt.app.client.project.permissions.ProjectPermissionsPresenter;
-import org.obiba.opal.web.gwt.app.client.report.presenter.ReportsPresenter;
+import org.obiba.opal.web.gwt.app.client.report.list.ReportsPresenter;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 import org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter;
@@ -36,7 +36,6 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
-import org.obiba.opal.web.model.client.opal.ProjectSummaryDto;
 
 import com.google.common.base.Strings;
 import com.google.gwt.event.shared.GwtEvent;

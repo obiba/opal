@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.report.presenter;
+package org.obiba.opal.web.gwt.app.client.report.edit;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.File
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ItemSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.report.ROptionsHelper;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
@@ -55,8 +56,8 @@ import com.gwtplatform.mvp.client.PopupView;
 import static com.google.gwt.http.client.Response.SC_CREATED;
 import static com.google.gwt.http.client.Response.SC_OK;
 
-public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<ReportTemplateUpdateModalPresenter.Display>
-    implements ReportTemplateUpdateModalUiHandlers {
+public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<ReportTemplateEditModalPresenter.Display>
+    implements ReportTemplateEditModalUiHandlers {
 
   private final FileSelectionPresenter fileSelectionPresenter;
 
@@ -74,7 +75,7 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
     CREATE, UPDATE
   }
 
-  public interface Display extends PopupView, HasUiHandlers<ReportTemplateUpdateModalUiHandlers> {
+  public interface Display extends PopupView, HasUiHandlers<ReportTemplateEditModalUiHandlers> {
 
     void setReportTemplate(ReportTemplateDto reportTemplate);
 
@@ -113,7 +114,7 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
   }
 
   @Inject
-  public ReportTemplateUpdateModalPresenter(Display display, EventBus eventBus,
+  public ReportTemplateEditModalPresenter(Display display, EventBus eventBus,
       Provider<FileSelectionPresenter> fileSelectionPresenterProvider,
       Provider<ItemSelectorPresenter> itemSelectorPresenterProvider) {
     super(eventBus, display);

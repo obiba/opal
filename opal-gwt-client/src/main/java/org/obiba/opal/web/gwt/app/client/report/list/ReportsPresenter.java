@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.report.presenter;
+package org.obiba.opal.web.gwt.app.client.report.list;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,9 +16,11 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.report.edit.ReportTemplateEditModalPresenter;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
+import org.obiba.opal.web.gwt.app.client.report.view.ReportTemplateDetailsPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -39,7 +41,7 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
 
   ReportTemplateDetailsPresenter reportTemplateDetailsPresenter;
 
-  ModalProvider<ReportTemplateUpdateModalPresenter> reportTemplateUpdateModalPresenterProvider;
+  ModalProvider<ReportTemplateEditModalPresenter> reportTemplateUpdateModalPresenterProvider;
 
   private ReportTemplateDto reportTemplate;
 
@@ -50,7 +52,7 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
   @Inject
   public ReportsPresenter(Display display, EventBus eventBus,
       ReportTemplateDetailsPresenter reportTemplateDetailsPresenter,
-      ModalProvider<ReportTemplateUpdateModalPresenter> reportTemplateUpdateModalPresenterProvider) {
+      ModalProvider<ReportTemplateEditModalPresenter> reportTemplateUpdateModalPresenterProvider) {
     super(eventBus, display);
     this.reportTemplateDetailsPresenter = reportTemplateDetailsPresenter;
     this.reportTemplateUpdateModalPresenterProvider = reportTemplateUpdateModalPresenterProvider.setContainer(this);
@@ -59,8 +61,8 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
 
   @Override
   public void onAdd() {
-    ReportTemplateUpdateModalPresenter presenter = reportTemplateUpdateModalPresenterProvider.get();
-    presenter.setDialogMode(ReportTemplateUpdateModalPresenter.Mode.CREATE);
+    ReportTemplateEditModalPresenter presenter = reportTemplateUpdateModalPresenterProvider.get();
+    presenter.setDialogMode(ReportTemplateEditModalPresenter.Mode.CREATE);
     presenter.setProject(project);
   }
 

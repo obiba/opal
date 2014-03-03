@@ -7,14 +7,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.report.view;
+package org.obiba.opal.web.gwt.app.client.report.edit;
 
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateModalPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateModalUiHandlers;
+import org.obiba.opal.web.gwt.app.client.report.edit.ReportTemplateEditModalPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
@@ -39,10 +38,10 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<ReportTemplateUpdateModalUiHandlers>
-    implements Display {
+public class ReportTemplateEditModalView extends ModalPopupViewWithUiHandlers<ReportTemplateEditModalUiHandlers>
+implements Display {
 
-  interface Binder extends UiBinder<Widget, ReportTemplateUpdateModalView> {}
+  interface Binder extends UiBinder<Widget, ReportTemplateEditModalView> {}
 
   @UiField
   Modal dialog;
@@ -91,7 +90,7 @@ public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<
   private final Translations translations;
 
   @Inject
-  public ReportTemplateUpdateModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
+  public ReportTemplateEditModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
     super(eventBus);
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;

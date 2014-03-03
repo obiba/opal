@@ -8,20 +8,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.report.presenter;
+package org.obiba.opal.web.gwt.app.client.report.list;
 
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.gwtplatform.mvp.client.UiHandlers;
 
-public interface ReportTemplateDetailsUiHandlers extends UiHandlers {
+public interface ReportsUiHandlers extends UiHandlers {
 
-  void onDownload();
+  void onAdd();
 
-  void onExecute();
-
-  void onEdit();
-
-  void onDelete();
+  void onSelection(ReportTemplateDto template);
 
 }

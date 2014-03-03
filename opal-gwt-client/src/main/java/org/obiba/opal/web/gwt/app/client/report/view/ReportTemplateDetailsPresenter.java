@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.report.presenter;
+package org.obiba.opal.web.gwt.app.client.report.view;
 
 import javax.annotation.Nullable;
 
@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.permissions.support.AclRequest;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.report.edit.ReportTemplateEditModalPresenter;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
@@ -66,7 +67,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
-  private final ModalProvider<ReportTemplateUpdateModalPresenter> reportTemplateUpdateModalPresenterProvider;
+  private final ModalProvider<ReportTemplateEditModalPresenter> reportTemplateUpdateModalPresenterProvider;
 
   private ReportTemplateDto reportTemplate;
 
@@ -75,7 +76,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
   @Inject
   public ReportTemplateDetailsPresenter(Display display, EventBus eventBus,
       Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
-      ModalProvider<ReportTemplateUpdateModalPresenter> reportTemplateUpdateModalPresenterProvider,
+      ModalProvider<ReportTemplateEditModalPresenter> reportTemplateUpdateModalPresenterProvider,
       TranslationMessages translationMessages) {
     super(eventBus, display);
     this.translationMessages = translationMessages;
@@ -111,7 +112,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
   @Override
   public void onEdit() {
-    ReportTemplateUpdateModalPresenter presenter = reportTemplateUpdateModalPresenterProvider.get();
+    ReportTemplateEditModalPresenter presenter = reportTemplateUpdateModalPresenterProvider.get();
     presenter.setReportTemplate(reportTemplate);
   }
 

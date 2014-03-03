@@ -1,4 +1,4 @@
-package org.obiba.opal.web.gwt.app.client.report.presenter;
+package org.obiba.opal.web.gwt.app.client.report;
 
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;

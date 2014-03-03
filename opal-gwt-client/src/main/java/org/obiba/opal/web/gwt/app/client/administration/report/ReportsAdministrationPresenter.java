@@ -13,7 +13,7 @@ import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministra
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
-import org.obiba.opal.web.gwt.app.client.report.presenter.ReportsPresenter;
+import org.obiba.opal.web.gwt.app.client.report.list.ReportsPresenter;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 

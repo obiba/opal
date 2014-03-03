@@ -11,9 +11,9 @@ package org.obiba.opal.web.gwt.app.client.report;
 
 import org.obiba.opal.web.gwt.app.client.administration.report.ReportsAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.report.ReportsAdministrationView;
-import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter;
-import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateModalPresenter;
-import org.obiba.opal.web.gwt.app.client.report.presenter.ReportsPresenter;
+import org.obiba.opal.web.gwt.app.client.report.edit.ReportTemplateEditModalPresenter;
+import org.obiba.opal.web.gwt.app.client.report.list.ReportsPresenter;
+import org.obiba.opal.web.gwt.app.client.report.view.ReportTemplateDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.report.view.ReportTemplateDetailsView;
 import org.obiba.opal.web.gwt.app.client.report.view.ReportTemplateUpdateModalView;
 import org.obiba.opal.web.gwt.app.client.report.view.ReportsView;
@@ -29,7 +29,7 @@ public class ReportsModule extends AbstractPresenterModule {
     bindPresenterWidget(ReportsPresenter.class, ReportsPresenter.Display.class, ReportsView.class);
     bindPresenterWidget(ReportTemplateDetailsPresenter.class, ReportTemplateDetailsPresenter.Display.class,
         ReportTemplateDetailsView.class);
-    bindPresenterWidget(ReportTemplateUpdateModalPresenter.class, ReportTemplateUpdateModalPresenter.Display.class,
+    bindPresenterWidget(ReportTemplateEditModalPresenter.class, ReportTemplateEditModalPresenter.Display.class,
         ReportTemplateUpdateModalView.class);
   }
 }
