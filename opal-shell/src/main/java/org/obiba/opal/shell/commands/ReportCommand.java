@@ -18,6 +18,8 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.velocity.app.VelocityEngine;
 import org.obiba.opal.core.domain.ReportTemplate;
+import org.obiba.opal.core.service.NoSuchReportTemplateException;
+import org.obiba.opal.core.service.ReportTemplateService;
 import org.obiba.opal.reporting.service.ReportException;
 import org.obiba.opal.reporting.service.ReportService;
 import org.obiba.opal.shell.commands.options.ReportCommandOptions;
@@ -36,9 +38,6 @@ import com.google.common.collect.ImmutableMap;
 @CommandUsage(description = "Generate a report based on the specified report template.",
     syntax = "Syntax: report --name TEMPLATE")
 public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCommandOptions> {
-  //
-  // Constants
-  //
 
   private static final Logger log = LoggerFactory.getLogger(ReportCommand.class);
 
@@ -47,12 +46,11 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
   private static final Map<String, String> formatFileExtension = ImmutableMap
       .of("HTML", "html", "PDF", "pdf", "EXCEL", "xls");
 
-  //
-  // Instance Variables
-  //
-
   @Autowired
   private ReportService reportService;
+
+  @Autowired
+  private ReportTemplateService reportTemplateService;
 
   @Autowired
   private MailSender mailSender;
@@ -73,10 +71,12 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
   @Override
   public int execute() {
     // Get the report template.
-    String reportTemplateName = getOptions().getName();
-    ReportTemplate reportTemplate = getOpalConfiguration().getReportTemplate(reportTemplateName);
-    if(reportTemplate == null) {
-      getShell().printf("Report template '%s' does not exist.\n", reportTemplateName);
+    String name = getOptions().getName();
+    ReportTemplate reportTemplate = null;
+    try {
+      reportTemplate = reportTemplateService.getReportTemplate(name, getOptions().getProject());
+    } catch(NoSuchReportTemplateException e) {
+      getShell().printf("Report template '%s' does not exist.\n", name);
       return 1;
     }
 
@@ -85,8 +85,8 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
       FileObject reportOutput = getReportOutput(reportTemplate, reportDate);
       return renderAndSendEmail(reportTemplate, reportOutput);
     } catch(FileSystemException e) {
-      getShell().printf("Cannot create report output: '/reports/%s/%s'", reportTemplateName,
-          getReportFileName(reportTemplateName, reportTemplate.getFormat(), reportDate));
+      getShell().printf("Cannot create report output: '/reports/%s/%s'", name,
+          getReportFileName(name, reportTemplate.getFormat(), reportDate));
       return 1;
     }
 
@@ -143,8 +143,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     String reportFormat = reportTemplate.getFormat();
     String reportFileName = getReportFileName(reportTemplateName, reportFormat, reportDate);
 
-    FileObject reportDir = getFile(
-        "/reports/" + (reportTemplate.hasProject() ? reportTemplate.getProject() + "/" : "") + reportTemplateName);
+    FileObject reportDir = getFile("/reports/" + reportTemplate.getProject() + "/" + reportTemplateName);
     reportDir.createFolder();
 
     return reportDir.resolveFile(reportFileName);
@@ -191,7 +190,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     model.put("report_template", reportTemplate.getName());
     model.put("report_public_link",
         opalPublicUrl + "/ws/report/public/" + getOpalRuntime().getFileSystem().getObfuscatedPath(reportOutput) +
-            (reportTemplate.hasProject() ? "?project=" + reportTemplate.getProject() : ""));
+            "?project=" + reportTemplate.getProject());
     return getMergedVelocityTemplate(model);
   }
 

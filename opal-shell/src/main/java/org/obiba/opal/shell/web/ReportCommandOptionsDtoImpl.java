@@ -29,4 +29,9 @@ public class ReportCommandOptionsDtoImpl implements ReportCommandOptions {
   public String getName() {
     return dto.getName();
   }
+
+  @Override
+  public String getProject() {
+    return dto.getProject();
+  }
 }

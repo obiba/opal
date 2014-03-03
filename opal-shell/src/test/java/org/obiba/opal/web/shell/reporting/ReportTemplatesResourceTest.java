@@ -10,6 +10,7 @@
 package org.obiba.opal.web.shell.reporting;
 
 import java.security.Principal;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -18,15 +19,12 @@ import javax.ws.rs.core.Response;
 
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
-import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.magma.MagmaEngine;
-import org.obiba.opal.core.cfg.OpalConfiguration;
-import org.obiba.opal.core.cfg.OpalConfigurationService;
-import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.core.domain.ReportTemplate;
+import org.obiba.opal.core.service.ReportTemplateService;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.service.CommandSchedulerService;
@@ -35,120 +33,94 @@ import org.obiba.opal.web.reporting.Dtos;
 
 import com.google.common.collect.Maps;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ReportTemplatesResourceTest {
 
-  private OpalConfigurationService opalConfigurationServiceMock;
+  private ReportTemplateService reportTemplateService;
 
   private CommandRegistry commandRegistry;
 
-  private CommandSchedulerService commandSchedulerServiceMock;
+  private CommandSchedulerService commandSchedulerService;
 
-  private Set<ReportTemplate> reportTemplates;
+  private ReportTemplateScheduler reportTemplateScheduler;
 
   @Before
-  public void setUp() {
+  public void before() {
     MagmaEngine.get().shutdown();
     new MagmaEngine();
-    opalConfigurationServiceMock = createMock(OpalConfigurationService.class);
-    OpalConfiguration opalConfiguration = new OpalConfiguration();
-    commandRegistry = createMock(CommandRegistry.class);
 
-    commandSchedulerServiceMock = createMock(CommandSchedulerService.class);
-    commandSchedulerServiceMock.unscheduleCommand("template1", "reports");
-    commandSchedulerServiceMock.scheduleCommand("template1", "reports", "schedule");
+    reportTemplateService = mock(ReportTemplateService.class);
+    commandRegistry = mock(CommandRegistry.class);
+    reportTemplateScheduler = mock(ReportTemplateScheduler.class);
 
-    reportTemplates = new LinkedHashSet<>();
-    reportTemplates.add(getReportTemplate("template1"));
-    reportTemplates.add(getReportTemplate("template2"));
-    reportTemplates.add(getReportTemplate("template3"));
-    reportTemplates.add(getReportTemplate("template4"));
-    opalConfiguration.setReportTemplates(reportTemplates);
+    commandSchedulerService = mock(CommandSchedulerService.class);
+    commandSchedulerService.unscheduleCommand("template1", "reports");
+    commandSchedulerService.scheduleCommand("template1", "reports", "schedule");
 
-    expect(opalConfigurationServiceMock.getOpalConfiguration()).andReturn(opalConfiguration).anyTimes();
+    Collection<ReportTemplate> reportTemplates = new LinkedHashSet<>();
+    reportTemplates.add(createReportTemplate("template1"));
+    reportTemplates.add(createReportTemplate("template2"));
+    reportTemplates.add(createReportTemplate("template3"));
+    reportTemplates.add(createReportTemplate("template4"));
+
+    when(reportTemplateService.getReportTemplates()).thenReturn(reportTemplates);
+
   }
 
   @After
-  public void stopYourEngine() {
+  public void after() {
     MagmaEngine.get().shutdown();
   }
 
   @Test
   public void testGetReportTemplates_RetrieveSetOfTemplates() {
-    Subject mockSubject = createMock(Subject.class);
-    ThreadContext.bind(mockSubject);
-    configureMock(mockSubject);
-    replay(opalConfigurationServiceMock, mockSubject);
+    Subject subject = mock(Subject.class);
+    ThreadContext.bind(subject);
+    configureMock(subject);
 
-    ReportTemplatesResource reportTemplateResource = new ReportTemplatesResource();
-    reportTemplateResource.setConfigService(opalConfigurationServiceMock);
-    reportTemplateResource.setCommandSchedulerService(commandSchedulerServiceMock);
-    reportTemplateResource.setCommandRegistry(commandRegistry);
-
-    Set<ReportTemplateDto> reportTemplatesDtos = reportTemplateResource.getReportTemplates();
+    ReportTemplatesResource resource = getReportTemplatesResource();
+    Set<ReportTemplateDto> dtos = resource.get();
     ThreadContext.unbindSubject();
 
-    assertThat(reportTemplates).hasSize(4);
-    assertThat(reportTemplatesDtos).hasSize(4);
+    assertThat(dtos).hasSize(4);
 
-    ReportTemplateDto reportTemplateDto = (ReportTemplateDto) reportTemplatesDtos.toArray()[0];
-    assertThat(reportTemplateDto.getName()).isEqualTo("template1");
-    assertThat(reportTemplateDto.getDesign()).isEqualTo("design");
-    assertThat(reportTemplateDto.getFormat()).isEqualTo("format");
-    assertThat(reportTemplateDto.getCron()).isEqualTo("schedule");
-    assertThat(reportTemplateDto.getParametersList()).hasSize(2);
-
-    verify(opalConfigurationServiceMock, mockSubject);
-  }
-
-  private void configureMock(Subject mockSubject) {
-    expect(mockSubject.getPrincipal()).andReturn(createMock(Principal.class)).anyTimes();
-    expect(mockSubject.isPermitted("rest:/report-template/template1:GET")).andReturn(true).anyTimes();
-    expect(mockSubject.isPermitted("rest:/report-template/template2:GET")).andReturn(true).anyTimes();
-    expect(mockSubject.isPermitted("rest:/report-template/template3:GET")).andReturn(true).anyTimes();
-    expect(mockSubject.isPermitted("rest:/report-template/template4:GET")).andReturn(true).anyTimes();
+    ReportTemplateDto dto = (ReportTemplateDto) dtos.toArray()[0];
+    assertThat(dto.getName()).isEqualTo("template1");
+    assertThat(dto.getDesign()).isEqualTo("design");
+    assertThat(dto.getFormat()).isEqualTo("format");
+    assertThat(dto.getCron()).isEqualTo("schedule");
+    assertThat(dto.getParametersList()).hasSize(2);
   }
 
   @Test
-  public void testUpdateReportTemplate_NewReportTemplateCreated() {
+  @SuppressWarnings("unchecked")
+  public void test_update_with_new_report_created() {
 
-    opalConfigurationServiceMock.modifyConfiguration((ConfigModificationTask) EasyMock.anyObject());
-    expectLastCall().once();
+    commandSchedulerService = mock(CommandSchedulerService.class);
+    commandSchedulerService.unscheduleCommand("template9", "reports");
+    commandSchedulerService.scheduleCommand("template9", "reports", "schedule");
 
-    commandSchedulerServiceMock = createMock(CommandSchedulerService.class);
-    commandSchedulerServiceMock.unscheduleCommand("template9", "reports");
-    commandSchedulerServiceMock.scheduleCommand("template9", "reports", "schedule");
+    Command<Object> commandMock = mock(Command.class);
+    commandSchedulerService.addCommand("template9", "reports", commandMock);
+    when(commandRegistry.newCommand("report")).thenReturn(commandMock);
 
-    @SuppressWarnings("unchecked")
-    Command<Object> commandMock = createMock(Command.class);
-    commandSchedulerServiceMock.addCommand("template9", "reports", commandMock);
+    ReportTemplatesResource reportTemplatesResource = getReportTemplatesResource();
 
-    expect(commandRegistry.newCommand("report")).andReturn(commandMock);
-
-    replay(opalConfigurationServiceMock, commandSchedulerServiceMock, commandRegistry);
-
-    ReportTemplatesResource reportTemplatesResource = new ReportTemplatesResource();
-    reportTemplatesResource.setConfigService(opalConfigurationServiceMock);
-    reportTemplatesResource.setCommandSchedulerService(commandSchedulerServiceMock);
-    reportTemplatesResource.setCommandRegistry(commandRegistry);
-
-    Response response = reportTemplatesResource.createReportTemplate(Dtos.asDto(getReportTemplate("template9")));
+    Response response = reportTemplatesResource.create(Dtos.asDto(createReportTemplate("template9")));
 
     assertThat(response.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
-    assertThat(response.getMetadata().get("location").get(0).toString()).isEqualTo("/report-template/template9");
+    assertThat(response.getMetadata().get("location").get(0).toString())
+        .isEqualTo("/project/project1/report-template/template9");
 
-    verify(opalConfigurationServiceMock, commandSchedulerServiceMock, commandRegistry);
   }
 
-  private ReportTemplate getReportTemplate(String name) {
+  private ReportTemplate createReportTemplate(String name) {
     ReportTemplate reportTemplate = new ReportTemplate();
     reportTemplate.setName(name);
+    reportTemplate.setProject("project1");
     reportTemplate.setDesign("design");
     reportTemplate.setFormat("format");
     reportTemplate.setSchedule("schedule");
@@ -157,6 +129,21 @@ public class ReportTemplatesResourceTest {
     params.put("param2", "value2");
     reportTemplate.setParameters(params);
     return reportTemplate;
+  }
+
+  private ReportTemplatesResource getReportTemplatesResource() {
+    ReportTemplatesResource resource = new ReportTemplatesResource();
+    resource.setReportTemplateService(reportTemplateService);
+    resource.setReportTemplateScheduler(reportTemplateScheduler);
+    return resource;
+  }
+
+  private void configureMock(Subject subject) {
+    when(subject.getPrincipal()).thenReturn(mock(Principal.class));
+    when(subject.isPermitted("rest:/project/project1/report-template/template1:GET")).thenReturn(true);
+    when(subject.isPermitted("rest:/project/project1/report-template/template2:GET")).thenReturn(true);
+    when(subject.isPermitted("rest:/project/project1/report-template/template3:GET")).thenReturn(true);
+    when(subject.isPermitted("rest:/project/project1/report-template/template4:GET")).thenReturn(true);
   }
 
 }

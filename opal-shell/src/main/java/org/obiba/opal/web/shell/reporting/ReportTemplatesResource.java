@@ -7,24 +7,17 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
-import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.domain.ReportTemplate;
 import org.obiba.opal.core.domain.security.SubjectAcl;
+import org.obiba.opal.core.service.ReportTemplateService;
 import org.obiba.opal.core.service.security.SubjectAclService;
-import org.obiba.opal.shell.CommandRegistry;
-import org.obiba.opal.shell.commands.Command;
-import org.obiba.opal.shell.commands.options.ReportCommandOptions;
-import org.obiba.opal.shell.service.CommandSchedulerService;
 import org.obiba.opal.web.model.Opal.AclAction;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
-import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.reporting.Dtos;
 import org.obiba.opal.web.ws.cfg.OpalWsConfig;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,93 +31,44 @@ import com.google.common.collect.Lists;
 @Transactional
 @Scope("request")
 @Path("/report-templates")
-public class ReportTemplatesResource extends AbstractReportTemplateResource {
+public class ReportTemplatesResource {
 
-  private OpalConfigurationService configService;
+  private ReportTemplateScheduler reportTemplateScheduler;
 
-  private CommandSchedulerService commandSchedulerService;
-
-  private CommandRegistry commandRegistry;
+  private ReportTemplateService reportTemplateService;
 
   @Autowired
-  @Qualifier("web")
-  public void setCommandRegistry(CommandRegistry commandRegistry) {
-    this.commandRegistry = commandRegistry;
+  public void setReportTemplateScheduler(ReportTemplateScheduler reportTemplateScheduler) {
+    this.reportTemplateScheduler = reportTemplateScheduler;
   }
 
   @Autowired
-  public void setCommandSchedulerService(CommandSchedulerService commandSchedulerService) {
-    this.commandSchedulerService = commandSchedulerService;
-  }
-
-  @Autowired
-  public void setConfigService(OpalConfigurationService configService) {
-    this.configService = configService;
+  public void setReportTemplateService(ReportTemplateService reportTemplateService) {
+    this.reportTemplateService = reportTemplateService;
   }
 
   @GET
-  public Set<ReportTemplateDto> getReportTemplates() {
-    Set<ReportTemplate> templates = configService.getOpalConfiguration().getReportTemplates();
-    ImmutableSet.Builder<ReportTemplate> builder = ImmutableSet.builder();
-    builder.addAll(Iterables.filter(templates, new Predicate<ReportTemplate>() {
+  public Set<ReportTemplateDto> get() {
+    ImmutableSet.Builder<ReportTemplate> setBuilder = ImmutableSet.builder();
+    setBuilder.addAll(Iterables.filter(reportTemplateService.getReportTemplates(), new Predicate<ReportTemplate>() {
 
       @Override
       public boolean apply(ReportTemplate template) {
-        return authzReadReportTemplate(template);
+        return ReportTemplateAuthorizer.authzGet(template);
       }
     }));
-    return Dtos.asDto(builder.build());
+    return Dtos.asDto(setBuilder.build());
   }
 
   @POST
-  public Response createReportTemplate(ReportTemplateDto reportTemplateDto) {
-    if(reportTemplateDto == null || reportTemplateDto.getName().isEmpty() ||
-        reportTemplateExists(reportTemplateDto.getName())) {
-      return Response.status(Response.Status.BAD_REQUEST).entity(
-          ClientErrorDto.newBuilder().setCode(Status.BAD_REQUEST.getStatusCode())
-              .setStatus("ReportTemplateAlreadyExists").build()).build();
-    }
-
-    save(reportTemplateDto);
-    addCommand(reportTemplateDto.getName());
-    updateSchedule(reportTemplateDto);
-
-    URI reportUri = getReportTemplateURI(reportTemplateDto);
-    return Response.created(reportUri) //
-        .header("X-Alt-Permissions", new ReportPermissions(reportUri, AclAction.REPORT_TEMPLATE_ALL)) //
+  public Response create(ReportTemplateDto dto) {
+    reportTemplateService.save(Dtos.fromDto(dto));
+    reportTemplateScheduler.scheduleCommand(dto);
+    reportTemplateScheduler.updateSchedule(dto);
+    URI uri = UriBuilder.fromResource(ProjectReportTemplateResource.class).build(dto.getProject(), dto.getName());
+    return Response.created(uri) //
+        .header("X-Alt-Permissions", new ReportPermissions(uri, AclAction.REPORT_TEMPLATE_ALL)) //
         .build();
-  }
-
-  protected URI getReportTemplateURI(ReportTemplateDto reportTemplateDto) {
-    return UriBuilder.fromResource(ReportTemplateResource.class).build(reportTemplateDto.getName());
-  }
-
-  private void addCommand(final String name) {
-    ReportCommandOptions reportOptions = new ReportCommandOptions() {
-
-      @Override
-      public boolean isHelp() {
-        return false;
-      }
-
-      @Override
-      public String getName() {
-        return name;
-      }
-    };
-    Command<ReportCommandOptions> reportCommand = commandRegistry.newCommand("report");
-    reportCommand.setOptions(reportOptions);
-    commandSchedulerService.addCommand(name, REPORT_SCHEDULING_GROUP, reportCommand);
-  }
-
-  @Override
-  protected OpalConfigurationService getOpalConfigurationService() {
-    return configService;
-  }
-
-  @Override
-  protected CommandSchedulerService getCommandSchedulerService() {
-    return commandSchedulerService;
   }
 
   private static final class ReportPermissions implements SubjectAclService.Permissions {

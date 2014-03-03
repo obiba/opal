@@ -69,4 +69,5 @@ message ExportCommandOptionsDto {
 
 message ReportCommandOptionsDto {
   required string name = 1;
+  required string project = 2;
 }

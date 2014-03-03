@@ -265,7 +265,7 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
               .username(username) //
               .password(password) //
               .sqlSchema(schema)) //
-          .usage(SqlSettings.SqlSchema.HIBERNATE.equals(schema) ? Database.Usage.STORAGE : Database.Usage.IMPORT) //
+          .usage(SqlSettings.SqlSchema.HIBERNATE == schema ? Database.Usage.STORAGE : Database.Usage.IMPORT) //
           .build();
       log.debug("Import database: {}", sqlDatabase);
       databaseRegistry.create(sqlDatabase);
@@ -287,6 +287,7 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
         if("surveys".equalsIgnoreCase(res.getString("TABLE_NAME"))) return SqlSettings.SqlSchema.LIMESURVEY;
       }
     } catch(SQLException e) {
+      //noinspection StringConcatenationArgumentToLogCall
       log.error("Cannot check database schema: " + url, e);
     }
     return SqlSettings.SqlSchema.JDBC;
@@ -372,6 +373,7 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
     deleteNode(doc, xPath, "//magmaEngineFactory/datasources");
     deleteNode(doc, xPath, "//org.obiba.opal.core.runtime.jdbc.DefaultJdbcDataSourceRegistry_-JdbcDataSourcesConfig");
     deleteNode(doc, xPath, "//binariesMigrated");
+    deleteNode(doc, xPath, "//reportTemplates");
     Transformer transformer = TransformerFactory.newInstance().newTransformer();
     transformer.transform(new DOMSource(doc), new StreamResult(configFile));
   }

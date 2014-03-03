@@ -27,6 +27,7 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.obiba.opal.core.domain.ReportTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.ReportTemplateService;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.reporting.Dtos;
@@ -42,18 +43,40 @@ import com.google.common.collect.Lists;
 @Transactional
 @Scope("request")
 @Path("/project/{project}/report-template/{name}")
-public class ProjectReportTemplateResource extends AbstractReportTemplateResource {
+public class ProjectReportTemplateResource {
 
   @PathParam("project")
   private String project;
 
   @PathParam("name")
-  protected String name;
+  private String name;
 
   @Nullable
   private ReportTemplate reportTemplate;
 
   private OpalRuntime opalRuntime;
+
+  private ReportTemplateScheduler reportTemplateScheduler;
+
+  private ReportTemplateService reportTemplateService;
+
+  public void setProject(String project) {
+    this.project = project;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  @Autowired
+  public void setReportTemplateScheduler(ReportTemplateScheduler reportTemplateScheduler) {
+    this.reportTemplateScheduler = reportTemplateScheduler;
+  }
+
+  @Autowired
+  public void setReportTemplateService(ReportTemplateService reportTemplateService) {
+    this.reportTemplateService = reportTemplateService;
+  }
 
   @Autowired
   public void setOpalRuntime(OpalRuntime opalRuntime) {
@@ -62,7 +85,7 @@ public class ProjectReportTemplateResource extends AbstractReportTemplateResourc
 
   @GET
   public Response get() {
-    return authzReadReportTemplate(getReportTemplate())
+    return ReportTemplateAuthorizer.authzGet(getReportTemplate())
         ? Response.ok(Dtos.asDto(getReportTemplate())).build()
         : Response.status(Response.Status.FORBIDDEN).build();
   }
@@ -78,11 +101,11 @@ public class ProjectReportTemplateResource extends AbstractReportTemplateResourc
   @DELETE
   public Response delete() {
     ReportTemplate reportTemplateToRemove = getReportTemplate();
-    if(!authzReadReportTemplate(reportTemplateToRemove)) {
+    if(!ReportTemplateAuthorizer.authzGet(reportTemplateToRemove)) {
       return Response.status(Response.Status.FORBIDDEN).build();
     }
     reportTemplateService.delete(reportTemplateToRemove.getName(), reportTemplateToRemove.getProject());
-    commandSchedulerService.deleteCommand(name, REPORT_SCHEDULING_GROUP);
+    reportTemplateScheduler.deleteSchedule(reportTemplateToRemove);
     return Response.ok().build();
   }
 
@@ -93,8 +116,8 @@ public class ProjectReportTemplateResource extends AbstractReportTemplateResourc
     Preconditions.checkArgument(dto.getName().equals(name),
         "The report template name in the URI does not match the name given in the request body DTO.");
 
-    save(dto);
-    updateSchedule(dto);
+    reportTemplateService.save(Dtos.fromDto(dto));
+    reportTemplateScheduler.updateSchedule(dto);
 
     return Response.ok().build();
   }
@@ -159,12 +182,6 @@ public class ProjectReportTemplateResource extends AbstractReportTemplateResourc
   private FileObject getReportFolder() throws FileSystemException {
     OpalFileSystem fileSystem = opalRuntime.getFileSystem();
     return fileSystem.getRoot().resolveFile("/reports/" + getReportTemplate().getProject() + "/" + name);
-  }
-
-  @Override
-  protected boolean authzReadReportTemplate(ReportTemplate template) {
-    return template.getProject().equals(project) &&
-        getAuthorizer().isPermitted("rest:/project/" + project + "/report-template/" + template.getName() + ":GET");
   }
 
 }

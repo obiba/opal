@@ -57,6 +57,8 @@ public class ReportTemplateServiceImplTest extends AbstractJUnit4SpringContextTe
     assertThat(reportTemplateService.getReportTemplates(template.getProject())).hasSize(1);
     assertEquals(reportTemplateService.getReportTemplates(template.getProject()).iterator().next(), template);
 
+    assertThat(reportTemplateService.getReportTemplates("project2")).isEmpty();
+
     assertEquals(reportTemplateService.getReportTemplate(template.getName(), template.getProject()), template);
 
     assertThat(reportTemplateService.hasReportTemplate(template.getName(), template.getProject())).isTrue();

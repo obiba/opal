@@ -11,7 +11,6 @@
 package org.obiba.opal.web.project.permissions;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -22,8 +21,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.obiba.opal.core.cfg.OpalConfigurationService;
-import org.obiba.opal.core.domain.ReportTemplate;
+import org.obiba.opal.core.service.ReportTemplateService;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.AbstractPermissionsResource;
@@ -53,7 +51,7 @@ public class ProjectReportTemplatePermissionsResource extends AbstractPermission
   private SubjectAclService subjectAclService;
 
   @Autowired
-  private OpalConfigurationService configService;
+  private ReportTemplateService reportTemplateService;
 
   @PathParam("name")
   private String name;
@@ -90,7 +88,8 @@ public class ProjectReportTemplatePermissionsResource extends AbstractPermission
    */
   @POST
   public Response setTablePermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
-      @QueryParam("principal") List<String> principals, @QueryParam("permission") ReportTemplatePermission permission) {
+      @SuppressWarnings("TypeMayBeWeakened") @QueryParam("principal") List<String> principals,
+      @QueryParam("permission") ReportTemplatePermission permission) {
     // make sure template exists
     validateTemplate();
     setPermission(principals, type, permission.name());
@@ -106,7 +105,7 @@ public class ProjectReportTemplatePermissionsResource extends AbstractPermission
    */
   @DELETE
   public Response deleteTablePermissions(@QueryParam("type") @DefaultValue("USER") SubjectType type,
-      @QueryParam("principal") List<String> principals) {
+      @SuppressWarnings("TypeMayBeWeakened") @QueryParam("principal") List<String> principals) {
 
     // make sure template exists
     validateTemplate();
@@ -115,8 +114,7 @@ public class ProjectReportTemplatePermissionsResource extends AbstractPermission
   }
 
   private void validateTemplate() {
-    ReportTemplate rt = configService.getOpalConfiguration().getReportTemplate(template);
-    if(rt == null || !rt.hasProject() || !name.equals(rt.getProject())) throw new NoSuchElementException();
+    reportTemplateService.getReportTemplate(template, name);
   }
 
   @Override
