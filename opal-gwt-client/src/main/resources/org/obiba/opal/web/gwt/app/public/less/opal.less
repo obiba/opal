@@ -171,6 +171,14 @@ th input[type="checkbox"], td input[type="checkbox"] {
     color: @white;
     font-weight: bold;
   }
+
+  &.actions-select {
+    margin-bottom: 0;
+    font-size: small;
+    min-height: 20px;
+    border-radius: 6px 6px 0 0;
+    background-color: @btnBackgroundHighlight
+  }
 }
 
 /* Ensure dialog box is at same z level as bootstrap modal */
@@ -685,12 +693,4 @@ a.bookmark-on:focus {
 .close {
   color: @white;
   opacity: 0.8;
-}
-
-.alert.actions-select {
-  margin-bottom: 0;
-  font-size: small;
-  min-height: 20px;
-  border-radius: 6px 6px 0 0;
-  background-color: @btnBackgroundHighlight
 }
