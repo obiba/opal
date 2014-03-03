@@ -62,7 +62,7 @@ public class ReportTemplateServiceImpl implements ReportTemplateService {
     try {
       getReportTemplate(name, project);
       return true;
-    } catch(NoSuchProjectException e) {
+    } catch(NoSuchReportTemplateException e) {
       return false;
     }
   }
