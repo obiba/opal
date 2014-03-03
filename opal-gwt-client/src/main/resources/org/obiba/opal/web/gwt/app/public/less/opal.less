@@ -173,12 +173,6 @@ th input[type="checkbox"], td input[type="checkbox"] {
   }
 }
 
-.alert.select {
-  margin-bottom: 5px;
-  font-size: small;
-  min-height: 20px;
-}
-
 /* Ensure dialog box is at same z level as bootstrap modal */
 .gwt-DialogBox {
   z-index: 1050;
@@ -686,4 +680,17 @@ a.bookmark-on:focus {
 
 .table-chooser-xlarge {
   width: 50em;
+}
+
+.close {
+  color: @white;
+  opacity: 0.8;
+}
+
+.alert.actions-select {
+  margin-bottom: 0;
+  font-size: small;
+  min-height: 20px;
+  border-radius: 6px 6px 0 0;
+  background-color: @btnBackgroundHighlight
 }

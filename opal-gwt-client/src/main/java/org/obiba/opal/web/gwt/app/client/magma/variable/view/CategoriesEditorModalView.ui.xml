@@ -35,7 +35,7 @@
     </g:FlowPanel>
 
     <g:FlowPanel addStyleNames="small-top-margin">
-      <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false" addStyleNames="select">
+      <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false" addStyleNames="actions-select">
 
         <g:FlowPanel addStyleNames="pull-left">
           <b2:IconAnchor ui:field="deleteLink" icon="TRASH" addStyleNames="inline xsmall-indent">
