@@ -27,7 +27,7 @@
         <b:ControlLabel>
           <ui:msg description="Table label">Table</ui:msg>
         </b:ControlLabel>
-        <o:TableChooser ui:field="tableChooser"/>
+        <o:TableChooser ui:field="tableChooser" isMultipleSelect="false"/>
       </b:ControlGroup>
 
       <g:FlowPanel>

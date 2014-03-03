@@ -16,23 +16,22 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
-import org.obiba.opal.web.gwt.app.client.ui.RadioGroup;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController.Builder;
 import org.obiba.opal.web.gwt.app.client.magma.derive.helper.OpenTextualVariableDerivationHelper.Method;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveOpenTextualVariableStepPresenter;
+import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
+import org.obiba.opal.web.gwt.app.client.ui.RadioGroup;
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController.Builder;
 
+import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
-import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -60,10 +59,10 @@ public class DeriveOpenTextualVariableStepView extends ViewImpl
   @UiField
   WizardStep mapStep;
 
-  @UiField(provided = true)
+  @UiField
   RadioButton auto;
 
-  @UiField(provided = true)
+  @UiField
   RadioButton manual;
 
   final RadioGroup<Method> radioGroup;
@@ -89,8 +88,6 @@ public class DeriveOpenTextualVariableStepView extends ViewImpl
 
   public DeriveOpenTextualVariableStepView() {
     value = new SuggestBox(valueOracle = new MultiWordSuggestOracleWithDisplay());
-    auto = new RadioButton(Method.GROUP_METHOD);
-    manual = new RadioButton(Method.GROUP_METHOD);
     widget = uiBinder.createAndBindUi(this);
     radioGroup = new RadioGroup<Method>();
     radioGroup.addButton(auto, Method.AUTOMATICALLY);

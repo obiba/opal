@@ -53,8 +53,8 @@ public class AddViewModalView extends ModalPopupViewWithUiHandlers<AddViewModalU
   @UiField
   ControlGroup tablesGroup;
 
-  @UiField(provided = true)
-  final TableChooser tables;
+  @UiField
+  TableChooser tables;
 
   @UiField
   ControlGroup fileSelectionGroup;
@@ -68,7 +68,6 @@ public class AddViewModalView extends ModalPopupViewWithUiHandlers<AddViewModalU
   public AddViewModalView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
     this.translations = translations;
-    tables = new TableChooser(true);
     initWidget(uiBinder.createAndBindUi(this));
     modal.setTitle(translations.addViewTitle());
   }

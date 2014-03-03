@@ -64,13 +64,12 @@ public class ViewPropertiesModalView extends ModalPopupViewWithUiHandlers<ViewPr
   @UiField
   ControlGroup tablesGroup;
 
-  @UiField(provided = true)
+  @UiField
   TableChooser tableChooser;
 
   @Inject
   public ViewPropertiesModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
     super(eventBus);
-    tableChooser = new TableChooser(true);
     initWidget(uiBinder.createAndBindUi(this));
     dialog.setTitle(translations.editProperties());
   }

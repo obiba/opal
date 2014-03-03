@@ -13,6 +13,7 @@
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+    xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.magma.view"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -130,7 +131,7 @@
             <ui:msg description="Edit Categories label">Edit Categories</ui:msg>
           </b:Button>
           <o:OpalSimplePager ui:field="categoryTablePager" location="RIGHT" addStyleNames="pull-right"/>
-          <o:Table ui:field="categoryTable" addStyleNames="pull-left small-top-margin"/>
+          <o2:CategoriesTable ui:field="categoryTable" addStyleNames="pull-left small-top-margin"/>
         </g:FlowPanel>
 
         <b:Heading size="4">
