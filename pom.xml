@@ -1528,7 +1528,7 @@
                     </excludes>
                   </bannedDependencies>
                   <requireMavenVersion>
-                    <version>[2.2.1,)</version>
+                    <version>[3.0.0,)</version>
                   </requireMavenVersion>
                   <requireJavaVersion>
                     <version>${maven.compiler.target}</version>
@@ -1544,6 +1544,12 @@
           <groupId>org.lesscss</groupId>
           <artifactId>lesscss-maven-plugin</artifactId>
           <version>${maven-lesscss-plugin.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>sonar-maven-plugin</artifactId>
+          <version>${maven-sonar-plugin.version}</version>
         </plugin>
 
       </plugins>
@@ -1775,6 +1781,7 @@
     <maven-processor-plugin.version>2.2.4</maven-processor-plugin.version>
     <maven-release-plugin.version>2.4.2</maven-release-plugin.version>
     <maven-resources-plugin.version>2.6</maven-resources-plugin.version>
+    <maven-sonar-plugin.version>2.2</maven-sonar-plugin.version>
     <maven-source-plugin.version>2.2.1</maven-source-plugin.version>
     <maven-surefire-plugin.version>2.16</maven-surefire-plugin.version>
     <maven-war-plugin.version>2.4</maven-war-plugin.version>
