@@ -14,19 +14,17 @@
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <o:Modal ui:field="dialog" resizable="false" closeVisible="true" keyboard="true" animation="false">
+  <o:Modal ui:field="dialog" closeVisible="true" keyboard="true" animation="false">
     <g:FlowPanel>
-      <g:FlowPanel styleName="input">
-        <g:Label addStyleNames="key">
-          <ui:msg description="Add or update derived variables to a view description label">
-            Add or update a derived variable in a view for each selected variable.
-          </ui:msg>
-        </g:Label>
-      </g:FlowPanel>
+      <b:Paragraph>
+        <ui:msg description="Add or update derived variables to a view description label">
+          Add or update a derived variable in a view for each selected variable.
+        </ui:msg>
+      </b:Paragraph>
 
-      <g:FlowPanel styleName="input">
+      <g:FlowPanel>
         <!-- Datasource -->
-        <b:ControlLabel addStyleNames="key">
+        <b:ControlLabel>
           <ui:msg description="Datasource label">Datasource</ui:msg>
         </b:ControlLabel>
         <o:Chooser ui:field="datasourceListBox" visibleItemCount="1"/>
@@ -37,9 +35,9 @@
       </g:FlowPanel>
 
       <!-- View-->
-      <g:FlowPanel styleName="input">
+      <g:FlowPanel>
         <b:ControlGroup ui:field="nameGroup">
-          <b:ControlLabel addStyleNames="key">
+          <b:ControlLabel>
             <ui:msg description="View label">View</ui:msg>
           </b:ControlLabel>
           <o:EditableListBox ui:field="viewListBox"/>
@@ -52,9 +50,9 @@
       </g:FlowPanel>
 
       <!-- Derived variable: Single -->
-      <g:FlowPanel styleName="input" ui:field="singleVariablePanel">
+      <g:FlowPanel ui:field="singleVariablePanel">
         <b:ControlGroup ui:field="variableGroup">
-          <b:ControlLabel addStyleNames="key">
+          <b:ControlLabel >
             <ui:msg description="Derived variable label">Derived variable</ui:msg>
           </b:ControlLabel>
           <b:TextBox ui:field="singleVariable"/>
@@ -63,21 +61,20 @@
 
       <!-- Derived variables: Multiple -->
       <g:VerticalPanel width="100%" addStyleNames="content">
-        <g:FlowPanel styleName="input" ui:field="multipleVariablePanel">
+        <g:FlowPanel ui:field="multipleVariablePanel">
           <b:ControlGroup ui:field="variablesGroup">
-            <b:ControlLabel addStyleNames="key">
+            <b:ControlLabel>
               <ui:msg description="Derived variables label">Derived variables</ui:msg>
             </b:ControlLabel>
             <g:InlineLabel ui:field="noVariables">
               <ui:msg description="No Variables label">No Variables</ui:msg>
             </g:InlineLabel>
-            <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
-            <v:VariableEditableTable ui:field="table" width="100%"
-                addStyleNames="left-aligned clear-both bottom-margin"/>
+            <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right small-bottom-margin"/>
+            <v:VariableEditableTable ui:field="table" width="100%" addStyleNames="bottom-margin"/>
           </b:ControlGroup>
         </g:FlowPanel>
 
-        <g:FlowPanel styleName="clear-both">
+        <g:FlowPanel>
           <b:HelpBlock>
             <ui:msg description="Derived variable help label">
               Derived variable name can be different from the original variable. If a variable with same name already
@@ -88,8 +85,8 @@
       </g:VerticalPanel>
 
       <!-- Rename -->
-      <g:FlowPanel styleName="input" ui:field="renameWithNumberPanel">
-      <b:CheckBox ui:field="renameWithNumber">
+      <g:FlowPanel ui:field="renameWithNumberPanel">
+        <b:CheckBox ui:field="renameWithNumber">
           <ui:msg description="Rename each category with a number">Rename each category with a number</ui:msg>
         </b:CheckBox>
         <b:HelpBlock addStyleNames="help-block">
