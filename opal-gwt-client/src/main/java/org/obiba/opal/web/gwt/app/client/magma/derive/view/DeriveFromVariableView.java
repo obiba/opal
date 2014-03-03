@@ -52,8 +52,8 @@ public class DeriveFromVariableView extends ViewImpl implements DeriveFromVariab
   public DeriveFromVariableView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
 
-    tableChooser.setWidth("50em");
-    variableBox.setWidth("50em");
+    tableChooser.addStyleName("table-chooser-xlarge");
+    variableBox.addStyleName("table-chooser-xlarge");
   }
 
   @Override
