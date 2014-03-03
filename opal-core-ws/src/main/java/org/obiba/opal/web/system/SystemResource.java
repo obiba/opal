@@ -159,10 +159,16 @@ public class SystemResource {
   @NotAuthenticated // allow anonymous to be able to retrive Opal instance name
   public Opal.GeneralConf getOpalGeneralConfiguration() {
     OpalGeneralConfig conf = serverService.getConfig();
-    return Opal.GeneralConf.newBuilder()//
+    Opal.GeneralConf.Builder builder = Opal.GeneralConf.newBuilder()//
         .setName(conf.getName())//
         .addAllLanguages(conf.getLocalesAsString())//
-        .setDefaultCharSet(conf.getDefaultCharacterSet()).build();
+        .setDefaultCharSet(conf.getDefaultCharacterSet());
+
+    if(conf.getPublicUrl() != null) {
+      builder.setPublicURL(conf.getPublicUrl());
+    }
+
+    return builder.build();
   }
 
   @PUT
@@ -170,6 +176,7 @@ public class SystemResource {
   public Response updateGeneralConfigurations(Opal.GeneralConf dto) {
     OpalGeneralConfig conf = serverService.getConfig();
     conf.setName(dto.getName().isEmpty() ? OpalGeneralConfig.DEFAULT_NAME : dto.getName());
+    conf.setPublicUrl(dto.getPublicURL());
 
     if(dto.getLanguagesList().isEmpty()) {
       conf.setLocales(Lists.newArrayList(OpalGeneralConfig.DEFAULT_LOCALE));

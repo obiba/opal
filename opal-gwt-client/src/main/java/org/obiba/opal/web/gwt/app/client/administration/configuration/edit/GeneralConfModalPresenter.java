@@ -60,6 +60,7 @@ public class GeneralConfModalPresenter extends ModalPresenterWidget<GeneralConfM
       dto.setName(getView().getName().getText());
       dto.setDefaultCharSet(getView().getDefaultCharSet().getText());
       dto.setLanguagesArray(getView().getLanguages());
+      dto.setPublicURL(getView().getPublicUrl().getText());
 
       ResourceRequestBuilderFactory.<GeneralConf>newBuilder().forResource("/system/conf/general")
           .withResourceBody(GeneralConf.stringify(dto)).withCallback(new ResponseCodeCallback() {
@@ -78,6 +79,7 @@ public class GeneralConfModalPresenter extends ModalPresenterWidget<GeneralConfM
 
   public void setGeneralConf(GeneralConf conf) {
     getView().getName().setText(conf.getName());
+    getView().getPublicUrl().setText(conf.getPublicURL());
     getView().setSelectedCharset(conf.getDefaultCharSet());
     getView().setSelectedLanguages(conf.getLanguagesArray());
   }
@@ -124,6 +126,8 @@ public class GeneralConfModalPresenter extends ModalPresenterWidget<GeneralConfM
     }
 
     HasText getName();
+
+    HasText getPublicUrl();
 
     HasText getDefaultCharSet();
 
