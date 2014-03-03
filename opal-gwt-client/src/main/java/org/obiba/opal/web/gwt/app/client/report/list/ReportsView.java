@@ -29,6 +29,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.HasVisibility;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -56,12 +57,18 @@ public class ReportsView extends ViewWithUiHandlers<ReportsUiHandlers> implement
   public ReportsView(Binder uiBinder, Translations translations) {
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
+    add.setVisible(false);
   }
 
   @Override
   public void setInSlot(Object slot, IsWidget content) {
     reportTemplateDetailsPanel.clear();
     reportTemplateDetailsPanel.add(content);
+  }
+
+  @Override
+  public HasVisibility getAddButtonVisibility() {
+    return add;
   }
 
   @Override
@@ -138,7 +145,8 @@ public class ReportsView extends ViewWithUiHandlers<ReportsUiHandlers> implement
     }
 
     private void unActivateLinks() {
-      for(int i = 0; i < reportList.getWidgetCount(); i++) {
+      int widgetCount = reportList.getWidgetCount();
+      for(int i = 0; i < widgetCount; i++) {
         if(reportList.getWidget(i) instanceof NavLink) {
           ((NavWidget) reportList.getWidget(i)).setActive(false);
         }

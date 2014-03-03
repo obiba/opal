@@ -57,6 +57,7 @@ import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
 import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
+import static com.google.gwt.http.client.Response.SC_OK;
 
 public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTemplateDetailsPresenter.Display>
     implements ReportTemplateDetailsUiHandlers {
@@ -123,13 +124,13 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
   @Override
   public void onExecute() {
-    ResponseCodeCallback callbackHandler = new CommandResponseCallBack();
     ReportCommandOptionsDto reportCommandOptions = ReportCommandOptionsDto.create();
     reportCommandOptions.setName(reportTemplate.getName());
+    reportCommandOptions.setProject(reportTemplate.getProject());
     ResourceRequestBuilderFactory.newBuilder() //
         .forResource("/project/" + reportTemplate.getProject() + "/commands/_report") //
         .withResourceBody(ReportCommandOptionsDto.stringify(reportCommandOptions)) //
-        .withCallback(Response.SC_CREATED, callbackHandler) //
+        .withCallback(Response.SC_CREATED, new CommandResponseCallBack()) //
         .post().send();
   }
 
@@ -142,7 +143,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
         ResourceRequestBuilderFactory.newBuilder() //
             .forResource(
                 UriBuilders.PROJECT_REPORT_TEMPLATE.create().build(reportTemplate.getProject(), reportTemplateName)) //
-            .withCallback(Response.SC_OK, new RemoveReportTemplateResponseCallBack()) //
+            .withCallback(SC_OK, new RemoveReportTemplateResponseCallBack()) //
             .withCallback(SC_NOT_FOUND, new ReportTemplateNotFoundCallBack(reportTemplateName)) //
             .delete().send();
       }
@@ -257,22 +258,15 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
           actionRequiringConfirmation = new Runnable() {
             @Override
             public void run() {
-              ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
-
-                @Override
-                public void onResponseCode(Request request, Response response) {
-                  if(response.getStatusCode() == Response.SC_OK) {
-                    refreshProducedReports(reportTemplate);
-                  } else {
-                    getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-                  }
-                }
-              };
-
-              ResourceRequestBuilderFactory.newBuilder().forResource(dto.getLink()).delete()
-                  .withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler)
-                  .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler)
-                  .withCallback(SC_NOT_FOUND, callbackHandler).send();
+              ResourceRequestBuilderFactory.newBuilder() //
+                  .forResource(dto.getLink()) //
+                  .withCallback(SC_OK, new ResponseCodeCallback() {
+                    @Override
+                    public void onResponseCode(Request request, Response response) {
+                      refreshProducedReports(reportTemplate);
+                    }
+                  }) //
+                  .delete().send();
             }
           };
           fireEvent(ConfirmationRequiredEvent
@@ -370,8 +364,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
     }
 
     private void downloadFile(String filePath) {
-      String url = "/files" + filePath;
-      getEventBus().fireEvent(new FileDownloadRequestEvent(url));
+      getEventBus().fireEvent(new FileDownloadRequestEvent("/files" + filePath));
     }
 
   }

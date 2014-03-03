@@ -13,6 +13,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
@@ -31,6 +33,7 @@ import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasVisibility;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -39,14 +42,15 @@ import com.gwtplatform.mvp.client.View;
 
 public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> implements ReportsUiHandlers {
 
-  private ReportTemplateDetailsPresenter reportTemplateDetailsPresenter;
+  private final ReportTemplateDetailsPresenter reportTemplateDetailsPresenter;
 
-  private ModalProvider<ReportTemplateEditModalPresenter> reportTemplateUpdateModalPresenterProvider;
+  private final ModalProvider<ReportTemplateEditModalPresenter> reportTemplateUpdateModalPresenterProvider;
 
   private ReportTemplateDto reportTemplate;
 
   private Runnable actionRequiringConfirmation;
 
+  @Nullable
   private String project;
 
   @Inject
@@ -79,6 +83,7 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
 
   public void showProject(String projectName) {
     project = projectName;
+    getView().getAddButtonVisibility().setVisible(true);
     refreshReportTemplates(null);
   }
 
@@ -86,10 +91,6 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
   protected void onReveal() {
     refreshReportTemplates(null);
   }
-
-  //
-  // Private methods
-  //
 
   private void addHandlers() {
     addRegisteredHandler(ReportTemplateSelectedEvent.getType(),
@@ -114,8 +115,7 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
   }
 
   private void refreshReportTemplates(ReportTemplateDto templateToSelect) {
-    String uri;
-    uri = project == null
+    String uri = project == null
         ? UriBuilders.REPORT_TEMPLATES.create().build()
         : UriBuilders.PROJECT_REPORT_TEMPLATES.create().build(project);
 
@@ -198,6 +198,8 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
     HasAuthorization getAddReportTemplateAuthorizer();
 
     void setCurrentReportTemplate(ReportTemplateDto reportTemplateDto);
+
+    HasVisibility getAddButtonVisibility();
 
     void setReportTemplates(JsArray<ReportTemplateDto> templates);
   }

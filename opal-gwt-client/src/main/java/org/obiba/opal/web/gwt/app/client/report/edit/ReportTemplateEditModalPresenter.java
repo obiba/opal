@@ -35,7 +35,6 @@ import org.obiba.opal.web.gwt.app.client.view.TextBoxItemInputView;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.ParameterDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
@@ -191,10 +190,13 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
 
   @Override
   public void updateReportTemplate() {
-    if(dialogMode == Mode.CREATE) {
-      createReportTemplate();
-    } else if(dialogMode == Mode.UPDATE) {
-      updateReportTemplateInternal();
+    switch(dialogMode) {
+      case CREATE:
+        createReportTemplate();
+        break;
+      case UPDATE:
+        updateReportTemplateInternal();
+        break;
     }
   }
 
@@ -216,12 +218,8 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
   private void createReportTemplate() {
     if(validReportTemplate()) {
       ReportTemplateDto reportTemplate = getReportTemplateDto();
-      String uri = UriBuilder.create().segment("report-templates").build();
-      if(project != null) {
-        reportTemplate.setProject(project);
-        uri = UriBuilders.PROJECT_REPORT_TEMPLATES.create().build(project);
-      }
-      ResourceRequestBuilderFactory.newBuilder().forResource(uri) //
+      ResourceRequestBuilderFactory.newBuilder() //
+          .forResource(UriBuilder.create().segment("report-templates").build()) //
           .withResourceBody(ReportTemplateDto.stringify(reportTemplate)) //
           .withCallback(new CreateOrUpdateReportTemplateCallBack(reportTemplate), SC_OK, SC_CREATED) //
           .post().send();
@@ -257,25 +255,26 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
   }
 
   private ReportTemplateDto getReportTemplateDto() {
-    ReportTemplateDto reportTemplate = ReportTemplateDto.create();
-    reportTemplate.setName(getView().getName().getText());
+    ReportTemplateDto dto = ReportTemplateDto.create();
+    dto.setName(getView().getName().getText());
+    dto.setProject(project);
     String schedule = getView().getSchedule().getText();
     if(schedule != null && schedule.trim().length() > 0) {
-      reportTemplate.setCron(getView().getSchedule().getText());
+      dto.setCron(getView().getSchedule().getText());
     }
-    reportTemplate.setDesign(getView().getDesignFile());
+    dto.setDesign(getView().getDesignFile());
     for(String email : emailSelectorPresenter.getView().getItems()) {
-      reportTemplate.addEmailNotification(email);
+      dto.addEmailNotification(email);
     }
-    reportTemplate.setFormat("html");
+    dto.setFormat("html");
     ParameterDto parameterDto;
     for(String parameterStr : parametersSelectorPresenter.getView().getItems()) {
       parameterDto = ParameterDto.create();
       parameterDto.setValue(getParameterValue(parameterStr));
       parameterDto.setKey(getParameterKey(parameterStr));
-      reportTemplate.addParameters(parameterDto);
+      dto.addParameters(parameterDto);
     }
-    return reportTemplate;
+    return dto;
   }
 
   private String getParameterKey(String parameterStr) {
@@ -298,7 +297,7 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
 
   private class CreateOrUpdateReportTemplateCallBack implements ResponseCodeCallback {
 
-    ReportTemplateDto reportTemplate;
+    private final ReportTemplateDto reportTemplate;
 
     private CreateOrUpdateReportTemplateCallBack(ReportTemplateDto reportTemplate) {
       this.reportTemplate = reportTemplate;
