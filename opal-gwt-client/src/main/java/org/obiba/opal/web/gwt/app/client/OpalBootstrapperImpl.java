@@ -122,13 +122,13 @@ public class OpalBootstrapperImpl implements Bootstrapper {
       @Override
       public void onSessionEnded(SessionEndedEvent event) {
         if(requestCredentials.hasCredentials()) {
+          Window.Location.replace("/");
           ResourceRequestBuilderFactory.newBuilder().forResource(
               UriBuilder.create().segment("auth", "session", requestCredentials.extractCredentials()).build())//
               .withCallback(new ResponseCodeCallback() {
                 @Override
                 public void onResponseCode(Request request, Response response) {
-                  // Reload application and reset history
-                  Window.Location.replace("/");
+                  // nothing
                 }
               }) //
               .delete().send();
@@ -137,7 +137,7 @@ public class OpalBootstrapperImpl implements Bootstrapper {
       }
     });
 
-    // Kills the session it the browser is closed or when navigating to another page.
+    // Kills the session if the browser is closed or when navigating to another page.
     Window.addWindowClosingHandler(new ClosingHandler() {
 
       @Override
