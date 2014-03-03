@@ -264,7 +264,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
       @Override
       public void onUserMessage(NotificationEvent event) {
-        if(isVisible() && !event.isConsumed()) {
+        if(isVisible() && !event.isConsumed() && activeModals == 0) {
           messageDialog.setNotification(event);
           setInSlot(NOTIFICATION, messageDialog);
         }

@@ -38,7 +38,7 @@ public class UnhandledResponseNotificationView extends ViewImpl
   @Override
   public void setErrorMessage(String title, String message) {
     alert.setHeading(title);
-    errorMessage.setText(message);
+    errorMessage.getElement().setInnerHTML(message);
     alertsPanel.add(alert);
   }
 

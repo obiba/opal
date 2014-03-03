@@ -36,11 +36,9 @@ public class ErrorResponseCallback implements ResponseCodeCallback {
     ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
     Collection<ConstraintViolationErrorDto> violationDtos = parseErrors(error);
     if(violationDtos.isEmpty()) {
-      String errorMessage = translations.userMessageMap().get(error.getStatus());
-      builder.message(errorMessage == null
-          ? translationMessages
-          .unknownResponse(error.getStatus(), String.valueOf(JsArrays.toList(error.getArgumentsArray())))
-          : errorMessage);
+      String defaultMessage = translationMessages
+          .unknownResponse(error.getStatus(), String.valueOf(JsArrays.toList(error.getArgumentsArray())));
+      builder.message(ClientErrorDtoMessageBuilder.get(error).withdefaultMessage(defaultMessage).build());
     } else {
       builder.violations(violationDtos);
     }

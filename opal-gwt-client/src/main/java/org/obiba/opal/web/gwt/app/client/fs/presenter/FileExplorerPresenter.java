@@ -359,8 +359,6 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == Response.SC_OK) {
           fireEvent(new FolderRequestEvent(getCurrentFolder()));
-        } else {
-          fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         }
         filesClipboard = null;
         currentAction = null;
@@ -375,10 +373,8 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
     }
     uriBuilder.query("action", currentAction.toString().toLowerCase());
     ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).put()
-        .withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler)
-        .withCallback(Response.SC_BAD_REQUEST, callbackHandler)
-        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler)
-        .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+        .withCallback(Response.SC_OK, callbackHandler)
+        .send();
   }
 
   private boolean hasCheckedFiles() {

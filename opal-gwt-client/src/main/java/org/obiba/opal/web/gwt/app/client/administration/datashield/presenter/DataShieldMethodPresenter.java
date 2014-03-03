@@ -161,8 +161,7 @@ public class DataShieldMethodPresenter extends ModalPresenterWidget<DataShieldMe
     ResourceRequestBuilderFactory.newBuilder().forResource(methods()).post()//
         .withResourceBody(DataShieldMethodDto.stringify(dto))//
         .withCallback(Response.SC_OK, callbackHandler)//
-        .withCallback(Response.SC_CREATED, callbackHandler)//
-        .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+        .withCallback(Response.SC_CREATED, callbackHandler).send();
   }
 
   private void putMethod(DataShieldMethodDto dto) {
@@ -170,8 +169,7 @@ public class DataShieldMethodPresenter extends ModalPresenterWidget<DataShieldMe
     ResourceRequestBuilderFactory.newBuilder().forResource(method(getView().getName().getText())).put()//
         .withResourceBody(DataShieldMethodDto.stringify(dto))//
         .withCallback(Response.SC_OK, callbackHandler)//
-        .withCallback(Response.SC_CREATED, callbackHandler)//
-        .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+        .withCallback(Response.SC_CREATED, callbackHandler).send();
   }
 
   private DataShieldMethodDto getDataShieldMethodDto() {
@@ -251,8 +249,6 @@ public class DataShieldMethodPresenter extends ModalPresenterWidget<DataShieldMe
         getEventBus().fireEvent(new DataShieldMethodUpdatedEvent());
       } else if(response.getStatusCode() == Response.SC_CREATED) {
         getEventBus().fireEvent(new DataShieldMethodCreatedEvent(dto));
-      } else {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
       }
     }
   }
