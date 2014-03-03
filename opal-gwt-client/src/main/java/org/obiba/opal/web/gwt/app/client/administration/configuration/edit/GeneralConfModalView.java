@@ -50,8 +50,8 @@ public class GeneralConfModalView extends ModalPopupViewWithUiHandlers<GeneralCo
   @UiField
   TextBox name;
 
-  @UiField(provided = true)
-  final LocaleChooser locales;
+  @UiField
+  LocaleChooser locales;
 
   @UiField
   CharacterSetView characterSet;
@@ -65,12 +65,12 @@ public class GeneralConfModalView extends ModalPopupViewWithUiHandlers<GeneralCo
   @UiField
   ControlGroup defaultCharsetGroup;
 
+  @UiField
+  TextBox publicUrl;
+
   @Inject
   public GeneralConfModalView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
-
-    locales = new LocaleChooser(true);
-
     initWidget(uiBinder.createAndBindUi(this));
     modal.setTitle(translations.editProperties());
   }
@@ -88,6 +88,11 @@ public class GeneralConfModalView extends ModalPopupViewWithUiHandlers<GeneralCo
   @Override
   public HasText getName() {
     return name;
+  }
+
+  @Override
+  public HasText getPublicUrl() {
+    return publicUrl;
   }
 
   @Override

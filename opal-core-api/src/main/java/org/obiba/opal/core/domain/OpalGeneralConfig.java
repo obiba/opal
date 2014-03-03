@@ -37,6 +37,8 @@ public class OpalGeneralConfig extends AbstractTimestamped {
 
   private String defaultCharacterSet = DEFAULT_CHARSET;
 
+  private String publicUrl;
+
   @NotNull
   public String getName() {
     return name;
@@ -69,6 +71,14 @@ public class OpalGeneralConfig extends AbstractTimestamped {
 
   public void setDefaultCharacterSet(String defaultCharacterSet) {
     this.defaultCharacterSet = defaultCharacterSet;
+  }
+
+  public String getPublicUrl() {
+    return publicUrl;
+  }
+
+  public void setPublicUrl(String publicUrl) {
+    this.publicUrl = publicUrl;
   }
 
   @Override
