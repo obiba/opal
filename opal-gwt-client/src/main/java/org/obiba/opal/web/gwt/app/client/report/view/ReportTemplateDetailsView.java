@@ -54,7 +54,6 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
-import static org.obiba.opal.web.gwt.app.client.report.view.ReportTemplateDetailsPresenter.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.report.view.ReportTemplateDetailsPresenter.DOWNLOAD_ACTION;
 
 public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplateDetailsUiHandlers>

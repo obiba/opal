@@ -99,7 +99,7 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
   public IdentifiersTableView(Binder uiBinder, Translations translations) {
     initWidget(uiBinder.createAndBindUi(this));
     valueSetsProvider = new ValueSetsDataProvider();
-    variablesProvider = new ListDataProvider<VariableDto>();
+    variablesProvider = new ListDataProvider<>();
     this.translations = translations;
 
     importIdentifiers.setText(translations.importIdentifiers());

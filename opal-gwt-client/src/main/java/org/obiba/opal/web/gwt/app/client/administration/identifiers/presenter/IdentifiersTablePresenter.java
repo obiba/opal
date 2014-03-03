@@ -56,7 +56,7 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
 
   private Runnable removeConfirmation;
 
-  private TranslationMessages translationMessages;
+  private final TranslationMessages translationMessages;
 
   @Inject
   public IdentifiersTablePresenter(EventBus eventBus, Display view,
@@ -74,7 +74,7 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
     getView().setUiHandlers(this);
   }
 
-  public void showIdentifiersTable(TableDto table) {
+  public void showIdentifiersTable(@SuppressWarnings("ParameterHidesMemberVariable") TableDto table) {
     this.table = table;
     getView().showIdentifiersTable(table);
     String uri = UriBuilders.IDENTIFIERS_TABLE_VARIABLES.create().build(table.getName());
@@ -254,7 +254,7 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
 
   public interface Display extends View, HasUiHandlers<IdentifiersTableUiHandlers> {
 
-    void showIdentifiersTable(TableDto table);
+    void showIdentifiersTable(TableDto tableDto);
 
     void setVariables(JsArray<VariableDto> variables);
 
