@@ -63,7 +63,7 @@
       <o:OpalSimplePager ui:field="indexTablePager" location="RIGHT" addStyleNames="pull-right"/>
     </g:FlowPanel>
 
-    <b:Alert ui:field="selectAllAlert" close="false" visible="false" addStyleNames="select">
+    <b:Alert ui:field="selectAllAlert" close="false" visible="false" addStyleNames="actions-select">
       <b2:IconAnchor icon="PLAY" ui:field="indexNow" addStyleNames="inline small-indent">
         <ui:msg description="Index Now label">Index Now</ui:msg>
       </b2:IconAnchor>
