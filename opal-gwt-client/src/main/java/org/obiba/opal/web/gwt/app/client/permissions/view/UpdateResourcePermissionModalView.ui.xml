@@ -14,12 +14,12 @@
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <o:Modal ui:field="dialog" resizable="false" closeVisible="true" keyboard="true" animation="false">
+  <o:Modal ui:field="dialog" closeVisible="true" keyboard="true" animation="false">
     <g:FlowPanel>
       <b:ControlGroup>
-        <b:Heading size="5" ui:field="subjectLabel"></b:Heading>
+        <b:Heading size="5" ui:field="subjectLabel"/>
         <b:Controls>
-          <o:ResourcePermissionsPanel ui:field="permissions" addStyleNames="large-top-margin"></o:ResourcePermissionsPanel>
+          <o:ResourcePermissionsPanel ui:field="permissions" addStyleNames="large-top-margin"/>
         </b:Controls>
       </b:ControlGroup>
     </g:FlowPanel>

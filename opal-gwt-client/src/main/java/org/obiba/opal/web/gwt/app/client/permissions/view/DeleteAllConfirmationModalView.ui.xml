@@ -14,9 +14,9 @@
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <o:Modal ui:field="dialog" resizable="false" closeVisible="true" keyboard="true" animation="false">
+  <o:Modal ui:field="dialog" closeVisible="true" keyboard="true" animation="false">
     <g:FlowPanel>
-      <b:Paragraph ui:field="message"></b:Paragraph>
+      <b:Paragraph ui:field="message"/>
     </g:FlowPanel>
 
     <b:ModalFooter>

@@ -4,7 +4,7 @@
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <o:Modal ui:field="dialogBox" resizable="false" draggable="false">
+  <o:Modal ui:field="dialogBox" draggable="false">
     <b:Paragraph ui:field="message">Confirmation message.</b:Paragraph>
     <b:ModalFooter>
       <b:Button type="PRIMARY" ui:field="yesButton">
