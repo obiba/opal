@@ -487,8 +487,6 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
             close(view);
           } else if(response.getStatusCode() == Response.SC_FORBIDDEN) {
             getEventBus().fireEvent(NotificationEvent.newBuilder().error("UnauthorizedOperation").build());
-          } else {
-            getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
           }
         }
       };
@@ -501,11 +499,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
           .accept("application/x-protobuf+json").withResourceBody(ViewDto.stringify(view))//
           .withCallback(Response.SC_CREATED, callback)//
           .withCallback(Response.SC_OK, callback)//
-          .withCallback(Response.SC_BAD_REQUEST, callback)//
           .withCallback(Response.SC_FORBIDDEN, callback)//
-          .withCallback(Response.SC_NOT_FOUND, callback)//
-          .withCallback(Response.SC_METHOD_NOT_ALLOWED, callback)//
-          .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback) //
           .send();
     }
   }
@@ -606,8 +600,6 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
                     close(view);
                   }
                 }).send();
-          } else {
-            getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
           }
         }
       };
@@ -618,12 +610,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
           .put() //
           .forResource(ub.build()) //
           .withResourceBody(ViewDto.stringify(view)) //
-          .withCallback(Response.SC_OK, callback) //
-          .withCallback(Response.SC_BAD_REQUEST, callback)//
-          .withCallback(Response.SC_NOT_FOUND, callback)//
-          .withCallback(Response.SC_METHOD_NOT_ALLOWED, callback)//
-          .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback) //
-          .send();
+          .withCallback(Response.SC_OK, callback).send();
     }
   }
 

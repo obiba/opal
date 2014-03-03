@@ -87,12 +87,7 @@ public class DatasourceValuesStepPresenter extends PresenterWidget<DatasourceVal
             }
           }
 
-        }).withCallback(Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        getView().showErrors((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));
-      }
-    }).send();
+        }).send();
   }
 
   //

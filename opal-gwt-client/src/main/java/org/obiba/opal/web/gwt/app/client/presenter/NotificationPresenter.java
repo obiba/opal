@@ -31,9 +31,6 @@ public class NotificationPresenter extends PresenterWidget<NotificationPresenter
 
     void setNotification(NotificationEvent event);
 
-    void setNotification(NotificationType type, List<String> message, @Nullable List<String> messageArgs,
-        @Nullable String title, boolean isSticky, ClosedHandler handler);
-
     void close();
   }
 
@@ -53,11 +50,6 @@ public class NotificationPresenter extends PresenterWidget<NotificationPresenter
 
   public void setNotification(NotificationEvent event) {
     getView().setNotification(event);
-  }
-
-  public void setNotification(NotificationType type, List<String> messages, @Nullable List<String> messageArgs,
-      @Nullable String title, boolean isSticky, ClosedHandler handler) {
-    getView().setNotification(type, messages, messageArgs, title, isSticky, handler);
   }
 
   public void close() {

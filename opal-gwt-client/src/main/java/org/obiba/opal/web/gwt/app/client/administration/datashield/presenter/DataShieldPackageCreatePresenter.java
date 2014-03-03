@@ -122,16 +122,14 @@ public class DataShieldPackageCreatePresenter extends ModalPresenterWidget<DataS
             .withResourceBody(RPackageDto.stringify(dto))//
             .withCallback(Response.SC_OK, callbackHandler)//
             .withCallback(Response.SC_NOT_FOUND, callbackHandler)//
-            .withCallback(Response.SC_CREATED, callbackHandler)//
-            .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+            .withCallback(Response.SC_CREATED, callbackHandler).send();
       } else {
         ResourceRequestBuilderFactory.newBuilder()
             .forResource(packagesR(getView().getName().getText(), getView().getReference().getText())).post()//
             .withResourceBody(RPackageDto.stringify(dto))//
             .withCallback(Response.SC_OK, callbackHandler)//
             .withCallback(Response.SC_CREATED, callbackHandler)//
-            .withCallback(Response.SC_NOT_FOUND, callbackHandler)//
-            .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+            .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
       }
     }
 

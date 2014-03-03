@@ -10,7 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.presenter;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.support.UnhandledResponseEventMessageBuilder;
+import org.obiba.opal.web.gwt.app.client.support.ErrorResponseMessageBuilder;
 import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 
 import com.google.inject.Inject;
@@ -37,8 +37,8 @@ public class UnhandledResponseNotificationPresenter
 
   public UnhandledResponseNotificationPresenter withResponseEvent(UnhandledResponseEvent event) {
     getView().clearErrorMessages();
-    getView()
-        .setErrorMessage(translations.systemErrorLablel(), UnhandledResponseEventMessageBuilder.get(event).build());
+    getView().setErrorMessage(translations.systemErrorLablel(),
+        ErrorResponseMessageBuilder.get(event.getResponse()).withDefaultMessage(event.getShortMessage()).build());
     return this;
   }
 }

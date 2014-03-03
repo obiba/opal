@@ -172,7 +172,6 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
     ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build(datasourceName)).post() //
         .withResourceBody(
             ExportCommandOptionsDto.stringify(createExportCommandOptions(fileFormat, outFile, idMapping))) //
-        .withCallback(Response.SC_BAD_REQUEST, new ClientFailureResponseCodeCallBack()) //
         .withCallback(Response.SC_CREATED, new SuccessResponseCodeCallBack(outFile)).send();
   }
 
@@ -204,13 +203,6 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
   //
   // Interfaces and classes
   //
-
-  class ClientFailureResponseCodeCallBack implements ResponseCodeCallback {
-    @Override
-    public void onResponseCode(Request request, Response response) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-    }
-  }
 
   class SuccessResponseCodeCallBack implements ResponseCodeCallback {
 

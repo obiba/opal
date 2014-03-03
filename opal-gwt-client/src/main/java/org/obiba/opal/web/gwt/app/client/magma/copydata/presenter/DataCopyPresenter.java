@@ -107,7 +107,6 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
         .forResource(UriBuilders.PROJECT_COMMANDS_COPY.create().build(datasourceName)) //
         .post() //
         .withResourceBody(CopyCommandOptionsDto.stringify(createCopyCommandOptions(destination, newName))) //
-        .withCallback(Response.SC_BAD_REQUEST, new ClientFailureResponseCodeCallBack()) //
         .withCallback(Response.SC_CREATED, new SuccessResponseCodeCallBack(destination)).send();
   }
 
@@ -183,20 +182,6 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
   //
   // Interfaces and classes
   //
-
-  class ClientFailureResponseCodeCallBack implements ResponseCodeCallback {
-    @Override
-    public void onResponseCode(Request request, Response response) {
-      NotificationEvent.Builder builder = NotificationEvent.newBuilder();
-      try {
-        ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
-        builder.error(errorDto.getStatus()).args(errorDto.getArgumentsArray());
-      } catch(Exception e) {
-        builder.error(response.getText());
-      }
-      fireEvent(builder.build());
-    }
-  }
 
   class SuccessResponseCodeCallBack implements ResponseCodeCallback {
 

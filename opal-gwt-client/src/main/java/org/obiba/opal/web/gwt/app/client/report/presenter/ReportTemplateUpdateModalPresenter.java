@@ -258,7 +258,7 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
       ResponseCodeCallback callbackHandler = new CreateOrUpdateReportTemplateCallBack(reportTemplate);
       ResourceRequestBuilderFactory.newBuilder().forResource(uri).post()
           .withResourceBody(ReportTemplateDto.stringify(reportTemplate)).withCallback(Response.SC_OK, callbackHandler)
-          .withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler)
+          .withCallback(Response.SC_CREATED, callbackHandler)
           .send();
     }
   }
@@ -330,7 +330,7 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
     UriBuilder ub = UriBuilder.create().segment("report-template", getView().getName().getText());
     ResourceRequestBuilderFactory.newBuilder().forResource(ub.build()).put()
         .withResourceBody(ReportTemplateDto.stringify(reportTemplate)).withCallback(Response.SC_OK, callbackHandler)
-        .withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler)
+        .withCallback(Response.SC_CREATED, callbackHandler)
         .send();
   }
 
@@ -349,17 +349,6 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
         getEventBus().fireEvent(new ReportTemplateUpdatedEvent(reportTemplate));
       } else if(response.getStatusCode() == Response.SC_CREATED) {
         getEventBus().fireEvent(new ReportTemplateCreatedEvent(reportTemplate));
-      } else {
-        String msg = "UnknownError";
-        if(response.getText() != null && response.getText().length() != 0) {
-          try {
-            ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
-            msg = errorDto.getStatus();
-          } catch(Exception ignored) {
-
-          }
-        }
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error(msg).build());
       }
     }
   }

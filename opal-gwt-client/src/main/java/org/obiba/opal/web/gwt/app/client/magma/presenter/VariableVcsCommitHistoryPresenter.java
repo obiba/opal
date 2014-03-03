@@ -92,7 +92,7 @@ public class VariableVcsCommitHistoryPresenter extends PresenterWidget<VariableV
       public void onResource(Response response, VcsCommitInfosDto commitInfos) {
         getView().setData(commitInfos.getCommitInfosArray());
       }
-    }).withCallback(Response.SC_BAD_REQUEST, new CsvErrorResponseCallback()).get().send();
+    }).get().send();
   }
 
   @Override
@@ -100,17 +100,6 @@ public class VariableVcsCommitHistoryPresenter extends PresenterWidget<VariableV
     super.onBind();
 
     getView().getActions().setActionHandler(new VcsCommitInfoActionHandler());
-  }
-
-  private final class CsvErrorResponseCallback implements ResponseCodeCallback {
-
-    CsvErrorResponseCallback() {}
-
-    @Override
-    public void onResponseCode(Request request, Response response) {
-      ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-      fireEvent(NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray()).build());
-    }
   }
 
   private class VcsCommitInfoActionHandler implements ActionHandler<VcsCommitInfoDto> {
@@ -141,7 +130,7 @@ public class VariableVcsCommitHistoryPresenter extends PresenterWidget<VariableV
           vcsHistoryModalPresenter.setCommitInfo(resource);
           vcsHistoryModalProvider.show();
         }
-      }).withCallback(Response.SC_BAD_REQUEST, new CsvErrorResponseCallback()).get().send();
+      }).get().send();
     }
 
     private void viewCommitContent(VcsCommitInfoDto dto) {
@@ -161,7 +150,7 @@ public class VariableVcsCommitHistoryPresenter extends PresenterWidget<VariableV
         public void onResource(Response response, VcsCommitInfoDto resource) {
           getEventBus().fireEvent(new VcsCommitInfoReceivedEvent(resource));
         }
-      }).withCallback(Response.SC_BAD_REQUEST, new CsvErrorResponseCallback()).get().send();
+      }).get().send();
     }
 
   }

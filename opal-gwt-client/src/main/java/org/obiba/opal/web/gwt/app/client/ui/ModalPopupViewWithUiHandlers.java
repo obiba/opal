@@ -1,6 +1,11 @@
 package org.obiba.opal.web.gwt.app.client.ui;
 
-import org.obiba.opal.web.gwt.app.client.support.UnhandledResponseEventMessageBuilder;
+import java.util.List;
+
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.support.ErrorResponseMessageBuilder;
+import org.obiba.opal.web.gwt.app.client.support.NotificationAlertTypeMap;
+import org.obiba.opal.web.gwt.app.client.support.NotificationMessageBuilder;
 import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
@@ -19,6 +24,8 @@ public abstract class ModalPopupViewWithUiHandlers<C extends ModalUiHandlers> ex
 
   private HandlerRegistration handlerRegistration;
 
+  private HandlerRegistration notificationHandlerRegistration;
+
   protected ModalPopupViewWithUiHandlers(EventBus eventBus) {
     super(eventBus);
     registerUserMessageEventHandler();
@@ -36,13 +43,31 @@ public abstract class ModalPopupViewWithUiHandlers<C extends ModalUiHandlers> ex
   }
 
   private void registerUserMessageEventHandler() {
+    notificationHandlerRegistration = getEventBus()
+        .addHandler(NotificationEvent.getType(), new NotificationEvent.Handler() {
+
+      @Override
+      public void onUserMessage(NotificationEvent event) {
+        if(event.isConsumed() || !asModal().isVisible()) return;
+        event.setConsumed(true);
+        List<String> messages = NotificationMessageBuilder.get(event).build();
+
+        for (String message : messages) {
+          asModal().addAlert(message, NotificationAlertTypeMap.getAlertType(event.getNotificationType()));
+        }
+      }
+    });
+
+
     handlerRegistration = getEventBus()
         .addHandler(UnhandledResponseEvent.getType(), new UnhandledResponseEvent.Handler() {
           @Override
           public void onUnhandledResponse(UnhandledResponseEvent event) {
             if(event.isConsumed() || !asModal().isVisible()) return;
             event.setConsumed(true);
-            asModal().addAlert(UnhandledResponseEventMessageBuilder.get(event).build(), AlertType.ERROR);
+            asModal().addAlert(
+                ErrorResponseMessageBuilder.get(event.getResponse()).withDefaultMessage(event.getShortMessage())
+                    .build(), AlertType.ERROR);
           }
         });
   }
@@ -52,6 +77,7 @@ public abstract class ModalPopupViewWithUiHandlers<C extends ModalUiHandlers> ex
     @Override
     public void onHidden(HiddenEvent hiddenEvent) {
       if(handlerRegistration != null) handlerRegistration.removeHandler();
+      if(notificationHandlerRegistration != null) notificationHandlerRegistration.removeHandler();
       getUiHandlers().onModalHidden();
     }
   }
