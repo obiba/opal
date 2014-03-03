@@ -18,33 +18,33 @@
 
   <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false">
     <g:FlowPanel addStyleNames="main">
-        <!--Name-->
-        <b:ControlGroup ui:field="nameGroup">
-          <b:ControlLabel>
-            <ui:msg description="Name label">Name</ui:msg>
-            <o:RequiredIcon/>
-          </b:ControlLabel>
-          <b:Controls>
-            <b:TextBox ui:field="name"/>
-          </b:Controls>
-          <b:HelpBlock>
-            <ui:msg description="View Name help">A view must have a unique name.</ui:msg>
-          </b:HelpBlock>
-        </b:ControlGroup>
+      <!--Name-->
+      <b:ControlGroup ui:field="nameGroup">
+        <b:ControlLabel>
+          <ui:msg description="Name label">Name</ui:msg>
+          <o:RequiredIcon/>
+        </b:ControlLabel>
+        <b:Controls>
+          <b:TextBox ui:field="name"/>
+        </b:Controls>
+        <b:HelpBlock>
+          <ui:msg description="View Name help">A view must have a unique name.</ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
 
-        <!--Mime type-->
-        <b:ControlGroup ui:field="tablesGroup">
-          <b:ControlLabel>
-            <ui:msg description="Table References label">Table References</ui:msg>
-            <o:RequiredIcon/>
-          </b:ControlLabel>
-          <b:Controls>
-            <o:TableChooser ui:field="tableChooser"/>
-          </b:Controls>
-          <b:HelpBlock>
-            <ui:msg description="Table references help">The table(s) from which the entities are extracted.</ui:msg>
-          </b:HelpBlock>
-        </b:ControlGroup>
+      <!--Mime type-->
+      <b:ControlGroup ui:field="tablesGroup">
+        <b:ControlLabel>
+          <ui:msg description="Table References label">Table References</ui:msg>
+          <o:RequiredIcon/>
+        </b:ControlLabel>
+        <b:Controls>
+          <o:TableChooser ui:field="tableChooser" isMultipleSelect="true"/>
+        </b:Controls>
+        <b:HelpBlock>
+          <ui:msg description="Table references help">The table(s) from which the entities are extracted.</ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
     </g:FlowPanel>
 
     <b:ModalFooter>

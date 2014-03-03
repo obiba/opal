@@ -59,7 +59,9 @@ public class EntityModalView extends ModalPopupViewWithUiHandlers<EntityModalUiH
     implements EntityModalPresenter.Display {
 
   private static final int PAGE_SIZE = 20;
+
   private static final int MIN_WIDTH = 700;
+
   private static final int MIN_HEIGHT = 500;
 
   interface EntityViewUiBinder extends UiBinder<Widget, EntityModalView> {}
@@ -84,7 +86,7 @@ public class EntityModalView extends ModalPopupViewWithUiHandlers<EntityModalUiH
   @UiField
   InlineLabel noValues;
 
-  @UiField(provided = true)
+  @UiField
   TableChooser tableChooser;
 
   @UiField
@@ -104,7 +106,6 @@ public class EntityModalView extends ModalPopupViewWithUiHandlers<EntityModalUiH
   @Inject
   public EntityModalView(EventBus eventBus) {
     super(eventBus);
-    tableChooser = new TableChooser(false);
     widget = uiBinder.createAndBindUi(this);
     valueSelectionHandler = new ValueSelectionHandlerImpl();
     initializeTable();

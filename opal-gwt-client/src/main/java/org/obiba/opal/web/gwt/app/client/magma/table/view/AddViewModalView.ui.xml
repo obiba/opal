@@ -27,7 +27,7 @@
           <o:RequiredIcon/>
         </b:ControlLabel>
         <b:Controls>
-          <o:TableChooser ui:field="tables" o:id="tables"/>
+          <o:TableChooser ui:field="tables" o:id="tables" isMultipleSelect="true"/>
         </b:Controls>
         <b:HelpBlock>
           <ui:msg description="Table references help">The table(s) from which the entities are extracted.</ui:msg>
@@ -41,7 +41,9 @@
         <b:Controls>
           <o:OpalSimplePanel ui:field="fileSelectionPanel" o:id="fileSelectionPanel"></o:OpalSimplePanel>
           <b:HelpBlock>
-            <ui:msg description="View Variables help">Provide derived variables from a view XML or a table dictionary in Excel, optional.</ui:msg>
+            <ui:msg description="View Variables help">Provide derived variables from a view XML or a table dictionary in
+              Excel, optional.
+            </ui:msg>
           </b:HelpBlock>
         </b:Controls>
       </b:ControlGroup>

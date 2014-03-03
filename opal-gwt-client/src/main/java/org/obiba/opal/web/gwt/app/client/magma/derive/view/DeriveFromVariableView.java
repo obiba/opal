@@ -42,7 +42,7 @@ public class DeriveFromVariableView extends ViewImpl implements DeriveFromVariab
   @UiField
   WizardStep deriveFromVariableStep;
 
-  @UiField(provided = true)
+  @UiField
   TableChooser tableChooser;
 
   @UiField
@@ -50,11 +50,10 @@ public class DeriveFromVariableView extends ViewImpl implements DeriveFromVariab
 
   @Inject
   public DeriveFromVariableView(Binder uiBinder) {
-    tableChooser = new TableChooser(false); // Single-select
-    tableChooser.setWidth("50em");
     initWidget(uiBinder.createAndBindUi(this));
 
-    variableBox.setWidth("50em");
+    tableChooser.addStyleName("table-chooser-xlarge");
+    variableBox.addStyleName("table-chooser-xlarge");
   }
 
   @Override

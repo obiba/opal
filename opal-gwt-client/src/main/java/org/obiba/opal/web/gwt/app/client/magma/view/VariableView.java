@@ -119,7 +119,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   @UiField
   TabPanel tabPanel;
 
-  @UiField(provided = true)
+  @UiField
   CategoriesTable categoryTable;
 
   @UiField
@@ -193,7 +193,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   public VariableView(Binder uiBinder, Translations translations, TranslationMessages translationMessages) {
     this.translations = translations;
     this.translationMessages = translationMessages;
-    categoryTable = new CategoriesTable();
 
     initWidget(uiBinder.createAndBindUi(this));
 
