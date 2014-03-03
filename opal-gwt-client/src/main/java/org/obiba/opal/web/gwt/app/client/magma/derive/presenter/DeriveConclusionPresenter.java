@@ -35,7 +35,6 @@ import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
@@ -124,13 +123,7 @@ public class DeriveConclusionPresenter extends DerivationPresenter<DeriveConclus
                 }
 
               })//
-              .withCallback(Response.SC_FORBIDDEN, new ResponseCodeCallback() {
-
-                @Override
-                public void onResponseCode(Request request, Response response) {
-                  // ignore
-                }
-              }).send();
+              .withCallback(Response.SC_FORBIDDEN, ResponseCodeCallback.NO_OP).send();
 
         }
       }

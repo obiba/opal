@@ -284,12 +284,7 @@ public class IndexAdministrationPresenter
     ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
         .forResource(Resources.indices())//
         .withCallback(new TableIndexStatusResourceCallback(getView().getIndexTable().getVisibleRange(), clearIndices))//
-        .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            // nothing
-          }
-        }) //
+        .withCallback(Response.SC_SERVICE_UNAVAILABLE, ResponseCodeCallback.NO_OP) //
         .get().send();
   }
 
@@ -329,12 +324,7 @@ public class IndexAdministrationPresenter
               getView().renderRows(resource);
             }
           }) //
-          .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              // nothing
-            }
-          }) //
+          .withCallback(Response.SC_SERVICE_UNAVAILABLE, ResponseCodeCallback.NO_OP) //
           .get().send();
 
     }

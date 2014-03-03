@@ -32,6 +32,9 @@ import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
+import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
+import static com.google.gwt.http.client.Response.SC_OK;
+
 public class RAdministrationPresenter
     extends ItemAdministrationPresenter<RAdministrationPresenter.Display, RAdministrationPresenter.Proxy>
     implements RAdministrationUiHandlers {
@@ -83,7 +86,7 @@ public class RAdministrationPresenter
         .withCallback(new ResourceCallback<ServiceDto>() {
           @Override
           public void onResource(Response response, ServiceDto resource) {
-            if(response.getStatusCode() == Response.SC_OK) {
+            if(response.getStatusCode() == SC_OK) {
               getView().setServiceStatus(resource.getStatus().isServiceStatus(ServiceStatus.RUNNING)
                   ? Display.Status.Stoppable
                   : Display.Status.Startable);
@@ -100,13 +103,13 @@ public class RAdministrationPresenter
     ResourceRequestBuilderFactory.newBuilder().forResource("/service/r").put().withCallback(new ResponseCodeCallback() {
       @Override
       public void onResponseCode(Request request, Response response) {
-        if (response.getStatusCode() == Response.SC_OK) {
+        if(response.getStatusCode() == SC_OK) {
           refreshStatus();
         } else {
           getView().setServiceStatus(Display.Status.Startable);
         }
       }
-    }, Response.SC_OK).send();
+    }, SC_OK).send();
   }
 
   @Override
@@ -118,16 +121,16 @@ public class RAdministrationPresenter
           @Override
           public void onResponseCode(Request request, Response response) {
             getView().setServiceStatus(
-                response.getStatusCode() == Response.SC_OK ? Display.Status.Startable : Display.Status.Stoppable);
+                response.getStatusCode() == SC_OK ? Display.Status.Startable : Display.Status.Stoppable);
           }
-        }, Response.SC_OK).send();
+        }, SC_OK).send();
   }
 
   @Override
   public void test() {
     ResourceRequestBuilderFactory.newBuilder().forResource("/r/sessions").post()//
         .withCallback(Response.SC_CREATED, new RSessionCreatedCallback())//
-        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, new RConnectionFailedCallback()).send();
+        .withCallback(SC_INTERNAL_SERVER_ERROR, new RConnectionFailedCallback()).send();
   }
 
   @Override
@@ -141,16 +144,10 @@ public class RAdministrationPresenter
     @Override
     public void onResponseCode(Request request, Response response) {
       fireEvent(NotificationEvent.newBuilder().info("RIsAlive").nonSticky().build());
-      // clean up
-      ResponseCodeCallback ignore = new ResponseCodeCallback() {
-
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          // ignore
-        }
-      };
-      ResourceRequestBuilderFactory.newBuilder().forResource("/r/session/current").delete()//
-          .withCallback(Response.SC_OK, ignore).withCallback(Response.SC_INTERNAL_SERVER_ERROR, ignore).send();
+      ResourceRequestBuilderFactory.newBuilder() //
+          .forResource("/r/session/current") //
+          .withCallback(ResponseCodeCallback.NO_OP, SC_OK, SC_INTERNAL_SERVER_ERROR) //
+          .delete().send();
     }
   }
 

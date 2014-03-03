@@ -19,7 +19,6 @@ import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.database.SqlSettingsDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -44,8 +43,8 @@ public class LimesurveyStepPresenter extends PresenterWidget<LimesurveyStepPrese
   @Override
   public void onReveal() {
     super.onReveal();
-    ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder().forResource("/system/databases/sql")
-        .withCallback(new ResourceCallback<JsArray<DatabaseDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder().forResource("/system/databases/sql").withCallback(
+        new ResourceCallback<JsArray<DatabaseDto>>() {
 
           @Override
           public void onResource(Response response, JsArray<DatabaseDto> resource) {
@@ -59,12 +58,7 @@ public class LimesurveyStepPresenter extends PresenterWidget<LimesurveyStepPrese
             getView().setDatabases(databases);
           }
         })//
-        .withCallback(Response.SC_FORBIDDEN, new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            // ignore
-          }
-        }).get().send();
+        .withCallback(Response.SC_FORBIDDEN, ResponseCodeCallback.NO_OP).get().send();
   }
 
   @Override

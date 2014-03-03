@@ -232,10 +232,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     UriBuilder builder = UriBuilder.create().segment("datasource", transientDatasourceName);
     ResourceRequestBuilderFactory.newBuilder() //
         .forResource(builder.build()) //
-        .withCallback(SC_OK, new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {}
-        }).delete().send();
+        .withCallback(SC_OK, ResponseCodeCallback.NO_OP).delete().send();
     transientDatasourceName = null;
   }
 
@@ -452,8 +449,8 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
               .replaceArguments(translations.datasourceParsingErrorMap().get(datasourceParsingErrorDto.getKey()),
                   datasourceParsingErrorDto.getArgumentsArray()));
 
-          if (++count >= MAX_ERROR_ALERTS && actualErrors != MAX_ERROR_ALERTS) {
-            getView().showError(null, translationMessages.errorsRemainingMessage(actualErrors- MAX_ERROR_ALERTS));
+          if(++count >= MAX_ERROR_ALERTS && actualErrors != MAX_ERROR_ALERTS) {
+            getView().showError(null, translationMessages.errorsRemainingMessage(actualErrors - MAX_ERROR_ALERTS));
             break;
           }
         }

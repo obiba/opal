@@ -52,6 +52,9 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 
+import static com.google.gwt.http.client.Response.SC_CREATED;
+import static com.google.gwt.http.client.Response.SC_OK;
+
 public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<ReportTemplateUpdateModalPresenter.Display>
     implements ReportTemplateUpdateModalUiHandlers {
 
@@ -61,7 +64,7 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
 
   private final ItemSelectorPresenter parametersSelectorPresenter;
 
-  private final Collection<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+  private final Collection<FieldValidator> validators = new LinkedHashSet<>();
 
   private String project;
 
@@ -129,10 +132,9 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
       public String renderItem(String item) {
         String option = super.renderItem(item);
         String[] parts = option.split("=");
-        if (parts.length == 2) {
-        return parts[0] + "=" + ROptionsHelper.renderROptionValue(parts[0],parts[1]);
-        }
-        return option;
+        return parts.length == 2 //
+            ? parts[0] + "=" + ROptionsHelper.renderROptionValue(parts[0], parts[1]) //
+            : option;
       }
     });
     emailSelectorPresenter.getView().setItemInputDisplay(new TextBoxItemInputView());
@@ -255,11 +257,10 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
         reportTemplate.setProject(project);
         uri = UriBuilders.PROJECT_REPORT_TEMPLATES.create().build(project);
       }
-      ResponseCodeCallback callbackHandler = new CreateOrUpdateReportTemplateCallBack(reportTemplate);
-      ResourceRequestBuilderFactory.newBuilder().forResource(uri).post()
-          .withResourceBody(ReportTemplateDto.stringify(reportTemplate)).withCallback(Response.SC_OK, callbackHandler)
-          .withCallback(Response.SC_CREATED, callbackHandler)
-          .send();
+      ResourceRequestBuilderFactory.newBuilder().forResource(uri) //
+          .withResourceBody(ReportTemplateDto.stringify(reportTemplate)) //
+          .withCallback(new CreateOrUpdateReportTemplateCallBack(reportTemplate), SC_OK, SC_CREATED) //
+          .post().send();
     }
   }
 
@@ -272,8 +273,8 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
   private boolean validReportTemplate() {
     getView().clearErrors();
 
-    List<Display.FormField> validatorIds = new ArrayList<Display.FormField>();
-    List<String> messages = new ArrayList<String>();
+    List<Display.FormField> validatorIds = new ArrayList<>();
+    List<String> messages = new ArrayList<>();
     String message;
     for(FieldValidator validator : validators) {
       message = validator.validate();
@@ -285,13 +286,10 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
 
     if(messages.size() > 0) {
       getView().showErrors(messages);
-
       getView().setErrors(messages, validatorIds);
       return false;
-    } else {
-      return true;
     }
-
+    return true;
   }
 
   private ReportTemplateDto getReportTemplateDto() {
@@ -327,11 +325,11 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
   private void doUpdateReportTemplate() {
     ReportTemplateDto reportTemplate = getReportTemplateDto();
     ResponseCodeCallback callbackHandler = new CreateOrUpdateReportTemplateCallBack(reportTemplate);
-    UriBuilder ub = UriBuilder.create().segment("report-template", getView().getName().getText());
-    ResourceRequestBuilderFactory.newBuilder().forResource(ub.build()).put()
-        .withResourceBody(ReportTemplateDto.stringify(reportTemplate)).withCallback(Response.SC_OK, callbackHandler)
-        .withCallback(Response.SC_CREATED, callbackHandler)
-        .send();
+    ResourceRequestBuilderFactory.newBuilder() //
+        .forResource(UriBuilder.create().segment("report-template", getView().getName().getText()).build()) //
+        .withResourceBody(ReportTemplateDto.stringify(reportTemplate)) //
+        .withCallback(callbackHandler, SC_OK, SC_CREATED) //
+        .put().send();
   }
 
   private class CreateOrUpdateReportTemplateCallBack implements ResponseCodeCallback {
@@ -345,9 +343,9 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
     @Override
     public void onResponseCode(Request request, Response response) {
       getView().hideDialog();
-      if(response.getStatusCode() == Response.SC_OK) {
+      if(response.getStatusCode() == SC_OK) {
         getEventBus().fireEvent(new ReportTemplateUpdatedEvent(reportTemplate));
-      } else if(response.getStatusCode() == Response.SC_CREATED) {
+      } else if(response.getStatusCode() == SC_CREATED) {
         getEventBus().fireEvent(new ReportTemplateCreatedEvent(reportTemplate));
       }
     }
@@ -361,7 +359,7 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
       setDialogMode(Mode.CREATE);
     } else {
       setDialogMode(Mode.UPDATE);
-      if(reportTemplate.hasProject()) project = reportTemplate.getProject();
+      project = reportTemplate.getProject();
       getView().setReportTemplate(reportTemplate);
       emailSelectorPresenter.getView().setItems(JsArrays.toIterable(reportTemplate.getEmailNotificationArray()));
       parametersSelectorPresenter.getView().setItems(Iterables

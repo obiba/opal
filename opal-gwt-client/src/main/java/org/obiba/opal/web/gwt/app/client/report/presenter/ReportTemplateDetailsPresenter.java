@@ -42,7 +42,6 @@ import org.obiba.opal.web.model.client.opal.ReportCommandOptionsDto;
 import org.obiba.opal.web.model.client.opal.ReportDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -55,6 +54,8 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+
+import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 
 public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTemplateDetailsPresenter.Display>
     implements ReportTemplateDetailsUiHandlers {
@@ -69,7 +70,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
   private ReportTemplateDto reportTemplate;
 
-  private TranslationMessages translationMessages;
+  private final TranslationMessages translationMessages;
 
   @Inject
   public ReportTemplateDetailsPresenter(Display display, EventBus eventBus,
@@ -124,13 +125,11 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
     ResponseCodeCallback callbackHandler = new CommandResponseCallBack();
     ReportCommandOptionsDto reportCommandOptions = ReportCommandOptionsDto.create();
     reportCommandOptions.setName(reportTemplate.getName());
-    String uri = "/shell/report";
-    if(reportTemplate.hasProject()) {
-      uri = "/project/" + reportTemplate.getProject() + "/commands/_report";
-    }
-    ResourceRequestBuilderFactory.newBuilder().forResource(uri).post()
-        .withResourceBody(ReportCommandOptionsDto.stringify(reportCommandOptions))
-        .withCallback(Response.SC_CREATED, callbackHandler).send();
+    ResourceRequestBuilderFactory.newBuilder() //
+        .forResource("/project/" + reportTemplate.getProject() + "/commands/_report") //
+        .withResourceBody(ReportCommandOptionsDto.stringify(reportCommandOptions)) //
+        .withCallback(Response.SC_CREATED, callbackHandler) //
+        .post().send();
   }
 
   @Override
@@ -139,13 +138,12 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
       @Override
       public void run() {
         String reportTemplateName = reportTemplate.getName();
-        String uri = UriBuilder.create().segment("report-template", reportTemplateName).build();
-        if(reportTemplate.hasProject()) {
-          uri = UriBuilders.PROJECT_REPORT_TEMPLATE.create().build(reportTemplate.getProject(), reportTemplateName);
-        }
-        ResourceRequestBuilderFactory.newBuilder().forResource(uri).delete()
-            .withCallback(Response.SC_OK, new RemoveReportTemplateResponseCallBack())
-            .withCallback(Response.SC_NOT_FOUND, new ReportTemplateNotFoundCallBack(reportTemplateName)).send();
+        ResourceRequestBuilderFactory.newBuilder() //
+            .forResource(
+                UriBuilders.PROJECT_REPORT_TEMPLATE.create().build(reportTemplate.getProject(), reportTemplateName)) //
+            .withCallback(Response.SC_OK, new RemoveReportTemplateResponseCallBack()) //
+            .withCallback(SC_NOT_FOUND, new ReportTemplateNotFoundCallBack(reportTemplateName)) //
+            .delete().send();
       }
     };
     fireEvent(ConfirmationRequiredEvent
@@ -194,44 +192,41 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
   private void authorize() {
     // display reports
-    String uri;
-    uri = reportTemplate.hasProject()
-        ? UriBuilder.create().segment("files", "meta", "reports", reportTemplate.getProject(), reportTemplate.getName())
-        .build()
-        : UriBuilder.create().segment("files", "meta", "reports", reportTemplate.getName()).build();
 
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(uri).get()
-        .authorize(getView().getListReportsAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(UriBuilder.create()
+            .segment("files", "meta", "reports", reportTemplate.getProject(), reportTemplate.getName()).build()) //
+        .authorize(getView().getListReportsAuthorizer()) //
+        .get().send();
 
     // set permissions
     AclRequest.newResourceAuthorizationRequestBuilder()
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
 
     // run report
-    uri = "/shell/report";
-    if(reportTemplate.hasProject()) {
-      uri = "/project/" + reportTemplate.getProject() + "/commands/_report";
-    }
-    GWT.log(uri);
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(uri).post()
-        .authorize(getView().getExecuteReportAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource("/project/" + reportTemplate.getProject() + "/commands/_report") //
+        .authorize(getView().getExecuteReportAuthorizer()) //
+        .post().send();
 
     // download report design
     UriBuilder ub = UriBuilder.create().segment("files", reportTemplate.getDesign());
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build()).get()
         .authorize(getView().getDownloadReportDesignAuthorizer()).send();
 
-    uri = UriBuilder.create().segment("report-template", reportTemplate.getName()).build();
-    if(reportTemplate.hasProject()) {
-      uri = UriBuilders.PROJECT_REPORT_TEMPLATE.create().build(reportTemplate.getProject(), reportTemplate.getName());
-    }
     // remove
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(uri).delete()
-        .authorize(getView().getRemoveReportTemplateAuthorizer()).send();
+    String uri = UriBuilders.PROJECT_REPORT_TEMPLATE.create()
+        .build(reportTemplate.getProject(), reportTemplate.getName());
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(uri) //
+        .authorize(getView().getRemoveReportTemplateAuthorizer()) //
+        .delete().send();
 
     // edit
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(uri).put()
-        .authorize(getView().getUpdateReportTemplateAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(uri) //
+        .authorize(getView().getUpdateReportTemplateAuthorizer()) //
+        .put().send();
   }
 
   private void authorizeDownloadReport(ReportDto dto, HasAuthorization authorizer) {
@@ -276,7 +271,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
               ResourceRequestBuilderFactory.newBuilder().forResource(dto.getLink()).delete()
                   .withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler)
                   .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler)
-                  .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+                  .withCallback(SC_NOT_FOUND, callbackHandler).send();
             }
           };
           fireEvent(ConfirmationRequiredEvent
@@ -288,26 +283,22 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
   }
 
   private void refreshProducedReports(ReportTemplateDto reportTemplateDto) {
-    String uri = UriBuilder.create().segment("report-template", reportTemplateDto.getName(), "reports").build();
-    if(reportTemplateDto.hasProject()) {
-      uri = UriBuilders.PROJECT_REPORT_TEMPLATE_REPORTS.create()
-          .build(reportTemplateDto.getProject(), reportTemplateDto.getName());
-    }
-    ResourceRequestBuilderFactory.<JsArray<ReportDto>>newBuilder().forResource(uri).get()
-        .withCallback(new ProducedReportsResourceCallback())
-        .withCallback(Response.SC_NOT_FOUND, new NoProducedReportsResourceCallback()).send();
+    ResourceRequestBuilderFactory.<JsArray<ReportDto>>newBuilder() //
+        .forResource(UriBuilders.PROJECT_REPORT_TEMPLATE_REPORTS.create()
+            .build(reportTemplateDto.getProject(), reportTemplateDto.getName())) //
+        .withCallback(new ProducedReportsResourceCallback()) //
+        .withCallback(SC_NOT_FOUND, new NoProducedReportsResourceCallback()) //
+        .get().send();
   }
 
   private void refreshReportTemplateDetails(ReportTemplateDto reportTemplateDto) {
     String reportTemplateName = reportTemplateDto.getName();
-    String uri = UriBuilder.create().segment("report-template", reportTemplateName).build();
-    if(reportTemplateDto.hasProject()) {
-      uri = UriBuilders.PROJECT_REPORT_TEMPLATE.create().build(reportTemplateDto.getProject(), reportTemplateName);
-    }
-
-    ResourceRequestBuilderFactory.<ReportTemplateDto>newBuilder().forResource(uri).get()
-        .withCallback(new ReportTemplateFoundCallBack())
-        .withCallback(Response.SC_NOT_FOUND, new ReportTemplateNotFoundCallBack(reportTemplateName)).send();
+    ResourceRequestBuilderFactory.<ReportTemplateDto>newBuilder() //
+        .forResource(
+            UriBuilders.PROJECT_REPORT_TEMPLATE.create().build(reportTemplateDto.getProject(), reportTemplateName)) //
+        .withCallback(new ReportTemplateFoundCallBack()) //
+        .withCallback(SC_NOT_FOUND, new ReportTemplateNotFoundCallBack(reportTemplateName)) //
+        .get().send();
   }
 
   private class RemoveReportTemplateResponseCallBack implements ResponseCodeCallback {
@@ -428,16 +419,12 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
     @Override
     public void authorized() {
-      if(reportTemplate.hasProject()) {
-        getView().setVisiblePermissionsPanel(true);
-        ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
-        resourcePermissionsPresenter.initialize(ResourcePermissionType.REPORT_TEMPLATE,
-            ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_REPORTTEMPLATE, reportTemplate.getProject(),
-            reportTemplate.getName());
-        setInSlot(null, resourcePermissionsPresenter);
-      } else {
-        getView().setVisiblePermissionsPanel(false);
-      }
+      getView().setVisiblePermissionsPanel(true);
+      ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
+      resourcePermissionsPresenter.initialize(ResourcePermissionType.REPORT_TEMPLATE,
+          ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_REPORTTEMPLATE, reportTemplate.getProject(),
+          reportTemplate.getName());
+      setInSlot(null, resourcePermissionsPresenter);
     }
   }
 

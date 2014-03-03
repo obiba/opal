@@ -183,12 +183,8 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
             getView().enableEditionDeletion(!Boolean.parseBoolean(response.getText()));
           }
         }, Response.SC_OK)//
-        .withCallback(new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
             // Nothing, when installing Opal, there is no identifiers database so it would return 400: NOT_FOUND
-          }
-        }, Response.SC_NOT_FOUND)//
+        .withCallback(ResponseCodeCallback.NO_OP, Response.SC_NOT_FOUND)//
         .get().send();
   }
 

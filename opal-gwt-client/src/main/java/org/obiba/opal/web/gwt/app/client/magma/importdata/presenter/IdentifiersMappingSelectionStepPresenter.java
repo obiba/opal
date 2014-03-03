@@ -16,12 +16,10 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.http.client.Request;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
@@ -41,12 +39,6 @@ public class IdentifiersMappingSelectionStepPresenter
 
   private void initIdentifiersMappings() {
 
-    ResponseCodeCallback errorCallback = new ResponseCodeCallback() {
-      @Override
-      public void onResponseCode(Request request, Response response) {
-      }
-    };
-
     ResourceRequestBuilderFactory.<JsArray<IdentifiersMappingDto>>newBuilder().forResource("/identifiers/mappings")
         .get().withCallback(new ResourceCallback<JsArray<IdentifiersMappingDto>>() {
       @Override
@@ -54,7 +46,7 @@ public class IdentifiersMappingSelectionStepPresenter
         getView().setIdentifiersMappings(JsArrays.toSafeArray(resource));
       }
 
-    }).withCallback(Response.SC_FORBIDDEN, errorCallback).send();
+    }).withCallback(Response.SC_FORBIDDEN, ResponseCodeCallback.NO_OP).send();
   }
 
   public void updateImportConfig(ImportConfig importConfig) {
@@ -64,7 +56,7 @@ public class IdentifiersMappingSelectionStepPresenter
     importConfig.setIdentifiersMapping(getView().getSelectedIdentifiersMapping());
     importConfig.setIncremental(getView().isIncremental());
     importConfig.setLimit(getView().getLimit());
-    GWT.log("ignore=" + getView().ignoreUnknownIdentifier() + " ; allow=" + getView().allowIdentifierGeneration());
+    //GWT.log("ignore=" + getView().ignoreUnknownIdentifier() + " ; allow=" + getView().allowIdentifierGeneration());
     importConfig.setAllowIdentifierGeneration(getView().allowIdentifierGeneration());
     importConfig.setIgnoreUnknownIdentifier(getView().ignoreUnknownIdentifier());
   }

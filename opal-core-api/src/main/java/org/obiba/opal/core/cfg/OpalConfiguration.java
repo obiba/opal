@@ -10,7 +10,7 @@
 package org.obiba.opal.core.cfg;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.obiba.magma.support.MagmaEngineFactory;
@@ -33,7 +33,8 @@ public class OpalConfiguration {
 
   private MagmaEngineFactory magmaEngineFactory;
 
-  private final Collection<OpalConfigurationExtension> extensions = new ArrayList<>();
+  @SuppressWarnings("TypeMayBeWeakened")
+  private final List<OpalConfigurationExtension> extensions = new ArrayList<>();
 
   public Version getVersion() {
     return version;

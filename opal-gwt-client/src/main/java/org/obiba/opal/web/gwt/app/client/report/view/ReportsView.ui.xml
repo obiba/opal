@@ -5,7 +5,6 @@
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-
   <g:FlowPanel>
     <b:Paragraph>
       <ui:msg description="Report Templates text">Reports can be produced from

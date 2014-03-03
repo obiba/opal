@@ -28,7 +28,6 @@ import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -118,13 +117,11 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
         ? UriBuilders.REPORT_TEMPLATES.create().build()
         : UriBuilders.PROJECT_REPORT_TEMPLATES.create().build(project);
 
-    ResourceRequestBuilderFactory.<JsArray<ReportTemplateDto>>newBuilder().forResource(uri).get()
-        .withCallback(new ReportTemplatesResourceCallback(templateToSelect)).withCallback(new ResponseCodeCallback() {
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        // ignore
-      }
-    }, Response.SC_FORBIDDEN).send();
+    ResourceRequestBuilderFactory.<JsArray<ReportTemplateDto>>newBuilder() //
+        .forResource(uri) //
+        .withCallback(new ReportTemplatesResourceCallback(templateToSelect)) //
+        .withCallback(ResponseCodeCallback.NO_OP, Response.SC_FORBIDDEN) //
+        .get().send();
   }
 
   private class ReportTemplateCreatedHandler implements ReportTemplateCreatedEvent.Handler {
@@ -157,11 +154,12 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
 
       getView().setReportTemplates(sortedTemplates);
 
-      if(sortedTemplates.length() == 0) {
+      int length = sortedTemplates.length();
+      if(length == 0) {
         onSelection(null);
       } else if(templateToSelect != null) {
         onSelection(templateToSelect);
-      } else if(sortedTemplates.length() > 0) {
+      } else if(length > 0) {
         onSelection(sortedTemplates.get(0));
       }
     }
@@ -187,17 +185,17 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
     }
   }
 
-
   protected void authorize() {
     // create report templates
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").post()
-        .authorize(getView().getAddReportTemplateAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource("/report-templates") //
+        .authorize(getView().getAddReportTemplateAuthorizer()) //
+        .post().send();
 
   }
 
   public interface Display extends View, HasUiHandlers<ReportsUiHandlers> {
     HasAuthorization getAddReportTemplateAuthorizer();
-
 
     void setCurrentReportTemplate(ReportTemplateDto reportTemplateDto);
 

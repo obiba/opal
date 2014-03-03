@@ -5,6 +5,8 @@ import com.google.gwt.regexp.shared.RegExp;
 
 public class ROptionsHelper {
 
+  private ROptionsHelper() {}
+
   public static String renderROptionValue(String key, String value) {
     String optValue = value;
     RegExp regExp = RegExp.compile("password");

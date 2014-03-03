@@ -175,15 +175,8 @@ public class VariableSuggestOracle extends SuggestOracle {
         .query("field", "name", "field", "datasource", "field", "table", "field", "label", "field", "label-en");
 
     // Get candidates from search words.
-    ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
-        .withCallback(com.google.gwt.http.client.Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
-
-          @Override
-          public void onResponseCode(com.google.gwt.http.client.Request request,
-              com.google.gwt.http.client.Response response) {
-            // nothing
-          }
-        })//
+    ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get().withCallback(
+        com.google.gwt.http.client.Response.SC_BAD_REQUEST, ResponseCodeCallback.NO_OP)//
         .withCallback(new ResourceCallback<QueryResultDto>() {
           @Override
           public void onResource(com.google.gwt.http.client.Response response, QueryResultDto resource) {
@@ -289,7 +282,7 @@ public class VariableSuggestOracle extends SuggestOracle {
    * @return selected element that is currently highlighted
    */
   private static native String findActiveItem() /*-{
-      return $wnd.jQuery('li.active').find('.variable-search-suggest-box').attr('id');
+    return $wnd.jQuery('li.active').find('.variable-search-suggest-box').attr('id');
   }-*/;
 
 }

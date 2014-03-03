@@ -21,4 +21,11 @@ public interface ResponseCodeCallback {
 
   void onResponseCode(Request request, Response response);
 
+  ResponseCodeCallback NO_OP = new ResponseCodeCallback() {
+    @Override
+    public void onResponseCode(Request request, Response response) {
+
+    }
+  };
+
 }
