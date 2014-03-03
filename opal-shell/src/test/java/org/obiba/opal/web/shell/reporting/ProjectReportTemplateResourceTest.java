@@ -40,23 +40,36 @@ import static org.mockito.Mockito.when;
 
 public class ProjectReportTemplateResourceTest {
 
-  public static final String BASE_URI = "http://localhost:8888/ws";
+  private static final String BASE_URI = "http://localhost:8888/ws";
 
   private ReportTemplateService reportTemplateService;
+
+  private ReportTemplateScheduler reportTemplateScheduler;
 
   @Before
   public void before() {
     new MagmaEngine();
 
     reportTemplateService = mock(ReportTemplateService.class);
+    reportTemplateScheduler = mock(ReportTemplateScheduler.class);
 
-    Collection<ReportTemplate> project1ReportTemplates = new LinkedHashSet<>();
-    project1ReportTemplates.add(createReportTemplate("template1", "project1"));
-    project1ReportTemplates.add(createReportTemplate("template2", "project1"));
-    project1ReportTemplates.add(createReportTemplate("template3", "project1"));
-    project1ReportTemplates.add(createReportTemplate("template4", "project1"));
+    ReportTemplate reportTemplate1 = createReportTemplate("template1", "project1");
+    ReportTemplate reportTemplate2 = createReportTemplate("template2", "project1");
+    ReportTemplate reportTemplate3 = createReportTemplate("template3", "project1");
+    ReportTemplate reportTemplate4 = createReportTemplate("template4", "project1");
+    Collection<ReportTemplate> templates = new LinkedHashSet<>();
+    templates.add(reportTemplate1);
+    templates.add(reportTemplate2);
+    templates.add(reportTemplate3);
+    templates.add(reportTemplate4);
+    when(reportTemplateService.getReportTemplates("project1")).thenReturn(templates);
 
-    when(reportTemplateService.getReportTemplates("project1")).thenReturn(project1ReportTemplates);
+    when(reportTemplateService.getReportTemplate("template1", "project1")).thenReturn(reportTemplate1);
+    when(reportTemplateService.getReportTemplate("template2", "project1")).thenReturn(reportTemplate2);
+    when(reportTemplateService.getReportTemplate("template3", "project1")).thenReturn(reportTemplate3);
+    when(reportTemplateService.getReportTemplate("template4", "project1")).thenReturn(reportTemplate4);
+    when(reportTemplateService.getReportTemplate("template9", "project1"))
+        .thenThrow(NoSuchReportTemplateException.class);
   }
 
   @After
@@ -66,10 +79,10 @@ public class ProjectReportTemplateResourceTest {
 
   @Test
   public void test_get() {
-    Subject mockSubject = mock(Subject.class);
-    ThreadContext.bind(mockSubject);
-    when(mockSubject.getPrincipal()).thenReturn(mock(Principal.class));
-    when(mockSubject.isPermitted("rest:/report-template/template3:GET")).thenReturn(true);
+    Subject subject = mock(Subject.class);
+    ThreadContext.bind(subject);
+    when(subject.getPrincipal()).thenReturn(mock(Principal.class));
+    when(subject.isPermitted("rest:/project/project1/report-template/template3:GET")).thenReturn(true);
 
     ProjectReportTemplateResource resource = createResource("template3", "project1");
     Response response = resource.get();
@@ -92,7 +105,7 @@ public class ProjectReportTemplateResourceTest {
     Subject mockSubject = mock(Subject.class);
     ThreadContext.bind(mockSubject);
     when(mockSubject.getPrincipal()).thenReturn(mock(Principal.class));
-    when(mockSubject.isPermitted("rest:/report-template/template2:GET")).thenReturn(true);
+    when(mockSubject.isPermitted("rest:/project/project1/report-template/template2:GET")).thenReturn(true);
 
     CommandSchedulerService commandSchedulerService = mock(CommandSchedulerService.class);
     commandSchedulerService.deleteCommand("template2", "reports");
@@ -107,6 +120,7 @@ public class ProjectReportTemplateResourceTest {
   private ProjectReportTemplateResource createResource(String name, String project) {
     ProjectReportTemplateResource resource = new ProjectReportTemplateResource();
     resource.setReportTemplateService(reportTemplateService);
+    resource.setReportTemplateScheduler(reportTemplateScheduler);
     resource.setName(name);
     resource.setProject(project);
     return resource;
@@ -115,7 +129,7 @@ public class ProjectReportTemplateResourceTest {
   @Test(expected = NoSuchReportTemplateException.class)
   public void test_delete_not_found() {
     ProjectReportTemplateResource resource = createResource("template9", "project1");
-    assertThat(resource.delete().getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode());
+    resource.delete();
   }
 
   @Test

@@ -43,9 +43,6 @@ import static org.fest.assertions.api.Assertions.assertThat;
  * Unit tests for {@link WebShellResource}.
  */
 public class WebShellResourceTest {
-  //
-  // Test Methods
-  //
 
   @Test
   public void testGetCommands() {
@@ -348,7 +345,7 @@ public class WebShellResourceTest {
     replay(mockCommandRegistry, mockCommandJobService);
 
     // Exercise
-    ReportCommandOptionsDto optionsDto = createReportCommandOptionsDto("test report");
+    ReportCommandOptionsDto optionsDto = createReportCommandOptionsDto("test report", "project1");
     Response response = sut.createReport(optionsDto);
 
     // Verify mocks
@@ -423,12 +420,8 @@ public class WebShellResourceTest {
     return new ArrayList<>();
   }
 
-  private ReportCommandOptionsDto createReportCommandOptionsDto(String name) {
-    ReportCommandOptionsDto.Builder dtoBuilder = ReportCommandOptionsDto.newBuilder();
-
-    dtoBuilder.setName(name);
-
-    return dtoBuilder.build();
+  private ReportCommandOptionsDto createReportCommandOptionsDto(String name, String project) {
+    return ReportCommandOptionsDto.newBuilder().setName(name).setProject(project).build();
   }
 
   private CommandJob createCommandJob(Integer id, Command<?> command, Date submitTime) {
