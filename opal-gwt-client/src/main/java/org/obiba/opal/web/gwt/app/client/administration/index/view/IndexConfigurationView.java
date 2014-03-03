@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.index.view;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexConfigurationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexConfigurationUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -16,7 +18,9 @@ import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
 
+import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -48,6 +52,15 @@ public class IndexConfigurationView extends ModalPopupViewWithUiHandlers<IndexCo
 
   @UiField
   HasText settings;
+
+  @UiField
+  ControlGroup clusterGroup;
+
+  @UiField
+  ControlGroup shardsGroup;
+
+  @UiField
+  ControlGroup replicasGroup;
 
   private final Translations translations;
 
@@ -84,23 +97,13 @@ public class IndexConfigurationView extends ModalPopupViewWithUiHandlers<IndexCo
   }
 
   @Override
-  public void setClusterName(String clusterName) {
-    this.clusterName.setText(clusterName);
+  public HasText getClusterName() {
+    return clusterName;
   }
 
   @Override
-  public void setSettings(String settings) {
-    this.settings.setText(settings);
-  }
-
-  @Override
-  public String getClusterName() {
-    return clusterName.getText();
-  }
-
-  @Override
-  public String getSettings() {
-    return settings.getText();
+  public HasText getSettings() {
+    return settings;
   }
 
   @Override
@@ -121,5 +124,33 @@ public class IndexConfigurationView extends ModalPopupViewWithUiHandlers<IndexCo
   @Override
   public void setNbReplicas(int nb) {
     nbReplicas.setValue(String.valueOf(nb));
+  }
+
+  @Override
+  public void clearErrors() {
+    dialog.closeAlerts();
+  }
+
+  @Override
+  public void showError(@Nullable IndexConfigurationPresenter.Display.FormField formField, String message) {
+    ControlGroup group = null;
+    if(formField != null) {
+      switch(formField) {
+        case CLUSTER_NAME:
+          group = clusterGroup;
+          break;
+        case SHARDS:
+          group = shardsGroup;
+          break;
+        case REPLICAS:
+          group = replicasGroup;
+          break;
+      }
+    }
+    if(group == null) {
+      dialog.addAlert(message, AlertType.ERROR);
+    } else {
+      dialog.addAlert(message, AlertType.ERROR, group);
+    }
   }
 }

@@ -540,7 +540,11 @@ public interface Translations extends Constants {
       "Name contains invalid characters. Characters must be alphanumeric, space, hyphen or underscore.",
       "UnsupportedEncoding",
       "An unsupported encoding other than Opal's current encoding '{0}' was detected. Please contact your administrator for further assistance.",
-      "SearchQueryIsInvalid", "Search query is invalid : {0}" })
+      "SearchQueryIsInvalid", "Search query is invalid : {0}",//
+      "ClusterNameIsRequired", "Cluster name is required.",//
+      "ShardsIsRequired", "Shards number is required.",//
+      "ReplicasIsRequired", "Replicas number is required."
+  })
   Map<String, String> userMessageMap();
 
   @Description("Missing label")
