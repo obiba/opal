@@ -1701,7 +1701,7 @@
     <gwtopenlayers.version>0.9</gwtopenlayers.version>
     <gwtp.version>1.1.1</gwtp.version>
     <gwtquery.version>1.4.0</gwtquery.version>
-    <hibernate.version>4.3.1.Final</hibernate.version>
+    <hibernate.version>4.3.4.Final</hibernate.version>
     <hibernate-validator.version>5.0.1.Final</hibernate-validator.version>
     <hsqldb.version>2.3.2</hsqldb.version>
     <httpclient.version>4.3.3</httpclient.version>
