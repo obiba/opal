@@ -39,9 +39,9 @@ import com.gwtplatform.mvp.client.View;
 
 public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> implements ReportsUiHandlers {
 
-  ReportTemplateDetailsPresenter reportTemplateDetailsPresenter;
+  private ReportTemplateDetailsPresenter reportTemplateDetailsPresenter;
 
-  ModalProvider<ReportTemplateEditModalPresenter> reportTemplateUpdateModalPresenterProvider;
+  private ModalProvider<ReportTemplateEditModalPresenter> reportTemplateUpdateModalPresenterProvider;
 
   private ReportTemplateDto reportTemplate;
 
@@ -92,14 +92,14 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
   //
 
   private void addHandlers() {
-    addRegisteredHandler(ReportTemplateSelectedEvent.getType(), new ReportTemplateSelectedEvent.Handler() {
-
-      @Override
-      public void onReportTemplateSelected(ReportTemplateSelectedEvent event) {
-        reportTemplate = event.getReportTemplate();
-        getView().setCurrentReportTemplate(reportTemplate);
-      }
-    });
+    addRegisteredHandler(ReportTemplateSelectedEvent.getType(),
+        new ReportTemplateSelectedEvent.ReportTemplateSelectedHandler() {
+          @Override
+          public void onReportTemplateSelected(ReportTemplateSelectedEvent event) {
+            reportTemplate = event.getReportTemplate();
+            getView().setCurrentReportTemplate(reportTemplate);
+          }
+        });
     addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEvent.Handler() {
       @Override
       public void onConfirmation(ConfirmationEvent event) {
@@ -126,16 +126,14 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
         .get().send();
   }
 
-  private class ReportTemplateCreatedHandler implements ReportTemplateCreatedEvent.Handler {
-
+  private class ReportTemplateCreatedHandler implements ReportTemplateCreatedEvent.ReportTemplateCreatedHandler {
     @Override
     public void onReportTemplateCreated(ReportTemplateCreatedEvent event) {
       refreshReportTemplates(event.getReportTemplate());
     }
   }
 
-  private class ReportTemplateDeletedHandler implements ReportTemplateDeletedEvent.Handler {
-
+  private class ReportTemplateDeletedHandler implements ReportTemplateDeletedEvent.ReportTemplateDeletedHandler {
     @Override
     public void onReportTemplateDeleted(ReportTemplateDeletedEvent event) {
       refreshReportTemplates(null);

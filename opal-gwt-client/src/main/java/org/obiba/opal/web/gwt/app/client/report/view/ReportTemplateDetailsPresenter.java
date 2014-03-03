@@ -172,18 +172,18 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
       }
     });
 
-    addRegisteredHandler(ReportTemplateSelectedEvent.getType(), new ReportTemplateSelectedEvent.Handler() {
-
-      @Override
-      public void onReportTemplateSelected(ReportTemplateSelectedEvent event) {
-        ReportTemplateDto template = event.getReportTemplate();
-        if(template == null) {
-          getView().setReportTemplateDetails(null);
-        } else {
-          refreshReportTemplateDetails(template);
-        }
-      }
-    });
+    addRegisteredHandler(ReportTemplateSelectedEvent.getType(),
+        new ReportTemplateSelectedEvent.ReportTemplateSelectedHandler() {
+          @Override
+          public void onReportTemplateSelected(ReportTemplateSelectedEvent event) {
+            ReportTemplateDto template = event.getReportTemplate();
+            if(template == null) {
+              getView().setReportTemplateDetails(null);
+            } else {
+              refreshReportTemplateDetails(template);
+            }
+          }
+        });
 
     registerHandler(getView().addReportDesignClickHandler(new ReportDesignClickHandler()));
     addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler());
@@ -303,12 +303,10 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
   }
 
   private class RemoveReportTemplateResponseCallBack implements ResponseCodeCallback {
-
     @Override
     public void onResponseCode(Request request, Response response) {
       fireEvent(new ReportTemplateDeletedEvent(reportTemplate));
     }
-
   }
 
   private class ReportTemplateNotFoundCallBack implements ResponseCodeCallback {
@@ -339,16 +337,15 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
     fireEvent(new FileDownloadRequestEvent("/files" + filePath));
   }
 
-  private class ReportTemplateCreatedUpdatedHandler
-      implements ReportTemplateUpdatedEvent.Handler, ReportTemplateCreatedEvent.Handler {
-
+  private class ReportTemplateCreatedUpdatedHandler implements ReportTemplateCreatedEvent.ReportTemplateCreatedHandler,
+      ReportTemplateUpdatedEvent.ReportTemplateUpdatedHandler {
     @Override
-    public void onReportTemplateUpdated(ReportTemplateUpdatedEvent event) {
+    public void onReportTemplateCreated(ReportTemplateCreatedEvent event) {
       refreshReportTemplateDetails(event.getReportTemplate());
     }
 
     @Override
-    public void onReportTemplateCreated(ReportTemplateCreatedEvent event) {
+    public void onReportTemplateUpdated(ReportTemplateUpdatedEvent event) {
       refreshReportTemplateDetails(event.getReportTemplate());
     }
   }

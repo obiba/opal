@@ -15,6 +15,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Provider;
+
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
@@ -48,7 +50,6 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
@@ -73,44 +74,6 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
 
   public enum Mode {
     CREATE, UPDATE
-  }
-
-  public interface Display extends PopupView, HasUiHandlers<ReportTemplateEditModalUiHandlers> {
-
-    void setReportTemplate(ReportTemplateDto reportTemplate);
-
-    void clear();
-
-    enum FormField {
-      NAME,
-      TEMPLATE_FILE,
-      EMAILS,
-      CRON_EXPRESSION
-    }
-
-    enum Slots {
-      EMAIL, REPORT_PARAMS
-    }
-
-    void showErrors(List<String> messages);
-
-    void hideDialog();
-
-    HasText getName();
-
-    String getDesignFile();
-
-    HasText getSchedule();
-
-    HasValue<Boolean> isScheduled();
-
-    void setDesignFileWidgetDisplay(FileSelectionPresenter.Display display);
-
-    void setEnabledReportTemplateName(boolean enabled);
-
-    void setErrors(List<String> messages, List<FormField> ids);
-
-    void clearErrors();
   }
 
   @Inject
@@ -373,5 +336,43 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
           }));
     }
 
+  }
+
+  public interface Display extends PopupView, HasUiHandlers<ReportTemplateEditModalUiHandlers> {
+
+    void setReportTemplate(ReportTemplateDto reportTemplate);
+
+    void clear();
+
+    enum FormField {
+      NAME,
+      TEMPLATE_FILE,
+      EMAILS,
+      CRON_EXPRESSION
+    }
+
+    enum Slots {
+      EMAIL, REPORT_PARAMS
+    }
+
+    void showErrors(List<String> messages);
+
+    void hideDialog();
+
+    HasText getName();
+
+    String getDesignFile();
+
+    HasText getSchedule();
+
+    HasValue<Boolean> isScheduled();
+
+    void setDesignFileWidgetDisplay(FileSelectionPresenter.Display display);
+
+    void setEnabledReportTemplateName(boolean enabled);
+
+    void setErrors(List<String> messages, List<FormField> ids);
+
+    void clearErrors();
   }
 }
