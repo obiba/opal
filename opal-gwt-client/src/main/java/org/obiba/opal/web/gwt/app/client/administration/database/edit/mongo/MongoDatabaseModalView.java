@@ -96,6 +96,8 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
 
   private final Translations translations;
 
+  private boolean isIdentifiers;
+
   @Inject
   public MongoDatabaseModalView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
@@ -116,7 +118,12 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
   }
 
   @Override
-  public void initUrl(boolean isIdentifiers) {
+  public void setIsIdentifiers(boolean isIdentifiers) {
+    this.isIdentifiers = isIdentifiers;
+  }
+
+  @Override
+  public void initUrl() {
     url.setText(isIdentifiers ? "mongodb://localhost:27017/opal_ids" : "mongodb://localhost:27017/opal_data");
   }
 
@@ -249,17 +256,7 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
   }
 
   @Override
-  public HasEnabled getUrlEnabled() {
-    return url;
-  }
-
-  @Override
   public HasText getUsername() {
-    return username;
-  }
-
-  @Override
-  public HasEnabled getUsernameEnabled() {
     return username;
   }
 
@@ -268,12 +265,7 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
     return password;
   }
 
-  @Override
-  public HasEnabled getPasswordEnabled() {
-    return password;
-  }
-
-  @Override
+   @Override
   public HasText getProperties() {
     return new HasText() {
       @Override

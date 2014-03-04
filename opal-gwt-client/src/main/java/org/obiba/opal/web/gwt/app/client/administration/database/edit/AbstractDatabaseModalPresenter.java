@@ -131,13 +131,15 @@ public abstract class AbstractDatabaseModalPresenter<TView extends AbstractDatab
   public void createNewDatabase(boolean storageOnly) {
     setDialogMode(Mode.CREATE);
     getView().getUsageGroupVisibility().setVisible(!storageOnly);
-    getView().initUrl(false);
+    getView().setIsIdentifiers(false);
+    getView().initUrl();
   }
 
   public void createNewIdentifierDatabase(DatabaseDto dto) {
     setDialogMode(Mode.CREATE);
     displayDatabase(dto);
-    getView().initUrl(true);
+    getView().setIsIdentifiers(true);
+    getView().initUrl();
     hideNonEditableIdentifiersDatabaseFields();
     usedForIdentifiers = true;
   }
@@ -150,6 +152,7 @@ public abstract class AbstractDatabaseModalPresenter<TView extends AbstractDatab
   public void editDatabase(DatabaseDto dto) {
     setDialogMode(Mode.UPDATE);
     usedForIdentifiers = dto.getUsedForIdentifiers();
+    getView().setIsIdentifiers(usedForIdentifiers);
     displayDatabase(dto);
     if(usedForIdentifiers) hideNonEditableIdentifiersDatabaseFields();
     if(dto.getHasDatasource()) disableFieldsForDatabaseWithDatasource();
@@ -239,15 +242,9 @@ public abstract class AbstractDatabaseModalPresenter<TView extends AbstractDatab
 
     HasText getUrl();
 
-    HasEnabled getUrlEnabled();
-
     HasText getUsername();
 
-    HasEnabled getUsernameEnabled();
-
     HasText getPassword();
-
-    HasEnabled getPasswordEnabled();
 
     HasText getProperties();
 
@@ -257,7 +254,9 @@ public abstract class AbstractDatabaseModalPresenter<TView extends AbstractDatab
 
     void toggleDefaultStorage(boolean show);
 
-    void initUrl(boolean b);
+    void initUrl();
+
+    void setIsIdentifiers(boolean isIdentifiers);
   }
 
 }
