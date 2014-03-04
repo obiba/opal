@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
@@ -19,6 +21,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class ErrorResponseCallback implements ResponseCodeCallback {
 
+  private static final Translations translations = GWT.create(Translations.class);
   private static final TranslationMessages translationMessages = GWT.create(TranslationMessages.class);
 
   private final Widget widget;
@@ -30,14 +33,20 @@ public class ErrorResponseCallback implements ResponseCodeCallback {
   @Override
   public void onResponseCode(Request request, Response response) {
     RequestErrorEvent.Builder builder = new RequestErrorEvent.Builder();
-    ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-    Collection<ConstraintViolationErrorDto> violationDtos = parseErrors(error);
-    if(violationDtos.isEmpty()) {
-      String defaultMessage = translationMessages
-          .unknownResponse(error.getStatus(), String.valueOf(JsArrays.toList(error.getArgumentsArray())));
-      builder.message(ClientErrorDtoMessageBuilder.get(error).withdefaultMessage(defaultMessage).build());
-    } else {
-      builder.violations(violationDtos);
+    try {
+      ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+      Collection<ConstraintViolationErrorDto> violationDtos = parseErrors(error);
+      if(violationDtos.isEmpty()) {
+        String defaultMessage = translationMessages
+            .unknownResponse(error.getStatus(), String.valueOf(JsArrays.toList(error.getArgumentsArray())));
+        builder.message(ClientErrorDtoMessageBuilder.get(error).withdefaultMessage(defaultMessage).build());
+      } else {
+        builder.violations(violationDtos);
+      }
+    } catch(IllegalArgumentException e) {
+      // response does not contain JSON, it is a simple server error
+      builder.message(TranslationsUtils
+          .replaceArguments(translations.userMessageMap().get("UnhandledException"), response.getText()));
     }
     RequestErrorEvent.fire(widget, builder.build());
   }
