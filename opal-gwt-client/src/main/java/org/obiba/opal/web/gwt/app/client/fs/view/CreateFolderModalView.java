@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.view;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderModalPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -16,11 +18,14 @@ import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -40,6 +45,9 @@ public class CreateFolderModalView extends ModalPopupViewWithUiHandlers<CreateFo
 
   @UiField
   TextBox folderToCreate;
+
+  @UiField
+  ControlGroup nameGroup;
 
   @Inject
   public CreateFolderModalView(EventBus eventBus, Binder binder, Translations translations) {
@@ -66,7 +74,33 @@ public class CreateFolderModalView extends ModalPopupViewWithUiHandlers<CreateFo
 
   @UiHandler("createFolderButton")
   public void onCreateFolderButton(ClickEvent event) {
-    getUiHandlers().createFolder(folderToCreate.getText());
+    getUiHandlers().createFolder();
   }
 
+  @Override
+  public HasText getFolderName() {
+    return folderToCreate;
+  }
+
+  @Override
+  public void clearErrors() {
+    dialog.clearAlert();
+  }
+
+  @Override
+  public void showError(@Nullable Display.FormField formField, String message) {
+    ControlGroup group = null;
+    if(formField != null) {
+      switch(formField) {
+        case NAME:
+          group = nameGroup;
+          break;
+      }
+    }
+    if(group == null) {
+      dialog.addAlert(message, AlertType.ERROR);
+    } else {
+      dialog.addAlert(message, AlertType.ERROR, group);
+    }
+  }
 }
