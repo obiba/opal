@@ -66,6 +66,11 @@ public class AuthenticationFilter extends OncePerRequestFilter {
       filterChain.doFilter(request, response);
     } catch(AuthenticationException e) {
       response.setStatus(HttpStatus.UNAUTHORIZED_401);
+    } catch(Exception e) {
+      log.error("Exception", e);
+      // see org.obiba.opal.web.magma.provider.UnhandledExceptionMapper
+      response.setStatus(HttpStatus.BAD_REQUEST_400);
+      response.getWriter().println(e.getMessage());
     } finally {
       unbind();
     }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
@@ -19,8 +18,6 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ErrorResponseCallback implements ResponseCodeCallback {
-
-  private static final Translations translations = GWT.create(Translations.class);
 
   private static final TranslationMessages translationMessages = GWT.create(TranslationMessages.class);
 
