@@ -15,10 +15,11 @@ import java.util.Collection;
 
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 
+import com.github.gwtbootstrap.client.ui.Badge;
 import com.github.gwtbootstrap.client.ui.SimplePager;
+import com.github.gwtbootstrap.client.ui.constants.BadgeType;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.uibinder.client.UiConstructor;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.HasRows;
@@ -26,21 +27,27 @@ import com.google.gwt.view.client.HasRows;
 public class OpalSimplePager extends SimplePager {
 
   protected final TranslationMessages translationMessages = GWT.create(TranslationMessages.class);
-  private final HTML label = new HTML();
+  private final Badge totalBadge = new Badge(BadgeType.DEFAULT);
   private final Panel panel;
   private final Collection<Widget> pagerWidgets = new ArrayList<>();
+
+  private boolean showTotalWhenNoPager = false;
 
   @UiConstructor
   public OpalSimplePager(TextLocation location) {
     super(location);
 
-    label.addStyleName("celltable-total-count");
+    totalBadge.addStyleName("total-count-badge");
     panel = (Panel)getWidget();
     assert panel != null;
 
     for(Widget child : panel) {
       pagerWidgets.add(child);
     }
+  }
+
+  public void setShowTotalWhenNoPager(boolean value){
+    showTotalWhenNoPager = value;
   }
 
   public void setPagerVisible(boolean visible) {
@@ -53,11 +60,12 @@ public class OpalSimplePager extends SimplePager {
     int total = display.getRowCount();
 
     if (visible) {
-      panel.remove(label);
-    } else if (total > 0) {
-      label.setText(translationMessages.cellTableTotalCount(total));
-      panel.add(label);
+      panel.removeStyleName("simple-pager-total-panel");
+      panel.remove(totalBadge);
+    } else if (total > 0 && showTotalWhenNoPager) {
+      totalBadge.setText(translationMessages.cellTableTotalCount(total));
+      panel.addStyleName("simple-pager-total-panel");
+      panel.add(totalBadge);
     }
-
   }
 }

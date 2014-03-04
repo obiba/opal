@@ -203,7 +203,7 @@ public interface TranslationMessages extends Messages {
   String mustSelectAtLeastFileFolder(String name);
 
   @Description("CellTable total count message")
-  @DefaultMessage("Total: {0}")
+  @DefaultMessage("Total {0}")
   String cellTableTotalCount(int count);
 
   @Description("Remove the currently displayed variable message")

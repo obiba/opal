@@ -79,7 +79,7 @@
         </b:Heading>
 
         <g:FlowPanel addStyleNames="small-bottom-margin">
-          <o:OpalSimplePager ui:field="pager" location="RIGHT"
+          <o:OpalSimplePager ui:field="pager" showTotalWhenNoPager="true" location="RIGHT"
               addStyleNames="pull-right small-top-margin small-indent"/>
           <b:Controls addStyleNames="pull-right small-top-margin">
             <b:InputAddOn prependIcon="FILTER">
@@ -148,7 +148,7 @@
 
                 <g:customCell>
                   <b2:IconAnchor icon="TRASH" ui:field="clearIndexLink" addStyleNames="inline small-indent">
-                    <ui:msg description="Remove label">Remove</ui:msg>
+                    <ui:msg description="Remove Index label">Remove Index</ui:msg>
                   </b2:IconAnchor>
                 </g:customCell>
 
