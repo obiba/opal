@@ -242,15 +242,9 @@ public abstract class AbstractDatabaseModalPresenter<TView extends AbstractDatab
 
     HasText getUrl();
 
-//    HasEnabled getUrlEnabled();
-
     HasText getUsername();
 
-//    HasEnabled getUsernameEnabled();
-
     HasText getPassword();
-
-//    HasEnabled getPasswordEnabled();
 
     HasText getProperties();
 
