@@ -9,19 +9,30 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
+import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -30,11 +41,7 @@ import com.gwtplatform.mvp.client.PopupView;
 public class CreateFolderModalPresenter extends ModalPresenterWidget<CreateFolderModalPresenter.Display>
     implements CreateFolderUiHandlers {
 
-  public interface Display extends PopupView, HasUiHandlers<CreateFolderUiHandlers> {
-    void hideDialog();
-  }
-
-  private final Translations translations = GWT.create(Translations.class);
+  private final ValidationHandler validationHandler;
 
   private FileDto currentFolder;
 
@@ -42,6 +49,7 @@ public class CreateFolderModalPresenter extends ModalPresenterWidget<CreateFolde
   public CreateFolderModalPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
     getView().setUiHandlers(this);
+    validationHandler = new FolderNameValidationHandler();
   }
 
   @Override
@@ -55,13 +63,10 @@ public class CreateFolderModalPresenter extends ModalPresenterWidget<CreateFolde
   }
 
   @Override
-  public void createFolder(String folderName) {
-    if("".equals(folderName)) {
-      fireEvent(NotificationEvent.newBuilder().error(translations.folderNameIsRequired()).build());
-    } else if(".".equals(folderName) || "..".equals(folderName)) {
-      fireEvent(NotificationEvent.newBuilder().error(translations.dotNamesAreInvalid()).build());
-    } else {
-      createRemoteFolder(currentFolder.getPath(), folderName);
+  public void createFolder() {
+    getView().clearErrors();
+    if(validationHandler.validate()) {
+      createRemoteFolder(currentFolder.getPath(), getView().getFolderName().getText());
     }
   }
 
@@ -88,4 +93,64 @@ public class CreateFolderModalPresenter extends ModalPresenterWidget<CreateFolde
         .withBody("text/plain", folder).withCallback(createdCallback).withCallback(Response.SC_FORBIDDEN, error)
         .withCallback(Response.SC_INTERNAL_SERVER_ERROR, error).send();
   }
+
+  private class FolderNameValidationHandler extends ViewValidationHandler {
+
+    private Set<FieldValidator> validators;
+
+    @Override
+    protected Set<FieldValidator> getValidators() {
+      if(validators == null) {
+        validators = new LinkedHashSet<FieldValidator>();
+        validators.add(new RequiredTextValidator(getView().getFolderName(), "FolderNameIsRequired",
+            Display.FormField.NAME.name()));
+        validators
+            .add(new ConditionValidator(dotNamesCondition(), "DotNamesAreInvalid", Display.FormField.NAME.name()));
+        validators.add(new ConditionValidator(invalidCharactersCondition(), "FolderNameInvalidCharacters",
+            Display.FormField.NAME.name()));
+      }
+      return validators;
+    }
+
+    private HasValue<Boolean> dotNamesCondition() {
+      return new HasBooleanValue() {
+        @Override
+        public Boolean getValue() {
+          return !(".".equals(getView().getFolderName().getText()) || "..".equals(getView().getFolderName().getText()));
+        }
+      };
+    }
+
+    private HasValue<Boolean> invalidCharactersCondition() {
+      return new HasBooleanValue() {
+        @Override
+        public Boolean getValue() {
+          return !(getView().getFolderName().getText().contains("#") ||
+              getView().getFolderName().getText().contains("%"));
+        }
+      };
+    }
+
+    @Override
+    protected void showMessage(String id, String message) {
+      getView().showError(Display.FormField.valueOf(id), message);
+    }
+
+  }
+
+  public interface Display extends PopupView, HasUiHandlers<CreateFolderUiHandlers> {
+
+    enum FormField {
+      NAME,
+    }
+
+    HasText getFolderName();
+
+    void clearErrors();
+
+    void showError(@Nullable FormField formField, String message);
+
+    void hideDialog();
+  }
+
 }

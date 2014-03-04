@@ -544,7 +544,10 @@ public interface Translations extends Constants {
       "SearchQueryIsInvalid", "Search query is invalid : {0}",//
       "ClusterNameIsRequired", "Cluster name is required.",//
       "ShardsIsRequired", "Shards number is required.",//
-      "ReplicasIsRequired", "Replicas number is required."
+      "ReplicasIsRequired", "Replicas number is required.",
+      "FolderNameIsRequired", "You must specify a folder name",//
+      "DotNamesAreInvalid", "The names '.' and '..' are not permitted.",//
+      "FolderNameInvalidCharacters", "Folder names cannot contains characters '#' or '%'."
   })
   Map<String, String> userMessageMap();
 
@@ -615,14 +618,6 @@ public interface Translations extends Constants {
   @Description("Remove category label")
   @DefaultStringValue("Remove Category")
   String removeCategory();
-
-  @Description("A name is required when creating a new folder")
-  @DefaultStringValue("You must specify a folder name")
-  String folderNameIsRequired();
-
-  @Description("Dot names are not permitted")
-  @DefaultStringValue("The names '.' and '..' are not permitted.")
-  String dotNamesAreInvalid();
 
   @Description("Data import Compared Datasources Report instructions")
   @DefaultStringValue(
