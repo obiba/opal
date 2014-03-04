@@ -162,7 +162,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
     driver.addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent event) {
-        initUrl(isIdentifiers);
+        initUrl();
       }
     });
 
@@ -184,8 +184,11 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   }
 
   @Override
-  public void initUrl(@SuppressWarnings("ParameterHidesMemberVariable") boolean isIdentifiers) {
-    this.isIdentifiers = isIdentifiers;
+  public void setIsIdentifiers(boolean isIdentifiers) {this.isIdentifiers = isIdentifiers;}
+
+
+  @Override
+  public void initUrl() {
     String defaultName = isIdentifiers ? "opal_ids" : "opal_data";
     if(getDriver().getText() == null || "com.mysql.jdbc.Driver".equals(getDriver().getText())) {
       url.setText("jdbc:mysql://localhost:3306/" + defaultName);
@@ -390,11 +393,6 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   }
 
   @Override
-  public HasEnabled getUrlEnabled() {
-    return url;
-  }
-
-  @Override
   public HasText getDriver() {
     return new HasText() {
 
@@ -429,17 +427,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   }
 
   @Override
-  public HasEnabled getUsernameEnabled() {
-    return username;
-  }
-
-  @Override
   public HasText getPassword() {
-    return password;
-  }
-
-  @Override
-  public HasEnabled getPasswordEnabled() {
     return password;
   }
 
