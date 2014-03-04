@@ -79,7 +79,7 @@
         </b:Heading>
 
         <g:FlowPanel addStyleNames="small-bottom-margin">
-          <o:OpalSimplePager ui:field="pager" location="RIGHT"
+          <o:OpalSimplePager ui:field="pager" showTotalWhenNoPager="true" location="RIGHT"
               addStyleNames="pull-right small-top-margin small-indent"/>
           <b:Controls addStyleNames="pull-right small-top-margin">
             <b:InputAddOn prependIcon="FILTER">

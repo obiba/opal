@@ -93,7 +93,7 @@
         </b:Row>
       </o:CollapsiblePanel>
 
-      <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
+      <o:OpalSimplePager ui:field="pager" showTotalWhenNoPager="true" location="RIGHT" addStyleNames="pull-right"/>
     </g:FlowPanel>
 
     <o:Table ui:field="valuesTable" addStyleNames="small-top-margin"/>
