@@ -16,26 +16,13 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 
 import org.obiba.magma.Datasource;
-import org.obiba.magma.DatasourceFactory;
-import org.obiba.magma.DuplicateDatasourceNameException;
 import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.MagmaRuntimeException;
-import org.obiba.magma.support.DatasourceParsingException;
-import org.obiba.opal.core.cfg.OpalConfiguration;
-import org.obiba.opal.core.cfg.OpalConfigurationService;
-import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
-import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
-import org.obiba.opal.web.magma.support.NoSuchDatasourceFactoryException;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.DatasourceDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,8 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.collect.Lists;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
-
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
 @Transactional
@@ -82,6 +67,14 @@ public class DatasourcesResource {
       tables.addAll(getDatasourceTablesResource(datasource).getTables(false, entityType));
     }
     return tables;
+  }
+
+  @GET
+  @Path("/count")
+  @ApiOperation(value = "Get the number of datasources", response = Integer.class)
+  public Response getDatasourcesCount() {
+    return Response.ok().entity(String.valueOf(MagmaEngine.get().getDatasources().size())).build();
+
   }
 
   private DatasourceTablesResource getDatasourceTablesResource(Datasource datasource) {

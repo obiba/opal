@@ -25,13 +25,11 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.CopyCommandOptionsDto;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.common.collect.Sets;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -47,7 +45,7 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
 
   private final Translations translations;
 
-  private TranslationMessages translationMessages;
+  private final TranslationMessages translationMessages;
 
   /**
    * @param display
@@ -84,7 +82,6 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
   public void onSubmit(String destination, String newName) {
 
     // if only 1 table is selected and is copied to current datasource, validate new table name
-
     if(copyTables.size() == 1) {
       if(destination.equals(datasourceName) && newName.isEmpty()) {
         getView()
@@ -135,29 +132,20 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
         .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
           @Override
           public void onResource(Response response, JsArray<DatasourceDto> resource) {
-            List<DatasourceDto> datasources = null;
-            if(resource != null && resource.length() > 0) {
-              datasources = filterDatasources(resource);
+            List<DatasourceDto> datasources = new ArrayList<>();
+
+            for(DatasourceDto datasource : JsArrays.toList(resource)) {
+              // Allow to copy in itself if only one table is selected
+              if(copyTables.size() == 1 || !datasource.getName().equals(datasourceName)) {
+                datasources.add(datasource);
+              }
             }
 
-            if(datasources != null && datasources.size() > 0) {
+            if(datasources.size() > 0) {
               getView().setDatasources(datasources);
             } else {
               getView().showError(null, translations.userMessageMap().get("NoDataToCopy"));
             }
-          }
-
-          private List<DatasourceDto> filterDatasources(JsArray<DatasourceDto> datasources) {
-
-            List<DatasourceDto> filteredDatasources = new ArrayList<DatasourceDto>();
-
-            for(DatasourceDto datasource : JsArrays.toList(datasources)) {
-              // Allow to copy in itself if only one table is selected
-              if(copyTables.size() == 1 || !datasource.getName().equals(datasourceName)) {
-                filteredDatasources.add(datasource);
-              }
-            }
-            return filteredDatasources;
           }
         }).send();
   }
