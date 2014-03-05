@@ -131,6 +131,13 @@ public enum UriBuilders {
     }
   },
 
+  DATASOURCES_COUNT {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasources", "count");
+    }
+  },
+
   DATASOURCE {
     @Override
     public UriBuilder create() {

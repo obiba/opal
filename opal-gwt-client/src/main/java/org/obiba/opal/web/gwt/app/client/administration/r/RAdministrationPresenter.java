@@ -143,7 +143,7 @@ public class RAdministrationPresenter
   private final class RSessionCreatedCallback implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      fireEvent(NotificationEvent.newBuilder().info("RIsAlive").nonSticky().build());
+      fireEvent(NotificationEvent.newBuilder().info("RIsAlive").build());
       ResourceRequestBuilderFactory.newBuilder() //
           .forResource("/r/session/current") //
           .withCallback(ResponseCodeCallback.NO_OP, SC_OK, SC_INTERNAL_SERVER_ERROR) //

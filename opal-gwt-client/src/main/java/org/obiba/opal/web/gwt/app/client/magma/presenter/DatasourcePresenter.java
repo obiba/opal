@@ -158,21 +158,49 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   @Override
   public void onCopyData() {
-    DataCopyPresenter copy = dataCopyModalProvider.get();
-
-    Set<TableDto> copyTables = new HashSet<TableDto>();
+    Set<TableDto> copyTables = new HashSet<>();
 
     int selectedTablesSize = getView().getSelectedTables().size();
+    boolean allTables = true;
+
     if(selectedTablesSize > 0) {
       copyTables.addAll(getView().getSelectedTables());
-      copy.setCopyTables(copyTables, getView().getAllTables().size() == selectedTablesSize);
+      allTables = getView().getAllTables().size() == selectedTablesSize;
     } else {
-      // Get all tables
       copyTables.addAll(getView().getAllTables());
-      copy.setCopyTables(copyTables, true);
     }
 
+    // Display error when copying multiple tables but there is only one project (cannot rename tables)
+    if(copyTables.size() > 1) {
+      checkDatasourceCountBeforeInitModal(copyTables, allTables, selectedTablesSize);
+    } else {
+      initDataCopyModal(copyTables, allTables);
+    }
+  }
+
+  private void checkDatasourceCountBeforeInitModal(final Set<TableDto> copyTables, boolean allTables, final int selectedTablesSize) {
+    final boolean finalAllTables = allTables;
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder()
+        .forResource(UriBuilders.DATASOURCES_COUNT.create().build()).get().withCallback(new ResponseCodeCallback() {
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        if(Integer.parseInt(response.getText()) > 1) {
+          initDataCopyModal(copyTables, finalAllTables);
+        } else if (selectedTablesSize > 0) {
+          fireEvent(NotificationEvent.newBuilder().warn("CannotCopySelectedTablesWithinProject").sticky().build());
+        }
+        else{
+          // Explain that this action would select all tables...
+          fireEvent(NotificationEvent.newBuilder().warn("CannotCopyAllTablesWithinProject").sticky().build());
+        }
+      }
+    }, SC_OK).send();
+  }
+
+  private void initDataCopyModal(Set<TableDto> copyTables, boolean allTables) {
+    DataCopyPresenter copy = dataCopyModalProvider.get();
     copy.setDatasourceName(datasourceName);
+    copy.setCopyTables(copyTables, allTables);
   }
 
   @Override
