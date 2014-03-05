@@ -21,7 +21,6 @@ import org.obiba.opal.core.service.database.MultipleIdentifiersDatabaseException
 import org.obiba.opal.core.service.database.NoSuchDatabaseException;
 import org.obiba.opal.web.database.Dtos;
 import org.obiba.opal.web.magma.ClientErrorDtos;
-import org.obiba.opal.web.model.Ws;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.dao.DataAccessException;
@@ -95,7 +94,6 @@ public class DatabaseResource {
   @ApiOperation(value = "Returns true if the database has entities")
   public Response getHasEntities() {
     Database database = databaseRegistry.getDatabase(name);
-
     return Response.ok().entity(String.valueOf(databaseRegistry.hasEntities(database))).build();
   }
 
@@ -104,27 +102,20 @@ public class DatabaseResource {
   }
 
   private Response testSqlConnection() {
-    Ws.ClientErrorDto error = ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed").build();
     try {
       JdbcOperations jdbcTemplate = new JdbcTemplate(databaseRegistry.getDataSource(name, null));
-      Boolean result = jdbcTemplate.execute(new ConnectionCallback<Boolean>() {
-
+      return jdbcTemplate.execute(new ConnectionCallback<Response>() {
         @Override
-        public Boolean doInConnection(Connection con) throws SQLException, DataAccessException {
-          return con.isValid(1);
+        public Response doInConnection(Connection con) throws SQLException, DataAccessException {
+          return con.isValid(1) ? Response.ok().build() : databaseConnectionFail();
         }
       });
-      if(result != null && result) {
-        return Response.ok().build();
-      }
     } catch(RuntimeException e) {
-      error = ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed", e);
+      return databaseConnectionFail();
     }
-    return Response.status(SERVICE_UNAVAILABLE).entity(error).build();
   }
 
   private Response testMongoConnection(MongoDbSettings mongoDbSettings) {
-
     try {
       MongoDBDatasourceFactory datasourceFactory = mongoDbSettings.createMongoDBDatasourceFactory("_test");
       List<String> dbs = datasourceFactory.getMongoDBFactory().getMongoClient().getDatabaseNames();
@@ -139,9 +130,13 @@ public class DatabaseResource {
         }
       });
     } catch(RuntimeException e) {
-      return Response.status(SERVICE_UNAVAILABLE)
-          .entity(ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed", e)).build();
+      return databaseConnectionFail();
     }
+  }
+
+  private Response databaseConnectionFail() {
+    return Response.status(SERVICE_UNAVAILABLE)
+        .entity(ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed").build()).build();
   }
 
 }
