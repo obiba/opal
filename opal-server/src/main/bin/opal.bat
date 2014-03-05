@@ -19,7 +19,7 @@ IF NOT EXIST "%OPAL_LOG%" mkdir "%OPAL_LOG%"
 echo OPAL_LOG=%OPAL_LOG%
 
 rem Java 7 supports wildcard classpaths
-rem http://download.oracle.com/javase/6/docs/technotes/tools/windows/classpath.html
+rem http://docs.oracle.com/javase/7/docs/technotes/tools/windows/classpath.html
 set CLASSPATH=%OPAL_HOME%\conf;%OPAL_DIST%\lib\*
 
 set JAVA_DEBUG=-agentlib:jdwp=transport=dt_socket,server=y,address=8000,suspend=n
