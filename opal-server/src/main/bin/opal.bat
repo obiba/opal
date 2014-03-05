@@ -25,11 +25,11 @@ set CLASSPATH=%OPAL_HOME%\conf;%OPAL_DIST%\lib\*
 set JAVA_DEBUG=-agentlib:jdwp=transport=dt_socket,server=y,address=8000,suspend=n
 
 rem Add %JAVA_DEBUG% to this line to enable remote JVM debugging (for developers)
-java %JAVA_OPTS% -cp "%CLASSPATH%" -DOPAL_HOME="%OPAL_HOME%" -DOPAL_DIST=%OPAL_DIST% -Dnewrelic.config.file="%OPAL_HOME%\conf\newrelic.yml" -javaagent:%OPAL_DIST%\lib\newrelic-agent-3.4.2.jar org.obiba.opal.server.OpalServer %*
+java %JAVA_OPTS% -cp "%CLASSPATH%" -DOPAL_HOME="%OPAL_HOME%" -DOPAL_DIST=%OPAL_DIST% -Dnewrelic.config.file="%OPAL_HOME%\conf\newrelic.yml" -javaagent:%OPAL_DIST%\lib\newrelic-agent-${newrelic.version}.jar org.obiba.opal.server.OpalServer %*
 goto :END
 
 :DEFAULT_JAVA_OPTS
-set JAVA_OPTS=-Xmx2G -XX:MaxPermSize=128M
+set JAVA_OPTS=-Xms1G -Xmx2G -XX:MaxPermSize=256M -XX:+UseG1GC
 goto :INVOKE
 
 :JAVA_HOME_NOT_SET
