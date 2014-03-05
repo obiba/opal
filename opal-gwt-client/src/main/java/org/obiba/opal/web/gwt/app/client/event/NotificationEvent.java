@@ -116,8 +116,8 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
     return this;
   }
 
-  public NotificationEvent nonSticky() {
-    sticky = false;
+  public NotificationEvent sticky() {
+    sticky = true;
     return this;
   }
 
@@ -212,8 +212,8 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
       return this;
     }
 
-    public Builder nonSticky() {
-      event.nonSticky();
+    public Builder sticky() {
+      event.sticky();
       return this;
     }
 

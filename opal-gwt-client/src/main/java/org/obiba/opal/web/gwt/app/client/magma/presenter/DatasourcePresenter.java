@@ -187,11 +187,10 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
         if(Integer.parseInt(response.getText()) > 1) {
           initDataCopyModal(copyTables, finalAllTables);
         } else {
-          fireEvent(NotificationEvent.newBuilder().warn("CannotCopyDataOneProject").build());
+          fireEvent(NotificationEvent.newBuilder().warn("CannotCopyDataOneProject").sticky().build());
         }
       }
-    }, SC_OK)//
-        .send();
+    }, SC_OK).send();
   }
 
   private void initDataCopyModal(Set<TableDto> copyTables, boolean allTables) {
