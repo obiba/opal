@@ -11,8 +11,9 @@ def add_arguments(parser):
     """
     Add data command specific options
     """
-    parser.add_argument('--name', '-n', required=False, help='User name.')
+    parser.add_argument('--name', '-n', required=True, help='User name.')
     parser.add_argument('--upassword', '-upa', required=False, help='User password.')
+    parser.add_argument('--ucertificate', '-usc', required=False, help='User certificate (public key) file')
     parser.add_argument('--disabled', '-di', action='store_true', required=False,
                         help='Disable user account (if ommited the user is enabled by default).')
     parser.add_argument('--groups', '-g', nargs='+', required=False, help='User groups')
@@ -30,12 +31,16 @@ def do_ws(args):
     """
     Build the web service resource path
     """
-    if args.name and args.fetch:
-        ws = "/user/" + args.name
+    if args.add:
+        ws = "/system/subject-credentials"
     else:
-        ws = "/users"
+        ws = "/system/subject-credential/" + args.name
 
     return ws
+
+
+def get_authentication_type(name):
+    return opal.protobuf.Opal_pb2._SUBJECTCREDENTIALSDTO_AUTHENTICATIONTYPE.values_by_name[name].number
 
 
 def do_command(args):
@@ -54,15 +59,19 @@ def do_command(args):
             # send request
             response = request.get().resource(do_ws(args)).send()
         elif args.add:
-            if not args.name:
-                raise Exception('A user name is required.')
-            if not args.upassword:
-                raise Exception('A user password is required.')
+            if not args.upassword and not args.ucertificate:
+                    raise Exception('A user password or a certificat file is required.')
 
             # create user
-            user = opal.protobuf.Opal_pb2.UserDto()
+            user = opal.protobuf.Opal_pb2.SubjectCredentialsDto()
             user.name = args.name
-            user.password = args.upassword
+            if args.upassword:
+                user.authenticationType = get_authentication_type('PASSWORD')
+                user.password = args.upassword
+            else:
+                user.authenticationType = get_authentication_type('CERTIFICATE')
+                with open(args.ucertificate, 'rb') as cert:
+                    user.certificate = cert.read()
 
             if args.disabled:
                 user.enabled = False
@@ -71,28 +80,38 @@ def do_command(args):
                 user.groups.extend(args.groups)
 
             request.fail_on_error().accept_json().content_type_protobuf()
-            response = request.post().resource("/users").content(user.SerializeToString()).send()
+            response = request.post().resource(do_ws(args)).content(user.SerializeToString()).send()
         elif args.update:
-            if not args.name:
-                raise Exception('A user name is required.')
+            userInfo = request.get().resource(do_ws(args)).send().as_json()
+            request = opal.core.OpalClient.build(opal.core.OpalClient.LoginInfo.parse(args)).new_request()
+            request.fail_on_error()
 
-            user = opal.protobuf.Opal_pb2.UserDto()
+            user = opal.protobuf.Opal_pb2.SubjectCredentialsDto()
             user.name = args.name
 
             if args.upassword:
+                if userInfo['authenticationType'] == "CERTIFICATE":
+                    raise Exception("%s requires a certificate (public key) file" % user.name)
+
+                user.authenticationType = get_authentication_type('PASSWORD')
                 user.password = args.upassword
+            else:
+                if userInfo['authenticationType'] == "PASSWORD":
+                    raise Exception("%s requires a password" % user.name)
+
+                user.authenticationType = get_authentication_type('CERTIFICATE')
+                with open(args.ucertificate, 'rb') as cert:
+                    user.certificate = cert.read()
+
             if args.disabled:
                 user.enabled = False
             if args.groups:
                 user.groups.extend(args.groups)
 
             request.fail_on_error().accept_json().content_type_protobuf()
-            response = request.put().resource("/user/" + args.name).content(user.SerializeToString()).send()
+            response = request.put().resource(do_ws(args)).content(user.SerializeToString()).send()
         elif args.delete:
-            if not args.name:
-                raise Exception('A user name is required.')
-
-            response = request.delete().resource("/user/" + args.name).send()
+            response = request.delete().resource(do_ws(args)).send()
 
         # format response
         res = response.content

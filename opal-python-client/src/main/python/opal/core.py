@@ -323,8 +323,11 @@ class OpalResponse:
         self.headers = headers
         self.content = content
 
+    def as_json(self):
+        return json.loads(self.content)
+
     def pretty_json(self):
-        return json.dumps(json.loads(self.content), sort_keys=True, indent=2)
+        return json.dumps(self.as_json(), sort_keys=True, indent=2)
 
     def __str__(self):
         return self.content
