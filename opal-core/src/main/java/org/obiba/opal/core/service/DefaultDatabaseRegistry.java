@@ -76,11 +76,11 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
   @Autowired
   private IdentifiersTableService identifiersTableService;
 
-  private final LoadingCache<String, DataSource> dataSourceCache = CacheBuilder.newBuilder()
+  private final LoadingCache<String, DataSource> dataSourceCache = CacheBuilder.newBuilder() //
       .removalListener(new DataSourceRemovalListener()) //
       .build(new DataSourceCacheLoader());
 
-  private final LoadingCache<String, SessionFactory> sessionFactoryCache = CacheBuilder.newBuilder()
+  private final LoadingCache<String, SessionFactory> sessionFactoryCache = CacheBuilder.newBuilder() //
       .removalListener(new SessionFactoryRemovalListener()) //
       .build(new SessionFactoryCacheLoader());
 
@@ -173,12 +173,14 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
   @Override
   public void update(@NotNull Database database)
       throws ConstraintViolationException, MultipleIdentifiersDatabaseException {
-
     Preconditions.checkArgument(orientDbService.findUnique(database) != null,
         "Cannot update non existing Database " + database.getName());
 
     destroyCache(database.getName());
     persist(database);
+    if(database.isUsedForIdentifiers()) {
+      identifiersTableService.stop();
+    }
   }
 
   private void persist(Database database) {
@@ -343,12 +345,17 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
 
     @Override
     public void onRemoval(RemovalNotification<String, DataSource> notification) {
-      log.info("Destroying DataSource {}", notification.getKey());
+      String key = notification.getKey();
+      log.info("Destroying DataSource {}", key);
       DataSource dataSource = notification.getValue();
-      if(dataSource != null) {
+      if(dataSource == null) {
+        log.info("Cannot close null DataSource {}", key);
+      } else {
         try {
           ((BasicDataSource) dataSource).close();
-        } catch(SQLException ignored) {
+        } catch(SQLException e) {
+          //noinspection StringConcatenationArgumentToLogCall
+          log.warn("Ignoring exception during DataSource " + key + " shutdown: ", e);
         }
       }
     }
@@ -366,14 +373,18 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
   private static class SessionFactoryRemovalListener implements RemovalListener<String, SessionFactory> {
     @Override
     public void onRemoval(RemovalNotification<String, SessionFactory> notification) {
+      String key = notification.getKey();
       try {
-        log.info("Destroying SessionFactory {}", notification.getKey());
+        log.info("Destroying SessionFactory {}", key);
         SessionFactory sessionFactory = notification.getValue();
-        if(sessionFactory != null) {
+        if(sessionFactory == null) {
+          log.info("Cannot close null SessionFactory {}", key);
+        } else {
           sessionFactory.close();
         }
       } catch(HibernateException e) {
-        log.warn("Ignoring exception during SessionFactory shutdown: ", e);
+        //noinspection StringConcatenationArgumentToLogCall
+        log.warn("Ignoring exception during SessionFactory " + key + " shutdown: ", e);
       }
     }
   }

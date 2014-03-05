@@ -18,17 +18,15 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.opal.core.identifiers.IdentifiersMapping;
-import org.obiba.opal.core.service.database.IdentifiersDatabaseNotFoundException;
-
-import com.google.common.base.Predicate;
 
 /**
  *
  */
-public interface IdentifiersTableService {
+public interface IdentifiersTableService extends SystemService {
 
   /**
    * Get the identifiers datasource.
+   *
    * @return
    */
   @NotNull
@@ -36,6 +34,7 @@ public interface IdentifiersTableService {
 
   /**
    * Check if any identifiers table exists for the given entity type.
+   *
    * @param entityType
    * @return
    */
@@ -43,6 +42,7 @@ public interface IdentifiersTableService {
 
   /**
    * Get the identifiers table for the given entity type.
+   *
    * @param entityType
    * @return
    * @throws NoSuchValueTableException
@@ -52,6 +52,7 @@ public interface IdentifiersTableService {
 
   /**
    * Create value table for entity type if not found.
+   *
    * @param entityType
    */
   @NotNull
@@ -59,6 +60,7 @@ public interface IdentifiersTableService {
 
   /**
    * Create value table for entity type and the variable with identifiers mapping name if not found.
+   *
    * @param idMapping
    * @return
    */
@@ -67,6 +69,7 @@ public interface IdentifiersTableService {
 
   /**
    * Get a writer on the identifiers table.
+   *
    * @param entityType
    * @return
    */
@@ -74,6 +77,7 @@ public interface IdentifiersTableService {
 
   /**
    * Check if there is at least one identifiers table that has a variable with the given name.
+   *
    * @param idMapping
    * @return
    */
@@ -81,6 +85,7 @@ public interface IdentifiersTableService {
 
   /**
    * Check if there is an identifiers table for the entity type that has a variable with the given name.
+   *
    * @param entityType
    * @param idMapping
    * @return
@@ -89,6 +94,7 @@ public interface IdentifiersTableService {
 
   /**
    * Get the javascript select script from the variable matching entity type and identifiers mapping.
+   *
    * @param entityType
    * @param idMapping
    * @return
@@ -113,6 +119,7 @@ public interface IdentifiersTableService {
 
   /**
    * Check if there are any identifiers tables with entities.
+   *
    * @return
    */
   boolean hasEntities();

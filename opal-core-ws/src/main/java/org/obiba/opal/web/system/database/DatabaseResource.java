@@ -108,11 +108,11 @@ public class DatabaseResource {
       return jdbcTemplate.execute(new ConnectionCallback<Response>() {
         @Override
         public Response doInConnection(Connection con) throws SQLException, DataAccessException {
-          return con.isValid(1) ? Response.ok().build() : databaseConnectionFail();
+          return con.isValid(1) ? Response.ok().build() : databaseConnectionFailed();
         }
       });
     } catch(RuntimeException e) {
-      return databaseConnectionFail();
+      return databaseConnectionFailed();
     }
   }
 
@@ -131,11 +131,11 @@ public class DatabaseResource {
         }
       });
     } catch(RuntimeException e) {
-      return databaseConnectionFail();
+      return databaseConnectionFailed();
     }
   }
 
-  private Response databaseConnectionFail() {
+  private Response databaseConnectionFailed() {
     return Response.status(SERVICE_UNAVAILABLE)
         .entity(ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed").build()).build();
   }
