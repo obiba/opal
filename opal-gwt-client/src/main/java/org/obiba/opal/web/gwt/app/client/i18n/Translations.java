@@ -1804,11 +1804,11 @@ public interface Translations extends Constants {
   String tableReferencesLabel();
 
   @Description("Edit categories label")
-  @DefaultStringValue("Edit categories")
+  @DefaultStringValue("Edit Categories")
   String editCategories();
 
   @Description("Edit properties label")
-  @DefaultStringValue("Edit properties")
+  @DefaultStringValue("Edit Properties")
   String editProperties();
 
   @Description("Edit Identifiers Mapping label")
