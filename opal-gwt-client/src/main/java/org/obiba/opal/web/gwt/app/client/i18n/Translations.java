@@ -548,9 +548,9 @@ public interface Translations extends Constants {
       "DotNamesAreInvalid", "The names '.' and '..' are not permitted.",//
       "FolderNameInvalidCharacters", "Folder names cannot contains characters '#' or '%'.",//
       "CannotCopySelectedTablesWithinProject",
-      "You cannot copy multiple tables into the current project. Copy each table individually or create a new project.",//
+      "You cannot copy multiple tables within the same project. Copy each table individually or create a new project.",//
       "CannotCopyAllTablesWithinProject", "This action would be applied to all tables. You cannot copy multiple " +
-      "tables into the current project. Copy each table individually or create a new project."//
+      "tables within the same project. Copy each table individually or create a new project."//
   })
   Map<String, String> userMessageMap();
 
