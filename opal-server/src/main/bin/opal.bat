@@ -14,15 +14,18 @@ setlocal ENABLEDELAYEDEXPANSION
 set OPAL_DIST=%~dp0..
 echo OPAL_DIST=%OPAL_DIST%
 
-rem Java 6 supports wildcard classpaths
+set OPAL_LOG=%OPAL_HOME%\logs
+IF NOT EXIST "%OPAL_LOG%" mkdir "%OPAL_LOG%"
+echo OPAL_LOG=%OPAL_LOG%
+
+rem Java 7 supports wildcard classpaths
 rem http://download.oracle.com/javase/6/docs/technotes/tools/windows/classpath.html
 set CLASSPATH=%OPAL_HOME%\conf;%OPAL_DIST%\lib\*
 
 set JAVA_DEBUG=-agentlib:jdwp=transport=dt_socket,server=y,address=8000,suspend=n
 
-IF NOT EXIST "%OPAL_HOME%\logs" mkdir "%OPAL_HOME%\logs"
-  rem Add %JAVA_DEBUG% to this line to enable remote JVM debugging (for developers)
-  java %JAVA_OPTS% -cp "%CLASSPATH%" -DOPAL_HOME="%OPAL_HOME%" -DOPAL_DIST=%OPAL_DIST% -Dnewrelic.config.file="%OPAL_HOME%\conf\newrelic.yml" -javaagent:%OPAL_DIST%\lib\newrelic-agent-${newrelic.version}.jar org.obiba.opal.server.OpalServer %*
+rem Add %JAVA_DEBUG% to this line to enable remote JVM debugging (for developers)
+java %JAVA_OPTS% -cp "%CLASSPATH%" -DOPAL_HOME="%OPAL_HOME%" -DOPAL_DIST=%OPAL_DIST% -Dnewrelic.config.file="%OPAL_HOME%\conf\newrelic.yml" -javaagent:%OPAL_DIST%\lib\newrelic-agent-3.4.2.jar org.obiba.opal.server.OpalServer %*
 goto :END
 
 :DEFAULT_JAVA_OPTS
