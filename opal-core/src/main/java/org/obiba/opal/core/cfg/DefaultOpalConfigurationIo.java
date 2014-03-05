@@ -17,10 +17,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 import org.obiba.core.spring.xstream.InjectingReflectionProviderWrapper;
-import org.obiba.core.util.FileUtil;
-import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.slf4j.Logger;
@@ -63,19 +62,18 @@ public class DefaultOpalConfigurationIo implements OpalConfigurationIo {
 
   @Override
   public void writeConfiguration(OpalConfiguration opalConfiguration) throws InvalidConfigurationException {
-    OutputStreamWriter writer = null;
     try {
       File tmpConfig = File.createTempFile("cfg", ".xml");
-      writer = new OutputStreamWriter(new FileOutputStream(tmpConfig), Charsets.UTF_8);
-      doCreateXStreamInstance().toXML(opalConfiguration, writer);
-      FileUtil.moveFile(tmpConfig, configFile);
+      tmpConfig.deleteOnExit();
+      try(Writer writer = new OutputStreamWriter(new FileOutputStream(tmpConfig), Charsets.UTF_8)) {
+        doCreateXStreamInstance().toXML(opalConfiguration, writer);
+      }
+      Files.move(tmpConfig, configFile);
     } catch(FileNotFoundException e) {
       throw new InvalidConfigurationException(
           "Opal configuration file '" + configFile.getAbsolutePath() + "' is not a regular file.", e);
     } catch(IOException | XStreamException e) {
       throw new InvalidConfigurationException("Error writing Opal configuration file.", e);
-    } finally {
-      StreamUtil.silentSafeClose(writer);
     }
   }
 
