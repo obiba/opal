@@ -84,7 +84,7 @@
         </b2:IconAnchor>
       </g:FlowPanel>
     </b:Alert>
-    <o:Table ui:field="indexTable" addStyleNames="small-top-margin"/>
+    <o:Table ui:field="indexTable"/>
 
   </g:FlowPanel>
 </ui:UiBinder>
