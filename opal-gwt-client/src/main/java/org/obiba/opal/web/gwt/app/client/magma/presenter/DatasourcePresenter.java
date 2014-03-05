@@ -172,13 +172,13 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
     // Display error when copying multiple tables but there is only one project (cannot rename tables)
     if(copyTables.size() > 1) {
-      checkDatasourceCountBeforeInitModal(copyTables, allTables);
+      checkDatasourceCountBeforeInitModal(copyTables, allTables, selectedTablesSize);
     } else {
       initDataCopyModal(copyTables, allTables);
     }
   }
 
-  private void checkDatasourceCountBeforeInitModal(final Set<TableDto> copyTables, boolean allTables) {
+  private void checkDatasourceCountBeforeInitModal(final Set<TableDto> copyTables, boolean allTables, final int selectedTablesSize) {
     final boolean finalAllTables = allTables;
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder()
         .forResource(UriBuilders.DATASOURCES_COUNT.create().build()).get().withCallback(new ResponseCodeCallback() {
@@ -186,8 +186,12 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       public void onResponseCode(Request request, Response response) {
         if(Integer.parseInt(response.getText()) > 1) {
           initDataCopyModal(copyTables, finalAllTables);
-        } else {
-          fireEvent(NotificationEvent.newBuilder().warn("CannotCopyDataOneProject").sticky().build());
+        } else if (selectedTablesSize > 0) {
+          fireEvent(NotificationEvent.newBuilder().warn("CannotCopySelectedTablesWithinProject").sticky().build());
+        }
+        else{
+          // Explain that this action would select all tables...
+          fireEvent(NotificationEvent.newBuilder().warn("CannotCopyAllTablesWithinProject").sticky().build());
         }
       }
     }, SC_OK).send();

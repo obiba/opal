@@ -547,8 +547,11 @@ public interface Translations extends Constants {
       "ReplicasIsRequired", "Replicas number is required.", "FolderNameIsRequired", "You must specify a folder name",//
       "DotNamesAreInvalid", "The names '.' and '..' are not permitted.",//
       "FolderNameInvalidCharacters", "Folder names cannot contains characters '#' or '%'.",//
-      "CannotCopyDataOneProject",
-      "You cannot copy multiple tables into the current project. Copy each table individually or create a new project." })
+      "CannotCopySelectedTablesWithinProject",
+      "You cannot copy multiple tables into the current project. Copy each table individually or create a new project.",//
+      "CannotCopyAllTablesWithinProject", "This action would be applied to all tables. You cannot copy multiple " +
+      "tables into the current project. Copy each table individually or create a new project."//
+  })
   Map<String, String> userMessageMap();
 
   @Description("Missing label")
