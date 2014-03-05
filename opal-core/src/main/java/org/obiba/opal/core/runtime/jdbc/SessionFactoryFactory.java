@@ -51,13 +51,27 @@ public class SessionFactoryFactory {
     factory.getHibernateProperties().setProperty(USE_STRUCTURED_CACHE, "true");
     factory.getHibernateProperties().setProperty(USE_QUERY_CACHE, "true");
     factory.getHibernateProperties().setProperty(USE_SECOND_LEVEL_CACHE, "true");
-    factory.getHibernateProperties().setProperty(CACHE_REGION_FACTORY, SingletonEhCacheRegionFactory.class.getName());
+    factory.getHibernateProperties()
+        .setProperty(CACHE_REGION_FACTORY, NoShutdownSingletonEhCacheRegionFactory.class.getName());
     factory.getHibernateProperties().setProperty(CURRENT_SESSION_CONTEXT_CLASS, "jta");
     factory.getHibernateProperties().setProperty(AUTO_CLOSE_SESSION, "true");
     factory.getHibernateProperties().setProperty(FLUSH_BEFORE_COMPLETION, "true");
     factory.getHibernateProperties().setProperty(DIALECT_RESOLVERS, MagmaDialectResolver.class.getName());
     return ((LocalSessionFactoryBean) applicationContext.getAutowireCapableBeanFactory()
         .initializeBean(factory, dataSource.hashCode() + "-sessionFactory")).getObject();
+  }
+
+  /**
+   * Never shutdown CacheManager
+   */
+  public static class NoShutdownSingletonEhCacheRegionFactory extends SingletonEhCacheRegionFactory {
+
+    private static final long serialVersionUID = 4004496611012448022L;
+
+    @Override
+    public void stop() {
+      if(manager != null) manager = null;
+    }
   }
 
 }
