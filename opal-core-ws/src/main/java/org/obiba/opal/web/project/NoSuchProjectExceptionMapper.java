@@ -14,7 +14,11 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.opal.core.service.NoSuchProjectException;
+import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.model.Ws;
 import org.springframework.stereotype.Component;
+
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 @Component
 @Provider
@@ -22,6 +26,8 @@ public class NoSuchProjectExceptionMapper implements ExceptionMapper<NoSuchProje
 
   @Override
   public Response toResponse(NoSuchProjectException exception) {
-    return Response.status(Response.Status.NOT_FOUND).entity(exception.getMessage()).build();
+    Ws.ClientErrorDto errorDto = ClientErrorDtos.getErrorMessage(NOT_FOUND, "NoSuchProject")
+        .addArguments(exception.getProjectName()).build();
+    return Response.status(NOT_FOUND).entity(errorDto).type("application/x-protobuf+json").build();
   }
 }

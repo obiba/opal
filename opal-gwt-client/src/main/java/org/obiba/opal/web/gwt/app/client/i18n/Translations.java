@@ -423,7 +423,10 @@ public interface Translations extends Constants {
       "DatasourceCreationFailed", "The datasource creation has failed: {0}",//
       "DatasourceReadFailed", "The datasource cannot be read: {0}",//
       "CircularVariableDependency", "Circular dependency for variable '{0}'.:<br /><br /><pre>{1}</pre>",//
+      "NoSuchProject", "No such project '{0}'",//
+      "NoSuchDatabase", "No such database '{0}'",//
       "NoSuchVariable", "No such variable '{0}'",//
+      "IdentifiersDatabaseNotFound", "Identifiers database not found",//
       "NoSuchVariableInTable", "No such variable '{0}' in table '{1}'",//
       "NoSuchReportTemplate", "No such report template '{0}' in project '{1}'",//
       "InvalidVariableScript", "Invalid variable script:<br /><br /><pre>{0}</pre>",//

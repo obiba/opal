@@ -66,18 +66,11 @@ public class DatabaseResource {
 
   @PUT
   public Response update(DatabaseDto dto) throws MultipleIdentifiersDatabaseException {
-    Database database = null;
+    Database database = Dtos.fromDto(dto);
     try {
-      Database existing = databaseRegistry.getDatabase(name);
-      if(databaseRegistry.hasDatasource(existing)) {
-        // Allow edition of all fields except database name
-        database = Dtos.fromDto(dto);
-        database.setName(existing.getName());
-      } else {
-        database = Dtos.fromDto(dto);
-      }
-    } catch(NoSuchDatabaseException e) {
-      database = Dtos.fromDto(dto);
+      // Allow edition of all fields except database name
+      database.setName(databaseRegistry.getDatabase(name).getName());
+    } catch(NoSuchDatabaseException ignored) {
     }
     databaseRegistry.update(database);
     return Response.ok().build();
