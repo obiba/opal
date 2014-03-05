@@ -13,7 +13,14 @@ package org.obiba.opal.core.service.security;
 public class SubjectPrincipalNotFoundException extends RuntimeException {
   private static final long serialVersionUID = 7644691674790618389L;
 
+  private final String principal;
+
   public SubjectPrincipalNotFoundException(String principal) {
     super("Subject principal '" + principal + "' not found.");
+    this.principal = principal;
+  }
+
+  public String getPrincipal() {
+    return principal;
   }
 }

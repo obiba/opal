@@ -70,6 +70,7 @@ public class DatabaseResource {
       // Allow edition of all fields except database name
       database.setName(databaseRegistry.getDatabase(name).getName());
     } catch(NoSuchDatabaseException ignored) {
+      // do nothing if it's a new database
     }
     databaseRegistry.update(database);
     return Response.ok().build();

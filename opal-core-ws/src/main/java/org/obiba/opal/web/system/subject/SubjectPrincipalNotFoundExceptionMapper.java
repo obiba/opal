@@ -26,7 +26,8 @@ public class SubjectPrincipalNotFoundExceptionMapper implements ExceptionMapper<
 
   @Override
   public Response toResponse(SubjectPrincipalNotFoundException exception) {
-    return Response.status(NOT_FOUND).entity(ClientErrorDtos.getErrorMessage(NOT_FOUND, "UserNotFound", exception))
+    return Response.status(NOT_FOUND)
+        .entity(ClientErrorDtos.getErrorMessage(NOT_FOUND, "SubjectPrincipalNotFound", exception.getPrincipal()))
         .build();
   }
 

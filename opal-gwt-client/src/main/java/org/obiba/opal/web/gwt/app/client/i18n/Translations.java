@@ -426,6 +426,8 @@ public interface Translations extends Constants {
       "NoSuchProject", "No such project '{0}'",//
       "NoSuchDatabase", "No such database '{0}'",//
       "NoSuchVariable", "No such variable '{0}'",//
+      "SubjectPrincipalNotFound", "No such subject principal '{0}'",//
+      "SubjectProfileNotFound", "No profile for subject '{0}'",//
       "IdentifiersDatabaseNotFound", "Identifiers database not found",//
       "NoSuchVariableInTable", "No such variable '{0}' in table '{1}'",//
       "NoSuchReportTemplate", "No such report template '{0}' in project '{1}'",//

@@ -14,7 +14,14 @@ public class SubjectProfileNotFoundException extends RuntimeException {
 
   private static final long serialVersionUID = 8076327259073208897L;
 
+  private final String principal;
+
   public SubjectProfileNotFoundException(String principal) {
     super("Subject profile not found for principal '" + principal + "'.");
+    this.principal = principal;
+  }
+
+  public String getPrincipal() {
+    return principal;
   }
 }
