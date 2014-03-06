@@ -18,14 +18,19 @@ import javax.ws.rs.core.Response;
 import org.obiba.opal.core.domain.security.Bookmark;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.web.security.Dtos;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class BookmarkResourceImpl implements BookmarkResource {
+
+  private static final Logger log = LoggerFactory.getLogger(BookmarkResourceImpl.class);
 
   private String principal;
 
@@ -60,9 +65,14 @@ public class BookmarkResourceImpl implements BookmarkResource {
 
   @Nullable
   private Bookmark getBookmark() {
+    log.debug("Searching for bookmark with path: {} for principal: {}", path, principal);
     for(Bookmark bookmark : subjectProfileService.getProfile(principal).getBookmarks()) {
-      if(Objects.equals(bookmark.getResource(), path)) return bookmark;
+      if(Objects.equals(bookmark.getResource(), path)) {
+        log.debug("Found bookmark: {} matching path: {}", bookmark, path);
+        return bookmark;
+      }
     }
+    log.debug("{} has no bookmarks matching path: {}", principal, path);
     return null;
   }
 

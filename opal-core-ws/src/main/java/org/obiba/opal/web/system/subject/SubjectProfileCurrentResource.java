@@ -28,6 +28,8 @@ import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.web.security.Dtos;
 import org.obiba.opal.web.ws.security.NoAuthorization;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
@@ -39,6 +41,7 @@ import static org.obiba.opal.web.model.Opal.BookmarkDto;
 @Scope("request")
 @Path("/system/subject-profile/_current")
 public class SubjectProfileCurrentResource {
+  private static final Logger log = LoggerFactory.getLogger(SubjectProfileCurrentResource.class);
 
   @Autowired
   private SubjectProfileService subjectProfileService;
@@ -68,9 +71,12 @@ public class SubjectProfileCurrentResource {
   @GET
   @NoAuthorization
   public Response getBookmark(@PathParam("path") String path) throws UnsupportedEncodingException {
+    String defaultCharacterSet = opalGeneralConfigService.getConfig().getDefaultCharacterSet();
+    log.debug("Retrieving current user's bookmark with path: {} and default Charset: {}", path, defaultCharacterSet);
+
     BookmarkResource resource = applicationContext.getBean(BookmarkResource.class);
     resource.setPrincipal(getPrincipal());
-    resource.setPath(URLDecoder.decode(path, opalGeneralConfigService.getConfig().getDefaultCharacterSet()));
+    resource.setPath(URLDecoder.decode(path, defaultCharacterSet));
     return resource.get();
   }
 
