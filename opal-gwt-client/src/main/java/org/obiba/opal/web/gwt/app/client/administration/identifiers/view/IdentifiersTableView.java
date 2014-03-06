@@ -261,15 +261,19 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
         @Override
         public void doAction(VariableDto object, String actionName) {
 
-          //noinspection IfStatementWithTooManyBranches
-          if(actionName.equalsIgnoreCase(REMOVE_ACTION)) {
-            getUiHandlers().onDeleteIdentifiersMapping(object);
-          } else if(actionName.equalsIgnoreCase(EDIT_ACTION)) {
-            getUiHandlers().onEditIdentifiersMapping(object);
-          } else if(actionName.equalsIgnoreCase(GENERATE_IDS_ACTION)) {
-            getUiHandlers().onGenerateIdentifiersMapping(object);
-          } else if(actionName.equalsIgnoreCase(DOWNLOAD_IDS_ACTION)) {
-            getUiHandlers().onDownloadIdentifiers(object);
+          switch(actionName){
+            case REMOVE_ACTION:
+              getUiHandlers().onDeleteIdentifiersMapping(object);
+              break;
+            case  EDIT_ACTION:
+              getUiHandlers().onEditIdentifiersMapping(object);
+              break;
+            case GENERATE_IDS_ACTION:
+              getUiHandlers().onGenerateIdentifiersMapping(object);
+              break;
+            case DOWNLOAD_IDS_ACTION:
+              getUiHandlers().onDownloadIdentifiers(object);
+              break;
           }
         }
       });
