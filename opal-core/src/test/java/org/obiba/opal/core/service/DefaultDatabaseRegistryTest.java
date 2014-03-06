@@ -59,7 +59,7 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
 
   @Before
   public void clear() throws Exception {
-    ((DefaultDatabaseRegistry) databaseRegistry).clearCaches();
+    databaseRegistry.stop();
     orientDbService.deleteAll(Database.class);
   }
 

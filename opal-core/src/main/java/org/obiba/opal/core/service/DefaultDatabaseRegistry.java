@@ -41,7 +41,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -98,6 +97,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
   public void stop() {
     sessionFactoryCache.invalidateAll();
     dataSourceCache.invalidateAll();
+    registrations.clear();
   }
 
   @Override
@@ -178,9 +178,6 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
 
     destroyCache(database.getName());
     persist(database);
-    if(database.isUsedForIdentifiers()) {
-      identifiersTableService.stop();
-    }
   }
 
   private void persist(Database database) {
@@ -345,17 +342,17 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
 
     @Override
     public void onRemoval(RemovalNotification<String, DataSource> notification) {
-      String key = notification.getKey();
-      log.info("Destroying DataSource {}", key);
+      String database = notification.getKey();
+      log.info("Destroying DataSource {}", database);
       DataSource dataSource = notification.getValue();
       if(dataSource == null) {
-        log.info("Cannot close null DataSource {}", key);
+        log.info("Cannot close null DataSource {}", database);
       } else {
         try {
           ((BasicDataSource) dataSource).close();
         } catch(SQLException e) {
           //noinspection StringConcatenationArgumentToLogCall
-          log.warn("Ignoring exception during DataSource " + key + " shutdown: ", e);
+          log.warn("Ignoring exception during DataSource " + database + " shutdown: ", e);
         }
       }
     }
@@ -370,30 +367,27 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
     }
   }
 
-  private static class SessionFactoryRemovalListener implements RemovalListener<String, SessionFactory> {
+  private class SessionFactoryRemovalListener implements RemovalListener<String, SessionFactory> {
     @Override
     public void onRemoval(RemovalNotification<String, SessionFactory> notification) {
-      String key = notification.getKey();
+      String database = notification.getKey();
+      log.info("Destroying SessionFactory {}", database);
+      if(database == null) return;
       try {
-        log.info("Destroying SessionFactory {}", key);
         SessionFactory sessionFactory = notification.getValue();
         if(sessionFactory == null) {
-          log.info("Cannot close null SessionFactory {}", key);
+          log.info("Cannot close null SessionFactory {}", database);
         } else {
           sessionFactory.close();
         }
       } catch(HibernateException e) {
         //noinspection StringConcatenationArgumentToLogCall
-        log.warn("Ignoring exception during SessionFactory " + key + " shutdown: ", e);
+        log.warn("Ignoring exception during SessionFactory " + database + " shutdown: ", e);
+      }
+      if(getDatabase(database).isUsedForIdentifiers()) {
+        identifiersTableService.stop();
       }
     }
-  }
-
-  @VisibleForTesting
-  void clearCaches() {
-    dataSourceCache.invalidateAll();
-    sessionFactoryCache.invalidateAll();
-    registrations.clear();
   }
 
 }
