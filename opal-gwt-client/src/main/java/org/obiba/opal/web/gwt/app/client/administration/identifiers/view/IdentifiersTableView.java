@@ -10,6 +10,8 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.identifiers.view;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersTablePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersTableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -123,8 +125,10 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
   @Override
   public void setValueSets(int offset, ValueSetsDto valueSets) {
     variableNames = valueSets.getVariablesArray();
-    valueSetsProvider.updateRowData(offset, JsArrays.toList(valueSets.getValueSetsArray()));
+    List<ValueSetsDto.ValueSetDto> values = JsArrays.toList(valueSets.getValueSetsArray());
+    valueSetsProvider.updateRowData(offset, values);
     valueSetsTable.setVisibleRange(offset, valueSetsTable.getPageSize());
+    valueSetsPager.setVisible(values.size() >= PAGE_SIZE);
   }
 
   @UiHandler("deleteIdTable")
@@ -257,6 +261,7 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
         @Override
         public void doAction(VariableDto object, String actionName) {
 
+          //noinspection IfStatementWithTooManyBranches
           if(actionName.equalsIgnoreCase(REMOVE_ACTION)) {
             getUiHandlers().onDeleteIdentifiersMapping(object);
           } else if(actionName.equalsIgnoreCase(EDIT_ACTION)) {
