@@ -11,23 +11,29 @@
 package org.obiba.opal.web.system.subject;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.opal.core.service.security.OldPasswordMismatchException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
+
+import com.google.protobuf.GeneratedMessage;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
 @Provider
-public class OldPasswordMismatchExceptionMapper implements ExceptionMapper<OldPasswordMismatchException> {
+public class OldPasswordMismatchExceptionMapper extends ErrorDtoExceptionMapper<OldPasswordMismatchException> {
 
   @Override
-  public Response toResponse(OldPasswordMismatchException exception) {
-    return Response.status(BAD_REQUEST).type("application/x-protobuf+json")
-        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "OldPasswordMismatch", exception)).build();
+  protected Response.Status getStatus() {
+    return BAD_REQUEST;
+  }
+
+  @Override
+  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(OldPasswordMismatchException exception) {
+    return ClientErrorDtos.getErrorMessage(getStatus(), "OldPasswordMismatch", exception);
   }
 
 }

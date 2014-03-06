@@ -10,29 +10,33 @@
 package org.obiba.opal.web.magma.provider;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.magma.NoSuchVariableException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
-import org.obiba.opal.web.model.Ws;
+import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
+import com.google.protobuf.GeneratedMessage;
 
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 @Component
 @Provider
-public class NoSuchVariableExceptionMapper implements ExceptionMapper<NoSuchVariableException> {
+public class NoSuchVariableExceptionMapper extends ErrorDtoExceptionMapper<NoSuchVariableException> {
 
   @Override
-  public Response toResponse(NoSuchVariableException exception) {
-    Ws.ClientErrorDto errorDto = Strings.isNullOrEmpty(exception.getValueTableName())
-        ? ClientErrorDtos.getErrorMessage(NOT_FOUND, "NoSuchVariable").addArguments(exception.getName()).build()
-        : ClientErrorDtos.getErrorMessage(NOT_FOUND, "NoSuchVariableInTable").addArguments(exception.getName())
-            .addArguments(exception.getValueTableName()).build();
-    return Response.status(NOT_FOUND).entity(errorDto).type("application/x-protobuf+json").build();
+  protected Response.Status getStatus() {
+    return NOT_FOUND;
+  }
+
+  @Override
+  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(NoSuchVariableException exception) {
+    return (Strings.isNullOrEmpty(exception.getValueTableName())
+        ? ClientErrorDtos.getErrorMessage(getStatus(), "NoSuchVariable").addArguments(exception.getName())
+        : ClientErrorDtos.getErrorMessage(getStatus(), "NoSuchVariableInTable").addArguments(exception.getName())
+            .addArguments(exception.getValueTableName())).build();
   }
 
 }

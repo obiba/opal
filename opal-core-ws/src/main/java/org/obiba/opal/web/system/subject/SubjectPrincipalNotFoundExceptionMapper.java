@@ -11,24 +11,30 @@
 package org.obiba.opal.web.system.subject;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.opal.core.service.security.SubjectPrincipalNotFoundException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
+
+import com.google.protobuf.GeneratedMessage;
 
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 @Component
 @Provider
-public class SubjectPrincipalNotFoundExceptionMapper implements ExceptionMapper<SubjectPrincipalNotFoundException> {
+public class SubjectPrincipalNotFoundExceptionMapper
+    extends ErrorDtoExceptionMapper<SubjectPrincipalNotFoundException> {
 
   @Override
-  public Response toResponse(SubjectPrincipalNotFoundException exception) {
-    return Response.status(NOT_FOUND).type("application/x-protobuf+json")
-        .entity(ClientErrorDtos.getErrorMessage(NOT_FOUND, "SubjectPrincipalNotFound", exception.getPrincipal()))
-        .build();
+  protected Response.Status getStatus() {
+    return NOT_FOUND;
+  }
+
+  @Override
+  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(SubjectPrincipalNotFoundException exception) {
+    return ClientErrorDtos.getErrorMessage(getStatus(), "SubjectPrincipalNotFound", exception.getPrincipal()).build();
   }
 
 }

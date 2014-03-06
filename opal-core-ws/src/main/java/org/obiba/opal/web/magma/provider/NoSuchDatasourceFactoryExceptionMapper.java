@@ -11,22 +11,29 @@
 package org.obiba.opal.web.magma.provider;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.support.NoSuchDatasourceFactoryException;
+import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
+
+import com.google.protobuf.GeneratedMessage;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
 @Provider
-public class NoSuchDatasourceFactoryExceptionMapper implements ExceptionMapper<NoSuchDatasourceFactoryException> {
+public class NoSuchDatasourceFactoryExceptionMapper extends ErrorDtoExceptionMapper<NoSuchDatasourceFactoryException> {
 
   @Override
-  public Response toResponse(NoSuchDatasourceFactoryException exception) {
-    return Response.status(BAD_REQUEST).type("application/x-protobuf+json")
-        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "UnidentifiedDatasourceFactory").build()).build();
+  protected Response.Status getStatus() {
+    return BAD_REQUEST;
   }
+
+  @Override
+  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(NoSuchDatasourceFactoryException exception) {
+    return ClientErrorDtos.getErrorMessage(getStatus(), "UnidentifiedDatasourceFactory").build();
+  }
+
 }

@@ -10,23 +10,29 @@
 package org.obiba.opal.web.magma.provider;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.magma.support.DatasourceParsingException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
+
+import com.google.protobuf.GeneratedMessage;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
 @Provider
-public class DatasourceParsingExceptionMapper implements ExceptionMapper<DatasourceParsingException> {
+public class DatasourceParsingExceptionMapper extends ErrorDtoExceptionMapper<DatasourceParsingException> {
 
   @Override
-  public Response toResponse(DatasourceParsingException exception) {
-    return Response.status(BAD_REQUEST).type("application/x-protobuf+json")
-        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceReadFailed", exception)).build();
+  protected Response.Status getStatus() {
+    return BAD_REQUEST;
+  }
+
+  @Override
+  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(DatasourceParsingException exception) {
+    return ClientErrorDtos.getErrorMessage(getStatus(), "DatasourceReadFailed", exception);
   }
 
 }

@@ -13,19 +13,28 @@ package org.obiba.opal.web.security;
 import java.security.InvalidParameterException;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
+
+import com.google.protobuf.GeneratedMessage;
+
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Provider
 @Component
-public class MagmaCryptInvalidArgumentExceptionMapper implements ExceptionMapper<InvalidParameterException> {
+public class MagmaCryptInvalidArgumentExceptionMapper extends ErrorDtoExceptionMapper<InvalidParameterException> {
 
   @Override
-  public Response toResponse(InvalidParameterException exception) {
-    return Response.status(Response.Status.BAD_REQUEST).type("application/x-protobuf+json")
-        .entity(ClientErrorDtos.getErrorMessage(Response.Status.BAD_REQUEST, "InvalidKeypair", exception)).build();
+  protected Response.Status getStatus() {
+    return BAD_REQUEST;
   }
+
+  @Override
+  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(InvalidParameterException exception) {
+    return ClientErrorDtos.getErrorMessage(getStatus(), "InvalidKeypair", exception);
+  }
+
 }

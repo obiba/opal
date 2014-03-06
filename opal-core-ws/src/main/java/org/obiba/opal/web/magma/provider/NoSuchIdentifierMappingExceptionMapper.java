@@ -10,23 +10,29 @@
 package org.obiba.opal.web.magma.provider;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.opal.core.service.NoSuchIdentifierMappingException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
+
+import com.google.protobuf.GeneratedMessage;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
 @Provider
-public class NoSuchIdentifierMappingExceptionMapper implements ExceptionMapper<NoSuchIdentifierMappingException> {
+public class NoSuchIdentifierMappingExceptionMapper extends ErrorDtoExceptionMapper<NoSuchIdentifierMappingException> {
 
   @Override
-  public Response toResponse(NoSuchIdentifierMappingException exception) {
-    return Response.status(BAD_REQUEST).type("application/x-protobuf+json")
-        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "IdentifierMappingFailed", exception)).build();
+  protected Response.Status getStatus() {
+    return BAD_REQUEST;
+  }
+
+  @Override
+  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(NoSuchIdentifierMappingException exception) {
+    return ClientErrorDtos.getErrorMessage(getStatus(), "IdentifierMappingFailed", exception);
   }
 
 }

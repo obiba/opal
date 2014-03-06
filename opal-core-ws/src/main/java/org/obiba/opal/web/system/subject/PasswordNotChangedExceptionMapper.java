@@ -11,23 +11,29 @@
 package org.obiba.opal.web.system.subject;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.opal.core.service.security.PasswordNotChangedException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
+
+import com.google.protobuf.GeneratedMessage;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
 @Provider
-public class PasswordNotChangedExceptionMapper implements ExceptionMapper<PasswordNotChangedException> {
+public class PasswordNotChangedExceptionMapper extends ErrorDtoExceptionMapper<PasswordNotChangedException> {
 
   @Override
-  public Response toResponse(PasswordNotChangedException exception) {
-    return Response.status(BAD_REQUEST).type("application/x-protobuf+json")
-        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "PasswordNotChanged", exception)).build();
+  protected Response.Status getStatus() {
+    return BAD_REQUEST;
+  }
+
+  @Override
+  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(PasswordNotChangedException exception) {
+    return ClientErrorDtos.getErrorMessage(getStatus(), "PasswordNotChanged", exception);
   }
 
 }

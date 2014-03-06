@@ -11,20 +11,28 @@
 package org.obiba.opal.web.magma.vcs;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.opal.core.vcs.git.OpalGitException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
+
+import com.google.protobuf.GeneratedMessage;
+
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Provider
 @Component
-public class OpalGitExceptionMapper implements ExceptionMapper<OpalGitException> {
+public class OpalGitExceptionMapper extends ErrorDtoExceptionMapper<OpalGitException> {
 
   @Override
-  public Response toResponse(OpalGitException exception) {
-    return Response.status(Response.Status.BAD_REQUEST).type("application/x-protobuf+json")
-        .entity(ClientErrorDtos.getErrorMessage(Response.Status.BAD_REQUEST, "VcsOperationFailed", exception)).build();
+  protected Response.Status getStatus() {
+    return BAD_REQUEST;
+  }
+
+  @Override
+  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(OpalGitException exception) {
+    return ClientErrorDtos.getErrorMessage(getStatus(), "VcsOperationFailed", exception);
   }
 }
