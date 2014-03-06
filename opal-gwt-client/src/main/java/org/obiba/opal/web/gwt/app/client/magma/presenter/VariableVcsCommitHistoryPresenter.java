@@ -124,11 +124,7 @@ public class VariableVcsCommitHistoryPresenter extends PresenterWidget<VariableV
           .forResource(requestUri).withCallback(new ResourceCallback<VcsCommitInfoDto>() {
         @Override
         public void onResource(Response response, VcsCommitInfoDto resource) {
-          if(vcsHistoryModalPresenter == null) {
-            vcsHistoryModalPresenter = vcsHistoryModalProvider.create();
-          }
-          vcsHistoryModalPresenter.setCommitInfo(resource);
-          vcsHistoryModalProvider.show();
+          vcsHistoryModalProvider.get().setCommitInfo(resource);
         }
       }).get().send();
     }
