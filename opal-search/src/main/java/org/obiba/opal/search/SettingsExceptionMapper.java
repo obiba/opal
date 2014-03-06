@@ -25,9 +25,9 @@ public class SettingsExceptionMapper implements ExceptionMapper<SettingsExceptio
 
   @Override
   public Response toResponse(SettingsException exception) {
-    return Response.status(BAD_REQUEST).type("application/x-protobuf+json").entity(
-        Ws.ClientErrorDto.newBuilder().setCode(BAD_REQUEST.getStatusCode()).setStatus(exception.getMessage()).build())
-        .build();
+    Ws.ClientErrorDto errorDto = Ws.ClientErrorDto.newBuilder().setCode(BAD_REQUEST.getStatusCode())
+        .setStatus(exception.getMessage()).build();
+    return Response.status(BAD_REQUEST).type("application/x-protobuf+json").entity(errorDto).build();
   }
 
 }

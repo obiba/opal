@@ -11,23 +11,29 @@
 package org.obiba.opal.web.system.subject;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.opal.core.service.SubjectProfileNotFoundException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
+
+import com.google.protobuf.GeneratedMessage;
 
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 @Component
 @Provider
-public class SubjectProfileNotFoundExceptionMapper implements ExceptionMapper<SubjectProfileNotFoundException> {
+public class SubjectProfileNotFoundExceptionMapper extends ErrorDtoExceptionMapper<SubjectProfileNotFoundException> {
 
   @Override
-  public Response toResponse(SubjectProfileNotFoundException exception) {
-    return Response.status(NOT_FOUND).type("application/x-protobuf+json")
-        .entity(ClientErrorDtos.getErrorMessage(NOT_FOUND, "SubjectProfileNotFound", exception.getPrincipal())).build();
+  protected Response.Status getStatus() {
+    return NOT_FOUND;
+  }
+
+  @Override
+  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(SubjectProfileNotFoundException exception) {
+    return ClientErrorDtos.getErrorMessage(getStatus(), "SubjectProfileNotFound", exception.getPrincipal()).build();
   }
 
 }

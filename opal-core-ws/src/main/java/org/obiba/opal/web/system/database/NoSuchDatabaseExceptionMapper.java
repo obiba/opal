@@ -1,24 +1,30 @@
 package org.obiba.opal.web.system.database;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.opal.core.service.database.NoSuchDatabaseException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
-import org.obiba.opal.web.model.Ws;
+import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
+
+import com.google.protobuf.GeneratedMessage;
 
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 @Component
 @Provider
-public class NoSuchDatabaseExceptionMapper implements ExceptionMapper<NoSuchDatabaseException> {
+public class NoSuchDatabaseExceptionMapper extends ErrorDtoExceptionMapper<NoSuchDatabaseException> {
 
   @Override
-  public Response toResponse(NoSuchDatabaseException exception) {
-    Ws.ClientErrorDto errorDto = ClientErrorDtos.getErrorMessage(NOT_FOUND, "NoSuchDatabase")
-        .addArguments(exception.getDatabaseName()).build();
-    return Response.status(NOT_FOUND).entity(errorDto).type("application/x-protobuf+json").build();
+  protected Response.Status getStatus() {
+    return NOT_FOUND;
   }
+
+  @Override
+  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(NoSuchDatabaseException exception) {
+    return ClientErrorDtos.getErrorMessage(getStatus(), "NoSuchDatabase").addArguments(exception.getDatabaseName())
+        .build();
+  }
+
 }

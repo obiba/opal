@@ -12,22 +12,27 @@ package org.obiba.opal.web.provider;
 
 import javax.validation.ConstraintViolationException;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.springframework.stereotype.Component;
 
+import com.google.protobuf.GeneratedMessage;
+
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
 @Provider
-public class ConstraintViolationExceptionMapper implements ExceptionMapper<ConstraintViolationException> {
+public class ConstraintViolationExceptionMapper extends ErrorDtoExceptionMapper<ConstraintViolationException> {
 
   @Override
-  public Response toResponse(ConstraintViolationException exception) {
-    return Response.status(BAD_REQUEST).type("application/x-protobuf+json")
-        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "ConstraintViolation", exception)).build();
+  protected Response.Status getStatus() {
+    return BAD_REQUEST;
+  }
+
+  @Override
+  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(ConstraintViolationException exception) {
+    return ClientErrorDtos.getErrorMessage(getStatus(), "ConstraintViolation", exception);
   }
 
 }

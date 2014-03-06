@@ -11,22 +11,30 @@
 package org.obiba.opal.web.security;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.opal.core.security.GeneralSecurityRuntimeException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
+
+import com.google.protobuf.GeneratedMessage;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Provider
 @Component
-public class MagmaGeneralSecurityRuntimeExceptionMapper implements ExceptionMapper<GeneralSecurityRuntimeException> {
+public class MagmaGeneralSecurityRuntimeExceptionMapper
+    extends ErrorDtoExceptionMapper<GeneralSecurityRuntimeException> {
 
   @Override
-  public Response toResponse(GeneralSecurityRuntimeException exception) {
-    return Response.status(BAD_REQUEST).type("application/x-protobuf+json")
-        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "InvalidKeypair", exception)).build();
+  protected Response.Status getStatus() {
+    return BAD_REQUEST;
   }
+
+  @Override
+  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(GeneralSecurityRuntimeException exception) {
+    return ClientErrorDtos.getErrorMessage(getStatus(), "InvalidKeypair", exception);
+  }
+
 }

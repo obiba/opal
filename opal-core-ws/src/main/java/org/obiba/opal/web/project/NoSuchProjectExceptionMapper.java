@@ -10,24 +10,30 @@
 package org.obiba.opal.web.project;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.opal.core.service.NoSuchProjectException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
-import org.obiba.opal.web.model.Ws;
+import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
+
+import com.google.protobuf.GeneratedMessage;
 
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 @Component
 @Provider
-public class NoSuchProjectExceptionMapper implements ExceptionMapper<NoSuchProjectException> {
+public class NoSuchProjectExceptionMapper extends ErrorDtoExceptionMapper<NoSuchProjectException> {
 
   @Override
-  public Response toResponse(NoSuchProjectException exception) {
-    Ws.ClientErrorDto errorDto = ClientErrorDtos.getErrorMessage(NOT_FOUND, "NoSuchProject")
-        .addArguments(exception.getProjectName()).build();
-    return Response.status(NOT_FOUND).entity(errorDto).type("application/x-protobuf+json").build();
+  protected Response.Status getStatus() {
+    return NOT_FOUND;
   }
+
+  @Override
+  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(NoSuchProjectException exception) {
+    return ClientErrorDtos.getErrorMessage(getStatus(), "NoSuchProject").addArguments(exception.getProjectName())
+        .build();
+  }
+
 }
