@@ -91,6 +91,7 @@ public class SubjectCredentialsAdministrationPresenter extends
   protected void onReveal() {
     super.onReveal();
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
+    refreshTables();
   }
 
   @Override
