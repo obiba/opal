@@ -25,7 +25,7 @@ public class SearchQueryExceptionMapper implements ExceptionMapper<SearchQueryEx
 
   @Override
   public Response toResponse(SearchQueryException exception) {
-    return Response.status(BAD_REQUEST)
+    return Response.status(BAD_REQUEST).type("application/x-protobuf+json")
         .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "SearchQueryIsInvalid", exception)).build();
   }
 

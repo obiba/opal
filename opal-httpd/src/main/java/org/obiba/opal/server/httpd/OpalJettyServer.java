@@ -106,15 +106,12 @@ public class OpalJettyServer {
   }
 
   private Properties loadProperties() throws IOException {
-    FileInputStream inputStream = null;
-    try {
-      // ${OPAL_HOME}/conf/opal-config.properties
-      inputStream = new FileInputStream(new File(System.getProperty("OPAL_HOME") + "/conf/opal-config.properties"));
+    // ${OPAL_HOME}/conf/opal-config.properties
+    try(FileInputStream inputStream = new FileInputStream(
+        new File(System.getProperty("OPAL_HOME") + "/conf/opal-config.properties"))) {
       Properties properties = new Properties(PropertiesLoaderUtils.loadAllProperties("META-INF/defaults.properties"));
       properties.load(inputStream);
       return properties;
-    } finally {
-      if(inputStream != null) inputStream.close();
     }
   }
 

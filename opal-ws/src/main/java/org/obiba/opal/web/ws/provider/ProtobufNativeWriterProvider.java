@@ -43,16 +43,16 @@ public class ProtobufNativeWriterProvider extends AbstractProtobufProvider imple
 
   @Override
   @SuppressWarnings({ "unchecked", "PMD.ExcessiveParameterList" })
-  public void writeTo(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
+  public void writeTo(Object obj, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
       MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
       throws IOException, WebApplicationException {
     if(isWrapped(type, genericType, annotations, mediaType)) {
       Class<Message> messageType = extractMessageType(type, genericType, annotations, mediaType);
-      for(Message m : sort(messageType, (Iterable<Message>) t)) {
-        m.writeDelimitedTo(entityStream);
+      for(Message message : sort(messageType, (Iterable<Message>) obj)) {
+        message.writeDelimitedTo(entityStream);
       }
     } else {
-      ((MessageLite) t).writeTo(entityStream);
+      ((MessageLite) obj).writeTo(entityStream);
     }
   }
 

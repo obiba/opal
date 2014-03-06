@@ -2,6 +2,7 @@ package org.obiba.opal.web.ws.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.google.protobuf.ExtensionRegistry;
 import com.google.protobuf.Message;
@@ -30,17 +31,17 @@ public final class JsonIoUtil {
   private JsonIoUtil() {
   }
 
-  public static <T extends Message> ArrayList<T> mergeCollection(Readable reader, Builder builder) throws IOException {
+  public static <T extends Message> List<T> mergeCollection(Readable reader, Builder builder) throws IOException {
     return mergeCollection(reader, ExtensionRegistry.getEmptyRegistry(), builder);
   }
 
-  public static <T extends Message> ArrayList<T> mergeCollection(Readable reader, ExtensionRegistry extensionRegistry,
+  public static <T extends Message> List<T> mergeCollection(Readable reader, ExtensionRegistry extensionRegistry,
       Builder builder) throws IOException {
     if(reader == null) throw new IllegalArgumentException("reader cannot be null");
     if(extensionRegistry == null) throw new IllegalArgumentException("extensionRegistry cannot be null");
     if(builder == null) throw new IllegalArgumentException("builder cannot be null");
 
-    final ArrayList<T> messages = new ArrayList<>();
+    final List<T> messages = new ArrayList<>();
     InnerJsonFormat.mergeCollection(reader, extensionRegistry, builder, new MergeCallback() {
 
       @Override
@@ -90,8 +91,8 @@ public final class JsonIoUtil {
    */
   private static final class InnerJsonFormat extends JsonFormat {
 
-    static void mergeCollection(Readable reader, ExtensionRegistry extensionRegistry, Builder builder,
-        MergeCallback callback) throws IOException {
+    static void mergeCollection(Readable reader, ExtensionRegistry extensionRegistry, @SuppressWarnings(
+        "TypeMayBeWeakened") Builder builder, MergeCallback callback) throws IOException {
       CharSequence input = toStringBuilder(reader);
       Tokenizer tokenizer = new Tokenizer(input.subSequence(0, input.length()));
       tokenizer.consume(JS_ARRAY_OPEN_STR);

@@ -30,6 +30,6 @@ public class InvalidRequestExceptionMapper implements ExceptionMapper<InvalidReq
         .addAllArguments(exception.getMessageArgs()) //
         .build();
 
-    return Response.status(Status.BAD_REQUEST).entity(errorDto).build();
+    return Response.status(Status.BAD_REQUEST).entity(errorDto).type("application/x-protobuf+json").build();
   }
 }

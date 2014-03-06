@@ -29,7 +29,7 @@ public class UnhandledExceptionMapper implements ExceptionMapper<Exception> {
   @Override
   public Response toResponse(Exception exception) {
     log.error("Unhandled exception", exception);
-    return Response.status(BAD_REQUEST)
+    return Response.status(BAD_REQUEST).type("application/x-protobuf+json")
         .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "UnhandledException", exception.getMessage()).build())
         .build();
   }

@@ -26,7 +26,7 @@ public class SubjectProfileNotFoundExceptionMapper implements ExceptionMapper<Su
 
   @Override
   public Response toResponse(SubjectProfileNotFoundException exception) {
-    return Response.status(NOT_FOUND)
+    return Response.status(NOT_FOUND).type("application/x-protobuf+json")
         .entity(ClientErrorDtos.getErrorMessage(NOT_FOUND, "SubjectProfileNotFound", exception.getPrincipal())).build();
   }
 

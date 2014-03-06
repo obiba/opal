@@ -26,7 +26,7 @@ public class ConstraintViolationExceptionMapper implements ExceptionMapper<Const
 
   @Override
   public Response toResponse(ConstraintViolationException exception) {
-    return Response.status(BAD_REQUEST)
+    return Response.status(BAD_REQUEST).type("application/x-protobuf+json")
         .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "ConstraintViolation", exception)).build();
   }
 

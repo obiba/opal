@@ -10,12 +10,10 @@
 package org.obiba.opal.web.magma.provider;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.opal.core.service.NoSuchIdentifierMappingException;
-import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +25,7 @@ public class NoSuchIdentifierMappingExceptionMapper implements ExceptionMapper<N
 
   @Override
   public Response toResponse(NoSuchIdentifierMappingException exception) {
-    return Response.status(BAD_REQUEST)
+    return Response.status(BAD_REQUEST).type("application/x-protobuf+json")
         .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "IdentifierMappingFailed", exception)).build();
   }
 

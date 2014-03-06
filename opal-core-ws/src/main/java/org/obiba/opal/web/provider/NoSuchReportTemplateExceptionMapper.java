@@ -25,8 +25,7 @@ public class NoSuchReportTemplateExceptionMapper implements ExceptionMapper<NoSu
 
   @Override
   public Response toResponse(NoSuchReportTemplateException exception) {
-    return Response.status(NOT_FOUND).entity(
-        ClientErrorDtos.getErrorMessage(NOT_FOUND, "NoSuchReportTemplate").addArguments(exception.getName())
+    return Response.status(NOT_FOUND).type("application/x-protobuf+json").entity(ClientErrorDtos.getErrorMessage(NOT_FOUND, "NoSuchReportTemplate").addArguments(exception.getName())
             .addArguments(exception.getProject()).build()).build();
   }
 }

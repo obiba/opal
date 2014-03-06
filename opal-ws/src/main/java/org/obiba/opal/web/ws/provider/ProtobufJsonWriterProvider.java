@@ -48,16 +48,17 @@ public class ProtobufJsonWriterProvider extends AbstractProtobufProvider impleme
   public void writeTo(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
       MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
       throws IOException, WebApplicationException {
-    OutputStreamWriter output = new OutputStreamWriter(entityStream, "UTF-8");
-    if(isWrapped(type, genericType, annotations, mediaType)) {
-      // JsonFormat does not provide a printList method
-      JsonIoUtil
-          .printCollection(sort(extractMessageType(type, genericType, annotations, mediaType), (Iterable<Message>) t),
-              output);
-    } else {
-      JsonFormat.print((Message) t, output);
+    try(OutputStreamWriter output = new OutputStreamWriter(entityStream, "UTF-8")) {
+      if(isWrapped(type, genericType, annotations, mediaType)) {
+        // JsonFormat does not provide a printList method
+        JsonIoUtil
+            .printCollection(sort(extractMessageType(type, genericType, annotations, mediaType), (Iterable<Message>) t),
+                output);
+      } else {
+        JsonFormat.print((Message) t, output);
+      }
+      output.flush();
     }
-    output.flush();
   }
 
 }

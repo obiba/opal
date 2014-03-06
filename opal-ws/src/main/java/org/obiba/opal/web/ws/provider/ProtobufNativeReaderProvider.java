@@ -64,10 +64,9 @@ public class ProtobufNativeReaderProvider extends AbstractProtobufProvider imple
         b = builder.clone();
       }
       return msgs;
-    } else {
-      CodedInputStream cis = CodedInputStream.newInstance(entityStream);
-      cis.setSizeLimit(messageSizeLimit);
-      return builder.mergeFrom(cis, extensionRegistry).build();
     }
+    CodedInputStream cis = CodedInputStream.newInstance(entityStream);
+    cis.setSizeLimit(messageSizeLimit);
+    return builder.mergeFrom(cis, extensionRegistry).build();
   }
 }

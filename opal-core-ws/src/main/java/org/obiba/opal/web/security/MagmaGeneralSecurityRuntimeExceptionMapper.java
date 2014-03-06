@@ -18,6 +18,7 @@ import org.obiba.opal.core.security.GeneralSecurityRuntimeException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.springframework.stereotype.Component;
 
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Provider
 @Component
@@ -25,7 +26,7 @@ public class MagmaGeneralSecurityRuntimeExceptionMapper implements ExceptionMapp
 
   @Override
   public Response toResponse(GeneralSecurityRuntimeException exception) {
-    return Response.status(Response.Status.BAD_REQUEST)
-        .entity(ClientErrorDtos.getErrorMessage(Response.Status.BAD_REQUEST, "InvalidKeypair", exception)).build();
+    return Response.status(BAD_REQUEST).type("application/x-protobuf+json")
+        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "InvalidKeypair", exception)).build();
   }
 }

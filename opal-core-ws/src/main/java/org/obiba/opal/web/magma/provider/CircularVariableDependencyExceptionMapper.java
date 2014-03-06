@@ -34,6 +34,6 @@ public class CircularVariableDependencyExceptionMapper implements ExceptionMappe
     log.debug("CircularVariableDependencyException", exception);
     Ws.ClientErrorDto errorDto = ClientErrorDtos.getErrorMessage(BAD_REQUEST, "CircularVariableDependency")
         .addArguments(exception.getVariableRef()).addArguments(exception.getHierarchy()).build();
-    return Response.status(BAD_REQUEST).entity(errorDto).build();
+    return Response.status(BAD_REQUEST).entity(errorDto).type("application/x-protobuf+json").build();
   }
 }

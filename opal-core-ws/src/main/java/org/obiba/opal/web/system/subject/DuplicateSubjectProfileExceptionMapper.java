@@ -25,7 +25,7 @@ public class DuplicateSubjectProfileExceptionMapper implements ExceptionMapper<D
 
   @Override
   public Response toResponse(DuplicateSubjectProfileException exception) {
-    return Response.status(BAD_REQUEST)
+    return Response.status(BAD_REQUEST).type("application/x-protobuf+json")
         .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DuplicateSubjectProfile", exception)).build();
   }
 

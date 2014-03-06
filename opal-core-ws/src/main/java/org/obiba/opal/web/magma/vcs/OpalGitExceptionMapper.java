@@ -18,14 +18,13 @@ import org.obiba.opal.core.vcs.git.OpalGitException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.springframework.stereotype.Component;
 
-
 @Provider
 @Component
 public class OpalGitExceptionMapper implements ExceptionMapper<OpalGitException> {
 
   @Override
   public Response toResponse(OpalGitException exception) {
-    return Response.status(Response.Status.BAD_REQUEST)
+    return Response.status(Response.Status.BAD_REQUEST).type("application/x-protobuf+json")
         .entity(ClientErrorDtos.getErrorMessage(Response.Status.BAD_REQUEST, "VcsOperationFailed", exception)).build();
   }
 }

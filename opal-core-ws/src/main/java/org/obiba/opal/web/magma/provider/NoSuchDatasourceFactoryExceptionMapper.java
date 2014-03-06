@@ -23,9 +23,10 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 @Component
 @Provider
 public class NoSuchDatasourceFactoryExceptionMapper implements ExceptionMapper<NoSuchDatasourceFactoryException> {
+
   @Override
   public Response toResponse(NoSuchDatasourceFactoryException exception) {
-    return Response.status(BAD_REQUEST)
+    return Response.status(BAD_REQUEST).type("application/x-protobuf+json")
         .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "UnidentifiedDatasourceFactory").build()).build();
   }
 }

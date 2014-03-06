@@ -26,7 +26,7 @@ public class DuplicateDatasourceNameExceptionMapper implements ExceptionMapper<D
 
   @Override
   public Response toResponse(DuplicateDatasourceNameException exception) {
-    return Response.status(BAD_REQUEST)
+    return Response.status(BAD_REQUEST).type("application/x-protobuf+json")
         .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DuplicateDatasourceName").build()).build();
   }
 }

@@ -23,6 +23,7 @@ public class NoSuchGitRepositoryExceptionMapper implements ExceptionMapper<NoSuc
 
   @Override
   public Response toResponse(NoSuchGitRepositoryException exception) {
+    // silently ignore missing git history when there is no Git repo
     return Response.ok().build();
   }
 }

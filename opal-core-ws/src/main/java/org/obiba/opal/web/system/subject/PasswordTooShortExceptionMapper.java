@@ -26,7 +26,7 @@ public class PasswordTooShortExceptionMapper implements ExceptionMapper<Password
 
   @Override
   public Response toResponse(PasswordTooShortException exception) {
-    return Response.status(BAD_REQUEST)
+    return Response.status(BAD_REQUEST).type("application/x-protobuf+json")
         .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "PasswordLengthMin", exception)).build();
   }
 

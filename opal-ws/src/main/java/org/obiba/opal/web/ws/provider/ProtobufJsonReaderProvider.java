@@ -53,9 +53,8 @@ public class ProtobufJsonReaderProvider extends AbstractProtobufProvider impleme
     if(isWrapped(type, genericType, annotations, mediaType)) {
       // JsonFormat does not provide a mergeCollection method
       return JsonIoUtil.mergeCollection(input, extensionRegistry, builder);
-    } else {
-      JsonFormat.merge(input, extensionRegistry, builder);
-      return builder.build();
     }
+    JsonFormat.merge(input, extensionRegistry, builder);
+    return builder.build();
   }
 }

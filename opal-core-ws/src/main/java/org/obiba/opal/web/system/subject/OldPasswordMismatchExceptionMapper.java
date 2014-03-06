@@ -26,7 +26,7 @@ public class OldPasswordMismatchExceptionMapper implements ExceptionMapper<OldPa
 
   @Override
   public Response toResponse(OldPasswordMismatchException exception) {
-    return Response.status(BAD_REQUEST)
+    return Response.status(BAD_REQUEST).type("application/x-protobuf+json")
         .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "OldPasswordMismatch", exception)).build();
   }
 

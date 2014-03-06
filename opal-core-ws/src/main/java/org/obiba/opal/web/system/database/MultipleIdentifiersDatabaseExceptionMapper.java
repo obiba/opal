@@ -17,7 +17,7 @@ public class MultipleIdentifiersDatabaseExceptionMapper
 
   @Override
   public Response toResponse(MultipleIdentifiersDatabaseException exception) {
-    return Response.status(BAD_REQUEST)
+    return Response.status(BAD_REQUEST).type("application/x-protobuf+json")
         .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "MultipleIdentifiersDatabase", exception)).build();
   }
 

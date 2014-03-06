@@ -10,7 +10,6 @@
 package org.obiba.opal.web.magma.provider;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
@@ -18,13 +17,15 @@ import org.mozilla.javascript.RhinoException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.springframework.stereotype.Component;
 
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+
 @Component
 @Provider
 public class JavaScriptExceptionMapper implements ExceptionMapper<RhinoException> {
 
   @Override
   public Response toResponse(RhinoException exception) {
-    return Response.status(Status.BAD_REQUEST).type("application/x-protobuf+json")
-        .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "JavaScriptException", exception)).build();
+    return Response.status(BAD_REQUEST).type("application/x-protobuf+json")
+        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "JavaScriptException", exception)).build();
   }
 }

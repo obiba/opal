@@ -26,7 +26,7 @@ public class PasswordNotChangedExceptionMapper implements ExceptionMapper<Passwo
 
   @Override
   public Response toResponse(PasswordNotChangedException exception) {
-    return Response.status(BAD_REQUEST)
+    return Response.status(BAD_REQUEST).type("application/x-protobuf+json")
         .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "PasswordNotChanged", exception)).build();
   }
 

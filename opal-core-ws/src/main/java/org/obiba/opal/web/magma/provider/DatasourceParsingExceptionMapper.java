@@ -25,7 +25,7 @@ public class DatasourceParsingExceptionMapper implements ExceptionMapper<Datasou
 
   @Override
   public Response toResponse(DatasourceParsingException exception) {
-    return Response.status(BAD_REQUEST)
+    return Response.status(BAD_REQUEST).type("application/x-protobuf+json")
         .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceReadFailed", exception)).build();
   }
 

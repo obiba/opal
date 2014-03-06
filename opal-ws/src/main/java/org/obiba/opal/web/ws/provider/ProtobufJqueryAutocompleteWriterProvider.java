@@ -67,15 +67,15 @@ public class ProtobufJqueryAutocompleteWriterProvider extends AbstractProtobufPr
     FieldDescriptor valueFd = descriptor.findFieldByName(valueProperty);
     FieldDescriptor labelFd = descriptor.findFieldByName(labelProperty);
 
-    AutocompletePrinter printer = new AutocompletePrinter(valueFd, labelFd);
-
-    OutputStreamWriter output = new OutputStreamWriter(entityStream, "UTF-8");
-    if(isWrapped(type, genericType, annotations, mediaType)) {
-      printer.print((Iterable<Message>) t, output);
-    } else {
-      printer.print((Message) t, output);
+    try(OutputStreamWriter output = new OutputStreamWriter(entityStream, "UTF-8")) {
+      AutocompletePrinter printer = new AutocompletePrinter(valueFd, labelFd);
+      if(isWrapped(type, genericType, annotations, mediaType)) {
+        printer.print((Iterable<Message>) t, output);
+      } else {
+        printer.print((Message) t, output);
+      }
+      output.flush();
     }
-    output.flush();
   }
 
   @Override
