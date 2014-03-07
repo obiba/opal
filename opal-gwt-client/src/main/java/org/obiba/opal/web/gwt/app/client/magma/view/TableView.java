@@ -238,7 +238,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
     downloadBtn.setText(translations.downloadLabel());
     addTableColumns();
-    initializeAnchorTexts();
     initializeFilter();
 
     progress.setWidth("150px");
@@ -661,12 +660,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     } else {
       progress.setVisible(false);
     }
-  }
-
-  private void initializeAnchorTexts() {
-    clearIndexLink.setText(translations.indexActionDelete());
-    indexNowLink.setText(translations.indexActionIndexNow());
-    scheduleLink.setText(translations.indexActionSchedule());
   }
 
   private class VariableDtoDisplay implements CheckboxColumn.Display<VariableDto> {
