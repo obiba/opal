@@ -21,17 +21,13 @@ import org.obiba.opal.web.gwt.datetime.client.FormatType;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.opal.VcsCommitInfoDto;
 import org.obiba.opal.web.model.client.opal.VcsCommitInfosDto;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -61,8 +57,6 @@ public class VariableVcsCommitHistoryPresenter extends PresenterWidget<VariableV
   private TableDto table;
 
   private VariableDto variable;
-
-  private VcsCommitHistoryModalPresenter vcsHistoryModalPresenter;
 
   /**
    * @param display
@@ -106,13 +100,17 @@ public class VariableVcsCommitHistoryPresenter extends PresenterWidget<VariableV
 
     @Override
     public void doAction(VcsCommitInfoDto commitInfo, String actionName) {
-        if(ActionsColumn.EDIT_ACTION.equals(actionName)) {
+      switch(actionName) {
+        case ActionsColumn.EDIT_ACTION:
           viewCommitContent(commitInfo);
-        } else if(Display.DIFF_ACTION.equals(actionName)) {
+          break;
+        case Display.DIFF_ACTION:
           showCommitInfo(commitInfo, false);
-        } else if(Display.DIFF_CURRENT_ACTION.equals(actionName)) {
+          break;
+        case Display.DIFF_CURRENT_ACTION:
           showCommitInfo(commitInfo, true);
-        }
+          break;
+      }
     }
 
     private void showCommitInfo(VcsCommitInfoDto dto, boolean withCurrent) {
