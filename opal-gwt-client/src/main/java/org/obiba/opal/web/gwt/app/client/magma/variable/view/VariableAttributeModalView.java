@@ -27,6 +27,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
+import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
@@ -84,6 +85,9 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
   @UiField
   ControlGroup namespaceGroup;
 
+  @UiField
+  Paragraph editAttributeHelp;
+
   @Inject
   public VariableAttributeModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
     super(eventBus);
@@ -135,11 +139,13 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
     switch(mode) {
       case APPLY:
         modal.setTitle(translations.applyAttribute());
+        editAttributeHelp.setText(translations.applyAttributeHelp());
         break;
       case UPDATE_MULTIPLE:
         valuesGroup.setVisible(false);
         nameGroup.setVisible(false);
         modal.setTitle(translations.editAttributes());
+        editAttributeHelp.setText(translations.editAttributesHelp());
         break;
       case DELETE:
         valuesGroup.setVisible(false);
