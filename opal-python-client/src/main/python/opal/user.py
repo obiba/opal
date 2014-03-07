@@ -12,10 +12,10 @@ def add_arguments(parser):
     Add data command specific options
     """
     parser.add_argument('--name', '-n', required=False, help='User name.')
-    parser.add_argument('--upassword', '-upa', required=False, help='User password.')
-    parser.add_argument('--ucertificate', '-usc', required=False, help='User certificate (public key) file')
+    parser.add_argument('--upassword', '-upa', required=False, help='User password of at least six characters.')
+    parser.add_argument('--ucertificate', '-uc', required=False, help='User certificate (public key) file')
     parser.add_argument('--disabled', '-di', action='store_true', required=False,
-                        help='Disable user account (if ommited the user is enabled by default).')
+                        help='Disable user account (if omitted the user is enabled by default).')
     parser.add_argument('--groups', '-g', nargs='+', required=False, help='User groups')
 
     parser.add_argument('--fetch', '-fe', action='store_true', required=False,
@@ -43,6 +43,13 @@ def get_authentication_type(name):
     return opal.protobuf.Opal_pb2._SUBJECTCREDENTIALSDTO_AUTHENTICATIONTYPE.values_by_name[name].number
 
 
+def get_user_information(args):
+    request = opal.core.OpalClient.build(opal.core.OpalClient.LoginInfo.parse(args)).new_request()
+    request.fail_on_error()
+    userInfo = request.get().resource(do_ws(args)).send().as_json()
+    return userInfo
+
+
 def do_command(args):
     """
     Execute group command
@@ -61,7 +68,7 @@ def do_command(args):
         elif args.add:
             if not args.name:
                 raise Exception('A user name is required.')
-            if not args.upassword:
+            if not args.upassword and not args.ucertificate:
                     raise Exception('A user password or a certificat file is required.')
 
             # create user
@@ -89,9 +96,8 @@ def do_command(args):
             if not args.name:
                 raise Exception('A user name is required.')
 
-            userInfo = request.get().resource(do_ws(args)).send().as_json()
-            request = opal.core.OpalClient.build(opal.core.OpalClient.LoginInfo.parse(args)).new_request()
-            request.fail_on_error()
+            # TODO place this under password or certificate once the DTO's authenticationType field becomes optional
+            userInfo = get_user_information(args)
 
             user = opal.protobuf.Opal_pb2.SubjectCredentialsDto()
             user.name = args.name
@@ -103,13 +109,16 @@ def do_command(args):
                     raise Exception('Password must contain at least 6 characters.')
                 user.authenticationType = get_authentication_type('PASSWORD')
                 user.password = args.upassword
-            else:
+            elif args.ucertificate:
                 if userInfo['authenticationType'] == "PASSWORD":
                     raise Exception("%s requires a password" % user.name)
 
                 user.authenticationType = get_authentication_type('CERTIFICATE')
                 with open(args.ucertificate, 'rb') as cert:
                     user.certificate = cert.read()
+            else:
+                user.authenticationType = get_authentication_type(userInfo['authenticationType'])
+
 
             if args.disabled:
                 user.enabled = False
