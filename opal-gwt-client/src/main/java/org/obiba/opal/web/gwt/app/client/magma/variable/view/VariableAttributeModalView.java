@@ -150,11 +150,9 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
       case DELETE:
         valuesGroup.setVisible(false);
         modal.setTitle(translations.deleteAttributes());
-//        editAttributeHelp.setVisible(false);
         break;
       case UPDATE_SINGLE:
         modal.setTitle(translations.editAttribute());
-//        editAttributeHelp.setText(translations.editAttributeHelp());
         break;
     }
   }
