@@ -828,6 +828,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Apply Attribute")
   String applyAttribute();
 
+  @Description("Apply attribute help")
+  @DefaultStringValue("Add or update variable attributes for each selected variable.")
+  String applyAttributeHelp();
+
   @Description("Add attribute title")
   @DefaultStringValue("Add Attribute")
   String addAttribute();
@@ -839,6 +843,10 @@ public interface Translations extends Constants {
   @Description("Edit attributes title")
   @DefaultStringValue("Edit Attributes")
   String editAttributes();
+
+  @Description("Edit attributes title")
+  @DefaultStringValue("Edit the namespace for each selected attribute.")
+  String editAttributesHelp();
 
   @Description("Delete attributes title")
   @DefaultStringValue("Delete Attributes")
