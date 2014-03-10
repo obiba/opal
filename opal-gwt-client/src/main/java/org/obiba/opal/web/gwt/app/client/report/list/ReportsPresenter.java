@@ -89,7 +89,6 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
 
   @Override
   protected void onReveal() {
-    authorize();
     refreshReportTemplates(null);
   }
 
@@ -119,6 +118,8 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
     String uri = project == null
         ? UriBuilders.REPORT_TEMPLATES.create().build()
         : UriBuilders.PROJECT_REPORT_TEMPLATES.create().build(project);
+
+    authorize(uri);
 
     ResourceRequestBuilderFactory.<JsArray<ReportTemplateDto>>newBuilder() //
         .forResource(uri) //
@@ -186,13 +187,12 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
     }
   }
 
-  protected void authorize() {
+  protected void authorize(String uri) {
     // create report templates
     ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-        .forResource(UriBuilders.REPORT_TEMPLATES.create().build()) //
+        .forResource(uri) //
         .authorize(getView().getAddReportTemplateAuthorizer()) //
         .post().send();
-
   }
 
   public interface Display extends View, HasUiHandlers<ReportsUiHandlers> {
