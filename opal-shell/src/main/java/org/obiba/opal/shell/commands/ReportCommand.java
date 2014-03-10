@@ -36,7 +36,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 
 @CommandUsage(description = "Generate a report based on the specified report template.",
-    syntax = "Syntax: report --name TEMPLATE")
+    syntax = "Syntax: report --project PROJECT --name TEMPLATE")
 public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCommandOptions> {
 
   private static final Logger log = LoggerFactory.getLogger(ReportCommand.class);
@@ -114,7 +114,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
 
   @Override
   public String toString() {
-    return "report -n " + getOptions().getName();
+    return "report -n " + getOptions().getName() + " -p " + getOptions().getProject();
   }
 
   private int renderAndSendEmail(ReportTemplate reportTemplate, FileObject reportOutput) throws FileSystemException {
