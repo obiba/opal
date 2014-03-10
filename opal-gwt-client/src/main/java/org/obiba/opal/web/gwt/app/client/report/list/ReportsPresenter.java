@@ -89,6 +89,7 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
 
   @Override
   protected void onReveal() {
+    authorize();
     refreshReportTemplates(null);
   }
 
