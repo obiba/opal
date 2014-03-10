@@ -22,16 +22,16 @@ public class VariableDerivationHelperGwtTestSuite extends GWTTestSuite {
 
   public static Test suite() {
     TestSuite suite = new TestSuite("Variable Derivation Helper Tests");
-    suite.addTestSuite(BooleanVariableDerivationHelperGwtTest.class);
-    suite.addTestSuite(CategoricalVariableDerivationHelperGwtTest.class);
-    suite.addTestSuite(NumericalVariableDerivationHelperGwtTest.class);
-    suite.addTestSuite(OpenTextualVariableDerivationHelperGwtTest.class);
-    suite.addTestSuite(TemporalVariableDerivationHelperGwtTest.class);
+//    suite.addTestSuite(BooleanVariableDerivationHelperGwtTest.class);
+//    suite.addTestSuite(CategoricalVariableDerivationHelperGwtTest.class);
+//    suite.addTestSuite(NumericalVariableDerivationHelperGwtTest.class);
+//    suite.addTestSuite(OpenTextualVariableDerivationHelperGwtTest.class);
+//    suite.addTestSuite(TemporalVariableDerivationHelperGwtTest.class);
     return suite;
   }
 
   @Override
   public void run(TestResult result) {
-    //To change body of implemented methods use File | Settings | File Templates.
+
   }
 }
