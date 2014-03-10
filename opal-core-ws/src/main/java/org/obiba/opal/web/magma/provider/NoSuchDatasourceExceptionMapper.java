@@ -10,20 +10,30 @@
 package org.obiba.opal.web.magma.provider;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.magma.NoSuchDatasourceException;
+import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
+
+import com.google.protobuf.GeneratedMessage;
+
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 @Component
 @Provider
-public class NoSuchDatasourceExceptionMapper implements ExceptionMapper<NoSuchDatasourceException> {
+public class NoSuchDatasourceExceptionMapper extends ErrorDtoExceptionMapper<NoSuchDatasourceException> {
 
   @Override
-  public Response toResponse(NoSuchDatasourceException exception) {
-    return Response.status(Status.NOT_FOUND).entity(exception.getMessage()).build();
+  protected Response.Status getStatus() {
+    return NOT_FOUND;
+  }
+
+  @Override
+  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(NoSuchDatasourceException exception) {
+    return ClientErrorDtos.getErrorMessage(getStatus(), "NoSuchDatasource").addArguments(exception.getDatasourceName())
+        .build();
   }
 
 }

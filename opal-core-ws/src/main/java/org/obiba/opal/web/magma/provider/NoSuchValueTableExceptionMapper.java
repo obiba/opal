@@ -10,20 +10,33 @@
 package org.obiba.opal.web.magma.provider;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.magma.NoSuchValueTableException;
+import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
+
+import com.google.common.base.Strings;
+import com.google.protobuf.GeneratedMessage;
+
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 @Component
 @Provider
-public class NoSuchValueTableExceptionMapper implements ExceptionMapper<NoSuchValueTableException> {
+public class NoSuchValueTableExceptionMapper extends ErrorDtoExceptionMapper<NoSuchValueTableException> {
 
   @Override
-  public Response toResponse(NoSuchValueTableException exception) {
-    return Response.status(Status.NOT_FOUND).entity(exception.getMessage()).build();
+  protected Response.Status getStatus() {
+    return NOT_FOUND;
+  }
+
+  @Override
+  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(NoSuchValueTableException exception) {
+    return (Strings.isNullOrEmpty(exception.getDatasourceName())
+        ? ClientErrorDtos.getErrorMessage(getStatus(), "NoSuchValueTable").addArguments(exception.getTableName())
+        : ClientErrorDtos.getErrorMessage(getStatus(), "NoSuchValueTableInDatasource")
+            .addArguments(exception.getTableName()).addArguments(exception.getDatasourceName())).build();
   }
 
 }

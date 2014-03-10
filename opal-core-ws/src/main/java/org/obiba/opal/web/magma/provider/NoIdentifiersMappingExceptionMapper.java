@@ -10,20 +10,30 @@
 package org.obiba.opal.web.magma.provider;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
+import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.springframework.stereotype.Component;
+
+import com.google.protobuf.GeneratedMessage;
+
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 @Component
 @Provider
-public class NoIdentifiersMappingExceptionMapper implements ExceptionMapper<NoSuchIdentifiersMappingException> {
+public class NoIdentifiersMappingExceptionMapper extends ErrorDtoExceptionMapper<NoSuchIdentifiersMappingException> {
 
   @Override
-  public Response toResponse(NoSuchIdentifiersMappingException exception) {
-    return Response.status(Status.NOT_FOUND).entity(exception.getMessage()).build();
+  protected Response.Status getStatus() {
+    return NOT_FOUND;
+  }
+
+  @Override
+  protected GeneratedMessage.ExtendableMessage<?> getErrorDto(NoSuchIdentifiersMappingException exception) {
+    return ClientErrorDtos.getErrorMessage(getStatus(), "NoSuchIdentifiersMapping")
+        .addArguments(exception.getIdentifiersMapping()).build();
   }
 
 }

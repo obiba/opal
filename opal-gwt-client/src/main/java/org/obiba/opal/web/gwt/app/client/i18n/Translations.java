@@ -425,11 +425,15 @@ public interface Translations extends Constants {
       "CircularVariableDependency", "Circular dependency for variable '{0}'.:<br /><br /><pre>{1}</pre>",//
       "NoSuchProject", "No such project '{0}'",//
       "NoSuchDatabase", "No such database '{0}'",//
-      "NoSuchVariable", "No such variable '{0}'",//
       "SubjectPrincipalNotFound", "No such subject principal '{0}'",//
       "SubjectProfileNotFound", "No profile for subject '{0}'",//
       "IdentifiersDatabaseNotFound", "Identifiers database not found",//
+      "NoSuchIdentifiersMapping", "No such identifiers mapping '{0}'",//
+      "NoSuchDatasource", "No such datasource '{0}'",//
+      "NoSuchVariable", "No such variable '{0}'",//
       "NoSuchVariableInTable", "No such variable '{0}' in table '{1}'",//
+      "NoSuchValueTable", "No such table '{0}'",//
+      "NoSuchValueTableInDatasource", "No such table '{0}' in datasource '{1}'",//
       "NoSuchReportTemplate", "No such report template '{0}' in project '{1}'",//
       "InvalidVariableScript", "Invalid variable script:<br /><br /><pre>{0}</pre>",//
       "DestinationTableRequired", "The destination table is required.",//
@@ -553,7 +557,8 @@ public interface Translations extends Constants {
       "DotNamesAreInvalid", "The names '.' and '..' are not permitted.",//
       "FolderNameInvalidCharacters", "Folder names cannot contains characters '#' or '%'.",//
       "CannotCopySelectedTablesWithinProject",
-      "You cannot copy multiple tables within the same project. Copy each table individually or create a new project.",//
+      "You cannot copy multiple tables within the same project. Copy each table individually or create a new project.",
+//
       "CannotCopyAllTablesWithinProject", "This action would be applied to all tables. You cannot copy multiple " +
       "tables within the same project. Copy each table individually or create a new project."//
   })
