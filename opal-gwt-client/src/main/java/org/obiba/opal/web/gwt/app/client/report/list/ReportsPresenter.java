@@ -89,6 +89,7 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
 
   @Override
   protected void onReveal() {
+    authorizeAddReports();
     refreshReportTemplates(null);
   }
 
@@ -185,13 +186,9 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
     }
   }
 
-  protected void authorize() {
-    // create report templates
-    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-        .forResource("/report-templates") //
-        .authorize(getView().getAddReportTemplateAuthorizer()) //
-        .post().send();
-
+  private void authorizeAddReports() {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").post()
+        .authorize(getView().getAddReportTemplateAuthorizer()).send();
   }
 
   public interface Display extends View, HasUiHandlers<ReportsUiHandlers> {
