@@ -107,7 +107,7 @@ public class ReportTemplatesResourceTest {
     commandSchedulerService.addCommand("template9", "reports", commandMock);
     when(commandRegistry.newCommand("report")).thenReturn(commandMock);
 
-    ReportTemplatesResource reportTemplatesResource = getReportTemplatesResource();
+    ProjectReportTemplatesResource reportTemplatesResource = getProjectReportTemplatesResource();
 
     Response response = reportTemplatesResource.create(Dtos.asDto(createReportTemplate("template9")));
 
@@ -133,6 +133,12 @@ public class ReportTemplatesResourceTest {
 
   private ReportTemplatesResource getReportTemplatesResource() {
     ReportTemplatesResource resource = new ReportTemplatesResource();
+    resource.setReportTemplateService(reportTemplateService);
+    return resource;
+  }
+
+  private ProjectReportTemplatesResource getProjectReportTemplatesResource() {
+    ProjectReportTemplatesResource resource = new ProjectReportTemplatesResource();
     resource.setReportTemplateService(reportTemplateService);
     resource.setReportTemplateScheduler(reportTemplateScheduler);
     return resource;
