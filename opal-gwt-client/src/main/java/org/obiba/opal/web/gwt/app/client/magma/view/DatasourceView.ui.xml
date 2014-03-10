@@ -16,17 +16,17 @@
       </b:DropdownButton>
       <b:ButtonGroup>
         <b:Button icon="UPLOAD_ALT" ui:field="importData">
-          <ui:msg description="Import data label">Import Data</ui:msg>
+          <ui:msg description="Import label">Import</ui:msg>
         </b:Button>
       </b:ButtonGroup>
       <b:ButtonGroup>
         <b:Button icon="DOWNLOAD_ALT" ui:field="exportData">
-          <ui:msg description="Export data label">Export Data</ui:msg>
+          <ui:msg description="Export label">Export</ui:msg>
         </b:Button>
       </b:ButtonGroup>
       <b:ButtonGroup>
         <b:Button icon="COPY" ui:field="copyData">
-          <ui:msg description="Copy data label">Copy Data</ui:msg>
+          <ui:msg description="Copy label">Copy</ui:msg>
         </b:Button>
       </b:ButtonGroup>
     </g:FlowPanel>
@@ -53,7 +53,7 @@
         <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false" addStyleNames="actions-select">
 
           <g:FlowPanel addStyleNames="pull-left">
-            <b2:IconAnchor ui:field="exportSelectionAnchor" icon="SIGNOUT"
+            <b2:IconAnchor ui:field="exportSelectionAnchor" icon="DOWNLOAD_ALT"
                 addStyleNames="inline">
               <ui:msg description="Export label">Export</ui:msg>
             </b2:IconAnchor>
