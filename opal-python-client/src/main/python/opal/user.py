@@ -96,9 +96,7 @@ def do_command(args):
             if not args.name:
                 raise Exception('A user name is required.')
 
-            # TODO place this under password or certificate once the DTO's authenticationType field becomes optional
             userInfo = get_user_information(args)
-
             user = opal.protobuf.Opal_pb2.SubjectCredentialsDto()
             user.name = args.name
 

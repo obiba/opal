@@ -18,7 +18,7 @@ def add_arguments(parser):
     parser.add_argument('--env', action='store_true', required=False,
                         help='Opal java execution environment (JVM related statistic properties')
     parser.add_argument('--status', action='store_true', required=False,
-                        help='Opal application status (JVM related dynamic properties')
+                        help='Opal application status (JVM related dynamic properties)')
     parser.add_argument('--conf', action='store_true', required=False,
                         help='Opal application configuration')
 
