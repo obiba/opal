@@ -216,7 +216,7 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
     if(validReportTemplate()) {
       ReportTemplateDto reportTemplate = getReportTemplateDto();
       ResourceRequestBuilderFactory.newBuilder() //
-          .forResource(UriBuilders.REPORT_TEMPLATES.create().build()) //
+          .forResource(UriBuilders.PROJECT_REPORT_TEMPLATES.create().build(reportTemplate.getProject())) //
           .withResourceBody(ReportTemplateDto.stringify(reportTemplate)) //
           .withCallback(new CreateOrUpdateReportTemplateCallBack(reportTemplate), SC_OK, SC_CREATED) //
           .post().send();
@@ -225,7 +225,13 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
 
   private void updateReportTemplateInternal() {
     if(validReportTemplate()) {
-      doUpdateReportTemplate();
+      ReportTemplateDto reportTemplate = getReportTemplateDto();
+      ResponseCodeCallback callbackHandler = new CreateOrUpdateReportTemplateCallBack(reportTemplate);
+      ResourceRequestBuilderFactory.newBuilder() //
+          .forResource(UriBuilders.PROJECT_REPORT_TEMPLATE.create().build(reportTemplate.getProject(), reportTemplate.getName())) //
+          .withResourceBody(ReportTemplateDto.stringify(reportTemplate)) //
+          .withCallback(callbackHandler, SC_OK, SC_CREATED) //
+          .put().send();
     }
   }
 
@@ -280,16 +286,6 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
 
   private String getParameterValue(String parameterStr) {
     return parameterStr.split("=")[1].trim();
-  }
-
-  private void doUpdateReportTemplate() {
-    ReportTemplateDto reportTemplate = getReportTemplateDto();
-    ResponseCodeCallback callbackHandler = new CreateOrUpdateReportTemplateCallBack(reportTemplate);
-    ResourceRequestBuilderFactory.newBuilder() //
-        .forResource(UriBuilders.PROJECT_REPORT_TEMPLATE.create().build(reportTemplate.getProject(), reportTemplate.getName())) //
-        .withResourceBody(ReportTemplateDto.stringify(reportTemplate)) //
-        .withCallback(callbackHandler, SC_OK, SC_CREATED) //
-        .put().send();
   }
 
   private class CreateOrUpdateReportTemplateCallBack implements ResponseCodeCallback {
