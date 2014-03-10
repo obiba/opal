@@ -19,6 +19,7 @@ import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.CommandLines;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.commands.Command;
+import org.obiba.opal.shell.commands.ReportCommand;
 import org.obiba.opal.shell.service.CommandJobService;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
@@ -53,10 +54,15 @@ public class QuartzCommandJob implements Job {
   //
 
   @Override
+  @SuppressWarnings("OverlyStrongTypeCast")
   public void execute(JobExecutionContext context) throws JobExecutionException {
     autowireSelf(context);
 
-    CommandJob commandJob = new CommandJob(getCommand(context));
+    Command<?> command = getCommand(context);
+    CommandJob commandJob = new CommandJob(command);
+    if(command instanceof ReportCommand) {
+      commandJob.setProject(((ReportCommand) command).getOptions().getProject());
+    }
     commandJobService.launchCommand(commandJob, getSubject(context));
   }
 
@@ -88,14 +94,11 @@ public class QuartzCommandJob implements Job {
   private Command<?> getCommand(JobExecutionContext context) throws JobExecutionException {
     JobDataMap dataMap = context.getJobDetail().getJobDataMap();
     String commandLine = dataMap.getString("command");
-
-    Command<?> command = null;
     try {
-      command = toCommand(commandLine);
+      return toCommand(commandLine);
     } catch(ArgumentValidationException ex) {
       throw new JobExecutionException("Invalid task parameter 'command': " + commandLine, ex);
     }
-    return command;
   }
 
   private Command<?> toCommand(String commandLine) throws ArgumentValidationException {
@@ -104,10 +107,8 @@ public class QuartzCommandJob implements Job {
     String[] commandArgs = Arrays.copyOfRange(commandLineArray, 1, commandLineArray.length);
 
     Class<?> optionsClass = commandRegistry.getOptionsClass(commandName);
-    Object options = CliFactory.parseArguments(optionsClass, commandArgs);
     Command<Object> command = commandRegistry.newCommand(commandName);
-    command.setOptions(options);
-
+    command.setOptions(CliFactory.parseArguments(optionsClass, commandArgs));
     return command;
   }
 }

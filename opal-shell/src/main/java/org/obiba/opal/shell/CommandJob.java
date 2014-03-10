@@ -198,7 +198,7 @@ public class CommandJob implements OpalShell, Runnable {
   }
 
   public Date getStartTime() {
-    return startTime != null ? new Date(startTime) : null;
+    return startTime == null ? null : new Date(startTime);
   }
 
   public String getStartTimeAsString() {
@@ -234,13 +234,16 @@ public class CommandJob implements OpalShell, Runnable {
   private void updateJobStatus(int errorCode) {
     // Update the status. Set to SUCCEEDED/FAILED, based on the error code, unless the status was changed to
     // CANCEL_PENDING (i.e., task was interrupted); in that case set it to CANCELED.
-    if(status == Status.IN_PROGRESS) {
-      status = errorCode == 0 ? Status.SUCCEEDED : Status.FAILED;
-    } else if(status == Status.CANCEL_PENDING) {
-      status = Status.CANCELED;
-    } else {
-      // Should never get here!
-      throw new IllegalStateException("Unexpected CommandJob status: " + status);
+    switch(status) {
+      case IN_PROGRESS:
+        status = errorCode == 0 ? Status.SUCCEEDED : Status.FAILED;
+        break;
+      case CANCEL_PENDING:
+        status = Status.CANCELED;
+        break;
+      default:
+        // Should never get here!
+        throw new IllegalStateException("Unexpected CommandJob status: " + status);
     }
   }
 
