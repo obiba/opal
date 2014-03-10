@@ -12,9 +12,9 @@ package org.obiba.opal.web.gwt.app.client.magma.derive.helper;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.magma.derive.helper.CategoricalVariableDerivationHelper.DerivedCategoricalVariableGenerator;
 import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry;
+import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
@@ -43,7 +43,7 @@ public class CategoricalVariableDerivationHelperGwtTest extends GWTTestCase {
     variable.setName("categorical-variable");
     variable.setCategoriesArray(categories);
 
-    List<ValueMapEntry> entries = new ArrayList<ValueMapEntry>();
+    List<ValueMapEntry> entries = new ArrayList<>();
     entries.add(ValueMapEntry.fromCategory(cat1).newValue("1").build());
     entries.add(ValueMapEntry.fromCategory(cat2).newValue("2").build());
     entries.add(ValueMapEntry.fromDistinct("BC").newValue("3").build());

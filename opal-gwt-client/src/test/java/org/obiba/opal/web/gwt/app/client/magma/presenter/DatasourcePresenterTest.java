@@ -57,6 +57,7 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
 
   @Test
   @Ignore
+  @SuppressWarnings("unchecked")
   public void testThatEventHandlersAreAddedToUIComponents() throws Exception {
     HandlerRegistration handlerRegistrationMock = createMock(HandlerRegistration.class);
     expect(eventBusMock.addHandler((Event.Type<TableSelectionChangeEvent.Handler>) EasyMock.anyObject(),

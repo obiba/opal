@@ -39,14 +39,13 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
 
   private VariablePresenter.Display displayMock;
 
-  private SummaryTabPresenter.Display summaryTabMock;
-
   private VariablePresenter variablePresenter;
 
   @Before
+  @SuppressWarnings("unchecked")
   public void setUp() {
     displayMock = createMock(VariablePresenter.Display.class);
-    summaryTabMock = createMock(SummaryTabPresenter.Display.class);
+    SummaryTabPresenter.Display summaryTabMock = createMock(SummaryTabPresenter.Display.class);
     eventBusMock = createMock(EventBus.class);
     VariableVcsCommitHistoryPresenter variableVcsCommitHistoryPresenterMock = createMock(
         VariableVcsCommitHistoryPresenter.class);
@@ -62,9 +61,9 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
         propertiesEditorModalProvider, varAttributeModalProvider, null);
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   @Ignore
+  @SuppressWarnings("unchecked")
   public void testThatEventHandlersAreAddedToUIComponents() throws Exception {
     HandlerRegistration handlerRegistrationMock = createMock(HandlerRegistration.class);
     expect(eventBusMock.addHandler((Event.Type<VariableSelectionChangeEvent.Handler>) EasyMock.anyObject(),

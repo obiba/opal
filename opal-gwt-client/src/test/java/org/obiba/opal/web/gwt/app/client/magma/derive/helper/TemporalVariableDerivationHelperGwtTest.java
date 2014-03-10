@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.magma.derive.helper.TemporalVariableDerivationHelper.GroupMethod;
 import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry;
+import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -664,7 +664,7 @@ public class TemporalVariableDerivationHelperGwtTest extends GWTTestCase {
     Date fromDate = dateFormat.parse("2011-11-22");
     Date toDate = dateFormat.parse("2012-01-22");
 
-    List<ValueMapEntry> entries = new ArrayList<ValueMapEntry>();
+    List<ValueMapEntry> entries = new ArrayList<>();
     DerivedTemporalVariableGenerator generator = new DerivedTemporalVariableGenerator(variable, entries, groupMethod,
         fromDate, toDate);
     groupMethod.initializeValueMapEntries(entries, fromDate, toDate);

@@ -14,8 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry;
+import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.common.collect.Range;
@@ -26,6 +26,7 @@ import com.google.gwt.junit.client.GWTTestCase;
  */
 public class NumericalVariableDerivationHelperGwtTest extends GWTTestCase {
 
+  @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
   public void testDerivedVariableGenerator_double() {
 
     // $('RES_FIRST_HEIGHT').group([150.0, 160.0, 170.0, 180.0, 190.0], [888]).map({
@@ -38,8 +39,8 @@ public class NumericalVariableDerivationHelperGwtTest extends GWTTestCase {
     // null,
     // null)
 
-    List<ValueMapEntry> entries = new ArrayList<ValueMapEntry>();
-    Map<ValueMapEntry, Range<Double>> entryRangeMap = new HashMap<ValueMapEntry, Range<Double>>();
+    List<ValueMapEntry> entries = new ArrayList<>();
+    Map<ValueMapEntry, Range<Double>> entryRangeMap = new HashMap<>();
 
     VariableDto variable = VariableDto.create();
     variable.setName("numerical-variable");
@@ -66,8 +67,8 @@ public class NumericalVariableDerivationHelperGwtTest extends GWTTestCase {
 
     entries.add(ValueMapEntry.fromDistinct(888d).newValue("5").build());
 
-    DerivedNumericalVariableGenerator<Double> generator = new DerivedNumericalVariableGenerator<Double>(variable,
-        entries, entryRangeMap);
+    DerivedNumericalVariableGenerator<Double> generator = new DerivedNumericalVariableGenerator<>(variable, entries,
+        entryRangeMap);
     VariableDto derived = generator.generate(null);
 
     assertEquals("$('numerical-variable').group([150.0, 160.0, 170.0, 180.0], [888]).map({\n" //

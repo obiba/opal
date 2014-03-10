@@ -92,9 +92,7 @@ public class GWTMockUtilities {
     setBridgeMethod.setAccessible(true);
     try {
       setBridgeMethod.invoke(gwtClass, bridge);
-    } catch(IllegalAccessException e) {
-      throw new RuntimeException(e);
-    } catch(InvocationTargetException e) {
+    } catch(IllegalAccessException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }

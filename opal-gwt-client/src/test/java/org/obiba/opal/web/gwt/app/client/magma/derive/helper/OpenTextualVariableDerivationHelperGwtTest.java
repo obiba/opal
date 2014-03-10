@@ -12,9 +12,9 @@ package org.obiba.opal.web.gwt.app.client.magma.derive.helper;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.magma.derive.helper.OpenTextualVariableDerivationHelper.DerivedOpenTextualVariableGenerator;
 import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry;
+import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.junit.client.GWTTestCase;
@@ -29,7 +29,7 @@ public class OpenTextualVariableDerivationHelperGwtTest extends GWTTestCase {
     VariableDto variable = VariableDto.create();
     variable.setName("open-textual-variable");
 
-    List<ValueMapEntry> entries = new ArrayList<ValueMapEntry>();
+    List<ValueMapEntry> entries = new ArrayList<>();
     entries.add(ValueMapEntry.fromDistinct("QC").newValue("1").build());
     entries.add(ValueMapEntry.fromDistinct("ON").newValue("2").build());
     entries.add(ValueMapEntry.fromDistinct("BC").newValue("3").build());

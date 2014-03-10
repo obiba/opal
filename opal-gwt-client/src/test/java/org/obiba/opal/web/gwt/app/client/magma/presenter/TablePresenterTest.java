@@ -48,6 +48,7 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
   private TablePresenter presenter;
 
   @Before
+  @SuppressWarnings("unchecked")
   public void setUp() {
     displayMock = createMock(TablePresenter.Display.class);
     eventBusMock = createMock(EventBus.class);
@@ -74,9 +75,9 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
         null, attributeModalProvider, translations, null);
   }
 
-  @SuppressWarnings({ "unchecked" })
   @Test
   @Ignore
+  @SuppressWarnings("unchecked")
   public void testOnBind_RegistersHandlersAndBindsDependencies() {
     HandlerRegistration handlerRegistrationMock = createMock(HandlerRegistration.class);
     expect(eventBusMock.addHandler((Event.Type<TableSelectionChangeEvent.Handler>) EasyMock.anyObject(),

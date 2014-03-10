@@ -12,9 +12,9 @@ package org.obiba.opal.web.gwt.app.client.magma.derive.helper;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.magma.derive.helper.BooleanVariableDerivationHelper.DerivedBooleanVariableGenerator;
 import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry;
+import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.junit.client.GWTTestCase;
@@ -29,7 +29,7 @@ public class BooleanVariableDerivationHelperGwtTest extends GWTTestCase {
     VariableDto variable = VariableDto.create();
     variable.setName("boolean-variable");
 
-    List<ValueMapEntry> entries = new ArrayList<ValueMapEntry>();
+    List<ValueMapEntry> entries = new ArrayList<>();
     entries.add(ValueMapEntry.fromDistinct(Boolean.FALSE.toString()).newValue("0").build());
     entries.add(ValueMapEntry.fromDistinct(Boolean.TRUE.toString()).newValue("1").build());
     entries.add(ValueMapEntry.createEmpties("Empty value").newValue("888").build());
