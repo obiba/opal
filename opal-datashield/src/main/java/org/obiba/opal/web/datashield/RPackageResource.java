@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 OBiBa. All rights reserved.
+ * Copyright (c) 2014 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -74,19 +74,31 @@ public abstract class RPackageResource {
   }
 
   protected RScriptROperation installPackage(String name) {
-    return execute(getInstallPackagesCommand(name));
+    RScriptROperation rval = execute(getInstallPackagesCommand(name));
+    restartRServer();
+    return rval;
   }
 
   protected RScriptROperation installDatashieldPackage(String name, String ref) {
     String cmd;
-    //execute(getInstallOpenMxPackageCommand());
     if(Strings.isNullOrEmpty(ref)) {
       cmd = getInstallPackagesCommand(name);
     } else {
       execute(getInstallDevtoolsPackageCommand());
       cmd = getInstallGitHubCommand(name, "datashield", ref);
     }
-    return execute(cmd);
+    RScriptROperation rval = execute(cmd);
+    restartRServer();
+    return rval;
+  }
+
+  private void restartRServer() {
+    try {
+      opalRService.stop();
+      opalRService.start();
+    } catch(Exception ex) {
+      log.error("Error while restarting R server after package install: {}", ex.getMessage(), ex);
+    }
   }
 
   private String getInstallPackagesCommand(String name) {
@@ -97,15 +109,6 @@ public abstract class RPackageResource {
   private String getInstallDevtoolsPackageCommand() {
     return "if (!require('devtools', character.only=TRUE)) { " + getInstallPackagesCommand("devtools") + " }";
   }
-
-//  /**
-//   * Install OpenMx package with default settings (multithreaded).
-//   *
-//   * @return
-//   */
-//  private String getInstallOpenMxPackageCommand() {
-//    return "if (!require('OpenMx', character.only=TRUE)) { source('http://openmx.psyc.virginia.edu/getOpenMx.R') }";
-//  }
 
   private String getInstallGitHubCommand(String name, String username, String ref) {
     return "devtools::install_github('" + name + "', username='" + username + "', ref='" + ref + "')";
