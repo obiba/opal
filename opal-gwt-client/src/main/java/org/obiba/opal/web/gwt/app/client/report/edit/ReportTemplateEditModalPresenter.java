@@ -17,7 +17,6 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -34,16 +33,14 @@ import org.obiba.opal.web.gwt.app.client.view.KeyValueItemInputView;
 import org.obiba.opal.web.gwt.app.client.view.TextBoxItemInputView;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.ParameterDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -219,7 +216,7 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
     if(validReportTemplate()) {
       ReportTemplateDto reportTemplate = getReportTemplateDto();
       ResourceRequestBuilderFactory.newBuilder() //
-          .forResource(UriBuilder.create().segment("report-templates").build()) //
+          .forResource(UriBuilders.REPORT_TEMPLATES.create().build()) //
           .withResourceBody(ReportTemplateDto.stringify(reportTemplate)) //
           .withCallback(new CreateOrUpdateReportTemplateCallBack(reportTemplate), SC_OK, SC_CREATED) //
           .post().send();
@@ -289,7 +286,7 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
     ReportTemplateDto reportTemplate = getReportTemplateDto();
     ResponseCodeCallback callbackHandler = new CreateOrUpdateReportTemplateCallBack(reportTemplate);
     ResourceRequestBuilderFactory.newBuilder() //
-        .forResource(UriBuilder.create().segment("report-template", getView().getName().getText()).build()) //
+        .forResource(UriBuilders.PROJECT_REPORT_TEMPLATE.create().build(reportTemplate.getProject(), reportTemplate.getName())) //
         .withResourceBody(ReportTemplateDto.stringify(reportTemplate)) //
         .withCallback(callbackHandler, SC_OK, SC_CREATED) //
         .put().send();

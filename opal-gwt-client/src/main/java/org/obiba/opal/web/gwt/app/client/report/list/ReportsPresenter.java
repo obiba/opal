@@ -189,7 +189,7 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
   protected void authorize() {
     // create report templates
     ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-        .forResource("/report-templates") //
+        .forResource(UriBuilders.REPORT_TEMPLATES.create().build()) //
         .authorize(getView().getAddReportTemplateAuthorizer()) //
         .post().send();
 
