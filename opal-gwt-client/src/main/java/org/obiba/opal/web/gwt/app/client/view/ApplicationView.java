@@ -30,6 +30,7 @@ import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.Tooltip;
 import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -200,6 +201,9 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
   @Override
   public void setApplicationName(String text) {
     applicationName.setText(text);
+    if (Document.get() != null) {
+      Document.get().setTitle (text);
+    }
   }
 
   @UiHandler("quitItem")
