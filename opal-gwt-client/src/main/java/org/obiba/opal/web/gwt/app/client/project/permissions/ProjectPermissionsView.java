@@ -30,6 +30,7 @@ import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.NavHeader;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.NavList;
+import com.github.gwtbootstrap.client.ui.NavWidget;
 import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -40,6 +41,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.IndexedPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
@@ -81,9 +83,11 @@ public class ProjectPermissionsView extends ViewWithUiHandlers<ProjectPermission
 
   private Subject currentSubject;
 
-  private ColumnSortEvent.ListHandler<Acl> typeSortHandler;
-
   private TypeColumn typeColumn;
+
+  private Comparator<Acl> resourceTypeComparator;
+
+  private ProjectPermissionsPresenter.NodeToTypeMapper nodeToTypeMapper;
 
   private final PlaceManager placeManager;
 
@@ -104,18 +108,17 @@ public class ProjectPermissionsView extends ViewWithUiHandlers<ProjectPermission
   public void initializeTable(ProjectPermissionsPresenter.NodeToPlaceMapper nodeToPlaceMapper,
       ProjectPermissionsPresenter.NodeNameFormatter formatter,
       ProjectPermissionsPresenter.NodeToTypeMapper nodeToTypeMapper, Comparator<Acl> resourceTypeComparator) {
+    this.nodeToTypeMapper = nodeToTypeMapper;
+    this.resourceTypeComparator = resourceTypeComparator;
 
     tablePager.setDisplay(permissionsTable);
-    typeColumn = new TypeColumn(nodeToTypeMapper);
     permissionsTable.addColumn(new ResourceColumn(nodeToPlaceMapper, formatter), translations.resourceLabel());
-    permissionsTable.addColumn(typeColumn, translations.typeLabel());
     permissionsTable.addColumn(ProjectPermissionColumns.PERMISSION, translations.permissionLabel());
     permissionsTable.addColumn(ProjectPermissionColumns.ACTIONS, translations.actionsLabel());
+    initTypeColumn();
+
     permissionsDataProvider.addDataDisplay(permissionsTable);
-    typeSortHandler = new ColumnSortEvent.ListHandler<Acl>(permissionsDataProvider.getList());
-    typeSortHandler.setComparator(typeColumn, resourceTypeComparator);
-    permissionsTable.getHeader(SORTABLE_COLUMN_TYPE).setHeaderStyleNames("addColumnSortHandler");
-    permissionsTable.addColumnSortHandler(typeSortHandler);
+
   }
 
   @Override
@@ -146,9 +149,22 @@ public class ProjectPermissionsView extends ViewWithUiHandlers<ProjectPermission
     tablePager.firstPage();
     permissionsDataProvider.refresh();
     tablePager.setPagerVisible(permissionsDataProvider.getList().size() > tablePager.getPageSize());
-    typeSortHandler.setList(permissionsDataProvider.getList());
-    permissionsTable.getColumnSortList().push(typeColumn);
+
+    permissionsTable.removeColumn(typeColumn);
+    initTypeColumn();
+
     ColumnSortEvent.fire(permissionsTable, permissionsTable.getColumnSortList());
+  }
+
+  private void initTypeColumn() {
+    typeColumn = new TypeColumn(nodeToTypeMapper);
+    permissionsTable.insertColumn(1, typeColumn, translations.typeLabel());
+    ColumnSortEvent.ListHandler<Acl> typeSortHandler = new ColumnSortEvent.ListHandler<Acl>(
+        permissionsDataProvider.getList());
+    typeSortHandler.setComparator(typeColumn, resourceTypeComparator);
+    permissionsTable.getColumnSortList().push(typeColumn);
+    permissionsTable.addColumnSortHandler(typeSortHandler);
+    permissionsTable.getHeader(SORTABLE_COLUMN_TYPE).setHeaderStyleNames("addColumnSortHandler");
   }
 
   private void activateSubjectNavLink(Subject subject) {
@@ -211,9 +227,9 @@ public class ProjectPermissionsView extends ViewWithUiHandlers<ProjectPermission
     }
   }
 
-  private class TypeColumn extends TextColumn<Acl> {
+  private static class TypeColumn extends TextColumn<Acl> {
 
-    private ProjectPermissionsPresenter.NodeToTypeMapper mapper;
+    private final ProjectPermissionsPresenter.NodeToTypeMapper mapper;
 
     private TypeColumn(ProjectPermissionsPresenter.NodeToTypeMapper mapper) {
       this.mapper = mapper;
@@ -269,10 +285,10 @@ public class ProjectPermissionsView extends ViewWithUiHandlers<ProjectPermission
       link.setActive(true);
     }
 
-    private void unActivateAll(NavList container) {
+    private void unActivateAll(IndexedPanel container) {
       for(int i = 0; i < container.getWidgetCount(); i++) {
         if(container.getWidget(i) instanceof NavLink) {
-          ((NavLink) container.getWidget(i)).setActive(false);
+          ((NavWidget) container.getWidget(i)).setActive(false);
         }
       }
     }
