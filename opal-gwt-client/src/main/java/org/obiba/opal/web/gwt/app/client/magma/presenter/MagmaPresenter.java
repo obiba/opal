@@ -9,6 +9,9 @@ import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEv
 import org.obiba.opal.web.gwt.app.client.magma.event.MagmaPathSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -25,10 +28,14 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
     implements MagmaPathSelectionEvent.Handler, DatasourceSelectionChangeEvent.DatasourceSelectionChangeHandler,
     TableSelectionChangeEvent.Handler, VariableSelectionChangeEvent.Handler {
+
+  private final PlaceManager placeManager;
 
   private final DatasourcePresenter datasourcePresenter;
 
@@ -39,10 +46,11 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
   private final BookmarkIconPresenter bookmarkIconPresenter;
 
   @Inject
-  public MagmaPresenter(EventBus eventBus, Display display, DatasourcePresenter datasourcePresenter,
-      TablePresenter tablePresenter, VariablePresenter variablePresenter,
+  public MagmaPresenter(EventBus eventBus, Display display, PlaceManager placeManager,
+      DatasourcePresenter datasourcePresenter, TablePresenter tablePresenter, VariablePresenter variablePresenter,
       Provider<BookmarkIconPresenter> bookmarkIconPresenterProvider) {
     super(eventBus, display);
+    this.placeManager = placeManager;
     this.datasourcePresenter = datasourcePresenter;
     this.tablePresenter = tablePresenter;
     this.variablePresenter = variablePresenter;
@@ -143,14 +151,24 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
                         break;
                       }
                     }
-                    fireEvent(new VariableSelectionChangeEvent(tableDto, selection, previous, next));
+                    if(selection != null) {
+                      fireEvent(new VariableSelectionChangeEvent(tableDto, selection, previous, next));
+                    } else {
+                      fireEvent(NotificationEvent.newBuilder().warn("NoSuchVariable").args(variable).build());
+                      PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.PROJECT)
+                          .with(ParameterTokens.TOKEN_NAME, datasource) //
+                          .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString())//
+                          .with(ParameterTokens.TOKEN_PATH, datasource + "." + table);
+
+                      placeManager.revealPlace(builder.build());
+                    }
                   }
                 })//
                 .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
                   @Override
                   public void onResponseCode(Request request, Response response) {
                     // TODO fix error message
-                    getEventBus().fireEvent(NotificationEvent.newBuilder().error("SearchServiceUnavailable").build());
+                    fireEvent(NotificationEvent.newBuilder().error("SearchServiceUnavailable").build());
                   }
                 }) //
                 .get() //

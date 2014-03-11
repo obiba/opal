@@ -37,8 +37,11 @@ import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.Variabl
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
+import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
+import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -76,6 +79,7 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
@@ -297,7 +301,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         .post().send();
   }
 
-  private void updateDisplay(String datasourceName, String tableName) {
+  private void updateDisplay(final String datasourceName, final String tableName) {
     // rely on 304 response
     UriBuilder ub = UriBuilders.DATASOURCE_TABLE.create().query("counts", "true");
     ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(datasourceName, tableName)).get()
@@ -307,6 +311,17 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
             if(resource != null) {
               updateDisplay(resource);
             }
+          }
+        })//
+        .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            fireEvent(NotificationEvent.newBuilder().warn("NoSuchValueTable").args(tableName).build());
+
+            PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.PROJECT)
+                .with(ParameterTokens.TOKEN_NAME, datasourceName) //
+                .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString());
+            placeManager.revealPlace(builder.build());
           }
         }).send();
   }

@@ -410,7 +410,7 @@ public interface Translations extends Constants {
       "DataShieldMethodNameIsRequired", "A name is required.",//
       "DataShieldRScriptIsRequired", "A R script is required.",//
       "DataShieldRFunctionIsRequired", "A R function is required.",//
-      "DataShieldPackageNameIsRequired", "A name is required",//
+      "DataShieldPackageNameIsRequired", "A name is required.",//
       "RIsAlive", "R server is alive.",//
       "RConnectionFailed", "Connection with R server failed.", //
       "UnauthorizedOperation", "You are not allowed to perform this operation.",//
@@ -421,35 +421,35 @@ public interface Translations extends Constants {
       "CouldNotCreateReportTemplate", "Could not create the Report Template.",//
       "ReportTemplateCannotBeFound", "The Report Template cannot be found.",//
       "DatasourceCreationFailed", "The datasource creation has failed: {0}",//
-      "DatasourceReadFailed", "The datasource cannot be read: {0}",//
+      "DatasourceReadFailed", "The datasource cannot be read: {0}.",//
       "CircularVariableDependency", "Circular dependency for variable '{0}'.:<br /><br /><pre>{1}</pre>",//
-      "NoSuchProject", "No such project '{0}'",//
-      "NoSuchDatabase", "No such database '{0}'",//
-      "SubjectPrincipalNotFound", "No such subject principal '{0}'",//
-      "SubjectProfileNotFound", "No profile for subject '{0}'",//
-      "IdentifiersDatabaseNotFound", "Identifiers database not found",//
-      "NoSuchIdentifiersMapping", "No such identifiers mapping '{0}'",//
-      "NoSuchDatasource", "No such datasource '{0}'",//
-      "NoSuchVariable", "No such variable '{0}'",//
-      "NoSuchVariableInTable", "No such variable '{0}' in table '{1}'",//
-      "NoSuchValueTable", "No such table '{0}'",//
-      "NoSuchValueTableInDatasource", "No such table '{0}' in datasource '{1}'",//
-      "NoSuchReportTemplate", "No such report template '{0}' in project '{1}'",//
+      "NoSuchProject", "No such project '{0}'.",//
+      "NoSuchDatabase", "No such database '{0}'.",//
+      "SubjectPrincipalNotFound", "No such subject principal '{0}'.",//
+      "SubjectProfileNotFound", "No profile for subject '{0}'.",//
+      "IdentifiersDatabaseNotFound", "Identifiers database not found.",//
+      "NoSuchIdentifiersMapping", "No such identifiers mapping '{0}'.",//
+      "NoSuchDatasource", "No such datasource '{0}'.",//
+      "NoSuchVariable", "No such variable '{0}'.",//
+      "NoSuchVariableInTable", "No such variable '{0}' in table '{1}'.",//
+      "NoSuchValueTable", "No such table '{0}'.",//
+      "NoSuchValueTableInDatasource", "No such table '{0}' in datasource '{1}'.",//
+      "NoSuchReportTemplate", "No such report template '{0}' in project '{1}'.",//
       "InvalidVariableScript", "Invalid variable script:<br /><br /><pre>{0}</pre>",//
       "DestinationTableRequired", "The destination table is required.",//
       "DestinationTableNameInvalid", "The destination table name is not valid (must not contain '.' or ':').",//
       "DestinationTableEntityTypeRequired", "The destination table entity type is required.",//
       "DestinationTableCannotBeView", "The destination table cannot be a view.",//
-      "DataImportationProcessLaunched", "The data importation process can be followed using the Job ID: {0}",//
+      "DataImportationProcessLaunched", "The data importation process can be followed using the Job ID: {0}.",//
       "DataExportationProcessLaunched",
-      "The data exportation process can be followed using the Job ID: {0}. Files will be exported to: {1}",//
-      "DataCopyProcessLaunched", "The data copy process can be followed using the Job ID: {0}",//
+      "The data exportation process can be followed using the Job ID: {0}. Files will be exported to: {1}.",//
+      "DataCopyProcessLaunched", "The data copy process can be followed using the Job ID: {0}.",//
       "DatabaseAlreadyExists", "A database with this name already exists.",//
       "DatabaseConnectionOk", "{0}: Connection successful.",//
       "DatabaseConnectionFailed", "Failed to connect: {0}.",//
       "FailedToConnectToDatabase", "Failed to connect to database '{0}'.",//
-      "DatabaseIsNotEditable", "Database is used by a Datasource and is not editable",//
-      "CannotFindDatabase", "Cannot find database named {0}",//
+      "DatabaseIsNotEditable", "Database is used by a Datasource and is not editable.",//
+      "CannotFindDatabase", "Cannot find database named {0}.",//
       "NameIsRequired", "A name is required.",//
       "EntityTypeIsRequired", "An entity type is required.",//
       "IdentifiersAreRequired", "Some identifiers are required.",//
@@ -484,11 +484,11 @@ public interface Translations extends Constants {
       "IdentifiersImportationFailed", "Identifiers importation failed: {0}.",//
       "DataWriteNotAuthorized", "You are not allowed to write in datasource: {0}.",//
       "AccessDeniedToTableValues", "You are not allowed to view the values of table: {0}.",//
-      "NoTablesForEntityIdType", "Failed to retrieve tables for entity {0} and type {1}",//
+      "NoTablesForEntityIdType", "Failed to retrieve tables for entity {0} and type {1}.",//
       "NoVariablesFound", "Failed to retrieve the list of variables",//
-      "NoVariableValuesFound", "Failed to retrieve the list of variable values",//
-      "EntityIdentifierNotFound", "{0} identifier {1} could not be found in table {2}",//
-      "ParticipantIdentifiersAlreadyGenerated", "Participant identifiers have already been generated for the Unit {0}",
+      "NoVariableValuesFound", "Failed to retrieve the list of variable values.",//
+      "EntityIdentifierNotFound", "{0} identifier {1} could not be found in table {2}.",//
+      "ParticipantIdentifiersAlreadyGenerated", "Participant identifiers have already been generated for the Unit {0}.",
       "RPackageInstalledButNotFound",
       "Package was probably successfully installed in R but cannot be found. Restarting R server might solve this issue.",
       "InvalidLocaleName", "Invalid locale name '{0}'. Please choose a valid locale name from the list.",//
@@ -498,8 +498,8 @@ public interface Translations extends Constants {
       "CopyVariableNameRequired", "Variable name cannot be empty.",//
       "CopyVariableNameColon", "Variable name '{0}' cannot contain ':'.",//
       "CopyVariableNameAlreadyExists", "Duplicate variable name: {0}.",//
-      "CopyVariableIncompatibleEntityType", "Incompatible entity types: {0} / {1}",//
-      "DeleteVariableSelectAtLeastOne", "Select at least one variable to remove",//
+      "CopyVariableIncompatibleEntityType", "Incompatible entity types: {0} / {1}.",//
+      "DeleteVariableSelectAtLeastOne", "Select at least one variable to remove.",//
       "SearchServiceUnavailable", "Search operation failed. Please make sure the service is started.",//
       "UserStatusChangedOk", "User {0} has been successfully {1}.",//
       "UserUpdatedOk", "User {0} has been successfully updated.",//
@@ -512,27 +512,27 @@ public interface Translations extends Constants {
       "GroupAlreadyExists", "Group already exists.", //
       "ProjectNameRequired", "Project name is required.", //
       "ProjectNameMustBeUnique", "A project already exists with this name.",//
-      "ProjectCreationFailed", "The datasource creation has failed: {0}", //
-      "FileNotFound", "File not found: {0}",//
-      "FileNotAccessible", "File not accessible: {0}",//
-      "MultipleIdentifiersDatabase", "Database for identifiers already exists: {0}", //
-      "DatabaseAlreadyExists", "Database named {0} already exists", //
+      "ProjectCreationFailed", "The datasource creation has failed: {0}.", //
+      "FileNotFound", "File not found: {0}.",//
+      "FileNotAccessible", "File not accessible: {0}.",//
+      "MultipleIdentifiersDatabase", "Database for identifiers already exists: {0}.", //
+      "DatabaseAlreadyExists", "Database named {0} already exists.", //
       "VcsScriptContentInfo", "The retrieved script content is from '{0}' committed by '{1}'.", //
       "VcsOperationFailed", "Failed to retrieve revision information. Please contact technical support.", //
       "GeneralConfigSaved", "Opal general configuration was successfully saved.", //
       "PostInstallNotCompleted", "Post-install configuration not completed.",//
-      "TermNameMustBeUnique", "Term name must be unique",//
-      "VocabularyNameMustBeUnique", "Vocabulary name must be unique",//
-      "DeleteTableSelectAtLeastOne", "Select at least one table to remove",//
+      "TermNameMustBeUnique", "Term name must be unique.",//
+      "VocabularyNameMustBeUnique", "Vocabulary name must be unique.",//
+      "DeleteTableSelectAtLeastOne", "Select at least one table to remove.",//
       "XMLOrExcelFileRequired", "An Excel or a XML file is required.",//
       "CreateViewFailed", "Failed to create view. Make sure the view file is valid.",//
       "SPSSOrExcelFileRequired", "An Excel or a SPSS file is required.",//
       "ESQueryBadRequest", "Not a valid search query.", "DuplicateUserName", "A user with same name already exists.",
       "DuplicateSubjectProfile", "A user profile is already registered with the same name.",//
-      "AttributeNameIsRequired", "An attribute name is required",//
-      "AttributeValueIsRequired", "At least one value is required",//
+      "AttributeNameIsRequired", "An attribute name is required.",//
+      "AttributeValueIsRequired", "At least one value is required.",//
       "AttributeAlreadyExists", "An attribute with this namespace and name already exists.",//
-      "AttributeConflictExists", "Setting to this namespace would conflict with an existing attribute",//
+      "AttributeConflictExists", "Setting to this namespace would conflict with an existing attribute.",//
       "PermissionRequired", "You must select a at most one permission type.",//
       "DuplicateAclSubjectUser", "User '{0}' already exists, please choose a unique name.",//
       "DuplicateAclSubjectGroup", "Group '{0}' already exists, please choose a unique name.",//
@@ -541,7 +541,7 @@ public interface Translations extends Constants {
       "KeyEntryAlreadyExists", "A key with the same name exists, please choose a unique name.",//
       "GeneralKeystoreError", "Key pair storage failed. Please make sure to provide valid certificate information.",
       "DerivedVariableNameRequired", "Derived variable name is required.",//
-      "DestinationViewNameRequired", "Destination View Name Required label",//
+      "DestinationViewNameRequired", "Destination View Name Required label.",//
       "AddDerivedVariableToViewOnly", "A derived variable can only be added to a view.",//
       "NamespaceCannotBeEmptyChars", "A namespace cannot contain only blank characters.",//
       "DefaultCharSetIsRequired", "A default character set is required.",//
@@ -550,10 +550,10 @@ public interface Translations extends Constants {
       "Name contains invalid characters. Characters must be alphanumeric, space, hyphen or underscore.",
       "UnsupportedEncoding",
       "An unsupported encoding other than Opal's current encoding '{0}' was detected. Please contact your administrator for further assistance.",
-      "SearchQueryIsInvalid", "Search query is invalid : {0}",//
+      "SearchQueryIsInvalid", "Search query is invalid : {0}.",//
       "ClusterNameIsRequired", "Cluster name is required.",//
       "ShardsIsRequired", "Shards number is required.",//
-      "ReplicasIsRequired", "Replicas number is required.", "FolderNameIsRequired", "You must specify a folder name",//
+      "ReplicasIsRequired", "Replicas number is required.", "FolderNameIsRequired", "You must specify a folder name.",//
       "DotNamesAreInvalid", "The names '.' and '..' are not permitted.",//
       "FolderNameInvalidCharacters", "Folder names cannot contains characters '#' or '%'.",//
       "CannotCopySelectedTablesWithinProject",

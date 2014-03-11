@@ -33,8 +33,11 @@ import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.Variabl
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
+import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
+import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
@@ -64,6 +67,7 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
 import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
@@ -186,19 +190,20 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     });
   }
 
-  private void updateDisplay(String datasourceName, String tableName, String variableName) {
+  private void updateDisplay(final String datasourceName, final String tableName, final String variableName) {
     if(table != null && table.getDatasourceName().equals(datasourceName) && table.getName().equals(tableName) &&
         variable != null && variable.getName().equals(variableName)) return;
 
     if(variableUpdatePending) return;
     ResourceRequestBuilderFactory.<VariableDto>newBuilder()
         .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create().build(datasourceName, tableName, variableName))
-        .get().withCallback(new ResourceCallback<VariableDto>() {
-      @Override
-      public void onResource(Response response, VariableDto resource) {
-        variableUpdatePending = false;
-      }
-    }).send();
+        .withCallback(new ResourceCallback<VariableDto>() {
+          @Override
+          public void onResource(Response response, VariableDto resource) {
+            variableUpdatePending = false;
+          }
+        }) //
+        .withCallback(Response.SC_NOT_FOUND, new VariableNotFoundCallback(variableName, datasourceName, tableName)).get().send();
 
   }
 
@@ -732,5 +737,31 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
     HasAuthorization getVariableAttributesAuthorizer(VariableDto variableDto);
 
+  }
+
+  private class VariableNotFoundCallback implements ResponseCodeCallback {
+    private final String variableName;
+
+    private final String datasourceName;
+
+    private final String tableName;
+
+    public VariableNotFoundCallback(String variableName, String datasourceName, String tableName) {
+      this.variableName = variableName;
+      this.datasourceName = datasourceName;
+      this.tableName = tableName;
+    }
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      fireEvent(NotificationEvent.newBuilder().warn("NoSuchVariable").args(variableName).build());
+
+      PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.PROJECT)
+          .with(ParameterTokens.TOKEN_NAME, datasourceName) //
+          .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString())//
+          .with(ParameterTokens.TOKEN_PATH, datasourceName + "." + tableName);
+
+      placeManager.revealPlace(builder.build());
+    }
   }
 }

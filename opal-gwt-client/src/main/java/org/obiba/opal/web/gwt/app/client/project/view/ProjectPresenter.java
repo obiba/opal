@@ -13,6 +13,7 @@ package org.obiba.opal.web.gwt.app.client.project.view;
 import java.util.Arrays;
 
 import org.obiba.opal.web.gwt.app.client.bookmark.icon.BookmarkIconPresenter;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
@@ -33,12 +34,14 @@ import org.obiba.opal.web.gwt.app.client.ui.HasTabPanel;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.google.common.base.Strings;
 import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -218,6 +221,13 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
             }
             bookmarkIconPresenter.setBookmarkable(UriBuilders.DATASOURCE.create().build(projectName));
           }
+        })//
+        .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            fireEvent(NotificationEvent.newBuilder().warn("NoSuchProject").args(projectName).build());
+            placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.PROJECTS).build());
+          }
         }).get().send();
     authorize();
   }
@@ -232,8 +242,9 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     String queryPathParam = (String) getView().getTabData(index);
     selectTab(index, queryPathParam);
 
-    PlaceRequest.Builder builder = PlaceRequestHelper.createRequestBuilderWithParams(
-        placeManager.getCurrentPlaceRequest(), Arrays.asList(ParameterTokens.TOKEN_NAME)) //
+    PlaceRequest.Builder builder = PlaceRequestHelper
+        .createRequestBuilderWithParams(placeManager.getCurrentPlaceRequest(),
+            Arrays.asList(ParameterTokens.TOKEN_NAME)) //
         .with(ParameterTokens.TOKEN_TAB, tab.toString());
     if(!Strings.isNullOrEmpty(queryPathParam)) {
       builder.with(ParameterTokens.TOKEN_PATH, queryPathParam);
