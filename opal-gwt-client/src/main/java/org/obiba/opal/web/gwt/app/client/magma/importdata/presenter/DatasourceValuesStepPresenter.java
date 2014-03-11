@@ -20,6 +20,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
@@ -67,7 +68,7 @@ public class DatasourceValuesStepPresenter extends PresenterWidget<DatasourceVal
   public void setDatasource(String datasource, final Collection<String> tableNames) {
     state = State.VALID;
     ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder() //
-        .forResource(UriBuilder.create().segment("datasource", datasource, "tables").build()) //
+        .forResource(UriBuilders.DATASOURCE_TABLES.create().query("counts", "true").build(datasource)) //
         .get() //
         .withCallback(new ResourceCallback<JsArray<TableDto>>() {
 
