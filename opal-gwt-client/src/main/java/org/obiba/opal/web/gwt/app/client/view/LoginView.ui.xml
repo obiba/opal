@@ -31,12 +31,7 @@
             <b:Button ui:field="login" type="INFO">
               <ui:msg description="Sign in button label">Sign In</ui:msg>
             </b:Button>
-            <b:ControlGroup ui:field="loginProgressGroup" addStyleNames="large-top-margin" visible="false">
-              <b:ControlLabel addStyleNames="inline-block">
-                <ui:msg description="Login progress label">User authentication in progress</ui:msg>
-              </b:ControlLabel>
-              <b:Image addStyleNames="xsmall-indent" url="image/login-progress.gif"></b:Image>
-            </b:ControlGroup>
+            <b:Image ui:field="loginProgress" addStyleNames="xsmall-indent inline-block" url="image/login-progress.gif" visible="false"/>
           </b:Well>
         </b:Column>
       </b:Row>

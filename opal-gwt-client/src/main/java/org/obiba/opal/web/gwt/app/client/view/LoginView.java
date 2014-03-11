@@ -8,6 +8,7 @@ import com.github.gwtbootstrap.client.ui.Brand;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.HelpBlock;
+import com.github.gwtbootstrap.client.ui.Image;
 import com.github.gwtbootstrap.client.ui.PasswordTextBox;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
@@ -57,7 +58,7 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
   Brand applicationName;
 
   @UiField
-  ControlGroup loginProgressGroup;
+  Image loginProgress;
 
   private final Translations translations;
 
@@ -138,8 +139,8 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
   public void setBusy(boolean value) {
     userName.setEnabled(!value);
     password.setEnabled(!value);
-    login.setVisible(!value);
-    loginProgressGroup.setVisible(value);
+    login.setEnabled(!value);
+    loginProgress.setVisible(value);
     RootPanel.get().getBodyElement().getStyle().setCursor(value ? Style.Cursor.WAIT : Style.Cursor.DEFAULT);
   }
 
