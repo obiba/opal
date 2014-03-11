@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -31,6 +32,7 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
@@ -71,6 +73,8 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
   private final RequestCredentials credentials;
 
   private final ResourceAuthorizationCache authorizationCache;
+
+    private HandlerRegistration unhandledExceptionHandler;
 
   @Inject
   public LoginPresenter(Display display, EventBus eventBus, Proxy proxy, RequestCredentials credentials,
@@ -150,6 +154,14 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
   }
 
   private void createSecurityResource(final String username, String password) {
+    unhandledExceptionHandler = addHandler(UnhandledResponseEvent.getType(), new UnhandledResponseEvent.Handler() {
+      @Override
+      public void onUnhandledResponse(UnhandledResponseEvent e) {
+        unhandledExceptionHandler.removeHandler();
+        getView().setBusy(false);
+      }
+    });
+
     getView().setBusy(true);
     ResponseCodeCallback authError = new ResponseCodeCallback() {
 
