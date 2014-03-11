@@ -15,6 +15,7 @@ import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
 import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.dom.client.HasKeyUpHandlers;
 import com.google.gwt.event.dom.client.KeyPressEvent;
@@ -22,8 +23,10 @@ import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
@@ -52,6 +55,9 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
 
   @UiField
   Brand applicationName;
+
+  @UiField
+  ControlGroup loginProgressGroup;
 
   private final Translations translations;
 
@@ -126,6 +132,15 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
     if (Document.get() != null) {
       Document.get().setTitle (text);
     }
+  }
+
+  @Override
+  public void setBusy(boolean value) {
+    userName.setEnabled(!value);
+    password.setEnabled(!value);
+    login.setVisible(!value);
+    loginProgressGroup.setVisible(value);
+    RootPanel.get().getBodyElement().getStyle().setCursor(value ? Style.Cursor.WAIT : Style.Cursor.DEFAULT);
   }
 
   private void clearPassword() {

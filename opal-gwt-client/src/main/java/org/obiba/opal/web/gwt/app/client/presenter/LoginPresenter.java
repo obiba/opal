@@ -59,6 +59,8 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
     HasKeyUpHandlers getPasswordTextBox();
 
     void setApplicationName(String text);
+
+    void setBusy(boolean value);
   }
 
   @ProxyStandard
@@ -112,6 +114,12 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
   }
 
   @Override
+  protected void onHide() {
+    super.onHide();
+    getView().setBusy(false);
+  }
+
+  @Override
   protected void onReveal() {
     refreshApplicationName();
   }
@@ -142,10 +150,12 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
   }
 
   private void createSecurityResource(final String username, String password) {
+    getView().setBusy(true);
     ResponseCodeCallback authError = new ResponseCodeCallback() {
 
       @Override
       public void onResponseCode(Request request, Response response) {
+        getView().setBusy(false);
         getView().showErrorMessageAndClearPassword();
       }
     };
@@ -162,10 +172,10 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
               credentials.setUsername(username);
               getEventBus().fireEvent(new SessionCreatedEvent(response.getHeader("Location")));
             } else {
+              getView().setBusy(false);
               getView().showErrorMessageAndClearPassword();
             }
           }
         }).withFormBody("username", username, "password", password).send();
   }
-
 }
