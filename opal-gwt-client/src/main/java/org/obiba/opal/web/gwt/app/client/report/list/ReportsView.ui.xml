@@ -26,7 +26,7 @@
         </g:ScrollPanel>
         <b:ButtonGroup addStyleNames="top-margin">
           <b:Button icon="PLUS" type="INFO" ui:field="add">
-            <ui:msg description="Add Report Template label">Add report template</ui:msg>
+            <ui:msg description="Add Report Template label">Add Report Template</ui:msg>
           </b:Button>
         </b:ButtonGroup>
       </b:Column>

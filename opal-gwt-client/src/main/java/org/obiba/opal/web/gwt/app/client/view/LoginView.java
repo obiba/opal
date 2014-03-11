@@ -14,6 +14,7 @@ import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
 import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.dom.client.HasKeyUpHandlers;
 import com.google.gwt.event.dom.client.KeyPressEvent;
@@ -122,6 +123,9 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
   @Override
   public void setApplicationName(String text) {
     applicationName.setText(text);
+    if (Document.get() != null) {
+      Document.get().setTitle (text);
+    }
   }
 
   private void clearPassword() {
