@@ -119,63 +119,22 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
     bookmarkIconPresenter.setBookmarkable(UriBuilders.DATASOURCE_TABLE.create().build(datasource, table));
   }
 
-  private void show(final String datasource, final String table, final String variable) {
+  private void show(final String datasource, final String table, String variable) {
     // table counts are required for having variable summary and values
     ResourceRequestBuilderFactory.<TableDto>newBuilder() //
         .forResource(UriBuilders.DATASOURCE_TABLE.create().query("counts", "true").build(datasource, table)) //
-        .withCallback(new ResourceCallback<TableDto>() {
+        .withCallback(new TableDtoResourceCallback(datasource, table, variable)) //
+        .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
           @Override
-          public void onResource(Response response, final TableDto tableDto) {
-            if(tableDto == null) return;
+          public void onResponseCode(Request request, Response response) {
+            fireEvent(NotificationEvent.newBuilder().warn("NoSuchValueTable").args(table).build());
 
-            ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder() //
-                .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLES.create().build(datasource, table)) //
-                .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
-
-                  @Override
-                  public void onResource(Response response, JsArray<VariableDto> resource) {
-                    JsArray<VariableDto> variables = JsArrays.toSafeArray(resource);
-                    VariableDto previous = null;
-                    VariableDto selection = null;
-                    VariableDto next = null;
-                    int nbVariables = variables.length();
-                    for(int i = 0; i < nbVariables; i++) {
-                      if(variables.get(i).getName().equals(variable)) {
-                        selection = variables.get(i);
-                        if(i >= 0) {
-                          previous = variables.get(i - 1);
-                        }
-                        if(i < nbVariables - 1) {
-                          next = variables.get(i + 1);
-                        }
-                        break;
-                      }
-                    }
-                    if(selection != null) {
-                      fireEvent(new VariableSelectionChangeEvent(tableDto, selection, previous, next));
-                    } else {
-                      fireEvent(NotificationEvent.newBuilder().warn("NoSuchVariable").args(variable).build());
-                      PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.PROJECT)
-                          .with(ParameterTokens.TOKEN_NAME, datasource) //
-                          .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString())//
-                          .with(ParameterTokens.TOKEN_PATH, datasource + "." + table);
-
-                      placeManager.revealPlace(builder.build());
-                    }
-                  }
-                })//
-                .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
-                  @Override
-                  public void onResponseCode(Request request, Response response) {
-                    // TODO fix error message
-                    fireEvent(NotificationEvent.newBuilder().error("SearchServiceUnavailable").build());
-                  }
-                }) //
-                .get() //
-                .send();
+            PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.PROJECT)
+                .with(ParameterTokens.TOKEN_NAME, datasource) //
+                .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString());
+            placeManager.revealPlace(builder.build());
           }
-        }) //
-        .get() //
+        }).get() //
         .send();
     bookmarkIconPresenter
         .setBookmarkable(UriBuilders.DATASOURCE_TABLE_VARIABLE.create().build(datasource, table, variable));
@@ -198,4 +157,68 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
     void selectVariable(String datasource, String table, String variable);
   }
 
+  private class TableDtoResourceCallback implements ResourceCallback<TableDto> {
+    private final String datasource;
+
+    private final String table;
+
+    private final String variable;
+
+    TableDtoResourceCallback(String datasource, String table, String variable) {
+      this.datasource = datasource;
+      this.table = table;
+      this.variable = variable;
+    }
+
+    @Override
+    public void onResource(Response response, final TableDto tableDto) {
+      if(tableDto == null) return;
+
+      ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder() //
+          .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLES.create().build(datasource, table)) //
+          .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
+
+            @Override
+            public void onResource(Response response, JsArray<VariableDto> resource) {
+              JsArray<VariableDto> variables = JsArrays.toSafeArray(resource);
+              VariableDto previous = null;
+              VariableDto selection = null;
+              VariableDto next = null;
+              int nbVariables = variables.length();
+              for(int i = 0; i < nbVariables; i++) {
+                if(variables.get(i).getName().equals(variable)) {
+                  selection = variables.get(i);
+                  if(i >= 0) {
+                    previous = variables.get(i - 1);
+                  }
+                  if(i < nbVariables - 1) {
+                    next = variables.get(i + 1);
+                  }
+                  break;
+                }
+              }
+              if(selection != null) {
+                fireEvent(new VariableSelectionChangeEvent(tableDto, selection, previous, next));
+              } else {
+                fireEvent(NotificationEvent.newBuilder().warn("NoSuchVariable").args(variable).build());
+                PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.PROJECT)
+                    .with(ParameterTokens.TOKEN_NAME, datasource) //
+                    .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString())//
+                    .with(ParameterTokens.TOKEN_PATH, datasource + "." + table);
+
+                placeManager.revealPlace(builder.build());
+              }
+            }
+          })//
+          .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              // TODO fix error message
+              fireEvent(NotificationEvent.newBuilder().error("SearchServiceUnavailable").build());
+            }
+          }) //
+          .get() //
+          .send();
+    }
+  }
 }
