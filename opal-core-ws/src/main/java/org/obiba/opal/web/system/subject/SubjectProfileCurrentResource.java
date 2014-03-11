@@ -71,6 +71,7 @@ public class SubjectProfileCurrentResource {
   @GET
   @NoAuthorization
   public Response getBookmark(@PathParam("path") String path) throws UnsupportedEncodingException {
+    log.debug("Getting configuration defaultCharSet");
     String defaultCharacterSet = opalGeneralConfigService.getConfig().getDefaultCharacterSet();
     log.debug("Retrieving current user's bookmark with path: {} and default Charset: {}", path, defaultCharacterSet);
 
