@@ -14,12 +14,17 @@ import java.util.Collection;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableUpdateListener;
+import org.obiba.magma.security.Authorizer;
+import org.obiba.magma.security.MagmaSecurityExtension;
+import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma.ViewDto;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.support.InvalidRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -61,6 +66,8 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
   @Override
   public Response updateView(ViewDto viewDto, @Nullable String comment) {
     if(!viewDto.hasName()) return Response.status(Status.BAD_REQUEST).build();
+
+    if (!checkValuesPermissions(viewDto))return Response.status(Status.FORBIDDEN).build();
 
     ValueTable table = getValueTable();
     if(!viewDto.getName().equals(table.getName())) {
@@ -114,6 +121,27 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
     resource.setLocales(getLocales());
     resource.setVariableValueSource(getValueTable().getVariableValueSource(name));
     return resource;
+  }
+
+  private boolean checkValuesPermissions(ViewDto viewDto) {
+    if(!MagmaEngine.get().hasExtension(MagmaSecurityExtension.class)) return true;
+
+    Authorizer authorizer = MagmaEngine.get().getExtension(MagmaSecurityExtension.class).getAuthorizer();
+
+    ValueTable table = getValueTable();
+    if(!authorizer.isPermitted(
+        "rest:/datasource/" + table.getDatasource().getName() + "/table/" + table.getName() + "/valueSet:GET")) return true;
+
+    // user can see the values of the view, so make sure user is also permitted to see the referred tables values
+    for(String tableName : viewDto.getFromList()) {
+      MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
+      ValueTable fromTable = resolver.resolveTable();
+      if(!authorizer.isPermitted(
+          "rest:/datasource/" + fromTable.getDatasource().getName() + "/table/" + fromTable.getName() + "/valueSet:GET")) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private View asView() {

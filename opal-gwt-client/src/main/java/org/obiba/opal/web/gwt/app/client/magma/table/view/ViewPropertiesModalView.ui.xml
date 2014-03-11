@@ -17,7 +17,7 @@
     ui:generateLocales="default">
 
   <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false">
-    <g:FlowPanel addStyleNames="main">
+    <g:FlowPanel>
       <!--Name-->
       <b:ControlGroup ui:field="nameGroup">
         <b:ControlLabel>

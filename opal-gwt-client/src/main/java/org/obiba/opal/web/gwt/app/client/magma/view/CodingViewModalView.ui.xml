@@ -18,7 +18,7 @@
     <g:DockLayoutPanel unit="EM" height="30em" width="40em">
       <g:center>
         <g:ScrollPanel>
-          <g:FlowPanel addStyleNames="main">
+          <g:FlowPanel>
             <g:Label>
               <ui:msg description="Coding View title">Categorical variables will be automatically recoded with numbers.
                 Other variables can be optionally duplicated.

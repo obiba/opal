@@ -203,7 +203,7 @@ public class DatasourceResource {
     // check the permissions and if table exists for the user
     AclAction action = getAction(viewDto);
 
-        View view = viewDtos.fromDto(viewDto);
+    View view = viewDtos.fromDto(viewDto);
     viewManager.addView(getDatasource().getName(), view, comment);
     scheduleViewIndexation(view);
 
@@ -215,7 +215,7 @@ public class DatasourceResource {
 
   private AclAction getAction(ViewDto viewDto) {
     AclAction action = AclAction.TABLE_ALL;
-    if (!MagmaEngine.get().hasExtension(MagmaSecurityExtension.class)) return action;
+    if(!MagmaEngine.get().hasExtension(MagmaSecurityExtension.class)) return action;
 
     for(String tableName : viewDto.getFromList()) {
       MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
