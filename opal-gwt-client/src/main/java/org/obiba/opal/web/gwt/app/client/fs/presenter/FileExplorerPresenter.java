@@ -53,7 +53,7 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
 
   private final FolderDetailsPresenter folderDetailsPresenter;
 
-  private TranslationMessages translationMessages;
+  private final TranslationMessages translationMessages;
 
   private final ModalProvider<FileUploadModalPresenter> fileUploadModalProvider;
 
@@ -124,6 +124,17 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
         updateCurrentFolderAuthorizations();
         updateCheckedFilesAuthorizations();
       }
+
+      private void updateCurrentFolderAuthorizations() {
+        // create folder and upload
+        ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + getCurrentFolder().getPath())
+            .post()//
+            .authorize(
+                new CompositeAuthorizer(getView().getCreateFolderAuthorizer(), getView().getFileUploadAuthorizer()))
+            .send();
+
+        updateCurrentFolderPasteAuthorization();
+      }
     });
 
     addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler());
@@ -155,16 +166,6 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
       getView().getFileCopyAuthorizer().unauthorized();
       getView().getFileCutAuthorizer().unauthorized();
     }
-  }
-
-  private void updateCurrentFolderAuthorizations() {
-    // create folder and upload
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + getCurrentFolder().getPath())
-        .post()//
-        .authorize(new CompositeAuthorizer(getView().getCreateFolderAuthorizer(), getView().getFileUploadAuthorizer()))
-        .send();
-
-    updateCurrentFolderPasteAuthorization();
   }
 
   /**

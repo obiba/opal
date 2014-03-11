@@ -16,6 +16,7 @@ import org.obiba.opal.web.model.client.opal.FileDto.FileType;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.gwt.http.client.URL;
 
 /**
  *
@@ -35,7 +36,8 @@ public class FileDtos {
   }
 
   public static String getLink(FileDto file) {
-    return "/files" + file.getPath();
+    // Append / if pasting directly under File System (/)
+    return "/files" + file.getPath() + ("/".equals(file.getPath()) ? URL.encodePathSegment("/") : "");
   }
 
   public static FileDto users() {
