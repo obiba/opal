@@ -18,19 +18,14 @@
 
   <g:FlowPanel>
     <g:FlowPanel addStyleNames="section-header">
-      <b:FluidRow>
-        <b:Column size="11">
-          <b:Breadcrumbs ui:field="titleCrumbs" addStyleNames="inline-block">
-            <b:NavLink ui:field="projects">
-              <ui:msg description="Projects label">Projects</ui:msg>
-            </b:NavLink>
-          </b:Breadcrumbs>
-          <g:FlowPanel ui:field="bookmarkIcon" addStyleNames="inline-block"/>
-          <g:FlowPanel ui:field="tagsPanel" addStyleNames="inline-block small-indent"/>
-        </b:Column>
-        <b:Column size="1">
-        </b:Column>
-      </b:FluidRow>
+      <b:Breadcrumbs ui:field="titleCrumbs" addStyleNames="inline-block">
+        <b:NavLink ui:field="projects">
+          <ui:msg description="Projects label">Projects</ui:msg>
+        </b:NavLink>
+      </b:Breadcrumbs>
+      <g:FlowPanel ui:field="bookmarkIcon" addStyleNames="inline-block"/>
+      <g:FlowPanel ui:field="tagsPanel" addStyleNames="inline-block small-indent"/>
+      <b:HelpBlock ui:field="description" visible="false" addStyleNames="small-top-margin"/>
     </g:FlowPanel>
     <o:OpalTabPanel tabPosition="left" ui:field="tabPanel">
       <b:Tab icon="TABLE">

@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
+import com.github.gwtbootstrap.client.ui.HelpBlock;
 import com.github.gwtbootstrap.client.ui.Label;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.TabPanel;
@@ -46,6 +47,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
 
   @UiField
   FlowPanel tagsPanel;
+
+  @UiField
+  HelpBlock description;
 
   @UiField
   OpalTabPanel tabPanel;
@@ -90,6 +94,8 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     }
     titleCrumbs.add(new NavLink(project.getTitle()));
     setTags(project);
+    description.setVisible(project.hasDescription());
+    description.setText(project.hasDescription() ? project.getDescription() : "");
   }
 
   private void setTags(ProjectDto project) {

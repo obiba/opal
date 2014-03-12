@@ -25,12 +25,15 @@
         <ui:msg description="Repeatable label">Repeatable</ui:msg>
       </b:CheckBox>
 
-      <b:Button ui:field="testScript" type="INFO" addStyleNames="pull-right">
+      <b:Button ui:field="testScript" type="INFO" addStyleNames="pull-right small-neg-top-margin">
         <ui:msg description="Test label">Test</ui:msg>
       </b:Button>
 
     </g:FlowPanel>
     <ace:AceEditor ui:field="scriptArea" addStyleNames="ace-editor"/>
+    <b:HelpBlock>
+      <ui:msg description="Script editor description">See detailed documentation about <a href="http://wiki.obiba.org/display/OPALDOC/Magma+Javascript+API" target="_blank">Magma Javascript API</a>.</ui:msg>
+    </b:HelpBlock>
   </g:FlowPanel>
 
 </ui:UiBinder>
