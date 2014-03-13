@@ -38,13 +38,13 @@ import static org.obiba.opal.web.model.client.opal.TableIndexationStatus.UPTODAT
  */
 public class IndexStatusImageCell extends AbstractCell<String> {
 
-  private final static String BULLET_GREEN = "image/16/bullet_green.png";
+  private final static String BULLET_GREEN = "status-success";
 
-  private final static String BULLET_ORANGE = "image/16/bullet_orange.png";
+  private final static String BULLET_ORANGE = "status-warning";
 
-  private final static String BULLET_RED = "image/16/bullet_red.png";
+  private final static String BULLET_RED = "status-error";
 
-  private final static String BULLET_BLACK = "image/16/bullet_black.png";
+  private final static String BULLET_BLACK = "status-default";
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -84,8 +84,8 @@ public class IndexStatusImageCell extends AbstractCell<String> {
   }
 
   interface Template extends SafeHtmlTemplates {
-    @Template("<img src=\"{0}\" title=\"{1}\"/>")
-    SafeHtml img(String url, String title);
+    @Template("<i class=\"icon-circle {0}\" title=\"{1}\"></i>")
+    SafeHtml img(String cssClass, String title);
 
     @Template(
         "<div class=\"progress progress-striped active\" title=\"{0} ({1})\"><div class=\"bar\" style=\"width: {1};\"></div></div>")
