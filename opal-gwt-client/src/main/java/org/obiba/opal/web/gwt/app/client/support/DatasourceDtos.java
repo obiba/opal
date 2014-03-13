@@ -179,33 +179,21 @@ public class DatasourceDtos {
     factoryDto.setEntityType(importConfig.getEntityType());
     factoryDto.setLocale(importConfig.getLocale());
 
-    DatasourceFactoryDto dto = DatasourceFactoryDto.create();
-    configureIncremental(importConfig, dto);
-    configureBatch(importConfig, dto);
-    dto.setExtension(SpssDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
-
-    return dto;
+    return createAndConfigureDatasourceFactoryDto(importConfig,
+        SpssDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
   }
 
   private static DatasourceFactoryDto createHCDatasourceFactoryDto(ImportConfig importConfig) {
     HCDatasourceFactoryDto factoryDto = HCDatasourceFactoryDto.create();
 
-    DatasourceFactoryDto dto = DatasourceFactoryDto.create();
-    configureIncremental(importConfig, dto);
-    configureBatch(importConfig, dto);
-    dto.setExtension(HCDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
-
-    return dto;
+    return createAndConfigureDatasourceFactoryDto(importConfig,
+        HCDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
   }
 
   private static DatasourceFactoryDto createGNPostalCodesDatasourceFactoryDto(ImportConfig importConfig) {
     GNPostalCodesDatasourceFactoryDto factoryDto = GNPostalCodesDatasourceFactoryDto.create();
 
-    DatasourceFactoryDto dto = DatasourceFactoryDto.create();
-    configureIncremental(importConfig, dto);
-    configureBatch(importConfig, dto);
-    dto.setExtension(GNPostalCodesDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
-
-    return dto;
+    return createAndConfigureDatasourceFactoryDto(importConfig,
+        GNPostalCodesDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
   }
 }
