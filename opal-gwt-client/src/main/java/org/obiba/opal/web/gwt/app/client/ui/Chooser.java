@@ -45,6 +45,7 @@ public class Chooser extends ChosenListBox {
       public void onAttachOrDetach(AttachEvent event) {
         if(event.isAttached()) {
           getChosenElement().addClass("chooser");
+          getChosenElement().children("div").last().addClass("chooser-dropdown");
           getChosenElement().find("div > ul").last().addClass("chooser-options");
         }
       }
