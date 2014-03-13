@@ -9,11 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
+import java.util.List;
+import java.util.Map;
+
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
+import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.math.BinarySummaryDto;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
@@ -22,6 +26,8 @@ import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
@@ -98,14 +104,27 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
     summary.clear();
     if(dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous) != null) {
       renderContinuousSummary(dto);
-    } else if(dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical) != null) {
-      renderCategoricalSummary(dto);
     } else if(dto.getExtension(DefaultSummaryDto.SummaryStatisticsDtoExtensions.defaultSummary) != null) {
       renderDefaultSummary(dto);
     } else if(dto.getExtension(BinarySummaryDto.SummaryStatisticsDtoExtensions.binarySummary) != null) {
       renderBinarySummary(dto);
     } else {
       renderNoSummary();
+    }
+  }
+
+  @Override
+  public void renderSummary(SummaryStatisticsDto dto, List<CategoryDto> categories) {
+    summary.clear();
+    if(dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical) != null) {
+      Map categoriesByName = Maps.uniqueIndex(categories, new Function<CategoryDto, String>() {
+        @Override
+        public String apply(CategoryDto input) {
+          return input.getName();
+        }
+      });
+
+      renderCategoricalSummary(dto, categoriesByName);
     }
   }
 
@@ -119,10 +138,10 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
     }
   }
 
-  private void renderCategoricalSummary(SummaryStatisticsDto dto) {
+  private void renderCategoricalSummary(SummaryStatisticsDto dto, Map<String, CategoryDto> categoriesByName) {
     CategoricalSummaryDto categorical = dto
         .getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
-    summary.add(new CategoricalSummaryView(dto.getResource(), categorical));
+    summary.add(new CategoricalSummaryView(dto.getResource(), categorical, categoriesByName));
   }
 
   private void renderDefaultSummary(SummaryStatisticsDto dto) {

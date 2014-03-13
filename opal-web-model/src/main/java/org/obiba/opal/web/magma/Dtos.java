@@ -358,8 +358,8 @@ public final class Dtos {
     for(CategoricalVariableSummary.Frequency frequency : summary.getFrequencies()) {
       Math.FrequencyDto.Builder freqBuilder = Math.FrequencyDto.newBuilder() //
           .setValue(frequency.getValue()) //
-          .setFreq(frequency.getFreq())//
-          .setPct(frequency.getPct());
+          .setFreq(frequency.getFreq());
+
       if(isNumeric(frequency.getPct())) freqBuilder.setPct(frequency.getPct());
       dtoBuilder.addFrequencies(freqBuilder);
     }

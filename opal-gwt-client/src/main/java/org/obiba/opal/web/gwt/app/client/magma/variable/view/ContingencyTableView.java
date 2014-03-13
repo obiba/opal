@@ -264,9 +264,9 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
     parentTable.getFlexCellFormatter().setWidth(0, 1, DEFAULT_WIDTH + "%");
     parentTable.getFlexCellFormatter().setWidth(0, 2, "10%");
 
-    parentTable.getFlexCellFormatter().addStyleName(0, 0, "cross-table-header");
-    parentTable.getFlexCellFormatter().addStyleName(0, 1, "cross-table-header");
-    parentTable.getFlexCellFormatter().addStyleName(0, 2, "cross-table-header");
+    parentTable.getFlexCellFormatter().addStyleName(0, 0, "bold-table-header");
+    parentTable.getFlexCellFormatter().addStyleName(0, 1, "bold-table-header");
+    parentTable.getFlexCellFormatter().addStyleName(0, 2, "bold-table-header");
 
     int width = DEFAULT_WIDTH / variableCategories.size();
     for(int i = 0; i < variableCategories.size(); i++) {
@@ -278,6 +278,6 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
   private void writeCategoryHeader(DefaultFlexTable parentTable, String name, int width, int col) {
     parentTable.setWidget(1, col, new Label(name));
     parentTable.getFlexCellFormatter().setWidth(1, col, width + "%");
-    parentTable.getFlexCellFormatter().addStyleName(1, col, "cross-table-header");
+    parentTable.getFlexCellFormatter().addStyleName(1, col, "bold-table-header");
   }
 }

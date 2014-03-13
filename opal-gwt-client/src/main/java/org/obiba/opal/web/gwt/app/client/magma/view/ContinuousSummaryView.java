@@ -19,6 +19,7 @@ import org.obiba.opal.web.model.client.math.IntervalFrequencyDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -54,33 +55,7 @@ public class ContinuousSummaryView extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     DescriptiveStatsDto descriptiveStats = continuous.getSummary();
-
-    grid.clear();
-    grid.setHeader(0, translations.descriptiveStatistics());
-    grid.setHeader(1, translations.value());
-    int row = 0;
-    grid.setWidget(row, 0, new Label(translations.NLabel()));
-    grid.setWidget(row++, 1, new Label("" + Math.round(descriptiveStats.getN())));
-    grid.setWidget(row, 0, new Label(translations.min()));
-    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getMin()));
-    grid.setWidget(row, 0, new Label(translations.max()));
-    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getMax()));
-    grid.setWidget(row, 0, new Label(translations.meanLabel()));
-    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getMean()));
-    grid.setWidget(row, 0, new Label(translations.median()));
-    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getMedian()));
-    grid.setWidget(row, 0, new Label(translations.standardDeviationLabel()));
-    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getStdDev()));
-    grid.setWidget(row, 0, new Label(translations.variance()));
-    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getVariance()));
-    grid.setWidget(row, 0, new Label(translations.skewness()));
-    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getSkewness()));
-    grid.setWidget(row, 0, new Label(translations.kurtosis()));
-    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getKurtosis()));
-    grid.setWidget(row, 0, new Label(translations.sum()));
-    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getSum()));
-    grid.setWidget(row, 0, new Label(translations.sumOfSquares()));
-    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getSumsq()));
+    initDescriptiveStatistics(descriptiveStats);
 
     if(descriptiveStats.getVariance() > 0) {
       histogram = new HistogramChartFactory();
@@ -99,6 +74,25 @@ public class ContinuousSummaryView extends Composite {
     }
   }
 
+  private void initDescriptiveStatistics(DescriptiveStatsDto descriptiveStats) {
+    grid.clear();
+    grid.setHeader(0, translations.descriptiveStatistics());
+    grid.setHeader(1, translations.value());
+    int row = 0;
+    addGridStat(translations.NLabel(), Math.round(descriptiveStats.getN()), row++);
+    addGridStat(translations.min(), descriptiveStats.getMin(), row++);
+    addGridStat(translations.max(), descriptiveStats.getMax(), row++);
+    addGridStat(translations.meanLabel(), descriptiveStats.getMean(), row++);
+    addGridStat(translations.geometricMeanLabel(), descriptiveStats.getGeometricMean(), row++);
+    addGridStat(translations.median(), descriptiveStats.getMedian(), row++);
+    addGridStat(translations.standardDeviationLabel(), descriptiveStats.getStdDev(), row++);
+    addGridStat(translations.variance(), descriptiveStats.getVariance(), row++);
+    addGridStat(translations.skewness(), descriptiveStats.getSkewness(), row++);
+    addGridStat(translations.kurtosis(), descriptiveStats.getKurtosis(), row++);
+    addGridStat(translations.sum(), descriptiveStats.getSum(), row++);
+    addGridStat(translations.sumOfSquares(), descriptiveStats.getSumsq(), row++);
+  }
+
   @Override
   protected void onLoad() {
     super.onLoad();
@@ -113,4 +107,10 @@ public class ContinuousSummaryView extends Composite {
     }
   }
 
+  private void addGridStat(String title, double number, int row) {
+    NumberFormat nf = NumberFormat.getFormat("#.####");
+
+    grid.setWidget(row, 0, new Label(title));
+    grid.setWidget(row, 1, new Label(String.valueOf(nf.format(number))));
+  }
 }
