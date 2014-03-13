@@ -51,7 +51,12 @@
         <g:Label>
           <ui:msg description="Spss Entity type">Entity type</ui:msg>
         </g:Label>
-        <g:TextBox name="entity" ui:field="entityType"/>
+        <g:TextBox name="entity" ui:field="entityType">Participant</g:TextBox>
+        <b:HelpBlock>
+          <ui:msg description="Destination Entity Type help label">Specify what these data relate to (Participant,
+            Instrument, Area etc.)
+          </ui:msg>
+        </b:HelpBlock>
       </g:FlowPanel>
     </o:CollapsiblePanel>
 
