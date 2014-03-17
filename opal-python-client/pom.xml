@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <artifactId>opal</artifactId>
     <groupId>org.obiba.opal</groupId>
-    <version>2.0-SNAPSHOT</version>
+    <version>2.0.2-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -32,7 +33,7 @@
           <descriptors>
             <descriptor>src/main/assembly/python-package.xml</descriptor>
           </descriptors>
-          <filters />
+          <filters/>
         </configuration>
         <executions>
           <execution>
@@ -53,25 +54,26 @@
             <configuration>
               <target>
                 <!-- Unzip package -->
-                <property name="python.dist.path" value="${basedir}/target" />
-                <property name="python.package.name" value="${project.name}-${project.version}.tar.gz" />
-                <unzip src="${basedir}/target/opal-python_${project.version}.zip" dest="${python.dist.path}" />
+                <property name="python.dist.path" value="${basedir}/target"/>
+                <property name="python.package.name" value="${project.name}-${project.version}.tar.gz"/>
+                <unzip src="${basedir}/target/opal-python_${project.version}.zip" dest="${python.dist.path}"/>
                 <copy todir="${python.dist.path}/opal-python">
-                    <fileset dir="${basedir}/dist/python">
-                        <include name="*.*" />
-                    </fileset>
-                    <filterset>
-                      <filter token="project.name" value="${project.name}" />
-                      <filter token="project.version" value="${project.version}" />
-                      <filter token="project.description" value="${project.description}" />
-                      <filter token="project.download.url" value="http://download.obiba.org/opal/${opal.deploy.dir}/${python.package.name}" />
-                    </filterset>
+                  <fileset dir="${basedir}/dist/python">
+                    <include name="*.*"/>
+                  </fileset>
+                  <filterset>
+                    <filter token="project.name" value="${project.name}"/>
+                    <filter token="project.version" value="${project.version}"/>
+                    <filter token="project.description" value="${project.description}"/>
+                    <filter token="project.download.url"
+                        value="http://download.obiba.org/opal/${opal.deploy.dir}/${python.package.name}"/>
+                  </filterset>
                 </copy>
                 <exec dir="${python.dist.path}/opal-python" executable="python" failonerror="true">
-                  <arg line="${python.dist.path}/opal-python/setup.py" />
-                  <arg line="sdist" />
-                  <arg line="--formats=gztar,zip" />
-                  <arg line="--dist-dir=${basedir}/target" />
+                  <arg line="${python.dist.path}/opal-python/setup.py"/>
+                  <arg line="sdist"/>
+                  <arg line="--formats=gztar,zip"/>
+                  <arg line="--dist-dir=${basedir}/target"/>
                 </exec>
               </target>
             </configuration>
@@ -101,42 +103,42 @@
                 </goals>
                 <configuration>
                   <target>
-                    <property name="target.dir" value="${basedir}/target" />
-                    <property name="deb.dir" value="${target.dir}/deb" />
-                    <property name="deb.version" value="${project.version}-b${buildNumber}" />
-                    <unzip src="${target.dir}/opal-python_${project.version}.zip" dest="${target.dir}" />
+                    <property name="target.dir" value="${basedir}/target"/>
+                    <property name="deb.dir" value="${target.dir}/deb"/>
+                    <property name="deb.version" value="${project.version}-b${buildNumber}"/>
+                    <unzip src="${target.dir}/opal-python_${project.version}.zip" dest="${target.dir}"/>
                     <!-- delete junk python bytecode -->
                     <delete>
-                      <fileset dir="${target.dir}/opal-python" includes="**/*.pyc" />
+                      <fileset dir="${target.dir}/opal-python" includes="**/*.pyc"/>
                     </delete>
                     <tstamp>
                       <!-- http://www.debian.org/doc/debian-policy/ch-source.html -->
-                      <format property="deb.date" pattern="EEE, d MMM yyyy HH:mm:ss Z" locale="en" />
+                      <format property="deb.date" pattern="EEE, d MMM yyyy HH:mm:ss Z" locale="en"/>
                     </tstamp>
                     <copy todir="${deb.dir}/debian">
-                      <fileset dir="${basedir}/dist/debian" />
+                      <fileset dir="${basedir}/dist/debian"/>
                       <filterset>
-                        <filter token="project.version" value="${deb.version}" />
-                        <filter token="date" value="${deb.date}" />
+                        <filter token="project.version" value="${deb.version}"/>
+                        <filter token="date" value="${deb.date}"/>
                       </filterset>
                     </copy>
-                    <mkdir dir="${deb.dir}/usr/share/pyshared" />
-                    <mkdir dir="${deb.dir}/usr/bin" />
+                    <mkdir dir="${deb.dir}/usr/share/pyshared"/>
+                    <mkdir dir="${deb.dir}/usr/bin"/>
                     <move todir="${deb.dir}/usr/bin">
-                      <fileset dir="${target.dir}/opal-python/bin/scripts" includes="opal" />
+                      <fileset dir="${target.dir}/opal-python/bin/scripts" includes="opal"/>
                     </move>
                     <move todir="${deb.dir}/usr/share/pyshared/opal">
-                      <fileset dir="${target.dir}/opal-python/bin/opal" includes="**/*" />
+                      <fileset dir="${target.dir}/opal-python/bin/opal" includes="**/*"/>
                     </move>
                     <exec executable="debuild" dir="${deb.dir}" failonerror="true" osfamily="unix">
-                      <arg value="-b" />
+                      <arg value="-b"/>
                     </exec>
                     <move todir="${basedir}/target">
                       <fileset dir="${deb.dir}">
-                        <include name="*.deb" />
+                        <include name="*.deb"/>
                       </fileset>
                     </move>
-                    <delete dir="${deb.dir}" />
+                    <delete dir="${deb.dir}"/>
                   </target>
                 </configuration>
               </execution>
@@ -148,9 +150,10 @@
                 </goals>
                 <configuration>
                   <target>
-                    <property name="deb.package.name" value="${project.name}_${project.version}-b${buildNumber}_all.deb" />
+                    <property name="deb.package.name"
+                        value="${project.name}_${project.version}-b${buildNumber}_all.deb"/>
                     <!-- Deploy deb file in deb repo -->
-                    <copy todir="${obiba.deb.dir}/${opal.deploy.dir}" file="target/${deb.package.name}" />
+                    <copy todir="${obiba.deb.dir}/${opal.deploy.dir}" file="target/${deb.package.name}"/>
                   </target>
                 </configuration>
               </execution>
@@ -162,10 +165,10 @@
                 </goals>
                 <configuration>
                   <target>
-                    <property name="python.dist.path" value="${basedir}/target" />
-                    <property name="python.package.name" value="${project.name}-${project.version}.tar.gz" />
+                    <property name="python.dist.path" value="${basedir}/target"/>
+                    <property name="python.package.name" value="${project.name}-${project.version}.tar.gz"/>
                     <!-- Deploy Python package file in download repo -->
-                    <copy todir="${obiba.download.dir}/opal/${opal.deploy.dir}" file="target/${python.package.name}" />
+                    <copy todir="${obiba.download.dir}/opal/${opal.deploy.dir}" file="target/${python.package.name}"/>
                   </target>
                 </configuration>
               </execution>
