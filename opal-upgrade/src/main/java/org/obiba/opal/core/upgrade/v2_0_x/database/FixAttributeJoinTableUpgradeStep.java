@@ -38,6 +38,8 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import com.google.common.collect.Lists;
+
 @SuppressWarnings("SpringJavaAutowiringInspection")
 public class FixAttributeJoinTableUpgradeStep extends AbstractUpgradeStep {
 
@@ -173,16 +175,9 @@ public class FixAttributeJoinTableUpgradeStep extends AbstractUpgradeStep {
                     String value_type = rs.getString("value_type");
                     boolean is_sequence = rs.getBoolean("is_sequence");
                     String value = rs.getString("value");
-                    int count = jdbcTemplate.queryForObject(
-                        "SELECT count(*) FROM " + attributeAware + "_state_attributes WHERE " + attributeAware +
-                            "_state_id = ? AND locale = ? AND name = ? AND namespace = ? AND value_type = ? " +
-                            "AND is_sequence = ? AND value = ?", Integer.class, id, locale, name, namespace, value_type,
-                        is_sequence, value);
 
-                    log.info("SELECT count(*) FROM " + attributeAware + "_state_attributes WHERE " + attributeAware +
-                        "_state_id = {} AND locale = '{}' AND name = '{}' AND namespace = '{}' AND value_type = '{}' " +
-                        "AND is_sequence = {} AND value = '{}'", id, locale, name, namespace, value_type, is_sequence,
-                        value);
+                    int count = countExistingAttributes(id, locale, name, namespace, value_type, is_sequence, value,
+                        attributeAware, jdbcTemplate);
                     if(count == 0) {
                       jdbcTemplate.update("insert into " + attributeAware + "_state_attributes (" + attributeAware +
                           "_state_id, locale, name, namespace, value_type, is_sequence, value) VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -198,6 +193,21 @@ public class FixAttributeJoinTableUpgradeStep extends AbstractUpgradeStep {
     } catch(DataAccessException e) {
       log.info("Ignore attribute copy error", e);
     }
+  }
+
+  @SuppressWarnings({ "PMD.ExcessiveParameterList", "MethodWithTooManyParameters", "MethodOnlyUsedFromInnerClass" })
+  private int countExistingAttributes(long id, String locale, String name, String namespace, String value_type,
+      boolean is_sequence, String value, String attributeAware, JdbcOperations jdbcTemplate) {
+    List<Object> arg = Lists.<Object>newArrayList(id, name, value_type, is_sequence, value);
+    String countSql = "SELECT count(*) FROM " + attributeAware + "_state_attributes WHERE " +
+        attributeAware +
+        "_state_id = ? AND name = ? AND value_type = ? AND is_sequence = ? AND value = ?";
+    countSql += " AND " + (locale == null ? "locale is null" : "locale = ?");
+    countSql += " AND " + (namespace == null ? "namespace is null" : "namespace = ?");
+
+    if(locale != null) arg.add(locale);
+    if(namespace != null) arg.add(namespace);
+    return jdbcTemplate.queryForObject(countSql, Integer.class, arg.toArray(new Object[arg.size()]));
   }
 
   private void execute(final JdbcOperations jdbcTemplate, final String sql) {
