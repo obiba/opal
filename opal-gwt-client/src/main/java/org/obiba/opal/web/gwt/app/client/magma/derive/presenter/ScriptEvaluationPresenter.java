@@ -208,6 +208,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
           break;
         case SC_FORBIDDEN:
           getView().setValuesVisible(false);
+          requestSummary();
           break;
         case SC_NOT_FOUND:
         case SC_BAD_REQUEST:
