@@ -94,6 +94,12 @@
           <property name="appliesTo" value="2.0.0"/>
         </bean>
 
+        <!-- 2.0.2 / Fix Hibernate Datasource attributes join table mapping -->
+        <bean class="org.obiba.opal.core.upgrade.v2_0_x.database.FixAttributeJoinTableUpgradeStep">
+          <property name="description" value="Fix Hibernate Datasource attributes join table mapping"/>
+          <property name="appliesTo" value="2.0.2"/>
+        </bean>
+
       </list>
     </property>
 
