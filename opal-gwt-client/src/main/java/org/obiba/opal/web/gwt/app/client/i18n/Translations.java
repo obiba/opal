@@ -1257,10 +1257,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Values")
   String values();
 
-  @Description("% (% non missings) label")
-  @DefaultStringValue("% (% non missings)")
-  String percentPercentNonMissings();
-
   @Description("Participant label")
   @DefaultStringValue("Participant")
   String participant();
@@ -2230,11 +2226,19 @@ public interface Translations extends Constants {
   @DefaultStringValue("Non-Missing")
   String nonMissing();
 
+  @Description("Non-missing top N label")
+  @DefaultStringValue("Non-Missing (top {0})")
+  String nonMissingTopN();
+
   @Description("Total Non Missings label")
   @DefaultStringValue("Subtotal")
   String subtotal();
 
-//  @Description("Total Missing label")
-//  @DefaultStringValue("Total Missings")
-//  String totalMissingsLabel();
+  @Description("Not Empty label")
+  @DefaultStringValue("Not Empty")
+  String notEmpty();
+
+  @Description("N/A label")
+  @DefaultStringValue("N/A")
+  String naLabel();
 }

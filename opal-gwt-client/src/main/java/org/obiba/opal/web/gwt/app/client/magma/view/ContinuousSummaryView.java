@@ -11,12 +11,15 @@ package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.DefaultFlexTable;
+import org.obiba.opal.web.gwt.app.client.ui.SummaryFlexTable;
 import org.obiba.opal.web.gwt.plot.client.HistogramChartFactory;
 import org.obiba.opal.web.gwt.plot.client.NormalProbabilityChartFactory;
 import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
 import org.obiba.opal.web.model.client.math.DescriptiveStatsDto;
+import org.obiba.opal.web.model.client.math.FrequencyDto;
 import org.obiba.opal.web.model.client.math.IntervalFrequencyDto;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.i18n.client.NumberFormat;
@@ -47,20 +50,34 @@ public class ContinuousSummaryView extends Composite {
   @UiField
   SimplePanel normalProbability;
 
+  @UiField
+  SummaryFlexTable stats;
+
   private HistogramChartFactory histogram;
 
   private NormalProbabilityChartFactory qqPlot;
 
-  public ContinuousSummaryView(ContinuousSummaryDto continuous) {
+  public ContinuousSummaryView(ContinuousSummaryDto continuous, ImmutableList<FrequencyDto> frequenciesNonMissing,
+      ImmutableList<FrequencyDto> frequenciesMissing, double totalNonMissing, double totalMissing) {
     initWidget(uiBinder.createAndBindUi(this));
 
+    initDescriptivestats(continuous);
+
+    stats.drawHeader();
+    double total = totalNonMissing + totalMissing;
+    stats.drawValuesFrequencies(frequenciesNonMissing, translations.nonMissing(), translations.notEmpty(),
+        totalNonMissing, total);
+    stats.drawValuesFrequencies(frequenciesMissing, translations.missingLabel(), translations.naLabel(), totalMissing,
+        total);
+    stats.drawTotal(total);
+  }
+
+  private void initDescriptivestats(ContinuousSummaryDto continuous) {
     DescriptiveStatsDto descriptiveStats = continuous.getSummary();
-    initDescriptiveStatistics(descriptiveStats);
+    addDescriptiveStatistics(descriptiveStats);
 
     if(descriptiveStats.getVariance() > 0) {
       histogram = new HistogramChartFactory();
-
-//      histogram = new HistogramPlot(histogramElement.getId(), descriptiveStats.getMin(), descriptiveStats.getMax());
       JsArray<IntervalFrequencyDto> frequencyArray = continuous.getIntervalFrequencyArray();
       if(frequencyArray != null) {
         int length = frequencyArray.length();
@@ -74,11 +91,12 @@ public class ContinuousSummaryView extends Composite {
     }
   }
 
-  private void initDescriptiveStatistics(DescriptiveStatsDto descriptiveStats) {
+  private void addDescriptiveStatistics(DescriptiveStatsDto descriptiveStats) {
     grid.clear();
     grid.setHeader(0, translations.descriptiveStatistics());
     grid.setHeader(1, translations.value());
     int row = 0;
+
     addGridStat(translations.NLabel(), Math.round(descriptiveStats.getN()), row++);
     addGridStat(translations.min(), descriptiveStats.getMin(), row++);
     addGridStat(translations.max(), descriptiveStats.getMax(), row++);

@@ -9,25 +9,32 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
-import java.util.List;
 import java.util.Map;
+
+import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.BinarySummaryDto;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
 import org.obiba.opal.web.model.client.math.DefaultSummaryDto;
+import org.obiba.opal.web.model.client.math.FrequencyDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
+import org.obiba.opal.web.model.client.math.TextSummaryDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimaps;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
@@ -47,6 +54,12 @@ import com.gwtplatform.mvp.client.ViewWithUiHandlers;
  *
  */
 public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> implements SummaryTabPresenter.Display {
+
+  private static final int DEFAULT_MAX_TEXT_RESULTS = 20;
+
+  private static final String EMPTY_VALUE = "N/A";
+
+  private static final String NOT_NULL_VALUE = "NOT_NULL";
 
   @UiTemplate("SummaryTabView.ui.xml")
   interface Binder extends UiBinder<Widget, SummaryTabView> {}
@@ -102,52 +115,140 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
   @SuppressWarnings("IfStatementWithTooManyBranches")
   public void renderSummary(SummaryStatisticsDto dto) {
     summary.clear();
+
     if(dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous) != null) {
       renderContinuousSummary(dto);
     } else if(dto.getExtension(DefaultSummaryDto.SummaryStatisticsDtoExtensions.defaultSummary) != null) {
       renderDefaultSummary(dto);
     } else if(dto.getExtension(BinarySummaryDto.SummaryStatisticsDtoExtensions.binarySummary) != null) {
       renderBinarySummary(dto);
+    } else if(dto.getExtension(TextSummaryDto.SummaryStatisticsDtoExtensions.textSummary) != null) {
+      renderTextSummary(dto);
     } else {
       renderNoSummary();
     }
   }
 
   @Override
-  public void renderSummary(SummaryStatisticsDto dto, List<CategoryDto> categories) {
+  public void renderSummary(SummaryStatisticsDto dto, VariableDto variableDto) {
     summary.clear();
     if(dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical) != null) {
-      Map categoriesByName = Maps.uniqueIndex(categories, new Function<CategoryDto, String>() {
-        @Override
-        public String apply(CategoryDto input) {
-          return input.getName();
-        }
-      });
-
-      renderCategoricalSummary(dto, categoriesByName);
+      renderCategoricalSummary(dto, variableDto);
     }
   }
 
   private void renderContinuousSummary(SummaryStatisticsDto dto) {
     ContinuousSummaryDto continuous = dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous)
         .cast();
-    if(continuous.getSummary().getN() > 0) {
-      summary.add(new ContinuousSummaryView(continuous));
-    } else {
-      renderNoSummary();
-    }
+
+    final double[] totals = { 0d, 0d };
+    ImmutableListMultimap<Boolean, FrequencyDto> frequenciesByMissing = Multimaps
+        .index(JsArrays.toIterable(continuous.getFrequenciesArray()), new Function<FrequencyDto, Boolean>() {
+          @Nullable
+          @Override
+          public Boolean apply(@Nullable FrequencyDto input) {
+            // when boolean, is missing is not set
+            if(input != null && EMPTY_VALUE.equals(input.getValue())) {
+              totals[1] += input.getFreq();
+              return true;
+            }
+            totals[0] += input == null ? 0 : input.getFreq();
+            return false;
+          }
+        });
+
+    summary.add(new ContinuousSummaryView(continuous, frequenciesByMissing.get(false), frequenciesByMissing.get(true),
+        totals[0], totals[1]));
   }
 
-  private void renderCategoricalSummary(SummaryStatisticsDto dto, Map<String, CategoryDto> categoriesByName) {
+  private void renderCategoricalSummary(SummaryStatisticsDto dto, final VariableDto variableDto) {
     CategoricalSummaryDto categorical = dto
         .getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
-    summary.add(new CategoricalSummaryView(dto.getResource(), categorical, categoriesByName));
+
+    final Map<String, CategoryDto> categoriesByName = Maps
+        .uniqueIndex(JsArrays.toIterable(variableDto.getCategoriesArray()), new Function<CategoryDto, String>() {
+          @Override
+          public String apply(CategoryDto input) {
+            return input.getName();
+          }
+        });
+
+    final double[] totals = { 0d, 0d };
+    ImmutableListMultimap<Boolean, FrequencyDto> categoriesByMissing = Multimaps
+        .index(JsArrays.toIterable(categorical.getFrequenciesArray()), new Function<FrequencyDto, Boolean>() {
+          @Nullable
+          @Override
+          public Boolean apply(@Nullable FrequencyDto input) {
+            // when boolean, is missing is not set
+            if("boolean".equals(variableDto.getValueType())) {
+              if(input != null && EMPTY_VALUE.equals(input.getValue())) {
+                totals[1] += input.getFreq();
+                return true;
+              }
+              totals[0] += input == null ? 0 : input.getFreq();
+              return false;
+            }
+
+            if(input != null && (!categoriesByName.containsKey(input.getValue()) ||
+                categoriesByName.get(input.getValue()).getIsMissing())) {
+              totals[1] += input.getFreq();
+              return true;
+            }
+            totals[0] += input == null ? 0 : input.getFreq();
+            return false;
+          }
+        });
+
+    summary.add(new CategoricalSummaryView(dto.getResource(), categorical, categoriesByMissing.get(false),
+        categoriesByMissing.get(true), totals[0], totals[1]));
   }
 
   private void renderDefaultSummary(SummaryStatisticsDto dto) {
     DefaultSummaryDto defaultSummaryDto = dto
         .getExtension(DefaultSummaryDto.SummaryStatisticsDtoExtensions.defaultSummary).cast();
-    summary.add(new DefaultSummaryView(defaultSummaryDto));
+
+    final double[] totals = { 0d, 0d };
+    ImmutableListMultimap<Boolean, FrequencyDto> valuesByMissing = Multimaps
+        .index(JsArrays.toIterable(defaultSummaryDto.getFrequenciesArray()), new Function<FrequencyDto, Boolean>() {
+          @Nullable
+          @Override
+          public Boolean apply(@Nullable FrequencyDto input) {
+            if(input != null && input.getValue().equals(NOT_NULL_VALUE)) {
+              input.setValue(translations.notEmpty());
+              totals[0] += input.getFreq();
+              return false;
+            }
+            totals[1] += input == null ? 0 : input.getFreq();
+            return true;
+          }
+        });
+
+    summary.add(
+        new DefaultSummaryView(defaultSummaryDto, valuesByMissing.get(false), valuesByMissing.get(true), totals[0],
+            totals[1]));
+  }
+
+  private void renderTextSummary(SummaryStatisticsDto dto) {
+    TextSummaryDto textSummaryDto = dto.getExtension(TextSummaryDto.SummaryStatisticsDtoExtensions.textSummary).cast();
+
+    final double[] totals = { 0d, 0d };
+    ImmutableListMultimap<Boolean, FrequencyDto> valuesByMissing = Multimaps
+        .index(JsArrays.toIterable(textSummaryDto.getFrequenciesArray()), new Function<FrequencyDto, Boolean>() {
+          @Nullable
+          @Override
+          public Boolean apply(@Nullable FrequencyDto input) {
+            if(input != null && EMPTY_VALUE.equals(input.getValue())) {
+              totals[1] += input.getFreq();
+              return true;
+            }
+            totals[0] += input == null ? 0 : input.getFreq();
+            return false;
+          }
+        });
+
+    summary.add(
+        new TextSummaryView(textSummaryDto, valuesByMissing.get(false), valuesByMissing.get(true), totals[0], totals[1],
+            DEFAULT_MAX_TEXT_RESULTS));
   }
 
   private void renderBinarySummary(SummaryStatisticsDto dto) {

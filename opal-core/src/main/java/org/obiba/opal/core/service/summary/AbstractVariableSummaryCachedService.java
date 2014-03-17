@@ -16,13 +16,13 @@ import org.obiba.magma.Timestamped;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
-import org.obiba.magma.math.summary.BinaryVariableSummaryFactory;
 import org.obiba.magma.math.summary.CategoricalVariableSummary;
 import org.obiba.magma.math.summary.CategoricalVariableSummaryFactory;
 import org.obiba.magma.math.summary.ContinuousVariableSummary;
 import org.obiba.magma.math.summary.ContinuousVariableSummaryFactory;
 import org.obiba.magma.math.summary.DefaultVariableSummary;
 import org.obiba.magma.math.summary.DefaultVariableSummaryFactory;
+import org.obiba.magma.math.summary.TextVariableSummaryFactory;
 import org.obiba.magma.math.summary.VariableSummary;
 import org.obiba.magma.math.summary.VariableSummaryFactory;
 import org.slf4j.Logger;
@@ -187,8 +187,8 @@ public abstract class AbstractVariableSummaryCachedService< //
     if(summaryFactory instanceof DefaultVariableSummaryFactory) {
       return "default";
     }
-    if(summaryFactory instanceof BinaryVariableSummaryFactory) {
-      return "binary";
+    if(summaryFactory instanceof TextVariableSummaryFactory) {
+      return "text";
     }
     throw new IllegalArgumentException("Unsupported factory class " + summaryFactory.getClass());
   }

@@ -27,6 +27,7 @@ import org.obiba.opal.web.magma.math.CategoricalSummaryResource;
 import org.obiba.opal.web.magma.math.ContinuousSummaryResource;
 import org.obiba.opal.web.magma.math.DefaultSummaryResource;
 import org.obiba.opal.web.magma.math.SummaryResource;
+import org.obiba.opal.web.magma.math.TextSummaryResource;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.support.InvalidRequestException;
@@ -114,7 +115,11 @@ public class VariableResourceImpl extends AbstractValueTableResource implements 
         ? VariableNature.getNature(variable)
         : VariableNature.valueOf(natureStr.toUpperCase());
 
-    SummaryResource resource = getSummaryResourceClass(nature);
+    SummaryResource resource;
+
+    resource = nature == VariableNature.UNDETERMINED && "text".equals(variable.getValueType().getName())
+        ? applicationContext.getBean(TextSummaryResource.class)
+        : getSummaryResourceClass(nature);
     resource.setValueTable(getValueTable());
     resource.setVariable(variable);
     resource.setVariableValueSource(variableValueSource);

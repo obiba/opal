@@ -26,6 +26,7 @@ message ContinuousSummaryDto {
   required DescriptiveStatsDto summary = 1;
   repeated double distributionPercentiles = 2;
   repeated IntervalFrequencyDto intervalFrequency = 3;
+  repeated FrequencyDto frequencies = 4;
 
   extend SummaryStatisticsDto {
     optional ContinuousSummaryDto continuous = 1001;
@@ -49,6 +50,16 @@ message BinarySummaryDto {
 
   extend SummaryStatisticsDto {
     optional BinarySummaryDto binarySummary = 1003;
+  }
+}
+
+message TextSummaryDto {
+
+  required int64 n = 2;
+  repeated FrequencyDto frequencies = 3;
+
+  extend SummaryStatisticsDto {
+    optional TextSummaryDto textSummary = 1004;
   }
 }
 

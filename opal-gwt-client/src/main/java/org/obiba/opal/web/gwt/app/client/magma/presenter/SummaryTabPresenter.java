@@ -9,10 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
-import java.util.List;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.SummaryReceivedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.SummaryRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
@@ -23,7 +20,6 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
@@ -193,7 +189,7 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
                   .withCallback(new ResourceCallback<VariableDto>() {
                     @Override
                     public void onResource(Response response, VariableDto resource) {
-                      getView().renderSummary(dto, JsArrays.toList(resource.getCategoriesArray()));
+                      getView().renderSummary(dto, resource);
                       getView().renderSummaryLimit(dto.hasLimit() ? dto.getLimit() : entitiesCount, entitiesCount);
                       getEventBus().fireEvent(new SummaryReceivedEvent(resourceRequestBuilder.getResource(), dto));
                     }
@@ -251,7 +247,7 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
 
     void renderSummary(SummaryStatisticsDto summary);
 
-    void renderSummary(SummaryStatisticsDto dto, List<CategoryDto> categories);
+    void renderSummary(SummaryStatisticsDto dto, VariableDto variableDto);
 
     void renderNoSummary();
 

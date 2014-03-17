@@ -25,7 +25,7 @@
     </b:Heading>
 
     <b:FluidRow>
-      <b:Column size="10">
+      <b:Column size="6">
         <o:SummaryFlexTable ui:field="stats"/>
       </b:Column>
     </b:FluidRow>
