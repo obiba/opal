@@ -33,6 +33,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -41,6 +42,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 public class FixAttributeJoinTableUpgradeStep extends AbstractUpgradeStep {
 
   private static final Logger log = LoggerFactory.getLogger(FixAttributeJoinTableUpgradeStep.class);
+
+  private static final int FK_NAME_COLUMN_INDEX = 12;
 
   @Autowired
   private DatabaseRegistry databaseRegistry;
@@ -79,39 +82,66 @@ public class FixAttributeJoinTableUpgradeStep extends AbstractUpgradeStep {
   }
 
   private void alterMySql(JdbcOperations jdbcTemplate) {
-    alter(jdbcTemplate, "ALTER TABLE datasource_state_attributes RENAME TO datasource_attributes");
-    alter(jdbcTemplate,
-        "ALTER TABLE datasource_attributes DROP FOREIGN KEY " + getForeignKey(jdbcTemplate, "datasource_attributes"));
-    alter(jdbcTemplate,
-        "ALTER TABLE datasource_attributes CHANGE COLUMN datasource_state_id datasource_id bigint(20) NOT NULL");
-    alter(jdbcTemplate, "ALTER TABLE datasource_attributes CHANGE COLUMN datasource datasource_id bigint(20) NOT NULL");
+    alterAttributeMySql(jdbcTemplate, "datasource");
+    alterAttributeMySql(jdbcTemplate, "variable");
+    alterAttributeMySql(jdbcTemplate, "category");
+  }
 
-    alter(jdbcTemplate, "ALTER TABLE variable_state_attributes RENAME TO variable_attributes");
-    alter(jdbcTemplate,
-        "ALTER TABLE variable_attributes DROP FOREIGN KEY " + getForeignKey(jdbcTemplate, "variable_attributes"));
-    alter(jdbcTemplate,
-        "ALTER TABLE variable_attributes CHANGE COLUMN variable_state_id variable_id bigint(20) NOT NULL");
-    alter(jdbcTemplate, "ALTER TABLE variable_attributes CHANGE COLUMN variable variable_id bigint(20) NOT NULL");
+  private void alterAttributeMySql(JdbcOperations jdbcTemplate, String attributeAware) {
+    // copy from variable_attributes to variable_state_attributes if exists
+    copyAttributes(jdbcTemplate, attributeAware);
 
-    alter(jdbcTemplate, "ALTER TABLE category_state_attributes RENAME TO category_attributes");
-    alter(jdbcTemplate,
-        "ALTER TABLE category_attributes DROP FOREIGN KEY " + getForeignKey(jdbcTemplate, "category_attributes"));
-    alter(jdbcTemplate,
-        "ALTER TABLE category_attributes CHANGE COLUMN category_state_id category_id bigint(20) NOT NULL");
-    alter(jdbcTemplate, "ALTER TABLE category_attributes CHANGE COLUMN category category_id bigint(20) NOT NULL");
+    // drop variable_attributes if exists
+    execute(jdbcTemplate, "DROP TABLE " + attributeAware + "_attributes");
+
+    // rename variable_state_attributes to variable_attributes if exists
+    execute(jdbcTemplate,
+        "ALTER TABLE " + attributeAware + "_state_attributes RENAME TO " + attributeAware + "_attributes");
+
+    // drop variable_attributes foreign key if exists
+    execute(jdbcTemplate, "ALTER TABLE " + attributeAware + "_attributes DROP FOREIGN KEY " +
+        getForeignKey(jdbcTemplate, attributeAware + "_attributes"));
+
+    // rename variable_state_id to variable_id if exists
+    execute(jdbcTemplate, "ALTER TABLE " + attributeAware +
+        "_attributes CHANGE COLUMN " + attributeAware + "_state_id " + attributeAware + "_id bigint(20) NOT NULL");
+
+    // rename variable to variable_id if exists
+    execute(jdbcTemplate,
+        "ALTER TABLE " + attributeAware + "_attributes CHANGE COLUMN " + attributeAware + " " + attributeAware +
+            "_id bigint(20) NOT NULL");
   }
 
   private void alterHsql(JdbcOperations jdbcTemplate) {
-    alter(jdbcTemplate, "ALTER TABLE datasource_state_attributes RENAME TO datasource_attributes");
-    alter(jdbcTemplate, "ALTER TABLE datasource_attributes ALTER COLUMN datasource_state_id RENAME TO datasource_id");
-    alter(jdbcTemplate, "ALTER TABLE datasource_attributes ALTER COLUMN datasource RENAME TO datasource_id");
-    alter(jdbcTemplate, "ALTER TABLE variable_state_attributes RENAME TO variable_attributes");
-    alter(jdbcTemplate, "ALTER TABLE variable_attributes ALTER COLUMN variable_state_id RENAME TO variable_id");
-    alter(jdbcTemplate, "ALTER TABLE variable_attributes ALTER COLUMN variable RENAME TO variable_id");
+    alterAttributeHsql(jdbcTemplate, "datasource");
+    alterAttributeHsql(jdbcTemplate, "variable");
+    alterAttributeHsql(jdbcTemplate, "category");
+  }
 
-    alter(jdbcTemplate, "ALTER TABLE category_state_attributes RENAME TO category_attributes");
-    alter(jdbcTemplate, "ALTER TABLE category_attributes ALTER COLUMN category_state_id RENAME TO category_id");
-    alter(jdbcTemplate, "ALTER TABLE category_attributes ALTER COLUMN category RENAME TO category_id");
+  private void alterAttributeHsql(JdbcOperations jdbcTemplate, String attributeAware) {
+    // copy from variable_attributes to variable_state_attributes if exists
+    copyAttributes(jdbcTemplate, attributeAware);
+
+    // drop variable_attributes if exists
+    execute(jdbcTemplate, "DROP TABLE " + attributeAware + "_attributes");
+
+    // rename variable_state_attributes to variable_attributes if exists
+    execute(jdbcTemplate,
+        "ALTER TABLE " + attributeAware + "_state_attributes RENAME TO " + attributeAware + "_attributes");
+
+    // drop variable_attributes foreign key if exists
+    execute(jdbcTemplate, "ALTER TABLE " + attributeAware + "_attributes DROP CONSTRAINT " +
+        getForeignKey(jdbcTemplate, attributeAware + "_attributes"));
+
+    // rename variable_state_id to variable_id if exists
+    execute(jdbcTemplate, "ALTER TABLE " + attributeAware +
+        "_attributes ALTER COLUMN " + attributeAware + "_state_id RENAME TO " + attributeAware + "_id");
+
+    // rename variable to variable_id if exists
+    execute(jdbcTemplate,
+        "ALTER TABLE " + attributeAware + "_attributes ALTER COLUMN " + attributeAware + " RENAME TO " +
+            attributeAware +
+            "_id");
   }
 
   private String getForeignKey(JdbcOperations jdbcTemplate, final String tableName) {
@@ -120,12 +150,57 @@ public class FixAttributeJoinTableUpgradeStep extends AbstractUpgradeStep {
       public String doInConnection(Connection connection) throws SQLException, DataAccessException {
         DatabaseMetaData metaData = connection.getMetaData();
         ResultSet rs = metaData.getImportedKeys(null, null, tableName);
-        return rs.next() ? rs.getString(12) : null;
+        return rs.next() ? rs.getString(FK_NAME_COLUMN_INDEX) : null;
       }
     });
   }
 
-  private void alter(final JdbcOperations jdbcTemplate, final String sql) {
+  private void copyAttributes(final JdbcOperations jdbcTemplate, final String attributeAware) {
+    try {
+      jdbcTemplate
+          .query("select " + attributeAware + "_id, locale, name, namespace, value_type, is_sequence, value from " +
+              attributeAware + "_attributes", new RowCallbackHandler() {
+            @Override
+            public void processRow(final ResultSet rs) throws SQLException {
+              transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+                @Override
+                protected void doInTransactionWithoutResult(TransactionStatus status) {
+                  try {
+                    long id = rs.getLong(attributeAware + "_id");
+                    String locale = rs.getString("locale");
+                    String name = rs.getString("name");
+                    String namespace = rs.getString("namespace");
+                    String value_type = rs.getString("value_type");
+                    boolean is_sequence = rs.getBoolean("is_sequence");
+                    String value = rs.getString("value");
+                    int count = jdbcTemplate.queryForObject(
+                        "SELECT count(*) FROM " + attributeAware + "_state_attributes WHERE " + attributeAware +
+                            "_state_id = ? AND locale = ? AND name = ? AND namespace = ? AND value_type = ? " +
+                            "AND is_sequence = ? AND value = ?", Integer.class, id, locale, name, namespace, value_type,
+                        is_sequence, value);
+
+                    log.info("SELECT count(*) FROM " + attributeAware + "_state_attributes WHERE " + attributeAware +
+                        "_state_id = {} AND locale = '{}' AND name = '{}' AND namespace = '{}' AND value_type = '{}' " +
+                        "AND is_sequence = {} AND value = '{}'", id, locale, name, namespace, value_type, is_sequence,
+                        value);
+                    if(count == 0) {
+                      jdbcTemplate.update("insert into " + attributeAware + "_state_attributes (" + attributeAware +
+                          "_state_id, locale, name, namespace, value_type, is_sequence, value) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                          id, locale, name, namespace, value_type, is_sequence, value);
+                    }
+                  } catch(SQLException e) {
+                    log.info("Ignore attribute copy error", e);
+                  }
+                }
+              });
+            }
+          });
+    } catch(DataAccessException e) {
+      log.info("Ignore attribute copy error", e);
+    }
+  }
+
+  private void execute(final JdbcOperations jdbcTemplate, final String sql) {
     transactionTemplate.execute(new TransactionCallbackWithoutResult() {
       @Override
       protected void doInTransactionWithoutResult(TransactionStatus status) {
