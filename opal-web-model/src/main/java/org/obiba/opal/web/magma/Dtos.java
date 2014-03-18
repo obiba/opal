@@ -34,6 +34,7 @@ import org.obiba.magma.math.summary.BinaryVariableSummary;
 import org.obiba.magma.math.summary.CategoricalVariableSummary;
 import org.obiba.magma.math.summary.ContinuousVariableSummary;
 import org.obiba.magma.math.summary.DefaultVariableSummary;
+import org.obiba.magma.math.summary.TextVariableSummary;
 import org.obiba.magma.type.BinaryType;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.AttributeDto;
@@ -358,8 +359,8 @@ public final class Dtos {
     for(CategoricalVariableSummary.Frequency frequency : summary.getFrequencies()) {
       Math.FrequencyDto.Builder freqBuilder = Math.FrequencyDto.newBuilder() //
           .setValue(frequency.getValue()) //
-          .setFreq(frequency.getFreq())//
-          .setPct(frequency.getPct());
+          .setFreq(frequency.getFreq());
+
       if(isNumeric(frequency.getPct())) freqBuilder.setPct(frequency.getPct());
       dtoBuilder.addFrequencies(freqBuilder);
     }
@@ -402,6 +403,15 @@ public final class Dtos {
       if(isNumeric(interval.getDensityPct())) freqBuilder.setDensityPct(interval.getDensityPct());
       continuousBuilder.addIntervalFrequency(freqBuilder);
     }
+
+    for(ContinuousVariableSummary.Frequency frequency : summary.getFrequencies()) {
+      Math.FrequencyDto.Builder freqBuilder = Math.FrequencyDto.newBuilder() //
+          .setValue(frequency.getValue()) //
+          .setFreq(frequency.getFreq());
+      if(isNumeric(frequency.getPct())) freqBuilder.setPct(frequency.getPct());
+      continuousBuilder.addFrequencies(freqBuilder);
+    }
+
     return continuousBuilder.setSummary(descriptiveBuilder);
   }
 
@@ -411,8 +421,7 @@ public final class Dtos {
     for(DefaultVariableSummary.Frequency frequency : summary.getFrequencies()) {
       Math.FrequencyDto.Builder freqBuilder = Math.FrequencyDto.newBuilder() //
           .setValue(frequency.getValue()) //
-          .setFreq(frequency.getFreq())//
-          .setPct(frequency.getPct());
+          .setFreq(frequency.getFreq());
       if(isNumeric(frequency.getPct())) freqBuilder.setPct(frequency.getPct());
       dtoBuilder.addFrequencies(freqBuilder);
     }
@@ -425,11 +434,39 @@ public final class Dtos {
     for(BinaryVariableSummary.Frequency frequency : summary.getFrequencies()) {
       Math.FrequencyDto.Builder freqBuilder = Math.FrequencyDto.newBuilder() //
           .setValue(frequency.getValue()) //
-          .setFreq(frequency.getFreq())//
-          .setPct(frequency.getPct());
+          .setFreq(frequency.getFreq());
       if(isNumeric(frequency.getPct())) freqBuilder.setPct(frequency.getPct());
       dtoBuilder.addFrequencies(freqBuilder);
     }
+    return dtoBuilder;
+  }
+
+  public static Math.TextSummaryDto.Builder asDto(TextVariableSummary summary, int maxResults) {
+    Math.TextSummaryDto.Builder dtoBuilder = Math.TextSummaryDto.newBuilder() //
+        .setN(summary.getN());
+    int i = 0;
+    // limit to X top text frequencies...
+    long otherFrequency = 0;
+    for(TextVariableSummary.Frequency frequency : summary.getFrequencies()) {
+
+      Math.FrequencyDto.Builder freqBuilder = Math.FrequencyDto.newBuilder() //
+          .setValue(frequency.getValue()) //
+          .setFreq(frequency.getFreq());
+
+      if(isNumeric(frequency.getPct())) freqBuilder.setPct(frequency.getPct());
+
+      if("N/A".equals(frequency.getValue())) {
+        dtoBuilder.addFrequencies(freqBuilder);
+      } else if(i < maxResults) {
+        dtoBuilder.addFrequencies(freqBuilder);
+        i++;
+      } else {
+        otherFrequency += frequency.getFreq();
+      }
+    }
+
+    dtoBuilder.setOtherFrequency(otherFrequency);
+
     return dtoBuilder;
   }
 

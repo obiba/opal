@@ -11,14 +11,18 @@ package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.DefaultFlexTable;
+import org.obiba.opal.web.gwt.app.client.ui.SummaryFlexTable;
 import org.obiba.opal.web.gwt.plot.client.HistogramChartFactory;
 import org.obiba.opal.web.gwt.plot.client.NormalProbabilityChartFactory;
 import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
 import org.obiba.opal.web.model.client.math.DescriptiveStatsDto;
+import org.obiba.opal.web.model.client.math.FrequencyDto;
 import org.obiba.opal.web.model.client.math.IntervalFrequencyDto;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -46,46 +50,34 @@ public class ContinuousSummaryView extends Composite {
   @UiField
   SimplePanel normalProbability;
 
+  @UiField
+  SummaryFlexTable stats;
+
   private HistogramChartFactory histogram;
 
   private NormalProbabilityChartFactory qqPlot;
 
-  public ContinuousSummaryView(ContinuousSummaryDto continuous) {
+  public ContinuousSummaryView(ContinuousSummaryDto continuous, ImmutableList<FrequencyDto> frequenciesNonMissing,
+      ImmutableList<FrequencyDto> frequenciesMissing, double totalNonMissing, double totalMissing) {
     initWidget(uiBinder.createAndBindUi(this));
 
-    DescriptiveStatsDto descriptiveStats = continuous.getSummary();
+    initDescriptivestats(continuous);
 
-    grid.clear();
-    grid.setHeader(0, translations.descriptiveStatistics());
-    grid.setHeader(1, translations.value());
-    int row = 0;
-    grid.setWidget(row, 0, new Label(translations.NLabel()));
-    grid.setWidget(row++, 1, new Label("" + Math.round(descriptiveStats.getN())));
-    grid.setWidget(row, 0, new Label(translations.min()));
-    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getMin()));
-    grid.setWidget(row, 0, new Label(translations.max()));
-    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getMax()));
-    grid.setWidget(row, 0, new Label(translations.meanLabel()));
-    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getMean()));
-    grid.setWidget(row, 0, new Label(translations.median()));
-    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getMedian()));
-    grid.setWidget(row, 0, new Label(translations.standardDeviationLabel()));
-    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getStdDev()));
-    grid.setWidget(row, 0, new Label(translations.variance()));
-    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getVariance()));
-    grid.setWidget(row, 0, new Label(translations.skewness()));
-    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getSkewness()));
-    grid.setWidget(row, 0, new Label(translations.kurtosis()));
-    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getKurtosis()));
-    grid.setWidget(row, 0, new Label(translations.sum()));
-    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getSum()));
-    grid.setWidget(row, 0, new Label(translations.sumOfSquares()));
-    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getSumsq()));
+    stats.drawHeader();
+    double total = totalNonMissing + totalMissing;
+    stats.drawValuesFrequencies(frequenciesNonMissing, translations.nonMissing(), translations.notEmpty(),
+        totalNonMissing, total);
+    stats.drawValuesFrequencies(frequenciesMissing, translations.missingLabel(), translations.naLabel(), totalMissing,
+        total);
+    stats.drawTotal(total);
+  }
+
+  private void initDescriptivestats(ContinuousSummaryDto continuous) {
+    DescriptiveStatsDto descriptiveStats = continuous.getSummary();
+    addDescriptiveStatistics(descriptiveStats);
 
     if(descriptiveStats.getVariance() > 0) {
       histogram = new HistogramChartFactory();
-
-//      histogram = new HistogramPlot(histogramElement.getId(), descriptiveStats.getMin(), descriptiveStats.getMax());
       JsArray<IntervalFrequencyDto> frequencyArray = continuous.getIntervalFrequencyArray();
       if(frequencyArray != null) {
         int length = frequencyArray.length();
@@ -97,6 +89,26 @@ public class ContinuousSummaryView extends Composite {
       qqPlot = new NormalProbabilityChartFactory(descriptiveStats.getMin(), descriptiveStats.getMax());
       qqPlot.push(descriptiveStats.getPercentilesArray(), continuous.getDistributionPercentilesArray());
     }
+  }
+
+  private void addDescriptiveStatistics(DescriptiveStatsDto descriptiveStats) {
+    grid.clear();
+    grid.setHeader(0, translations.descriptiveStatistics());
+    grid.setHeader(1, translations.value());
+    int row = 0;
+
+    addGridStat(translations.NLabel(), Math.round(descriptiveStats.getN()), row++);
+    addGridStat(translations.min(), descriptiveStats.getMin(), row++);
+    addGridStat(translations.max(), descriptiveStats.getMax(), row++);
+    addGridStat(translations.meanLabel(), descriptiveStats.getMean(), row++);
+    addGridStat(translations.geometricMeanLabel(), descriptiveStats.getGeometricMean(), row++);
+    addGridStat(translations.median(), descriptiveStats.getMedian(), row++);
+    addGridStat(translations.standardDeviationLabel(), descriptiveStats.getStdDev(), row++);
+    addGridStat(translations.variance(), descriptiveStats.getVariance(), row++);
+    addGridStat(translations.skewness(), descriptiveStats.getSkewness(), row++);
+    addGridStat(translations.kurtosis(), descriptiveStats.getKurtosis(), row++);
+    addGridStat(translations.sum(), descriptiveStats.getSum(), row++);
+    addGridStat(translations.sumOfSquares(), descriptiveStats.getSumsq(), row++);
   }
 
   @Override
@@ -113,4 +125,10 @@ public class ContinuousSummaryView extends Composite {
     }
   }
 
+  private void addGridStat(String title, double number, int row) {
+    NumberFormat nf = NumberFormat.getFormat("#.####");
+
+    grid.setWidget(row, 0, new Label(title));
+    grid.setWidget(row, 1, new Label(String.valueOf(nf.format(number))));
+  }
 }

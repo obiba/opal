@@ -9,22 +9,25 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.AbstractTabPanel;
-import org.obiba.opal.web.gwt.app.client.ui.DefaultFlexTable;
+import org.obiba.opal.web.gwt.app.client.ui.SummaryFlexTable;
 import org.obiba.opal.web.gwt.plot.client.FrequencyChartFactory;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -48,23 +51,14 @@ public class CategoricalSummaryView extends Composite {
   FlowPanel pctPanel;
 
   @UiField
-  DefaultFlexTable stats;
-
-  @UiField
-  DefaultFlexTable frequencies;
+  SummaryFlexTable stats;
 
   private FrequencyChartFactory chartFactory = null;
 
-  public CategoricalSummaryView(final String title, CategoricalSummaryDto categorical) {
+  public CategoricalSummaryView(final String title, CategoricalSummaryDto categorical,
+      ImmutableList<FrequencyDto> categoriesNonMissing, ImmutableList<FrequencyDto> categoriesMissing,
+      double totalNonMissing, double totalMissing) {
     initWidget(uiBinder.createAndBindUi(this));
-    stats.clear();
-    stats.setHeader(0, translations.descriptiveStatistics());
-    stats.setHeader(1, translations.value());
-    int row = 0;
-    stats.setWidget(row, 0, new Label(translations.NLabel()));
-    stats.setWidget(row++, 1, new Label("" + Math.round(categorical.getN())));
-    stats.setWidget(row, 0, new Label(translations.mode()));
-    stats.setWidget(row++, 1, new Label(categorical.getMode()));
 
     chartsPanel.addSelectionHandler(new SelectionHandler<Integer>() {
       @Override
@@ -75,33 +69,30 @@ public class CategoricalSummaryView extends Composite {
       }
     });
 
+    stats.clear();
+    stats.drawHeader();
+
     freqPanel.clear();
     pctPanel.clear();
     if(categorical.getFrequenciesArray() != null) {
-      int count = categorical.getFrequenciesArray().length();
-      chartFactory = new FrequencyChartFactory();
-      frequencies.clear();
 
-      frequencies.setHeader(0, translations.categoryLabel());
-      frequencies.setHeader(1, translations.frequency());
-      frequencies.setHeader(2, "%");
-      for(int i = 0; i < count; i++) {
-        FrequencyDto value = categorical.getFrequenciesArray().get(i);
-        if(value.hasValue()) {
-          chartFactory.push(value.getValue(), value.getFreq(), value.getPct() * 100);
-          frequencies.setWidget(i + 1, 0, new Label(value.getValue()));
-          frequencies.setWidget(i + 1, 1, new Label("" + Math.round(value.getFreq())));
-          frequencies.setWidget(i + 1, 2, new Label("" + formatDecimal(value.getPct() * 100)));
+      double total = totalNonMissing + totalMissing;
+      stats.drawValuesFrequencies(categoriesNonMissing, translations.nonMissing(), translations.notEmpty(),
+          totalNonMissing, total);
+      stats.drawValuesFrequencies(categoriesMissing, translations.missingLabel(), translations.naLabel(), totalMissing,
+          total);
+      stats.drawTotal(total);
+
+      // Populate chart
+      chartFactory = new FrequencyChartFactory();
+      for(FrequencyDto frequency : JsArrays.toIterable(categorical.getFrequenciesArray())) {
+        if(frequency.hasValue()) {
+          chartFactory.push(frequency.getValue(), frequency.getFreq(),
+              new BigDecimal(frequency.getPct() * 100).setScale(2, RoundingMode.HALF_UP).doubleValue());
         }
       }
       freqPanel.add(chartFactory.createValueChart(title));
-    } else {
-      frequencies.clear();
     }
   }
 
-  private String formatDecimal(double number) {
-    NumberFormat nf = NumberFormat.getFormat("#.##");
-    return nf.format(number);
-  }
 }

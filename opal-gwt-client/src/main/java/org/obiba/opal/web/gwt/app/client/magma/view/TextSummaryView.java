@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
+ * Copyright (c) 2014 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -10,9 +10,10 @@
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.ui.SummaryFlexTable;
-import org.obiba.opal.web.model.client.math.DefaultSummaryDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
+import org.obiba.opal.web.model.client.math.TextSummaryDto;
 
 import com.google.common.collect.ImmutableList;
 import com.google.gwt.core.client.GWT;
@@ -24,9 +25,9 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  *
  */
-public class DefaultSummaryView extends Composite {
+public class TextSummaryView extends Composite {
 
-  interface DefaultSummaryViewUiBinder extends UiBinder<Widget, DefaultSummaryView> {}
+  interface DefaultSummaryViewUiBinder extends UiBinder<Widget, TextSummaryView> {}
 
   private static final DefaultSummaryViewUiBinder uiBinder = GWT.create(DefaultSummaryViewUiBinder.class);
 
@@ -35,16 +36,18 @@ public class DefaultSummaryView extends Composite {
   @UiField
   SummaryFlexTable stats;
 
-  public DefaultSummaryView(DefaultSummaryDto summaryDto, ImmutableList<FrequencyDto> frequenciesNonMissing,
-      ImmutableList<FrequencyDto> frequenciesMissing, double totalNonMissing, double totalMissing) {
+  public TextSummaryView(TextSummaryDto summaryDto, ImmutableList<FrequencyDto> frequenciesNonMissing,
+      ImmutableList<FrequencyDto> frequenciesMissing, double totalNonMissing, double totalMissing, double totalOther,
+      int maxResults) {
     initWidget(uiBinder.createAndBindUi(this));
     stats.clear();
 
     if(summaryDto.getFrequenciesArray() != null) {
       double total = totalNonMissing + totalMissing;
       stats.drawHeader();
-      stats.drawValuesFrequencies(frequenciesNonMissing, translations.nonMissing(), translations.notEmpty(),
-          totalNonMissing, total);
+      stats.drawValuesFrequencies(frequenciesNonMissing,
+          TranslationsUtils.replaceArguments(translations.nonMissingTopN(), String.valueOf(maxResults)),
+          translations.notEmpty(), totalNonMissing + totalOther, totalOther, total);
       stats.drawValuesFrequencies(frequenciesMissing, translations.missingLabel(), translations.naLabel(), totalMissing,
           total);
       stats.drawTotal(total);

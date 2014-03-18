@@ -1253,6 +1253,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Value")
   String value();
 
+  @Description("Values label")
+  @DefaultStringValue("Values")
+  String values();
+
   @Description("Participant label")
   @DefaultStringValue("Participant")
   String participant();
@@ -2022,6 +2026,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Mean")
   String meanLabel();
 
+  @Description("Geometric Mean label")
+  @DefaultStringValue("Geometric Mean")
+  String geometricMeanLabel();
+
   @Description("Standard deviation) label")
   @DefaultStringValue("Standard deviation")
   String standardDeviationLabel();
@@ -2213,4 +2221,28 @@ public interface Translations extends Constants {
   @Description("System Error label")
   @DefaultStringValue("System Error")
   String systemErrorLablel();
+
+  @Description("Non-missing label")
+  @DefaultStringValue("Non-Missing")
+  String nonMissing();
+
+  @Description("Non-missing top N label")
+  @DefaultStringValue("Non-Missing (top {0})")
+  String nonMissingTopN();
+
+  @Description("Total Non Missings label")
+  @DefaultStringValue("Subtotal")
+  String subtotal();
+
+  @Description("Not Empty label")
+  @DefaultStringValue("Not Empty")
+  String notEmpty();
+
+  @Description("N/A label")
+  @DefaultStringValue("N/A")
+  String naLabel();
+
+  @Description("Total other label")
+  @DefaultStringValue("Other values...")
+  String totalOtherLabel();
 }

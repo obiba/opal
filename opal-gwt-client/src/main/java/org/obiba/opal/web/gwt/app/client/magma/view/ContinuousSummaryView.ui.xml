@@ -23,6 +23,9 @@
     </b:Heading>
     <b:FluidRow>
       <b:Column size="5">
+        <o:SummaryFlexTable ui:field="stats"/>
+      </b:Column>
+      <b:Column size="5" offset="2">
         <o:DefaultFlexTable ui:field="grid"/>
       </b:Column>
     </b:FluidRow>

@@ -20,6 +20,8 @@ import org.obiba.magma.math.summary.ContinuousVariableSummary;
 import org.obiba.magma.math.summary.ContinuousVariableSummaryFactory;
 import org.obiba.magma.math.summary.DefaultVariableSummary;
 import org.obiba.magma.math.summary.DefaultVariableSummaryFactory;
+import org.obiba.magma.math.summary.TextVariableSummary;
+import org.obiba.magma.math.summary.TextVariableSummaryFactory;
 import org.obiba.magma.math.summary.VariableSummary;
 import org.obiba.magma.math.summary.VariableSummaryFactory;
 import org.obiba.magma.type.BinaryType;
@@ -52,6 +54,7 @@ public class CachedVariableSummaryService implements VariableSummaryService {
     summaryServices.put(CategoricalVariableSummaryFactory.class, new CategoricalVariableSummaryCachedService());
     summaryServices.put(DefaultVariableSummaryFactory.class, new DefaultVariableSummaryCachedService());
     summaryServices.put(BinaryVariableSummaryFactory.class, new BinaryVariableSummaryCachedService());
+    summaryServices.put(TextVariableSummaryFactory.class, new TextVariableSummaryCachedService());
   }
 
   @SuppressWarnings("unchecked")
@@ -186,4 +189,19 @@ public class CachedVariableSummaryService implements VariableSummaryService {
     }
   }
 
+  private class TextVariableSummaryCachedService extends
+      AbstractVariableSummaryCachedService<TextVariableSummary, TextVariableSummaryFactory, TextVariableSummary.Builder> {
+
+    @NotNull
+    @Override
+    protected Cache getCache() {
+      return cacheManager.getCache("opal-variable-summary-text");
+    }
+
+    @NotNull
+    @Override
+    protected TextVariableSummary.Builder newVariableSummaryBuilder(@NotNull Variable variable) {
+      return new TextVariableSummary.Builder(variable);
+    }
+  }
 }

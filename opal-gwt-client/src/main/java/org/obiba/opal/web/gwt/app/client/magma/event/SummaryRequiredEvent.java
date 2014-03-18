@@ -29,14 +29,20 @@ public class SummaryRequiredEvent extends GwtEvent<SummaryRequiredEvent.Handler>
 
   private final UriBuilder uri;
 
-  private final String[] args;
-
   private Integer max = null;
 
-  public SummaryRequiredEvent(UriBuilder uri, Integer max, String... args) {
+  private String datasource;
+
+  private String table;
+
+  private String variable;
+
+  public SummaryRequiredEvent(UriBuilder uri, Integer max, String datasource, String table, String variable) {
     this.uri = uri;
     this.max = max;
-    this.args = args;
+    this.datasource = datasource;
+    this.table = table;
+    this.variable = variable;
   }
 
   public UriBuilder getResourceUri() {
@@ -51,8 +57,16 @@ public class SummaryRequiredEvent extends GwtEvent<SummaryRequiredEvent.Handler>
     return TYPE;
   }
 
-  public String[] getArgs() {
-    return args;
+  public String getDatasource() {
+    return datasource;
+  }
+
+  public String getTable() {
+    return table;
+  }
+
+  public String getVariable() {
+    return variable;
   }
 
   @Override
