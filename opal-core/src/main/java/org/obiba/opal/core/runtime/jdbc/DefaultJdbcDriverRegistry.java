@@ -30,16 +30,13 @@ import com.google.common.io.ByteStreams;
 public class DefaultJdbcDriverRegistry implements JdbcDriverRegistry {
 
   private static final Map<String, String> SUPPORTED_DRIVER_CLASS_TO_NAME = ImmutableMap
-      .of("com.mysql.jdbc.Driver", "MySQL", //
-          "org.hsqldb.jdbc.JDBCDriver", "HSQLDB");
+      .of("com.mysql.jdbc.Driver", "MySQL");
 
   private static final Map<String, String> DRIVER_CLASS_TO_URL_TEMPLATE = ImmutableMap
-      .of("com.mysql.jdbc.Driver", "jdbc:mysql://{hostname}:{port}/{databaseName}", //
-          "org.hsqldb.jdbc.JDBCDriver", "jdbc:hsqldb:file:{databaseName};shutdown=true;hsqldb.tx=mvcc");
+      .of("com.mysql.jdbc.Driver", "jdbc:mysql://{hostname}:{port}/{databaseName}");
 
   private static final Map<String, String> DRIVER_CLASS_TO_URL_EXAMPLE = ImmutableMap
-      .of("com.mysql.jdbc.Driver", "jdbc:mysql://localhost:3306/opal", //
-          "org.hsqldb.jdbc.JDBCDriver", "jdbc:hsqldb:file:opal;shutdown=true;hsqldb.tx=mvcc");
+      .of("com.mysql.jdbc.Driver", "jdbc:mysql://localhost:3306/opal");
 
   @Override
   public Iterable<Driver> listDrivers() {
@@ -69,16 +66,11 @@ public class DefaultJdbcDriverRegistry implements JdbcDriverRegistry {
 
   @Override
   public void addDriver(String filename, InputStream jarFile) throws IOException {
-    FileOutputStream fos = new FileOutputStream(new File(System.getenv("OPAL_HOME") + "/ext", filename));
-    try {
+    try(FileOutputStream fos = new FileOutputStream(new File(System.getenv("OPAL_HOME") + "/ext", filename))) {
       ByteStreams.copy(jarFile, fos);
     } finally {
       try {
-        if(jarFile != null) jarFile.close();
-      } catch(IOException ignored) {
-      }
-      try {
-        fos.close();
+        jarFile.close();
       } catch(IOException ignored) {
       }
     }

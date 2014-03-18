@@ -15,7 +15,7 @@ public class SqlSettings {
   }
 
   /**
-   * jdbc:{mysql|hsqldb|postgresql}://{hostname}:{port}/{databaseName}
+   * jdbc:{mysql|postgresql}://{hostname}:{port}/{databaseName}
    */
   @NotNull
   @NotBlank

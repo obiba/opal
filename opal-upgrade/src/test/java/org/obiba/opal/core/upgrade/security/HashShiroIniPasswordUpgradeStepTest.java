@@ -49,7 +49,7 @@ public class HashShiroIniPasswordUpgradeStepTest {
   public void setUp() throws Exception {
     iniFile = ResourceUtils.getFile("classpath:org/obiba/opal/core/upgrade/security/shiro-password.ini");
     destIniFile = ResourceUtils.getFile(iniFile.getAbsolutePath() + ".hashed");
-    iniBackup = ResourceUtils.getFile(iniFile.getAbsolutePath() + ".backup");
+    iniBackup = ResourceUtils.getFile(iniFile.getAbsolutePath() + ".opal1-backup");
 
     upgradeStep.setSrcIniFile(iniFile);
     upgradeStep.setDestIniFile(destIniFile);

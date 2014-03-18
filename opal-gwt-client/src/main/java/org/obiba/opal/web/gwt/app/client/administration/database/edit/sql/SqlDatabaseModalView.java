@@ -186,14 +186,11 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   @Override
   public void setIsIdentifiers(boolean isIdentifiers) {this.isIdentifiers = isIdentifiers;}
 
-
   @Override
   public void initUrl() {
     String defaultName = isIdentifiers ? "opal_ids" : "opal_data";
     if(getDriver().getText() == null || "com.mysql.jdbc.Driver".equals(getDriver().getText())) {
       url.setText("jdbc:mysql://localhost:3306/" + defaultName);
-    } else if("org.hsqldb.jdbcDriver".equals(getDriver().getText())) {
-      url.setText("jdbc:hsqldb:file:" + defaultName + ";shutdown=true;hsqldb.tx=mvcc");
     }
   }
 

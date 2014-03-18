@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
@@ -16,6 +17,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
@@ -172,7 +174,7 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
       config.setHeader(config.getHeader() + "\n" + StringUtils.collectionToDelimitedString(comments, "\n"));
       config.save(propertiesFile);
     } catch(ConfigurationException e) {
-      throw new RuntimeException(e);
+      log.error("Cannot comment deprecated configuration in {}", propertiesFile.getAbsolutePath(), e);
     }
   }
 
@@ -221,12 +223,12 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
     try {
       Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(configFile);
       XPath xPath = XPathFactory.newInstance().newXPath();
-      importJdbcDataSources(doc, xPath);
-      importHibernateDatasourceFactories(doc, xPath);
-      importJdbcDatasourceFactories(doc, xPath);
+      Collection<String> ignoredDataSources = importJdbcDataSources(doc, xPath);
+      importHibernateDatasourceFactories(doc, xPath, ignoredDataSources);
+      importJdbcDatasourceFactories(doc, xPath, ignoredDataSources);
       importNullDatasourceFactories(doc, xPath);
       deleteDeprecatedNodes(doc, xPath);
-    } catch(SAXException | TransformerException | XPathExpressionException | ParserConfigurationException | IOException e) {
+    } catch(SAXException | XPathExpressionException | ParserConfigurationException | IOException e) {
       throw new RuntimeException(e);
     }
   }
@@ -246,7 +248,8 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
     </datasources>
   </org.obiba.opal.core.runtime.jdbc.DefaultJdbcDataSourceRegistry_-JdbcDataSourcesConfig>
 */
-  private void importJdbcDataSources(Document doc, XPath xPath) throws XPathExpressionException {
+  private Collection<String> importJdbcDataSources(Document doc, XPath xPath) throws XPathExpressionException {
+    Collection<String> ignoredDataSources = new ArrayList<>();
     NodeList nodeList = (NodeList) xPath.compile("//org.obiba.opal.core.runtime.jdbc.JdbcDataSource")
         .evaluate(doc.getDocumentElement(), XPathConstants.NODESET);
     for(int i = 0; i < nodeList.getLength(); i++) {
@@ -254,6 +257,14 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
       String name = getChildTextContent(element, "name");
       String url = getChildTextContent(element, "url");
       String driverClass = getChildTextContent(element, "driverClass");
+
+      if("org.hsqldb.jdbcDriver".equals(driverClass) || "org.hsqldb.jdbc.JDBCDriver".equals(driverClass)) {
+        log.error("Skip migration of {} datasource ({}) as from Opal 2.0, HSQLDB datasources are no more supported. " +
+            "Please migrate to MySQL!", name, url);
+        ignoredDataSources.add(name);
+        continue;
+      }
+
       String username = getChildTextContent(element, "username");
       String password = getChildTextContent(element, "password");
       SqlSettings.SqlSchema schema = detectSchema(driverClass, url, username, password);
@@ -270,6 +281,7 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
       log.debug("Import database: {}", sqlDatabase);
       databaseRegistry.create(sqlDatabase);
     }
+    return ignoredDataSources;
   }
 
   private SqlSettings.SqlSchema detectSchema(String driverClass, String url, String username, String password) {
@@ -287,8 +299,7 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
         if("surveys".equalsIgnoreCase(res.getString("TABLE_NAME"))) return SqlSettings.SqlSchema.LIMESURVEY;
       }
     } catch(SQLException e) {
-      //noinspection StringConcatenationArgumentToLogCall
-      log.error("Cannot check database schema: " + url, e);
+      log.error("Cannot check database schema: {}", url, e);
     }
     return SqlSettings.SqlSchema.JDBC;
   }
@@ -308,16 +319,17 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
     }
   }
 
-  private void importHibernateDatasourceFactories(Document doc, XPath xPath) throws XPathExpressionException {
+  private void importHibernateDatasourceFactories(Document doc, XPath xPath, Collection<String> ignoredDataSources)
+      throws XPathExpressionException {
     NodeList nodeList = (NodeList) xPath
         .compile("//org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory")
         .evaluate(doc, XPathConstants.NODESET);
     for(int i = 0; i < nodeList.getLength(); i++) {
-      parseHibernateDatasourceFactory((Element) nodeList.item(i));
+      parseHibernateDatasourceFactory((Element) nodeList.item(i), ignoredDataSources);
     }
   }
 
-  private void parseHibernateDatasourceFactory(Element factoryElement) {
+  private void parseHibernateDatasourceFactory(Element factoryElement, Collection<String> ignoredDataSources) {
     String name = getChildTextContent(factoryElement, "name");
     if(!"opal-data".equals(name)) { // skip opal-data as it was already imported when reading opal-config.properties
       Project.Builder projectBuilder = Project.Builder.create().name(name).title(name);
@@ -330,6 +342,7 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
           break;
         case "org.obiba.opal.web.magma.support.DatabaseSessionFactoryProvider":
           String databaseName = getChildTextContent(sessionFactoryElement, "databaseName");
+          if(ignoredDataSources.contains(databaseName)) return;
           projectBuilder.database(databaseName);
           break;
         default:
@@ -339,7 +352,9 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
     }
   }
 
-  private void importJdbcDatasourceFactories(Document doc, XPath xPath) throws XPathExpressionException {
+  @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
+  private void importJdbcDatasourceFactories(Document doc, XPath xPath, Collection<String> ignoredDataSources)
+      throws XPathExpressionException {
     NodeList nodeList = (NodeList) xPath.compile("//org.obiba.opal.web.magma.support.DatabaseJdbcDatasourceFactory")
         .evaluate(doc, XPathConstants.NODESET);
     for(int i = 0; i < nodeList.getLength(); i++) {
@@ -347,6 +362,7 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
 
       String name = getChildTextContent(element, "name");
       String databaseName = getChildTextContent(element, "databaseName");
+      if(ignoredDataSources.contains(databaseName)) return;
       Database database = databaseRegistry.getDatabase(databaseName);
       if(database.getSqlSettings() == null) {
         throw new IllegalArgumentException("Cannot find SqlSettings for database " + databaseName);
@@ -368,14 +384,18 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
     }
   }
 
-  private void deleteDeprecatedNodes(Document doc, XPath xPath) throws XPathExpressionException, TransformerException {
-    deleteNode(doc, xPath, "//magmaEngineFactory/factories");
-    deleteNode(doc, xPath, "//magmaEngineFactory/datasources");
-    deleteNode(doc, xPath, "//org.obiba.opal.core.runtime.jdbc.DefaultJdbcDataSourceRegistry_-JdbcDataSourcesConfig");
-    deleteNode(doc, xPath, "//binariesMigrated");
-    deleteNode(doc, xPath, "//reportTemplates");
-    Transformer transformer = TransformerFactory.newInstance().newTransformer();
-    transformer.transform(new DOMSource(doc), new StreamResult(configFile));
+  private void deleteDeprecatedNodes(Document doc, XPath xPath) {
+    try {
+      deleteNode(doc, xPath, "//magmaEngineFactory/factories");
+      deleteNode(doc, xPath, "//magmaEngineFactory/datasources");
+      deleteNode(doc, xPath, "//org.obiba.opal.core.runtime.jdbc.DefaultJdbcDataSourceRegistry_-JdbcDataSourcesConfig");
+      deleteNode(doc, xPath, "//binariesMigrated");
+      deleteNode(doc, xPath, "//reportTemplates");
+      Transformer transformer = TransformerFactory.newInstance().newTransformer();
+      transformer.transform(new DOMSource(doc), new StreamResult(configFile));
+    } catch(XPathExpressionException | TransformerFactoryConfigurationError | TransformerException e) {
+      log.error("Cannot comment deprecated configuration in {}", configFile.getAbsolutePath(), e);
+    }
   }
 
   private void deleteNode(Document doc, XPath xPath, String expression) throws XPathExpressionException {
