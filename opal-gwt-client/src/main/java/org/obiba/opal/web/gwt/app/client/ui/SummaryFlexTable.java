@@ -70,7 +70,7 @@ public class SummaryFlexTable extends DefaultFlexTable {
 
   private void drawOtherValuesRow(double frequency, String subtotal, String total) {
     if(frequency > 0) {
-      setWidget(row, 0, new Icon(IconType.ELLIPSIS_VERTICAL));
+      setWidget(row, 0, new Icon(IconType.ELLIPSIS_HORIZONTAL));
       setWidget(row, 1, new Label(String.valueOf(Math.round(frequency))));
       setWidget(row, 2, new Label(subtotal));
       setWidget(row++, 3, new Label(total));
