@@ -147,7 +147,7 @@ public class UpgradeCommand {
     if(!originalConfig.exists()) return;
 
     try {
-      File originalConfigCopy = new File(originalConfig.getAbsolutePath() + ".opal1");
+      File originalConfigCopy = new File(originalConfig.getAbsolutePath() + ".opal1-backup");
       if(!originalConfigCopy.exists()) FileUtil.copyFile(originalConfig, originalConfigCopy);
       File dataDir = new File(System.getenv().get("OPAL_HOME"), "data");
       if(!dataDir.exists()) dataDir.mkdirs();

@@ -27,6 +27,8 @@ import org.apache.shiro.util.StringUtils;
 import org.obiba.opal.tools.hasher.Hasher;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.google.common.base.Charsets;
@@ -35,6 +37,8 @@ import com.google.common.io.CharSink;
 import com.google.common.io.Files;
 
 public class HashShiroIniPasswordUpgradeStep extends AbstractUpgradeStep {
+
+  private static final Logger log = LoggerFactory.getLogger(HashShiroIniPasswordUpgradeStep.class);
 
   private File srcIniFile;
 
@@ -75,7 +79,9 @@ public class HashShiroIniPasswordUpgradeStep extends AbstractUpgradeStep {
       backupAndWriteIniFile();
 
     } catch(IOException e) {
-      throw new RuntimeException("Cannot hash password in " + srcIniFile.getAbsolutePath(), e);
+      log.error("Cannot hash password in {}. " +
+          "Encrypt manually your passwords using shiro-hasher tools (included in Opal tools directory)",
+          srcIniFile.getAbsolutePath(), e);
     }
   }
 
@@ -108,7 +114,7 @@ public class HashShiroIniPasswordUpgradeStep extends AbstractUpgradeStep {
   }
 
   private void backupAndWriteIniFile() throws IOException {
-    Files.copy(srcIniFile, new File(srcIniFile.getAbsolutePath() + ".backup"));
+    Files.copy(srcIniFile, new File(srcIniFile.getAbsolutePath() + ".opal1-backup"));
     CharSink charSink = new CharSink() {
       @Override
       public Writer openStream() throws IOException {
