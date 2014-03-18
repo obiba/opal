@@ -69,14 +69,15 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
   }
 
   private String guessValidationQuery() {
-    if("com.mysql.jdbc.Driver".equals(driverClass)) {
-      return "select 1";
+    switch(driverClass) {
+      case "com.mysql.jdbc.Driver":
+        return "select 1";
+      case "org.hsqldb.jdbcDriver":
+      case "org.hsqldb.jdbc.JDBCDriver":
+        return "select 1 from INFORMATION_SCHEMA.SYSTEM_USERS";
+      default:
+        throw new IllegalArgumentException("Unsupported JDBC driver: " + driverClass);
     }
-    if("org.hsqldb.jdbcDriver".equals(driverClass)) {
-      return "select 1 from INFORMATION_SCHEMA.SYSTEM_USERS";
-    }
-    //TODO validation query for PostgreSQL
-    throw new IllegalArgumentException("Unsupported JDBC driver: " + driverClass);
   }
 
   private void setConnectionProperties(BasicManagedDataSource dataSource) {
