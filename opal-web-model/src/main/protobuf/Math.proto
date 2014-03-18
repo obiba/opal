@@ -57,6 +57,7 @@ message TextSummaryDto {
 
   required int64 n = 2;
   repeated FrequencyDto frequencies = 3;
+  optional int64 otherFrequency = 4;
 
   extend SummaryStatisticsDto {
     optional TextSummaryDto textSummary = 1004;

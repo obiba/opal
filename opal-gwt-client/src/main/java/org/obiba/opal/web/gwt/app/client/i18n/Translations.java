@@ -2241,4 +2241,8 @@ public interface Translations extends Constants {
   @Description("N/A label")
   @DefaultStringValue("N/A")
   String naLabel();
+
+  @Description("Total other label")
+  @DefaultStringValue("Other values...")
+  String totalOtherLabel();
 }

@@ -37,7 +37,8 @@ public class TextSummaryView extends Composite {
   SummaryFlexTable stats;
 
   public TextSummaryView(TextSummaryDto summaryDto, ImmutableList<FrequencyDto> frequenciesNonMissing,
-      ImmutableList<FrequencyDto> frequenciesMissing, double totalNonMissing, double totalMissing, int maxResults) {
+      ImmutableList<FrequencyDto> frequenciesMissing, double totalNonMissing, double totalMissing, double totalOther,
+      int maxResults) {
     initWidget(uiBinder.createAndBindUi(this));
     stats.clear();
 
@@ -46,7 +47,7 @@ public class TextSummaryView extends Composite {
       stats.drawHeader();
       stats.drawValuesFrequencies(frequenciesNonMissing,
           TranslationsUtils.replaceArguments(translations.nonMissingTopN(), String.valueOf(maxResults)),
-          translations.notEmpty(), totalNonMissing, total);
+          translations.notEmpty(), totalNonMissing + totalOther, totalOther, total);
       stats.drawValuesFrequencies(frequenciesMissing, translations.missingLabel(), translations.naLabel(), totalMissing,
           total);
       stats.drawTotal(total);

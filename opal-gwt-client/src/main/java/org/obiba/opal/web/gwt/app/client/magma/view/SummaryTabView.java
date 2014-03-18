@@ -57,9 +57,11 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
 
   private static final int DEFAULT_MAX_TEXT_RESULTS = 20;
 
-  private static final String EMPTY_VALUE = "N/A";
+  public static final String EMPTY_VALUE = "N/A";
 
-  private static final String NOT_NULL_VALUE = "NOT_NULL";
+  public static final String NOT_NULL_VALUE = "NOT_NULL";
+
+  public static final String OTHER_VALUES = "OTHER_VALUES";
 
   @UiTemplate("SummaryTabView.ui.xml")
   interface Binder extends UiBinder<Widget, SummaryTabView> {}
@@ -185,7 +187,13 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
                 totals[1] += input.getFreq();
                 return true;
               }
+
               totals[0] += input == null ? 0 : input.getFreq();
+              return false;
+            }
+
+            if(input != null && OTHER_VALUES.equals(input.getValue())) {
+              totals[0] += input.getFreq();
               return false;
             }
 
@@ -194,6 +202,7 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
               totals[1] += input.getFreq();
               return true;
             }
+
             totals[0] += input == null ? 0 : input.getFreq();
             return false;
           }
@@ -248,7 +257,7 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
 
     summary.add(
         new TextSummaryView(textSummaryDto, valuesByMissing.get(false), valuesByMissing.get(true), totals[0], totals[1],
-            DEFAULT_MAX_TEXT_RESULTS));
+            textSummaryDto.getOtherFrequency(), DEFAULT_MAX_TEXT_RESULTS));
   }
 
   private void renderBinarySummary(SummaryStatisticsDto dto) {

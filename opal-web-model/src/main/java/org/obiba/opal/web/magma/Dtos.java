@@ -10,7 +10,6 @@
 package org.obiba.opal.web.magma;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -447,18 +446,27 @@ public final class Dtos {
         .setN(summary.getN());
     int i = 0;
     // limit to X top text frequencies...
-    Iterator<TextVariableSummary.Frequency> iterator = summary.getFrequencies().iterator();
-    while(iterator.hasNext() && i < maxResults) {
-      TextVariableSummary.Frequency frequency = iterator.next();
+    long otherFrequency = 0;
+    for(TextVariableSummary.Frequency frequency : summary.getFrequencies()) {
+
       Math.FrequencyDto.Builder freqBuilder = Math.FrequencyDto.newBuilder() //
           .setValue(frequency.getValue()) //
           .setFreq(frequency.getFreq());
 
       if(isNumeric(frequency.getPct())) freqBuilder.setPct(frequency.getPct());
-      dtoBuilder.addFrequencies(freqBuilder);
 
-      if(!"N/A".equals(frequency.getValue())) i++;
+      if("N/A".equals(frequency.getValue())) {
+        dtoBuilder.addFrequencies(freqBuilder);
+      } else if(i < maxResults) {
+        dtoBuilder.addFrequencies(freqBuilder);
+        i++;
+      } else {
+        otherFrequency += frequency.getFreq();
+      }
     }
+
+    dtoBuilder.setOtherFrequency(otherFrequency);
+
     return dtoBuilder;
   }
 
