@@ -43,8 +43,6 @@ public class RReportServiceImpl implements ReportService {
 
   private static final String REPORT_STYLE_OPTION = "opal.report.style";
 
-  private static final String DEFAULT_REPORT_STYLE = "Flatly";
-
   @Autowired
   private OpalRSessionManager opalRSessionManager;
 
@@ -97,11 +95,6 @@ public class RReportServiceImpl implements ReportService {
     StringBuilder script = new StringBuilder();
     script.append("options(");
     boolean appended = false;
-    // set default style
-    if(parameters == null || !parameters.containsKey(REPORT_STYLE_OPTION)) {
-      script.append(REPORT_STYLE_OPTION).append("=").append(toOptionValue(DEFAULT_REPORT_STYLE));
-      appended = true;
-    }
     // append other parameters as R options
     if(parameters != null) {
       for(Map.Entry<String, String> param : parameters.entrySet()) {
