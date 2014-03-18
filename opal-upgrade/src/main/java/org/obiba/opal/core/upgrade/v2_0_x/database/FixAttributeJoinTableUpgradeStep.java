@@ -11,7 +11,6 @@
 package org.obiba.opal.core.upgrade.v2_0_x.database;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -78,25 +77,41 @@ public class FixAttributeJoinTableUpgradeStep extends AbstractUpgradeStep {
   }
 
   private void alterAttribute(JdbcOperations jdbcTemplate, String attributeAware) {
-    // copy from variable_attributes to variable_state_attributes if exists
-    copyAttributes(jdbcTemplate, attributeAware);
 
-    // drop variable_attributes if exists
-    execute(jdbcTemplate, "DROP TABLE " + attributeAware + "_attributes");
+    boolean stateAttributesTableExists = tableExists(jdbcTemplate, attributeAware + "_state_attributes");
+    boolean attributesTableExists = tableExists(jdbcTemplate, attributeAware + "_attributes");
 
-    // rename variable_state_attributes to variable_attributes if exists
-    execute(jdbcTemplate,
-        "ALTER TABLE " + attributeAware + "_state_attributes RENAME TO " + attributeAware + "_attributes");
+    if(stateAttributesTableExists && attributesTableExists) {
+
+      // copy from variable_state_attributes to variable_attributes
+      log.debug("Copy from table {}_state_attributes to {}_attributes", attributeAware, attributeAware);
+      copyAttributes(jdbcTemplate, attributeAware);
+
+      // drop variable_state_attributes
+      log.debug("Drop table {}_state_attributes", attributeAware);
+      execute(jdbcTemplate, "DROP TABLE " + attributeAware + "_state_attributes");
+
+    } else if(stateAttributesTableExists) {
+
+      // rename variable_state_attributes to variable_attributes
+      log.debug("Rename table {}_state_attributes to {}_attributes", attributeAware, attributeAware);
+      execute(jdbcTemplate,
+          "ALTER TABLE " + attributeAware + "_state_attributes RENAME TO " + attributeAware + "_attributes");
+
+    }
 
     // drop variable_attributes foreign key if exists
+    log.debug("Drop {}_attributes foreign key if exists", attributeAware);
     execute(jdbcTemplate, "ALTER TABLE " + attributeAware + "_attributes DROP FOREIGN KEY " +
         getForeignKey(jdbcTemplate, attributeAware + "_attributes"));
 
     // rename variable_state_id to variable_id if exists
+    log.debug("Rename {}_state_id to {}_id if exists", attributeAware, attributeAware);
     execute(jdbcTemplate, "ALTER TABLE " + attributeAware +
         "_attributes CHANGE COLUMN " + attributeAware + "_state_id " + attributeAware + "_id bigint(20) NOT NULL");
 
     // rename variable to variable_id if exists
+    log.debug("Rename {} to {}_id if exists", attributeAware, attributeAware);
     execute(jdbcTemplate,
         "ALTER TABLE " + attributeAware + "_attributes CHANGE COLUMN " + attributeAware + " " + attributeAware +
             "_id bigint(20) NOT NULL");
@@ -106,48 +121,68 @@ public class FixAttributeJoinTableUpgradeStep extends AbstractUpgradeStep {
     return jdbcTemplate.execute(new ConnectionCallback<String>() {
       @Override
       public String doInConnection(Connection connection) throws SQLException, DataAccessException {
-        DatabaseMetaData metaData = connection.getMetaData();
-        ResultSet rs = metaData.getImportedKeys(null, null, tableName);
+        ResultSet rs = connection.getMetaData().getImportedKeys(null, null, tableName);
         return rs.next() ? rs.getString(FK_NAME_COLUMN_INDEX) : null;
       }
     });
   }
 
+  private boolean tableExists(JdbcOperations jdbcTemplate, final String tableName) {
+    return jdbcTemplate.execute(new ConnectionCallback<Boolean>() {
+      @Override
+      public Boolean doInConnection(Connection con) throws SQLException, DataAccessException {
+        ResultSet res = con.getMetaData().getTables(null, null, null, new String[] { "TABLE" });
+        while(res.next()) {
+          if(tableName.equalsIgnoreCase(res.getString("TABLE_NAME"))) {
+            return true;
+          }
+        }
+        return false;
+      }
+    });
+  }
+
+  /**
+   * Copy from variable_state_attributes to variable_attributes if exists
+   *
+   * @param jdbcTemplate
+   * @param attributeAware
+   */
   private void copyAttributes(final JdbcOperations jdbcTemplate, final String attributeAware) {
     try {
-      jdbcTemplate
-          .query("select " + attributeAware + "_id, locale, name, namespace, value_type, is_sequence, value from " +
-              attributeAware + "_attributes", new RowCallbackHandler() {
+      jdbcTemplate.query(
+          "select " + attributeAware + "_state_id, locale, name, namespace, value_type, is_sequence, value from " +
+              attributeAware + "_state_attributes", new RowCallbackHandler() {
+        @Override
+        public void processRow(final ResultSet rs) throws SQLException {
+          transactionTemplate.execute(new TransactionCallbackWithoutResult() {
             @Override
-            public void processRow(final ResultSet rs) throws SQLException {
-              transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-                @Override
-                protected void doInTransactionWithoutResult(TransactionStatus status) {
-                  try {
-                    long id = rs.getLong(attributeAware + "_id");
-                    String locale = rs.getString("locale");
-                    String name = rs.getString("name");
-                    String namespace = rs.getString("namespace");
-                    String value_type = rs.getString("value_type");
-                    boolean is_sequence = rs.getBoolean("is_sequence");
-                    String value = rs.getString("value");
+            protected void doInTransactionWithoutResult(TransactionStatus status) {
+              try {
+                long id = rs.getLong(attributeAware + "_sate_id");
+                String locale = rs.getString("locale");
+                String name = rs.getString("name");
+                String namespace = rs.getString("namespace");
+                String value_type = rs.getString("value_type");
+                boolean is_sequence = rs.getBoolean("is_sequence");
+                String value = rs.getString("value");
 
-                    int count = countExistingAttributes(id, locale, name, namespace, value_type, is_sequence, value,
-                        attributeAware, jdbcTemplate);
-                    if(count == 0) {
-                      jdbcTemplate.update("insert into " + attributeAware + "_state_attributes (" + attributeAware +
-                          "_state_id, locale, name, namespace, value_type, is_sequence, value) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                          id, locale, name, namespace, value_type, is_sequence, value);
-                    }
-                  } catch(SQLException e) {
-                    log.info("Ignore attribute copy error", e);
-                  }
+                int count = countExistingAttributes(id, locale, name, namespace, value_type, is_sequence, value,
+                    attributeAware, jdbcTemplate);
+                if(count == 0) {
+                  jdbcTemplate.update("insert into " + attributeAware + "_attributes (" + attributeAware +
+                      "_id, locale, name, namespace, value_type, is_sequence, value) VALUES (?, ?, ?, ?, ?, ?, ?)", //
+                      id, locale, name, namespace, value_type, is_sequence, value);
                 }
-              });
+              } catch(SQLException e) {
+                log.debug("Ignore attribute copy error", e);
+              }
             }
           });
+        }
+      });
     } catch(DataAccessException e) {
-      log.info("Ignore attribute copy error", e);
+      log.debug("Ignore attribute copy error", e);
     }
   }
 
@@ -155,9 +190,8 @@ public class FixAttributeJoinTableUpgradeStep extends AbstractUpgradeStep {
   private int countExistingAttributes(long id, String locale, String name, String namespace, String value_type,
       boolean is_sequence, String value, String attributeAware, JdbcOperations jdbcTemplate) {
     List<Object> arg = Lists.<Object>newArrayList(id, name, value_type, is_sequence, value);
-    String countSql = "SELECT count(*) FROM " + attributeAware + "_state_attributes WHERE " +
-        attributeAware +
-        "_state_id = ? AND name = ? AND value_type = ? AND is_sequence = ? AND value = ?";
+    String countSql = "SELECT count(*) FROM " + attributeAware + "_attributes WHERE " +
+        attributeAware + "_id = ? AND name = ? AND value_type = ? AND is_sequence = ? AND value = ?";
     countSql += " AND " + (locale == null ? "locale is null" : "locale = ?");
     countSql += " AND " + (namespace == null ? "namespace is null" : "namespace = ?");
 
