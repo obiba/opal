@@ -128,6 +128,7 @@
 
         <!-- 2.0.0 / hash passwords in shiro.ini -->
         <bean class="org.obiba.opal.core.upgrade.v2_0_x.HashShiroIniPasswordUpgradeStep">
+          <property name="description" value="Hash passwords in shiro.ini"/>
           <property name="appliesTo" value="2.0.0"/>
         </bean>
 
