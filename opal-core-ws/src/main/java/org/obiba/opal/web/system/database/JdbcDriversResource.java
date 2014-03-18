@@ -2,7 +2,7 @@ package org.obiba.opal.web.system.database;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -35,18 +35,12 @@ public class JdbcDriversResource {
 
   @GET
   public Iterable<Database.JdbcDriverDto> getJdbcDrivers() {
-    List<Database.JdbcDriverDto> drivers = new ArrayList<>();
+    Collection<Database.JdbcDriverDto> drivers = new ArrayList<>();
     drivers.add(Database.JdbcDriverDto.newBuilder() //
         .setDriverName("MySQL") //
         .setDriverClass("com.mysql.jdbc.Driver") //
         .setJdbcUrlTemplate("jdbc:mysql://{hostname}:{port}/{databaseName}") //
         .setJdbcUrlExample("jdbc:mysql://localhost:3306/opal").build());
-    drivers.add(Database.JdbcDriverDto.newBuilder() //
-        .setDriverName("HSQLDB") //
-        .setDriverClass("org.hsqldb.jdbcDriver") //
-        .setJdbcUrlTemplate("jdbc:hsqldb:file:{databaseName};shutdown=true;hsqldb.tx=mvcc") //
-        .setJdbcUrlExample("jdbc:hsqldb:file:opal;shutdown=true;hsqldb.tx=mvcc").build());
-
     return drivers;
   }
 

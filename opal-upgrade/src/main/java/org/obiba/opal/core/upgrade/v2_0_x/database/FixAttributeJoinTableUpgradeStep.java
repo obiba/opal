@@ -63,33 +63,21 @@ public class FixAttributeJoinTableUpgradeStep extends AbstractUpgradeStep {
 
   private void process(Database database) {
     if(database.getSqlSettings() == null ||
-        database.getSqlSettings().getSqlSchema() != SqlSettings.SqlSchema.HIBERNATE) {
+        database.getSqlSettings().getSqlSchema() != SqlSettings.SqlSchema.HIBERNATE ||
+        !"com.mysql.jdbc.Driver".equals(database.getSqlSettings().getDriverClass())) {
       return;
     }
 
     log.info("Upgrade database {}: {}", database.getName(), database.getSqlSettings().getUrl());
 
     JdbcOperations jdbcTemplate = new JdbcTemplate(databaseRegistry.getDataSource(database.getName(), null));
-
-    switch(database.getSqlSettings().getDriverClass()) {
-      case "com.mysql.jdbc.Driver":
-        alterMySql(jdbcTemplate);
-        break;
-      case "org.hsqldb.jdbc.JDBCDriver":
-        alterHsql(jdbcTemplate);
-        break;
-    }
-
+    alterAttribute(jdbcTemplate, "datasource");
+    alterAttribute(jdbcTemplate, "variable");
+    alterAttribute(jdbcTemplate, "category");
     touchValueTablesTimestamps(database);
   }
 
-  private void alterMySql(JdbcOperations jdbcTemplate) {
-    alterAttributeMySql(jdbcTemplate, "datasource");
-    alterAttributeMySql(jdbcTemplate, "variable");
-    alterAttributeMySql(jdbcTemplate, "category");
-  }
-
-  private void alterAttributeMySql(JdbcOperations jdbcTemplate, String attributeAware) {
+  private void alterAttribute(JdbcOperations jdbcTemplate, String attributeAware) {
     // copy from variable_attributes to variable_state_attributes if exists
     copyAttributes(jdbcTemplate, attributeAware);
 
@@ -112,38 +100,6 @@ public class FixAttributeJoinTableUpgradeStep extends AbstractUpgradeStep {
     execute(jdbcTemplate,
         "ALTER TABLE " + attributeAware + "_attributes CHANGE COLUMN " + attributeAware + " " + attributeAware +
             "_id bigint(20) NOT NULL");
-  }
-
-  private void alterHsql(JdbcOperations jdbcTemplate) {
-    alterAttributeHsql(jdbcTemplate, "datasource");
-    alterAttributeHsql(jdbcTemplate, "variable");
-    alterAttributeHsql(jdbcTemplate, "category");
-  }
-
-  private void alterAttributeHsql(JdbcOperations jdbcTemplate, String attributeAware) {
-    // copy from variable_attributes to variable_state_attributes if exists
-    copyAttributes(jdbcTemplate, attributeAware);
-
-    // drop variable_attributes if exists
-    execute(jdbcTemplate, "DROP TABLE " + attributeAware + "_attributes");
-
-    // rename variable_state_attributes to variable_attributes if exists
-    execute(jdbcTemplate,
-        "ALTER TABLE " + attributeAware + "_state_attributes RENAME TO " + attributeAware + "_attributes");
-
-    // drop variable_attributes foreign key if exists
-    execute(jdbcTemplate, "ALTER TABLE " + attributeAware + "_attributes DROP CONSTRAINT " +
-        getForeignKey(jdbcTemplate, attributeAware + "_attributes"));
-
-    // rename variable_state_id to variable_id if exists
-    execute(jdbcTemplate, "ALTER TABLE " + attributeAware +
-        "_attributes ALTER COLUMN " + attributeAware + "_state_id RENAME TO " + attributeAware + "_id");
-
-    // rename variable to variable_id if exists
-    execute(jdbcTemplate,
-        "ALTER TABLE " + attributeAware + "_attributes ALTER COLUMN " + attributeAware + " RENAME TO " +
-            attributeAware +
-            "_id");
   }
 
   private String getForeignKey(JdbcOperations jdbcTemplate, final String tableName) {

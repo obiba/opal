@@ -254,6 +254,16 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
       String name = getChildTextContent(element, "name");
       String url = getChildTextContent(element, "url");
       String driverClass = getChildTextContent(element, "driverClass");
+
+      if("org.hsqldb.jdbcDriver".equals(driverClass) || "org.hsqldb.jdbc.JDBCDriver".equals(driverClass)) {
+        String msg = "Skip " + name + " (" + url + ") datasource migration as from Opal 2.0, " +
+            "HSQLDB datasources are no more supported. Please migrate to MySQL.";
+        //noinspection UseOfSystemOutOrSystemErr
+        System.out.println(msg);
+        log.error(msg);
+        continue;
+      }
+
       String username = getChildTextContent(element, "username");
       String password = getChildTextContent(element, "password");
       SqlSettings.SqlSchema schema = detectSchema(driverClass, url, username, password);
@@ -287,8 +297,7 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
         if("surveys".equalsIgnoreCase(res.getString("TABLE_NAME"))) return SqlSettings.SqlSchema.LIMESURVEY;
       }
     } catch(SQLException e) {
-      //noinspection StringConcatenationArgumentToLogCall
-      log.error("Cannot check database schema: " + url, e);
+      log.error("Cannot check database schema: {}", url, e);
     }
     return SqlSettings.SqlSchema.JDBC;
   }

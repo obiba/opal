@@ -42,7 +42,7 @@ message SqlSettingsDto {
   message LimesurveyDatasourceSettingsDto {
     optional string tablePrefix = 1;
   }
-  required string url = 1; // jdbc:{mysql|hsqldb|postgresql}://{hostname}:{port}/{databaseName}
+  required string url = 1; // jdbc:{mysql|postgresql}://{hostname}:{port}/{databaseName}
   required string driverClass = 2;
   required string username = 3;
   optional string password = 4;

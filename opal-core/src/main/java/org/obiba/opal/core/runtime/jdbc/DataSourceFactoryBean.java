@@ -72,9 +72,6 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
     switch(driverClass) {
       case "com.mysql.jdbc.Driver":
         return "select 1";
-      case "org.hsqldb.jdbcDriver":
-      case "org.hsqldb.jdbc.JDBCDriver":
-        return "select 1 from INFORMATION_SCHEMA.SYSTEM_USERS";
       default:
         throw new IllegalArgumentException("Unsupported JDBC driver: " + driverClass);
     }
