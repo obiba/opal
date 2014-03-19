@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Collection;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -20,7 +21,6 @@ import org.obiba.opal.web.gwt.plot.client.FrequencyChartFactory;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 
-import com.google.common.collect.ImmutableList;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -56,8 +56,8 @@ public class CategoricalSummaryView extends Composite {
   private FrequencyChartFactory chartFactory = null;
 
   public CategoricalSummaryView(final String title, CategoricalSummaryDto categorical,
-      ImmutableList<FrequencyDto> categoriesNonMissing, ImmutableList<FrequencyDto> categoriesMissing,
-      double totalNonMissing, double totalMissing) {
+      Collection<FrequencyDto> categoriesNonMissing, Collection<FrequencyDto> categoriesMissing, double totalNonMissing,
+      double totalMissing, double totalOther) {
     initWidget(uiBinder.createAndBindUi(this));
 
     chartsPanel.addSelectionHandler(new SelectionHandler<Integer>() {
@@ -76,9 +76,9 @@ public class CategoricalSummaryView extends Composite {
     pctPanel.clear();
     if(categorical.getFrequenciesArray() != null) {
 
-      double total = totalNonMissing + totalMissing;
+      double total = totalNonMissing + totalMissing + totalOther;
       stats.drawValuesFrequencies(categoriesNonMissing, translations.nonMissing(), translations.notEmpty(),
-          totalNonMissing, total);
+          totalNonMissing + totalOther, totalOther, total);
       stats.drawValuesFrequencies(categoriesMissing, translations.missingLabel(), translations.naLabel(), totalMissing,
           total);
       stats.drawTotal(total);

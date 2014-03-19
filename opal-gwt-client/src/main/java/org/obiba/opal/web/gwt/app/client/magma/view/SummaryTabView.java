@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
-import java.util.Map;
-
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
@@ -19,8 +17,6 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
-import org.obiba.opal.web.model.client.magma.CategoryDto;
-import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.BinarySummaryDto;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
@@ -33,7 +29,6 @@ import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimaps;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -126,16 +121,10 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
       renderBinarySummary(dto);
     } else if(dto.getExtension(TextSummaryDto.SummaryStatisticsDtoExtensions.textSummary) != null) {
       renderTextSummary(dto);
+    } else if(dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical) != null) {
+      renderCategoricalSummary(dto);
     } else {
       renderNoSummary();
-    }
-  }
-
-  @Override
-  public void renderSummary(SummaryStatisticsDto dto, VariableDto variableDto) {
-    summary.clear();
-    if(dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical) != null) {
-      renderCategoricalSummary(dto, variableDto);
     }
   }
 
@@ -150,12 +139,12 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
           @Override
           public Boolean apply(@Nullable FrequencyDto input) {
             // when boolean, is missing is not set
-            if(input != null && EMPTY_VALUE.equals(input.getValue())) {
-              totals[1] += input.getFreq();
-              return true;
+            if(input != null && !input.getMissing()) {
+              totals[0] += input.getFreq();
+              return false;
             }
-            totals[0] += input == null ? 0 : input.getFreq();
-            return false;
+            totals[1] += input == null ? 0 : input.getFreq();
+            return true;
           }
         });
 
@@ -163,17 +152,9 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
         totals[0], totals[1]));
   }
 
-  private void renderCategoricalSummary(SummaryStatisticsDto dto, final VariableDto variableDto) {
+  private void renderCategoricalSummary(SummaryStatisticsDto dto) {
     CategoricalSummaryDto categorical = dto
         .getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
-
-    final Map<String, CategoryDto> categoriesByName = Maps
-        .uniqueIndex(JsArrays.toIterable(variableDto.getCategoriesArray()), new Function<CategoryDto, String>() {
-          @Override
-          public String apply(CategoryDto input) {
-            return input.getName();
-          }
-        });
 
     final double[] totals = { 0d, 0d };
     ImmutableListMultimap<Boolean, FrequencyDto> categoriesByMissing = Multimaps
@@ -182,34 +163,18 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
           @Override
           public Boolean apply(@Nullable FrequencyDto input) {
             // when boolean, is missing is not set
-            if("boolean".equals(variableDto.getValueType())) {
-              if(input != null && EMPTY_VALUE.equals(input.getValue())) {
-                totals[1] += input.getFreq();
-                return true;
-              }
-
-              totals[0] += input == null ? 0 : input.getFreq();
-              return false;
-            }
-
-            if(input != null && OTHER_VALUES.equals(input.getValue())) {
+            if(input != null && !input.getMissing()) {
               totals[0] += input.getFreq();
               return false;
             }
 
-            if(input != null && (!categoriesByName.containsKey(input.getValue()) ||
-                categoriesByName.get(input.getValue()).getIsMissing())) {
-              totals[1] += input.getFreq();
-              return true;
-            }
-
-            totals[0] += input == null ? 0 : input.getFreq();
-            return false;
+            totals[1] += input == null ? 0 : input.getFreq();
+            return true;
           }
         });
 
     summary.add(new CategoricalSummaryView(dto.getResource(), categorical, categoriesByMissing.get(false),
-        categoriesByMissing.get(true), totals[0], totals[1]));
+        categoriesByMissing.get(true), totals[0], totals[1], categorical.getOtherFrequency()));
   }
 
   private void renderDefaultSummary(SummaryStatisticsDto dto) {
@@ -222,7 +187,7 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
           @Nullable
           @Override
           public Boolean apply(@Nullable FrequencyDto input) {
-            if(input != null && input.getValue().equals(NOT_NULL_VALUE)) {
+            if(input != null && !input.getMissing()) {
               input.setValue(translations.notEmpty());
               totals[0] += input.getFreq();
               return false;
@@ -246,12 +211,12 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
           @Nullable
           @Override
           public Boolean apply(@Nullable FrequencyDto input) {
-            if(input != null && EMPTY_VALUE.equals(input.getValue())) {
-              totals[1] += input.getFreq();
-              return true;
+            if(input != null && !input.getMissing()) {
+              totals[0] += input.getFreq();
+              return false;
             }
-            totals[0] += input == null ? 0 : input.getFreq();
-            return false;
+            totals[1] += input == null ? 0 : input.getFreq();
+            return true;
           }
         });
 

@@ -118,7 +118,7 @@ public interface TableResource {
   VariableResource getTransientVariable(@QueryParam("valueType") @DefaultValue("text") String valueTypeName,
       @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP,
       @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP,
-      @FormParam("category") List<String> categoriesFP);
+      @FormParam("category") List<String> categoriesFP, @FormParam("missingCategory") List<String> missingCategory);
 
   /**
    * Compile a derived variable script.

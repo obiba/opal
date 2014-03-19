@@ -10,7 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.magma.derive.presenter;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
@@ -234,8 +234,8 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
 
     private ResourceRequestBuilder<SummaryStatisticsDto> requestSummaryBuilder(String link) {
       String script = VariableDtos.getScript(originalVariable);
-      ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder
-          = ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder() //
+      ResourceRequestBuilder<SummaryStatisticsDto> requestBuilder = ResourceRequestBuilderFactory
+          .<SummaryStatisticsDto>newBuilder() //
           .forResource(link) //
           .withFormBody("script", script).post() //
           .accept("application/x-protobuf+json");
@@ -245,6 +245,9 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
         if(cats != null) {
           for(int i = 0; i < cats.length(); i++) {
             requestBuilder.withFormBody("category", cats.get(i).getName());
+            if(cats.get(i).getIsMissing()) {
+              requestBuilder.withFormBody("missingCategory", cats.get(i).getName());
+            }
           }
         }
       }
@@ -283,11 +286,9 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
 
       if(errorDto != null) {
 
-        if(errorDto.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors) != null) {
-          errorMessage = getScriptInterpretationFailureMessage(extractJavaScriptErrors(errorDto));
-        } else {
-          errorMessage = getClientErrorMessage(errorDto);
-        }
+        errorMessage = errorDto.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors) != null
+            ? getScriptInterpretationFailureMessage(extractJavaScriptErrors(errorDto))
+            : getClientErrorMessage(errorDto);
       }
 
       fireEvent(new ScriptEvaluationFailedEvent(
@@ -301,7 +302,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
           .replaceArguments(translations.userMessageMap().get(messageKey), errorDto.getArgumentsArray());
     }
 
-    private String getScriptInterpretationFailureMessage(List<JavaScriptErrorDto> errors) {
+    private String getScriptInterpretationFailureMessage(Iterable<JavaScriptErrorDto> errors) {
       StringBuilder messageBuilder = new StringBuilder();
       for(JavaScriptErrorDto error : errors) {
         messageBuilder
@@ -312,8 +313,8 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
     }
 
     @SuppressWarnings("unchecked")
-    private List<JavaScriptErrorDto> extractJavaScriptErrors(ClientErrorDto errorDto) {
-      List<JavaScriptErrorDto> javaScriptErrors = new ArrayList<>();
+    private Iterable<JavaScriptErrorDto> extractJavaScriptErrors(ClientErrorDto errorDto) {
+      Collection<JavaScriptErrorDto> javaScriptErrors = new ArrayList<>();
 
       JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) errorDto
           .getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);
