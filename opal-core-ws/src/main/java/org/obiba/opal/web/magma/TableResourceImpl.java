@@ -305,7 +305,7 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
 
   private JavascriptVariableValueSource getJavascriptVariableValueSource(String valueTypeName, Boolean repeatable,
       String scriptQP, List<String> categoriesQP, String scriptFP, List<String> categoriesFP,
-      List<String> missingCategories) {
+      Collection<String> missingCategories) {
     String script = scriptQP;
     List<String> categories = categoriesQP;
     if(Strings.isNullOrEmpty(script)) {
@@ -325,16 +325,16 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
   }
 
   private Variable buildTransientVariable(ValueType valueType, boolean repeatable, String script,
-      @Nullable List<String> categories, @Nullable List<String> missingCategories) {
+      @Nullable Iterable<String> categories, @Nullable Collection<String> missingCategories) {
     Variable.Builder builder = new Variable.Builder("_transient", valueType, getValueTable().getEntityType())
         .extend(JavascriptVariableBuilder.class).setScript(script);
     if(repeatable) {
       builder.repeatable();
     }
     if(categories != null) {
-      for(int i = 0; i < categories.size(); i++) {
-        boolean isMissing = missingCategories != null ? missingCategories.contains(categories.get(i)) : false;
-        builder.addCategory(categories.get(i), "", isMissing);
+      for(String category : categories) {
+        boolean isMissing = missingCategories != null && missingCategories.contains(category);
+        builder.addCategory(category, "", isMissing);
       }
 
     }
