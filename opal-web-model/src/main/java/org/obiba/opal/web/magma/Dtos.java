@@ -359,11 +359,14 @@ public final class Dtos {
     for(CategoricalVariableSummary.Frequency frequency : summary.getFrequencies()) {
       Math.FrequencyDto.Builder freqBuilder = Math.FrequencyDto.newBuilder() //
           .setValue(frequency.getValue()) //
-          .setFreq(frequency.getFreq());
+          .setFreq(frequency.getFreq())//
+          .setMissing(frequency.isMissing());
 
       if(isNumeric(frequency.getPct())) freqBuilder.setPct(frequency.getPct());
       dtoBuilder.addFrequencies(freqBuilder);
     }
+
+    dtoBuilder.setOtherFrequency(summary.getOtherFrequency());
     return dtoBuilder;
   }
 
@@ -407,7 +410,8 @@ public final class Dtos {
     for(ContinuousVariableSummary.Frequency frequency : summary.getFrequencies()) {
       Math.FrequencyDto.Builder freqBuilder = Math.FrequencyDto.newBuilder() //
           .setValue(frequency.getValue()) //
-          .setFreq(frequency.getFreq());
+          .setFreq(frequency.getFreq())//
+          .setMissing(frequency.isMissing());
       if(isNumeric(frequency.getPct())) freqBuilder.setPct(frequency.getPct());
       continuousBuilder.addFrequencies(freqBuilder);
     }
@@ -421,7 +425,8 @@ public final class Dtos {
     for(DefaultVariableSummary.Frequency frequency : summary.getFrequencies()) {
       Math.FrequencyDto.Builder freqBuilder = Math.FrequencyDto.newBuilder() //
           .setValue(frequency.getValue()) //
-          .setFreq(frequency.getFreq());
+          .setFreq(frequency.getFreq())//
+          .setMissing(frequency.isMissing());
       if(isNumeric(frequency.getPct())) freqBuilder.setPct(frequency.getPct());
       dtoBuilder.addFrequencies(freqBuilder);
     }
@@ -451,7 +456,8 @@ public final class Dtos {
 
       Math.FrequencyDto.Builder freqBuilder = Math.FrequencyDto.newBuilder() //
           .setValue(frequency.getValue()) //
-          .setFreq(frequency.getFreq());
+          .setFreq(frequency.getFreq())//
+          .setMissing(frequency.isMissing());
 
       if(isNumeric(frequency.getPct())) freqBuilder.setPct(frequency.getPct());
 

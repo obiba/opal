@@ -9,13 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
+import java.util.Collection;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.ui.SummaryFlexTable;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 import org.obiba.opal.web.model.client.math.TextSummaryDto;
 
-import com.google.common.collect.ImmutableList;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -36,14 +37,14 @@ public class TextSummaryView extends Composite {
   @UiField
   SummaryFlexTable stats;
 
-  public TextSummaryView(TextSummaryDto summaryDto, ImmutableList<FrequencyDto> frequenciesNonMissing,
-      ImmutableList<FrequencyDto> frequenciesMissing, double totalNonMissing, double totalMissing, double totalOther,
+  public TextSummaryView(TextSummaryDto summaryDto, Collection<FrequencyDto> frequenciesNonMissing,
+      Collection<FrequencyDto> frequenciesMissing, double totalNonMissing, double totalMissing, double totalOther,
       int maxResults) {
     initWidget(uiBinder.createAndBindUi(this));
     stats.clear();
 
     if(summaryDto.getFrequenciesArray() != null) {
-      double total = totalNonMissing + totalMissing;
+      double total = totalNonMissing + totalMissing + totalOther;
       stats.drawHeader();
       stats.drawValuesFrequencies(frequenciesNonMissing,
           TranslationsUtils.replaceArguments(translations.nonMissingTopN(), String.valueOf(maxResults)),

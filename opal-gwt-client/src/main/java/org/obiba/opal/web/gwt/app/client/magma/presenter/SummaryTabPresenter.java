@@ -19,9 +19,6 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
@@ -179,28 +176,11 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     summaryRequest = resourceRequestBuilder //
         .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
           @Override
-          public void onResource(Response response, final SummaryStatisticsDto dto) {
+          public void onResource(Response response, SummaryStatisticsDto dto) {
             summary = dto;
-
-            // if categorical variable, fetch its categories
-            if(dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical) != null) {
-              ResourceRequestBuilderFactory.<VariableDto>newBuilder() //
-                  .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create().build(datasource, table, variable)) //
-                  .withCallback(new ResourceCallback<VariableDto>() {
-                    @Override
-                    public void onResource(Response response, VariableDto resource) {
-                      getView().renderSummary(dto, resource);
-                      getView().renderSummaryLimit(dto.hasLimit() ? dto.getLimit() : entitiesCount, entitiesCount);
-                      getEventBus().fireEvent(new SummaryReceivedEvent(resourceRequestBuilder.getResource(), dto));
-                    }
-                  }) //
-                  .get().send();
-            } else {
-              getView().renderSummary(dto);
-              getView().renderSummaryLimit(dto.hasLimit() ? dto.getLimit() : entitiesCount, entitiesCount);
-              getEventBus().fireEvent(new SummaryReceivedEvent(resourceRequestBuilder.getResource(), dto));
-            }
-
+            getView().renderSummary(dto);
+            getView().renderSummaryLimit(dto.hasLimit() ? dto.getLimit() : entitiesCount, entitiesCount);
+            getEventBus().fireEvent(new SummaryReceivedEvent(resourceRequestBuilder.getResource(), dto));
           }
         })//
         .withCallback(Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
@@ -246,8 +226,6 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     void requestingSummary(int limit, int entitiesCount);
 
     void renderSummary(SummaryStatisticsDto summary);
-
-    void renderSummary(SummaryStatisticsDto dto, VariableDto variableDto);
 
     void renderNoSummary();
 

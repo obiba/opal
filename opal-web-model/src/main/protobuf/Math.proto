@@ -15,6 +15,7 @@ message CategoricalSummaryDto {
   required string mode = 1;
   required int64 n = 2;
   repeated FrequencyDto frequencies = 3;
+  optional int64 otherFrequency = 4;
 
   extend SummaryStatisticsDto {
     optional CategoricalSummaryDto categorical = 1000;
@@ -68,8 +69,9 @@ message FrequencyDto {
   required string value = 1;
   required int64 freq = 2;
   required double pct = 3;
-  optional int64 cummFreq = 4;
-  optional double cummPct = 5;
+  required bool missing = 4;
+  optional int64 cummFreq = 5;
+  optional double cummPct = 6;
 }
 
 message IntervalFrequencyDto {
