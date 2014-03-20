@@ -167,7 +167,14 @@ public abstract class VariablesFilter extends AbstractVariablesFilter {
               }
               onVariableResourceCallback();
             }
-          }).send();
+          })//
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              // ignore
+            }
+          }, Response.SC_NOT_FOUND)//
+          .send();
     }
   }
 }
