@@ -121,7 +121,8 @@ public class TablePermissionConverter extends OpalPermissionConverter {
               toRest("/datasource/{0}/view/{1}/variables", "DELETE:GET/*", args),//
               toRest("/datasource/{0}/view/{1}/from/variable/_transient/summary", "GET:GET", args),//
               toRest("/datasource/{0}/view/{1}/from/variable/_transient/summary", "POST:GET", args),//
-              toRest("/datasource/{0}/view/{1}/from/variable/_transient/_compile", "POST:GET", args));
+              toRest("/datasource/{0}/view/{1}/from/variable/_transient/_compile", "POST:GET", args),//
+              toRest("/datasource/{0}/view/{1}/vcs", "GET:GET/*", args));
         } else {
           perms = Lists.newArrayList(toRest("/datasource/{0}/table/{1}", "PUT:GET", args),//
               toRest("/datasource/{0}/table/{1}/variables", "POST:GET/*", args),//
