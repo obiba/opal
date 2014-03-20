@@ -22,6 +22,9 @@ import org.obiba.magma.math.summary.ContinuousVariableSummary;
 import org.obiba.magma.math.summary.ContinuousVariableSummaryFactory;
 import org.obiba.magma.math.summary.DefaultVariableSummary;
 import org.obiba.magma.math.summary.DefaultVariableSummaryFactory;
+import org.obiba.magma.math.summary.GeoVariableSummary;
+import org.obiba.magma.math.summary.GeoVariableSummaryFactory;
+import org.obiba.magma.math.summary.TextVariableSummary;
 import org.obiba.magma.math.summary.TextVariableSummaryFactory;
 import org.obiba.magma.math.summary.VariableSummary;
 import org.obiba.magma.math.summary.VariableSummaryFactory;
@@ -173,6 +176,12 @@ public abstract class AbstractVariableSummaryCachedService< //
     if(summary instanceof DefaultVariableSummary) {
       return "default";
     }
+    if(summary instanceof TextVariableSummary) {
+      return "text";
+    }
+    if(summary instanceof GeoVariableSummary) {
+      return "geo";
+    }
     throw new IllegalArgumentException("Unsupported summary class " + summary.getClass());
   }
 
@@ -189,6 +198,9 @@ public abstract class AbstractVariableSummaryCachedService< //
     }
     if(summaryFactory instanceof TextVariableSummaryFactory) {
       return "text";
+    }
+    if(summaryFactory instanceof GeoVariableSummaryFactory) {
+      return "geo";
     }
     throw new IllegalArgumentException("Unsupported factory class " + summaryFactory.getClass());
   }

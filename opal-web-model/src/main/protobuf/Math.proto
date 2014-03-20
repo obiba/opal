@@ -65,6 +65,21 @@ message TextSummaryDto {
   }
 }
 
+message GeoSummaryDto {
+  required int64 n = 2;
+  repeated FrequencyDto frequencies = 3;
+  repeated PointDto points = 4;
+
+  extend SummaryStatisticsDto {
+    optional GeoSummaryDto geoSummary = 1005;
+  }
+}
+
+message PointDto {
+  required double lat = 1;
+  required double lon = 2;
+}
+
 message FrequencyDto {
   required string value = 1;
   required int64 freq = 2;

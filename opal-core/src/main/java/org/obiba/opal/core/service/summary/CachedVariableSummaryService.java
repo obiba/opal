@@ -20,6 +20,8 @@ import org.obiba.magma.math.summary.ContinuousVariableSummary;
 import org.obiba.magma.math.summary.ContinuousVariableSummaryFactory;
 import org.obiba.magma.math.summary.DefaultVariableSummary;
 import org.obiba.magma.math.summary.DefaultVariableSummaryFactory;
+import org.obiba.magma.math.summary.GeoVariableSummary;
+import org.obiba.magma.math.summary.GeoVariableSummaryFactory;
 import org.obiba.magma.math.summary.TextVariableSummary;
 import org.obiba.magma.math.summary.TextVariableSummaryFactory;
 import org.obiba.magma.math.summary.VariableSummary;
@@ -55,6 +57,7 @@ public class CachedVariableSummaryService implements VariableSummaryService {
     summaryServices.put(DefaultVariableSummaryFactory.class, new DefaultVariableSummaryCachedService());
     summaryServices.put(BinaryVariableSummaryFactory.class, new BinaryVariableSummaryCachedService());
     summaryServices.put(TextVariableSummaryFactory.class, new TextVariableSummaryCachedService());
+    summaryServices.put(GeoVariableSummaryFactory.class, new GeoVariableSummaryCachedService());
   }
 
   @SuppressWarnings("unchecked")
@@ -202,6 +205,22 @@ public class CachedVariableSummaryService implements VariableSummaryService {
     @Override
     protected TextVariableSummary.Builder newVariableSummaryBuilder(@NotNull Variable variable) {
       return new TextVariableSummary.Builder(variable);
+    }
+  }
+
+  private class GeoVariableSummaryCachedService extends
+      AbstractVariableSummaryCachedService<GeoVariableSummary, GeoVariableSummaryFactory, GeoVariableSummary.Builder> {
+
+    @NotNull
+    @Override
+    protected Cache getCache() {
+      return cacheManager.getCache("opal-variable-summary-geo");
+    }
+
+    @NotNull
+    @Override
+    protected GeoVariableSummary.Builder newVariableSummaryBuilder(@NotNull Variable variable) {
+      return new GeoVariableSummary.Builder(variable);
     }
   }
 }

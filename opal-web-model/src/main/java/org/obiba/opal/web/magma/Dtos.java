@@ -20,6 +20,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.obiba.magma.Attribute;
 import org.obiba.magma.Category;
+import org.obiba.magma.Coordinate;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.Timestamped;
 import org.obiba.magma.Timestamps;
@@ -34,6 +35,7 @@ import org.obiba.magma.math.summary.BinaryVariableSummary;
 import org.obiba.magma.math.summary.CategoricalVariableSummary;
 import org.obiba.magma.math.summary.ContinuousVariableSummary;
 import org.obiba.magma.math.summary.DefaultVariableSummary;
+import org.obiba.magma.math.summary.GeoVariableSummary;
 import org.obiba.magma.math.summary.TextVariableSummary;
 import org.obiba.magma.type.BinaryType;
 import org.obiba.opal.web.model.Magma;
@@ -472,6 +474,27 @@ public final class Dtos {
     }
 
     dtoBuilder.setOtherFrequency(otherFrequency);
+
+    return dtoBuilder;
+  }
+
+  public static Math.GeoSummaryDto.Builder asDto(GeoVariableSummary summary) {
+    Math.GeoSummaryDto.Builder dtoBuilder = Math.GeoSummaryDto.newBuilder() //
+        .setN(summary.getN());
+    for(GeoVariableSummary.Frequency frequency : summary.getFrequencies()) {
+
+      Math.FrequencyDto.Builder freqBuilder = Math.FrequencyDto.newBuilder() //
+          .setValue(frequency.getValue()) //
+          .setFreq(frequency.getFreq())//
+          .setMissing(frequency.isMissing());
+
+      if(isNumeric(frequency.getPct())) freqBuilder.setPct(frequency.getPct());
+      dtoBuilder.addFrequencies(freqBuilder);
+    }
+
+    for(Coordinate coord : summary.getCoordinates()) {
+      dtoBuilder.addPoints(Math.PointDto.newBuilder().setLon(coord.getLongitude()).setLat(coord.getLatitude()).build());
+    }
 
     return dtoBuilder;
   }

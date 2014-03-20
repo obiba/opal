@@ -22,6 +22,7 @@ import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
 import org.obiba.opal.web.model.client.math.DefaultSummaryDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
+import org.obiba.opal.web.model.client.math.GeoSummaryDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 import org.obiba.opal.web.model.client.math.TextSummaryDto;
 
@@ -123,6 +124,8 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
       renderTextSummary(dto);
     } else if(dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical) != null) {
       renderCategoricalSummary(dto);
+    } else if(dto.getExtension(GeoSummaryDto.SummaryStatisticsDtoExtensions.geoSummary) != null) {
+      renderGeoSummary(dto);
     } else {
       renderNoSummary();
     }
@@ -199,7 +202,8 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
 
     summary.add(
         new DefaultSummaryView(defaultSummaryDto, valuesByMissing.get(false), valuesByMissing.get(true), totals[0],
-            totals[1]));
+            totals[1])
+    );
   }
 
   private void renderTextSummary(SummaryStatisticsDto dto) {
@@ -222,13 +226,38 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
 
     summary.add(
         new TextSummaryView(textSummaryDto, valuesByMissing.get(false), valuesByMissing.get(true), totals[0], totals[1],
-            textSummaryDto.getOtherFrequency(), DEFAULT_MAX_TEXT_RESULTS));
+            textSummaryDto.getOtherFrequency(), DEFAULT_MAX_TEXT_RESULTS)
+    );
   }
 
   private void renderBinarySummary(SummaryStatisticsDto dto) {
     BinarySummaryDto binarySummaryDto = dto.getExtension(BinarySummaryDto.SummaryStatisticsDtoExtensions.binarySummary)
         .cast();
     summary.add(new BinarySummaryView(binarySummaryDto));
+  }
+
+  private void renderGeoSummary(SummaryStatisticsDto dto) {
+    GeoSummaryDto geoSummaryDto = dto.getExtension(GeoSummaryDto.SummaryStatisticsDtoExtensions.geoSummary).cast();
+
+    final double[] totals = { 0d, 0d };
+    ImmutableListMultimap<Boolean, FrequencyDto> valuesByMissing = Multimaps
+        .index(JsArrays.toIterable(geoSummaryDto.getFrequenciesArray()), new Function<FrequencyDto, Boolean>() {
+          @Nullable
+          @Override
+          public Boolean apply(@Nullable FrequencyDto input) {
+            if(input != null && !input.getMissing()) {
+              input.setValue(translations.notEmpty());
+              totals[0] += input.getFreq();
+              return false;
+            }
+            totals[1] += input == null ? 0 : input.getFreq();
+            return true;
+          }
+        });
+
+    summary.add(
+        new GeoSummaryView(geoSummaryDto, valuesByMissing.get(false), valuesByMissing.get(true), totals[0], totals[1])
+    );
   }
 
   @Override

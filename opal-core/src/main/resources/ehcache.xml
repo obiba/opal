@@ -44,6 +44,14 @@
       overflowToDisk="true"
       diskPersistent="true"/>
 
+  <cache name="opal-variable-summary-geo"
+      maxElementsInMemory="1"
+      eternal="true"
+      timeToLiveSeconds="0"
+      timeToIdleSeconds="0"
+      overflowToDisk="true"
+      diskPersistent="true"/>
+
   <!-- We want eternal="true" and no timeToIdle or timeToLive settings because Shiro manages session
          expirations explicitly.  If we set it to false and then set corresponding timeToIdle and timeToLive properties,
          ehcache would evict sessions without Shiro's knowledge, which would cause many problems
