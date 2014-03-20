@@ -26,6 +26,7 @@ import org.obiba.opal.web.magma.math.BinarySummaryResource;
 import org.obiba.opal.web.magma.math.CategoricalSummaryResource;
 import org.obiba.opal.web.magma.math.ContinuousSummaryResource;
 import org.obiba.opal.web.magma.math.DefaultSummaryResource;
+import org.obiba.opal.web.magma.math.GeoSummaryResource;
 import org.obiba.opal.web.magma.math.SummaryResource;
 import org.obiba.opal.web.magma.math.TextSummaryResource;
 import org.obiba.opal.web.model.Magma;
@@ -135,9 +136,10 @@ public class VariableResourceImpl extends AbstractValueTableResource implements 
         return applicationContext.getBean(ContinuousSummaryResource.class);
       case BINARY:
         return applicationContext.getBean(BinarySummaryResource.class);
+      case GEO:
+        return applicationContext.getBean(GeoSummaryResource.class);
       case TEMPORAL:
       case UNDETERMINED:
-      case GEO:
       default:
         return applicationContext.getBean(DefaultSummaryResource.class);
     }

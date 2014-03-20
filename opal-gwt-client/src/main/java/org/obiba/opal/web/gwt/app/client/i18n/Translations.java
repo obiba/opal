@@ -2245,4 +2245,8 @@ public interface Translations extends Constants {
   @Description("Total other label")
   @DefaultStringValue("Other values...")
   String totalOtherLabel();
+
+  @Description("Approx. Area (Km2) label")
+  @DefaultStringValue("Approximate Area (Km2)")
+  String approxArea();
 }
