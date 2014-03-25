@@ -1371,7 +1371,7 @@
               <excludeRoot>target/generated-sources</excludeRoot>
             </excludeRoots>
             <rulesets>
-              <ruleset>https://github.com/obiba/conventions/raw/master/obiba-pmd-ruleset.xml</ruleset>
+              <ruleset>http://github.com/obiba/conventions/raw/master/obiba-pmd-ruleset.xml</ruleset>
             </rulesets>
           </configuration>
         </plugin>

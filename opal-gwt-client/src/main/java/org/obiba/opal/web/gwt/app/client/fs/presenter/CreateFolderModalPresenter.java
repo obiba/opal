@@ -94,6 +94,10 @@ public class CreateFolderModalPresenter extends ModalPresenterWidget<CreateFolde
         .withCallback(Response.SC_INTERNAL_SERVER_ERROR, error).send();
   }
 
+  public void setCurrentFolder(FileDto fileDto) {
+    currentFolder = fileDto;
+  }
+
   private class FolderNameValidationHandler extends ViewValidationHandler {
 
     private Set<FieldValidator> validators;
