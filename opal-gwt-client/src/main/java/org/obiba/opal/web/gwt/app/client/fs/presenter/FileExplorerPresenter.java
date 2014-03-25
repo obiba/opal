@@ -98,9 +98,6 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
     for(SplitPaneWorkbenchPresenter.Slot slot : SplitPaneWorkbenchPresenter.Slot.values()) {
       setInSlot(slot, getDefaultPresenter(slot));
     }
-    // Create so that modal's event handlers are active
-    fileUploadModalProvider.create();
-    createFolderModalProvider.create();
   }
 
   protected PresenterWidget<?> getDefaultPresenter(SplitPaneWorkbenchPresenter.Slot slot) {
@@ -281,12 +278,12 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
 
   @Override
   public void onAddFolder() {
-    createFolderModalProvider.show();
+    createFolderModalProvider.get().setCurrentFolder(getCurrentFolder());
   }
 
   @Override
   public void onUploadFile() {
-    fileUploadModalProvider.show();
+    fileUploadModalProvider.get().setCurrentFolder(getCurrentFolder());
   }
 
   @Override
