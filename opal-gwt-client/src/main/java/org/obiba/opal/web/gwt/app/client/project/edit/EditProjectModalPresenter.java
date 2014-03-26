@@ -260,7 +260,7 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
       protected boolean hasError() {
         String name = getView().getName().getText();
         for(ProjectDto projectDto : JsArrays.toIterable(projects)) {
-          if(projectDto.getName().equalsIgnoreCase(name)) {
+          if(projectDto.getName().equals(name)) {
             return true;
           }
         }
