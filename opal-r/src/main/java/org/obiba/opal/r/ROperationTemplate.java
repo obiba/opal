@@ -21,6 +21,4 @@ public interface ROperationTemplate {
    */
   void execute(ROperation rop);
 
-  void execute(Iterable<ROperation> rop);
-
 }

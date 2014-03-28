@@ -31,16 +31,17 @@ public interface RSymbolResource {
 
   @PUT
   @Consumes(MediaType.TEXT_PLAIN)
-  Response putString(@Context UriInfo uri, String content);
+  Response putString(@Context UriInfo uri, String content, @QueryParam("async") @DefaultValue("false") boolean async);
 
   @PUT
   @Consumes("application/x-rscript")
-  Response putRScript(@Context UriInfo uri, String script);
+  Response putRScript(@Context UriInfo uri, String script, @QueryParam("async") @DefaultValue("false") boolean async);
 
   @PUT
   @Consumes("application/x-opal")
   Response putMagma(@Context UriInfo uri, String path, @QueryParam("variables") String variableFilter,
-      @QueryParam("missings") @DefaultValue("false") Boolean missings, @QueryParam("identifiers") String identifiers);
+      @QueryParam("missings") @DefaultValue("false") Boolean missings, @QueryParam("identifiers") String identifiers,
+      @QueryParam("async") @DefaultValue("false") boolean async);
 
   @DELETE
   Response rm();

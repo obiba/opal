@@ -9,9 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.web.r;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.obiba.opal.r.RASyncOperationTemplate;
 import org.obiba.opal.r.ROperationTemplate;
 import org.obiba.opal.r.ROperationWithResult;
 import org.obiba.opal.r.RScriptROperation;
@@ -31,16 +33,25 @@ public abstract class AbstractOpalRSessionResource {
    * @param script
    * @return
    */
-  Response executeScript(ROperationTemplate rSession, String script) {
+  Response executeScript(ROperationTemplate rSession, String script, boolean async) {
     if(script == null) return Response.status(Status.BAD_REQUEST).build();
 
     ROperationWithResult rop = new RScriptROperation(script);
-    rSession.execute(rop);
-    if(rop.hasResult() && rop.hasRawResult()) {
-      return Response.ok().entity(rop.getRawResult().asBytes()).build();
+    if(async && rSession instanceof RASyncOperationTemplate) {
+      String id = ((RASyncOperationTemplate)rSession).executeAsync(rop);
+      return Response.ok().entity(id).type(MediaType.TEXT_PLAIN_TYPE).build();
+    } else {
+      rSession.execute(rop);
+      if(rop.hasResult() && rop.hasRawResult()) {
+        return Response.ok().entity(rop.getRawResult().asBytes()).build();
+      }
+      log.error("R Script '{}' has result: {}, has raw result: {}", script, rop.hasResult(), rop.hasRawResult());
+      return Response.status(Status.INTERNAL_SERVER_ERROR).build();
     }
-    log.error("R Script '{}' has result: {}, has raw result: {}", script, rop.hasResult(), rop.hasRawResult());
-    return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+  }
+
+  Response executeScript(ROperationTemplate rSession, String script) {
+    return executeScript(rSession, script, false);
   }
 
 }

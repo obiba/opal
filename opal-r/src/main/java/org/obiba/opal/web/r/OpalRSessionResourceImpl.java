@@ -68,12 +68,12 @@ public class OpalRSessionResourceImpl extends AbstractOpalRSessionResource imple
   }
 
   @Override
-  public Response execute(String script, String body) {
+  public Response execute(String script, boolean async, String body) {
     String rScript = script;
     if(Strings.isNullOrEmpty(rScript)) {
       rScript = body;
     }
-    return executeScript(rSession, rScript);
+    return executeScript(rSession, rScript, async);
   }
 
   @Override

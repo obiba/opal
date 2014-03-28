@@ -60,19 +60,19 @@ public abstract class AbstractRSymbolResourceImpl extends AbstractOpalRSessionRe
   }
 
   @Override
-  public Response putString(UriInfo uri, String content) {
+  public Response putString(UriInfo uri, String content, boolean async) {
     rSession.execute(new StringAssignROperation(name, content));
     return Response.created(getSymbolURI(uri)).build();
   }
 
   @Override
-  public Response putRScript(UriInfo uri, String script) {
+  public Response putRScript(UriInfo uri, String script, boolean async) {
     rSession.execute(new RScriptROperation(name + "<-" + script));
     return Response.created(getSymbolURI(uri)).build();
   }
 
   @Override
-  public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean missings, String identifiers) {
+  public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean missings, String identifiers, boolean async) {
     rSession
         .execute(new MagmaAssignROperation(name, path, variableFilter, missings, identifiers, identifiersTableService));
     return Response.created(getSymbolURI(uri)).build();

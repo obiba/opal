@@ -36,27 +36,28 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
   private Supplier<DatashieldConfiguration> configSupplier;
 
   @Override
-  public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean missings, String identifiers) {
+  public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean missings, String identifiers,
+      boolean async) {
     DataShieldLog.userLog("creating symbol '{}' from opal data '{}'", getName(), path);
-    return super.putMagma(uri, path, variableFilter, missings, identifiers);
+    return super.putMagma(uri, path, variableFilter, missings, identifiers, async);
   }
 
   @Override
-  public Response putRScript(UriInfo uri, String script) {
+  public Response putRScript(UriInfo uri, String script, boolean async) {
     DataShieldLog.userLog("creating symbol '{}' from R script '{}'", getName(), script);
     switch(configSupplier.get().getLevel()) {
       case RESTRICTED:
         return putRestrictedRScript(uri, script);
       case UNRESTRICTED:
-        return super.putRScript(uri, script);
+        return super.putRScript(uri, script, async);
     }
     throw new IllegalStateException("Unknown script interpretation level: " + configSupplier.get().getLevel());
   }
 
   @Override
-  public Response putString(UriInfo uri, String content) {
+  public Response putString(UriInfo uri, String content, boolean async) {
     DataShieldLog.userLog("creating text symbol '{}' as '{}'", getName(), content);
-    return super.putString(uri, content);
+    return super.putString(uri, content, async);
   }
 
   @Override

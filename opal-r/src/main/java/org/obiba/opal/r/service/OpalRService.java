@@ -111,18 +111,6 @@ public class OpalRService implements Service, ROperationTemplate, HasServiceList
     }
   }
 
-  @Override
-  public void execute(Iterable<ROperation> rops) {
-    RConnection connection = newConnection();
-    try {
-      for(ROperation rop : rops) {
-        rop.doWithConnection(connection);
-      }
-    } finally {
-      connection.close();
-    }
-  }
-
   //
   // Service methods
   //

@@ -9,12 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.r.service;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.obiba.opal.r.RASyncOperationTemplate;
 import org.obiba.opal.r.ROperation;
-import org.obiba.opal.r.ROperationTemplate;
 import org.obiba.opal.r.RRuntimeException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RSession;
@@ -22,10 +25,12 @@ import org.rosuda.REngine.Rserve.RserveException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
+
 /**
  * Reference to a R session.
  */
-public class OpalRSession implements ROperationTemplate {
+public class OpalRSession implements RASyncOperationTemplate {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRSession.class);
 
@@ -34,6 +39,25 @@ public class OpalRSession implements ROperationTemplate {
   private final Lock lock = new ReentrantLock();
 
   private RSession rSession;
+
+  /**
+   * R commands to be processed.
+   */
+  private final BlockingQueue<RCommand> rCommandQueue = new LinkedBlockingQueue<>();
+
+  /**
+   * All R commands.
+   */
+  private final List<RCommand> rCommandList = Lists.newLinkedList();
+
+  private RCommandsConsumer rCommandsConsumer;
+
+  private Thread consumer;
+
+  /**
+   * R command identifier increment.
+   */
+  private int commandId = 1;
 
   /**
    * Build a R session reference from a R connection.
@@ -82,24 +106,37 @@ public class OpalRSession implements ROperationTemplate {
     }
   }
 
-  /**
-   * Executes a batch of {@code ROperation} within a single connection to the R environment.
-   *
-   * @param rops
-   */
   @Override
-  public void execute(Iterable<ROperation> rops) {
-    RConnection connection = null;
-    lock.lock();
-    try {
-      connection = newConnection();
-      for(ROperation rop : rops) {
-        rop.doWithConnection(connection);
-      }
-    } finally {
-      lock.unlock();
-      if(connection != null) close(connection);
+  public synchronized String executeAsync(ROperation rop) {
+    String rCommandId = id + "-" + commandId++;
+    RCommand cmd = new RCommand(rCommandId, rop);
+    rCommandList.add(cmd);
+    rCommandQueue.offer(cmd);
+    ensureRCommandsConsumer();
+    return rCommandId;
+  }
+
+  @Override
+  public boolean hasRCommand(String cmdId) {
+    for(RCommand rCommand : rCommandList) {
+      if(rCommand.getId().equals(cmdId)) return true;
     }
+    return false;
+  }
+
+  @Override
+  public RCommand getRCommand(String cmdId) {
+    for(RCommand rCommand : rCommandList) {
+      if(rCommand.getId().equals(cmdId)) return rCommand;
+    }
+    throw new NoSuchRCommandException(cmdId);
+  }
+
+  @Override
+  public RCommand removeRCommand(String cmdId) {
+    RCommand rCommand = getRCommand(cmdId);
+    rCommandList.remove(rCommand);
+    return rCommand;
   }
 
   /**
@@ -110,10 +147,21 @@ public class OpalRSession implements ROperationTemplate {
 
     try {
       newConnection().close();
-    } catch (Exception e) {
+    } catch(Exception e) {
       // ignore
     } finally {
       rSession = null;
+    }
+
+    if(consumer == null) return;
+    try {
+      consumer.interrupt();
+    } catch(Exception e) {
+      // ignore
+    } finally {
+      consumer = null;
+      rCommandList.clear();
+      rCommandQueue.clear();
     }
   }
 
@@ -127,7 +175,7 @@ public class OpalRSession implements ROperationTemplate {
    * @return
    */
   private RConnection newConnection() {
-    if (rSession == null) throw new NoSuchRSessionException();
+    if(rSession == null) throw new NoSuchRSessionException();
     try {
       return rSession.attach();
     } catch(RserveException e) {
@@ -146,8 +194,44 @@ public class OpalRSession implements ROperationTemplate {
     try {
       rSession = connection.detach();
     } catch(RserveException e) {
-      log.error("Error while detaching R session.", e);
-      throw new RRuntimeException(e);
+      log.warn("Error while detaching R session.", e);
+    }
+  }
+
+  private void ensureRCommandsConsumer() {
+    if(rCommandsConsumer == null) {
+      rCommandsConsumer = new RCommandsConsumer();
+      startRCommandsConsumer();
+    } else if(consumer != null && !consumer.isAlive()) {
+      startRCommandsConsumer();
+    }
+  }
+
+  private void startRCommandsConsumer() {
+    consumer = new Thread(rCommandsConsumer);
+    consumer.setName("R Operations Consumer " + rCommandsConsumer);
+    consumer.start();
+  }
+
+  private class RCommandsConsumer implements Runnable {
+
+    @Override
+    public void run() {
+      log.debug("Starting R operations consumer");
+      try {
+        //noinspection InfiniteLoopStatement
+        while(true) {
+          consume(rCommandQueue.take());
+        }
+      } catch(InterruptedException ignored) {
+        log.debug("Stopping R operations consumer");
+      }
+    }
+
+    private void consume(RCommand rCommand) {
+      rCommand.inProgress();
+      execute(rCommand.getROperation());
+      rCommand.completed();
     }
   }
 
