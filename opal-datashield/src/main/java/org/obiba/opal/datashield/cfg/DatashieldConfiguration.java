@@ -11,7 +11,10 @@ package org.obiba.opal.datashield.cfg;
 
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.datashield.DataShieldEnvironment;
@@ -43,12 +46,46 @@ public class DatashieldConfiguration implements OpalConfigurationExtension, Seri
 
   private List<DataShieldEnvironment> environments;
 
+  private Map<String, String> options = new HashMap<>();
+
   public Level getLevel() {
     return level == null ? Level.RESTRICTED : level;
   }
 
   public void setLevel(Level level) {
     this.level = level;
+  }
+
+  public Iterable<Map.Entry<String, String>> getOptions() {
+    return options.entrySet();
+  }
+
+  public String getOption(String name) {
+    if (options.containsKey(name)) {
+      return options.get(name);
+    }
+
+    throw new NoSuchElementException(name + " option does not exists");
+  }
+
+  public void addOption(String name, String value) {
+    options.put(name, value);
+  }
+
+  public void updateOption(String name, String value) {
+    if (!options.containsKey(name)) {
+      throw new NoSuchElementException(name + " option does not exists");
+    }
+
+    options.put(name, value);
+  }
+
+  public void removeOption(String name) {
+    if (!options.containsKey(name)) {
+      throw new NoSuchElementException(name + " option does not exists");
+    }
+
+    options.remove(name);
   }
 
   public DataShieldEnvironment getAggregateEnvironment() {
