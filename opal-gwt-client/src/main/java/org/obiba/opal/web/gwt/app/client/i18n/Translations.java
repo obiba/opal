@@ -407,6 +407,8 @@ public interface Translations extends Constants {
       "TwoMappedUnitsExpected", "Exactly two Units to be mapped are expected.",//
       "DataShieldMethodAlreadyExistWithTheSpecifiedName", "A method already exists with the specified name.",//
       "DataShieldPackageAlreadyExistWithTheSpecifiedName", "A package already exists with the specified name.",//
+      "DataShieldROptionNameIsRequired", "Option name is required.",//
+      "DataShieldROptionValueIsRequired", "Option value is required.",//
       "DataShieldMethodNameIsRequired", "A name is required.",//
       "DataShieldRScriptIsRequired", "A R script is required.",//
       "DataShieldRFunctionIsRequired", "A R function is required.",//
@@ -757,6 +759,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("No summary data available")
   String noSummaryDataAvailableLabel();
 
+  @Description("No Options label")
+  @DefaultStringValue("No Options")
+  String noOtionsLabel();
+
   @Description("Summary preview pending on label")
   @DefaultStringValue("Summary preview pending on")
   String summaryPreviewPendingLabel();
@@ -975,6 +981,14 @@ public interface Translations extends Constants {
   @Description("Edit DataShield method label")
   @DefaultStringValue("Edit Method")
   String editDataShieldMethod();
+
+  @Description("Add R Option title")
+  @DefaultStringValue("Add R Option")
+  String addROptionTitle();
+
+  @Description("Edit R Option title")
+  @DefaultStringValue("Edit R Option")
+  String editROptionTitle();
 
   @Description("R Script label")
   @DefaultStringValue("R Script")

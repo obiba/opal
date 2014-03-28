@@ -607,6 +607,22 @@ public enum UriBuilders {
       return UriBuilder.create().segment("shell", "commands");
 
     }
+  },
+
+  DATASHIELD_ROPTIONS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datashield", "options");
+
+    }
+  },
+
+  DATASHIELD_ROPTION {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datashield", "option");
+
+    }
   };
 
   public abstract UriBuilder create();
