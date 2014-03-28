@@ -19,6 +19,11 @@ message DataShieldMethodDto {
   extensions 1000 to max;
 }
 
+message DataShieldROptionDto {
+  required string name = 1;
+  required string value = 2;
+}
+
 message RFunctionDataShieldMethodDto {
   required string func = 1;
   optional string rPackage = 2;
