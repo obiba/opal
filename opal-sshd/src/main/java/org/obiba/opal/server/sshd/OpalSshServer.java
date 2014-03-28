@@ -1,20 +1,15 @@
 package org.obiba.opal.server.sshd;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.sshd.SshServer;
-import org.apache.sshd.common.Factory;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.Session;
 import org.apache.sshd.server.Command;
-import org.apache.sshd.server.Environment;
-import org.apache.sshd.server.ExitCallback;
 import org.apache.sshd.server.FileSystemFactory;
 import org.apache.sshd.server.FileSystemView;
 import org.apache.sshd.server.PasswordAuthenticator;
@@ -25,15 +20,9 @@ import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.core.service.SubjectProfileService;
-import org.obiba.opal.shell.CommandRegistry;
-import org.obiba.opal.shell.OpalShell;
-import org.obiba.opal.shell.OpalShellExitCallback;
-import org.obiba.opal.shell.OpalShellFactory;
-import org.obiba.opal.shell.OpalShellHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -46,12 +35,6 @@ public class OpalSshServer implements Service {
 
   private final SshServer sshd;
 
-  private final CommandRegistry commandRegistry;
-
-  private final OpalShellHolder opalShellHolder;
-
-  private final OpalShellFactory shellFactory;
-
   @Autowired
   private OpalRuntime opalRuntime;
 
@@ -61,24 +44,12 @@ public class OpalSshServer implements Service {
   private boolean isRunning = false;
 
   @Autowired
-  public OpalSshServer(@Qualifier("ssh") CommandRegistry commandRegistry, OpalShellFactory shellFactory,
-      OpalShellHolder opalShellHolder, @Value("${org.obiba.opal.ssh.port}") Integer port) {
-    this.commandRegistry = commandRegistry;
-    this.shellFactory = shellFactory;
-    this.opalShellHolder = opalShellHolder;
+  public OpalSshServer(@Value("${org.obiba.opal.ssh.port}") Integer port) {
 
     sshd = SshServer.setUpDefaultServer();
     sshd.setPort(port);
     sshd.setKeyPairProvider(
         new PEMGeneratorHostKeyProvider(System.getProperty("OPAL_HOME") + "/conf/sshd.pem", "RSA", 2048));
-    sshd.setShellFactory(new Factory<Command>() {
-
-      @Override
-      public Command create() {
-        return new OpalShellCommand();
-      }
-
-    });
     sshd.setPasswordAuthenticator(new PasswordAuthenticator() {
 
       @Override
@@ -149,63 +120,6 @@ public class OpalSshServer implements Service {
   @Override
   public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
     throw new NoSuchServiceConfigurationException(getName());
-  }
-
-  private class OpalShellCommand implements Command {
-
-    private Thread thread;
-
-    private ExitCallback exitCallback;
-
-    private InputStream in;
-
-    private OutputStream out;
-
-    private OutputStream err;
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public void destroy() {
-      thread.stop();
-    }
-
-    @Override
-    public void setErrorStream(OutputStream err) {
-      this.err = err;
-    }
-
-    @Override
-    public void setExitCallback(ExitCallback callback) {
-      exitCallback = callback;
-    }
-
-    @Override
-    public void setInputStream(InputStream in) {
-      this.in = in;
-    }
-
-    @Override
-    public void setOutputStream(OutputStream out) {
-      this.out = out;
-    }
-
-    @Override
-    public void start(Environment env) throws IOException {
-      OpalShell shell = shellFactory.newShell(commandRegistry, in, out, err);
-      shell.addExitCallback(new OpalShellExitCallback() {
-
-        @Override
-        public void onExit() {
-          SecurityUtils.getSubject().logout();
-          exitCallback.onExit(0);
-        }
-      });
-      opalShellHolder.bind(shell);
-      thread = new Thread(shell);
-      thread.setName("Opal Shell");
-      thread.setDaemon(true);
-      thread.start();
-    }
   }
 
 }
