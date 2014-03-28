@@ -25,12 +25,9 @@ public interface DataShieldROptionResource {
   Response deleteDataShieldROption(@QueryParam("name") String name);
 
   @POST
-  Response createDataShieldROption(DataShield.DataShieldROptionDto dto);
+  @PUT
+  Response addOrUpdateDataShieldROption(DataShield.DataShieldROptionDto dto);
 
   @GET
   Response getDataShieldROption(@QueryParam("name") String name);
-
-  @PUT
-  Response updateDataShieldROption(DataShield.DataShieldROptionDto dto);
-
 }

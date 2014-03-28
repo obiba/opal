@@ -60,6 +60,10 @@ public class DatashieldConfiguration implements OpalConfigurationExtension, Seri
     return options.entrySet();
   }
 
+  public boolean hasOption(String name) {
+    return options.containsKey(name);
+  }
+
   public String getOption(String name) {
     if (options.containsKey(name)) {
       return options.get(name);
@@ -68,24 +72,12 @@ public class DatashieldConfiguration implements OpalConfigurationExtension, Seri
     throw new NoSuchElementException(name + " option does not exists");
   }
 
-  public void addOption(String name, String value) {
-    options.put(name, value);
-  }
-
-  public void updateOption(String name, String value) {
-    if (!options.containsKey(name)) {
-      throw new NoSuchElementException(name + " option does not exists");
-    }
-
+  public void addOrUpdateOption(String name, String value) {
     options.put(name, value);
   }
 
   public void removeOption(String name) {
-    if (!options.containsKey(name)) {
-      throw new NoSuchElementException(name + " option does not exists");
-    }
-
-    options.remove(name);
+    if (hasOption(name)) options.remove(name);
   }
 
   public DataShieldEnvironment getAggregateEnvironment() {

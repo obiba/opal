@@ -51,13 +51,13 @@ public class DataShieldROptionResourceImpl implements DataShieldROptionResource 
   }
 
   @Override
-  public Response createDataShieldROption(final DataShield.DataShieldROptionDto dto) {
+  public Response addOrUpdateDataShieldROption(final DataShield.DataShieldROptionDto dto) {
     configurationSupplier
         .modify(new ExtensionConfigurationSupplier.ExtensionConfigModificationTask<DatashieldConfiguration>() {
 
           @Override
           public void doWithConfig(DatashieldConfiguration config) {
-            config.addOption(dto.getName(), dto.getValue());
+            config.addOrUpdateOption(dto.getName(), dto.getValue());
           }
         });
 
@@ -67,23 +67,14 @@ public class DataShieldROptionResourceImpl implements DataShieldROptionResource 
   @Override
   public Response getDataShieldROption(final @QueryParam("name") String name) {
     DatashieldConfiguration config = configurationSupplier.get();
-    DataShield.DataShieldROptionDto dto = DataShield.DataShieldROptionDto.newBuilder().setName(name)
-        .setValue(config.getOption(name)).build();
 
-    return Response.ok().entity(dto).build();
-  }
+    if (config.hasOption(name)) {
+      DataShield.DataShieldROptionDto dto = DataShield.DataShieldROptionDto.newBuilder().setName(name)
+          .setValue(config.getOption(name)).build();
 
-  @Override
-  public Response updateDataShieldROption(final DataShield.DataShieldROptionDto dto) {
-    configurationSupplier
-        .modify(new ExtensionConfigurationSupplier.ExtensionConfigModificationTask<DatashieldConfiguration>() {
+      return Response.ok().entity(dto).build();
+    }
 
-          @Override
-          public void doWithConfig(DatashieldConfiguration config) {
-            config.updateOption(dto.getName(), dto.getValue());
-          }
-        });
-
-    return Response.ok().entity(dto).build();
+    return Response.status(Response.Status.NOT_FOUND).build();
   }
 }
