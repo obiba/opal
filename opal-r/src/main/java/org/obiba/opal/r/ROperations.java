@@ -37,6 +37,11 @@ public final class ROperations {
       protected void doWithConnection() {
         eval(script);
       }
+
+      @Override
+      public String toString() {
+        return script;
+      }
     };
   }
 

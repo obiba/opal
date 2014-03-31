@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.r.service;
 
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
@@ -48,7 +50,7 @@ public class OpalRSession implements RASyncOperationTemplate {
   /**
    * All R commands.
    */
-  private final List<RCommand> rCommandList = Lists.newLinkedList();
+  private final List<RCommand> rCommandList = Collections.synchronizedList(new LinkedList<RCommand>());
 
   private RCommandsConsumer rCommandsConsumer;
 
@@ -108,12 +110,17 @@ public class OpalRSession implements RASyncOperationTemplate {
 
   @Override
   public synchronized String executeAsync(ROperation rop) {
+    ensureRCommandsConsumer();
     String rCommandId = id + "-" + commandId++;
     RCommand cmd = new RCommand(rCommandId, rop);
     rCommandList.add(cmd);
     rCommandQueue.offer(cmd);
-    ensureRCommandsConsumer();
     return rCommandId;
+  }
+
+  @Override
+  public Iterable<RCommand> getRCommands() {
+    return rCommandList;
   }
 
   @Override
@@ -202,7 +209,7 @@ public class OpalRSession implements RASyncOperationTemplate {
     if(rCommandsConsumer == null) {
       rCommandsConsumer = new RCommandsConsumer();
       startRCommandsConsumer();
-    } else if(consumer != null && !consumer.isAlive()) {
+    } else if(consumer == null || !consumer.isAlive()) {
       startRCommandsConsumer();
     }
   }
@@ -225,13 +232,20 @@ public class OpalRSession implements RASyncOperationTemplate {
         }
       } catch(InterruptedException ignored) {
         log.debug("Stopping R operations consumer");
+      } catch(Exception e) {
+        log.error("Error in R command consumer", e);
       }
     }
 
     private void consume(RCommand rCommand) {
-      rCommand.inProgress();
-      execute(rCommand.getROperation());
-      rCommand.completed();
+      try {
+        rCommand.inProgress();
+        execute(rCommand.getROperation());
+        rCommand.completed();
+      } catch(Exception e) {
+        log.error("Error when consuming R command: {}", e.getMessage());
+        rCommand.failed(e.getMessage());
+      }
     }
   }
 

@@ -24,6 +24,12 @@ public interface RASyncOperationTemplate extends ROperationTemplate {
   String executeAsync(ROperation rop);
 
   /**
+   * Iterate over the registered R commands.
+   * @return
+   */
+  Iterable<RCommand> getRCommands();
+
+  /**
    * Check if a R command exists with provided identifier.
    * @param id
    * @return

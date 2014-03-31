@@ -14,3 +14,14 @@ message RPackageDto {
   required string name = 1;
   repeated Opal.EntryDto description = 2;
 }
+
+message RCommandDto {
+  required string id = 1;
+  required string script = 2;
+  required string status = 3;
+  required string createDate = 4;
+  required bool withResult = 5 [default = false];
+  optional string startDate = 6;
+  optional string endDate = 7;
+  optional string error = 8;
+}

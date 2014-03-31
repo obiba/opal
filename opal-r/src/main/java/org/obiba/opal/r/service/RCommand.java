@@ -10,15 +10,19 @@
 
 package org.obiba.opal.r.service;
 
+import java.util.Date;
+
 import org.obiba.opal.r.ROperation;
 import org.obiba.opal.r.ROperationWithResult;
+
+import com.google.common.base.Strings;
 
 /**
  * A R command is for deferred execution of an ROperation.
  */
 public class RCommand {
   public enum Status {
-    PENDING, IN_PROGRESS, COMPLETED
+    PENDING, IN_PROGRESS, COMPLETED, FAILED
   }
 
   private final String id;
@@ -27,10 +31,19 @@ public class RCommand {
 
   private Status status;
 
+  private final Date createDate;
+
+  private Date startDate;
+
+  private Date endDate;
+
+  private String error;
+
   public RCommand(String id, ROperation rOperation) {
     this.id = id;
     this.rOperation = rOperation;
     status = Status.PENDING;
+    createDate = new Date();
   }
 
   public String getId() {
@@ -45,6 +58,26 @@ public class RCommand {
     return status;
   }
 
+  public Date getCreateDate() {
+    return createDate;
+  }
+
+  public Date getStartDate() {
+    return startDate;
+  }
+
+  public Date getEndDate() {
+    return endDate;
+  }
+
+  public boolean hasError() {
+    return !Strings.isNullOrEmpty(error);
+  }
+
+  public String getError() {
+    return error;
+  }
+
   public boolean hasResult() {
     return rOperation instanceof ROperationWithResult && asROperationWithResult().hasResult();
   }
@@ -55,9 +88,22 @@ public class RCommand {
 
   void inProgress() {
     status = Status.IN_PROGRESS;
+    startDate = new Date();
   }
 
   void completed() {
     status = Status.COMPLETED;
+    endDate = new Date();
+  }
+
+  void failed(String message) {
+    status = Status.FAILED;
+    endDate = new Date();
+    error = message;
+  }
+
+  @Override
+  public String toString() {
+    return rOperation.toString();
   }
 }

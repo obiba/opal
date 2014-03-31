@@ -24,6 +24,8 @@ import com.google.common.base.Preconditions;
 
 public abstract class AbstractRestrictedRScriptROperation extends AbstractROperationWithResult {
 
+  private final String script;
+
   private final SimpleNode scriptAst;
 
   private final DataShieldEnvironment environment;
@@ -35,6 +37,7 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
     Preconditions.checkArgument(environment != null, "environment cannot be null");
     Preconditions.checkArgument(validator != null, "validator cannot be null");
 
+    this.script = script;
     this.environment = environment;
 
     DataShieldLog.userLog("parsing '{}'", script);
@@ -62,4 +65,8 @@ public abstract class AbstractRestrictedRScriptROperation extends AbstractROpera
     return new RScriptGenerator(environment).toScript(scriptAst);
   }
 
+  @Override
+  public String toString() {
+    return script;
+  }
 }

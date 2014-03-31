@@ -36,4 +36,9 @@ public class RScriptROperation extends AbstractROperationWithResult {
     setResult(null);
     setResult(eval(script, serialize));
   }
+
+  @Override
+  public String toString() {
+    return script;
+  }
 }

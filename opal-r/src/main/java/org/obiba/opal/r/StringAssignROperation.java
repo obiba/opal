@@ -42,4 +42,14 @@ public class StringAssignROperation extends AbstractROperation {
     }
   }
 
+  @Override
+  public String toString() {
+    StringBuffer buffer = new StringBuffer();
+    for(Entry<String, List<String>> entry : symbols.entrySet()) {
+      for(String content : entry.getValue()) {
+        buffer.append(entry.getKey()).append(" <- ").append(content).append("\n");
+      }
+    }
+    return buffer.toString();
+  }
 }

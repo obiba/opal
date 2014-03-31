@@ -116,6 +116,11 @@ public class MagmaAssignROperation extends AbstractROperation {
     setEntities(ImmutableSortedSet.copyOf(table.getVariableEntities()));
   }
 
+  @Override
+  public String toString() {
+    return symbol + " <- opal[" + path + "]";
+  }
+
   //
   // Magma R Convectors
   //

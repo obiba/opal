@@ -1,5 +1,7 @@
 package org.obiba.opal.web.r;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -34,7 +36,8 @@ public interface OpalRSessionResource {
   @POST
   @Path("/execute")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
-  Response execute(@QueryParam("script") String script, @QueryParam("async") @DefaultValue("false") boolean async, String body);
+  Response execute(@QueryParam("script") String script, @QueryParam("async") @DefaultValue("false") boolean async,
+      String body);
 
   @GET
   @Path("/symbols")
@@ -49,4 +52,21 @@ public interface OpalRSessionResource {
 
   @Path("/symbol/{name}")
   RSymbolResource getRSymbolResource(@PathParam("name") String name);
+
+  @GET
+  @Path("/commands")
+  List<OpalR.RCommandDto> getRCommands();
+
+  @GET
+  @Path("/command/{rid}")
+  OpalR.RCommandDto getRCommand(@PathParam("rid") String rid);
+
+  @DELETE
+  @Path("/command/{rid}")
+  Response removeRCommand(@PathParam("rid") String rid);
+
+  @GET
+  @Path("/command/{rid}/result")
+  @Produces(MediaType.APPLICATION_OCTET_STREAM)
+  Response getRCommandResult(@PathParam("rid") String rid, @QueryParam("rm") @DefaultValue("true") boolean remove);
 }
