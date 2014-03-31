@@ -12,11 +12,13 @@ package org.obiba.opal.web.r;
 import java.net.URI;
 
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.r.MagmaAssignROperation;
+import org.obiba.opal.r.ROperation;
 import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.StringAssignROperation;
 import org.obiba.opal.r.service.OpalRSession;
@@ -61,21 +63,29 @@ public abstract class AbstractRSymbolResourceImpl extends AbstractOpalRSessionRe
 
   @Override
   public Response putString(UriInfo uri, String content, boolean async) {
-    rSession.execute(new StringAssignROperation(name, content));
-    return Response.created(getSymbolURI(uri)).build();
+    return putSymbol(uri, new StringAssignROperation(name, content), async);
   }
 
   @Override
   public Response putRScript(UriInfo uri, String script, boolean async) {
-    rSession.execute(new RScriptROperation(name + "<-" + script));
-    return Response.created(getSymbolURI(uri)).build();
+    return putSymbol(uri, new RScriptROperation(name + " <- " + script), async);
   }
 
   @Override
-  public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean missings, String identifiers, boolean async) {
-    rSession
-        .execute(new MagmaAssignROperation(name, path, variableFilter, missings, identifiers, identifiersTableService));
-    return Response.created(getSymbolURI(uri)).build();
+  public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean missings, String identifiers,
+      boolean async) {
+    return putSymbol(uri,
+        new MagmaAssignROperation(name, path, variableFilter, missings, identifiers, identifiersTableService), async);
+  }
+
+  private Response putSymbol(UriInfo uri, ROperation rop, boolean async) {
+    if(async) {
+      String id = rSession.executeAsync(rop);
+      return Response.created(getSymbolURI(uri)).entity(id).type(MediaType.TEXT_PLAIN_TYPE).build();
+    } else {
+      rSession.execute(rop);
+      return Response.created(getSymbolURI(uri)).build();
+    }
   }
 
   @Override
