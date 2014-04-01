@@ -18,6 +18,7 @@ import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.RestrictedAssignmentROperation;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.datashield.expr.ParseException;
+import org.obiba.opal.r.ROperation;
 import org.obiba.opal.web.r.AbstractRSymbolResourceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -47,7 +48,7 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
     DataShieldLog.userLog("creating symbol '{}' from R script '{}'", getName(), script);
     switch(configSupplier.get().getLevel()) {
       case RESTRICTED:
-        return putRestrictedRScript(uri, script);
+        return putRestrictedRScript(uri, script, async);
       case UNRESTRICTED:
         return super.putRScript(uri, script, async);
     }
@@ -71,11 +72,17 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
     return Response.noContent().build();
   }
 
-  protected Response putRestrictedRScript(UriInfo uri, String content) {
+  protected Response putRestrictedRScript(UriInfo uri, String content, boolean async) {
     try {
-      getRSession()
-          .execute(new RestrictedAssignmentROperation(getName(), content, configSupplier.get().getAssignEnvironment()));
-      return Response.created(getSymbolURI(uri)).build();
+      ROperation rop = new RestrictedAssignmentROperation(getName(), content,
+          configSupplier.get().getAssignEnvironment());
+      if(async) {
+        String id = getRSession().executeAsync(rop);
+        return Response.created(getSymbolURI(uri)).entity(id).type(MediaType.TEXT_PLAIN_TYPE).build();
+      } else {
+        getRSession().execute(rop);
+        return Response.created(getSymbolURI(uri)).build();
+      }
     } catch(ParseException e) {
       return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
     }

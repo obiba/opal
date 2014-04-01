@@ -59,7 +59,7 @@ public interface OpalRSessionResource {
 
   @GET
   @Path("/command/{rid}")
-  OpalR.RCommandDto getRCommand(@PathParam("rid") String rid);
+  OpalR.RCommandDto getRCommand(@PathParam("rid") String rid, @QueryParam("wait") @DefaultValue("false") boolean wait);
 
   @DELETE
   @Path("/command/{rid}")

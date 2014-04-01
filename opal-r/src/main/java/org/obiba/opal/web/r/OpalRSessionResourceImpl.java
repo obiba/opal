@@ -120,8 +120,20 @@ public class OpalRSessionResourceImpl extends AbstractOpalRSessionResource imple
   }
 
   @Override
-  public OpalR.RCommandDto getRCommand(@PathParam("rid") String rid) {
-    return asDto(getOpalRSession().getRCommand(rid));
+  public OpalR.RCommandDto getRCommand(@PathParam("rid") String rid, @QueryParam("wait") @DefaultValue("false") boolean wait) {
+    RCommand rCommand = getOpalRSession().getRCommand(rid);
+    if(!rCommand.isFinished() && wait) {
+      while(!getOpalRSession().getRCommand(rid).isFinished()) {
+        try {
+          synchronized(rCommand) {
+            rCommand.wait();
+          }
+        } catch(InterruptedException e) {
+          return asDto(rCommand);
+        }
+      }
+    }
+    return asDto(rCommand);
   }
 
   @Override

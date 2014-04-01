@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.datashield;
 
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -47,7 +49,7 @@ public class OpalDataShieldSessionResourceImpl extends OpalRSessionResourceImpl
   private IdentifiersTableService identifiersTableService;
 
   @Override
-  public Response aggregate(String body) {
+  public Response aggregate(@QueryParam("async") @DefaultValue("false") boolean async, String body) {
     try {
       ROperationWithResult operation;
       switch(configurationSupplier.get().getLevel()) {
@@ -62,8 +64,13 @@ public class OpalDataShieldSessionResourceImpl extends OpalRSessionResourceImpl
           throw new IllegalStateException(
               "Unknown script interpretation level: " + configurationSupplier.get().getLevel());
       }
-      getOpalRSession().execute(operation);
-      return Response.ok().entity(operation.getRawResult().asBytes()).build();
+      if (async) {
+        String id = getOpalRSession().executeAsync(operation);
+        return Response.ok().entity(id).type(MediaType.TEXT_PLAIN).build();
+      } else {
+        getOpalRSession().execute(operation);
+        return Response.ok().entity(operation.getRawResult().asBytes()).build();
+      }
     } catch(ParseException e) {
       return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
     }
