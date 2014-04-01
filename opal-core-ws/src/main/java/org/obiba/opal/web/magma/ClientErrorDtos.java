@@ -12,6 +12,7 @@ package org.obiba.opal.web.magma;
 import java.util.Arrays;
 import java.util.Collections;
 
+import javax.annotation.Nullable;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.ws.rs.core.Response;
@@ -25,6 +26,9 @@ import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+
 /**
  * Utilities for handling ClientError Dtos.
  */
@@ -36,10 +40,19 @@ public class ClientErrorDtos {
 
   public static ClientErrorDto.Builder getErrorMessage(Response.StatusType responseStatus, String errorStatus,
       String... args) {
-    return ClientErrorDto.newBuilder() //
+    ClientErrorDto.Builder builder = ClientErrorDto.newBuilder() //
         .setCode(responseStatus.getStatusCode()) //
-        .setStatus(errorStatus == null ? "" : errorStatus) //
-        .addAllArguments(args == null ? Collections.<String>emptyList() : Arrays.asList(args));
+        .setStatus(errorStatus == null ? "" : errorStatus);
+
+    if (args != null) {
+      builder.addAllArguments(Iterables.filter(Arrays.asList(args), new Predicate<String>() {
+        @Override
+        public boolean apply(@Nullable String s) {
+          return s != null;
+        }
+      }));
+    }
+    return builder;
   }
 
   @SuppressWarnings("ThrowableResultOfMethodCallIgnored")

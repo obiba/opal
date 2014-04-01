@@ -134,16 +134,38 @@ public class OpalRSessionResourceImpl extends AbstractOpalRSessionResource imple
 
   @Override
   public Response getRCommandResult(@PathParam("rid") String rid,
-      @QueryParam("rm") @DefaultValue("true") boolean remove) {
+      @QueryParam("rm") @DefaultValue("true") boolean remove, @QueryParam("wait") @DefaultValue("false") boolean wait) {
     RCommand rCommand = getOpalRSession().getRCommand(rid);
-    if(remove) getOpalRSession().removeRCommand(rid);
+    Response resp = Response.noContent().build();
+    if(!rCommand.isFinished()) {
+      if(wait) {
+        while(!getOpalRSession().getRCommand(rid).isFinished()) {
+          try {
+            synchronized(rCommand) {
+              rCommand.wait();
+            }
+          } catch(InterruptedException e) {
+            return resp;
+          }
+        }
+      } else {
+        return resp;
+      }
+    }
+
+    return getFinishedRCommandResult(rCommand, remove);
+  }
+
+  private Response getFinishedRCommandResult(RCommand rCommand, boolean remove) {
+    Response resp = Response.noContent().build();
     if(rCommand.hasResult()) {
       ROperationWithResult rop = rCommand.asROperationWithResult();
       if(rop.hasRawResult()) {
-        return Response.ok().entity(rop.getRawResult().asBytes()).build();
+        resp = Response.ok().entity(rop.getRawResult().asBytes()).build();
       }
     }
-    return Response.noContent().build();
+    if(remove) getOpalRSession().removeRCommand(rCommand.getId());
+    return resp;
   }
 
   private OpalR.RCommandDto asDto(RCommand rCommand) {

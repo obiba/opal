@@ -142,6 +142,9 @@ public class OpalRSession implements RASyncOperationTemplate {
   @Override
   public RCommand removeRCommand(String cmdId) {
     RCommand rCommand = getRCommand(cmdId);
+    synchronized(rCommand) {
+      rCommand.notifyAll();
+    }
     rCommandList.remove(rCommand);
     return rCommand;
   }
@@ -245,6 +248,9 @@ public class OpalRSession implements RASyncOperationTemplate {
       } catch(Exception e) {
         log.error("Error when consuming R command: {}", e.getMessage());
         rCommand.failed(e.getMessage());
+      }
+      synchronized(rCommand) {
+        rCommand.notifyAll();
       }
     }
   }

@@ -63,22 +63,28 @@ public abstract class AbstractRSymbolResourceImpl extends AbstractOpalRSessionRe
 
   @Override
   public Response putString(UriInfo uri, String content, boolean async) {
-    return putSymbol(uri, new StringAssignROperation(name, content), async);
+    return assignSymbol(uri, new StringAssignROperation(name, content), async);
   }
 
   @Override
   public Response putRScript(UriInfo uri, String script, boolean async) {
-    return putSymbol(uri, new RScriptROperation(name + " <- " + script), async);
+    return assignSymbol(uri, new RScriptROperation(name + " <- " + script), async);
   }
 
   @Override
   public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean missings, String identifiers,
       boolean async) {
-    return putSymbol(uri,
+    return assignSymbol(uri,
         new MagmaAssignROperation(name, path, variableFilter, missings, identifiers, identifiersTableService), async);
   }
 
-  private Response putSymbol(UriInfo uri, ROperation rop, boolean async) {
+  @Override
+  public Response rm() {
+    rSession.execute(new RScriptROperation("base::rm(" + name + ")"));
+    return Response.ok().build();
+  }
+
+  private Response assignSymbol(UriInfo uri, ROperation rop, boolean async) {
     if(async) {
       String id = rSession.executeAsync(rop);
       return Response.created(getSymbolURI(uri)).entity(id).type(MediaType.TEXT_PLAIN_TYPE).build();
@@ -86,12 +92,6 @@ public abstract class AbstractRSymbolResourceImpl extends AbstractOpalRSessionRe
       rSession.execute(rop);
       return Response.created(getSymbolURI(uri)).build();
     }
-  }
-
-  @Override
-  public Response rm() {
-    rSession.execute(new RScriptROperation("base::rm(" + name + ")"));
-    return Response.ok().build();
   }
 
   protected URI getSymbolURI(UriInfo info) {

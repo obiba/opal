@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import com.google.protobuf.GeneratedMessage;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 
 @Component
 @Provider
@@ -30,13 +31,14 @@ public class UnhandledExceptionMapper extends ErrorDtoExceptionMapper<Exception>
 
   @Override
   protected Response.Status getStatus() {
-    return BAD_REQUEST;
+    return INTERNAL_SERVER_ERROR;
   }
 
   @Override
   protected GeneratedMessage.ExtendableMessage<?> getErrorDto(Exception exception) {
     log.error("Unhandled exception", exception);
-    return ClientErrorDtos.getErrorMessage(getStatus(), "UnhandledException", exception.getMessage()).build();
+    return ClientErrorDtos.getErrorMessage(getStatus(), "UnhandledException", exception.getClass().getSimpleName(),
+        exception.getMessage()).build();
   }
 
 }

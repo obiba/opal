@@ -58,6 +58,10 @@ public class RCommand {
     return status;
   }
 
+  public boolean isFinished() {
+    return status == Status.COMPLETED || status == Status.FAILED;
+  }
+
   public Date getCreateDate() {
     return createDate;
   }

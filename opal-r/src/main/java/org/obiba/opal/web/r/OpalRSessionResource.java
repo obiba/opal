@@ -68,5 +68,6 @@ public interface OpalRSessionResource {
   @GET
   @Path("/command/{rid}/result")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
-  Response getRCommandResult(@PathParam("rid") String rid, @QueryParam("rm") @DefaultValue("true") boolean remove);
+  Response getRCommandResult(@PathParam("rid") String rid, @QueryParam("rm") @DefaultValue("true") boolean remove,
+      @QueryParam("wait") @DefaultValue("false") boolean wait);
 }
