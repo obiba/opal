@@ -69,7 +69,7 @@ public class DataShieldROptionsScriptBuilder {
   }
 
   private String quoteTextValue(String value) {
-    Pattern pattern = Pattern.compile("^\\w+\\(");
+    Pattern pattern = Pattern.compile("^([A-Za-z]\\w*[:]{0,3})*[\\.]*[A-Za-z]\\w*([\\.]*\\w*)*\\(");
     if (pattern.matcher(value).find()) {
       // R Options may contain directives or functions ('c', 'q', 'quote'), do not quote these
       return value;
