@@ -142,15 +142,25 @@ public class DataShieldPackageMethodImpl extends RPackageResource {
 
     List<DataShield.DataShieldMethodDto> aggregateMethodDtos = Lists.newArrayList();
     List<DataShield.DataShieldMethodDto> assignMethodDtos = Lists.newArrayList();
+    List<DataShield.DataShieldROptionDto> optionDtos = Lists.newArrayList();
     for(Opal.EntryDto entry : packageDto.getDescriptionList()) {
-      if(entry.getKey().equals(AGGREGATE_METHODS)) {
+      String key = entry.getKey();
+      if(AGGREGATE_METHODS.equals(key)) {
         aggregateMethodDtos.addAll(parsePackageMethods(packageDto.getName(), version, entry.getValue()));
-      } else if(entry.getKey().equals(ASSIGN_METHODS)) {
+      } else if(ASSIGN_METHODS.equals(key)) {
         assignMethodDtos.addAll(parsePackageMethods(packageDto.getName(), version, entry.getValue()));
+      } else if(OPTIONS.equals(key)) {
+        optionDtos.addAll(parsePackageOptions(packageDto.getName(), version, entry.getValue()));
       }
     }
     return DataShield.DataShieldPackageMethodsDto.newBuilder().setName(name).addAllAggregate(aggregateMethodDtos)
         .addAllAssign(assignMethodDtos).build();
+  }
+
+  private Collection<? extends DataShield.DataShieldROptionDto> parsePackageOptions(String name, String version,
+      String value) {
+    // TODO
+    return Lists.newArrayList();
   }
 
   private String getPackageVersion(OpalR.RPackageDto packageDto) {

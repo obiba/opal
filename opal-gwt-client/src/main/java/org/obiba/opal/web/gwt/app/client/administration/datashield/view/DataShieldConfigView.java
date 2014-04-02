@@ -9,28 +9,19 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
 
-import java.util.Comparator;
-
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.NavPillsPanel;
-import org.obiba.opal.web.gwt.app.client.ui.NavTabsPanel;
-import org.obiba.opal.web.gwt.app.client.ui.RadioGroup;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
-import org.obiba.opal.web.model.client.datashield.DataShieldConfigDto;
-import org.obiba.opal.web.model.client.datashield.DataShieldConfigDto.Level;
 
-import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
@@ -40,9 +31,6 @@ public class DataShieldConfigView extends ViewImpl implements DataShieldConfigPr
   interface Binder extends UiBinder<Widget, DataShieldConfigView> {}
 
   private static final Translations translations = GWT.create(Translations.class);
-
-  @UiField
-  Panel packagesPanel;
 
   @UiField
   Panel packages;
@@ -58,6 +46,9 @@ public class DataShieldConfigView extends ViewImpl implements DataShieldConfigPr
 
   @UiField
   Panel breadcrumbs;
+
+  @UiField
+  SimplePanel options;
 
   @Inject
   public DataShieldConfigView(Binder uiBinder) {
@@ -83,6 +74,9 @@ public class DataShieldConfigView extends ViewImpl implements DataShieldConfigPr
     if(slot == DataShieldConfigPresenter.PermissionSlot) {
       permissions.clear();
       permissions.add(content);
+    } else if(slot == DataShieldConfigPresenter.OptionsSlot) {
+      options.clear();
+      options.add(content);
     }
   }
 

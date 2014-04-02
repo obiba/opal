@@ -20,8 +20,10 @@ import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration.Environment;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
+import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
+import org.obiba.opal.web.datashield.support.DataShieldROptionsScriptBuilder;
 import org.obiba.opal.web.model.DataShield.DataShieldConfigDto;
 import org.obiba.opal.web.r.OpalRSessionsResource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,6 +102,11 @@ public class DataShieldResource {
   }
 
   protected void onNewDataShieldSession(OpalRSession session) {
+    DatashieldConfiguration config = configurationSupplier.get();
+    if (config.hasOptions()) {
+      session.execute(
+          new RScriptROperation(DataShieldROptionsScriptBuilder.newBuilder().setROptions(config.getOptions()).build()));
+    }
     DataShieldLog.userLog("created a datashield session {}", session.getId());
   }
 

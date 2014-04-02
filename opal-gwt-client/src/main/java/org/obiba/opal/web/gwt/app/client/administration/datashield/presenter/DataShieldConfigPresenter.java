@@ -54,6 +54,8 @@ public class DataShieldConfigPresenter
 
   public static final Object PermissionSlot = new Object();
 
+  public static final Object OptionsSlot = new Object();
+
   private final DataShieldPackageAdministrationPresenter packagePresenter;
 
   private final DataShieldAdministrationPresenter aggregatePresenter;
@@ -62,16 +64,20 @@ public class DataShieldConfigPresenter
 
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
 
+  private final DataShieldROptionsPresenter dataShieldROptionsPresenter;
+
   private static final String DATASHIELD_NAME = "DataSHIELD";
 
   @Inject
   public DataShieldConfigPresenter(Display display, EventBus eventBus, Proxy proxy,
       Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
       Provider<DataShieldAdministrationPresenter> adminPresenterProvider,
+      Provider<DataShieldROptionsPresenter> dataShieldROptionsProvider,
       DataShieldPackageAdministrationPresenter packagePresenter, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.packagePresenter = packagePresenter;
+    dataShieldROptionsPresenter = dataShieldROptionsProvider.get();
     aggregatePresenter = adminPresenterProvider.get();
     assignPresenter = adminPresenterProvider.get();
     aggregatePresenter.setEnvironment(DataShieldEnvironment.AGGREGATE);
@@ -135,6 +141,7 @@ public class DataShieldConfigPresenter
       ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
       resourcePermissionsPresenter.initialize(ResourcePermissionType.DATASHIELD, ResourcePermissionRequestPaths.UriBuilders.SYSTEM_PERMISSIONS_DATASHIELD);
 
+      setInSlot(OptionsSlot, dataShieldROptionsPresenter);
       setInSlot(PermissionSlot, resourcePermissionsPresenter);
     }
   }

@@ -48,6 +48,8 @@ public abstract class RPackageResource {
 
   protected static final String ASSIGN_METHODS = "AssignMethods";
 
+  protected static final String OPTIONS = "Options";
+
   private static final String[] defaultFields = new String[] { "Title", "Description", "Author", "Maintainer",
       "Date/Publication", AGGREGATE_METHODS, ASSIGN_METHODS };
 
@@ -174,7 +176,8 @@ public abstract class RPackageResource {
     public boolean apply(@Nullable OpalR.RPackageDto input) {
       if(input == null) return false;
       for(Opal.EntryDto entry : input.getDescriptionList()) {
-        if("AggregateMethods".equals(entry.getKey()) || "AssignMethods".equals(entry.getKey())) {
+        String key = entry.getKey();
+        if(AGGREGATE_METHODS.equals(key) || ASSIGN_METHODS.equals(key) || OPTIONS.equals(key)) {
           return !"NA".equals(entry.getValue());
         }
       }

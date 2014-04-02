@@ -21,11 +21,18 @@
       <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
 
-    <g:FlowPanel ui:field="packagesPanel">
+    <g:FlowPanel>
       <b:Heading size="4">
         <ui:msg description="Packages label">Packages</ui:msg>
       </b:Heading>
       <g:SimplePanel ui:field="packages"></g:SimplePanel>
+    </g:FlowPanel>
+
+    <g:FlowPanel>
+      <b:Heading size="4">
+        <ui:msg description="Options label">Options</ui:msg>
+      </b:Heading>
+      <g:SimplePanel ui:field="options"></g:SimplePanel>
     </g:FlowPanel>
 
     <g:FlowPanel>
