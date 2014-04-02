@@ -9,10 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.datashield;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -27,13 +23,13 @@ import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
 import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
+import org.obiba.opal.web.datashield.support.DataShieldROptionsScriptBuilder;
 import org.obiba.opal.web.model.DataShield.DataShieldConfigDto;
 import org.obiba.opal.web.r.OpalRSessionsResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 @Component
 @Transactional
@@ -106,12 +102,11 @@ public class DataShieldResource {
   }
 
   protected void onNewDataShieldSession(OpalRSession session) {
-    List<String> options = new ArrayList<>();
-    for(Map.Entry<String, String> entry : configurationSupplier.get().getOptions()) {
-      options.add(entry.getKey() + "=" + entry.getValue());
+    DatashieldConfiguration config = configurationSupplier.get();
+    if (config.hasOptions()) {
+      session.execute(
+          new RScriptROperation(DataShieldROptionsScriptBuilder.newBuilder().setROptions(config.getOptions()).build()));
     }
-    session.execute(
-        new RScriptROperation(String.format("options(%s)", StringUtils.collectionToCommaDelimitedString(options))));
     DataShieldLog.userLog("created a datashield session {}", session.getId());
   }
 

@@ -15,6 +15,7 @@ import java.util.Set;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShiledROptionCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RegExValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.model.client.datashield.DataShieldROptionDto;
@@ -88,6 +89,8 @@ public class DataShieldROptionModalPresenter extends ModalPresenterWidget<DataSh
     protected Set<FieldValidator> getValidators() {
       validators = new LinkedHashSet<>();
       validators.add(new RequiredTextValidator(getView().getName(), "DataShieldROptionNameIsRequired", NAME.name()));
+      validators.add(new RegExValidator(getView().getName(), "^[A-Za-z]\\w*([\\.]*\\w*)*$", "DataShieldROptionInvalidName",
+          NAME.name()));
       validators.add(new RequiredTextValidator(getView().getValue(), "DataShieldROptionValueIsRequired", VALUE.name()));
       return validators;
     }

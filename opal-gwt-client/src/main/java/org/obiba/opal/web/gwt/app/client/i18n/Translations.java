@@ -408,6 +408,7 @@ public interface Translations extends Constants {
       "DataShieldMethodAlreadyExistWithTheSpecifiedName", "A method already exists with the specified name.",//
       "DataShieldPackageAlreadyExistWithTheSpecifiedName", "A package already exists with the specified name.",//
       "DataShieldROptionNameIsRequired", "Option name is required.",//
+      "DataShieldROptionInvalidName", "Option name is invalid. Options names are composed of one or many words separated by a '.' or a '_' and cannot start with a non-alphabetical character.",//
       "DataShieldROptionValueIsRequired", "Option value is required.",//
       "DataShieldMethodNameIsRequired", "A name is required.",//
       "DataShieldRScriptIsRequired", "A R script is required.",//

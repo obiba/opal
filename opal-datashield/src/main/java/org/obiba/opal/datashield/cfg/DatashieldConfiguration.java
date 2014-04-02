@@ -21,6 +21,7 @@ import org.obiba.opal.datashield.DataShieldEnvironment;
 import org.obiba.opal.datashield.DataShieldMethod;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 public class DatashieldConfiguration implements OpalConfigurationExtension, Serializable {
@@ -64,6 +65,10 @@ public class DatashieldConfiguration implements OpalConfigurationExtension, Seri
     return options.containsKey(name);
   }
 
+  public boolean hasOptions() {
+    return !options.isEmpty();
+  }
+
   public String getOption(String name) {
     if (options.containsKey(name)) {
       return options.get(name);
@@ -73,6 +78,7 @@ public class DatashieldConfiguration implements OpalConfigurationExtension, Seri
   }
 
   public void addOrUpdateOption(String name, String value) {
+    Preconditions.checkArgument(!Strings.isNullOrEmpty(name), "option name cannot be null nor empty");
     options.put(name, value);
   }
 
