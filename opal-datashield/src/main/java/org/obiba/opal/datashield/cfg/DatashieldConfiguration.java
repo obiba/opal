@@ -19,6 +19,7 @@ import java.util.NoSuchElementException;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.datashield.DataShieldEnvironment;
 import org.obiba.opal.datashield.DataShieldMethod;
+import org.obiba.opal.web.model.DataShield;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -47,7 +48,7 @@ public class DatashieldConfiguration implements OpalConfigurationExtension, Seri
 
   private List<DataShieldEnvironment> environments;
 
-  private Map<String, String> options = new HashMap<>();
+  private final Map<String, String> options = new HashMap<>();
 
   public Level getLevel() {
     return level == null ? Level.RESTRICTED : level;
@@ -78,7 +79,18 @@ public class DatashieldConfiguration implements OpalConfigurationExtension, Seri
   }
 
   public void addOrUpdateOption(String name, String value) {
+    addOption(name, value, true);
+  }
+
+  public void addOptions(Iterable<DataShield.DataShieldROptionDto> optionsList) {
+    for (DataShield.DataShieldROptionDto option : optionsList) {
+      addOption(option.getName(), option.getValue(), false);
+    }
+  }
+
+  private void addOption(String name, String value, boolean overwrite) {
     Preconditions.checkArgument(!Strings.isNullOrEmpty(name), "option name cannot be null nor empty");
+    if (!overwrite && hasOption(name)) return;
     options.put(name, value);
   }
 

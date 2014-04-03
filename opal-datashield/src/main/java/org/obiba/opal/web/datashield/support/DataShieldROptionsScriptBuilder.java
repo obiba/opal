@@ -11,7 +11,7 @@
 package org.obiba.opal.web.datashield.support;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -36,7 +36,7 @@ public class DataShieldROptionsScriptBuilder {
   public String build() {
     if (!rOptions.iterator().hasNext()) return "";
 
-    List<String> options = new ArrayList<>();
+    Collection<String> options = new ArrayList<>();
     for(Map.Entry<String, String> entry : rOptions) {
       options.add(entry.getKey() + "=" + formatValue(entry.getValue()));
     }
@@ -58,12 +58,12 @@ public class DataShieldROptionsScriptBuilder {
     return scanner.hasNextInt() || scanner.hasNextFloat();
   }
 
-  private boolean isBoolean(String value) {
+  private boolean isBoolean(CharSequence value) {
     Pattern pattern = Pattern.compile("^(TRUE|T|FALSE|F)$");
     return pattern.matcher(value).matches();
   }
 
-  private boolean isNull(String value) {
+  private boolean isNull(CharSequence value) {
     Pattern pattern = Pattern.compile("^NULL$");
     return pattern.matcher(value).matches();
   }
@@ -75,7 +75,7 @@ public class DataShieldROptionsScriptBuilder {
       return value;
     }
 
-    return StringUtils.quote(StringUtils.trimTrailingCharacter((StringUtils.trimLeadingCharacter(value, '\'')), '\''));
+    return StringUtils.quote(StringUtils.trimTrailingCharacter(StringUtils.trimLeadingCharacter(value, '\''), '\''));
   }
 }
 
