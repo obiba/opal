@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 import org.obiba.opal.web.model.client.opal.r.RPackageDto;
 
 import com.google.gwt.http.client.Request;
@@ -30,6 +31,7 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 
@@ -109,12 +111,27 @@ public class DataShieldPackageCreatePresenter extends ModalPresenterWidget<DataS
 
   private class CreatePackageCallBack implements ResponseCodeCallback {
 
+    private HandlerRegistration unhandledExceptionHandler;
+
     @Override
     public void onResponseCode(Request request, Response response) {
       postMethod(getDataShieldPackageDto());
     }
 
     private void postMethod(RPackageDto dto) {
+
+      unhandledExceptionHandler = addHandler(UnhandledResponseEvent.getType(),
+          new UnhandledResponseEvent.Handler() {
+            @Override
+            public void onUnhandledResponse(UnhandledResponseEvent e) {
+              // since an invalid or not found package is not flagged, silently close the dialog
+              e.setConsumed(true);
+              unhandledExceptionHandler.removeHandler();
+              getView().hideDialog();
+            }
+          });
+
+
       ResponseCodeCallback callbackHandler = new CreateOrUpdatePackageCallBack(dto);
 
       if(getView().getReference().getText().isEmpty()) {
