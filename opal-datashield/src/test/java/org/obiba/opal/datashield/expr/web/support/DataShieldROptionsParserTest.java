@@ -37,11 +37,16 @@ public class DataShieldROptionsParserTest {
   }
 
   @Test
-  public void test_booleanOption() {
-    List<DataShield.DataShieldROptionDto> options = parser.parse("zorro=TRUE");
-    DataShield.DataShieldROptionDto dto = options.get(0);
-    assertThat(dto.getName()).isEqualTo("zorro");
-    assertThat(dto.getValue()).isEqualTo("TRUE");
+  public void test_booleanOptions() {
+    List<DataShield.DataShieldROptionDto> options = parser.parse("zorro0=TRUE,zorro1=T,zorro2=FALSE,zorro3=F");
+    assertThat(options.get(0).getName()).isEqualTo("zorro0");
+    assertThat(options.get(0).getValue()).isEqualTo("TRUE");
+    assertThat(options.get(1).getName()).isEqualTo("zorro1");
+    assertThat(options.get(1).getValue()).isEqualTo("T");
+    assertThat(options.get(2).getName()).isEqualTo("zorro2");
+    assertThat(options.get(2).getValue()).isEqualTo("FALSE");
+    assertThat(options.get(3).getName()).isEqualTo("zorro3");
+    assertThat(options.get(3).getValue()).isEqualTo("F");
   }
 
   @Test
@@ -72,7 +77,7 @@ public class DataShieldROptionsParserTest {
   @Test
   public void test_multipleOptions() {
     String source
-        = "zorro0=\"Zorro es un chaval muy simpatico\",zorro1=\"Es un hombre amoroso\",zorro2=\"TRUE\",zorro3=base:::log(x=10, base=5), zorro4=quote({dump.frames(to.file = TRUE); q()}), zorro5=c(\"hey\", \"ho\"),zorro6=quote(q(\"no\", status = 66, runLast = FALSE))";
+        = "zorro0=\"Zorro es un chaval muy simpatico\",zorro1=\"Es un hombre amoroso\",zorro2=TRUE,zorro3=base:::log(x=10, base=5), zorro4=quote({dump.frames(to.file = TRUE); q()}), zorro5=c(\"hey\", \"ho\"),zorro6=quote(q(\"no\", status = 66, runLast = FALSE))";
     List<DataShield.DataShieldROptionDto> options = parser.parse(source);
     assertThat(options.get(0).getName()).isEqualTo("zorro0");
     assertThat(options.get(0).getValue()).isEqualTo("Zorro es un chaval muy simpatico");
@@ -93,7 +98,7 @@ public class DataShieldROptionsParserTest {
   @Test
   public void test_multipleOptionsWithWS() {
     String source
-        = "\n\t\rzorro0=\"Zorro es un chaval muy simpatico\",\nzorro1=\"Es un hombre amoroso\",zorro2=\"TRUE\", \tzorro3=base:::log(x=10, base=5), zorro4=quote({dump.frames(to.file = TRUE); q()}), \r\nzorro5=c(\"hey\", \"ho\"),\nzorro6=quote(q(\"no\", status = 66, runLast = FALSE))\n";
+        = "\n\t\rzorro0=\"Zorro es un chaval muy simpatico\",\nzorro1=\"Es un hombre amoroso\",zorro2=TRUE, \tzorro3=base:::log(x=10, base=5), zorro4=quote({dump.frames(to.file = TRUE); q()}), \r\nzorro5=c(\"hey\", \"ho\"),\nzorro6=quote(q(\"no\", status = 66, runLast = FALSE))\n";
     List<DataShield.DataShieldROptionDto> options = parser.parse(source);
     assertThat(options.get(0).getName()).isEqualTo("zorro0");
     assertThat(options.get(0).getValue()).isEqualTo("Zorro es un chaval muy simpatico");
