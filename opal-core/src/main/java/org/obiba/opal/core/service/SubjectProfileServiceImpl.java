@@ -143,7 +143,7 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
 
   private void ensureUserHomeExists(String username) {
     try {
-      if (!opalRuntime.hasFileSystem()) return;
+      if(!opalRuntime.hasFileSystem()) return;
       FileObject home = opalRuntime.getFileSystem().getRoot().resolveFile("/home/" + username);
       if(!home.exists()) {
         log.info("Creating user home: /home/{}", username);
@@ -156,13 +156,9 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
 
   private void ensureFolderPermissions(String username, String path) {
     String folderNode = "/files" + path;
-    boolean found = false;
-    for(SubjectAclService.Permissions acl : subjectAclService
-        .getNodePermissions("opal", folderNode, SubjectAcl.SubjectType.USER)) {
-      found = findPermission(acl, FILES_SHARE_PERM);
-      if(found) break;
-    }
-    if(!found) {
+    SubjectAclService.Permissions acl = subjectAclService
+        .getSubjectNodePermissions("opal", folderNode, new SubjectAcl.Subject(username, SubjectAcl.SubjectType.USER));
+    if(!findPermission(acl, FILES_SHARE_PERM)) {
       subjectAclService
           .addSubjectPermission("opal", folderNode, SubjectAcl.SubjectType.USER.subjectFor(username), FILES_SHARE_PERM);
     }
