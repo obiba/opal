@@ -194,17 +194,24 @@ public class DefaultOpalRuntime implements OpalRuntime {
         opalFileSystem = new SecuredOpalFileSystem(
             new DefaultOpalFileSystem(opalConfigurationService.getOpalConfiguration().getFileSystemRoot()));
 
-        // Create tmp folder, if it does not exist.
-        FileObject tmpFolder = getFileSystem().getRoot().resolveFile("tmp");
-        tmpFolder.createFolder();
+        // Create some system folders, if they do not exist.
+        ensureFolder("home");
+        ensureFolder("projects");
+        ensureFolder("reports");
+        ensureFolder("tmp");
       } catch(RuntimeException e) {
         log.error("The opal filesystem cannot be started.");
         throw e;
       } catch(FileSystemException e) {
-        log.error("Error creating functional unit's directory in the Opal File System.", e);
+        log.error("Error creating a system directory in the Opal File System.", e);
       }
       syncFs.notifyAll();
     }
+  }
+
+  private void ensureFolder(String path) throws FileSystemException {
+    FileObject folder = getFileSystem().getRoot().resolveFile(path);
+    folder.createFolder();
   }
 
 }
