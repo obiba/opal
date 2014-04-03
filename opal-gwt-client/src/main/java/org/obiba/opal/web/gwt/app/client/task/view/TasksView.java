@@ -11,23 +11,27 @@ package org.obiba.opal.web.gwt.app.client.task.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
 import org.obiba.opal.web.gwt.datetime.client.Duration;
 import org.obiba.opal.web.gwt.datetime.client.FormatType;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.model.client.opal.CommandStateDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
+import com.google.gwt.cell.client.Cell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
@@ -35,6 +39,8 @@ import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewImpl;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 import static org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter.CANCEL_ACTION;
 import static org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter.LOG_ACTION;
@@ -67,12 +73,15 @@ public class TasksView extends ViewImpl implements Display {
 
   private ActionsColumn<CommandStateDto> actionsColumn;
 
+  private final PlaceManager placeManager;
+
   //
   // Constructors
   //
 
   @Inject
-  public TasksView(Binder uiBinder) {
+  public TasksView(Binder uiBinder, PlaceManager placeManager) {
+    this.placeManager = placeManager;
     initWidget(uiBinder.createAndBindUi(this));
     initTable();
   }
@@ -110,7 +119,7 @@ public class TasksView extends ViewImpl implements Display {
 
   @Override
   public void inProject(boolean b) {
-    if (b && table.getColumnCount() == 8) table.removeColumn(2);
+    if(b && table.getColumnCount() == 8) table.removeColumn(2);
   }
 
   //
@@ -141,12 +150,7 @@ public class TasksView extends ViewImpl implements Display {
       }
     }, translations.typeLabel());
 
-    table.addColumn(new TextColumn<CommandStateDto>() {
-      @Override
-      public String getValue(CommandStateDto object) {
-        return object.getProject();
-      }
-    }, translations.projectLabel());
+    table.addColumn(new ProjectColumn(), translations.projectLabel());
 
     table.addColumn(new TextColumn<CommandStateDto>() {
       @Override
@@ -158,7 +162,7 @@ public class TasksView extends ViewImpl implements Display {
     table.addColumn(new TextColumn<CommandStateDto>() {
       @Override
       public String getValue(CommandStateDto object) {
-        if (!object.hasStartTime()) return "-";
+        if(!object.hasStartTime()) return "-";
         return Moment.create(object.getStartTime()).format(FormatType.MONTH_NAME_TIME_SHORT);
       }
     }, translations.startLabel());
@@ -166,10 +170,10 @@ public class TasksView extends ViewImpl implements Display {
     table.addColumn(new TextColumn<CommandStateDto>() {
       @Override
       public String getValue(CommandStateDto object) {
-        if (!object.hasEndTime()) return "-";
+        if(!object.hasEndTime()) return "-";
         Moment end = Moment.create(object.getEndTime());
         Moment start = Moment.create(object.getStartTime());
-        return end.format(FormatType.MONTH_NAME_TIME_SHORT) + " [" + Duration.create(start,end).humanize() + "]";
+        return end.format(FormatType.MONTH_NAME_TIME_SHORT) + " [" + Duration.create(start, end).humanize() + "]";
       }
     }, translations.endLabel());
 
@@ -208,4 +212,19 @@ public class TasksView extends ViewImpl implements Display {
     pager.setDisplay(table);
   }
 
+  private class ProjectColumn extends Column<CommandStateDto, String> {
+    private ProjectColumn() {
+      super(new PlaceRequestCell<String>(placeManager) {
+        @Override
+        public PlaceRequest getPlaceRequest(String value) {
+          return ProjectPlacesHelper.getProjectPlace(value);
+        }
+      });
+    }
+
+    @Override
+    public String getValue(CommandStateDto object) {
+      return object.getProject();
+    }
+  }
 }
