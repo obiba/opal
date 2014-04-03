@@ -28,9 +28,12 @@ import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.Acl;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.Subject;
@@ -85,21 +88,28 @@ public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissi
 
   @Override
   public void selectSubject(final Subject subject) {
-    ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder().forResource(
-        ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_SUBJECT.create()
-            .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, subject.getType().getName())
-            .build(project.getName(), subject.getPrincipal())).get().withCallback(new ResourceCallback<JsArray<Acl>>() {
-      @Override
-      public void onResource(Response response, JsArray<Acl> acls) {
-        List<Acl> subjectAcls = JsArrays.toList(acls);
-        if(subjectAcls.size() > 0) {
-          getView().setSubjectData(subject, subjectAcls);
-        } else {
-          // refresh and select another subject if any
-          retrievePermissions();
-        }
-      }
-    }).send();
+    String uri = ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_SUBJECT.create()
+        .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, subject.getType().getName())
+        .build(project.getName(), subject.getPrincipal());
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(uri) //
+        .authorize(getView().getDeleteAllAuthorizer()) //
+        .delete().send();
+
+    ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder().forResource(uri).get()
+        .withCallback(new ResourceCallback<JsArray<Acl>>() {
+          @Override
+          public void onResource(Response response, JsArray<Acl> acls) {
+            List<Acl> subjectAcls = JsArrays.toList(acls);
+            if(subjectAcls.size() > 0) {
+              getView().setSubjectData(subject, subjectAcls);
+            } else {
+              // refresh and select another subject if any
+              retrievePermissions();
+            }
+          }
+        }).send();
   }
 
   public void deletePermission(Acl acl) {
@@ -113,7 +123,14 @@ public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissi
           public void onResponseCode(Request request, Response response) {
             selectSubject(subject);
           }
-        }).send();
+        })//
+        .withCallback(Response.SC_FORBIDDEN, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            //ignore
+          }
+        })//
+        .send();
   }
 
   private String getNodeUri(ResourcePermissionType type, String aclResource, String principal, String typeName) {
@@ -212,6 +229,8 @@ public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissi
         NodeToTypeMapper nodeToTypeMapper, Comparator<Acl> resourceTypeComparator);
 
     HasActionHandler<Acl> getActions();
+
+    HasAuthorization getDeleteAllAuthorizer();
   }
 
   public interface NodeToPlaceMapper {
