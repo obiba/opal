@@ -15,7 +15,7 @@ import java.util.Objects;
 import org.apache.shiro.mgt.SessionStorageEvaluator;
 import org.apache.shiro.subject.Subject;
 import org.obiba.opal.core.service.security.realm.BackgroundJobRealm;
-import org.obiba.opal.core.service.security.realm.SudoRealm;
+import org.obiba.shiro.realm.SudoRealm;
 
 public class OpalSessionStorageEvaluator implements SessionStorageEvaluator {
 
