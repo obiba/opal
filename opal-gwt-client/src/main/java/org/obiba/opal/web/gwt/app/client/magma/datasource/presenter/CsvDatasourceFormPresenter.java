@@ -19,12 +19,16 @@ import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidatablePresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.CsvDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.CsvDatasourceTableBundleDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
@@ -141,16 +145,15 @@ public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDa
   }
 
   private void getDefaultCharset() {
-    ResourceRequestBuilderFactory.<JsArrayString>newBuilder().forResource("/files/charsets/default").get()
-        .withCallback(new ResourceCallback<JsArrayString>() {
-
+    ResourceRequestBuilderFactory.<QueryResultDto>newBuilder() //
+        .forResource(UriBuilders.SYSTEM_CHARSET.create().build()) //
+        .get() //
+        .withCallback(new ResponseCodeCallback() {
           @Override
-          public void onResource(Response response, JsArrayString resource) {
-            String charset = resource.get(0);
-            getView().setDefaultCharset(charset);
+          public void onResponseCode(Request request, Response response) {
+            getView().setDefaultCharset(response.getText());
           }
-        }).send();
-
+        }, Response.SC_OK).send();
   }
 
   private void getAvailableCharsets() {

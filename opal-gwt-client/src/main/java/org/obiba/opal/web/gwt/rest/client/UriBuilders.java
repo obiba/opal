@@ -325,6 +325,14 @@ public enum UriBuilders {
     }
   },
 
+  SYSTEM_CHARSET {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "charset");
+
+    }
+  },
+
   PROJECT_KEYSTORE {
     @Override
     public UriBuilder create() {

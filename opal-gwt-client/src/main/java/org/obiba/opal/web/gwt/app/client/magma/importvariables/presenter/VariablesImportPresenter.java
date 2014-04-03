@@ -55,11 +55,11 @@ import org.obiba.opal.web.model.client.magma.FileViewDto.FileViewType;
 import org.obiba.opal.web.model.client.magma.SpssDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.StaticDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
+import org.obiba.opal.web.model.client.search.QueryResultDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -200,15 +200,15 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   }
 
   private void setDefaultCharset() {
-    ResourceRequestBuilderFactory.<JsArrayString>newBuilder().forResource("/files/charsets/default").get()
-        .withCallback(new ResourceCallback<JsArrayString>() {
-
+    ResourceRequestBuilderFactory.<QueryResultDto>newBuilder() //
+        .forResource(UriBuilders.SYSTEM_CHARSET.create().build()) //
+        .get() //
+        .withCallback(new ResponseCodeCallback() {
           @Override
-          public void onResource(Response response, JsArrayString resource) {
-            String charset = resource.get(0);
-            getView().setDefaultCharset(charset);
+          public void onResponseCode(Request request, Response response) {
+            getView().setDefaultCharset(response.getText());
           }
-        }).send();
+        }, Response.SC_OK).send();
   }
 
   private void createTransientDatasource() {
