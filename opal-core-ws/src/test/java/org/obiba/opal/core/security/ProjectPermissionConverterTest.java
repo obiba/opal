@@ -22,7 +22,7 @@ public class ProjectPermissionConverterTest
   public void testProjectAll() {
     testConversion("/project/patate", ProjectPermissionConverter.Permission.PROJECT_ALL, //
         "rest:/datasource/patate:*:GET/*", //
-        "rest:/system/identifiers/mappings:GET", //
+        "rest:/identifiers/mappings:GET", //
         "rest:/project/patate:*:GET/*",//
         "rest:/files/projects/patate:*:GET/*");
   }

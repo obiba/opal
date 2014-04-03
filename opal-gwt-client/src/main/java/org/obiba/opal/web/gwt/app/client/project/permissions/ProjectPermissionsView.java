@@ -22,9 +22,12 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.Acl;
 import org.obiba.opal.web.model.client.opal.Subject;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.FluidRow;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.NavHeader;
@@ -62,6 +65,9 @@ public class ProjectPermissionsView extends ViewWithUiHandlers<ProjectPermission
 
   @UiField
   Heading principal;
+
+  @UiField
+  Button deleteAll;
 
   @UiField
   OpalSimplePager tablePager;
@@ -132,6 +138,11 @@ public class ProjectPermissionsView extends ViewWithUiHandlers<ProjectPermission
   @Override
   public HasActionHandler<Acl> getActions() {
     return ProjectPermissionColumns.ACTIONS;
+  }
+
+  @Override
+  public HasAuthorization getDeleteAllAuthorizer() {
+    return new WidgetAuthorizer(deleteAll);
   }
 
   @SuppressWarnings("UnusedParameters")

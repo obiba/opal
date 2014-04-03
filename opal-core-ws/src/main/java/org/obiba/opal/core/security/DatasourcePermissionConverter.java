@@ -41,8 +41,15 @@ public class DatasourcePermissionConverter extends OpalPermissionConverter {
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)");
         return Lists.newArrayList(toRest("/datasource/{0}", "*:GET/*", args), //
-            toRest("/system/identifiers/mappings", "GET"), //
-            toRest("/project/{0}", "GET:GET/*", args),//
+            toRest("/identifiers/mappings", "GET"), //
+            toRest("/project/{0}", "GET:GET", args),//
+            toRest("/project/{0}/transient-datasource", "*:GET/*", args),//
+            toRest("/project/{0}/report-template", "*:GET/*", args),//
+            toRest("/project/{0}/command", "*:GET/*", args),//
+            toRest("/project/{0}/permissions/datasource", "*:GET/*", args),//
+            toRest("/project/{0}/permissions/table", "*:GET/*", args),//
+            toRest("/project/{0}/permissions/report-template", "*:GET/*", args),//
+            toRest("/project/{0}/permissions/subject", "GET:GET/GET", args),//
             toRest("/files/projects/{0}", "GET:GET/*", args), //
             toRest("/files/projects/{0}", "POST:GET/*", args), //
             toRest("/files/projects/{0}", "PUT:GET/*", args));

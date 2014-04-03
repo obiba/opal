@@ -21,8 +21,15 @@ public class DatasourcePermissionConverterTest
   public void testDatasourceAll() {
     testConversion("/datasource/patate", DatasourcePermissionConverter.Permission.DATASOURCE_ALL, //
         "rest:/datasource/patate:*:GET/*", //
-        "rest:/system/identifiers/mappings:GET", //
-        "rest:/project/patate:GET:GET/*",//
+        "rest:/identifiers/mappings:GET", //
+        "rest:/project/patate:GET:GET", //
+        "rest:/project/patate/transient-datasource:*:GET/*", //
+        "rest:/project/patate/report-template:*:GET/*", //
+        "rest:/project/patate/command:*:GET/*", //
+        "rest:/project/patate/permissions/datasource:*:GET/*", //
+        "rest:/project/patate/permissions/table:*:GET/*", //
+        "rest:/project/patate/permissions/report-template:*:GET/*", //
+        "rest:/project/patate/permissions/subject:GET:GET/GET", //
         "rest:/files/projects/patate:GET:GET/*",//
         "rest:/files/projects/patate:POST:GET/*",//
         "rest:/files/projects/patate:PUT:GET/*");
