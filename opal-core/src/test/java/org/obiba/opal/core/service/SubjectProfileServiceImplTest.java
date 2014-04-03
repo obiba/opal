@@ -158,10 +158,10 @@ public class SubjectProfileServiceImplTest extends AbstractJUnit4SpringContextTe
       SubjectAclService.Permissions permsMock = EasyMock.createMock(SubjectAclService.Permissions.class);
       EasyMock.expect(permsMock.getPermissions()).andReturn(Sets.newHashSet(SubjectProfileServiceImpl.FILES_SHARE_PERM))
           .anyTimes();
-      EasyMock.expect(mock.getNodePermissions("opal", "/files/home/principal", SubjectAcl.SubjectType.USER))
-          .andReturn(Sets.newHashSet(permsMock)).anyTimes();
-      EasyMock.expect(mock.getNodePermissions("opal", "/files/tmp", SubjectAcl.SubjectType.USER))
-          .andReturn(Sets.newHashSet(permsMock)).anyTimes();
+      EasyMock.expect(mock.getSubjectNodePermissions("opal", "/files/home/principal", new SubjectAcl.Subject(PRINCIPAL, SubjectAcl.SubjectType.USER)))
+          .andReturn(permsMock).anyTimes();
+      EasyMock.expect(mock.getSubjectNodePermissions("opal", "/files/tmp", new SubjectAcl.Subject(PRINCIPAL, SubjectAcl.SubjectType.USER)))
+          .andReturn(permsMock).anyTimes();
       EasyMock.replay(mock, permsMock);
       return mock;
     }
