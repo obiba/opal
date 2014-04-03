@@ -46,6 +46,7 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.github.gwtbootstrap.client.ui.base.HasType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -66,8 +67,6 @@ import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
 import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 import static com.google.gwt.http.client.Response.SC_OK;
 import static org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig.ImportFormat;
-
-;
 
 @SuppressWarnings("OverlyCoupledClass")
 public class DataImportPresenter extends WizardPresenterWidget<DataImportPresenter.Display> {
@@ -117,8 +116,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       IdentifiersMappingSelectionStepPresenter identifiersMappingSelectionStepPresenter, //
       ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter,
       ArchiveStepPresenter archiveStepPresenter, //
-      DatasourceValuesStepPresenter datasourceValuesStepPresenter,
-      Translations translations) {
+      DatasourceValuesStepPresenter datasourceValuesStepPresenter, Translations translations) {
     super(eventBus, display);
     this.csvFormatStepPresenter = csvFormatStepPresenter;
     this.xmlFormatStepPresenter = xmlFormatStepPresenter;
@@ -201,7 +199,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
                 jdbc = true;
               }
             }
-//            Hide if not found
+            // Hide if not found
             if(!limeSurvey) {
               getView().removeFormat(ImportFormat.LIMESURVEY);
             }
@@ -209,7 +207,15 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
               getView().removeFormat(ImportFormat.JDBC);
             }
           }
-        }).get().send();
+        })//
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().removeFormat(ImportFormat.LIMESURVEY);
+            getView().removeFormat(ImportFormat.JDBC);
+          }
+        }, Response.SC_FORBIDDEN, Response.SC_INTERNAL_SERVER_ERROR) //
+        .get().send();
   }
 
   private void addEventHandlers() {
