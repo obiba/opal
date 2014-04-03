@@ -28,10 +28,14 @@ import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import com.github.gwtbootstrap.client.ui.base.HasType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
@@ -103,15 +107,15 @@ public class SpssFormatStepPresenter extends PresenterWidget<SpssFormatStepPrese
   }
 
   private void setDefaultCharset() {
-    ResourceRequestBuilderFactory.<JsArrayString>newBuilder().forResource("/files/charsets/default").get()
-        .withCallback(new ResourceCallback<JsArrayString>() {
-
+    ResourceRequestBuilderFactory.<QueryResultDto>newBuilder() //
+        .forResource(UriBuilders.SYSTEM_CHARSET.create().build()) //
+        .get() //
+        .withCallback(new ResponseCodeCallback() {
           @Override
-          public void onResource(Response response, JsArrayString resource) {
-            String charset = resource.get(0);
-            getView().setDefaultCharset(charset);
+          public void onResponseCode(Request request, Response response) {
+            getView().setDefaultCharset(response.getText());
           }
-        }).send();
+        }, Response.SC_OK).send();
   }
 
   private final class ViewValidator extends ViewValidationHandler {

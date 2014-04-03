@@ -44,6 +44,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
@@ -61,8 +62,10 @@ import org.apache.commons.vfs2.Selectors;
 import org.codehaus.jettison.json.JSONArray;
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.core.util.StreamUtil;
+import org.obiba.opal.core.domain.OpalGeneralConfig;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.security.OpalPermissions;
+import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.AclAction;
@@ -86,9 +89,6 @@ public class FilesResource {
   private SubjectAclService subjectAclService;
 
   private final MimetypesFileTypeMap mimeTypes = new MimetypesFileTypeMap();
-
-  @Value("${org.obiba.opal.charset.default}")
-  private String defaultCharset;
 
   @Autowired
   public void setOpalRuntime(OpalRuntime opalRuntime) {
@@ -390,14 +390,6 @@ public class FilesResource {
       names.addAll(charSet.aliases());
     }
     return Response.ok(new JSONArray(names).toString()).build();
-  }
-
-  @GET
-  @Cache
-  @Path("/charsets/default")
-  @NoAuthorization
-  public Response getDefaultCharset() {
-    return Response.ok(new JSONArray(Arrays.asList(new String[] { defaultCharset })).toString()).build();
   }
 
   //
