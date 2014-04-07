@@ -118,6 +118,7 @@ public class ProjectsServiceImpl implements ProjectService {
     MagmaEngine.get().removeDatasource(datasource);
     // remove all views
     viewManager.removeAllViews(datasource.getName());
+    viewManager.unregisterDatasource(datasource.getName());
     // remove datasource
     if(datasource.canDrop()) datasource.drop();
 
@@ -138,6 +139,7 @@ public class ProjectsServiceImpl implements ProjectService {
           protected void doInTransactionWithoutResult(TransactionStatus status) {
             Datasource datasource = MagmaEngine.get().getDatasource(project.getName());
             MagmaEngine.get().removeDatasource(datasource);
+            viewManager.unregisterDatasource(datasource.getName());
             if(datasource.canDrop()) {
               datasource.drop();
             }
