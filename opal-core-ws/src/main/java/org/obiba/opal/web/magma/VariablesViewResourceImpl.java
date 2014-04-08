@@ -16,9 +16,12 @@ import javax.ws.rs.core.Response;
 
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
+import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
+import org.obiba.opal.web.magma.view.ViewDtos;
+import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -37,6 +40,13 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
   @Autowired
   private ViewManager viewManager;
 
+  private ViewDtos viewDtos;
+
+  @Autowired
+  public void setViewDtos(ViewDtos viewDtos) {
+    this.viewDtos = viewDtos;
+  }
+
   @Override
   public Response addOrUpdateVariables(List<VariableDto> variables, @Nullable String comment) {
     if(getValueTable().isView()) {
@@ -44,6 +54,21 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
     } else {
       addOrUpdateTableVariables(variables);
     }
+    return Response.ok().build();
+  }
+
+  @Override
+  public Response addOrUpdateVariablesFromFile(Magma.ViewDto viewDto, @Nullable String comment) {
+    View view = viewDtos.fromDto(viewDto);
+    view.initialise();
+    View source = getValueTableAsView();
+    try(VariableWriter variableWriter = source.getListClause().createWriter()) {
+      for(Variable variable : view.getVariables()) {
+        variableWriter.writeVariable(variable);
+      }
+      viewManager.addView(getDatasource().getName(), source, comment);
+    }
+
     return Response.ok().build();
   }
 
@@ -76,5 +101,4 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
   private View getValueTableAsView() {
     return viewManager.getView(getDatasource().getName(), getValueTable().getName());
   }
-
 }

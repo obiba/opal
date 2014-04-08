@@ -23,11 +23,11 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.HasCollection;
-import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.DisallowedCharactersValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.MatchingTableEntitiesValidator;
 import org.obiba.opal.web.gwt.app.client.validator.MinimumSizeCollectionValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredFileSelectionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -248,7 +248,7 @@ public class AddViewModalPresenter extends ModalPresenterWidget<AddViewModalPres
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+      Set<FieldValidator> validators = new LinkedHashSet<>();
       addViewNameValidators(validators);
       addTablesValidators(validators);
       addFileSelectionValidators(validators);
@@ -275,29 +275,15 @@ public class AddViewModalPresenter extends ModalPresenterWidget<AddViewModalPres
           return getView().getSelectedTables();
         }
       };
-      validators.add(new MinimumSizeCollectionValidator<TableDto>(tablesField, 1, "TableSelectionRequired",
+      validators.add(new MinimumSizeCollectionValidator<>(tablesField, 1, "TableSelectionRequired",
           Display.FormField.TABLES.name()));
       validators.add(new MatchingTableEntitiesValidator(tablesField, Display.FormField.TABLES.name()));
     }
 
     private void addFileSelectionValidators(Collection<FieldValidator> validators) {
-      validators.add(new RequiredFileSelectionValidator(Display.FormField.FILE_SELECTION.name()));
-    }
-
-  }
-
-  class RequiredFileSelectionValidator extends AbstractFieldValidator {
-
-    private static final String EXTENSION_PATTERN = "\\.(xml|xls|xlsx)$";
-
-    RequiredFileSelectionValidator(String id) {
-      super("XMLOrExcelFileRequired", id);
-    }
-
-    @Override
-    protected boolean hasError() {
-      String fileName = fileSelectionPresenter.getSelectedFile().toLowerCase();
-      return !Strings.isNullOrEmpty(fileName) && !RegExp.compile(EXTENSION_PATTERN).test(fileName);
+      validators.add(
+          new RequiredFileSelectionValidator("\\.(xml|xls|xlsx)$", fileSelectionPresenter.getView().getFileText(),
+              "XMLOrExcelFileRequired", Display.FormField.FILE_SELECTION.name()));
     }
 
   }

@@ -112,6 +112,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider;
 
+  private final ModalProvider<AddVariablesModalPresenter> addVariablesModalProvider;
+
   private final ModalProvider<DataExportPresenter> dataExportModalProvider;
 
   private final ModalProvider<DataCopyPresenter> dataCopyModalProvider;
@@ -126,7 +128,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final Translations translations;
 
-  private TranslationMessages translationMessages;
+  private final TranslationMessages translationMessages;
 
   private Runnable removeConfirmation;
 
@@ -148,6 +150,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
       ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider,
       ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider,
+      ModalProvider<AddVariablesModalPresenter> addVariablesModalProvider,
       ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider,
       ModalProvider<DataExportPresenter> dataExportModalProvider,
       ModalProvider<DataCopyPresenter> dataCopyModalProvider,
@@ -162,6 +165,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     this.indexPresenter = indexPresenter.setContainer(this);
     this.variablesToViewProvider = variablesToViewProvider.setContainer(this);
     this.variablePropertiesModalProvider = variablePropertiesModalProvider.setContainer(this);
+    this.addVariablesModalProvider = addVariablesModalProvider.setContainer(this);
     this.tablePropertiesModalProvider = tablePropertiesModalProvider.setContainer(this);
     this.viewPropertiesModalProvider = viewPropertiesModalProvider.setContainer(this);
     this.dataExportModalProvider = dataExportModalProvider.setContainer(this);
@@ -201,11 +205,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     if(indexProgressTimer != null) {
       indexProgressTimer.cancel();
     }
-  }
-
-  @Override
-  public void unbind() {
-    super.unbind();
   }
 
   private void updateTableIndexStatus() {
@@ -432,7 +431,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @Override
   public void onExportData() {
     DataExportPresenter export = dataExportModalProvider.get();
-    Set<TableDto> tables = new HashSet<TableDto>();
+    Set<TableDto> tables = new HashSet<>();
     tables.add(table);
     export.setExportTables(tables, false);
     export.setDatasourceName(table.getDatasourceName());
@@ -441,7 +440,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @Override
   public void onCopyData() {
     DataCopyPresenter copy = dataCopyModalProvider.get();
-    Set<TableDto> copyTables = new HashSet<TableDto>();
+    Set<TableDto> copyTables = new HashSet<>();
     copyTables.add(table);
     copy.setCopyTables(copyTables, false);
     copy.setDatasourceName(table.getDatasourceName());
@@ -464,6 +463,11 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   public void onAddVariable() {
     VariablePropertiesModalPresenter propertiesEditorPresenter = variablePropertiesModalProvider.get();
     propertiesEditorPresenter.initialize(table);
+  }
+
+  @Override
+  public void onAddVariablesFromFile() {
+    addVariablesModalProvider.get().initialize(table);
   }
 
   @Override
@@ -597,7 +601,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onIndexSchedule() {
-    List<TableIndexStatusDto> objects = new ArrayList<TableIndexStatusDto>();
+    List<TableIndexStatusDto> objects = new ArrayList<>();
     objects.add(statusDto);
 
     IndexPresenter dialog = indexPresenter.get();
@@ -1009,7 +1013,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private class VariableNotFoundCallback implements ResponseCodeCallback {
 
-    String name;
+    final String name;
 
     protected VariableNotFoundCallback(String name) {
       this.name = name;
@@ -1021,6 +1025,4 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
           .error(TranslationsUtils.replaceArguments(translations.variableNotFound(), name)).build());
     }
   }
-
-  ;
 }

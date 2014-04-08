@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.magma.datasource.view.FsDatasourceFormV
 import org.obiba.opal.web.gwt.app.client.magma.datasource.view.HibernateDatasourceFormView;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.view.JdbcDatasourceFormView;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.view.NullDatasourceFormView;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.AddVariablesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
@@ -43,6 +44,7 @@ import org.obiba.opal.web.gwt.app.client.magma.variable.view.CategoriesEditorMod
 import org.obiba.opal.web.gwt.app.client.magma.variable.view.ContingencyTableView;
 import org.obiba.opal.web.gwt.app.client.magma.variable.view.VariableAttributeModalView;
 import org.obiba.opal.web.gwt.app.client.magma.variable.view.VariablePropertiesModalView;
+import org.obiba.opal.web.gwt.app.client.magma.view.AddVariablesModalView;
 import org.obiba.opal.web.gwt.app.client.magma.view.DatasourceView;
 import org.obiba.opal.web.gwt.app.client.magma.view.EntityModalView;
 import org.obiba.opal.web.gwt.app.client.magma.view.MagmaView;
@@ -91,6 +93,9 @@ public class MagmaModule extends AbstractOpalModule {
         VariablePropertiesModalView.class);
     bindPresenterWidget(VariableAttributeModalPresenter.class, VariableAttributeModalPresenter.Display.class,
         VariableAttributeModalView.class);
+    bindPresenterWidget(AddVariablesModalPresenter.class, AddVariablesModalPresenter.Display.class,
+        AddVariablesModalView.class);
+
   }
 
   private void configureDatasource() {
