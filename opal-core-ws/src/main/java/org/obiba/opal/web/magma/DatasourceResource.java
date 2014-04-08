@@ -140,6 +140,7 @@ public class DatasourceResource {
     if(MagmaEngine.get().hasTransientDatasource(name)) {
       ds = MagmaEngine.get().getTransientDatasourceInstance(name);
       MagmaEngine.get().removeTransientDatasource(name);
+      viewManager.unregisterDatasource(name);
     } else if(MagmaEngine.get().hasDatasource(name)) {
       throw new InvalidRequestException("DatasourceNotFound");
     } else {
