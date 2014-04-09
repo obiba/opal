@@ -93,12 +93,12 @@
             </b:Button>
           </b:ButtonGroup>
           <b:DropdownButton type="INFO" icon="PLUS" ui:field="addVariablesButton"
-              addStyleNames="small-top-margin" visible="false">
+              addStyleNames="no-left-margin small-top-margin" visible="false">
             <b:NavLink icon="TABLE" ui:field="addVariable">
               <ui:msg description="Add Variable Button label">Add variable...</ui:msg>
             </b:NavLink>
             <b:NavLink icon="TABLE" ui:field="addVariablesFromFile">
-              <ui:msg description="Add Variables Button label">Add variables...</ui:msg>
+              <ui:msg description="Add/Update Variables Button label">Add/update variables from dictionary...</ui:msg>
             </b:NavLink>
           </b:DropdownButton>
         </g:FlowPanel>

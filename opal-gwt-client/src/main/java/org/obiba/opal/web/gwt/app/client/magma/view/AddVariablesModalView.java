@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.AddVariablesModalUiHand
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePanel;
+import org.obiba.opal.web.gwt.app.client.ui.VariablesTemplateDownloadPanel;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
@@ -40,6 +41,9 @@ public class AddVariablesModalView extends ModalPopupViewWithUiHandlers<AddVaria
 
   @UiField
   ControlGroup fileSelectionGroup;
+
+  @UiField
+  VariablesTemplateDownloadPanel variableTemplatePanel;
 
   interface Binder extends UiBinder<Widget, AddVariablesModalView> {}
 
@@ -92,5 +96,10 @@ public class AddVariablesModalView extends ModalPopupViewWithUiHandlers<AddVaria
     } else {
       modal.addAlert(message, AlertType.ERROR, group);
     }
+  }
+
+  @UiHandler("variableTemplatePanel")
+  public void onClickEvent(ClickEvent event) {
+    getUiHandlers().downloadTemplate();
   }
 }

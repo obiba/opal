@@ -15,6 +15,13 @@
     >
 
   <o:Modal ui:field="modal" resizable="false" closeVisible="true" keyboard="true" animation="false">
+    <b:Paragraph>
+      <ui:msg description="Supported variables file format btn-information">Select an Excel or an XML for batch
+        edition or creation of variables.
+      </ui:msg>
+    </b:Paragraph>
+    <o:VariablesTemplateDownloadPanel ui:field="variableTemplatePanel"/>
+
     <b:ControlGroup ui:field="fileSelectionGroup">
       <b:ControlLabel for="fileSelectionPanel">
         <ui:msg description="Variables File label">Variables File</ui:msg>
@@ -22,7 +29,7 @@
       <b:Controls>
         <o:OpalSimplePanel ui:field="fileSelectionPanel"></o:OpalSimplePanel>
         <b:HelpBlock>
-          <ui:msg description="View Variables help">File must be an XML or an Excel file.</ui:msg>
+          <ui:msg description="View Variables help">Valid file extensions: xls, xlsx and xml.</ui:msg>
         </b:HelpBlock>
       </b:Controls>
     </b:ControlGroup>

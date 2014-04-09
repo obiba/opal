@@ -2268,4 +2268,12 @@ public interface Translations extends Constants {
   @Description("Approx. Area (Km2) label")
   @DefaultStringValue("Approximate Area (Km2)")
   String approxArea();
+
+  @Description("Variable Template Download Panel label")
+  @DefaultStringValue("Use the following Excel template to add new variables or update existing ones:")
+  String variablesTemplateDownloadLabel();
+
+  @Description("Variable Template Download Button label")
+  @DefaultStringValue("Download Opal Variables Template")
+  String variablesTemplateButtonLabel();
 }

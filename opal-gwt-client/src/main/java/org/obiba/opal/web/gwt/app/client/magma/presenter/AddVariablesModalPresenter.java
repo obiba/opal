@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
@@ -45,6 +46,8 @@ public class AddVariablesModalPresenter extends ModalPresenterWidget<AddVariable
     implements AddVariablesModalUiHandlers {
 
   private final FileSelectionPresenter fileSelectionPresenter;
+
+  private static final String EXCEL_TEMPLATE = "/opalVariableTemplate.xls";
 
   private final ViewValidator validator;
 
@@ -88,6 +91,11 @@ public class AddVariablesModalPresenter extends ModalPresenterWidget<AddVariable
         .withCallback(SC_OK, new VariablesCreatedCallback())//
         .post()//
         .send();
+  }
+
+  @Override
+  public void downloadTemplate() {
+    fireEvent(new FileDownloadRequestEvent("/templates" + EXCEL_TEMPLATE));
   }
 
   private ViewDto createViewDto() {

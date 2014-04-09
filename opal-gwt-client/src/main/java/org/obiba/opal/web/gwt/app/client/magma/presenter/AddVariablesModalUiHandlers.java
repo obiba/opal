@@ -14,4 +14,6 @@ import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
 public interface AddVariablesModalUiHandlers extends ModalUiHandlers {
   void save();
+
+  void downloadTemplate();
 }
