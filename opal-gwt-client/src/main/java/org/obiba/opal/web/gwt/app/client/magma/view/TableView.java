@@ -40,6 +40,7 @@ import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.ButtonGroup;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.FluidRow;
 import com.github.gwtbootstrap.client.ui.NavLink;
@@ -50,6 +51,7 @@ import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.google.gwt.cell.client.Cell;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -80,8 +82,6 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements TablePresenter.Display {
-
-  private final EventBus eventBus;
 
   interface Binder extends UiBinder<Widget, TableView> {}
 
@@ -174,9 +174,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   IconAnchor edit;
 
   @UiField
-  Button addVariable;
-
-  @UiField
   Button remove;
 
   @UiField
@@ -209,7 +206,16 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiField
   DropdownButton downloadBtn;
 
-  private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
+  @UiField
+  NavLink addVariablesFromFile;
+
+  @UiField
+  DropdownButton addVariablesButton;
+
+  @UiField
+  ButtonGroup tableAddVariableGroup;
+
+  private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<>();
 
   private final Translations translations;
 
@@ -226,13 +232,12 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @Inject
   public TableView(Binder uiBinder, EventBus eventBus, Translations translations,
       TranslationMessages translationMessages, PlaceManager placeManager) {
-    this.eventBus = eventBus;
     this.translations = translations;
     this.translationMessages = translationMessages;
     this.placeManager = placeManager;
 
-    categoricalVariables = new Typeahead(new CategoricalVariableSuggestOracle(this.eventBus));
-    crossWithVariables = new Typeahead(new CrossableVariableSuggestOracle(this.eventBus));
+    categoricalVariables = new Typeahead(new CategoricalVariableSuggestOracle(eventBus));
+    crossWithVariables = new Typeahead(new CrossableVariableSuggestOracle(eventBus));
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -241,6 +246,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     initializeFilter();
 
     progress.setWidth("150px");
+    addVariablesButton.setText(translations.addVariables());
+
+
   }
 
   @Override
@@ -313,7 +321,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   }
 
   private void addCheckColumn() {
-    checkColumn = new CheckboxColumn<VariableDto>(new VariableDtoDisplay());
+    checkColumn = new CheckboxColumn<>(new VariableDtoDisplay());
 
     table.addColumn(checkColumn, checkColumn.getCheckColumnHeader());
     table.setColumnWidth(checkColumn, 1, Unit.PX);
@@ -392,6 +400,8 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     timestamps.setText(Moment.create(dto.getTimestamps().getLastUpdate()).fromNow());
     variableCount.setText(dto.hasVariableCount() ? dto.getVariableCount() + "" : "-");
     entityCount.setText(dto.hasValueSetCount() ? dto.getValueSetCount() + "" : "-");
+    addVariablesButton.setVisible(dto.hasViewLink());
+    tableAddVariableGroup.setVisible(!addVariablesButton.isVisible());
 
     VariableSuggestOracle oracle = (VariableSuggestOracle) categoricalVariables.getSuggestOracle();
     oracle.setDatasource("\"" + tableDto.getDatasourceName() + "\"");
@@ -471,9 +481,14 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     getUiHandlers().onEdit();
   }
 
-  @UiHandler("addVariable")
+  @UiHandler({"addVariable", "addTableVariable"})
   void onAddVariable(ClickEvent event) {
     getUiHandlers().onAddVariable();
+  }
+
+  @UiHandler("addVariablesFromFile")
+  void onAddVariableFromFile(ClickEvent event) {
+    getUiHandlers().onAddVariablesFromFile();
   }
 
   @UiHandler("exportData")
@@ -546,7 +561,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @Override
   public HasAuthorization getEditAuthorizer() {
-    return new WidgetAuthorizer(edit, addVariable);
+    return new WidgetAuthorizer(edit, tableDto.hasViewLink() ? addVariablesButton : tableAddVariableGroup);
   }
 
   @Override

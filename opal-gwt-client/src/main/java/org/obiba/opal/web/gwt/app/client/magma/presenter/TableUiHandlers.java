@@ -18,6 +18,8 @@ public interface TableUiHandlers extends UiHandlers {
 
   void onAddVariable();
 
+  void onAddVariablesFromFile();
+
   void onAddVariablesToView(List<VariableDto> variables);
 
   void onEdit();

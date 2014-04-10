@@ -156,7 +156,7 @@ public class VariablesImportView extends ModalPopupViewWithUiHandlers<VariablesI
     localeNameBox.setText(LanguageLocale.EN.getName());
   }
 
-  @UiHandler("downloadExcelTemplateButton")
+  @UiHandler("variableTemplatePanel")
   public void onDownloadExcelTemplateClicked(ClickEvent event) {
     getUiHandlers().downExcelTemplate();
   }

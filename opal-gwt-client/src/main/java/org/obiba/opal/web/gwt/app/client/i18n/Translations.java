@@ -527,7 +527,7 @@ public interface Translations extends Constants {
       "TermNameMustBeUnique", "Term name must be unique.",//
       "VocabularyNameMustBeUnique", "Vocabulary name must be unique.",//
       "DeleteTableSelectAtLeastOne", "Select at least one table to remove.",//
-      "XMLOrExcelFileRequired", "An Excel or a XML file is required.",//
+      "XMLOrExcelFileRequired", "An Excel or an XML file is required.",//
       "CreateViewFailed", "Failed to create view. Make sure the view file is valid.",//
       "SPSSOrExcelFileRequired", "An Excel or a SPSS file is required.",//
       "ESQueryBadRequest", "Not a valid search query.", "DuplicateUserName", "A user with same name already exists.",
@@ -1546,6 +1546,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Add Variable")
   String addVariable();
 
+  @Description("Add variables label")
+  @DefaultStringValue("Add Variables")
+  String addVariables();
+
   @Description("Add Identifiers Mapping label")
   @DefaultStringValue("Add Identifiers Mapping")
   String addIdentifiersMapping();
@@ -2264,4 +2268,12 @@ public interface Translations extends Constants {
   @Description("Approx. Area (Km2) label")
   @DefaultStringValue("Approximate Area (Km2)")
   String approxArea();
+
+  @Description("Variable Template Download Panel label")
+  @DefaultStringValue("Use the following Excel template to add new variables or update existing ones:")
+  String variablesTemplateDownloadLabel();
+
+  @Description("Variable Template Download Button label")
+  @DefaultStringValue("Download Opal Variables Template")
+  String variablesTemplateButtonLabel();
 }
