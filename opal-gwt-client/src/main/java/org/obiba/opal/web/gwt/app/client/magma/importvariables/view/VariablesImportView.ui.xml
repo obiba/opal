@@ -9,15 +9,7 @@
   <o:WizardModalBox ui:field="dialog" title="Add/Update Tables">
     <g:FlowPanel>
       <o:WizardStep ui:field="fileSelectionStep">
-        <b:Paragraph>
-          <ui:msg description="Supported variables file format btn-information">Use the following Excel template to
-            add new variables or update existing ones:
-          </ui:msg>
-        </b:Paragraph>
-        <b:Button ui:field="downloadExcelTemplateButton" icon="DOWNLOAD" type="INFO" addStyleNames="large-bottom-margin">
-          <ui:msg description="Download Opal Variables Template button label">Download Opal Variables Template
-          </ui:msg>
-        </b:Button>
+        <o:VariablesTemplateDownloadPanel ui:field="variableTemplatePanel"/>
 
         <b:ControlGroup ui:field="fileSelectionGroup" addStyleNames="large-top-margin">
           <b:ControlLabel>

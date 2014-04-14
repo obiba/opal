@@ -51,7 +51,7 @@ public abstract class RPackageResource {
   protected static final String OPTIONS = "Options";
 
   private static final String[] defaultFields = new String[] { "Title", "Description", "Author", "Maintainer",
-      "Date/Publication", AGGREGATE_METHODS, ASSIGN_METHODS };
+      "Date/Publication", AGGREGATE_METHODS, ASSIGN_METHODS, OPTIONS };
 
   private static final String[] defaultRepos = new String[] { "http://cran.obiba.org", //"http://cran.datashield.org",
       "http://cran.rstudio.com" };

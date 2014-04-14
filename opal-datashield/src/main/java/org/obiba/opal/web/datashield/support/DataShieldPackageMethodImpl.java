@@ -59,7 +59,7 @@ public class DataShieldPackageMethodImpl extends RPackageResource {
     OpalR.RPackageDto packageDto = getDatashieldPackage(name);
 
     final DataShield.DataShieldPackageMethodsDto methods = getPackageMethods(packageDto);
-
+    final List<DataShield.DataShieldROptionDto> roptions = getPackageROptions(packageDto);
     configurationSupplier
         .modify(new ExtensionConfigurationSupplier.ExtensionConfigModificationTask<DatashieldConfiguration>() {
 
@@ -67,6 +67,7 @@ public class DataShieldPackageMethodImpl extends RPackageResource {
           public void doWithConfig(DatashieldConfiguration config) {
             addMethods(configurationSupplier.get().getAggregateEnvironment(), methods.getAggregateList());
             addMethods(configurationSupplier.get().getAssignEnvironment(), methods.getAssignList());
+            config.addOptions(roptions);
           }
 
           private void addMethods(DataShieldEnvironment env, Iterable<DataShield.DataShieldMethodDto> envMethods) {
@@ -132,6 +133,18 @@ public class DataShieldPackageMethodImpl extends RPackageResource {
     return getDatashieldPackage(name);
   }
 
+  private List<DataShield.DataShieldROptionDto> getPackageROptions(OpalR.RPackageDto packageDto) {
+    List<DataShield.DataShieldROptionDto> optionDtos = Lists.newArrayList();
+    for(Opal.EntryDto entry : packageDto.getDescriptionList()) {
+      String key = entry.getKey();
+      if(OPTIONS.equals(key)) {
+        optionDtos.addAll(new DataShieldROptionsParser().parse(entry.getValue()));
+      }
+    }
+
+    return optionDtos;
+  }
+
   private DataShield.DataShieldPackageMethodsDto getPackageMethods() throws REXPMismatchException {
     return getPackageMethods(getPackage());
   }
@@ -142,25 +155,16 @@ public class DataShieldPackageMethodImpl extends RPackageResource {
 
     List<DataShield.DataShieldMethodDto> aggregateMethodDtos = Lists.newArrayList();
     List<DataShield.DataShieldMethodDto> assignMethodDtos = Lists.newArrayList();
-    List<DataShield.DataShieldROptionDto> optionDtos = Lists.newArrayList();
     for(Opal.EntryDto entry : packageDto.getDescriptionList()) {
       String key = entry.getKey();
       if(AGGREGATE_METHODS.equals(key)) {
         aggregateMethodDtos.addAll(parsePackageMethods(packageDto.getName(), version, entry.getValue()));
       } else if(ASSIGN_METHODS.equals(key)) {
         assignMethodDtos.addAll(parsePackageMethods(packageDto.getName(), version, entry.getValue()));
-      } else if(OPTIONS.equals(key)) {
-        optionDtos.addAll(parsePackageOptions(packageDto.getName(), version, entry.getValue()));
       }
     }
     return DataShield.DataShieldPackageMethodsDto.newBuilder().setName(name).addAllAggregate(aggregateMethodDtos)
         .addAllAssign(assignMethodDtos).build();
-  }
-
-  private Collection<? extends DataShield.DataShieldROptionDto> parsePackageOptions(String name, String version,
-      String value) {
-    // TODO
-    return Lists.newArrayList();
   }
 
   private String getPackageVersion(OpalR.RPackageDto packageDto) {

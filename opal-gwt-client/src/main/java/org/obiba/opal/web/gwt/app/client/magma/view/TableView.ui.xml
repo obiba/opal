@@ -86,12 +86,21 @@
               <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
             </b:InputAddOn>
           </b:Controls>
-          <b:ButtonGroup>
-            <b:Button type="INFO" icon="PLUS" ui:field="addVariable"
+          <b:ButtonGroup ui:field="tableAddVariableGroup">
+            <b:Button type="INFO" icon="PLUS" ui:field="addTableVariable"
                 addStyleNames="small-right-indent small-top-margin">
               <ui:msg description="Add Variable label">Add Variable</ui:msg>
             </b:Button>
           </b:ButtonGroup>
+          <b:DropdownButton type="INFO" icon="PLUS" ui:field="addVariablesButton"
+              addStyleNames="no-left-margin small-top-margin" visible="false">
+            <b:NavLink icon="TABLE" ui:field="addVariable">
+              <ui:msg description="Add Variable Button label">Add variable...</ui:msg>
+            </b:NavLink>
+            <b:NavLink icon="TABLE" ui:field="addVariablesFromFile">
+              <ui:msg description="Add/Update Variables Button label">Add/update variables from dictionary...</ui:msg>
+            </b:NavLink>
+          </b:DropdownButton>
         </g:FlowPanel>
 
         <g:FlowPanel>

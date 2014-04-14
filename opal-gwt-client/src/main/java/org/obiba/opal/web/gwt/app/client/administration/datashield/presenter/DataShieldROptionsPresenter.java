@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShiledROptionCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
@@ -50,6 +51,14 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
   @Override
   protected void onBind() {
     super.onBind();
+    addHandler(DataShieldPackageCreatedEvent.getType(),
+        new DataShieldPackageCreatedEvent.DataShieldPackageCreatedHandler() {
+          @Override
+          public void onDataShieldPackageCreated(DataShieldPackageCreatedEvent event) {
+            refresh();
+          }
+        });
+
     addHandler(DataShiledROptionCreatedEvent.getType(),
         new DataShiledROptionCreatedEvent.DataShiledROptionCreatedHandler() {
           @Override
