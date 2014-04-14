@@ -18,9 +18,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
-import org.obiba.opal.core.vcs.CommitInfo;
+import org.obiba.git.CommitInfo;
+import org.obiba.opal.core.vcs.GitUtils;
 import org.obiba.opal.core.vcs.OpalVersionControlSystem;
-import org.obiba.opal.core.vcs.git.support.GitUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -46,14 +46,14 @@ public class ViewVcsLogResource {
   @GET
   @Path("/commits")
   public Response getCommitsInfo() {
-    List<CommitInfo> commitInfos = vcs.getCommitsInfo(datasource, GitUtils.getViewFilePath(view));
+    Iterable<CommitInfo> commitInfos = vcs.getCommitsInfo(datasource, GitUtils.getViewFilePath(view));
     return Response.ok().entity(Dtos.asDto(commitInfos)).build();
   }
 
   @GET
   @Path("/variable/{variableName}/commits")
   public Response getVariableCommitsInfo(@NotNull @PathParam("variableName") String variableName) {
-    List<CommitInfo> commitInfos = vcs.getCommitsInfo(datasource, GitUtils.getVariableFilePath(view, variableName));
+    Iterable<CommitInfo> commitInfos = vcs.getCommitsInfo(datasource, GitUtils.getVariableFilePath(view, variableName));
     return Response.ok().entity(Dtos.asDto(commitInfos)).build();
   }
 
@@ -85,14 +85,13 @@ public class ViewVcsLogResource {
       @NotNull @PathParam("commitId") String commitId) {
     String blob = vcs.getBlob(datasource, GitUtils.getVariableFilePath(view, variableName), commitId);
     String path = GitUtils.getVariableFilePath(view, variableName);
-    CommitInfo commitInfo = CommitInfo.Builder.createFromObject(vcs.getCommitInfo(datasource, path, commitId))
-        .setBlob(blob).build();
-    return Response.ok().entity(Dtos.asDto(commitInfo)).build();
+    CommitInfo info = vcs.getCommitInfo(datasource, path, commitId);
+    return Response.ok().entity(Dtos.asDto(CommitInfo.Builder.createFromObject(info).blob(blob).build())).build();
   }
 
   private CommitInfo getVariableDiffInternal(@NotNull CommitInfo commitInfo, @NotNull String path,
       @NotNull String commitId, @Nullable String prevCommitId) {
-    List<String> diffEntries = vcs.getDiffEntries(datasource, commitId, prevCommitId, path);
-    return CommitInfo.Builder.createFromObject(commitInfo).setDiffEntries(diffEntries).build();
+    Iterable<String> diffEntries = vcs.getDiffEntries(datasource, commitId, prevCommitId, path);
+    return CommitInfo.Builder.createFromObject(commitInfo).diffEntries((List<String>) diffEntries).build();
   }
 }

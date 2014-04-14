@@ -43,7 +43,7 @@ import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewPersistenceStrategy;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.audit.OpalUserProvider;
-import org.obiba.opal.core.vcs.git.support.GitUtils;
+import org.obiba.opal.core.vcs.GitUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

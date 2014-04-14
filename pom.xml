@@ -187,6 +187,11 @@
         <artifactId>obiba-shiro-crowd</artifactId>
         <version>${obiba-commons.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.obiba.commons</groupId>
+        <artifactId>obiba-git</artifactId>
+        <version>${obiba-commons.version}</version>
+      </dependency>
 
       <!-- Magma dependencies -->
       <dependency>

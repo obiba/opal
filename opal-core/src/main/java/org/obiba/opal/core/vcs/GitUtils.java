@@ -1,4 +1,4 @@
-package org.obiba.opal.core.vcs.git.support;
+package org.obiba.opal.core.vcs;
 
 import java.io.File;
 import java.io.IOException;
