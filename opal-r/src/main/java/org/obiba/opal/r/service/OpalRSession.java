@@ -18,6 +18,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.RASyncOperationTemplate;
 import org.obiba.opal.r.ROperation;
 import org.obiba.opal.r.RRuntimeException;
@@ -35,6 +36,8 @@ import com.google.common.collect.Lists;
 public class OpalRSession implements RASyncOperationTemplate {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRSession.class);
+
+  private final TransactionalThreadFactory transactionalThreadFactory;
 
   private final String id;
 
@@ -66,7 +69,8 @@ public class OpalRSession implements RASyncOperationTemplate {
    *
    * @param connection
    */
-  OpalRSession(RConnection connection) {
+  OpalRSession(RConnection connection, TransactionalThreadFactory transactionalThreadFactory) {
+    this.transactionalThreadFactory = transactionalThreadFactory;
     try {
       rSession = connection.detach();
     } catch(RserveException e) {
@@ -218,7 +222,7 @@ public class OpalRSession implements RASyncOperationTemplate {
   }
 
   private void startRCommandsConsumer() {
-    consumer = new Thread(rCommandsConsumer);
+    consumer = transactionalThreadFactory.newThread(rCommandsConsumer);
     consumer.setName("R Operations Consumer " + rCommandsConsumer);
     consumer.start();
   }
@@ -246,7 +250,7 @@ public class OpalRSession implements RASyncOperationTemplate {
         execute(rCommand.getROperation());
         rCommand.completed();
       } catch(Exception e) {
-        log.error("Error when consuming R command: {}", e.getMessage());
+        log.error("Error when consuming R command: {}", e.getMessage(), e);
         rCommand.failed(e.getMessage());
       }
       synchronized(rCommand) {

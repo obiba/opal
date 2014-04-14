@@ -21,6 +21,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListener;
 import org.obiba.opal.core.runtime.ServiceListener;
+import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,9 @@ import com.google.common.collect.ImmutableList;
 public class OpalRSessionManager implements SessionListener, ServiceListener<OpalRService> {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRSessionManager.class);
+
+  @Autowired
+  private TransactionalThreadFactory transactionalThreadFactory;
 
   private OpalRService opalRService;
 
@@ -196,7 +200,7 @@ public class OpalRSessionManager implements SessionListener, ServiceListener<Opa
 
   private OpalRSession addCurrentRSession(String sessionId, RConnection connection) {
     SubjectRSessions rSessions = getRSessions(sessionId);
-    OpalRSession current = new OpalRSession(connection);
+    OpalRSession current = new OpalRSession(connection, transactionalThreadFactory);
     rSessions.addRSession(current);
     return current;
   }
