@@ -58,8 +58,7 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
       return null;
     }
 
-    // If method allows authentication using the cookie only and a valid cookie is present
-    // let method through
+    // If method allows authentication using the cookie only and a valid cookie is present, let method through
     if(isWebServiceAuthenticatedByCookie(method) && isOpalCookieValid(request)) {
       return null;
     }

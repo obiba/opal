@@ -12,19 +12,16 @@ package org.obiba.opal.core.service.security;
 
 import java.util.Objects;
 
-import org.apache.shiro.mgt.SessionStorageEvaluator;
 import org.apache.shiro.subject.Subject;
 import org.obiba.opal.core.service.security.realm.BackgroundJobRealm;
-import org.obiba.shiro.realm.SudoRealm;
+import org.obiba.shiro.SessionStorageEvaluator;
 
-public class OpalSessionStorageEvaluator implements SessionStorageEvaluator {
+public class OpalSessionStorageEvaluator extends SessionStorageEvaluator {
 
   @Override
   public boolean isSessionStorageEnabled(Subject subject) {
-    if(subject == null) return false;
-    Object principal = subject.getPrincipal();
-    return !Objects.equals(principal, BackgroundJobRealm.SystemPrincipal.INSTANCE) &&
-        !Objects.equals(principal, SudoRealm.SudoPrincipal.INSTANCE);
+    return super.isSessionStorageEnabled(subject) &&
+        !Objects.equals(subject.getPrincipal(), BackgroundJobRealm.SystemPrincipal.INSTANCE);
   }
 
 }

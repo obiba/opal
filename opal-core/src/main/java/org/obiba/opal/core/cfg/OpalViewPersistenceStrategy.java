@@ -262,7 +262,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     File viewRepo = new File(localRepo, view.getName());
     viewRepo.mkdirs();
 
-    // Write serialiazed view
+    // Write serialized view
     File viewFile = new File(viewRepo, VIEW_FILE_NAME);
     OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(viewFile), Charsets.UTF_8);
     try {
