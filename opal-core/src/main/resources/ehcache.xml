@@ -12,6 +12,14 @@
       maxElementsOnDisk="10000000"
       diskPersistent="false"/>
 
+  <cache name="magma-table-entities"
+      maxElementsInMemory="1"
+      eternal="true"
+      timeToLiveSeconds="0"
+      timeToIdleSeconds="0"
+      overflowToDisk="true"
+      diskPersistent="true"/>
+
   <cache name="opal-variable-summary-categorical"
       maxElementsInMemory="1"
       eternal="true"
