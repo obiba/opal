@@ -16,9 +16,12 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.validation.constraints.NotNull;
 
+import net.sf.ehcache.CacheManager;
+
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
+import org.obiba.magma.MagmaCacheExtension;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaEngineExtension;
 import org.obiba.magma.support.MagmaEngineFactory;
@@ -31,6 +34,7 @@ import org.obiba.opal.fs.security.SecuredOpalFileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
@@ -57,6 +61,9 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   @Autowired
   private ViewManager viewManager;
+
+  @Autowired
+  private CacheManager cacheManager;
 
   private OpalFileSystem opalFileSystem;
 
@@ -169,6 +176,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
           for(MagmaEngineExtension extension : magmaEngineFactory.extensions()) {
             MagmaEngine.get().extend(extension);
           }
+          MagmaEngine.get().extend(new MagmaCacheExtension(new EhCacheCacheManager(cacheManager)));
         }
       };
       new TransactionalThread(transactionTemplate, magmaEngineInit).start();
