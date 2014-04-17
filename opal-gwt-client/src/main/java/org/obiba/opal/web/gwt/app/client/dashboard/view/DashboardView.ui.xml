@@ -37,7 +37,7 @@
             </g:FlowPanel>
 
             <g:FlowPanel ui:field="tasks">
-              <b2:IconAnchor ui:field="tasksLink" icon="COG"/>
+              <b2:IconAnchor ui:field="tasksLink" icon="TASKS"/>
               <g:Label addStyleNames="help-block">
                 <ui:msg description="Manage Files link description">Follow tasks being executed.
                 </ui:msg>
