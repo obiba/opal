@@ -108,6 +108,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   @Override
   public void writeViews(@NotNull final String datasourceName, @NotNull final Set<View> views,
       @Nullable final String comment) {
+    log.info("Git::writeViews ds: {} views: {}", datasourceName, views.size());
     executeWithWriteLock(new Action() {
       @Override
       public void execute() {
@@ -119,6 +120,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   @Override
   public void writeView(@NotNull final String datasourceName, @NotNull final View view,
       @Nullable final String comment) {
+    log.info("Git::writeView ds: {} views: {}", datasourceName, view.getName());
     executeWithWriteLock(new Action() {
       @Override
       public void execute() {
@@ -129,6 +131,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
 
   @Override
   public void removeView(@NotNull final String datasourceName, @NotNull final String viewName) {
+    log.info("Git::removeView ds: {} views: {}", datasourceName, viewName);
     executeWithWriteLock(new Action() {
       @Override
       public void execute() {
@@ -139,6 +142,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
 
   @Override
   public void removeViews(final String datasourceName) {
+    log.info("Git::removeViews ds: {}", datasourceName);
     executeWithWriteLock(new Action() {
       @Override
       public void execute() {
@@ -153,6 +157,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
 
   @Override
   public Set<View> readViews(@NotNull final String datasourceName) {
+    log.info("Git::readViews ds: {}", datasourceName);
     return executeWithReadLock(new ActionWithReturn<Set<View>>() {
       @Override
       public Set<View> execute() {

@@ -10,8 +10,6 @@
 
 package org.obiba.opal.core.vcs;
 
-import java.io.File;
-
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
@@ -27,54 +25,33 @@ import org.springframework.stereotype.Component;
 @Component
 public class OpalGitVersionControlSystem implements OpalVersionControlSystem {
 
-  private static final String GIT_ROOT_PATH = "data" + File.separator + "git" + File.separator +
-      "views";
-
-  private final File repoPath;
-
   @Autowired
   private GitCommandHandler gitCommandHandler;
 
-  public OpalGitVersionControlSystem() {
-    this(new File(System.getProperty("OPAL_HOME"), GIT_ROOT_PATH));
-  }
-
-  public OpalGitVersionControlSystem(File repoPath) {
-    this.repoPath = repoPath;
-  }
-
   @Override
   public Iterable<CommitInfo> getCommitsInfo(@NotNull String datasource, @NotNull String path) {
-//    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(getRepository(datasource)).addPath(path)
-//        .addDatasourceName(datasource).build();
-    //TODO support datasourceName
-    return gitCommandHandler.execute(new LogsCommand.Builder(repoPath).path(path).build());
+    return gitCommandHandler
+        .execute(new LogsCommand.Builder(OpalGitUtils.getDatasourceGitFolder(datasource)).path(path).build());
   }
 
   @Override
   public CommitInfo getCommitInfo(@NotNull String datasource, @NotNull String path, @NotNull String commitId) {
-//    OpalGitCommitLogCommand command = new OpalGitCommitLogCommand.Builder(getRepository(datasource), path, commitId)
-//        .addDatasourceName(datasource).build();
-    //TODO support datasourceName
-    return gitCommandHandler.execute(new CommitLogCommand.Builder(repoPath, path, commitId).build());
+    return gitCommandHandler
+        .execute(new CommitLogCommand.Builder(OpalGitUtils.getDatasourceGitFolder(datasource), path, commitId).build());
   }
 
   @Override
   public String getBlob(@NotNull String datasource, @NotNull String path, @NotNull String commitId) {
-//    OpalGitFetchBlobCommand command = new OpalGitFetchBlobCommand.Builder(getRepository(datasource), path, commitId)
-//        .addDatasourceName(datasource).build();
-    //TODO support datasourceName
-    return gitCommandHandler.execute(new FetchBlobCommand.Builder(repoPath, path).commitId(commitId).build());
+    return gitCommandHandler.execute(
+        new FetchBlobCommand.Builder(OpalGitUtils.getDatasourceGitFolder(datasource), path).commitId(commitId).build());
   }
 
   @Override
   public Iterable<String> getDiffEntries(@NotNull String datasource, @NotNull String commitId,
       @Nullable String prevCommitId, @Nullable String path) {
-//    OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(getRepository(datasource), commitId).addPath(path)
-//        .addDatasourceName(datasource).addPreviousCommitId(prevCommitId).build();
-    //TODO support datasourceName
-    return gitCommandHandler
-        .execute(new DiffAsStringCommand.Builder(repoPath, commitId).path(path).previousCommitId(prevCommitId).build());
+    return gitCommandHandler.execute(
+        new DiffAsStringCommand.Builder(OpalGitUtils.getDatasourceGitFolder(datasource), commitId).path(path)
+            .previousCommitId(prevCommitId).build());
   }
 
 }
