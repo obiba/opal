@@ -120,13 +120,13 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   }
 
   private String getDefaultComment(Set<View> views) {
-    StringBuilder builder = new StringBuilder();
+    StringBuilder builder = new StringBuilder("Update ");
     for(View view : views) {
-      if(builder.length() > 0) builder.append(", ");
+      if(builder.length() > 1) builder.append(", ");
       builder.append(view.getName());
     }
 
-    return builder.insert(0, "Update ").toString();
+    return builder.toString();
   }
 
   /**

@@ -87,11 +87,8 @@ public class OpalWriteViewsCommand extends AbstractGitWriteCommand {
 
     // Write serialized view
     File viewFile = new File(viewRepo, OpalGitUtils.VIEW_FILE_NAME);
-    OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(viewFile), Charsets.UTF_8);
-    try {
+    try(OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(viewFile), Charsets.UTF_8)) {
       getXStream().toXML(view, writer);
-    } finally {
-      StreamUtil.silentSafeClose(writer);
     }
 
     // Write variable script files
@@ -115,14 +112,11 @@ public class OpalWriteViewsCommand extends AbstractGitWriteCommand {
 
   private void doWriteGitViewVariable(File viewRepo, Variable variable) throws IOException {
     String script = variable.hasAttribute("script") ? variable.getAttributeStringValue("script") : "null";
-    File variableFile = new File(viewRepo, variable.getName() + ".js");
+    File variableFile = new File(viewRepo, variable.getName() + OpalGitUtils.VARIABLE_FILE_EXTENSION);
 
-    FileWriter fileWriter = new FileWriter(variableFile);
-    try {
+    try (FileWriter fileWriter = new FileWriter(variableFile)) {
       fileWriter.append(script);
       fileWriter.flush();
-    } finally {
-      StreamUtil.silentSafeClose(fileWriter);
     }
   }
 
