@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
 import com.google.gwt.event.shared.GwtEvent;
@@ -67,6 +68,9 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
         .authorize(getView().getIdentifiersAuthorizer()).send();
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").get()
         .authorize(getView().getReportsAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.SHELL_COMMANDS.create().build())
+        .get().authorize(getView().getTasksAuthorizer()).send();
     setInSlot(BOOKMARKS, bookmarkListPresenter);
   }
 
@@ -83,6 +87,8 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
     HasAuthorization getIdentifiersAuthorizer();
 
     HasAuthorization getReportsAuthorizer();
+
+    HasAuthorization getTasksAuthorizer();
 
   }
 

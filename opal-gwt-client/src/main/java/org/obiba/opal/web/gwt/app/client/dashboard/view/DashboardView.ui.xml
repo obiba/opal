@@ -36,6 +36,14 @@
               </g:Label>
             </g:FlowPanel>
 
+            <g:FlowPanel ui:field="tasks">
+              <b2:IconAnchor ui:field="tasksLink" icon="TASKS"/>
+              <g:Label addStyleNames="help-block">
+                <ui:msg description="Manage Files link description">Follow tasks being executed.
+                </ui:msg>
+              </g:Label>
+            </g:FlowPanel>
+
             <g:FlowPanel ui:field="reports">
               <b2:IconAnchor ui:field="reportsLink" icon="FILE_ALT"/>
               <g:Label addStyleNames="help-block">

@@ -40,6 +40,9 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   IconAnchor exploreFilesLink;
 
   @UiField
+  IconAnchor tasksLink;
+
+  @UiField
   IconAnchor reportsLink;
 
   @UiField
@@ -55,6 +58,9 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   Panel files;
 
   @UiField
+  Panel tasks;
+
+  @UiField
   Panel reports;
 
   @UiField
@@ -67,10 +73,12 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
     getIdentifiersLink().setHref("#" + Places.ADMINISTRATION + "/" + Places.IDENTIFIERS);
     getReportsLink().setHref("#" + Places.ADMINISTRATION + "/" + Places.REPORT_TEMPLATES);
     getFilesLink().setHref("#" + Places.ADMINISTRATION + "/" + Places.FILES);
+    tasksLink.setHref("#" + Places.ADMINISTRATION + "/" + Places.TASKS);
     pageTitle.setText(translations.pageDashboardTitle());
 
     exploreVariablesLink.setText(translations.exploreVariables());
     exploreFilesLink.setText(translations.manageFiles());
+    tasksLink.setText(translations.tasks());
     reportsLink.setText(translations.runReports());
     identifiersLink.setText(translations.manageParticipantIdentifiers());
   }
@@ -115,6 +123,11 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   @Override
   public HasAuthorization getReportsAuthorizer() {
     return new WidgetAuthorizer(reports);
+  }
+
+  @Override
+  public HasAuthorization getTasksAuthorizer() {
+    return new WidgetAuthorizer(tasks);
   }
 
 }
