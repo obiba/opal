@@ -30,8 +30,9 @@ public class OpalGitVersionControlSystem implements OpalVersionControlSystem {
 
   @Override
   public Iterable<CommitInfo> getCommitsInfo(@NotNull String datasource, @NotNull String path) {
-    return gitCommandHandler
-        .execute(new LogsCommand.Builder(OpalGitUtils.getDatasourceGitFolder(datasource)).path(path).build());
+    return gitCommandHandler.execute(
+        new LogsCommand.Builder(OpalGitUtils.getDatasourceGitFolder(datasource)).path(path).excludeDeletedCommits(true)
+            .build());
   }
 
   @Override

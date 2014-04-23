@@ -20,23 +20,24 @@ import com.google.common.base.Preconditions;
 public final class OpalGitUtils {
   private OpalGitUtils() {}
 
-  public final static String DATA_FOLDER_NAME = "data";
+  public static final String HEAD_COMMIT_ID = "HEAD";
 
-  public final static String GIT_FOLDER_NAME = "git";
+  public static final String VARIABLE_FILE_EXTENSION = ".js";
 
-  public final static String GIT_VIEWS_NAME = "views";
+  public static final String VIEW_FILE_NAME = "View.xml";
 
-  private static final Object VIEW_FILE_NAME = "View.xml";
+  private final static String DATA_FOLDER_NAME = "data";
 
-  private static final Object VARIABLE_FILE_EXTENSION = ".js";
+  private final static String GIT_FOLDER_NAME = "git";
 
-  public final static File GIT_ROOT_PATH = new File(
-      System.getenv().get("OPAL_HOME") + File.separatorChar + DATA_FOLDER_NAME + File.separatorChar + GIT_FOLDER_NAME +
+  private final static String GIT_VIEWS_NAME = "views";
+
+  private final static File GIT_ROOT_PATH = new File(
+      System.getProperty("OPAL_HOME") + File.separatorChar + DATA_FOLDER_NAME + File.separatorChar + GIT_FOLDER_NAME +
           File.separatorChar + GIT_VIEWS_NAME);
 
   public static File getDatasourceGitFolder(@Nonnull String datasourceName) {
     Preconditions.checkArgument(datasourceName != null);
-    Map<String, String> v = System.getenv();
     return new File(GIT_ROOT_PATH, datasourceName + ".git");
   }
 

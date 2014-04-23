@@ -18,8 +18,7 @@ import org.springframework.stereotype.Component;
 public class OpalViewManager extends DefaultViewManagerImpl {
 
   @Autowired
-  public OpalViewManager(OpalUserProvider opalUserProvider, OpalViewPersistenceStrategyNew viewPersistenceStrategy) {
-//    super(new OpalViewPersistenceStrategy(opalUserProvider));
+  public OpalViewManager(OpalViewPersistenceStrategy viewPersistenceStrategy) {
     super(viewPersistenceStrategy);
   }
 
