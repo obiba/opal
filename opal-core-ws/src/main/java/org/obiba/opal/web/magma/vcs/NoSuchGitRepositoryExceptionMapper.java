@@ -14,7 +14,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import org.obiba.opal.core.vcs.git.NoSuchGitRepositoryException;
+import org.obiba.git.NoSuchGitRepositoryException;
 import org.springframework.stereotype.Component;
 
 @Provider

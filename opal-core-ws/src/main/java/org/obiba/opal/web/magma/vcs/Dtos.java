@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.obiba.opal.core.vcs.CommitInfo;
+import org.obiba.git.CommitInfo;
 import org.obiba.opal.web.model.Opal;
 
 import com.google.common.base.Strings;
@@ -24,31 +24,29 @@ public final class Dtos {
 
   public static Opal.VcsCommitInfosDto asDto(Iterable<CommitInfo> commitInfos) {
     Collection<Opal.VcsCommitInfoDto> commitInfoDtos = new ArrayList<>();
-
     for(CommitInfo commitInfo : commitInfos) {
       commitInfoDtos.add(asDto(commitInfo));
     }
-
     return Opal.VcsCommitInfosDto.newBuilder().addAllCommitInfos(commitInfoDtos).build();
   }
 
   public static Opal.VcsCommitInfoDto asDto(CommitInfo commitInfo) {
-    Opal.VcsCommitInfoDto.Builder commitInfoDtoBuilder = Opal.VcsCommitInfoDto.newBuilder()
-        .setAuthor(commitInfo.getAuthor()).setDate(commitInfo.getDateAsIso8601()).setCommitId(commitInfo.getCommitId())
-        .setComment(commitInfo.getComment()).setIsHead(commitInfo.getIsHead()).setIsCurrent(commitInfo.getIsCurrent());
+    Opal.VcsCommitInfoDto.Builder commitInfoDtoBuilder = Opal.VcsCommitInfoDto.newBuilder() //
+        .setAuthor(commitInfo.getAuthorName()) //
+        .setDate(commitInfo.getDateAsIso8601()) //
+        .setCommitId(commitInfo.getCommitId()) //
+        .setComment(commitInfo.getComment()) //
+        .setIsHead(commitInfo.isHead()) //
+        .setIsCurrent(commitInfo.isCurrent());
 
     List<String> diffEntries = commitInfo.getDiffEntries();
-
     if(diffEntries != null) {
       commitInfoDtoBuilder.addAllDiffEntries(diffEntries);
     }
-
     String blob = commitInfo.getBlob();
-
     if(!Strings.isNullOrEmpty(blob)) {
       commitInfoDtoBuilder.setBlob(blob);
     }
-
     return commitInfoDtoBuilder.build();
   }
 }
