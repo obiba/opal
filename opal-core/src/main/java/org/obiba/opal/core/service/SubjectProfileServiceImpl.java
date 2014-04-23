@@ -27,7 +27,7 @@ import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.core.service.security.realm.BackgroundJobRealm;
-import org.obiba.opal.core.service.security.realm.SudoRealm;
+import org.obiba.shiro.realm.SudoRealm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +74,8 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
       if(!profile.getRealm().equals(realm)) {
         throw new AuthenticationException(
             "Wrong realm for subject '" + principal + "': " + realm + " (" + profile.getRealm() +
-                " expected). Make sure the same subject is not defined in several realms.");
+                " expected). Make sure the same subject is not defined in several realms."
+        );
       }
     } catch(SubjectProfileNotFoundException e) {
       HasUniqueProperties newProfile = new SubjectProfile(principal, realm);

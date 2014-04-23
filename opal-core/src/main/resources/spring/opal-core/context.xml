@@ -5,7 +5,7 @@
 
   <context:annotation-config/>
 
-  <context:component-scan base-package="org.obiba.opal">
+  <context:component-scan base-package="org.obiba">
     <context:exclude-filter type="regex" expression="org.obiba.opal.install"/>
     <context:exclude-filter type="regex" expression="org.obiba.opal.upgrade"/>
   </context:component-scan>

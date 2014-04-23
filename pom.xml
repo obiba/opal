@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -167,14 +168,28 @@
 
       <!-- Obiba dependencies -->
       <dependency>
-        <groupId>org.obiba</groupId>
+        <groupId>org.obiba.commons</groupId>
         <artifactId>obiba-core</artifactId>
         <version>${obiba-commons.version}</version>
       </dependency>
-
       <dependency>
-        <groupId>org.obiba</groupId>
-        <artifactId>obiba-security</artifactId>
+        <groupId>org.obiba.commons</groupId>
+        <artifactId>obiba-shiro</artifactId>
+        <version>${obiba-commons.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.commons</groupId>
+        <artifactId>obiba-shiro-web</artifactId>
+        <version>${obiba-commons.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.commons</groupId>
+        <artifactId>obiba-shiro-crowd</artifactId>
+        <version>${obiba-commons.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.commons</groupId>
+        <artifactId>obiba-git</artifactId>
         <version>${obiba-commons.version}</version>
       </dependency>
 
@@ -1729,14 +1744,14 @@
     <logback.version>1.1.1</logback.version>
     <logstash-logback.version>2.4</logstash-logback.version>
     <magma.version>1.9-SNAPSHOT</magma.version>
-    <public-datasources.version>1.1.0</public-datasources.version>
+    <public-datasources.version>1.2-SNAPSHOT</public-datasources.version>
     <mail.version>1.5.0-b01</mail.version>
     <mockftpserver.version>2.4</mockftpserver.version>
     <mockito.version>1.9.5</mockito.version>
     <mongodb-driver.version>2.11.4</mongodb-driver.version>
     <mysql-connector-java.version>5.1.29</mysql-connector-java.version>
     <newrelic.version>3.4.2</newrelic.version>
-    <obiba-commons.version>1.5.0</obiba-commons.version>
+    <obiba-commons.version>1.6-SNAPSHOT</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <opencsv.version>2.3</opencsv.version>
     <orientdb.version>1.6.4</orientdb.version>

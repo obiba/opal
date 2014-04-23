@@ -31,11 +31,9 @@ import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.security.CredentialsKeyStoreService;
 import org.obiba.opal.core.service.security.SubjectCredentialsService;
-import org.obiba.opal.core.service.security.X509CertificateAuthenticationToken;
+import org.obiba.shiro.authc.X509CertificateAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.google.common.base.Strings;
 
 /**
  * Realm for applications authenticated by SSL certificate.
