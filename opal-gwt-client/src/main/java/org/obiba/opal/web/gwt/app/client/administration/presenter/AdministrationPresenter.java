@@ -17,7 +17,6 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
-import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
@@ -25,7 +24,7 @@ import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.TokenFormatter;
 
 public class AdministrationPresenter extends Presenter<AdministrationPresenter.Display, AdministrationPresenter.Proxy>
-    implements HasPageTitle, RequestAdministrationPermissionEvent.Handler {
+    implements HasPageTitle {
 
   @ProxyStandard
   @NameToken(Places.ADMINISTRATION)
@@ -100,53 +99,61 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
     return translations.pageAdministrationTitle();
   }
 
-  @ProxyEvent
-  @Override
-  public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
+  public void authorize() {
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
         .forResource(UriBuilders.SUBJECT_CREDENTIALS.create().build()).get()
-        .authorize(getView().getUsersGroupsAuthorizer()).send();
+        .authorize(composeAuthorizer(getView().getUsersGroupsAuthorizer())).send();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
         .forResource(UriBuilders.PROFILES.create().build()).get()
-        .authorize(getView().getProfilesAuthorizer()).send();
+        .authorize(composeAuthorizer(getView().getProfilesAuthorizer())).send();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
         .forResource(ResourcePermissionRequestPaths.UriBuilders.SYSTEM_PERMISSIONS_R.create().build()).get()
-        .authorize(getView().getRAuthorizer()).send();
+        .authorize(composeAuthorizer(getView().getRAuthorizer())).send();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
         .forResource(ResourcePermissionRequestPaths.UriBuilders.SYSTEM_PERMISSIONS_DATASHIELD.create().build()).get()
-        .authorize(getView().getDataShieldAuthorizer()).send();
+        .authorize(composeAuthorizer(getView().getDataShieldAuthorizer())).send();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
         .forResource(UriBuilders.SERVICE_SEARCH_INDICES.create().build()).get()
-        .authorize(getView().getSearchAuthorizer()).send();
+        .authorize(composeAuthorizer(getView().getSearchAuthorizer())).send();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
         .forResource(UriBuilders.SYSTEM_ENV.create().build()).get()
-        .authorize(getView().getGeneralSettingsAuthorizer()).send();
+        .authorize(composeAuthorizer(getView().getGeneralSettingsAuthorizer())).send();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
         .forResource(UriBuilders.DATABASES.create().build()).get()
-        .authorize(getView().getDatabasesAuthorizer()).send();
+        .authorize(composeAuthorizer(getView().getDatabasesAuthorizer())).send();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
         .forResource(UriBuilders.SYSTEM_ENV.create().build()).get()
-        .authorize(getView().getJVMAuthorizer()).send();
+        .authorize(composeAuthorizer(getView().getJVMAuthorizer())).send();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
         .forResource(UriBuilders.IDENTIFIERS_TABLES.create().build()).get()
-        .authorize(getView().getIdentifiersAuthorizer()).send();
+        .authorize(composeAuthorizer(getView().getIdentifiersAuthorizer())).send();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
         .forResource(UriBuilders.REPORT_TEMPLATES.create().build())
-        .get().authorize(getView().getReportsAuthorizer()).send();
+        .get().authorize(composeAuthorizer(getView().getReportsAuthorizer())).send();
 
-    // Must use a CompositeAuthorizer and include ViewAuthorization to update the group widgets
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
         .forResource(UriBuilders.SHELL_COMMANDS.create().build())
-        .get().authorize(new CompositeAuthorizer(getView().getTasksAuthorizer(), new ViewAuthorization())).send();
+        .get().authorize(composeAuthorizer(getView().getTasksAuthorizer())).send();
+  }
+
+  private HasAuthorization composeAuthorizer(HasAuthorization authorization) {
+    // Must use a CompositeAuthorizer and include ViewAuthorization to update the group widgets
+    return new CompositeAuthorizer(authorization, new ViewAuthorization());
+  }
+
+  @Override
+  protected void onReveal() {
+    super.onReveal();
+    authorize();
   }
 
   private void setHistoryTokens(TokenFormatter tokenFormatter) {

@@ -202,10 +202,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   protected void onReveal() {
     getView().setUsername(credentials.getUsername());
     getView().setVersion(ResourceRequestBuilderFactory.newBuilder().getVersion());
-
     refreshApplicationName();
-
-    authorize();
   }
 
   private void refreshApplicationName() {
@@ -218,28 +215,6 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
             getView().setApplicationName(response.getText());
           }
         }, Response.SC_OK).send();
-  }
-
-  private void authorize() {
-    // Edit system config
-//    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/system/conf/general").put()
-//        .authorize(getView().getAdministrationAuthorizer()).send();
-    fireEvent(new RequestAdministrationPermissionEvent(new HasAuthorization() {
-
-      @Override
-      public void unauthorized() {
-      }
-
-      @Override
-      public void beforeAuthorization() {
-        getView().getAdministrationAuthorizer().beforeAuthorization();
-      }
-
-      @Override
-      public void authorized() {
-        getView().getAdministrationAuthorizer().authorized();
-      }
-    }));
   }
 
   private void registerModalEvents() {
