@@ -26,6 +26,7 @@ import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.core.security.BackgroundJobServiceAuthToken;
+import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.search.service.OpalSearchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,9 @@ public class IndexSynchronizationManager {
 
   @Autowired
   private OpalSearchService opalSearchService;
+
+  @Autowired
+  private TransactionalThreadFactory transactionalThreadFactory;
 
   private final SyncProducer syncProducer = new SyncProducer();
 
@@ -95,7 +99,7 @@ public class IndexSynchronizationManager {
   }
 
   private void startConsumerThread() {
-    consumer = new Thread(getSubject().associateWith(syncConsumer));
+    consumer = transactionalThreadFactory.newThread(getSubject().associateWith(syncConsumer));
     consumer.setName("Index Synchronization Consumer " + syncConsumer);
     consumer.setPriority(Thread.MIN_PRIORITY);
     consumer.start();
