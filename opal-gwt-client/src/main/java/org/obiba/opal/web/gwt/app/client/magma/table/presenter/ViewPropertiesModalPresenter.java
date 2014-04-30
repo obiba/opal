@@ -102,7 +102,7 @@ public class ViewPropertiesModalPresenter extends ModalPresenterWidget<ViewPrope
         if(response.getStatusCode() == Response.SC_OK) {
           getView().hide();
           placeManager.revealPlace(ProjectPlacesHelper.getTablePlace(view.getDatasourceName(), name));
-        } else if (response.getStatusCode() == Response.SC_FORBIDDEN) {
+        } else if(response.getStatusCode() == Response.SC_FORBIDDEN) {
           getView().showError(translations.userMessageMap().get("UnauthorizedOperation"), null);
         } else {
           ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
@@ -121,6 +121,7 @@ public class ViewPropertiesModalPresenter extends ModalPresenterWidget<ViewPrope
       tables.push(tableDto.getDatasourceName() + "." + tableDto.getName());
     }
     v.setFromArray(tables);
+    if(view.hasWhere()) v.setWhere(view.getWhere());
 
     v.setExtension(VariableListViewDto.ViewDtoExtensions.view,
         view.getExtension(VariableListViewDto.ViewDtoExtensions.view));

@@ -55,11 +55,6 @@ public class VariableListViewDtoExtension implements ViewDtoExtension {
   public View fromDto(ViewDto viewDto, Builder viewBuilder) {
     VariableListViewDto listDto = viewDto.getExtension(VariableListViewDto.view);
 
-    if(listDto.hasWhere()) {
-      WhereClause whereClause = new JavascriptClause(listDto.getWhere());
-      viewBuilder.where(whereClause);
-    }
-
     Collection<Variable> variables = new LinkedHashSet<>();
     for(VariableDto variableDto : listDto.getVariablesList()) {
       variables.add(Dtos.fromDto(variableDto));
@@ -77,17 +72,15 @@ public class VariableListViewDtoExtension implements ViewDtoExtension {
     ViewDto.Builder viewDtoBuilder = ViewDto.newBuilder();
     viewDtoBuilder.setDatasourceName(view.getDatasource().getName());
     viewDtoBuilder.setName(view.getName());
-
+    if(view.getWhereClause() instanceof JavascriptClause) {
+      viewDtoBuilder.setWhere(((JavascriptClause) view.getWhereClause()).getScript());
+    }
     setFromTables(view, viewDtoBuilder);
 
     VariableListViewDto.Builder listDtoBuilder = VariableListViewDto.newBuilder();
     for(Variable v : view.getVariables()) {
       listDtoBuilder.addVariables(Dtos.asDto(v));
     }
-    if(view.getWhereClause() instanceof JavascriptClause) {
-      listDtoBuilder.setWhere(((JavascriptClause) view.getWhereClause()).getScript());
-    }
-
     viewDtoBuilder.setExtension(VariableListViewDto.view, listDtoBuilder.build());
 
     return viewDtoBuilder.build();

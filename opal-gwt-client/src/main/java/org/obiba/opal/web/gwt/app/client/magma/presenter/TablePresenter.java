@@ -30,6 +30,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewPropertiesModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewWhereModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.ContingencyTablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
@@ -110,6 +111,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider;
 
+  private final ModalProvider<ViewWhereModalPresenter> viewWhereModalProvider;
+
   private final ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider;
 
   private final ModalProvider<AddVariablesModalPresenter> addVariablesModalProvider;
@@ -150,6 +153,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
       ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider,
       ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider,
+      ModalProvider<ViewWhereModalPresenter> viewWhereModalProvider,
       ModalProvider<AddVariablesModalPresenter> addVariablesModalProvider,
       ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider,
       ModalProvider<DataExportPresenter> dataExportModalProvider,
@@ -168,6 +172,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     this.addVariablesModalProvider = addVariablesModalProvider.setContainer(this);
     this.tablePropertiesModalProvider = tablePropertiesModalProvider.setContainer(this);
     this.viewPropertiesModalProvider = viewPropertiesModalProvider.setContainer(this);
+    this.viewWhereModalProvider = viewWhereModalProvider.setContainer(this);
     this.dataExportModalProvider = dataExportModalProvider.setContainer(this);
     this.dataCopyModalProvider = dataCopyModalProvider.setContainer(this);
     this.crossVariableProvider = crossVariableProvider;
@@ -333,9 +338,10 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     getView().setTable(tableDto);
 
     if(tableIsView()) {
-      showFromTables(table);
+      showViewProperties(table);
     } else {
       getView().setFromTables(null);
+      getView().setWhereScript(null);
     }
 
     if(getView().isValuesTabSelected()) {
@@ -348,13 +354,14 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     authorize();
   }
 
-  private void showFromTables(TableDto tableDto) {
+  private void showViewProperties(TableDto tableDto) {
     // Show from tables
     ResourceRequestBuilderFactory.<JsArray<ViewDto>>newBuilder().forResource(tableDto.getViewLink()).get() //
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
             getView().setFromTables(null);
+            getView().setWhereScript(null);
           }
         }, SC_FORBIDDEN, SC_INTERNAL_SERVER_ERROR, SC_NOT_FOUND)//
         .withCallback(new ViewResourceCallback()).send();
@@ -514,6 +521,22 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     } else {
       TablePropertiesModalPresenter p = tablePropertiesModalProvider.get();
       p.initialize(table);
+    }
+  }
+
+  @Override
+  public void onEditWhere() {
+    if(table.hasViewLink()) {
+      UriBuilder ub = UriBuilders.DATASOURCE_VIEW.create();
+      ResourceRequestBuilderFactory.<ViewDto>newBuilder()
+          .forResource(ub.build(table.getDatasourceName(), table.getName())).get()
+          .withCallback(new ResourceCallback<ViewDto>() {
+            @Override
+            public void onResource(Response response, ViewDto viewDto) {
+              ViewWhereModalPresenter p = viewWhereModalProvider.get();
+              p.initialize(viewDto);
+            }
+          }).send();
     }
   }
 
@@ -805,6 +828,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     public void onResource(Response response, JsArray<ViewDto> resource) {
       ViewDto viewDto = ViewDto.get(JsArrays.toSafeArray(resource));
       getView().setFromTables(viewDto.getFromArray());
+      getView().setWhereScript(viewDto.hasWhere() ? viewDto.getWhere() : null);
     }
   }
 
@@ -863,6 +887,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     void setIndexStatusAlert(TableIndexStatusDto statusDto);
 
     void setFromTables(JsArrayString tables);
+
+    void setWhereScript(String script);
 
     HandlerRegistration addFilterVariableHandler(KeyUpHandler handler);
 

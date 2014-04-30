@@ -361,6 +361,7 @@ public interface Translations extends Constants {
       "NewVariableNameIsRequired", "A name is required for the new variable to be created.",//
       "ScriptIsRequired", "A script is required.",//
       "JavascriptError", "Error in script '{0}': {1} ({2}:{3})",//
+      "JavaScriptException", "Error in script: {0}",//
       "CopyFromVariableNameIsRequired",
       "You must enter the name of a variable from which the new variable will be created from.",//
       "cannotSwitchTabBecauseOfUnsavedChanges",
@@ -1852,6 +1853,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Edit Properties")
   String editProperties();
 
+  @Description("Edit entities filter label")
+  @DefaultStringValue("Edit Entities Filter")
+  String editEntitiesFilter();
+
   @Description("Edit Identifiers Mapping label")
   @DefaultStringValue("Edit Identifiers Mapping")
   String editIdentifiersMapping();
@@ -1879,6 +1884,10 @@ public interface Translations extends Constants {
   @Description("Custom SQL label")
   @DefaultStringValue("Custom SQL")
   String jdbcDatasourceLabel();
+
+  @Description("Update entities filter label")
+  @DefaultStringValue("Update entities filter")
+  String updateWhereComment();
 
   @Description("Update {0} label")
   @DefaultStringValue("Update {0}")
@@ -2276,4 +2285,8 @@ public interface Translations extends Constants {
   @Description("Variable Template Download Button label")
   @DefaultStringValue("Download Opal Variables Template")
   String variablesTemplateButtonLabel();
+
+  @Description("No Filter comment")
+  @DefaultStringValue("no filter")
+  String noFilter();
 }

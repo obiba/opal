@@ -24,6 +24,8 @@ public interface TableUiHandlers extends UiHandlers {
 
   void onEdit();
 
+  void onEditWhere();
+
   void onRemove();
 
   void onIndexClear();

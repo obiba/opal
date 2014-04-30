@@ -54,7 +54,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
 
   @Override
   public void writeViews(@NotNull String datasourceName, @NotNull Set<View> views, @Nullable String comment) {
-    log.info("WriteViews ds: {} views: {}", datasourceName, views.size());
+    log.debug("WriteViews ds: {} views: {}", datasourceName, views.size());
     OpalWriteViewsCommand.Builder builder = new OpalWriteViewsCommand.Builder(
         OpalGitUtils.getDatasourceGitFolder(datasourceName), views,
         Strings.isNullOrEmpty(comment) ? getDefaultComment(views) : comment);
@@ -69,14 +69,14 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
 
   @Override
   public void removeView(@NotNull String datasourceName, @NotNull String viewName) {
-    log.info("RemoveView ds: {}, view: {}", datasourceName, viewName);
+    log.debug("RemoveView ds: {}, view: {}", datasourceName, viewName);
     handler.execute(new DeleteFilesCommand.Builder(OpalGitUtils.getDatasourceGitFolder(datasourceName), viewName,
         "Remove " + viewName).build());
   }
 
   @Override
   public void removeViews(String datasourceName) {
-    log.info("RemoveViews ds: {}", datasourceName);
+    log.debug("RemoveViews ds: {}", datasourceName);
     try {
       FileUtil.delete(OpalGitUtils.getDatasourceGitFolder(datasourceName));
     } catch(IOException e) {
@@ -87,7 +87,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
 
   @Override
   public Set<View> readViews(@NotNull String datasourceName) {
-    log.info("ReadViews ds: {}", datasourceName);
+    log.debug("ReadViews ds: {}", datasourceName);
     File datasourceRepo = OpalGitUtils.getDatasourceGitFolder(datasourceName);
     return datasourceRepo.exists() ? readGitViews(datasourceRepo) : new LegacyViews().readViews(datasourceName);
   }
@@ -149,7 +149,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     public Set<View> readViews(@NotNull String datasourceName) {
       Set<View> result = ImmutableSet.of();
       if(!viewsDirectory.isDirectory()) {
-        log.info("The legacy views directory '{}' does not exist.", viewsDirectory.getAbsolutePath());
+        log.debug("The legacy views directory '{}' does not exist.", viewsDirectory.getAbsolutePath());
         return result;
       }
 

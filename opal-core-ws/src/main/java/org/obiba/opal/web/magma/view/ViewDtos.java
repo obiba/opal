@@ -18,7 +18,9 @@ import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.views.View;
+import org.obiba.magma.views.WhereClause;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,12 @@ public final class ViewDtos {
     List<ValueTable> fromTables = getFromTables(viewDto);
     View.Builder builder = View.Builder
         .newView(viewDto.getName(), (ValueTable[]) fromTables.toArray(new ValueTable[fromTables.size()]));
+
+    if(viewDto.hasWhere()) {
+      WhereClause whereClause = new JavascriptClause(viewDto.getWhere());
+      builder.where(whereClause);
+    }
+
     for(ViewDtoExtension extension : extensions) {
       if(extension.isExtensionOf(viewDto)) {
         return extension.fromDto(viewDto, builder);

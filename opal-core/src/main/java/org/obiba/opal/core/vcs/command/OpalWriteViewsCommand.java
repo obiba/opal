@@ -31,7 +31,9 @@ import org.obiba.git.command.AbstractGitWriteCommand;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
+import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.views.View;
+import org.obiba.magma.views.WhereClause;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.core.vcs.OpalGitUtils;
 
@@ -44,8 +46,7 @@ public class OpalWriteViewsCommand extends AbstractGitWriteCommand {
 
   private final Set<View> views;
 
-  private OpalWriteViewsCommand(@NotNull File repositoryPath, @NotNull Set<View> views,
-      @NotNull String commitMessage) {
+  private OpalWriteViewsCommand(@NotNull File repositoryPath, @NotNull Set<View> views, @NotNull String commitMessage) {
     super(repositoryPath, commitMessage);
     this.views = views;
   }
@@ -70,8 +71,8 @@ public class OpalWriteViewsCommand extends AbstractGitWriteCommand {
     }
   }
 
-  private void serializeAllViewFiles(File localRepo, Collection<String> varFilesToRemove,
-      StringBuilder message) throws IOException {
+  private void serializeAllViewFiles(File localRepo, Collection<String> varFilesToRemove, StringBuilder message)
+      throws IOException {
     for(View view : views) {
       doWriteGitView(localRepo, view, varFilesToRemove);
       if(message.length() > 0) {
@@ -81,7 +82,7 @@ public class OpalWriteViewsCommand extends AbstractGitWriteCommand {
     }
   }
 
-  private void doWriteGitView(File localRepo, ValueTable view, Collection<String> varFilesToRemove) throws IOException {
+  private void doWriteGitView(File localRepo, View view, Collection<String> varFilesToRemove) throws IOException {
     File viewRepo = new File(localRepo, view.getName());
     viewRepo.mkdirs();
 
@@ -91,6 +92,27 @@ public class OpalWriteViewsCommand extends AbstractGitWriteCommand {
       getXStream().toXML(view, writer);
     }
 
+    doWriteGitViewWhere(viewRepo, view, varFilesToRemove);
+    doWriteGitViewVariables(viewRepo, view, varFilesToRemove);
+  }
+
+  private void doWriteGitViewWhere(File viewRepo, View view, Collection<String> varFilesToRemove) throws IOException {
+    File scriptFile = new File(viewRepo, OpalGitUtils.VIEW_WHERE_FILE_NAME);
+    WhereClause where = view.getWhereClause();
+
+    if(where != null && where instanceof JavascriptClause) {
+      String script = ((JavascriptClause) where).getScript();
+      try(FileWriter fileWriter = new FileWriter(scriptFile)) {
+        fileWriter.append(script);
+        fileWriter.flush();
+      }
+    } else if (scriptFile.exists()) {
+      varFilesToRemove.add(viewRepo.getName() + "/" + scriptFile.getName());
+    }
+  }
+
+  private void doWriteGitViewVariables(File viewRepo, ValueTable view, Collection<String> varFilesToRemove)
+      throws IOException {
     // Write variable script files
     for(Variable variable : view.getVariables()) {
       doWriteGitViewVariable(viewRepo, variable);
@@ -114,7 +136,7 @@ public class OpalWriteViewsCommand extends AbstractGitWriteCommand {
     String script = variable.hasAttribute("script") ? variable.getAttributeStringValue("script") : "null";
     File variableFile = new File(viewRepo, variable.getName() + OpalGitUtils.VARIABLE_FILE_EXTENSION);
 
-    try (FileWriter fileWriter = new FileWriter(variableFile)) {
+    try(FileWriter fileWriter = new FileWriter(variableFile)) {
       fileWriter.append(script);
       fileWriter.flush();
     }

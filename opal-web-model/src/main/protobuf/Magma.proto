@@ -253,12 +253,12 @@ message ViewDto {
   repeated string from = 1;
   optional string name = 2;
   optional string datasourceName = 3;
+  optional string where = 4;
   extensions 1000 to max;
 }
 
 message JavaScriptViewDto {
   optional string select = 1;
-  optional string where = 2;
   extend ViewDto {
     optional JavaScriptViewDto view = 1000;
   }
@@ -266,7 +266,6 @@ message JavaScriptViewDto {
 
 message VariableListViewDto {
   repeated VariableDto variables = 1;
-  optional string where = 2;
   extend ViewDto {
     optional VariableListViewDto view = 1001;
   }

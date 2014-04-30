@@ -54,10 +54,6 @@ public class JavaScriptViewDtoExtension implements ViewDtoExtension {
       SelectClause selectClause = new JavascriptClause(jsDto.getSelect());
       viewBuilder.select(selectClause);
     }
-    if(jsDto.hasWhere()) {
-      WhereClause whereClause = new JavascriptClause(jsDto.getWhere());
-      viewBuilder.where(whereClause);
-    }
 
     return viewBuilder.build();
   }
@@ -67,15 +63,14 @@ public class JavaScriptViewDtoExtension implements ViewDtoExtension {
     ViewDto.Builder viewDtoBuilder = ViewDto.newBuilder();
     viewDtoBuilder.setDatasourceName(view.getDatasource().getName());
     viewDtoBuilder.setName(view.getName());
-
+    if(view.getWhereClause() instanceof JavascriptClause) {
+      viewDtoBuilder.setWhere(((JavascriptClause) view.getWhereClause()).getScript());
+    }
     setFromTables(view, viewDtoBuilder);
 
     JavaScriptViewDto.Builder jsDtoBuilder = JavaScriptViewDto.newBuilder();
     if(view.getSelectClause() instanceof JavascriptClause) {
       jsDtoBuilder.setSelect(((JavascriptClause) view.getSelectClause()).getScript());
-    }
-    if(view.getWhereClause() instanceof JavascriptClause) {
-      jsDtoBuilder.setWhere(((JavascriptClause) view.getWhereClause()).getScript());
     }
 
     viewDtoBuilder.setExtension(JavaScriptViewDto.view, jsDtoBuilder.build());

@@ -74,6 +74,18 @@
           </b:Column>
         </b:Row>
 
+        <g:FlowPanel ui:field="viewProperties">
+          <g:FlowPanel>
+            <b:Heading size="4" addStyleNames="inline-block large-top-margin">
+              <ui:msg description="Entities Filter label">Entities Filter</ui:msg>
+            </b:Heading>
+            <b2:IconAnchor ui:field="editWhere" icon="EDIT" addStyleNames="small-indent">
+            </b2:IconAnchor>
+          </g:FlowPanel>
+
+          <b:CodeBlock ui:field="whereScript"/>
+        </g:FlowPanel>
+
         <b:Heading size="4">
           <ui:msg description="Variables label">Variables</ui:msg>
         </b:Heading>

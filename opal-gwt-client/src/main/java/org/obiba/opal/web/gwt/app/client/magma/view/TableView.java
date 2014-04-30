@@ -41,6 +41,7 @@ import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ButtonGroup;
+import com.github.gwtbootstrap.client.ui.CodeBlock;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.FluidRow;
 import com.github.gwtbootstrap.client.ui.NavLink;
@@ -51,7 +52,7 @@ import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
-import com.google.gwt.cell.client.Cell;
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -97,6 +98,12 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @UiField
   PropertiesTable propertiesTable;
+
+  @UiField
+  Panel viewProperties;
+
+  @UiField
+  CodeBlock whereScript;
 
   @UiField
   Label timestamps;
@@ -174,6 +181,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   IconAnchor edit;
 
   @UiField
+  IconAnchor editWhere;
+
+  @UiField
   Button remove;
 
   @UiField
@@ -247,8 +257,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
     progress.setWidth("150px");
     addVariablesButton.setText(translations.addVariables());
-
-
   }
 
   @Override
@@ -410,6 +418,8 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     VariableSuggestOracle crossOracle = (VariableSuggestOracle) crossWithVariables.getSuggestOracle();
     crossOracle.setDatasource("\"" + tableDto.getDatasourceName() + "\"");
     crossOracle.setTable("\"" + tableDto.getName() + "\"");
+
+    viewProperties.setVisible(dto.hasViewLink());
   }
 
   @Override
@@ -433,6 +443,15 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
         }
       }
       propertiesTable.addProperty(new Label(translations.tableReferencesLabel()), fromTableLinks);
+    }
+  }
+
+  @Override
+  public void setWhereScript(String script) {
+    if (Strings.isNullOrEmpty(script)) {
+      whereScript.setText("// " + translations.noFilter());
+    } else {
+      whereScript.setText(script);
     }
   }
 
@@ -479,6 +498,11 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiHandler("edit")
   void onEdit(ClickEvent event) {
     getUiHandlers().onEdit();
+  }
+
+  @UiHandler("editWhere")
+  void onEditWhere(ClickEvent event) {
+    getUiHandlers().onEditWhere();
   }
 
   @UiHandler({"addVariable", "addTableVariable"})
@@ -561,7 +585,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @Override
   public HasAuthorization getEditAuthorizer() {
-    return new WidgetAuthorizer(edit, tableDto.hasViewLink() ? addVariablesButton : tableAddVariableGroup);
+    return new WidgetAuthorizer(edit, editWhere, tableDto.hasViewLink() ? addVariablesButton : tableAddVariableGroup);
   }
 
   @Override

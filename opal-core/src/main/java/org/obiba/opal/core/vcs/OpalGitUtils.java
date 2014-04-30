@@ -26,6 +26,8 @@ public final class OpalGitUtils {
 
   public static final String VIEW_FILE_NAME = "View.xml";
 
+  public static final String VIEW_WHERE_FILE_NAME = "__where.js";
+
   private final static String DATA_FOLDER_NAME = "data";
 
   private final static String GIT_FOLDER_NAME = "git";
