@@ -306,24 +306,38 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   }
 
   private void updateDisplay(final String datasourceName, final String tableName) {
+    updateDisplay(datasourceName, tableName, false);
+  }
+
+  private void updateDisplay(final String datasourceName, final String tableName, final boolean withSummary) {
     // rely on 304 response
-    UriBuilder ub = UriBuilders.DATASOURCE_TABLE.create().query("counts", "true");
-    ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(datasourceName, tableName)).get()
-        .withCallback(new ResourceCallback<TableDto>() {
-          @Override
-          public void onResource(Response response, TableDto resource) {
-            if(resource != null) {
-              updateDisplay(resource);
-            }
+    UriBuilder ub = UriBuilders.DATASOURCE_TABLE.create();
+    if(withSummary) ub.query("counts", "true");
+    ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(datasourceName, tableName))
+        .get().withCallback(new ResourceCallback<TableDto>() {
+      @Override
+      public void onResource(Response response, TableDto resource) {
+        if(resource != null) {
+          if(!withSummary) {
+            updateDisplay(resource);
+            // then get the summary
+            updateDisplay(datasourceName, tableName, true);
+          } else {
+            table = resource;
+            String variableCount = resource.hasVariableCount() ? resource.getVariableCount() + "" : "-";
+            String valueSetCount = resource.hasValueSetCount() ? resource.getValueSetCount() + "" : "-";
+            getView().setTableSummary(variableCount, valueSetCount);
           }
-        })//
+        }
+      }
+    })//
         .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
             fireEvent(NotificationEvent.newBuilder().warn("NoSuchValueTable").args(tableName).build());
 
-            PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.PROJECT)
-                .with(ParameterTokens.TOKEN_NAME, datasourceName) //
+            PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.PROJECT).with(
+                ParameterTokens.TOKEN_NAME, datasourceName) //
                 .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString());
             placeManager.revealPlace(builder.build());
           }
@@ -857,6 +871,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     void clear(boolean cleanFilter);
 
     void setTable(TableDto dto);
+
+    void setTableSummary(String variableCount, String valueSetCount);
 
     HandlerRegistration addVariableSortHandler(ColumnSortEvent.Handler handler);
 

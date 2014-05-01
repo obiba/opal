@@ -21,13 +21,17 @@
     <g:FlowPanel>
       <b:ControlGroup ui:field="whereGroup">
         <b:ControlLabel>
-          <ui:msg description="Entities Filter Script label">Entities Filter Script</ui:msg>
+          <ui:msg description="Script label">Script</ui:msg>
         </b:ControlLabel>
         <b:Controls>
           <ace:AceEditor ui:field="scriptArea" addStyleNames="ace-editor small-ace-editor"/>
         </b:Controls>
         <b:HelpBlock>
-          <ui:msg description="Entities Filter help">When returned value is true, the entity is selected. Otherwise it is rejected.</ui:msg>
+          <ui:msg description="Entities Filter help">When returned value is true, the entity is selected. Otherwise it
+            is rejected. See also detailed documentation about
+            <a href="http://wiki.obiba.org/display/OPALDOC/Magma+Javascript+API" target="_blank">Magma Javascript
+              API</a>.
+          </ui:msg>
         </b:HelpBlock>
       </b:ControlGroup>
     </g:FlowPanel>

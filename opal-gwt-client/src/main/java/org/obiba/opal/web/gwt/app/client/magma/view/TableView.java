@@ -423,6 +423,12 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   }
 
   @Override
+  public void setTableSummary(String varCount, String valueSetCount) {
+    variableCount.setText(varCount);
+    entityCount.setText(valueSetCount);
+  }
+
+  @Override
   public void setFromTables(JsArrayString tableNames) {
     if(propertiesTable.getRowCount() > 2) {
       propertiesTable.removeProperty(2);
