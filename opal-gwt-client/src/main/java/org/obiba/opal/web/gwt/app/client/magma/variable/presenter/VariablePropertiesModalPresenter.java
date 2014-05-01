@@ -31,6 +31,7 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -231,7 +232,11 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
     }
 
     protected void onSuccess() {
-      fireEvent(new VariableRefreshEvent());
+      if (variable.getName().equals(updatedVariable.getName())) {
+        fireEvent(new VariableRefreshEvent());
+      } else {
+        placeManager.revealPlace(ProjectPlacesHelper.getVariablePlace(tableDto.getDatasourceName(), tableDto.getName(), updatedVariable.getName()));
+      }
     }
   }
 
