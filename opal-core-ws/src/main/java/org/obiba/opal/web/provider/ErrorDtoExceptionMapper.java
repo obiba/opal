@@ -28,7 +28,7 @@ public abstract class ErrorDtoExceptionMapper<E extends Throwable> implements Ex
 
   @Override
   public Response toResponse(E exception) {
-    log.debug("Exception", exception);
+    log.error("Unhandled exception", exception);
     return Response.status(getStatus()).type("application/x-protobuf+json").entity(getErrorDto(exception)).build();
   }
 
