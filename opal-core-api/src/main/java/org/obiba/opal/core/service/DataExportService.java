@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.Datasource;
+import org.obiba.magma.DatasourceCopierProgressListener;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.DatasourceCopier;
 
@@ -41,12 +42,13 @@ public interface DataExportService {
    * @param destinationDatasource tables will be copied to this existing Datasource.
    * @param datasourceCopier copier used to perform the copy.
    * @param incremental if <code>true</code> the tables are exported incrementally (updates only)
+   * @param progressListener
    * @throws NoSuchIdentifiersMappingException if a unit has been specified that does not exist
    * @throws ExportException if the datasource of a sourceTable matches the destinationDatasource.
    * @throws InterruptedException if the current thread was interrupted
    */
   void exportTablesToDatasource(@Nullable String idMapping, @NotNull Set<ValueTable> sourceTables,
       @NotNull Datasource destinationDatasource, @NotNull DatasourceCopier.Builder datasourceCopier,
-      boolean incremental) throws InterruptedException;
+      boolean incremental, @Nullable DatasourceCopierProgressListener progressListener) throws InterruptedException;
 
 }

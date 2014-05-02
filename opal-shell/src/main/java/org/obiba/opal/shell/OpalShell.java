@@ -17,6 +17,15 @@ public interface OpalShell extends Runnable {
   void printf(String format, Object... args);
 
   /**
+   * Report progress of a command
+   * @param message
+   * @param current
+   * @param end
+   * @param percent
+   */
+  void progress(String message, long current, long end, int percent);
+
+  /**
    * Prompts the shell for a password.
    *
    * @param format prompt message format

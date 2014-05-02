@@ -58,6 +58,12 @@ public class CommandJob implements OpalShell, Runnable {
 
   private String project;
 
+  private Long currentProgress;
+
+  private Long endProgress;
+
+  private Integer percentProgress;
+
   //
   // CommandJob
   //
@@ -83,6 +89,16 @@ public class CommandJob implements OpalShell, Runnable {
   public void printf(String format, Object... args) {
     if(format == null) throw new IllegalArgumentException("format cannot be null");
     messages.add(createMessage(String.format(format, args)));
+  }
+
+  @Override
+  public void progress(String message, long current, long end, int percent) {
+    if (percent == 100) {
+      messages.add(createMessage(String.format("%s %s completed", message, name)));
+    }
+    currentProgress = current;
+    endProgress = end;
+    percentProgress = percent;
   }
 
   @Override
@@ -215,6 +231,18 @@ public class CommandJob implements OpalShell, Runnable {
 
   public List<Message> getMessages() {
     return Collections.unmodifiableList(messages);
+  }
+
+  public Long getCurrentProgress() {
+    return currentProgress;
+  }
+
+  public Long getEndProgress() {
+    return endProgress;
+  }
+
+  public Integer getPercentProgress() {
+    return percentProgress;
   }
 
   protected long getCurrentTime() {

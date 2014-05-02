@@ -32,6 +32,11 @@ public abstract class AbstractOpalShell implements OpalShell {
   }
 
   @Override
+  public void progress(String message, long current, long end, int percent) {
+    printf("%s %d%% (%d/%d)", message, percent, current, end);
+  }
+
+  @Override
   public void run() {
     printf("Welcome to opal.\nType help to get a list of available commands.\n");
     while(!quit) {

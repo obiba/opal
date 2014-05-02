@@ -22,6 +22,7 @@ import org.apache.commons.vfs2.FileSelectInfo;
 import org.apache.commons.vfs2.FileSelector;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
+import org.obiba.magma.DatasourceCopierProgressListener;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.opal.core.crypt.KeyProviderException;
@@ -125,7 +126,8 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     int errorCode = CRITICAL_ERROR;
     getShell().printf("  Importing datasource %s in %s...\n", options.getSource(), options.getDestination());
     try {
-      dataImportService.importData(options.getSource(), options.getDestination(), options.isForce(), options.isIgnore());
+      dataImportService.importData(options.getSource(), options.getDestination(), options.isForce(), options.isIgnore(),
+          new ImportProgressListener());
       if(file != null) archive(file);
       errorCode = SUCCESS;
     } catch(NoSuchDatasourceException ex) {
@@ -150,7 +152,8 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     int errorCode = CRITICAL_ERROR;
     getShell().printf("  Importing tables [%s] in %s ...\n", getTableNames(), options.getDestination());
     try {
-      dataImportService.importData(options.getTables(), options.getDestination(), options.isForce(), options.isIgnore());
+      dataImportService.importData(options.getTables(), options.getDestination(), options.isForce(), options.isIgnore(),
+          new ImportProgressListener());
       if(file != null) archive(file);
       errorCode = SUCCESS;
     } catch(NoSuchDatasourceException | NoSuchValueTableException ex) {
@@ -186,7 +189,8 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       getShell().printf(
           "Datasource '%s' cannot be imported 'as-is'. It contains the following entity ids which are not present " +
               "as public identifiers in the keys database. %s\n", options.getSource(),
-          ((NonExistentVariableEntitiesException) ex.getCause()).getNonExistentIdentifiers());
+          ((NonExistentVariableEntitiesException) ex.getCause()).getNonExistentIdentifiers()
+      );
     } else {
       printThrowable(ex, false);
     }
@@ -293,4 +297,16 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     return Arrays.asList(filesInDir);
   }
 
+  private class ImportProgressListener implements DatasourceCopierProgressListener {
+
+    private int currentPercentComplete = -1;
+
+    @Override
+    public void status(String table, long entitiesCopied, long entitiesToCopy, int percentComplete) {
+      if (percentComplete > currentPercentComplete) {
+        getShell().progress(table, entitiesCopied, entitiesToCopy, percentComplete);
+        currentPercentComplete = percentComplete;
+      }
+    }
+  }
 }

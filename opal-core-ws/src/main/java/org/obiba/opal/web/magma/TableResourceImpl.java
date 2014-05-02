@@ -167,7 +167,8 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
         Datasource ds = new StaticDatasource("import");
         // static writers will add entities and variables while writing values
         writeValueSets(ds.createWriter(vt.getName(), valueSetsDto.getEntityType()), valueSetsDto);
-        dataImportService.importData(ds.getValueTables(), vt.getDatasource().getName(), generateIds, ignoreUnknownIds);
+        dataImportService
+            .importData(ds.getValueTables(), vt.getDatasource().getName(), generateIds, ignoreUnknownIds, null);
       }
     } catch(NoSuchIdentifiersMappingException ex) {
       return Response.status(BAD_REQUEST)
@@ -207,7 +208,8 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
       List<String> categoriesQP, String scriptFP, List<String> categoriesFP, List<String> missingCategories) {
     return getVariableResource(
         getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP, categoriesFP,
-            missingCategories), null);
+            missingCategories), null
+    );
   }
 
   @Override
@@ -227,7 +229,8 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
     resource.setValueTable(getValueTable());
     resource.setVariableValueSource(
         getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP, categoriesFP,
-            null));
+            null)
+    );
     return resource;
   }
 
@@ -248,7 +251,8 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
     resource.setValueTable(getValueTable());
     resource.setVariableValueSource(
         getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP, categoriesQP, scriptFP, categoriesFP,
-            null));
+            null)
+    );
     resource.setEntity(new VariableEntityBean(getValueTable().getEntityType(), identifier));
     return resource;
   }

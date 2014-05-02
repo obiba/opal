@@ -24,7 +24,7 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsIndexColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.IndexStatusImageCell;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.StatusImageCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueRenderer;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
@@ -400,11 +400,11 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
   private static class StatusColumn extends Column<TableIndexStatusDto, String> {
 
-    private StatusColumn() {super(new IndexStatusImageCell());}
+    private StatusColumn() {super(new StatusImageCell());}
 
     @Override
     public String getValue(TableIndexStatusDto tableIndexStatusDto) {
-      return IndexStatusImageCell.getSrc(tableIndexStatusDto);
+      return StatusImageCell.getSrc(tableIndexStatusDto);
     }
   }
 }

@@ -17,6 +17,7 @@ import java.util.concurrent.ThreadFactory;
 import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.Datasource;
+import org.obiba.magma.DatasourceCopierProgressListener;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
@@ -53,10 +54,12 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
 
   private final TransactionTemplate txTemplate;
 
+  private final DatasourceCopierProgressListener progressListener;
+
   @SuppressWarnings("PMD.ExcessiveParameterList")
   CopyValueTablesLockingAction(IdentifiersTableService identifiersTableService, IdentifierService identifierService,
       TransactionTemplate txTemplate, Set<ValueTable> sourceTables, Datasource destination,
-      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier) {
+      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier, DatasourceCopierProgressListener progressListener) {
     this.identifiersTableService = identifiersTableService;
     this.identifierService = identifierService;
     this.txTemplate = txTemplate;
@@ -64,6 +67,7 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
     this.destination = destination;
     this.allowIdentifierGeneration = allowIdentifierGeneration;
     this.ignoreUnknownIdentifier = ignoreUnknownIdentifier;
+    this.progressListener = progressListener;
   }
 
   @Override
@@ -117,6 +121,7 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
                     return new TransactionalThread(r);
                   }
                 }) //
+                .withProgressListener(progressListener) //
                 .withCopier(newCopierForParticipants()) //
                 .from(valueTable) //
                 .to(destination).build() //

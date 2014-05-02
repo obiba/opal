@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
+import org.obiba.magma.DatasourceCopierProgressListener;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
@@ -31,6 +34,7 @@ public interface DataImportService {
    * @param destinationDatasourceName name of the destination datasource
    * @param allowIdentifierGeneration unknown participant will be created at importation time
    * @param ignoreUnknownIdentifier
+   * @param progressListener
    * @throws NoSuchIdentifiersMappingException
    * @throws NonExistentVariableEntitiesException if unitName is null and the source entities do not exist as public
    * keys in the opal keys database
@@ -38,7 +42,7 @@ public interface DataImportService {
    * @throws InterruptedException if the current thread was interrupted
    */
   void importData(String sourceDatasourceName, String destinationDatasourceName, boolean allowIdentifierGeneration,
-      boolean ignoreUnknownIdentifier)
+      boolean ignoreUnknownIdentifier, @Nullable DatasourceCopierProgressListener progressListener)
       throws NoSuchIdentifiersMappingException, NoSuchDatasourceException, NoSuchValueTableException,
       NonExistentVariableEntitiesException, IOException, InterruptedException;
 
@@ -49,13 +53,14 @@ public interface DataImportService {
    * @param destinationDatasourceName
    * @param allowIdentifierGeneration
    * @param ignoreUnknownIdentifier
+   * @param progressListener
    * @throws NoSuchIdentifiersMappingException
    * @throws NonExistentVariableEntitiesException
    * @throws IOException
    * @throws InterruptedException
    */
   void importData(List<String> sourceTableNames, String destinationDatasourceName, boolean allowIdentifierGeneration,
-      boolean ignoreUnknownIdentifier)
+      boolean ignoreUnknownIdentifier, @Nullable DatasourceCopierProgressListener progressListener)
       throws NoSuchIdentifiersMappingException, NoSuchDatasourceException, NoSuchValueTableException,
       NonExistentVariableEntitiesException, IOException, InterruptedException;
 
@@ -66,9 +71,11 @@ public interface DataImportService {
    * @param destinationDatasourceName
    * @param allowIdentifierGeneration
    * @param ignoreUnknownIdentifier
+   * @param progressListener
    */
   void importData(Set<ValueTable> sourceValueTables, String destinationDatasourceName,
-      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
+      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier,
+      @Nullable DatasourceCopierProgressListener progressListener)
       throws NoSuchIdentifiersMappingException, NonExistentVariableEntitiesException, IOException, InterruptedException;
 
 }

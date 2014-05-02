@@ -27,7 +27,7 @@ public final class Dtos {
         .setStatus(commandJob.getStatus().toString()) //
         .addAllMessages(commandJob.getMessages());
 
-    if (commandJob.hasProject()) {
+    if(commandJob.hasProject()) {
       dtoBuilder.setProject(commandJob.getProject());
     }
 
@@ -38,6 +38,17 @@ public final class Dtos {
       dtoBuilder.setEndTime(DateTimeType.get().valueOf(commandJob.getEndTime()).toString());
     }
 
+    if(commandJob.getCurrentProgress() != null) {
+      dtoBuilder.setCurrentProgress(commandJob.getCurrentProgress().intValue());
+    }
+    if(commandJob.getEndProgress() != null) {
+      dtoBuilder.setEndProgress(commandJob.getEndProgress().intValue());
+    }
+    if(commandJob.getPercentProgress() != null) {
+      dtoBuilder.setPercentProgress(commandJob.getPercentProgress());
+    }
+
     return dtoBuilder.build();
   }
+  
 }

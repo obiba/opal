@@ -11,6 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.ui.celltable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.model.client.opal.CommandStateDto;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 
 import com.google.gwt.cell.client.AbstractCell;
@@ -36,15 +37,15 @@ import static org.obiba.opal.web.model.client.opal.TableIndexationStatus.UPTODAT
  *
  * @see com.google.gwt.cell.client.ImageResourceCell
  */
-public class IndexStatusImageCell extends AbstractCell<String> {
+public class StatusImageCell extends AbstractCell<String> {
 
-  private final static String BULLET_GREEN = "status-success";
+  public final static String BULLET_GREEN = "status-success";
 
-  private final static String BULLET_ORANGE = "status-warning";
+  public final static String BULLET_ORANGE = "status-warning";
 
-  private final static String BULLET_RED = "status-error";
+  public final static String BULLET_RED = "status-error";
 
-  private final static String BULLET_BLACK = "status-default";
+  public final static String BULLET_BLACK = "status-default";
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -71,17 +72,28 @@ public class IndexStatusImageCell extends AbstractCell<String> {
     return BULLET_BLACK;
   }
 
-  public static String forSrc(String src) {
-    if(src.equals(BULLET_GREEN)) return translations.indexUpToDate();
-
-    if(src.equals(BULLET_ORANGE)) return translations.indexOutdatedScheduled();
-
-    if(src.equals(BULLET_RED)) return translations.indexOutdatedNotScheduled();
-
-    if(src.equals(BULLET_BLACK)) return translations.indexNotScheduled();
-
-    return translations.indexInProgress();
+  public static String getSrc(CommandStateDto dto) {
+    // In progress
+    if(dto.getStatus().equals(CommandStateDto.Status.IN_PROGRESS.getName())) {
+      return dto.getPercentProgress() + "%";
+    }
+    // Success
+    if(dto.getStatus().equals(CommandStateDto.Status.SUCCEEDED.getName())) {
+      return BULLET_GREEN;
+    }
+    // Failed
+    if(dto.getStatus().equals(CommandStateDto.Status.FAILED.getName())) {
+      return BULLET_RED;
+    }
+    // Cancelled
+    if(dto.getStatus().equals(CommandStateDto.Status.CANCELED.getName())) {
+      return BULLET_ORANGE;
+    }
+    // Other
+    return BULLET_BLACK;
   }
+
+
 
   interface Template extends SafeHtmlTemplates {
     @Template("<i class=\"icon-circle {0}\" title=\"{1}\"></i>")
@@ -99,7 +111,7 @@ public class IndexStatusImageCell extends AbstractCell<String> {
    * Construct a new ImageCell.
    */
   @SuppressWarnings("AssignmentToStaticFieldFromInstanceMethod")
-  public IndexStatusImageCell() {
+  public StatusImageCell() {
     if(template == null) {
       template = GWT.create(Template.class);
     }
@@ -115,5 +127,17 @@ public class IndexStatusImageCell extends AbstractCell<String> {
         sb.append(template.img(value, forSrc(value)));
       }
     }
+  }
+
+  protected String forSrc(String src) {
+    if(src.equals(BULLET_GREEN)) return translations.indexUpToDate();
+
+    if(src.equals(BULLET_ORANGE)) return translations.indexOutdatedScheduled();
+
+    if(src.equals(BULLET_RED)) return translations.indexOutdatedNotScheduled();
+
+    if(src.equals(BULLET_BLACK)) return translations.indexNotScheduled();
+
+    return translations.indexInProgress();
   }
 }

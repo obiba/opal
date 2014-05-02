@@ -19,6 +19,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.Datasource;
+import org.obiba.magma.DatasourceCopierProgressListener;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.DatasourceCopier.Builder;
@@ -66,14 +67,15 @@ public class DataExportServiceImpl implements DataExportService {
   @Override
   public void exportTablesToDatasource(@Nullable String idMapping, @NotNull Set<ValueTable> sourceTables,
       @NotNull Datasource destinationDatasource, @NotNull DatasourceCopier.Builder datasourceCopier,
-      boolean incremental) throws InterruptedException {
+      boolean incremental, @Nullable DatasourceCopierProgressListener progressListener) throws InterruptedException {
     if(!Strings.isNullOrEmpty(idMapping) && !identifiersTableService.hasIdentifiersMapping(idMapping))
       throw new NoSuchIdentifiersMappingException(idMapping);
 
     validateSourceDatasourceNotEqualDestinationDatasource(sourceTables, destinationDatasource);
 
     try {
-      new ExportActionTemplate(sourceTables, destinationDatasource, datasourceCopier, incremental, idMapping).execute();
+      new ExportActionTemplate(sourceTables, destinationDatasource, datasourceCopier, incremental, idMapping,
+          progressListener).execute();
     } catch(InvocationTargetException ex) {
       if(ex.getCause() instanceof ExportException) {
         throw (ExportException) ex.getCause();
@@ -92,7 +94,8 @@ public class DataExportServiceImpl implements DataExportService {
         throw new ExportException(
             "Cannot export when datasource of source table '" + sourceTable.getDatasource().getName() + "." +
                 sourceTable.getName() + "' matches the destination datasource '" + destinationDatasource.getName() +
-                "'.");
+                "'."
+        );
       }
     }
   }
@@ -113,13 +116,18 @@ public class DataExportServiceImpl implements DataExportService {
     @Nullable
     private final String idMapping;
 
+    @Nullable
+    private final DatasourceCopierProgressListener progressListener;
+
     private ExportActionTemplate(@NotNull Set<ValueTable> sourceTables, @NotNull Datasource destinationDatasource,
-        @NotNull Builder datasourceCopier, boolean incremental, @Nullable String idMapping) {
+        @NotNull Builder datasourceCopier, boolean incremental, @Nullable String idMapping,
+        @Nullable DatasourceCopierProgressListener progressListener) {
       this.sourceTables = sourceTables;
       this.destinationDatasource = destinationDatasource;
       this.datasourceCopier = datasourceCopier;
       this.incremental = incremental;
       this.idMapping = idMapping;
+      this.progressListener = progressListener;
     }
 
     @NotNull
@@ -169,7 +177,8 @@ public class DataExportServiceImpl implements DataExportService {
 
         // If the table contains an entity that requires key separation, create a "unit view" of the table (replace
         // public identifiers with private, unit-specific identifiers).
-        if(!Strings.isNullOrEmpty(idMapping) && identifiersTableService.hasIdentifiersMapping(tableToCopy.getEntityType(), idMapping)) {
+        if(!Strings.isNullOrEmpty(idMapping) &&
+            identifiersTableService.hasIdentifiersMapping(tableToCopy.getEntityType(), idMapping)) {
           // Make a view that converts opal identifiers to unit identifiers
           tableToCopy = new IdentifiersMappingView(idMapping, Policy.UNIT_IDENTIFIERS_ARE_PUBLIC, tableToCopy,
               identifiersTableService.getIdentifiersTable(tableToCopy.getEntityType()));
@@ -177,7 +186,8 @@ public class DataExportServiceImpl implements DataExportService {
 
         // Go ahead and copy the result to the destination datasource.
         MultithreadedDatasourceCopier.Builder.newCopier().from(tableToCopy).to(destinationDatasource)
-            .withCopier(datasourceCopier).withReaders(4).withThreads(threadFactory).build().copy();
+            .withCopier(datasourceCopier).withReaders(4).withProgressListener(progressListener)
+            .withThreads(threadFactory).build().copy();
       }
 
       @NotNull
