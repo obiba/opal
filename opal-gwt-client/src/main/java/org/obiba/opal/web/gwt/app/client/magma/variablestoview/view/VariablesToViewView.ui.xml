@@ -25,11 +25,11 @@
       <g:FlowPanel>
         <!-- Datasource -->
         <b:ControlLabel>
-          <ui:msg description="Datasource label">Datasource</ui:msg>
+          <ui:msg description="Project label">Project</ui:msg>
         </b:ControlLabel>
         <o:Chooser ui:field="datasourceListBox" visibleItemCount="1"/>
         <b:HelpBlock addStyleNames="help-block">
-          <ui:msg description="Datasource help label">The view will be attached to the selected datasource.
+          <ui:msg description="Add variable to view, project help">The view will be attached to the selected project.
           </ui:msg>
         </b:HelpBlock>
       </g:FlowPanel>
@@ -42,7 +42,7 @@
           </b:ControlLabel>
           <o:EditableListBox ui:field="viewListBox"/>
           <g:Label addStyleNames="help-block">
-            <ui:msg description="Add variable to view, view help label">
+            <ui:msg description="Add variable to view, view help">
               Name of the view that will be created or updated with the derived variable.
             </ui:msg>
           </g:Label>

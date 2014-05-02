@@ -35,11 +35,11 @@
 
     <b:ControlGroup ui:field="remoteDatasourceGroup">
       <b:ControlLabel>
-        <ui:msg description="Remote Datasource label">Remote datasource</ui:msg>
+        <ui:msg description="Remote Project label">Remote project</ui:msg>
       </b:ControlLabel>
       <g:TextBox ui:field="remoteDatasource"/>
       <g:Label styleName="help-block">
-        <ui:msg description="Remote Datasource Description label">Name of the datasource from which data will
+        <ui:msg description="Remote Datasource Description label">Name of the project from which data will
           be imported.
         </ui:msg>
       </g:Label>
