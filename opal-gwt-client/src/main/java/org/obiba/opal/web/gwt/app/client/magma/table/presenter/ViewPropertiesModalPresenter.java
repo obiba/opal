@@ -37,6 +37,7 @@ import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -164,13 +165,18 @@ public class ViewPropertiesModalPresenter extends ModalPresenterWidget<ViewPrope
           private JsArray<TableDto> filterTables(JsArray<TableDto> tables, TableDto viewTableDto) {
             if(viewTableDto == null) return tables;
 
+            boolean hasEntityType = hasEntityType(viewTableDto);
             JsArray<TableDto> filteredTables = JsArrays.create();
             for(TableDto table : JsArrays.toIterable(tables)) {
-              if(!table.equals(viewTableDto) && table.getEntityType().equals(viewTableDto.getEntityType())) {
+              if(!table.equals(viewTableDto) && (!hasEntityType || hasEntityType(table) && table.getEntityType().equals(viewTableDto.getEntityType()))) {
                 filteredTables.push(table);
               }
             }
             return filteredTables;
+          }
+
+          private boolean hasEntityType(TableDto dto) {
+            return dto.hasEntityType() && !dto.getEntityType().equals("?");
           }
 
         }).send();
