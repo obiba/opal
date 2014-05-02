@@ -227,7 +227,8 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
 
       @Override
       public String getValue(TableDto object) {
-        return Integer.toString(object.getVariableCount());
+        if(object.hasVariableCount()) return Integer.toString(object.getVariableCount());
+        return "-";
       }
     }, translations.variablesLabel());
 
@@ -235,7 +236,8 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
 
       @Override
       public String getValue(TableDto object) {
-        return Integer.toString(object.getValueSetCount());
+        if(object.hasValueSetCount()) return Integer.toString(object.getValueSetCount());
+        return "-";
       }
     }, translations.entitiesLabel());
 

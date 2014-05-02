@@ -27,7 +27,7 @@
           <ace:AceEditor ui:field="scriptArea" addStyleNames="ace-editor small-ace-editor"/>
         </b:Controls>
         <b:HelpBlock>
-          <ui:msg description="Entities Filter help">When returned value is true, the entity is selected. Otherwise it
+          <ui:msg description="Entity Filter help">When returned value is true, the entity is selected. Otherwise it
             is rejected. See also detailed documentation about
             <a href="http://wiki.obiba.org/display/OPALDOC/Magma+Javascript+API" target="_blank">Magma Javascript
               API</a>.

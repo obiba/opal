@@ -77,7 +77,7 @@
         <g:FlowPanel ui:field="viewProperties">
           <g:FlowPanel>
             <b:Heading size="4" addStyleNames="inline-block large-top-margin">
-              <ui:msg description="Entities Filter label">Entities Filter</ui:msg>
+              <ui:msg description="Entity Filter label">Entity Filter</ui:msg>
             </b:Heading>
             <b2:IconAnchor ui:field="editWhere" icon="EDIT" addStyleNames="small-indent">
             </b2:IconAnchor>

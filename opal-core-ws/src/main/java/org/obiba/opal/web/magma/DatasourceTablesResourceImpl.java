@@ -51,6 +51,8 @@ import org.obiba.opal.web.model.Opal.AclAction;
 import org.obiba.opal.web.security.AuthorizationInterceptor;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.AuthorizeResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -63,6 +65,8 @@ import com.google.common.collect.Lists;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Transactional
 public class DatasourceTablesResourceImpl implements AbstractTablesResource, DatasourceTablesResource {
+
+  private static final Logger log = LoggerFactory.getLogger(DatasourceTablesResourceImpl.class);
 
   private Datasource datasource;
 
@@ -112,8 +116,17 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
         .path(DatasourceResource.class, "getView");
     for(ValueTable valueTable : datasource.getValueTables()) {
       if(entityType == null || valueTable.getEntityType().equals(entityType)) {
-        TableDto.Builder builder = Dtos.asDto(valueTable, counts)
-            .setLink(tableLink.build(datasource.getName(), valueTable.getName()).toString());
+        TableDto.Builder builder;
+        try {
+          builder = Dtos.asDto(valueTable, counts);
+        } catch(Exception e) {
+          if (counts) {
+            log.warn("Error when evaluating table variables/values counts: " + valueTable.getName(), e);
+            builder = Dtos.asDto(valueTable, true, false);
+          }
+          else throw e;
+        }
+        builder.setLink(tableLink.build(datasource.getName(), valueTable.getName()).toString());
         if(valueTable.isView()) {
           builder.setViewLink(viewLink.build(datasource.getName(), valueTable.getName()).toString());
         }

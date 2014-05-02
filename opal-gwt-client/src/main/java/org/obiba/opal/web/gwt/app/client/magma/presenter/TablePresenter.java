@@ -336,10 +336,14 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
           public void onResponseCode(Request request, Response response) {
             fireEvent(NotificationEvent.newBuilder().warn("NoSuchValueTable").args(tableName).build());
 
-            PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.PROJECT).with(
-                ParameterTokens.TOKEN_NAME, datasourceName) //
-                .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString());
-            placeManager.revealPlace(builder.build());
+            placeManager.revealPlace(ProjectPlacesHelper.getTablesPlace(datasourceName));
+          }
+        }) //
+        .withCallback(Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            fireEvent(NotificationEvent.newBuilder().error((ClientErrorDto) JsonUtils.unsafeEval(response.getText()))
+                .build());
           }
         }).send();
   }
@@ -576,8 +580,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         if(response.getStatusCode() == SC_OK) {
           updateIndexStatus();
         } else {
-          ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-          fireEvent(NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray()).build());
+          fireEvent(
+              NotificationEvent.newBuilder().error((ClientErrorDto) JsonUtils.unsafeEval(response.getText())).build());
         }
       }
 

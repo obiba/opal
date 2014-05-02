@@ -17,6 +17,7 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationCloseHandler;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.shared.EventHandler;
@@ -171,6 +172,11 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
 
     public Builder error(List<String> messages) {
       event = new NotificationEvent(NotificationType.ERROR, messages, null);
+      return this;
+    }
+
+    public Builder error(ClientErrorDto error) {
+      error(error.getStatus()).args(error.getArgumentsArray());
       return this;
     }
 

@@ -43,9 +43,11 @@ import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -178,7 +180,8 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     }
   }
 
-  private void checkDatasourceCountBeforeInitModal(final Set<TableDto> copyTables, boolean allTables, final int selectedTablesSize) {
+  private void checkDatasourceCountBeforeInitModal(final Set<TableDto> copyTables, boolean allTables,
+      final int selectedTablesSize) {
     final boolean finalAllTables = allTables;
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder()
         .forResource(UriBuilders.DATASOURCES_COUNT.create().build()).get().withCallback(new ResponseCodeCallback() {
@@ -186,10 +189,9 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       public void onResponseCode(Request request, Response response) {
         if(Integer.parseInt(response.getText()) > 1) {
           initDataCopyModal(copyTables, finalAllTables);
-        } else if (selectedTablesSize > 0) {
+        } else if(selectedTablesSize > 0) {
           fireEvent(NotificationEvent.newBuilder().warn("CannotCopySelectedTablesWithinProject").sticky().build());
-        }
-        else{
+        } else {
           // Explain that this action would select all tables...
           fireEvent(NotificationEvent.newBuilder().warn("CannotCopyAllTablesWithinProject").sticky().build());
         }
@@ -259,9 +261,22 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     }
 
     private void updateTables() {
-      UriBuilder ub = UriBuilders.DATASOURCE_TABLES.create().query("counts", "true");
-      ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(ub.build(datasourceName)).get()
-          .withCallback(new TablesResourceCallback(datasourceName)).send();
+      updateTables(true);
+    }
+
+    private void updateTables(final boolean withCounts) {
+      UriBuilder ub = UriBuilders.DATASOURCE_TABLES.create();
+      if(withCounts) ub.query("counts", "true");
+      ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(ub.build(datasourceName))
+          .get().withCallback(new TablesResourceCallback(datasourceName)) //
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              fireEvent(NotificationEvent.newBuilder().error((ClientErrorDto) JsonUtils.unsafeEval(response.getText()))
+                  .build());
+              if(withCounts) updateTables(false);
+            }
+          }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_NOT_FOUND).send();
     }
 
     private void authorize() {
