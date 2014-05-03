@@ -235,7 +235,24 @@ public class TasksView extends ViewImpl implements Display {
 
     @Override
     public String getValue(CommandStateDto dto) {
-      return StatusImageCell.getSrc(dto);
+      // In progress
+      if(dto.getStatus().equals(CommandStateDto.Status.IN_PROGRESS.getName()) && dto.hasProgress()) {
+        return dto.getProgress().getMessage() + ":" + dto.getProgress().getPercent() + "%";
+      }
+      // Success
+      if(dto.getStatus().equals(CommandStateDto.Status.SUCCEEDED.getName())) {
+        return StatusImageCell.BULLET_GREEN;
+      }
+      // Failed
+      if(dto.getStatus().equals(CommandStateDto.Status.FAILED.getName())) {
+        return StatusImageCell.BULLET_RED;
+      }
+      // Cancelled
+      if(dto.getStatus().equals(CommandStateDto.Status.CANCELED.getName())) {
+        return StatusImageCell.BULLET_ORANGE;
+      }
+      // Other
+      return StatusImageCell.BULLET_BLACK;
     }
   }
 }

@@ -24,8 +24,8 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsIndexColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.StatusImageCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.StatusImageCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueRenderer;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 
@@ -61,6 +61,9 @@ import static org.obiba.opal.web.model.client.opal.ScheduleType.MINUTES_30;
 import static org.obiba.opal.web.model.client.opal.ScheduleType.MINUTES_5;
 import static org.obiba.opal.web.model.client.opal.ScheduleType.NOT_SCHEDULED;
 import static org.obiba.opal.web.model.client.opal.ScheduleType.WEEKLY;
+import static org.obiba.opal.web.model.client.opal.TableIndexationStatus.IN_PROGRESS;
+import static org.obiba.opal.web.model.client.opal.TableIndexationStatus.OUTDATED;
+import static org.obiba.opal.web.model.client.opal.TableIndexationStatus.UPTODATE;
 
 public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrationUiHandlers>
     implements IndexAdministrationPresenter.Display {
@@ -141,7 +144,8 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
           public String[] getActions(TableIndexStatusDto value) {
             return allActions();
           }
-        });
+        }
+    );
 
     indexTable.addColumn(checkboxColumn, checkboxColumn.getCheckColumnHeader());
     indexTable.addColumn(new DatasourceColumn(), translations.projectLabel());
@@ -400,11 +404,43 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
   private static class StatusColumn extends Column<TableIndexStatusDto, String> {
 
-    private StatusColumn() {super(new StatusImageCell());}
+    private StatusColumn() {super(new StatusImageCell(){
+      @Override
+      protected String forSrc(String src) {
+        if(src.equals(BULLET_GREEN)) return translations.indexUpToDate();
+
+        if(src.equals(BULLET_ORANGE)) return translations.indexOutdatedScheduled();
+
+        if(src.equals(BULLET_RED)) return translations.indexOutdatedNotScheduled();
+
+        if(src.equals(BULLET_BLACK)) return translations.indexNotScheduled();
+
+        return translations.indexInProgress();
+      }
+    });}
 
     @Override
-    public String getValue(TableIndexStatusDto tableIndexStatusDto) {
-      return StatusImageCell.getSrc(tableIndexStatusDto);
+    public String getValue(TableIndexStatusDto dto) {
+      // In progress
+      if(dto.getStatus().getName().equals(IN_PROGRESS.getName())) {
+        return translations.indexInProgress() + ":" + (int) (dto.getProgress() * 100) + "%";
+      }
+      // Up to date
+      if(dto.getStatus().getName().equals(UPTODATE.getName())) {
+        return StatusImageCell.BULLET_GREEN;
+      }
+      // Out dated but scheduled
+      if(dto.getStatus().getName().equals(OUTDATED.getName()) &&
+          !dto.getSchedule().getType().isScheduleType(NOT_SCHEDULED)) {
+        return StatusImageCell.BULLET_ORANGE;
+      }
+      // Out dated but not scheduled
+      if(dto.getStatus().getName().equals(OUTDATED.getName()) &&
+          dto.getSchedule().getType().isScheduleType(NOT_SCHEDULED)) {
+        return StatusImageCell.BULLET_RED;
+      }
+      // Unknown status
+      return StatusImageCell.BULLET_BLACK;
     }
   }
 }

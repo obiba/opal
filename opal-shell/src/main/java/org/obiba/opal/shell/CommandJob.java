@@ -58,6 +58,8 @@ public class CommandJob implements OpalShell, Runnable {
 
   private String project;
 
+  private String messageProgress;
+
   private Long currentProgress;
 
   private Long endProgress;
@@ -94,8 +96,9 @@ public class CommandJob implements OpalShell, Runnable {
   @Override
   public void progress(String message, long current, long end, int percent) {
     if (percent == 100) {
-      messages.add(createMessage(String.format("%s %s completed", message, name)));
+      messages.add(createMessage(String.format("%s %s completed.", message, name)));
     }
+    messageProgress = message;
     currentProgress = current;
     endProgress = end;
     percentProgress = percent;
@@ -231,6 +234,10 @@ public class CommandJob implements OpalShell, Runnable {
 
   public List<Message> getMessages() {
     return Collections.unmodifiableList(messages);
+  }
+
+  public String getMessageProgress() {
+    return messageProgress;
   }
 
   public Long getCurrentProgress() {

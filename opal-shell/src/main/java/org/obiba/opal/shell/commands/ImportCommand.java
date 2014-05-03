@@ -303,7 +303,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
 
     @Override
     public void status(String table, long entitiesCopied, long entitiesToCopy, int percentComplete) {
-      if (percentComplete > currentPercentComplete) {
+      if (percentComplete != currentPercentComplete) {
         getShell().progress(table, entitiesCopied, entitiesToCopy, percentComplete);
         currentPercentComplete = percentComplete;
       }

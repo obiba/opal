@@ -20,6 +20,13 @@ message CommandStateDto {
     CANCELED = 5;
   }
 
+  message ProgressDto {
+    required string message = 1;
+    required uint32 current = 2;
+    required uint32 end = 3;
+    required uint32 percent = 4;
+  }
+
   required uint32 id = 1;
   required string command = 2;
   required string commandArgs = 3;
@@ -30,9 +37,7 @@ message CommandStateDto {
   repeated Message messages = 8;
   optional string project = 9;
   required string name = 10;
-  optional uint32 currentProgress = 11;
-  optional uint32 endProgress = 12;
-  optional uint32 percentProgress = 13;
+  optional ProgressDto progress = 11;
 }
 
 message ImportCommandOptionsDto {

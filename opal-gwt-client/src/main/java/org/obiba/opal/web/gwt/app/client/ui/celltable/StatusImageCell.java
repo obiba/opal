@@ -37,7 +37,7 @@ import static org.obiba.opal.web.model.client.opal.TableIndexationStatus.UPTODAT
  *
  * @see com.google.gwt.cell.client.ImageResourceCell
  */
-public class StatusImageCell extends AbstractCell<String> {
+public abstract class StatusImageCell extends AbstractCell<String> {
 
   public final static String BULLET_GREEN = "status-success";
 
@@ -47,55 +47,7 @@ public class StatusImageCell extends AbstractCell<String> {
 
   public final static String BULLET_BLACK = "status-default";
 
-  private static final Translations translations = GWT.create(Translations.class);
-
-  public static String getSrc(TableIndexStatusDto tableIndexStatusDto) {
-    // In progress
-    if(tableIndexStatusDto.getStatus().getName().equals(IN_PROGRESS.getName())) {
-      return (int) (tableIndexStatusDto.getProgress() * 100) + "%";
-    }
-    // Up to date
-    if(tableIndexStatusDto.getStatus().getName().equals(UPTODATE.getName())) {
-      return BULLET_GREEN;
-    }
-    // Out dated but scheduled
-    if(tableIndexStatusDto.getStatus().getName().equals(OUTDATED.getName()) &&
-        !tableIndexStatusDto.getSchedule().getType().isScheduleType(NOT_SCHEDULED)) {
-      return BULLET_ORANGE;
-    }
-    // Out dated but not scheduled
-    if(tableIndexStatusDto.getStatus().getName().equals(OUTDATED.getName()) &&
-        tableIndexStatusDto.getSchedule().getType().isScheduleType(NOT_SCHEDULED)) {
-      return BULLET_RED;
-    }
-    // Unknown status
-    return BULLET_BLACK;
-  }
-
-  public static String getSrc(CommandStateDto dto) {
-    // In progress
-    if(dto.getStatus().equals(CommandStateDto.Status.IN_PROGRESS.getName())) {
-      return dto.getPercentProgress() + "%";
-    }
-    // Success
-    if(dto.getStatus().equals(CommandStateDto.Status.SUCCEEDED.getName())) {
-      return BULLET_GREEN;
-    }
-    // Failed
-    if(dto.getStatus().equals(CommandStateDto.Status.FAILED.getName())) {
-      return BULLET_RED;
-    }
-    // Cancelled
-    if(dto.getStatus().equals(CommandStateDto.Status.CANCELED.getName())) {
-      return BULLET_ORANGE;
-    }
-    // Other
-    return BULLET_BLACK;
-  }
-
-
-
-  interface Template extends SafeHtmlTemplates {
+  protected interface Template extends SafeHtmlTemplates {
     @Template("<i class=\"icon-circle {0}\" title=\"{1}\"></i>")
     SafeHtml img(String cssClass, String title);
 
@@ -122,22 +74,13 @@ public class StatusImageCell extends AbstractCell<String> {
     if(value != null) {
       // The template will sanitize the URI.
       if(value.endsWith("%")) {
-        sb.append(template.progress(translations.indexInProgress(), value));
+        String[] values = value.split(":");
+        sb.append(template.progress(values[0], values[1]));
       } else {
         sb.append(template.img(value, forSrc(value)));
       }
     }
   }
 
-  protected String forSrc(String src) {
-    if(src.equals(BULLET_GREEN)) return translations.indexUpToDate();
-
-    if(src.equals(BULLET_ORANGE)) return translations.indexOutdatedScheduled();
-
-    if(src.equals(BULLET_RED)) return translations.indexOutdatedNotScheduled();
-
-    if(src.equals(BULLET_BLACK)) return translations.indexNotScheduled();
-
-    return translations.indexInProgress();
-  }
+  protected abstract String forSrc(String src);
 }

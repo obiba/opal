@@ -38,17 +38,19 @@ public final class Dtos {
       dtoBuilder.setEndTime(DateTimeType.get().valueOf(commandJob.getEndTime()).toString());
     }
 
-    if(commandJob.getCurrentProgress() != null) {
-      dtoBuilder.setCurrentProgress(commandJob.getCurrentProgress().intValue());
-    }
-    if(commandJob.getEndProgress() != null) {
-      dtoBuilder.setEndProgress(commandJob.getEndProgress().intValue());
-    }
-    if(commandJob.getPercentProgress() != null) {
-      dtoBuilder.setPercentProgress(commandJob.getPercentProgress());
+    if(commandJob.getMessageProgress() != null) {
+      dtoBuilder.setProgress(progressAsDto(commandJob));
     }
 
     return dtoBuilder.build();
   }
-  
+
+  private static Commands.CommandStateDto.ProgressDto.Builder progressAsDto(CommandJob commandJob) {
+    Commands.CommandStateDto.ProgressDto.Builder dtoBuilder = Commands.CommandStateDto.ProgressDto.newBuilder()//
+        .setMessage(commandJob.getMessageProgress())//
+        .setCurrent(commandJob.getCurrentProgress().intValue())//
+        .setEnd(commandJob.getEndProgress().intValue())//
+        .setPercent(commandJob.getPercentProgress());
+    return dtoBuilder;
+  }
 }

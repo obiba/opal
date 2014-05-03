@@ -530,7 +530,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
     @Override
     public void status(String message, long entitiesCopied, long entitiesToCopy, int percentComplete) {
-      if (percentComplete > currentPercentComplete) {
+      if (percentComplete != currentPercentComplete) {
         getShell().progress(message, entitiesCopied, entitiesToCopy, percentComplete);
         currentPercentComplete = percentComplete;
       }
