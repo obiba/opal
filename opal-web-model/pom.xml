@@ -105,6 +105,9 @@
 
                 <fail message="No protoc binary for your OS: ${os.name} ${os.arch}." unless="os.protoc" />
 
+                <!-- Delete the wrapper.proto upfront, as post-compilation cleanup is not fail-safe -->
+                <delete file="${basedir}/src/main/protobuf/wrapper.proto" />
+
                 <path id="protofiles">
                   <fileset dir="src/main/protobuf">
                     <include name="*.proto" />
