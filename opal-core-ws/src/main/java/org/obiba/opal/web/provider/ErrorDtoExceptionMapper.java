@@ -28,7 +28,8 @@ public abstract class ErrorDtoExceptionMapper<E extends Throwable> implements Ex
 
   @Override
   public Response toResponse(E exception) {
-    log.error("Unhandled exception", exception);
+    if(getStatus().getStatusCode() >= Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      log.error("System error {}: {}", getStatus(), exception.getClass().getName(), exception);
     return Response.status(getStatus()).type("application/x-protobuf+json").entity(getErrorDto(exception)).build();
   }
 
