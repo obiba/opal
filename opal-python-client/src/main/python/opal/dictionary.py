@@ -28,7 +28,7 @@ def do_command(args):
             request.verbose()
 
         # send request
-        request.get().resource(opal.core.MagmaNameResolver(args.name).get_ws());
+        request.get().resource(opal.core.MagmaNameResolver(args.name).get_ws())
         response = request.send()
 
         # format response
