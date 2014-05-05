@@ -37,7 +37,7 @@ import static org.obiba.opal.web.model.client.opal.TableIndexationStatus.UPTODAT
  *
  * @see com.google.gwt.cell.client.ImageResourceCell
  */
-public abstract class StatusImageCell extends AbstractCell<String> {
+public class StatusImageCell extends AbstractCell<String> {
 
   public final static String BULLET_GREEN = "status-success";
 
@@ -48,7 +48,7 @@ public abstract class StatusImageCell extends AbstractCell<String> {
   public final static String BULLET_BLACK = "status-default";
 
   protected interface Template extends SafeHtmlTemplates {
-    @Template("<i class=\"icon-circle {0}\" title=\"{1}\"></i>")
+    @Template("<i class=\"icon-circle {1}\" title=\"{0}\"></i>")
     SafeHtml img(String cssClass, String title);
 
     @Template(
@@ -69,18 +69,23 @@ public abstract class StatusImageCell extends AbstractCell<String> {
     }
   }
 
+  /**
+   * The value is expected to be encoded as TITLE:[STATUS|PROGRESS].
+   * @param context
+   * @param value
+   * @param sb
+   */
   @Override
   public void render(Context context, String value, SafeHtmlBuilder sb) {
     if(value != null) {
+      String[] values = value.split(":");
       // The template will sanitize the URI.
       if(value.endsWith("%")) {
-        String[] values = value.split(":");
         sb.append(template.progress(values[0], values[1]));
       } else {
-        sb.append(template.img(value, forSrc(value)));
+        sb.append(template.img(values[0], values[1]));
       }
     }
   }
 
-  protected abstract String forSrc(String src);
 }

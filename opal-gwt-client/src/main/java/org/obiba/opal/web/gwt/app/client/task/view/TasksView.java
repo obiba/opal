@@ -218,20 +218,7 @@ public class TasksView extends ViewImpl implements Display {
 
   private static class StatusColumn extends Column<CommandStateDto, String> {
 
-    private StatusColumn() {super(new StatusImageCell() {
-      @Override
-      protected String forSrc(String src) {
-        if(src.equals(BULLET_GREEN)) return translations.statusMap().get(CommandStateDto.Status.SUCCEEDED.getName());
-
-        if(src.equals(BULLET_ORANGE)) return translations.statusMap().get(CommandStateDto.Status.CANCELED.getName());
-
-        if(src.equals(BULLET_RED)) return translations.statusMap().get(CommandStateDto.Status.FAILED.getName());
-
-        if(src.equals(BULLET_BLACK)) return translations.statusMap().get(CommandStateDto.Status.CANCEL_PENDING.getName());
-
-        return translations.statusMap().get(CommandStateDto.Status.IN_PROGRESS.getName());
-      }
-    });}
+    private StatusColumn() {super(new StatusImageCell());}
 
     @Override
     public String getValue(CommandStateDto dto) {
@@ -241,18 +228,22 @@ public class TasksView extends ViewImpl implements Display {
       }
       // Success
       if(dto.getStatus().equals(CommandStateDto.Status.SUCCEEDED.getName())) {
-        return StatusImageCell.BULLET_GREEN;
+        return translations.statusMap().get(CommandStateDto.Status.SUCCEEDED.getName()) + ":" + StatusImageCell.BULLET_GREEN;
       }
       // Failed
       if(dto.getStatus().equals(CommandStateDto.Status.FAILED.getName())) {
-        return StatusImageCell.BULLET_RED;
+        return translations.statusMap().get(CommandStateDto.Status.CANCELED.getName()) + ":" + StatusImageCell.BULLET_RED;
       }
       // Cancelled
       if(dto.getStatus().equals(CommandStateDto.Status.CANCELED.getName())) {
-        return StatusImageCell.BULLET_ORANGE;
+        return translations.statusMap().get(CommandStateDto.Status.FAILED.getName()) + ":" + StatusImageCell.BULLET_ORANGE;
+      }
+      // Cancelled pending
+      if(dto.getStatus().equals(CommandStateDto.Status.CANCEL_PENDING.getName())) {
+        return translations.statusMap().get(CommandStateDto.Status.CANCEL_PENDING.getName()) + ":" + StatusImageCell.BULLET_BLACK;
       }
       // Other
-      return StatusImageCell.BULLET_BLACK;
+      return translations.statusMap().get(CommandStateDto.Status.NOT_STARTED.getName()) + ":" + StatusImageCell.BULLET_BLACK;
     }
   }
 }

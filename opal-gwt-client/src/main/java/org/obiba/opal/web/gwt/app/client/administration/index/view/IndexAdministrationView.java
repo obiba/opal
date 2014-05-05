@@ -404,20 +404,7 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
   private static class StatusColumn extends Column<TableIndexStatusDto, String> {
 
-    private StatusColumn() {super(new StatusImageCell(){
-      @Override
-      protected String forSrc(String src) {
-        if(src.equals(BULLET_GREEN)) return translations.indexUpToDate();
-
-        if(src.equals(BULLET_ORANGE)) return translations.indexOutdatedScheduled();
-
-        if(src.equals(BULLET_RED)) return translations.indexOutdatedNotScheduled();
-
-        if(src.equals(BULLET_BLACK)) return translations.indexNotScheduled();
-
-        return translations.indexInProgress();
-      }
-    });}
+    private StatusColumn() {super(new StatusImageCell());}
 
     @Override
     public String getValue(TableIndexStatusDto dto) {
@@ -427,20 +414,20 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
       }
       // Up to date
       if(dto.getStatus().getName().equals(UPTODATE.getName())) {
-        return StatusImageCell.BULLET_GREEN;
+        return translations.indexUpToDate() + ":" + StatusImageCell.BULLET_GREEN;
       }
       // Out dated but scheduled
       if(dto.getStatus().getName().equals(OUTDATED.getName()) &&
           !dto.getSchedule().getType().isScheduleType(NOT_SCHEDULED)) {
-        return StatusImageCell.BULLET_ORANGE;
+        return translations.indexOutdatedScheduled() + ":" + StatusImageCell.BULLET_ORANGE;
       }
       // Out dated but not scheduled
       if(dto.getStatus().getName().equals(OUTDATED.getName()) &&
           dto.getSchedule().getType().isScheduleType(NOT_SCHEDULED)) {
-        return StatusImageCell.BULLET_RED;
+        return translations.indexOutdatedNotScheduled() + ":" + StatusImageCell.BULLET_RED;
       }
       // Unknown status
-      return StatusImageCell.BULLET_BLACK;
+      return translations.indexNotScheduled() + ":" + StatusImageCell.BULLET_BLACK;
     }
   }
 }
