@@ -131,6 +131,7 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
         } else {
           DatasourceCopier.Builder.newCopier() //
               .dontCopyNullValues() //
+              .withProgressListener(progressListener)//
               .withLoggingListener().build() //
               .copy(valueTable, destination);
         }
