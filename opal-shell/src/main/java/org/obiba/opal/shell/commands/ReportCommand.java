@@ -70,6 +70,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
 
   @Override
   public int execute() {
+    getShell().progress("Prepare report", 0, 3, 0);
     // Get the report template.
     String name = getOptions().getName();
     ReportTemplate reportTemplate = null;
@@ -118,6 +119,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
   }
 
   private int renderAndSendEmail(ReportTemplate reportTemplate, FileObject reportOutput) throws FileSystemException {
+    getShell().progress("Executing report", 1, 3, 10);
     try {
       reportService.render(reportTemplate.getFormat(), reportTemplate.getParameters(),
           getLocalFile(getReportDesign(reportTemplate.getDesign())).getPath(), getLocalFile(reportOutput).getPath());
@@ -127,9 +129,11 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
       return 1;
     }
 
+    getShell().progress("Sending emails", 2, 3, 90);
     if(!reportTemplate.getEmailNotificationAddresses().isEmpty()) {
       sendEmailNotification(reportTemplate, reportOutput);
     }
+    getShell().progress(reportTemplate.getName(), 3, 3, 100);
     return 0;
 
   }
