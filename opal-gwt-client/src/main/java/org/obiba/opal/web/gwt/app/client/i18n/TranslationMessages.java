@@ -64,6 +64,10 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Remove Project")
   String removeProject();
 
+  @Description("Archive Project label")
+  @DefaultMessage("Archive Project")
+  String archiveProject();
+
   @Description("Remove Datasource label")
   @DefaultMessage("Remove Datasource")
   String removeDatasource();
@@ -246,6 +250,11 @@ public interface TranslationMessages extends Messages {
       "Please confirm that you want to remove permanently the current project and all associated data message.")
   @DefaultMessage("Please confirm that you want to remove permanently the current project and all associated data.")
   String confirmRemoveProject();
+
+  @Description(
+      "Please confirm that you want to remove the current project and keep all associated data message.")
+  @DefaultMessage("Please confirm that you want to remove the current project and keep all associated data.")
+  String confirmArchiveProject();
 
   @Description("Please confirm that you want to remove the current datasource from Opal configuration message")
   @DefaultMessage("Please confirm that you want to remove the current datasource from Opal configuration")

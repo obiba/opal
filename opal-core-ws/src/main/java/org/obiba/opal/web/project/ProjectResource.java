@@ -14,10 +14,12 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -96,10 +98,10 @@ public class ProjectResource {
 
   @DELETE
   @Transactional
-  public Response delete() throws FileSystemException {
+  public Response delete(@QueryParam("archive") @DefaultValue("false") boolean archive) throws FileSystemException {
     try {
       Datasource ds = getProject().getDatasource();
-      projectService.delete(name);
+      projectService.delete(name, archive);
       for(DatasourceUpdateListener listener : datasourceUpdateListeners) {
         listener.onDelete(ds);
       }

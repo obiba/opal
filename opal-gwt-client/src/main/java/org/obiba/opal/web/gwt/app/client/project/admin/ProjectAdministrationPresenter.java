@@ -26,6 +26,7 @@ import org.obiba.opal.web.gwt.app.client.project.keystore.ProjectKeyStorePresent
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -129,9 +130,16 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
 
   @Override
   public void onDelete() {
-    removeConfirmation = new RemoveRunnable(project);
+    removeConfirmation = new RemoveRunnable(project, false);
     fireEvent(ConfirmationRequiredEvent.createWithMessages(removeConfirmation, translationMessages.removeProject(),
         translationMessages.confirmRemoveProject()));
+  }
+
+  @Override
+  public void onArchive() {
+    removeConfirmation = new RemoveRunnable(project, true);
+    fireEvent(ConfirmationRequiredEvent.createWithMessages(removeConfirmation, translationMessages.archiveProject(),
+        translationMessages.confirmArchiveProject()));
   }
 
   private class RemoveConfirmationEventHandler implements ConfirmationEvent.Handler {
@@ -149,8 +157,11 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
 
     private final ProjectDto projectDto;
 
-    private RemoveRunnable(ProjectDto projectDto) {
+    private final boolean archive;
+
+    private RemoveRunnable(ProjectDto projectDto, boolean archive) {
       this.projectDto = projectDto;
+      this.archive = archive;
     }
 
     @Override
@@ -169,8 +180,9 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
         }
       };
 
+      UriBuilder uri = UriBuilders.PROJECT.create().query("archive", archive + "");
       ResourceRequestBuilderFactory.newBuilder() //
-          .forResource(projectDto.getLink()) //
+          .forResource(uri.build(projectDto.getName())) //
           .withCallback(callbackHandler, SC_OK, SC_FORBIDDEN, SC_INTERNAL_SERVER_ERROR, SC_NOT_FOUND) //
           .delete().send();
     }

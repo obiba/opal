@@ -30,7 +30,7 @@ public interface ProjectService extends SystemService {
 
   void save(@NotNull Project project) throws ConstraintViolationException;
 
-  void delete(@NotNull String name) throws NoSuchProjectException, FileSystemException;
+  void delete(@NotNull String name, boolean archive) throws NoSuchProjectException, FileSystemException;
 
   /**
    * Get project directory, create it if it does not exist.

@@ -30,6 +30,7 @@ import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
+import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionStatus;
@@ -54,6 +55,9 @@ public class ProjectsServiceImpl implements ProjectService {
 
   @Autowired
   private DatabaseRegistry databaseRegistry;
+
+  @Autowired
+  private ProjectsKeyStoreService projectsKeyStoreService;
 
   @Autowired
   private ViewManager viewManager;
@@ -98,7 +102,7 @@ public class ProjectsServiceImpl implements ProjectService {
   }
 
   @Override
-  public void delete(@NotNull String name) throws NoSuchProjectException, FileSystemException {
+  public void delete(@NotNull String name, boolean archive) throws NoSuchProjectException, FileSystemException {
     Project project = getProject(name);
 
     orientDbService.delete(project);
@@ -116,14 +120,18 @@ public class ProjectsServiceImpl implements ProjectService {
 
     // disconnect datasource
     MagmaEngine.get().removeDatasource(datasource);
-    // remove all views
-    viewManager.removeAllViews(datasource.getName());
     viewManager.unregisterDatasource(datasource.getName());
-    // remove datasource
-    if(datasource.canDrop()) datasource.drop();
 
-    // remove project folder
-    deleteFolder(getProjectDirectory(project));
+    if (!archive) {
+      // remove all views
+      viewManager.removeAllViews(datasource.getName());
+      // remove datasource
+      if(datasource.canDrop()) datasource.drop();
+      // remove project folder
+      deleteFolder(getProjectDirectory(project));
+      // remove keystore
+      projectsKeyStoreService.deleteKeyStore(project);
+    }
   }
 
   @Override

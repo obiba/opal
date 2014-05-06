@@ -56,6 +56,13 @@ public class ProjectsKeyStoreServiceImpl extends AbstractKeyStoreService impleme
   }
 
   @Override
+  public void deleteKeyStore(@NotNull Project project) {
+    for (String alias : getKeyStore(project).listAliases()) {
+      deleteKeyStore(project, alias);
+    }
+  }
+
+  @Override
   public void importKey(@NotNull Project project, @NotNull String alias, @NotNull FileObject privateKey,
       @NotNull FileObject certificate) {
     importKey(getStoreName(project), alias, privateKey, certificate);

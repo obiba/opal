@@ -29,9 +29,14 @@ public interface ProjectsKeyStoreService extends KeyStoreService {
       @NotNull String certificateInfo);
 
   /**
-   * Deletes the specified public/private key pair
+   * Delete the specified public/private key pair.
    */
   void deleteKeyStore(@NotNull Project project, @NotNull String alias);
+
+  /**
+   * Delete all entries of the keystore.
+   */
+  void deleteKeyStore(@NotNull Project project);
 
   /**
    * Import a private key and its associated certificate into the specified keystore at the given alias.

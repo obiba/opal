@@ -95,13 +95,15 @@
       <b:Heading size="4">
         <ui:msg description="Danger Zone label">Danger zone</ui:msg>
       </b:Heading>
-      <!-- b:Paragraph>
-        <ui:msg description="Archive Project text">Archiving a project makes it inaccessible. This can be reverted.
+      <b:Paragraph>
+        <ui:msg description="Archive Project text">Archiving a project makes its data inaccessible. Project tables,
+          views, files, reports and keystore will remain untouched. These data will be reinstated when a project with the same
+          name is added. Note that project description and permissions will be deleted permanently.
         </ui:msg>
       </b:Paragraph>
       <b:Form>
         <b:Button type="WARNING" ui:field="archiveProject">Archive Project</b:Button>
-      </b:Form-->
+      </b:Form>
       <b:Paragraph>
         <ui:msg description="Remove Project text">Removing a project destroys all associated data and files. It can be a
           long running task and there is no going back.

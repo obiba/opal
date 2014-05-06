@@ -18,4 +18,6 @@ public interface ProjectAdministrationUiHandlers extends UiHandlers {
 
   void onDelete();
 
+  void onArchive();
+
 }

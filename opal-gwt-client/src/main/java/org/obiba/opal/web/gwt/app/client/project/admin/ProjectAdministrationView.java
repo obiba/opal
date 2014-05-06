@@ -153,4 +153,9 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
     getUiHandlers().onDelete();
   }
 
+  @UiHandler("archiveProject")
+  void onArchiveProject(ClickEvent event) {
+    getUiHandlers().onArchive();
+  }
+
 }
