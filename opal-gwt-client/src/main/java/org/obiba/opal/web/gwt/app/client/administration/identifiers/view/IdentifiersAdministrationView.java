@@ -55,23 +55,26 @@ public class IdentifiersAdministrationView extends ViewWithUiHandlers<Identifier
   public void showIdentifiersTables(JsArray<TableDto> identifiersTables, String entityType) {
     this.identifiersTables = identifiersTables;
     selector.clear();
-    selector.add(new NavHeader(translations.identifiersTablesTitle()));
-    TableSelectionHandler linkToSelect = null;
-    for(int i = 0; i < identifiersTables.length(); i++) {
-      TableDto table = identifiersTables.get(i);
-      NavLink link = new NavLink(table.getEntityType());
-      TableSelectionHandler handler = new TableSelectionHandler(i);
-      link.addClickHandler(handler);
-      if(i == 0) {
-        linkToSelect = handler;
+    body.setVisible(identifiersTables.length() > 0);
+    if (identifiersTables.length() > 0) {
+      selector.add(new NavHeader(translations.identifiersTablesTitle()));
+      TableSelectionHandler linkToSelect = null;
+      for(int i = 0; i < identifiersTables.length(); i++) {
+        TableDto table = identifiersTables.get(i);
+        NavLink link = new NavLink(table.getEntityType());
+        TableSelectionHandler handler = new TableSelectionHandler(i);
+        link.addClickHandler(handler);
+        if(i == 0) {
+          linkToSelect = handler;
+        }
+        if(!Strings.isNullOrEmpty(entityType) && entityType.toLowerCase().equals(table.getEntityType().toLowerCase())) {
+          linkToSelect = handler;
+        }
+        selector.add(link);
       }
-      if (!Strings.isNullOrEmpty(entityType) && entityType.toLowerCase().equals(table.getEntityType().toLowerCase())) {
-        linkToSelect = handler;
+      if(linkToSelect != null) {
+        linkToSelect.select();
       }
-      selector.add(link);
-    }
-    if (linkToSelect != null) {
-      linkToSelect.select();
     }
   }
 
