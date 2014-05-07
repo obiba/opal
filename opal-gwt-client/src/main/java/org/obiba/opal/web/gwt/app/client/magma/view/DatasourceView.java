@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
@@ -21,12 +22,14 @@ import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
+import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
@@ -41,6 +44,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -57,6 +61,14 @@ import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> implements DatasourcePresenter.Display {
 
   private static final int PERMISSIONS_TAB_INDEX = 1;
+
+  private static final int SORTABLE_COLUMN_NAME = 1;
+
+  private static final int SORTABLE_COLUMN_VARIABLES = 3;
+
+  private static final int SORTABLE_COLUMN_ENTITIES = 4;
+
+  private static final int SORTABLE_COLUMN_LAST_UPDATED = 5;
 
   interface Binder extends UiBinder<Widget, DatasourceView> {}
 
@@ -117,6 +129,8 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   private final PlaceManager placeManager;
 
   private CheckboxColumn<TableDto> checkColumn;
+
+  private ColumnSortEvent.ListHandler<TableDto> typeSortHandler;
 
   @Inject
   public DatasourceView(Binder uiBinder, Translations translations, TranslationMessages translationMessages,
@@ -189,32 +203,20 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   }
 
   private void addTableColumns() {
-    checkColumn = new CheckboxColumn<TableDto>(new DatasourceCheckStatusDisplay());
+    initializeColumns();
+    dataProvider.addDataDisplay(table);
+    initializeSortableColumns();
+    table.setSelectionModel(new SingleSelectionModel<TableDto>());
+    table.setPageSize(Table.DEFAULT_PAGESIZE);
+    table.setEmptyTableWidget(new InlineLabel(translationMessages.tableCount(0)));
+    pager.setDisplay(table);
+  }
 
+  private void initializeColumns() {
+    checkColumn = new CheckboxColumn<TableDto>(new DatasourceCheckStatusDisplay());
     table.addColumn(checkColumn, checkColumn.getCheckColumnHeader());
     table.setColumnWidth(checkColumn, 1, Style.Unit.PX);
-
-    table.addColumn(new Column<TableDto, TableDto>(new PlaceRequestCell<TableDto>(placeManager) {
-
-      @Override
-      public PlaceRequest getPlaceRequest(TableDto value) {
-        return ProjectPlacesHelper.getTablePlace(value.getDatasourceName(), value.getName());
-      }
-
-      @Override
-      public String getText(TableDto value) {
-        String name = value.getName();
-        return value.hasViewLink()
-            ? "<i class=\"icon-th-large\"></i>&nbsp;" + name
-            : "<i class=\"icon-table\"></i>&nbsp;" + name;
-      }
-    }) {
-      @Override
-      public TableDto getValue(TableDto object) {
-        return object;
-      }
-    }, translations.nameLabel());
-
+    table.addColumn(new NameColumn(), translations.nameLabel());
     table.addColumn(new TextColumn<TableDto>() {
 
       @Override
@@ -222,30 +224,27 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
         return object.getEntityType();
       }
     }, translations.entityTypeColumnLabel());
+    table.addColumn(new VariablesColumn(), translations.variablesLabel());
+    table.addColumn(new EntitiesColumn(), translations.entitiesLabel());
+    table.addColumn(new LastUpdatedColumn(), translations.lastUpdatedLabel());
+  }
 
-    table.addColumn(new TextColumn<TableDto>() {
+  private void initializeSortableColumns() {
+    typeSortHandler = new ColumnSortEvent.ListHandler<TableDto>(dataProvider.getList());
+    typeSortHandler.setComparator(table.getColumn(SORTABLE_COLUMN_NAME), new NameComparator());
+    typeSortHandler.setComparator(table.getColumn(SORTABLE_COLUMN_VARIABLES), new VariablesComparator());
+    typeSortHandler.setComparator(table.getColumn(SORTABLE_COLUMN_ENTITIES), new EntitiesComparator());
+    typeSortHandler.setComparator(table.getColumn(SORTABLE_COLUMN_LAST_UPDATED), new LastUpdateComparator());
 
-      @Override
-      public String getValue(TableDto object) {
-        if(object.hasVariableCount()) return Integer.toString(object.getVariableCount());
-        return "-";
-      }
-    }, translations.variablesLabel());
-
-    table.addColumn(new TextColumn<TableDto>() {
-
-      @Override
-      public String getValue(TableDto object) {
-        if(object.hasValueSetCount()) return Integer.toString(object.getValueSetCount());
-        return "-";
-      }
-    }, translations.entitiesLabel());
-
-    dataProvider.addDataDisplay(table);
-    table.setSelectionModel(new SingleSelectionModel<TableDto>());
-    table.setPageSize(Table.DEFAULT_PAGESIZE);
-    table.setEmptyTableWidget(new InlineLabel(translationMessages.tableCount(0)));
-    pager.setDisplay(table);
+    table.getHeader(SORTABLE_COLUMN_NAME).setHeaderStyleNames("sortable-header-column");
+    table.getHeader(SORTABLE_COLUMN_VARIABLES).setHeaderStyleNames("sortable-header-column");
+    table.getHeader(SORTABLE_COLUMN_ENTITIES).setHeaderStyleNames("sortable-header-column");
+    table.getHeader(SORTABLE_COLUMN_LAST_UPDATED).setHeaderStyleNames("sortable-header-column");
+    table.getColumnSortList().push(table.getColumn(SORTABLE_COLUMN_NAME));
+    table.getColumnSortList().push(table.getColumn(SORTABLE_COLUMN_VARIABLES));
+    table.getColumnSortList().push(table.getColumn(SORTABLE_COLUMN_ENTITIES));
+    table.getColumnSortList().push(table.getColumn(SORTABLE_COLUMN_LAST_UPDATED));
+    table.addColumnSortHandler(typeSortHandler);
   }
 
   @Override
@@ -268,6 +267,8 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   @Override
   public void renderRows(JsArray<TableDto> rows) {
     dataProvider.setList(JsArrays.toList(rows));
+    typeSortHandler.setList(dataProvider.getList());
+    ColumnSortEvent.fire(table, table.getColumnSortList());
     pager.firstPage();
   }
 
@@ -347,6 +348,49 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     return dataProvider.getList();
   }
 
+  private static class LastUpdatedColumn extends TextColumn<TableDto> {
+
+    private LastUpdatedColumn() {
+      setSortable(true);
+      setDefaultSortAscending(true);
+    }
+
+    @Override
+    public String getValue(TableDto object) {
+      return object.hasTimestamps() && object.getTimestamps().hasLastUpdate() //
+          ? Moment.create(object.getTimestamps().getLastUpdate()).fromNow() //
+          : "";
+    }
+  }
+
+  private static class VariablesColumn extends TextColumn<TableDto> {
+
+    private VariablesColumn() {
+      setSortable(true);
+      setDefaultSortAscending(true);
+    }
+
+    @Override
+    public String getValue(TableDto object) {
+      if(object.hasVariableCount()) return Integer.toString(object.getVariableCount());
+      return "-";
+    }
+  }
+
+  private static class EntitiesColumn extends TextColumn<TableDto> {
+
+    private EntitiesColumn() {
+      setSortable(true);
+      setDefaultSortAscending(true);
+    }
+
+    @Override
+    public String getValue(TableDto object) {
+      if(object.hasValueSetCount()) return Integer.toString(object.getValueSetCount());
+      return "-";
+    }
+  }
+
   private class DatasourceCheckStatusDisplay implements CheckboxColumn.Display<TableDto> {
     @Override
     public Table<TableDto> getTable() {
@@ -386,6 +430,70 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     @Override
     public Alert getAlert() {
       return selectAllItemsAlert;
+    }
+  }
+
+  private static final class NameComparator implements Comparator<TableDto> {
+    @Override
+    public int compare(TableDto o1, TableDto o2) {
+      return o1.getName().compareTo(o2.getName());
+    }
+  }
+
+  private static final class VariablesComparator implements Comparator<TableDto> {
+    @Override
+    public int compare(TableDto o1, TableDto o2) {
+      int c1 = o1.hasVariableCount() ? o1.getVariableCount() : 0;
+      int c2 = o2.hasVariableCount() ? o2.getVariableCount() : 0;
+      return c1 - c2;
+    }
+  }
+
+  private static final class EntitiesComparator implements Comparator<TableDto> {
+    @Override
+    public int compare(TableDto o1, TableDto o2) {
+      int c1 = o1.hasValueSetCount() ? o1.getValueSetCount() : 0;
+      int c2 = o2.hasValueSetCount() ? o2.getValueSetCount() : 0;
+      return c1 - c2;
+    }
+  }
+
+  private static final class LastUpdateComparator implements Comparator<TableDto> {
+    @Override
+    public int compare(TableDto o1, TableDto o2) {
+      Moment m1 = Moment.create(o1.getTimestamps().getLastUpdate());
+      Moment m2 = Moment.create(o2.getTimestamps().getLastUpdate());
+      if(m1 == null) {
+        return m2 == null ? 0 : 1;
+      }
+      return m2 == null ? -1 : m2.unix() - m1.unix();
+    }
+  }
+
+  private class NameColumn extends Column<TableDto, TableDto> {
+    public NameColumn() {
+      super(new PlaceRequestCell<TableDto>(DatasourceView.this.placeManager) {
+
+        @Override
+        public PlaceRequest getPlaceRequest(TableDto value) {
+          return ProjectPlacesHelper.getTablePlace(value.getDatasourceName(), value.getName());
+        }
+
+        @Override
+        public String getText(TableDto value) {
+          String name = value.getName();
+          return value.hasViewLink()
+              ? "<i class=\"icon-th-large\"></i>&nbsp;" + name
+              : "<i class=\"icon-table\"></i>&nbsp;" + name;
+        }
+      });
+      setSortable(true);
+      setDefaultSortAscending(true);
+    }
+
+    @Override
+    public TableDto getValue(TableDto object) {
+      return object;
     }
   }
 }
