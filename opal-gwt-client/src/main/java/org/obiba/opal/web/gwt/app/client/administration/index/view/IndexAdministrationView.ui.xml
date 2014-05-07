@@ -52,8 +52,8 @@
     </b:Heading>
 
     <b:Paragraph>
-      <ui:msg description="Table indices text">Values of the tables are indexed allowing advanced search. Indexing can
-        be scheduled by table or suspended for all tables.
+      <ui:msg description="Table indices text">Values of the tables are indexed, allowing advanced values search.
+        Indexing can be scheduled by table or suspended for all tables.
       </ui:msg>
     </b:Paragraph>
 
