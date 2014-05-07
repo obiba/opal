@@ -55,8 +55,7 @@ public class GenerateIdentifiersModalPresenter extends ModalPresenterWidget<Gene
     this.table = table;
 
     String prefix = variable.getName().toUpperCase() + "-";
-    int size = (table.getValueSetCount() + "").length();
-    getView().setDefault(size, prefix);
+    getView().setDefault(10, prefix);
 
     UriBuilder ub = UriBuilder.create().segment("identifiers", "mapping", "{}", "_count")
         .query("type", table.getEntityType());
