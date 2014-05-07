@@ -23,6 +23,8 @@ public interface IdentifiersTableUiHandlers extends UiHandlers {
 
   void onImportSystemIdentifiers();
 
+  void onCopySystemIdentifiers();
+
   void onImportIdentifiersMapping();
 
   void onAddIdentifiersMapping();

@@ -46,6 +46,8 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
 
   private final ModalProvider<ImportSystemIdentifiersModalPresenter> importSystemIdentifiersModalProvider;
 
+  private final ModalProvider<CopySystemIdentifiersModalPresenter> copySystemIdentifiersModalProvider;
+
   private final ModalProvider<ImportIdentifiersMappingModalPresenter> importIdentifiersMappingModalProvider;
 
   private final ModalProvider<IdentifiersMappingModalPresenter> identifiersMappingModalProvider;
@@ -61,6 +63,7 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
   @Inject
   public IdentifiersTablePresenter(EventBus eventBus, Display view,
       ModalProvider<ImportSystemIdentifiersModalPresenter> importSystemIdentifiersModalProvider,
+      ModalProvider<CopySystemIdentifiersModalPresenter> copySystemIdentifiersModalProvider,
       ModalProvider<ImportIdentifiersMappingModalPresenter> importIdentifiersMappingModalProvider,
       ModalProvider<IdentifiersMappingModalPresenter> identifiersMappingModalProvider,
       ModalProvider<GenerateIdentifiersModalPresenter> generateIdentifiersModalProvider,
@@ -68,6 +71,7 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
     super(eventBus, view);
     this.translationMessages = translationMessages;
     this.importSystemIdentifiersModalProvider = importSystemIdentifiersModalProvider.setContainer(this);
+    this.copySystemIdentifiersModalProvider = copySystemIdentifiersModalProvider.setContainer(this);
     this.importIdentifiersMappingModalProvider = importIdentifiersMappingModalProvider.setContainer(this);
     this.identifiersMappingModalProvider = identifiersMappingModalProvider.setContainer(this);
     this.generateIdentifiersModalProvider = generateIdentifiersModalProvider.setContainer(this);
@@ -125,6 +129,14 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
   public void onImportSystemIdentifiers() {
     if(table != null) {
       ImportSystemIdentifiersModalPresenter p = importSystemIdentifiersModalProvider.get();
+      p.initialize(table);
+    }
+  }
+
+  @Override
+  public void onCopySystemIdentifiers() {
+    if(table != null) {
+      CopySystemIdentifiersModalPresenter p = copySystemIdentifiersModalProvider.get();
       p.initialize(table);
     }
   }

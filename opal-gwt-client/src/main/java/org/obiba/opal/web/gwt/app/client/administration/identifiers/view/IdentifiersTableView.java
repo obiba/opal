@@ -141,6 +141,12 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
     getUiHandlers().onImportSystemIdentifiers();
   }
 
+  @UiHandler("copySystemId")
+  void onCopySystemIdentifiers(ClickEvent event) {
+    getUiHandlers().onCopySystemIdentifiers();
+  }
+
+
   @UiHandler("importIdMapping")
   void onImportIdentifiersMapping(ClickEvent event) {
     getUiHandlers().onImportIdentifiersMapping();

@@ -29,6 +29,9 @@
             <b:NavLink ui:field="importSystemId">
               <ui:msg description="Import System Identifiers label">Import system identifiers...</ui:msg>
             </b:NavLink>
+            <b:NavLink ui:field="copySystemId">
+              <ui:msg description="Copy System Identifiers label">Copy system identifiers...</ui:msg>
+            </b:NavLink>
             <b:NavLink ui:field="importIdMapping">
               <ui:msg description="Import Identifiers Mapping label">Import identifiers mapping...</ui:msg>
             </b:NavLink>

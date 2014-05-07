@@ -41,6 +41,7 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShie
 import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShieldROptionsView;
 import org.obiba.opal.web.gwt.app.client.administration.fs.presenter.FilesAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.fs.view.FilesAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.CopySystemIdentifiersModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.GenerateIdentifiersModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersMappingModalPresenter;
@@ -48,6 +49,7 @@ import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.Id
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersTablePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.ImportIdentifiersMappingModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.ImportSystemIdentifiersModalPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.CopySystemIdentifiersModalView;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.GenerateIdentifiersModalView;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.IdentifiersAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.IdentifiersMappingModalView;
@@ -197,6 +199,8 @@ public class AdministrationModule extends AbstractPresenterModule {
         IdentifiersTableModalView.class);
     bindPresenterWidget(ImportSystemIdentifiersModalPresenter.class,
         ImportSystemIdentifiersModalPresenter.Display.class, ImportSystemIdentifiersModalView.class);
+    bindPresenterWidget(CopySystemIdentifiersModalPresenter.class,
+        CopySystemIdentifiersModalPresenter.Display.class, CopySystemIdentifiersModalView.class);
     bindPresenterWidget(ImportIdentifiersMappingModalPresenter.class,
         ImportIdentifiersMappingModalPresenter.Display.class, ImportIdentifiersMappingModalView.class);
     bindPresenterWidget(IdentifiersMappingModalPresenter.class, IdentifiersMappingModalPresenter.Display.class,
