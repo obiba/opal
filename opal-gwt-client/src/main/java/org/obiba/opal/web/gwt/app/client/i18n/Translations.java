@@ -2294,4 +2294,8 @@ public interface Translations extends Constants {
   @Description("No Filter comment")
   @DefaultStringValue("no filter")
   String noFilter();
+
+  @Description("No Tables for EntityType label")
+  @DefaultStringValue("No tables for this entity type.")
+  String noTablesforEntityType();
 }

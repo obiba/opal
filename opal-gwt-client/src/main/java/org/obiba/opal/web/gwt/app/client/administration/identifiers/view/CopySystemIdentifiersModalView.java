@@ -27,6 +27,7 @@ import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextArea;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -80,7 +81,14 @@ public class CopySystemIdentifiersModalView extends ModalPopupViewWithUiHandlers
 
   @Override
   public void addSelectableTables(JsArray<TableDto> tables) {
-    tableChooser.addTableSelections(tables);
+    tableChooser.clear();
+    tableChooser.setEnabled(tables.length() > 0);
+    saveButton.setEnabled(tables.length() > 0);
+    if(tables.length() == 0) {
+      showError(translations.noTablesforEntityType(), null);
+    } else {
+      tableChooser.addTableSelections(tables);
+    }
   }
 
   @Override
