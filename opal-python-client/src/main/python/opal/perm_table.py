@@ -32,11 +32,22 @@ def do_ws(args, table):
     """
 
     if args.add:
-        return "/project/%s/permissions/table/%s?type=%s&permission=%s&principal=%s" % \
-               (args.datasource, table, args.type.upper(), map_permission(args.permission), args.subject)
+        return opal.core.UriBuilder(['project', args.datasource, 'permissions', 'table', table]) \
+            .query('type', args.type.upper()) \
+            .query('permission', map_permission(args.permission)) \
+            .query('principal', args.subject) \
+            .build()
+
+        # return UriBuilder("/project/%s/permissions/table/%s?type=%s&permission=%s&principal=%s" % \
+        #        (args.datasource, table, args.type.upper(), map_permission(args.permission), args.subject)).build()
     if args.delete:
-        return "/project/%s/permissions/table/%s?type=%s&principal=%s" % \
-               (args.datasource, table, args.type.upper(), args.subject)
+        return opal.core.UriBuilder(['project', args.datasource, 'permissions', 'table', table]) \
+            .query('type', args.type.upper()) \
+            .query('principal', args.subject) \
+            .build()
+
+        # return "/project/%s/permissions/table/%s?type=%s&principal=%s" % \
+        #        (args.datasource, table, args.type.upper(), args.subject)
 
 
 def map_permission(permission):
@@ -85,7 +96,11 @@ def do_command(args):
                 request.delete()
             else:
                 request.post()
-            response = request.resource(do_ws(args, table)).send()
+
+            try:
+                response = request.resource(do_ws(args, table)).send()
+            except Exception, e:
+                print Exception, e
 
             # format response
             print response.content
