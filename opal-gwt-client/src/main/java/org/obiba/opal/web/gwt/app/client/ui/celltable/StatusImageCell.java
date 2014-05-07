@@ -10,20 +10,11 @@
 
 package org.obiba.opal.web.gwt.app.client.ui.celltable;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.model.client.opal.CommandStateDto;
-import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
-
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.client.SafeHtmlTemplates;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-
-import static org.obiba.opal.web.model.client.opal.ScheduleType.NOT_SCHEDULED;
-import static org.obiba.opal.web.model.client.opal.TableIndexationStatus.IN_PROGRESS;
-import static org.obiba.opal.web.model.client.opal.TableIndexationStatus.OUTDATED;
-import static org.obiba.opal.web.model.client.opal.TableIndexationStatus.UPTODATE;
 
 /**
  * <p>

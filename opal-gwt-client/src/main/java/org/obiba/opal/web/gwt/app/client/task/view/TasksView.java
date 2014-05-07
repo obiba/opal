@@ -223,27 +223,33 @@ public class TasksView extends ViewImpl implements Display {
     @Override
     public String getValue(CommandStateDto dto) {
       // In progress
-      if(dto.getStatus().equals(CommandStateDto.Status.IN_PROGRESS.getName()) && dto.hasProgress()) {
-        return dto.getProgress().getMessage() + ":" + dto.getProgress().getPercent() + "%";
+      if(dto.getStatus().equals(CommandStateDto.Status.IN_PROGRESS.getName())) {
+        if(dto.hasProgress()) return dto.getProgress().getMessage() + ":" + dto.getProgress().getPercent() + "%";
+        else return translations.statusMap().get(CommandStateDto.Status.IN_PROGRESS.getName()) + ":100%";
       }
       // Success
       if(dto.getStatus().equals(CommandStateDto.Status.SUCCEEDED.getName())) {
-        return translations.statusMap().get(CommandStateDto.Status.SUCCEEDED.getName()) + ":" + StatusImageCell.BULLET_GREEN;
+        return translations.statusMap().get(CommandStateDto.Status.SUCCEEDED.getName()) + ":" +
+            StatusImageCell.BULLET_GREEN;
       }
       // Failed
       if(dto.getStatus().equals(CommandStateDto.Status.FAILED.getName())) {
-        return translations.statusMap().get(CommandStateDto.Status.CANCELED.getName()) + ":" + StatusImageCell.BULLET_RED;
+        return translations.statusMap().get(CommandStateDto.Status.CANCELED.getName()) + ":" +
+            StatusImageCell.BULLET_RED;
       }
       // Cancelled
       if(dto.getStatus().equals(CommandStateDto.Status.CANCELED.getName())) {
-        return translations.statusMap().get(CommandStateDto.Status.FAILED.getName()) + ":" + StatusImageCell.BULLET_ORANGE;
+        return translations.statusMap().get(CommandStateDto.Status.FAILED.getName()) + ":" +
+            StatusImageCell.BULLET_ORANGE;
       }
       // Cancelled pending
       if(dto.getStatus().equals(CommandStateDto.Status.CANCEL_PENDING.getName())) {
-        return translations.statusMap().get(CommandStateDto.Status.CANCEL_PENDING.getName()) + ":" + StatusImageCell.BULLET_BLACK;
+        return translations.statusMap().get(CommandStateDto.Status.CANCEL_PENDING.getName()) + ":" +
+            StatusImageCell.BULLET_BLACK;
       }
       // Other
-      return translations.statusMap().get(CommandStateDto.Status.NOT_STARTED.getName()) + ":" + StatusImageCell.BULLET_BLACK;
+      return translations.statusMap().get(CommandStateDto.Status.NOT_STARTED.getName()) + ":" +
+          StatusImageCell.BULLET_BLACK;
     }
   }
 }
