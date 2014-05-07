@@ -118,7 +118,9 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
       Initialisables.initialise(datasourceFactory);
       datasource = datasourceFactory.create();
       Initialisables.initialise(datasource);
-      if(!datasource.hasValueTable(getParticipantTableName())) {
+      try {
+        getIdentifiersTable(getParticipantEntityType());
+      } catch (NoSuchValueTableException e) {
         datasource.createWriter(getParticipantTableName(), getParticipantEntityType()).close();
       }
     }
