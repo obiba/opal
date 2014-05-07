@@ -54,6 +54,11 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
   }
 
   @Override
+  public boolean isReady() {
+    return opalSearchService.isEnabled();
+  }
+
+  @Override
   public boolean isIndexable(@NotNull ValueTable valueTable) {
     return !getIndex(valueTable).isUpToDate();
   }

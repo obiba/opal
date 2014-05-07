@@ -75,6 +75,8 @@ public class IndexAdministrationPresenter
 
     void setServiceStatus(Status status);
 
+    void setEnabled(boolean enabled);
+
     void unselectIndex(TableIndexStatusDto object);
 
     void renderRows(JsArray<TableIndexStatusDto> rows);
@@ -133,6 +135,15 @@ public class IndexAdministrationPresenter
         }) //
         .get().send();
 
+    ResourceRequestBuilderFactory.newBuilder().forResource(Resources.indicesEnabled()) //
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().setEnabled(response.getStatusCode() == Response.SC_OK);
+          }
+        }, Response.SC_OK, Response.SC_SERVICE_UNAVAILABLE, Response.SC_UNAUTHORIZED)//
+        .get().send();
+
     getView().getIndexTable().setVisibleRange(0, 10);
     refresh();
   }
@@ -172,7 +183,7 @@ public class IndexAdministrationPresenter
           public void onResponseCode(Request request, Response response) {
             getView().setServiceStatus(Display.Status.Stoppable);
             refresh();
-            getEventBus().fireEvent(new TableIndexStatusRefreshEvent());
+            fireEvent(new TableIndexStatusRefreshEvent());
           }
         }) //
         .withCallback(new ResponseCodeCallback() {
@@ -182,11 +193,11 @@ public class IndexAdministrationPresenter
 
             ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
             if(error.getStatus() != null) {
-              getEventBus().fireEvent(NotificationEvent.newBuilder()
+              fireEvent(NotificationEvent.newBuilder()
                   .error(TranslationsUtils.replaceArguments(translations.searchSettingsError(), error.getStatus()))
                   .build());
             } else {
-              getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+              fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
             }
           }
         }, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_BAD_REQUEST) //
@@ -204,7 +215,7 @@ public class IndexAdministrationPresenter
           public void onResponseCode(Request request, Response response) {
             getView().setServiceStatus(Display.Status.Startable);
             getView().clear();
-            getEventBus().fireEvent(new TableIndexStatusRefreshEvent());
+            fireEvent(new TableIndexStatusRefreshEvent());
           }
         }) //
         .withCallback(Response.SC_INTERNAL_SERVER_ERROR, new ResponseCodeCallback() {
@@ -213,8 +224,55 @@ public class IndexAdministrationPresenter
             getView().clear();
             getView().setServiceStatus(Display.Status.Stoppable);
             ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-            getEventBus().fireEvent(
-                NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray()).build());
+            fireEvent(NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray()).build());
+          }
+        }) //
+        .delete().send();
+  }
+
+  @Override
+  public void resume() {
+    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder() //
+        .forResource(Resources.searchServiceEnabled()).accept("application/json") //
+        .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().setEnabled(true);
+            getView().clear();
+            refresh();
+          }
+        }) //
+        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().clear();
+            getView().setEnabled(false);
+            ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+            fireEvent(NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray()).build());
+          }
+        }) //
+        .put().send();
+  }
+
+  @Override
+  public void suspend() {
+    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder() //
+        .forResource(Resources.searchServiceEnabled()).accept("application/json") //
+        .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().setEnabled(false);
+            getView().clear();
+            refresh();
+          }
+        }) //
+        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().clear();
+            getView().setEnabled(true);
+            ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+            fireEvent(NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray()).build());
           }
         }) //
         .delete().send();

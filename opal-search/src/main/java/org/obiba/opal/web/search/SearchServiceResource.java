@@ -14,8 +14,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.magma.Datasource;
@@ -40,7 +43,7 @@ public class SearchServiceResource extends IndexResource {
     List<Opal.TableIndexStatusDto> tableStatusDtos = Lists.newArrayList();
 
     // ES is available
-    if(!esProvider.isEnabled() || esProvider.getClient() == null) return tableStatusDtos;
+    if(!valuesIndexManager.isReady() || esProvider.getClient() == null) return tableStatusDtos;
 
     for(Datasource datasource : MagmaEngine.get().getDatasources()) {
       for(ValueTable valueTable : datasource.getValueTables()) {
@@ -50,6 +53,28 @@ public class SearchServiceResource extends IndexResource {
     sortByName(tableStatusDtos);
 
     return tableStatusDtos;
+  }
+
+  @PUT
+  @Path("/cfg/enabled")
+  public Response enableIndexing() {
+    valuesIndexManager.setEnabled(true);
+    return Response.ok().build();
+  }
+
+  @GET
+  @Path("/cfg/enabled")
+  public Response isEnableIndexing() {
+    return valuesIndexManager.isEnabled()
+        ? Response.ok().build()
+        : Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
+  }
+
+  @DELETE
+  @Path("/cfg/enabled")
+  public Response disableIndexing() {
+    valuesIndexManager.setEnabled(false);
+    return Response.ok().build();
   }
 
   private void sortByName(List<Opal.TableIndexStatusDto> tableStatusDtos) {
@@ -94,7 +119,8 @@ public class SearchServiceResource extends IndexResource {
     }
     if(!valuesIndexManager.getIndex(valueTable).getTimestamps().getLastUpdate().isNull()) {
       tableStatusDto = tableStatusDto.toBuilder()
-          .setIndexLastUpdate(valuesIndexManager.getIndex(valueTable).getTimestamps().getLastUpdate().toString()).build();
+          .setIndexLastUpdate(valuesIndexManager.getIndex(valueTable).getTimestamps().getLastUpdate().toString())
+          .build();
     }
 
     return tableStatusDto;

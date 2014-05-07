@@ -78,6 +78,9 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
   Button startStopButton;
 
   @UiField
+  Button enableButton;
+
+  @UiField
   Button configureButton;
 
   @UiField
@@ -85,6 +88,9 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
   @UiField
   OpalSimplePager indexTablePager;
+
+  @UiField
+  Panel indexPanel;
 
   @UiField
   Alert selectAllAlert;
@@ -120,6 +126,8 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
   private final CheckboxColumn<TableIndexStatusDto> checkboxColumn;
 
   private Status status;
+
+  private boolean enabled;
 
   @Inject
   public IndexAdministrationView(Binder uiBinder, PlaceManager placeManager, TranslationMessages translationMessages) {
@@ -176,6 +184,12 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
   public void onStartStop(ClickEvent event) {
     if(status == Status.Startable) getUiHandlers().start();
     else getUiHandlers().stop();
+  }
+
+  @UiHandler("enableButton")
+  public void onSuspendResume(ClickEvent event) {
+    if(enabled) getUiHandlers().suspend();
+    else getUiHandlers().resume();
   }
 
   @UiHandler("refreshIndicesButton")
@@ -238,6 +252,15 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
         enableActions(false);
         break;
     }
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+    enableButton.setText(enabled ? translations.suspendLabel() : translations.resumeLabel());
+    indexPanel.setVisible(enabled);
+    indexTablePager.setVisible(enabled);
+    refreshIndicesButton.setVisible(enabled);
   }
 
   private void enableStart(boolean enable) {

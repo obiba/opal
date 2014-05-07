@@ -48,6 +48,16 @@ public class IndexManagerConfigurationService implements ValueTableUpdateListene
   }
 
   /**
+   * Enable this index.
+   * @param enabled
+   */
+  public void setEnabled(boolean enabled) {
+    IndexManagerConfiguration config = getConfig();
+    config.setEnabled(enabled);
+    configSupplier.addExtension(config);
+  }
+
+  /**
    * Removes schedule entry in index manager configuration. If table still exists, default scheduling behaviour applies.
    */
   public void remove(ValueTable vt) {

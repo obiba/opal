@@ -83,7 +83,8 @@ public class TableVariablesSearchResource extends AbstractVariablesSearchResourc
   }
 
   private boolean canQueryEsIndex() {
-    return searchServiceAvailable() && variablesIndexManager.isIndexUpToDate(getValueTable());
+    return searchServiceAvailable() && variablesIndexManager.isReady() &&
+        variablesIndexManager.isIndexUpToDate(getValueTable());
   }
 
   private ValueTable getValueTable() {

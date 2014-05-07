@@ -21,6 +21,8 @@ public class IndexManagerConfiguration implements OpalConfigurationExtension {
 
   private final Map<String, Schedule> indexConfigurations;
 
+  private boolean enabled = true;
+
   public IndexManagerConfiguration() {
     indexConfigurations = new HashMap<>();
   }
@@ -33,6 +35,14 @@ public class IndexManagerConfiguration implements OpalConfigurationExtension {
     Schedule schedule = getSchedule(vt);
     return schedule.getType() != Opal.ScheduleType.NOT_SCHEDULED && !index.isUpToDate() &&
         shouldUpdate(schedule, index.now());
+  }
+
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
   }
 
   public void updateSchedule(ValueTable vt, Schedule schedule) {

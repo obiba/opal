@@ -105,9 +105,17 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
 
   protected abstract ValueTableIndex createIndex(@NotNull ValueTable vt);
 
+  public boolean isEnabled() {
+    return indexConfig.getConfig().isEnabled();
+  }
+
+  public void setEnabled(boolean enabled) {
+    this.indexConfig.setEnabled(enabled);
+  }
+
   @Override
   public boolean isReady() {
-    return opalSearchService.isEnabled();
+    return opalSearchService.isEnabled() && indexConfig.getConfig().isEnabled();
   }
 
   @Override

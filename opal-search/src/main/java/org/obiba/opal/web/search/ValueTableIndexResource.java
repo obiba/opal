@@ -61,7 +61,7 @@ public class ValueTableIndexResource extends IndexResource {
   @GET
   @OPTIONS
   public Response getTableStatus() {
-    if(!esProvider.isEnabled()) {
+    if(!valuesIndexManager.isReady()) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
     }
 

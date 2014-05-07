@@ -20,6 +20,10 @@ final class Resources {
     return "/service/search/indices";
   }
 
+  static String indicesEnabled() {
+    return "/service/search/indices/cfg/enabled";
+  }
+
   static String index(String datasource, String table) {
     return UriBuilder.create().segment("datasource", datasource, "table", table, "index").build();
   }

@@ -21,6 +21,10 @@ public interface IndexAdministrationUiHandlers extends UiHandlers {
 
   void stop();
 
+  void suspend();
+
+  void resume();
+
   void refresh();
 
   void configure();

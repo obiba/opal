@@ -85,6 +85,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Stop")
   String stopLabel();
 
+  @Description("Resume label")
+  @DefaultStringValue("Resume")
+  String resumeLabel();
+
+  @Description("Suspend label")
+  @DefaultStringValue("Suspend")
+  String suspendLabel();
+
   @Description("End label")
   @DefaultStringValue("End")
   String endLabel();

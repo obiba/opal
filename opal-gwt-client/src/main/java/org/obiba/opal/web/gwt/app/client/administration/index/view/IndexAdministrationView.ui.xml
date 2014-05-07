@@ -28,7 +28,7 @@
     <b:Paragraph>
       <ui:msg description="Search service text">Changes in search service configuration will take effect on service
         start. See details in
-        <a href="http://wiki.obiba.org/display/OPALDOC/Administrating+Opal#AdministratingOpal-SearchService"
+        <a href="http://wiki.obiba.org/display/OPALDOC/Administrating+Opal#AdministratingOpal-Search"
             target="_blank">Search Service Administration documentation
         </a>.
       </ui:msg>
@@ -51,8 +51,19 @@
       <ui:msg description="Indices label">Table indices</ui:msg>
     </b:Heading>
 
+    <b:Paragraph>
+      <ui:msg description="Table indices text">Values of the tables are indexed allowing advanced search. Indexing can
+        be scheduled by table or suspended for all tables.
+      </ui:msg>
+    </b:Paragraph>
+
     <g:FlowPanel addStyleNames="clearfix small-bottom-margin">
       <g:FlowPanel addStyleNames="pull-left">
+        <b:ButtonGroup>
+          <b:Button ui:field="enableButton" type="INVERSE">
+            Suspend/Resume
+          </b:Button>
+        </b:ButtonGroup>
         <b:ButtonGroup>
           <b:Button ui:field="refreshIndicesButton" icon="REFRESH">
             <ui:msg description="Refresh indices label">Refresh</ui:msg>
@@ -63,28 +74,30 @@
       <o:OpalSimplePager ui:field="indexTablePager" location="RIGHT" addStyleNames="pull-right"/>
     </g:FlowPanel>
 
-    <b:Alert ui:field="selectAllAlert" close="false" visible="false" addStyleNames="actions-select">
-      <b2:IconAnchor icon="PLAY" ui:field="indexNow" addStyleNames="inline small-indent">
-        <ui:msg description="Index Now label">Index Now</ui:msg>
-      </b2:IconAnchor>
-
-      <b2:IconAnchor icon="TIME" ui:field="scheduleIndex" addStyleNames="inline small-indent">
-        <ui:msg description="Schedule label">Schedule</ui:msg>
-      </b2:IconAnchor>
-
-      <b2:IconAnchor icon="TRASH" ui:field="deleteIndex" addStyleNames="inline small-indent">
-        <ui:msg description="Remove Index label">Remove Index</ui:msg>
-      </b2:IconAnchor>
-
-      <g:FlowPanel addStyleNames="pull-right">
-        <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
-        <b2:IconAnchor ui:field="selectAllAnchor" icon="CHECK" addStyleNames="inline small-indent"/>
-        <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" addStyleNames="inline small-indent">
-          <ui:msg description="Clear label">Clear</ui:msg>
+    <g:FlowPanel ui:field="indexPanel">
+      <b:Alert ui:field="selectAllAlert" close="false" visible="false" addStyleNames="actions-select">
+        <b2:IconAnchor icon="PLAY" ui:field="indexNow" addStyleNames="inline small-indent">
+          <ui:msg description="Index Now label">Index Now</ui:msg>
         </b2:IconAnchor>
-      </g:FlowPanel>
-    </b:Alert>
-    <o:Table ui:field="indexTable"/>
+
+        <b2:IconAnchor icon="TIME" ui:field="scheduleIndex" addStyleNames="inline small-indent">
+          <ui:msg description="Schedule label">Schedule</ui:msg>
+        </b2:IconAnchor>
+
+        <b2:IconAnchor icon="TRASH" ui:field="deleteIndex" addStyleNames="inline small-indent">
+          <ui:msg description="Remove Index label">Remove Index</ui:msg>
+        </b2:IconAnchor>
+
+        <g:FlowPanel addStyleNames="pull-right">
+          <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
+          <b2:IconAnchor ui:field="selectAllAnchor" icon="CHECK" addStyleNames="inline small-indent"/>
+          <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" addStyleNames="inline small-indent">
+            <ui:msg description="Clear label">Clear</ui:msg>
+          </b2:IconAnchor>
+        </g:FlowPanel>
+      </b:Alert>
+      <o:Table ui:field="indexTable"/>
+    </g:FlowPanel>
 
   </g:FlowPanel>
 </ui:UiBinder>

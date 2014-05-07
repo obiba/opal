@@ -124,7 +124,8 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
   //
 
   private boolean canQueryEsIndex() {
-    return searchServiceAvailable() && valuesIndexManager.isIndexUpToDate(getValueTable());
+    return searchServiceAvailable() && valuesIndexManager.isReady() &&
+        valuesIndexManager.isIndexUpToDate(getValueTable());
   }
 
   private ValueTable getValueTable() {

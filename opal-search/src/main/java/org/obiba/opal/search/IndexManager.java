@@ -45,6 +45,10 @@ public interface IndexManager {
   @NotNull
   IndexSynchronization createSyncTask(ValueTable valueTable, ValueTableIndex index);
 
+  boolean isEnabled();
+
+  void setEnabled(boolean enabled);
+
   /**
    * Check if any indexation tasks can be started.
    *
