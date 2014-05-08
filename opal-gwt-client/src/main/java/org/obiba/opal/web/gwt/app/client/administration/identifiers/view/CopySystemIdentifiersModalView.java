@@ -66,7 +66,7 @@ public class CopySystemIdentifiersModalView extends ModalPopupViewWithUiHandlers
     super(eventBus);
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
-    dialog.setTitle(translations.copySystemIdentifiersTitle());
+    dialog.setTitle(translations.importSystemIdentifiersTitle());
   }
 
   @UiHandler("closeButton")

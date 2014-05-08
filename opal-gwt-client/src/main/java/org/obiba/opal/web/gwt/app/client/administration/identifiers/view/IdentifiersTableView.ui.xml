@@ -27,10 +27,10 @@
         <b:ButtonGroup>
           <b:DropdownButton ui:field="importIdentifiers" icon="UPLOAD">
             <b:NavLink ui:field="importSystemId">
-              <ui:msg description="Import System Identifiers label">Import system identifiers...</ui:msg>
+              <ui:msg description="Import System Identifiers from List label">Import system identifiers from list...</ui:msg>
             </b:NavLink>
             <b:NavLink ui:field="copySystemId">
-              <ui:msg description="Copy System Identifiers label">Copy system identifiers...</ui:msg>
+              <ui:msg description="Import System Identifiers from Table label">Import system identifiers from table...</ui:msg>
             </b:NavLink>
             <b:NavLink ui:field="importIdMapping">
               <ui:msg description="Import Identifiers Mapping label">Import identifiers mapping...</ui:msg>

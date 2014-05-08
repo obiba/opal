@@ -814,10 +814,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Import System Identifiers")
   String importSystemIdentifiersTitle();
 
-  @Description("Copy System Identifiers title")
-  @DefaultStringValue("Copy System Identifiers")
-  String copySystemIdentifiersTitle();
-
   @Description("Import Identifiers Mapping title")
   @DefaultStringValue("Import Identifiers Mapping")
   String importIdentifiersMappingTitle();
