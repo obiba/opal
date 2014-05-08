@@ -4,24 +4,20 @@ Apply permissions on a set of tables.
 
 import sys
 import opal.core
+import opal.perm
 
 
 TABLE_PERMISSIONS = ('TABLE_READ', 'TABLE_VALUES', 'TABLE_EDIT', 'TABLE_VALUES_EDIT', 'TABLE_ALL')
-USER_PERMISSIONS = ('view', 'view-value', 'edit', 'edit-values', 'administrate')
-PERMISSION_TYPES = ('USER', 'GROUP')
+TABLE_PERMISSIONS_ARGS = ('view', 'view-value', 'edit', 'edit-values', 'administrate')
+SUBJECT_TYPES = ('USER', 'GROUP')
 
 
 def add_arguments(parser):
     """
     Add variable command specific options
     """
-    parser.add_argument('--add', '-a', action='store_true', help='Add permission.')
-    parser.add_argument('--delete', '-d', action='store_true', required=False, help='Delete a user.')
-    parser.add_argument('--permission', '-pe',
-                        help='Permission to apply: view, view-value, edit, edit-values or administrate')
-    parser.add_argument('--subject', '-s', required=True, help='Subject name to which the permission will be granted')
-    parser.add_argument('--type', '-ty', required=False, help='Subject type: user or group (default is user)')
-    parser.add_argument('--datasource', '-ds', required=True, help='Datasource/project name to which the tables belong')
+    opal.perm.add_permission_arguments(parser, 'Permission to apply: view, view-value, edit, edit-values or administrate')
+    parser.add_argument('--project', '-pr', required=True, help='Project name to which the tables belong')
     parser.add_argument('--tables', '-t', nargs='+', required=False,
                         help='List of table names on which the permission is to be set (default is all)')
 
@@ -32,26 +28,20 @@ def do_ws(args, table):
     """
 
     if args.add:
-        return opal.core.UriBuilder(['project', args.datasource, 'permissions', 'table', table]) \
+        return opal.core.UriBuilder(['project', args.project, 'permissions', 'table', table]) \
             .query('type', args.type.upper()) \
             .query('permission', map_permission(args.permission)) \
             .query('principal', args.subject) \
             .build()
 
-        # return UriBuilder("/project/%s/permissions/table/%s?type=%s&permission=%s&principal=%s" % \
-        #        (args.datasource, table, args.type.upper(), map_permission(args.permission), args.subject)).build()
     if args.delete:
-        return opal.core.UriBuilder(['project', args.datasource, 'permissions', 'table', table]) \
+        return opal.core.UriBuilder(['project', args.project, 'permissions', 'table', table]) \
             .query('type', args.type.upper()) \
             .query('principal', args.subject) \
             .build()
 
-        # return "/project/%s/permissions/table/%s?type=%s&principal=%s" % \
-        #        (args.datasource, table, args.type.upper(), args.subject)
-
-
 def map_permission(permission):
-    if permission.lower() not in USER_PERMISSIONS:
+    if permission.lower() not in TABLE_PERMISSIONS_ARGS:
         return None
 
     return {
@@ -69,19 +59,19 @@ def validate_args(args):
 
     if args.add:
         if not args.permission:
-            raise Exception("A permission name is required: %s" % ', '.join(USER_PERMISSIONS))
+            raise Exception("A permission name is required: %s" % ', '.join(TABLE_PERMISSIONS_ARGS))
         if map_permission(args.permission) is None:
-            raise Exception("Valid table permissions are: %s " % ', '.join(USER_PERMISSIONS))
+            raise Exception("Valid table permissions are: %s " % ', '.join(TABLE_PERMISSIONS_ARGS))
 
-    if args.type.upper() not in PERMISSION_TYPES:
-        raise Exception("Valid permission types are (%s) " % ', '.join(PERMISSION_TYPES).lower())
+    if args.type.upper() not in SUBJECT_TYPES:
+        raise Exception("Valid permission types are (%s) " % ', '.join(SUBJECT_TYPES).lower())
 
 
 def do_command(args):
     """
-    Execute variable command
+    Execute permission command
     """
-    # Build and send request
+    # Build and send requests
     try:
         validate_args(args)
 
