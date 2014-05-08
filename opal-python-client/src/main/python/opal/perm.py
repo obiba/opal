@@ -36,10 +36,10 @@ def validate_args(args, permissions):
         if not args.permission:
             raise Exception("A permission name is required: %s" % ', '.join(permissions.keys()))
         if map_permission(args.permission, permissions) is None:
-            raise Exception("Valid permissions are: %s " % ', '.join(permissions.keys()))
+            raise Exception("Valid permissions are: %s" % ', '.join(permissions.keys()))
 
     if not args.type or args.type.upper() not in SUBJECT_TYPES:
-        raise Exception("Valid subject types are (%s) " % ', '.join(SUBJECT_TYPES).lower())
+        raise Exception("Valid subject types are: %s" % ', '.join(SUBJECT_TYPES).lower())
 
 def do_ws(args, path, permissions):
     """
