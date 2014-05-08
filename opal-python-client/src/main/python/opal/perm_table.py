@@ -18,7 +18,7 @@ PERMISSIONS = {
 
 def add_arguments(parser):
     """
-    Add variable command specific options
+    Add command specific options
     """
     opal.perm.add_permission_arguments(parser, PERMISSIONS.keys())
     parser.add_argument('--project', '-pr', required=True, help='Project name to which the tables belong')
@@ -91,7 +91,8 @@ def do_command(args):
                 print Exception, e
 
             # format response
-            print response.content
+            if response.code != 200:
+                print response.content
 
     except Exception, e:
         print e

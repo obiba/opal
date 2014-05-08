@@ -1,5 +1,5 @@
 """
-Apply permissions on a set of tables.
+Apply permissions on a set of variables.
 """
 
 import sys
