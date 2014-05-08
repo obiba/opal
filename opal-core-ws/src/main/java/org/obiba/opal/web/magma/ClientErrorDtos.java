@@ -10,7 +10,6 @@
 package org.obiba.opal.web.magma;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 import javax.annotation.Nullable;
 import javax.validation.ConstraintViolation;
@@ -18,6 +17,7 @@ import javax.validation.ConstraintViolationException;
 import javax.ws.rs.core.Response;
 
 import org.mozilla.javascript.RhinoException;
+import org.mozilla.javascript.WrappedException;
 import org.obiba.magma.support.DatasourceParsingException;
 import org.obiba.opal.web.model.Magma.DatasourceParsingErrorDto;
 import org.obiba.opal.web.model.Magma.JavaScriptErrorDto;
@@ -44,7 +44,7 @@ public class ClientErrorDtos {
         .setCode(responseStatus.getStatusCode()) //
         .setStatus(errorStatus == null ? "" : errorStatus);
 
-    if (args != null) {
+    if(args != null) {
       builder.addAllArguments(Iterables.filter(Arrays.asList(args), new Predicate<String>() {
         @Override
         public boolean apply(@Nullable String s) {
@@ -97,8 +97,11 @@ public class ClientErrorDtos {
 
   public static ClientErrorDto getErrorMessage(Response.StatusType responseStatus, String errorStatus,
       RhinoException exception) {
+    String message = exception.getMessage();
+    if(exception instanceof WrappedException)
+      message = ((WrappedException) exception).getWrappedException().getMessage();
     return getErrorMessage(responseStatus, errorStatus) //
-        .addArguments(exception.getMessage()) //
+        .addArguments(message) //
         .addExtension(JavaScriptErrorDto.errors, newErrorDto(exception).build()).build();
   }
 
@@ -128,8 +131,11 @@ public class ClientErrorDtos {
   }
 
   private static JavaScriptErrorDto.Builder newErrorDto(RhinoException exception) {
+    String message = exception.details();
+    if(exception instanceof WrappedException)
+      message = ((WrappedException) exception).getWrappedException().getMessage();
     JavaScriptErrorDto.Builder builder = JavaScriptErrorDto.newBuilder() //
-        .setMessage(exception.details()) //
+        .setMessage(message) //
         .setSourceName(exception.sourceName()) //
         .setLineNumber(exception.lineNumber()); //
     if(exception.lineSource() != null) {

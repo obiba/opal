@@ -40,12 +40,10 @@ public class WrappedExceptionMapper extends ErrorDtoExceptionMapper<WrappedExcep
 
   @Override
   protected GeneratedMessage.ExtendableMessage<?> getErrorDto(WrappedException exception) {
-    if (exception.getWrappedException() instanceof NoSuchVariableException) {
+    if(exception.getWrappedException() instanceof NoSuchVariableException) {
       return getErrorDto((NoSuchVariableException) exception.getWrappedException());
     } else {
-      log.error("Unhandled javascript exception", exception);
-      return ClientErrorDtos.getErrorMessage(getStatus(), "UnhandledException", exception.getClass().getSimpleName(),
-          exception.getMessage()).build();
+      return ClientErrorDtos.getErrorMessage(getStatus(), "JavaScriptException", exception);
     }
   }
 
