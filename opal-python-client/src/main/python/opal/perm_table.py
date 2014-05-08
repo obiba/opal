@@ -16,7 +16,8 @@ def add_arguments(parser):
     """
     Add variable command specific options
     """
-    opal.perm.add_permission_arguments(parser, 'Permission to apply: view, view-value, edit, edit-values or administrate')
+    opal.perm.add_permission_arguments(parser,
+                                       'Permission to apply: view, view-value, edit, edit-values or administrate')
     parser.add_argument('--project', '-pr', required=True, help='Project name to which the tables belong')
     parser.add_argument('--tables', '-t', nargs='+', required=False,
                         help='List of table names on which the permission is to be set (default is all)')
@@ -40,6 +41,7 @@ def do_ws(args, table):
             .query('principal', args.subject) \
             .build()
 
+
 def map_permission(permission):
     if permission.lower() not in TABLE_PERMISSIONS_ARGS:
         return None
@@ -51,6 +53,21 @@ def map_permission(permission):
         'edit-values': 'TABLE_VALUES_EDIT',
         'administrate': 'TABLE_ALL'
     }[permission.lower()]
+
+
+def retrieve_datasource_tables(args):
+    request = opal.core.OpalClient.build(opal.core.OpalClient.LoginInfo.parse(args)).new_request()
+    request.fail_on_error()
+    if args.verbose:
+        request.verbose()
+    response = request.get().resource(
+        opal.core.UriBuilder(['datasource', args.project, 'tables']).build()).send().as_json()
+
+    tables = []
+    for table in response:
+        tables.append(str(table[u'name']))
+
+    return tables
 
 
 def validate_args(args):
@@ -75,7 +92,11 @@ def do_command(args):
     try:
         validate_args(args)
 
-        for table in args.tables:
+        tables = args.tables
+        if not tables:
+            tables = retrieve_datasource_tables(args)
+
+        for table in tables:
             request = opal.core.OpalClient.build(opal.core.OpalClient.LoginInfo.parse(args)).new_request()
 
             if args.verbose:
