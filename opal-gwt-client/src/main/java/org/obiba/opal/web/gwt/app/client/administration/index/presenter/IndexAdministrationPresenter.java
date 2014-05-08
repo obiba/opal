@@ -233,7 +233,7 @@ public class IndexAdministrationPresenter
   @Override
   public void resume() {
     ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder() //
-        .forResource(Resources.searchServiceEnabled()).accept("application/json") //
+        .forResource(Resources.indicesEnabled()).accept("application/json") //
         .withCallback(Response.SC_OK, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
@@ -257,7 +257,7 @@ public class IndexAdministrationPresenter
   @Override
   public void suspend() {
     ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder() //
-        .forResource(Resources.searchServiceEnabled()).accept("application/json") //
+        .forResource(Resources.indicesEnabled()).accept("application/json") //
         .withCallback(Response.SC_OK, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
