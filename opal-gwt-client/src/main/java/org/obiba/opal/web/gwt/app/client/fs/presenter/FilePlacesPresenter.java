@@ -67,7 +67,7 @@ public class FilePlacesPresenter extends PresenterWidget<FilePlacesPresenter.Dis
 
   public void showProject(@SuppressWarnings("ParameterHidesMemberVariable") String project) {
     this.project = project;
-    getView().showProjectHome(true);
+    getView().showProjectHome(project != null);
   }
 
   public interface Display extends View, HasUiHandlers<FilePlacesUiHandler> {
