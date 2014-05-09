@@ -91,10 +91,10 @@ public class VariableListViewDtoExtension implements ViewDtoExtension {
     if(from instanceof JoinTable) {
       List<ValueTable> fromTables = ((JoinTable) from).getTables();
       for(ValueTable vt : fromTables) {
-        if(hasTableAccess(vt)) viewDtoBuilder.addFrom(toStringReference(vt));
+        viewDtoBuilder.addFrom(toStringReference(vt));
       }
     } else {
-      if(hasTableAccess(from)) viewDtoBuilder.addFrom(toStringReference(from));
+      viewDtoBuilder.addFrom(toStringReference(from));
     }
   }
 
@@ -115,8 +115,4 @@ public class VariableListViewDtoExtension implements ViewDtoExtension {
     return tableDtoBuilder.build();
   }
 
-  private boolean hasTableAccess(ValueTable vt) {
-    return vt != null && vt.getDatasource() != null && MagmaEngine.get().hasDatasource(vt.getDatasource().getName()) &&
-        MagmaEngine.get().getDatasource(vt.getDatasource().getName()).hasValueTable(vt.getName());
-  }
 }
