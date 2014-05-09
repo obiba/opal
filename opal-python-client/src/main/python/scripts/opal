@@ -17,6 +17,7 @@ import opal.import_idsmap
 import opal.export_xml
 import opal.export_csv
 import opal.copy_table
+import opal.delete_table
 import opal.user
 import opal.group
 import opal.perm_project
@@ -83,6 +84,7 @@ add_subcommand('export-xml', 'Export data to a zip of Opal XML files.', opal.exp
 add_subcommand('export-csv', 'Export data to a folder of CSV files.', opal.export_csv.add_arguments,
                opal.export_csv.do_command)
 add_subcommand('copy-table', 'Copy a table into another table.', opal.copy_table.add_arguments, opal.copy_table.do_command)
+add_subcommand('delete-table', 'Delete some tables.', opal.delete_table.add_arguments, opal.delete_table.do_command)
 add_subcommand('user', 'Manage users.', opal.user.add_arguments, opal.user.do_command)
 add_subcommand('group', 'Manage groups.', opal.group.add_arguments, opal.group.do_command)
 add_subcommand('perm-project', 'Apply permission on a project.', opal.perm_project.add_arguments, opal.perm_project.do_command)
