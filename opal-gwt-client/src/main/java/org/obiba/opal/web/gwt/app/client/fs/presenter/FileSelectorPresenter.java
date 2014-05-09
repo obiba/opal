@@ -82,6 +82,7 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
   public void handle(FileSelectionRequestEvent event) {
     setFileSelectionSource(event.getSource());
     setFileSelectionType(event.getFileSelectionType());
+    showProject(event.getProject());
   }
 
   public void showProject(String project) {

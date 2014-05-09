@@ -32,13 +32,20 @@ public class FileSelectionRequestEvent extends GwtEvent<FileSelectionRequestEven
 
   private final FileSelectionType fileSelectionType;
 
+  private final String project;
+
   //
   // Constructors
   //
 
   public FileSelectionRequestEvent(Object source, FileSelectionType fileSelectionType) {
+    this(source, fileSelectionType, null);
+  }
+
+  public FileSelectionRequestEvent(Object source, FileSelectionType fileSelectionType, String project) {
     this.source = source;
     this.fileSelectionType = fileSelectionType;
+    this.project = project;
   }
 
   //
@@ -70,6 +77,10 @@ public class FileSelectionRequestEvent extends GwtEvent<FileSelectionRequestEven
 
   public FileSelectionType getFileSelectionType() {
     return fileSelectionType;
+  }
+
+  public String getProject() {
+    return project;
   }
 
   //
