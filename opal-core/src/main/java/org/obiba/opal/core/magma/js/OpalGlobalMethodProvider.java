@@ -26,14 +26,14 @@ public class OpalGlobalMethodProvider extends AbstractGlobalMethodProvider {
   /**
    * Set of methods to be exposed as top-level methods (ones that can be invoked anywhere)
    */
-  private static final Set<String> GLOBAL_METHODS = ImmutableSet.of("require");
+  private static final Set<String> GLOBAL_METHODS = ImmutableSet.of("source");
 
   @Override
   protected Set<String> getExposedMethods() {
     return GLOBAL_METHODS;
   }
 
-  public static void require(Context ctx, Scriptable thisObj, Object[] args, Function funObj) {
+  public static void source(Context ctx, Scriptable thisObj, Object[] args, Function funObj) {
 
     for(Object arg : args) {
       String fileName = Context.toString(arg);
