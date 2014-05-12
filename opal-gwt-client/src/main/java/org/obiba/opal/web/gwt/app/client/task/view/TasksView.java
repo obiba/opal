@@ -225,7 +225,8 @@ public class TasksView extends ViewImpl implements Display {
       // In progress
       if(dto.getStatus().equals(CommandStateDto.Status.IN_PROGRESS.getName())) {
         if(dto.hasProgress()) return dto.getProgress().getMessage() + ":" + dto.getProgress().getPercent() + "%";
-        else return translations.statusMap().get(CommandStateDto.Status.IN_PROGRESS.getName()) + ":100%";
+        else return translations.statusMap().get(CommandStateDto.Status.IN_PROGRESS.getName()) + ":" +
+            StatusImageCell.BULLET_BLACK;
       }
       // Success
       if(dto.getStatus().equals(CommandStateDto.Status.SUCCEEDED.getName())) {
@@ -234,12 +235,12 @@ public class TasksView extends ViewImpl implements Display {
       }
       // Failed
       if(dto.getStatus().equals(CommandStateDto.Status.FAILED.getName())) {
-        return translations.statusMap().get(CommandStateDto.Status.CANCELED.getName()) + ":" +
+        return translations.statusMap().get(CommandStateDto.Status.FAILED.getName()) + ":" +
             StatusImageCell.BULLET_RED;
       }
       // Cancelled
       if(dto.getStatus().equals(CommandStateDto.Status.CANCELED.getName())) {
-        return translations.statusMap().get(CommandStateDto.Status.FAILED.getName()) + ":" +
+        return translations.statusMap().get(CommandStateDto.Status.CANCELED.getName()) + ":" +
             StatusImageCell.BULLET_ORANGE;
       }
       // Cancelled pending
