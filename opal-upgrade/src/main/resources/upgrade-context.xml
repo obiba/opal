@@ -100,6 +100,11 @@
           <property name="appliesTo" value="2.0.2"/>
         </bean>
 
+        <bean class="org.obiba.opal.core.upgrade.v2_2_x.MongoDBDatasourceUpgradeStep">
+          <property name="description" value="Add datasource name field in datasource collection"/>
+          <property name="appliesTo" value="2.2.3"/>
+        </bean>
+
       </list>
     </property>
 
