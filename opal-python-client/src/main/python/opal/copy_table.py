@@ -14,7 +14,7 @@ def add_arguments(parser):
     parser.add_argument('--project', '-pr', required=True, help='Source project name')
     parser.add_argument('--tables', '-t', nargs='+', required=False,
                         help='List of table names to be copied (default is all)')
-    parser.add_argument('--destination', '-de', required=True, help='Destination project name')
+    parser.add_argument('--destination', '-d', required=True, help='Destination project name')
     parser.add_argument('--name', '-na', required=False,
                         help='New table name (required if source and destination are the same, ignored if more than one table is to be copied)')
     parser.add_argument('--incremental', '-i', action='store_true', help='Incremental copy')
