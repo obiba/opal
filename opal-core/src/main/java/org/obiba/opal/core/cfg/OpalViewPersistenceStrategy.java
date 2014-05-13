@@ -58,8 +58,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   public void writeViews(@NotNull String datasourceName, @NotNull Set<View> views, @Nullable String comment) {
     log.debug("WriteViews ds: {} views: {}", datasourceName, views.size());
     OpalWriteViewsCommand.Builder builder = new OpalWriteViewsCommand.Builder(
-        OpalGitUtils.getDatasourceGitFolder(datasourceName), views,
-        Strings.isNullOrEmpty(comment) ? getDefaultComment(views) : comment);
+        OpalGitUtils.getDatasourceGitFolder(datasourceName), views, comment);
 
     handler.execute(builder.build());
   }
@@ -142,16 +141,6 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
 
   private XStream getXStream() {
     return MagmaEngine.get().getExtension(MagmaXStreamExtension.class).getXStreamFactory().createXStream();
-  }
-
-  private String getDefaultComment(Set<View> views) {
-    StringBuilder builder = new StringBuilder("Update ");
-    for(View view : views) {
-      if(builder.length() > 1) builder.append(", ");
-      builder.append(view.getName());
-    }
-
-    return builder.toString();
   }
 
   /**
