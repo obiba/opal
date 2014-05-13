@@ -9,18 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.presenter;
 
-import java.util.List;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 
-import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
-
-import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
  * Presenter used to display error, warning and info messages in a dialog box.

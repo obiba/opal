@@ -38,6 +38,10 @@ public class NotificationView extends ViewImpl implements NotificationPresenter.
 
   interface Binder extends UiBinder<Widget, NotificationView> {}
 
+  private static final int DEFAULT_NOTIFICATION_DELAY = 5000;
+
+  private static final int ERROR_NOTIFICATION_DELAY = 10000;
+
   @UiField
   Panel alertPanel;
 
@@ -52,8 +56,8 @@ public class NotificationView extends ViewImpl implements NotificationPresenter.
     Alert alert = createAlert(type, event.getTitle());
     addMessages(alert, NotificationMessageBuilder.get(event).build());
     alertPanel.add(alert);
-    if(NotificationType.ERROR != type && !event.isSticky()) runSticky(alert);
-
+    if(!event.isSticky()) runNonStickyTimer(alert,
+        (NotificationType.ERROR == type ? ERROR_NOTIFICATION_DELAY : DEFAULT_NOTIFICATION_DELAY));
   }
 
   private Alert createAlert(NotificationType type, @Nullable String title) {
@@ -83,7 +87,7 @@ public class NotificationView extends ViewImpl implements NotificationPresenter.
     }
   }
 
-  private void runSticky(final Alert alert) {
+  private void runNonStickyTimer(final Alert alert, int delayMillis) {
     Timer nonStickyTimer = new Timer() {
 
       @Override
@@ -91,7 +95,7 @@ public class NotificationView extends ViewImpl implements NotificationPresenter.
         alert.close();
       }
     };
-    nonStickyTimer.schedule(5000);
+    nonStickyTimer.schedule(delayMillis);
   }
 
 }
