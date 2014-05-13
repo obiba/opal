@@ -212,10 +212,10 @@ class OpalCopier:
     """
 
     @classmethod
-    def build(cls, client, datasource, table, destination, name, incremental=False, nulls=False, verbose=None):
+    def build(cls, client, datasource, tables, destination, name, incremental=False, nulls=False, verbose=None):
         setattr(cls, 'client', client)
         setattr(cls, 'datasource', datasource)
-        setattr(cls, 'table', table)
+        setattr(cls, 'tables', tables)
         setattr(cls, 'destination', destination)
         setattr(cls, 'name', name)
         setattr(cls, 'incremental', incremental)
@@ -235,8 +235,13 @@ class OpalCopier:
         options.noVariables = False
         options.noValues = False
         options.copyNullValues = self.nulls
-        if self.table:
-            options.tables.extend([self.datasource + '.' + self.table])
+        if self.tables:
+            tables2copy = self.tables
+
+            def table_fullname(t): return self.datasource + '.' + t
+
+            options.tables.extend(map(table_fullname, tables2copy))
+        # name option will be ignored if more than one table
         if self.name:
             options.destinationTableName = self.name
 
