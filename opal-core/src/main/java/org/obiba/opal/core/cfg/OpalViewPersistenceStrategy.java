@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -40,6 +41,7 @@ import org.springframework.stereotype.Component;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStream;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -89,7 +91,30 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   public Set<View> readViews(@NotNull String datasourceName) {
     log.debug("ReadViews ds: {}", datasourceName);
     File datasourceRepo = OpalGitUtils.getDatasourceGitFolder(datasourceName);
-    return datasourceRepo.exists() ? readGitViews(datasourceRepo) : new LegacyViews().readViews(datasourceName);
+    ImmutableSet.Builder<View> builder = ImmutableSet.builder();
+    List<String> viewNames = Lists.newArrayList();
+    if(datasourceRepo.exists()) {
+      for(View view : readGitViews(datasourceRepo)) {
+        builder.add(view);
+        viewNames.add(view.getName());
+      }
+    }
+    readLegacyViews(datasourceName, builder, viewNames);
+    return builder.build();
+  }
+
+  private void readLegacyViews(String datasourceName, ImmutableSet.Builder<View> builder, List<String> viewNames) {
+    LegacyViews legacyViews = new LegacyViews(datasourceName);
+    boolean noLegacy = true;
+    for(View view : legacyViews.readViews()) {
+      if(!viewNames.contains(view.getName())) {
+        builder.add(view);
+        noLegacy = false;
+      }
+    }
+    if (noLegacy) {
+      legacyViews.removeViews();
+    }
   }
 
   @Override
@@ -134,28 +159,34 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
    */
   private final class LegacyViews {
     private static final String CONF_DIRECTORY_NAME = "conf";
+
     private static final String VIEWS_DIRECTORY_NAME = "views";
 
     private final File viewsDirectory;
 
-    public LegacyViews() {
+    @NotNull
+    private final String datasourceName;
+
+    LegacyViews(@NotNull String datasourceName) {
       String viewsDirectoryName = System.getProperty("OPAL_HOME") + File.separator //
           + CONF_DIRECTORY_NAME + File.separator + VIEWS_DIRECTORY_NAME;
       viewsDirectory = new File(viewsDirectoryName);
+      this.datasourceName = datasourceName;
     }
 
     @SuppressWarnings("unchecked")
     @NotNull
-    public Set<View> readViews(@NotNull String datasourceName) {
+    public Set<View> readViews() {
       Set<View> result = ImmutableSet.of();
-      if(!viewsDirectory.isDirectory()) {
-        log.debug("The legacy views directory '{}' does not exist.", viewsDirectory.getAbsolutePath());
+      File datasourceViewsFile = getDatasourceViewsFile();
+      if(!datasourceViewsFile.exists()) {
+        log.debug("The legacy views '{}' does not exist.", datasourceViewsFile.getAbsolutePath());
         return result;
       }
 
       InputStreamReader reader = null;
       try {
-        reader = new InputStreamReader(new FileInputStream(getDatasourceViewsFile(datasourceName)), Charsets.UTF_8);
+        reader = new InputStreamReader(new FileInputStream(datasourceViewsFile), Charsets.UTF_8);
         result = (Set<View>) getXStream().fromXML(reader);
       } catch(FileNotFoundException e) {
         return ImmutableSet.of();
@@ -165,12 +196,19 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
       return result;
     }
 
-    private String normalizeDatasourceName(@SuppressWarnings("TypeMayBeWeakened") String datasourceName) {
+    private void removeViews() {
+      File datasourceViewsFile = getDatasourceViewsFile();
+      if(datasourceViewsFile.exists()) {
+        datasourceViewsFile.delete();
+      }
+    }
+
+    private String normalizeDatasourceName() {
       return Pattern.compile("([^a-zA-Z0-9-_. ])").matcher(datasourceName).replaceAll("");
     }
 
-    private File getDatasourceViewsFile(String datasourceName) {
-      return new File(viewsDirectory, normalizeDatasourceName(datasourceName) + ".xml");
+    private File getDatasourceViewsFile() {
+      return new File(viewsDirectory, normalizeDatasourceName() + ".xml");
     }
   }
 
