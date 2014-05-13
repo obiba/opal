@@ -87,12 +87,12 @@ public class OpalViewPersistenceStrategyTest {
     Set<View> views = Sets.newHashSet();
     View view = new View("aView", valueTableMock);
     views.add(view);
-    viewPersistenceStrategy.writeViews("temporary-views", views, null);
+    viewPersistenceStrategy.writeViews("temporary-views", views, null, null);
     // Verify the temporary views file exists.
     Set<View> singleViewResult = viewPersistenceStrategy.readViews("temporary-views");
     assertThat(singleViewResult).hasSize(1);
     // Write the temporary views file with an empty views set. This will remove the file.
-    viewPersistenceStrategy.writeViews("temporary-views", ImmutableSet.<View>of(), null);
+    viewPersistenceStrategy.writeViews("temporary-views", ImmutableSet.<View>of(), null, null);
     // Verify that the temporary file has been removed, by ensuring that an empty set has been returned.
     Set<View> noViewsResult = viewPersistenceStrategy.readViews("temporary-views");
     assertThat(noViewsResult).isEmpty();
@@ -113,7 +113,7 @@ public class OpalViewPersistenceStrategyTest {
     Set<View> views = Sets.newHashSet();
     View view = new View("aView", valueTableMock);
     views.add(view);
-    viewPersistenceStrategy.writeViews("single-views", views, null);
+    viewPersistenceStrategy.writeViews("single-views", views, null, null);
   }
 
   private String getTestFilesRoot() {

@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.validation.constraints.NotNull;
@@ -25,7 +26,6 @@ import javax.validation.constraints.NotNull;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.PushResult;
-import org.obiba.core.util.StreamUtil;
 import org.obiba.git.GitException;
 import org.obiba.git.command.AbstractGitWriteCommand;
 import org.obiba.magma.MagmaEngine;
@@ -34,6 +34,7 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.WhereClause;
+import org.obiba.magma.views.support.VariableOperationContext;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.core.vcs.OpalGitUtils;
 
@@ -42,13 +43,19 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStream;
 
+import static org.obiba.magma.views.support.VariableOperationContext.Operation;
+
 public class OpalWriteViewsCommand extends AbstractGitWriteCommand {
 
   private final Set<View> views;
 
-  private OpalWriteViewsCommand(@NotNull File repositoryPath, @NotNull Set<View> views, @NotNull String commitMessage) {
+  private final VariableOperationContext context;
+
+  private OpalWriteViewsCommand(@NotNull File repositoryPath, @NotNull Set<View> views, @NotNull String commitMessage,
+      VariableOperationContext context) {
     super(repositoryPath, commitMessage);
     this.views = views;
+    this.context = context;
   }
 
   @Override
@@ -93,7 +100,11 @@ public class OpalWriteViewsCommand extends AbstractGitWriteCommand {
     }
 
     doWriteGitViewWhere(viewRepo, view, varFilesToRemove);
-    doWriteGitViewVariables(viewRepo, view, varFilesToRemove);
+    if (context != null && context.hasOperations(view)) {
+      doWriteGitViewVariables(viewRepo, view, context.getOperations(view), varFilesToRemove);
+    } else {
+      doWriteGitViewVariables(viewRepo, view, varFilesToRemove);
+    }
   }
 
   private void doWriteGitViewWhere(File viewRepo, View view, Collection<String> varFilesToRemove) throws IOException {
@@ -109,6 +120,27 @@ public class OpalWriteViewsCommand extends AbstractGitWriteCommand {
     } else if (scriptFile.exists()) {
       varFilesToRemove.add(viewRepo.getName() + "/" + scriptFile.getName());
     }
+  }
+
+  private void doWriteGitViewVariables(File viewRepo, ValueTable view, Map<Operation, Collection<Variable>> operations,
+      Collection<String> varFilesToRemove)
+      throws IOException {
+    // Write variable script files
+    Collection<Variable> variablesToWrite = operations.get(Operation.ADD);
+    if (variablesToWrite != null) {
+      for(Variable variable : variablesToWrite) {
+        doWriteGitViewVariable(viewRepo, variable);
+      }
+    }
+
+    // Remove variable script files
+    Collection<Variable> variablesToDelete = operations.get(Operation.DELETE);
+    if (variablesToDelete != null) {
+      for(Variable variable : variablesToDelete) {
+        varFilesToRemove.add(OpalGitUtils.getVariableFilePath(view.getName(), variable.getName()));
+      }
+    }
+
   }
 
   private void doWriteGitViewVariables(File viewRepo, ValueTable view, Collection<String> varFilesToRemove)
@@ -127,7 +159,7 @@ public class OpalWriteViewsCommand extends AbstractGitWriteCommand {
     })) {
       String varName = f.getName().substring(0, f.getName().length() - 3);
       if(!view.hasVariable(varName)) {
-        varFilesToRemove.add(f.getParentFile().getName() + "/" + f.getName());
+        varFilesToRemove.add(f.getParentFile().getName() + File.separator + f.getName());
       }
     }
   }
@@ -150,8 +182,8 @@ public class OpalWriteViewsCommand extends AbstractGitWriteCommand {
 
     private final OpalWriteViewsCommand command;
 
-    public Builder(@NotNull File repositoryPath, @NotNull Set<View> views, @NotNull String comment) {
-      command = new OpalWriteViewsCommand(repositoryPath, views, comment);
+    public Builder(@NotNull File repositoryPath, @NotNull Set<View> views, @NotNull String comment, VariableOperationContext context) {
+      command = new OpalWriteViewsCommand(repositoryPath, views, comment, context);
     }
 
     public OpalWriteViewsCommand build() {
