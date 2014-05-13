@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
@@ -20,6 +21,7 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
+import org.obiba.magma.views.support.VariableOperationContext;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
@@ -28,6 +30,8 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.base.Joiner;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
 
@@ -66,7 +70,7 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
       for(Variable variable : view.getVariables()) {
         variableWriter.writeVariable(variable);
       }
-      viewManager.addView(getDatasource().getName(), source, comment);
+      viewManager.addView(getDatasource().getName(), source, comment, null);
     }
 
     return Response.ok().build();
@@ -78,22 +82,28 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
       for(VariableDto variable : variables) {
         variableWriter.writeVariable(Dtos.fromDto(variable));
       }
-      viewManager.addView(getDatasource().getName(), view, comment);
+      viewManager.addView(getDatasource().getName(), view, comment, null);
     }
   }
 
   @Override
   public Response deleteVariables(List<String> variables) {
     View view = getValueTableAsView();
+    VariableOperationContext operationContext = new VariableOperationContext();
     try(ValueTableWriter.VariableWriter variableWriter = view.getListClause().createWriter()) {
+      List<String> names = new ArrayList<>();
       // Remove from listClause
       for(VariableValueSource variableSource : view.getListClause().getVariableValueSources()) {
-        String name = variableSource.getVariable().getName();
+        Variable variable = variableSource.getVariable();
+        String name = variable.getName();
         if(variables.contains(name)) {
-          variableWriter.removeVariable(variableSource.getVariable());
-          viewManager.addView(getDatasource().getName(), view, "Remove " + name);
+          operationContext.deleteVariable(view, variable);
+          names.add(name);
+          variableWriter.removeVariable(variable);
         }
       }
+
+      viewManager.addView(getDatasource().getName(), view, "Remove " + Joiner.on(',').join(names), operationContext);
     }
     return Response.ok().build();
   }

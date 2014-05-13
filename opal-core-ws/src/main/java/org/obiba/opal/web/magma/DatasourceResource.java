@@ -205,7 +205,7 @@ public class DatasourceResource {
     AclAction action = getAction(viewDto);
 
     View view = viewDtos.fromDto(viewDto);
-    viewManager.addView(getDatasource().getName(), view, comment);
+    viewManager.addView(getDatasource().getName(), view, comment, null);
     scheduleViewIndexation(view);
 
     URI viewUri = UriBuilder.fromUri(uriInfo.getBaseUri().toString()).path(DatasourceResource.class)
