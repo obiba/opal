@@ -30,6 +30,7 @@ import org.obiba.git.command.ReadFilesCommand;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewPersistenceStrategy;
+import org.obiba.magma.views.support.VariableOperationContext;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.core.vcs.OpalGitUtils;
 import org.obiba.opal.core.vcs.command.OpalWriteViewsCommand;
@@ -39,7 +40,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStream;
@@ -55,17 +55,19 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   private GitCommandHandler handler;
 
   @Override
-  public void writeViews(@NotNull String datasourceName, @NotNull Set<View> views, @Nullable String comment) {
+  public void writeViews(@NotNull String datasourceName, @NotNull Set<View> views, @Nullable String comment, @Nullable
+      VariableOperationContext context) {
     log.debug("WriteViews ds: {} views: {}", datasourceName, views.size());
     OpalWriteViewsCommand.Builder builder = new OpalWriteViewsCommand.Builder(
-        OpalGitUtils.getDatasourceGitFolder(datasourceName), views, comment);
+        OpalGitUtils.getDatasourceGitFolder(datasourceName), views, comment, context);
 
     handler.execute(builder.build());
   }
 
   @Override
-  public void writeView(@NotNull String datasourceName, @NotNull View view, @Nullable String comment) {
-    writeViews(datasourceName, ImmutableSet.of(view), comment);
+  public void writeView(@NotNull String datasourceName, @NotNull View view, @Nullable String comment,
+      @Nullable VariableOperationContext context) {
+    writeViews(datasourceName, ImmutableSet.of(view), comment, context);
   }
 
   @Override

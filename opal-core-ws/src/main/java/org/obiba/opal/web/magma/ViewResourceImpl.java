@@ -24,7 +24,6 @@ import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma.ViewDto;
-import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.support.InvalidRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -78,7 +77,7 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
       }
       viewManager.removeView(getDatasource().getName(), getValueTable().getName());
     }
-    viewManager.addView(getDatasource().getName(), viewDtos.fromDto(viewDto), comment);
+    viewManager.addView(getDatasource().getName(), viewDtos.fromDto(viewDto), comment, null);
 
     return Response.ok().build();
   }

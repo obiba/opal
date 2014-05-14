@@ -24,6 +24,7 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
+import org.obiba.magma.views.support.VariableOperationContext;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,15 +71,19 @@ public class VariableViewResourceImpl extends VariableResourceImpl implements Va
     }
 
     View view = getValueTableAsView();
+    VariableOperationContext operationContext = new VariableOperationContext();
 
     try(ValueTableWriter.VariableWriter variableWriter = view.getListClause().createWriter()) {
 
       // Rename existing variable
       if(!variableDto.getName().equals(variable.getName())) {
+        operationContext.deleteVariable(view, variable);
         renameVariable(variable, variableDto.getName(), table, variableWriter);
       }
-      variableWriter.writeVariable(Dtos.fromDto(variableDto));
-      viewManager.addView(getDatasource().getName(), view, comment);
+      Variable updatedVariable = Dtos.fromDto(variableDto);
+      operationContext.addVariable(view, updatedVariable);
+      variableWriter.writeVariable(updatedVariable);
+      viewManager.addView(getDatasource().getName(), view, comment, operationContext);
     }
     return Response.ok().build();
   }
@@ -100,9 +105,12 @@ public class VariableViewResourceImpl extends VariableResourceImpl implements Va
 
       // Remove from listClause
       for(VariableValueSource v : view.getListClause().getVariableValueSources()) {
-        if(v.getVariable().getName().equals(getName())) {
-          variableWriter.removeVariable(v.getVariable());
-          viewManager.addView(getDatasource().getName(), view, "Remove " + getName());
+        Variable variable = v.getVariable();
+        if(variable.getName().equals(getName())) {
+          variableWriter.removeVariable(variable);
+          VariableOperationContext operationContext = new VariableOperationContext();
+          operationContext.deleteVariable(view, variable);
+          viewManager.addView(getDatasource().getName(), view, "Remove " + getName(), operationContext);
           break;
         }
       }
