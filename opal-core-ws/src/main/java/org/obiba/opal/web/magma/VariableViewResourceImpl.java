@@ -71,15 +71,19 @@ public class VariableViewResourceImpl extends VariableResourceImpl implements Va
     }
 
     View view = getValueTableAsView();
+    VariableOperationContext operationContext = new VariableOperationContext();
 
     try(ValueTableWriter.VariableWriter variableWriter = view.getListClause().createWriter()) {
 
       // Rename existing variable
       if(!variableDto.getName().equals(variable.getName())) {
+        operationContext.deleteVariable(view, variable);
         renameVariable(variable, variableDto.getName(), table, variableWriter);
       }
-      variableWriter.writeVariable(Dtos.fromDto(variableDto));
-      viewManager.addView(getDatasource().getName(), view, comment, null);
+      Variable updatedVariable = Dtos.fromDto(variableDto);
+      operationContext.addVariable(view, updatedVariable);
+      variableWriter.writeVariable(updatedVariable);
+      viewManager.addView(getDatasource().getName(), view, comment, operationContext);
     }
     return Response.ok().build();
   }
