@@ -66,11 +66,13 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
     View view = viewDtos.fromDto(viewDto);
     view.initialise();
     View source = getValueTableAsView();
+    VariableOperationContext operationContext = new VariableOperationContext();
     try(VariableWriter variableWriter = source.getListClause().createWriter()) {
       for(Variable variable : view.getVariables()) {
+        operationContext.addVariable(source, variable);
         variableWriter.writeVariable(variable);
       }
-      viewManager.addView(getDatasource().getName(), source, comment, null);
+      viewManager.addView(getDatasource().getName(), source, comment, operationContext);
     }
 
     return Response.ok().build();
@@ -78,11 +80,14 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
 
   private void addOrUpdateViewVariables(Iterable<VariableDto> variables, @Nullable String comment) {
     View view = getValueTableAsView();
+    VariableOperationContext operationContext = new VariableOperationContext();
     try(VariableWriter variableWriter = view.getListClause().createWriter()) {
-      for(VariableDto variable : variables) {
-        variableWriter.writeVariable(Dtos.fromDto(variable));
+      for(VariableDto variableDto : variables) {
+        Variable variable = Dtos.fromDto(variableDto);
+        operationContext.addVariable(view, variable);
+        variableWriter.writeVariable(variable);
       }
-      viewManager.addView(getDatasource().getName(), view, comment, null);
+      viewManager.addView(getDatasource().getName(), view, comment, operationContext);
     }
   }
 
