@@ -53,7 +53,7 @@ public class OpalWriteViewsCommand extends AbstractGitWriteCommand {
 
   private OpalWriteViewsCommand(@NotNull File repositoryPath, @NotNull Set<View> views, @NotNull String commitMessage,
       VariableOperationContext context) {
-    super(repositoryPath, commitMessage);
+    super(repositoryPath, OpalGitUtils.getGitViewsWorkFolder(), commitMessage);
     this.views = views;
     this.context = context;
   }
@@ -80,13 +80,15 @@ public class OpalWriteViewsCommand extends AbstractGitWriteCommand {
 
   private void serializeAllViewFiles(File localRepo, Collection<String> varFilesToRemove, StringBuilder message)
       throws IOException {
+    message.append("[");
     for(View view : views) {
       doWriteGitView(localRepo, view, varFilesToRemove);
-      if(message.length() > 0) {
+      if(message.length() > 1) {
         message.append(", ");
       }
       message.append(view.getName());
     }
+    message.append("]");
   }
 
   private void doWriteGitView(File localRepo, View view, Collection<String> varFilesToRemove) throws IOException {

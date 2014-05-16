@@ -30,29 +30,32 @@ public class OpalGitVersionControlSystem implements OpalVersionControlSystem {
 
   @Override
   public Iterable<CommitInfo> getCommitsInfo(@NotNull String datasource, @NotNull String path) {
-    return gitCommandHandler.execute(
-        new LogsCommand.Builder(OpalGitUtils.getDatasourceGitFolder(datasource)).path(path).excludeDeletedCommits(true)
-            .build());
+    return gitCommandHandler.execute(new LogsCommand.Builder(OpalGitUtils.getGitDatasourceViewsRepoFolder(datasource),
+            OpalGitUtils.getGitViewsWorkFolder()).path(path).excludeDeletedCommits(true).build()
+    );
   }
 
   @Override
   public CommitInfo getCommitInfo(@NotNull String datasource, @NotNull String path, @NotNull String commitId) {
-    return gitCommandHandler
-        .execute(new CommitLogCommand.Builder(OpalGitUtils.getDatasourceGitFolder(datasource), path, commitId).build());
+    return gitCommandHandler.execute(
+        new CommitLogCommand.Builder(OpalGitUtils.getGitDatasourceViewsRepoFolder(datasource),
+            OpalGitUtils.getGitViewsWorkFolder(), path, commitId).build());
   }
 
   @Override
   public String getBlob(@NotNull String datasource, @NotNull String path, @NotNull String commitId) {
     return gitCommandHandler.execute(
-        new FetchBlobCommand.Builder(OpalGitUtils.getDatasourceGitFolder(datasource), path).commitId(commitId).build());
+        new FetchBlobCommand.Builder(OpalGitUtils.getGitDatasourceViewsRepoFolder(datasource),
+            OpalGitUtils.getGitViewsWorkFolder(), path).commitId(commitId).build());
   }
 
   @Override
   public Iterable<String> getDiffEntries(@NotNull String datasource, @NotNull String commitId,
       @Nullable String prevCommitId, @Nullable String path) {
     return gitCommandHandler.execute(
-        new DiffAsStringCommand.Builder(OpalGitUtils.getDatasourceGitFolder(datasource), commitId).path(path)
-            .previousCommitId(prevCommitId).build());
+        new DiffAsStringCommand.Builder(OpalGitUtils.getGitDatasourceViewsRepoFolder(datasource),
+            OpalGitUtils.getGitViewsWorkFolder(), commitId).path(path).previousCommitId(prevCommitId).build()
+    );
   }
 
 }

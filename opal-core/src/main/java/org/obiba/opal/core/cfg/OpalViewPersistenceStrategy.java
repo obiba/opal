@@ -55,11 +55,11 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   private GitCommandHandler handler;
 
   @Override
-  public void writeViews(@NotNull String datasourceName, @NotNull Set<View> views, @Nullable String comment, @Nullable
-      VariableOperationContext context) {
+  public void writeViews(@NotNull String datasourceName, @NotNull Set<View> views, @Nullable String comment,
+      @Nullable VariableOperationContext context) {
     log.debug("WriteViews ds: {} views: {}", datasourceName, views.size());
     OpalWriteViewsCommand.Builder builder = new OpalWriteViewsCommand.Builder(
-        OpalGitUtils.getDatasourceGitFolder(datasourceName), views, comment, context);
+        OpalGitUtils.getGitDatasourceViewsRepoFolder(datasourceName), views, comment, context);
 
     handler.execute(builder.build());
   }
@@ -73,15 +73,16 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   @Override
   public void removeView(@NotNull String datasourceName, @NotNull String viewName) {
     log.debug("RemoveView ds: {}, view: {}", datasourceName, viewName);
-    handler.execute(new DeleteFilesCommand.Builder(OpalGitUtils.getDatasourceGitFolder(datasourceName), viewName,
-        "Remove " + viewName).build());
+    handler.execute(new DeleteFilesCommand.Builder(OpalGitUtils.getGitDatasourceViewsRepoFolder(datasourceName),
+        OpalGitUtils.getGitViewsWorkFolder(), viewName, "Remove " + viewName).build());
   }
 
   @Override
   public void removeViews(String datasourceName) {
     log.debug("RemoveViews ds: {}", datasourceName);
     try {
-      FileUtil.delete(OpalGitUtils.getDatasourceGitFolder(datasourceName));
+      FileUtil.delete(OpalGitUtils.getGitDatasourceViewsRepoFolder(datasourceName));
+      FileUtil.delete(new File(OpalGitUtils.getGitViewsWorkFolder(), datasourceName));
     } catch(IOException e) {
       throw new RuntimeException("Failed deleting views in git for datasource: " + datasourceName, e);
     }
@@ -91,7 +92,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   @Override
   public Set<View> readViews(@NotNull String datasourceName) {
     log.debug("ReadViews ds: {}", datasourceName);
-    File datasourceRepo = OpalGitUtils.getDatasourceGitFolder(datasourceName);
+    File datasourceRepo = OpalGitUtils.getGitDatasourceViewsRepoFolder(datasourceName);
     ImmutableSet.Builder<View> builder = ImmutableSet.builder();
     List<String> viewNames = Lists.newArrayList();
     if(datasourceRepo.exists()) {
@@ -113,7 +114,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
         noLegacy = false;
       }
     }
-    if (noLegacy) {
+    if(noLegacy) {
       legacyViews.removeViews();
     }
   }
@@ -131,7 +132,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   private Set<View> readGitViews(File datasourceRepo) {
     ImmutableSet.Builder<View> builder = ImmutableSet.builder();
     Set<InputStream> files = handler
-        .execute(new ReadFilesCommand.Builder(datasourceRepo).recursive(true).filter("View\\.xml$").build());
+        .execute(new ReadFilesCommand.Builder(datasourceRepo, OpalGitUtils.getGitViewsWorkFolder()).recursive(true).filter("View\\.xml$").build());
 
     for(InputStream file : files) {
       InputStreamReader reader = new InputStreamReader(file, Charsets.UTF_8);

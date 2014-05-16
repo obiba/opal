@@ -11,7 +11,6 @@
 package org.obiba.opal.core.vcs;
 
 import java.io.File;
-import java.util.Map;
 
 import javax.annotation.Nonnull;
 
@@ -30,6 +29,8 @@ public final class OpalGitUtils {
 
   private final static String DATA_FOLDER_NAME = "data";
 
+  private final static String WORK_FOLDER_NAME = "work";
+
   private final static String GIT_FOLDER_NAME = "git";
 
   private final static String GIT_VIEWS_NAME = "views";
@@ -38,9 +39,18 @@ public final class OpalGitUtils {
       System.getProperty("OPAL_HOME") + File.separatorChar + DATA_FOLDER_NAME + File.separatorChar + GIT_FOLDER_NAME +
           File.separatorChar + GIT_VIEWS_NAME);
 
-  public static File getDatasourceGitFolder(@Nonnull String datasourceName) {
+  private final static File GIT_WORK_PATH = new File(
+      System.getProperty("OPAL_HOME") + File.separatorChar + WORK_FOLDER_NAME + File.separatorChar + GIT_FOLDER_NAME +
+          File.separatorChar + GIT_VIEWS_NAME);
+
+  public static File getGitDatasourceViewsRepoFolder(@Nonnull String datasourceName) {
     Preconditions.checkArgument(datasourceName != null);
     return new File(GIT_ROOT_PATH, datasourceName + ".git");
+  }
+
+  public static File getGitViewsWorkFolder() {
+    if (!GIT_WORK_PATH.exists()) GIT_WORK_PATH.mkdirs();
+    return GIT_WORK_PATH;
   }
 
   public static String getViewFilePath(String view) {
