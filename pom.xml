@@ -1763,7 +1763,7 @@
     <mongodb-driver.version>2.11.4</mongodb-driver.version>
     <mysql-connector-java.version>5.1.29</mysql-connector-java.version>
     <newrelic.version>3.4.2</newrelic.version>
-    <obiba-commons.version>1.6.1</obiba-commons.version>
+    <obiba-commons.version>1.7-SNAPSHOT</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <opencsv.version>2.3</opencsv.version>
     <orientdb.version>1.6.4</orientdb.version>
