@@ -18,6 +18,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
@@ -29,6 +30,7 @@ import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
+import org.jboss.resteasy.util.HttpHeaderNames;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
@@ -44,6 +46,8 @@ public class AuthenticationResource extends AbstractSecurityComponent {
   private static final Logger log = LoggerFactory.getLogger(AuthenticationResource.class);
 
   private static final String ENSURED_PROFILE = "ensuredProfile";
+
+  private static final String OBIBA_ID_COOKIE_NAME = "obibaid";
 
   @Autowired
   private SubjectProfileService subjectProfileService;
@@ -62,7 +66,8 @@ public class AuthenticationResource extends AbstractSecurityComponent {
       log.info("Successful session creation for user '{}' session ID is '{}'.", username, sessionId);
       return Response.created(
           UriBuilder.fromPath("/").path(AuthenticationResource.class).path(AuthenticationResource.class, "checkSession")
-              .build(sessionId)).build();
+              .build(sessionId)
+      ).build();
 
     } catch(AuthenticationException e) {
       log.info("Authentication failure of user '{}' at ip: '{}': {}", username, servletRequest.getRemoteAddr(),
@@ -85,10 +90,12 @@ public class AuthenticationResource extends AbstractSecurityComponent {
     // Delete the Shiro session
     try {
       SecurityUtils.getSubject().logout();
+      return Response.ok().header(HttpHeaderNames.SET_COOKIE,
+          new NewCookie(OBIBA_ID_COOKIE_NAME, null, "/", null, "Obiba session deleted", 0, false)).build();
     } catch(InvalidSessionException e) {
       // Ignore
+      return Response.ok().build();
     }
-    return Response.ok().build();
   }
 
   @GET

@@ -10,7 +10,6 @@
 
 package org.obiba.opal.core.service.security.authc;
 
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationListener;
@@ -23,18 +22,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class SubjectProfileAuthenticationListener implements AuthenticationListener {
 
-  private static final String SET_COOKIE_HEADER = "Set-Cookie";
-
   @Autowired
   private SubjectProfileService subjectProfileService;
 
   @Override
   public void onSuccess(AuthenticationToken token, AuthenticationInfo info) {
-    Object credentials = info.getCredentials();
-    if(credentials != null && credentials.toString().startsWith(SET_COOKIE_HEADER + ":")) {
-      SecurityUtils.getSubject().getSession()
-          .setAttribute(SET_COOKIE_HEADER, credentials.toString().substring(SET_COOKIE_HEADER.length() + 1));
-    }
   }
 
   @Override
