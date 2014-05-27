@@ -21,6 +21,10 @@
       <artifactId>obiba-core</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.obiba.commons</groupId>
+      <artifactId>obiba-shiro</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.obiba.opal</groupId>
       <artifactId>opal-core-api</artifactId>
     </dependency>

@@ -41,8 +41,6 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
 
   private static final String OPAL_SESSION_ID_COOKIE_NAME = "opalsid";
 
-  private static final String AGATE_SESSION_ID_COOKIE_NAME = "agatesid";
-
   @Nullable
   @Override
   public Response preProcess(HttpRequest request, ResourceMethodInvoker method)
@@ -89,8 +87,6 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
         // Only web service calls that require authentication will lose their opalsid cookie
         response.getMetadata().add(HttpHeaderNames.SET_COOKIE,
             new NewCookie(OPAL_SESSION_ID_COOKIE_NAME, null, "/", null, "Opal session deleted", 0, false));
-        response.getMetadata().add(HttpHeaderNames.SET_COOKIE,
-            new NewCookie(AGATE_SESSION_ID_COOKIE_NAME, null, "/", null, "Agate session deleted", 0, false));
       }
     }
   }

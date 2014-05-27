@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import javax.annotation.PreDestroy;
+import javax.validation.constraints.NotNull;
 
 import net.sf.ehcache.CacheManager;
 
@@ -40,8 +41,10 @@ import org.apache.shiro.session.mgt.SessionValidationScheduler;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.util.LifecycleUtils;
 import org.obiba.opal.core.service.security.realm.OpalPermissionResolver;
+import org.obiba.shiro.realm.ObibaRealm;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.ImmutableList;
@@ -64,6 +67,18 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
 
   @Autowired
   private RolePermissionResolver rolePermissionResolver;
+
+  @NotNull
+  @Value("${org.obiba.obiba.realm.url}")
+  private String obibaRealmUrl;
+
+  @NotNull
+  @Value("${org.obiba.obiba.realm.service.name}")
+  private String serviceName;
+
+  @NotNull
+  @Value("${org.obiba.obiba.realm.service.key}")
+  private String serviceKey;
 
   @Autowired
   private CacheManager cacheManager;
@@ -154,7 +169,11 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
     @Override
     protected void applyRealmsToSecurityManager(Collection<Realm> shiroRealms, @SuppressWarnings(
         "ParameterHidesMemberVariable") SecurityManager securityManager) {
-      super.applyRealmsToSecurityManager(ImmutableList.<Realm>builder().addAll(realms).addAll(shiroRealms).build(),
+      ObibaRealm oRealm = new ObibaRealm();
+      oRealm.setBaseUrl(obibaRealmUrl);
+      oRealm.setServiceName(serviceName);
+      oRealm.setServiceKey(serviceKey);
+      super.applyRealmsToSecurityManager(ImmutableList.<Realm>builder().addAll(realms).add(oRealm).addAll(shiroRealms).build(),
           securityManager);
     }
 
