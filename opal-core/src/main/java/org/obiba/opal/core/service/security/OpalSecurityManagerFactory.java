@@ -21,6 +21,8 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AbstractAuthenticator;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authc.credential.PasswordMatcher;
+import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
+import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.authz.ModularRealmAuthorizer;
 import org.apache.shiro.authz.permission.PermissionResolver;
 import org.apache.shiro.authz.permission.PermissionResolverAware;
@@ -47,6 +49,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 
 @Component
@@ -69,15 +72,15 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
   private RolePermissionResolver rolePermissionResolver;
 
   @NotNull
-  @Value("${org.obiba.obiba.realm.url}")
+  @Value("${org.obiba.realm.url}")
   private String obibaRealmUrl;
 
   @NotNull
-  @Value("${org.obiba.obiba.realm.service.name}")
+  @Value("${org.obiba.realm.service.name}")
   private String serviceName;
 
   @NotNull
-  @Value("${org.obiba.obiba.realm.service.key}")
+  @Value("${org.obiba.realm.service.key}")
   private String serviceKey;
 
   @Autowired
@@ -133,8 +136,7 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
       initializeSessionManager(dsm);
       initializeSubjectDAO(dsm);
       initializeAuthorizer(dsm);
-
-      ((AbstractAuthenticator) dsm.getAuthenticator()).setAuthenticationListeners(authenticationListeners);
+      initializeAuthenticator(dsm);
 
       return dsm;
     }
@@ -166,15 +168,26 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
       }
     }
 
+    private void initializeAuthenticator(DefaultSecurityManager dsm) {
+      ((AbstractAuthenticator) dsm.getAuthenticator()).setAuthenticationListeners(authenticationListeners);
+
+      if(dsm.getAuthenticator() instanceof ModularRealmAuthenticator) {
+        ((ModularRealmAuthenticator) dsm.getAuthenticator()).setAuthenticationStrategy(new FirstSuccessfulStrategy());
+      }
+    }
+
     @Override
     protected void applyRealmsToSecurityManager(Collection<Realm> shiroRealms, @SuppressWarnings(
         "ParameterHidesMemberVariable") SecurityManager securityManager) {
-      ObibaRealm oRealm = new ObibaRealm();
-      oRealm.setBaseUrl(obibaRealmUrl);
-      oRealm.setServiceName(serviceName);
-      oRealm.setServiceKey(serviceKey);
-      super.applyRealmsToSecurityManager(ImmutableList.<Realm>builder().addAll(realms).add(oRealm).addAll(shiroRealms).build(),
-          securityManager);
+      ImmutableList.Builder<Realm> builder = ImmutableList.<Realm>builder().addAll(realms).addAll(shiroRealms);
+      if(!Strings.isNullOrEmpty(obibaRealmUrl)) {
+        ObibaRealm oRealm = new ObibaRealm();
+        oRealm.setBaseUrl(obibaRealmUrl);
+        oRealm.setServiceName(serviceName);
+        oRealm.setServiceKey(serviceKey);
+        builder.add(oRealm);
+      }
+      super.applyRealmsToSecurityManager(builder.build(), securityManager);
     }
 
     @Override
