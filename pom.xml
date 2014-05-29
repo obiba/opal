@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -42,7 +43,6 @@
     <module>opal-datashield</module>
     <module>opal-search</module>
     <module>opal-upgrade</module>
-    <module>opal-tools</module>
   </modules>
 
   <dependencyManagement>
@@ -153,17 +153,6 @@
         <artifactId>opal-upgrade</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.obiba.opal.tools</groupId>
-        <artifactId>password-hasher</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.obiba.opal.tools</groupId>
-        <artifactId>password-hasher</artifactId>
-        <version>${project.version}</version>
-        <classifier>cli</classifier>
-      </dependency>
 
       <!-- Obiba dependencies -->
       <dependency>
@@ -190,6 +179,17 @@
         <groupId>org.obiba.commons</groupId>
         <artifactId>obiba-git</artifactId>
         <version>${obiba-commons.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.commons</groupId>
+        <artifactId>obiba-password-hasher</artifactId>
+        <version>${obiba-commons.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.commons</groupId>
+        <artifactId>obiba-password-hasher</artifactId>
+        <version>${obiba-commons.version}</version>
+        <classifier>cli</classifier>
       </dependency>
 
       <!-- Magma dependencies -->
@@ -1763,7 +1763,7 @@
     <mongodb-driver.version>2.11.4</mongodb-driver.version>
     <mysql-connector-java.version>5.1.29</mysql-connector-java.version>
     <newrelic.version>3.4.2</newrelic.version>
-    <obiba-commons.version>1.6.1</obiba-commons.version>
+    <obiba-commons.version>1.7-SNAPSHOT</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <opencsv.version>2.3</opencsv.version>
     <orientdb.version>1.6.4</orientdb.version>
@@ -1775,7 +1775,7 @@
     <REngine.version>0.6-8.1</REngine.version>
     <resteasy.version>3.0.6.Final</resteasy.version>
     <rhino-js.version>1.7R4</rhino-js.version>
-    <shiro.version>1.2.2</shiro.version>
+    <shiro.version>1.2.3-java8</shiro.version>
     <shiro-extras.version>1.0.3-obiba</shiro-extras.version>
     <slf4j.version>1.7.6</slf4j.version>
     <spring.version>4.0.3.RELEASE</spring.version>
