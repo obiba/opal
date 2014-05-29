@@ -10,14 +10,10 @@
 
 package org.obiba.opal.web.security;
 
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.ThreadContext;
 import org.obiba.opal.core.service.SubjectProfileService;
-import org.obiba.shiro.web.filter.AuthenticationExecutor;
+import org.obiba.shiro.web.filter.AbstractAuthenticationExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +23,7 @@ import org.springframework.stereotype.Component;
  * Perform the authentication, either by username-password token or by obiba ticket token.
  */
 @Component
-public class AuthenticationExecutorImpl implements AuthenticationExecutor {
+public class AuthenticationExecutorImpl extends AbstractAuthenticationExecutor {
 
   private static final Logger log = LoggerFactory.getLogger(AuthenticationExecutorImpl.class);
 
@@ -37,18 +33,7 @@ public class AuthenticationExecutorImpl implements AuthenticationExecutor {
   private SubjectProfileService subjectProfileService;
 
   @Override
-  public Subject login(AuthenticationToken token) throws AuthenticationException {
-    Subject subject = SecurityUtils.getSubject();
-    if (!subject.isAuthenticated()) {
-      subject.login(token);
-      ThreadContext.bind(subject);
-    }
-    ensureProfile(subject);
-    return subject;
-  }
-
-
-  private void ensureProfile(Subject subject) {
+  protected void ensureProfile(Subject subject) {
     Object principal = subject.getPrincipal();
 
     if(!subjectProfileService.supportProfile(principal)) {
