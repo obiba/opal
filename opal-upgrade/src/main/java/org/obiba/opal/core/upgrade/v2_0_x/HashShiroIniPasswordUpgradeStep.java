@@ -24,9 +24,9 @@ import java.util.regex.Pattern;
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.realm.text.IniRealm;
 import org.apache.shiro.util.StringUtils;
-import org.obiba.opal.tools.hasher.Hasher;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
+import org.obiba.shiro.tools.hasher.Hasher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -80,7 +80,7 @@ public class HashShiroIniPasswordUpgradeStep extends AbstractUpgradeStep {
 
     } catch(IOException e) {
       log.error("Cannot hash password in {}. " +
-          "Encrypt manually your passwords using shiro-hasher tools (included in Opal tools directory)",
+              "Encrypt manually your passwords using shiro-hasher tools (included in Opal tools directory)",
           srcIniFile.getAbsolutePath(), e);
     }
   }
