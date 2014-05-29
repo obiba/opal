@@ -105,12 +105,14 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
 
   protected abstract ValueTableIndex createIndex(@NotNull ValueTable vt);
 
+  @Override
   public boolean isEnabled() {
     return indexConfig.getConfig().isEnabled();
   }
 
+  @Override
   public void setEnabled(boolean enabled) {
-    this.indexConfig.setEnabled(enabled);
+    indexConfig.setEnabled(enabled);
   }
 
   @Override
@@ -145,8 +147,8 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
       log.info("Creating index [{}]", getName());
       idxAdmin.prepareCreate(getName()).setSettings(getIndexSettings()).execute().actionGet();
     }
-    return opalSearchService.getClient().admin().cluster().prepareState().setIndices(getName()).execute()
-        .actionGet().getState().getMetaData().index(getName());
+    return opalSearchService.getClient().admin().cluster().prepareState().setIndices(getName()).execute().actionGet()
+        .getState().getMetaData().index(getName());
   }
 
   @Override
@@ -413,8 +415,8 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
     private IndexMetaData getIndexMetaData() {
       if(opalSearchService.getClient() == null) return null;
 
-      IndexMetaData imd = opalSearchService.getClient().admin().cluster().prepareState().setIndices(getName())
-          .execute().actionGet().getState().getMetaData().index(getName());
+      IndexMetaData imd = opalSearchService.getClient().admin().cluster().prepareState().setIndices(getName()).execute()
+          .actionGet().getState().getMetaData().index(getName());
       return imd == null ? createIndex() : imd;
     }
 
