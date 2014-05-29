@@ -64,12 +64,6 @@ public class SecurityResourceTest {
   }
 
   @Test
-  public void testLoginBadCredentials() throws FileSystemException {
-    Response response = securityResource.createSession(mockHttpServletRequest(), "admninistrator", "password");
-    assertThat(response.getStatus()).isEqualTo(Status.FORBIDDEN.getStatusCode());
-  }
-
-  @Test
   public void testCheckSession() {
     Session mockSession = createMock(Session.class);
 

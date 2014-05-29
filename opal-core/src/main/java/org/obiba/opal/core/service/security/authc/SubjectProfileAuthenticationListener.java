@@ -38,7 +38,7 @@ public class SubjectProfileAuthenticationListener implements AuthenticationListe
 
   @Override
   public void onSuccess(AuthenticationToken token, AuthenticationInfo info) {
-    log.info("Subject {} successfully authenticated as {}", token.getPrincipal(),
+    log.debug("Subject with token '{}' successfully authenticated as principal '{}'", token.getPrincipal(),
         info.getPrincipals().getPrimaryPrincipal());
     // if authenticated by ticket, the session created has to be properly configured
     if(token instanceof TicketAuthenticationToken) {

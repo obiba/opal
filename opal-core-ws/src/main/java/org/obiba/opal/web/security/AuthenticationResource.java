@@ -27,13 +27,10 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.session.InvalidSessionException;
-import org.apache.shiro.session.Session;
-import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.ThreadContext;
 import org.jboss.resteasy.util.HttpHeaderNames;
-import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
+import org.obiba.shiro.web.filter.AuthenticationExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,12 +42,10 @@ public class AuthenticationResource extends AbstractSecurityComponent {
 
   private static final Logger log = LoggerFactory.getLogger(AuthenticationResource.class);
 
-  private static final String ENSURED_PROFILE = "ensuredProfile";
-
   private static final String OBIBA_ID_COOKIE_NAME = "obibaid";
 
   @Autowired
-  private SubjectProfileService subjectProfileService;
+  private AuthenticationExecutor authenticationExecutor;
 
   @POST
   @Path("/sessions")
@@ -58,10 +53,8 @@ public class AuthenticationResource extends AbstractSecurityComponent {
   public Response createSession(@SuppressWarnings("TypeMayBeWeakened") @Context HttpServletRequest servletRequest,
       @FormParam("username") String username, @FormParam("password") String password) {
     try {
-      Subject subject = SecurityUtils.getSubject();
-      subject.login(new UsernamePasswordToken(username, password));
-      ThreadContext.bind(subject);
-      ensureProfile(subject);
+      //if (SecurityUtils.getSubject().isAuthenticated()) return Response.status(Status.BAD_REQUEST).build();
+      authenticationExecutor.login(new UsernamePasswordToken(username, password));
       String sessionId = SecurityUtils.getSubject().getSession().getId().toString();
       log.info("Successful session creation for user '{}' session ID is '{}'.", username, sessionId);
       return Response.created(
@@ -109,22 +102,4 @@ public class AuthenticationResource extends AbstractSecurityComponent {
         .build();
   }
 
-  private void ensureProfile(Subject subject) {
-    Object principal = subject.getPrincipal();
-
-    if(!subjectProfileService.supportProfile(principal)) {
-      return;
-    }
-
-    Session subjectSession = subject.getSession(false);
-    boolean ensuredProfile = subjectSession != null && subjectSession.getAttribute(ENSURED_PROFILE) != null;
-    if(!ensuredProfile) {
-      String username = principal.toString();
-      log.info("Ensure HOME folder for {}", username);
-      subjectProfileService.ensureProfile(subject.getPrincipals());
-      if(subjectSession != null) {
-        subjectSession.setAttribute(ENSURED_PROFILE, true);
-      }
-    }
-  }
 }
