@@ -27,8 +27,10 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.session.InvalidSessionException;
+import org.apache.shiro.subject.Subject;
 import org.jboss.resteasy.util.HttpHeaderNames;
 import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.obiba.shiro.web.filter.AuthenticationExecutor;
 import org.slf4j.Logger;
@@ -89,6 +91,19 @@ public class AuthenticationResource extends AbstractSecurityComponent {
       // Ignore
       return Response.ok().build();
     }
+  }
+
+  @GET
+  @Path("/session/_current/username")
+  @NoAuthorization
+  public Opal.Subject getCurrentSubject() {
+    // Find the Shiro username
+    Subject subject = SecurityUtils.getSubject();
+    String principal = subject.getPrincipal() == null ? "" : subject.getPrincipal().toString();
+    return Opal.Subject.newBuilder() //
+        .setPrincipal(principal) //
+        .setType(Opal.Subject.SubjectType.USER) //
+        .build();
   }
 
   @GET
