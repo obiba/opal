@@ -38,7 +38,7 @@ public class OpalServer {
   /**
    * Bridge/route all java.util.logging log records to the SLF4J API.
    */
-  private void configureSLF4JBridgeHandler() {
+  public static void configureSLF4JBridgeHandler() {
     //  remove existing handlers attached to java.util.logging root logger
     SLF4JBridgeHandler.removeHandlersForRootLogger();
 
@@ -46,7 +46,7 @@ public class OpalServer {
     SLF4JBridgeHandler.install();
   }
 
-  private void setProperties() {
+  public static void setProperties() {
     // Disable EHCache and Quartz usage tracker
     // http://martijndashorst.com/blog/2011/02/21/ehcache-and-quartz-phone-home-during-startup
     System.setProperty("net.sf.ehcache.skipUpdateCheck", "true");

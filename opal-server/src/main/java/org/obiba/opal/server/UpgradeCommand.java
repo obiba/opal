@@ -74,7 +74,7 @@ public class UpgradeCommand {
    */
   private boolean hasVersionInConfigXml() {
     try {
-      File opalConfig = new File(System.getenv().get("OPAL_HOME"), "data" + File.separatorChar + "opal-config.xml");
+      File opalConfig = new File(getOpalHome(), "data" + File.separatorChar + "opal-config.xml");
       if(!opalConfig.exists()) return false;
 
       Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(opalConfig);
@@ -86,13 +86,22 @@ public class UpgradeCommand {
     }
   }
 
+    private String getOpalHome() {
+        return getSysProp("OPAL_HOME");
+    }
+
+    private String getSysProp(String name) {
+        return System.getProperty(name); //this is what is being used everywhere else in Opal code, and is mutable
+        //return System.getenv().get(name);
+    }
+
   /**
    * Load opal-config.properties and search for datasource definition
    */
   private boolean hasDatasourceInConfigProperties() {
     try {
       Properties properties = PropertiesLoaderUtils.loadProperties(
-          new FileSystemResource(new File(System.getenv().get("OPAL_HOME"), "conf" + File.separatorChar +
+          new FileSystemResource(new File(getOpalHome(), "conf" + File.separatorChar +
               "opal-config.properties")));
       return properties.containsKey("org.obiba.opal.datasource.opal.driver");
     } catch(IOException e) {
@@ -125,13 +134,18 @@ public class UpgradeCommand {
   }
 
   private void prepareDistConfigFile(String name) {
-    File confFile = new File(System.getenv().get("OPAL_HOME"), "conf" + File.separatorChar +
+    File confFile = new File(getOpalHome(), "conf" + File.separatorChar +
         name);
     if(confFile.exists()) return;
 
     // try to find conf file in opal distribution
-    if(!System.getenv().containsKey("OPAL_DIST")) return;
-    File distFile = new File(System.getenv().get("OPAL_DIST"), "conf" + File.separatorChar +
+    String opalDist = getSysProp("OPAL_DIST");
+
+    if (opalDist == null) {
+        return;
+    }
+
+    File distFile = new File(opalDist, "conf" + File.separatorChar +
         name);
     if(!distFile.exists()) return;
     try {
@@ -142,14 +156,14 @@ public class UpgradeCommand {
   }
 
   private void prepareOpalConfigFile() {
-    File originalConfig = new File(System.getenv().get("OPAL_HOME"), "conf" + File.separatorChar +
+    File originalConfig = new File(getOpalHome(), "conf" + File.separatorChar +
         "opal-config.xml");
     if(!originalConfig.exists()) return;
 
     try {
       File originalConfigCopy = new File(originalConfig.getAbsolutePath() + ".opal1-backup");
       if(!originalConfigCopy.exists()) FileUtil.copyFile(originalConfig, originalConfigCopy);
-      File dataDir = new File(System.getenv().get("OPAL_HOME"), "data");
+      File dataDir = new File(getOpalHome(), "data");
       if(!dataDir.exists()) dataDir.mkdirs();
       FileUtil.moveFile(originalConfig, dataDir);
     } catch(IOException e) {
