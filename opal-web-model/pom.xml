@@ -99,12 +99,6 @@
                     <os name="linux" arch="x86_64" />
                   </or>
                 </condition>
-                <condition property="os.protoc" value="${protobuf.version}-linux-x86_32">
-                  <or>
-                    <os name="linux" arch="x86" />
-                    <os name="linux" arch="i386" />
-                  </or>
-                </condition>
                 <condition property="os.protoc" value="${protobuf.version}-win32">
                   <os family="windows" />
                 </condition>
