@@ -1769,7 +1769,7 @@
     <orientdb.version>1.6.4</orientdb.version>
     <ow2-spec.version>1.0.13</ow2-spec.version>
     <protobuf-java-format.version>1.2.1-obiba</protobuf-java-format.version>
-    <protobuf.version>2.3.0</protobuf.version>
+    <protobuf.version>2.5.0</protobuf.version>
     <protostuff.version>1.0.1</protostuff.version>
     <quartz.version>2.2.1</quartz.version>
     <REngine.version>0.6-8.1</REngine.version>
