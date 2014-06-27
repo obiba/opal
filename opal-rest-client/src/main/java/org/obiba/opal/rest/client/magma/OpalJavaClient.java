@@ -14,6 +14,8 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyManagementException;
@@ -22,7 +24,9 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -67,6 +71,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Files;
+import com.google.protobuf.ExtensionRegistry;
 import com.google.protobuf.Message;
 
 /**
@@ -98,6 +103,8 @@ public class OpalJavaClient {
   private BasicHttpContext ctx;
 
   private ManagedHttpCacheStorage cacheStorage;
+
+  private final ExtensionRegistryFactory extensionRegistryFactory = new ExtensionRegistryFactory();
 
   public OpalJavaClient(String uri, String username, String password) throws URISyntaxException {
     if(uri == null) throw new IllegalArgumentException("uri cannot be null");
@@ -234,7 +241,8 @@ public class OpalJavaClient {
         throw new RuntimeException(response.getStatusLine().getReasonPhrase());
       }
       is = response.getEntity().getContent();
-      return (T) builder.mergeFrom(is).build();
+      ExtensionRegistry extensionRegistry = extensionRegistryFactory.forMessage((Class<Message>) messageType);
+      return (T) builder.mergeFrom(is, extensionRegistry).build();
     } catch(IOException e) {
       //noinspection CallToPrintStackTrace
       e.printStackTrace();
@@ -358,4 +366,55 @@ public class OpalJavaClient {
     }
   }
 
+  protected static final class ExtensionRegistryFactory {
+
+    private final Map<Class<?>, ExtensionRegistry> registryCache = new HashMap<>();
+
+    private final Map<Class<?>, Method> methodCache = new HashMap<>();
+
+    ExtensionRegistry forMessage(Class<Message> messageType) {
+      if(messageType == null) throw new IllegalArgumentException("messageType cannot be null");
+
+      Class<?> enclosingType = messageType.getEnclosingClass();
+      if(!registryCache.containsKey(enclosingType)) {
+        ExtensionRegistry registry = ExtensionRegistry.newInstance();
+        invokeStaticMethod(extractStaticMethod("registerAllExtensions", methodCache, messageType.getEnclosingClass(),
+            ExtensionRegistry.class), registry);
+        registryCache.put(enclosingType, registry);
+      }
+      return registryCache.get(enclosingType);
+    }
+  }
+
+  private static Object invokeStaticMethod(Method method, Object... arguments) {
+    if(method == null) throw new IllegalArgumentException("method cannot be null");
+
+    try {
+      return method.invoke(null, arguments);
+    } catch(RuntimeException | InvocationTargetException | IllegalAccessException e) {
+      log.error("Error invoking '{}' method for type {}", method.getName(), method.getDeclaringClass().getName(), e);
+      throw new RuntimeException(
+          "Error invoking '" + method.getName() + "' method for type " + method.getDeclaringClass().getName());
+    }
+  }
+
+  private static Method extractStaticMethod(String methodName, Map<Class<?>, Method> methodCache, Class<?> type,
+      Class<?>... arguments) {
+    if(methodName == null) throw new IllegalArgumentException("methodName cannot be null");
+    if(methodCache == null) throw new IllegalArgumentException("methodCache cannot be null");
+    if(type == null) throw new IllegalArgumentException("type cannot be null");
+
+    if(!methodCache.containsKey(type)) {
+      try {
+        methodCache.put(type, type.getMethod(methodName, arguments));
+      } catch(SecurityException e) {
+        log.error("Error getting '{}' method from type {}", methodName, type.getName(), e);
+        throw new RuntimeException("Error getting '" + methodName + "' method from type " + type.getName());
+      } catch(NoSuchMethodException e) {
+        throw new IllegalStateException(
+            "The type " + type.getName() + " does not define a '" + methodName + "' static method.");
+      }
+    }
+    return methodCache.get(type);
+  }
 }
