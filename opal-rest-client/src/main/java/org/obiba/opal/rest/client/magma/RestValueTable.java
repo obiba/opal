@@ -42,11 +42,12 @@ import org.obiba.magma.support.VariableEntityProvider;
 import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.web.magma.Dtos;
-import org.obiba.opal.web.model.Magma;
+import org.obiba.opal.web.model.*;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
+import org.obiba.opal.web.model.Math;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
@@ -55,7 +56,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
 
-class RestValueTable extends AbstractValueTable {
+public class RestValueTable extends AbstractValueTable {
 
 //  private static final Logger log = LoggerFactory.getLogger(RestValueTable.class);
 
@@ -91,40 +92,7 @@ class RestValueTable extends AbstractValueTable {
     Iterable<VariableDto> variables = getOpalClient()
         .getResources(VariableDto.class, newReference("variables"), VariableDto.newBuilder());
     for(final VariableDto dto : variables) {
-      addVariableValueSource(new AbstractVariableValueSource() {
-
-        private final Variable variable = Dtos.fromDto(dto);
-
-        @Override
-        public Variable getVariable() {
-          return variable;
-        }
-
-        @NotNull
-        @Override
-        public Value getValue(ValueSet valueSet) {
-          return ((LazyValueSet) valueSet).get(variable);
-        }
-
-        @Override
-        public boolean supportVectorSource() {
-          return false;
-        }
-
-        @NotNull
-        @Override
-        public ValueType getValueType() {
-          return variable.getValueType();
-        }
-
-        @NotNull
-        @Override
-        @SuppressWarnings("unchecked")
-        public VectorSource asVectorSource() {
-          throw new VectorSourceNotSupportedException((Class<? extends ValueSource>) getClass());
-        }
-
-      });
+      addVariableValueSource(new RestVariableValueSource(dto));
     }
   }
 
@@ -367,5 +335,59 @@ class RestValueTable extends AbstractValueTable {
       };
     }
     return tableTimestamps;
+  }
+
+  public class RestVariableValueSource extends AbstractVariableValueSource {
+
+    private final Variable variable;
+
+    private final VariableDto dto;
+
+    private RestVariableValueSource(VariableDto dto) {
+      this.dto = dto;
+      variable = Dtos.fromDto(dto);
+    }
+
+    @Override
+    public Variable getVariable() {
+      return variable;
+    }
+
+    @NotNull
+    @Override
+    public Value getValue(ValueSet valueSet) {
+      return ((LazyValueSet) valueSet).get(variable);
+    }
+
+    @Override
+    public boolean supportVectorSource() {
+      return false;
+    }
+
+    @NotNull
+    @Override
+    public ValueType getValueType() {
+      return variable.getValueType();
+    }
+
+    @NotNull
+    @Override
+    @SuppressWarnings("unchecked")
+    public VectorSource asVectorSource() {
+      throw new VectorSourceNotSupportedException((Class<? extends ValueSource>) getClass());
+    }
+
+    public Math.SummaryStatisticsDto getSummary() {
+      return getOpalClient()
+          .getResource(Math.SummaryStatisticsDto.class, newReference("variable", variable.getName(), "summary"),
+              Math.SummaryStatisticsDto.newBuilder());
+    }
+
+    public Search.QueryResultDto getFacet() {
+      return getOpalClient()
+          .getResource(Search.QueryResultDto.class, newReference("facet", "variable", variable.getName(), "_search"),
+              Search.QueryResultDto.newBuilder());
+    }
+
   }
 }
