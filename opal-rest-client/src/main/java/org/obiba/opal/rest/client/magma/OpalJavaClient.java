@@ -231,11 +231,29 @@ public class OpalJavaClient {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public <T extends Message> T getResource(Class<T> messageType, URI uri, Message.Builder builder) {
+    try {
+      return readResource(messageType, get(uri), builder);
+    } catch(IOException e) {
+      //noinspection CallToPrintStackTrace
+      e.printStackTrace();
+      throw new RuntimeException(e);
+    }
+  }
+
+  public <T extends Message> T postResource(Class<T> messageType, URI uri, Message.Builder builder, Message message) {
+    try {
+      return readResource(messageType, post(uri, message), builder);
+    } catch(IOException e) {
+      //noinspection CallToPrintStackTrace
+      e.printStackTrace();
+      throw new RuntimeException(e);
+    }
+  }
+
+  public <T extends Message> T readResource(Class<T> messageType, HttpResponse response, Message.Builder builder) {
     InputStream is = null;
     try {
-      HttpResponse response = get(uri);
       if(response.getStatusLine().getStatusCode() >= HttpStatus.SC_BAD_REQUEST) {
         EntityUtils.consume(response.getEntity());
         throw new RuntimeException(response.getStatusLine().getReasonPhrase());

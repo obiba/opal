@@ -42,12 +42,13 @@ import org.obiba.magma.support.VariableEntityProvider;
 import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.web.magma.Dtos;
-import org.obiba.opal.web.model.*;
+import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
 import org.obiba.opal.web.model.Math;
+import org.obiba.opal.web.model.Search;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
@@ -113,6 +114,11 @@ public class RestValueTable extends AbstractValueTable {
     return valueSetsTimestampsSupported
         ? valueSetsTimestamps.get(entity.getIdentifier())
         : super.getValueSetTimestamps(entity);
+  }
+
+  public Search.QueryResultDto getFacets(Search.QueryTermsDto dtoQueries) {
+    return getOpalClient().postResource(Search.QueryResultDto.class, newReference("facets", "_search"),
+        Search.QueryResultDto.newBuilder(), dtoQueries);
   }
 
   private void initialiseValueSetsTimestamps() {
@@ -375,6 +381,10 @@ public class RestValueTable extends AbstractValueTable {
     @SuppressWarnings("unchecked")
     public VectorSource asVectorSource() {
       throw new VectorSourceNotSupportedException((Class<? extends ValueSource>) getClass());
+    }
+
+    public VariableDto getVariableDto() {
+      return dto;
     }
 
     public Math.SummaryStatisticsDto getSummary() {

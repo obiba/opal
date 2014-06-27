@@ -9,11 +9,9 @@
  */
 package org.obiba.opal.web.search;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import org.codehaus.jettison.json.JSONException;
@@ -50,20 +48,16 @@ public class ValueTableFacetsResource {
   @POST
   @Path("/_search")
   @Transactional(readOnly = true)
-  public Response search(@Context HttpServletRequest servletRequest, Search.QueryTermsDto dtoQueries) {
-    Search.QueryResultDto dtoResult = Search.QueryResultDto.newBuilder().setTotalHits(0).build();
-
+  public Response search(Search.QueryTermsDto dtoQueries) {
     try {
       IndexManagerHelper indexManagerHelper = new IndexManagerHelper(indexManager).setDatasource(datasource)
           .setTable(table);
-      dtoResult = searchQueryFactory.create().execute(indexManagerHelper, dtoQueries);
-
+      Search.QueryResultDto dtoResult = searchQueryFactory.create().execute(indexManagerHelper, dtoQueries);
+      return Response.ok().entity(dtoResult).build();
     } catch(UnsupportedOperationException e) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
     } catch(JSONException e) {
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
-
-    return Response.ok().entity(dtoResult).build();
   }
 }
