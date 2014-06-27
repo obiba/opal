@@ -18,6 +18,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
@@ -26,12 +27,12 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.session.InvalidSessionException;
-import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.ThreadContext;
-import org.obiba.opal.core.service.SubjectProfileService;
+import org.jboss.resteasy.util.HttpHeaderNames;
 import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
+import org.obiba.shiro.web.filter.AuthenticationExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,10 +44,10 @@ public class AuthenticationResource extends AbstractSecurityComponent {
 
   private static final Logger log = LoggerFactory.getLogger(AuthenticationResource.class);
 
-  private static final String ENSURED_PROFILE = "ensuredProfile";
+  private static final String OBIBA_ID_COOKIE_NAME = "obibaid";
 
   @Autowired
-  private SubjectProfileService subjectProfileService;
+  private AuthenticationExecutor authenticationExecutor;
 
   @POST
   @Path("/sessions")
@@ -54,15 +55,14 @@ public class AuthenticationResource extends AbstractSecurityComponent {
   public Response createSession(@SuppressWarnings("TypeMayBeWeakened") @Context HttpServletRequest servletRequest,
       @FormParam("username") String username, @FormParam("password") String password) {
     try {
-      Subject subject = SecurityUtils.getSubject();
-      subject.login(new UsernamePasswordToken(username, password));
-      ThreadContext.bind(subject);
-      ensureProfile(subject);
+      //if (SecurityUtils.getSubject().isAuthenticated()) return Response.status(Status.BAD_REQUEST).build();
+      authenticationExecutor.login(new UsernamePasswordToken(username, password));
       String sessionId = SecurityUtils.getSubject().getSession().getId().toString();
       log.info("Successful session creation for user '{}' session ID is '{}'.", username, sessionId);
       return Response.created(
           UriBuilder.fromPath("/").path(AuthenticationResource.class).path(AuthenticationResource.class, "checkSession")
-              .build(sessionId)).build();
+              .build(sessionId)
+      ).build();
 
     } catch(AuthenticationException e) {
       log.info("Authentication failure of user '{}' at ip: '{}': {}", username, servletRequest.getRemoteAddr(),
@@ -85,10 +85,25 @@ public class AuthenticationResource extends AbstractSecurityComponent {
     // Delete the Shiro session
     try {
       SecurityUtils.getSubject().logout();
+      return Response.ok().header(HttpHeaderNames.SET_COOKIE,
+          new NewCookie(OBIBA_ID_COOKIE_NAME, null, "/", null, "Obiba session deleted", 0, false)).build();
     } catch(InvalidSessionException e) {
       // Ignore
+      return Response.ok().build();
     }
-    return Response.ok().build();
+  }
+
+  @GET
+  @Path("/session/_current/username")
+  @NoAuthorization
+  public Opal.Subject getCurrentSubject() {
+    // Find the Shiro username
+    Subject subject = SecurityUtils.getSubject();
+    String principal = subject.getPrincipal() == null ? "" : subject.getPrincipal().toString();
+    return Opal.Subject.newBuilder() //
+        .setPrincipal(principal) //
+        .setType(Opal.Subject.SubjectType.USER) //
+        .build();
   }
 
   @GET
@@ -102,22 +117,4 @@ public class AuthenticationResource extends AbstractSecurityComponent {
         .build();
   }
 
-  private void ensureProfile(Subject subject) {
-    Object principal = subject.getPrincipal();
-
-    if(!subjectProfileService.supportProfile(principal)) {
-      return;
-    }
-
-    Session subjectSession = subject.getSession(false);
-    boolean ensuredProfile = subjectSession != null && subjectSession.getAttribute(ENSURED_PROFILE) != null;
-    if(!ensuredProfile) {
-      String username = principal.toString();
-      log.info("Ensure HOME folder for {}", username);
-      subjectProfileService.ensureProfile(subject.getPrincipals());
-      if(subjectSession != null) {
-        subjectSession.setAttribute(ENSURED_PROFILE, true);
-      }
-    }
-  }
 }

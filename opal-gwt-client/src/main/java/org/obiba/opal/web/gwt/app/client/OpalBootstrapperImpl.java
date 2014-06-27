@@ -82,14 +82,18 @@ public class OpalBootstrapperImpl implements Bootstrapper {
     if(!requestCredentials.hasCredentials()) {
       placeManager.revealUnauthorizedPlace(Places.LOGIN);
     } else if(Strings.isNullOrEmpty(username) || "undefined".equals(username)) {
-      // get the username
-      UriBuilder builder = UriBuilder.create()
-          .segment("auth", "session", requestCredentials.extractCredentials(), "username");
-      ResourceRequestBuilderFactory.<Subject>newBuilder().forResource(builder.build()).get() //
-          .withCallback(new SubjectResourceCallback()).send();
+      initUsernameFromSession();
     } else {
       revealCurrentPlace();
     }
+  }
+
+  private void initUsernameFromSession() {
+    // get the username
+    UriBuilder builder = UriBuilder.create()
+        .segment("auth", "session", "_current", "username");
+    ResourceRequestBuilderFactory.<Subject>newBuilder().forResource(builder.build()).get() //
+        .withCallback(new SubjectResourceCallback()).send();
   }
 
   private void initConfirmationPresenter() {
@@ -122,13 +126,12 @@ public class OpalBootstrapperImpl implements Bootstrapper {
       @Override
       public void onSessionEnded(SessionEndedEvent event) {
         if(requestCredentials.hasCredentials()) {
-          Window.Location.replace("/");
           ResourceRequestBuilderFactory.newBuilder().forResource(
-              UriBuilder.create().segment("auth", "session", requestCredentials.extractCredentials()).build())//
+              UriBuilder.create().segment("auth", "session", requestCredentials.extractOpalCredentials()).build())//
               .withCallback(new ResponseCodeCallback() {
                 @Override
                 public void onResponseCode(Request request, Response response) {
-                  // nothing
+                  //Window.Location.replace("/");
                 }
               }) //
               .delete().send();

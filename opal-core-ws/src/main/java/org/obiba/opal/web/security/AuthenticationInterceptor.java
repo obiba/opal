@@ -77,6 +77,10 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
       int timeout = (int) (session.getTimeout() / 1000);
       response.getMetadata().add(HttpHeaderNames.SET_COOKIE,
           new NewCookie(OPAL_SESSION_ID_COOKIE_NAME, session.getId().toString(), "/", null, null, timeout, false));
+      Object cookieValue = session.getAttribute(HttpHeaderNames.SET_COOKIE);
+      if(cookieValue != null) {
+        response.getMetadata().add(HttpHeaderNames.SET_COOKIE, NewCookie.valueOf(cookieValue.toString()));
+      }
     } else {
       // Remove the cookie if the user is not/no longer authenticated
       if(isWebServiceAuthenticated(response.getAnnotations())) {

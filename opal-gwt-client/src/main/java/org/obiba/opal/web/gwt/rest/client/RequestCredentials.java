@@ -23,6 +23,11 @@ import com.google.gwt.user.client.Cookies;
 public class RequestCredentials {
 
   /**
+   * Obiba single sign-on session.
+   */
+  private static final String OBIBASID = "obibaid";
+
+  /**
    * Opal session id cookie name.
    */
   private static final String OPALSID = "opalsid";
@@ -35,8 +40,8 @@ public class RequestCredentials {
   private String username;
 
   public RequestBuilder provideCredentials(RequestBuilder builder) {
-    if(hasCredentials()) {
-      builder.setHeader(OpalAuth.CREDENTIALS_HEADER, extractCredentials());
+    if(hasOpalCredentials()) {
+      builder.setHeader(OpalAuth.CREDENTIALS_HEADER, extractOpalCredentials());
     }
     return builder;
   }
@@ -57,7 +62,7 @@ public class RequestCredentials {
   public void provideCredentials(String url) {
     if(hasCredentials()) {
       Md5Digest digest = new Md5Digest();
-      digest.update(extractCredentials().getBytes());
+      digest.update(extractOpalCredentials().getBytes());
       String urlToHash = url;
       int queryIdx = url.indexOf('?');
       if(queryIdx != -1) {
@@ -89,11 +94,11 @@ public class RequestCredentials {
    * @return true if we currently have credentials to offer to the server.
    */
   public boolean hasCredentials() {
-    return extractCredentials() != null && !extractCredentials().isEmpty();
+    return hasOpalCredentials() || hasObibaCredentials();
   }
 
-  public void invalidate() {
-    Cookies.removeCookie(OPALSID, "/");
+  public boolean hasOpalCredentials() {
+    return extractOpalCredentials() != null && !extractOpalCredentials().isEmpty();
   }
 
   /**
@@ -101,8 +106,20 @@ public class RequestCredentials {
    *
    * @return the opalsid.
    */
-  public String extractCredentials() {
+  public String extractOpalCredentials() {
     return Cookies.getCookie(OPALSID);
+  }
+
+  public boolean hasObibaCredentials() {
+    return extractObibaCredentials() != null && !extractObibaCredentials().isEmpty();
+  }
+
+  public String extractObibaCredentials() {
+    return Cookies.getCookie(OBIBASID);
+  }
+
+  public void invalidate() {
+    Cookies.removeCookie(OPALSID, "/");
   }
 
   private static String toHexString(byte... bytes) {
