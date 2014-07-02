@@ -116,6 +116,10 @@ public class RestValueTable extends AbstractValueTable {
         : super.getValueSetTimestamps(entity);
   }
 
+  public TableDto getTableDto() {
+    return tableDto;
+  }
+
   public Search.QueryResultDto getFacets(Search.QueryTermsDto dtoQueries) {
     return getOpalClient().postResource(Search.QueryResultDto.class, newReference("facets", "_search"),
         Search.QueryResultDto.newBuilder(), dtoQueries);
