@@ -27,7 +27,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.obiba.opal.core.crypt.CacheablePasswordCallback;
+import org.obiba.crypt.CacheablePasswordCallback;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.domain.security.Group;

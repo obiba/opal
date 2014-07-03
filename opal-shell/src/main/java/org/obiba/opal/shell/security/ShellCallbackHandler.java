@@ -19,8 +19,8 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.TextInputCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-import org.obiba.opal.core.crypt.CacheablePasswordCallback;
-import org.obiba.opal.core.crypt.CachingCallbackHandler;
+import org.obiba.crypt.CacheablePasswordCallback;
+import org.obiba.crypt.CachingCallbackHandler;
 import org.obiba.opal.shell.OpalShell;
 import org.obiba.opal.shell.OpalShellHolder;
 

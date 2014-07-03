@@ -25,7 +25,7 @@ import org.apache.commons.vfs2.FileType;
 import org.obiba.magma.DatasourceCopierProgressListener;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
-import org.obiba.opal.core.crypt.KeyProviderException;
+import org.obiba.crypt.KeyProviderException;
 import org.obiba.opal.core.service.DataImportService;
 import org.obiba.opal.core.service.NonExistentVariableEntitiesException;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;

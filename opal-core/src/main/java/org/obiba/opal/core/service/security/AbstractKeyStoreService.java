@@ -26,9 +26,9 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileObject;
-import org.obiba.opal.core.crypt.CacheablePasswordCallback;
-import org.obiba.opal.core.crypt.CachingCallbackHandler;
-import org.obiba.opal.core.crypt.KeyProviderSecurityException;
+import org.obiba.crypt.CacheablePasswordCallback;
+import org.obiba.crypt.CachingCallbackHandler;
+import org.obiba.crypt.KeyProviderSecurityException;
 import org.obiba.opal.core.domain.security.KeyStoreState;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
