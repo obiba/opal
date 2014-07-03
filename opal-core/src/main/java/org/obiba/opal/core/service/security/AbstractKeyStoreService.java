@@ -66,7 +66,7 @@ public abstract class AbstractKeyStoreService {
   OpalKeyStore getOrCreateKeyStore(@NotNull String name) {
     OpalKeyStore keyStore = getKeyStore(name);
     if(keyStore == null) {
-      keyStore = OpalKeyStore.Builder.newStore().name(name).passwordPrompt(callbackHandler).build();
+      keyStore = (OpalKeyStore) OpalKeyStore.Builder.newStore().name(name).passwordPrompt(callbackHandler).build();
       saveKeyStore(keyStore);
     }
     return keyStore;
