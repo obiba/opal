@@ -18,6 +18,8 @@ import javax.net.ssl.TrustManager;
 
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.security.SystemKeyStoreService;
+import org.obiba.ssl.SslContextFactory;
+import org.obiba.ssl.X509ExtendedKeyManagerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -41,8 +43,8 @@ public class OpalSslContextFactory implements SslContextFactory {
     OpalKeyStore opalKeystore = prepareServerKeystore();
     try {
       SSLContext ctx = SSLContext.getInstance("TLSv1");
-      ctx.init(new KeyManager[] { new OpalKeyManager(opalKeystore) }, new TrustManager[] { credentialsTrustManager },
-          null);
+      ctx.init(new KeyManager[] { new X509ExtendedKeyManagerImpl(opalKeystore) },
+          new TrustManager[] { credentialsTrustManager }, null);
       return ctx;
     } catch(Exception e) {
       throw new RuntimeException(e);
@@ -57,8 +59,8 @@ public class OpalSslContextFactory implements SslContextFactory {
    */
   private OpalKeyStore prepareServerKeystore() {
     OpalKeyStore keystore = systemKeyStoreService.getKeyStore();
-    if(!systemKeyStoreService.aliasExists(OpalKeyManager.HTTPS_ALIAS)) {
-      keystore.createOrUpdateKey(OpalKeyManager.HTTPS_ALIAS, "RSA", 2048, generateCertificateInfo());
+    if(!systemKeyStoreService.aliasExists(X509ExtendedKeyManagerImpl.HTTPS_ALIAS)) {
+      keystore.createOrUpdateKey(X509ExtendedKeyManagerImpl.HTTPS_ALIAS, "RSA", 2048, generateCertificateInfo());
       systemKeyStoreService.saveKeyStore(keystore);
     }
     return keystore;

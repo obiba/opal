@@ -139,9 +139,9 @@ public class OpalJettyServer {
 
       @Override
       protected void doStart() throws Exception {
-        org.obiba.opal.server.ssl.SslContextFactory sslContextFactory = WebApplicationContextUtils
+        org.obiba.ssl.SslContextFactory sslContextFactory = WebApplicationContextUtils
             .getRequiredWebApplicationContext(servletContextHandler.getServletContext())
-            .getBean(org.obiba.opal.server.ssl.SslContextFactory.class);
+            .getBean(org.obiba.ssl.SslContextFactory.class);
         setSslContext(sslContextFactory.createSslContext());
       }
 

@@ -84,7 +84,7 @@ public class OpalKeyStore extends KeyStoreManager implements KeyProvider {
       throw new MagmaCryptRuntimeException(e);
     }
   }
-  
+
   public static class Builder extends KeyStoreManager.Builder {
 
     public static Builder newStore() {
