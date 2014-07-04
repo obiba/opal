@@ -22,9 +22,9 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.crypt.KeyProvider;
 import org.obiba.magma.crypt.MagmaCryptRuntimeException;
 import org.obiba.magma.crypt.NoSuchKeyException;
-import org.obiba.security.ObibaKeyStore;
+import org.obiba.security.KeyStoreManager;
 
-public class OpalKeyStore extends ObibaKeyStore implements KeyProvider {
+public class OpalKeyStore extends KeyStoreManager implements KeyProvider {
 
   public OpalKeyStore(String name, KeyStore store) {
     super(name, store);
@@ -84,15 +84,14 @@ public class OpalKeyStore extends ObibaKeyStore implements KeyProvider {
       throw new MagmaCryptRuntimeException(e);
     }
   }
-
-  @SuppressWarnings({ "StaticMethodOnlyUsedInOneClass", "ParameterHidesMemberVariable" })
-  public static class Builder extends ObibaKeyStore.Builder {
+  
+  public static class Builder extends KeyStoreManager.Builder {
 
     public static Builder newStore() {
       return new Builder();
     }
 
-    protected OpalKeyStore createKeyStore(KeyStore keyStore) {
+    protected KeyStoreManager createKeyStoreManager(KeyStore keyStore) {
       OpalKeyStore opalKeyStore = new OpalKeyStore(name, keyStore);
       opalKeyStore.setCallbackHandler(callbackHandler);
       return opalKeyStore;
