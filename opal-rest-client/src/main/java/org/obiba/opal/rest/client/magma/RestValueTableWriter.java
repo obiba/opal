@@ -107,6 +107,11 @@ class RestValueTableWriter implements ValueTableWriter {
       }
 
       @Override
+      public void remove() {
+        throw new UnsupportedOperationException("Removing a value set is not supported yet");
+      }
+
+      @Override
       public void writeValue(@NotNull Variable variable, Value value) {
         valueSetsDtoBuilder.addVariables(variable.getName());
         valueSetDtoBuilder.addValues(Dtos.asDto(value));
