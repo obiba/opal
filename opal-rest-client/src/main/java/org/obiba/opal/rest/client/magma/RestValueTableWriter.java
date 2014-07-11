@@ -108,7 +108,12 @@ class RestValueTableWriter implements ValueTableWriter {
 
       @Override
       public void remove() {
-        throw new UnsupportedOperationException("Removing a value set is not supported yet");
+        URI valueSetUri = restValueTable.newReference("valueSet", entity.getIdentifier());
+        try {
+          checkResponse(restValueTable.getOpalClient().delete(valueSetUri));
+        } catch(IOException e) {
+          throw new RuntimeException(e);
+        }
       }
 
       @Override

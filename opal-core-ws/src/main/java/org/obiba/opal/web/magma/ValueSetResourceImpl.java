@@ -22,6 +22,8 @@ import org.obiba.magma.AttributeAware;
 import org.obiba.magma.NoSuchValueSetException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
@@ -74,6 +76,16 @@ public class ValueSetResourceImpl extends AbstractValueTableResource implements 
     // ignore select parameter if value set is accessed by variable value source
     ValueSetsDto.ValueDto vs = getValueDto(uriInfo, filterBinary);
     return TimestampedResponses.ok(getValueTable(), vs).build();
+  }
+
+  @Override
+  public Response drop() {
+    ValueTable table = getValueTable();
+    if (table.isView()) throw new IllegalArgumentException("Cannot remove a value set from a view");
+    ValueTableWriter.ValueSetWriter vsw = getDatasource().createWriter(table.getName(), table.getEntityType()).writeValueSet(entity);
+    vsw.remove();
+    vsw.close();
+    return Response.ok().build();
   }
 
   @Override

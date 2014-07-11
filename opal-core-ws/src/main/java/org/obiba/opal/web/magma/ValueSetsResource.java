@@ -1,6 +1,9 @@
 package org.obiba.opal.web.magma;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -37,6 +40,15 @@ public interface ValueSetsResource {
       @QueryParam("offset") @DefaultValue("0") int offset, //
       @QueryParam("limit") @DefaultValue("100") int limit, //
       @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary);
+
+  /**
+   * Remove all value sets of the table.
+   *
+   * @param identifiers
+   * @return
+   */
+  @DELETE
+  Response drop(@QueryParam("id") List<String> identifiers);
 
   /**
    * Get the value set timestamps without the values.

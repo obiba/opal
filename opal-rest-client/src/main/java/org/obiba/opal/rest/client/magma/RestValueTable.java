@@ -57,7 +57,7 @@ import com.google.common.io.ByteStreams;
 
 class RestValueTable extends AbstractValueTable {
 
-//  private static final Logger log = LoggerFactory.getLogger(RestValueTable.class);
+  //private static final Logger log = LoggerFactory.getLogger(RestValueTable.class);
 
   private final TableDto tableDto;
 
@@ -134,6 +134,21 @@ class RestValueTable extends AbstractValueTable {
       throw new NoSuchValueSetException(this, entity);
     }
     return new LazyValueSet(this, entity);
+  }
+
+  @Override
+  public boolean canDropValueSets() {
+    return true;
+  }
+
+  @Override
+  public void dropValueSets() {
+    try {
+      getOpalClient().delete(newReference("valueSets"));
+      refresh();
+    } catch(IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override
@@ -276,8 +291,6 @@ class RestValueTable extends AbstractValueTable {
         is = response.getEntity().getContent();
         return BinaryType.get().valueOf(ByteStreams.toByteArray(is));
       } catch(IOException e) {
-        //noinspection CallToPrintStackTrace
-        e.printStackTrace();
         throw new RuntimeException(e);
       } finally {
         getOpalClient().closeQuietly(is);
