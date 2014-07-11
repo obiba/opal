@@ -11,9 +11,11 @@ package org.obiba.opal.web.magma;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
@@ -21,10 +23,12 @@ import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.VectorSource;
+import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.ValueSetsDto.ValueSetDto;
@@ -59,6 +63,25 @@ public class ValueSetsResourceImpl extends AbstractValueTableResource implements
         ? getValueSetsDto(uriInfo, select, variableEntities, filterBinary)
         : getValueSetsDto(uriInfo, variableEntities, filterBinary);
     return TimestampedResponses.ok(getValueTable(), vs).build();
+  }
+
+  @Override
+  public Response drop(@QueryParam("id") List<String> identifiers) {
+    ValueTable table = getValueTable();
+    if (identifiers == null || identifiers.isEmpty()) {
+      table.dropValueSets();
+    } else if (table.isView()) {
+      throw new IllegalArgumentException("Cannot remove a value set from a view");
+    } else {
+      ValueTableWriter vtw = getDatasource().createWriter(table.getName(), table.getEntityType());
+      for (String id : identifiers) {
+        ValueTableWriter.ValueSetWriter vsw = vtw.writeValueSet(new VariableEntityBean(table.getEntityType(), id));
+        vsw.remove();
+        vsw.close();
+      }
+      vtw.close();
+    }
+    return Response.ok().build();
   }
 
   @Override
