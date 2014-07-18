@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response;
 
 import org.codehaus.jettison.json.JSONException;
 import org.obiba.opal.search.ValuesIndexManager;
+import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.IndexManagerHelper;
 import org.obiba.opal.web.search.support.QueryTermDtoBuilder;
@@ -33,6 +34,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Scope("request")
 @Path("/datasource/{ds}/table/{table}/facet")
 public class ValueTableFacetResource {
+
+  @Autowired
+  protected ElasticSearchProvider esProvider;
 
   @Autowired
   private ValuesIndexManager indexManager;
@@ -58,6 +62,10 @@ public class ValueTableFacetResource {
   @Path("/variable/{variable}/_search")
   @Transactional(readOnly = true)
   public Response search(@PathParam("variable") String variable) {
+    if(!esProvider.isEnabled()) {
+      return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
+    }
+
     Search.QueryResultDto dtoResult = Search.QueryResultDto.newBuilder().setTotalHits(0).build();
 
     try {
@@ -67,10 +75,8 @@ public class ValueTableFacetResource {
 
       dtoResult = searchQueryFactory.create().execute(indexManagerHelper, dtoBuilder.build());
 
-    } catch(UnsupportedOperationException e) {
+    } catch(UnsupportedOperationException|JSONException e) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-    } catch(JSONException e) {
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
 
     return Response.ok().entity(dtoResult).build();

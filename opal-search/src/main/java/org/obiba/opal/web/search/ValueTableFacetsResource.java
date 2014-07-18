@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response;
 
 import org.codehaus.jettison.json.JSONException;
 import org.obiba.opal.search.ValuesIndexManager;
+import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.IndexManagerHelper;
 import org.obiba.opal.web.search.support.SearchQueryExecutorFactory;
@@ -34,6 +35,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class ValueTableFacetsResource {
 
   @Autowired
+  protected ElasticSearchProvider esProvider;
+
+  @Autowired
   private ValuesIndexManager indexManager;
 
   @Autowired
@@ -49,15 +53,17 @@ public class ValueTableFacetsResource {
   @Path("/_search")
   @Transactional(readOnly = true)
   public Response search(Search.QueryTermsDto dtoQueries) {
+    if(!esProvider.isEnabled()) {
+      return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
+    }
+
     try {
       IndexManagerHelper indexManagerHelper = new IndexManagerHelper(indexManager).setDatasource(datasource)
           .setTable(table);
       Search.QueryResultDto dtoResult = searchQueryFactory.create().execute(indexManagerHelper, dtoQueries);
       return Response.ok().entity(dtoResult).build();
-    } catch(UnsupportedOperationException e) {
+    } catch(UnsupportedOperationException|JSONException e) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-    } catch(JSONException e) {
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }
 }
