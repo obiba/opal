@@ -31,11 +31,13 @@ public class ValidatorFactoryTest {
         validateVocab(factory.getVocabularyValidator(url));
     }
 
+    /*
     @Test
     public void testHttpVocab() throws Exception {
         String url = "http://localhost:9090/codes_v1.txt";
         validateVocab(factory.getVocabularyValidator(url));
     }
+    */
 
     private void validateVocab(VocabularyValidator validator) {
 
