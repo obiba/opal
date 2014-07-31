@@ -10,7 +10,10 @@
 package org.obiba.opal.shell.commands;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -23,12 +26,8 @@ import org.obiba.magma.DatasourceCopierProgressListener;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.crypt.KeyProviderException;
-import org.obiba.magma.VariableEntity;
 import org.obiba.opal.core.service.DataImportService;
 import org.obiba.opal.core.service.NonExistentVariableEntitiesException;
-import org.obiba.opal.core.service.ValidationService;
-import org.obiba.opal.shell.OpalShell;
-import org.obiba.opal.shell.ShellMessageLogger;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,13 +150,10 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   @SuppressWarnings("PMD.NcssMethodCount")
   private int importFromTables(@Nullable FileObject file) {
     int errorCode = CRITICAL_ERROR;
-
-      ValidationService.ValidationListener validationListener = new ShellValidationListener(getShell());
-
     getShell().printf("  Importing tables [%s] in %s ...\n", getTableNames(), options.getDestination());
     try {
       dataImportService.importData(options.getTables(), options.getDestination(), options.isForce(), options.isIgnore(),
-          new ImportProgressListener(), validationListener);
+          new ImportProgressListener());
       if(file != null) archive(file);
       errorCode = SUCCESS;
     } catch(NoSuchDatasourceException | NoSuchValueTableException ex) {
@@ -313,18 +309,4 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       }
     }
   }
-
-    private static class ShellValidationListener
-            extends ShellMessageLogger
-            implements ValidationService.ValidationListener {
-
-        public ShellValidationListener(OpalShell shell) {
-            super(shell);
-        }
-
-        @Override
-        public void addFailure(VariableEntity entity, Set<String> failedValidationRules) {
-            info("Entity %s failed validation of rules %s", entity.getIdentifier(), failedValidationRules);
-        }
-    }
 }

@@ -54,16 +54,13 @@ public interface DataImportService {
    * @param allowIdentifierGeneration
    * @param ignoreUnknownIdentifier
    * @param progressListener
-   * @param validationListener if not null, data validation will be attempted on the source values, and results reported here
-   *
    * @throws NoSuchIdentifiersMappingException
    * @throws NonExistentVariableEntitiesException
    * @throws IOException
    * @throws InterruptedException
    */
   void importData(List<String> sourceTableNames, String destinationDatasourceName, boolean allowIdentifierGeneration,
-      boolean ignoreUnknownIdentifier, @Nullable DatasourceCopierProgressListener progressListener,
-      @Nullable ValidationService.ValidationListener validationListener)
+      boolean ignoreUnknownIdentifier, @Nullable DatasourceCopierProgressListener progressListener)
       throws NoSuchIdentifiersMappingException, NoSuchDatasourceException, NoSuchValueTableException,
       NonExistentVariableEntitiesException, IOException, InterruptedException;
 

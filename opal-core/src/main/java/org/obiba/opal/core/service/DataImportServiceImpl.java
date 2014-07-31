@@ -11,11 +11,17 @@ package org.obiba.opal.core.service;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 
-import org.obiba.magma.*;
+import org.obiba.magma.Datasource;
+import org.obiba.magma.DatasourceCopierProgressListener;
+import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.NoSuchDatasourceException;
+import org.obiba.magma.NoSuchValueTableException;
+import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,9 +50,6 @@ public class DataImportServiceImpl implements DataImportService {
   @Autowired
   private IdentifierService identifierService;
 
-  @Autowired
-  private ValidationService validationService;
-
   @Override
   public void importData(@NotNull String sourceDatasourceName, String destinationDatasourceName,
       boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier,
@@ -67,26 +70,17 @@ public class DataImportServiceImpl implements DataImportService {
   @Override
   public void importData(@NotNull List<String> sourceTableNames, String destinationDatasourceName,
       boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier,
-      DatasourceCopierProgressListener progressListener, ValidationService.ValidationListener validationListener)
+      DatasourceCopierProgressListener progressListener)
       throws NoSuchIdentifiersMappingException, NoSuchDatasourceException, NoSuchValueTableException,
       NonExistentVariableEntitiesException, IOException, InterruptedException {
     Assert.notNull(sourceTableNames, "sourceTableNames is null");
     Assert.notEmpty(sourceTableNames, "sourceTableNames is empty");
 
     ImmutableSet.Builder<ValueTable> builder = ImmutableSet.builder();
-    Datasource targetDatasource = getDatasourceOrTransientDatasource(destinationDatasourceName);
-
     for(String tableName : sourceTableNames) {
       MagmaEngineTableResolver resolver = MagmaEngineTableResolver.valueOf(tableName);
       Datasource ds = getDatasourceOrTransientDatasource(resolver.getDatasourceName());
-
-      //builder.add(ds.getValueTable(resolver.getTableName()));
-      ValueTable valueTable = ds.getValueTable(resolver.getTableName());
-      if (validationListener != null) {
-          this.validationService.validateData(targetDatasource, valueTable, validationListener);
-      }
-      builder.add(valueTable);
-
+      builder.add(ds.getValueTable(resolver.getTableName()));
     }
     Set<ValueTable> sourceTables = builder.build();
     try {
