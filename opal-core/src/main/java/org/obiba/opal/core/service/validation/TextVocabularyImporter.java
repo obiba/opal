@@ -8,7 +8,7 @@ import java.net.URL;
 import java.util.Set;
 
 /**
- * Created by carlos on 7/28/14.
+ * Generic VocabularyImporter impl bases on text content, using Readers.
  */
 public abstract class TextVocabularyImporter implements VocabularyImporter {
 

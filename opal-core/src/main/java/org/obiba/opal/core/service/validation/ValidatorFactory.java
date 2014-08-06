@@ -1,17 +1,21 @@
 package org.obiba.opal.core.service.validation;
 
-import org.obiba.magma.Attribute;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.NoSuchAttributeException;
-import org.obiba.magma.Variable;
-import org.obiba.opal.core.service.MessageLogger;
-
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.obiba.magma.Attribute;
+import org.obiba.magma.NoSuchAttributeException;
+import org.obiba.magma.Variable;
+import org.obiba.opal.core.service.ValidationService;
 
 /**
- * Created by carlos on 7/29/14.
+ * Knows how to create DataValidators for a Variable.
+ * Datasource and variable attributes will determine if validation is enabled, and which validators the variable has.
  */
 public class ValidatorFactory {
 
@@ -29,14 +33,13 @@ public class ValidatorFactory {
      * @param variable
      * @return list of validators
      */
-    public List<DataValidator> getValidators(Variable variable, MessageLogger logger) {
+    public List<DataValidator> getValidators(Variable variable) {
         List<DataValidator> result = new ArrayList<>();
         //TODO add type validators
 
         Attribute attr = null;
-        System.out.println(variable.getAttributes().size());
         try {
-            attr = variable.getAttribute("vocabulary_url");
+            attr = variable.getAttribute(ValidationService.VOCABULARY_URL_ATTRIBUTE);
         } catch (NoSuchAttributeException ex) {
             //ignored
         }
@@ -46,7 +49,9 @@ public class ValidatorFactory {
             try {
                 result.add(getVocabularyValidator(url));
             } catch (Exception ex) {
-                logger.error(ex, "Unexpected error obtaining validators for variable %s, url %s", variable.getName(), url);
+                String msg = 
+                		String.format("Unexpected error obtaining validators for variable %s, url %s", variable.getName(), url);
+                throw new RuntimeException(msg, ex);
             }
         }
 

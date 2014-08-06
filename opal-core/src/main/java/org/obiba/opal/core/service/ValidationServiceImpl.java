@@ -1,6 +1,7 @@
 package org.obiba.opal.core.service;
 
 import org.obiba.magma.Datasource;
+import org.obiba.magma.NoSuchAttributeException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
@@ -14,11 +15,9 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by carlos on 7/28/14.
@@ -29,37 +28,57 @@ public class ValidationServiceImpl implements ValidationService {
     @Autowired
     private TransactionTemplate txTemplate;
 
+    private boolean isValidationEnabled(Datasource datasource) {
+        boolean result = false;
+        try {
+            result = Boolean.valueOf(datasource.getAttributeStringValue(VALIDATE_ATTRIBUTE));
+        } catch (NoSuchAttributeException ex) {
+            //ignored
+        }
+        return result;
+    }
+
     @Override
-    public void validateData(final Datasource ds, final ValueTable valueTable,
-                             final ValidationListener listener) {
+    public ValidationResult validateData(final ValueTable valueTable) {
+
+        if (!isValidationEnabled(valueTable.getDatasource())) {
+            return null;
+        }
+
+        final ValidationResult result = new ValidationResult();
 
         final Runnable task = new Runnable() {
             @Override
             public void run() {
-                validate(ds, valueTable, listener);
+                validate(valueTable, result);
             }
         };
 
         txTemplate.execute(
                 new TransactionCallbackWithoutResult() {
-                   @Override
-                   protected void doInTransactionWithoutResult(TransactionStatus status) {
-                       task.run();
-                       status.flush();
-                   }
-               });
+                    @Override
+                    protected void doInTransactionWithoutResult(TransactionStatus status) {
+                        task.run();
+                        status.flush();
+                    }
+                });
+
+        return result;
     }
 
-    private void validate(final Datasource ds, final ValueTable valueTable,
-                          final ValidationListener listener) {
+    /**
+     * This method does not use database transaction, and so suitable for unit tests without database. 
+     * @param valueTable
+     * @param collector
+     */
+    void validate(final ValueTable valueTable,
+                          final ValidationResult collector) {
 
         final ValidatorFactory validatorFactory = new ValidatorFactory();
         Map<String, List<DataValidator>> validatorMap = new HashMap<>();
-        ValueTable vt = ds.getValueTable(valueTable.getName());
 
-        for (Variable var: vt.getVariables()) {
-            List<DataValidator> validators = validatorFactory.getValidators(var, listener);
-            //copyAttributes(var, valueTable.getVariable(var.getName()));
+        for (Variable var: valueTable.getVariables()) {
+            List<DataValidator> validators = validatorFactory.getValidators(var);
             if (validators != null && validators.size() > 0) {
                 validatorMap.put(var.getName(), validators);
             }
@@ -72,27 +91,22 @@ public class ValidationServiceImpl implements ValidationService {
         Iterator<ValueSet> valueSets = valueTable.getValueSets().iterator();
         while (valueSets.hasNext()) {
             ValueSet vset = valueSets.next();
-            Set<String> failures = getFailures(validatorMap, valueTable, vset);
-            if (failures.size() > 0) {
-                listener.addFailure(vset.getVariableEntity(), failures);
-            }
+            validate(validatorMap, valueTable, vset, collector);
         }
-
     }
 
-    public Set<String> getFailures(Map<String, List<DataValidator>> validatorMap, ValueTable valueTable,
-                                   ValueSet valueSet) {
+    private void validate(Map<String, List<DataValidator>> validatorMap, ValueTable valueTable,
+                          ValueSet valueSet, ValidationResult collector) {
 
-        Set<String> result = new HashSet<>();
         for (Map.Entry<String, List<DataValidator>> entry: validatorMap.entrySet()) {
-            Value value = valueTable.getValue(valueTable.getVariable(entry.getKey()), valueSet);
+        	String varName = entry.getKey();
+            Value value = valueTable.getValue(valueTable.getVariable(varName), valueSet);
             List<DataValidator> validators = entry.getValue();
             for (DataValidator validator: validators) {
                 if (!validator.isValid(value)) {
-                    result.add(validator.getName());
+                    collector.addFailure(varName, validator.getType(), value);
                 }
             }
         }
-        return result;
     }
 }

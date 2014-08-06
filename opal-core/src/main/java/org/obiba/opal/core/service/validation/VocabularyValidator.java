@@ -5,10 +5,12 @@ import org.obiba.magma.Value;
 import java.util.Set;
 
 /**
- * Created by carlos on 7/28/14.
+ * Impl of DataValidator that checks for existence of vocabulary codes.
  */
 public class VocabularyValidator implements DataValidator {
 
+	public static final String NAME = "Vocabulary";
+	
     private final String name;
     private final Set<String> codes;
 
@@ -26,6 +28,11 @@ public class VocabularyValidator implements DataValidator {
     }
 
     @Override
+	public String getType() {
+		return NAME;
+	}
+
+	@Override
     public String getName() {
         return name;
     }

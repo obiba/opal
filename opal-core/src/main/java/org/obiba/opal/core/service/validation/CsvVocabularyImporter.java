@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by carlos on 7/28/14.
+ * Impl of VocabularyImporter that reads from text file (csv) where the 1st column is the code. 
  */
 public class CsvVocabularyImporter extends TextVocabularyImporter {
 

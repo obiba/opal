@@ -5,7 +5,7 @@ import java.net.URL;
 import java.util.Set;
 
 /**
- * Created by carlos on 7/28/14.
+ * Represents an importer of vocabulary.
  */
 public interface VocabularyImporter {
 
