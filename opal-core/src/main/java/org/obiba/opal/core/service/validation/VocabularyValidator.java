@@ -9,7 +9,7 @@ import java.util.Set;
  */
 public class VocabularyValidator implements DataValidator {
 
-	public static final String NAME = "Vocabulary";
+	public static final String TYPE = "Vocabulary";
 	
     private final String name;
     private final Set<String> codes;
@@ -29,11 +29,17 @@ public class VocabularyValidator implements DataValidator {
 
     @Override
 	public String getType() {
-		return NAME;
+		return TYPE;
 	}
 
 	@Override
     public String getName() {
         return name;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s[%s]", getClass().getSimpleName(), getName());
+    }
+
 }

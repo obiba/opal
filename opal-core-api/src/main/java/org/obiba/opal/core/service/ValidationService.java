@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
+import org.obiba.opal.core.support.MessageListener;
 
 /**
  * Service for validation.
@@ -20,12 +21,24 @@ public interface ValidationService {
     public static final String VOCABULARY_URL_ATTRIBUTE = "vocabulary_url";
 
     /**
-     * Validates the table values.
+     * Returns true if all the values in the table are valid.
+     * If the tables is not configured for validation, returns true immediately.
+     * This method is fail-fast, so intended to return false on the first invalid value, not to collect all the failures.
+     *
+     * @param valueTable
+     * @param  listener
+     * @return
+     */
+    boolean isValid(ValueTable valueTable, MessageListener listener);
+
+    /**
+     * Validates the table values, collecting all the failures and returning the result.
      *
      * @param valueTable table to be validated
+     * @param listener
      * @return validation result (if datasource is configured for validation), or null
      */
-    ValidationResult validateData(ValueTable valueTable);
+    ValidationResult validateData(ValueTable valueTable, MessageListener listener);
 
     /**
      * Container for validation results.

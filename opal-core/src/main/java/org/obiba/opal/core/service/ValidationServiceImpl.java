@@ -8,6 +8,7 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.opal.core.service.validation.DataValidator;
 import org.obiba.opal.core.service.validation.ValidatorFactory;
+import org.obiba.opal.core.support.MessageListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionStatus;
@@ -39,7 +40,7 @@ public class ValidationServiceImpl implements ValidationService {
     }
 
     @Override
-    public ValidationResult validateData(final ValueTable valueTable) {
+    public ValidationResult validateData(final ValueTable valueTable, final MessageListener listener) {
 
         if (!isValidationEnabled(valueTable.getDatasource())) {
             return null;
@@ -50,7 +51,7 @@ public class ValidationServiceImpl implements ValidationService {
         final Runnable task = new Runnable() {
             @Override
             public void run() {
-                validate(valueTable, result);
+                validate(valueTable, result, listener);
             }
         };
 
@@ -66,13 +67,17 @@ public class ValidationServiceImpl implements ValidationService {
         return result;
     }
 
+    @Override
+    public boolean isValid(ValueTable valueTable, MessageListener listener) {
+        throw new UnsupportedOperationException("implement me");
+    }
+
     /**
      * This method does not use database transaction, and so suitable for unit tests without database. 
      * @param valueTable
      * @param collector
      */
-    void validate(final ValueTable valueTable,
-                          final ValidationResult collector) {
+    void validate(final ValueTable valueTable, final ValidationResult collector, final MessageListener listener) {
 
         final ValidatorFactory validatorFactory = new ValidatorFactory();
         Map<String, List<DataValidator>> validatorMap = new HashMap<>();
@@ -80,6 +85,7 @@ public class ValidationServiceImpl implements ValidationService {
         for (Variable var: valueTable.getVariables()) {
             List<DataValidator> validators = validatorFactory.getValidators(var);
             if (validators != null && validators.size() > 0) {
+                listener.info("Validators for variable %s: %s", var.getName(), validators.toString());
                 validatorMap.put(var.getName(), validators);
             }
         }
@@ -91,12 +97,14 @@ public class ValidationServiceImpl implements ValidationService {
         Iterator<ValueSet> valueSets = valueTable.getValueSets().iterator();
         while (valueSets.hasNext()) {
             ValueSet vset = valueSets.next();
-            validate(validatorMap, valueTable, vset, collector);
+            validate(validatorMap, valueTable, vset, collector, listener);
         }
     }
 
     private void validate(Map<String, List<DataValidator>> validatorMap, ValueTable valueTable,
-                          ValueSet valueSet, ValidationResult collector) {
+                          ValueSet valueSet, ValidationResult collector, MessageListener listener) {
+
+        listener.info("Validating table %s.%s", valueTable.getDatasource().getName(), valueTable.getName());
 
         for (Map.Entry<String, List<DataValidator>> entry: validatorMap.entrySet()) {
         	String varName = entry.getKey();
@@ -104,6 +112,7 @@ public class ValidationServiceImpl implements ValidationService {
             List<DataValidator> validators = entry.getValue();
             for (DataValidator validator: validators) {
                 if (!validator.isValid(value)) {
+                    listener.warn("Failed validation for rule %s on variable %s: %s", validator.getType(), varName, String.valueOf(value));
                     collector.addFailure(varName, validator.getType(), value);
                 }
             }

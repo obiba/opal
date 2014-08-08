@@ -13,6 +13,7 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.StaticValueTable;
 import org.obiba.opal.core.service.ValidationService.ValidationResult;
 import org.obiba.opal.core.service.validation.VocabularyValidator;
+import org.obiba.opal.core.support.TestMessageListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -51,14 +52,14 @@ public class ValidationServiceImplTest /*extends AbstractJUnit4SpringContextTest
     	ValidationResult collector = new ValidationResult();
     	ValueTable table = createTableForVocabularyTest(INVALID_CODE);
 
-		validationService.validate(table, collector);
+		validationService.validate(table, collector, new TestMessageListener());
 		Assert.assertTrue("should have failures", collector.hasFailures());
 		List<List<String>> pairs = collector.getFailurePairs();
 		Assert.assertEquals("wrong count", 1, pairs.size());
 		List<String> pair = pairs.get(0);
 		Assert.assertEquals("wrong length", 2, pair.size());
 		Assert.assertEquals("wrong variable", MagmaHelper.VOCAB_VARIABLE, pair.get(0));
-		Assert.assertEquals("wrong rule", VocabularyValidator.NAME, pair.get(1));
+		Assert.assertEquals("wrong rule", VocabularyValidator.TYPE, pair.get(1));
 		Set<Value> failedValues = collector.getFailedValues(pair);
 		Assert.assertEquals("wrong count", 1, failedValues.size());
 		Assert.assertEquals("value mismatch", INVALID_CODE, failedValues.iterator().next().toString());
@@ -69,7 +70,7 @@ public class ValidationServiceImplTest /*extends AbstractJUnit4SpringContextTest
     	ValidationResult collector = new ValidationResult();
     	ValueTable table = createTableForVocabularyTest(VALID_CODE);
 
-		validationService.validate(table, collector);
+		validationService.validate(table, collector, new TestMessageListener());
 		Assert.assertFalse("should have no failures", collector.hasFailures());
     }
     
