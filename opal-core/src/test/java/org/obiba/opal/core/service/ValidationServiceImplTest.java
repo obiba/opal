@@ -8,7 +8,8 @@ import org.obiba.magma.support.StaticValueTable;
 import org.obiba.opal.core.service.ValidationService.ValidationResult;
 import org.obiba.opal.core.service.ValidationService.ValidationTask;
 import org.obiba.opal.core.service.validation.VocabularyValidator;
-import org.obiba.opal.core.support.MessageListener;
+import org.obiba.opal.core.support.MessageLogger;
+import org.obiba.opal.core.support.SystemOutMessageLogger;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -45,7 +46,7 @@ public class ValidationServiceImplTest {
     @Test
     public void testValidateWithVocabularyFailure() throws Exception {
         ValueTable table = createTable(INVALID_CODE, MagmaHelper.createVocabularyVariable());
-        ValidationTask task = validationService.createValidationTask(table, new MessageListener.NullMessageListener());
+        ValidationTask task = validationService.createValidationTask(table, new SystemOutMessageLogger());
         ValidationResult result = task.validate();
 
 		Assert.assertTrue("should have failures", result.hasFailures());
@@ -63,7 +64,7 @@ public class ValidationServiceImplTest {
     @Test
     public void testValidateWithVocabularyNoFailures() throws Exception {
     	ValueTable table = createTable(VALID_CODE, MagmaHelper.createVocabularyVariable());
-        ValidationTask task = validationService.createValidationTask(table, new MessageListener.NullMessageListener());
+        ValidationTask task = validationService.createValidationTask(table, new SystemOutMessageLogger());
         ValidationResult result = task.validate();
 
 		Assert.assertFalse("should have no failures", result.hasFailures());
@@ -72,7 +73,7 @@ public class ValidationServiceImplTest {
     @Test
     public void testValidateNoValidationNoTask() throws Exception {
         ValueTable table = createTable(INVALID_CODE, MagmaHelper.createVariable());
-        ValidationTask task = validationService.createValidationTask(table, new MessageListener.NullMessageListener());
+        ValidationTask task = validationService.createValidationTask(table, new SystemOutMessageLogger());
         Assert.assertNull("should have no validation task", task);
     }
 
@@ -93,7 +94,7 @@ public class ValidationServiceImplTest {
     }
 
     private boolean isValid(ValueTable valueTable) {
-        ValidationTask task = validationService.createValidationTask(valueTable, new MessageListener.NullMessageListener());
+        ValidationTask task = validationService.createValidationTask(valueTable, new SystemOutMessageLogger());
 
         List<String> variables = task.getVariableNames();
 

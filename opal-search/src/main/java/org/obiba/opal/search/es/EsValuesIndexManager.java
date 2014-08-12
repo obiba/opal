@@ -28,7 +28,8 @@ import org.obiba.magma.type.DateType;
 import org.obiba.opal.core.domain.VariableNature;
 import org.obiba.opal.core.service.ValidationService;
 import org.obiba.opal.core.service.VariableSummaryService;
-import org.obiba.opal.core.support.MessageListener;
+import org.obiba.opal.core.support.MessageLogger;
+import org.obiba.opal.core.support.Slf4jMessageAdapter;
 import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.ValueTableValuesIndex;
@@ -81,8 +82,8 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
   }
 
   private ValidationService.ValidationTask createValidationTask(ValueTable table) {
-    MessageListener listener = new MessageListener.NullMessageListener();
-    return validationService.createValidationTask(table, listener);
+    MessageLogger logger = new Slf4jMessageAdapter(log);
+    return validationService.createValidationTask(table, logger);
   }
 
   @NotNull
@@ -266,7 +267,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
               if (!validationTask.isValid(var, value)) {
                   //abort indexing on 1st validation failure
                   String msg = String.format("Validation failled: variable %s, value %s", var.getName(), value.toString());
-                  throw new RuntimeException(msg); //@todo better exception??
+                  throw new RuntimeException(msg);
               }
           }
 

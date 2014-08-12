@@ -11,7 +11,7 @@ import java.util.Set;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
-import org.obiba.opal.core.support.MessageListener;
+import org.obiba.opal.core.support.MessageLogger;
 
 /**
  * Service for validation.
@@ -24,10 +24,10 @@ public interface ValidationService {
 
     /**
      * @param valueTable table to be validated
-     * @param listener
+     * @param logger
      * @return new validation task for the given table and listener, or null if validation is not enabled for that table.
      */
-    ValidationTask createValidationTask(ValueTable valueTable, MessageListener listener);
+    ValidationTask createValidationTask(ValueTable valueTable, MessageLogger logger);
 
     /**
      * Container for validation results.

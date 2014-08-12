@@ -3,7 +3,7 @@ package org.obiba.opal.core.service;
 import org.obiba.magma.*;
 import org.obiba.opal.core.service.validation.DataValidator;
 import org.obiba.opal.core.service.validation.ValidatorFactory;
-import org.obiba.opal.core.support.MessageListener;
+import org.obiba.opal.core.support.MessageLogger;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
@@ -35,7 +35,7 @@ public class ValidationServiceImpl implements ValidationService {
     /*
     //previous code performing validation in a transaction
     @Override
-    public ValidationResult validateData(final ValueTable valueTable, final MessageListener listener) {
+    public ValidationResult validateData(final ValueTable valueTable, final MessageListener logger) {
 
         if (!isValidationEnabled(valueTable.getDatasource())) {
             return null;
@@ -46,7 +46,7 @@ public class ValidationServiceImpl implements ValidationService {
         final Runnable task = new Runnable() {
             @Override
             public void run() {
-                validate(valueTable, result, listener);
+                validate(valueTable, result, logger);
             }
         };
 
@@ -63,18 +63,12 @@ public class ValidationServiceImpl implements ValidationService {
     }
 */
 
-    /**
-     *
-     * @param valueTable
-     * @param listener
-     * @return
-     */
-    private ValidationResult validate(ValueTable valueTable, final MessageListener listener,
+    private ValidationResult validate(ValueTable valueTable, final MessageLogger logger,
                                       Map<String, List<DataValidator>> validatorMap) {
 
         final ValidationResult result = new ValidationResult();
 
-        listener.info("Validating table %s.%s", valueTable.getDatasource().getName(), valueTable.getName());
+        logger.info("Validating table %s.%s", valueTable.getDatasource().getName(), valueTable.getName());
         Iterator<ValueSet> valueSets = valueTable.getValueSets().iterator();
 
         while (valueSets.hasNext()) {
@@ -86,7 +80,7 @@ public class ValidationServiceImpl implements ValidationService {
                 List<DataValidator> validators = entry.getValue();
                 for (DataValidator validator: validators) {
                     if (!validator.isValid(value)) {
-                        listener.warn(getValidationFailMessage(validator,varName, value));
+                        logger.warn(getValidationFailMessage(validator,varName, value));
                         result.addFailure(varName, validator.getType(), value);
                     }
                 }
@@ -97,8 +91,8 @@ public class ValidationServiceImpl implements ValidationService {
     }
 
     @Override
-    public ValidationTask createValidationTask(ValueTable valueTable, MessageListener listener) {
-        InternalValidationTask task = createInternalValidationTask(valueTable, listener);
+    public ValidationTask createValidationTask(ValueTable valueTable, MessageLogger logger) {
+        InternalValidationTask task = createInternalValidationTask(valueTable, logger);
         if (task.isEmpty()) {
             return null; //noting to validate
         }
@@ -106,15 +100,15 @@ public class ValidationServiceImpl implements ValidationService {
         return task;
     }
 
-    private InternalValidationTask createInternalValidationTask(ValueTable valueTable, MessageListener listener) {
+    private InternalValidationTask createInternalValidationTask(ValueTable valueTable, MessageLogger logger) {
         final ValidatorFactory validatorFactory = new ValidatorFactory();
-        InternalValidationTask task = new InternalValidationTask(valueTable, listener);
+        InternalValidationTask task = new InternalValidationTask(valueTable, logger);
 
         if (isValidationEnabled(valueTable.getDatasource())) {
             for (Variable var: valueTable.getVariables()) {
                 List<DataValidator> validators = validatorFactory.getValidators(var);
                 if (validators != null && validators.size() > 0) {
-                    listener.info("Validators for variable %s: %s", var.getName(), validators.toString());
+                    logger.info("Validators for variable %s: %s", var.getName(), validators.toString());
                     task.addValidators(var, validators);
                 }
             }
@@ -133,13 +127,13 @@ public class ValidationServiceImpl implements ValidationService {
         private final ValueTable valueTable;
 
         @NotNull
-        private final MessageListener listener;
+        private final MessageLogger logger;
 
         private final Map<String, List<DataValidator>> validatorMap = new HashMap<>();
 
-        public InternalValidationTask(ValueTable valueTable, MessageListener listener) {
+        public InternalValidationTask(ValueTable valueTable, MessageLogger logger) {
             this.valueTable = valueTable;
-            this.listener = listener;
+            this.logger = logger;
         }
 
         private void addValidators(Variable var, List<DataValidator> validators) {
@@ -161,7 +155,7 @@ public class ValidationServiceImpl implements ValidationService {
             if (validators != null) {
                 for (DataValidator validator: validators) {
                     if (!validator.isValid(value)) {
-                        listener.warn(getValidationFailMessage(validator, var.getName(), value));
+                        logger.warn(getValidationFailMessage(validator, var.getName(), value));
                         return false;
                     }
                 }
@@ -171,7 +165,7 @@ public class ValidationServiceImpl implements ValidationService {
 
         @Override
         public ValidationResult validate() {
-            return ValidationServiceImpl.this.validate(valueTable, listener, validatorMap);
+            return ValidationServiceImpl.this.validate(valueTable, logger, validatorMap);
         }
     }
 }
