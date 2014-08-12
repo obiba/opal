@@ -1,32 +1,28 @@
 package org.obiba.opal.core.service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.Value;
-import org.obiba.magma.ValueTable;
+import org.obiba.magma.*;
 import org.obiba.magma.support.StaticValueTable;
 import org.obiba.opal.core.service.ValidationService.ValidationResult;
+import org.obiba.opal.core.service.ValidationService.ValidationTask;
 import org.obiba.opal.core.service.validation.VocabularyValidator;
-import org.obiba.opal.core.support.TestMessageListener;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.obiba.opal.core.support.MessageListener;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by carlos on 8/5/14.
  */
-//@ContextConfiguration(classes = ValidationServiceImplTest.Config.class)
-public class ValidationServiceImplTest /*extends AbstractJUnit4SpringContextTests*/ {
+public class ValidationServiceImplTest {
 
 	private static final String VALID_CODE = "AAA";
 	private static final String INVALID_CODE = "foo";
 
-	//@Autowired
     private ValidationServiceImpl validationService;
 
     @Before
@@ -34,51 +30,90 @@ public class ValidationServiceImplTest /*extends AbstractJUnit4SpringContextTest
     	validationService = new ValidationServiceImpl();
     }
 
-    private ValueTable createTableForVocabularyTest(String codeValue) throws Exception {
+    private ValueTable createTable(String codeValue, Variable var) throws Exception {
     	Datasource ds = MagmaHelper.createDatasource(true);
     	Set<String> entities = new HashSet<>();
     	entities.add("a");
     	entities.add("b");
-    	
-    	StaticValueTable table = MagmaHelper.createValueTable(ds, entities, MagmaHelper.createVocabularyVariable());
+        StaticValueTable table = MagmaHelper.createValueTable(ds, entities, var);
 		MagmaHelper.addRow(table, "a", MagmaHelper.VOCAB_VARIABLE, VALID_CODE);
 		MagmaHelper.addRow(table, "b", MagmaHelper.VOCAB_VARIABLE, codeValue);
 		
 		return table;
     }
-    
+
     @Test
     public void testValidateWithVocabularyFailure() throws Exception {
-    	ValidationResult collector = new ValidationResult();
-    	ValueTable table = createTableForVocabularyTest(INVALID_CODE);
+        ValueTable table = createTable(INVALID_CODE, MagmaHelper.createVocabularyVariable());
+        ValidationTask task = validationService.createValidationTask(table, new MessageListener.NullMessageListener());
+        ValidationResult result = task.validate();
 
-		validationService.validate(table, collector, new TestMessageListener());
-		Assert.assertTrue("should have failures", collector.hasFailures());
-		List<List<String>> pairs = collector.getFailurePairs();
+		Assert.assertTrue("should have failures", result.hasFailures());
+		List<List<String>> pairs = result.getFailurePairs();
 		Assert.assertEquals("wrong count", 1, pairs.size());
 		List<String> pair = pairs.get(0);
 		Assert.assertEquals("wrong length", 2, pair.size());
 		Assert.assertEquals("wrong variable", MagmaHelper.VOCAB_VARIABLE, pair.get(0));
 		Assert.assertEquals("wrong rule", VocabularyValidator.TYPE, pair.get(1));
-		Set<Value> failedValues = collector.getFailedValues(pair);
+		Set<Value> failedValues = result.getFailedValues(pair);
 		Assert.assertEquals("wrong count", 1, failedValues.size());
 		Assert.assertEquals("value mismatch", INVALID_CODE, failedValues.iterator().next().toString());
     }
-    
-    @Test
-    public void testValidateNoFailures() throws Exception {
-    	ValidationResult collector = new ValidationResult();
-    	ValueTable table = createTableForVocabularyTest(VALID_CODE);
 
-		validationService.validate(table, collector, new TestMessageListener());
-		Assert.assertFalse("should have no failures", collector.hasFailures());
+    @Test
+    public void testValidateWithVocabularyNoFailures() throws Exception {
+    	ValueTable table = createTable(VALID_CODE, MagmaHelper.createVocabularyVariable());
+        ValidationTask task = validationService.createValidationTask(table, new MessageListener.NullMessageListener());
+        ValidationResult result = task.validate();
+
+		Assert.assertFalse("should have no failures", result.hasFailures());
     }
-    
-    @Configuration
-    public static class Config extends AbstractOrientDbTestConfig {
-        @Bean
-        public ValidationService taxonomyService() {
-            return new ValidationServiceImpl();
+
+    @Test
+    public void testValidateNoValidationNoTask() throws Exception {
+        ValueTable table = createTable(INVALID_CODE, MagmaHelper.createVariable());
+        ValidationTask task = validationService.createValidationTask(table, new MessageListener.NullMessageListener());
+        Assert.assertNull("should have no validation task", task);
+    }
+
+    @Test
+    public void testVocabularyIsValidTrue() throws Exception {
+        ValueTable table = createTable(VALID_CODE, MagmaHelper.createVocabularyVariable());
+        boolean valid = isValid(table);
+
+        Assert.assertTrue("should be valid", valid);
+    }
+
+    @Test
+    public void testVocabularyIsValidFalse() throws Exception {
+        ValueTable table = createTable(INVALID_CODE, MagmaHelper.createVocabularyVariable());
+        boolean valid = isValid(table);
+
+        Assert.assertFalse("should be invalid", valid);
+    }
+
+    private boolean isValid(ValueTable valueTable) {
+        ValidationTask task = validationService.createValidationTask(valueTable, new MessageListener.NullMessageListener());
+
+        List<String> variables = task.getVariableNames();
+
+        if (variables.isEmpty()) {
+            return true; //no variables under validation
         }
+
+        Iterator<ValueSet> valueSets = valueTable.getValueSets().iterator();
+        while (valueSets.hasNext()) {
+            ValueSet vset = valueSets.next();
+
+            for (String varName: variables) {
+                Variable var = valueTable.getVariable(varName);
+                Value value = valueTable.getValue(var, vset);
+                if (!task.isValid(var, value)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
+
 }

@@ -30,6 +30,11 @@ public class MagmaHelper {
     	return createVocabularyVariable(getVocabularyFileUrl());
     }
 
+    public static Variable createVariable() {
+        Variable.Builder builder = new Variable.Builder(VOCAB_VARIABLE, TextType.get(), ENTITY);
+        return builder.build();
+    }
+
     public static Variable createVocabularyVariable(String vocabUrl) {
     	Variable.Builder builder = new Variable.Builder(VOCAB_VARIABLE, TextType.get(), ENTITY);
     	builder.addAttribute(ValidationService.VOCABULARY_URL_ATTRIBUTE, vocabUrl);

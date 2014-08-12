@@ -10,10 +10,12 @@ import java.util.Set;
 
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
 import org.obiba.opal.core.support.MessageListener;
 
 /**
  * Service for validation.
+ * The validation itself is done inside the ValidationTask.
  */
 public interface ValidationService {
 
@@ -21,24 +23,11 @@ public interface ValidationService {
     public static final String VOCABULARY_URL_ATTRIBUTE = "vocabulary_url";
 
     /**
-     * Returns true if all the values in the table are valid.
-     * If the tables is not configured for validation, returns true immediately.
-     * This method is fail-fast, so intended to return false on the first invalid value, not to collect all the failures.
-     *
-     * @param valueTable
-     * @param  listener
-     * @return
-     */
-    boolean isValid(ValueTable valueTable, MessageListener listener);
-
-    /**
-     * Validates the table values, collecting all the failures and returning the result.
-     *
      * @param valueTable table to be validated
      * @param listener
-     * @return validation result (if datasource is configured for validation), or null
+     * @return new validation task for the given table and listener, or null if validation is not enabled for that table.
      */
-    ValidationResult validateData(ValueTable valueTable, MessageListener listener);
+    ValidationTask createValidationTask(ValueTable valueTable, MessageListener listener);
 
     /**
      * Container for validation results.
@@ -107,6 +96,30 @@ public interface ValidationService {
         	list.add(rule);
         	return Collections.unmodifiableList(list);
         }
+    }
+
+    /**
+     * Represents a delayed validation task that is aware of the table under validation.
+     */
+    public interface ValidationTask {
+
+        /**
+         * @return list of names of variables under validation
+         */
+        List<String> getVariableNames();
+
+        /**
+         * @param variable
+         * @param value
+         * @return false if variable has validation enabled and some rule failed for given value, true otherwise
+         */
+        boolean isValid(Variable variable, Value value);
+
+        /**
+         * Validates the whole table data, collecting and returning the results
+         * @return
+         */
+        ValidationResult validate();
     }
     
 }

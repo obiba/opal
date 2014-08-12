@@ -9,15 +9,10 @@
  */
 package org.obiba.opal.search.es;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ThreadFactory;
-
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
-
+import com.google.common.base.Predicate;
+import com.google.common.base.Stopwatch;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -31,7 +26,9 @@ import org.obiba.magma.concurrent.ConcurrentValueTableReader.ConcurrentReaderCal
 import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.DateType;
 import org.obiba.opal.core.domain.VariableNature;
+import org.obiba.opal.core.service.ValidationService;
 import org.obiba.opal.core.service.VariableSummaryService;
+import org.obiba.opal.core.support.MessageListener;
 import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.ValueTableValuesIndex;
@@ -43,10 +40,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Stopwatch;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ThreadFactory;
 
 @Component
 @Transactional(readOnly = true)
@@ -59,6 +59,9 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
 
   @Autowired
   private VariableSummaryService variableSummaryService;
+
+  @Autowired
+  private ValidationService validationService;
 
   @NotNull
   @Override
@@ -75,6 +78,11 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
   @Override
   public IndexSynchronization createSyncTask(ValueTable valueTable, ValueTableIndex index) {
     return new Indexer(valueTable, (EsValueTableValuesIndex) index);
+  }
+
+  private ValidationService.ValidationTask createValidationTask(ValueTable table) {
+    MessageListener listener = new MessageListener.NullMessageListener();
+    return validationService.createValidationTask(table, listener);
   }
 
   @NotNull
@@ -94,12 +102,20 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
 
     @Override
     protected void index() {
+
+      ConcurrentReaderCallback callback = new ValuesReaderCallback();
+      ValidationService.ValidationTask validationTask = createValidationTask(valueTable);
+      if (validationTask != null) {
+        //if validation is enabled, decorate the values reader callback with a validating one
+        callback = new ValidatingCallback(callback, validationTask);
+      }
+
       ConcurrentValueTableReader.Builder.newReader() //
           .withThreads(threadFactory) //
           .ignoreReadErrors() //
           .from(valueTable) //
           .variablesFilter(index.getVariables()) //
-          .to(new ValuesReaderCallback()) //
+          .to(callback) //
           .build() //
           .read();
     }
@@ -213,6 +229,59 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
       }
     }
 
+  }
+
+  private class ValidatingCallback implements ConcurrentReaderCallback {
+
+      @NotNull
+      private final ConcurrentReaderCallback delegate;
+
+      @NotNull
+      private final ValidationService.ValidationTask validationTask;
+
+      private List<String> validationVariables;
+
+      public ValidatingCallback(ConcurrentReaderCallback delegate, ValidationService.ValidationTask validationTask) {
+          this.delegate = delegate;
+          this.validationTask = validationTask;
+      }
+
+      @Override
+      public void onBegin(List<VariableEntity> entities, Variable... variables) {
+        delegate.onBegin(entities, variables);
+          this.validationVariables = validationTask.getVariableNames();
+      }
+
+      @Override
+      public void onValues(VariableEntity entity, Variable[] variables, Value... values) {
+
+          for (int i = 0; i<variables.length; i++) {
+              Variable var = variables[i];
+
+              if (!validationVariables.contains(var.getName())) {
+                  continue; //variable not validated: ignore
+              }
+
+              Value value = values[i];
+              if (!validationTask.isValid(var, value)) {
+                  //abort indexing on 1st validation failure
+                  String msg = String.format("Validation failled: variable %s, value %s", var.getName(), value.toString());
+                  throw new RuntimeException(msg); //@todo better exception??
+              }
+          }
+
+        delegate.onValues(entity, variables, values);
+      }
+
+      @Override
+      public void onComplete() {
+        delegate.onComplete();
+      }
+
+      @Override
+      public boolean isCancelled() {
+          return delegate.isCancelled();
+      }
   }
 
   private class EsValueTableValuesIndex extends EsValueTableIndex implements ValueTableValuesIndex {
