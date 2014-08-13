@@ -1,7 +1,6 @@
 package org.obiba.opal.core.support;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Impl of MessageLogger that delegates all the messages to a given slf4j logger.
@@ -17,22 +16,22 @@ public class Slf4jMessageAdapter implements MessageLogger {
 
     @Override
     public void debug(String msgFormat, Object... args) {
-        delegate.debug(msgFormat, args);
+        delegate.debug(String.format(msgFormat, args));
     }
 
     @Override
     public void info(String msgFormat, Object... args) {
-        delegate.info(msgFormat, args);
+        delegate.info(String.format(msgFormat, args));
     }
 
     @Override
     public void warn(String msgFormat, Object... args) {
-        delegate.warn(msgFormat, args);
+        delegate.warn(String.format(msgFormat, args));
     }
 
     @Override
     public void error(String msgFormat, Object... args) {
-        delegate.error(msgFormat, args);
+        delegate.error(String.format(msgFormat, args));
     }
 
 }

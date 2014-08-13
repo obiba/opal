@@ -20,6 +20,9 @@ public class CsvVocabularyImporter extends TextVocabularyImporter {
         }
 
         while ((line = reader.readLine()) != null) {
+            if (line.trim().isEmpty()) {
+                continue; //ignore empty lines
+            }
             String[] parts = line.split(",");
             result.add(parts[0]);
         }

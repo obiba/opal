@@ -12,9 +12,9 @@ import java.util.Set;
  */
 public abstract class TextVocabularyImporter implements VocabularyImporter {
 
-    public final Set<String> getCodes(URL url) throws IOException {
+    @Override
+    public final Set<String> getCodes(InputStream in) throws IOException {
 
-        InputStream in = url.openStream();
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
         try {

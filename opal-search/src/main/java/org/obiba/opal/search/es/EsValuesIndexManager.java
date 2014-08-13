@@ -266,7 +266,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
               Value value = values[i];
               if (!validationTask.isValid(var, value)) {
                   //abort indexing on 1st validation failure
-                  String msg = String.format("Validation failled: variable %s, value %s", var.getName(), value.toString());
+                  String msg = String.format("Validation failed: variable %s, value %s", var.getName(), value.toString());
                   throw new RuntimeException(msg);
               }
           }
