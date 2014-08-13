@@ -37,7 +37,8 @@ def do_command(args):
         extension_factory = OpalExtensionFactory(characterSet=args.characterSet, separator=args.separator,
                                                  quote=args.quote,
                                                  firstRow=args.firstRow, path=args.path, type=args.type,
-                                                 tables=args.tables)
+                                                 tables=args.tables,
+                                                 destination=args.destination)
 
         response = importer.submit(extension_factory)
 
@@ -58,7 +59,7 @@ def do_command(args):
 
 
 class OpalExtensionFactory(opal.io.OpalImporter.ExtensionFactoryInterface):
-    def __init__(self, characterSet, separator, quote, firstRow, path, type, tables):
+    def __init__(self, characterSet, separator, quote, firstRow, path, type, tables, destination):
         self.characterSet = characterSet
         self.separator = separator
         self.quote = quote
@@ -66,6 +67,7 @@ class OpalExtensionFactory(opal.io.OpalImporter.ExtensionFactoryInterface):
         self.path = path
         self.type = type
         self.tables = tables
+        self.destination = destination
 
 
     def add(self, factory):
@@ -101,3 +103,5 @@ class OpalExtensionFactory(opal.io.OpalImporter.ExtensionFactoryInterface):
                 table.name = name[-1][:-index]
             else:
                 table.name = name[-1]
+
+        table.refTable = self.destination + "." + table.name
