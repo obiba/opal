@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableProper
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
@@ -79,6 +80,9 @@ public class VariablePropertiesModalView extends ModalPopupViewWithUiHandlers<Va
   @UiField
   TextBox occurenceGroup;
 
+  @UiField
+  NumericTextBox index;
+
   @Inject
   public VariablePropertiesModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
     super(eventBus);
@@ -86,6 +90,8 @@ public class VariablePropertiesModalView extends ModalPopupViewWithUiHandlers<Va
     initWidget(uiBinder.createAndBindUi(this));
     dialog.setTitle(translations.editProperties());
     dialog.setResizable(true);
+    index.setMaxConstrained(false);
+    index.setMinConstrained(false);
   }
 
   @UiHandler("repeatable")
@@ -113,6 +119,7 @@ public class VariablePropertiesModalView extends ModalPopupViewWithUiHandlers<Va
       refEntityType.setText(variable.getReferencedEntityType());
       mimeType.setText(variable.getMimeType());
       occurenceGroup.setText(variable.getOccurrenceGroup());
+      index.setValue(variable.getIndex());
     } else {
       dialog.setTitle(translations.addVariable());
     }
@@ -178,5 +185,10 @@ public class VariablePropertiesModalView extends ModalPopupViewWithUiHandlers<Va
   @Override
   public String getOccurrenceGroup() {
     return occurenceGroup.getText();
+  }
+
+  @Override
+  public Long getIndex() {
+    return index.getNumberValue();
   }
 }

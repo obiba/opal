@@ -23,12 +23,12 @@ public class ItemResultDtoStrategy {
     this.valueTable = valueTable;
   }
 
-  public void process(Search.ItemResultDto.Builder dtoItemResultBuilder, int tableIndex) {
+  public void process(Search.ItemResultDto.Builder dtoItemResultBuilder) {
     String variableName = MagmaEngineVariableResolver.valueOf(dtoItemResultBuilder.getIdentifier()).getVariableName();
     Search.VariableItemDto.Builder dtoVariableItemBuilder = Search.VariableItemDto.newBuilder();
     Magma.LinkDto parentLink = Magma.LinkDto.newBuilder().setRel(valueTable.getName())
         .setLink("/datasource/" + valueTable.getDatasource().getName() + "/table/" + valueTable.getName()).build();
-    dtoVariableItemBuilder.setVariable(Dtos.asDto(parentLink, valueTable.getVariable(variableName), tableIndex)
+    dtoVariableItemBuilder.setVariable(Dtos.asDto(parentLink, valueTable.getVariable(variableName))
         .setLink(parentLink.getLink() + "/variable/" + variableName));
     dtoItemResultBuilder.setExtension(Search.VariableItemDto.item, dtoVariableItemBuilder.build());
   }

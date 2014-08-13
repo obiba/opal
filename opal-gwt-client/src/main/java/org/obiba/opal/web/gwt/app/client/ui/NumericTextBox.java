@@ -111,6 +111,10 @@ public class NumericTextBox extends TextBox {
     setValue(numberType.formatValue(newValue));
   }
 
+  public void setValue(int value) {
+    setValue(String.valueOf(value), false);
+  }
+
   @Override
   public void setValue(String value) {
     setValue(value, false);

@@ -105,6 +105,11 @@
           <property name="appliesTo" value="2.2.3"/>
         </bean>
 
+        <bean class="org.obiba.opal.core.upgrade.v2_3_x.database.VariableTableUpgradeStep">
+          <property name="description" value="Add index column to variable tables"/>
+          <property name="appliesTo" value="2.3.0"/>
+        </bean>
+
       </list>
     </property>
 

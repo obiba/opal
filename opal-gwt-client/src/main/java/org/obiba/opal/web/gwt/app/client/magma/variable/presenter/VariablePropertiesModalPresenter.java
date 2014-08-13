@@ -31,7 +31,6 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -184,6 +183,7 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
     v.setReferencedEntityType(getView().getReferencedEntityType());
     v.setMimeType(getView().getMimeType());
     v.setOccurrenceGroup(getView().getRepeatable() ? getView().getOccurrenceGroup() : "");
+    if(getView().getIndex() != null) v.setIndex(getView().getIndex().intValue());
   }
 
   public interface Display extends PopupView, HasUiHandlers<VariablePropertiesModalUiHandlers> {
@@ -199,6 +199,8 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
     String getMimeType();
 
     String getOccurrenceGroup();
+
+    Long getIndex();
 
     String getName();
 
@@ -232,10 +234,11 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
     }
 
     protected void onSuccess() {
-      if (variable.getName().equals(updatedVariable.getName())) {
+      if(variable.getName().equals(updatedVariable.getName())) {
         fireEvent(new VariableRefreshEvent());
       } else {
-        placeManager.revealPlace(ProjectPlacesHelper.getVariablePlace(tableDto.getDatasourceName(), tableDto.getName(), updatedVariable.getName()));
+        placeManager.revealPlace(ProjectPlacesHelper
+            .getVariablePlace(tableDto.getDatasourceName(), tableDto.getName(), updatedVariable.getName()));
       }
     }
   }

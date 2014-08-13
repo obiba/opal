@@ -276,6 +276,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     dto.setReferencedEntityType(variable.getReferencedEntityType());
     dto.setMimeType(variable.getMimeType());
     dto.setOccurrenceGroup(variable.getOccurrenceGroup());
+    dto.setIndex(variable.getIndex());
 
     dto.setAttributesArray(getAttributesArray(variable));
     dto.setCategoriesArray(getCategoriesDtoArray(variable.getCategoriesArray()));

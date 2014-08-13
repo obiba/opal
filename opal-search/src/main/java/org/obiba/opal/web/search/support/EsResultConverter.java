@@ -164,10 +164,8 @@ public class EsResultConverter {
         dtoItemResultBuilder.setIdentifier(jsonHit.getString("_id"));
         JSONObject fields = jsonHit.getJSONObject("fields").getJSONArray("partial").getJSONObject(0);
 
-        int tableIndex = fields.getInt("index");
-        fields.remove("index"); // no longer needed
         if(fields.length() > 0) convertFields(dtoItemResultBuilder, fields);
-        if(itemResultStrategy != null) itemResultStrategy.process(dtoItemResultBuilder, tableIndex);
+        if(itemResultStrategy != null) itemResultStrategy.process(dtoItemResultBuilder);
 
         itemsDtoList.add(dtoItemResultBuilder.build());
       }

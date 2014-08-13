@@ -2,6 +2,7 @@ package org.obiba.opal.web.magma;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -82,7 +83,19 @@ abstract class AbstractValueTableResource {
         ? Math.min(fromIndex + limit, filteredVariables.size()) //
         : filteredVariables.size();
 
+    orderVariables(filteredVariables);
+
     return filteredVariables.subList(fromIndex, toIndex);
+  }
+
+  private Iterable<Variable> orderVariables(List<Variable> variables) {
+    Collections.sort(variables, new Comparator<Variable>() {
+      @Override
+      public int compare(Variable o1, Variable o2) {
+        return o1.getIndex() - o2.getIndex();
+      }
+    });
+    return variables;
   }
 
   Iterable<VariableEntity> filterEntities(@Nullable Integer offset, @Nullable Integer limit) {

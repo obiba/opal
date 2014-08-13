@@ -102,6 +102,18 @@
           </b:HelpBlock>
         </b:ControlGroup>
 
+        <!--Mime type-->
+        <b:ControlGroup>
+          <b:ControlLabel>Index</b:ControlLabel>
+          <b:Controls>
+            <o:NumericTextBox ui:field="index" addStyleNames="span1"/>
+          </b:Controls>
+
+          <b:HelpBlock>
+            <ui:msg description="Variable Index help">Position or weight of the variable in the list of variables of the table, for ordering.</ui:msg>
+          </b:HelpBlock>
+        </b:ControlGroup>
+
       </o:CollapsiblePanel>
 
     </g:FlowPanel>

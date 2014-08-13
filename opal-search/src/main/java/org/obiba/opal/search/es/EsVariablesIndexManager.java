@@ -88,23 +88,21 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
     protected void index() {
       BulkRequestBuilder bulkRequest = opalSearchService.getClient().prepareBulk();
 
-      int tableIndex = 0;
       for(Variable variable : valueTable.getVariables()) {
-        bulkRequest = indexVariable(variable, bulkRequest, tableIndex++);
+        bulkRequest = indexVariable(variable, bulkRequest);
       }
 
       sendAndCheck(bulkRequest);
       index.updateTimestamps();
     }
 
-    private BulkRequestBuilder indexVariable(Variable variable, BulkRequestBuilder bulkRequest, int tableIndex) {
+    private BulkRequestBuilder indexVariable(Variable variable, BulkRequestBuilder bulkRequest) {
       String fullName = valueTable.getDatasource().getName() + "." + valueTable.getName() + ":" + variable.getName();
       try {
         XContentBuilder xcb = XContentFactory.jsonBuilder().startObject();
         xcb.field("datasource", valueTable.getDatasource().getName());
         xcb.field("table", valueTable.getName());
         xcb.field("fullName", fullName);
-        xcb.field("index", tableIndex);
         indexVariableParameters(variable, xcb);
 
         if(variable.hasAttributes()) {
@@ -136,6 +134,7 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
       xcb.field("unit", variable.getUnit());
       xcb.field("referencedEntityType", variable.getReferencedEntityType());
       xcb.field("nature", VariableNature.getNature(variable).name());
+      xcb.field("index", variable.getIndex());
     }
 
     private void indexVariableAttributes(AttributeAware variable, XContentBuilder xcb) throws IOException {

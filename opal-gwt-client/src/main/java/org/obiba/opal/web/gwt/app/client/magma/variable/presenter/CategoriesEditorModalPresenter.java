@@ -122,6 +122,7 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
     dto.setReferencedEntityType(variable.getReferencedEntityType());
     dto.setMimeType(variable.getMimeType());
     dto.setOccurrenceGroup(variable.getOccurrenceGroup());
+    dto.setIndex(variable.getIndex());
 
     dto.setAttributesArray(getAttributesDtoArray(variable.getAttributesArray()));
     dto.setCategoriesArray(getCategoriesDtoArray(categories));
