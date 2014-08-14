@@ -16,22 +16,22 @@ public class Slf4jMessageAdapter implements MessageLogger {
 
     @Override
     public void debug(String msgFormat, Object... args) {
-        delegate.debug(String.format(msgFormat, args));
+        delegate.debug(msgFormat, args);
     }
 
     @Override
     public void info(String msgFormat, Object... args) {
-        delegate.info(String.format(msgFormat, args));
+        delegate.info(msgFormat, args);
     }
 
     @Override
     public void warn(String msgFormat, Object... args) {
-        delegate.warn(String.format(msgFormat, args));
+        delegate.warn(msgFormat, args);
     }
 
     @Override
     public void error(String msgFormat, Object... args) {
-        delegate.error(String.format(msgFormat, args));
+        delegate.error(msgFormat, args);
     }
 
 }

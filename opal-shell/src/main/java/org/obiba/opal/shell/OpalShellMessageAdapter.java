@@ -41,6 +41,6 @@ public class OpalShellMessageAdapter implements MessageLogger {
     }
 
     private void out(String msg, Object ... args) {
-        shell.printf(msg + "/n", args);
+        shell.printf(msg + "\n", args);
     }
 }
