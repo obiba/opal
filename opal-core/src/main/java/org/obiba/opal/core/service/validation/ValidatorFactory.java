@@ -1,5 +1,8 @@
 package org.obiba.opal.core.service.validation;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -23,6 +26,7 @@ import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -51,29 +55,19 @@ public class ValidatorFactory {
      * @return list of validators
      */
     public List<DataValidator> getValidators(Variable variable) {
-        List<DataValidator> result = new ArrayList<>();
-
-        Attribute attr = null;
         try {
-            attr = variable.getAttribute(ValidationService.VOCABULARY_URL_ATTRIBUTE);
+            Attribute attr = variable.getAttribute(ValidationService.VOCABULARY_URL_ATTRIBUTE);
+            URL url = new URL(attr.getValue().toString());
+            return Lists.<DataValidator>newArrayList(getVocabularyValidator(url));
         } catch (NoSuchAttributeException ex) {
-            //ignored
+            return Lists.newArrayList();
+        } catch (RuntimeException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            String msg =
+                    String.format("Error obtaining validators for variable %s", variable.getName());
+            throw new RuntimeException(msg, ex);
         }
-
-        if (attr != null) {
-            String url = attr.getValue().toString();
-            try {
-                result.add(getVocabularyValidator(url));
-            } catch (RuntimeException ex) {
-                throw ex;
-            } catch (Exception ex) {
-                String msg =
-                		String.format("Error obtaining validators for variable %s", variable.getName());
-                throw new RuntimeException(msg, ex);
-            }
-        }
-
-        return result;
     }
 
     /**
@@ -83,35 +77,27 @@ public class ValidatorFactory {
      * @return
      * @throws IOException
      */
-    public VocabularyValidator getVocabularyValidator(String url) throws Exception {
-        int idx = url.lastIndexOf('.');
-        if (idx < 0) {
+    public VocabularyValidator getVocabularyValidator(URL url) throws Exception {
+        String extension = Files.getFileExtension(url.getFile());
+        if (extension.equals("")) {
             throw new IllegalArgumentException("Could not obtain filename extension from " + url);
         }
-        String extension = url.substring(idx + 1).toLowerCase();
         VocabularyImporter importer = importerMap.get(extension);
 
         if (importer == null) {
             throw new UnsupportedOperationException("File extension " + extension + " is not supported");
         }
 
-        try {
-            Set<String> codes = getVocabularyCodes(url, importer);
-            return new VocabularyValidator(url, codes);
-        } catch (RuntimeException ex) {
-            throw ex;
-        }
+        Set<String> codes = getVocabularyCodes(url, importer);
+        return new VocabularyValidator(url.toString(), codes);
     }
 
-    Set<String> getVocabularyCodes(String url, VocabularyImporter importer) throws IOException, GeneralSecurityException {
-        if (url.startsWith("https")) {
+    Set<String> getVocabularyCodes(URL url, VocabularyImporter importer) throws IOException, GeneralSecurityException {
+        if (url.getProtocol() == "https") {
             return getVocabularyCodesHttps(url, importer);
         } else {
-            InputStream in = new URL(url).openStream();
-            try {
+            try (InputStream in = url.openStream()) {
                 return importer.getCodes(in);
-            } finally {
-                in.close();
             }
         }
     }
@@ -120,25 +106,16 @@ public class ValidatorFactory {
      * To be used for unit tests purposes only
      * @param keyStore
      */
-    synchronized void setKeyStore(KeyStore keyStore) {
-        if (this.systemKeyStoreService == null) {
-            this.keyStore = keyStore;
-        } else {
+    @VisibleForTesting
+    void setKeyStore(KeyStore keyStore) {
+        if (this.systemKeyStoreService != null) {
             //not to be used when systemKeyStoreService is available
             throw new IllegalStateException("Should not be set manually when systemKeyStoreService is available");
         }
-    }
-
-    private synchronized KeyStore getKeyStore() {
-        if (keyStore == null) {
-            keyStore = systemKeyStoreService.getKeyStore().getKeyStore();
-        }
-        return keyStore;
+        this.keyStore = keyStore;
     }
 
     private CloseableHttpClient getHttpsClient() throws IOException, GeneralSecurityException {
-
-        KeyStore keyStore = getKeyStore();
 
         // Trust own CA and all self-signed certs
         SSLContext sslcontext = SSLContexts.custom()
@@ -159,29 +136,27 @@ public class ValidatorFactory {
                 .setSSLSocketFactory(sslsf).build();
     }
 
-    private Set<String> getVocabularyCodesHttps(String url, VocabularyImporter importer) throws IOException, GeneralSecurityException {
-        CloseableHttpClient httpClient = getHttpsClient();
-
-        try {
-            HttpGet httpGet = new HttpGet(url);
-            CloseableHttpResponse response = httpClient.execute(httpGet);
-            try {
-                StatusLine status = response.getStatusLine();
-                if (status.getStatusCode() != 200) {
-                    throw new RuntimeException(String.format("Error getting contents of %s: status is %s", url, status.toString()));
-                }
-                HttpEntity entity = response.getEntity();
-                return importer.getCodes(entity.getContent());
-            } finally {
-                response.close();
+    private Set<String> getVocabularyCodesHttps(URL url, VocabularyImporter importer) throws IOException,
+            GeneralSecurityException {
+        try (CloseableHttpClient httpClient = getHttpsClient();
+             CloseableHttpResponse response = httpClient.execute(
+                     new HttpGet(url.toURI())) ) {
+            StatusLine status = response.getStatusLine();
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new RuntimeException(String.format("Error getting contents of %s: status is %s", url, status.toString()));
             }
-        } finally {
-            httpClient.close();
+            return importer.getCodes(response.getEntity().getContent());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @PostConstruct
     public void postConstruct() {
+        try {
+            keyStore = systemKeyStoreService.getKeyStore().getKeyStore();
+        } catch(NullPointerException e) { /* leave keyStore as null */ }
+
         Map<String, VocabularyImporter> map = new HashMap<>();
         VocabularyImporter csvImporter = new CsvVocabularyImporter();
         map.put("csv", csvImporter);
