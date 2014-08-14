@@ -250,13 +250,13 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
       @Override
       public void onBegin(List<VariableEntity> entities, Variable... variables) {
         delegate.onBegin(entities, variables);
-          this.validationVariables = validationTask.getVariableNames();
+        this.validationVariables = validationTask.getVariableNames();
       }
 
       @Override
       public void onValues(VariableEntity entity, Variable[] variables, Value... values) {
 
-          for (int i = 0; i<variables.length; i++) {
+          for(int i = 0; i<variables.length; i++) {
               Variable var = variables[i];
 
               if (!validationVariables.contains(var.getName())) {
@@ -271,7 +271,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
               }
           }
 
-        delegate.onValues(entity, variables, values);
+          delegate.onValues(entity, variables, values);
       }
 
       @Override
