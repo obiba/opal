@@ -50,13 +50,13 @@ public class ValidationServiceImplTest {
         ValidationResult result = task.validate();
 
 		Assert.assertTrue("should have failures", result.hasFailures());
-		List<List<String>> pairs = result.getFailurePairs();
+		Set<List<String>> pairs = result.getFailurePairs();
 		Assert.assertEquals("wrong count", 1, pairs.size());
-		List<String> pair = pairs.get(0);
+		List<String> pair = pairs.iterator().next();
 		Assert.assertEquals("wrong length", 2, pair.size());
 		Assert.assertEquals("wrong variable", MagmaHelper.VOCAB_VARIABLE, pair.get(0));
 		Assert.assertEquals("wrong rule", VocabularyValidator.TYPE, pair.get(1));
-		Set<Value> failedValues = result.getFailedValues(pair);
+		Set<Value> failedValues = result.getFailedValues(pair.get(0), pair.get(1));
 		Assert.assertEquals("wrong count", 1, failedValues.size());
 		Assert.assertEquals("value mismatch", INVALID_CODE, failedValues.iterator().next().toString());
     }
