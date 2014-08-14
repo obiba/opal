@@ -61,6 +61,7 @@ public enum ValueRenderer {
   }
 
   public String render(ValueSetsDto.ValueDto value) {
+    if (value == null) return "";
     return getValue(value);
   }
 
