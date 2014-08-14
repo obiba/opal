@@ -1,12 +1,17 @@
 package org.obiba.opal.core.service.validation;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.obiba.magma.Variable;
 import org.obiba.opal.core.service.MagmaHelper;
@@ -28,6 +33,7 @@ public class ValidatorFactoryTest {
     @Before
     public void setUp() {
         factory = new ValidatorFactory();
+        factory.postConstruct(); //initialize
     }
 
     @Test
@@ -54,20 +60,45 @@ public class ValidatorFactoryTest {
         Assert.assertFalse(validator.isValid(MagmaHelper.valueOf("bar")));
     }
     
-    //@Test
+    @Test
+    @Ignore //not automated
     public void testGetVocabularyCodesHttp() throws Exception {
         testCsvVocabularyCodes("http://localhost:9090/codes_v1.txt");
     }
 
-    //@Test
+    @Test
+    @Ignore //not automated
     public void testGetVocabularyCodesHttps() throws Exception {
         testCsvVocabularyCodes("https://185.9.174.105/mica/sites/default/files/codes_v1.txt");
     }
 
     private void testCsvVocabularyCodes(String url) throws Exception {
+        factory.setKeyStore(getTestKeyStore());
         VocabularyImporter importer = new CsvVocabularyImporter();
         Set<String> codes = factory.getVocabularyCodes(url, importer);
         Assert.assertEquals("codes set should match", VALID_CODES, codes);
+    }
+
+    private KeyStore getTestKeyStore() throws IOException, GeneralSecurityException {
+        String keyStorePath = "~/.keystore".replace("~", System.getProperty("user.home"));
+        String keyStorePassword = "nopassword";
+
+        File file = new File(keyStorePath);
+
+        if (!file.exists()) {
+            throw new IllegalArgumentException("KeyStore file not found: " + file.getPath());
+        }
+
+        FileInputStream instream = new FileInputStream(file);
+        KeyStore store  = KeyStore.getInstance(KeyStore.getDefaultType());
+
+        try {
+            store.load(instream, keyStorePassword.toCharArray());
+        } finally {
+            instream.close();
+        }
+
+        return store;
     }
 
 }

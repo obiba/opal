@@ -13,32 +13,36 @@ import org.obiba.magma.Attribute;
 import org.obiba.magma.NoSuchAttributeException;
 import org.obiba.magma.Variable;
 import org.obiba.opal.core.service.ValidationService;
+import org.obiba.opal.core.service.security.SystemKeyStoreService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLContext;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.cert.Certificate;
 import java.util.*;
 
 /**
  * Knows how to create DataValidators for a Variable.
  * Datasource and variable attributes will determine if validation is enabled, and which validators the variable has.
  */
+@Component("validatorFactory")
 public class ValidatorFactory {
 
     private static final Logger log = LoggerFactory.getLogger(ValidatorFactory.class);
 
-    private static final Map<String, VocabularyImporter> importerMap = new HashMap<>();
+    private Map<String, VocabularyImporter> importerMap;
 
-    static {
-        VocabularyImporter csvImporter = new CsvVocabularyImporter();
-        importerMap.put("csv", csvImporter);
-        importerMap.put("txt", csvImporter);
-    }
+    @Autowired
+    private SystemKeyStoreService systemKeyStoreService;
+
+    private KeyStore keyStore; //lazily initialized from systemKeyStoreService or injected from unit test
 
     /**
      * Returns the list of validators for a given Variable.
@@ -112,38 +116,29 @@ public class ValidatorFactory {
         }
     }
 
-    private KeyStore getKeyStore() throws IOException, GeneralSecurityException {
-        String keyStorePath = System.getProperty("javax.net.ssl.keyStore");
-        String keyStorePwd = System.getProperty("javax.net.ssl.keyStorePassword");
-
-        File file = null;
-        if (keyStorePwd == null) {
-            keyStorePwd = "nopassword";
-        }
-
-        if (keyStorePath == null) {
-            file = new File(System.getProperty("user.home"), ".keystore");
+    /**
+     * To be used for unit tests purposes only
+     * @param keyStore
+     */
+    synchronized void setKeyStore(KeyStore keyStore) {
+        if (this.systemKeyStoreService == null) {
+            this.keyStore = keyStore;
         } else {
-            file = new File(keyStorePath);
+            //no to be used when systemKeyStoreService is available
+            throw new IllegalStateException("Should not be set manually when systemKeyStoreService is available");
         }
-
-        if (!file.exists()) {
-            throw new IllegalArgumentException("KeyStore file not found: " + file.getPath());
-        }
-
-        FileInputStream instream = new FileInputStream(file);
-        KeyStore store  = KeyStore.getInstance(KeyStore.getDefaultType());
-
-        try {
-            store.load(instream, keyStorePwd.toCharArray());
-        } finally {
-            instream.close();
-        }
-
-        return store;
     }
 
-    private CloseableHttpClient getHttpsClient(KeyStore keyStore) throws IOException, GeneralSecurityException {
+    private synchronized KeyStore getKeyStore() {
+        if (keyStore == null) {
+            keyStore = systemKeyStoreService.getKeyStore().getKeyStore();
+        }
+        return keyStore;
+    }
+
+    private CloseableHttpClient getHttpsClient() throws IOException, GeneralSecurityException {
+
+        KeyStore keyStore = getKeyStore();
 
         // Trust own CA and all self-signed certs
         SSLContext sslcontext = SSLContexts.custom()
@@ -165,9 +160,7 @@ public class ValidatorFactory {
     }
 
     private Set<String> getVocabularyCodesHttps(String url, VocabularyImporter importer) throws IOException, GeneralSecurityException {
-        KeyStore keyStore = getKeyStore();
-
-        CloseableHttpClient httpClient = getHttpsClient(keyStore);
+        CloseableHttpClient httpClient = getHttpsClient();
 
         try {
             HttpGet httpGet = new HttpGet(url);
@@ -185,6 +178,15 @@ public class ValidatorFactory {
         } finally {
             httpClient.close();
         }
+    }
+
+    @PostConstruct
+    public void postConstruct() {
+        Map<String, VocabularyImporter> map = new HashMap<>();
+        VocabularyImporter csvImporter = new CsvVocabularyImporter();
+        map.put("csv", csvImporter);
+        map.put("txt", csvImporter);
+        this.importerMap = Collections.unmodifiableMap(map);
     }
 
 }

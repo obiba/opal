@@ -2,8 +2,10 @@ package org.obiba.opal.core.service;
 
 import org.obiba.magma.*;
 import org.obiba.opal.core.service.validation.DataValidator;
+//import org.obiba.opal.core.service.validation.ValidatorFactory;
 import org.obiba.opal.core.service.validation.ValidatorFactory;
 import org.obiba.opal.core.support.MessageLogger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
@@ -17,6 +19,9 @@ public class ValidationServiceImpl implements ValidationService {
 
     //@Autowired
     //private TransactionTemplate txTemplate;
+
+    @Autowired
+    private ValidatorFactory validatorFactory;
 
     private boolean isValidationEnabled(Datasource datasource) {
         return true;
@@ -101,7 +106,6 @@ public class ValidationServiceImpl implements ValidationService {
     }
 
     private InternalValidationTask createInternalValidationTask(ValueTable valueTable, MessageLogger logger) {
-        final ValidatorFactory validatorFactory = new ValidatorFactory();
         InternalValidationTask task = new InternalValidationTask(valueTable, logger);
 
         if (isValidationEnabled(valueTable.getDatasource())) {
