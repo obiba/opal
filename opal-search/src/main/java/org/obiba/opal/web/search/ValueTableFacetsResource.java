@@ -62,7 +62,9 @@ public class ValueTableFacetsResource {
           .setTable(table);
       Search.QueryResultDto dtoResult = searchQueryFactory.create().execute(indexManagerHelper, dtoQueries);
       return Response.ok().entity(dtoResult).build();
-    } catch(UnsupportedOperationException|JSONException e) {
+    } catch(UnsupportedOperationException e) {
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    } catch(JSONException e) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
     }
   }

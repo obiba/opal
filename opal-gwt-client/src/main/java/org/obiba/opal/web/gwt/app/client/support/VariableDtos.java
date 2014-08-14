@@ -266,6 +266,48 @@ public class VariableDtos {
     return attribute;
   }
 
+  public static boolean isNumeric(VariableDto variable) {
+    String type = variable.getValueType().toLowerCase();
+    return type.equals("integer") || type.equals("decimal");
+  }
+
+  public static boolean isDateTime(VariableDto variable) {
+    String type = variable.getValueType().toLowerCase();
+    return type.equals("date") || type.equals("datetime");
+  }
+
+  public static boolean isGeo(VariableDto variable) {
+    String type = variable.getValueType().toLowerCase();
+    return type.equals("point") || type.equals("linestring") || type.equals("polygon");
+  }
+
+  public static VariableNature nature(VariableDto variable) {
+    if(JsArrays.toSafeArray(variable.getCategoriesArray()).length()>0) {
+      return allCategoriesMissing(variable) && isNumeric(variable) ? VariableNature.CONTINUOUS : VariableNature.CATEGORICAL;
+    }
+    if(isNumeric(variable)) {
+      return VariableNature.CONTINUOUS;
+    }
+    if(isDateTime(variable)) {
+      return VariableNature.TEMPORAL;
+    }
+    if(variable.getValueType().equals("boolean")) {
+      return VariableNature.CATEGORICAL;
+    }
+    if(isGeo(variable)) {
+      return VariableNature.GEO;
+    }
+    if(variable.getValueType().equals("binary")) {
+      return VariableNature.BINARY;
+    }
+
+    return VariableNature.UNDETERMINED;
+  }
+
+  public enum VariableNature {
+    CATEGORICAL, CONTINUOUS, TEMPORAL, GEO, BINARY, UNDETERMINED
+  }
+
   public enum ValueType {
 
     TEXT, DECIMAL, INTEGER, BINARY, BOOLEAN, DATETIME, DATE, LOCALE, POINT, LINE, POLYGON;

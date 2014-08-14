@@ -2179,6 +2179,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Variable not found: {0}")
   String variableNotFound();
 
+  @Description("Variable not categorical label")
+  @DefaultStringValue("Variable is not categorical: {0}")
+  String variableNotCategorical();
+
+  @Description("Variable not categorical nor continuous label")
+  @DefaultStringValue("Variable is not categorical nor continuous: {0}")
+  String variableNotCategoricalNorContinuous();
+
   @Description("NA (total: {N}) label")
   @DefaultStringValue("N/A (total: {0})")
   String NATotalLabel();

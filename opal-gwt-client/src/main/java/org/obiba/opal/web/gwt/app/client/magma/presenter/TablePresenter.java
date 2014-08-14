@@ -38,11 +38,9 @@ import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.Variabl
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
-import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
-import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
-import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
+import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -60,6 +58,7 @@ import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
@@ -80,7 +79,6 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
@@ -662,25 +660,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
           .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
               .build(table.getDatasourceName(), table.getName(), selectedVariableName)) //
           .get() //
-          .withCallback(new ResourceCallback<VariableDto>() {
-            @Override
-            public void onResource(Response response, final VariableDto variableDto) {
-
-              ResourceRequestBuilderFactory.<VariableDto>newBuilder() //
-                  .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
-                      .build(table.getDatasourceName(), table.getName(), crossWithVariableName)) //
-                  .get() //
-                  .withCallback(new ResourceCallback<VariableDto>() {
-                    @Override
-                    public void onResource(Response response, VariableDto crossWithVariable) {
-                      ContingencyTablePresenter crossVariablePresenter = crossVariableProvider.get();
-                      crossVariablePresenter.initialize(table, variableDto, crossWithVariable);
-                      setInSlot(Display.Slots.ContingencyTable, crossVariablePresenter);
-                    }//
-                  }).withCallback(new VariableNotFoundCallback(crossWithVariableName), Response.SC_NOT_FOUND)//
-                  .send();
-            }//
-          }).withCallback(new VariableNotFoundCallback(selectedVariableName), Response.SC_NOT_FOUND)//
+          .withCallback(new SelectedVariableCallback(crossWithVariableName)).withCallback(
+          new VariableNotFoundCallback(selectedVariableName), Response.SC_NOT_FOUND)//
           .send();
     }
   }
@@ -797,6 +778,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
       // Hide contingency table and show only if up to date or outdated
       getView().hideContingencyTable();
+      GWT.log("index status = " + response.getStatusCode());
       if(response.getStatusCode() == SC_OK) {
         getView().setIndexStatusVisible(true);
         statusDto = TableIndexStatusDto.get(JsArrays.toSafeArray(resource));
@@ -826,9 +808,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
     private void updateContingencyTableVariables() {
       TableIndexationStatus status = statusDto.getStatus();
-      if(status.isTableIndexationStatus(TableIndexationStatus.UPTODATE) ||
-          status.isTableIndexationStatus(TableIndexationStatus.OUTDATED)) {
-
+      if(status.isTableIndexationStatus(TableIndexationStatus.UPTODATE)) {
         ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(table.getLink() + "/variables")
             .get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
           @Override
@@ -1070,5 +1050,55 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       fireEvent(NotificationEvent.newBuilder()
           .error(TranslationsUtils.replaceArguments(translations.variableNotFound(), name)).build());
     }
+  }
+
+  private class SelectedVariableCallback implements ResourceCallback<VariableDto> {
+    private final String crossWithVariableName;
+
+    public SelectedVariableCallback(String crossWithVariableName) {
+      this.crossWithVariableName = crossWithVariableName;
+    }
+
+    @Override
+    public void onResource(Response response, final VariableDto variableDto) {
+      // check selected variable is valid
+      if(VariableDtos.nature(variableDto) == VariableDtos.VariableNature.CATEGORICAL) {
+        ResourceRequestBuilderFactory.<VariableDto>newBuilder() //
+            .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
+                .build(table.getDatasourceName(), table.getName(), crossWithVariableName)) //
+            .get() //
+            .withCallback(new CrossVariableCallback(variableDto)).withCallback(
+            new VariableNotFoundCallback(crossWithVariableName), Response.SC_NOT_FOUND)//
+            .send();
+      } else {
+        fireEvent(NotificationEvent.newBuilder()
+            .error(TranslationsUtils.replaceArguments(translations.variableNotCategorical(), variableDto.getName()))
+            .build());
+      }
+    }//
+  }
+
+  private class CrossVariableCallback implements ResourceCallback<VariableDto> {
+    private final VariableDto variableDto;
+
+    public CrossVariableCallback(VariableDto variableDto) {
+      this.variableDto = variableDto;
+    }
+
+    @Override
+    public void onResource(Response response, VariableDto crossWithVariable) {
+      // check cross variable is valid
+      VariableDtos.VariableNature nature = VariableDtos.nature(crossWithVariable);
+      if(nature == VariableDtos.VariableNature.CATEGORICAL ||
+          nature == VariableDtos.VariableNature.CONTINUOUS) {
+        ContingencyTablePresenter crossVariablePresenter = crossVariableProvider.get();
+        crossVariablePresenter.initialize(table, variableDto, crossWithVariable);
+        setInSlot(Display.Slots.ContingencyTable, crossVariablePresenter);
+      } else {
+        fireEvent(NotificationEvent.newBuilder().error(TranslationsUtils
+            .replaceArguments(translations.variableNotCategoricalNorContinuous(), crossWithVariable.getName()))
+            .build());
+      }
+    }//
   }
 }
