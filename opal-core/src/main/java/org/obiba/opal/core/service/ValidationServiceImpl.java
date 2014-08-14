@@ -2,7 +2,6 @@ package org.obiba.opal.core.service;
 
 import org.obiba.magma.*;
 import org.obiba.opal.core.service.validation.DataValidator;
-//import org.obiba.opal.core.service.validation.ValidatorFactory;
 import org.obiba.opal.core.service.validation.ValidatorFactory;
 import org.obiba.opal.core.support.MessageLogger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +10,6 @@ import org.springframework.stereotype.Component;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 
-/**
- * Created by carlos on 7/28/14.
- */
 @Component
 public class ValidationServiceImpl implements ValidationService {
 

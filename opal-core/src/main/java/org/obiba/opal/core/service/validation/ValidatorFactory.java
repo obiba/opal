@@ -124,7 +124,7 @@ public class ValidatorFactory {
         if (this.systemKeyStoreService == null) {
             this.keyStore = keyStore;
         } else {
-            //no to be used when systemKeyStoreService is available
+            //not to be used when systemKeyStoreService is available
             throw new IllegalStateException("Should not be set manually when systemKeyStoreService is available");
         }
     }
