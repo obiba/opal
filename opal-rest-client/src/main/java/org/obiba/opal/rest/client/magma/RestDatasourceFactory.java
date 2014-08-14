@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.rest.client.magma;
 
+import java.security.KeyStore;
+
 import javax.validation.constraints.NotNull;
 
 import org.apache.http.params.CoreConnectionPNames;
@@ -29,14 +31,38 @@ public class RestDatasourceFactory extends AbstractDatasourceFactory {
 
   private final String remoteDatasource;
 
+  private KeyStore keyStore;
+
   private Integer soTimeout;
 
+  /**
+   * Authenticate by username/password.
+   * @param name
+   * @param url
+   * @param username
+   * @param password
+   * @param remoteDatasource
+   */
   public RestDatasourceFactory(String name, String url, String username, String password, String remoteDatasource) {
     setName(name);
     this.url = url;
     this.username = username;
     this.password = password;
     this.remoteDatasource = remoteDatasource;
+  }
+
+  /**
+   * Authenticate by SSL 2-way encryption.
+   * @param name
+   * @param url
+   * @param keyStore
+   * @param alias
+   * @param keyStorePassword
+   * @param remoteDatasource
+   */
+  public RestDatasourceFactory(String name, String url, KeyStore keyStore, String alias, String keyStorePassword, String remoteDatasource) {
+    this(name, url, alias, keyStorePassword, remoteDatasource);
+    this.keyStore = keyStore;
   }
 
   /**
@@ -54,7 +80,8 @@ public class RestDatasourceFactory extends AbstractDatasourceFactory {
     if(!url.endsWith("/ws") || !url.endsWith("/ws/")) {
       opalUrl = url + "/ws";
     }
-    OpalJavaClient client = new OpalJavaClient(opalUrl, username, password);
+    OpalJavaClient client;
+    client = new OpalJavaClient(opalUrl, keyStore, username, password);
     if(soTimeout != null) {
       client.setSoTimeout(soTimeout);
     }

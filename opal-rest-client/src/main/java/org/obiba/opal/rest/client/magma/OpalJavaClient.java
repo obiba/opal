@@ -16,21 +16,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
+import java.security.UnrecoverableKeyException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.annotation.Nullable;
 
 import org.apache.http.Header;
 import org.apache.http.HttpMessage;
@@ -51,7 +51,12 @@ import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeSocketFactory;
+import org.apache.http.conn.ssl.PrivateKeyDetails;
+import org.apache.http.conn.ssl.PrivateKeyStrategy;
+import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntity;
@@ -94,6 +99,8 @@ public class OpalJavaClient {
 
   private final URI opalURI;
 
+  private KeyStore keyStore;
+
   private final Credentials credentials;
 
   private int soTimeout = DEFAULT_SO_TIMEOUT;
@@ -106,13 +113,33 @@ public class OpalJavaClient {
 
   private final ExtensionRegistryFactory extensionRegistryFactory = new ExtensionRegistryFactory();
 
+  /**
+   * Authenticate by username/password.
+   * @param uri
+   * @param username user principal name
+   * @param password user password
+   * @throws URISyntaxException
+   */
   public OpalJavaClient(String uri, String username, String password) throws URISyntaxException {
+    this(uri, null, username, password);
+  }
+
+  /**
+   * Authenticate by SSL 2-way encryption if a key store is provided, else authenticate by username/password.
+   * @param uri
+   * @param keyStore
+   * @param username key store alias or user principal name (if keyStore is null)
+   * @param password key store password or user password (if keyStore is null)
+   * @throws URISyntaxException
+   */
+  public OpalJavaClient(String uri, @Nullable KeyStore keyStore, String username, String password) throws URISyntaxException {
     if(uri == null) throw new IllegalArgumentException("uri cannot be null");
     if(username == null) throw new IllegalArgumentException("username cannot be null");
     if(password == null) throw new IllegalArgumentException("password cannot be null");
 
     opalURI = new URI(uri.endsWith("/") ? uri : uri + "/");
     credentials = new UsernamePasswordCredentials(username, password);
+    this.keyStore = keyStore;
   }
 
   /**
@@ -132,7 +159,7 @@ public class OpalJavaClient {
   private void createClient() {
     log.info("Connecting to Opal: {}", opalURI);
     DefaultHttpClient httpClient = new DefaultHttpClient();
-    httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, credentials);
+    if(keyStore == null) httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, credentials);
     httpClient.getParams().setParameter(ClientPNames.HANDLE_AUTHENTICATION, Boolean.TRUE);
     httpClient.getParams()
         .setParameter(AuthPNames.TARGET_AUTH_PREF, Collections.singletonList(OpalAuth.CREDENTIALS_HEADER));
@@ -155,28 +182,27 @@ public class OpalJavaClient {
   }
 
   private SchemeSocketFactory getSocketFactory() throws NoSuchAlgorithmException, KeyManagementException {
-    // Accepts any SSL certificate
-    TrustManager tm = new X509TrustManager() {
+    SSLContextBuilder builder = SSLContexts.custom().useTLS();
+    try {
+      builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+    } catch(KeyStoreException e) {
+      log.error("Unable to set SSL trust manager: {}", e.getMessage(), e);
+    }
 
-      @Override
-      public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-
+    if(keyStore != null) {
+      try {
+        builder.loadKeyMaterial(keyStore, credentials.getPassword().toCharArray(), new PrivateKeyStrategy() {
+          @Override
+          public String chooseAlias(Map<String, PrivateKeyDetails> aliases, Socket socket) {
+            return credentials.getUserPrincipal().getName();
+          }
+        });
+      } catch(KeyStoreException | UnrecoverableKeyException e) {
+        log.error("Unable to set SSL key manager: {}", e.getMessage(), e);
       }
+    }
 
-      @Override
-      public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-
-      }
-
-      @Override
-      public X509Certificate[] getAcceptedIssuers() {
-        return null;
-      }
-    };
-    SSLContext sslContext = SSLContext.getInstance("TLS");
-    sslContext.init(null, new TrustManager[] { tm }, null);
-
-    return new SSLSocketFactory(sslContext, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+    return new SSLSocketFactory(builder.build(), SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
   }
 
   public void close() {
@@ -331,7 +357,7 @@ public class OpalJavaClient {
   }
 
   private void authenticate(HttpMessage msg) {
-    if(credentials != null) {
+    if(keyStore == null) {
       msg.addHeader(OpalAuthScheme.authenticate(credentials, AuthParams.getCredentialCharset(msg.getParams()), false));
     }
   }
