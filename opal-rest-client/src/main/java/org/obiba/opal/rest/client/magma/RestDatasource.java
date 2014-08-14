@@ -61,9 +61,9 @@ public class RestDatasource extends AbstractDatasource {
       refresh();
     } catch(RuntimeException e) {
       if(e.getCause() instanceof ConnectException) {
-        log.error("Failed connecting to Opal: {}", e.getCause().getMessage());
+        log.error("Failed connecting to Opal server: {}", e.getMessage(), e);
       } else {
-        log.error("Unexpected error while communicating with Opal", e);
+        log.error("Unexpected error while communicating with Opal server: {}", e.getMessage(), e);
       }
       throw new MagmaRuntimeException(e.getMessage(), e);
     }
@@ -76,9 +76,9 @@ public class RestDatasource extends AbstractDatasource {
       super.initialise();
     } catch(RuntimeException e) {
       if(e.getCause() instanceof ConnectException) {
-        log.error("Failed connecting to Opal: {}", e.getCause().getMessage());
+        log.error("Failed connecting to Opal server: {}", e.getMessage(), e);
       } else {
-        log.error("Unexpected error while communicating with Opal", e);
+        log.error("Unexpected error while communicating with Opal server: {}", e.getMessage(), e);
       }
       throw new MagmaRuntimeException(e.getMessage(), e);
     }
@@ -128,24 +128,28 @@ public class RestDatasource extends AbstractDatasource {
   }
 
   private void refresh() {
-    Set<String> cachedTableNames = ImmutableSet
-        .copyOf(Iterables.transform(super.getValueTables(), new Function<ValueTable, String>() {
+    try {
+      Set<String> cachedTableNames = ImmutableSet
+          .copyOf(Iterables.transform(super.getValueTables(), new Function<ValueTable, String>() {
 
-          @Override
-          public String apply(ValueTable input) {
-            return input.getName();
-          }
-        }));
-    Set<String> currentTables = getValueTableNames();
+            @Override
+            public String apply(ValueTable input) {
+              return input.getName();
+            }
+          }));
+      Set<String> currentTables = getValueTableNames();
 
-    SetView<String> tablesToRemove = Sets.difference(cachedTableNames, currentTables);
-    SetView<String> tablesToAdd = Sets.difference(currentTables, cachedTableNames);
+      SetView<String> tablesToRemove = Sets.difference(cachedTableNames, currentTables);
+      SetView<String> tablesToAdd = Sets.difference(currentTables, cachedTableNames);
 
-    for(String table : tablesToRemove) {
-      removeValueTable(table);
-    }
-    for(String table : tablesToAdd) {
-      addValueTable(table);
+      for(String table : tablesToRemove) {
+        removeValueTable(table);
+      }
+      for(String table : tablesToAdd) {
+        addValueTable(table);
+      }
+    } catch (Exception e) {
+      log.error("Failed refreshing value tables from Opal server: {}", e.getMessage(), e);
     }
   }
 
