@@ -17,6 +17,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import org.codehaus.jettison.json.JSONException;
+import org.hibernate.annotations.Check;
 import org.obiba.opal.search.ValuesIndexManager;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.IndexManagerHelper;
@@ -59,9 +60,9 @@ public class ValueTableFacetsResource {
       dtoResult = searchQueryFactory.create().execute(indexManagerHelper, dtoQueries);
 
     } catch(UnsupportedOperationException e) {
-      return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+      return Response.status(Response.Status.BAD_REQUEST).build();
     } catch(JSONException e) {
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+      return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
     }
 
     return Response.ok().entity(dtoResult).build();
