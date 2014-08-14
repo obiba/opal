@@ -41,7 +41,7 @@ public enum VariableNature {
 
   public static VariableNature getNature(Variable variable) {
     if(variable.hasCategories()) {
-      return variable.areAllCategoriesMissing() ? CONTINUOUS : CATEGORICAL;
+      return variable.areAllCategoriesMissing() && variable.getValueType().isNumeric() ? CONTINUOUS : CATEGORICAL;
     }
     if(variable.getValueType().isNumeric()) {
       return CONTINUOUS;
