@@ -17,7 +17,7 @@ public class ValidationServiceImpl implements ValidationService {
     //private TransactionTemplate txTemplate;
 
     @Autowired
-    private ValidatorFactory validatorFactory;
+    ValidatorFactory validatorFactory;
 
     private boolean isValidationEnabled(Datasource datasource) {
         return true;

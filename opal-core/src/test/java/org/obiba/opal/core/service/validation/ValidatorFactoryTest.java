@@ -3,6 +3,7 @@ package org.obiba.opal.core.service.validation;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.util.HashSet;
@@ -75,7 +76,7 @@ public class ValidatorFactoryTest {
     private void testCsvVocabularyCodes(String url) throws Exception {
         factory.setKeyStore(getTestKeyStore());
         VocabularyImporter importer = new CsvVocabularyImporter();
-        Set<String> codes = factory.getVocabularyCodes(url, importer);
+        Set<String> codes = factory.getVocabularyCodes(new URL(url), importer);
         Assert.assertEquals("codes set should match", VALID_CODES, codes);
     }
 

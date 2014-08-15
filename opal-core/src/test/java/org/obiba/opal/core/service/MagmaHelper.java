@@ -2,6 +2,7 @@ package org.obiba.opal.core.service;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -20,14 +21,14 @@ public class MagmaHelper {
 	public static final String VOCAB_VARIABLE = "code";
 	public static final String ENTITY = "Participant";
 	
-    public static String getVocabularyFileUrl() throws Exception {
+    public static URL getVocabularyFileUrl() throws Exception {
         File file = new File("src/test/resources/vocabulary.csv");
         URI uri = file.toURI();
-        return uri.toURL().toExternalForm();
+        return uri.toURL();
     }
     
     public static Variable createVocabularyVariable() throws Exception {
-    	return createVocabularyVariable(getVocabularyFileUrl());
+    	return createVocabularyVariable(getVocabularyFileUrl().toExternalForm());
     }
 
     public static Variable createVariable() {
@@ -36,6 +37,7 @@ public class MagmaHelper {
     }
 
     public static Variable createVocabularyVariable(String vocabUrl) {
+        System.out.println(vocabUrl);
     	Variable.Builder builder = new Variable.Builder(VOCAB_VARIABLE, TextType.get(), ENTITY);
     	builder.addAttribute(ValidationService.VOCABULARY_URL_ATTRIBUTE, vocabUrl);
     	return builder.build();

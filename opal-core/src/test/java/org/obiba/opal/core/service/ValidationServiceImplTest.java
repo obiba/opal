@@ -7,6 +7,7 @@ import org.obiba.magma.*;
 import org.obiba.magma.support.StaticValueTable;
 import org.obiba.opal.core.service.ValidationService.ValidationResult;
 import org.obiba.opal.core.service.ValidationService.ValidationTask;
+import org.obiba.opal.core.service.validation.ValidatorFactory;
 import org.obiba.opal.core.service.validation.VocabularyValidator;
 import org.obiba.opal.core.support.MessageLogger;
 import org.obiba.opal.core.support.SystemOutMessageLogger;
@@ -29,6 +30,8 @@ public class ValidationServiceImplTest {
     @Before
     public void setUp() {
     	validationService = new ValidationServiceImpl();
+        validationService.validatorFactory = new ValidatorFactory();
+        validationService.validatorFactory.postConstruct();
     }
 
     private ValueTable createTable(String codeValue, Variable var) throws Exception {
