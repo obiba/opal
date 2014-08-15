@@ -65,6 +65,8 @@ public class OpalJettyServer {
 
   private static final int REQUEST_HEADER_SIZE = 8192;
 
+  private static final String MAX_FORM_CONTENT_SIZE = "200000";
+
   private Server jettyServer;
 
   private ServletContextHandler servletContextHandler;
@@ -85,6 +87,8 @@ public class OpalJettyServer {
     // OPAL-342: We will manually stop the Jetty server instead of relying its shutdown hook
     jettyServer.setStopAtShutdown(false);
 
+
+
     Properties properties = loadProperties();
     String httpPort = properties.getProperty("org.obiba.opal.http.port");
     String httpsPort = properties.getProperty("org.obiba.opal.https.port");
@@ -94,6 +98,11 @@ public class OpalJettyServer {
     configureHttpConnector(httpPort == null ? null : Integer.valueOf(httpPort), maxIdleTime);
     configureSslConnector(httpsPort == null ? null : Integer.valueOf(httpsPort), maxIdleTime);
     configureAjpConnector(ajpPort == null ? null : Integer.valueOf(ajpPort));
+
+    // OPAL-2652
+    int maxFormContentSize = Integer
+        .valueOf(properties.getProperty("org.obiba.opal.maxFormContentSize", MAX_FORM_CONTENT_SIZE));
+    jettyServer.setAttribute("org.eclipse.jetty.server.Request.maxFormContentSize", maxFormContentSize);
 
     HandlerList handlers = new HandlerList();
 
