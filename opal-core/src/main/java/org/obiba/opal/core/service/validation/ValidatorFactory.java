@@ -153,9 +153,9 @@ public class ValidatorFactory {
 
     @PostConstruct
     public void postConstruct() {
-        try {
+        if (systemKeyStoreService != null) {
             keyStore = systemKeyStoreService.getKeyStore().getKeyStore();
-        } catch(NullPointerException e) { /* leave keyStore as null */ }
+        }
 
         Map<String, VocabularyImporter> map = new HashMap<>();
         VocabularyImporter csvImporter = new CsvVocabularyImporter();
