@@ -195,10 +195,16 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
     @Override
     public void run() {
       log.debug("Updating ValueTable index {}", index.getValueTableReference());
-      index.delete();
-      createIndex();
-      index.createMapping();
-      index();
+        try {
+            index.delete();
+            createIndex();
+            index.createMapping();
+            index();
+        } catch (RuntimeException ex) {
+            //logging this explicitly, otherwise will be lost
+            log.error("Unexpected error creating index", ex);
+            //throw ex;
+        }
     }
 
     protected BulkRequestBuilder sendAndCheck(BulkRequestBuilder bulkRequest) {
