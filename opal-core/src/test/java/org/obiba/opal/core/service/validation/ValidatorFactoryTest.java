@@ -17,9 +17,6 @@ import org.junit.Test;
 import org.obiba.magma.Variable;
 import org.obiba.opal.core.service.MagmaHelper;
 
-/**
- * Created by carlos on 7/28/14.
- */
 public class ValidatorFactoryTest {
 
     private ValidatorFactory factory;
