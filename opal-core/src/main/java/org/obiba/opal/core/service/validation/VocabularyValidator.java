@@ -21,10 +21,10 @@ public class VocabularyValidator implements DataValidator {
 
     @Override
     public boolean isValid(Value value) {
-        if (!value.isNull()) {
-            return codes.contains(value.toString());
+        if (value.isNull()) {
+            return true;
         }
-        return true;
+        return codes.contains(value.toString());
     }
 
     @Override

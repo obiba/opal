@@ -22,13 +22,11 @@ public class ValidationServiceImpl implements ValidationService {
     private boolean isValidationEnabled(Datasource datasource) {
         return true;
         /* @todo implement way to set this attribute on the project
-        boolean result = false;
         try {
-            result = Boolean.valueOf(datasource.getAttributeStringValue(VALIDATE_ATTRIBUTE));
+            return Boolean.valueOf(datasource.getAttributeStringValue(VALIDATE_ATTRIBUTE));
         } catch (NoSuchAttributeException ex) {
-            //ignored
+            return false;
         }
-        return result;
         */
     }
 
@@ -70,18 +68,16 @@ public class ValidationServiceImpl implements ValidationService {
         final ValidationResult result = new ValidationResult();
 
         logger.info("Validating table %s.%s", valueTable.getDatasource().getName(), valueTable.getName());
-        Iterator<ValueSet> valueSets = valueTable.getValueSets().iterator();
 
-        while (valueSets.hasNext()) {
-            ValueSet vset = valueSets.next();
-            for (Map.Entry<String, List<DataValidator>> entry: validatorMap.entrySet()) {
+        for (ValueSet vset : valueTable.getValueSets()) {
+            for (Map.Entry<String, List<DataValidator>> entry : validatorMap.entrySet()) {
                 String varName = entry.getKey();
                 Value value = valueTable.getValue(valueTable.getVariable(varName), vset);
 
                 List<DataValidator> validators = entry.getValue();
-                for (DataValidator validator: validators) {
+                for (DataValidator validator : validators) {
                     if (!validator.isValid(value)) {
-                        logger.warn(getValidationFailMessage(validator,varName, value));
+                        logger.warn(getValidationFailMessage(validator, varName, value));
                         result.addFailure(varName, validator.getType(), value);
                     }
                 }
