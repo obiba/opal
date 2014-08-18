@@ -18,38 +18,32 @@ public class ValidateCommand extends AbstractOpalRuntimeDependentCommand<Validat
     @Override
     public int execute() {
         int errorCode = CommandResultCode.CRITICAL_ERROR;
-        Datasource ds = null;
-        ValueTable valueTable = null;
+        Datasource ds;
+        ValueTable valueTable;
 
-        String datasource = getOptions().getDatasource();
-        if (datasource == null) {
+        try {
+            String datasource = getOptions().getDatasource();
+            ds = MagmaEngine.get().getDatasource(datasource);
+        } catch (NullPointerException ex) {
             getShell().printf("No datasource specified\n");
-        } else {
-            try {
-                ds = MagmaEngine.get().getDatasource(datasource);
-            } catch (NoSuchDatasourceException ex) {
-                getShell().printf("Datasource not found\n");
-            }
-        }
-
-        if (ds != null) {
-            String table = getOptions().getTable();
-            if (table == null) {
-                getShell().printf("No table specified\n");
-            }
-
-            try {
-                valueTable = ds.getValueTable(table);
-            } catch (NoSuchValueTableException ex) {
-                getShell().printf("Table not found\n");
-            }
-        }
-
-        if (valueTable != null) {
-            return executeValidation(valueTable);
-        } else {
+            return errorCode;
+        } catch (NoSuchDatasourceException ex) {
+            getShell().printf("Datasource not found\n");
             return errorCode;
         }
+
+        try {
+            String table = getOptions().getTable();
+            valueTable = ds.getValueTable(table);
+        } catch (NullPointerException ex) {
+            getShell().printf("No table specified\n");
+            return errorCode;
+        } catch (NoSuchValueTableException ex) {
+            getShell().printf("Table not found\n");
+            return errorCode;
+        }
+
+        return executeValidation(valueTable);
     }
 
     private int executeValidation(ValueTable valueTable) {
