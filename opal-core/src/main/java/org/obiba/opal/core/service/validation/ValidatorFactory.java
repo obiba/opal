@@ -79,7 +79,7 @@ public class ValidatorFactory {
      */
     public VocabularyValidator getVocabularyValidator(URL url) throws Exception {
         String extension = Files.getFileExtension(url.getFile());
-        if (extension.equals("")) {
+        if (extension.isEmpty()) {
             throw new IllegalArgumentException("Could not obtain filename extension from " + url);
         }
         VocabularyImporter importer = importerMap.get(extension);
@@ -93,7 +93,7 @@ public class ValidatorFactory {
     }
 
     Set<String> getVocabularyCodes(URL url, VocabularyImporter importer) throws IOException, GeneralSecurityException {
-        if (url.getProtocol() == "https") {
+        if ("https".equals(url.getProtocol())) {
             return getVocabularyCodesHttps(url, importer);
         } else {
             try (InputStream in = url.openStream()) {
@@ -139,8 +139,7 @@ public class ValidatorFactory {
     private Set<String> getVocabularyCodesHttps(URL url, VocabularyImporter importer) throws IOException,
             GeneralSecurityException {
         try (CloseableHttpClient httpClient = getHttpsClient();
-             CloseableHttpResponse response = httpClient.execute(
-                     new HttpGet(url.toURI())) ) {
+             CloseableHttpResponse response = httpClient.execute(new HttpGet(url.toURI())) ) {
             StatusLine status = response.getStatusLine();
             if (response.getStatusLine().getStatusCode() != 200) {
                 throw new RuntimeException(String.format("Error getting contents of %s: status is %s", url, status.toString()));
