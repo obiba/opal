@@ -35,8 +35,7 @@ public interface ValidationService {
      */
     public class ValidationResult {
 
-        private final SetMultimap<List<String>, Value> failureMap = Multimaps.synchronizedSetMultimap(
-                HashMultimap.<List<String>, Value>create());
+        private final SetMultimap<List<String>, Value> failureMap = HashMultimap.<List<String>, Value>create();
 
         /**
          * Adds a validation failure to this.
