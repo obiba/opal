@@ -117,6 +117,12 @@ public class ValidatorFactory {
 
     private CloseableHttpClient getHttpsClient() throws IOException, GeneralSecurityException {
 
+        /*
+         * @Todo: The current code doesn't verify the certificate at all. The plan is to use self-signed certificates
+         * for the mica instances we are connecting to, but to only trust known certificates rather than any
+         * self-signed cert.
+         */
+
         // Trust own CA and all self-signed certs
         SSLContext sslcontext = SSLContexts.custom()
                 .loadTrustMaterial(keyStore, new TrustSelfSignedStrategy())
