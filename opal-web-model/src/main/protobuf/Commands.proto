@@ -79,3 +79,9 @@ message ReportCommandOptionsDto {
   required string name = 1;
   required string project = 2;
 }
+
+message ValidateCommandOptionsDto {
+    required string project = 1;
+    required string table = 2;
+    optional string variable = 3;
+}

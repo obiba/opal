@@ -378,3 +378,13 @@ message VcsCommitInfoDto {
   optional bool isHead = 7 [default = false]; // head of the commit tree
   optional bool isCurrent = 8 [default = false]; // current (latest) commit for a given path
 }
+
+message ValidationResultDto {
+    required string datasource = 1;
+    required string table = 2;
+    required int64 jobId = 3;
+    required int64 triggerDate = 4;
+    optional string results = 5; //json with validation result
+    optional string errorMessage = 6; //string for any unexpected error (that aborts validation)
+}
+

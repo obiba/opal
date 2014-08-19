@@ -13,4 +13,7 @@ public interface ValidateCommandOptions  extends HelpOption {
     @Option(shortName = "t", description = "Tables/view to be validated.")
     String getTable();
 
+    @Option(shortName = "v", description = "Variable to be validated.")
+    String getVariable();
+
 }
