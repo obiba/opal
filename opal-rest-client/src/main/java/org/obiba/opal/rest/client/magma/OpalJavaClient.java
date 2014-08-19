@@ -259,7 +259,7 @@ public class OpalJavaClient {
 
   public <T extends Message> T getResource(Class<T> messageType, URI uri, Message.Builder builder) {
     try {
-      return readResource(messageType, get(uri), builder);
+      return readResource(messageType, uri, get(uri), builder);
     } catch(IOException e) {
       //noinspection CallToPrintStackTrace
       e.printStackTrace();
@@ -269,7 +269,7 @@ public class OpalJavaClient {
 
   public <T extends Message> T postResource(Class<T> messageType, URI uri, Message.Builder builder, Message message) {
     try {
-      return readResource(messageType, post(uri, message), builder);
+      return readResource(messageType, uri, post(uri, message), builder);
     } catch(IOException e) {
       //noinspection CallToPrintStackTrace
       e.printStackTrace();
@@ -277,12 +277,12 @@ public class OpalJavaClient {
     }
   }
 
-  public <T extends Message> T readResource(Class<T> messageType, HttpResponse response, Message.Builder builder) {
+  public <T extends Message> T readResource(Class<T> messageType, URI uri, HttpResponse response, Message.Builder builder) {
     InputStream is = null;
     try {
       if(response.getStatusLine().getStatusCode() >= HttpStatus.SC_BAD_REQUEST) {
         EntityUtils.consume(response.getEntity());
-        throw new RuntimeException(response.getStatusLine().getReasonPhrase());
+        throw new RestRuntimeException(uri, response.getStatusLine());
       }
       is = response.getEntity().getContent();
       ExtensionRegistry extensionRegistry = extensionRegistryFactory.forMessage((Class<Message>) messageType);
