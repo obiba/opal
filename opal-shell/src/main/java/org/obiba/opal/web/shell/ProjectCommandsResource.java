@@ -29,10 +29,8 @@ import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
 import org.obiba.opal.shell.commands.options.ReportCommandOptions;
-import org.obiba.opal.shell.web.CopyCommandOptionsDtoImpl;
-import org.obiba.opal.shell.web.ExportCommandOptionsDtoImpl;
-import org.obiba.opal.shell.web.ImportCommandOptionsDtoImpl;
-import org.obiba.opal.shell.web.ReportCommandOptionsDtoImpl;
+import org.obiba.opal.shell.commands.options.ValidateCommandOptions;
+import org.obiba.opal.shell.web.*;
 import org.obiba.opal.web.model.Commands;
 import org.obiba.opal.web.support.InvalidRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,6 +135,21 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
     reportCommand.setOptions(reportOptions);
 
     return launchCommand(reportCommand);
+  }
+
+  @POST
+  @Path("/_validate")
+  public Response validateData(Commands.ValidateCommandOptionsDto dto) {
+
+    if(!name.equals(dto.getProject())) {
+      throw new InvalidRequestException("NotTheCurrentDatasource", name);
+    }
+
+    ValidateCommandOptions options = new ValidateCommandOptionsDtoImpl(dto);
+    Command<ValidateCommandOptions> command = commandRegistry.newCommand("validate");
+    command.setOptions(options);
+
+    return launchCommand(command);
   }
 
   @Override

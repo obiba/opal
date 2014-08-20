@@ -1,5 +1,6 @@
 package org.obiba.opal.core.service;
 
+import com.google.common.collect.ImmutableSet;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,13 +10,9 @@ import org.obiba.opal.core.service.ValidationService.ValidationResult;
 import org.obiba.opal.core.service.ValidationService.ValidationTask;
 import org.obiba.opal.core.service.validation.ValidatorFactory;
 import org.obiba.opal.core.service.validation.VocabularyValidator;
-import org.obiba.opal.core.support.MessageLogger;
 import org.obiba.opal.core.support.SystemOutMessageLogger;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by carlos on 8/5/14.
@@ -49,8 +46,9 @@ public class ValidationServiceImplTest {
     @Test
     public void testValidateWithVocabularyFailure() throws Exception {
         ValueTable table = createTable(INVALID_CODE, MagmaHelper.createVocabularyVariable());
-        ValidationTask task = validationService.createValidationTask(table, new SystemOutMessageLogger());
-        ValidationResult result = task.validate();
+        ValidationResult result = validationService.validateNoTransaction(table, new SystemOutMessageLogger());
+
+        checkVariableRules(result);
 
 		Assert.assertTrue("should have failures", result.hasFailures());
 		Set<List<String>> pairs = result.getFailurePairs();
@@ -64,13 +62,23 @@ public class ValidationServiceImplTest {
 		Assert.assertEquals("value mismatch", INVALID_CODE, failedValues.iterator().next().toString());
     }
 
+    private void checkVariableRules(ValidationResult result) {
+        Map<String, Set<String>> map =  result.getVariableRules();
+        Assert.assertEquals("wrong rule map count", 1, map.size());
+        Set<String> rules = map.get(MagmaHelper.VOCAB_VARIABLE);
+        Assert.assertNotNull("should have rules", rules);
+        Set<String> expectedRules = ImmutableSet.of(VocabularyValidator.TYPE);
+        Assert.assertEquals("rules mismatch", expectedRules, rules);
+    }
+
     @Test
     public void testValidateWithVocabularyNoFailures() throws Exception {
     	ValueTable table = createTable(VALID_CODE, MagmaHelper.createVocabularyVariable());
-        ValidationTask task = validationService.createValidationTask(table, new SystemOutMessageLogger());
-        ValidationResult result = task.validate();
+        ValidationResult result = validationService.validateNoTransaction(table, new SystemOutMessageLogger());
 
-		Assert.assertFalse("should have no failures", result.hasFailures());
+        checkVariableRules(result);
+
+        Assert.assertFalse("should have no failures", result.hasFailures());
     }
 
     @Test

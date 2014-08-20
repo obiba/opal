@@ -1,11 +1,15 @@
 package org.obiba.opal.core.service;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.obiba.magma.*;
 import org.obiba.opal.core.service.validation.DataValidator;
 import org.obiba.opal.core.service.validation.ValidatorFactory;
 import org.obiba.opal.core.support.MessageLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
@@ -13,8 +17,8 @@ import java.util.*;
 @Component
 public class ValidationServiceImpl implements ValidationService {
 
-    //@Autowired
-    //private TransactionTemplate txTemplate;
+    @Autowired
+    private TransactionTemplate txTemplate;
 
     @Autowired
     ValidatorFactory validatorFactory;
@@ -30,11 +34,8 @@ public class ValidationServiceImpl implements ValidationService {
         */
     }
 
-
-    /*
-    //previous code performing validation in a transaction
-    @Override
-    public ValidationResult validateData(final ValueTable valueTable, final MessageListener logger) {
+    private ValidationResult validateInTransaction(final ValueTable valueTable, final MessageLogger logger,
+                                      final Map<String, List<DataValidator>> validatorMap) {
 
         if (!isValidationEnabled(valueTable.getDatasource())) {
             return null;
@@ -45,7 +46,7 @@ public class ValidationServiceImpl implements ValidationService {
         final Runnable task = new Runnable() {
             @Override
             public void run() {
-                validate(valueTable, result, logger);
+                collectResults(valueTable, logger, validatorMap, result);
             }
         };
 
@@ -54,20 +55,47 @@ public class ValidationServiceImpl implements ValidationService {
                     @Override
                     protected void doInTransactionWithoutResult(TransactionStatus status) {
                         task.run();
-                        status.flush();
+                        //status.flush();
                     }
                 });
 
         return result;
+
     }
-*/
 
-    private ValidationResult validate(ValueTable valueTable, final MessageLogger logger,
-                                      Map<String, List<DataValidator>> validatorMap) {
-
+    /**
+     * For testing purposes only.
+     * Creates a validation task and runs the validation with no transaction/real database required
+     * @param valueTable
+     * @param logger
+     * @return
+     */
+    @VisibleForTesting
+    ValidationResult validateNoTransaction(ValueTable valueTable, MessageLogger logger) {
+        InternalValidationTask task = createInternalValidationTask(valueTable, logger);
         final ValidationResult result = new ValidationResult();
+        collectResults(valueTable, logger, task.validatorMap, result);
+        return result;
+    }
+
+    private Set<String> getRuleTypes(List<DataValidator> validators) {
+        Set<String> result = new HashSet<>();
+        for (DataValidator validator: validators) {
+            result.add(validator.getType());
+        }
+        return result;
+    }
+
+    private void collectResults(ValueTable valueTable,
+                                final MessageLogger logger,
+                                Map<String, List<DataValidator>> validatorMap,
+                                ValidationResult collector) {
 
         logger.info("Validating table %s.%s", valueTable.getDatasource().getName(), valueTable.getName());
+
+        for (Map.Entry<String,List<DataValidator>> entry: validatorMap.entrySet()) {
+            collector.setRules(entry.getKey(), getRuleTypes(entry.getValue()));
+        }
 
         for (ValueSet vset : valueTable.getValueSets()) {
             for (Map.Entry<String, List<DataValidator>> entry : validatorMap.entrySet()) {
@@ -78,13 +106,11 @@ public class ValidationServiceImpl implements ValidationService {
                 for (DataValidator validator : validators) {
                     if (!validator.isValid(value)) {
                         logger.warn(getValidationFailMessage(validator, varName, value));
-                        result.addFailure(varName, validator.getType(), value);
+                        collector.addFailure(varName, validator.getType(), value);
                     }
                 }
             }
         }
-
-        return result;
     }
 
     @Override
@@ -161,7 +187,7 @@ public class ValidationServiceImpl implements ValidationService {
 
         @Override
         public ValidationResult validate() {
-            return ValidationServiceImpl.this.validate(valueTable, logger, validatorMap);
+            return ValidationServiceImpl.this.validateInTransaction(valueTable, logger, validatorMap);
         }
     }
 }
