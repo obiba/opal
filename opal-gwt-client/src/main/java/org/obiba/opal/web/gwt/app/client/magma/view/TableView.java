@@ -229,6 +229,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiField
   ButtonGroup tableAddVariableGroup;
 
+  @UiField
+  FlowPanel validationResultsPanel;
+
   private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<>();
 
   private final Translations translations;
@@ -498,6 +501,11 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     getUiHandlers().onShowValues();
   }
 
+  @UiHandler("validationTab")
+  void onValidationTabSelect(ClickEvent event) {
+    getUiHandlers().onShowValidation();
+  }
+
   @UiHandler("downloadDictionary")
   void onDownloadDictionary(ClickEvent event) {
     getUiHandlers().onDownloadDictionary();
@@ -611,7 +619,13 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     getUiHandlers().onVariablesFilterUpdate(filter.getText());
   }
 
-  @Override
+  @UiHandler("validateTableButton")
+  void onValidate(ClickEvent event) {
+    validationResultsPanel.clear();
+    getUiHandlers().onValidate();
+  }
+
+    @Override
   public HandlerRegistration addVariableSortHandler(ColumnSortEvent.Handler handler) {
     return table.addColumnSortHandler(handler);
   }

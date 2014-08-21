@@ -279,6 +279,21 @@
         <g:SimplePanel ui:field="permissionsPanel"/>
       </b:Tab>
 
+      <b:Tab heading="Validation" ui:field="validationTab">
+          <b:FluidRow>
+              <b:FluidRow>
+                  <g:FlowPanel>
+                      <b:Button ui:field="validateTableButton" type="PRIMARY" addStyleNames="bottom-margin small-indent">
+                          <ui:msg description="Validate">Validate</ui:msg>
+                      </b:Button>
+                  </g:FlowPanel>
+              </b:FluidRow>
+              <b:FluidRow>
+                  <g:FlowPanel ui:field="validationResultsPanel"/>
+              </b:FluidRow>
+          </b:FluidRow>
+      </b:Tab>
+
     </b:TabPanel>
 
   </g:FlowPanel>

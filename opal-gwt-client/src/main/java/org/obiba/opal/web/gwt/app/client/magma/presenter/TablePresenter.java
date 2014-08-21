@@ -451,6 +451,11 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   }
 
   @Override
+  public void onShowValidation() {
+    //todo
+  }
+
+    @Override
   public void onExportData() {
     DataExportPresenter export = dataExportModalProvider.get();
     Set<TableDto> tables = new HashSet<>();
@@ -703,7 +708,12 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     }
   }
 
-  private final class VariableSortHandler implements ColumnSortEvent.Handler {
+  @Override
+  public void onValidate() {
+    //TODO
+  }
+
+    private final class VariableSortHandler implements ColumnSortEvent.Handler {
 
     @Override
     public void onColumnSort(ColumnSortEvent event) {
