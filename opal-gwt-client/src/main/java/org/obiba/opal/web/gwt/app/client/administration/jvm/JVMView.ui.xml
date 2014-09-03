@@ -31,7 +31,10 @@
     <b:Heading size="4">
       <ui:msg description="JVM Status header">Status</ui:msg>
     </b:Heading>
-    <g:Label ui:field="uptime"/>
+    <g:Label ui:field="uptime" addStyleNames="bottom-margin"/>
+    <b:Button ui:field="gc" icon="TRASH" addStyleNames="bottom-margin">
+      <ui:msg description="Clean memory label">Clean Memory</ui:msg>
+    </b:Button>
     <b:Row>
       <b:Column size="4" offset="1" ui:field="memHeapChartColumn"/>
       <b:Column size="4" offset="2" ui:field="memNonHeapChartColumn"/>

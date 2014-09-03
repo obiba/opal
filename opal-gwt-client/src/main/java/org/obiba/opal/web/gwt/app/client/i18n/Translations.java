@@ -2311,4 +2311,8 @@ public interface Translations extends Constants {
   @Description("No Tables for EntityType label")
   @DefaultStringValue("No tables for this entity type.")
   String noTablesforEntityType();
+
+  @Description("Launch garbage collector title")
+  @DefaultStringValue("Launch garbage collector")
+  String launchGarbageCollectorTitle();
 }
