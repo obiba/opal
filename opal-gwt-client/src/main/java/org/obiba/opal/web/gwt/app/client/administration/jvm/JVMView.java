@@ -20,17 +20,20 @@ import org.obiba.opal.web.model.client.opal.EntryDto;
 import org.obiba.opal.web.model.client.opal.OpalEnv;
 import org.obiba.opal.web.model.client.opal.OpalStatus;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.Column;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.ViewImpl;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
-public class JVMView extends ViewImpl implements JVMPresenter.Display {
+public class JVMView extends ViewWithUiHandlers<JVMUiHandlers> implements JVMPresenter.Display {
 
   // 2 minutes in milliseconds
   private static final int DURATION = 2 * 60000;
@@ -83,12 +86,16 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
   @UiField
   Column gcChartColumn;
 
+  @UiField
+  Button gc;
+
   private final Translations translations;
 
   @Inject
   public JVMView(Binder uiBinder, Translations translations) {
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
+    gc.setTitle(translations.launchGarbageCollectorTitle());
   }
 
   @Override
@@ -198,6 +205,11 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
 
     updateGcChart(status, timestamp);
 
+  }
+
+  @UiHandler("gc")
+  void onGc(ClickEvent event) {
+    getUiHandlers().onGc();
   }
 
   private void updateGcChart(OpalStatus status, double timestamp) {// Garbage collectors

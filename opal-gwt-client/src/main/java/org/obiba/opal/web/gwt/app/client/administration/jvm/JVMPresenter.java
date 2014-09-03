@@ -17,15 +17,18 @@ import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.OpalEnv;
 import org.obiba.opal.web.model.client.opal.OpalStatus;
 
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Timer;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyEvent;
@@ -33,7 +36,10 @@ import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
-public class JVMPresenter extends ItemAdministrationPresenter<JVMPresenter.Display, JVMPresenter.Proxy> {
+import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
+
+public class JVMPresenter extends ItemAdministrationPresenter<JVMPresenter.Display, JVMPresenter.Proxy>
+    implements JVMUiHandlers {
 
   private static final int DELAY_MILLIS = 2000;
 
@@ -43,7 +49,7 @@ public class JVMPresenter extends ItemAdministrationPresenter<JVMPresenter.Displ
   @NameToken(Places.JVM)
   public interface Proxy extends ProxyPlace<JVMPresenter> {}
 
-  public interface Display extends View, HasBreadcrumbs {
+  public interface Display extends View, HasBreadcrumbs, HasUiHandlers<JVMUiHandlers> {
 
     void renderProperties(OpalEnv env);
 
@@ -58,6 +64,7 @@ public class JVMPresenter extends ItemAdministrationPresenter<JVMPresenter.Displ
   public JVMPresenter(Display display, EventBus eventBus, Proxy proxy, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     this.breadcrumbsHelper = breadcrumbsHelper;
+    getView().setUiHandlers(this);
   }
 
   @ProxyEvent
@@ -119,6 +126,17 @@ public class JVMPresenter extends ItemAdministrationPresenter<JVMPresenter.Displ
   @TitleFunction
   public String getTitle() {
     return translations.pageJVMTitle();
+  }
+
+  @Override
+  public void onGc() {
+    ResourceRequestBuilderFactory.newBuilder().forResource("/system/status/gc").put()//
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            //ignore
+          }
+        }, Response.SC_NO_CONTENT, SC_INTERNAL_SERVER_ERROR).send();
   }
 
   private final class ListEnvironmentAuthorization implements HasAuthorization {

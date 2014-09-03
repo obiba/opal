@@ -14,8 +14,6 @@ import java.util.Map;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.cfg.TaxonomyService;
@@ -108,6 +106,13 @@ public class SystemResource {
         .setThreads(getThread(ManagementFactory.getThreadMXBean()))//
         .addAllGcs(garbageCollectorUsagesValues)//
         .build();
+  }
+
+  @PUT
+  @Path("/status/gc")
+  public Response launchGC() {
+    System.gc();
+    return Response.noContent().build();
   }
 
   @GET
