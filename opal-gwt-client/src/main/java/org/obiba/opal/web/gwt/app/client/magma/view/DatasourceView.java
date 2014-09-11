@@ -20,6 +20,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourceUiHandlers;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
@@ -29,7 +30,6 @@ import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
@@ -40,6 +40,7 @@ import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -118,6 +119,9 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   OpalSimplePager pager;
 
   @UiField
+  TextBoxClearable filter;
+
+  @UiField
   Panel permissionsPanel;
 
   private final ListDataProvider<TableDto> dataProvider = new ListDataProvider<TableDto>();
@@ -142,6 +146,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
 
     addBtn.setText(translations.addTable());
     addTableColumns();
+    initializeFilter();
   }
 
   @Override
@@ -150,6 +155,13 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     if(content != null) {
       permissionsPanel.add(content);
     }
+  }
+
+  private void initializeFilter() {
+    filter.setText("");
+    filter.getTextBox().setPlaceholder(translations.filterTables());
+    filter.getTextBox().addStyleName("input-xlarge");
+    filter.getClear().setTitle(translations.clearFilter());
   }
 
   @UiHandler("downloadDictionary")
@@ -202,6 +214,11 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     getUiHandlers().onCopyData();
   }
 
+  @UiHandler("filter")
+  void onFilterUpdate(KeyUpEvent event) {
+    getUiHandlers().onTablesFilterUpdate(filter.getText());
+  }
+
   private void addTableColumns() {
     initializeColumns();
     dataProvider.addDataDisplay(table);
@@ -251,6 +268,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   public void beforeRenderRows() {
     pager.setPagerVisible(false);
     table.showLoadingIndicator(dataProvider);
+    initializeFilter();
   }
 
   @Override

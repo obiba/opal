@@ -31,20 +31,19 @@ import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionR
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
-import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
@@ -240,6 +239,21 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
       fireEvent(ConfirmationRequiredEvent.createWithMessages(deleteConfirmation, translationMessages.removeTables(),
           translationMessages.confirmRemoveTables(tableNames.length())));
+    }
+  }
+
+  @Override
+  public void onTablesFilterUpdate(String filter) {
+    if (Strings.isNullOrEmpty(filter)) {
+      getView().renderRows(tables);
+    } else {
+      JsArray<TableDto> filteredTables = JsArrays.create();
+      for (TableDto table : JsArrays.toIterable(tables)) {
+        if (table.getName().toLowerCase().contains(filter.toLowerCase())) {
+          filteredTables.push(table);
+        }
+      }
+      getView().renderRows(filteredTables);
     }
   }
 

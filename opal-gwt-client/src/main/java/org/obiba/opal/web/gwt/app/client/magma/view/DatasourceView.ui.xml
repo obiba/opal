@@ -36,6 +36,11 @@
         <g:FlowPanel addStyleNames="small-bottom-margin">
           <o:OpalSimplePager ui:field="pager" showTotalWhenNoPager="true" location="RIGHT"
               addStyleNames="pull-right small-top-margin small-indent"/>
+          <b:Controls addStyleNames="pull-right small-top-margin">
+            <b:InputAddOn prependIcon="FILTER">
+              <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
+            </b:InputAddOn>
+          </b:Controls>
           <b:DropdownButton type="INFO" icon="PLUS" ui:field="addBtn"
               addStyleNames="small-top-margin">
             <b:NavLink icon="TABLE" ui:field="addTable">
