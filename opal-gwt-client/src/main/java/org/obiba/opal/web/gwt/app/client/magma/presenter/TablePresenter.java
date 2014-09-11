@@ -42,7 +42,6 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
-import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -58,15 +57,11 @@ import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
@@ -138,6 +133,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   private Boolean sortAscending;
 
   private Timer indexProgressTimer;
+
+  private String variableFilter;
 
   /**
    * @param display
@@ -235,11 +232,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     });
 
     registerHandler(getView().addVariableSortHandler(new VariableSortHandler()));
-
-    // Filter variable event
-    registerHandler(getView().addFilterVariableHandler(new FilterVariableHandler()));
-    // Filter: Clear filter event
-    registerHandler(getView().getFilter().getClear().addClickHandler(new FilterClearHandler()));
 
     addRegisteredHandler(TableIndexStatusRefreshEvent.getType(), new TableIndexStatusRefreshHandler());
 
@@ -365,6 +357,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       valuesTablePresenter.updateValuesDisplay("");
     }
 
+    variableFilter = "";
     updateVariables();
     updateTableIndexStatus();
     authorize();
@@ -420,7 +413,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         }
       }
     }//
-        .withQuery(getView().getFilter().getText())//
+        .withQuery(variableFilter)//
         .withVariable(true)//
         .withLimit(table.getVariableCount())//
         .withSortDir(
@@ -435,10 +428,11 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onShowDictionary() {
-    getView().getFilter().setText(valuesTablePresenter.getView().getFilterText());
+    variableFilter = valuesTablePresenter.getView().getFilterText();
+    getView().setVariableFilter(variableFilter);
 
     // Fetch variables
-    if(valuesTablePresenter.getView().getFilterText().isEmpty()) {
+    if(Strings.isNullOrEmpty(variableFilter)) {
       updateVariables();
     } else {
       doFilterVariables();
@@ -448,7 +442,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @Override
   public void onShowValues() {
     valuesTablePresenter.setTable(table);
-    valuesTablePresenter.updateValuesDisplay(getView().getFilter().getText());
+    valuesTablePresenter.updateValuesDisplay(variableFilter);
   }
 
   @Override
@@ -680,6 +674,16 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     attributeEditorPresenter.initialize(table, selectedItems);
   }
 
+  @Override
+  public void onVariablesFilterUpdate(String filter) {
+    variableFilter = filter;
+    if(Strings.isNullOrEmpty(filter)) {
+      updateVariables();
+    } else {
+      doFilterVariables();
+    }
+  }
+
   private final class VariableSortHandler implements ColumnSortEvent.Handler {
 
     @Override
@@ -689,22 +693,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     }
   }
 
-  private final class FilterVariableHandler implements KeyUpHandler {
-
-    @Override
-    public void onKeyUp(KeyUpEvent event) {
-      String filter = getView().getFilter().getText();
-
-      if(filter.isEmpty()) {
-        updateVariables();
-      } else if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-        doFilterVariables();
-      }
-    }
-  }
 
   private void doFilterVariables() {
-    String query = getView().getFilter().getText();
 
     new VariablesFilter() {
       @Override
@@ -727,18 +717,11 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       }
     }//
         .withVariable(true)//
-        .withQuery(query)//
+        .withQuery(variableFilter)//
         .withLimit(table.getVariableCount())//
         .withSortDir(
             sortAscending == null || sortAscending ? VariablesFilter.SORT_ASCENDING : VariablesFilter.SORT_DESCENDING)//
         .filter(getEventBus(), table);
-  }
-
-  private final class FilterClearHandler implements ClickHandler {
-    @Override
-    public void onClick(ClickEvent event) {
-      updateVariables();
-    }
   }
 
   private class RemoveConfirmationEventHandler implements ConfirmationEvent.Handler {
@@ -840,6 +823,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   public interface Display extends View, HasUiHandlers<TableUiHandlers> {
 
+
+
     enum Slots {
       Permissions, Values, ContingencyTable
     }
@@ -890,10 +875,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
     void setWhereScript(String script);
 
-    HandlerRegistration addFilterVariableHandler(KeyUpHandler handler);
-
-    TextBoxClearable getFilter();
-
     void setCancelVisible(boolean b);
 
     String getSelectedVariableName();
@@ -901,6 +882,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     String getCrossWithVariableName();
 
     void hideContingencyTable();
+
+    void setVariableFilter(String variableFilter);
   }
 
   private class RemoveRunnable implements Runnable {

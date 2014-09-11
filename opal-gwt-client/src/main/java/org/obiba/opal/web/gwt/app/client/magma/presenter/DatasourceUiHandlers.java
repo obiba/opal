@@ -23,4 +23,6 @@ public interface DatasourceUiHandlers extends UiHandlers {
   void onDownloadDictionary();
 
   void onDeleteTables(List<TableDto> tables);
+
+  void onTablesFilterUpdate(String filter);
 }

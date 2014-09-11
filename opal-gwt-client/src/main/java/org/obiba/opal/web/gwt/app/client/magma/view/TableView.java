@@ -58,7 +58,7 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -420,6 +420,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     crossOracle.setTable("\"" + tableDto.getName() + "\"");
 
     viewProperties.setVisible(dto.hasViewLink());
+    initializeFilter();
   }
 
   @Override
@@ -474,6 +475,11 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @Override
   public void hideContingencyTable() {
     contingencyTablePanel.setVisible(false);
+  }
+
+  @Override
+  public void setVariableFilter(String variableFilter) {
+    filter.setText(variableFilter);
   }
 
   @UiHandler("dictionnaryTab")
@@ -582,6 +588,12 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiHandler("deleteAttribute")
   void onDeleteAttribute(ClickEvent event) {
     getUiHandlers().onDeleteAttribute(checkColumn.getSelectedItems());
+  }
+
+
+  @UiHandler("filter")
+  void onFilterUpdate(KeyUpEvent event) {
+    getUiHandlers().onVariablesFilterUpdate(filter.getText());
   }
 
   @Override
@@ -747,16 +759,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     public Alert getAlert() {
       return selectAllItemsAlert;
     }
-  }
-
-  @Override
-  public HandlerRegistration addFilterVariableHandler(KeyUpHandler handler) {
-    return filter.getTextBox().addKeyUpHandler(handler);
-  }
-
-  @Override
-  public TextBoxClearable getFilter() {
-    return filter;
   }
 
   @Override
