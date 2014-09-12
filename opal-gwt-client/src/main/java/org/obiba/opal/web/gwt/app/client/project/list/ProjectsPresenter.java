@@ -53,6 +53,8 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
 
   private JsArray<ProjectDto> projects;
 
+  private String projectsFilter;
+
   private final Translations translations;
 
   private final ModalProvider<EditProjectModalPresenter> addProjectModalProvider;
@@ -99,7 +101,7 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
           @Override
           public void onResource(Response response, JsArray<ProjectDto> resource) {
             projects = JsArrays.toSafeArray(resource);
-            getView().setProjects(projects);
+            onProjectsFilterUpdate(projectsFilter);
           }
         }) //
         .get().send();
@@ -131,6 +133,39 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
   public void showAddProject() {
     EditProjectModalPresenter presenter = addProjectModalProvider.get();
     presenter.setProjects(projects);
+  }
+
+  @Override
+  public void onProjectsFilterUpdate(String filter) {
+    projectsFilter = filter;
+    if(Strings.isNullOrEmpty(filter)) {
+      getView().setProjects(projects);
+    } else {
+      JsArray<ProjectDto> filtered = JsArrays.create();
+      for(ProjectDto table : JsArrays.toIterable(projects)) {
+        if(tableMatches(table, filter)) {
+          filtered.push(table);
+        }
+      }
+      getView().setProjects(filtered);
+    }
+  }
+
+  /**
+   * Check if project name matches all the words of the project filter.
+   *
+   * @param project
+   * @param filter
+   * @return
+   */
+  private boolean tableMatches(ProjectDto project, String filter) {
+    String name = project.getName().toLowerCase();
+    for(String token : filter.toLowerCase().split(" ")) {
+      if(!Strings.isNullOrEmpty(token)) {
+        if(!name.contains(token)) return false;
+      }
+    }
+    return true;
   }
 
   public interface Display extends View, HasUiHandlers<ProjectsUiHandlers> {

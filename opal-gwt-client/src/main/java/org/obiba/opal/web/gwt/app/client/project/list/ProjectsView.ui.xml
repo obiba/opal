@@ -28,13 +28,21 @@
       </ui:msg>
     </b:Paragraph>
 
-    <b:ButtonGroup ui:field="addGroup">
-      <b:Button type="INFO" icon="PLUS" ui:field="add">
-        <ui:msg description="Add Project label">Add Project</ui:msg>
-      </b:Button>
-    </b:ButtonGroup>
+    <g:FlowPanel addStyleNames="small-bottom-margin">
+      <o:OpalSimplePager ui:field="tablePager" showTotalWhenNoPager="true" location="RIGHT"
+          addStyleNames="pull-right small-top-margin small-indent"/>
+      <b:Controls addStyleNames="pull-right small-top-margin">
+        <b:InputAddOn prependIcon="FILTER">
+          <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
+        </b:InputAddOn>
+      </b:Controls>
+      <b:ButtonGroup ui:field="addGroup">
+        <b:Button type="INFO" icon="PLUS" ui:field="add">
+          <ui:msg description="Add Project label">Add Project</ui:msg>
+        </b:Button>
+      </b:ButtonGroup>
+    </g:FlowPanel>
 
-    <o:OpalSimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
     <o:Table ui:field="projectsTable" addStyleNames="small-top-margin"/>
 
   </g:FlowPanel>

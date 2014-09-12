@@ -1589,6 +1589,10 @@ public interface Translations extends Constants {
   @Constants.DefaultStringValue("Filter tables...")
   String filterTables();
 
+  @Description("Filter Project label")
+  @Constants.DefaultStringValue("Filter projects...")
+  String filterProjects();
+
   @Description("Clear filter label")
   @DefaultStringValue("Clear filter")
   String clearFilter();

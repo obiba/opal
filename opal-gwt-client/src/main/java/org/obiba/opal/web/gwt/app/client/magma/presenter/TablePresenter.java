@@ -679,7 +679,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     variableFilter = filter;
     if(Strings.isNullOrEmpty(filter)) {
       updateVariables();
-    } else {
+    } else if (filter.length() > 1) {
       doFilterVariables();
     }
   }

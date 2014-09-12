@@ -21,4 +21,6 @@ public interface ProjectsUiHandlers extends UiHandlers {
   void onProjectTableSelection(ProjectDto project, String table);
 
   void showAddProject();
+
+  void onProjectsFilterUpdate(String filter);
 }
