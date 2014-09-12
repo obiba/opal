@@ -19,16 +19,17 @@ import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.Strings;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
-import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ButtonGroup;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -63,6 +64,9 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   @UiField
   ButtonGroup addGroup;
 
+  @UiField
+  TextBoxClearable filter;
+
   private final ListDataProvider<ProjectDto> projectsDataProvider = new ListDataProvider<ProjectDto>();
 
   private final PlaceManager placeManager;
@@ -81,6 +85,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 //    this.bookmarkIconPresenterProvider = bookmarkIconPresenterProvider;
     initWidget(uiBinder.createAndBindUi(this));
     initProjectsTable();
+    initializeFilter();
   }
 
   @Override
@@ -96,6 +101,11 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   @UiHandler("add")
   void onShowAddProject(ClickEvent event) {
     getUiHandlers().showAddProject();
+  }
+
+  @UiHandler("filter")
+  void onFilterUpdate(KeyUpEvent event) {
+    getUiHandlers().onProjectsFilterUpdate(filter.getText());
   }
 
   private void initProjectsTable() {
@@ -123,6 +133,13 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     tablePager.setPagerVisible(projectsDataProvider.getList().size() > tablePager.getPageSize());
     typeSortHandler.setList(projectsDataProvider.getList());
     ColumnSortEvent.fire(projectsTable, projectsTable.getColumnSortList());
+  }
+
+  private void initializeFilter() {
+    filter.setText("");
+    filter.getTextBox().setPlaceholder(translations.filterProjects());
+    filter.getTextBox().addStyleName("input-xlarge");
+    filter.getClear().setTitle(translations.clearFilter());
   }
 
   private static class ProjectLinkCell extends PlaceRequestCell<ProjectDto> {

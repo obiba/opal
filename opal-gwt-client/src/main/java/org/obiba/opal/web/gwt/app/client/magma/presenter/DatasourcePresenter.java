@@ -244,17 +244,34 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   @Override
   public void onTablesFilterUpdate(String filter) {
-    if (Strings.isNullOrEmpty(filter)) {
+    if(Strings.isNullOrEmpty(filter)) {
       getView().renderRows(tables);
     } else {
       JsArray<TableDto> filteredTables = JsArrays.create();
-      for (TableDto table : JsArrays.toIterable(tables)) {
-        if (table.getName().toLowerCase().contains(filter.toLowerCase())) {
+      for(TableDto table : JsArrays.toIterable(tables)) {
+        if(tableMatches(table, filter)) {
           filteredTables.push(table);
         }
       }
       getView().renderRows(filteredTables);
     }
+  }
+
+  /**
+   * Check if table name matches all the words of the table filter.
+   *
+   * @param table
+   * @param filter
+   * @return
+   */
+  private boolean tableMatches(TableDto table, String filter) {
+    String name = table.getName().toLowerCase();
+    for(String token : filter.toLowerCase().split(" ")) {
+      if(!Strings.isNullOrEmpty(token)) {
+        if(!name.contains(token)) return false;
+      }
+    }
+    return true;
   }
 
   //
