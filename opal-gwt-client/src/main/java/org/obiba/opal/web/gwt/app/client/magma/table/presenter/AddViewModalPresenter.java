@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.HasCollection;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.validator.DisallowedCharactersValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.MatchingTableEntitiesValidator;
@@ -234,7 +235,8 @@ public class AddViewModalPresenter extends ModalPresenterWidget<AddViewModalPres
       if(response.getText() != null && response.getText().length() != 0) {
         try {
           ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
-          getView().showError(null, errorDto.getStatus());
+          getView().showError(null, errorDto.getStatus() +
+                  Modal.alertDebugInfo(errorDto.getArgumentsArray()));
           return;
         } catch(Exception ignored) {
         }

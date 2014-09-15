@@ -14,6 +14,7 @@ import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.BackdropType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.github.gwtbootstrap.client.ui.event.ShowEvent;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.logical.shared.CloseEvent;
@@ -441,6 +442,17 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   public void clearAlert(HasType<ControlGroupType> group) {
     clearAlert();
     group.setType(ControlGroupType.NONE);
+  }
+
+  // This method should probably live somewhere else, but we currently only use it to add debug info during testing.
+  public static String alertDebugInfo(JsArrayString items) {
+      StringBuilder sb = new StringBuilder();
+      for (int i = 0; i < items.length(); i++) {
+          sb.append("<pre>");
+          sb.append(items.get(i));
+          sb.append("</pre>\n");
+      }
+      return sb.toString();
   }
 
   public void addAlert(Alert alert) {
