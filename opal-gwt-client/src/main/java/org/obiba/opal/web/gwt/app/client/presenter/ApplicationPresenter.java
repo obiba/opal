@@ -44,6 +44,7 @@ import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -254,7 +255,10 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       @Override
       public void onModalClosed(ModalClosedEvent event) {
         activeModals--;
-        if (activeModals < 0) throw new IllegalStateException("Active modal count is invalid: " + activeModals);
+        if (activeModals < 0) {
+          GWT.log("WARN: Active modal count is invalid: " + activeModals);
+          activeModals = 0;
+        }
       }
     });
   }
