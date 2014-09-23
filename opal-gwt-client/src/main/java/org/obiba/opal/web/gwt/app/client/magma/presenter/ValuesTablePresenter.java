@@ -484,9 +484,14 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     public void updateVariables(String select) {
       final String query = select.isEmpty() ? "*" : select;
 
+      // case the variable dto has not the variable count yet
+      int limit = originalTable.hasVariableCount() ? originalTable.getVariableCount() : Integer.MAX_VALUE;
+
       String resource = UriBuilders.DATASOURCE_TABLE_VARIABLES_SEARCH.create()//
           .query("query", query)//
-          .query("limit", String.valueOf(originalTable.getVariableCount()))//
+          .query("limit", String.valueOf(limit))//
+          .query("sortField", "index") //
+          .query("sortDir", "ASC") //
           .query("variable", "true")//
           .build(originalTable.getDatasourceName(), originalTable.getName());
 
