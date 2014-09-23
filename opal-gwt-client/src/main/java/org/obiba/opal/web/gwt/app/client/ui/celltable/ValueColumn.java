@@ -16,6 +16,7 @@ import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.common.base.Strings;
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
@@ -62,7 +63,8 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
       return new ClickableTextCell(new ClickableIconRenderer(IconType.MAP_MARKER));
     }
     if(VariableDtos.ValueType.TEXT.is(variable.getValueType())) {
-      return new TextCell(new MultilineTextRenderer());
+      if(Strings.isNullOrEmpty(variable.getReferencedEntityType())) return new TextCell(new MultilineTextRenderer());
+      else return new ClickableTextCell(new ClickableIconRenderer(IconType.ELLIPSIS_VERTICAL));
     }
     return new TextCell();
   }
@@ -105,6 +107,18 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
           }
         }
       });
+    } else if(VariableDtos.ValueType.TEXT.is(variable.getValueType()) &&
+        !Strings.isNullOrEmpty(variable.getReferencedEntityType())) {
+      setFieldUpdater(new FieldUpdater<ValueSetsDto.ValueSetDto, String>() {
+
+        @Override
+        public void update(int index, ValueSetDto valueSet, String value) {
+          if(valueSelectionHandler != null) {
+            valueSelectionHandler.onEntityIDSelection(ValueColumn.this.variable, index, getPosition(), valueSet,
+                valueSet.getValuesArray().get(getPosition()));
+          }
+        }
+      });
     }
   }
 
@@ -137,6 +151,8 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
 
     void onValueSequenceSelection(VariableDto variableDto, int row, int column, ValueSetsDto.ValueSetDto valueSet);
 
+    void onEntityIDSelection(VariableDto variableDto, int row, int column, ValueSetsDto.ValueSetDto valueSet,
+        ValueSetsDto.ValueDto value);
   }
 
 }

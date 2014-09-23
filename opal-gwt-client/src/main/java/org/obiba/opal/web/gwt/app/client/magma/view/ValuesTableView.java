@@ -425,7 +425,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
     setMinimumWidth(entityColumn);
 
-    valuesTable.addColumn(entityColumn, table.getEntityType());
+    valuesTable.addColumn(entityColumn, "ID");
   }
 
   private Column<ValueSetDto, ?> createClickableEntityColumn() {
@@ -769,6 +769,12 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     public void onGeoValueSelection(VariableDto variable, int row, int column, ValueSetDto valueSet,
         ValueSetsDto.ValueDto value) {
       fetcher.requestGeoValue(variable, valueSet.getIdentifier(), value);
+    }
+
+    @Override
+    public void onEntityIDSelection(VariableDto variableDto, int row, int column, ValueSetDto valueSet,
+        ValueSetsDto.ValueDto value) {
+      entitySelectionHandler.onEntitySelection(variableDto.getReferencedEntityType(), value.getValue());
     }
 
     @Override

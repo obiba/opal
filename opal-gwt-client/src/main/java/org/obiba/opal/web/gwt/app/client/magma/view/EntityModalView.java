@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityModalUiHandlers;
@@ -50,6 +51,7 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
@@ -76,6 +78,9 @@ public class EntityModalView extends ModalPopupViewWithUiHandlers<EntityModalUiH
 
   @UiField
   Label entityId;
+
+  @UiField
+  Panel valuesPanel;
 
   @UiField
   CellTable<EntityModalPresenter.VariableValueRow> table;
@@ -141,8 +146,11 @@ public class EntityModalView extends ModalPopupViewWithUiHandlers<EntityModalUiH
   @Override
   public void setTables(JsArray<TableDto> tables, TableDto selectedTable) {
     clear();
-    tableChooser.addTableSelections(tables);
-    tableChooser.selectTable(selectedTable);
+    valuesPanel.setVisible(tables.length()>0);
+    if (tables.length()>0) {
+      tableChooser.addTableSelections(tables);
+      tableChooser.selectTable(selectedTable);
+    }
   }
 
   @Override
