@@ -447,6 +447,7 @@ public interface Translations extends Constants {
       "NoSuchVariable", "No such variable '{0}'.",//
       "NoSuchVariableInTable", "No such variable '{0}' in table '{1}'.",//
       "NoSuchValueTable", "No such table '{0}'.",//
+      "NoSuchEntity", "No such entity '{0}' of type '{1}'.",//
       "NoSuchValueTableInDatasource", "No such table '{0}' in datasource '{1}'.",//
       "NoSuchReportTemplate", "No such report template '{0}' in project '{1}'.",//
       "InvalidVariableScript", "Invalid variable script:<br /><br /><pre>{0}</pre>",//

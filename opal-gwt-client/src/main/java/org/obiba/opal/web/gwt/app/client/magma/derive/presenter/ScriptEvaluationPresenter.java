@@ -102,6 +102,11 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
       public void onValueSequenceSelection(VariableDto variable, int row, int column, ValueSetDto valueSet) {
       }
 
+      @Override
+      public void onEntityIDSelection(VariableDto variableDto, int row, int column, ValueSetDto valueSet,
+          ValueSetsDto.ValueDto value) {
+
+      }
     });
 
     getView().setValueSetFetcher(new ValueSetFetcherImpl());

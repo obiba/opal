@@ -23,27 +23,30 @@
         </g:FlowPanel>
       </o:PropertiesTable>
 
-      <b:ControlGroup>
-        <b:ControlLabel>
-          <ui:msg description="Table label">Table</ui:msg>
-        </b:ControlLabel>
-        <o:TableChooser ui:field="tableChooser" isMultipleSelect="false"/>
-      </b:ControlGroup>
+      <g:FlowPanel ui:field="valuesPanel">
+        <b:ControlGroup>
+          <b:ControlLabel>
+            <ui:msg description="Table label">Table</ui:msg>
+          </b:ControlLabel>
+          <o:TableChooser ui:field="tableChooser" isMultipleSelect="false"/>
+        </b:ControlGroup>
 
-      <g:FlowPanel>
-        <g:InlineLabel ui:field="noValues">
-          <ui:msg description="No Values label">No values.</ui:msg>
-        </g:InlineLabel>
+        <g:FlowPanel>
+          <g:InlineLabel ui:field="noValues">
+            <ui:msg description="No Values label">No values.</ui:msg>
+          </g:InlineLabel>
 
-        <b:Controls addStyleNames="pull-left">
-          <b:InputAddOn prependIcon="FILTER">
-            <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"></o:TextBoxClearable>
-          </b:InputAddOn>
-        </b:Controls>
+          <b:Controls addStyleNames="pull-left">
+            <b:InputAddOn prependIcon="FILTER">
+              <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"></o:TextBoxClearable>
+            </b:InputAddOn>
+          </b:Controls>
 
-        <o:OpalSimplePager ui:field="pager" showTotalWhenNoPager="true" location="RIGHT" addStyleNames="pull-right"/>
-        <o:Table ui:field="table" width="100%" addStyleNames="pull-left"/>
+          <o:OpalSimplePager ui:field="pager" showTotalWhenNoPager="true" location="RIGHT" addStyleNames="pull-right"/>
+          <o:Table ui:field="table" width="100%" addStyleNames="pull-left"/>
+        </g:FlowPanel>
       </g:FlowPanel>
+
     </g:FlowPanel>
 
     <b:ModalFooter>
