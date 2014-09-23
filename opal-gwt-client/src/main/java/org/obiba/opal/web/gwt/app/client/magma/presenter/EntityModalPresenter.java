@@ -71,11 +71,12 @@ public class EntityModalPresenter extends ModalPresenterWidget<EntityModalPresen
 
   @SuppressWarnings("ParameterHidesMemberVariable")
   public void initialize(TableDto table, String entityType, String entityId, String filterText) {
-    if(table.getEntityType().equals(entityType)) selectedTable = table;
+    if (table == null) selectedTable = null;
+    else if(table.getEntityType().equals(entityType)) selectedTable = table;
     this.entityType = entityType;
     this.entityId = entityId;
     getView().setUiHandlers(this);
-    getView().setFilterText(table.getEntityType().equals(entityType) ? filterText : "");
+    getView().setFilterText(table != null && table.getEntityType().equals(entityType) ? filterText : "");
     getView().setEntityType(entityType);
     getView().setEntityId(entityId);
     getView().setValueViewHandler(new ValueSequenceHandlerImpl());
@@ -319,6 +320,8 @@ public class EntityModalPresenter extends ModalPresenterWidget<EntityModalPresen
     void requestBinaryValueView(VariableDto variable);
 
     void requestGeoValueView(VariableDto variable, ValueSetsDto.ValueDto value);
+
+    void requestEntityView(VariableDto variable, ValueSetsDto.ValueDto value);
   }
 
   public class ValueSequenceHandlerImpl implements ValueViewHandler {
@@ -339,6 +342,11 @@ public class EntityModalPresenter extends ModalPresenterWidget<EntityModalPresen
     @Override
     public void requestGeoValueView(VariableDto variable, ValueSetsDto.ValueDto value) {
       getEventBus().fireEvent(new GeoValueDisplayEvent(variable, entityId, value));
+    }
+
+    @Override
+    public void requestEntityView(VariableDto variable, ValueSetsDto.ValueDto value) {
+      initialize(null, variable.getReferencedEntityType(), value.getValue(), "");
     }
   }
 }

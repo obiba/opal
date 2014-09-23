@@ -19,6 +19,7 @@ import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.common.base.Strings;
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
@@ -64,12 +65,26 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
           }
         }
       });
+    } else if("text".equalsIgnoreCase(variable.getValueType()) && !Strings.isNullOrEmpty(variable.getReferencedEntityType())) {
+      setFieldUpdater(new FieldUpdater<ValueOccurrence, String>() {
+
+        @Override
+        public void update(int index, ValueOccurrence object, String value) {
+          if(valueSelectionHandler != null) {
+            valueSelectionHandler.onEntityIDSelection(ValueOccurrenceColumn.this.variable, index, object.getValueSet(),
+                object.getValueSet().getValuesArray().get(pos));
+          }
+        }
+      });
     }
   }
 
   private static Cell<String> createCell(VariableDto variable) {
     if("binary".equalsIgnoreCase(variable.getValueType())) {
       return new ClickableTextCell(new ClickableIconRenderer(IconType.DOWNLOAD));
+    }
+    if("text".equalsIgnoreCase(variable.getValueType()) && !Strings.isNullOrEmpty(variable.getReferencedEntityType())) {
+      return new ClickableTextCell(new ClickableIconRenderer(IconType.ELLIPSIS_VERTICAL));
     }
     if(variable.getValueType().matches("point|linestring|polygon")) {
       return new ClickableTextCell(new ClickableIconRenderer(IconType.MAP_MARKER));
@@ -122,6 +137,8 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
     void onBinaryValueSelection(VariableDto variable, int index, ValueSetDto valueSet);
 
     void onGeoValueSelection(VariableDto variable, int index, ValueSetDto valueSet, ValueSetsDto.ValueDto value);
+
+    void onEntityIDSelection(VariableDto variable, int index, ValueSetDto valueSet, ValueSetsDto.ValueDto value);
 
   }
 }
