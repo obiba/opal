@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -26,10 +27,10 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 
@@ -38,6 +39,8 @@ import com.gwtplatform.mvp.client.PopupView;
  */
 public class ValueSequencePopupPresenter extends ModalPresenterWidget<ValueSequencePopupPresenter.Display>
     implements ValueSequencePopupUiHandlers {
+
+  private final ModalProvider<EntityModalPresenter> entityModalProvider;
 
   private TableDto table;
 
@@ -51,9 +54,11 @@ public class ValueSequencePopupPresenter extends ModalPresenterWidget<ValueSeque
    * @param proxy
    */
   @Inject
-  public ValueSequencePopupPresenter(EventBus eventBus, Display view) {
+  public ValueSequencePopupPresenter(EventBus eventBus, Display view,
+      ModalProvider<EntityModalPresenter> entityModalProvider) {
     super(eventBus, view);
     getView().setUiHandlers(this);
+    this.entityModalProvider = entityModalProvider.setContainer(this);
   }
 
   @Override
@@ -140,6 +145,13 @@ public class ValueSequencePopupPresenter extends ModalPresenterWidget<ValueSeque
     public void requestGeoValue(VariableDto variable, String entityIdentifier, ValueSetsDto.ValueDto value, int index) {
       getEventBus().fireEvent(new GeoValueDisplayEvent(variable, entityIdentifier, value, index));
     }
+
+    @Override
+    public void requestEntityID(VariableDto variable, String entityIdentifier, ValueSetsDto.ValueDto value, int index) {
+      String entityId = value.getValuesArray().get(index).getValue();
+      EntityModalPresenter entityModalPresenter = entityModalProvider.get();
+      entityModalPresenter.initialize(null, variable.getReferencedEntityType(), entityId, "");
+    }
   }
 
   public interface Display extends PopupView, HasUiHandlers<ValueSequencePopupUiHandlers> {
@@ -161,6 +173,8 @@ public class ValueSequencePopupPresenter extends ModalPresenterWidget<ValueSeque
     void requestBinaryValue(VariableDto variable, String entityIdentifier, int index);
 
     void requestGeoValue(VariableDto variable, String entityIdentifier, ValueSetsDto.ValueDto value, int index);
+
+    void requestEntityID(VariableDto variable, String entityIdentifier, ValueSetsDto.ValueDto value, int index);
   }
 
 }

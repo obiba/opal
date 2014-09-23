@@ -11,7 +11,6 @@ package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityModalUiHandlers;
@@ -27,6 +26,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import com.github.gwtbootstrap.client.ui.Icon;
 import com.github.gwtbootstrap.client.ui.constants.IconSize;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.common.base.Strings;
 import com.google.gwt.cell.client.AbstractSafeHtmlCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.ValueUpdater;
@@ -146,8 +146,8 @@ public class EntityModalView extends ModalPopupViewWithUiHandlers<EntityModalUiH
   @Override
   public void setTables(JsArray<TableDto> tables, TableDto selectedTable) {
     clear();
-    valuesPanel.setVisible(tables.length()>0);
-    if (tables.length()>0) {
+    valuesPanel.setVisible(tables.length() > 0);
+    if(tables.length() > 0) {
       tableChooser.addTableSelections(tables);
       tableChooser.selectTable(selectedTable);
     }
@@ -260,6 +260,9 @@ public class EntityModalView extends ModalPopupViewWithUiHandlers<EntityModalUiH
         valueViewHandler.requestBinaryValueView(variable);
       } else if(variable.getValueType().matches("point|linestring|polygon")) {
         valueViewHandler.requestGeoValueView(variable, variableValueRow.getValueDto());
+      } else if("text".equalsIgnoreCase(variable.getValueType()) &&
+          !Strings.isNullOrEmpty(variable.getReferencedEntityType())) {
+        valueViewHandler.requestEntityView(variable, variableValueRow.getValueDto());
       }
     }
   }
@@ -295,11 +298,15 @@ public class EntityModalView extends ModalPopupViewWithUiHandlers<EntityModalUiH
           if(object.getVariableDto().getIsRepeatable()) {
             return renderLink(valueStr, IconType.LIST);
           }
-          if(object.getVariableDto().getValueType().compareToIgnoreCase("binary") == 0) {
+          if(object.getVariableDto().getValueType().equalsIgnoreCase("binary")) {
             return renderLink(valueStr, IconType.DOWNLOAD);
           }
           if(object.getVariableDto().getValueType().matches("point|linestring|polygon")) {
             return renderLink(valueStr, IconType.MAP_MARKER);
+          }
+          if(object.getVariableDto().getValueType().equalsIgnoreCase("text") &&
+              !Strings.isNullOrEmpty(object.getVariableDto().getReferencedEntityType())) {
+            return renderLink(valueStr, IconType.ELLIPSIS_VERTICAL);
           }
           return SimpleSafeHtmlRenderer.getInstance().render(valueStr);
         }

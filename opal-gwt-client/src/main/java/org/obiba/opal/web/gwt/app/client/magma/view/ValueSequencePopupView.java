@@ -225,6 +225,11 @@ public class ValueSequencePopupView extends ModalPopupViewWithUiHandlers<ValueSe
         public void onGeoValueSelection(VariableDto variable, int index, ValueSetDto valueSet, ValueSetsDto.ValueDto value) {
           fetcher.requestGeoValue(variable, valueSet.getIdentifier(), value, index);
         }
+
+        @Override
+        public void onEntityIDSelection(VariableDto variable, int index, ValueSetDto valueSet, ValueDto value) {
+          fetcher.requestEntityID(variable, valueSet.getIdentifier(), value, index);
+        }
       };
     }
     col.setValueSelectionHandler(valueSelectionHandler);
