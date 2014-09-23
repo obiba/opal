@@ -66,6 +66,7 @@ public class EntityModalPresenter extends ModalPresenterWidget<EntityModalPresen
   public EntityModalPresenter(EventBus eventBus, Display display,
       ModalProvider<ValueSequencePopupPresenter> valueSequencePopupProvider) {
     super(eventBus, display);
+    getView().setUiHandlers(this);
     this.valueSequencePopupProvider = valueSequencePopupProvider.setContainer(this);
   }
 
@@ -75,7 +76,6 @@ public class EntityModalPresenter extends ModalPresenterWidget<EntityModalPresen
     else if(table.getEntityType().equals(entityType)) selectedTable = table;
     this.entityType = entityType;
     this.entityId = entityId;
-    getView().setUiHandlers(this);
     getView().setFilterText(table != null && table.getEntityType().equals(entityType) ? filterText : "");
     getView().setEntityType(entityType);
     getView().setEntityId(entityId);
