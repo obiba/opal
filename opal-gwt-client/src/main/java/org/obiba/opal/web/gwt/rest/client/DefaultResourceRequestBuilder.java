@@ -295,7 +295,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
         try {
           resourceCallback.onResource(response, (T) JsonUtils.unsafeEval(response.getText()));
         } catch(Exception e) {
-          GWT.log(uri + " -> " + response.getText() + ": " + e.getMessage());
+          GWT.log("ERROR: unsafeEval fails on response: " + uri + " -> " + response.getText() + ": " + e.getMessage());
         }
       }
 

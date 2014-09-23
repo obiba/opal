@@ -58,7 +58,6 @@ import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
@@ -761,7 +760,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
       // Hide contingency table and show only if up to date or outdated
       getView().hideContingencyTable();
-      GWT.log("index status = " + response.getStatusCode());
       if(response.getStatusCode() == SC_OK) {
         getView().setIndexStatusVisible(true);
         statusDto = TableIndexStatusDto.get(JsArrays.toSafeArray(resource));
