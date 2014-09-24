@@ -154,7 +154,7 @@ public class RAdministrationPresenter
   private final class RConnectionFailedCallback implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error("RConnectionFailed", response.getText()).build());
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error("RConnectionFailed").build());
     }
   }
 
