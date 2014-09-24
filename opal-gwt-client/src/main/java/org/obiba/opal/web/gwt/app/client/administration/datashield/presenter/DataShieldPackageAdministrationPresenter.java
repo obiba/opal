@@ -171,6 +171,8 @@ public class DataShieldPackageAdministrationPresenter
           public void onResponseCode(Request request, Response response) {
             getView().setAddPackageButtonEnabled(false);
             getView().renderDataShieldPackagesRows(null);
+            getEventBus()
+                .fireEvent(NotificationEvent.newBuilder().error("RConnectionFailed").build());
           }
         }, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_SERVICE_UNAVAILABLE)//
         .withCallback(new ResourceCallback<JsArray<RPackageDto>>() {
