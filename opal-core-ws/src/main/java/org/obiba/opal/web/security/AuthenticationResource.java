@@ -58,11 +58,11 @@ public class AuthenticationResource extends AbstractSecurityComponent {
       //if (SecurityUtils.getSubject().isAuthenticated()) return Response.status(Status.BAD_REQUEST).build();
       authenticationExecutor.login(new UsernamePasswordToken(username, password));
       String sessionId = SecurityUtils.getSubject().getSession().getId().toString();
-      log.info("Successful session creation for user '{}' session ID is '{}'.", username, sessionId);
+      log.info("Successful session creation for user '{}' at ip: '{}': session ID is '{}'.", username,
+          servletRequest.getRemoteAddr(), sessionId);
       return Response.created(
           UriBuilder.fromPath("/").path(AuthenticationResource.class).path(AuthenticationResource.class, "checkSession")
-              .build(sessionId)
-      ).build();
+              .build(sessionId)).build();
 
     } catch(AuthenticationException e) {
       log.info("Authentication failure of user '{}' at ip: '{}': {}", username, servletRequest.getRemoteAddr(),
