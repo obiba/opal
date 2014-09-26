@@ -68,10 +68,14 @@ import org.obiba.opal.web.gwt.app.client.administration.jvm.JVMView;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.RAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.RAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.TaxonomiesAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.TaxonomiesAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.edit.TaxonomyEditModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.edit.TaxonomyEditModalView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.list.TaxonomiesPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.list.TaxonomiesView;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.TaxonomyPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.TaxonomyView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.edit.VocabularyEditPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.edit.VocabularyEditView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.view.VocabularyPresenter;
@@ -124,8 +128,10 @@ public class AdministrationModule extends AbstractPresenterModule {
   }
 
   private void configureTaxonomies() {
-    bindPresenter(TaxonomiesPresenter.class, TaxonomiesPresenter.Display.class, TaxonomiesView.class,
-        TaxonomiesPresenter.Proxy.class);
+    bindPresenter(TaxonomiesAdministrationPresenter.class, TaxonomiesAdministrationPresenter.Display.class,
+        TaxonomiesAdministrationView.class, TaxonomiesAdministrationPresenter.Proxy.class);
+    bindPresenterWidget(TaxonomiesPresenter.class, TaxonomiesPresenter.Display.class, TaxonomiesView.class);
+    bindPresenterWidget(TaxonomyPresenter.class, TaxonomyPresenter.Display.class, TaxonomyView.class);
     bindPresenterWidget(TaxonomyEditModalPresenter.class, TaxonomyEditModalPresenter.Display.class,
         TaxonomyEditModalView.class);
     bindPresenter(VocabularyPresenter.class, VocabularyPresenter.Display.class, VocabularyView.class,
@@ -199,8 +205,8 @@ public class AdministrationModule extends AbstractPresenterModule {
         IdentifiersTableModalView.class);
     bindPresenterWidget(ImportSystemIdentifiersModalPresenter.class,
         ImportSystemIdentifiersModalPresenter.Display.class, ImportSystemIdentifiersModalView.class);
-    bindPresenterWidget(CopySystemIdentifiersModalPresenter.class,
-        CopySystemIdentifiersModalPresenter.Display.class, CopySystemIdentifiersModalView.class);
+    bindPresenterWidget(CopySystemIdentifiersModalPresenter.class, CopySystemIdentifiersModalPresenter.Display.class,
+        CopySystemIdentifiersModalView.class);
     bindPresenterWidget(ImportIdentifiersMappingModalPresenter.class,
         ImportIdentifiersMappingModalPresenter.Display.class, ImportIdentifiersMappingModalView.class);
     bindPresenterWidget(IdentifiersMappingModalPresenter.class, IdentifiersMappingModalPresenter.Display.class,

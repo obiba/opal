@@ -2,13 +2,14 @@ package org.obiba.opal.web.gwt.app.client.administration.taxonomies.list;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.ui.LocalizedLabel;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
-import com.github.gwtbootstrap.client.ui.Breadcrumbs;
+import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.NavList;
+import com.github.gwtbootstrap.client.ui.NavWidget;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.core.client.JsArray;
@@ -18,8 +19,9 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasWidgets;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
@@ -31,12 +33,15 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
   interface ViewUiBinder extends UiBinder<Widget, TaxonomiesView> {}
 
   @UiField
-  FlowPanel panel;
+  Button add;
 
   @UiField
-  Breadcrumbs breadcrumbs;
+  ScrollPanel taxonomyDetailsPanel;
 
-  private JsArray<TaxonomyDto> taxonomies;
+  @UiField
+  NavList taxonomyList;
+
+  private NavLink currentLink;
 
   @Inject
   public TaxonomiesView(ViewUiBinder viewUiBinder, Translations translations) {
@@ -45,18 +50,27 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
   }
 
   @Override
-  public HasWidgets getBreadcrumbs() {
-    return breadcrumbs;
+  public void setInSlot(Object slot, IsWidget content) {
+    taxonomyDetailsPanel.clear();
+    taxonomyDetailsPanel.add(content);
   }
 
   @Override
   public void setTaxonomies(JsArray<TaxonomyDto> taxonomies) {
-    this.taxonomies = taxonomies;
-    if(taxonomies.length() == 0) {
-      panel.clear();
-    } else {
-      redraw();
+    taxonomyList.clear();
+    TaxonomyDto first = null;
+    for(TaxonomyDto taxonomy : JsArrays.toIterable(taxonomies)) {
+
+      NavLink link = new NavLink(taxonomy.getName());
+      link.addClickHandler(new TaxonomyClickHandler(taxonomy, link));
+      taxonomyList.add(link);
+      if (first == null) {
+        first = taxonomy;
+        link.setActive(true);
+        getUiHandlers().onTaxonomySelection(first);
+      }
     }
+
   }
 
   @UiHandler("add")
@@ -64,27 +78,6 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
     getUiHandlers().onAddTaxonomy();
   }
 
-  private void redraw() {
-    panel.clear();
-    for(TaxonomyDto taxonomy : JsArrays.toIterable(taxonomies)) {
-      FlowPanel panelTaxonomy = new FlowPanel();
-      panelTaxonomy.addStyleName("item");
-
-      Widget taxonomyLink = newTaxonomyLink(getUiHandlers(), taxonomy);
-      panelTaxonomy.add(taxonomyLink);
-
-      for(int i = 0; i < taxonomy.getDescriptionCount(); i++) {
-        if(!taxonomy.getDescription(i).getText().isEmpty()) {
-          panelTaxonomy
-              .add(new LocalizedLabel(taxonomy.getDescription(i).getLocale(), taxonomy.getDescription(i).getText()));
-        }
-      }
-
-      redrawVocabularies(taxonomy, panelTaxonomy);
-
-      panel.add(panelTaxonomy);
-    }
-  }
 
   private void redrawVocabularies(TaxonomyDto taxonomy, FlowPanel panelTaxonomy) {
     JsArray<VocabularyDto> vocabularies = JsArrays.toSafeArray(taxonomy.getVocabulariesArray());
@@ -143,4 +136,32 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
     return link;
   }
 
+
+  private class TaxonomyClickHandler implements ClickHandler {
+
+    private final TaxonomyDto taxonomy;
+
+    private final NavLink link;
+
+    TaxonomyClickHandler(TaxonomyDto taxonomy, NavLink link) {
+      this.taxonomy = taxonomy;
+      this.link = link;
+    }
+
+    @Override
+    public void onClick(ClickEvent event) {
+      unActivateLinks();
+      link.setActive(true);
+      getUiHandlers().onTaxonomySelection(taxonomy);
+    }
+
+    private void unActivateLinks() {
+      int widgetCount = taxonomyList.getWidgetCount();
+      for(int i = 0; i < widgetCount; i++) {
+        if(taxonomyList.getWidget(i) instanceof NavLink) {
+          ((NavWidget) taxonomyList.getWidget(i)).setActive(false);
+        }
+      }
+    }
+  }
 }

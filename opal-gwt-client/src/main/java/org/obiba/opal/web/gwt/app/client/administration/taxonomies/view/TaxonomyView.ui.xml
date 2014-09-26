@@ -1,0 +1,76 @@
+<!--
+  ~ Copyright (c) 2014 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+
+  <g:FlowPanel ui:field="detailsPanel">
+
+    <g:FlowPanel addStyleNames="clearfix">
+      <b:Heading size="3" ui:field="taxonomyName" addStyleNames="no-top-margin pull-left"/>
+      <g:FlowPanel addStyleNames="pull-right">
+        <b:ButtonGroup>
+          <b:Button icon="DOWNLOAD" ui:field="download">
+            <ui:msg description="Download label">Download</ui:msg>
+          </b:Button>
+        </b:ButtonGroup>
+        <b:ButtonGroup>
+          <b:Button icon="TRASH" ui:field="remove">
+          </b:Button>
+        </b:ButtonGroup>
+      </g:FlowPanel>
+    </g:FlowPanel>
+
+    <g:FlowPanel>
+      <b:Heading size="4" addStyleNames="inline-block">
+        <ui:msg description="Properties label">Properties</ui:msg>
+      </b:Heading>
+      <b2:IconAnchor ui:field="edit" icon="EDIT" addStyleNames="small-indent">
+      </b2:IconAnchor>
+    </g:FlowPanel>
+
+    <o:PropertiesTable ui:field="taxonomyPanel" keyStyleNames="span3">
+      <g:FlowPanel>
+        <g:Label>
+          <ui:msg description="Version label">Version</ui:msg>
+        </g:Label>
+        <g:Label ui:field="version"/>
+      </g:FlowPanel>
+      <g:FlowPanel>
+        <g:Label>
+          <ui:msg description="Title label">Title</ui:msg>
+        </g:Label>
+        <g:FlowPanel ui:field="titlePanel"/>
+      </g:FlowPanel>
+      <g:FlowPanel>
+        <g:Label>
+          <ui:msg description="Description label">Description</ui:msg>
+        </g:Label>
+        <g:FlowPanel ui:field="descriptionPanel"/>
+      </g:FlowPanel>
+    </o:PropertiesTable>
+
+    <b:Heading size="4">
+      <ui:msg description="Vocabularies label">Vocabularies</ui:msg>
+    </b:Heading>
+    <b:Button type="INFO" icon="PLUS" ui:field="addVocabulary">
+      <ui:msg description="Add Vocabulary label">Add Vocabulary</ui:msg>
+    </b:Button>
+    <g:FlowPanel ui:field="vocabulariesPanel"/>
+
+  </g:FlowPanel>
+
+</ui:UiBinder>

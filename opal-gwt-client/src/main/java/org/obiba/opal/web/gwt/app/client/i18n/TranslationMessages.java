@@ -261,10 +261,16 @@ public interface TranslationMessages extends Messages {
   String confirmRemoveDatasource();
 
   @Description(
-      "Please confirm that you want to remove the current Report Template from Opal configuration(report design and generated reports will not be affected) message")
+      "Please confirm that you want to remove the current Report Template from Opal configuration (report design and generated reports will not be affected) message")
   @DefaultMessage(
-      "Please confirm that you want to remove the current Report Template from Opal configuration(report design and generated reports will not be affected).")
+      "Please confirm that you want to remove the current report template from Opal configuration (report design and generated reports will not be affected).")
   String confirmDeleteReportTemplate();
+
+  @Description(
+      "Please confirm that you want to remove the current Taxonomy from Opal configuration message")
+  @DefaultMessage(
+      "Please confirm that you want to remove the current taxonomy from Opal configuration (variable attributes will not be affected).")
+  String confirmDeleteTaxonomy();
 
   @Description(
       "A variable with the same name already exists. Please confirm that you want to overwrite this variable message")

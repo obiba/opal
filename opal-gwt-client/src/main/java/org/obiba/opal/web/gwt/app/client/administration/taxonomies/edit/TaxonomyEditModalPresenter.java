@@ -63,7 +63,7 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
 
   @Override
   public void onSaveTaxonomy() {
-    TaxonomyDto dto = TaxonomyDto.create();
+    final TaxonomyDto dto = TaxonomyDto.create();
     dto.setName(getView().getName().getText());
     dto.setTitleArray(getView().getTitles().getValue());
     dto.setDescriptionArray(getView().getDescriptions().getValue());
@@ -77,7 +77,7 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
             @Override
             public void onResponseCode(Request request, Response response) {
               getView().hide();
-              getEventBus().fireEvent(new TaxonomyCreatedEvent());
+              getEventBus().fireEvent(new TaxonomyCreatedEvent(dto.getName()));
             }
           }, Response.SC_OK, Response.SC_CREATED)//
           .withCallback(new ResponseCodeCallback() {
@@ -97,7 +97,7 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
             @Override
             public void onResponseCode(Request request, Response response) {
               getView().hide();
-              getEventBus().fireEvent(new TaxonomyCreatedEvent());
+              getEventBus().fireEvent(new TaxonomyCreatedEvent(dto.getName()));
             }
           }, Response.SC_OK, Response.SC_CREATED)//
           .withCallback(new ResponseCodeCallback() {
@@ -225,7 +225,7 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
             @Override
             public void onResponseCode(Request request, Response response) {
               getView().hide();
-              getEventBus().fireEvent(new TaxonomyCreatedEvent());
+              getEventBus().fireEvent(new TaxonomyCreatedEvent(name));
             }
           }, Response.SC_OK)//
           .withCallback(new ResponseCodeCallback() {

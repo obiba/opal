@@ -6,15 +6,30 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <g:FlowPanel addStyleNames="section-header">
-      <b:Breadcrumbs ui:field="breadcrumbs"/>
-    </g:FlowPanel>
-
-    <b:ButtonGroup>
-      <b:Button type="INFO" icon="PLUS" ui:field="add">
-        <ui:msg description="Add Taxonomy label">Add Taxonomy</ui:msg>
-      </b:Button>
-    </b:ButtonGroup>
-    <g:FlowPanel ui:field="panel" addStyleNames="items"/>
+    <b:Paragraph>
+      <ui:msg description="Taxonomies text">Taxonomies are controlled vocabularies that can be used to classify
+        variables.
+      </ui:msg>
+    </b:Paragraph>
+    <b:FluidRow>
+      <b:Column size="3">
+        <g:ScrollPanel>
+          <b:NavList ui:field="taxonomyList">
+            <b:NavHeader>
+              <ui:msg description="Taxonomies label">Taxonomies</ui:msg>
+            </b:NavHeader>
+          </b:NavList>
+        </g:ScrollPanel>
+        <b:ButtonGroup addStyleNames="top-margin">
+          <b:Button icon="PLUS" type="INFO" ui:field="add">
+            <ui:msg description="Add Taxonomy label">Add Taxonomy</ui:msg>
+          </b:Button>
+        </b:ButtonGroup>
+      </b:Column>
+      <b:Column size="9">
+        <g:ScrollPanel ui:field="taxonomyDetailsPanel"/>
+      </b:Column>
+    </b:FluidRow>
   </g:FlowPanel>
+
 </ui:UiBinder>

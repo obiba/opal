@@ -7,4 +7,8 @@ import com.gwtplatform.dispatch.annotation.GenEvent;
  */
 
 @GenEvent
-public class TaxonomyCreated {}
+public class TaxonomyCreated {
+
+  String name;
+
+}
