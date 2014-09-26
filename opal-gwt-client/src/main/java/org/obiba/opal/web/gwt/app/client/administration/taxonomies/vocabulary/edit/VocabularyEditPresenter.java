@@ -132,8 +132,8 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
                 getView().getVocabularyName().setText(vocabulary.getName());
                 getView().setTaxonomies(taxonomies);
                 getView().setSelectedTaxonomy(taxonomyName);
-                getView().getTitles().setValue(vocabulary.getTitlesArray());
-                getView().getDescriptions().setValue(vocabulary.getDescriptionsArray());
+                getView().getTitles().setValue(vocabulary.getTitleArray());
+                getView().getDescriptions().setValue(vocabulary.getDescriptionArray());
                 getView().getRepeatable().setValue(vocabulary.getRepeatable());
 
                 getView().displayVocabulary(vocabulary);
@@ -156,9 +156,8 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
 
     VocabularyDto dto = VocabularyDto.create();
     dto.setName(getView().getVocabularyName().getText());
-    dto.setTitlesArray(getView().getTitles().getValue());
-    dto.setDescriptionsArray(getView().getDescriptions().getValue());
-    dto.setTaxonomyName(getView().getSelectedTaxonomy());
+    dto.setTitleArray(getView().getTitles().getValue());
+    dto.setDescriptionArray(getView().getDescriptions().getValue());
     dto.setRepeatable(getView().getRepeatable().getValue());
     dto.setTermsArray(JsArrays.toSafeArray(vocabulary.getTermsArray()));
 
@@ -205,8 +204,8 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
     currentTerm = termDto;
 
     getView().getTermName().setText(termDto.getName());
-    getView().getTermTitles(termDto.getName()).setValue(termDto.getTitlesArray());
-    getView().getTermDescriptions(termDto.getName()).setValue(termDto.getDescriptionsArray());
+    getView().getTermTitles(termDto.getName()).setValue(termDto.getTitleArray());
+    getView().getTermDescriptions(termDto.getName()).setValue(termDto.getDescriptionArray());
     getView().getTermPanel().setVisible(true);
   }
 
@@ -214,8 +213,8 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
     if(currentTerm != null) {
       // Save currentTerm titles, descriptions to map
       TermDto t = TermArrayUtils.findTerm(vocabulary.getTermsArray(), currentTerm.getName());
-      t.setDescriptionsArray(getView().getTermDescriptions(currentTerm.getName()).getValue());
-      t.setTitlesArray(getView().getTermTitles(currentTerm.getName()).getValue());
+      t.setDescriptionArray(getView().getTermDescriptions(currentTerm.getName()).getValue());
+      t.setTitleArray(getView().getTermTitles(currentTerm.getName()).getValue());
     }
   }
 
@@ -238,11 +237,11 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
       TermDto t = TermArrayUtils
           .findTerm(vocabulary.getTermsArray(), currentTerm != null ? currentTerm.getName() : null);
 
-      if(t.getTermsArray() == null) {
-        t.setTermsArray(terms);
-      }
-
-      t.getTermsArray().push(newTerm);
+//      if(t.getTermsArray() == null) {
+//        t.setTermsArray(terms);
+//      }
+//
+//      t.getTermsArray().push(newTerm);
     } else {
       // Add at the end of terms
       for(int i = 0; i < vocabulary.getTermsCount(); i++) {
@@ -272,16 +271,16 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
 
   private void updateVocabularyWithSibling(TermDto newTerm, JsArray<TermDto> terms, TermDto t) {
     if(t != null) {
-      for(int i = 0; i < t.getTermsCount(); i++) {
-        terms.push(t.getTerms(i));
-
-        // Add after sibling
-        if(t.getTerms(i).getName().equals(currentTerm.getName())) {
-          terms.push(newTerm);
-        }
-      }
-
-      t.setTermsArray(terms);
+//      for(int i = 0; i < t.getTermsCount(); i++) {
+//        terms.push(t.getTerms(i));
+//
+//        // Add after sibling
+//        if(t.getTerms(i).getName().equals(currentTerm.getName())) {
+//          terms.push(newTerm);
+//        }
+//      }
+//
+//      t.setTermsArray(terms);
     } else {
       for(int i = 0; i < vocabulary.getTermsCount(); i++) {
         terms.push(vocabulary.getTerms(i));
@@ -297,7 +296,7 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
     TermDto term = TermArrayUtils.findTerm(vocabulary.getTermsArray(), termName);
     TermDto parent = TermArrayUtils.findParent(null, vocabulary.getTermsArray(), term);
     if(parent != null) {
-      parent.setTermsArray(getReorderedTerms(parent.getTermsArray(), term, pos, insertAfter));
+      //parent.setTermsArray(getReorderedTerms(parent.getTermsArray(), term, pos, insertAfter));
     } else {
       // Reording at root level
       vocabulary.setTermsArray(getReorderedTerms(vocabulary.getTermsArray(), term, pos, insertAfter));
@@ -311,10 +310,6 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
 
     JsArray<TermDto> termsArray = JsArrays.create().cast();
     for(int i = 0; i < terms.length(); i++) {
-
-      // When a term has child terms, a FlowPanel was created for those terms
-      if(terms.get(i).getTermsCount() > 0 && newPos > i) newPos--;
-
       if(!insertAfter && i == newPos) {
         termsArray.push(term);
       }
@@ -335,24 +330,14 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
   public void onDeleteTerm(TermDto term) {
     // Modify vocabularyDto with the new structure
     TermDto parent = TermArrayUtils.findParent(null, vocabulary.getTermsArray(), term);
-    if(parent != null) {
-      JsArray<TermDto> termsArray = JsArrays.create().cast();
-      for(int i = 0; i < parent.getTermsCount(); i++) {
-        if(!parent.getTerms(i).getName().equals(term.getName())) {
-          termsArray.push(parent.getTerms(i));
-        }
+    JsArray<TermDto> termsArray = JsArrays.create().cast();
+    for(int i = 0; i < vocabulary.getTermsCount(); i++) {
+      if(!vocabulary.getTerms(i).getName().equals(term.getName())) {
+        termsArray.push(vocabulary.getTerms(i));
       }
-      parent.setTermsArray(termsArray);
-    } else {
-      JsArray<TermDto> termsArray = JsArrays.create().cast();
-      for(int i = 0; i < vocabulary.getTermsCount(); i++) {
-        if(!vocabulary.getTerms(i).getName().equals(term.getName())) {
-          termsArray.push(vocabulary.getTerms(i));
-        }
-      }
-
-      vocabulary.setTermsArray(termsArray);
     }
+
+    vocabulary.setTermsArray(termsArray);
     getView().displayVocabulary(vocabulary);
   }
 

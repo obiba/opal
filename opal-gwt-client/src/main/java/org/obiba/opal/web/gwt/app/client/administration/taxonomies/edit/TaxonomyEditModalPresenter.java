@@ -6,7 +6,6 @@ import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -66,8 +65,8 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
   public void onSaveTaxonomy() {
     TaxonomyDto dto = TaxonomyDto.create();
     dto.setName(getView().getName().getText());
-    dto.setTitlesArray(getView().getTitles().getValue());
-    dto.setDescriptionsArray(getView().getDescriptions().getValue());
+    dto.setTitleArray(getView().getTitles().getValue());
+    dto.setDescriptionArray(getView().getDescriptions().getValue());
     dto.setVocabulariesArray(originalTaxonomy.getVocabulariesArray());
 
     if(mode == EDIT_MODE.EDIT) {
@@ -124,28 +123,28 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
   @Override
   public void onAddVocabulary() {
     String name = getView().getNewVocabularyName().getText();
-    if(uniqueVocabularyName(name)) {
-      JsArrayString vocabularies = JsArrays.toSafeArray(originalTaxonomy.getVocabulariesArray());
-      vocabularies.push(name);
-      originalTaxonomy.setVocabulariesArray(vocabularies);
-      refreshVocabularies();
-    }
+//    if(uniqueVocabularyName(name)) {
+//      JsArrayString vocabularies = JsArrays.toSafeArray(originalTaxonomy.getVocabulariesArray());
+//      vocabularies.push(name);
+//      originalTaxonomy.setVocabulariesArray(vocabularies);
+//      refreshVocabularies();
+//    }
   }
 
   @Override
   public void onDeleteVocabulary(String vocabularyName) {
     JsArrayString vocabularies = JsArrayString.createArray().cast();
-    for(int i = 0; i < originalTaxonomy.getVocabulariesArray().length(); i++) {
-      if(!originalTaxonomy.getVocabularies(i).equals(vocabularyName)) {
-        vocabularies.push(originalTaxonomy.getVocabularies(i));
-      }
-    }
-    originalTaxonomy.setVocabulariesArray(vocabularies);
+//    for(int i = 0; i < originalTaxonomy.getVocabulariesArray().length(); i++) {
+//      if(!originalTaxonomy.getVocabularies(i).equals(vocabularyName)) {
+//        vocabularies.push(originalTaxonomy.getVocabularies(i));
+//      }
+//    }
+//    originalTaxonomy.setVocabulariesArray(vocabularies);
     refreshVocabularies();
   }
 
   private void refreshVocabularies() {
-    getView().setVocabularies(originalTaxonomy.getVocabulariesArray());
+    //getView().setVocabularies(originalTaxonomy.getVocabulariesArray());
     getView().getNewVocabularyName().setText("");
   }
 
@@ -166,9 +165,9 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
             getView()
                 .setTitle(editionMode == EDIT_MODE.CREATE ? translations.addTaxonomy() : translations.editTaxonomy());
             getView().getName().setText(taxonomyDto.getName());
-            getView().getTitles().setValue(taxonomyDto.getTitlesArray());
-            getView().getDescriptions().setValue(taxonomyDto.getDescriptionsArray());
-            getView().setVocabularies(taxonomyDto.getVocabulariesArray());
+            getView().getTitles().setValue(taxonomyDto.getTitleArray());
+            getView().getDescriptions().setValue(taxonomyDto.getDescriptionArray());
+            //getView().setVocabularies(taxonomyDto.getVocabulariesArray());
           }
         }).get().send();
   }

@@ -110,29 +110,14 @@ public class VocabularyResourceImpl implements VocabularyResource {
         t = new Term(terms[0]);
       } else {
         Term parent = t;
-
-        for(int i = 1; i < level; i++) {
-          // find parent
-          if(parent != null) {
-            parent = parent.getTerms().get(parent.getTerms().size() - 1);
-          }
-        }
-
-        // Add new term
-        if(parent != null) {
-          parent.getTerms().add(new Term(terms[terms.length - 1]));
-        }
       }
     }
   }
 
   @Override
   public Response saveVocabulary(Opal.VocabularyDto dto) {
-
     try {
-
-      Vocabulary vocabulary = taxonomyService.getVocabulary(taxonomyName, vocabularyName);
-      taxonomyService.saveVocabulary(vocabulary, Dtos.fromDto(dto));
+      taxonomyService.saveVocabulary(taxonomyName, Dtos.fromDto(dto));
     } catch(NoSuchTaxonomyException e) {
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch(NoSuchVocabularyException e) {

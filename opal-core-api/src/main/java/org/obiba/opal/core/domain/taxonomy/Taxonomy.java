@@ -10,114 +10,91 @@
 
 package org.obiba.opal.core.domain.taxonomy;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.NotBlank;
-import org.obiba.opal.core.domain.AbstractTimestamped;
-import org.obiba.opal.core.domain.HasUniqueProperties;
+import org.obiba.opal.core.cfg.NoSuchVocabularyException;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 /**
  * A taxonomies is a set of vocabularies that allows to describe the attributes.
  */
-public class Taxonomy extends AbstractTimestamped implements HasUniqueProperties {
+public class Taxonomy extends TaxonomyEntity {
 
-  @NotNull
-  @NotBlank
-  private String name;
+  private String version;
 
-  private Map<Locale, String> titles = new HashMap<>();
-
-  private Map<Locale, String> descriptions = new HashMap<>();
-
-  private List<String> vocabularies;
+  private List<Vocabulary> vocabularies;
 
   public Taxonomy() {
   }
 
   public Taxonomy(@NotNull String name) {
-    this.name = name;
+    setName(name);
   }
 
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("name");
+  public String getVersion() {
+    return version;
   }
 
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.<Object>newArrayList(name);
+  public void setVersion(String version) {
+    this.version = version;
   }
 
-  @NotNull
-  public String getName() {
-    return name;
-  }
-
-  public void setName(@NotNull String name) {
-    this.name = name;
-  }
-
-  public Map<Locale, String> getTitles() {
-    return titles;
-  }
-
-  public void setTitles(Map<Locale, String> titles) {
-    this.titles = titles;
-  }
-
-  public Taxonomy addTitle(Locale locale, String title) {
-    if(titles == null) titles = new HashMap<>();
-    titles.put(locale, title);
-    return this;
-  }
-
-  public Map<Locale, String> getDescriptions() {
-    return descriptions;
-  }
-
-  public void setDescriptions(Map<Locale, String> descriptions) {
-    this.descriptions = descriptions;
-  }
-
-  public Taxonomy addDescription(Locale locale, String title) {
-    if(descriptions == null) descriptions = new HashMap<>();
-    descriptions.put(locale, title);
-    return this;
+  public boolean hasVersion() {
+    return !Strings.isNullOrEmpty(version);
   }
 
   public boolean hasVocabularies() {
     return vocabularies != null && vocabularies.size() > 0;
   }
 
-  public List<String> getVocabularies() {
+  public List<Vocabulary> getVocabularies() {
     return vocabularies;
   }
 
-  public void setVocabularies(List<String> vocabularies) {
+  public void setVocabularies(List<Vocabulary> vocabularies) {
     this.vocabularies = vocabularies;
   }
 
-  public Taxonomy addVocabulary(String vocabulary) {
-    if(vocabularies == null) vocabularies = new ArrayList<>();
-    if(!vocabularies.contains(vocabulary)) vocabularies.add(vocabulary);
+  public Taxonomy addVocabulary(Vocabulary vocabulary) {
+    if(vocabularies == null) vocabularies = Lists.newArrayList();
+    int idx = vocabularies.indexOf(vocabulary);
+    if(idx < 0) vocabularies.add(vocabulary);
+    else vocabularies.set(idx, vocabulary);
     return this;
   }
 
-  public Taxonomy removeVocabulary(String vocabulary) {
-    if(vocabularies != null) vocabularies.remove(vocabulary);
-    return this;
+  public void removeVocabulary(String name) {
+    if(vocabularies == null) return;
+    Vocabulary found = null;
+    for(Vocabulary vocabulary : vocabularies) {
+      if(vocabulary.getName().equals(name)) {
+        found = vocabulary;
+        break;
+      }
+    }
+    if (found != null) {
+      vocabularies.remove(found);
+    }
   }
 
-  public boolean hasVocabulary(String vocabulary) {
-    return vocabularies != null && vocabularies.contains(vocabulary);
+  public boolean hasVocabulary(String name) {
+    if(vocabularies == null) return false;
+    for(Vocabulary vocabulary : vocabularies) {
+      if(vocabulary.getName().equals(name)) return true;
+    }
+    return false;
+  }
+
+  public Vocabulary getVocabulary(@NotNull String name) throws NoSuchVocabularyException {
+    if(vocabularies == null) throw new NoSuchVocabularyException(name);
+    for(Vocabulary vocabulary : vocabularies) {
+      if(vocabulary.getName().equals(name)) return vocabulary;
+    }
+    throw new NoSuchVocabularyException(name);
   }
 
   @Override
@@ -125,19 +102,12 @@ public class Taxonomy extends AbstractTimestamped implements HasUniqueProperties
     if(this == o) return true;
     if(!(o instanceof Taxonomy)) return false;
     Taxonomy taxonomy = (Taxonomy) o;
-    return name.equals(taxonomy.name);
+    return getName().equals(taxonomy.getName());
   }
 
   @Override
   public int hashCode() {
-    return name.hashCode();
+    return getName().hashCode();
   }
 
-  public void renameVocabulary(String templateName, String name) {
-    int pos = vocabularies.indexOf(templateName);
-
-    if(pos >= 0) {
-      vocabularies.set(pos, name);
-    }
-  }
 }

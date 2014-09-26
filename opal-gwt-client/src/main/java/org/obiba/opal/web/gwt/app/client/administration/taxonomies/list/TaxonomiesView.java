@@ -4,6 +4,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.LocalizedLabel;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
+import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.Heading;
@@ -11,7 +12,6 @@ import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -73,10 +73,10 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
       Widget taxonomyLink = newTaxonomyLink(getUiHandlers(), taxonomy);
       panelTaxonomy.add(taxonomyLink);
 
-      for(int i = 0; i < taxonomy.getDescriptionsCount(); i++) {
-        if(!taxonomy.getDescriptions(i).getText().isEmpty()) {
+      for(int i = 0; i < taxonomy.getDescriptionCount(); i++) {
+        if(!taxonomy.getDescription(i).getText().isEmpty()) {
           panelTaxonomy
-              .add(new LocalizedLabel(taxonomy.getDescriptions(i).getLocale(), taxonomy.getDescriptions(i).getText()));
+              .add(new LocalizedLabel(taxonomy.getDescription(i).getLocale(), taxonomy.getDescription(i).getText()));
         }
       }
 
@@ -87,12 +87,12 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
   }
 
   private void redrawVocabularies(TaxonomyDto taxonomy, FlowPanel panelTaxonomy) {
-    JsArrayString vocabularies = JsArrays.toSafeArray(taxonomy.getVocabulariesArray());
+    JsArray<VocabularyDto> vocabularies = JsArrays.toSafeArray(taxonomy.getVocabulariesArray());
     if(vocabularies.length() > 0) {
       panelTaxonomy.add(new Heading(5, translations.vocabulariesLabel()));
       FlowPanel vocabulariesPanel = new FlowPanel();
       for(int i = 0; i < vocabularies.length(); i++) {
-        vocabulariesPanel.add(getVocabularyLink(getUiHandlers(), taxonomy, vocabularies.get(i)));
+        vocabulariesPanel.add(getVocabularyLink(getUiHandlers(), taxonomy, vocabularies.get(i).getName()));
       }
       panelTaxonomy.add(vocabulariesPanel);
     }

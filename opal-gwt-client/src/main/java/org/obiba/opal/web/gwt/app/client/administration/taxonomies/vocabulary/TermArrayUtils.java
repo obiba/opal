@@ -18,12 +18,6 @@ public class TermArrayUtils {
       if(termsArray.get(i).getName().equals(termName)) {
         return termsArray.get(i);
       }
-
-      // Find in child
-      TermDto t = findTerm(termsArray.get(i).getTermsArray(), termName);
-      if(t != null) {
-        return t;
-      }
     }
 
     return null;
@@ -38,12 +32,6 @@ public class TermArrayUtils {
     for(int i = 0; i < termsArray.length(); i++) {
       if(termsArray.get(i).getName().equals(termToFind.getName())) {
         return parent;
-      }
-
-      // Find in child
-      TermDto t = findParent(termsArray.get(i), terms.get(i).getTermsArray(), termToFind);
-      if(t != null) {
-        return t;
       }
     }
 

@@ -85,9 +85,9 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
     vocabularyProperties.addProperty(translations.taxonomyLabel(), taxonomy);
 
     vocabularyProperties.addProperty(new Label(translations.titleLabel()),
-        getLocalizedText(JsArrays.toSafeArray(vocabulary.getTitlesArray())));
+        getLocalizedText(JsArrays.toSafeArray(vocabulary.getTitleArray())));
     vocabularyProperties.addProperty(new Label(translations.descriptionLabel()),
-        getLocalizedText(JsArrays.toSafeArray(vocabulary.getDescriptionsArray())));
+        getLocalizedText(JsArrays.toSafeArray(vocabulary.getDescriptionArray())));
 
     vocabularyProperties.addProperty(translations.repeatableLabel(), Boolean.toString(vocabulary.getRepeatable()));
 
@@ -119,10 +119,6 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
       link.addStyleName("inline");
 
       navList.add(link);
-
-      if(terms.get(i).getTermsCount() > 0) {
-        getTermsLinks(navList, terms.get(i).getTermsArray(), level + 1);
-      }
     }
   }
 
@@ -134,9 +130,9 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
       termTitle.setText(termDto.getName());
       termProperties.addProperty(translations.nameLabel(), termDto.getName());
       termProperties.addProperty(new Label(translations.titleLabel()),
-          getLocalizedText(JsArrays.toSafeArray(termDto.getTitlesArray())));
+          getLocalizedText(JsArrays.toSafeArray(termDto.getTitleArray())));
       termProperties.addProperty(new Label(translations.descriptionLabel()),
-          getLocalizedText(JsArrays.toSafeArray(termDto.getDescriptionsArray())));
+          getLocalizedText(JsArrays.toSafeArray(termDto.getDescriptionArray())));
       termProperties.setVisible(true);
     } else {
       termTitle.setVisible(false);

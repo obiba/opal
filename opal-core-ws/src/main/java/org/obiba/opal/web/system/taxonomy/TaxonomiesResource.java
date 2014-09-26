@@ -43,7 +43,7 @@ public class TaxonomiesResource {
 
   @POST
   public Response addTaxonomy(TaxonomyDto dto) {
-    taxonomyService.saveTaxonomy(null, Dtos.fromDto(dto));
+    taxonomyService.saveTaxonomy(Dtos.fromDto(dto));
     return Response.ok().build();
   }
 }

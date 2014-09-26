@@ -1200,6 +1200,12 @@
       </dependency>
 
       <dependency>
+        <groupId>org.yaml</groupId>
+        <artifactId>snakeyaml</artifactId>
+        <version>${snakeyaml.version}</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.eclipse.jgit</groupId>
         <artifactId>org.eclipse.jgit</artifactId>
         <version>${jgit.version}</version>
@@ -1783,6 +1789,7 @@
     <shiro.version>1.2.3-java8</shiro.version>
     <shiro-extras.version>1.0.3-obiba</shiro-extras.version>
     <slf4j.version>1.7.6</slf4j.version>
+    <snakeyaml.version>1.14</snakeyaml.version>
     <spring.version>4.0.3.RELEASE</spring.version>
     <spring-batch.version>2.0.3.RELEASE</spring-batch.version>
     <sshd.version>0.8.0</sshd.version>

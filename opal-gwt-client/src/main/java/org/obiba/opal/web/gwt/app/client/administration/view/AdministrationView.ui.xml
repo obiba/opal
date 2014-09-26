@@ -172,13 +172,13 @@
                 </g:FlowPanel>
               </g:FlowPanel>
               <b:Divider visible="false"/>
-              <o:OpalNavLink ui:field="taxonomiesPlace" icon="COG" visible="false">
+              <o:OpalNavLink ui:field="taxonomiesPlace" icon="COG">
                 <ui:msg description="Main Administration Taxonomies title">Taxonomies</ui:msg>
               </o:OpalNavLink>
-              <g:FlowPanel visible="false">
+              <g:FlowPanel>
                 <g:Label styleName="help-block">
                   <ui:msg description="Main Administration Taxonomies help">
-                    Manage pre-defined variable attributes
+                    Manage taxonomies for variable classification with controlled vocabularies
                   </ui:msg>
                 </g:Label>
               </g:FlowPanel>

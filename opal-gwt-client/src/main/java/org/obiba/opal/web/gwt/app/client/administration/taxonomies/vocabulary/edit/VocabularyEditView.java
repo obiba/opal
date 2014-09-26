@@ -272,9 +272,6 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
       for(int i = 0; i < nb; i++) {
         FocusPanel focusPanel = getTermFocusPanel(terms.get(i), dragController, level);
         target.add(focusPanel);
-        if(terms.get(i).getTermsCount() > 0) {
-          target.add(addTermsLinks(vocabulary, terms.get(i).getTermsArray(), level + 1));
-        }
       }
     }
 
