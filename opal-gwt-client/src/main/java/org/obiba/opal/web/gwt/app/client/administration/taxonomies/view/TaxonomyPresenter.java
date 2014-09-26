@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.Taxonom
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -69,7 +70,8 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
 
   @Override
   public void onDownload() {
-
+    String downloadUrl = UriBuilders.SYSTEM_CONF_TAXONOMY.create().build(taxonomy.getName()) + "/_download";
+    fireEvent(new FileDownloadRequestEvent(downloadUrl));
   }
 
   @Override
@@ -178,6 +180,7 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
 
     @Override
     public void onResource(Response response, TaxonomyDto resource) {
+      taxonomy = resource;
       getView().setTaxonomy(resource);
       authorize();
     }

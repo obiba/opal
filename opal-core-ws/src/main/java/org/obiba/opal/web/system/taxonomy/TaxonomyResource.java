@@ -15,10 +15,13 @@ import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import org.obiba.opal.core.cfg.NoSuchTaxonomyException;
 import org.obiba.opal.core.cfg.TaxonomyService;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
+import org.obiba.opal.core.support.yaml.TaxonomyYaml;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.taxonomy.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,12 +46,24 @@ public class TaxonomyResource {
   @GET
   public Opal.TaxonomyDto getTaxonomy() {
     Taxonomy taxonomy = taxonomyService.getTaxonomy(name);
+    if(taxonomy == null) throw new NoSuchTaxonomyException(name);
     return Dtos.asDto(taxonomy);
+  }
+
+  @GET
+  @Produces(value = "text/plain")
+  @Path("_download")
+  public Response download() {
+    Taxonomy taxonomy = taxonomyService.getTaxonomy(name);
+    if(taxonomy == null) throw new NoSuchTaxonomyException(name);
+    TaxonomyYaml yaml = new TaxonomyYaml();
+    return Response.ok(yaml.dump(taxonomy), "text/plain")
+        .header("Content-Disposition", "attachment; filename=\"" + taxonomy.getName() + ".yml\"").build();
   }
 
   @PUT
   public Response updateTaxonomy(Opal.TaxonomyDto dto) {
-    if (name.equals(dto.getName())) {
+    if(name.equals(dto.getName())) {
       // rename
       taxonomyService.deleteTaxonomy(name);
     }
