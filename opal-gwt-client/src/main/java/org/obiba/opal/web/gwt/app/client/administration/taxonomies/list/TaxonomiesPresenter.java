@@ -9,6 +9,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.opal.TaxonomiesDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -58,19 +59,19 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
   }
 
   void refresh() {
-    ResourceRequestBuilderFactory.<JsArray<TaxonomyDto>>newBuilder()
+    ResourceRequestBuilderFactory.<TaxonomiesDto>newBuilder()
         .forResource(UriBuilders.SYSTEM_CONF_TAXONOMIES.create().build()).get()
-        .withCallback(new ResourceCallback<JsArray<TaxonomyDto>>() {
+        .withCallback(new ResourceCallback<TaxonomiesDto>() {
           @Override
-          public void onResource(Response response, JsArray<TaxonomyDto> resource) {
-            getView().setTaxonomies(JsArrays.toSafeArray(resource));
+          public void onResource(Response response, TaxonomiesDto resource) {
+            getView().setTaxonomies(JsArrays.toSafeArray(resource.getSummariesArray()));
           }
         }).send();
   }
 
   @Override
-  public void onTaxonomySelection(TaxonomyDto taxonomy) {
-    fireEvent(new TaxonomySelectedEvent(taxonomy));
+  public void onTaxonomySelection(TaxonomiesDto.TaxonomySummaryDto taxonomy) {
+    fireEvent(new TaxonomySelectedEvent(taxonomy.getName()));
   }
 
   @Override
@@ -90,6 +91,6 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
 
   public interface Display extends View, HasUiHandlers<TaxonomiesUiHandlers> {
 
-    void setTaxonomies(JsArray<TaxonomyDto> taxonomies);
+    void setTaxonomies(JsArray<TaxonomiesDto.TaxonomySummaryDto> taxonomies);
   }
 }

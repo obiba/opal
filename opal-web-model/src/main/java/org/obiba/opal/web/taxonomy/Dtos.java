@@ -27,17 +27,25 @@ public class Dtos {
     builder.addAllTitle(toLocaleTextDtoList(taxonomy.getTitle()));
     builder.addAllDescription(toLocaleTextDtoList(taxonomy.getDescription()));
 
-    if (taxonomy.hasVersion()) builder.setVersion(taxonomy.getVersion());
+    if(taxonomy.hasVersion()) builder.setVersion(taxonomy.getVersion());
 
     if(taxonomy.hasVocabularies()) {
-      builder.addAllVocabularies(Iterables.transform(taxonomy.getVocabularies(), new Function<Vocabulary, Opal.VocabularyDto>() {
-        @Nullable
-        @Override
-        public Opal.VocabularyDto apply(@Nullable Vocabulary input) {
-          return asDto(input);
-        }
-      }));
+      builder.addAllVocabularies(
+          Iterables.transform(taxonomy.getVocabularies(), new Function<Vocabulary, Opal.VocabularyDto>() {
+            @Nullable
+            @Override
+            public Opal.VocabularyDto apply(@Nullable Vocabulary input) {
+              return asDto(input);
+            }
+          }));
     }
+    return builder.build();
+  }
+
+  public static Opal.TaxonomiesDto.TaxonomySummaryDto asSummaryDto(Taxonomy taxonomy) {
+    Opal.TaxonomiesDto.TaxonomySummaryDto.Builder builder = Opal.TaxonomiesDto.TaxonomySummaryDto.newBuilder();
+    builder.setName(taxonomy.getName());
+    builder.addAllTitle(toLocaleTextDtoList(taxonomy.getTitle()));
     return builder.build();
   }
 
@@ -55,7 +63,7 @@ public class Dtos {
 
   public static Taxonomy fromDto(Opal.TaxonomyDto dto) {
     Taxonomy taxonomy = new Taxonomy(dto.getName());
-    if (dto.hasVersion()) taxonomy.setVersion(dto.getVersion());
+    if(dto.hasVersion()) taxonomy.setVersion(dto.getVersion());
     taxonomy.setTitle(fromLocaleTextDtoList(dto.getTitleList()));
     taxonomy.setDescription(fromLocaleTextDtoList(dto.getDescriptionList()));
 
@@ -102,7 +110,7 @@ public class Dtos {
     builder.setName(vocabulary.getName());
     builder.addAllTitle(toLocaleTextDtoList(vocabulary.getTitle()));
     builder.addAllDescription(toLocaleTextDtoList(vocabulary.getDescription()));
-    if (vocabulary.hasTerms()) builder.addAllTerms(asDto(vocabulary.getTerms()));
+    if(vocabulary.hasTerms()) builder.addAllTerms(asDto(vocabulary.getTerms()));
     builder.setRepeatable(vocabulary.isRepeatable());
     return builder.build();
   }

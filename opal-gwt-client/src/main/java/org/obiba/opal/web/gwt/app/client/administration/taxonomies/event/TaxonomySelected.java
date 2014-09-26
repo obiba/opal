@@ -9,13 +9,11 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.taxonomies.event;
 
-import org.obiba.opal.web.model.client.opal.TaxonomyDto;
-
 import com.gwtplatform.dispatch.annotation.GenEvent;
 
 @GenEvent
 public class TaxonomySelected {
 
-  TaxonomyDto taxonomy;
+  String taxonomy;
 
 }

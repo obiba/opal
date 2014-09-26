@@ -334,6 +334,14 @@ message VocabularyDto {
   repeated TermDto terms = 5;
 }
 
+message TaxonomiesDto {
+  message TaxonomySummaryDto {
+    required string name = 1;
+    repeated LocaleTextDto title = 2;
+  }
+  repeated TaxonomySummaryDto summaries = 1;
+}
+
 message TaxonomyDto {
   required string name = 1; // mapped to attribute namespace
   repeated LocaleTextDto title = 2;

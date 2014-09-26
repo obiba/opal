@@ -11,8 +11,6 @@
 package org.obiba.opal.web.system.taxonomy;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -25,6 +23,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.obiba.opal.core.cfg.TaxonomyService;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.TaxonomyDto;
 import org.obiba.opal.web.taxonomy.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,12 +37,12 @@ public class TaxonomiesResource {
   private TaxonomyService taxonomyService;
 
   @GET
-  public List<TaxonomyDto> getTaxonomies() {
-    List<TaxonomyDto> taxonomies = new ArrayList<>();
+  public Opal.TaxonomiesDto getTaxonomies() {
+    Opal.TaxonomiesDto.Builder builder = Opal.TaxonomiesDto.newBuilder();
     for(Taxonomy taxonomy : taxonomyService.getTaxonomies()) {
-      taxonomies.add(Dtos.asDto(taxonomy));
+      builder.addSummaries(Dtos.asSummaryDto(taxonomy));
     }
-    return taxonomies;
+    return builder.build();
   }
 
   @POST

@@ -25,6 +25,8 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 
+import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -106,11 +108,11 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
 
           @Override
           public void onTaxonomySelected(TaxonomySelectedEvent event) {
-            TaxonomyDto taxonomy = event.getTaxonomy();
-            if(taxonomy == null) {
+            String name = event.getTaxonomy();
+            if(Strings.isNullOrEmpty(name)) {
               getView().setTaxonomy(null);
             } else {
-              refreshTaxonomy(taxonomy);
+              refreshTaxonomy(name);
             }
           }
         });
@@ -122,10 +124,6 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
 
   private void authorize() {
     // TODO
-  }
-
-  private void refreshTaxonomy(TaxonomyDto taxonomyDto) {
-    refreshTaxonomy(taxonomyDto.getName());
   }
 
   private void refreshTaxonomy(String name) {

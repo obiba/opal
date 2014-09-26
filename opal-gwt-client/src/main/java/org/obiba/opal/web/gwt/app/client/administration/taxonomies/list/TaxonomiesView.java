@@ -2,25 +2,19 @@ package org.obiba.opal.web.gwt.app.client.administration.taxonomies.list;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.model.client.opal.TaxonomyDto;
-import org.obiba.opal.web.model.client.opal.VocabularyDto;
+import org.obiba.opal.web.model.client.opal.TaxonomiesDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.NavList;
 import com.github.gwtbootstrap.client.ui.NavWidget;
-import com.github.gwtbootstrap.client.ui.base.IconAnchor;
-import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -56,15 +50,15 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
   }
 
   @Override
-  public void setTaxonomies(JsArray<TaxonomyDto> taxonomies) {
+  public void setTaxonomies(JsArray<TaxonomiesDto.TaxonomySummaryDto> taxonomies) {
     taxonomyList.clear();
-    TaxonomyDto first = null;
-    for(TaxonomyDto taxonomy : JsArrays.toIterable(taxonomies)) {
+    TaxonomiesDto.TaxonomySummaryDto first = null;
+    for(TaxonomiesDto.TaxonomySummaryDto taxonomy : JsArrays.toIterable(taxonomies)) {
 
       NavLink link = new NavLink(taxonomy.getName());
       link.addClickHandler(new TaxonomyClickHandler(taxonomy, link));
       taxonomyList.add(link);
-      if (first == null) {
+      if(first == null) {
         first = taxonomy;
         link.setActive(true);
         getUiHandlers().onTaxonomySelection(first);
@@ -78,72 +72,13 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
     getUiHandlers().onAddTaxonomy();
   }
 
-
-  private void redrawVocabularies(TaxonomyDto taxonomy, FlowPanel panelTaxonomy) {
-    JsArray<VocabularyDto> vocabularies = JsArrays.toSafeArray(taxonomy.getVocabulariesArray());
-    if(vocabularies.length() > 0) {
-      panelTaxonomy.add(new Heading(5, translations.vocabulariesLabel()));
-      FlowPanel vocabulariesPanel = new FlowPanel();
-      for(int i = 0; i < vocabularies.length(); i++) {
-        vocabulariesPanel.add(getVocabularyLink(getUiHandlers(), taxonomy, vocabularies.get(i).getName()));
-      }
-      panelTaxonomy.add(vocabulariesPanel);
-    }
-  }
-
-  protected Widget newTaxonomyLink(final TaxonomiesUiHandlers handlers, final TaxonomyDto taxonomy) {
-    FlowPanel titlePanel = new FlowPanel();
-    Label taxonomyTitle = new Label(taxonomy.getName());
-    taxonomyTitle.addStyleName("inline-block");
-    taxonomyTitle.setTitle(taxonomy.getName());
-    taxonomyTitle.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent clickEvent) {
-        handlers.onTaxonomySelection(taxonomy);
-      }
-    });
-
-    titlePanel.add(taxonomyTitle);
-    IconAnchor edit = new IconAnchor();
-    edit.setIcon(IconType.EDIT);
-    edit.addStyleName("small-dual-indent");
-    edit.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent clickEvent) {
-        handlers.onTaxonomyEdit(taxonomy);
-      }
-    });
-
-    titlePanel.add(edit);
-
-    Heading head = new Heading(4);
-    head.addStyleName("inline-block small-right-indent");
-    head.add(titlePanel);
-    return head;
-  }
-
-  private Widget getVocabularyLink(final TaxonomiesUiHandlers uiHandlers, final TaxonomyDto taxonomy,
-      final String vocabulary) {
-    NavLink link = new NavLink(vocabulary);
-//    link.setIcon(IconType.TAG);
-    link.addStyleName("small-dual-indent");
-    link.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent clickEvent) {
-        uiHandlers.onVocabularySelection(taxonomy.getName(), vocabulary);
-      }
-    });
-    return link;
-  }
-
-
   private class TaxonomyClickHandler implements ClickHandler {
 
-    private final TaxonomyDto taxonomy;
+    private final TaxonomiesDto.TaxonomySummaryDto taxonomy;
 
     private final NavLink link;
 
-    TaxonomyClickHandler(TaxonomyDto taxonomy, NavLink link) {
+    TaxonomyClickHandler(TaxonomiesDto.TaxonomySummaryDto taxonomy, NavLink link) {
       this.taxonomy = taxonomy;
       this.link = link;
     }
