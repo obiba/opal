@@ -10,31 +10,22 @@
 
 package org.obiba.opal.core.domain.taxonomy;
 
-import java.beans.IntrospectionException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
 import org.junit.Test;
-import org.yaml.snakeyaml.DumperOptions;
+import org.obiba.opal.core.support.yaml.TaxonomyYaml;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.introspector.BeanAccess;
-import org.yaml.snakeyaml.introspector.Property;
-import org.yaml.snakeyaml.introspector.PropertyUtils;
-import org.yaml.snakeyaml.nodes.NodeTuple;
-import org.yaml.snakeyaml.nodes.Tag;
-import org.yaml.snakeyaml.representer.Representer;
 
-import com.google.common.collect.ImmutableSet;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class TaxonomyTest {
 
   @Test
-  public void test_yaml() {
-    Representer repr = new TaxonomyRepresenter();
-    DumperOptions options = new DumperOptions();
-    options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-    Yaml yaml = new Yaml(repr, options);
+  public void test_yaml_dump() {
+    Yaml yaml = new TaxonomyYaml();
 
     Taxonomy taxonomy = new Taxonomy();
     taxonomy.setVersion("1.0-SNAPSHOT");
@@ -76,42 +67,18 @@ public class TaxonomyTest {
     System.out.println(yaml.dump(taxonomy));
   }
 
-  private class TaxonomyPropertyUtils extends PropertyUtils {
-    @Override
-    protected Set<Property> createPropertySet(Class<? extends Object> type, BeanAccess bAccess)
-        throws IntrospectionException {
-      Map<String, Property> propertyMap = getPropertiesMap(type, BeanAccess.DEFAULT);
-
-      ImmutableSet.Builder<Property> builder = ImmutableSet.builder();
-      addProperty("name", propertyMap, builder);
-      addProperty("version", propertyMap, builder);
-      addProperty("title", propertyMap, builder);
-      addProperty("description", propertyMap, builder);
-      builder.addAll(propertyMap.values());
-      return builder.build();
-    }
-
-
-
-    private void addProperty(String key, Map<String, Property> propertyMap, ImmutableSet.Builder<Property> builder) {
-      if(propertyMap.containsKey(key)) {
-        builder.add(propertyMap.remove(key));
-      }
+  @Test
+  public void test_yaml_read() {
+    try {
+      InputStream input = new URL(
+          "https://raw.githubusercontent.com/maelstrom-research/maelstrom-area-of-information/master/taxonomy.yml")
+          .openStream();
+      TaxonomyYaml yaml = new TaxonomyYaml();
+      Taxonomy taxonomy = yaml.load(input);
+      assertThat(taxonomy).isNotNull();
+    } catch(IOException e) {
+      e.printStackTrace();
     }
   }
 
-  private class TaxonomyRepresenter extends Representer {
-
-    private TaxonomyRepresenter() {
-      setPropertyUtils(new TaxonomyPropertyUtils());
-    }
-
-    @Override
-    protected NodeTuple representJavaBeanProperty(Object javaBean, Property property, Object propertyValue,
-        Tag customTag) {
-      if (propertyValue == null) return null;
-      if (propertyValue instanceof Boolean && !(Boolean)propertyValue) return null;
-      return super.representJavaBeanProperty(javaBean, property, propertyValue, customTag);
-    }
-  }
 }

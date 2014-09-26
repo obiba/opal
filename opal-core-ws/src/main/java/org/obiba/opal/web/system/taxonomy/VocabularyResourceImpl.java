@@ -69,52 +69,6 @@ public class VocabularyResourceImpl implements VocabularyResource {
   }
 
   @Override
-  public Response addVocabularyTerms(String csv) {
-    Taxonomy taxonomy = taxonomyService.getTaxonomy(taxonomyName);
-
-    if(taxonomy == null) {
-      return Response.status(Response.Status.NOT_FOUND).build();
-    }
-
-    Vocabulary vocabulary = taxonomyService.getVocabulary(taxonomyName, vocabularyName);
-    if(vocabulary == null) {
-      return Response.status(Response.Status.NOT_FOUND).build();
-    }
-
-    vocabulary.getTerms().clear();
-
-    try {
-      parseStringAsCsv(csv, vocabulary);
-    } catch(IOException e) {
-      return Response.status(Response.Status.BAD_REQUEST).build();
-    }
-
-    taxonomyService.saveVocabulary(null, vocabulary);
-
-    return Response.ok().build();
-  }
-
-  private void parseStringAsCsv(String csv, Vocabulary vocabulary) throws IOException {// Parse csv and add terms
-    CSVReader reader = new CSVReader(new StringReader(csv));
-    List<String[]> lines = reader.readAll();
-
-    Term t = null;
-    for(String[] terms : lines) {
-
-      int level = terms.length - 1;
-      if(level == 0) {
-        if(t != null) {
-          vocabulary.getTerms().add(t);
-        }
-
-        t = new Term(terms[0]);
-      } else {
-        Term parent = t;
-      }
-    }
-  }
-
-  @Override
   public Response saveVocabulary(Opal.VocabularyDto dto) {
     try {
       taxonomyService.saveVocabulary(taxonomyName, Dtos.fromDto(dto));

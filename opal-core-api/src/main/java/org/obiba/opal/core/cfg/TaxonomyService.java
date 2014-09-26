@@ -23,12 +23,37 @@ import org.obiba.opal.core.service.SystemService;
 public interface TaxonomyService extends SystemService {
 
   /**
+   * Import a {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} from a GitHub repository.
+   *
+   * @param username default to maelstrom-research
+   * @param repo
+   * @param ref default to master
+   * @param taxonomyFile default to taxonomy.yml
+   * @return null if import failed
+   */
+  Taxonomy importGitHubTaxonomy(@NotNull String username, @NotNull String repo, @Nullable String ref,
+      @NotNull String taxonomyFile);
+
+  /**
    * Get all {@link org.obiba.opal.core.domain.taxonomy.Taxonomy}s.
    *
    * @return
    */
   Iterable<Taxonomy> getTaxonomies();
 
+  /**
+   * Check {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} exists from name.
+   *
+   * @return
+   */
+  boolean hasTaxonomy(@NotNull String name);
+
+  /**
+   * Get {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} from name.
+   *
+   * @param name
+   * @return null if not found
+   */
   @Nullable
   Taxonomy getTaxonomy(@NotNull String name);
 
