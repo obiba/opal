@@ -2,6 +2,7 @@ package org.obiba.opal.web.gwt.app.client.administration.taxonomies.list;
 
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.edit.TaxonomyEditModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomySelectedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularySelectedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.TaxonomyPresenter;
@@ -108,6 +109,13 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
         VocabularyPresenter presenter = vocabularyPresenterProvider.get();
         presenter.setVocabulary(event.getTaxonomy(), event.getVocabulary());
         setInSlot(null, presenter);
+      }
+    });
+
+    addRegisteredHandler(TaxonomyDeletedEvent.getType(), new TaxonomyDeletedEvent.TaxonomyDeletedHandler() {
+      @Override
+      public void onTaxonomyDeleted(TaxonomyDeletedEvent event) {
+        refresh();
       }
     });
   }

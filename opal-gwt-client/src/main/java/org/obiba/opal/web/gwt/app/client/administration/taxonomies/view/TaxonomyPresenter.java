@@ -160,7 +160,12 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
   private void addHandlers() {
     addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler());
     addRegisteredHandler(TaxonomyCreatedEvent.getType(), new TaxonomyCreatedUpdatedHandler());
-    //addRegisteredHandler(TaxonomyUpdatedEvent.getType(), new TaxonomyCreatedUpdatedHandler());
+    addRegisteredHandler(TaxonomyDeletedEvent.getType(), new TaxonomyDeletedEvent.TaxonomyDeletedHandler() {
+      @Override
+      public void onTaxonomyDeleted(TaxonomyDeletedEvent event) {
+        setTaxonomy(null);
+      }
+    });
   }
 
   private void authorize() {

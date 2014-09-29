@@ -7,63 +7,48 @@
     ui:generateLocales="default">
 
   <o:Modal ui:field="modal" closeVisible="true" keyboard="true" animation="false">
-    <b:FluidRow>
-      <b:Column size="12">
-        <b:Form type="HORIZONTAL">
-          <!--Name-->
-          <b:ControlGroup>
-            <b:ControlLabel>
-              <ui:msg description="Name label">Name</ui:msg>
-            </b:ControlLabel>
-            <b:Controls>
-              <b:TextBox ui:field="name"/>
-            </b:Controls>
-          </b:ControlGroup>
+    <!-- Name -->
+    <b:ControlGroup>
+      <b:ControlLabel>
+        <ui:msg description="Name label">Name</ui:msg>
+      </b:ControlLabel>
+      <b:Controls>
+        <b:TextBox ui:field="name"/>
+      </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="Taxonomy Name help">A taxonomy must have a unique name.</ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
 
-          <!--Titles -->
-          <b:ControlGroup>
-            <b:ControlLabel>
-              <ui:msg description="titles label">Titles</ui:msg>
-            </b:ControlLabel>
-            <b:Controls>
-              <g:FlowPanel ui:field="taxonomyTitles"/>
-            </b:Controls>
-          </b:ControlGroup>
+    <!-- Title -->
+    <b:ControlGroup>
+      <b:ControlLabel>
+        <ui:msg description="Title label">Title</ui:msg>
+      </b:ControlLabel>
+      <b:Controls>
+        <g:FlowPanel ui:field="taxonomyTitles"/>
+      </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="Taxonomy Title help">A title for the human beings.</ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
 
-          <!--Descriptions-->
-          <b:ControlGroup>
-            <b:ControlLabel>
-              <ui:msg description="Name label">Descriptions</ui:msg>
-            </b:ControlLabel>
-            <b:Controls>
-              <g:FlowPanel ui:field="taxonomyDescriptions"/>
-            </b:Controls>
-          </b:ControlGroup>
+    <!-- Description -->
+    <b:ControlGroup>
+      <b:ControlLabel>
+        <ui:msg description="Description label">Description</ui:msg>
+      </b:ControlLabel>
+      <b:Controls>
+        <g:FlowPanel ui:field="taxonomyDescriptions"/>
+      </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="Taxonomy Description help">Optional description of the taxonomy.</ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
 
-          <b:ControlGroup ui:field="vocabularyGroup">
-            <b:ControlLabel>
-              <ui:msg description="Vocabularies label">Vocabularies</ui:msg>
-            </b:ControlLabel>
-            <b:Controls>
-              <g:FlowPanel>
-                <b:TextBox ui:field="newVocabularyName"/>
-                <b:Button ui:field="addVocabulary" icon="PLUS"/>
-                <g:FlowPanel ui:field="vocabularies"/>
-              </g:FlowPanel>
-            </b:Controls>
-          </b:ControlGroup>
-
-        </b:Form>
-      </b:Column>
-    </b:FluidRow>
-
-    <!--<b:TabPanel tabPosition="up" ui:field="localesTabs"/>-->
     <b:ModalFooter>
       <b:Button type="PRIMARY" ui:field="save">
         <ui:msg description="Save label">Save</ui:msg>
-      </b:Button>
-      <b:Button type="DANGER" ui:field="delete">
-        <ui:msg description="Remove label">Remove</ui:msg>
       </b:Button>
       <b:Button ui:field="cancel">
         <ui:msg description="Cancel label">Cancel</ui:msg>

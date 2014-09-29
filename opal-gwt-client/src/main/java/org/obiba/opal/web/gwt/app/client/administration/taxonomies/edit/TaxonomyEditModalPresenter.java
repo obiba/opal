@@ -2,7 +2,6 @@ package org.obiba.opal.web.gwt.app.client.administration.taxonomies.edit;
 
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -67,7 +66,6 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
     dto.setName(getView().getName().getText());
     dto.setTitleArray(getView().getTitles().getValue());
     dto.setDescriptionArray(getView().getDescriptions().getValue());
-    dto.setVocabulariesArray(originalTaxonomy.getVocabulariesArray());
 
     if(mode == EDIT_MODE.EDIT) {
       ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder()
@@ -84,7 +82,7 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
             @Override
             public void onResponseCode(Request request, Response response) {
               if(response.getText() != null && response.getText().length() != 0) {
-                getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+                fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
               }
             }
           }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR)//
@@ -104,48 +102,12 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
             @Override
             public void onResponseCode(Request request, Response response) {
               if(response.getText() != null && response.getText().length() != 0) {
-                getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+                fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
               }
             }
           }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR)//
           .post().send();
     }
-  }
-
-  @Override
-  public void onDeleteTaxonomy() {
-    removeConfirmation = new RemoveRunnable(originalTaxonomy.getName());
-
-    fireEvent(ConfirmationRequiredEvent.createWithMessages(removeConfirmation, translationMessages.removeTaxonomy(),
-        translationMessages.confirmRemoveTaxonomy(originalTaxonomy.getName())));
-  }
-
-  @Override
-  public void onAddVocabulary() {
-    String name = getView().getNewVocabularyName().getText();
-//    if(uniqueVocabularyName(name)) {
-//      JsArrayString vocabularies = JsArrays.toSafeArray(originalTaxonomy.getVocabulariesArray());
-//      vocabularies.push(name);
-//      originalTaxonomy.setVocabulariesArray(vocabularies);
-//      refreshVocabularies();
-//    }
-  }
-
-  @Override
-  public void onDeleteVocabulary(String vocabularyName) {
-    JsArrayString vocabularies = JsArrayString.createArray().cast();
-//    for(int i = 0; i < originalTaxonomy.getVocabulariesArray().length(); i++) {
-//      if(!originalTaxonomy.getVocabularies(i).equals(vocabularyName)) {
-//        vocabularies.push(originalTaxonomy.getVocabularies(i));
-//      }
-//    }
-//    originalTaxonomy.setVocabulariesArray(vocabularies);
-    refreshVocabularies();
-  }
-
-  private void refreshVocabularies() {
-    //getView().setVocabularies(originalTaxonomy.getVocabulariesArray());
-    getView().getNewVocabularyName().setText("");
   }
 
   public void initView(final TaxonomyDto taxonomyDto, final EDIT_MODE editionMode) {
@@ -201,10 +163,6 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
     TakesValue<JsArray<LocaleTextDto>> getDescriptions();
 
     HasText getName();
-
-    void setVocabularies(JsArrayString vocabulariesArray);
-
-    HasText getNewVocabularyName();
 
     void showError(FormField formField, String message);
   }
