@@ -22,8 +22,6 @@ import com.gwtplatform.mvp.client.View;
 
 public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Display> implements TaxonomiesUiHandlers {
 
-  private JsArray<TaxonomyDto> taxonomies;
-
   private final TaxonomyPresenter taxonomyPresenter;
 
   private final ModalProvider<TaxonomyEditModalPresenter> taxonomyEditModalProvider;
@@ -60,7 +58,7 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
 
   void refresh() {
     ResourceRequestBuilderFactory.<TaxonomiesDto>newBuilder()
-        .forResource(UriBuilders.SYSTEM_CONF_TAXONOMIES.create().build()).get()
+        .forResource(UriBuilders.SYSTEM_CONF_TAXONOMIES_SUMMARIES.create().build()).get()
         .withCallback(new ResourceCallback<TaxonomiesDto>() {
           @Override
           public void onResource(Response response, TaxonomiesDto resource) {

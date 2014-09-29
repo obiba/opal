@@ -45,12 +45,6 @@
     <o:PropertiesTable ui:field="taxonomyPanel" keyStyleNames="span3">
       <g:FlowPanel>
         <g:Label>
-          <ui:msg description="Version label">Version</ui:msg>
-        </g:Label>
-        <g:Label ui:field="version"/>
-      </g:FlowPanel>
-      <g:FlowPanel>
-        <g:Label>
           <ui:msg description="Title label">Title</ui:msg>
         </g:Label>
         <g:FlowPanel ui:field="titlePanel"/>

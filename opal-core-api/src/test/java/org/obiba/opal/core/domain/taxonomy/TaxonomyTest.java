@@ -28,7 +28,6 @@ public class TaxonomyTest {
     Yaml yaml = new TaxonomyYaml();
 
     Taxonomy taxonomy = new Taxonomy();
-    taxonomy.setVersion("1.0-SNAPSHOT");
     taxonomy.setName("mlst_area");
     taxonomy.addTitle(Locale.ENGLISH, "Maelstrom - Area of Information");
     taxonomy.addTitle(Locale.FRENCH, "Maelstrom - Domaines d'information");
@@ -71,7 +70,7 @@ public class TaxonomyTest {
   public void test_yaml_read() {
     try {
       InputStream input = new URL(
-          "https://raw.githubusercontent.com/maelstrom-research/maelstrom-area-of-information/master/taxonomy.yml")
+          "https://raw.githubusercontent.com/maelstrom-research/maelstrom-taxonomies/master/area-of-information/taxonomy.yml")
           .openStream();
       TaxonomyYaml yaml = new TaxonomyYaml();
       Taxonomy taxonomy = yaml.load(input);

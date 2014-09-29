@@ -46,15 +46,16 @@ public class TaxonomyServiceImpl implements TaxonomyService {
   @Override
   @PostConstruct
   public void start() {
-    importMaelstromGitHubTaxonomy("maelstrom-area-of-information", null);
+    importMaelstromGitHubTaxonomy("maelstrom-taxonomies", null, "area-of-information");
+    importMaelstromGitHubTaxonomy("maelstrom-taxonomies", null, "harmonization");
   }
 
   @Override
   public void stop() {
   }
 
-  public void importMaelstromGitHubTaxonomy(@NotNull String taxonomy, @Nullable String ref) {
-    importGitHubTaxonomy(MLSTRM_USER, taxonomy, ref, TAXONOMY_YAML);
+  public void importMaelstromGitHubTaxonomy(@NotNull String repo, @Nullable String ref, String taxonomy) {
+    importGitHubTaxonomy(MLSTRM_USER, repo, ref, taxonomy + "/" + TAXONOMY_YAML);
   }
 
   @Override
@@ -78,7 +79,7 @@ public class TaxonomyServiceImpl implements TaxonomyService {
       saveTaxonomy(taxonomy);
       return taxonomy;
     } catch(Exception e) {
-      log.error("Failed loading taxonomy from: " + uri);
+      log.error("Failed loading taxonomy from: " + uri, e);
       return null;
     }
   }

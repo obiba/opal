@@ -72,9 +72,6 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
   Panel taxonomyPanel;
 
   @UiField
-  Label version;
-
-  @UiField
   Panel titlePanel;
 
   @UiField
@@ -102,7 +99,6 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
   private void renderTaxonomy(TaxonomyDto taxonomy) {
     this.taxonomy = taxonomy;
     taxonomyName.setText(taxonomy.getName());
-    version.setText(taxonomy.getVersion());
     renderText(titlePanel, taxonomy.getTitleArray());
     renderText(descriptionPanel, taxonomy.getDescriptionArray());
     vocabulariesPanel.clear();

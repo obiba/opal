@@ -16,15 +16,12 @@ import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.core.cfg.NoSuchVocabularyException;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 /**
  * A taxonomies is a set of vocabularies that allows to describe the attributes.
  */
 public class Taxonomy extends TaxonomyEntity {
-
-  private String version;
 
   private List<Vocabulary> vocabularies;
 
@@ -33,18 +30,6 @@ public class Taxonomy extends TaxonomyEntity {
 
   public Taxonomy(@NotNull String name) {
     setName(name);
-  }
-
-  public String getVersion() {
-    return version;
-  }
-
-  public void setVersion(String version) {
-    this.version = version;
-  }
-
-  public boolean hasVersion() {
-    return !Strings.isNullOrEmpty(version);
   }
 
   public boolean hasVocabularies() {

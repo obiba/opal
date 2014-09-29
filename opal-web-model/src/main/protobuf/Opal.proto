@@ -347,7 +347,6 @@ message TaxonomyDto {
   repeated LocaleTextDto title = 2;
   repeated LocaleTextDto description = 3;
   repeated VocabularyDto vocabularies = 4;
-  optional string version = 5;
 }
 
 message OpalConf {

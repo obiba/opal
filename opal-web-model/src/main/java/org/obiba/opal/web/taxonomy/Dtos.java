@@ -27,8 +27,6 @@ public class Dtos {
     builder.addAllTitle(toLocaleTextDtoList(taxonomy.getTitle()));
     builder.addAllDescription(toLocaleTextDtoList(taxonomy.getDescription()));
 
-    if(taxonomy.hasVersion()) builder.setVersion(taxonomy.getVersion());
-
     if(taxonomy.hasVocabularies()) {
       builder.addAllVocabularies(
           Iterables.transform(taxonomy.getVocabularies(), new Function<Vocabulary, Opal.VocabularyDto>() {
@@ -63,7 +61,6 @@ public class Dtos {
 
   public static Taxonomy fromDto(Opal.TaxonomyDto dto) {
     Taxonomy taxonomy = new Taxonomy(dto.getName());
-    if(dto.hasVersion()) taxonomy.setVersion(dto.getVersion());
     taxonomy.setTitle(fromLocaleTextDtoList(dto.getTitleList()));
     taxonomy.setDescription(fromLocaleTextDtoList(dto.getDescriptionList()));
 
