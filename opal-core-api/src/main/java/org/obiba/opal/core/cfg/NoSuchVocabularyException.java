@@ -13,11 +13,18 @@ public class NoSuchVocabularyException extends RuntimeException {
 
   private static final long serialVersionUID = -6357540199499515674L;
 
+  private final String taxonomyName;
+
   private final String vocabularyName;
 
-  public NoSuchVocabularyException(String vocabularyName) {
-    super("No vocabulary exists with the specified name '" + vocabularyName + "'");
+  public NoSuchVocabularyException(String taxonomyName, String vocabularyName) {
+    super("No vocabulary exists in taxonomy '" + taxonomyName + "' with the specified name '" + vocabularyName + "'");
+    this.taxonomyName = taxonomyName;
     this.vocabularyName = vocabularyName;
+  }
+
+  public String getTaxonomyName() {
+    return taxonomyName;
   }
 
   public String getVocabularyName() {

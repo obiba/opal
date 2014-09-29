@@ -75,11 +75,11 @@ public class Taxonomy extends TaxonomyEntity {
   }
 
   public Vocabulary getVocabulary(@NotNull String name) throws NoSuchVocabularyException {
-    if(vocabularies == null) throw new NoSuchVocabularyException(name);
+    if(vocabularies == null) throw new NoSuchVocabularyException(getName(), name);
     for(Vocabulary vocabulary : vocabularies) {
       if(vocabulary.getName().equals(name)) return vocabulary;
     }
-    throw new NoSuchVocabularyException(name);
+    throw new NoSuchVocabularyException(getName(), name);
   }
 
   @Override

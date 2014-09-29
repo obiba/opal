@@ -10,17 +10,10 @@
 
 package org.obiba.opal.web.system.taxonomy;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.List;
-
 import javax.ws.rs.core.Response;
 
-import org.obiba.opal.core.cfg.NoSuchTaxonomyException;
-import org.obiba.opal.core.cfg.NoSuchVocabularyException;
 import org.obiba.opal.core.cfg.TaxonomyService;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
-import org.obiba.opal.core.domain.taxonomy.Term;
 import org.obiba.opal.core.domain.taxonomy.Vocabulary;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.taxonomy.Dtos;
@@ -28,8 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import au.com.bytecode.opencsv.CSVReader;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -70,14 +61,7 @@ public class VocabularyResourceImpl implements VocabularyResource {
 
   @Override
   public Response saveVocabulary(Opal.VocabularyDto dto) {
-    try {
-      taxonomyService.saveVocabulary(taxonomyName, Dtos.fromDto(dto));
-    } catch(NoSuchTaxonomyException e) {
-      return Response.status(Response.Status.NOT_FOUND).build();
-    } catch(NoSuchVocabularyException e) {
-      return Response.status(Response.Status.NOT_FOUND).build();
-    }
-
+    taxonomyService.saveVocabulary(taxonomyName, Dtos.fromDto(dto));
     return Response.ok().build();
   }
 }
