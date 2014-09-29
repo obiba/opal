@@ -12,6 +12,8 @@ package org.obiba.opal.core.service;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -35,6 +37,8 @@ public class TaxonomyServiceImpl implements TaxonomyService {
 
   private static final Logger log = LoggerFactory.getLogger(TaxonomyServiceImpl.class);
 
+  private static final String OBIBA_USER = "obiba";
+
   private static final String MLSTRM_USER = "maelstrom-research";
 
   private static final String TAXONOMY_YAML = "taxonomy.yml";
@@ -46,16 +50,14 @@ public class TaxonomyServiceImpl implements TaxonomyService {
   @Override
   @PostConstruct
   public void start() {
-    importMaelstromGitHubTaxonomy("maelstrom-taxonomies", null, "area-of-information");
-    importMaelstromGitHubTaxonomy("maelstrom-taxonomies", null, "harmonization");
+    importGitHubTaxonomy(MLSTRM_USER, "maelstrom-taxonomies", null, "area-of-information");
+    importGitHubTaxonomy(MLSTRM_USER, "maelstrom-taxonomies", null, "harmonization");
+    importGitHubTaxonomy(OBIBA_USER, "obiba-taxonomies", null, "default");
+    importGitHubTaxonomy(OBIBA_USER, "obiba-taxonomies", null, "onyx");
   }
 
   @Override
   public void stop() {
-  }
-
-  public void importMaelstromGitHubTaxonomy(@NotNull String repo, @Nullable String ref, String taxonomy) {
-    importGitHubTaxonomy(MLSTRM_USER, repo, ref, taxonomy + "/" + TAXONOMY_YAML);
   }
 
   @Override
@@ -68,7 +70,7 @@ public class TaxonomyServiceImpl implements TaxonomyService {
     if(Strings.isNullOrEmpty(ref)) reference = "master";
     String fileName = taxonomyFile;
     if(Strings.isNullOrEmpty(taxonomyFile)) fileName = TAXONOMY_YAML;
-    if(!fileName.endsWith(".yml")) throw new IllegalArgumentException("Taxonomy file in YAML format is required");
+    if(!fileName.endsWith(".yml")) fileName = taxonomyFile + "/" + TAXONOMY_YAML;
 
     String uri = GITHUB_URL + "/" + user + "/" + repo + "/" + reference + "/" + fileName;
 
@@ -93,6 +95,14 @@ public class TaxonomyServiceImpl implements TaxonomyService {
 
   @Override
   public Iterable<Taxonomy> getTaxonomies() {
+    Collections.sort(taxonomies, new Comparator<Taxonomy>() {
+
+      @Override
+      public int compare(Taxonomy t1, Taxonomy t2) {
+        return t1.getName().compareTo(t2.getName());
+      }
+
+    });
     return taxonomies;
   }
 
