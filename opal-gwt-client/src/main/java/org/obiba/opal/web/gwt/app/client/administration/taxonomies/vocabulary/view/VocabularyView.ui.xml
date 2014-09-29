@@ -7,34 +7,73 @@
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <g:FlowPanel>
-    <g:FlowPanel addStyleNames="section-header">
-      <b:Breadcrumbs ui:field="breadcrumbs"/>
+  <g:FlowPanel ui:field="detailsPanel">
+
+    <g:FlowPanel addStyleNames="clearfix">
+      <g:HTMLPanel>
+        <h3 class="pull-left no-top-margin">
+          <b2:IconAnchor icon="CHEVRON_LEFT" ui:field="back">
+          </b2:IconAnchor>
+        </h3>
+      </g:HTMLPanel>
+
+      <b:Heading size="3" ui:field="vocabularyName" addStyleNames="no-top-margin small-indent pull-left"/>
+      <g:FlowPanel addStyleNames="pull-right">
+        <b:ButtonGroup>
+          <b:Button icon="TRASH" ui:field="remove">
+          </b:Button>
+        </b:ButtonGroup>
+      </g:FlowPanel>
     </g:FlowPanel>
 
     <g:FlowPanel>
-      <b:Heading size="4" ui:field="vocabularyName" addStyleNames="inline-block"/>
-      <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="editVocabulary">
+      <b:Heading size="4" addStyleNames="inline-block">
+        <ui:msg description="Properties label">Properties</ui:msg>
+      </b:Heading>
+      <b2:IconAnchor ui:field="edit" icon="EDIT" addStyleNames="small-indent">
       </b2:IconAnchor>
     </g:FlowPanel>
 
-    <b:Row>
-      <b:Column size="6">
-        <o:PropertiesTable ui:field="vocabularyProperties" keyStyleNames="span2"/>
-      </b:Column>
-    </b:Row>
+    <o:PropertiesTable keyStyleNames="span3">
+      <g:FlowPanel>
+        <g:Label>
+          <ui:msg description="Title label">Title</ui:msg>
+        </g:Label>
+        <g:FlowPanel ui:field="titlePanel"/>
+      </g:FlowPanel>
+      <g:FlowPanel>
+        <g:Label>
+          <ui:msg description="Description label">Description</ui:msg>
+        </g:Label>
+        <g:FlowPanel ui:field="descriptionPanel"/>
+      </g:FlowPanel>
+      <g:FlowPanel>
+        <g:Label>
+          <ui:msg description="Repeatable label">Repeatable</ui:msg>
+        </g:Label>
+        <g:Label ui:field="repeatable"></g:Label>
+      </g:FlowPanel>
+    </o:PropertiesTable>
 
-    <b:Heading size="4" addStyleNames="inline-block">Terms</b:Heading>
+    <b:Heading size="4">
+      <ui:msg description="Terms label">Terms</ui:msg>
+    </b:Heading>
 
-    <b:Row>
-      <b:Column size="3">
-        <g:FlowPanel ui:field="termsLinks" addStyleNames="items"/>
-      </b:Column>
-      <b:Column size="9">
-        <b:Heading size="4" addStyleNames="inline-block no-top-margin" ui:field="termTitle"/>
-        <o:PropertiesTable ui:field="termProperties" keyStyleNames="span2"/>
-      </b:Column>
-    </b:Row>
+    <g:FlowPanel addStyleNames="small-bottom-margin">
+      <o:OpalSimplePager ui:field="pager" showTotalWhenNoPager="true" location="RIGHT"
+          addStyleNames="pull-right small-top-margin small-indent"/>
+      <b:Controls addStyleNames="pull-right small-top-margin">
+        <b:InputAddOn prependIcon="FILTER">
+          <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
+        </b:InputAddOn>
+      </b:Controls>
+      <b:Button type="INFO" icon="PLUS" ui:field="addTerm">
+        <ui:msg description="Add Term label">Add Term</ui:msg>
+      </b:Button>
+    </g:FlowPanel>
+
+    <o:Table ui:field="table"/>
 
   </g:FlowPanel>
+
 </ui:UiBinder>

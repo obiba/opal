@@ -20,4 +20,9 @@ public interface TaxonomyUiHandlers extends UiHandlers {
 
   void onDelete();
 
+  void onVocabularySelection(String vocabularyName);
+
+  void onAddVocabulary();
+
+  void onFilterUpdate(String filter);
 }

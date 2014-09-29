@@ -1,174 +1,174 @@
 package org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.view;
 
-import org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.TermArrayUtils;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.ui.LocalizedLabel;
-import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
+import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.LocaleTextColumn;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
+import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.opal.TermDto;
 import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
-import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.Heading;
-import com.github.gwtbootstrap.client.ui.NavLink;
-import com.github.gwtbootstrap.client.ui.NavList;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
+import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasWidgets;
-import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> implements VocabularyPresenter.Display {
 
+  private final TranslationMessages translationMessages;
+
   private final Translations translations;
 
   interface ViewUiBinder extends UiBinder<Widget, VocabularyView> {}
 
-  JsArrayString locales;
-
   @UiField
-  Breadcrumbs breadcrumbs;
-
-  @UiField
-  IconAnchor editVocabulary;
+  IconAnchor back;
 
   @UiField
   Heading vocabularyName;
 
   @UiField
-  PropertiesTable vocabularyProperties;
+  Panel titlePanel;
 
   @UiField
-  PropertiesTable termProperties;
+  Panel descriptionPanel;
 
   @UiField
-  Heading termTitle;
+  Label repeatable;
 
   @UiField
-  FlowPanel termsLinks;
+  Table<TermDto> table;
+
+  @UiField
+  OpalSimplePager pager;
+
+  @UiField
+  TextBoxClearable filter;
+
+  private final ListDataProvider<TermDto> dataProvider = new ListDataProvider<TermDto>();
 
   @Inject
-  public VocabularyView(ViewUiBinder viewUiBinder, Translations translations) {
+  public VocabularyView(ViewUiBinder viewUiBinder, Translations translations, TranslationMessages translationMessages) {
+    this.translationMessages = translationMessages;
     this.translations = translations;
     initWidget(viewUiBinder.createAndBindUi(this));
+    initializeTermsTable();
+    initializeFilter();
   }
 
-  @Override
-  public HasWidgets getBreadcrumbs() {
-    return breadcrumbs;
-  }
+  private void initializeTermsTable() {
+    dataProvider.addDataDisplay(table);
 
-  @UiHandler("editVocabulary")
-  void onEdit(ClickEvent event) {
-    getUiHandlers().onEditVocabulary();
-  }
-
-  @Override
-  public void displayVocabulary(VocabularyDto vocabulary, String taxonomy, String term) {
-
-    vocabularyName.setText(vocabulary.getName());
-    vocabularyProperties.clearProperties();
-    vocabularyProperties.addProperty(translations.nameLabel(), vocabulary.getName());
-    vocabularyProperties.addProperty(translations.taxonomyLabel(), taxonomy);
-
-    vocabularyProperties.addProperty(new Label(translations.titleLabel()),
-        getLocalizedText(JsArrays.toSafeArray(vocabulary.getTitleArray())));
-    vocabularyProperties.addProperty(new Label(translations.descriptionLabel()),
-        getLocalizedText(JsArrays.toSafeArray(vocabulary.getDescriptionArray())));
-
-    vocabularyProperties.addProperty(translations.repeatableLabel(), Boolean.toString(vocabulary.getRepeatable()));
-
-    termsLinks.clear();
-    NavList navList = new NavList();
-    getTermsLinks(navList, JsArrays.toSafeArray(vocabulary.getTermsArray()), 0);
-    termsLinks.add(navList);
-
-    displayTerm(TermArrayUtils.findTerm(vocabulary.getTermsArray(), term));
-  }
-
-  private void getTermsLinks(NavList navList, final JsArray<TermDto> terms, int level) {
-
-    for(int i = 0; i < terms.length(); i++) {
-      final int finalI = i;
-      NavLink link = new NavLink();
-
-      NavLink linkTitle = new NavLink(terms.get(i).getName());
-      linkTitle.addStyleName("inline-block");
-
-      link.add(getInlineHTMLSpacer(level));
-      link.add(linkTitle);
-      link.addClickHandler(new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent clickEvent) {
-          getUiHandlers().onTermSelection(terms.get(finalI));
-        }
-      });
-      link.addStyleName("inline");
-
-      navList.add(link);
-    }
-  }
-
-  @Override
-  public void displayTerm(TermDto termDto) {
-    termProperties.clearProperties();
-    if(termDto != null) {
-      termTitle.setVisible(true);
-      termTitle.setText(termDto.getName());
-      termProperties.addProperty(translations.nameLabel(), termDto.getName());
-      termProperties.addProperty(new Label(translations.titleLabel()),
-          getLocalizedText(JsArrays.toSafeArray(termDto.getTitleArray())));
-      termProperties.addProperty(new Label(translations.descriptionLabel()),
-          getLocalizedText(JsArrays.toSafeArray(termDto.getDescriptionArray())));
-      termProperties.setVisible(true);
-    } else {
-      termTitle.setVisible(false);
-      termProperties.setVisible(false);
-    }
-  }
-
-  @Override
-  public void setAvailableLocales(JsArrayString locales) {
-    this.locales = locales;
-  }
-
-  private InlineHTML getInlineHTMLSpacer(int level) {
-    SafeHtml indent = SafeHtmlUtils.fromString("");
-    for(int i = 0; i < level; i++) {
-      indent = SafeHtmlUtils.fromTrustedString(indent.asString() + "&nbsp;&nbsp;&nbsp;&nbsp;");
-    }
-    InlineHTML spacer = new InlineHTML(indent);
-    spacer.addStyleName("inline-block");
-    return spacer;
-  }
-
-  private Widget getLocalizedText(JsArray<LocaleTextDto> texts) {
-    FlowPanel textList = new FlowPanel();
-
-    for(int i = 0; i < locales.length(); i++) {
-      String textValue = "";
-      for(int j = 0; j < texts.length(); j++) {
-        if(texts.get(j).getLocale().equals(locales.get(i))) {
-          textValue = texts.get(j).getText();
-          break;
+    table.addColumn(new TextColumn<TermDto>() {
+      @Override
+      public String getValue(TermDto object) {
+        return object.getName();
+      }
+    }, translations.nameLabel());
+    table.addColumn(new LocaleTextColumn<TermDto>() {
+      @Override
+      protected JsArray<LocaleTextDto> getLocaleText(TermDto term) {
+        return term.getTitleArray();
+      }
+    }, translations.titleLabel());
+    table.addColumn(new LocaleTextColumn<TermDto>() {
+      @Override
+      protected JsArray<LocaleTextDto> getLocaleText(TermDto term) {
+        return term.getDescriptionArray();
+      }
+    }, translations.descriptionLabel());
+    table.addColumn(new ActionsColumn<TermDto>(new ActionHandler<TermDto>() {
+      @Override
+      public void doAction(TermDto object, String actionName) {
+        if(ActionsColumn.EDIT_ACTION.equals(actionName)) {
+          getUiHandlers().onEditTerm(object);
+        } else {
+          getUiHandlers().onDeleteTerm(object);
         }
       }
-      textList.add(new LocalizedLabel(locales.get(i), textValue));
+    }), translations.actionsLabel());
+
+    //table.setSelectionModel(new SingleSelectionModel<VocabularyDto>());
+    table.setPageSize(Table.DEFAULT_PAGESIZE);
+    table.setEmptyTableWidget(new com.google.gwt.user.client.ui.InlineLabel(translationMessages.termCount(0)));
+    pager.setDisplay(table);
+  }
+
+  private void initializeFilter() {
+    filter.setText("");
+    filter.getTextBox().setPlaceholder(translations.filterTerms());
+    filter.getTextBox().addStyleName("input-xlarge");
+    filter.getClear().setTitle(translations.clearFilter());
+  }
+
+  @UiHandler("remove")
+  public void onDelete(ClickEvent event) {
+    getUiHandlers().onDelete();
+  }
+
+  @UiHandler("edit")
+  void onEdit(ClickEvent event) {
+    getUiHandlers().onEdit();
+  }
+
+  @UiHandler("back")
+  void onBack(ClickEvent event) {
+    getUiHandlers().onTaxonomySelected();
+  }
+
+  @UiHandler("filter")
+  void onFilterUpdate(KeyUpEvent event) {
+    getUiHandlers().onFilterUpdate(filter.getText());
+  }
+
+  @Override
+  public void renderVocabulary(TaxonomyDto taxonomy, VocabularyDto vocabulary) {
+    back.setTitle(taxonomy.getName());
+    vocabularyName.setText(vocabulary.getName());
+    renderText(titlePanel, vocabulary.getTitleArray());
+    renderText(descriptionPanel, vocabulary.getDescriptionArray());
+    repeatable.setText(vocabulary.getRepeatable() ? translations.yesLabel() : translations.noLabel());
+    renderTerms(vocabulary.getTermsArray());
+  }
+
+  @Override
+  public void renderTerms(JsArray<TermDto> terms) {
+    dataProvider.setList(JsArrays.toList(terms));
+    dataProvider.refresh();
+    pager.setPagerVisible(table.getRowCount() > Table.DEFAULT_PAGESIZE);
+  }
+
+  private void renderText(Panel panel, JsArray<LocaleTextDto> texts) {
+    panel.clear();
+    for(LocaleTextDto text : JsArrays.toIterable(texts)) {
+      FlowPanel localePanel = new FlowPanel();
+      localePanel.setStyleName("small-bottom-margin");
+      panel.add(localePanel);
+      InlineLabel locale = new InlineLabel(text.getLocale());
+      locale.setStyleName("label small-right-indent");
+      localePanel.add(locale);
+      InlineLabel label = new InlineLabel(text.getText());
+      localePanel.add(label);
     }
-    return textList;
   }
 
 }

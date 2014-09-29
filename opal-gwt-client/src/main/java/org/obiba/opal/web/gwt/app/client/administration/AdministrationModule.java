@@ -134,8 +134,7 @@ public class AdministrationModule extends AbstractPresenterModule {
     bindPresenterWidget(TaxonomyPresenter.class, TaxonomyPresenter.Display.class, TaxonomyView.class);
     bindPresenterWidget(TaxonomyEditModalPresenter.class, TaxonomyEditModalPresenter.Display.class,
         TaxonomyEditModalView.class);
-    bindPresenter(VocabularyPresenter.class, VocabularyPresenter.Display.class, VocabularyView.class,
-        VocabularyPresenter.Proxy.class);
+    bindPresenterWidget(VocabularyPresenter.class, VocabularyPresenter.Display.class, VocabularyView.class);
     bindPresenter(VocabularyEditPresenter.class, VocabularyEditPresenter.Display.class, VocabularyEditView.class,
         VocabularyEditPresenter.Proxy.class);
   }

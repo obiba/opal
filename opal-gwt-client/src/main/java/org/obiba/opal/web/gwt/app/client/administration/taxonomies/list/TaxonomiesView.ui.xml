@@ -12,7 +12,7 @@
       </ui:msg>
     </b:Paragraph>
     <b:FluidRow>
-      <b:Column size="3">
+      <b:Column size="2">
         <g:ScrollPanel>
           <b:NavList ui:field="taxonomyList">
             <b:NavHeader>
@@ -26,7 +26,7 @@
           </b:Button>
         </b:ButtonGroup>
       </b:Column>
-      <b:Column size="9">
+      <b:Column size="10">
         <g:ScrollPanel ui:field="taxonomyDetailsPanel"/>
       </b:Column>
     </b:FluidRow>

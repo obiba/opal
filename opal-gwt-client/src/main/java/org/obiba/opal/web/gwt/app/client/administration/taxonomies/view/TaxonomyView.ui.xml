@@ -60,10 +60,21 @@
     <b:Heading size="4">
       <ui:msg description="Vocabularies label">Vocabularies</ui:msg>
     </b:Heading>
-    <b:Button type="INFO" icon="PLUS" ui:field="addVocabulary">
-      <ui:msg description="Add Vocabulary label">Add Vocabulary</ui:msg>
-    </b:Button>
-    <g:FlowPanel ui:field="vocabulariesPanel"/>
+
+    <g:FlowPanel addStyleNames="small-bottom-margin">
+      <o:OpalSimplePager ui:field="pager" showTotalWhenNoPager="true" location="RIGHT"
+          addStyleNames="pull-right small-top-margin small-indent"/>
+      <b:Controls addStyleNames="pull-right small-top-margin">
+        <b:InputAddOn prependIcon="FILTER">
+          <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
+        </b:InputAddOn>
+      </b:Controls>
+      <b:Button type="INFO" icon="PLUS" ui:field="addVocabulary">
+        <ui:msg description="Add Vocabulary label">Add Vocabulary</ui:msg>
+      </b:Button>
+    </g:FlowPanel>
+
+    <o:Table ui:field="table"/>
 
   </g:FlowPanel>
 

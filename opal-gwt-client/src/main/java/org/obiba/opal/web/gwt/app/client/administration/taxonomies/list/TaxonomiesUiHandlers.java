@@ -13,5 +13,4 @@ public interface TaxonomiesUiHandlers extends UiHandlers {
 
   void onTaxonomyEdit(TaxonomyDto taxonomyDto);
 
-  void onVocabularySelection(String name, String vocabulary);
 }

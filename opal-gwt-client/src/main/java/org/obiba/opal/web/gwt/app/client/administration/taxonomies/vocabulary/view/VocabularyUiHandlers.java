@@ -6,17 +6,16 @@ import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface VocabularyUiHandlers extends UiHandlers {
 
-//  void showEditVocabulary();
+  void onDelete();
 
-//  void showAddTerm(TaxonomyDto taxonomyDto, VocabularyDto vocabulary);
+  void onEdit();
 
-  void onTermSelection(TermDto termDto);
+  void onTaxonomySelected();
 
-  void onEditVocabulary();
+  void onEditTerm(TermDto termDto);
 
-//  void onMoveUp(TaxonomyDto taxonomy, VocabularyDto vocabulary, TermDto term);
-//
-//  void onMoveDown(TaxonomyDto taxonomy, VocabularyDto vocabulary, TermDto term);
+  void onDeleteTerm(TermDto termDto);
 
-//  void onEditVocabulary(TaxonomyDto taxonomyDto, VocabularyDto vocabulary);
+  void onFilterUpdate(String filter);
+
 }

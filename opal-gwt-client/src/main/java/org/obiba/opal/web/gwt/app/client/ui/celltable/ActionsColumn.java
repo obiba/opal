@@ -8,6 +8,11 @@ public class ActionsColumn<T> extends Column<T, T> implements HasActionHandler<T
 
   public static final String EDIT_ACTION = "Edit";
 
+  public ActionsColumn(ActionHandler<T> handler) {
+    this(EDIT_ACTION, REMOVE_ACTION);
+    setActionHandler(handler);
+  }
+
   public ActionsColumn(String... actions) {
     this(new ConstantActionsProvider<T>(actions));
   }

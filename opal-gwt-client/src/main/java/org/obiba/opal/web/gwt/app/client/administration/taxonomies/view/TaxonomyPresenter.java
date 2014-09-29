@@ -13,20 +13,23 @@ import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyDeletedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomySelectedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularySelectedEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
+import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -66,6 +69,14 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
     taxonomy = null;
   }
 
+  public void setTaxonomy(String name) {
+    if (Strings.isNullOrEmpty(name)) {
+      getView().setTaxonomy(null);
+    } else {
+      refreshTaxonomy(name);
+    }
+  }
+
   @Override
   public void onEdit() {
   }
@@ -94,6 +105,49 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
             translationMessages.confirmDeleteTaxonomy()));
   }
 
+  @Override
+  public void onVocabularySelection(String vocabularyName) {
+    fireEvent(new VocabularySelectedEvent(taxonomy, vocabularyName));
+  }
+
+  @Override
+  public void onAddVocabulary() {
+
+  }
+
+  @Override
+  public void onFilterUpdate(String filter) {
+    if(Strings.isNullOrEmpty(filter)) {
+      getView().setVocabularies(taxonomy.getVocabulariesArray());
+    } else {
+      JsArray<VocabularyDto> filtered = JsArrays.create();
+      for(VocabularyDto vocabulary : JsArrays.toIterable(taxonomy.getVocabulariesArray())) {
+        if(vocabularyMatches(vocabulary, filter)) {
+          filtered.push(vocabulary);
+        }
+      }
+      getView().setVocabularies(filtered);
+    }
+  }
+
+  private boolean vocabularyMatches(VocabularyDto vocabulary, String filter) {
+    String name = vocabulary.getName().toLowerCase();
+    for(String token : filter.toLowerCase().split(" ")) {
+      if(!Strings.isNullOrEmpty(token)) {
+        if(!name.contains(token) && !textsContains(vocabulary.getTitleArray(), token) &&
+            !textsContains(vocabulary.getDescriptionArray(), token)) return false;
+      }
+    }
+    return true;
+  }
+
+  private boolean textsContains(JsArray<LocaleTextDto> texts, String token) {
+    for(LocaleTextDto text : JsArrays.toIterable(texts)) {
+      if(text.getText().contains(token)) return true;
+    }
+    return false;
+  }
+
   //
   // Private methods
   //
@@ -104,19 +158,6 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
   }
 
   private void addHandlers() {
-    addRegisteredHandler(TaxonomySelectedEvent.getType(), new TaxonomySelectedEvent.TaxonomySelectedHandler() {
-
-          @Override
-          public void onTaxonomySelected(TaxonomySelectedEvent event) {
-            String name = event.getTaxonomy();
-            if(Strings.isNullOrEmpty(name)) {
-              getView().setTaxonomy(null);
-            } else {
-              refreshTaxonomy(name);
-            }
-          }
-        });
-
     addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler());
     addRegisteredHandler(TaxonomyCreatedEvent.getType(), new TaxonomyCreatedUpdatedHandler());
     //addRegisteredHandler(TaxonomyUpdatedEvent.getType(), new TaxonomyCreatedUpdatedHandler());
@@ -188,6 +229,7 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
 
     void setTaxonomy(@Nullable TaxonomyDto taxonomy);
 
+    void setVocabularies(JsArray<VocabularyDto> vocabularies);
   }
 
 }

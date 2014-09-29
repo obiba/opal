@@ -1594,6 +1594,14 @@ public interface Translations extends Constants {
   @Constants.DefaultStringValue("Filter projects...")
   String filterProjects();
 
+  @Description("Filter Vocabulary label")
+  @Constants.DefaultStringValue("Filter vocabularies...")
+  String filterVocabularies();
+
+  @Description("Filter Term label")
+  @Constants.DefaultStringValue("Filter terms...")
+  String filterTerms();
+
   @Description("Clear filter label")
   @DefaultStringValue("Clear filter")
   String clearFilter();
@@ -1967,6 +1975,10 @@ public interface Translations extends Constants {
   @Description("Vocabularies label")
   @DefaultStringValue("Vocabularies")
   String vocabulariesLabel();
+
+  @Description("Terms label")
+  @DefaultStringValue("Terms")
+  String termsLabel();
 
   @Description("New vocabulary name label")
   @DefaultStringValue("New vocabulary name")

@@ -3,7 +3,9 @@ package org.obiba.opal.web.gwt.app.client.administration.taxonomies.list;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.edit.TaxonomyEditModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomySelectedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularySelectedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.TaxonomyPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.view.VocabularyPresenter;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -15,6 +17,7 @@ import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
@@ -22,32 +25,28 @@ import com.gwtplatform.mvp.client.View;
 
 public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Display> implements TaxonomiesUiHandlers {
 
-  private final TaxonomyPresenter taxonomyPresenter;
+  private final Provider<TaxonomyPresenter> taxonomyPresenterProvider;
+
+  private final Provider<VocabularyPresenter> vocabularyPresenterProvider;
 
   private final ModalProvider<TaxonomyEditModalPresenter> taxonomyEditModalProvider;
 
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
-  public TaxonomiesPresenter(Display display, EventBus eventBus,
-      TaxonomyPresenter taxonomyPresenter,
+  public TaxonomiesPresenter(Display display, EventBus eventBus, Provider<TaxonomyPresenter> taxonomyPresenterProvider,
+      Provider<VocabularyPresenter> vocabularyPresenterProvider,
       ModalProvider<TaxonomyEditModalPresenter> taxonomyEditModalProvider) {
     super(eventBus, display);
     getView().setUiHandlers(this);
-    this.taxonomyPresenter = taxonomyPresenter;
+    this.taxonomyPresenterProvider = taxonomyPresenterProvider;
+    this.vocabularyPresenterProvider = vocabularyPresenterProvider;
     this.taxonomyEditModalProvider = taxonomyEditModalProvider.setContainer(this);
   }
 
   @Override
   public void onBind() {
     super.onBind();
-    setInSlot(null, taxonomyPresenter);
-    registerHandler(
-        getEventBus().addHandler(TaxonomyCreatedEvent.getType(), new TaxonomyCreatedEvent.TaxonomyCreatedHandler() {
-          @Override
-          public void onTaxonomyCreated(TaxonomyCreatedEvent event) {
-            refresh();
-          }
-        }));
+    addHandlers();
   }
 
   @Override
@@ -82,9 +81,35 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
     taxonomyEditModalProvider.get().initView(TaxonomyDto.create(), TaxonomyEditModalPresenter.EDIT_MODE.CREATE);
   }
 
-  @Override
-  public void onVocabularySelection(String name, String vocabulary) {
+  private void addHandlers() {
+    addRegisteredHandler(TaxonomyCreatedEvent.getType(), new TaxonomyCreatedEvent.TaxonomyCreatedHandler() {
+      @Override
+      public void onTaxonomyCreated(TaxonomyCreatedEvent event) {
+        refresh();
+      }
+    });
 
+    addRegisteredHandler(TaxonomySelectedEvent.getType(), new TaxonomySelectedEvent.TaxonomySelectedHandler() {
+
+      @Override
+      public void onTaxonomySelected(TaxonomySelectedEvent event) {
+        String name = event.getTaxonomy();
+        TaxonomyPresenter presenter = taxonomyPresenterProvider.get();
+        presenter.setTaxonomy(event.getTaxonomy());
+        setInSlot(null, presenter);
+      }
+    });
+
+    addRegisteredHandler(VocabularySelectedEvent.getType(), new VocabularySelectedEvent.VocabularySelectedHandler() {
+      @Override
+      public void onVocabularySelected(VocabularySelectedEvent event) {
+        TaxonomyDto taxonomy = event.getTaxonomy();
+        String name = event.getVocabulary();
+        VocabularyPresenter presenter = vocabularyPresenterProvider.get();
+        presenter.setVocabulary(event.getTaxonomy(), event.getVocabulary());
+        setInSlot(null, presenter);
+      }
+    });
   }
 
   public interface Display extends View, HasUiHandlers<TaxonomiesUiHandlers> {

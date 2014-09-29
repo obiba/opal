@@ -162,6 +162,16 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Please confirm that you want to remove the profile of user {0}. All its preferences will be lost.")
   String confirmRemoveUserProfile(String name);
 
+  @Description("Vocabulary count label")
+  @DefaultMessage("{0} vocabularies")
+  @AlternateMessage({ "=0", "No vocabularies", "one", "1 vocabulary" })
+  String vocabularyCount(@PluralCount int count);
+
+  @Description("Term count label")
+  @DefaultMessage("{0} terms")
+  @AlternateMessage({ "=0", "No terms", "one", "1 term" })
+  String termCount(@PluralCount int count);
+
   @Description("Table count label")
   @DefaultMessage("{0} tables")
   @AlternateMessage({ "=0", "No tables", "one", "1 table" })

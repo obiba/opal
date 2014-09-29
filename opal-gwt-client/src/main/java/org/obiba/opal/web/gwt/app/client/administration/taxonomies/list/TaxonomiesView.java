@@ -2,6 +2,7 @@ package org.obiba.opal.web.gwt.app.client.administration.taxonomies.list;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomiesDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
@@ -56,6 +57,7 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
     for(TaxonomiesDto.TaxonomySummaryDto taxonomy : JsArrays.toIterable(taxonomies)) {
 
       NavLink link = new NavLink(taxonomy.getName());
+      link.setTitle(asText(taxonomy.getTitleArray()));
       link.addClickHandler(new TaxonomyClickHandler(taxonomy, link));
       taxonomyList.add(link);
       if(first == null) {
@@ -65,6 +67,14 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
       }
     }
 
+  }
+
+  private String asText(JsArray<LocaleTextDto> texts) {
+    StringBuilder builder = new StringBuilder();
+    for (LocaleTextDto text : JsArrays.toIterable(texts)) {
+      builder.append("[").append(text.getLocale()).append("] ").append(text.getText()).append("\n");
+    }
+    return builder.toString();
   }
 
   @UiHandler("add")
