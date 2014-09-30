@@ -29,6 +29,7 @@ import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.TaxonomyDto;
 import org.obiba.opal.web.taxonomy.Dtos;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -42,6 +43,7 @@ public class TaxonomiesResource {
   private TaxonomyService taxonomyService;
 
   @GET
+  @NoAuthorization
   public List<TaxonomyDto> getTaxonomies() {
     List<TaxonomyDto> taxonomies = new ArrayList<>();
     for(Taxonomy taxonomy : taxonomyService.getTaxonomies()) {
@@ -52,6 +54,7 @@ public class TaxonomiesResource {
 
   @GET
   @Path("summaries")
+  @NoAuthorization
   public Opal.TaxonomiesDto getTaxonomySummaries() {
     Opal.TaxonomiesDto.Builder builder = Opal.TaxonomiesDto.newBuilder();
     for(Taxonomy taxonomy : taxonomyService.getTaxonomies()) {

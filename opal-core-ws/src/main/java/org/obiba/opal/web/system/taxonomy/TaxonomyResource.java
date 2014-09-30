@@ -24,6 +24,7 @@ import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.support.yaml.TaxonomyYaml;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.taxonomy.Dtos;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
@@ -44,6 +45,7 @@ public class TaxonomyResource {
   private String name;
 
   @GET
+  @NoAuthorization
   public Opal.TaxonomyDto getTaxonomy() {
     Taxonomy taxonomy = taxonomyService.getTaxonomy(name);
     if(taxonomy == null) throw new NoSuchTaxonomyException(name);
