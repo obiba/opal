@@ -113,6 +113,13 @@ public class TaxonomyEditModalView extends ModalPopupViewWithUiHandlers<Taxonomy
       public Map<String, LocalizedEditableText> getLocalizedEditableTextMap() {
         return taxonomyDescriptionTexts;
       }
+
+      @Override
+      protected LocalizedEditableText getTextValueInput(String locale, String text) {
+        LocalizedEditableText textWidget = super.getTextValueInput(locale, text);
+        textWidget.setLargeText(true);
+        return textWidget;
+      }
     };
   }
 
@@ -177,10 +184,9 @@ public class TaxonomyEditModalView extends ModalPopupViewWithUiHandlers<Taxonomy
       return texts;
     }
 
-    private LocalizedEditableText getTextValueInput(String locale, String text) {
+    protected LocalizedEditableText getTextValueInput(String locale, String text) {
       LocalizedEditableText localizedText = new LocalizedEditableText();
       localizedText.setValue(new LocalizedEditableText.LocalizedText(locale, text));
-
       return localizedText;
     }
   }

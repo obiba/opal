@@ -439,6 +439,7 @@ select:focus:invalid {
   // Reset the white space collapse hack
   input,
   select,
+  textarea,
   .uneditable-input,
   .dropdown-menu,
   .popover {
@@ -447,6 +448,7 @@ select:focus:invalid {
 
   input,
   select,
+  textarea,
   .uneditable-input {
     position: relative; // placed here by default so that on :focus we can place the input above the .add-on for full border and box-shadow goodness
     margin-bottom: 0; // prevent bottom margin from screwing up alignment in stacked forms
@@ -457,6 +459,9 @@ select:focus:invalid {
     &:focus {
       z-index: 2;
     }
+  }
+  textarea {
+    .border-radius(0 @inputBorderRadius @inputBorderRadius @inputBorderRadius);
   }
   .add-on {
     display: inline-block;

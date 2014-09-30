@@ -160,6 +160,13 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
       public Map<String, LocalizedEditableText> getLocalizedEditableTextMap() {
         return vocabularyDescriptionTexts;
       }
+
+      @Override
+      protected LocalizedEditableText getTextValueInput(String locale, String text) {
+        LocalizedEditableText textWidget = super.getTextValueInput(locale, text);
+        textWidget.setLargeText(true);
+        return textWidget;
+      }
     };
   }
 
@@ -216,6 +223,13 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
         }
 
         return termsDescriptionTexts.get(title);
+      }
+
+      @Override
+      protected LocalizedEditableText getTextValueInput(String locale, String text) {
+        LocalizedEditableText textWidget = super.getTextValueInput(locale, text);
+        textWidget.setLargeText(true);
+        return textWidget;
       }
     };
   }
@@ -409,7 +423,7 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
       return texts;
     }
 
-    private LocalizedEditableText getTextValueInput(String locale, String text) {
+    protected LocalizedEditableText getTextValueInput(String locale, String text) {
       LocalizedEditableText localizedText = new LocalizedEditableText();
       localizedText.setValue(new LocalizedEditableText.LocalizedText(locale, text));
 
