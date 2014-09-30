@@ -20,13 +20,17 @@ import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.opal.core.cfg.NoSuchTaxonomyException;
 import org.obiba.opal.core.cfg.TaxonomyService;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.domain.taxonomy.Vocabulary;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.support.yaml.TaxonomyYaml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
@@ -34,6 +38,9 @@ import com.google.common.collect.Lists;
 
 @Component
 public class TaxonomyServiceImpl implements TaxonomyService {
+
+  @Autowired
+  private OpalRuntime opalRuntime;
 
   private static final Logger log = LoggerFactory.getLogger(TaxonomyServiceImpl.class);
 
@@ -50,10 +57,7 @@ public class TaxonomyServiceImpl implements TaxonomyService {
   @Override
   @PostConstruct
   public void start() {
-    importGitHubTaxonomy(MLSTRM_USER, "maelstrom-taxonomies", null, "area-of-information");
-    importGitHubTaxonomy(MLSTRM_USER, "maelstrom-taxonomies", null, "harmonization");
-    importGitHubTaxonomy(OBIBA_USER, "obiba-taxonomies", null, "default");
-    importGitHubTaxonomy(OBIBA_USER, "obiba-taxonomies", null, "onyx");
+    importDefault(false);
   }
 
   @Override
@@ -61,36 +65,31 @@ public class TaxonomyServiceImpl implements TaxonomyService {
   }
 
   @Override
+  public void importDefault() {
+    importDefault(true);
+  }
+
+  @Override
   public Taxonomy importGitHubTaxonomy(@NotNull String username, @NotNull String repo, @Nullable String ref,
       @NotNull String taxonomyFile) {
-    String user = username;
-    if(Strings.isNullOrEmpty(username)) user = MLSTRM_USER;
-    if(Strings.isNullOrEmpty(repo)) throw new IllegalArgumentException("GitHub repository is required");
-    String reference = ref;
-    if(Strings.isNullOrEmpty(ref)) reference = "master";
-    String fileName = taxonomyFile;
-    if(Strings.isNullOrEmpty(taxonomyFile)) fileName = TAXONOMY_YAML;
-    if(!fileName.endsWith(".yml")) fileName = taxonomyFile + "/" + TAXONOMY_YAML;
+    return importGitHubTaxonomy(username, repo, ref, taxonomyFile, true);
+  }
 
-    String uri = GITHUB_URL + "/" + user + "/" + repo + "/" + reference + "/" + fileName;
+  @Override
+  public Taxonomy importFileTaxonomy(@NotNull String file) throws FileSystemException {
+    FileObject fileObj = resolveFileInFileSystem(file);
 
     try {
-      InputStream input = new URL(uri).openStream();
+      InputStream input = fileObj.getContent().getInputStream();
       TaxonomyYaml yaml = new TaxonomyYaml();
       Taxonomy taxonomy = yaml.load(input);
       saveTaxonomy(taxonomy);
       return taxonomy;
     } catch(Exception e) {
-      log.error("Failed loading taxonomy from: " + uri, e);
-      return null;
+      log.error("Failed loading taxonomy from: " + file, e);
     }
-  }
 
-  /**
-   * For testing.
-   */
-  void clear() {
-    taxonomies.clear();
+    return null;
   }
 
   @Override
@@ -173,6 +172,55 @@ public class TaxonomyServiceImpl implements TaxonomyService {
     Taxonomy taxonomy = getTaxonomy(taxonomyName);
     if(taxonomy == null) throw new NoSuchTaxonomyException(taxonomyName);
     taxonomy.removeVocabulary(vocabularyName);
+  }
+
+  //
+  // Private methods
+  //
+
+  private void importDefault(boolean override) {
+    importGitHubTaxonomy(MLSTRM_USER, "maelstrom-taxonomies", null, "area-of-information", override);
+    importGitHubTaxonomy(MLSTRM_USER, "maelstrom-taxonomies", null, "harmonization", override);
+    importGitHubTaxonomy(OBIBA_USER, "obiba-taxonomies", null, "default", override);
+    importGitHubTaxonomy(OBIBA_USER, "obiba-taxonomies", null, "onyx", override);
+  }
+
+  private Taxonomy importGitHubTaxonomy(@NotNull String username, @NotNull String repo, @Nullable String ref,
+      @NotNull String taxonomyFile, boolean override) {
+    String user = username;
+    if(Strings.isNullOrEmpty(username)) user = MLSTRM_USER;
+    if(Strings.isNullOrEmpty(repo)) throw new IllegalArgumentException("GitHub repository is required");
+    String reference = ref;
+    if(Strings.isNullOrEmpty(ref)) reference = "master";
+    String fileName = taxonomyFile;
+    if(Strings.isNullOrEmpty(taxonomyFile)) fileName = TAXONOMY_YAML;
+    if(!fileName.endsWith(".yml")) fileName = taxonomyFile + "/" + TAXONOMY_YAML;
+
+    String uri = GITHUB_URL + "/" + user + "/" + repo + "/" + reference + "/" + fileName;
+
+    try {
+      InputStream input = new URL(uri).openStream();
+      TaxonomyYaml yaml = new TaxonomyYaml();
+      Taxonomy taxonomy = yaml.load(input);
+      if(override || !hasTaxonomy(taxonomy.getName())) {
+        saveTaxonomy(taxonomy);
+        return taxonomy;
+      }
+    } catch(Exception e) {
+      log.error("Failed loading taxonomy from: " + uri, e);
+    }
+    return null;
+  }
+
+  private FileObject resolveFileInFileSystem(String path) throws FileSystemException {
+    return opalRuntime.getFileSystem().getRoot().resolveFile(path);
+  }
+
+  /**
+   * For testing.
+   */
+  void clear() {
+    taxonomies.clear();
   }
 
 }

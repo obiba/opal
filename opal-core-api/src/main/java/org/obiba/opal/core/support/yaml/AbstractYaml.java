@@ -90,6 +90,7 @@ public abstract class AbstractYaml<T> extends Yaml {
   private static class TDumperOptions extends DumperOptions {
     private TDumperOptions() {
       setDefaultFlowStyle(FlowStyle.BLOCK);
+      setDefaultScalarStyle(ScalarStyle.DOUBLE_QUOTED);
     }
   }
 

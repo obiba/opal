@@ -7,12 +7,14 @@
 
   <g:FlowPanel>
     <b:Paragraph>
-      <ui:msg description="Taxonomies text">Taxonomies are controlled vocabularies that can be used to classify
-        variables.
+      <ui:msg description="Taxonomies text">Taxonomies are controlled vocabularies that can be used to classify or qualify
+        variables. Some predefined taxonomies are available and can be imported at any time. See details in
+        <a href="http://wiki.obiba.org/display/OPALDOC/Taxonomies+Administration"
+            target="_blank">Taxonomies Administration documentation</a>.
       </ui:msg>
     </b:Paragraph>
     <b:FluidRow>
-      <b:Column size="2">
+      <b:Column size="3">
         <g:ScrollPanel>
           <b:NavList ui:field="taxonomyList">
             <b:NavHeader>
@@ -20,13 +22,20 @@
             </b:NavHeader>
           </b:NavList>
         </g:ScrollPanel>
-        <b:ButtonGroup addStyleNames="top-margin">
-          <b:Button icon="PLUS" type="INFO" ui:field="add">
-            <ui:msg description="Add Taxonomy label">Add Taxonomy</ui:msg>
-          </b:Button>
-        </b:ButtonGroup>
+        <b:DropdownButton type="INFO" icon="PLUS" ui:field="addBtn"
+            addStyleNames="top-margin">
+          <b:NavLink ui:field="addTaxonomy">
+            <ui:msg description="Add Taxonomy label">Add taxonomy...</ui:msg>
+          </b:NavLink>
+          <!--<b:NavLink icon="BOOK" ui:field="addUpdateTaxonomyFile">-->
+            <!--<ui:msg description="Add Taxonomy File label">Add/update taxonomy from file...</ui:msg>-->
+          <!--</b:NavLink>-->
+          <b:NavLink ui:field="importDefault">
+            <ui:msg description="Add Builtin Taxonomies label">Add/update built-in taxonomies</ui:msg>
+          </b:NavLink>
+        </b:DropdownButton>
       </b:Column>
-      <b:Column size="10">
+      <b:Column size="9">
         <g:ScrollPanel ui:field="taxonomyDetailsPanel"/>
       </b:Column>
     </b:FluidRow>

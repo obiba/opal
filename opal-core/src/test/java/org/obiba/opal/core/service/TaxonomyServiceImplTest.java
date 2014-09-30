@@ -13,6 +13,7 @@ package org.obiba.opal.core.service;
 import java.util.List;
 import java.util.Locale;
 
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -24,6 +25,7 @@ import org.obiba.opal.core.cfg.TaxonomyService;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.domain.taxonomy.Term;
 import org.obiba.opal.core.domain.taxonomy.Vocabulary;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -247,6 +249,14 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     @Bean
     public TaxonomyService taxonomyService() {
       return new TaxonomyServiceImpl();
+    }
+
+    @Bean
+    public OpalRuntime opalRuntime() {
+      OpalRuntime mock = EasyMock.createMock(OpalRuntime.class);
+      EasyMock.expect(mock.hasFileSystem()).andReturn(false).anyTimes();
+      EasyMock.replay(mock);
+      return mock;
     }
 
   }

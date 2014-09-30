@@ -11,11 +11,13 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.TaxonomiesDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -72,14 +74,26 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
     fireEvent(new TaxonomySelectedEvent(taxonomy.getName()));
   }
 
-  @Override
-  public void onTaxonomyEdit(TaxonomyDto taxonomyDto) {
-    taxonomyEditModalProvider.get().initView(taxonomyDto, TaxonomyEditModalPresenter.EDIT_MODE.EDIT);
-  }
+//  @Override
+//  public void onTaxonomyEdit(TaxonomyDto taxonomyDto) {
+//    taxonomyEditModalProvider.get().initView(taxonomyDto, TaxonomyEditModalPresenter.EDIT_MODE.EDIT);
+//  }
 
   @Override
   public void onAddTaxonomy() {
     taxonomyEditModalProvider.get().initView(TaxonomyDto.create(), TaxonomyEditModalPresenter.EDIT_MODE.CREATE);
+  }
+
+  @Override
+  public void onImportDefaultTaxonomies() {
+    ResourceRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.SYSTEM_CONF_TAXONOMIES_IMPORT_DEFAULT.create().build()).post()
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            refresh();
+          }
+        }, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_NOT_FOUND).send();
   }
 
   private void addHandlers() {

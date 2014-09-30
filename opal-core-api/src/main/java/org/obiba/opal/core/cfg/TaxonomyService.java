@@ -13,6 +13,7 @@ package org.obiba.opal.core.cfg;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.domain.taxonomy.Vocabulary;
 import org.obiba.opal.core.service.SystemService;
@@ -21,6 +22,11 @@ import org.obiba.opal.core.service.SystemService;
  * Create, update and delete {@link Taxonomy}.
  */
 public interface TaxonomyService extends SystemService {
+
+  /**
+   * Import the taxonomies defined by Maelstrom and OBiBa.
+   */
+  void importDefault();
 
   /**
    * Import a {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} from a GitHub repository.
@@ -33,6 +39,14 @@ public interface TaxonomyService extends SystemService {
    */
   Taxonomy importGitHubTaxonomy(@NotNull String username, @NotNull String repo, @Nullable String ref,
       @NotNull String taxonomyFile);
+
+  /**
+   * Import a {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} from a file in Opal's file system.
+   *
+   * @param file
+   * @return
+   */
+  Taxonomy importFileTaxonomy(@NotNull String file) throws FileSystemException;
 
   /**
    * Get all {@link org.obiba.opal.core.domain.taxonomy.Taxonomy}s.

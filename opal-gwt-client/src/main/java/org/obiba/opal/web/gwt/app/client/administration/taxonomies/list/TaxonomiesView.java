@@ -5,7 +5,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomiesDto;
 
-import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.NavList;
 import com.github.gwtbootstrap.client.ui.NavWidget;
@@ -28,7 +28,7 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
   interface ViewUiBinder extends UiBinder<Widget, TaxonomiesView> {}
 
   @UiField
-  Button add;
+  DropdownButton addBtn;
 
   @UiField
   ScrollPanel taxonomyDetailsPanel;
@@ -36,12 +36,11 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
   @UiField
   NavList taxonomyList;
 
-  private NavLink currentLink;
-
   @Inject
   public TaxonomiesView(ViewUiBinder viewUiBinder, Translations translations) {
     this.translations = translations;
     initWidget(viewUiBinder.createAndBindUi(this));
+    addBtn.setText(translations.addTaxonomy());
   }
 
   @Override
@@ -71,16 +70,22 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
 
   private String asText(JsArray<LocaleTextDto> texts) {
     StringBuilder builder = new StringBuilder();
-    for (LocaleTextDto text : JsArrays.toIterable(texts)) {
+    for(LocaleTextDto text : JsArrays.toIterable(texts)) {
       builder.append("[").append(text.getLocale()).append("] ").append(text.getText()).append("\n");
     }
     return builder.toString();
   }
 
-  @UiHandler("add")
+  @UiHandler("addTaxonomy")
   void onShowAddTaxonomy(ClickEvent event) {
     getUiHandlers().onAddTaxonomy();
   }
+
+  @UiHandler("importDefault")
+  void onImportDefaultTaxonomies(ClickEvent event) {
+    getUiHandlers().onImportDefaultTaxonomies();
+  }
+
 
   private class TaxonomyClickHandler implements ClickHandler {
 

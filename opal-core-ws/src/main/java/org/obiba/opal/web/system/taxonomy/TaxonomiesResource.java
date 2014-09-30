@@ -23,6 +23,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.opal.core.cfg.TaxonomyService;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.web.model.Opal;
@@ -30,6 +31,8 @@ import org.obiba.opal.web.model.Opal.TaxonomyDto;
 import org.obiba.opal.web.taxonomy.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.google.common.base.Strings;
 
 @Component
 @Path("/system/conf/taxonomies")
@@ -58,8 +61,8 @@ public class TaxonomiesResource {
   }
 
   @POST
-  @Path("_import_github")
-  public Response importTaxonomy(@Context UriInfo uriInfo,
+  @Path("import/_github")
+  public Response importTaxonomyFromGitHub(@Context UriInfo uriInfo,
       @QueryParam("user") @DefaultValue("maelstrom-research") String username, @QueryParam("repo") String repo,
       @QueryParam("ref") @DefaultValue("master") String ref,
       @QueryParam("file") @DefaultValue("taxonomy.yml") String file) {
@@ -71,14 +74,34 @@ public class TaxonomiesResource {
   }
 
   @POST
+  @Path("import/_default")
+  public Response importDefaultTaxonomies() {
+    taxonomyService.importDefault();
+    return Response.ok().build();
+  }
+
+  @POST
+  @Path("import/_file")
+  public Response importTaxonomyFromFile(@Context UriInfo uriInfo, @QueryParam("file") String file) throws
+      FileSystemException {
+    if(Strings.isNullOrEmpty(file)) return Response.status(Response.Status.BAD_REQUEST).build();
+    Taxonomy taxonomy = taxonomyService.importFileTaxonomy(file);
+    if(taxonomy == null) return Response.status(Response.Status.BAD_REQUEST).build();
+
+    URI uri = uriInfo.getBaseUriBuilder().path("/system/conf/taxonomy").path(taxonomy.getName()).build();
+    return Response.created(uri).build();
+  }
+
+  @POST
   public Response addOrUpdateTaxonomy(@Context UriInfo uriInfo, TaxonomyDto dto) {
     boolean update = taxonomyService.hasTaxonomy(dto.getName());
     taxonomyService.saveTaxonomy(Dtos.fromDto(dto));
 
-    if (update) return Response.ok().build();
+    if(update) return Response.ok().build();
 
     URI uri = uriInfo.getBaseUriBuilder().path("/system/conf/taxonomy").path(dto.getName()).build();
     return Response.created(uri).build();
   }
+
 }
 
