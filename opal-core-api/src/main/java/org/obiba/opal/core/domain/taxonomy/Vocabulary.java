@@ -12,6 +12,10 @@ package org.obiba.opal.core.domain.taxonomy;
 
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
+import org.obiba.opal.core.cfg.NoSuchTermException;
+
 import com.google.common.collect.Lists;
 
 public class Vocabulary extends TaxonomyEntity {
@@ -45,6 +49,22 @@ public class Vocabulary extends TaxonomyEntity {
 
   public boolean hasTerms() {
     return terms != null && terms.size() > 0;
+  }
+
+  public boolean hasTerm(String name) {
+    if (!hasTerms()) return false;
+    for(Term term : terms) {
+      if (term.getName().equals(name)) return true;
+    }
+    return false;
+  }
+
+  public Term getTerm(@NotNull String name) {
+    if(terms == null) throw new NoSuchTermException(getName(), name);
+    for(Term term : terms) {
+      if(term.getName().equals(name)) return term;
+    }
+    throw new NoSuchTermException(getName(), name);
   }
 
   public Vocabulary addTerm(Term term) {
