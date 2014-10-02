@@ -49,6 +49,8 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
 
   private final boolean allowIdentifierGeneration;
 
+  private final boolean allowVariableCreation;
+
   private final boolean ignoreUnknownIdentifier;
 
   private final IdentifiersTableService identifiersTableService;
@@ -62,7 +64,8 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
   @SuppressWarnings("PMD.ExcessiveParameterList")
   CopyValueTablesLockingAction(IdentifiersTableService identifiersTableService, IdentifierService identifierService,
       TransactionTemplate txTemplate, Set<ValueTable> sourceTables, Datasource destination,
-      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier, DatasourceCopierProgressListener progressListener) {
+      boolean allowIdentifierGeneration, boolean allowVariableCreation, boolean ignoreUnknownIdentifier,
+      DatasourceCopierProgressListener progressListener) {
     this.identifiersTableService = identifiersTableService;
     this.identifierService = identifierService;
     this.txTemplate = txTemplate;
@@ -74,6 +77,7 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
     });
     this.destination = destination;
     this.allowIdentifierGeneration = allowIdentifierGeneration;
+    this.allowVariableCreation = allowVariableCreation;
     this.ignoreUnknownIdentifier = ignoreUnknownIdentifier;
     this.progressListener = progressListener;
   }
