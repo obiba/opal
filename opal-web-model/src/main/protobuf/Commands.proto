@@ -48,6 +48,7 @@ message ImportCommandOptionsDto {
   repeated string tables = 7;
   optional bool incremental = 9 [default = false];
   optional Identifiers.IdentifiersMappingConfigDto idConfig = 10;
+  optional bool createVariables = 11 [default = true];
 }
 
 message CopyCommandOptionsDto {

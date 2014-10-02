@@ -18,6 +18,11 @@ def add_import_arguments(parser):
     parser.add_argument('--identifiers', '-id', required=False, help='Name of the ID mapping')
     parser.add_argument('--policy', '-po', required=False, help='ID mapping policy: required (each identifiers must be mapped prior importation, default), ignore (ignore unknown identifiers), generate (generate a system identifier for each unknown identifier)')
     parser.add_argument('--json', '-j', action='store_true', help='Pretty JSON formatting of the response')
+    parser.add_argument('--create-variables', '-cv', action='store_true',
+                        help='Create variables that do not yet exist in the destination (default)')
+    parser.add_argument('--no-create-variables', '-ncv', action='store_false', dest='create_variables',
+                        help='Do not create variables that do not exist in the destination.')
+    parser.set_defaults(create_variables=True)
 
 class OpalImporter:
     """
@@ -29,7 +34,8 @@ class OpalImporter:
             raise Exception("ExtensionFactoryInterface.add() method must be implemented by a concrete class.")
 
     @classmethod
-    def build(cls, client, destination, tables=None, incremental=None, limit=None, identifiers=None, policy=None, verbose=None):
+    def build(cls, client, destination, tables=None, incremental=None, limit=None, identifiers=None, policy=None, verbose=None,
+              create_variables=None):
         setattr(cls, 'client', client)
         setattr(cls, 'destination', destination)
         setattr(cls, 'tables', tables)
@@ -38,6 +44,7 @@ class OpalImporter:
         setattr(cls, 'identifiers', identifiers)
         setattr(cls, 'policy', policy)
         setattr(cls, 'verbose', verbose)
+        setattr(cls, 'createVariables', create_variables)
         return cls()
 
     def submit(self, extension_factory):
@@ -56,6 +63,7 @@ class OpalImporter:
         # import options
         options = opal.protobuf.Commands_pb2.ImportCommandOptionsDto()
         options.destination = self.destination
+        options.createVariables = self.createVariables
         # tables must be the ones of the transient
         tables2import = transient.table
         if self.tables:

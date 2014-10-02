@@ -67,4 +67,7 @@ public interface ImportCommandOptions extends HelpOption {
   @Option(shortName = "c",
       description = "Use incremental import.")
   boolean isIncremental();
+
+  @Option(description = "Create new variables in the destination table if they do not yet exist.")
+  boolean isCreateVariables();
 }
