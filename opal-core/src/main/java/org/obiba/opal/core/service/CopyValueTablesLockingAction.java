@@ -17,12 +17,10 @@ import java.util.concurrent.ThreadFactory;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-import org.obiba.magma.Datasource;
-import org.obiba.magma.DatasourceCopierProgressListener;
-import org.obiba.magma.ValueSet;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.VariableEntity;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
+import org.obiba.magma.*;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
 import org.obiba.magma.views.View;
@@ -114,6 +112,35 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
   private class CopyAction implements Action {
     @Override
     public void execute() throws Exception {
+
+      if(!allowVariableCreation) {
+        // The (Multithreaded)DatasourceCopier by default creates missing variables.
+        // For correctness, this check needs to run within the same transaction as the rest of the import
+        for(ValueTable valueTable : sourceTables) {
+
+          Set<String> missingVariableNames = Sets.newHashSet(
+              Iterables.transform(valueTable.getVariables(), new Function<Variable, String>() {
+                      public String apply(Variable v) { return v.getName(); }
+          }));
+
+          // Destination name is the temporary source table name.
+          ValueTable destinationTable = destination.getValueTable(valueTable.getName());
+
+          for(Variable v : destinationTable.getVariables()) {
+            missingVariableNames.remove(v.getName());
+          }
+
+          if(missingVariableNames.size() > 0) {
+            String vars = Joiner.on(", ").join(Iterables.transform(missingVariableNames, new Function<String,String>() {
+              public String apply(String v) { return "'" + v + "'"; }
+            }));
+            throw new IllegalArgumentException(
+                String.format("Variables do not exist in %s and creating new variables is disabled: %s",
+                                 vars, destinationTable.getTableReference()));
+          }
+        }
+      }
+
       for(ValueTable valueTable : sourceTables) {
         if(Thread.interrupted()) {
           throw new InterruptedException("Thread interrupted");
