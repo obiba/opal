@@ -182,7 +182,6 @@ public class TaxonomyServiceImpl implements TaxonomyService {
     importGitHubTaxonomy(MLSTRM_USER, "maelstrom-taxonomies", null, "area-of-information", override);
     importGitHubTaxonomy(MLSTRM_USER, "maelstrom-taxonomies", null, "harmonization", override);
     importGitHubTaxonomy(OBIBA_USER, "obiba-taxonomies", null, "default", override);
-    importGitHubTaxonomy(OBIBA_USER, "obiba-taxonomies", null, "onyx", override);
   }
 
   private Taxonomy importGitHubTaxonomy(@NotNull String username, @NotNull String repo, @Nullable String ref,
