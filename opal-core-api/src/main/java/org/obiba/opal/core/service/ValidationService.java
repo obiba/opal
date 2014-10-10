@@ -1,18 +1,19 @@
 package org.obiba.opal.core.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import com.google.common.collect.*;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.SetMultimap;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.opal.core.support.MessageLogger;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Service for validation.
@@ -21,7 +22,6 @@ import org.obiba.opal.core.support.MessageLogger;
 public interface ValidationService {
 
     public static final String VALIDATE_ATTRIBUTE = "validate";
-    public static final String VOCABULARY_URL_ATTRIBUTE = "vocabulary_url";
 
     /**
      * @param valueTable table to be validated

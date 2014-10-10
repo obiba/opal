@@ -1,5 +1,14 @@
 package org.obiba.opal.core.service.validation;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.obiba.magma.Datasource;
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
+import org.obiba.opal.core.service.MagmaHelper;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -9,13 +18,6 @@ import java.security.KeyStore;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.obiba.magma.Variable;
-import org.obiba.opal.core.service.MagmaHelper;
 
 public class ValidatorFactoryTest {
 
@@ -36,19 +38,23 @@ public class ValidatorFactoryTest {
 
     @Test
     public void testGetValidators() throws Exception  {
-    	Variable variable = MagmaHelper.createVocabularyVariable(); 
-		List<DataValidator> validators = factory.getValidators(variable);
+        Datasource datasource = MagmaHelper.createDatasource(true);
+        Variable variable = MagmaHelper.createVocabularyVariable();
+        Set<String> entities = new HashSet<>();
+        entities.add(MagmaHelper.ENTITY);
+        ValueTable table = MagmaHelper.createValueTable(datasource, entities, variable);
+		List<DataConstraint> validators = factory.getValidators(table, variable);
 		Assert.assertEquals("wrong count", 1, validators.size());
     	checkVocabValidator(validators.get(0));
     }
 
     @Test
     public void testGetVocabValidator() throws Exception  {
-    	VocabularyValidator validator = factory.getVocabularyValidator(MagmaHelper.getVocabularyFileUrl());
+    	VocabularyConstraint validator = factory.getVocabularyValidator(MagmaHelper.getVocabularyFileUrl());
     	checkVocabValidator(validator);
     }
     
-    private void checkVocabValidator(DataValidator validator) {
+    private void checkVocabValidator(DataConstraint validator) {
 
         for (String code: VALID_CODES) {
             Assert.assertTrue(validator.isValid(MagmaHelper.valueOf(code)));

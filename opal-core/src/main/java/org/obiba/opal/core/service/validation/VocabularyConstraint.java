@@ -5,16 +5,16 @@ import org.obiba.magma.Value;
 import java.util.Set;
 
 /**
- * Impl of DataValidator that checks for existence of vocabulary codes.
+ * Impl of DataConstraint that checks for existence in vocabulary codes.
  */
-public class VocabularyValidator implements DataValidator {
+public class VocabularyConstraint implements DataConstraint {
 
 	public static final String TYPE = "Vocabulary";
 	
     private final String name;
     private final Set<String> codes;
 
-    public VocabularyValidator(String name, Set<String> codes) {
+    public VocabularyConstraint(String name, Set<String> codes) {
         this.name = name;
         this.codes = codes;
     }

@@ -15,6 +15,7 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.support.StaticDatasource;
 import org.obiba.magma.support.StaticValueTable;
 import org.obiba.magma.type.TextType;
+import org.obiba.opal.core.service.validation.ConstraintType;
 
 public class MagmaHelper {
 
@@ -39,7 +40,7 @@ public class MagmaHelper {
     public static Variable createVocabularyVariable(String vocabUrl) {
         System.out.println(vocabUrl);
     	Variable.Builder builder = new Variable.Builder(VOCAB_VARIABLE, TextType.get(), ENTITY);
-    	builder.addAttribute(ValidationService.VOCABULARY_URL_ATTRIBUTE, vocabUrl);
+    	builder.addAttribute(ConstraintType.EXTERNAL_VOCABULARY.getAttribute(), vocabUrl);
     	return builder.build();
     }
     

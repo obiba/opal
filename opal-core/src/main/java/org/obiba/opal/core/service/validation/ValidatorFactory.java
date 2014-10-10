@@ -1,9 +1,7 @@
 package org.obiba.opal.core.service.validation;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Lists;
 import com.google.common.io.Files;
-import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -13,9 +11,8 @@ import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.obiba.magma.Attribute;
-import org.obiba.magma.NoSuchAttributeException;
+import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
-import org.obiba.opal.core.service.ValidationService;
 import org.obiba.opal.core.service.security.SystemKeyStoreService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +30,8 @@ import java.security.KeyStore;
 import java.util.*;
 
 /**
- * Knows how to create DataValidators for a Variable.
- * Datasource and variable attributes will determine if validation is enabled, and which validators the variable has.
+ * Knows how to create DataConstraints for a Variable.
+ * Table/View and variable attributes will determine if validation is enabled, and which constraints the variable has.
  */
 @Component("validatorFactory")
 public class ValidatorFactory {
@@ -54,13 +51,17 @@ public class ValidatorFactory {
      * @param variable
      * @return list of validators
      */
-    public List<DataValidator> getValidators(Variable variable) {
+    public List<DataConstraint> getValidators(ValueTable valueTable, Variable variable) {
+
+        List<DataConstraint> result = new ArrayList<>();
+
         try {
-            Attribute attr = variable.getAttribute(ValidationService.VOCABULARY_URL_ATTRIBUTE);
-            URL url = new URL(attr.getValue().toString());
-            return Lists.<DataValidator>newArrayList(getVocabularyValidator(url));
-        } catch (NoSuchAttributeException ex) {
-            return Lists.newArrayList();
+            for (ConstraintType type: ConstraintType.values()) {
+                DataConstraint dc = getConstraint(type, valueTable, variable);
+                if (dc != null) {
+                    result.add(dc);
+                }
+            }
         } catch (RuntimeException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -68,6 +69,32 @@ public class ValidatorFactory {
                     String.format("Error obtaining validators for variable %s", variable.getName());
             throw new RuntimeException(msg, ex);
         }
+        return result;
+    }
+
+    private DataConstraint getConstraint(ConstraintType type, ValueTable table, Variable variable) throws Exception {
+
+        Attribute attr = type.getAttributeValue(variable);
+        if (attr == null && type.isAtrributeBased()) {
+            return null;
+        }
+
+        DataConstraint result = null;
+        switch (type) {
+            case EMBEDDED_VOCABULARY:
+                if (table.isView() && variable.hasCategories()) {
+                    result = new EmbeddedVocabularyConstraint(table, variable);
+                }
+                break;
+            case EXTERNAL_VOCABULARY:
+                result = getVocabularyValidator(new URL(attr.getValue().toString()));
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Implement for " + type);
+        }
+
+        return result;
     }
 
     /**
@@ -77,7 +104,7 @@ public class ValidatorFactory {
      * @return
      * @throws IOException
      */
-    public VocabularyValidator getVocabularyValidator(URL url) throws Exception {
+    VocabularyConstraint getVocabularyValidator(URL url) throws Exception {
         String extension = Files.getFileExtension(url.getFile());
         if (extension.isEmpty()) {
             throw new IllegalArgumentException("Could not obtain filename extension from " + url);
@@ -89,7 +116,7 @@ public class ValidatorFactory {
         }
 
         Set<String> codes = getVocabularyCodes(url, importer);
-        return new VocabularyValidator(url.toString(), codes);
+        return new VocabularyConstraint(url.toString(), codes);
     }
 
     Set<String> getVocabularyCodes(URL url, VocabularyImporter importer) throws IOException, GeneralSecurityException {
