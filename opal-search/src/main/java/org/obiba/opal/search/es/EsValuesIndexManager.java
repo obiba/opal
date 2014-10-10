@@ -30,10 +30,7 @@ import org.obiba.opal.core.service.ValidationService;
 import org.obiba.opal.core.service.VariableSummaryService;
 import org.obiba.opal.core.support.MessageLogger;
 import org.obiba.opal.core.support.Slf4jMessageAdapter;
-import org.obiba.opal.search.IndexSynchronization;
-import org.obiba.opal.search.ValueTableIndex;
-import org.obiba.opal.search.ValueTableValuesIndex;
-import org.obiba.opal.search.ValuesIndexManager;
+import org.obiba.opal.search.*;
 import org.obiba.opal.search.es.mapping.ValueTableMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +61,8 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
   @Autowired
   private ValidationService validationService;
 
+  private MessageCollector messageCollector = new MessageCollector();
+
   @NotNull
   @Override
   public EsValueTableValuesIndex getIndex(@NotNull ValueTable vt) {
@@ -86,6 +85,15 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
     return validationService.createValidationTask(table, logger);
   }
 
+  @Override
+  public List<Message> getMessages(@NotNull ValueTable valueTable) {
+    return messageCollector.getMessages(valueTable);
+  }
+
+  private MessageCollector.Task createCollectorTask(ValueTable valueTable) {
+      return messageCollector.createTask(valueTable);
+  }
+
   @NotNull
   @Override
   public String getName() {
@@ -104,21 +112,39 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
     @Override
     protected void index() {
 
+      MessageCollector.Task collectorTask = createCollectorTask(valueTable);
       ConcurrentReaderCallback callback = new ValuesReaderCallback();
+
       ValidationService.ValidationTask validationTask = createValidationTask(valueTable);
       if (validationTask != null) {
         //if validation is enabled, decorate the values reader callback with a validating one
         callback = new ValidatingCallback(callback, validationTask);
       }
 
-      ConcurrentValueTableReader.Builder.newReader() //
-          .withThreads(threadFactory) //
-          .ignoreReadErrors() //
-          .from(valueTable) //
-          .variablesFilter(index.getVariables()) //
-          .to(callback) //
-          .build() //
-          .read();
+      try {
+          ConcurrentValueTableReader.Builder builder =
+                ConcurrentValueTableReader.Builder.newReader() //
+                  .withThreads(threadFactory) //
+                  .from(valueTable) //
+                  .variablesFilter(index.getVariables()) //
+                  .to(callback); //
+
+          if (!validationService.isValidationEnabled(valueTable)) {
+              //this was on the original code, but its not desirable for validation
+              builder.ignoreReadErrors();
+          }
+
+          collectorTask.info("Indexing table %s", valueTable.getTableReference());
+          builder.build().read();
+          collectorTask.info("Table successfully indexed");
+
+      } catch (RuntimeException ex) {
+          collectorTask.error("Failure indexing table: %s", ex.toString());
+          throw ex;
+      } finally {
+          //making sure messages are kept
+          collectorTask.close();
+      }
     }
 
     private class ValuesReaderCallback implements ConcurrentReaderCallback {

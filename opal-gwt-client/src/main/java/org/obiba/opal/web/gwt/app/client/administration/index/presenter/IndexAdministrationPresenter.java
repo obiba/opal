@@ -59,7 +59,9 @@ public class IndexAdministrationPresenter
 
   private static final int DELAY_MILLIS = 1500;
 
-  public interface Display extends View, HasBreadcrumbs, HasUiHandlers<IndexAdministrationUiHandlers> {
+    private final ModalProvider<IndexDetailsPresenter> detailsModalProvider;
+
+    public interface Display extends View, HasBreadcrumbs, HasUiHandlers<IndexAdministrationUiHandlers> {
 
     enum Slots {
       Drivers, Permissions
@@ -72,6 +74,8 @@ public class IndexAdministrationPresenter
     String INDEX_ACTION = "Index now";
 
     String REMOVE_ACTION = "Remove Index";
+
+    String LOG_ACTION = "Log";
 
     void setServiceStatus(Status status);
 
@@ -98,10 +102,12 @@ public class IndexAdministrationPresenter
   public IndexAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
       ModalProvider<IndexPresenter> indexModalProvider,
       ModalProvider<IndexConfigurationPresenter> indexConfigurationProvider,
+      ModalProvider<IndexDetailsPresenter> detailsModalProvider,
       DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     this.indexModalProvider = indexModalProvider.setContainer(this);
     this.indexConfigurationProvider = indexConfigurationProvider.setContainer(this);
+    this.detailsModalProvider = detailsModalProvider.setContainer(this);
     this.breadcrumbsHelper = breadcrumbsHelper;
     getView().setUiHandlers(this);
   }
@@ -337,7 +343,12 @@ public class IndexAdministrationPresenter
     }
   }
 
-  private void refresh(boolean clearIndices) {
+    @Override
+    public void showDetail(TableIndexStatusDto dto) {
+        detailsModalProvider.get().setElement(dto);
+    }
+
+    private void refresh(boolean clearIndices) {
     // Fetch all indices
     ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
         .forResource(Resources.indices())//

@@ -10,6 +10,7 @@
 package org.obiba.opal.web.search;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -25,6 +26,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.ValueTable;
+import org.obiba.opal.web.model.Commands;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -107,6 +109,7 @@ public class SearchServiceResource extends IndexResource {
         .setSchedule(getScheduleDto(datasource.getName(), valueTable.getName())) //
         .setStatus(getTableIndexationStatus(datasource.getName(), valueTable.getName())) //
         .setProgress(progress) //
+        .addAllMessages(getMessages(valueTable)) //
         .setLink(link.getPath()).build();
 
     if(!timestamps.getLastUpdate().isNull()) {
@@ -125,5 +128,16 @@ public class SearchServiceResource extends IndexResource {
 
     return tableStatusDto;
   }
+
+    private List<Commands.Message> getMessages(ValueTable table) {
+        Commands.Message.Builder builder = Commands.Message.newBuilder();
+        List<Commands.Message> result = new ArrayList<>();
+        for (org.obiba.opal.search.Message msg: valuesIndexManager.getMessages(table)) {
+            builder.setMsg(msg.getMessage());
+            builder.setTimestamp(msg.getTimestamp());
+            result.add(builder.build());
+        }
+        return result;
+    }
 
 }

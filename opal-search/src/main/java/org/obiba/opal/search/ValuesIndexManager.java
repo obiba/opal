@@ -13,6 +13,8 @@ import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.ValueTable;
 
+import java.util.List;
+
 /**
  * Manager of {@code ValueTable} values indices.
  */
@@ -27,5 +29,12 @@ public interface ValuesIndexManager extends IndexManager {
   @NotNull
   @Override
   ValueTableValuesIndex getIndex(@NotNull ValueTable valueTable);
+
+    /**
+     * Returns the messages of the last attempt (successful or not) to index the given ValueTable
+     * @param valueTable
+     * @return
+     */
+  List<Message> getMessages(@NotNull ValueTable valueTable);
 
 }

@@ -23,11 +23,13 @@ public class ValidationServiceImpl implements ValidationService {
     @Autowired
     ValidatorFactory validatorFactory;
 
-    private boolean isValidationEnabled(Datasource datasource) {
+
+    @Override
+    public boolean isValidationEnabled(ValueTable valueTable) {
         return true;
-        /* @todo implement way to set this attribute on the project
+        /* @todo enabled when ValueTable supports attributes
         try {
-            return Boolean.valueOf(datasource.getAttributeStringValue(VALIDATE_ATTRIBUTE));
+            return Boolean.valueOf(valueTable.getAttributeStringValue(VALIDATE_ATTRIBUTE));
         } catch (NoSuchAttributeException ex) {
             return false;
         }
@@ -37,7 +39,7 @@ public class ValidationServiceImpl implements ValidationService {
     private ValidationResult validateInTransaction(final ValueTable valueTable, final MessageLogger logger,
                                       final Map<String, List<DataValidator>> validatorMap) {
 
-        if (!isValidationEnabled(valueTable.getDatasource())) {
+        if (!isValidationEnabled(valueTable)) {
             return null;
         }
 
@@ -126,7 +128,7 @@ public class ValidationServiceImpl implements ValidationService {
     private InternalValidationTask createInternalValidationTask(ValueTable valueTable, MessageLogger logger) {
         InternalValidationTask task = new InternalValidationTask(valueTable, logger);
 
-        if (isValidationEnabled(valueTable.getDatasource())) {
+        if (isValidationEnabled(valueTable)) {
             for (Variable var: valueTable.getVariables()) {
                 List<DataValidator> validators = validatorFactory.getValidators(var);
                 if (validators != null && validators.size() > 0) {

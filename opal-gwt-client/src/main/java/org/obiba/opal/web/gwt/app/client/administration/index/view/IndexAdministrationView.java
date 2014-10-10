@@ -141,7 +141,7 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     ActionsIndexColumn<TableIndexStatusDto> actionsColumn = new ActionsIndexColumn<TableIndexStatusDto>(
         new ActionsProvider<TableIndexStatusDto>() {
 
-          private final String[] all = new String[] { REMOVE_ACTION, INDEX_ACTION };
+          private final String[] all = new String[] { REMOVE_ACTION, INDEX_ACTION, LOG_ACTION };
 
           @Override
           public String[] allActions() {
@@ -175,6 +175,8 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
           getUiHandlers().delete(Arrays.asList(statusDto));
         } else if(actionName.trim().equalsIgnoreCase(INDEX_ACTION)) {
           getUiHandlers().indexNow(Arrays.asList(statusDto));
+        } else if(actionName.trim().equalsIgnoreCase(LOG_ACTION)) {
+          getUiHandlers().showDetail(statusDto);
         }
       }
     });

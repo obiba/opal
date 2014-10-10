@@ -34,4 +34,7 @@ public interface IndexAdministrationUiHandlers extends UiHandlers {
   void schedule(List<TableIndexStatusDto> statusDtos);
 
   void indexNow(List<TableIndexStatusDto> statusDtos);
+
+  void showDetail(TableIndexStatusDto dto);
+
 }

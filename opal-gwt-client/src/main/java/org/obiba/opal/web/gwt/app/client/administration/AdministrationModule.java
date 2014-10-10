@@ -59,9 +59,11 @@ import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.ImportI
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.ImportSystemIdentifiersModalView;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexConfigurationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.index.view.IndexAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.index.view.IndexConfigurationView;
+import org.obiba.opal.web.gwt.app.client.administration.index.view.IndexDetailsView;
 import org.obiba.opal.web.gwt.app.client.administration.index.view.IndexView;
 import org.obiba.opal.web.gwt.app.client.administration.jvm.JVMPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.jvm.JVMView;
@@ -191,6 +193,8 @@ public class AdministrationModule extends AbstractPresenterModule {
     bindPresenterWidget(IndexPresenter.class, IndexPresenter.Display.class, IndexView.class);
     bindPresenterWidget(IndexConfigurationPresenter.class, IndexConfigurationPresenter.Display.class,
         IndexConfigurationView.class);
+      bindPresenterWidget(IndexDetailsPresenter.class, IndexDetailsPresenter.Display.class,
+              IndexDetailsView.class);
   }
 
   private void configureDatabases() {

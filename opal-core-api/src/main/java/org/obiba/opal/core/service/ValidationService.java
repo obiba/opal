@@ -31,6 +31,12 @@ public interface ValidationService {
     ValidationTask createValidationTask(ValueTable valueTable, MessageLogger logger);
 
     /**
+     * @param valueTable
+     * @return true if validation is enabled for the given table.
+     */
+    boolean isValidationEnabled(ValueTable valueTable);
+
+    /**
      * Container for validation results.
      */
     public class ValidationResult {

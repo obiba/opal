@@ -1,0 +1,22 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+    ui:generateLocales="default"
+    >
+
+  <o:Modal ui:field="dialogBox" resizable="true" closeVisible="true" keyboard="true" animation="false">
+    <g:FlowPanel>
+        <o:Table ui:field="table"/>
+    </g:FlowPanel>
+
+    <b:ModalFooter>
+      <b:Button ui:field="closeButton">
+        <ui:msg description="Close label">Close</ui:msg>
+      </b:Button>
+    </b:ModalFooter>
+  </o:Modal>
+
+</ui:UiBinder>
