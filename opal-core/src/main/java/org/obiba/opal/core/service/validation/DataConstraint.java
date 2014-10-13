@@ -19,10 +19,8 @@ public interface DataConstraint {
     boolean isValid(Value value);
 
     /**
-     * @param variable
-     * @param value
-     * @return message for failed constraint given the variable name and offending value
+     * @return message for failed constraint
      */
-    String getMessage(String variable, String value);
+    String getMessage();
 
 }

@@ -12,7 +12,7 @@ import java.util.Set;
 public class EmbeddedVocabularyConstraint extends VocabularyConstraint {
 
     public EmbeddedVocabularyConstraint(Variable variable) {
-        super("Not found in category vocabulary of variable %s: %s", getVocabularyCodes(variable));
+        super("category vocabulary", getVocabularyCodes(variable));
     }
 
     private static final Set<String> getVocabularyCodes(Variable variable) {

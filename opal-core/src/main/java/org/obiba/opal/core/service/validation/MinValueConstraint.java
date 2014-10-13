@@ -21,8 +21,8 @@ public class MinValueConstraint extends NumberConstraint {
     }
 
     @Override
-    public String getMessage(String variable, String value) {
-        return String.format("Lower than minimum " + constant + ", variable %s, value %s", variable, value);
+    public String getMessage() {
+        return String.format("Lower than %s", constant.toString());
     }
 
 }

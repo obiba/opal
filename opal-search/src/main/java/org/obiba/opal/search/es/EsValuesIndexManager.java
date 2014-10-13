@@ -289,7 +289,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
                   continue; //variable not validated: ignore
               }
 
-              validationTask.validate(var, values[i]);
+              validationTask.validate(var, values[i], entity);
           }
 
           delegate.onValues(entity, variables, values);

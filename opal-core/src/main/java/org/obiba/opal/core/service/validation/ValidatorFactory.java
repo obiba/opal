@@ -129,8 +129,8 @@ public class ValidatorFactory {
         }
 
         Set<String> codes = getVocabularyCodes(url, importer);
-        String msgPattern = "Not found in vocabulary " + url.toString() + ", variable %s, value %s";
-        return new VocabularyConstraint(msgPattern, codes);
+        String msg = String.format("external vocabulary %s", url.toString());
+        return new VocabularyConstraint(msg, codes);
     }
 
     Set<String> getVocabularyCodes(URL url, VocabularyImporter importer) throws IOException, GeneralSecurityException {

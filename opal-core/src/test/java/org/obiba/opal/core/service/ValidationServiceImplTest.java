@@ -113,7 +113,7 @@ public class ValidationServiceImplTest {
                 Variable var = valueTable.getVariable(varName);
                 Value value = valueTable.getValue(var, vset);
                 try {
-                    task.validate(var, value);
+                    task.validate(var, value, vset.getVariableEntity());
                 } catch (ValidationException ex) {
                     return false;
                 }

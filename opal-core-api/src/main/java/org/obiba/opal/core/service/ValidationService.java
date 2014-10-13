@@ -7,6 +7,7 @@ import com.google.common.collect.SetMultimap;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
+import org.obiba.magma.VariableEntity;
 import org.obiba.opal.core.support.MessageLogger;
 
 import javax.validation.ValidationException;
@@ -89,9 +90,10 @@ public interface ValidationService {
          * Validates the given value for variable.
          * @param variable
          * @param value
+         * @param entity
          * @throws ValidationException if the given value is not valid
          */
-        void validate(Variable variable, Value value) throws ValidationException;
+        void validate(Variable variable, Value value, VariableEntity entity) throws ValidationException;
 
         /**
          * Validates the whole table data, collecting and returning the results

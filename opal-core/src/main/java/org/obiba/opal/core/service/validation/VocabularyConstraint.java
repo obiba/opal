@@ -11,16 +11,16 @@ public class VocabularyConstraint implements DataConstraint {
 
 	public static final String TYPE = "Vocabulary";
 	
-    private final String messagePattern;
+    private final String source;
     private final Set<String> codes;
 
-    public VocabularyConstraint(String messagePattern, Set<String> codes) {
-        this.messagePattern = messagePattern;
+    public VocabularyConstraint(String source, Set<String> codes) {
+        this.source = source;
         this.codes = codes;
     }
 
     @Override
-    public boolean isValid(Value value) {
+    public final boolean isValid(Value value) {
         if (value.isNull()) {
             return true;
         }
@@ -34,8 +34,8 @@ public class VocabularyConstraint implements DataConstraint {
 
 
     @Override
-    public String getMessage(String variable, String value) {
-        return String.format(messagePattern, variable, value);
+    public final String getMessage() {
+        return String.format("Not found in %s", source);
     }
 
 }

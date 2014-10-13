@@ -79,7 +79,7 @@ public class ValidationServiceImpl implements ValidationService {
                 List<DataConstraint> constraints = entry.getValue();
                 for (DataConstraint constraint : constraints) {
                     if (!constraint.isValid(value)) {
-                        logger.warn(constraint.getMessage(varName, String.valueOf(value)));
+                        logger.warn(getMessage(vset.getVariableEntity().getIdentifier(), varName, value.toString(), constraint));
                         result.addFailure(varName, constraint.getType(), value);
                     }
                 }
@@ -115,6 +115,14 @@ public class ValidationServiceImpl implements ValidationService {
         return task;
     }
 
+    private static String getMessage(String entityId, String variable, String value, DataConstraint constraint) {
+        return String.format("Validation failed: Entity %s, Variable %s, Value %s: %s",
+                entityId,
+                variable,
+                value,
+                constraint.getMessage());
+    }
+
     private class InternalValidationTask implements ValidationTask {
 
         @NotNull
@@ -145,12 +153,12 @@ public class ValidationServiceImpl implements ValidationService {
 
 
         @Override
-        public void validate(Variable variable, Value value) throws ValidationException {
+        public void validate(Variable variable, Value value, VariableEntity entity) throws ValidationException {
             List<DataConstraint> constraints = constraintMap.get(variable.getName());
             if (constraints != null) {
                 for (DataConstraint constraint: constraints) {
                     if (!constraint.isValid(value)) {
-                        String msg = constraint.getMessage(variable.getName(), String.valueOf(value));
+                        String msg = getMessage(entity.getIdentifier(), variable.getName(), value.toString(), constraint);
                         throw new ValidationException(msg);
                     }
                 }
