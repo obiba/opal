@@ -11,6 +11,7 @@ import org.obiba.opal.core.service.validation.ValidatorFactory;
 import org.obiba.opal.core.service.validation.VocabularyConstraint;
 import org.obiba.opal.core.support.SystemOutMessageLogger;
 
+import javax.validation.ValidationException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -111,7 +112,9 @@ public class ValidationServiceImplTest {
             for (String varName: variables) {
                 Variable var = valueTable.getVariable(varName);
                 Value value = valueTable.getValue(var, vset);
-                if (!task.isValid(var, value)) {
+                try {
+                    task.validate(var, value);
+                } catch (ValidationException ex) {
                     return false;
                 }
             }

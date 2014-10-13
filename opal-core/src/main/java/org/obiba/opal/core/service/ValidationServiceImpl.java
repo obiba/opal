@@ -7,6 +7,7 @@ import org.obiba.opal.core.support.MessageLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 
@@ -78,7 +79,7 @@ public class ValidationServiceImpl implements ValidationService {
                 List<DataConstraint> constraints = entry.getValue();
                 for (DataConstraint constraint : constraints) {
                     if (!constraint.isValid(value)) {
-                        logger.warn(getValidationFailMessage(constraint, varName, value));
+                        logger.warn(constraint.getMessage(varName, String.valueOf(value)));
                         result.addFailure(varName, constraint.getType(), value);
                     }
                 }
@@ -114,10 +115,6 @@ public class ValidationServiceImpl implements ValidationService {
         return task;
     }
 
-    private String getValidationFailMessage(DataConstraint validator, String varName, Value value) {
-        return String.format("Failed validation for rule %s on variable %s: %s", validator.getType(), varName, String.valueOf(value));
-    }
-
     private class InternalValidationTask implements ValidationTask {
 
         @NotNull
@@ -146,18 +143,18 @@ public class ValidationServiceImpl implements ValidationService {
             return new ArrayList<>(constraintMap.keySet());
         }
 
+
         @Override
-        public boolean isValid(Variable var, Value value) {
-            List<DataConstraint> constraints = constraintMap.get(var.getName());
+        public void validate(Variable variable, Value value) throws ValidationException {
+            List<DataConstraint> constraints = constraintMap.get(variable.getName());
             if (constraints != null) {
                 for (DataConstraint constraint: constraints) {
                     if (!constraint.isValid(value)) {
-                        logger.warn(getValidationFailMessage(constraint, var.getName(), value));
-                        return false;
+                        String msg = constraint.getMessage(variable.getName(), String.valueOf(value));
+                        throw new ValidationException(msg);
                     }
                 }
             }
-            return true;
         }
 
         @Override

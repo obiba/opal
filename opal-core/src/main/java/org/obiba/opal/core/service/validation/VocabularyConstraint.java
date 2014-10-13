@@ -11,11 +11,11 @@ public class VocabularyConstraint implements DataConstraint {
 
 	public static final String TYPE = "Vocabulary";
 	
-    private final String name;
+    private final String messagePattern;
     private final Set<String> codes;
 
-    public VocabularyConstraint(String name, Set<String> codes) {
-        this.name = name;
+    public VocabularyConstraint(String messagePattern, Set<String> codes) {
+        this.messagePattern = messagePattern;
         this.codes = codes;
     }
 
@@ -32,14 +32,10 @@ public class VocabularyConstraint implements DataConstraint {
 		return TYPE;
 	}
 
-	@Override
-    public String getName() {
-        return name;
-    }
 
     @Override
-    public String toString() {
-        return String.format("%s[%s]", getClass().getSimpleName(), getName());
+    public String getMessage(String variable, String value) {
+        return String.format(messagePattern, variable, value);
     }
 
 }

@@ -83,18 +83,31 @@ public class ValidatorFactory {
         switch (type) {
             case EMBEDDED_VOCABULARY:
                 if (table.isView() && variable.hasCategories()) {
-                    result = new EmbeddedVocabularyConstraint(table, variable);
+                    result = new EmbeddedVocabularyConstraint(variable);
                 }
                 break;
             case EXTERNAL_VOCABULARY:
                 result = getVocabularyValidator(new URL(attr.getValue().toString()));
                 break;
-
+            case MIN_VALUE:
+                result = new MinValueConstraint(getDouble(attr));
+                break;
+            case MAX_VALUE:
+                result = new MaxValueConstraint(getDouble(attr));
+                break;
+            case PAST_DATE:
+                result = new PastDateConstraint(); //attribute value is irrelevant
+                break;
             default:
                 throw new UnsupportedOperationException("Implement for " + type);
         }
 
         return result;
+    }
+
+    private static double getDouble(Attribute attr) {
+        String str = attr.getValue().toString();
+        return Double.valueOf(str);
     }
 
     /**
@@ -116,7 +129,8 @@ public class ValidatorFactory {
         }
 
         Set<String> codes = getVocabularyCodes(url, importer);
-        return new VocabularyConstraint(url.toString(), codes);
+        String msgPattern = "Not found in vocabulary " + url.toString() + ", variable %s, value %s";
+        return new VocabularyConstraint(msgPattern, codes);
     }
 
     Set<String> getVocabularyCodes(URL url, VocabularyImporter importer) throws IOException, GeneralSecurityException {

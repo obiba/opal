@@ -1,7 +1,6 @@
 package org.obiba.opal.core.service.validation;
 
 import org.obiba.magma.Category;
-import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 
 import java.util.HashSet;
@@ -12,9 +11,8 @@ import java.util.Set;
  */
 public class EmbeddedVocabularyConstraint extends VocabularyConstraint {
 
-    public EmbeddedVocabularyConstraint(ValueTable table, Variable variable) {
-        super(String.format("%s.%s", table.getTableReference(), variable.getName()),
-                getVocabularyCodes(variable));
+    public EmbeddedVocabularyConstraint(Variable variable) {
+        super("Not found in category vocabulary of variable %s: %s", getVocabularyCodes(variable));
     }
 
     private static final Set<String> getVocabularyCodes(Variable variable) {
@@ -24,4 +22,5 @@ public class EmbeddedVocabularyConstraint extends VocabularyConstraint {
         }
         return result;
     }
+
 }

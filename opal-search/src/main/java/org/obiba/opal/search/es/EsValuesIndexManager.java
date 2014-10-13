@@ -139,7 +139,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
           collectorTask.info("Table successfully indexed");
 
       } catch (RuntimeException ex) {
-          collectorTask.error("Failure indexing table: %s", ex.toString());
+          collectorTask.error("Failure indexing table: %s", ex.getMessage());
           throw ex;
       } finally {
           //making sure messages are kept
@@ -289,12 +289,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
                   continue; //variable not validated: ignore
               }
 
-              Value value = values[i];
-              if (!validationTask.isValid(var, value)) {
-                  //abort indexing on 1st validation failure
-                  String msg = String.format("Validation failed: variable %s, value %s", var.getName(), value.toString());
-                  throw new RuntimeException(msg);
-              }
+              validationTask.validate(var, values[i]);
           }
 
           delegate.onValues(entity, variables, values);

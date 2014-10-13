@@ -13,6 +13,7 @@ public enum ConstraintType {
     EMBEDDED_VOCABULARY(null),
     MIN_VALUE("min_value"),
     MAX_VALUE("max_value"),
+    PAST_DATE("past_date"),
     ;
 
     private final String attribute;

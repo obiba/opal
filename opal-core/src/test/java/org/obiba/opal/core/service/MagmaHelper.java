@@ -4,17 +4,15 @@ import java.io.File;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 import org.easymock.EasyMock;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.Value;
-import org.obiba.magma.ValueSet;
-import org.obiba.magma.Variable;
+import org.obiba.magma.*;
 import org.obiba.magma.support.StaticDatasource;
 import org.obiba.magma.support.StaticValueTable;
-import org.obiba.magma.type.TextType;
+import org.obiba.magma.type.*;
 import org.obiba.opal.core.service.validation.ConstraintType;
 
 public class MagmaHelper {
@@ -86,6 +84,26 @@ public class MagmaHelper {
     	
     	
     	return result;
+    }
+
+    public static Value valueOf(int value) {
+        return IntegerType.get().valueOf(value);
+    }
+
+    public static Value valueOf(double value) {
+        return DecimalType.get().valueOf(value);
+    }
+
+    public static Value nowAsDate(long delta) {
+        return DateTimeType.get().valueOf(nowAsJavaDate(delta));
+    }
+
+    public static Value nowAsMagmaDate(long delta) {
+        return DateTimeType.get().valueOf(new MagmaDate(nowAsJavaDate(delta)));
+    }
+
+    private static Date nowAsJavaDate(long delta) {
+        return new Date(System.currentTimeMillis() + delta);
     }
 
 }

@@ -9,10 +9,8 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.opal.core.support.MessageLogger;
 
-import java.util.Collections;
-import java.util.HashMap;
+import javax.validation.ValidationException;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -41,12 +39,7 @@ public interface ValidationService {
      */
     public class ValidationResult {
 
-        private final Map<String, Set<String>> ruleMap = new HashMap<>();
         private final SetMultimap<List<String>, Value> failureMap = HashMultimap.<List<String>, Value>create();
-
-        public void setRules(String variable, Set<String> rules) {
-            ruleMap.put(variable, Collections.unmodifiableSet(rules));
-        }
 
         /**
          * Adds a validation failure to this.
@@ -57,14 +50,14 @@ public interface ValidationService {
         public void addFailure(String variable, String rule, Value value) {
             failureMap.put(ImmutableList.of(variable, rule), value);
         }
-        
+
         public boolean hasFailures() {
-        	return failureMap.size() > 0;
+            return failureMap.size() > 0;
         }
 
         /**
          * Gets all the values that failed the given variable and rule_type.
-         * 
+         *
          * @param variable
          * @param rule rule type
          * @return
@@ -72,7 +65,7 @@ public interface ValidationService {
         public Set<Value> getFailedValues(String variable, String rule) {
             return ImmutableSet.copyOf(failureMap.get(ImmutableList.of(variable, rule)));
         }
-        
+
         /**
          * @return list of pairs variable/rule_type that have at least one failure
          */
@@ -80,13 +73,6 @@ public interface ValidationService {
             return ImmutableSet.copyOf(failureMap.keySet());
         }
 
-
-        /**
-         * @return the map of all variables with some validation enabled to a set of validation rules
-         */
-        public Map<String, Set<String>> getVariableRules() {
-            return ruleMap;
-        }
     }
 
     /**
@@ -100,11 +86,12 @@ public interface ValidationService {
         List<String> getVariableNames();
 
         /**
+         * Validates the given value for variable.
          * @param variable
          * @param value
-         * @return false if variable has validation enabled and some rule failed for given value, true otherwise
+         * @throws ValidationException if the given value is not valid
          */
-        boolean isValid(Variable variable, Value value);
+        void validate(Variable variable, Value value) throws ValidationException;
 
         /**
          * Validates the whole table data, collecting and returning the results
@@ -112,5 +99,5 @@ public interface ValidationService {
          */
         ValidationResult validate();
     }
-    
+
 }
