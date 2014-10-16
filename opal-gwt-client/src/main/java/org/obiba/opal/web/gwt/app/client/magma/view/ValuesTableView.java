@@ -12,6 +12,9 @@ package org.obiba.opal.web.gwt.app.client.magma.view;
 import java.util.AbstractList;
 import java.util.List;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.google.gwt.event.dom.client.*;
+import com.google.gwt.uibinder.client.UiHandler;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
@@ -50,11 +53,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -856,4 +854,11 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
       }
     }
   }
+
+
+    @UiHandler("validate")
+    public void onValidate(ClickEvent event) {
+        getUiHandlers().onValidate();
+    }
+
 }

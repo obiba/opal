@@ -91,6 +91,8 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   private static final int PERMISSIONS_TAB_INDEX = 3;
 
+  private static final int VALIDATION_TAB_INDEX = 4;
+
   @UiField
   Label name;
 
@@ -704,7 +706,12 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     return tabPanel.getSelectedTab() == VALUES_TAB_INDEX;
   }
 
-  @Override
+    @Override
+    public boolean isValidationTabSelected() {
+        return tabPanel.getSelectedTab() == VALIDATION_TAB_INDEX;
+    }
+
+    @Override
   public void setIndexStatusVisible(boolean b) {
     indexStatus.setVisible(b);
   }

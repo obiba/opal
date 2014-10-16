@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.server.rpc.RPC;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -39,9 +42,7 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.opal.OpalMap;
-import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
-import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
+import org.obiba.opal.web.model.client.opal.*;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 import org.obiba.opal.web.model.client.search.ValueSetsResultDto;
 import org.obiba.opal.web.model.client.search.VariableItemDto;
@@ -779,4 +780,70 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       getView().getSearchIdentifierGroup().setVisible(!isIndexed);
     }
   }
+
+    private ValidateCommandOptionsDto createValidateOptions() {
+        ValidateCommandOptionsDto dto = ValidateCommandOptionsDto.create();
+        dto.setProject(originalTable.getDatasourceName());
+        dto.setTable(originalTable.getName());
+        return dto;
+    }
+
+    @Override
+    public void onValidate() {
+        GWT.log("onValidate");
+        sendValidateCommandRequest();
+    }
+
+    private void sendValidateCommandRequest() {
+
+        String body = ValidateCommandOptionsDto.stringify(createValidateOptions());
+
+        GWT.log("body: " + body);
+        ResourceRequestBuilderFactory.<CommandStateDto>newBuilder().forResource(
+                UriBuilders.PROJECT_COMMANDS_VALIDATE.create().build(originalTable.getDatasourceName()))
+                .post()
+                .withResourceBody(body)
+                //.withCallback(new ValidateErrorCallback(), SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN, SC_NOT_FOUND, SC_SERVICE_UNAVAILABLE)//
+                .withCallback(Response.SC_CREATED, new ValidateJobCallBack()).send();
+    }
+
+    class ValidateJobCallBack implements ResponseCodeCallback {
+        @Override
+        public void onResponseCode(Request request, Response response) {
+            String location = response.getHeader("Location");
+            String jobId = location.substring(location.lastIndexOf('/') + 1);
+            handleValidationJob(Integer.valueOf(jobId));
+            //fireEvent(NotificationEvent.newBuilder().info("DataCopyProcessLaunched").args(jobId, destination).build());
+        }
+    }
+
+    private void handleValidationJob(final Integer jobId) {
+        GWT.log("Launched validation job " + jobId);
+        Timer timer = new Timer() {
+            @Override
+            public void run() {
+                sendValidationResultRequest(jobId);
+            }
+        };
+
+        //@todo have proper job termination polling, not a hack (fixed delay)
+        timer.schedule(10000);
+    }
+
+    private void sendValidationResultRequest(Integer jobId) {
+        ResourceRequestBuilderFactory.<ValidationResultDto>newBuilder().forResource(
+                UriBuilders.VALIDATION_RESULT.create().build(jobId.toString()))
+                .withCallback(new ValidationResultsCallBack()).get().send();
+    }
+
+    private class ValidationResultsCallBack implements ResourceCallback<ValidationResultDto> {
+        @Override
+        public void onResource(Response response, ValidationResultDto resource) {
+            GWT.log("Validation rules: " + resource.getRules());
+            GWT.log("Validation failures: " + resource.getFailures());
+        }
+    }
+
+
+
 }

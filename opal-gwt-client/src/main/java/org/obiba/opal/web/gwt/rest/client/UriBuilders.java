@@ -82,6 +82,13 @@ public enum UriBuilders {
     }
   },
 
+  PROJECT_COMMANDS_VALIDATE {
+    @Override
+    public UriBuilder create() {
+            return UriBuilder.create().segment("project", "{}", "commands", "_validate");
+        }
+  },
+
   PROJECT_PERMISSIONS_SUBJECTS {
     @Override
     public UriBuilder create() {
@@ -678,7 +685,17 @@ public enum UriBuilders {
       return UriBuilder.create().segment("datashield", "option");
 
     }
-  };
+  },
+
+  VALIDATION_RESULT {
+    @Override
+    public UriBuilder create() {
+        return UriBuilder.create().segment("validation", "result", "{}");
+    }
+  }
+
+
+  ;
 
   public abstract UriBuilder create();
 }

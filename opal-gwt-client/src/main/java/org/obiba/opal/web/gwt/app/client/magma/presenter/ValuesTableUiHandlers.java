@@ -15,4 +15,6 @@ import com.gwtplatform.mvp.client.UiHandlers;
 public interface ValuesTableUiHandlers extends UiHandlers {
 
   void onVariableFilter(String variableName);
+
+    void onValidate();
 }

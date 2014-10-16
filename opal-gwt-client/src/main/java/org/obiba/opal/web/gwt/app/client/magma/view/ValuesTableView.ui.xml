@@ -22,6 +22,14 @@
     </g:InlineLabel>
     <g:PopupPanel ui:field="navigationPopup" autoHideEnabled="true" styleName="gwt-MenuBarPopup"/>
 
+    <g:FlowPanel addStyleNames="pull-right">
+        <b:ButtonGroup>
+              <b:Button icon="DOWNLOAD_ALT" ui:field="validate" type="INFO">
+                  <ui:msg description="Validate label">Validate</ui:msg>
+              </b:Button>
+        </b:ButtonGroup>
+    </g:FlowPanel>
+
     <g:FlowPanel ui:field="searchPanel">
       <b:Well>
         <b:ControlGroup ui:field="searchIdentifierGroup" visible="false">

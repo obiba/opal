@@ -760,4 +760,9 @@ public class TableValidationPresenter extends PresenterWidget<TableValidationPre
       getView().getSearchIdentifierGroup().setVisible(!isIndexed);
     }
   }
+
+    @Override
+    public void onValidate() {
+
+    }
 }
