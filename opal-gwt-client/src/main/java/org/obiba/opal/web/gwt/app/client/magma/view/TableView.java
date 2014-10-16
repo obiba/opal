@@ -161,6 +161,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   Panel valuesPanel;
 
   @UiField
+  Panel validationPanel;
+
+    @UiField
   OpalSimplePager pager;
 
   @UiField
@@ -277,6 +280,8 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
       panel = permissionsPanel;
     } else if(slot == Slots.ContingencyTable) {
       panel = crossResultsPanel;
+    } else if (slot == Slots.Validation) {
+      panel = validationPanel;
     }
 
     if(panel != null) {

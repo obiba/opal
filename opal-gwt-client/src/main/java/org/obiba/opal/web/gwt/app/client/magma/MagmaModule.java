@@ -23,15 +23,7 @@ import org.obiba.opal.web.gwt.app.client.magma.datasource.view.FsDatasourceFormV
 import org.obiba.opal.web.gwt.app.client.magma.datasource.view.HibernateDatasourceFormView;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.view.JdbcDatasourceFormView;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.view.NullDatasourceFormView;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.AddVariablesModalPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityModalPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableVcsCommitHistoryPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.VcsCommitHistoryModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.*;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewPropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewWhereModalPresenter;
@@ -48,15 +40,7 @@ import org.obiba.opal.web.gwt.app.client.magma.variable.view.ContingencyTableVie
 import org.obiba.opal.web.gwt.app.client.magma.variable.view.VariableAttributeModalView;
 import org.obiba.opal.web.gwt.app.client.magma.variable.view.VariablePropertiesModalView;
 import org.obiba.opal.web.gwt.app.client.magma.variable.view.VariableTaxonomyModalView;
-import org.obiba.opal.web.gwt.app.client.magma.view.AddVariablesModalView;
-import org.obiba.opal.web.gwt.app.client.magma.view.DatasourceView;
-import org.obiba.opal.web.gwt.app.client.magma.view.EntityModalView;
-import org.obiba.opal.web.gwt.app.client.magma.view.MagmaView;
-import org.obiba.opal.web.gwt.app.client.magma.view.TableView;
-import org.obiba.opal.web.gwt.app.client.magma.view.ValuesTableView;
-import org.obiba.opal.web.gwt.app.client.magma.view.VariableVcsCommitHistoryView;
-import org.obiba.opal.web.gwt.app.client.magma.view.VariableView;
-import org.obiba.opal.web.gwt.app.client.magma.view.VcsCommitHistoryModalView;
+import org.obiba.opal.web.gwt.app.client.magma.view.*;
 
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
@@ -81,7 +65,9 @@ public class MagmaModule extends AbstractOpalModule {
     bindPresenterWidget(ContingencyTablePresenter.class, ContingencyTablePresenter.Display.class,
         ContingencyTableView.class);
     bindPresenterWidget(ValuesTablePresenter.class, ValuesTablePresenter.Display.class, ValuesTableView.class);
-    bindPresenterWidget(EntityModalPresenter.class, EntityModalPresenter.Display.class, EntityModalView.class);
+    bindPresenterWidget(TableValidationPresenter.class, TableValidationPresenter.Display.class, TableValidationView.class);
+
+      bindPresenterWidget(EntityModalPresenter.class, EntityModalPresenter.Display.class, EntityModalView.class);
     bindPresenterWidget(VariableVcsCommitHistoryPresenter.class, VariableVcsCommitHistoryPresenter.Display.class,
         VariableVcsCommitHistoryView.class);
     bindPresenterWidget(VcsCommitHistoryModalPresenter.class, VcsCommitHistoryModalPresenter.Display.class,

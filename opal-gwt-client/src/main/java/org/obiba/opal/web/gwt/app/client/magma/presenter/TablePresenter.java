@@ -117,6 +117,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final ValuesTablePresenter valuesTablePresenter;
 
+  private final TableValidationPresenter tableValidationPresenter;
+
   private final ModalProvider<IndexPresenter> indexPresenter;
 
   private final Provider<ContingencyTablePresenter> crossVariableProvider;
@@ -146,7 +148,9 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @SuppressWarnings({ "ConstructorWithTooManyParameters", "PMD.ExcessiveParameterList" })
   @Inject
   public TablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
-      ValuesTablePresenter valuesTablePresenter, Provider<ContingencyTablePresenter> crossVariableProvider,
+      ValuesTablePresenter valuesTablePresenter,
+      TableValidationPresenter tableValidationPresenter,
+      Provider<ContingencyTablePresenter> crossVariableProvider,
       Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, ModalProvider<IndexPresenter> indexPresenter,
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
       ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider,
@@ -162,6 +166,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     super(eventBus, display);
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
+    this.tableValidationPresenter = tableValidationPresenter;
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.translations = translations;
     this.translationMessages = translationMessages;
@@ -452,10 +457,12 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onShowValidation() {
-    //todo
+      //@TODO implement properly
+      tableValidationPresenter.setTable(table);
+      tableValidationPresenter.updateValuesDisplay(variableFilter);
   }
 
-    @Override
+  @Override
   public void onExportData() {
     DataExportPresenter export = dataExportModalProvider.get();
     Set<TableDto> tables = new HashSet<>();
@@ -713,7 +720,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     //TODO
   }
 
-    private final class VariableSortHandler implements ColumnSortEvent.Handler {
+  private final class VariableSortHandler implements ColumnSortEvent.Handler {
 
     @Override
     public void onColumnSort(ColumnSortEvent event) {
@@ -854,7 +861,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
 
     enum Slots {
-      Permissions, Values, ContingencyTable
+      Permissions, Values, ContingencyTable, Validation
     }
 
     void beforeRenderRows();
