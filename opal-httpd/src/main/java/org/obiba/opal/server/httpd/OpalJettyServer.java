@@ -45,6 +45,7 @@ import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.filter.DelegatingFilterProxy;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 
 import static javax.servlet.DispatcherType.ERROR;
@@ -87,16 +88,17 @@ public class OpalJettyServer {
     // OPAL-342: We will manually stop the Jetty server instead of relying its shutdown hook
     jettyServer.setStopAtShutdown(false);
 
-
-
     Properties properties = loadProperties();
     String httpPort = properties.getProperty("org.obiba.opal.http.port");
     String httpsPort = properties.getProperty("org.obiba.opal.https.port");
     String ajpPort = properties.getProperty("org.obiba.opal.ajp.port");
     int maxIdleTime = Integer.valueOf(properties.getProperty("org.obiba.opal.maxIdleTime", MAX_IDLE_TIME));
 
+    // OPAL-2687
+    String excludedProtocols = properties.getProperty("org.obiba.opal.ssl.excludedProtocols");
+
     configureHttpConnector(httpPort == null ? null : Integer.valueOf(httpPort), maxIdleTime);
-    configureSslConnector(httpsPort == null ? null : Integer.valueOf(httpsPort), maxIdleTime);
+    configureSslConnector(httpsPort == null ? null : Integer.valueOf(httpsPort), maxIdleTime, excludedProtocols);
     configureAjpConnector(ajpPort == null ? null : Integer.valueOf(ajpPort));
 
     // OPAL-2652
@@ -141,7 +143,7 @@ public class OpalJettyServer {
     jettyServer.addConnector(httpConnector);
   }
 
-  private void configureSslConnector(@Nullable Integer httpsPort, int maxIdleTime) {
+  private void configureSslConnector(@Nullable Integer httpsPort, int maxIdleTime, String excludedProtocols) {
     if(httpsPort == null || httpsPort <= 0) return;
 
     SslContextFactory jettySsl = new SslContextFactory() {
@@ -158,6 +160,12 @@ public class OpalJettyServer {
       public void checkKeyStore() {
       }
     };
+
+    if(!Strings.isNullOrEmpty(excludedProtocols)) {
+      String[] protocols = excludedProtocols.split("\\s*,\\s*");
+      if(protocols.length > 0) jettySsl.addExcludeProtocols(protocols);
+    }
+
     jettySsl.setWantClientAuth(true);
     jettySsl.setNeedClientAuth(false);
 
