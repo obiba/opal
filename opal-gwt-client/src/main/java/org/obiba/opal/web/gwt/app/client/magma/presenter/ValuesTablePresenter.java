@@ -584,6 +584,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     void setRowCount(int totalHits);
 
     ControlGroup getSearchIdentifierGroup();
+
+      void setValidationResult(ValidationResultDto dto);
   }
 
   public enum ViewMode {
@@ -827,7 +829,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         };
 
         //@todo have proper job termination polling, not a hack (fixed delay)
-        timer.schedule(10000);
+        timer.schedule(5000);
     }
 
     private void sendValidationResultRequest(Integer jobId) {
@@ -841,9 +843,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         public void onResource(Response response, ValidationResultDto resource) {
             GWT.log("Validation rules: " + resource.getRules());
             GWT.log("Validation failures: " + resource.getFailures());
+            getView().setValidationResult(resource);
         }
     }
-
-
 
 }

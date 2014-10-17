@@ -105,6 +105,10 @@
     </g:FlowPanel>
 
     <o:Table ui:field="valuesTable" addStyleNames="small-top-margin"/>
+
+    <g:HTMLPanel ui:field="validationResultsPanel">
+
+    </g:HTMLPanel>
   </g:FlowPanel>
 
 </ui:UiBinder>

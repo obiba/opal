@@ -9,12 +9,15 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
-import java.util.AbstractList;
-import java.util.List;
+import java.util.*;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.google.gwt.event.dom.client.*;
+import com.google.gwt.json.client.*;
+import com.google.gwt.regexp.shared.RegExp;
+import com.google.gwt.regexp.shared.SplitResult;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
@@ -65,20 +68,15 @@ import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.InlineLabel;
-import com.google.gwt.user.client.ui.MenuBar;
-import com.google.gwt.user.client.ui.MenuItem;
-import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.SuggestOracle;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.AbstractDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import org.obiba.opal.web.model.client.opal.ValidationResultDto;
+
+import javax.annotation.RegEx;
 
 @SuppressWarnings("OverlyCoupledClass")
 public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> implements ValuesTablePresenter.Display {
@@ -855,10 +853,155 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     }
   }
 
+    //@todo is there a better way than hardcoding the styles?
+    private static final String TABLE_TAG = "<TABLE class=\"table table-striped table-condensed table-bordered bottom-margin\">";
+
+    @UiField
+    HTMLPanel validationResultsPanel;
 
     @UiHandler("validate")
     public void onValidate(ClickEvent event) {
         getUiHandlers().onValidate();
+    }
+
+    @Override
+    public void setValidationResult(ValidationResultDto dto) {
+        validationResultsPanel.clear();
+        SafeHtml html = buildValidationResultsHtml(dto);
+        validationResultsPanel.getElement().setInnerSafeHtml(html);
+    }
+
+    private static final Map<String, Set<String>> getVariableRuleMap(JSONObject rules) {
+        List<String> vars = new ArrayList<>(rules.keySet());
+        Map<String, Set<String>> map = new LinkedHashMap<>();
+        for (String var: vars) {
+            JSONArray array = (JSONArray)rules.get(var);
+            Set<String> set = new LinkedHashSet<>();
+            for (int i=0; i<array.size(); i++) {
+                JSONString str = (JSONString)array.get(i);
+                set.add(str.stringValue());
+            }
+            map.put(var, set);
+        }
+        return map;
+    }
+
+    private static Set<String> flatten(Collection<Set<String>> sets) {
+        Set<String> result = new HashSet<>();
+        for (Set<String> set: sets) {
+            result.addAll(set);
+        }
+        return result;
+    }
+
+    private static Map<List<String>, List<String>> getVariableRuleFailedValuesMap(JSONObject failures) {
+        Map<List<String>, List<String>> result = new HashMap<>();
+
+        for (String key: failures.keySet()) {
+            //@todo improve the tokenizing code (use regex)
+            String str = key.replace("[","").replace("]", "").replace(",", " ");
+            String[] parts = str.split("\\s+");
+            List<String> pair = Arrays.asList(parts);
+            result.put(pair, toList((JSONArray) failures.get(key)));
+        }
+
+        return result;
+    }
+
+    private static List<String> toList(JSONArray array) {
+        List<String> result = new ArrayList<>();
+        for (int i=0; i<array.size(); i++) {
+            JSONString str = (JSONString)array.get(i);
+            result.add(str.stringValue());
+        }
+        return result;
+    }
+
+    private SafeHtml buildValidationResultsHtml(ValidationResultDto dto) {
+        JSONObject rules = (JSONObject)JSONParser.parseStrict(dto.getRules());
+        JSONObject failures = (JSONObject)JSONParser.parseStrict(dto.getFailures());
+
+        SafeHtmlBuilder builder = new SafeHtmlBuilder();
+
+        if (rules.size() > 0) {
+            Map<String, Set<String>> variableRuleMap = getVariableRuleMap(rules);
+            Map<List<String>, List<String>> failedValuesMap = getVariableRuleFailedValuesMap(failures);
+            builder.appendHtmlConstant("<h4>").appendEscaped("Summary").appendHtmlConstant("</h4>");
+            builder.append(buildValidationSummaryTable(variableRuleMap, failedValuesMap));
+            builder.appendHtmlConstant("<h4>").appendEscaped("Invalid values detail").appendHtmlConstant("</h4>");
+            addValidationFailureTable(builder, failedValuesMap);
+        } else {
+            builder.appendEscaped("No validation configured");
+        }
+        return builder.toSafeHtml();
+    }
+
+
+    private SafeHtml buildValidationSummaryTable(Map<String, Set<String>> variableRuleMap, Map<List<String>, List<String>> failedValuesMap) {
+        SafeHtmlBuilder builder = new SafeHtmlBuilder();
+        List<String> constraints = new ArrayList<>(flatten(variableRuleMap.values()));
+
+        builder.appendHtmlConstant(TABLE_TAG);
+        builder.appendHtmlConstant("<TR>");
+        builder.appendHtmlConstant("<TH>").appendEscaped("Variable").appendHtmlConstant("</TH>");
+
+        for (String constraint: constraints) {
+            builder.appendHtmlConstant("<TH>").appendEscaped(constraint).appendHtmlConstant("</TH>");
+        }
+
+        builder.appendHtmlConstant("</TR>");
+
+        for (String var: variableRuleMap.keySet()) {
+            builder.appendHtmlConstant("<TR>");
+
+            builder.appendHtmlConstant("<TD>").appendEscaped(var).appendHtmlConstant("</TD>");
+            Set<String> set = variableRuleMap.get(var);
+            for (String cons: constraints) {
+                String cell = "";
+                if (set.contains(cons)) {
+                    //constraint/variable is configured
+                    List<String> key = Arrays.asList(var, cons);
+                    cell = failedValuesMap.containsKey(key) ? "FAILED" : "OK";
+                }
+                builder.appendHtmlConstant("<TD>").appendEscaped(cell).appendHtmlConstant("</TD>");
+            }
+            builder.appendHtmlConstant("</TR>");
+        }
+
+        builder.appendHtmlConstant("</TABLE>");
+
+        return builder.toSafeHtml();
+    }
+
+    private void addValidationFailureTable(SafeHtmlBuilder builder, Map<List<String>, List<String>> failedValuesMap) {
+        builder.appendHtmlConstant(TABLE_TAG);
+        builder.appendHtmlConstant("<TR>");
+        builder.appendHtmlConstant("<TH>").appendEscaped("Variable").appendHtmlConstant("</TH>");
+        builder.appendHtmlConstant("<TH>").appendEscaped("Constraint").appendHtmlConstant("</TH>");
+        builder.appendHtmlConstant("<TH>").appendEscaped("Values").appendHtmlConstant("</TH>");
+        builder.appendHtmlConstant("</TR>");
+
+        for (List<String> key: failedValuesMap.keySet()) {
+
+            builder.appendHtmlConstant("<TR>");
+            builder.appendHtmlConstant("<TD>").appendEscaped(key.get(0)).appendHtmlConstant("</TD>");
+            builder.appendHtmlConstant("<TD>").appendEscaped(key.get(1)).appendHtmlConstant("</TD>");
+            builder.appendHtmlConstant("<TD>");
+            List<String> values = failedValuesMap.get(key);
+            for (String value: values) {
+                builder.appendEscaped(value).appendHtmlConstant("</BR>");
+            }
+            builder.appendHtmlConstant("</TD>");
+            builder.appendHtmlConstant("</TR>");
+        }
+
+        builder.appendHtmlConstant("</TABLE>");
+    }
+
+
+    private SafeHtml buildValidationFailureTable(String variable, String constraint, List<String> values) {
+        SafeHtmlBuilder builder = new SafeHtmlBuilder();
+        return builder.toSafeHtml();
     }
 
 }
