@@ -16,11 +16,14 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.service.SubjectProfileService;
+import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.security.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType.USER;
 
 @Component
 @Scope("request")
@@ -30,6 +33,9 @@ public class SubjectProfileResource {
   @PathParam("principal")
   private String principal;
 
+  @Autowired
+  private SubjectAclService subjectAclService;
+  
   @Autowired
   private SubjectProfileService subjectProfileService;
 
@@ -44,6 +50,7 @@ public class SubjectProfileResource {
   @DELETE
   public Response delete() {
     subjectProfileService.deleteProfile(principal);
+    subjectAclService.deleteSubjectPermissions(USER.subjectFor(principal));
     return Response.ok().build();
   }
 
