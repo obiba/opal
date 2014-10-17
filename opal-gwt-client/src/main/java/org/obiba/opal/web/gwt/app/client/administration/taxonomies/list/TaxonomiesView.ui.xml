@@ -31,7 +31,7 @@
             <!--<ui:msg description="Add Taxonomy File label">Add/update taxonomy from file...</ui:msg>-->
           <!--</b:NavLink>-->
           <b:NavLink ui:field="importDefault">
-            <ui:msg description="Add Builtin Taxonomies label">Add/update built-in taxonomies</ui:msg>
+            <ui:msg description="Add Builtin Taxonomies label">Add/update core taxonomies</ui:msg>
           </b:NavLink>
         </b:DropdownButton>
       </b:Column>

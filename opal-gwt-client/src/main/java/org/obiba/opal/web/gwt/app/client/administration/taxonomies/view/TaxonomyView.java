@@ -113,13 +113,7 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
     table.addColumn(new TextColumn<VocabularyDto>() {
       @Override
       public String getValue(VocabularyDto object) {
-        if(object.getTermsCount() == 0) return "";
-        StringBuilder text = new StringBuilder();
-        for(int i = 0; i < object.getTermsCount(); i++) {
-          if(i > 0) text.append(", ");
-          text.append(object.getTerms(i).getName());
-        }
-        return text.toString();
+        return object.getTermsCount() + "";
       }
     }, translations.termsLabel());
 
