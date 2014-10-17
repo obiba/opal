@@ -109,6 +109,14 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
+  public void deleteSubjectPermissions(Subject subject) {
+    for(SubjectAcl acl : find(subject)) {
+      delete(acl);
+    }
+    notifyListeners(subject);
+  }
+
+  @Override
   public void deleteSubjectPermissions(String domain, String node, Subject subject) {
     for(SubjectAcl acl : find(domain, node, subject)) {
       delete(acl);
@@ -218,24 +226,24 @@ public class DefaultSubjectAclService implements SubjectAclService {
             domain, type);
   }
 
-  private Iterable<SubjectAcl> find(String domain, String node, Subject subject) {
+  private Iterable<SubjectAcl> find(@NotNull String domain, @NotNull String node, @NotNull Subject subject) {
     return orientDbService.list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() +
         " where domain = ? and node = ? and principal = ? and type = ?", domain, node, subject.getPrincipal(),
         subject.getType());
   }
 
-  private Iterable<SubjectAcl> findLike(String domain, String node, Subject subject) {
+  private Iterable<SubjectAcl> findLike(@NotNull String domain, @NotNull String node, @NotNull Subject subject) {
     return orientDbService.list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() +
         " where domain = ? and node like ? and principal = ? and type = ?", domain, node + "%", subject.getPrincipal(),
         subject.getType());
   }
 
-  private Iterable<SubjectAcl> find(String domain, String node) {
+  private Iterable<SubjectAcl> find(@NotNull String domain, @NotNull String node) {
     return orientDbService.list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() +
         " where domain = ? and node = ?", domain, node);
   }
 
-  private Iterable<SubjectAcl> findLike(String domain, String node) {
+  private Iterable<SubjectAcl> findLike(@NotNull String domain, @NotNull String node) {
     return orientDbService.list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() +
         " where domain = ? and node like ?", domain, node + "%");
   }

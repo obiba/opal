@@ -187,7 +187,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
           keyStore.importCertificate(alias, new ByteArrayInputStream(subjectCredentials.getCertificate()));
         }
         // OPAL-2688
-        if (!newSubject) {
+        if(!newSubject) {
           subjectCredentials.setCertificateAlias(existing.getCertificateAlias());
         }
         break;
@@ -312,14 +312,14 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     orientDbService.delete(subjectCredentials);
     if(!toSave.isEmpty()) orientDbService.save(toSave);
     // Delete subjectCredentials's permissions
-    subjectAclService.deleteSubjectPermissions(OPAL_DOMAIN, null, USER.subjectFor(subjectCredentials.getName()));
+    subjectAclService.deleteSubjectPermissions(USER.subjectFor(subjectCredentials.getName()));
     subjectProfileService.deleteProfile(subjectCredentials.getName());
 
     if(subjectCredentials.getAuthenticationType() == SubjectCredentials.AuthenticationType.CERTIFICATE) {
       OpalKeyStore keyStore = credentialsKeyStoreService.getKeyStore();
       String alias = subjectCredentials.getCertificateAlias();
       // OPAL-2688
-      if (!Strings.isNullOrEmpty(alias)) {
+      if(!Strings.isNullOrEmpty(alias)) {
         keyStore.deleteKey(alias);
         credentialsKeyStoreService.saveKeyStore(keyStore);
       }
@@ -354,8 +354,8 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     orientDbService.delete(group);
     if(!toSave.isEmpty()) orientDbService.save(toSave);
     // Delete group's permissions
-    subjectAclService.deleteSubjectPermissions(OPAL_DOMAIN, null,
-        SubjectType.valueOf(SubjectType.GROUP.name()).subjectFor(group.getName()));
+    subjectAclService
+        .deleteSubjectPermissions(SubjectType.valueOf(SubjectType.GROUP.name()).subjectFor(group.getName()));
   }
 
 }
