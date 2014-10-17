@@ -10,6 +10,8 @@
   <import resource="spring/opal-core/tx.xml"/>
   <import resource="spring/opal-core/version.xml"/>
 
+  <bean id="opalRuntime" class="org.obiba.opal.core.upgrade.support.OpalRuntimeMock"/>
+  
   <bean id="applicationContextProvider" class="org.obiba.opal.core.service.ApplicationContextProvider"/>
 
   <bean id="configDataSource" class="org.obiba.opal.core.cfg.ConfigDataSourceFactoryBean"/>
@@ -37,6 +39,16 @@
   <bean id="upgradeOpalConfigurationService" class="org.obiba.opal.core.cfg.DefaultOpalConfigurationService"/>
 
   <bean id="opalVersionModifier" class="org.obiba.opal.core.upgrade.support.OpalVersionModifier"/>
+
+  <bean id="passwordCallbackHandler" class="org.obiba.opal.core.crypt.OpalSecretKeyPasswordCallbackHandler"/>
+
+  <bean id="subjectAclService" class="org.obiba.opal.core.service.security.DefaultSubjectAclService"/>
+
+  <bean id="subjectProfileService" class="org.obiba.opal.core.service.SubjectProfileServiceImpl"/>
+  
+  <bean id="subjectCredentialsService" class="org.obiba.opal.core.service.security.SubjectCredentialsServiceImpl"/>
+
+  <bean id="credentialsKeyStoreService" class="org.obiba.opal.core.service.security.CredentialsKeyStoreServiceImpl"/>
 
   <bean id="upgradeManager" class="org.obiba.runtime.upgrade.support.DefaultUpgradeManager">
     <property name="currentVersionProvider" ref="opalVersionModifier"/>
@@ -100,11 +112,19 @@
           <property name="appliesTo" value="2.0.2"/>
         </bean>
 
+        <!-- 2.2.3 / MongoDB datasource schema update -->
         <bean class="org.obiba.opal.core.upgrade.v2_2_x.MongoDBDatasourceUpgradeStep">
           <property name="description" value="Add datasource name field in datasource collection"/>
           <property name="appliesTo" value="2.2.3"/>
         </bean>
 
+        <!-- 2.2.13 / Restore missing subject credentials certificate alias in OrientDB -->
+        <bean class="org.obiba.opal.core.upgrade.v2_2_x.SubjectCredentialsCertificateAliasUpgradeStep">
+          <property name="description" value="Restore missing subject credentials certificate alias"/>
+          <property name="appliesTo" value="2.2.13"/>
+        </bean>
+
+        <!-- 2.3.0 / Variable weight property added to SQL schema -->
         <bean class="org.obiba.opal.core.upgrade.v2_3_x.database.VariableTableUpgradeStep">
           <property name="description" value="Add index column to variable tables"/>
           <property name="appliesTo" value="2.3.0"/>

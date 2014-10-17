@@ -34,12 +34,10 @@ import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
 import org.obiba.opal.core.service.OrientDbService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import static org.springframework.util.Assert.hasText;
 import static org.springframework.util.Assert.notNull;
 
-@Component
 public abstract class AbstractKeyStoreService {
 
   @NotNull
