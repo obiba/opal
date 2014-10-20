@@ -673,6 +673,11 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   }
 
   @Override
+  public HasAuthorization getValidationAuthorizer() {
+        return new TabPanelAuthorizer(tabPanel, VALIDATION_TAB_INDEX);
+    }
+
+  @Override
   public HasAuthorization getTableIndexStatusAuthorizer() {
     return new UIObjectAuthorizer(indexStatus);
   }

@@ -9,29 +9,47 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
-import java.util.*;
-
-import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.ControlGroup;
+import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.Typeahead;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.gwt.cell.client.*;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.*;
-import com.google.gwt.json.client.*;
-import com.google.gwt.regexp.shared.RegExp;
-import com.google.gwt.regexp.shared.SplitResult;
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONString;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.text.shared.SafeHtmlRenderer;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.Header;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.*;
+import com.google.gwt.view.client.AbstractDataProvider;
+import com.google.gwt.view.client.HasData;
+import com.google.gwt.view.client.Range;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter.DataFetcher;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter.EntitySelectionHandler;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTableUiHandlers;
-import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
-import org.obiba.opal.web.gwt.app.client.ui.CriterionPanel;
-import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
-import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
-import org.obiba.opal.web.gwt.app.client.ui.Table;
-import org.obiba.opal.web.gwt.app.client.ui.TableVariableSuggestOracle;
-import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
-import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
+import org.obiba.opal.web.gwt.app.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.IconActionCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.IconActionCell.Delegate;
@@ -41,42 +59,9 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
-
-import com.github.gwtbootstrap.client.ui.ControlGroup;
-import com.github.gwtbootstrap.client.ui.TextBox;
-import com.github.gwtbootstrap.client.ui.Typeahead;
-import com.github.gwtbootstrap.client.ui.constants.IconType;
-import com.google.gwt.cell.client.AbstractCell;
-import com.google.gwt.cell.client.AbstractSafeHtmlCell;
-import com.google.gwt.cell.client.ClickableTextCell;
-import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.cell.client.TextCell;
-import com.google.gwt.cell.client.ValueUpdater;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.dom.client.NativeEvent;
-import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.text.shared.SafeHtmlRenderer;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.Header;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.Timer;
-import com.google.gwt.view.client.AbstractDataProvider;
-import com.google.gwt.view.client.HasData;
-import com.google.gwt.view.client.Range;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.model.client.opal.ValidationResultDto;
 
-import javax.annotation.RegEx;
+import java.util.*;
 
 @SuppressWarnings("OverlyCoupledClass")
 public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> implements ValuesTablePresenter.Display {
@@ -240,12 +225,20 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   public void clearTable() {
     valuesTable.setVisible(false);
     pager.setPagerVisible(false);
+    setValidationResult(null);
     setRefreshing(true);
   }
 
   @Override
   public void setTable(TableDto table) {
     valuesTable.setEmptyTableWidget(noValues);
+
+    if (!table.getName().equals(this.table.getName()) ||
+            !table.getDatasourceName().equals(this.table.getDatasourceName())) {
+        //new table: clear validation results
+        setValidationResult(null);
+    }
+
     this.table = table;
     valuesTable.setRowCount(table.getValueSetCount());
     valuesTable.setPageStart(0);
@@ -867,8 +860,11 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     @Override
     public void setValidationResult(ValidationResultDto dto) {
         validationResultsPanel.clear();
-        SafeHtml html = buildValidationResultsHtml(dto);
-        validationResultsPanel.getElement().setInnerSafeHtml(html);
+
+        if (dto != null) {
+            SafeHtml html = buildValidationResultsHtml(dto);
+            validationResultsPanel.getElement().setInnerSafeHtml(html);
+        }
     }
 
     private static final Map<String, Set<String>> getVariableRuleMap(JSONObject rules) {
@@ -928,7 +924,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
             Map<List<String>, List<String>> failedValuesMap = getVariableRuleFailedValuesMap(failures);
             builder.appendHtmlConstant("<h4>").appendEscaped("Summary").appendHtmlConstant("</h4>");
             builder.append(buildValidationSummaryTable(variableRuleMap, failedValuesMap));
-            builder.appendHtmlConstant("<h4>").appendEscaped("Invalid values detail").appendHtmlConstant("</h4>");
+            builder.appendHtmlConstant("<h4>").appendEscaped("Detail").appendHtmlConstant("</h4>");
             addValidationFailureTable(builder, failedValuesMap);
         } else {
             builder.appendEscaped("No validation configured");
@@ -996,12 +992,6 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
         }
 
         builder.appendHtmlConstant("</TABLE>");
-    }
-
-
-    private SafeHtml buildValidationFailureTable(String variable, String constraint, List<String> values) {
-        SafeHtmlBuilder builder = new SafeHtmlBuilder();
-        return builder.toSafeHtml();
     }
 
 }

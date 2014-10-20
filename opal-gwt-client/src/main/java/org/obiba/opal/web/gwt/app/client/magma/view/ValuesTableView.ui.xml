@@ -22,14 +22,6 @@
     </g:InlineLabel>
     <g:PopupPanel ui:field="navigationPopup" autoHideEnabled="true" styleName="gwt-MenuBarPopup"/>
 
-    <g:FlowPanel addStyleNames="pull-right">
-        <b:ButtonGroup>
-              <b:Button icon="DOWNLOAD_ALT" ui:field="validate" type="INFO">
-                  <ui:msg description="Validate label">Validate</ui:msg>
-              </b:Button>
-        </b:ButtonGroup>
-    </g:FlowPanel>
-
     <g:FlowPanel ui:field="searchPanel">
       <b:Well>
         <b:ControlGroup ui:field="searchIdentifierGroup" visible="false">
@@ -56,7 +48,7 @@
       </b:Well>
     </g:FlowPanel>
 
-    <g:FlowPanel addStyleNames="clearfix">
+      <g:FlowPanel addStyleNames="clearfix">
       <g:Image ui:field="refreshPending" url="image/loading.gif" addStyleNames="small-indent"/>
       <o:CollapsiblePanel ui:field="addPanel" addStyleNames="pull-left">
         <b:Row>
@@ -106,7 +98,15 @@
 
     <o:Table ui:field="valuesTable" addStyleNames="small-top-margin"/>
 
-    <g:HTMLPanel ui:field="validationResultsPanel">
+      <g:FlowPanel addStyleNames="pull-right">
+          <b:ButtonGroup>
+              <b:Button icon="DOWNLOAD_ALT" ui:field="validate" type="INFO">
+                  <ui:msg description="Validate label">Validate</ui:msg>
+              </b:Button>
+          </b:ButtonGroup>
+      </g:FlowPanel>
+
+      <g:HTMLPanel ui:field="validationResultsPanel">
 
     </g:HTMLPanel>
   </g:FlowPanel>

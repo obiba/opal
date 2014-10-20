@@ -149,8 +149,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   /**
    * When showing values from the VariablePresenter, we don't have to set/reset the filter
-   *
-   * @param select
    */
   public void updateValuesDisplay() {
     updateValuesDisplay("");
@@ -841,10 +839,16 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     private class ValidationResultsCallBack implements ResourceCallback<ValidationResultDto> {
         @Override
         public void onResource(Response response, ValidationResultDto resource) {
-            GWT.log("Validation rules: " + resource.getRules());
-            GWT.log("Validation failures: " + resource.getFailures());
-            getView().setValidationResult(resource);
+            handleValidationResult(resource);
         }
+    }
+
+    private void handleValidationResult(ValidationResultDto dto) {
+        if (!originalTable.getName().equals(dto.getTable()) ||
+                !originalTable.getDatasourceName().equals(dto.getDatasource())) {
+            return; //ignore results for other tables
+        }
+        getView().setValidationResult(dto);
     }
 
 }
