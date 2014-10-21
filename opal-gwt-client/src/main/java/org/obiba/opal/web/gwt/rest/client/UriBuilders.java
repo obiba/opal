@@ -663,6 +663,14 @@ public enum UriBuilders {
     }
   },
 
+  SHELL_COMMAND {
+        @Override
+        public UriBuilder create() {
+            return UriBuilder.create().segment("shell", "command", "{}");
+
+        }
+    },
+
   SHELL_COMMANDS {
     @Override
     public UriBuilder create() {

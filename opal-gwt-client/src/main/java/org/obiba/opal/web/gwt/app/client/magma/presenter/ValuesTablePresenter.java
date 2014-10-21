@@ -9,45 +9,6 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.server.rpc.RPC;
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
-import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
-import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
-import org.obiba.opal.web.gwt.app.client.support.VariableDtoNature;
-import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
-import org.obiba.opal.web.gwt.app.client.ui.CategoricalCriterionDropdown;
-import org.obiba.opal.web.gwt.app.client.ui.CriterionPanel;
-import org.obiba.opal.web.gwt.app.client.ui.DateTimeCriterionDropdown;
-import org.obiba.opal.web.gwt.app.client.ui.DefaultCriterionDropdown;
-import org.obiba.opal.web.gwt.app.client.ui.IdentifiersCriterionDropdown;
-import org.obiba.opal.web.gwt.app.client.ui.NumericalCriterionDropdown;
-import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.ValueSetsDto;
-import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.opal.*;
-import org.obiba.opal.web.model.client.search.QueryResultDto;
-import org.obiba.opal.web.model.client.search.ValueSetsResultDto;
-import org.obiba.opal.web.model.client.search.VariableItemDto;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
-
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
@@ -60,6 +21,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -67,16 +29,34 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
+import org.obiba.opal.web.gwt.app.client.support.VariableDtoNature;
+import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
+import org.obiba.opal.web.gwt.app.client.ui.*;
+import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.ValueSetsDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.opal.*;
+import org.obiba.opal.web.model.client.search.QueryResultDto;
+import org.obiba.opal.web.model.client.search.ValueSetsResultDto;
+import org.obiba.opal.web.model.client.search.VariableItemDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
-import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
-import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
-import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
-import static com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE;
-import static org.obiba.opal.web.gwt.app.client.support.VariableDtoNature.CATEGORICAL;
-import static org.obiba.opal.web.gwt.app.client.support.VariableDtoNature.CONTINUOUS;
-import static org.obiba.opal.web.gwt.app.client.support.VariableDtoNature.TEMPORAL;
-import static org.obiba.opal.web.gwt.app.client.support.VariableDtoNature.getNature;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import static com.google.gwt.http.client.Response.*;
+import static org.obiba.opal.web.gwt.app.client.support.VariableDtoNature.*;
 
 public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.Display>
     implements ValuesTableUiHandlers {
@@ -781,6 +761,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
   }
 
+    /******************* TO BE MOVED TO ValidationTablePresenter ********************/
+
     private ValidateCommandOptionsDto createValidateOptions() {
         ValidateCommandOptionsDto dto = ValidateCommandOptionsDto.create();
         dto.setProject(originalTable.getDatasourceName());
@@ -790,50 +772,69 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     @Override
     public void onValidate() {
-        GWT.log("onValidate");
         sendValidateCommandRequest();
+        getView().setValidationResult(null); //clear the view results
+    }
+
+    /**
+     * Handler of job validation dto.
+     * Based on the job status, this will trigger one of:
+     * -validation results retrieval (if finished with success)
+     * -retry job state retrieval (if in progress)
+     * -error message (omn any other status)
+     * @param jobDto validation
+     */
+    private void handleValidationJobState(CommandStateDto jobDto) {
+        String status = jobDto.getStatus();
+        final String jobId = String.valueOf(jobDto.getId());
+        if ("SUCCEEDED".equals(status)) {
+            //retrieve validation result
+            sendValidationResultRequest(jobId);
+        } else if ("IN_PROGRESS".equals(status)) {
+            //retry job state in 1000 millis
+            Timer timer = new Timer() {
+                @Override
+                public void run() {
+                    sendValidationJobStateRequest(jobId);
+                }
+            };
+            timer.schedule(1000);
+        } else {
+            //@todo show error
+        }
     }
 
     private void sendValidateCommandRequest() {
-
         String body = ValidateCommandOptionsDto.stringify(createValidateOptions());
-
-        GWT.log("body: " + body);
         ResourceRequestBuilderFactory.<CommandStateDto>newBuilder().forResource(
                 UriBuilders.PROJECT_COMMANDS_VALIDATE.create().build(originalTable.getDatasourceName()))
                 .post()
                 .withResourceBody(body)
                 //.withCallback(new ValidateErrorCallback(), SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN, SC_NOT_FOUND, SC_SERVICE_UNAVAILABLE)//
-                .withCallback(Response.SC_CREATED, new ValidateJobCallBack()).send();
+                .withCallback(Response.SC_CREATED, new ValidateJobCallBack())
+                .send();
     }
 
-    class ValidateJobCallBack implements ResponseCodeCallback {
-        @Override
-        public void onResponseCode(Request request, Response response) {
-            String location = response.getHeader("Location");
-            String jobId = location.substring(location.lastIndexOf('/') + 1);
-            handleValidationJob(Integer.valueOf(jobId));
-            //fireEvent(NotificationEvent.newBuilder().info("DataCopyProcessLaunched").args(jobId, destination).build());
-        }
+    private void sendValidationJobStateRequest(String jobId) {
+        ResourceRequestBuilderFactory.<CommandStateDto>newBuilder().forResource(
+                UriBuilders.SHELL_COMMAND.create().build(jobId))
+                .get()
+                .withCallback(new ValidateJobStateCallback())
+                .send();
     }
 
-    private void handleValidationJob(final Integer jobId) {
-        GWT.log("Launched validation job " + jobId);
-        Timer timer = new Timer() {
-            @Override
-            public void run() {
-                sendValidationResultRequest(jobId);
-            }
-        };
-
-        //@todo have proper job termination polling, not a hack (fixed delay)
-        timer.schedule(5000);
-    }
-
-    private void sendValidationResultRequest(Integer jobId) {
+    private void sendValidationResultRequest(String jobId) {
         ResourceRequestBuilderFactory.<ValidationResultDto>newBuilder().forResource(
-                UriBuilders.VALIDATION_RESULT.create().build(jobId.toString()))
+                UriBuilders.VALIDATION_RESULT.create().build(jobId))
                 .withCallback(new ValidationResultsCallBack()).get().send();
+    }
+
+    private void handleValidationResult(ValidationResultDto dto) {
+        if (!originalTable.getName().equals(dto.getTable()) ||
+                !originalTable.getDatasourceName().equals(dto.getDatasource())) {
+            return; //ignore results for other tables
+        }
+        getView().setValidationResult(dto);
     }
 
     private class ValidationResultsCallBack implements ResourceCallback<ValidationResultDto> {
@@ -843,12 +844,20 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         }
     }
 
-    private void handleValidationResult(ValidationResultDto dto) {
-        if (!originalTable.getName().equals(dto.getTable()) ||
-                !originalTable.getDatasourceName().equals(dto.getDatasource())) {
-            return; //ignore results for other tables
+    class ValidateJobCallBack implements ResponseCodeCallback {
+        @Override
+        public void onResponseCode(Request request, Response response) {
+            String location = response.getHeader("Location");
+            String jobId = location.substring(location.lastIndexOf('/') + 1);
+            sendValidationJobStateRequest(jobId);
         }
-        getView().setValidationResult(dto);
+    }
+
+    class ValidateJobStateCallback implements ResourceCallback<CommandStateDto> {
+        @Override
+        public void onResource(Response response, CommandStateDto resource) {
+            handleValidationJobState(resource);
+        }
     }
 
 }

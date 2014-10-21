@@ -225,7 +225,6 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   public void clearTable() {
     valuesTable.setVisible(false);
     pager.setPagerVisible(false);
-    setValidationResult(null);
     setRefreshing(true);
   }
 
@@ -846,6 +845,8 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     }
   }
 
+    /******************* TO BE MOVED TO ValidationTableView ********************/
+
     //@todo is there a better way than hardcoding the styles?
     private static final String TABLE_TAG = "<TABLE class=\"table table-striped table-condensed table-bordered bottom-margin\">";
 
@@ -859,11 +860,13 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
     @Override
     public void setValidationResult(ValidationResultDto dto) {
-        validationResultsPanel.clear();
 
         if (dto != null) {
             SafeHtml html = buildValidationResultsHtml(dto);
             validationResultsPanel.getElement().setInnerSafeHtml(html);
+        } else {
+            validationResultsPanel.clear();
+            validationResultsPanel.getElement().setInnerHTML("");
         }
     }
 
@@ -939,10 +942,10 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
         builder.appendHtmlConstant(TABLE_TAG);
         builder.appendHtmlConstant("<TR>");
-        builder.appendHtmlConstant("<TH>").appendEscaped("Variable").appendHtmlConstant("</TH>");
+        addTableHeader(builder, "Variable");
 
         for (String constraint: constraints) {
-            builder.appendHtmlConstant("<TH>").appendEscaped(constraint).appendHtmlConstant("</TH>");
+            addTableHeader(builder, constraint);
         }
 
         builder.appendHtmlConstant("</TR>");
@@ -989,9 +992,9 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     private void addValidationFailureTable(SafeHtmlBuilder builder, Map<List<String>, List<String>> failedValuesMap) {
         builder.appendHtmlConstant(TABLE_TAG);
         builder.appendHtmlConstant("<TR>");
-        builder.appendHtmlConstant("<TH>").appendEscaped("Variable").appendHtmlConstant("</TH>");
-        builder.appendHtmlConstant("<TH>").appendEscaped("Constraint").appendHtmlConstant("</TH>");
-        builder.appendHtmlConstant("<TH>").appendEscaped("Values").appendHtmlConstant("</TH>");
+        addTableHeader(builder, "Variable");
+        addTableHeader(builder, "Constraint");
+        addTableHeader(builder, "Values");
         builder.appendHtmlConstant("</TR>");
 
         for (List<String> key: failedValuesMap.keySet()) {
@@ -1009,6 +1012,10 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
         }
 
         builder.appendHtmlConstant("</TABLE>");
+    }
+
+    private static void addTableHeader(SafeHtmlBuilder builder, String header) {
+        builder.appendHtmlConstant("<TH>").appendEscaped(header).appendHtmlConstant("</TH>");
     }
 
 }

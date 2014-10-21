@@ -11,8 +11,7 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.opal.core.support.MessageLogger;
 
 import javax.validation.ValidationException;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Service for validation.
@@ -40,7 +39,12 @@ public interface ValidationService {
      */
     public class ValidationResult {
 
+        private final Map<String, Set<String>> ruleMap = new HashMap<>();
         private final SetMultimap<List<String>, Value> failureMap = HashMultimap.<List<String>, Value>create();
+
+        public void setRules(String variable, Set<String> rules) {
+            ruleMap.put(variable, Collections.unmodifiableSet(rules));
+        }
 
         /**
          * Adds a validation failure to this.
@@ -74,6 +78,13 @@ public interface ValidationService {
             return ImmutableSet.copyOf(failureMap.keySet());
         }
 
+
+        /**
+         * @return the map of all variables with some validation enabled to a set of validation rules
+         */
+        public Map<String, Set<String>> getVariableRules() {
+            return ruleMap;
+        }
     }
 
     /**
