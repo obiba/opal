@@ -922,7 +922,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
         if (rules.size() > 0) {
             Map<String, Set<String>> variableRuleMap = getVariableRuleMap(rules);
             Map<List<String>, List<String>> failedValuesMap = getVariableRuleFailedValuesMap(failures);
-            builder.appendHtmlConstant("<h4>").appendEscaped("Summary").appendHtmlConstant("</h4>");
+            builder.appendHtmlConstant("<h4>").appendEscaped("Overview").appendHtmlConstant("</h4>");
             builder.append(buildValidationSummaryTable(variableRuleMap, failedValuesMap));
             builder.appendHtmlConstant("<h4>").appendEscaped("Detail").appendHtmlConstant("</h4>");
             addValidationFailureTable(builder, failedValuesMap);
@@ -953,13 +953,17 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
             builder.appendHtmlConstant("<TD>").appendEscaped(var).appendHtmlConstant("</TD>");
             Set<String> set = variableRuleMap.get(var);
             for (String cons: constraints) {
-                String cell = "";
+                Boolean failure = null;
                 if (set.contains(cons)) {
                     //constraint/variable is configured
                     List<String> key = Arrays.asList(var, cons);
-                    cell = failedValuesMap.containsKey(key) ? "FAILED" : "OK";
+                    failure = failedValuesMap.containsKey(key);
                 }
-                builder.appendHtmlConstant("<TD>").appendEscaped(cell).appendHtmlConstant("</TD>");
+                builder.appendHtmlConstant("<TD>");
+                if (failure != null) {
+                    addValidationCell(builder, failure.booleanValue());
+                }
+                builder.appendHtmlConstant("</TD>");
             }
             builder.appendHtmlConstant("</TR>");
         }
@@ -967,6 +971,19 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
         builder.appendHtmlConstant("</TABLE>");
 
         return builder.toSafeHtml();
+    }
+
+    private void addValidationCell(SafeHtmlBuilder builder, boolean failure) {
+        String color = "green";
+        String text = "OK";
+        if (failure) {
+            color = "red";
+            text = "FAILURE";
+        }
+
+        builder.appendHtmlConstant("<font color=\"" + color + "\">");
+        builder.appendEscaped(text);
+        builder.appendHtmlConstant("</font>");
     }
 
     private void addValidationFailureTable(SafeHtmlBuilder builder, Map<List<String>, List<String>> failedValuesMap) {
