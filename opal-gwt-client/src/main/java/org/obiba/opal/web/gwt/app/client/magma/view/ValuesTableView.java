@@ -232,10 +232,10 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   public void setTable(TableDto table) {
     valuesTable.setEmptyTableWidget(noValues);
 
-    if (!table.getName().equals(this.table.getName()) ||
-            !table.getDatasourceName().equals(this.table.getDatasourceName())) {
-        //new table: clear validation results
-        setValidationResult(null);
+    if (needsValidationViewReset(table)) {
+      //only clear validation results if needed.
+      //this way we can keep the results if they are still on the same datasource/table
+      setValidationResult(null);
     }
 
     this.table = table;
@@ -1016,6 +1016,23 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
     private static void addTableHeader(SafeHtmlBuilder builder, String header) {
         builder.appendHtmlConstant("<TH>").appendEscaped(header).appendHtmlConstant("</TH>");
+    }
+
+    private boolean needsValidationViewReset(TableDto newTable) {
+
+        if (table == null || this.table == null) {
+            return true;
+        }
+
+        if (!table.getName().equals(this.table.getName())) {
+            return true; //different table
+        }
+
+        if (!table.getDatasourceName().equals(this.table.getDatasourceName())) {
+            return true; //different datasource
+        }
+
+        return false;
     }
 
 }

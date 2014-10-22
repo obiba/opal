@@ -116,7 +116,7 @@ public class ValidationServiceImpl implements ValidationService {
     }
 
     private static String getMessage(String entityId, String variable, String value, DataConstraint constraint) {
-        return String.format("Validation failed: Entity %s, Variable %s, Value %s: %s",
+        return String.format("Validation failed: EntityId %s, Variable %s, Value %s: %s",
                 entityId,
                 variable,
                 value,

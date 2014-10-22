@@ -18,4 +18,12 @@ public abstract class NumberConstraint implements DataConstraint {
         return type;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(type);
+        sb.append("[").append(constant).append("]");
+        return sb.toString();
+    }
+
+
 }

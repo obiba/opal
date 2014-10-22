@@ -38,4 +38,8 @@ public class VocabularyConstraint implements DataConstraint {
         return String.format("Not found in %s", source);
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s[%s]", getType(), source);
+    }
 }

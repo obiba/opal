@@ -41,4 +41,9 @@ public class PastDateConstraint implements DataConstraint {
     public String getMessage() {
         return String.format("Not past date");
     }
+
+    @Override
+    public String toString() {
+        return "PastDate";
+    }
 }
