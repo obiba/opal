@@ -563,7 +563,11 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     ControlGroup getSearchIdentifierGroup();
 
-      void setValidationResult(ValidationResultDto dto);
+    void setValidationResult(ValidationResultDto dto);
+
+    void clearErrorMessages();
+
+    void setErrorMessage(String title, String msg);
   }
 
   public enum ViewMode {
@@ -773,6 +777,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     @Override
     public void onValidate() {
         sendValidateCommandRequest();
+        getView().clearErrorMessages(); //clear error messages
         getView().setValidationResult(null); //clear the view results
     }
 
@@ -791,16 +796,16 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
             //retrieve validation result
             sendValidationResultRequest(jobId);
         } else if ("IN_PROGRESS".equals(status)) {
-            //retry job state in 1000 millis
             Timer timer = new Timer() {
                 @Override
                 public void run() {
                     sendValidationJobStateRequest(jobId);
                 }
             };
-            timer.schedule(1000);
+            timer.schedule(1000); //retry job state in 1000 millis
         } else {
-            //@todo show error
+            getView().clearErrorMessages();
+            getView().setErrorMessage("Unexpected validation job status", status);
         }
     }
 
@@ -810,7 +815,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
                 UriBuilders.PROJECT_COMMANDS_VALIDATE.create().build(originalTable.getDatasourceName()))
                 .post()
                 .withResourceBody(body)
-                //.withCallback(new ValidateErrorCallback(), SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN, SC_NOT_FOUND, SC_SERVICE_UNAVAILABLE)//
                 .withCallback(Response.SC_CREATED, new ValidateJobCallBack())
                 .send();
     }
@@ -844,7 +848,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         }
     }
 
-    class ValidateJobCallBack implements ResponseCodeCallback {
+    private class ValidateJobCallBack implements ResponseCodeCallback {
         @Override
         public void onResponseCode(Request request, Response response) {
             String location = response.getHeader("Location");
@@ -853,7 +857,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         }
     }
 
-    class ValidateJobStateCallback implements ResourceCallback<CommandStateDto> {
+    private class ValidateJobStateCallback implements ResourceCallback<CommandStateDto> {
         @Override
         public void onResource(Response response, CommandStateDto resource) {
             handleValidationJobState(resource);

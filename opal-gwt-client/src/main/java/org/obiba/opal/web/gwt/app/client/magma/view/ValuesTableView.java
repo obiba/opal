@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
+import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.Typeahead;
@@ -127,6 +128,15 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   @UiField
   ControlGroup searchIdentifierGroup;
 
+  @UiField
+  FlowPanel alertsPanel;
+
+  @UiField
+  Alert alert;
+
+  @UiField
+  Label errorMessage;
+
   private ValueSetsDataProvider dataProvider;
 
   private List<VariableDto> listVariable;
@@ -231,6 +241,8 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   @Override
   public void setTable(TableDto table) {
     valuesTable.setEmptyTableWidget(noValues);
+
+    clearErrorMessages();
 
     if (needsValidationViewReset(table)) {
       //only clear validation results if needed.
@@ -870,6 +882,18 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
         }
     }
 
+    @Override
+    public void clearErrorMessages() {
+        alertsPanel.clear();
+    }
+
+    @Override
+    public void setErrorMessage(String title, String message) {
+        alert.setHeading(title);
+        errorMessage.getElement().setInnerHTML(message);
+        alertsPanel.add(alert);
+    }
+
     private static final Map<String, Set<String>> getVariableRuleMap(JSONObject rules) {
         List<String> vars = new ArrayList<>(rules.keySet());
         Map<String, Set<String>> map = new LinkedHashMap<>();
@@ -1020,15 +1044,15 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
     private boolean needsValidationViewReset(TableDto newTable) {
 
-        if (table == null || this.table == null) {
+        if (newTable == null || this.table == null) {
             return true;
         }
 
-        if (!table.getName().equals(this.table.getName())) {
+        if (!newTable.getName().equals(this.table.getName())) {
             return true; //different table
         }
 
-        if (!table.getDatasourceName().equals(this.table.getDatasourceName())) {
+        if (!newTable.getDatasourceName().equals(this.table.getDatasourceName())) {
             return true; //different datasource
         }
 

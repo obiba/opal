@@ -43,9 +43,14 @@ public class ClientErrorDtoMessageBuilder {
 
   private String getClientErrorMessage() {
     String messageKey = clientErrorDto.getStatus();
-    assert translations.userMessageMap().containsKey(messageKey);
-    return TranslationsUtils
-        .replaceArguments(translations.userMessageMap().get(messageKey), clientErrorDto.getArgumentsArray());
+
+    //assert translations.userMessageMap().containsKey(messageKey);
+    if (translations.userMessageMap().containsKey(messageKey)) {
+        return TranslationsUtils
+                .replaceArguments(translations.userMessageMap().get(messageKey), clientErrorDto.getArgumentsArray());
+    } else {
+        return getDefaultMessage(); //this way we are able to get something out of the error
+    }
   }
 
   private String getDefaultMessage() {
