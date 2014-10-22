@@ -130,7 +130,7 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
 
   @UiHandler("createSql")
   public void onCreateSQL(ClickEvent event) {
-    getUiHandlers().createSql(true);
+    getUiHandlers().createSql(false);
   }
 
   @UiHandler("createMongo")
