@@ -29,7 +29,7 @@ case "$1" in
       if [ -z "$2" ] && [ "$RET" != "" ] ; then
         echo Updating administrator password.
         # hash the password and escape the possible '$/&' characters
-        adminpw=$(echo -n $RET | xargs java -jar /usr/share/opal-*/tools/lib/password-hasher-*-cli.jar | sed -e 's/\([\$\/\/]\)/\\\1/g' | cut -d ' ' -f 1)
+        adminpw=$(echo -n $RET | xargs java -jar /usr/share/opal-*/tools/lib/obiba-password-hasher-*-cli.jar | sed -e 's/\([\$\/\/]\)/\\\1/g' | cut -d ' ' -f 1)
         tfile=`mktemp`
         if [ ! -f "$tfile" ]; then
           return 1
