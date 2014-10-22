@@ -32,6 +32,7 @@ public class MagmaRuntimeExceptionMapper extends ErrorDtoExceptionMapper<MagmaRu
 
   @Override
   protected GeneratedMessage.ExtendableMessage<?> getErrorDto(MagmaRuntimeException exception) {
+    log.warn("Magma exception", exception);
     return ClientErrorDtos.getErrorMessage(getStatus(), "MagmaRuntimeException", exception.getMessage()).build();
   }
 
