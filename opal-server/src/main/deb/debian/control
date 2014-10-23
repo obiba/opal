@@ -9,7 +9,7 @@ Homepage: http://www.obiba.org
 Package: opal
 Architecture: all
 Pre-Depends: debconf, coreutils (>= 6.10)
-Depends: ${shlibs:Depends}, ${misc:Depends}, daemon, adduser, psmisc, java7-runtime
+Depends: ${shlibs:Depends}, ${misc:Depends}, daemon, adduser, psmisc, java7-runtime|oracle-java8-installer
 Suggests: mysql-server, rserver-admin
 Description: OBiBa Data integration Web application for biobanks
  Opal is OBiBa’s core database application for biobanks. Participant data, once
