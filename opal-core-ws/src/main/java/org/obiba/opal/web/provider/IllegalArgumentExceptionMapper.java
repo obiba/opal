@@ -14,6 +14,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.google.protobuf.GeneratedMessage;
@@ -24,6 +26,8 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 @Provider
 public class IllegalArgumentExceptionMapper extends ErrorDtoExceptionMapper<IllegalArgumentException> {
 
+  private static final Logger log = LoggerFactory.getLogger(IllegalArgumentExceptionMapper.class);
+
   @Override
   protected Response.Status getStatus() {
     return BAD_REQUEST;
@@ -31,6 +35,7 @@ public class IllegalArgumentExceptionMapper extends ErrorDtoExceptionMapper<Ille
 
   @Override
   protected GeneratedMessage.ExtendableMessage<?> getErrorDto(IllegalArgumentException exception) {
+    log.warn("Illegal argument exception", exception);
     return ClientErrorDtos.getErrorMessage(getStatus(), "IllegalArgument", exception);
   }
 
