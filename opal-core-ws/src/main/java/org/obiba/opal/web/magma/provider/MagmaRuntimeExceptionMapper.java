@@ -15,6 +15,8 @@ import javax.ws.rs.ext.Provider;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.google.protobuf.GeneratedMessage;
@@ -24,6 +26,8 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 @Component
 @Provider
 public class MagmaRuntimeExceptionMapper extends ErrorDtoExceptionMapper<MagmaRuntimeException> {
+
+  private static final Logger log = LoggerFactory.getLogger(MagmaRuntimeExceptionMapper.class);
 
   @Override
   protected Response.Status getStatus() {
