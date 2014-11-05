@@ -28,7 +28,7 @@ import org.rosuda.REngine.Rserve.RserveException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
+import com.google.common.base.Strings;
 
 /**
  * Reference to a R session.
@@ -205,6 +205,9 @@ public class OpalRSession implements RASyncOperationTemplate {
    */
   private void close(RConnection connection) {
     if(connection == null) return;
+    if (!Strings.isNullOrEmpty(connection.getLastError()) && !connection.getLastError().toLowerCase().equals("ok")) {
+      throw new RRuntimeException("Unexpected R server error: " + connection.getLastError());
+    }
     try {
       rSession = connection.detach();
     } catch(RserveException e) {
