@@ -12,7 +12,7 @@ package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
 import com.gwtplatform.mvp.client.UiHandlers;
 
-public interface ValuesTableUiHandlers extends UiHandlers {
+public interface TableValidationUiHandlers extends UiHandlers {
 
-  void onVariableFilter(String variableName);
+    void onValidate();
 }

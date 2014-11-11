@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
@@ -295,8 +296,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())) //
         .post().send();
 
-      //@todo associate validation with a different resource for auth?
-      // validation
+      // validation: uses same permissions as values tab
       ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/valueSets").get()
               .authorize(getView().getValidationAuthorizer()).send();
   }
@@ -365,7 +365,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
     if(getView().isValidationTabSelected()) {
       tableValidationPresenter.setTable(tableDto);
-      tableValidationPresenter.updateValuesDisplay("");
     }
 
     variableFilter = "";
@@ -458,9 +457,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onShowValidation() {
-      //@TODO implement properly
       tableValidationPresenter.setTable(table);
-      tableValidationPresenter.updateValuesDisplay(variableFilter);
   }
 
   @Override

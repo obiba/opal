@@ -97,24 +97,6 @@
     </g:FlowPanel>
 
     <o:Table ui:field="valuesTable" addStyleNames="small-top-margin"/>
-
-      <g:FlowPanel ui:field="alertsPanel">
-          <b:Alert close="true" type="ERROR" ui:field="alert">
-              <g:Label ui:field="errorMessage"/>
-          </b:Alert>
-      </g:FlowPanel>
-
-      <g:FlowPanel addStyleNames="pull-right">
-          <b:ButtonGroup>
-              <b:Button ui:field="validate" type="INFO">
-                  <ui:msg description="Validate label">Validate</ui:msg>
-              </b:Button>
-          </b:ButtonGroup>
-      </g:FlowPanel>
-
-      <g:HTMLPanel ui:field="validationResultsPanel">
-
-    </g:HTMLPanel>
   </g:FlowPanel>
 
 </ui:UiBinder>

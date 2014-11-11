@@ -9,48 +9,23 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
-import com.github.gwtbootstrap.client.ui.Alert;
-import com.github.gwtbootstrap.client.ui.ControlGroup;
-import com.github.gwtbootstrap.client.ui.TextBox;
-import com.github.gwtbootstrap.client.ui.Typeahead;
-import com.github.gwtbootstrap.client.ui.constants.IconType;
-import com.google.gwt.cell.client.*;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.dom.client.NativeEvent;
-import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.*;
-import com.google.gwt.json.client.JSONArray;
-import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONParser;
-import com.google.gwt.json.client.JSONString;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.text.shared.SafeHtmlRenderer;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.Header;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.ui.*;
-import com.google.gwt.view.client.AbstractDataProvider;
-import com.google.gwt.view.client.HasData;
-import com.google.gwt.view.client.Range;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import java.util.AbstractList;
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter.DataFetcher;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter.EntitySelectionHandler;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTableUiHandlers;
-import org.obiba.opal.web.gwt.app.client.ui.*;
+import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
+import org.obiba.opal.web.gwt.app.client.ui.CriterionPanel;
+import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
+import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.TableVariableSuggestOracle;
+import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
+import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.IconActionCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.IconActionCell.Delegate;
@@ -60,9 +35,52 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.opal.ValidationResultDto;
 
-import java.util.*;
+import com.github.gwtbootstrap.client.ui.ControlGroup;
+import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.Typeahead;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.cell.client.AbstractSafeHtmlCell;
+import com.google.gwt.cell.client.ClickableTextCell;
+import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.cell.client.TextCell;
+import com.google.gwt.cell.client.ValueUpdater;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.text.shared.SafeHtmlRenderer;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.Header;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.InlineLabel;
+import com.google.gwt.user.client.ui.MenuBar;
+import com.google.gwt.user.client.ui.MenuItem;
+import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.SuggestOracle;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.AbstractDataProvider;
+import com.google.gwt.view.client.HasData;
+import com.google.gwt.view.client.Range;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 @SuppressWarnings("OverlyCoupledClass")
 public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> implements ValuesTablePresenter.Display {
@@ -127,15 +145,6 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
   @UiField
   ControlGroup searchIdentifierGroup;
-
-  @UiField
-  FlowPanel alertsPanel;
-
-  @UiField
-  Alert alert;
-
-  @UiField
-  Label errorMessage;
 
   private ValueSetsDataProvider dataProvider;
 
@@ -241,15 +250,6 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   @Override
   public void setTable(TableDto table) {
     valuesTable.setEmptyTableWidget(noValues);
-
-    clearErrorMessages();
-
-    if (needsValidationViewReset(table)) {
-      //only clear validation results if needed.
-      //this way we can keep the results if they are still on the same datasource/table
-      setValidationResult(null);
-    }
-
     this.table = table;
     valuesTable.setRowCount(table.getValueSetCount());
     valuesTable.setPageStart(0);
@@ -856,207 +856,4 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
       }
     }
   }
-
-    /******************* TO BE MOVED TO ValidationTableView ********************/
-
-    //@todo is there a better way than hardcoding the styles?
-    private static final String TABLE_TAG = "<TABLE class=\"table table-striped table-condensed table-bordered bottom-margin\">";
-
-    @UiField
-    HTMLPanel validationResultsPanel;
-
-    @UiHandler("validate")
-    public void onValidate(ClickEvent event) {
-        getUiHandlers().onValidate();
-    }
-
-    @Override
-    public void setValidationResult(ValidationResultDto dto) {
-
-        if (dto != null) {
-            SafeHtml html = buildValidationResultsHtml(dto);
-            validationResultsPanel.getElement().setInnerSafeHtml(html);
-        } else {
-            validationResultsPanel.clear();
-            validationResultsPanel.getElement().setInnerHTML("");
-        }
-    }
-
-    @Override
-    public void clearErrorMessages() {
-        alertsPanel.clear();
-    }
-
-    @Override
-    public void setErrorMessage(String title, String message) {
-        alert.setHeading(title);
-        errorMessage.getElement().setInnerHTML(message);
-        alertsPanel.add(alert);
-    }
-
-    private static final Map<String, Set<String>> getVariableRuleMap(JSONObject rules) {
-        List<String> vars = new ArrayList<>(rules.keySet());
-        Map<String, Set<String>> map = new LinkedHashMap<>();
-        for (String var: vars) {
-            JSONArray array = (JSONArray)rules.get(var);
-            Set<String> set = new LinkedHashSet<>();
-            for (int i=0; i<array.size(); i++) {
-                JSONString str = (JSONString)array.get(i);
-                set.add(str.stringValue());
-            }
-            map.put(var, set);
-        }
-        return map;
-    }
-
-    private static Set<String> flatten(Collection<Set<String>> sets) {
-        Set<String> result = new HashSet<>();
-        for (Set<String> set: sets) {
-            result.addAll(set);
-        }
-        return result;
-    }
-
-    private static Map<List<String>, List<String>> getVariableRuleFailedValuesMap(JSONObject failures) {
-        Map<List<String>, List<String>> result = new HashMap<>();
-
-        for (String key: failures.keySet()) {
-            //@todo improve the tokenizing code (use regex)
-            String str = key.replace("[","").replace("]", "").replace(",", " ");
-            String[] parts = str.split("\\s+");
-            List<String> pair = Arrays.asList(parts);
-            result.put(pair, toList((JSONArray) failures.get(key)));
-        }
-
-        return result;
-    }
-
-    private static List<String> toList(JSONArray array) {
-        List<String> result = new ArrayList<>();
-        for (int i=0; i<array.size(); i++) {
-            JSONString str = (JSONString)array.get(i);
-            result.add(str.stringValue());
-        }
-        return result;
-    }
-
-    private SafeHtml buildValidationResultsHtml(ValidationResultDto dto) {
-        JSONObject rules = (JSONObject)JSONParser.parseStrict(dto.getRules());
-        JSONObject failures = (JSONObject)JSONParser.parseStrict(dto.getFailures());
-
-        SafeHtmlBuilder builder = new SafeHtmlBuilder();
-
-        if (rules.size() > 0) {
-            Map<String, Set<String>> variableRuleMap = getVariableRuleMap(rules);
-            Map<List<String>, List<String>> failedValuesMap = getVariableRuleFailedValuesMap(failures);
-            builder.appendHtmlConstant("<h4>").appendEscaped("Overview").appendHtmlConstant("</h4>");
-            builder.append(buildValidationSummaryTable(variableRuleMap, failedValuesMap));
-            builder.appendHtmlConstant("<h4>").appendEscaped("Detail").appendHtmlConstant("</h4>");
-            addValidationFailureTable(builder, failedValuesMap);
-        } else {
-            builder.appendEscaped("No validation configured");
-        }
-        return builder.toSafeHtml();
-    }
-
-
-    private SafeHtml buildValidationSummaryTable(Map<String, Set<String>> variableRuleMap, Map<List<String>, List<String>> failedValuesMap) {
-        SafeHtmlBuilder builder = new SafeHtmlBuilder();
-        List<String> constraints = new ArrayList<>(flatten(variableRuleMap.values()));
-
-        builder.appendHtmlConstant(TABLE_TAG);
-        builder.appendHtmlConstant("<TR>");
-        addTableHeader(builder, "Variable");
-
-        for (String constraint: constraints) {
-            addTableHeader(builder, constraint);
-        }
-
-        builder.appendHtmlConstant("</TR>");
-
-        for (String var: variableRuleMap.keySet()) {
-            builder.appendHtmlConstant("<TR>");
-
-            builder.appendHtmlConstant("<TD>").appendEscaped(var).appendHtmlConstant("</TD>");
-            Set<String> set = variableRuleMap.get(var);
-            for (String cons: constraints) {
-                Boolean failure = null;
-                if (set.contains(cons)) {
-                    //constraint/variable is configured
-                    List<String> key = Arrays.asList(var, cons);
-                    failure = failedValuesMap.containsKey(key);
-                }
-                builder.appendHtmlConstant("<TD>");
-                if (failure != null) {
-                    addValidationCell(builder, failure.booleanValue());
-                }
-                builder.appendHtmlConstant("</TD>");
-            }
-            builder.appendHtmlConstant("</TR>");
-        }
-
-        builder.appendHtmlConstant("</TABLE>");
-
-        return builder.toSafeHtml();
-    }
-
-    private void addValidationCell(SafeHtmlBuilder builder, boolean failure) {
-        String color = "green";
-        String text = "OK";
-        if (failure) {
-            color = "red";
-            text = "FAILURE";
-        }
-
-        builder.appendHtmlConstant("<font color=\"" + color + "\">");
-        builder.appendEscaped(text);
-        builder.appendHtmlConstant("</font>");
-    }
-
-    private void addValidationFailureTable(SafeHtmlBuilder builder, Map<List<String>, List<String>> failedValuesMap) {
-        builder.appendHtmlConstant(TABLE_TAG);
-        builder.appendHtmlConstant("<TR>");
-        addTableHeader(builder, "Variable");
-        addTableHeader(builder, "Constraint");
-        addTableHeader(builder, "Values");
-        builder.appendHtmlConstant("</TR>");
-
-        for (List<String> key: failedValuesMap.keySet()) {
-
-            builder.appendHtmlConstant("<TR>");
-            builder.appendHtmlConstant("<TD>").appendEscaped(key.get(0)).appendHtmlConstant("</TD>");
-            builder.appendHtmlConstant("<TD>").appendEscaped(key.get(1)).appendHtmlConstant("</TD>");
-            builder.appendHtmlConstant("<TD>");
-            List<String> values = failedValuesMap.get(key);
-            for (String value: values) {
-                builder.appendEscaped(value).appendHtmlConstant("</BR>");
-            }
-            builder.appendHtmlConstant("</TD>");
-            builder.appendHtmlConstant("</TR>");
-        }
-
-        builder.appendHtmlConstant("</TABLE>");
-    }
-
-    private static void addTableHeader(SafeHtmlBuilder builder, String header) {
-        builder.appendHtmlConstant("<TH>").appendEscaped(header).appendHtmlConstant("</TH>");
-    }
-
-    private boolean needsValidationViewReset(TableDto newTable) {
-
-        if (newTable == null || this.table == null) {
-            return true;
-        }
-
-        if (!newTable.getName().equals(this.table.getName())) {
-            return true; //different table
-        }
-
-        if (!newTable.getDatasourceName().equals(this.table.getDatasourceName())) {
-            return true; //different datasource
-        }
-
-        return false;
-    }
-
 }
