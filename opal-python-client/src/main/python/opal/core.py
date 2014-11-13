@@ -40,7 +40,6 @@ class OpalClient:
         if client.base_url.startswith('https:'):
             client.verify_peer(0)
             client.verify_host(0)
-            client.ssl_version(3)
         client.keys(cert, key)
         return client
 
