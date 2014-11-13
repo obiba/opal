@@ -46,7 +46,6 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.github.gwtbootstrap.client.ui.base.HasType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -385,6 +384,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     if(importConfig.isIdentifierSharedWithUnit()) {
       IdentifiersMappingConfigDto idConfig = IdentifiersMappingConfigDto.create();
       idConfig.setName(importConfig.getIdentifiersMapping());
+      idConfig.setAllowIdentifierGeneration(importConfig.isAllowIdentifierGeneration());
+      idConfig.setIgnoreUnknownIdentifier(importConfig.isIgnoreUnknownIdentifier());
       dto.setIdConfig(idConfig);
     }
     JsArrayString selectedTables = JavaScriptObject.createArray().cast();
