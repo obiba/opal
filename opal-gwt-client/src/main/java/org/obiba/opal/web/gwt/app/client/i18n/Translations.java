@@ -564,7 +564,7 @@ public interface Translations extends Constants {
       "NameHasInvalidCharacters",
       "Name contains invalid characters. Characters must be alphanumeric, space, hyphen or underscore.",
       "UnsupportedEncoding",
-      "An unsupported encoding other than Opal's current encoding '{0}' was detected. Please contact your administrator for further assistance.",
+      "An unsupported encoding other than Opal's current encoding '{0}' was detected. Please contact your administrator for further assistance.", //
       "SearchQueryIsInvalid", "Search query is invalid : {0}.",//
       "ClusterNameIsRequired", "Cluster name is required.",//
       "ShardsIsRequired", "Shards number is required.",//
@@ -575,7 +575,8 @@ public interface Translations extends Constants {
       "You cannot copy multiple tables within the same project. Copy each table individually or create a new project.",
 //
       "CannotCopyAllTablesWithinProject", "This action would be applied to all tables. You cannot copy multiple " +
-      "tables within the same project. Copy each table individually or create a new project."//
+      "tables within the same project. Copy each table individually or create a new project.",//
+      "IdentifierMappingFailed", "Identifiers mapping failed : {0}."
   })
   Map<String, String> userMessageMap();
 

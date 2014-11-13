@@ -31,7 +31,7 @@ def do_command(args):
         client = opal.core.OpalClient.build(opal.core.OpalClient.LoginInfo.parse(args))
         importer = opal.io.OpalImporter.build(client=client, destination=args.destination, tables=args.tables,
                                               incremental=args.incremental, limit=args.limit, identifiers=args.identifiers,
-                                              verbose=args.verbose)
+                                              policy=args.policy, verbose=args.verbose)
         # print result
         extension_factory = OpalExtensionFactory(characterSet=args.characterSet, path=args.path,
                                                  locale=args.locale, entityType=args.type)

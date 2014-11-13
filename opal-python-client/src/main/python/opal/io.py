@@ -16,6 +16,7 @@ def add_import_arguments(parser):
     parser.add_argument('--incremental', '-i', action='store_true', help='Incremental import (new and updated value sets)')
     parser.add_argument('--limit', '-li', required=False, type=int, help='Import limit (maximum number of value sets)')
     parser.add_argument('--identifiers', '-id', required=False, help='Name of the ID mapping')
+    parser.add_argument('--policy', '-po', required=False, help='ID mapping policy: required (each identifiers must be mapped prior importation, default), ignore (ignore unknown identifiers), generate (generate a system identifier for each unknown identifier)')
     parser.add_argument('--json', '-j', action='store_true', help='Pretty JSON formatting of the response')
 
 class OpalImporter:
@@ -28,13 +29,14 @@ class OpalImporter:
             raise Exception("ExtensionFactoryInterface.add() method must be implemented by a concrete class.")
 
     @classmethod
-    def build(cls, client, destination, tables=None, incremental=None, limit=None, identifiers=None, verbose=None):
+    def build(cls, client, destination, tables=None, incremental=None, limit=None, identifiers=None, policy=None, verbose=None):
         setattr(cls, 'client', client)
         setattr(cls, 'destination', destination)
         setattr(cls, 'tables', tables)
         setattr(cls, 'incremental', incremental)
         setattr(cls, 'limit', limit)
         setattr(cls, 'identifiers', identifiers)
+        setattr(cls, 'policy', policy)
         setattr(cls, 'verbose', verbose)
         return cls()
 
@@ -68,8 +70,19 @@ class OpalImporter:
 
         if self.identifiers:
             options.idConfig.name = self.identifiers
-            options.idConfig.allowIdentifierGeneration = False
-            options.idConfig.ignoreUnknownIdentifier = False
+            if self.policy:
+                if self.policy == 'ignore':
+                    options.idConfig.allowIdentifierGeneration = False
+                    options.idConfig.ignoreUnknownIdentifier = True
+                elif self.policy == 'generate':
+                    options.idConfig.allowIdentifierGeneration = True
+                    options.idConfig.ignoreUnknownIdentifier = False
+                else:
+                    options.idConfig.allowIdentifierGeneration = False
+                    options.idConfig.ignoreUnknownIdentifier = False
+            else:
+                options.idConfig.allowIdentifierGeneration = False
+                options.idConfig.ignoreUnknownIdentifier = False
 
         if self.verbose:
             print "** Import options:"
@@ -104,8 +117,19 @@ class OpalImporter:
             factory.batchConfig.limit = self.limit
         if self.identifiers:
             factory.idConfig.name = self.identifiers
-            factory.idConfig.allowIdentifierGeneration = False
-            factory.idConfig.ignoreUnknownIdentifier = False
+            if self.policy:
+                if self.policy == 'ignore':
+                    factory.idConfig.allowIdentifierGeneration = False
+                    factory.idConfig.ignoreUnknownIdentifier = True
+                elif self.policy == 'generate':
+                    factory.idConfig.allowIdentifierGeneration = True
+                    factory.idConfig.ignoreUnknownIdentifier = False
+                else:
+                    factory.idConfig.allowIdentifierGeneration = False
+                    factory.idConfig.ignoreUnknownIdentifier = False
+            else:
+                factory.idConfig.allowIdentifierGeneration = False
+                factory.idConfig.ignoreUnknownIdentifier = False
 
         extension_factory.add(factory)
 
