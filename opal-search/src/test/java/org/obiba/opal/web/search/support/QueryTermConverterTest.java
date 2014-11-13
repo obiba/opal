@@ -26,6 +26,7 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.type.DecimalType;
+import org.obiba.magma.type.PointType;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.search.ValueTableValuesIndex;
 import org.obiba.opal.search.ValuesIndexManager;
@@ -50,13 +51,13 @@ public class QueryTermConverterTest {
   }
 
   @Test
-  public void testConvert_ValidCategoricalQueryJson() throws Exception {
+  public void test_convert_ValidCategoricalQueryJson() throws Exception {
 
     String variableName = "LAST_MEAL_WHEN";
     IndexManagerHelper indexManagerHelper = createIndexManagerHelper("opal-data", "CIPreliminaryQuestionnaire",
         "opal-data-cipreliminaryquestionnaire", variableName, createCategoricalVariable(variableName));
 
-    QueryTermConverter converter = new QueryTermConverter(indexManagerHelper);
+    QueryTermConverter converter = new QueryTermConverter(indexManagerHelper, 10);
     Search.QueryTermsDto dtoQuery = createSimpleQueryDto(variableName);
 
     JSONObject jsonExpected = new JSONObject("{\"query\":{\"match_all\":{} }, \"size\":0, " + //
@@ -68,17 +69,35 @@ public class QueryTermConverterTest {
   }
 
   @Test
-  public void testConvert_ValidStatisticalQueryJson() throws Exception {
+  public void test_convert_ValidStatisticalQueryJson() throws Exception {
     String variableName = "RES_FIRST_HEIGHT";
     IndexManagerHelper indexManagerHelper = createIndexManagerHelper("opal-data", "StandingHeight",
         "opal-data-standingheight", variableName, createContinuousVariable(variableName));
 
-    QueryTermConverter converter = new QueryTermConverter(indexManagerHelper);
+    QueryTermConverter converter = new QueryTermConverter(indexManagerHelper, 10);
     Search.QueryTermsDto dtoQuery = createSimpleQueryDto(variableName);
 
     JSONObject jsonExpected = new JSONObject("{\"query\":{\"match_all\":{} }, \"size\":0, " + //
         "\"facets\":{\"0\":{\"statistical\":{\"field\":\"opal-data" + //
         "-standingheight-RES_FIRST_HEIGHT\"} } } }");
+
+    JSONObject jsonResult = converter.convert(dtoQuery);
+    assertThat(jsonResult).isNotNull();
+    JsonAssert.assertEquals(jsonExpected, jsonResult);
+  }
+
+  @Test
+  public void test_non_categorical_continuous_conversion_limit_one() throws JSONException {
+    String variableName = "NON_CATEGORICAL_CONTINUOUS";
+    IndexManagerHelper indexManagerHelper = createIndexManagerHelper("opal-data", "StandingHeight",
+        "opal-data-StandingHeight", variableName, createNonCategoricalContinuousVariable(variableName));
+
+    QueryTermConverter converter = new QueryTermConverter(indexManagerHelper, 1);
+    Search.QueryTermsDto dtoQuery = createSimpleQueryDto(variableName);
+
+    JSONObject jsonExpected = new JSONObject("{\"query\":{\"match_all\":{} }, \"size\":0, " + //
+        "\"facets\":{\"0\":{\"terms\":{\"field\":\"opal-data" + //
+        "-StandingHeight-NON_CATEGORICAL_CONTINUOUS\", \"size\": 1} } } }");
 
     JSONObject jsonResult = converter.convert(dtoQuery);
     assertThat(jsonResult).isNotNull();
@@ -114,6 +133,7 @@ public class QueryTermConverterTest {
     expect(mockTableIndex.getIndexName()).andReturn(indexName).anyTimes();
     expect(mockTableIndex.getFieldName("LAST_MEAL_WHEN")).andReturn(indexName + "-LAST_MEAL_WHEN").anyTimes();
     expect(mockTableIndex.getFieldName("RES_FIRST_HEIGHT")).andReturn(indexName + "-RES_FIRST_HEIGHT").anyTimes();
+    expect(mockTableIndex.getFieldName("NON_CATEGORICAL_CONTINUOUS")).andReturn(indexName + "-NON_CATEGORICAL_CONTINUOUS").anyTimes();
     replay(mockTableIndex);
 
     expect(mockTable.getVariable(variableName)).andReturn(variable).anyTimes();
@@ -124,6 +144,12 @@ public class QueryTermConverterTest {
     MagmaEngine.get().addDatasource(datasource);
 
     return indexManager;
+  }
+
+  private Variable createNonCategoricalContinuousVariable(String variableName) {
+    Variable.Builder builder = Variable.Builder.newVariable(variableName, PointType.get(), "dummy");
+
+    return builder.build();
   }
 
   private Variable createCategoricalVariable(String variableName) {
