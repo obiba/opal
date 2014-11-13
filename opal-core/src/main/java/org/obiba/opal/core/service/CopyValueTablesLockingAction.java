@@ -188,9 +188,9 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
       View privateView = identifierService.createPrivateView(identifiersMappingView.getName(), table,
           identifiersTableService.getSelectScript(table.getEntityType(), idMapping));
 
-      IdentifiersMappingView publicView = identifierService
-          .createPublicView(identifiersMappingView, allowIdentifierGeneration, ignoreUnknownIdentifier);
-      PrivateVariableEntityMap entityMap = publicView.getPrivateVariableEntityMap();
+      // Do not use arguments: allowIdentifierGeneration, ignoreUnknownIdentifier, as they are
+      // already contained in the provided view
+      PrivateVariableEntityMap entityMap = identifiersMappingView.getPrivateVariableEntityMap();
 
       // prepare for copying participant data
 
@@ -200,7 +200,7 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
             keysTableWriter);
         // Copy participant's non-identifiable variables and data
         DatasourceCopier datasourceCopier = newCopierForParticipants().withListener(keysListener).build();
-        datasourceCopier.copy(publicView, destination);
+        datasourceCopier.copy(identifiersMappingView, destination);
       }
     }
 
