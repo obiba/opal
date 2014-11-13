@@ -100,16 +100,15 @@ public class QueryTermConverter {
     jsonField.put("field", variableFieldName(variable));
 
     switch(indexManagerHelper.getVariableNature(variable)) {
-      case CATEGORICAL:
-        jsonFacet.put("terms", jsonField);
-        break;
 
       case CONTINUOUS:
         jsonFacet.put("statistical", jsonField);
         break;
 
+      case CATEGORICAL:
       default:
-        throw new UnsupportedOperationException("Variable nature not supported");
+        jsonFacet.put("terms", jsonField);
+        break;
     }
   }
 
