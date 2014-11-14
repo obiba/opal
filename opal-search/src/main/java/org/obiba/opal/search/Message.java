@@ -1,5 +1,7 @@
 package org.obiba.opal.search;
 
+import java.util.Date;
+
 /**
  *
  */
@@ -19,5 +21,11 @@ public class Message {
 
     public String getMessage() {
         return message;
+    }
+
+    @Override
+    public String toString() {
+        Date time = new Date(timestamp);
+        return String.format("%s: %s", time, message);
     }
 }

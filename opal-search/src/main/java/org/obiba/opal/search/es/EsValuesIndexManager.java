@@ -17,15 +17,13 @@ import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
-import org.obiba.magma.Value;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.Variable;
-import org.obiba.magma.VariableEntity;
+import org.obiba.magma.*;
 import org.obiba.magma.concurrent.ConcurrentValueTableReader;
 import org.obiba.magma.concurrent.ConcurrentValueTableReader.ConcurrentReaderCallback;
 import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.DateType;
 import org.obiba.opal.core.domain.VariableNature;
+import org.obiba.opal.core.service.NotificationService;
 import org.obiba.opal.core.service.ValidationService;
 import org.obiba.opal.core.service.VariableSummaryService;
 import org.obiba.opal.core.support.MessageLogger;
@@ -41,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +59,9 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
 
   @Autowired
   private ValidationService validationService;
+
+  @Autowired
+  private NotificationService notificationService;
 
   private MessageCollector messageCollector = new MessageCollector();
 
@@ -100,7 +102,32 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
     return esIndexName() + "-values";
   }
 
-  private class Indexer extends EsIndexer {
+    /**
+     * Checks if a notification is due for the indexing failure, and if so sends it.
+     * @param valueTable
+     * @param collectorTask
+     */
+  private void checkIndexFailureNotification(ValueTable valueTable, MessageCollector.Task collectorTask) {
+
+    if (notificationService.isNotificationEnabled()) {
+        String subject = String.format("Indexing failed for table %s", valueTable.getTableReference());
+        String text = getNotificationEmailText(collectorTask);
+
+        //@todo make from address configurable
+        notificationService.sendNotification(subject, text);
+    }
+  }
+
+  static String getNotificationEmailText(MessageCollector.Task collectorTask) {
+    StringBuilder sb = new StringBuilder();
+    for (Message msg: collectorTask.getErrorMessages()) {
+        sb.append(msg.toString());
+        sb.append("/n");
+    }
+    return sb.toString();
+  }
+
+    private class Indexer extends EsIndexer {
 
     private final EsValueTableValuesIndex index;
 
@@ -120,6 +147,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
         //if validation is enabled, decorate the values reader callback with a validating one
         callback = new ValidatingCallback(callback, validationTask);
       }
+      boolean success = false;
 
       try {
           ConcurrentValueTableReader.Builder builder =
@@ -137,6 +165,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
           collectorTask.info("Indexing table %s", valueTable.getTableReference());
           builder.build().read();
           collectorTask.info("Table successfully indexed");
+          success = true;
 
       } catch (RuntimeException ex) {
           collectorTask.error("Failure indexing table: %s", ex.getMessage());
@@ -144,6 +173,10 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
       } finally {
           //making sure messages are kept
           collectorTask.close();
+          if (!success) {
+              //checking if a failure notification is due
+              checkIndexFailureNotification(valueTable, collectorTask);
+          }
       }
     }
 

@@ -10,6 +10,9 @@ import java.util.*;
  */
 public class MessageCollector {
 
+    private static final String WARN_PREFIX = "WARN: ";
+    private static final String ERROR_PREFIX = "ERROR: ";
+
     private Map<String, List<Message>> map = new HashMap<>();
 
     public List<Message> getMessages(String tableRef) {
@@ -60,24 +63,35 @@ public class MessageCollector {
 
         @Override
         public void warn(String msgFormat, Object... args) {
-            add("WARN: " + msgFormat, args);
+            add(WARN_PREFIX + msgFormat, args);
         }
 
         @Override
         public void error(String msgFormat, Object... args) {
-            add("ERROR: " + msgFormat, args);
+            add(ERROR_PREFIX + msgFormat, args);
         }
 
         private void add(String msgFormat, Object... args) {
             list.add(new Message(System.currentTimeMillis(), String.format(msgFormat, args)));
         }
 
+
+        public List<Message> getErrorMessages() {
+            List<Message> result = new ArrayList<>();
+            for (Message msg: list) {
+                if (msg.getMessage().startsWith(ERROR_PREFIX)) {
+                    result.add(msg);
+                }
+            }
+            return result;
+        }
         /**
          * Closes this task, making sure the collected messages are kept.
          */
         public void close() {
             setMessages(ref, list); //replaces the messages
         }
+
     }
 
 }
