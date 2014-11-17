@@ -40,6 +40,8 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
 
   private static final Logger log = LoggerFactory.getLogger(EsSearchQueryExecutor.class);
 
+  private static final int NON_CATEGORICAL_TERMS_FACET_SIZE = 10;
+
   private final ElasticSearchProvider esProvider;
 
   public EsSearchQueryExecutor(@NotNull ElasticSearchProvider esProvider) {
@@ -136,7 +138,7 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
   }
 
   private String build(Search.QueryTermsDto dtoQueries, IndexManagerHelper indexManagerHelper) throws JSONException {
-    QueryTermConverter converter = new QueryTermConverter(indexManagerHelper);
+    QueryTermConverter converter = new QueryTermConverter(indexManagerHelper, NON_CATEGORICAL_TERMS_FACET_SIZE);
     JSONObject queryJSON = converter.convert(dtoQueries);
 
     return queryJSON.toString();
