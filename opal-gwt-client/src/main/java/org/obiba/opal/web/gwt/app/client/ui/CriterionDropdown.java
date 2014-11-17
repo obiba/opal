@@ -13,6 +13,7 @@ package org.obiba.opal.web.gwt.app.client.ui;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.gwt.user.client.Random;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
@@ -40,10 +41,14 @@ public abstract class CriterionDropdown extends DropdownButton {
 
   protected final ListItem radioControls = new ListItem();
 
+  private final String groupId;
+
   CriterionDropdown(VariableDto variableDto, @Nonnull String fieldName, @Nullable QueryResultDto termDto) {
     variable = variableDto;
     this.fieldName = fieldName.replace(' ', '+');
     queryResult = termDto;
+
+    groupId = String.valueOf(Random.nextInt(1000000)); //to be used in radio button names, to make they don't clash
 
     setSize(ButtonSize.SMALL);
     updateCriterionFilter(translations.criterionFiltersMap().get("all"));
@@ -110,7 +115,8 @@ public abstract class CriterionDropdown extends DropdownButton {
           .appendHtmlConstant("</span>");
     }
 
-    RadioButton radio = new RadioButton(fieldName + "-radio", builder.toSafeHtml());
+    //RadioButton radio = new RadioButton(fieldName + "-radio", builder.toSafeHtml());
+      RadioButton radio = new RadioButton(fieldName + "-radio-" + this.groupId, builder.toSafeHtml());
 
     radio.addClickHandler(new ClickHandler() {
       @Override
