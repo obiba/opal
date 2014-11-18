@@ -115,7 +115,6 @@ public abstract class CriterionDropdown extends DropdownButton {
           .appendHtmlConstant("</span>");
     }
 
-    //RadioButton radio = new RadioButton(fieldName + "-radio", builder.toSafeHtml());
       RadioButton radio = new RadioButton(fieldName + "-radio-" + this.groupId, builder.toSafeHtml());
 
     radio.addClickHandler(new ClickHandler() {
