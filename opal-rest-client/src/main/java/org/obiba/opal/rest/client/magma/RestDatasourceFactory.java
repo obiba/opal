@@ -35,6 +35,8 @@ public class RestDatasourceFactory extends AbstractDatasourceFactory {
 
   private Integer soTimeout;
 
+  private Integer connectionTimeout;
+
   /**
    * Authenticate by username/password.
    * @param name
@@ -73,6 +75,15 @@ public class RestDatasourceFactory extends AbstractDatasourceFactory {
     this.soTimeout = soTimeout;
   }
 
+  /**
+   * Set the connection timeout.
+   * @param connectionTimeout
+   */
+  @SuppressWarnings("UnusedDeclaration")
+  public void setConnectionTimeout(int connectionTimeout) {
+    this.connectionTimeout = connectionTimeout;
+  }
+
   private OpalJavaClient createOpalJavaClient() throws Exception {
     if(url == null || url.isEmpty()) throw new IllegalStateException("Opal url cannot be empty.");
 
@@ -82,9 +93,15 @@ public class RestDatasourceFactory extends AbstractDatasourceFactory {
     }
     OpalJavaClient client;
     client = new OpalJavaClient(opalUrl, keyStore, username, password);
+
     if(soTimeout != null) {
       client.setSoTimeout(soTimeout);
     }
+
+    if(connectionTimeout != null) {
+      client.setConnectionTimeout(connectionTimeout);
+    }
+
     return client;
   }
 
