@@ -42,9 +42,12 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
 
   private final ElasticSearchProvider esProvider;
 
-  public EsSearchQueryExecutor(@NotNull ElasticSearchProvider esProvider) {
+  private final int termsFacetSizeLimit;
+
+  public EsSearchQueryExecutor(@NotNull ElasticSearchProvider esProvider, int termsFacetSizeLimit) {
     Assert.notNull(esProvider, "Elastic Search provider is null!");
     this.esProvider = esProvider;
+    this.termsFacetSizeLimit = termsFacetSizeLimit;
   }
 
   /**
@@ -107,7 +110,7 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
    * Executes a single elastic search query.
    *
    * @param indexManagerHelper
-   * @param dtoQueries
+   * @param dtoQuery
    * @return
    * @throws JSONException
    */
@@ -136,7 +139,7 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
   }
 
   private String build(Search.QueryTermsDto dtoQueries, IndexManagerHelper indexManagerHelper) throws JSONException {
-    QueryTermConverter converter = new QueryTermConverter(indexManagerHelper);
+    QueryTermConverter converter = new QueryTermConverter(indexManagerHelper, termsFacetSizeLimit);
     JSONObject queryJSON = converter.convert(dtoQueries);
 
     return queryJSON.toString();

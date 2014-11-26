@@ -23,14 +23,17 @@ public class QueryTermConverter {
 
   private final IndexManagerHelper indexManagerHelper;
 
+  private final int termsFacetSize;
+
   /**
-   * @param fieldPrefix - the field prefix is in the form of 'datasource.table' and is needed to fully qualify a
-   * variable.
+   * @param indexManagerHelper - IndexManagerHelper provides certain variable information required for conversion
+   * @param termsFacetSize - used to limit the 'terms' facet results
    */
-  public QueryTermConverter(IndexManagerHelper indexManagerHelper) {
+  public QueryTermConverter(IndexManagerHelper indexManagerHelper, int termsFacetSize) {
     Assert.notNull(indexManagerHelper, "Index Manager Helper is null!");
 
     this.indexManagerHelper = indexManagerHelper;
+    this.termsFacetSize = termsFacetSize;
   }
 
   /**
@@ -100,16 +103,19 @@ public class QueryTermConverter {
     jsonField.put("field", variableFieldName(variable));
 
     switch(indexManagerHelper.getVariableNature(variable)) {
-      case CATEGORICAL:
-        jsonFacet.put("terms", jsonField);
-        break;
 
       case CONTINUOUS:
         jsonFacet.put("statistical", jsonField);
         break;
 
+      case CATEGORICAL:
+        jsonFacet.put("terms", jsonField);
+        break;
+
       default:
-        throw new UnsupportedOperationException("Variable nature not supported");
+        jsonField.put("size", termsFacetSize);
+        jsonFacet.put("terms", jsonField);
+        break;
     }
   }
 

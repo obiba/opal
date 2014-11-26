@@ -11,6 +11,7 @@ package org.obiba.opal.web.search.support;
 
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,11 +20,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class EsSearchQueryExecutorFactory implements SearchQueryExecutorFactory {
 
+  @Value("${org.obiba.opal.web.search.termsFacetSizeLimit}")
+  private int termsFacetSizeLimit;
+
   @Autowired
   private ElasticSearchProvider esProvider;
 
   @Override
   public SearchQueryExecutor create() {
-    return new EsSearchQueryExecutor(esProvider);
+    return new EsSearchQueryExecutor(esProvider, termsFacetSizeLimit);
   }
 }
