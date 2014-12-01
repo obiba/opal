@@ -109,6 +109,10 @@ public class QueryTermConverter {
         break;
 
       case CATEGORICAL:
+        // we want all categories frequencies: as we do not know the variable description at this point,
+        // set a default size to term facets request
+        // http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-facets-terms-facet.html
+        jsonField.put("size", termsFacetSize);
         jsonFacet.put("terms", jsonField);
         break;
 
