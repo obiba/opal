@@ -90,6 +90,8 @@ public class OpalJavaClient {
   // 10 minutes
   public static final int DEFAULT_SO_TIMEOUT = 10 * 60 * 1000;
 
+  public static final int DEFAULT_CONNECTION_TIMEOUT = 10 * 1000;
+
   public static final int DEFAULT_MAX_ATTEMPT = 5;
 
   // 5MB
@@ -104,6 +106,8 @@ public class OpalJavaClient {
   private final Credentials credentials;
 
   private int soTimeout = DEFAULT_SO_TIMEOUT;
+
+  private int connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
 
   private HttpClient client;
 
@@ -149,6 +153,10 @@ public class OpalJavaClient {
     this.soTimeout = soTimeout == null ? DEFAULT_SO_TIMEOUT : soTimeout;
   }
 
+  public void setConnectionTimeout(int connectionTimeout) {
+    this.connectionTimeout = connectionTimeout;
+  }
+
   private HttpClient getClient() {
     if(client == null) {
       createClient();
@@ -165,6 +173,7 @@ public class OpalJavaClient {
         .setParameter(AuthPNames.TARGET_AUTH_PREF, Collections.singletonList(OpalAuth.CREDENTIALS_HEADER));
     httpClient.getParams().setParameter(ClientPNames.CONNECTION_MANAGER_FACTORY_CLASS_NAME,
         OpalClientConnectionManagerFactory.class.getName());
+    httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, connectionTimeout);
     httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, soTimeout);
     httpClient.setHttpRequestRetryHandler(new DefaultHttpRequestRetryHandler(DEFAULT_MAX_ATTEMPT, false));
     httpClient.getAuthSchemes().register(OpalAuth.CREDENTIALS_HEADER, new OpalAuthScheme.Factory());
