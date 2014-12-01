@@ -61,7 +61,7 @@ public class QueryTermConverterTest {
     Search.QueryTermsDto dtoQuery = createSimpleQueryDto(variableName);
 
     JSONObject jsonExpected = new JSONObject("{\"query\":{\"match_all\":{} }, \"size\":0, " + //
-        "\"facets\":{\"0\":{\"terms\":{\"field\":\"opal-data-cipreliminaryquestionnaire-LAST_MEAL_WHEN\" } } } }");
+        "\"facets\":{\"0\":{\"terms\":{\"field\":\"opal-data-cipreliminaryquestionnaire-LAST_MEAL_WHEN\", \"size\": 10 } } } }");
 
     JSONObject jsonResult = converter.convert(dtoQuery);
     assertThat(jsonResult).isNotNull();
@@ -87,17 +87,17 @@ public class QueryTermConverterTest {
   }
 
   @Test
-  public void test_non_categorical_continuous_conversion_limit_one() throws JSONException {
+  public void test_non_categorical_continuous_conversion_limit_one_thousand() throws JSONException {
     String variableName = "NON_CATEGORICAL_CONTINUOUS";
     IndexManagerHelper indexManagerHelper = createIndexManagerHelper("opal-data", "StandingHeight",
         "opal-data-StandingHeight", variableName, createNonCategoricalContinuousVariable(variableName));
 
-    QueryTermConverter converter = new QueryTermConverter(indexManagerHelper, 1);
+    QueryTermConverter converter = new QueryTermConverter(indexManagerHelper, 1000);
     Search.QueryTermsDto dtoQuery = createSimpleQueryDto(variableName);
 
     JSONObject jsonExpected = new JSONObject("{\"query\":{\"match_all\":{} }, \"size\":0, " + //
         "\"facets\":{\"0\":{\"terms\":{\"field\":\"opal-data" + //
-        "-StandingHeight-NON_CATEGORICAL_CONTINUOUS\", \"size\": 1} } } }");
+        "-StandingHeight-NON_CATEGORICAL_CONTINUOUS\", \"size\": 1000} } } }");
 
     JSONObject jsonResult = converter.convert(dtoQuery);
     assertThat(jsonResult).isNotNull();
