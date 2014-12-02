@@ -12,13 +12,13 @@ import java.util.Set;
 public class EmbeddedVocabularyConstraint extends VocabularyConstraint {
 
     public EmbeddedVocabularyConstraint(Variable variable) {
-        super("category vocabulary", getVocabularyCodes(variable));
+        super("category vocabulary", getVocabularyKeys(variable));
     }
 
-    private static final Set<String> getVocabularyCodes(Variable variable) {
+    private static final Set<String> getVocabularyKeys(Variable variable) {
         Set<String> result = new HashSet<>();
         for (Category cat: variable.getCategories()) {
-            result.add(cat.getCode());
+            result.add(cat.getName());
         }
         return result;
     }
