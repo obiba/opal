@@ -16,11 +16,11 @@ public class UriBuilder {
 
   private final Map<String, String> query = new LinkedHashMap<>();
 
-  UriBuilder(URI root) {
+  public UriBuilder(URI root) {
     this.root = root;
   }
 
-  UriBuilder(UriBuilder builder) {
+  public UriBuilder(UriBuilder builder) {
     root = builder.root;
     pathSegments.addAll(builder.pathSegments);
     query.putAll(builder.query);
