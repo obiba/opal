@@ -21,16 +21,21 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.util.EntityUtils;
 import org.obiba.magma.MagmaRuntimeException;
+import org.obiba.magma.Timestamps;
+import org.obiba.magma.TimestampsBean;
+import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.support.AbstractDatasource;
 import org.obiba.magma.support.Initialisables;
+import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.web.model.Magma.DatasourceDto;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -44,6 +49,8 @@ public class RestDatasource extends AbstractDatasource {
 
   private final URI datasourceURI;
 
+  private Timestamps timestamps;
+
   public RestDatasource(String name, String opalUri, String remoteDatasource, String username, String password)
       throws URISyntaxException {
     this(name, new OpalJavaClient(opalUri, username, password), remoteDatasource);
@@ -55,18 +62,20 @@ public class RestDatasource extends AbstractDatasource {
     datasourceURI = opalClient.newUri().segment("datasource", remoteDatasource).build();
   }
 
+  @NotNull
+  @Override
+  public Timestamps getTimestamps() {
+    if (timestamps == null) {
+      refresh();
+    }
+
+    return  timestamps;
+  }
+
   @Override
   public Set<ValueTable> getValueTables() {
-    try {
-      refresh();
-    } catch(RuntimeException e) {
-      if(e.getCause() instanceof ConnectException) {
-        log.error("Failed connecting to Opal server: {}", e.getMessage(), e);
-      } else {
-        log.error("Unexpected error while communicating with Opal server: {}", e.getMessage(), e);
-      }
-      throw new MagmaRuntimeException(e.getMessage(), e);
-    }
+    refresh();
+
     return super.getValueTables();
   }
 
@@ -131,26 +140,54 @@ public class RestDatasource extends AbstractDatasource {
     try {
       Set<String> cachedTableNames = ImmutableSet
           .copyOf(Iterables.transform(super.getValueTables(), new Function<ValueTable, String>() {
-
             @Override
             public String apply(ValueTable input) {
               return input.getName();
             }
           }));
-      Set<String> currentTables = getValueTableNames();
 
-      SetView<String> tablesToRemove = Sets.difference(cachedTableNames, currentTables);
-      SetView<String> tablesToAdd = Sets.difference(currentTables, cachedTableNames);
+      DatasourceDto d = opalClient.getResource(DatasourceDto.class, datasourceURI, DatasourceDto.newBuilder());
+      Value currentTimestamp = DateTimeType.get().valueOf(d.getTimestamps().getLastUpdate());
 
-      for(String table : tablesToRemove) {
+      if(timestamps != null && timestamps.getLastUpdate().equals(currentTimestamp)) {
+        log.debug("RestDatasource is up to date. Skipping refresh.");
+        return; //Cache is up to date
+      }
+
+      log.debug("Refreshing data source value tables.");
+
+      timestamps = new TimestampsBean(DateTimeType.get().valueOf(d.getTimestamps().getCreated()),
+          DateTimeType.get().valueOf(d.getTimestamps().getLastUpdate()));
+      Set<String> currentTables = ImmutableSet.copyOf(d.getTableList());
+
+      for(String tableName : cachedTableNames) {
+        ValueTable table = getCachedValueTable(tableName);
         removeValueTable(table);
       }
-      for(String table : tablesToAdd) {
-        addValueTable(table);
+
+      for(String tableName : currentTables) {
+        addValueTable(tableName);
       }
     } catch (Exception e) {
       log.error("Failed refreshing value tables from Opal server: {}", e.getMessage(), e);
+
+      if(e.getCause() instanceof ConnectException) {
+        log.error("Failed connecting to Opal server: {}", e.getMessage(), e);
+      } else {
+        log.error("Unexpected error while communicating with Opal server: {}", e.getMessage(), e);
+      }
+
+      throw new MagmaRuntimeException(e.getMessage(), e);
     }
+  }
+
+  private ValueTable getCachedValueTable(final String tableName) {
+    return Iterables.find(super.getValueTables(), new Predicate<ValueTable>() {
+      @Override
+      public boolean apply(ValueTable input) {
+        return tableName.equals(input.getName());
+      }
+    });
   }
 
   private void addValueTable(String table) {
