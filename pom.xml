@@ -42,6 +42,7 @@
     <module>opal-datashield</module>
     <module>opal-search</module>
     <module>opal-upgrade</module>
+    <module>opal-eid</module>
   </modules>
 
   <dependencyManagement>
@@ -152,7 +153,11 @@
         <artifactId>opal-upgrade</artifactId>
         <version>${project.version}</version>
       </dependency>
-
+      <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-eid</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <!-- Obiba dependencies -->
       <dependency>
         <groupId>org.obiba.commons</groupId>
@@ -1299,6 +1304,18 @@
         <version>${newrelic.version}</version>
         <scope>runtime</scope>
       </dependency>
+
+    <dependency>
+        <groupId>org.pac4j</groupId>
+        <artifactId>pac4j-openid</artifactId>
+        <version>1.6.0</version>
+    </dependency>
+
+    <dependency>
+        <groupId>io.buji</groupId>
+        <artifactId>buji-pac4j-servlet</artifactId>
+        <version>1.3.0</version>
+    </dependency>
 
     </dependencies>
   </dependencyManagement>

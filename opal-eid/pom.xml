@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>opal</artifactId>
+        <groupId>org.obiba.opal</groupId>
+        <version>2.4-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+  <artifactId>opal-eid</artifactId>
+  <name>opal-eid</name>
+
+  <dependencies>
+      <dependency>
+          <groupId>org.pac4j</groupId>
+          <artifactId>pac4j-openid</artifactId>
+      </dependency>
+
+      <dependency>
+          <groupId>io.buji</groupId>
+          <artifactId>buji-pac4j-servlet</artifactId>
+      </dependency>
+  </dependencies>
+
+  <build>
+
+  </build>
+
+</project>

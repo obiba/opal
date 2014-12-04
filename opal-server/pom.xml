@@ -67,7 +67,10 @@
       <groupId>org.obiba.opal</groupId>
       <artifactId>opal-upgrade</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-eid</artifactId>
+    </dependency>
     <dependency>
       <groupId>cglib</groupId>
       <artifactId>cglib-nodep</artifactId>
