@@ -69,7 +69,7 @@
     </dependency>
     <dependency>
       <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-eid</artifactId>
+      <artifactId>opal-pac4j</artifactId>
     </dependency>
     <dependency>
       <groupId>cglib</groupId>

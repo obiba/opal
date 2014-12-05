@@ -1,4 +1,4 @@
-package org.obiba.opal.auth.eid;
+package org.obiba.opal.pac4j.eid;
 
 /**
  * OpenID Attribute Exchange 1.0 Attribute Types returned by eID.

@@ -9,18 +9,21 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-  <artifactId>opal-eid</artifactId>
-  <name>opal-eid</name>
+  <artifactId>opal-pac4j</artifactId>
+  <name>opal-pac4j</name>
 
   <dependencies>
       <dependency>
           <groupId>org.pac4j</groupId>
           <artifactId>pac4j-openid</artifactId>
       </dependency>
-
       <dependency>
           <groupId>io.buji</groupId>
           <artifactId>buji-pac4j-servlet</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-context</artifactId>
       </dependency>
   </dependencies>
 

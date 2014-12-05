@@ -42,7 +42,7 @@
     <module>opal-datashield</module>
     <module>opal-search</module>
     <module>opal-upgrade</module>
-    <module>opal-eid</module>
+    <module>opal-pac4j</module>
   </modules>
 
   <dependencyManagement>
@@ -155,7 +155,7 @@
       </dependency>
       <dependency>
         <groupId>org.obiba.opal</groupId>
-        <artifactId>opal-eid</artifactId>
+        <artifactId>opal-pac4j</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!-- Obiba dependencies -->

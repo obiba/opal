@@ -1,4 +1,4 @@
-package org.obiba.opal.auth.eid;
+package org.obiba.opal.pac4j.eid;
 
 import org.pac4j.core.profile.AttributesDefinition;
 import org.pac4j.core.profile.converter.Converters;

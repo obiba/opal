@@ -9,17 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.server.httpd;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.EnumSet;
-import java.util.Properties;
-
-import javax.annotation.Nullable;
-import javax.servlet.ServletContext;
-
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.jetty.ajp.Ajp13SocketConnector;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
@@ -47,13 +38,17 @@ import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.filter.DelegatingFilterProxy;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
+import javax.annotation.Nullable;
+import javax.servlet.ServletContext;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.EnumSet;
+import java.util.Properties;
 
-import static javax.servlet.DispatcherType.ERROR;
-import static javax.servlet.DispatcherType.FORWARD;
-import static javax.servlet.DispatcherType.INCLUDE;
-import static javax.servlet.DispatcherType.REQUEST;
+import static javax.servlet.DispatcherType.*;
 import static org.springframework.web.context.ContextLoader.CONFIG_LOCATION_PARAM;
 
 /**
@@ -114,7 +109,7 @@ public class OpalJettyServer {
     handlers.addHandler(createDistFileHandler("/webapp"));
     // Add webapp extensions
     handlers.addHandler(createExtensionFileHandler(OpalRuntime.WEBAPP_EXTENSION));
-    handlers.addHandler(createServletHandler());
+    handlers.addHandler(createServletHandler(properties));
     jettyServer.setHandler(handlers);
   }
 
@@ -179,7 +174,7 @@ public class OpalJettyServer {
     jettyServer.addConnector(sslConnector);
   }
 
-  private Handler createServletHandler() {
+  private Handler createServletHandler(Properties properties) {
     servletContextHandler = new ServletContextHandler(ServletContextHandler.NO_SECURITY);
     servletContextHandler.setContextPath("/");
 
@@ -198,6 +193,12 @@ public class OpalJettyServer {
     servletContextHandler.setInitParameter(CONFIG_LOCATION_PARAM, "classpath:/META-INF/spring/opal-server/context.xml");
     servletContextHandler.setInitParameter("resteasy.servlet.mapping.prefix", "/ws");
     servletContextHandler.addServlet(HttpServletDispatcher.class, "/ws/*");
+
+    String pac4jCallbackHandler = properties.getProperty("org.obiba.opal.pac4j.clients.callbackPath", null);
+    if (pac4jCallbackHandler != null) {
+        servletContextHandler.addServlet(HttpServletDispatcher.class, pac4jCallbackHandler);
+        servletContextHandler.addFilter(authenticationFilterHolder, pac4jCallbackHandler, EnumSet.of(REQUEST, FORWARD));
+    }
 
     return servletContextHandler;
   }

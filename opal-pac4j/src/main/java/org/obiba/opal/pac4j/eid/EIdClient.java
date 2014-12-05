@@ -1,6 +1,5 @@
-package org.obiba.opal.auth.eid;
+package org.obiba.opal.pac4j.eid;
 
-import org.apache.shiro.SecurityUtils;
 import org.openid4java.message.AuthSuccess;
 import org.openid4java.message.MessageException;
 import org.openid4java.message.ax.AxMessage;
@@ -18,10 +17,12 @@ import org.pac4j.openid.credentials.OpenIdCredentials;
  */
 public class EIdClient extends BaseOpenIdClient<CommonProfile> {
 
+    public static final String NAME = "eidClient";
+
     private String endpoint;
 
     public EIdClient() {
-        setName("eidClient");
+        setName(NAME);
     }
 
     @Override
