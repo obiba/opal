@@ -38,8 +38,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
-import com.google.common.collect.Sets.SetView;
 
 public class RestDatasource extends AbstractDatasource {
 
@@ -136,16 +134,8 @@ public class RestDatasource extends AbstractDatasource {
             TableDto.newBuilder()));
   }
 
-  private void refresh() {
+  private synchronized void refresh() {
     try {
-      Set<String> cachedTableNames = ImmutableSet
-          .copyOf(Iterables.transform(super.getValueTables(), new Function<ValueTable, String>() {
-            @Override
-            public String apply(ValueTable input) {
-              return input.getName();
-            }
-          }));
-
       DatasourceDto d = opalClient.getResource(DatasourceDto.class, datasourceURI, DatasourceDto.newBuilder());
       Value currentTimestamp = DateTimeType.get().valueOf(d.getTimestamps().getLastUpdate());
 
@@ -155,6 +145,14 @@ public class RestDatasource extends AbstractDatasource {
       }
 
       log.debug("Refreshing data source value tables.");
+
+      Set<String> cachedTableNames = ImmutableSet
+          .copyOf(Iterables.transform(super.getValueTables(), new Function<ValueTable, String>() {
+            @Override
+            public String apply(ValueTable input) {
+              return input.getName();
+            }
+          }));
 
       timestamps = new TimestampsBean(DateTimeType.get().valueOf(d.getTimestamps().getCreated()),
           DateTimeType.get().valueOf(d.getTimestamps().getLastUpdate()));
