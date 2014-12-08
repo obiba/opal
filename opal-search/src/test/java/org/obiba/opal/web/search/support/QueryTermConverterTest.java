@@ -61,7 +61,7 @@ public class QueryTermConverterTest {
     Search.QueryTermsDto dtoQuery = createSimpleQueryDto(variableName);
 
     JSONObject jsonExpected = new JSONObject("{\"query\":{\"match_all\":{} }, \"size\":0, " + //
-        "\"facets\":{\"0\":{\"terms\":{\"field\":\"opal-data-cipreliminaryquestionnaire-LAST_MEAL_WHEN\", \"size\": 10 } } } }");
+        "\"aggregations\":{\"0\":{\"terms\":{\"field\":\"opal-data-cipreliminaryquestionnaire-LAST_MEAL_WHEN\", \"size\": 10 } } } }");
 
     JSONObject jsonResult = converter.convert(dtoQuery);
     assertThat(jsonResult).isNotNull();
@@ -78,7 +78,7 @@ public class QueryTermConverterTest {
     Search.QueryTermsDto dtoQuery = createSimpleQueryDto(variableName);
 
     JSONObject jsonExpected = new JSONObject("{\"query\":{\"match_all\":{} }, \"size\":0, " + //
-        "\"facets\":{\"0\":{\"statistical\":{\"field\":\"opal-data" + //
+        "\"aggregations\":{\"0\":{\"extended_stats\":{\"field\":\"opal-data" + //
         "-standingheight-RES_FIRST_HEIGHT\"} } } }");
 
     JSONObject jsonResult = converter.convert(dtoQuery);
@@ -96,7 +96,7 @@ public class QueryTermConverterTest {
     Search.QueryTermsDto dtoQuery = createSimpleQueryDto(variableName);
 
     JSONObject jsonExpected = new JSONObject("{\"query\":{\"match_all\":{} }, \"size\":0, " + //
-        "\"facets\":{\"0\":{\"terms\":{\"field\":\"opal-data" + //
+        "\"aggregations\":{\"0\":{\"terms\":{\"field\":\"opal-data" + //
         "-StandingHeight-NON_CATEGORICAL_CONTINUOUS\", \"size\": 1000} } } }");
 
     JSONObject jsonResult = converter.convert(dtoQuery);

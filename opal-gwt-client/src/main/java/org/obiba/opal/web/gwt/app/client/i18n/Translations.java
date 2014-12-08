@@ -2082,6 +2082,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("No results found")
   String noResultsFound();
 
+  @Description("Min label")
+  @DefaultStringValue("Min")
+  String minLabel();
+
+  @Description("Max label")
+  @DefaultStringValue("Max")
+  String maxLabel();
+
   @Description("Mean label")
   @DefaultStringValue("Mean")
   String meanLabel();

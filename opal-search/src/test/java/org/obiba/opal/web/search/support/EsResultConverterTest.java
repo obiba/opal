@@ -36,27 +36,72 @@ public class EsResultConverterTest {
 
   @Test
   public void testConvert_ValidCategoricalResultDto() throws Exception {
-    JSONObject jsonQuery = new JSONObject(
-        "{\"took\":38, \"timed_out\":false, \"_shards\":{\"total\":5, \"successful\":5, \"failed\":0 }, " +
-            "" + "\"hits\":{\"total\":20, \"max_score\":1.0, \"hits\":[] }, \"facets\":{\"0\":{\"_type\":\"terms\", " +
-            "\"missing\":0, \"total\":20, \"other\":0, \"terms\":[{\"term\":\"TIME_24\", \"count\":20 } ] } } }");
+    JSONObject jsonResult = new JSONObject("{\n" +
+        "    \"took\": 4,\n" +
+        "    \"timed_out\": false,\n" +
+        "    \"_shards\": {\n" +
+        "        \"total\": 5,\n" +
+        "        \"successful\": 5,\n" +
+        "        \"failed\": 0\n" +
+        "    },\n" +
+        "    \"hits\": {\n" +
+        "        \"total\": 8053,\n" +
+        "        \"max_score\": 0,\n" +
+        "        \"hits\": []\n" +
+        "    },\n" +
+        "    \"aggregations\": {\n" +
+        "        \"0\": {\n" +
+        "            \"buckets\": [\n" +
+        "                {\n" +
+        "                    \"key\": 2,\n" +
+        "                    \"doc_count\": 4916\n" +
+        "                },\n" +
+        "                {\n" +
+        "                    \"key\": 1,\n" +
+        "                    \"doc_count\": 3137\n" +
+        "                }\n" +
+        "            ]\n" +
+        "        }\n" +
+        "    }\n" +
+        "}");
 
     EsResultConverter converter = new EsResultConverter();
-    Search.QueryResultDto dtoResult = converter.convert(jsonQuery);
+    Search.QueryResultDto dtoResult = converter.convert(jsonResult);
 
     validateCategoricalQueryResultDto(dtoResult);
   }
 
   @Test
   public void testConvert_ValidStatisticalResultDto() throws Exception {
-    JSONObject jsonQuery = new JSONObject(
-        "{\"took\": 32, \"timed_out\": false, \"_shards\": {\"total\": 5, \"successful\": 5, \"failed\": 0 }," +
-            " \"hits\": {\"total\": 5, \"max_score\": 1.0, \"hits\": [] }, \"facets\": {\"0\": {\"_type\": \"statistical\", " +
-            "\"count\": 5, \"total\": 820.8, \"min\": 155.6, \"max\": 179.9, \"mean\": 164.16, \"sum_of_squares\": 135096.62, " +
-            "\"variance\": 70.81840000000084, \"std_deviation\": 8.415366896339151 } } }");
+    JSONObject jsonResult = new JSONObject("{\n" +
+        "    \"took\": 1,\n" +
+        "    \"timed_out\": false,\n" +
+        "    \"_shards\": {\n" +
+        "        \"total\": 5,\n" +
+        "        \"successful\": 5,\n" +
+        "        \"failed\": 0\n" +
+        "    },\n" +
+        "    \"hits\": {\n" +
+        "        \"total\": 8053,\n" +
+        "        \"max_score\": 0,\n" +
+        "        \"hits\": []\n" +
+        "    },\n" +
+        "    \"aggregations\": {\n" +
+        "        \"0\": {\n" +
+        "            \"count\": 8053,\n" +
+        "            \"min\": 35,\n" +
+        "            \"max\": 69,\n" +
+        "            \"avg\": 51.141810505401715,\n" +
+        "            \"sum\": 411845,\n" +
+        "            \"sum_of_squares\": 21786719,\n" +
+        "            \"variance\": 89.93170897837224,\n" +
+        "            \"std_deviation\": 9.48323304460943\n" +
+        "        }\n" +
+        "    }\n" +
+        "}");
 
     EsResultConverter converter = new EsResultConverter();
-    Search.QueryResultDto dtoResult = converter.convert(jsonQuery);
+    Search.QueryResultDto dtoResult = converter.convert(jsonResult);
 
     validateStatisticalQueryResultDto(dtoResult);
   }
@@ -80,6 +125,7 @@ public class EsResultConverterTest {
 
     List<Search.FacetResultDto.TermFrequencyResultDto> listTermDto = dtoFacetResult.getFrequenciesList();
     assertThat(listTermDto).isNotNull();
+    assertThat(listTermDto).hasSize(2);
 
     Search.FacetResultDto.StatisticalResultDto statistics = dtoFacetResult.getStatistics();
     assertThat(statistics.hasCount()).isFalse();
@@ -95,6 +141,13 @@ public class EsResultConverterTest {
     Search.FacetResultDto.StatisticalResultDto dtoStatistical = dtoFacetResult.getStatistics();
     assertThat(dtoStatistical).isNotNull();
     assertThat(dtoStatistical.hasCount()).isTrue();
+    assertThat(dtoStatistical.hasMin()).isTrue();
+    assertThat(dtoStatistical.hasMax()).isTrue();
+    assertThat(dtoStatistical.hasMean()).isTrue();
+    assertThat(dtoStatistical.hasStdDeviation()).isTrue();
+    assertThat(dtoStatistical.hasTotal()).isTrue();
+    assertThat(dtoStatistical.hasSumOfSquares()).isTrue();
+    assertThat(dtoStatistical.hasVariance()).isTrue();
 
     List<Search.FacetResultDto.TermFrequencyResultDto> listTermDto = dtoFacetResult.getFrequenciesList();
     assertThat(listTermDto).isEmpty();

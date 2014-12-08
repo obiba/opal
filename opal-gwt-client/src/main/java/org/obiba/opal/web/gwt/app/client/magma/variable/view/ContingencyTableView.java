@@ -225,9 +225,11 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
       continuousFacets.put(facetResultDto.getFacet(), facetResultDto.getStatistics());
     }
 
-    parentTable.setWidget(2, 0, new Label(translations.meanLabel()));
-    parentTable.setWidget(3, 0, new Label(translations.standardDeviationLabel()));
-    parentTable.setWidget(4, 0, new Label(translations.NLabel()));
+    parentTable.setWidget(2, 0, new Label(translations.minLabel()));
+    parentTable.setWidget(3, 0, new Label(translations.maxLabel()));
+    parentTable.setWidget(4, 0, new Label(translations.meanLabel()));
+    parentTable.setWidget(5, 0, new Label(translations.standardDeviationLabel()));
+    parentTable.setWidget(6, 0, new Label(translations.NLabel()));
 
     int variableCategoriesSize = variableCategories.size();
     for(int i = 0; i < variableCategoriesSize; i++) {
@@ -235,18 +237,24 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
     }
 
     parentTable.setWidget(2, variableCategoriesSize + 1,
-        new Label(formatDecimal(continuousFacets.get(ContingencyTablePresenter.TOTAL_FACET).getMean())));
+        new Label(formatDecimal(continuousFacets.get(ContingencyTablePresenter.TOTAL_FACET).getMin())));
     parentTable.setWidget(3, variableCategoriesSize + 1,
-        new Label(formatDecimal(continuousFacets.get(ContingencyTablePresenter.TOTAL_FACET).getStdDeviation())));
+        new Label(formatDecimal(continuousFacets.get(ContingencyTablePresenter.TOTAL_FACET).getMax())));
     parentTable.setWidget(4, variableCategoriesSize + 1,
+        new Label(formatDecimal(continuousFacets.get(ContingencyTablePresenter.TOTAL_FACET).getMean())));
+    parentTable.setWidget(5, variableCategoriesSize + 1,
+        new Label(formatDecimal(continuousFacets.get(ContingencyTablePresenter.TOTAL_FACET).getStdDeviation())));
+    parentTable.setWidget(6, variableCategoriesSize + 1,
         new Label(String.valueOf((int) continuousFacets.get(ContingencyTablePresenter.TOTAL_FACET).getCount())));
   }
 
   private void writeFacetRow(DefaultFlexTable parentTable,
       Map<String, FacetResultDto.StatisticalResultDto> continuousFacets, int col, String name) {
-    parentTable.setWidget(2, col, new Label(formatDecimal(continuousFacets.get(name).getMean())));
-    parentTable.setWidget(3, col, new Label(formatDecimal(continuousFacets.get(name).getStdDeviation())));
-    parentTable.setWidget(4, col, new Label(String.valueOf((int) continuousFacets.get(name).getCount())));
+    parentTable.setWidget(2, col, new Label(formatDecimal(continuousFacets.get(name).getMin())));
+    parentTable.setWidget(3, col, new Label(formatDecimal(continuousFacets.get(name).getMax())));
+    parentTable.setWidget(4, col, new Label(formatDecimal(continuousFacets.get(name).getMean())));
+    parentTable.setWidget(5, col, new Label(formatDecimal(continuousFacets.get(name).getStdDeviation())));
+    parentTable.setWidget(6, col, new Label(String.valueOf((int) continuousFacets.get(name).getCount())));
   }
 
   private String formatDecimal(double number) {

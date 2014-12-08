@@ -47,37 +47,31 @@ public class QueryTermConverter {
     Assert.notNull(dtoQueries, "Query term DTO is null!");
 
     JSONObject jsonQuery = new JSONObject("{\"query\":{\"match_all\":{}}, \"size\":0}");
-    JSONObject jsonFacets = new JSONObject();
+    JSONObject jsonAggregations = new JSONObject();
 
     for(Search.QueryTermDto dtoQuery : dtoQueries.getQueriesList()) {
-      JSONObject jsonFacet = new JSONObject();
+      JSONObject jsonAggregation = new JSONObject();
 
       if(dtoQuery.hasExtension(Search.LogicalTermDto.filter)) {
-        convertLogicalFilter("filter", dtoQuery.getExtension(Search.LogicalTermDto.filter), jsonFacet);
-      } else {
-        if(dtoQuery.hasExtension(Search.VariableTermDto.field)) {
-          convertField(dtoQuery.getExtension(Search.VariableTermDto.field), jsonFacet);
-        }
-
-        if(dtoQuery.hasExtension(Search.LogicalTermDto.facetFilter)) {
-          convertLogicalFilter("facet_filter", dtoQuery.getExtension(Search.LogicalTermDto.facetFilter), jsonFacet);
-        }
+        convertLogicalFilter("filter", dtoQuery.getExtension(Search.LogicalTermDto.filter), jsonAggregation);
+      } else if(dtoQuery.hasExtension(Search.LogicalTermDto.facetFilter)) {
+        convertFilter(dtoQuery, jsonAggregation);
+      } else if(dtoQuery.hasExtension(Search.VariableTermDto.field)) {
+        convertField(dtoQuery.getExtension(Search.VariableTermDto.field), jsonAggregation);
+      } else if(dtoQuery.hasGlobal()) {
+        convertGlobal(dtoQuery, jsonAggregation);
       }
 
-      if(dtoQuery.hasGlobal()) {
-        jsonFacet.put("global", dtoQuery.getGlobal());
-      }
-
-      jsonFacets.put(dtoQuery.getFacet(), jsonFacet);
+      jsonAggregations.put(dtoQuery.getFacet(), jsonAggregation);
     }
 
-    jsonQuery.put("facets", jsonFacets);
+    jsonQuery.put("aggregations", jsonAggregations);
 
     return jsonQuery;
   }
 
-  private void convertLogicalFilter(String filterName, Search.LogicalTermDto dtoLogicalFilter, JSONObject jsonFacet)
-      throws JSONException {
+  private void convertLogicalFilter(String filterName, Search.LogicalTermDto dtoLogicalFilter,
+      JSONObject jsonAggregation) throws JSONException {
     Search.TermOperator operator = dtoLogicalFilter.getOperator();
     String operatorName = operator == Search.TermOperator.AND_OP ? "and" : "or";
     JSONObject jsonOperator = new JSONObject();
@@ -89,13 +83,38 @@ public class QueryTermConverter {
         jsonOperator.accumulate(operatorName, convertFilterType(filter));
       }
 
-      jsonFacet.put(filterName, jsonOperator);
+      jsonAggregation.put(filterName, jsonOperator);
     } else {
-      jsonFacet.put(filterName, convertFilterType(filters.get(0)));
+      jsonAggregation.put(filterName, convertFilterType(filters.get(0)));
     }
   }
 
-  private void convertField(Search.VariableTermDto dtoVariable, JSONObject jsonFacet)
+  private void convertFilter(Search.QueryTermDto dtoQuery, JSONObject jsonAggregation)
+      throws JSONException, UnsupportedOperationException {
+    convertLogicalFilter("filter", dtoQuery.getExtension(Search.LogicalTermDto.facetFilter), jsonAggregation);
+    if(dtoQuery.hasExtension(Search.VariableTermDto.field)) {
+      convertNestedField(dtoQuery.getExtension(Search.VariableTermDto.field), jsonAggregation);
+    }
+  }
+
+  private void convertGlobal(Search.QueryTermDto dtoQuery, JSONObject jsonAggregation)
+      throws JSONException, UnsupportedOperationException {
+    jsonAggregation.put("global", new JSONObject());
+    if(dtoQuery.hasExtension(Search.VariableTermDto.field)) {
+      convertNestedField(dtoQuery.getExtension(Search.VariableTermDto.field), jsonAggregation);
+    }
+  }
+
+  private void convertNestedField(Search.VariableTermDto dtoVariable, JSONObject jsonAggregation)
+      throws JSONException, UnsupportedOperationException {
+    JSONObject jsonAgg = new JSONObject();
+    convertField(dtoVariable, jsonAgg);
+    JSONObject jsonAggregation2 = new JSONObject();
+    jsonAggregation2.put("0", jsonAgg);
+    jsonAggregation.put("aggregations", jsonAggregation2);
+  }
+
+  private void convertField(Search.VariableTermDto dtoVariable, JSONObject jsonAggregation)
       throws JSONException, UnsupportedOperationException {
 
     String variable = dtoVariable.getVariable();
@@ -105,7 +124,7 @@ public class QueryTermConverter {
     switch(indexManagerHelper.getVariableNature(variable)) {
 
       case CONTINUOUS:
-        jsonFacet.put("statistical", jsonField);
+        jsonAggregation.put("extended_stats", jsonField);
         break;
 
       case CATEGORICAL:
@@ -113,12 +132,12 @@ public class QueryTermConverter {
         // set a default size to term facets request
         // http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-facets-terms-facet.html
         jsonField.put("size", termsFacetSize);
-        jsonFacet.put("terms", jsonField);
+        jsonAggregation.put("terms", jsonField);
         break;
 
       default:
         jsonField.put("size", termsFacetSize);
-        jsonFacet.put("terms", jsonField);
+        jsonAggregation.put("terms", jsonField);
         break;
     }
   }
