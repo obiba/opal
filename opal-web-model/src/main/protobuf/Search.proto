@@ -92,7 +92,7 @@ message FacetResultDto {
   }
 
   message TermFrequencyResultDto {
-    required string term = 1;
+    optional string term = 1;
     required int32 count = 2;
   }
 

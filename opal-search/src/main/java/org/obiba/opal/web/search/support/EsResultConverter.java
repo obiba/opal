@@ -114,7 +114,11 @@ public class EsResultConverter {
       convertAggregation(jsonAggregation, dtoResultBuilder);
 
       if(jsonAggregation.has("doc_count")) {
-        convertMissing(jsonAggregation, dtoResultBuilder);
+        convertCount(jsonAggregation, dtoResultBuilder, "doc_count");
+      }
+
+      if(jsonAggregation.has("value")) {
+        convertCount(jsonAggregation, dtoResultBuilder, "value");
       }
     }
 
@@ -129,12 +133,12 @@ public class EsResultConverter {
       }
     }
 
-    private void convertMissing(JSONObject jsonAggregation, Search.FacetResultDto.Builder dtoResultBuilder)
+    private void convertCount(JSONObject jsonAggregation, Search.FacetResultDto.Builder dtoResultBuilder, String key)
         throws JSONException {
 
-      if(countAboveThreshold(jsonAggregation.getInt("doc_count"))) {
+      if(countAboveThreshold(jsonAggregation.getInt(key))) {
         Search.FacetResultDto.TermFrequencyResultDto dtoTermFrequency = Search.FacetResultDto.TermFrequencyResultDto
-            .newBuilder().setTerm("N/A").setCount(jsonAggregation.getInt("doc_count")).build();
+            .newBuilder().setCount(jsonAggregation.getInt(key)).build();
 
         dtoResultBuilder.addFrequencies(dtoTermFrequency);
       }

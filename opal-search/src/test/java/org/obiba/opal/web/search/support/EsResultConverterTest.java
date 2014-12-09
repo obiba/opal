@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.web.model.Search;
 
@@ -21,21 +20,10 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 public class EsResultConverterTest {
 
-  private Search.QueryTermDto dtoQuery;
 
-  @Before
-  public void setUp() throws Exception {
-    Search.QueryTermDto.Builder dtoBuilder = Search.QueryTermDto.newBuilder().setFacet("0");
-
-    Search.VariableTermDto.Builder variableDto = Search.VariableTermDto.newBuilder();
-    variableDto.setVariable("LAST_MEAL_WHEN");
-    dtoBuilder.setExtension(Search.VariableTermDto.field, variableDto.build());
-
-    dtoQuery = dtoBuilder.build();
-  }
 
   @Test
-  public void testConvert_ValidCategoricalResultDto() throws Exception {
+  public void test_convert_categorical_result() throws Exception {
     JSONObject jsonResult = new JSONObject("{\n" +
         "    \"took\": 4,\n" +
         "    \"timed_out\": false,\n" +
@@ -72,7 +60,7 @@ public class EsResultConverterTest {
   }
 
   @Test
-  public void testConvert_ValidStatisticalResultDto() throws Exception {
+  public void test_convert_statistical_result() throws Exception {
     JSONObject jsonResult = new JSONObject("{\n" +
         "    \"took\": 1,\n" +
         "    \"timed_out\": false,\n" +
@@ -106,6 +94,94 @@ public class EsResultConverterTest {
     validateStatisticalQueryResultDto(dtoResult);
   }
 
+  @Test
+  public void test_convert_missing_result() throws Exception {
+    JSONObject jsonResult = new JSONObject("{\n" +
+        "    \"took\": 4,\n" +
+        "    \"timed_out\": false,\n" +
+        "    \"_shards\": {\n" +
+        "        \"total\": 5,\n" +
+        "        \"successful\": 5,\n" +
+        "        \"failed\": 0\n" +
+        "    },\n" +
+        "    \"hits\": {\n" +
+        "        \"total\": 6,\n" +
+        "        \"max_score\": 0,\n" +
+        "        \"hits\": []\n" +
+        "    },\n" +
+        "    \"aggregations\": {\n" +
+        "        \"1\": {\n" +
+        "            \"0\": {\n" +
+        "                \"doc_count\": 0\n" +
+        "            },\n" +
+        "            \"doc_count\": 4\n" +
+        "        },\n" +
+        "        \"2\": {\n" +
+        "            \"0\": {\n" +
+        "                \"doc_count\": 0\n" +
+        "            },\n" +
+        "            \"doc_count\": 5\n" +
+        "        },\n" +
+        "        \"total\": {\n" +
+        "            \"0\": {\n" +
+        "                \"doc_count\": 0\n" +
+        "            },\n" +
+        "            \"doc_count\": 3\n" +
+        "        }\n" +
+        "    }\n" +
+        "}");
+
+    EsResultConverter converter = new EsResultConverter();
+    Search.QueryResultDto dtoResult = converter.convert(jsonResult);
+
+    validateMissingQueryResultDto(dtoResult);
+  }
+
+  @Test
+  public void test_convert_cardinality_result() throws Exception {
+    JSONObject jsonResult = new JSONObject("{\n" +
+        "    \"took\": 11,\n" +
+        "    \"timed_out\": false,\n" +
+        "    \"_shards\": {\n" +
+        "        \"total\": 5,\n" +
+        "        \"successful\": 5,\n" +
+        "        \"failed\": 0\n" +
+        "    },\n" +
+        "    \"hits\": {\n" +
+        "        \"total\": 6,\n" +
+        "        \"max_score\": 0,\n" +
+        "        \"hits\": []\n" +
+        "    },\n" +
+        "    \"aggregations\": {\n" +
+        "        \"1\": {\n" +
+        "            \"0\": {\n" +
+        "                \"value\": 3\n" +
+        "            },\n" +
+        "            \"doc_count\": 4\n" +
+        "        },\n" +
+        "        \"2\": {\n" +
+        "            \"0\": {\n" +
+        "                \"value\": 3\n" +
+        "            },\n" +
+        "            \"doc_count\": 5\n" +
+        "        },\n" +
+        "        \"total\": {\n" +
+        "            \"0\": {\n" +
+        "                \"value\": 2\n" +
+        "            },\n" +
+        "            \"doc_count\": 3\n" +
+        "        }\n" +
+        "    }\n" +
+        "}");
+
+    EsResultConverter converter = new EsResultConverter();
+    Search.QueryResultDto dtoResult = converter.convert(jsonResult);
+
+    validateCardinalityQueryResultDto(dtoResult);
+  }
+
+
+
   @Test(expected = JSONException.class)
   public void testConvert_InvalidJsonQuery() throws Exception {
     // missing a colon
@@ -121,7 +197,7 @@ public class EsResultConverterTest {
 
     Search.FacetResultDto dtoFacetResult = dtoResult.getFacets(0);
     assertThat(dtoFacetResult).isNotNull();
-    assertThat(dtoQuery.getFacet()).isEqualTo(dtoFacetResult.getFacet());
+    assertThat(dtoFacetResult.getFacet()).isEqualTo("0");
 
     List<Search.FacetResultDto.TermFrequencyResultDto> listTermDto = dtoFacetResult.getFrequenciesList();
     assertThat(listTermDto).isNotNull();
@@ -136,7 +212,7 @@ public class EsResultConverterTest {
 
     Search.FacetResultDto dtoFacetResult = dtoResult.getFacets(0);
     assertThat(dtoFacetResult).isNotNull();
-    assertThat(dtoQuery.getFacet()).isEqualTo(dtoFacetResult.getFacet());
+    assertThat(dtoFacetResult.getFacet()).isEqualTo("0");
 
     Search.FacetResultDto.StatisticalResultDto dtoStatistical = dtoFacetResult.getStatistics();
     assertThat(dtoStatistical).isNotNull();
@@ -151,5 +227,35 @@ public class EsResultConverterTest {
 
     List<Search.FacetResultDto.TermFrequencyResultDto> listTermDto = dtoFacetResult.getFrequenciesList();
     assertThat(listTermDto).isEmpty();
+  }
+
+  private void validateCardinalityQueryResultDto(Search.QueryResultDto dtoResult) {
+    assertThat(dtoResult).isNotNull();
+
+    Search.FacetResultDto dtoFacetResult = dtoResult.getFacets(0);
+    assertThat(dtoFacetResult).isNotNull();
+    assertThat(dtoFacetResult.getFacet()).isEqualTo("1");
+
+    List<Search.FacetResultDto.TermFrequencyResultDto> listTermDto = dtoFacetResult.getFrequenciesList();
+    assertThat(listTermDto).isNotNull();
+    assertThat(listTermDto).hasSize(1);
+
+    Search.FacetResultDto.StatisticalResultDto statistics = dtoFacetResult.getStatistics();
+    assertThat(statistics.hasCount()).isFalse();
+  }
+
+  private void validateMissingQueryResultDto(Search.QueryResultDto dtoResult) {
+    assertThat(dtoResult).isNotNull();
+
+    Search.FacetResultDto dtoFacetResult = dtoResult.getFacets(0);
+    assertThat(dtoFacetResult).isNotNull();
+    assertThat(dtoFacetResult.getFacet()).isEqualTo("1");
+
+    List<Search.FacetResultDto.TermFrequencyResultDto> listTermDto = dtoFacetResult.getFrequenciesList();
+    assertThat(listTermDto).isNotNull();
+    assertThat(listTermDto).hasSize(1);
+
+    Search.FacetResultDto.StatisticalResultDto statistics = dtoFacetResult.getStatistics();
+    assertThat(statistics.hasCount()).isFalse();
   }
 }
