@@ -20,7 +20,12 @@ message QueryTermDto {
 }
 
 message VariableTermDto {
+  enum AltType {
+    MISSING = 0;
+    CARDINALITY = 1;
+  }
   required string variable = 1;
+  optional AltType type = 2; // when not specified: make the aggregation according to the variable nature
 
   extend QueryTermDto {
     optional VariableTermDto field = 1001;

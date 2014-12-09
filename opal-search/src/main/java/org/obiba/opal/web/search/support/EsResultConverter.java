@@ -61,7 +61,7 @@ public class EsResultConverter {
       AggregationsConverter aggsConverter = new AggregationsConverter();
       dtoResultsBuilder.addAllFacets(aggsConverter.convert(json.getJSONObject("aggregations")));
     }
-    
+
     return dtoResultsBuilder.build();
   }
 
@@ -81,25 +81,24 @@ public class EsResultConverter {
       for(Iterator<String> iterator = jsonAggregations.keys(); iterator.hasNext(); ) {
         String aggName = iterator.next();
         JSONObject jsonAggregation = jsonAggregations.getJSONObject(aggName);
-        Search.FacetResultDto.Builder dtoFacetResultBuilder = Search.FacetResultDto.newBuilder().setFacet(aggName);
+        Search.FacetResultDto.Builder dtoResultBuilder = Search.FacetResultDto.newBuilder().setFacet(aggName);
 
-        convertAggregationAPI(jsonAggregation, dtoFacetResultBuilder);
+        convertAggregation(jsonAggregation, dtoResultBuilder);
 
         if(jsonAggregation.has("doc_count")) {
-          if (jsonAggregation.has("0")) {
-            convertAggregationAPI(jsonAggregation.getJSONObject("0"), dtoFacetResultBuilder);
-          } else {
-            convertFiltered(jsonAggregation, dtoFacetResultBuilder);
+          if(jsonAggregation.has("0")) {
+            convertNestedAggregation(jsonAggregation.getJSONObject("0"), dtoResultBuilder);
           }
+          convertFiltered(jsonAggregation, dtoResultBuilder);
         }
 
-        facetsDtoList.add(dtoFacetResultBuilder.build());
+        facetsDtoList.add(dtoResultBuilder.build());
       }
 
       return facetsDtoList;
     }
 
-    private void convertAggregationAPI(JSONObject jsonAggregation, Search.FacetResultDto.Builder dtoResultBuilder)
+    private void convertAggregation(JSONObject jsonAggregation, Search.FacetResultDto.Builder dtoResultBuilder)
         throws JSONException {
       if(jsonAggregation.has("buckets")) {
         convertBuckets(jsonAggregation.getJSONArray("buckets"), dtoResultBuilder);
@@ -110,18 +109,38 @@ public class EsResultConverter {
       }
     }
 
-    private void convertFiltered(JSONObject jsonFacet, Search.FacetResultDto.Builder dtoResultBuilder)
+    private void convertNestedAggregation(JSONObject jsonAggregation, Search.FacetResultDto.Builder dtoResultBuilder)
+        throws JSONException {
+      convertAggregation(jsonAggregation, dtoResultBuilder);
+
+      if(jsonAggregation.has("doc_count")) {
+        convertMissing(jsonAggregation, dtoResultBuilder);
+      }
+    }
+
+    private void convertFiltered(JSONObject jsonAggregation, Search.FacetResultDto.Builder dtoResultBuilder)
         throws JSONException {
 
-      if(countAboveThreshold(jsonFacet.getInt("doc_count"))) {
+      if(countAboveThreshold(jsonAggregation.getInt("doc_count"))) {
         Search.FacetResultDto.FilterResultDto dtoFilter = Search.FacetResultDto.FilterResultDto.newBuilder()
-            .setCount(jsonFacet.getInt("doc_count")).build();
+            .setCount(jsonAggregation.getInt("doc_count")).build();
 
         dtoResultBuilder.addFilters(dtoFilter);
       }
     }
 
-    private void convertBuckets(JSONArray buckets, Search.FacetResultDto.Builder dtoFacetResultBuilder)
+    private void convertMissing(JSONObject jsonAggregation, Search.FacetResultDto.Builder dtoResultBuilder)
+        throws JSONException {
+
+      if(countAboveThreshold(jsonAggregation.getInt("doc_count"))) {
+        Search.FacetResultDto.TermFrequencyResultDto dtoTermFrequency = Search.FacetResultDto.TermFrequencyResultDto
+            .newBuilder().setTerm("N/A").setCount(jsonAggregation.getInt("doc_count")).build();
+
+        dtoResultBuilder.addFrequencies(dtoTermFrequency);
+      }
+    }
+
+    private void convertBuckets(JSONArray buckets, Search.FacetResultDto.Builder dtoResultBuilder)
         throws JSONException {
 
       for(int i = 0; i < buckets.length(); i++) {
@@ -131,18 +150,18 @@ public class EsResultConverter {
           Search.FacetResultDto.TermFrequencyResultDto dtoTermFrequency = Search.FacetResultDto.TermFrequencyResultDto
               .newBuilder().setTerm(term.getString("key")).setCount(term.getInt("doc_count")).build();
 
-          dtoFacetResultBuilder.addFrequencies(dtoTermFrequency);
+          dtoResultBuilder.addFrequencies(dtoTermFrequency);
         }
       }
     }
 
-    private void convertStats(JSONObject jsonStatistical, Search.FacetResultDto.Builder dtoFacetResultBuilder)
+    private void convertStats(JSONObject jsonStatistical, Search.FacetResultDto.Builder dtoResultBuilder)
         throws JSONException {
 
       if(countAboveThreshold(jsonStatistical.getInt("count"))) {
         Search.FacetResultDto.StatisticalResultDto dtoStatistical = Search.FacetResultDto.StatisticalResultDto
-            .newBuilder().setCount(jsonStatistical.getInt("count"))
-            .setTotal((float) jsonStatistical.getDouble("sum")) //
+            .newBuilder().setCount(jsonStatistical.getInt("count")).setTotal(
+                (float) jsonStatistical.getDouble("sum")) //
             .setMin((float) jsonStatistical.getDouble("min")) //
             .setMax((float) jsonStatistical.getDouble("max")) //
             .setMean((float) jsonStatistical.getDouble("avg")) //
@@ -150,7 +169,7 @@ public class EsResultConverter {
             .setVariance((float) jsonStatistical.getDouble("variance")) //
             .setStdDeviation((float) jsonStatistical.getDouble("std_deviation")).build();
 
-        dtoFacetResultBuilder.setStatistics(dtoStatistical);
+        dtoResultBuilder.setStatistics(dtoStatistical);
       }
     }
 

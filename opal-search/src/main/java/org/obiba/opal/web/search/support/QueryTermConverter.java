@@ -121,24 +121,36 @@ public class QueryTermConverter {
     JSONObject jsonField = new JSONObject();
     jsonField.put("field", variableFieldName(variable));
 
-    switch(indexManagerHelper.getVariableNature(variable)) {
+    if (dtoVariable.hasType()) {
+      switch(dtoVariable.getType()) {
+        case MISSING:
+          jsonAggregation.put("missing", jsonField);
+          break;
+        case CARDINALITY:
+          jsonAggregation.put("cardinality", jsonField);
+          break;
+      }
+    }
+    else {
+      switch(indexManagerHelper.getVariableNature(variable)) {
 
-      case CONTINUOUS:
-        jsonAggregation.put("extended_stats", jsonField);
-        break;
+        case CONTINUOUS:
+          jsonAggregation.put("extended_stats", jsonField);
+          break;
 
-      case CATEGORICAL:
-        // we want all categories frequencies: as we do not know the variable description at this point,
-        // set a default size to term facets request
-        // http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-facets-terms-facet.html
-        jsonField.put("size", termsFacetSize);
-        jsonAggregation.put("terms", jsonField);
-        break;
+        case CATEGORICAL:
+          // we want all categories frequencies: as we do not know the variable description at this point,
+          // set a default size to term facets request
+          // http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-facets-terms-facet.html
+          jsonField.put("size", termsFacetSize);
+          jsonAggregation.put("terms", jsonField);
+          break;
 
-      default:
-        jsonField.put("size", termsFacetSize);
-        jsonAggregation.put("terms", jsonField);
-        break;
+        default:
+          jsonField.put("size", termsFacetSize);
+          jsonAggregation.put("terms", jsonField);
+          break;
+      }
     }
   }
 
