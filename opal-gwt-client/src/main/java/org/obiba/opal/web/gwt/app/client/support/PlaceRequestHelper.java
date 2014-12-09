@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 
-import com.gwtplatform.mvp.client.proxy.PlaceRequest;
+import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 
 public class PlaceRequestHelper {
 

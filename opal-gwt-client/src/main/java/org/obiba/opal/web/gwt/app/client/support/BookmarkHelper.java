@@ -16,7 +16,7 @@ import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.model.client.opal.LinkDto;
 
 import com.google.common.base.Preconditions;
-import com.gwtplatform.mvp.client.proxy.PlaceRequest;
+import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 
 public final class BookmarkHelper {
 
@@ -35,7 +35,7 @@ public final class BookmarkHelper {
           .getVariablePlace(tokenizer.getProject(), tokenizer.getTable(), tokenizer.getVariable());
     } else if(tokenizer.hasTable()) {
       return ProjectPlacesHelper.getTablePlace(tokenizer.getProject(), tokenizer.getTable());
-    } else if (tokenizer.hasProject()) {
+    } else if(tokenizer.hasProject()) {
       return ProjectPlacesHelper.getProjectPlace(tokenizer.getProject());
     }
 
@@ -54,9 +54,13 @@ public final class BookmarkHelper {
     public Tokenizer() {}
 
     private int index = 0;
+
     private String[] tokens;
+
     private String project;
+
     private String table;
+
     private String variable;
 
     public static Tokenizer newTokenizer() {
@@ -68,13 +72,13 @@ public final class BookmarkHelper {
       tokens = path.substring(1).split("/");
       index = 0;
 
-      while (hasToken()) {
+      while(hasToken()) {
         String resource = nextToken();
-        if ("datasource".equals(resource)) {
+        if("datasource".equals(resource)) {
           project = nextToken();
-        } else if ("table".equals(resource)) {
+        } else if("table".equals(resource)) {
           table = nextToken();
-        } else if ("variable".equals(resource)) {
+        } else if("variable".equals(resource)) {
           variable = nextToken();
         }
       }

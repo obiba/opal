@@ -11,7 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.ui.celltable;
 
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.client.proxy.PlaceRequest;
+import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 
 public abstract class PlaceRequestCell<C> extends LinkCell<C> {
 

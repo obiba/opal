@@ -14,7 +14,7 @@ import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
 
-import com.gwtplatform.mvp.client.proxy.PlaceRequest;
+import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 
 @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
 public class ProjectPlacesHelper {

@@ -40,7 +40,7 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewImpl;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.client.proxy.PlaceRequest;
+import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 
 import static org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter.CANCEL_ACTION;
 import static org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter.LOG_ACTION;
