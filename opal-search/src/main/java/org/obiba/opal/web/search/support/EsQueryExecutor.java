@@ -63,7 +63,7 @@ public class EsQueryExecutor {
     final CountDownLatch latch = new CountDownLatch(1);
     final AtomicReference<byte[]> ref = new AtomicReference<>();
 
-    elasticSearchProvider.getRest().dispatchRequest(esRestRequest, new RestChannel() {
+    elasticSearchProvider.getRest().dispatchRequest(esRestRequest, new RestChannel(esRestRequest) {
 
       @Override
       public void sendResponse(RestResponse response) {
@@ -95,10 +95,10 @@ public class EsQueryExecutor {
   private byte[] convert(RestResponse response) throws IOException {
     byte[] entity;
     if(response.contentThreadSafe()) {
-      entity = response.content();
+      entity = response.content().toBytes();
     } else {
-      entity = new byte[response.contentLength()];
-      System.arraycopy(response.content(), 0, entity, 0, response.contentLength());
+      entity = new byte[response.content().length()];
+      System.arraycopy(response.content().toBytes(), 0, entity, 0, response.content().length());
     }
     return entity;
   }

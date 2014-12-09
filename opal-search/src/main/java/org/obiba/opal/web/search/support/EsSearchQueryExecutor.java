@@ -70,8 +70,9 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
 
     String body = build(dtoQueries, indexManagerHelper);
 
-    esProvider.getRest().dispatchRequest(new EsRestRequest(indexManagerHelper.getValueTableIndex(), body, "_search"),
-        new RestChannel() {
+    EsRestRequest request = new EsRestRequest(indexManagerHelper.getValueTableIndex(), body, "_search");
+    esProvider.getRest().dispatchRequest(request,
+        new RestChannel(request) {
 
           @Override
           public void sendResponse(RestResponse response) {
@@ -130,10 +131,10 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
   private Response convert(RestResponse response) throws IOException {
     byte[] entity;
     if(response.contentThreadSafe()) {
-      entity = response.content();
+      entity = response.content().toBytes();
     } else {
-      entity = new byte[response.contentLength()];
-      System.arraycopy(response.content(), 0, entity, 0, response.contentLength());
+      entity = new byte[response.content().length()];
+      System.arraycopy(response.content().toBytes(), 0, entity, 0, response.content().length());
     }
     return Response.status(response.status().getStatus()).entity(entity).type(response.contentType()).build();
   }

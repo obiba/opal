@@ -181,9 +181,10 @@ public class ValueTableIndexResource extends IndexResource {
     final CountDownLatch latch = new CountDownLatch(1);
     final AtomicReference<Response> ref = new AtomicReference<>();
 
+    JaxRsRestRequest request = new JaxRsRestRequest(getValueTableIndex(datasource, table), servletRequest, body, "_search");
     esProvider.getRest()
-        .dispatchRequest(new JaxRsRestRequest(getValueTableIndex(datasource, table), servletRequest, body, "_search"),
-            new RestChannel() {
+        .dispatchRequest(request,
+            new RestChannel(request) {
 
               @Override
               public void sendResponse(RestResponse response) {
@@ -210,10 +211,10 @@ public class ValueTableIndexResource extends IndexResource {
   private Response convert(RestResponse response) throws IOException {
     byte[] entity;
     if(response.contentThreadSafe()) {
-      entity = response.content();
+      entity = response.content().toBytes();
     } else {
-      entity = new byte[response.contentLength()];
-      System.arraycopy(response.content(), 0, entity, 0, response.contentLength());
+      entity = new byte[response.content().length()];
+      System.arraycopy(response.content().toBytes(), 0, entity, 0, response.content().length());
     }
     return Response.status(response.status().getStatus()).entity(entity).type(response.contentType()).build();
   }
