@@ -212,7 +212,7 @@ public class QueryTermConverter {
       convertExistFilter(jsonFilter, variable);
     }
 
-    if(dtoFilter.hasNot()) {
+    if(dtoFilter.hasNot() && dtoFilter.getNot()) {
       jsonFilter = new JSONObject().put("not", jsonFilter);
     }
 
