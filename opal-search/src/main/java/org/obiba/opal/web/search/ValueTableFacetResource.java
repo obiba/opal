@@ -9,9 +9,11 @@
  */
 package org.obiba.opal.web.search;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.codehaus.jettison.json.JSONException;
@@ -61,7 +63,7 @@ public class ValueTableFacetResource {
   @GET
   @Path("/variable/{variable}/_search")
   @Transactional(readOnly = true)
-  public Response search(@PathParam("variable") String variable) {
+  public Response search(@PathParam("variable") String variable, @Nullable @QueryParam("type") String type) {
     if(!esProvider.isEnabled()) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
     }
@@ -71,7 +73,7 @@ public class ValueTableFacetResource {
     try {
       IndexManagerHelper indexManagerHelper = new IndexManagerHelper(indexManager).setDatasource(datasource)
           .setTable(table);
-      QueryTermDtoBuilder dtoBuilder = new QueryTermDtoBuilder("0").variableTermDto(variable);
+      QueryTermDtoBuilder dtoBuilder = new QueryTermDtoBuilder("0").variableTermDto(variable, type);
 
       dtoResult = searchQueryFactory.create().execute(indexManagerHelper, dtoBuilder.build());
 

@@ -110,6 +110,10 @@ public class EsResultConverter {
         convertStats(jsonAggregation, dtoResultBuilder);
       }
 
+      if(jsonAggregation.has("value")) {
+        convertCount(jsonAggregation, dtoResultBuilder, "value");
+      }
+
       if(jsonAggregation.has("values")) {
         convertValues(jsonAggregation.getJSONObject("values"), dtoResultBuilder);
       }
@@ -121,10 +125,6 @@ public class EsResultConverter {
 
       if(jsonAggregation.has("doc_count")) {
         convertCount(jsonAggregation, dtoResultBuilder, "doc_count");
-      }
-
-      if(jsonAggregation.has("value")) {
-        convertCount(jsonAggregation, dtoResultBuilder, "value");
       }
     }
 

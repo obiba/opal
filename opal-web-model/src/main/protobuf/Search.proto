@@ -20,7 +20,7 @@ message QueryTermDto {
 }
 
 message VariableTermDto {
-  enum AltType {
+  enum AggType {
     MISSING = 0;
     CARDINALITY = 1;
     TERMS = 2;
@@ -28,7 +28,7 @@ message VariableTermDto {
     PERCENTILES = 4;
   }
   required string variable = 1;
-  optional AltType type = 2; // when not specified: make the aggregation according to the variable nature
+  optional AggType type = 2; // when not specified: make the aggregation according to the variable nature
 
   extend QueryTermDto {
     optional VariableTermDto field = 1001;

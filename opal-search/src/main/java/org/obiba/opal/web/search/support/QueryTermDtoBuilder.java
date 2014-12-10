@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.search.support;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+
 import org.obiba.opal.web.model.Search;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,12 +38,16 @@ public class QueryTermDtoBuilder {
    * Given a variable name and depending on its nature, returns a DTO query
    *
    * @param variable
+   * @param type optional field aggregation type
    * @return
    */
-  public QueryTermDtoBuilder variableTermDto(String variable) {
+  public QueryTermDtoBuilder variableTermDto(@NotNull String variable, @Nullable String type) {
     log.info("* Variable {}", variable);
     Search.VariableTermDto.Builder variableDto = Search.VariableTermDto.newBuilder();
     variableDto.setVariable(variable);
+    if(type != null) {
+      variableDto.setType(Search.VariableTermDto.AggType.valueOf(type.toUpperCase()));
+    }
     dto.setExtension(Search.VariableTermDto.field, variableDto.build());
 
     return this;
