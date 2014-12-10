@@ -20,6 +20,8 @@ import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Search;
 import org.springframework.util.Assert;
 
+import com.google.common.collect.Iterators;
+
 /**
  * Utility class used to convert an elastic search JSON query to a DTO query.
  */
@@ -107,6 +109,10 @@ public class EsResultConverter {
       if(jsonAggregation.has("avg")) {
         convertStats(jsonAggregation, dtoResultBuilder);
       }
+
+      if(jsonAggregation.has("values")) {
+        convertValues(jsonAggregation.getJSONObject("values"), dtoResultBuilder);
+      }
     }
 
     private void convertNestedAggregation(JSONObject jsonAggregation, Search.FacetResultDto.Builder dtoResultBuilder)
@@ -137,10 +143,10 @@ public class EsResultConverter {
         throws JSONException {
 
       if(countAboveThreshold(jsonAggregation.getInt(key))) {
-        Search.FacetResultDto.TermFrequencyResultDto dtoTermFrequency = Search.FacetResultDto.TermFrequencyResultDto
+        Search.FacetResultDto.ValueResultDto dtoValue = Search.FacetResultDto.ValueResultDto
             .newBuilder().setCount(jsonAggregation.getInt(key)).build();
 
-        dtoResultBuilder.addFrequencies(dtoTermFrequency);
+        dtoResultBuilder.addValues(dtoValue);
       }
     }
 
@@ -158,6 +164,18 @@ public class EsResultConverter {
         }
       }
     }
+
+    private void convertValues(JSONObject values, Search.FacetResultDto.Builder dtoResultBuilder)
+        throws JSONException {
+
+      for (String key : Iterators.toArray(values.keys(), String.class)) {
+        Search.FacetResultDto.ValueResultDto dtoValue = Search.FacetResultDto.ValueResultDto
+            .newBuilder().setKey(key).setValue((float)values.getDouble(key)).build();
+
+        dtoResultBuilder.addValues(dtoValue);
+      }
+    }
+
 
     private void convertStats(JSONObject jsonStatistical, Search.FacetResultDto.Builder dtoResultBuilder)
         throws JSONException {

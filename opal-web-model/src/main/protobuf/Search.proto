@@ -23,6 +23,9 @@ message VariableTermDto {
   enum AltType {
     MISSING = 0;
     CARDINALITY = 1;
+    TERMS = 2;
+    STATS = 3;
+    PERCENTILES = 4;
   }
   required string variable = 1;
   optional AltType type = 2; // when not specified: make the aggregation according to the variable nature
@@ -92,8 +95,14 @@ message FacetResultDto {
   }
 
   message TermFrequencyResultDto {
-    optional string term = 1;
+    required string term = 1;
     required int32 count = 2;
+  }
+
+  message ValueResultDto {
+    optional string key = 1;
+    optional int32 count = 2;
+    optional float value = 3;
   }
 
   message StatisticalResultDto {
@@ -112,6 +121,7 @@ message FacetResultDto {
   repeated TermFrequencyResultDto frequencies = 2;
   optional StatisticalResultDto statistics = 3;
   repeated FilterResultDto filters = 4;
+  repeated ValueResultDto values = 5;
 }
 
 message ItemResultDto {

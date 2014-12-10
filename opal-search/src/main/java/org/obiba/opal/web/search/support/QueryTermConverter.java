@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.obiba.opal.core.domain.VariableNature;
 import org.obiba.opal.web.model.Search;
 import org.springframework.util.Assert;
 
@@ -116,41 +117,85 @@ public class QueryTermConverter {
 
   private void convertField(Search.VariableTermDto dtoVariable, JSONObject jsonAggregation)
       throws JSONException, UnsupportedOperationException {
+    if(dtoVariable.hasType()) {
+      convertFieldByType(dtoVariable, jsonAggregation);
+    } else {
+      convertFieldByNature(dtoVariable, jsonAggregation);
+    }
+  }
 
+  /**
+   * Convert variable query to field aggregation of the specified type (if applicable).
+   *
+   * @param dtoVariable
+   * @param jsonAggregation
+   * @throws JSONException
+   * @throws UnsupportedOperationException
+   */
+  private void convertFieldByType(Search.VariableTermDto dtoVariable, JSONObject jsonAggregation)
+      throws JSONException, UnsupportedOperationException {
     String variable = dtoVariable.getVariable();
     JSONObject jsonField = new JSONObject();
     jsonField.put("field", variableFieldName(variable));
 
-    if (dtoVariable.hasType()) {
-      switch(dtoVariable.getType()) {
-        case MISSING:
-          jsonAggregation.put("missing", jsonField);
-          break;
-        case CARDINALITY:
-          jsonAggregation.put("cardinality", jsonField);
-          break;
-      }
+    switch(dtoVariable.getType()) {
+      case MISSING:
+        jsonAggregation.put("missing", jsonField);
+        break;
+      case CARDINALITY:
+        jsonAggregation.put("cardinality", jsonField);
+        break;
+      case TERMS:
+        jsonField.put("size", termsFacetSize);
+        jsonAggregation.put("terms", jsonField);
+        break;
+      case STATS:
+        if(indexManagerHelper.getVariableNature(variable) != VariableNature.CONTINUOUS)
+          throw new IllegalArgumentException(
+              "Statistics aggregation is only applicable to numeric continuous variables");
+        jsonAggregation.put("extended_stats", jsonField);
+        break;
+      case PERCENTILES:
+        if(indexManagerHelper.getVariableNature(variable) != VariableNature.CONTINUOUS)
+          throw new IllegalArgumentException(
+              "Percentiles aggregation is only applicable to numeric continuous variables");
+        jsonAggregation.put("percentiles", jsonField);
+        break;
     }
-    else {
-      switch(indexManagerHelper.getVariableNature(variable)) {
+  }
 
-        case CONTINUOUS:
-          jsonAggregation.put("extended_stats", jsonField);
-          break;
+  /**
+   * Convert field query to default field aggregation according to variable nature.
+   *
+   * @param dtoVariable
+   * @param jsonAggregation
+   * @throws JSONException
+   * @throws UnsupportedOperationException
+   */
+  private void convertFieldByNature(Search.VariableTermDto dtoVariable, JSONObject jsonAggregation)
+      throws JSONException, UnsupportedOperationException {
+    String variable = dtoVariable.getVariable();
+    JSONObject jsonField = new JSONObject();
+    jsonField.put("field", variableFieldName(variable));
 
-        case CATEGORICAL:
-          // we want all categories frequencies: as we do not know the variable description at this point,
-          // set a default size to term facets request
-          // http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-facets-terms-facet.html
-          jsonField.put("size", termsFacetSize);
-          jsonAggregation.put("terms", jsonField);
-          break;
+    switch(indexManagerHelper.getVariableNature(variable)) {
 
-        default:
-          jsonField.put("size", termsFacetSize);
-          jsonAggregation.put("terms", jsonField);
-          break;
-      }
+      case CONTINUOUS:
+        jsonAggregation.put("extended_stats", jsonField);
+        break;
+
+      case CATEGORICAL:
+        // we want all categories frequencies: as we do not know the variable description at this point,
+        // set a maximum size to term facets request (0 means maximum)
+        // http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html
+        jsonField.put("size", 0);
+        jsonAggregation.put("terms", jsonField);
+        break;
+
+      default:
+        jsonField.put("size", termsFacetSize);
+        jsonAggregation.put("terms", jsonField);
+        break;
     }
   }
 

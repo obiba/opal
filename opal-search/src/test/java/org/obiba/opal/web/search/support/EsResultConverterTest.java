@@ -20,8 +20,6 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 public class EsResultConverterTest {
 
-
-
   @Test
   public void test_convert_categorical_result() throws Exception {
     JSONObject jsonResult = new JSONObject("{\n" +
@@ -180,7 +178,72 @@ public class EsResultConverterTest {
     validateCardinalityQueryResultDto(dtoResult);
   }
 
+  @Test
+  public void test_convert_percentiles_result() throws Exception {
+    JSONObject jsonResult = new JSONObject("{\n" +
+        "    \"took\": 12,\n" +
+        "    \"timed_out\": false,\n" +
+        "    \"_shards\": {\n" +
+        "        \"total\": 5,\n" +
+        "        \"successful\": 5,\n" +
+        "        \"failed\": 0\n" +
+        "    },\n" +
+        "    \"hits\": {\n" +
+        "        \"total\": 6,\n" +
+        "        \"max_score\": 0,\n" +
+        "        \"hits\": []\n" +
+        "    },\n" +
+        "    \"aggregations\": {\n" +
+        "        \"1\": {\n" +
+        "            \"0\": {\n" +
+        "                \"values\": {\n" +
+        "                    \"1.0\": 16,\n" +
+        "                    \"5.0\": 16,\n" +
+        "                    \"25.0\": 16,\n" +
+        "                    \"50.0\": 16,\n" +
+        "                    \"75.0\": 17.5,\n" +
+        "                    \"95.0\": 21.099999999999998,\n" +
+        "                    \"99.0\": 21.82\n" +
+        "                }\n" +
+        "            },\n" +
+        "            \"doc_count\": 4\n" +
+        "        },\n" +
+        "        \"2\": {\n" +
+        "            \"0\": {\n" +
+        "                \"values\": {\n" +
+        "                    \"1.0\": 16,\n" +
+        "                    \"5.0\": 16,\n" +
+        "                    \"25.0\": 16,\n" +
+        "                    \"50.0\": 16,\n" +
+        "                    \"75.0\": 16,\n" +
+        "                    \"95.0\": 16,\n" +
+        "                    \"99.0\": 16\n" +
+        "                }\n" +
+        "            },\n" +
+        "            \"doc_count\": 5\n" +
+        "        },\n" +
+        "        \"total\": {\n" +
+        "            \"0\": {\n" +
+        "                \"values\": {\n" +
+        "                    \"1.0\": 16,\n" +
+        "                    \"5.0\": 16,\n" +
+        "                    \"25.0\": 16,\n" +
+        "                    \"50.0\": 16,\n" +
+        "                    \"75.0\": 16,\n" +
+        "                    \"95.0\": 16,\n" +
+        "                    \"99.0\": 16\n" +
+        "                }\n" +
+        "            },\n" +
+        "            \"doc_count\": 3\n" +
+        "        }\n" +
+        "    }\n" +
+        "}");
 
+    EsResultConverter converter = new EsResultConverter();
+    Search.QueryResultDto dtoResult = converter.convert(jsonResult);
+
+    validatePercentilesQueryResultDto(dtoResult);
+  }
 
   @Test(expected = JSONException.class)
   public void testConvert_InvalidJsonQuery() throws Exception {
@@ -238,7 +301,11 @@ public class EsResultConverterTest {
 
     List<Search.FacetResultDto.TermFrequencyResultDto> listTermDto = dtoFacetResult.getFrequenciesList();
     assertThat(listTermDto).isNotNull();
-    assertThat(listTermDto).hasSize(1);
+    assertThat(listTermDto).hasSize(0);
+
+    List<Search.FacetResultDto.ValueResultDto> valuesDto = dtoFacetResult.getValuesList();
+    assertThat(valuesDto).isNotNull();
+    assertThat(valuesDto).hasSize(1);
 
     Search.FacetResultDto.StatisticalResultDto statistics = dtoFacetResult.getStatistics();
     assertThat(statistics.hasCount()).isFalse();
@@ -253,7 +320,30 @@ public class EsResultConverterTest {
 
     List<Search.FacetResultDto.TermFrequencyResultDto> listTermDto = dtoFacetResult.getFrequenciesList();
     assertThat(listTermDto).isNotNull();
-    assertThat(listTermDto).hasSize(1);
+    assertThat(listTermDto).hasSize(0);
+
+    List<Search.FacetResultDto.ValueResultDto> valuesDto = dtoFacetResult.getValuesList();
+    assertThat(valuesDto).isNotNull();
+    assertThat(valuesDto).hasSize(1);
+
+    Search.FacetResultDto.StatisticalResultDto statistics = dtoFacetResult.getStatistics();
+    assertThat(statistics.hasCount()).isFalse();
+  }
+
+  private void validatePercentilesQueryResultDto(Search.QueryResultDto dtoResult) {
+    assertThat(dtoResult).isNotNull();
+
+    Search.FacetResultDto dtoFacetResult = dtoResult.getFacets(0);
+    assertThat(dtoFacetResult).isNotNull();
+    assertThat(dtoFacetResult.getFacet()).isEqualTo("1");
+
+    List<Search.FacetResultDto.TermFrequencyResultDto> listTermDto = dtoFacetResult.getFrequenciesList();
+    assertThat(listTermDto).isNotNull();
+    assertThat(listTermDto).hasSize(0);
+
+    List<Search.FacetResultDto.ValueResultDto> valuesDto = dtoFacetResult.getValuesList();
+    assertThat(valuesDto).isNotNull();
+    assertThat(valuesDto).hasSize(7);
 
     Search.FacetResultDto.StatisticalResultDto statistics = dtoFacetResult.getStatistics();
     assertThat(statistics.hasCount()).isFalse();

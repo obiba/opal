@@ -61,7 +61,7 @@ public class QueryTermConverterTest {
     Search.QueryTermsDto dtoQuery = createSimpleQueryDto(variableName);
 
     JSONObject jsonExpected = new JSONObject("{\"query\":{\"match_all\":{} }, \"size\":0, " + //
-        "\"aggregations\":{\"0\":{\"terms\":{\"field\":\"opal-data-cipreliminaryquestionnaire-LAST_MEAL_WHEN\", \"size\": 10 } } } }");
+        "\"aggregations\":{\"0\":{\"terms\":{\"field\":\"opal-data-cipreliminaryquestionnaire-LAST_MEAL_WHEN\", \"size\": 0 } } } }");
 
     JSONObject jsonResult = converter.convert(dtoQuery);
     assertThat(jsonResult).isNotNull();
