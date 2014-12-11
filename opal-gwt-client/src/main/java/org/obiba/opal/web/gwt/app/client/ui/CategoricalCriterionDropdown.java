@@ -13,7 +13,11 @@ package org.obiba.opal.web.gwt.app.client.ui;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.model.client.magma.AttributeDto;
+import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.search.FacetResultDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import com.github.gwtbootstrap.client.ui.CheckBox;
@@ -54,9 +58,8 @@ public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
 
   private SimplePanel getCategoriesChooserPanel() {
     SimplePanel categoriesPanel = new SimplePanel();
-    for(int i = 0; i < variable.getCategoriesArray().length(); i++) {
-      categories.addItem(getCategoryItem(variable.getCategoriesArray().get(i).getName()),
-          variable.getCategoriesArray().get(i).getName());
+    for(CategoryDto cat : JsArrays.toIterable(variable.getCategoriesArray())) {
+      categories.addItem(getCategoryItem(cat), cat.getName());
     }
 
     categories.addChosenChangeHandler(new UpdateFilterChosenHandler());
@@ -71,15 +74,46 @@ public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
     categories.setVisible(false);
   }
 
-  private String getCategoryItem(String name) {
+  private String getCategoryItem(CategoryDto cat) {
     // Get the frequency of this category
-    for(int i = 0; i < queryResult.getFacetsArray().get(0).getFrequenciesArray().length(); i++) {
-      if(queryResult.getFacetsArray().get(0).getFrequenciesArray().get(i).getTerm().equals(name)) {
-        return name + " (" + queryResult.getFacetsArray().get(0).getFrequenciesArray().get(i).getCount() + ")";
+    int count = 0;
+    for(FacetResultDto.TermFrequencyResultDto result : JsArrays
+        .toIterable(queryResult.getFacetsArray().get(0).getFrequenciesArray())) {
+      if(result.getTerm().equals(cat.getName())) {
+        count = result.getCount();
+        break;
       }
     }
 
-    return name;
+    StringBuilder labelBuilder = new StringBuilder(cat.getName());
+    String freqLabel = count > 0 ? " (" + count + ")" : "";
+    String catLabel = getCategoryLabel(cat);
+    // OPAL-2693 max label length: truncate cat label if necessary
+    int maxLength = 20 - labelBuilder.length() - freqLabel.length();
+
+    if(catLabel.isEmpty()) return labelBuilder.append(freqLabel).toString();
+    if(maxLength <= 0) return labelBuilder.append(freqLabel).toString();
+
+    if(catLabel.length() > maxLength) {
+      labelBuilder.append(": ").append(catLabel.substring(0, maxLength)).append("...");
+    } else {
+      labelBuilder.append(": ").append(catLabel);
+    }
+    return labelBuilder.append(freqLabel).toString();
+  }
+
+  private String getCategoryLabel(CategoryDto cat) {
+    StringBuilder label = new StringBuilder();
+    for(AttributeDto attr : JsArrays.toIterable(cat.getAttributesArray())) {
+      if(!attr.hasNamespace() && attr.getName().equals("label")) {
+        if(label.length() > 0) label.append(" ");
+        if(attr.hasLocale()) {
+          label.append("[").append(attr.getLocale()).append("] ");
+        }
+        label.append(attr.getValue());
+      }
+    }
+    return label.toString();
   }
 
   @Override
