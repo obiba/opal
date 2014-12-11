@@ -12,5 +12,6 @@
     'http://google-web-toolkit.googlecode.com/svn/tags/2.5.1/distro-source/core/src/gwt-module.dtd'>
 <module>
   <inherits name="com.google.gwt.core.Core"/>
-  <script src="moment/moment+langs.min.js"/>
+  <inherits name="com.google.common.collect.Collect"/>
+  <entry-point class="org.obiba.opal.web.gwt.datetime.client.DatetimeEntryPoint"/>
 </module>
