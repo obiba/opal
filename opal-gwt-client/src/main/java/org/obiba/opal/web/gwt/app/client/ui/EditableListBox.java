@@ -23,6 +23,7 @@ import com.google.gwt.user.client.ui.HasEnabled;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
+import com.google.gwt.user.client.ui.SuggestOracle;
 
 public class EditableListBox extends Composite implements HasText, HasValue<String>, HasEnabled {
 
@@ -35,6 +36,13 @@ public class EditableListBox extends Composite implements HasText, HasValue<Stri
   public EditableListBox() {
     suggestBox = new Typeahead();
     suggestBox.setWidget(textBox = new TextBox());
+    suggestBox.setUpdaterCallback(new Typeahead.UpdaterCallback() {
+      @Override
+      public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {
+        textBox.setValue(selectedSuggestion.getReplacementString(), true);
+        return selectedSuggestion.getReplacementString();
+      }
+    });
     FlowPanel layout = new FlowPanel();
     layout.add(suggestBox);
     initWidget(layout);

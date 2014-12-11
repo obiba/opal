@@ -10,10 +10,9 @@
 
 package org.obiba.opal.web.gwt.app.client.magma.importdata.presenter;
 
-import com.google.gwt.user.client.ui.HasText;
 import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface CsvFormatStepUiHandlers extends UiHandlers {
 
-  void selectTable(HasText selectedTable);
+  void selectTable(String selectedTable);
 }

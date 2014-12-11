@@ -180,8 +180,8 @@ public class CsvFormatStepPresenter extends PresenterWidget<CsvFormatStepPresent
   }
 
   @Override
-  public void selectTable(HasText selectedTable) {
-    UriBuilder ub = UriBuilder.create().segment("datasource", datasource.getName(), "table", selectedTable.getText())
+  public void selectTable(String selectedTable) {
+    UriBuilder ub = UriBuilder.create().segment("datasource", datasource.getName(), "table", selectedTable)
         .query("counts", "false");
     ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build()).get()//
         .withCallback(new ResourceCallback<TableDto>() {

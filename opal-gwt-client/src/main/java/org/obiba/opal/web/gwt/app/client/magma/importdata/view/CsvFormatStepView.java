@@ -23,6 +23,7 @@ import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.base.HasType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -60,6 +61,8 @@ public class CsvFormatStepView extends AbstractCsvOptionsViewWithUiHandlers<CsvF
 
   @UiField
   CsvOptionsView csvOptions;
+
+  private DatasourceDto datasource;
 
   //
   // Constructors
@@ -123,7 +126,7 @@ public class CsvFormatStepView extends AbstractCsvOptionsViewWithUiHandlers<CsvF
     boolean knownTable = tableListBox.hasItem(tableListBox.getText());
     entityTypeListBox.setEnabled(!knownTable);
     if(knownTable) {
-      getUiHandlers().selectTable(getSelectedTable());
+      getUiHandlers().selectTable(tableListBox.getText());
     }
   }
 
