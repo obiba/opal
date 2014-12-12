@@ -10,6 +10,7 @@ import org.obiba.opal.core.domain.AbstractTimestamped;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.validator.Unique;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 
@@ -123,7 +124,7 @@ public class Database extends AbstractTimestamped implements HasUniqueProperties
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).add("defaultStorage", defaultStorage).add("name", name).add("usage", usage)
+    return MoreObjects.toStringHelper(this).add("defaultStorage", defaultStorage).add("name", name).add("usage", usage)
         .add("usedForIdentifiers", usedForIdentifiers).toString();
   }
 

@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 public class SqlSettings {
 
@@ -114,7 +114,7 @@ public class SqlSettings {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).omitNullValues().add("driverClass", driverClass).add("url", url)
+    return MoreObjects.toStringHelper(this).omitNullValues().add("driverClass", driverClass).add("url", url)
         .add("username", username).add("password", password).add("properties", properties)
         .add("magmaDatasourceType", sqlSchema).toString();
   }

@@ -26,7 +26,7 @@ import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
 import org.obiba.magma.type.DateTimeType;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
@@ -138,7 +138,7 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).add("name", name).add("database", database).toString();
+    return MoreObjects.toStringHelper(this).add("name", name).add("database", database).toString();
   }
 
   @Override

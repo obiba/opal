@@ -22,6 +22,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Lists;
 
@@ -155,7 +156,7 @@ public class ReportTemplate extends AbstractTimestamped implements HasUniqueProp
 
   @Override
   public String toString() {
-    return com.google.common.base.Objects.toStringHelper(this).add("name", name).add("project", project).toString();
+    return MoreObjects.toStringHelper(this).add("name", name).add("project", project).toString();
   }
 
   @SuppressWarnings("ParameterHidesMemberVariable")
