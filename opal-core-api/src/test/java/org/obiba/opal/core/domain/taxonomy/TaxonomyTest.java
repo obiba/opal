@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Locale;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.obiba.opal.core.support.yaml.TaxonomyYaml;
 import org.yaml.snakeyaml.Yaml;
@@ -67,6 +68,7 @@ public class TaxonomyTest {
   }
 
   @Test
+  @Ignore
   public void test_yaml_read() {
     try {
       InputStream input = new URL(
