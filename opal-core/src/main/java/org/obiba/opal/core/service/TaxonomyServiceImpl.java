@@ -94,14 +94,6 @@ public class TaxonomyServiceImpl implements TaxonomyService {
 
   @Override
   public Iterable<Taxonomy> getTaxonomies() {
-    Collections.sort(taxonomies, new Comparator<Taxonomy>() {
-
-      @Override
-      public int compare(Taxonomy t1, Taxonomy t2) {
-        return t1.getName().compareTo(t2.getName());
-      }
-
-    });
     return taxonomies;
   }
 
@@ -123,9 +115,19 @@ public class TaxonomyServiceImpl implements TaxonomyService {
   }
 
   @Override
-  public void saveTaxonomy(@NotNull final Taxonomy taxonomy) {
+  public synchronized void saveTaxonomy(@NotNull final Taxonomy taxonomy) {
     Taxonomy stored = getTaxonomy(taxonomy.getName());
-    if(stored == null) taxonomies.add(taxonomy);
+    if(stored == null) {
+      taxonomies.add(taxonomy);
+      Collections.sort(taxonomies, new Comparator<Taxonomy>() {
+
+        @Override
+        public int compare(Taxonomy t1, Taxonomy t2) {
+          return t1.getName().compareTo(t2.getName());
+        }
+
+      });
+    }
     else {
       int idx = taxonomies.indexOf(stored);
       taxonomies.set(idx, taxonomy);
