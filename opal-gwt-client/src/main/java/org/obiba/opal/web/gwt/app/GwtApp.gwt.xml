@@ -89,6 +89,9 @@
   <!-- Opal Datetime Module -->
   <inherits name='org.obiba.opal.web.gwt.datetime.Datetime'/>
 
+  <!-- Opal Markdown Module -->
+  <inherits name='org.obiba.opal.web.gwt.markdown.Markdown'/>
+
   <!-- Ace editor -->
   <inherits name='org.obiba.opal.web.gwt.ace.Ace'/>
 
