@@ -1,0 +1,17 @@
+<!--
+  ~ Copyright (c) 2014 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE module PUBLIC '//gwt-module/'
+    'http://google-web-toolkit.googlecode.com/svn/tags/2.5.1/distro-source/core/src/gwt-module.dtd'>
+<module>
+  <inherits name="com.google.gwt.core.Core"/>
+  <inherits name="com.google.common.collect.Collect"/>
+  <entry-point class="org.obiba.opal.web.gwt.markdown.client.MarkdownEntryPoint"/>
+</module>
