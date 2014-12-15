@@ -23,11 +23,9 @@ import com.google.gwt.core.client.JsArray;
 
 import static org.obiba.opal.web.gwt.app.client.support.AttributeDtos.COMMENT_ATTRIBUTE;
 import static org.obiba.opal.web.gwt.app.client.support.AttributeDtos.DERIVED_FROM_ATTRIBUTE;
-import static org.obiba.opal.web.gwt.app.client.support.AttributeDtos.DESCRIPTION_ATTRIBUTE;
 import static org.obiba.opal.web.gwt.app.client.support.AttributeDtos.MAELSTROM_NAMESPACE;
 import static org.obiba.opal.web.gwt.app.client.support.AttributeDtos.OPAL_NAMESPACE;
 import static org.obiba.opal.web.gwt.app.client.support.AttributeDtos.SCRIPT_ATTRIBUTE;
-import static org.obiba.opal.web.gwt.app.client.support.AttributeDtos.STATUS_ATTRIBUTE;
 
 @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
 public class VariableDtos {
@@ -95,30 +93,12 @@ public class VariableDtos {
   }
 
   @Nullable
-  public static String getDescription(VariableDto variable) {
-    return getAttributeValue(variable, MAELSTROM_NAMESPACE, DESCRIPTION_ATTRIBUTE);
-  }
-
-  public static void setDescription(VariableDto variable, String description) {
-    setAttributeValue(variable, MAELSTROM_NAMESPACE, DESCRIPTION_ATTRIBUTE, description);
-  }
-
-  @Nullable
   public static String getComment(VariableDto variable) {
     return getAttributeValue(variable, MAELSTROM_NAMESPACE, COMMENT_ATTRIBUTE);
   }
 
   public static void setComment(VariableDto variable, String description) {
     setAttributeValue(variable, MAELSTROM_NAMESPACE, COMMENT_ATTRIBUTE, description);
-  }
-
-  @Nullable
-  public static String getStatus(VariableDto variable) {
-    return getAttributeValue(variable, MAELSTROM_NAMESPACE, STATUS_ATTRIBUTE);
-  }
-
-  public static void setStatus(VariableDto variable, String description) {
-    setAttributeValue(variable, MAELSTROM_NAMESPACE, STATUS_ATTRIBUTE, description);
   }
 
   @Nullable

@@ -136,16 +136,19 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
 
   @Override
   public void setDialogMode(VariableAttributeModalPresenter.Mode mode) {
+    editAttributeHelp.setVisible(false);
     switch(mode) {
       case APPLY:
         modal.setTitle(translations.applyAttribute());
         editAttributeHelp.setText(translations.applyAttributeHelp());
+        editAttributeHelp.setVisible(true);
         break;
       case UPDATE_MULTIPLE:
         valuesGroup.setVisible(false);
         nameGroup.setVisible(false);
         modal.setTitle(translations.editAttributes());
         editAttributeHelp.setText(translations.editAttributesHelp());
+        editAttributeHelp.setVisible(true);
         break;
       case DELETE:
         valuesGroup.setVisible(false);

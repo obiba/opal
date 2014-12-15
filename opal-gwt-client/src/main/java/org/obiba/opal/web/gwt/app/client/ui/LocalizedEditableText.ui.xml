@@ -6,7 +6,7 @@
   <b:FluidRow addStyleNames="small-bottom-margin">
     <b:InputAddOn ui:field="locale">
       <b:TextBox ui:field="textBox" visible="false"/>
-      <b:TextArea ui:field="textArea" visible="false" visibleLines="5" alternateSize="XLARGE"/>
+      <b:TextArea ui:field="textArea" visible="false" visibleLines="5" alternateSize="XXLARGE"/>
     </b:InputAddOn>
   </b:FluidRow>
 </ui:UiBinder>

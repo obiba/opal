@@ -9,11 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.support;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -42,16 +38,6 @@ public class AttributeDtos {
   public static final String COMMENT_ATTRIBUTE = "comment";
 
   public static final String STATUS_ATTRIBUTE = "status";
-
-  public static final Map<String, List<String>> NAMESPACE_ATTRIBUTES = new HashMap<String, List<String>>();
-
-  static {
-    // don't use null for unknown namespace but blank
-    NAMESPACE_ATTRIBUTES.put("", Arrays.asList(LABEL_ATTRIBUTE, SCRIPT_ATTRIBUTE));
-    NAMESPACE_ATTRIBUTES.put(OPAL_NAMESPACE, Arrays.asList(DERIVED_FROM_ATTRIBUTE));
-    NAMESPACE_ATTRIBUTES
-        .put(MAELSTROM_NAMESPACE, Arrays.asList(DESCRIPTION_ATTRIBUTE, COMMENT_ATTRIBUTE, STATUS_ATTRIBUTE));
-  }
 
   private AttributeDtos() {
   }

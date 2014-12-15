@@ -352,6 +352,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
   private List<LocalizedEditableText> getLocalizedEditableTexts(@Nullable Map<String, String> localeTexts) {
     List<LocalizedEditableText> localizedValues = new ArrayList<LocalizedEditableText>();
     LocalizedEditableText noLocale = new LocalizedEditableText();
+    noLocale.setLargeText(true);
 
     if(localeTexts != null && localeTexts.containsKey("")) {
       noLocale.setValue(new LocalizedEditableText.LocalizedText("", localeTexts.get("")));
@@ -364,6 +365,7 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     for(String locale : locales) {
       if(!locale.isEmpty()) {
         LocalizedEditableText localized = new LocalizedEditableText();
+        localized.setLargeText(true);
 
         if(localeTexts != null && localeTexts.containsKey(locale)) {
           localized.setValue(new LocalizedEditableText.LocalizedText(locale, localeTexts.get(locale)));

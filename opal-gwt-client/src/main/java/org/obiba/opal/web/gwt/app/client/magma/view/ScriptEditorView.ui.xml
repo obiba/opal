@@ -17,7 +17,7 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <g:FlowPanel addStyleNames="well no-bottom-margin">
+    <g:FlowPanel addStyleNames="well no-bottom-margin no-bottom-radius">
       <g:SimplePanel addStyleNames="pull-left">
         <o:ValueTypeChooser ui:field="valueTypes"/>
       </g:SimplePanel>
