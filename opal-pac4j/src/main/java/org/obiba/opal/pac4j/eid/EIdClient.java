@@ -1,5 +1,7 @@
 package org.obiba.opal.pac4j.eid;
 
+import org.obiba.opal.pac4j.Pac4jConfigurer;
+import org.obiba.opal.pac4j.eid.EIdAttributesDefinition.Attr;
 import org.openid4java.message.AuthSuccess;
 import org.openid4java.message.MessageException;
 import org.openid4java.message.ax.AxMessage;
@@ -23,21 +25,20 @@ public class EIdClient extends BaseOpenIdClient<CommonProfile> {
 
     public EIdClient() {
         setName(NAME);
+        setCallbackUrl(Pac4jConfigurer.getCallbackUrl());
     }
 
     @Override
     protected String getUser(WebContext context) {
-        //return SecurityUtils.getSubject().getPrincipal().toString();
         return endpoint;
     }
 
     @Override
     protected FetchRequest getFetchRequest() throws MessageException {
         final FetchRequest fetchRequest = FetchRequest.createFetchRequest();
-        fetchRequest.addAttribute(EIdAttributesDefinition.FULLNAME, OpenIDAXConstants.AX_NAME_PERSON_TYPE, true);
-        fetchRequest.addAttribute(EIdAttributesDefinition.FIRSTNAME, OpenIDAXConstants.AX_FIRST_NAME_PERSON_TYPE, true);
-        fetchRequest.addAttribute(EIdAttributesDefinition.LASTNAME, OpenIDAXConstants.AX_LAST_NAME_PERSON_TYPE, true);
-        fetchRequest.addAttribute(EIdAttributesDefinition.CARDNUMBER, OpenIDAXConstants.AX_CARD_NUMBER_TYPE, false);
+        for (Attr attr: Attr.values()) {
+            fetchRequest.addAttribute(attr.getKey(), attr.getTypeUri(), attr.isRequired());
+        }
         logger.debug("fetchRequest: {}", fetchRequest);
         return fetchRequest;
     }
@@ -48,6 +49,7 @@ public class EIdClient extends BaseOpenIdClient<CommonProfile> {
 
         if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX)) {
             final FetchResponse fetchResp = (FetchResponse) authSuccess.getExtension(AxMessage.OPENID_NS_AX);
+
             for (final String name : EIdAttributesDefinition.instance.getAllAttributes()) {
                 profile.addAttribute(name, fetchResp.getAttributeValue(name));
             }

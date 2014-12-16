@@ -14,6 +14,18 @@
 
   <dependencies>
       <dependency>
+          <groupId>org.obiba.opal</groupId>
+          <artifactId>opal-web-model</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.obiba.opal</groupId>
+          <artifactId>opal-ws</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.obiba.opal</groupId>
+          <artifactId>opal-core-ws</artifactId>
+      </dependency>
+      <dependency>
           <groupId>org.pac4j</groupId>
           <artifactId>pac4j-openid</artifactId>
       </dependency>
@@ -25,6 +37,11 @@
           <groupId>org.springframework</groupId>
           <artifactId>spring-context</artifactId>
       </dependency>
+      <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jaxrs</artifactId>
+      </dependency>
+
   </dependencies>
 
   <build>

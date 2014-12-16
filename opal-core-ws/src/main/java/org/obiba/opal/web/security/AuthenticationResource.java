@@ -72,6 +72,15 @@ public class AuthenticationResource extends AbstractSecurityComponent {
     }
   }
 
+  public static String getSucessfulLoginPath() {
+      String sessionId = SecurityUtils.getSubject().getSession().getId().toString();
+      return UriBuilder.fromPath("/")
+              .path(AuthenticationResource.class)
+              .path(AuthenticationResource.class, "checkSession")
+              .build(sessionId).getPath();
+
+  }
+
   @HEAD
   @Path("/session/{id}")
   public Response checkSession(@PathParam("id") String sessionId) {

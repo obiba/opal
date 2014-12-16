@@ -2,10 +2,7 @@ package org.obiba.opal.web.security;
 
 import java.text.SimpleDateFormat;
 
-import org.obiba.opal.core.domain.security.Bookmark;
-import org.obiba.opal.core.domain.security.Group;
-import org.obiba.opal.core.domain.security.SubjectCredentials;
-import org.obiba.opal.core.domain.security.SubjectProfile;
+import org.obiba.opal.core.domain.security.*;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.util.StringUtils;
 
@@ -91,6 +88,15 @@ public class Dtos {
     }
     return builder.build();
   }
+
+    public static Opal.AuthClientDto asDto(String name, String redirectUrl) {
+        Opal.AuthClientDto.Builder builder = Opal.AuthClientDto.newBuilder();
+        builder.setName(name);
+        if (redirectUrl != null) {
+            builder.setRedirectUrl(redirectUrl);
+        }
+        return builder.build();
+    }
 
   private static String toUri(String... fragments) {
     StringBuilder sb = new StringBuilder();

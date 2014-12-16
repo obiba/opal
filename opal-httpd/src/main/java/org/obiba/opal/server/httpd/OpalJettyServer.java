@@ -29,6 +29,9 @@ import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
 import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
 import org.jboss.resteasy.plugins.spring.SpringContextLoaderSupport;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.pac4j.Pac4jClientFilter;
+import org.obiba.opal.pac4j.Pac4jConfigurer;
+import org.obiba.opal.pac4j.Pac4jMultiClientUserFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -109,7 +112,12 @@ public class OpalJettyServer {
     handlers.addHandler(createDistFileHandler("/webapp"));
     // Add webapp extensions
     handlers.addHandler(createExtensionFileHandler(OpalRuntime.WEBAPP_EXTENSION));
-    handlers.addHandler(createServletHandler(properties));
+    ServletContextHandler servletContextHandler = createServletHandler();
+
+    //check/configure pac4j extra auth clients related servlets/filters
+    configurePac4j(servletContextHandler, properties);
+
+    handlers.addHandler(servletContextHandler);
     jettyServer.setHandler(handlers);
   }
 
@@ -174,7 +182,7 @@ public class OpalJettyServer {
     jettyServer.addConnector(sslConnector);
   }
 
-  private Handler createServletHandler(Properties properties) {
+  private ServletContextHandler createServletHandler() {
     servletContextHandler = new ServletContextHandler(ServletContextHandler.NO_SECURITY);
     servletContextHandler.setContextPath("/");
 
@@ -194,16 +202,27 @@ public class OpalJettyServer {
     servletContextHandler.setInitParameter("resteasy.servlet.mapping.prefix", "/ws");
     servletContextHandler.addServlet(HttpServletDispatcher.class, "/ws/*");
 
-    String pac4jCallbackHandler = properties.getProperty("org.obiba.opal.pac4j.clients.callbackPath", null);
-    if (pac4jCallbackHandler != null) {
-        servletContextHandler.addServlet(HttpServletDispatcher.class, pac4jCallbackHandler);
-        servletContextHandler.addFilter(authenticationFilterHolder, pac4jCallbackHandler, EnumSet.of(REQUEST, FORWARD));
-    }
-
     return servletContextHandler;
   }
 
-  private Handler createDistFileHandler(String directory) throws IOException, URISyntaxException {
+    public static final void configurePac4j(ServletContextHandler handler, Properties properties) {
+
+        if (Pac4jConfigurer.init(properties)) {
+            String pac4jCallbackPath = Pac4jConfigurer.getCallbackPath();
+            String baseRedirectPath = properties.getProperty("org.obiba.opal.pac4j.clients.basePath",
+                    Pac4jMultiClientUserFilter.DEFAULT_BASE_PATH);
+            String baseRedirectPattern = baseRedirectPath + "/*";
+
+            handler.addServlet(HttpServletDispatcher.class, baseRedirectPattern);
+            handler.addFilter(Pac4jMultiClientUserFilter.Wrapper.class, baseRedirectPattern, EnumSet.of(REQUEST, FORWARD));
+
+            handler.addServlet(HttpServletDispatcher.class, pac4jCallbackPath);
+            handler.addFilter(Pac4jClientFilter.Wrapper.class, pac4jCallbackPath, EnumSet.of(REQUEST, FORWARD));
+        }
+    }
+
+
+    private Handler createDistFileHandler(String directory) throws IOException, URISyntaxException {
     return createFileHandler("file://" + System.getProperty("OPAL_DIST") + directory);
   }
 
