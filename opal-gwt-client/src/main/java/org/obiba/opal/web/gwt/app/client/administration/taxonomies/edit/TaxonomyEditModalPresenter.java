@@ -66,6 +66,8 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
     dto.setDescriptionArray(descriptions);
 
     if(mode == EDIT_MODE.EDIT) {
+      dto.setVocabulariesArray(originalTaxonomy.getVocabulariesArray());
+
       ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder()
           .forResource(UriBuilders.SYSTEM_CONF_TAXONOMY.create().build(originalTaxonomy.getName()))//
           .withResourceBody(TaxonomyDto.stringify(dto))//

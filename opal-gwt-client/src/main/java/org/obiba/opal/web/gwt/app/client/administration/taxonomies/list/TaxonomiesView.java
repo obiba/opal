@@ -50,9 +50,11 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
   }
 
   @Override
-  public void setTaxonomies(JsArray<TaxonomiesDto.TaxonomySummaryDto> taxonomies) {
+  public void setTaxonomies(JsArray<TaxonomiesDto.TaxonomySummaryDto> taxonomies, String selection) {
     taxonomyList.clear();
     TaxonomiesDto.TaxonomySummaryDto first = null;
+    TaxonomiesDto.TaxonomySummaryDto toSelect = null;
+    NavLink activeLink = null;
     for(TaxonomiesDto.TaxonomySummaryDto taxonomy : JsArrays.toIterable(taxonomies)) {
 
       NavLink link = new NavLink(taxonomy.getName());
@@ -61,11 +63,17 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
       taxonomyList.add(link);
       if(first == null) {
         first = taxonomy;
-        link.setActive(true);
-        getUiHandlers().onTaxonomySelection(first);
+        activeLink = link;
+      }
+      if(taxonomy.getName().equals(selection)) {
+        toSelect = taxonomy;
+        activeLink = link;
       }
     }
 
+    if(toSelect != null) getUiHandlers().onTaxonomySelection(toSelect);
+    else getUiHandlers().onTaxonomySelection(first);
+    if(activeLink != null) activeLink.setActive(true);
   }
 
   private String asText(JsArray<LocaleTextDto> texts) {
@@ -85,7 +93,6 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
   void onImportDefaultTaxonomies(ClickEvent event) {
     getUiHandlers().onImportDefaultTaxonomies();
   }
-
 
   private class TaxonomyClickHandler implements ClickHandler {
 

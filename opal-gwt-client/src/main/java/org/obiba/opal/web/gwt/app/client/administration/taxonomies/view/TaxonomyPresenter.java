@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.administration.taxonomies.view;
 
 import javax.annotation.Nullable;
 
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.edit.TaxonomyEditModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularySelectedEvent;
@@ -20,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -49,10 +51,14 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
 
   private final TranslationMessages translationMessages;
 
+  private final ModalProvider<TaxonomyEditModalPresenter> taxonomyEditModalProvider;
+
   @Inject
-  public TaxonomyPresenter(Display display, EventBus eventBus, TranslationMessages translationMessages) {
+  public TaxonomyPresenter(Display display, EventBus eventBus, TranslationMessages translationMessages,
+      ModalProvider<TaxonomyEditModalPresenter> taxonomyEditModalProvider) {
     super(eventBus, display);
     this.translationMessages = translationMessages;
+    this.taxonomyEditModalProvider = taxonomyEditModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -79,6 +85,7 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
 
   @Override
   public void onEdit() {
+    taxonomyEditModalProvider.get().initView(taxonomy, TaxonomyEditModalPresenter.EDIT_MODE.EDIT);
   }
 
   @Override

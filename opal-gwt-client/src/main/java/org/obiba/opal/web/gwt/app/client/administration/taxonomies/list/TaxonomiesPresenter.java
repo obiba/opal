@@ -59,12 +59,23 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
   }
 
   void refresh() {
+    refresh(null);
+  }
+
+  /**
+   * Refresh the taxonomy list and select the one with the provided name or the first one.
+   *
+   * @param taxonomy
+   */
+  void refresh(final String taxonomy) {
     ResourceRequestBuilderFactory.<TaxonomiesDto>newBuilder()
         .forResource(UriBuilders.SYSTEM_CONF_TAXONOMIES_SUMMARIES.create().build()).get()
         .withCallback(new ResourceCallback<TaxonomiesDto>() {
           @Override
           public void onResource(Response response, TaxonomiesDto resource) {
-            getView().setTaxonomies(JsArrays.toSafeArray(resource.getSummariesArray()));
+            JsArray<TaxonomiesDto.TaxonomySummaryDto> summaries = JsArrays.toSafeArray(resource.getSummariesArray());
+            String selection = taxonomy != null ? taxonomy : null;
+            getView().setTaxonomies(summaries, selection);
           }
         }).send();
   }
@@ -73,11 +84,6 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
   public void onTaxonomySelection(TaxonomiesDto.TaxonomySummaryDto taxonomy) {
     fireEvent(new TaxonomySelectedEvent(taxonomy.getName()));
   }
-
-//  @Override
-//  public void onTaxonomyEdit(TaxonomyDto taxonomyDto) {
-//    taxonomyEditModalProvider.get().initView(taxonomyDto, TaxonomyEditModalPresenter.EDIT_MODE.EDIT);
-//  }
 
   @Override
   public void onAddTaxonomy() {
@@ -100,7 +106,7 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
     addRegisteredHandler(TaxonomyCreatedEvent.getType(), new TaxonomyCreatedEvent.TaxonomyCreatedHandler() {
       @Override
       public void onTaxonomyCreated(TaxonomyCreatedEvent event) {
-        refresh();
+        refresh(event.getName());
       }
     });
 
@@ -136,6 +142,6 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
 
   public interface Display extends View, HasUiHandlers<TaxonomiesUiHandlers> {
 
-    void setTaxonomies(JsArray<TaxonomiesDto.TaxonomySummaryDto> taxonomies);
+    void setTaxonomies(JsArray<TaxonomiesDto.TaxonomySummaryDto> taxonomies, String selection);
   }
 }
