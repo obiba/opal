@@ -318,6 +318,22 @@ public enum UriBuilders {
     }
   },
 
+  SYSTEM_CONF_TAXONOMY_VOCABULARY_TERM {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "conf", "taxonomy", "{}", "vocabulary", "{}", "term", "{}");
+
+    }
+  },
+
+  SYSTEM_CONF_TAXONOMY_VOCABULARY_TERMS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "conf", "taxonomy", "{}", "vocabulary", "{}", "terms");
+
+    }
+  },
+
   SYSTEM_CONF_TAXONOMY {
     @Override
     public UriBuilder create() {

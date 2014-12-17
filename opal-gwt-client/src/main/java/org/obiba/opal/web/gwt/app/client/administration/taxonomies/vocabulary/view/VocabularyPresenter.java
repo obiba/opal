@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.v
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomySelectedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularyDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularyUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.term.edit.TermEditModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.edit.VocabularyEditModalPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
@@ -51,6 +52,8 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
 
   private final ModalProvider<VocabularyEditModalPresenter> vocabularyEditModalProvider;
 
+  private final ModalProvider<TermEditModalPresenter> termEditModalProvider;
+
   private Runnable actionRequiringConfirmation;
 
   private TaxonomyDto taxonomy;
@@ -60,11 +63,13 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
   @Inject
   public VocabularyPresenter(Display display, EventBus eventBus, Translations translations,
       TranslationMessages translationMessages,
-      ModalProvider<VocabularyEditModalPresenter> vocabularyEditModalProvider) {
+      ModalProvider<VocabularyEditModalPresenter> vocabularyEditModalProvider,
+      ModalProvider<TermEditModalPresenter> termEditModalProvider) {
     super(eventBus, display);
     this.translations = translations;
     this.translationMessages = translationMessages;
     this.vocabularyEditModalProvider = vocabularyEditModalProvider.setContainer(this);
+    this.termEditModalProvider = termEditModalProvider.setContainer(this);
     getView().setUiHandlers(this);
     addHandlers();
   }
@@ -116,13 +121,18 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
   }
 
   @Override
-  public void onEditTerm(TermDto termDto) {
+  public void onAddTerm() {
+    termEditModalProvider.get().initView(taxonomy, vocabulary, TermDto.create());
+  }
 
+  @Override
+  public void onEditTerm(TermDto termDto) {
+    termEditModalProvider.get().initView(taxonomy, vocabulary, termDto);
   }
 
   @Override
   public void onDeleteTerm(TermDto termDto) {
-
+    // TODO
   }
 
   @Override

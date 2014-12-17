@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.edit;
+package org.obiba.opal.web.gwt.app.client.administration.taxonomies.term.edit;
 
 import javax.annotation.Nullable;
 
@@ -17,7 +17,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.LocalizedEditor;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
-import org.obiba.opal.web.model.client.opal.VocabularyDto;
+import org.obiba.opal.web.model.client.opal.TermDto;
 
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.TextBox;
@@ -32,10 +32,10 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-public class VocabularyEditModalView extends ModalPopupViewWithUiHandlers<VocabularyEditModalUiHandlers>
-    implements VocabularyEditModalPresenter.Display {
+public class TermEditModalView extends ModalPopupViewWithUiHandlers<TermEditModalUiHandlers>
+    implements TermEditModalPresenter.Display {
 
-  interface ViewUiBinder extends UiBinder<Widget, VocabularyEditModalView> {}
+  interface ViewUiBinder extends UiBinder<Widget, TermEditModalView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -57,7 +57,7 @@ public class VocabularyEditModalView extends ModalPopupViewWithUiHandlers<Vocabu
   CheckBox repeatable;
 
   @Inject
-  public VocabularyEditModalView(EventBus eventBus) {
+  public TermEditModalView(EventBus eventBus) {
     super(eventBus);
     uiBinder.createAndBindUi(this);
     modal.setTitle(translations.addTaxonomy());
@@ -69,23 +69,22 @@ public class VocabularyEditModalView extends ModalPopupViewWithUiHandlers<Vocabu
   }
 
   @Override
-  public void setMode(VocabularyEditModalPresenter.EDIT_MODE editionMode) {
-    modal.setTitle(editionMode == VocabularyEditModalPresenter.EDIT_MODE.CREATE
-        ? translations.addVocabulary()
-        : translations.editVocabulary());
+  public void setMode(TermEditModalPresenter.EDIT_MODE editionMode) {
+    modal.setTitle(editionMode == TermEditModalPresenter.EDIT_MODE.CREATE
+        ? translations.addTerm()
+        : translations.editTerm());
   }
 
   @Override
-  public void setVocabulary(VocabularyDto vocabulary, JsArrayString locales) {
-    name.setText(vocabulary.getName());
-    titles.setLocaleTexts(vocabulary.getTitleArray(), JsArrays.toList(locales));
-    descriptions.setLocaleTexts(vocabulary.getDescriptionArray(), JsArrays.toList(locales));
-    repeatable.setValue(vocabulary.hasRepeatable() && vocabulary.getRepeatable());
+  public void setTerm(TermDto term, JsArrayString locales) {
+    name.setText(term.getName());
+    titles.setLocaleTexts(term.getTitleArray(), JsArrays.toList(locales));
+    descriptions.setLocaleTexts(term.getDescriptionArray(), JsArrays.toList(locales));
   }
 
   @UiHandler("save")
   void onSave(ClickEvent event) {
-    getUiHandlers().onSave(name.getText(), repeatable.getValue(), titles.getLocaleTexts(), descriptions.getLocaleTexts());
+    getUiHandlers().onSave(name.getText(), titles.getLocaleTexts(), descriptions.getLocaleTexts());
   }
 
   @UiHandler("cancel")

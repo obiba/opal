@@ -16,6 +16,8 @@ public interface VocabularyUiHandlers extends UiHandlers {
 
   void onTaxonomySelected();
 
+  void onAddTerm();
+
   void onEditTerm(TermDto termDto);
 
   void onDeleteTerm(TermDto termDto);

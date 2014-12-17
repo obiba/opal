@@ -1677,9 +1677,21 @@ public interface Translations extends Constants {
   @DefaultStringValue("Edit Taxonomy")
   String editTaxonomy();
 
-  @Description("Page Vocabulary title")
-  @DefaultStringValue("Vocabulary")
-  String pageVocabularyTitle();
+  @Description("Add Vocabulary")
+  @DefaultStringValue("Add Vocabulary")
+  String addVocabulary();
+
+  @Description("Edit Vocabulary")
+  @DefaultStringValue("Edit Vocabulary")
+  String editVocabulary();
+
+  @Description("Add Term")
+  @DefaultStringValue("Add Term")
+  String addTerm();
+
+  @Description("Edit Term")
+  @DefaultStringValue("Edit Term")
+  String editTerm();
 
   @Description("Page Java title")
   @DefaultStringValue("Java Virtual Machine")

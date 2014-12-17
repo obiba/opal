@@ -95,7 +95,7 @@ public class Dtos {
     return termDto;
   }
 
-  private static Term fromDto(Opal.TermDto from) {
+  public static Term fromDto(Opal.TermDto from) {
     Term term = new Term(from.getName());
     term.setTitle(fromLocaleTextDtoList(from.getTitleList()));
     term.setDescription(fromLocaleTextDtoList(from.getDescriptionList()));

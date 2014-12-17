@@ -11,11 +11,8 @@
 package org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.edit;
 
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularyDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularyUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -25,11 +22,9 @@ import org.obiba.opal.web.model.client.opal.GeneralConf;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.opal.VocabularyDto;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -40,13 +35,9 @@ import com.gwtplatform.mvp.client.PopupView;
 public class VocabularyEditModalPresenter extends ModalPresenterWidget<VocabularyEditModalPresenter.Display>
     implements VocabularyEditModalUiHandlers {
 
-  private final Translations translations;
-
   private TaxonomyDto originalTaxonomy;
 
   private VocabularyDto originalVocabulary;
-
-  private RemoveRunnable removeConfirmation;
 
   private EDIT_MODE mode;
 
@@ -56,16 +47,9 @@ public class VocabularyEditModalPresenter extends ModalPresenterWidget<Vocabular
   }
 
   @Inject
-  public VocabularyEditModalPresenter(EventBus eventBus, Display display, Translations translations) {
+  public VocabularyEditModalPresenter(EventBus eventBus, Display display) {
     super(eventBus, display);
-    this.translations = translations;
     getView().setUiHandlers(this);
-  }
-
-  @Override
-  public void onBind() {
-    // Register event handlers
-    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler()));
   }
 
   @Override
@@ -143,20 +127,6 @@ public class VocabularyEditModalPresenter extends ModalPresenterWidget<Vocabular
         }).get().send();
   }
 
-  private boolean uniqueVocabularyName(String name) {
-    for(int i = 0; i < originalTaxonomy.getVocabulariesCount(); i++) {
-      if(originalTaxonomy.getVocabularies(i).equals(name)) {
-        showMessage("VOCABULARY", translations.userMessageMap().get("VocabularyNameMustBeUnique"));
-        return false;
-      }
-    }
-    return true;
-  }
-
-  void showMessage(String id, String message) {
-    getView().showError(Display.FormField.valueOf(id), message);
-  }
-
   public interface Display extends PopupView, HasUiHandlers<VocabularyEditModalUiHandlers> {
 
     enum FormField {
@@ -168,51 +138,6 @@ public class VocabularyEditModalPresenter extends ModalPresenterWidget<Vocabular
     void setVocabulary(VocabularyDto vocabulary, JsArrayString locales);
 
     void showError(FormField formField, String message);
-  }
-
-  // Remove group/user confirmation event
-  private class RemoveRunnable implements Runnable {
-
-    private final String name;
-
-    RemoveRunnable(String name) {
-      this.name = name;
-    }
-
-    @Override
-    public void run() {
-      ResourceRequestBuilderFactory.newBuilder().forResource(
-          UriBuilders.SYSTEM_CONF_TAXONOMY_VOCABULARY.create().build(originalTaxonomy.getName(), name))//
-          .withCallback(new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              getView().hide();
-              getEventBus().fireEvent(new VocabularyDeletedEvent(originalTaxonomy.getName(), name));
-            }
-          }, Response.SC_OK)//
-          .withCallback(new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              if(response.getText() != null && response.getText().length() != 0) {
-                ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-                getEventBus().fireEvent(
-                    NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray()).build());
-              }
-            }
-          }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR)//
-          .delete().send();
-    }
-  }
-
-  private class RemoveConfirmationEventHandler implements ConfirmationEvent.Handler {
-
-    @Override
-    public void onConfirmation(ConfirmationEvent event) {
-      if(removeConfirmation != null && event.getSource().equals(removeConfirmation) && event.isConfirmed()) {
-        removeConfirmation.run();
-        removeConfirmation = null;
-      }
-    }
   }
 
 }

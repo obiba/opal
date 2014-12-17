@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.system.taxonomy;
 
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.cfg.TaxonomyService;
@@ -68,6 +69,21 @@ public class VocabularyResourceImpl implements VocabularyResource {
   @Override
   public Response deleteVocabulary() {
     taxonomyService.deleteVocabulary(taxonomyName, vocabularyName);
+    return Response.ok().build();
+  }
+
+  @Override
+  public Response createTerm(Opal.TermDto dto) {
+    Vocabulary vocabulary = taxonomyService.getVocabulary(taxonomyName, vocabularyName);
+    vocabulary.addTerm(Dtos.fromDto(dto));
+    taxonomyService.saveVocabulary(taxonomyName, vocabularyName, vocabulary);
+    return Response.ok().build();
+  }
+
+  @Override
+  public Response saveTerm(@PathParam("term") String term, Opal.TermDto dto) {
+    Vocabulary vocabulary = taxonomyService.getVocabulary(taxonomyName, vocabularyName);
+    // TODO
     return Response.ok().build();
   }
 }

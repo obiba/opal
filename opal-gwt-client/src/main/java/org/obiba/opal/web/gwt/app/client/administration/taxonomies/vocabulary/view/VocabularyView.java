@@ -157,6 +157,12 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
     getUiHandlers().onFilterUpdate(filter.getText());
   }
 
+  @UiHandler("addTerm")
+  void onAddTerm(ClickEvent event) {
+    getUiHandlers().onAddTerm();
+  }
+
+
   @Override
   public void renderVocabulary(TaxonomyDto taxonomy, VocabularyDto vocabulary) {
     back.setTitle(taxonomy.getName());
