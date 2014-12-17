@@ -61,7 +61,7 @@ public class VocabularyResourceImpl implements VocabularyResource {
 
   @Override
   public Response saveVocabulary(Opal.VocabularyDto dto) {
-    taxonomyService.saveVocabulary(taxonomyName, Dtos.fromDto(dto));
+    taxonomyService.saveVocabulary(taxonomyName, vocabularyName, Dtos.fromDto(dto));
     return Response.ok().build();
   }
 

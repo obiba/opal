@@ -23,6 +23,7 @@ import javax.validation.constraints.NotNull;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.opal.core.cfg.NoSuchTaxonomyException;
+import org.obiba.opal.core.cfg.NoSuchVocabularyException;
 import org.obiba.opal.core.cfg.TaxonomyService;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.domain.taxonomy.Vocabulary;
@@ -167,6 +168,14 @@ public class TaxonomyServiceImpl implements TaxonomyService {
     Taxonomy taxonomy = getTaxonomy(taxonomyName);
     if(taxonomy == null) throw new NoSuchTaxonomyException(taxonomyName);
     taxonomy.addVocabulary(vocabulary);
+  }
+
+  @Override
+  public void saveVocabulary(@NotNull String taxonomyName, @NotNull String vocabularyName, @NotNull Vocabulary vocabulary)
+      throws NoSuchTaxonomyException, NoSuchVocabularyException {
+    Taxonomy taxonomy = getTaxonomy(taxonomyName);
+    if(taxonomy == null) throw new NoSuchTaxonomyException(taxonomyName);
+    taxonomy.updateVocabulary(vocabularyName, vocabulary);
   }
 
   @Override
