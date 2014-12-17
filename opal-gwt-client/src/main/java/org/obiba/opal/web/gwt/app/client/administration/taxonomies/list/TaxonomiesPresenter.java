@@ -1,9 +1,10 @@
 package org.obiba.opal.web.gwt.app.client.administration.taxonomies.list;
 
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.edit.TaxonomyEditModalPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomySelectedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularyDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularySelectedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.TaxonomyPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.view.VocabularyPresenter;
@@ -20,7 +21,6 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
@@ -28,21 +28,20 @@ import com.gwtplatform.mvp.client.View;
 
 public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Display> implements TaxonomiesUiHandlers {
 
-  private final Provider<TaxonomyPresenter> taxonomyPresenterProvider;
+  private final TaxonomyPresenter taxonomyPresenter;
 
-  private final Provider<VocabularyPresenter> vocabularyPresenterProvider;
+  private final VocabularyPresenter vocabularyPresenter;
 
   private final ModalProvider<TaxonomyEditModalPresenter> taxonomyEditModalProvider;
 
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
-  public TaxonomiesPresenter(Display display, EventBus eventBus, Provider<TaxonomyPresenter> taxonomyPresenterProvider,
-      Provider<VocabularyPresenter> vocabularyPresenterProvider,
-      ModalProvider<TaxonomyEditModalPresenter> taxonomyEditModalProvider) {
+  public TaxonomiesPresenter(Display display, EventBus eventBus, TaxonomyPresenter taxonomyPresenter,
+      VocabularyPresenter vocabularyPresenter, ModalProvider<TaxonomyEditModalPresenter> taxonomyEditModalProvider) {
     super(eventBus, display);
     getView().setUiHandlers(this);
-    this.taxonomyPresenterProvider = taxonomyPresenterProvider;
-    this.vocabularyPresenterProvider = vocabularyPresenterProvider;
+    this.taxonomyPresenter = taxonomyPresenter;
+    this.vocabularyPresenter = vocabularyPresenter;
     this.taxonomyEditModalProvider = taxonomyEditModalProvider.setContainer(this);
   }
 
@@ -87,7 +86,7 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
 
   @Override
   public void onAddTaxonomy() {
-    taxonomyEditModalProvider.get().initView(TaxonomyDto.create(), TaxonomyEditModalPresenter.EDIT_MODE.CREATE);
+    taxonomyEditModalProvider.get().initView(TaxonomyDto.create());
   }
 
   @Override
@@ -103,9 +102,10 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
   }
 
   private void addHandlers() {
-    addRegisteredHandler(TaxonomyCreatedEvent.getType(), new TaxonomyCreatedEvent.TaxonomyCreatedHandler() {
+    addRegisteredHandler(TaxonomyUpdatedEvent.getType(), new TaxonomyUpdatedEvent.TaxonomyUpdatedHandler() {
+
       @Override
-      public void onTaxonomyCreated(TaxonomyCreatedEvent event) {
+      public void onTaxonomyUpdated(TaxonomyUpdatedEvent event) {
         refresh(event.getName());
       }
     });
@@ -114,21 +114,16 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
 
       @Override
       public void onTaxonomySelected(TaxonomySelectedEvent event) {
-        String name = event.getTaxonomy();
-        TaxonomyPresenter presenter = taxonomyPresenterProvider.get();
-        presenter.setTaxonomy(event.getTaxonomy());
-        setInSlot(null, presenter);
+        taxonomyPresenter.setTaxonomy(event.getTaxonomy());
+        setInSlot(null, taxonomyPresenter);
       }
     });
 
     addRegisteredHandler(VocabularySelectedEvent.getType(), new VocabularySelectedEvent.VocabularySelectedHandler() {
       @Override
       public void onVocabularySelected(VocabularySelectedEvent event) {
-        TaxonomyDto taxonomy = event.getTaxonomy();
-        String name = event.getVocabulary();
-        VocabularyPresenter presenter = vocabularyPresenterProvider.get();
-        presenter.setVocabulary(event.getTaxonomy(), event.getVocabulary());
-        setInSlot(null, presenter);
+        vocabularyPresenter.setVocabulary(event.getTaxonomy(), event.getVocabulary());
+        setInSlot(null, vocabularyPresenter);
       }
     });
 
@@ -136,6 +131,14 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
       @Override
       public void onTaxonomyDeleted(TaxonomyDeletedEvent event) {
         refresh();
+      }
+    });
+
+    addRegisteredHandler(VocabularyDeletedEvent.getType(), new VocabularyDeletedEvent.VocabularyDeletedHandler() {
+      @Override
+      public void onVocabularyDeleted(VocabularyDeletedEvent event) {
+        taxonomyPresenter.setTaxonomy(event.getTaxonomy());
+        setInSlot(null, taxonomyPresenter);
       }
     });
   }

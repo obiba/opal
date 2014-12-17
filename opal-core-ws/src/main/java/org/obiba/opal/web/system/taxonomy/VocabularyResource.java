@@ -1,5 +1,6 @@
 package org.obiba.opal.web.system.taxonomy;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.core.Response;
@@ -17,4 +18,7 @@ public interface VocabularyResource {
 
   @PUT
   Response saveVocabulary(Opal.VocabularyDto dto);
+
+  @DELETE
+  Response deleteVocabulary();
 }

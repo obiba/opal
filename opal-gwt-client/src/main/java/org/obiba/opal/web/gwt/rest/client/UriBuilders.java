@@ -326,6 +326,14 @@ public enum UriBuilders {
     }
   },
 
+  SYSTEM_CONF_TAXONOMY_VOCABULARIES {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "conf", "taxonomy", "{}", "vocabularies");
+
+    }
+  },
+
   SYSTEM_KEYSTORE_HTTPS_CERTIFICATE {
     @Override
     public UriBuilder create() {

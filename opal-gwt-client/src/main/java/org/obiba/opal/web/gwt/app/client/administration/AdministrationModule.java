@@ -76,8 +76,8 @@ import org.obiba.opal.web.gwt.app.client.administration.taxonomies.list.Taxonomi
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.list.TaxonomiesView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.TaxonomyPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.TaxonomyView;
-import org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.edit.VocabularyEditPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.edit.VocabularyEditView;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.edit.VocabularyEditModalPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.edit.VocabularyEditModalView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.view.VocabularyPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.view.VocabularyView;
 import org.obiba.opal.web.gwt.app.client.administration.users.changePassword.ChangePasswordModalPresenter;
@@ -134,9 +134,9 @@ public class AdministrationModule extends AbstractPresenterModule {
     bindPresenterWidget(TaxonomyPresenter.class, TaxonomyPresenter.Display.class, TaxonomyView.class);
     bindPresenterWidget(TaxonomyEditModalPresenter.class, TaxonomyEditModalPresenter.Display.class,
         TaxonomyEditModalView.class);
+    bindPresenterWidget(VocabularyEditModalPresenter.class, VocabularyEditModalPresenter.Display.class,
+        VocabularyEditModalView.class);
     bindPresenterWidget(VocabularyPresenter.class, VocabularyPresenter.Display.class, VocabularyView.class);
-    bindPresenter(VocabularyEditPresenter.class, VocabularyEditPresenter.Display.class, VocabularyEditView.class,
-        VocabularyEditPresenter.Proxy.class);
   }
 
   private void configureUserGroups() {

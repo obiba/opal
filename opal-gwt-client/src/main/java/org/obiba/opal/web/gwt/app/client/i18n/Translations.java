@@ -576,7 +576,9 @@ public interface Translations extends Constants {
 //
       "CannotCopyAllTablesWithinProject", "This action would be applied to all tables. You cannot copy multiple " +
       "tables within the same project. Copy each table individually or create a new project.",//
-      "IdentifierMappingFailed", "Identifiers mapping failed : {0}."
+      "IdentifierMappingFailed", "Identifiers mapping failed : {0}.",//
+      "TaxonomyNotFound", "No such taxonomy with name: {0}.",
+      "VocabularyNotFound", "No such vocabulary in taxonomy '{0}' with name: {1}."
   })
   Map<String, String> userMessageMap();
 

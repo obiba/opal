@@ -136,6 +136,10 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Remove Taxonomy")
   String removeTaxonomy();
 
+  @Description("Remove Vocabulary label")
+  @DefaultMessage("Remove Vocabulary")
+  String removeVocabulary();
+
   @Description("Remove Variables label")
   @DefaultMessage("Remove Variables")
   String removeVariables();
@@ -279,8 +283,14 @@ public interface TranslationMessages extends Messages {
   @Description(
       "Please confirm that you want to remove the current Taxonomy from Opal configuration message")
   @DefaultMessage(
-      "Please confirm that you want to remove the current taxonomy from Opal configuration (variable attributes will not be affected).")
+      "Please confirm that you want to remove the current taxonomy from configuration (variable attributes will not be affected).")
   String confirmDeleteTaxonomy();
+
+  @Description(
+      "Please confirm that you want to remove the current Vocabulary message")
+  @DefaultMessage(
+      "Please confirm that you want to remove the current vocabulary (variable attributes will not be affected).")
+  String confirmDeleteVocabulary();
 
   @Description(
       "A variable with the same name already exists. Please confirm that you want to overwrite this variable message")

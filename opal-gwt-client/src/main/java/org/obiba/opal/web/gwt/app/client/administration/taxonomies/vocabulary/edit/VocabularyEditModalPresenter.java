@@ -1,7 +1,18 @@
-package org.obiba.opal.web.gwt.app.client.administration.taxonomies.edit;
+/*
+ * Copyright (c) 2014 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyDeletedEvent;
+package org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.edit;
+
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularyDeletedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularyUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -13,6 +24,7 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.GeneralConf;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
+import org.obiba.opal.web.model.client.opal.VocabularyDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -25,12 +37,14 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 
-public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEditModalPresenter.Display>
-    implements TaxonomyEditModalUiHandlers {
+public class VocabularyEditModalPresenter extends ModalPresenterWidget<VocabularyEditModalPresenter.Display>
+    implements VocabularyEditModalUiHandlers {
 
   private final Translations translations;
 
   private TaxonomyDto originalTaxonomy;
+
+  private VocabularyDto originalVocabulary;
 
   private RemoveRunnable removeConfirmation;
 
@@ -42,7 +56,7 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
   }
 
   @Inject
-  public TaxonomyEditModalPresenter(EventBus eventBus, Display display, Translations translations) {
+  public VocabularyEditModalPresenter(EventBus eventBus, Display display, Translations translations) {
     super(eventBus, display);
     this.translations = translations;
     getView().setUiHandlers(this);
@@ -55,23 +69,26 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
   }
 
   @Override
-  public void onSave(String name, JsArray<LocaleTextDto> titles, JsArray<LocaleTextDto> descriptions) {
-    final TaxonomyDto dto = TaxonomyDto.create();
+  public void onSave(String name, boolean repeatable, JsArray<LocaleTextDto> titles,
+      JsArray<LocaleTextDto> descriptions) {
+    final VocabularyDto dto = VocabularyDto.create();
     dto.setName(name);
     dto.setTitleArray(titles);
     dto.setDescriptionArray(descriptions);
+    dto.setRepeatable(repeatable);
 
     if(mode == EDIT_MODE.EDIT) {
-      dto.setVocabulariesArray(originalTaxonomy.getVocabulariesArray());
+      dto.setTermsArray(originalVocabulary.getTermsArray());
 
-      ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder()
-          .forResource(UriBuilders.SYSTEM_CONF_TAXONOMY.create().build(originalTaxonomy.getName()))//
-          .withResourceBody(TaxonomyDto.stringify(dto))//
+      ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder().forResource(
+          UriBuilders.SYSTEM_CONF_TAXONOMY_VOCABULARY.create()
+              .build(originalTaxonomy.getName(), originalVocabulary.getName()))//
+          .withResourceBody(VocabularyDto.stringify(dto))//
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
               getView().hide();
-              getEventBus().fireEvent(new TaxonomyUpdatedEvent(dto.getName()));
+              getEventBus().fireEvent(new VocabularyUpdatedEvent(originalTaxonomy.getName(), dto.getName()));
             }
           }, Response.SC_OK, Response.SC_CREATED)//
           .withCallback(new ResponseCodeCallback() {
@@ -84,14 +101,14 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
           }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR)//
           .put().send();
     } else {
-      ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder()
-          .forResource(UriBuilders.SYSTEM_CONF_TAXONOMIES.create().build())//
-          .withResourceBody(TaxonomyDto.stringify(dto))//
+      ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder().forResource(
+          UriBuilders.SYSTEM_CONF_TAXONOMY_VOCABULARIES.create().build(originalTaxonomy.getName()))//
+          .withResourceBody(VocabularyDto.stringify(dto))//
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
               getView().hide();
-              getEventBus().fireEvent(new TaxonomyUpdatedEvent(dto.getName()));
+              getEventBus().fireEvent(new TaxonomyUpdatedEvent(originalTaxonomy.getName()));
             }
           }, Response.SC_OK, Response.SC_CREATED)//
           .withCallback(new ResponseCodeCallback() {
@@ -106,9 +123,10 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
     }
   }
 
-  public void initView(final TaxonomyDto taxonomyDto) {
+  public void initView(final TaxonomyDto taxonomyDto, final VocabularyDto vocabularyDto) {
     originalTaxonomy = taxonomyDto;
-    mode = taxonomyDto.hasName() ? EDIT_MODE.EDIT : EDIT_MODE.CREATE;
+    originalVocabulary = vocabularyDto;
+    mode = vocabularyDto.hasName() ? EDIT_MODE.EDIT : EDIT_MODE.CREATE;
 
     ResourceRequestBuilderFactory.<GeneralConf>newBuilder()
         .forResource(UriBuilders.SYSTEM_CONF_GENERAL.create().build())
@@ -120,12 +138,26 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
               locales.push(resource.getLanguages(i));
             }
             getView().setMode(mode);
-            getView().setTaxonomy(taxonomyDto, locales);
+            getView().setVocabulary(vocabularyDto, locales);
           }
         }).get().send();
   }
 
-  public interface Display extends PopupView, HasUiHandlers<TaxonomyEditModalUiHandlers> {
+  private boolean uniqueVocabularyName(String name) {
+    for(int i = 0; i < originalTaxonomy.getVocabulariesCount(); i++) {
+      if(originalTaxonomy.getVocabularies(i).equals(name)) {
+        showMessage("VOCABULARY", translations.userMessageMap().get("VocabularyNameMustBeUnique"));
+        return false;
+      }
+    }
+    return true;
+  }
+
+  void showMessage(String id, String message) {
+    getView().showError(Display.FormField.valueOf(id), message);
+  }
+
+  public interface Display extends PopupView, HasUiHandlers<VocabularyEditModalUiHandlers> {
 
     enum FormField {
       VOCABULARY
@@ -133,7 +165,7 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
 
     void setMode(EDIT_MODE editionMode);
 
-    void setTaxonomy(TaxonomyDto taxonomy, JsArrayString locales);
+    void setVocabulary(VocabularyDto vocabulary, JsArrayString locales);
 
     void showError(FormField formField, String message);
   }
@@ -149,12 +181,13 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
 
     @Override
     public void run() {
-      ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SYSTEM_CONF_TAXONOMY.create().build(name))//
+      ResourceRequestBuilderFactory.newBuilder().forResource(
+          UriBuilders.SYSTEM_CONF_TAXONOMY_VOCABULARY.create().build(originalTaxonomy.getName(), name))//
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
               getView().hide();
-              getEventBus().fireEvent(new TaxonomyDeletedEvent(originalTaxonomy));
+              getEventBus().fireEvent(new VocabularyDeletedEvent(originalTaxonomy.getName(), name));
             }
           }, Response.SC_OK)//
           .withCallback(new ResponseCodeCallback() {

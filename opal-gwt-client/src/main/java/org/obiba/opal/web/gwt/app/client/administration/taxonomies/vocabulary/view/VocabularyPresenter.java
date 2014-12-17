@@ -10,10 +10,19 @@
 package org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomySelectedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularyDeletedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularyUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.edit.VocabularyEditModalPresenter;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
@@ -22,6 +31,7 @@ import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -29,31 +39,44 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
+import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
+import static com.google.gwt.http.client.Response.SC_OK;
 import static org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.view.VocabularyPresenter.Display;
 
 public class VocabularyPresenter extends PresenterWidget<Display> implements VocabularyUiHandlers {
 
   private final Translations translations;
 
+  private final TranslationMessages translationMessages;
+
+  private final ModalProvider<VocabularyEditModalPresenter> vocabularyEditModalProvider;
+
+  private Runnable actionRequiringConfirmation;
+
   private TaxonomyDto taxonomy;
 
   private VocabularyDto vocabulary;
 
   @Inject
-  public VocabularyPresenter(Display display, EventBus eventBus, Translations translations) {
+  public VocabularyPresenter(Display display, EventBus eventBus, Translations translations,
+      TranslationMessages translationMessages,
+      ModalProvider<VocabularyEditModalPresenter> vocabularyEditModalProvider) {
     super(eventBus, display);
     this.translations = translations;
+    this.translationMessages = translationMessages;
+    this.vocabularyEditModalProvider = vocabularyEditModalProvider.setContainer(this);
     getView().setUiHandlers(this);
+    addHandlers();
   }
 
   public void setVocabulary(TaxonomyDto taxonomy, String name) {
     this.taxonomy = taxonomy;
-    refresh(name);
+    refresh(taxonomy.getName(), name);
   }
 
-  private void refresh(String name) {
+  private void refresh(String taxonomyName, String name) {
     ResourceRequestBuilderFactory.<VocabularyDto>newBuilder().forResource(
-        UriBuilders.SYSTEM_CONF_TAXONOMY_VOCABULARY.create().build(taxonomy.getName(), name))//
+        UriBuilders.SYSTEM_CONF_TAXONOMY_VOCABULARY.create().build(taxonomyName, name))//
         .get()//
         .withCallback(new ResourceCallback<VocabularyDto>() {
 
@@ -61,9 +84,10 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
           public void onResource(Response response, VocabularyDto resource) {
             vocabulary = resource;
             getView().renderVocabulary(taxonomy, resource);
-
           }
-        }).send();
+        })
+        .withCallback(SC_NOT_FOUND, new VocabularyNotFoundCallback(taxonomy.getName(), name)) //
+        .send();
   }
 
   @Override
@@ -83,11 +107,30 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
 
   @Override
   public void onDelete() {
-
+    actionRequiringConfirmation = new Runnable() {
+      @Override
+      public void run() {
+        ResourceRequestBuilderFactory.newBuilder() //
+            .forResource(
+                UriBuilders.SYSTEM_CONF_TAXONOMY_VOCABULARY.create().build(taxonomy.getName(), vocabulary.getName())) //
+            .withCallback(SC_OK, new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                fireEvent(new VocabularyDeletedEvent(taxonomy.getName(), vocabulary.getName()));
+              }
+            }) //
+            .withCallback(SC_NOT_FOUND, new VocabularyNotFoundCallback(taxonomy.getName(), vocabulary.getName())) //
+            .delete().send();
+      }
+    };
+    fireEvent(ConfirmationRequiredEvent
+        .createWithMessages(actionRequiringConfirmation, translationMessages.removeVocabulary(),
+            translationMessages.confirmDeleteVocabulary()));
   }
 
   @Override
   public void onEdit() {
+    vocabularyEditModalProvider.get().initView(taxonomy, vocabulary);
   }
 
   @Override
@@ -103,6 +146,20 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
       }
       getView().renderTerms(filtered);
     }
+  }
+
+  //
+  // Private methods
+  //
+
+  private void addHandlers() {
+    addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler());
+    addRegisteredHandler(VocabularyUpdatedEvent.getType(), new VocabularyUpdatedEvent.VocabularyUpdatedHandler() {
+      @Override
+      public void onVocabularyUpdated(VocabularyUpdatedEvent event) {
+        refresh(event.getTaxonomy(), event.getName());
+      }
+    });
   }
 
   private boolean termMatches(TermDto term, String filter) {
@@ -129,5 +186,34 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
 
     void renderTerms(JsArray<TermDto> terms);
 
+  }
+
+  private class ConfirmationEventHandler implements ConfirmationEvent.Handler {
+
+    @Override
+    public void onConfirmation(ConfirmationEvent event) {
+      if(actionRequiringConfirmation != null && event.getSource().equals(actionRequiringConfirmation) &&
+          event.isConfirmed()) {
+        actionRequiringConfirmation.run();
+        actionRequiringConfirmation = null;
+      }
+    }
+  }
+
+  private class VocabularyNotFoundCallback implements ResponseCodeCallback {
+
+    private final String taxonomy;
+
+    private final String vocabulary;
+
+    private VocabularyNotFoundCallback(String taxonomy, String vocabulary) {
+      this.taxonomy = taxonomy;
+      this.vocabulary = vocabulary;
+    }
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      fireEvent(NotificationEvent.newBuilder().error("VocabularyNotFound").args(taxonomy, vocabulary).build());
+    }
   }
 }

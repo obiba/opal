@@ -63,7 +63,7 @@ public class VocabulariesResourceImpl implements VocabulariesResource {
     }
 
     Vocabulary v = Dtos.fromDto(vocabulary);
-    taxonomyService.saveVocabulary(null, v);
+    taxonomyService.saveVocabulary(taxonomyName, v);
 
     return Response.ok().build();
   }

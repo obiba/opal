@@ -64,5 +64,11 @@ public class VocabularyResourceImpl implements VocabularyResource {
     taxonomyService.saveVocabulary(taxonomyName, Dtos.fromDto(dto));
     return Response.ok().build();
   }
+
+  @Override
+  public Response deleteVocabulary() {
+    taxonomyService.deleteVocabulary(taxonomyName, vocabularyName);
+    return Response.ok().build();
+  }
 }
 
