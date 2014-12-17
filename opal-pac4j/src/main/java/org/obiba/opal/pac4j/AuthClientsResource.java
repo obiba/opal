@@ -4,7 +4,7 @@ import io.buji.pac4j.ClientRealm;
 import io.buji.pac4j.ShiroWebContext;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.Dtos;
-import org.obiba.opal.web.ws.security.NoAuthorization;
+import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.pac4j.core.client.BaseClient;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
@@ -36,7 +36,7 @@ public class AuthClientsResource {
     private HttpServletResponse response;
 
     @GET
-    @NoAuthorization
+    @NotAuthenticated
     public List<Opal.AuthClientDto> getClients() {
 
         List<Opal.AuthClientDto> result = new ArrayList<>();
