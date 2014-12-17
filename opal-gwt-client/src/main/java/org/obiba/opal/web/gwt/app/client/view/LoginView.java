@@ -1,6 +1,13 @@
 package org.obiba.opal.web.gwt.app.client.view;
 
+import com.google.gwt.cell.client.Cell;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.ColumnSortEvent;
+import com.google.gwt.user.client.ui.*;
+import com.google.gwt.view.client.ListDataProvider;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 
 import com.github.gwtbootstrap.client.ui.Alert;
@@ -24,13 +31,14 @@ import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
+import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.model.client.opal.AuthClientDto;
+import org.obiba.opal.web.model.client.opal.ProjectDto;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LoginView extends ViewImpl implements LoginPresenter.Display {
 
@@ -60,6 +68,14 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
   @UiField
   Image loginProgress;
 
+  @UiField
+  VerticalPanel authClientsPanel;
+
+  //@UiField
+  //Table<AuthClientDto> authClientsTable;
+
+  //private final ListDataProvider<AuthClientDto> authClientsDataProvider = new ListDataProvider<AuthClientDto>();
+
   private final Translations translations;
 
   @Inject
@@ -68,6 +84,11 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
     this.translations = translations;
     userName.setFocus(true);
     password.addKeyPressHandler(new CapsLockTestKeyPressesHandler());
+      authClientsPanel.setBorderWidth(5);
+      authClientsPanel.setVisible(true);
+      //authClientsPanel.setStylePrimaryName();
+
+    //initAuthClientsTable();
   }
 
   @Override
@@ -144,11 +165,59 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
     RootPanel.get().getBodyElement().getStyle().setCursor(value ? Style.Cursor.WAIT : Style.Cursor.DEFAULT);
   }
 
-  private void clearPassword() {
+    @Override
+    public void renderAuthClients(JsArray<AuthClientDto> clients) {
+        List<Widget> widgets = new ArrayList<>();
+        for (int i=0;i<clients.length(); i++) {
+            AuthClientDto client = clients.get(i);
+            String url = client.getRedirectUrl();
+            if (url == null) {
+                continue; //not interested in clients without redirect url
+            }
+
+            String key = client.getName();
+            String title = translations.authClientsTitleMap().get(key);
+            if (title == null) {
+                title = key; //fallback
+            }
+            Anchor anchor = new Anchor(title, false, url);
+            String icon = translations.authClientsIconMap().get(key);
+
+            if (icon != null) {
+                Image img = null;
+                anchor.getElement().appendChild(img.getElement());
+            }
+            widgets.add(anchor);
+        }
+
+        if (widgets.size() > 0) {
+            for (Widget w: widgets) {
+                authClientsPanel.add(w);
+            }
+        }
+        authClientsPanel.setVisible(widgets.size() > 0);
+    }
+
+    private void clearPassword() {
     getPassword().setValue("");
   }
 
-  private final class CapsLockTestKeyPressesHandler implements KeyPressHandler {
+/*
+    private void initAuthClientsTable() {
+
+        //tablePager.setDisplay(projectsTable);
+        //projectsTable.addColumn(new NameColumn(new ProjectLinkCell(placeManager)), translations.nameLabel());
+        //projectsTable.addColumn(new TitleColumn() , translations.titleLabel());
+        //projectsTable.addColumn(new DescriptionColumn(), translations.descriptionLabel());
+        //projectsTable.addColumn(new LastUpdatedColumn(), translations.lastUpdatedLabel());
+        //authClientsTable.addC
+
+        authClientsDataProvider.addDataDisplay(authClientsTable);
+        //projectsTable.getHeader(SORTABLE_COLUMN_NAME).setHeaderStyleNames("sortable-header-column");
+        //projectsTable.getHeader(SORTABLE_COLUMN_LAST_UPDATED).setHeaderStyleNames("sortable-header-column");
+    }
+*/
+    private final class CapsLockTestKeyPressesHandler implements KeyPressHandler {
 
     @Override
     public void onKeyPress(KeyPressEvent event) {
@@ -163,5 +232,4 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
       }
     }
   }
-
 }

@@ -678,7 +678,16 @@ public enum UriBuilders {
       return UriBuilder.create().segment("datashield", "option");
 
     }
-  };
+  },
+
+  AUTH_CLIENTS {
+    @Override
+    public UriBuilder create() {
+        return UriBuilder.create().segment("authclients");
+    }
+  },
+
+  ;
 
   public abstract UriBuilder create();
 }
