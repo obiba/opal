@@ -19,7 +19,6 @@ import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.model.client.opal.TermDto;
 
-import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.core.client.GWT;
@@ -52,9 +51,6 @@ public class TermEditModalView extends ModalPopupViewWithUiHandlers<TermEditModa
 
   @UiField
   LocalizedEditor descriptions;
-
-  @UiField
-  CheckBox repeatable;
 
   @Inject
   public TermEditModalView(EventBus eventBus) {
