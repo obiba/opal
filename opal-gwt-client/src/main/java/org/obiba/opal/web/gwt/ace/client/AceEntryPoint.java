@@ -31,6 +31,12 @@ public class AceEntryPoint implements EntryPoint {
     @Source("js/min-noconflict/theme-textmate.js")
     TextResource scriptThemeTextMate();
 
+    @Source("js/min-noconflict/mode-text.js")
+    TextResource scriptModeText();
+
+    @Source("js/min-noconflict/mode-markdown.js")
+    TextResource scriptModeMarkdown();
+
     @Source("js/min-noconflict/mode-javascript.js")
     TextResource scriptModeJavascript();
 
@@ -45,6 +51,10 @@ public class AceEntryPoint implements EntryPoint {
   public void onModuleLoad() {
     ScriptInjector.fromString(Scripts.INSTANCE.scriptAce().getText()).setWindow(ScriptInjector.TOP_WINDOW).inject();
     ScriptInjector.fromString(Scripts.INSTANCE.scriptThemeTextMate().getText()).setWindow(ScriptInjector.TOP_WINDOW)
+        .inject();
+    ScriptInjector.fromString(Scripts.INSTANCE.scriptModeText().getText()).setWindow(ScriptInjector.TOP_WINDOW)
+        .inject();
+    ScriptInjector.fromString(Scripts.INSTANCE.scriptModeMarkdown().getText()).setWindow(ScriptInjector.TOP_WINDOW)
         .inject();
     ScriptInjector.fromString(Scripts.INSTANCE.scriptModeJavascript().getText()).setWindow(ScriptInjector.TOP_WINDOW)
         .inject();

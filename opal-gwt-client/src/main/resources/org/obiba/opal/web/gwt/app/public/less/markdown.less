@@ -1,0 +1,30 @@
+/*
+ * Copyright (c) 2014 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import "variables.less";
+@import "mixins.less";
+@import "tables.less";
+
+.markdown {
+  border: 1px solid @tableBorder;
+  .border-radius(@baseBorderRadius);
+  padding: 10px;
+
+  table {
+    .table;
+    .table-striped;
+    .table-condensed;
+    .table-bordered;
+  }
+
+  li {
+    list-style-type: inherit;
+  }
+}

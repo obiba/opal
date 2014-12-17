@@ -76,6 +76,7 @@
 
   <!--  Opal css style sheets -->
   <stylesheet src='css/opal.css'/>
+  <stylesheet src='css/markdown.css'/>
 
   <!--  for ClientBundle -->
   <inherits name='com.google.gwt.resources.Resources'/>

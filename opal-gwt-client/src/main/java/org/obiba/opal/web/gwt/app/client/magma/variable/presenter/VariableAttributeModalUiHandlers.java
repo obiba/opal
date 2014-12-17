@@ -10,10 +10,13 @@
 
 package org.obiba.opal.web.gwt.app.client.magma.variable.presenter;
 
+import java.util.Map;
+
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
 public interface VariableAttributeModalUiHandlers extends ModalUiHandlers {
+
   void cancel();
 
-  void save();
+  void save(String namespace, String name, Map<String, String> localizedTexts);
 }

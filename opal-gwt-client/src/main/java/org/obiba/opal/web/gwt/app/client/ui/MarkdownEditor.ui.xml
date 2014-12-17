@@ -1,0 +1,32 @@
+<!--
+  ~ Copyright (c) 2014 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:ace="urn:import:org.obiba.opal.web.gwt.ace.client"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator">
+
+  <g:FlowPanel>
+    <g:FlowPanel>
+      <o:ToggleAnchor ui:field="toggle" addStyleNames="small-bottom-margin"></o:ToggleAnchor>
+      <b:HelpBlock addStyleNames="pull-right">
+        <ui:msg description="Report Templates text">See more about
+          <a href="https://guides.github.com/features/mastering-markdown/" target="_blank">Markdown</a> formatting.
+        </ui:msg>
+      </b:HelpBlock>
+    </g:FlowPanel>
+
+    <ace:AceEditor ui:field="editor" addStyleNames="ace-editor small-ace-editor clear" mode="markdown"/>
+    <g:SimplePanel ui:field="preview"/>
+  </g:FlowPanel>
+</ui:UiBinder>

@@ -224,6 +224,7 @@
             <!-- files need to be renamed with the named expected by gwt-bootstrap -->
             <include>bootstrap.min.less</include>
             <include>opal.less</include>
+            <include>markdown.less</include>
           </includes>
         </configuration>
         <executions>

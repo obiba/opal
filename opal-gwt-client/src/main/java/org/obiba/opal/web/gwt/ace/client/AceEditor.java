@@ -33,6 +33,9 @@ public class AceEditor extends SimplePanel implements HasText, HasEnabled, HasCh
   @SuppressWarnings({ "FieldCanBeLocal", "UnusedDeclaration" })
   private final JavaScriptObject editor;
 
+  /**
+   * Create editor, mode defaults to javascript.
+   */
   public AceEditor() {
     editor = createEditor(getElement());
     // Hack to avoid fire ChangeEvent on Ace change event because Ace API fire change events on SetValue() and for all internal changes.
@@ -51,6 +54,12 @@ public class AceEditor extends SimplePanel implements HasText, HasEnabled, HasCh
       editor.getSession().setMode("ace/mode/javascript");
       editor.getSession().setTabSize(2);
       return editor;
+  }-*/;
+
+  public final native void setMode(String mode) /*-{
+      var editor = this.@org.obiba.opal.web.gwt.ace.client.AceEditor::editor;
+      editor.getSession().setMode("ace/mode/" + mode);
+      editor.renderer.setShowGutter(mode == "javascript");
   }-*/;
 
   @Override

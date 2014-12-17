@@ -9,8 +9,8 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.variable.view;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -18,7 +18,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalUiHandlers;
-import org.obiba.opal.web.gwt.app.client.ui.LocalizedEditableText;
+import org.obiba.opal.web.gwt.app.client.ui.LocalizedEditor;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.validator.ConstrainedModal;
@@ -35,9 +35,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.TakesValue;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -80,7 +77,7 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
   ControlGroup valuesGroup;
 
   @UiField
-  FlowPanel valuesPanel;
+  LocalizedEditor editor;
 
   @UiField
   ControlGroup namespaceGroup;
@@ -94,13 +91,13 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
     modal.setTitle(translations.addAttribute());
-
+    modal.setMinWidth(700);
     new ConstrainedModal(modal);
   }
 
   @UiHandler("saveButton")
   public void onSave(ClickEvent event) {
-    getUiHandlers().save();
+    getUiHandlers().save(namespace.getText(), name.getText(), editor.getLocalizedTexts());
   }
 
   @UiHandler("cancelButton")
@@ -109,13 +106,13 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
   }
 
   @Override
-  public HasText getName() {
-    return name;
+  public void setNamespace(String namespace) {
+    this.namespace.setText(namespace);
   }
 
   @Override
-  public TextBox getNamespaceSuggestBox() {
-    return namespace;
+  public void setName(String name) {
+    this.name.setText(name);
   }
 
   @Override
@@ -161,27 +158,8 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
   }
 
   @Override
-  public TakesValue<List<LocalizedEditableText>> getLocalizedValues() {
-    return new TakesValue<List<LocalizedEditableText>>() {
-      @Override
-      public void setValue(List<LocalizedEditableText> values) {
-        if(values != null) {
-          for(LocalizedEditableText value : values) {
-            valuesPanel.add(value);
-          }
-        }
-      }
-
-      @Override
-      public List<LocalizedEditableText> getValue() {
-        List<LocalizedEditableText> selected = new ArrayList<LocalizedEditableText>();
-        for(int i = 0; i < valuesPanel.getWidgetCount(); i++) {
-          selected.add((LocalizedEditableText) valuesPanel.getWidget(i));
-        }
-
-        return selected;
-      }
-    };
+  public void setLocalizedTexts(Map<String, String> localizedTexts, List<String> locales) {
+    editor.setLocalizedTexts(localizedTexts, locales);
   }
 
   @Override
@@ -211,4 +189,5 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
   public void clearErrors() {
     modal.closeAlerts();
   }
+
 }

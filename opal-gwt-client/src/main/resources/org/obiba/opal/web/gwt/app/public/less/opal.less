@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2014 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 @import "variables.less";
 
 a:visited {
@@ -10,10 +20,6 @@ a:hover {
 
 a [class^="icon-"], a [class*=" icon-"] {
   text-decoration: none;
-}
-
-h4 {
-  margin-top: 30px;
 }
 
 li {
@@ -533,7 +539,7 @@ ul.closeables {
 }
 
 /* Ace editor in a wizard step */
-div.step > div > div > div.ace_editor {
+div.step > div > div > div.ace-editor {
   height: 440px !important;
 }
 
@@ -583,7 +589,7 @@ td.row-bookmarks span {
 
   & > ul {
     border: 2px solid #DCE4EC !important;
-    border-radius: 6px 6px 6px 6px;
+    border-radius: @baseBorderRadius;
     padding: 4px 6px !important;
     text-indent: 1px;
   }

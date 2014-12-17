@@ -1778,6 +1778,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Update")
   String scriptUpdateDefaultPrefixLabel();
 
+  @Description("Default label")
+  @DefaultStringValue("default")
+  String defaultLabel();
+
+  @Description("Preview label")
+  @DefaultStringValue("Preview")
+  String previewLabel();
+
   @Description("Edit label")
   @DefaultStringValue("Edit")
   String editLabel();
