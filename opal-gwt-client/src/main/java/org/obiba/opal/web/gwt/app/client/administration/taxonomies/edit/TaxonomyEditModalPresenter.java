@@ -20,8 +20,6 @@ import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.TakesValue;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -61,11 +59,11 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
   }
 
   @Override
-  public void onSaveTaxonomy() {
+  public void onSave(String name, JsArray<LocaleTextDto> titles, JsArray<LocaleTextDto> descriptions) {
     final TaxonomyDto dto = TaxonomyDto.create();
-    dto.setName(getView().getName().getText());
-    dto.setTitleArray(getView().getTitles().getValue());
-    dto.setDescriptionArray(getView().getDescriptions().getValue());
+    dto.setName(name);
+    dto.setTitleArray(titles);
+    dto.setDescriptionArray(descriptions);
 
     if(mode == EDIT_MODE.EDIT) {
       ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder()
@@ -123,13 +121,11 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
             for(int i = 0; i < resource.getLanguagesArray().length(); i++) {
               locales.push(resource.getLanguages(i));
             }
-            getView().setAvailableLocales(locales);
-            getView()
-                .setTitle(editionMode == EDIT_MODE.CREATE ? translations.addTaxonomy() : translations.editTaxonomy());
-            getView().getName().setText(taxonomyDto.getName());
-            getView().getTitles().setValue(taxonomyDto.getTitleArray());
-            getView().getDescriptions().setValue(taxonomyDto.getDescriptionArray());
-            //getView().setVocabularies(taxonomyDto.getVocabulariesArray());
+            getView().setMode(editionMode);
+            //    .setTitle(editionMode == EDIT_MODE.CREATE ? translations.addTaxonomy() : translations.editTaxonomy());
+            getView().setName(taxonomyDto.getName());
+            getView().setTitles(taxonomyDto.getTitleArray(), locales);
+            getView().setDescriptions(taxonomyDto.getDescriptionArray(), locales);
           }
         }).get().send();
   }
@@ -154,15 +150,13 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
       VOCABULARY
     }
 
-    void setAvailableLocales(JsArrayString locales);
+    void setMode(EDIT_MODE editionMode);
 
-    void setTitle(String title);
+    void setName(String name);
 
-    TakesValue<JsArray<LocaleTextDto>> getTitles();
+    void setTitles(JsArray<LocaleTextDto> titles, JsArrayString locales);
 
-    TakesValue<JsArray<LocaleTextDto>> getDescriptions();
-
-    HasText getName();
+    void setDescriptions(JsArray<LocaleTextDto> descriptions, JsArrayString locales);
 
     void showError(FormField formField, String message);
   }

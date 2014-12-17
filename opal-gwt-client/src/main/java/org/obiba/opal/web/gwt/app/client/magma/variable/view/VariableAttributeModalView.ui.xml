@@ -51,7 +51,7 @@
         <ui:msg description="Value label">Values</ui:msg>
       </b:ControlLabel>
       <b:Controls>
-        <o:LocalizedEditor ui:field="editor"/>
+        <o:LocalizedEditor ui:field="editor" type="MARKDOWN"/>
       </b:Controls>
       <b:HelpBlock>
         <ui:msg description="Attribute Values help">Values can be expressed in different languages (at least one value
