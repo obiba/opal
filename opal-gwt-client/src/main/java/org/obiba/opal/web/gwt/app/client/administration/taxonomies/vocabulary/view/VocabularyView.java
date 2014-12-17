@@ -14,6 +14,7 @@ import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.opal.TermDto;
 import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
@@ -42,6 +43,12 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
 
   @UiField
   IconAnchor back;
+
+  @UiField
+  Button previous;
+
+  @UiField
+  Button next;
 
   @UiField
   Heading vocabularyName;
@@ -125,6 +132,16 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
     getUiHandlers().onDelete();
   }
 
+  @UiHandler("previous")
+  public void onPrevious(ClickEvent event) {
+    getUiHandlers().onPrevious();
+  }
+
+  @UiHandler("next")
+  public void onNext(ClickEvent event) {
+    getUiHandlers().onNext();
+  }
+
   @UiHandler("edit")
   void onEdit(ClickEvent event) {
     getUiHandlers().onEdit();
@@ -148,6 +165,10 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
     renderText(descriptionPanel, vocabulary.getDescriptionArray());
     repeatable.setText(vocabulary.getRepeatable() ? translations.yesLabel() : translations.noLabel());
     renderTerms(vocabulary.getTermsArray());
+
+    int idx = getVocabularyIndex(taxonomy, vocabulary);
+    previous.setEnabled(idx > 0);
+    next.setEnabled(idx < taxonomy.getVocabulariesCount() -1);
   }
 
   @Override
@@ -155,6 +176,16 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
     dataProvider.setList(JsArrays.toList(terms));
     dataProvider.refresh();
     pager.setPagerVisible(table.getRowCount() > Table.DEFAULT_PAGESIZE);
+  }
+
+  private int getVocabularyIndex(TaxonomyDto taxonomy, VocabularyDto vocabulary) {
+    for(int i = 0; i < taxonomy.getVocabulariesCount(); i++) {
+      VocabularyDto current = taxonomy.getVocabularies(i);
+      if(current.getName().equals(vocabulary.getName())) {
+        return i;
+      }
+    }
+    return -1;
   }
 
   private void renderText(Panel panel, JsArray<LocaleTextDto> texts) {

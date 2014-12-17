@@ -23,6 +23,12 @@
           <b:Button icon="TRASH" ui:field="remove">
           </b:Button>
         </b:ButtonGroup>
+        <b:ButtonGroup>
+          <b:Button icon="CHEVRON_UP" ui:field="previous">
+          </b:Button>
+          <b:Button icon="CHEVRON_DOWN" ui:field="next">
+          </b:Button>
+        </b:ButtonGroup>
       </g:FlowPanel>
     </g:FlowPanel>
 

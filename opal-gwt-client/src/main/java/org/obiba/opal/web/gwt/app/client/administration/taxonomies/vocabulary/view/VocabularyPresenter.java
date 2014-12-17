@@ -74,7 +74,7 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
     refresh(taxonomy.getName(), name);
   }
 
-  private void refresh(String taxonomyName, String name) {
+  private void refresh(final String taxonomyName, String name) {
     ResourceRequestBuilderFactory.<VocabularyDto>newBuilder().forResource(
         UriBuilders.SYSTEM_CONF_TAXONOMY_VOCABULARY.create().build(taxonomyName, name))//
         .get()//
@@ -83,10 +83,30 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
           @Override
           public void onResource(Response response, VocabularyDto resource) {
             vocabulary = resource;
-            getView().renderVocabulary(taxonomy, resource);
+            if (getVocabularyIndex() == -1) {
+              // vocabulary could have been renamed
+              ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder() //
+                  .forResource(UriBuilders.SYSTEM_CONF_TAXONOMY.create().build(taxonomyName)) //
+                  .withCallback(new ResourceCallback<TaxonomyDto>() {
+                    @Override
+                    public void onResource(Response response, TaxonomyDto resource) {
+                      taxonomy = resource;
+                      getView().renderVocabulary(taxonomy, vocabulary);
+                    }
+                  }) //
+                  .withCallback(SC_NOT_FOUND, new ResponseCodeCallback() {
+
+                    @Override
+                    public void onResponseCode(Request request, Response response) {
+                      fireEvent(NotificationEvent.newBuilder().error("TaxonomyNotFound").args(taxonomyName).build());
+                    }
+                  }) //
+                  .get().send();
+            } else {
+              getView().renderVocabulary(taxonomy, resource);
+            }
           }
-        })
-        .withCallback(SC_NOT_FOUND, new VocabularyNotFoundCallback(taxonomy.getName(), name)) //
+        }).withCallback(SC_NOT_FOUND, new VocabularyNotFoundCallback(taxonomy.getName(), name)) //
         .send();
   }
 
@@ -126,6 +146,34 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
     fireEvent(ConfirmationRequiredEvent
         .createWithMessages(actionRequiringConfirmation, translationMessages.removeVocabulary(),
             translationMessages.confirmDeleteVocabulary()));
+  }
+
+  @Override
+  public void onPrevious() {
+    int idx = getVocabularyIndex();
+    if(idx > 0) {
+      vocabulary = taxonomy.getVocabularies(idx - 1);
+      getView().renderVocabulary(taxonomy, vocabulary);
+    }
+  }
+
+  @Override
+  public void onNext() {
+    int idx = getVocabularyIndex();
+    if(idx < taxonomy.getVocabulariesCount() - 1) {
+      vocabulary = taxonomy.getVocabularies(idx + 1);
+      getView().renderVocabulary(taxonomy, vocabulary);
+    }
+  }
+
+  private int getVocabularyIndex() {
+    for(int i = 0; i < taxonomy.getVocabulariesCount(); i++) {
+      VocabularyDto current = taxonomy.getVocabularies(i);
+      if(current.getName().equals(vocabulary.getName())) {
+        return i;
+      }
+    }
+    return -1;
   }
 
   @Override
