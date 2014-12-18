@@ -79,6 +79,15 @@ public interface TaxonomyService extends SystemService {
   void saveTaxonomy(@NotNull Taxonomy taxonomy);
 
   /**
+   * Update an existing {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} (can be renamed).
+   *
+   * @param taxonomy
+   * @param taxonomyObj
+   * @throws NoSuchTaxonomyException
+   */
+  void saveTaxonomy(@NotNull String taxonomy, @NotNull Taxonomy taxonomyObj) throws NoSuchTaxonomyException;
+
+  /**
    * Delete a {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} from name.
    *
    * @param name

@@ -65,11 +65,7 @@ public class TaxonomyResource {
 
   @PUT
   public Response updateTaxonomy(Opal.TaxonomyDto dto) {
-    if(!name.equals(dto.getName())) {
-      // rename
-      taxonomyService.deleteTaxonomy(name);
-    }
-    taxonomyService.saveTaxonomy(Dtos.fromDto(dto));
+    taxonomyService.saveTaxonomy(name, Dtos.fromDto(dto));
     return Response.ok().build();
   }
 
