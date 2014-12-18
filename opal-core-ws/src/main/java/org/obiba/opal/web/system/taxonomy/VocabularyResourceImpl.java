@@ -83,7 +83,16 @@ public class VocabularyResourceImpl implements VocabularyResource {
   @Override
   public Response saveTerm(@PathParam("term") String term, Opal.TermDto dto) {
     Vocabulary vocabulary = taxonomyService.getVocabulary(taxonomyName, vocabularyName);
-    // TODO
+    vocabulary.updateTerm(term, Dtos.fromDto(dto));
+    taxonomyService.saveVocabulary(taxonomyName, vocabularyName, vocabulary);
+    return Response.ok().build();
+  }
+
+  @Override
+  public Response deleteTerm(@PathParam("term") String term) {
+    Vocabulary vocabulary = taxonomyService.getVocabulary(taxonomyName, vocabularyName);
+    vocabulary.removeTerm(term);
+    taxonomyService.saveVocabulary(taxonomyName, vocabularyName, vocabulary);
     return Response.ok().build();
   }
 }

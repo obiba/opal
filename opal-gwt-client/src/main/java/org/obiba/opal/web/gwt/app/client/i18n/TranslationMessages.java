@@ -140,6 +140,10 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Remove Vocabulary")
   String removeVocabulary();
 
+  @Description("Remove Term label")
+  @DefaultMessage("Remove Term")
+  String removeTerm();
+
   @Description("Remove Variables label")
   @DefaultMessage("Remove Variables")
   String removeVariables();
@@ -291,6 +295,12 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage(
       "Please confirm that you want to remove the current vocabulary (variable attributes will not be affected).")
   String confirmDeleteVocabulary();
+
+  @Description(
+      "Please confirm that you want to remove the current Term message")
+  @DefaultMessage(
+      "Please confirm that you want to remove the current term (variable attributes will not be affected).")
+  String confirmDeleteTerm();
 
   @Description(
       "A variable with the same name already exists. Please confirm that you want to overwrite this variable message")

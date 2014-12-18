@@ -32,4 +32,8 @@ public interface VocabularyResource {
   @PUT
   @Path("term/{term}")
   Response saveTerm(@PathParam("term") String term, Opal.TermDto dto);
+
+  @DELETE
+  @Path("term/{term}")
+  Response deleteTerm(@PathParam("term") String term);
 }

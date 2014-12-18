@@ -62,8 +62,7 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
 
   @Inject
   public VocabularyPresenter(Display display, EventBus eventBus, Translations translations,
-      TranslationMessages translationMessages,
-      ModalProvider<VocabularyEditModalPresenter> vocabularyEditModalProvider,
+      TranslationMessages translationMessages, ModalProvider<VocabularyEditModalPresenter> vocabularyEditModalProvider,
       ModalProvider<TermEditModalPresenter> termEditModalProvider) {
     super(eventBus, display);
     this.translations = translations;
@@ -88,7 +87,7 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
           @Override
           public void onResource(Response response, VocabularyDto resource) {
             vocabulary = resource;
-            if (getVocabularyIndex() == -1) {
+            if(getVocabularyIndex() == -1) {
               // vocabulary could have been renamed
               ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder() //
                   .forResource(UriBuilders.SYSTEM_CONF_TAXONOMY.create().build(taxonomyName)) //
@@ -131,8 +130,27 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
   }
 
   @Override
-  public void onDeleteTerm(TermDto termDto) {
-    // TODO
+  public void onDeleteTerm(final TermDto termDto) {
+    actionRequiringConfirmation = new Runnable() {
+      @Override
+      public void run() {
+        ResourceRequestBuilderFactory.newBuilder() //
+            .forResource(UriBuilders.SYSTEM_CONF_TAXONOMY_VOCABULARY_TERM.create()
+                .build(taxonomy.getName(), vocabulary.getName(), termDto.getName())) //
+            .withCallback(SC_OK, new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                fireEvent(new VocabularyUpdatedEvent(taxonomy.getName(), vocabulary.getName()));
+              }
+            }) //
+            .withCallback(SC_NOT_FOUND,
+                new TermNotFoundCallback(taxonomy.getName(), vocabulary.getName(), termDto.getName())) //
+            .delete().send();
+      }
+    };
+    fireEvent(ConfirmationRequiredEvent
+        .createWithMessages(actionRequiringConfirmation, translationMessages.removeTerm(),
+            translationMessages.confirmDeleteTerm()));
   }
 
   @Override
@@ -272,6 +290,26 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
     @Override
     public void onResponseCode(Request request, Response response) {
       fireEvent(NotificationEvent.newBuilder().error("VocabularyNotFound").args(taxonomy, vocabulary).build());
+    }
+  }
+
+  private class TermNotFoundCallback implements ResponseCodeCallback {
+
+    private final String taxonomy;
+
+    private final String vocabulary;
+
+    private final String term;
+
+    private TermNotFoundCallback(String taxonomy, String vocabulary, String term) {
+      this.taxonomy = taxonomy;
+      this.vocabulary = vocabulary;
+      this.term = term;
+    }
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      fireEvent(NotificationEvent.newBuilder().error("TermNotFound").args(taxonomy, vocabulary, term).build());
     }
   }
 }

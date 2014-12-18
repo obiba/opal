@@ -45,6 +45,12 @@ public class Taxonomy extends TaxonomyEntity {
     this.vocabularies = vocabularies;
   }
 
+  /**
+   * Add or update a vocabulary (in the latter case, cannot be renamed).
+   *
+   * @param vocabulary
+   * @return
+   */
   public Taxonomy addVocabulary(Vocabulary vocabulary) {
     int idx = getVocabularies().indexOf(vocabulary);
     if(idx < 0) vocabularies.add(vocabulary);
@@ -52,6 +58,14 @@ public class Taxonomy extends TaxonomyEntity {
     return this;
   }
 
+  /**
+   * Update the vocabulary (can be renamed).
+   *
+   * @param name
+   * @param vocabulary
+   * @return
+   * @throws NoSuchVocabularyException
+   */
   public Taxonomy updateVocabulary(String name, Vocabulary vocabulary) throws NoSuchVocabularyException {
     Vocabulary original = getVocabulary(name);
     int idx = vocabularies.indexOf(original);

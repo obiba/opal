@@ -67,12 +67,52 @@ public class Vocabulary extends TaxonomyEntity {
     throw new NoSuchTermException(getName(), name);
   }
 
+  /**
+   * Add or update a term (in the latter case, cannot be renamed).
+   *
+   * @param term
+   * @return
+   */
   public Vocabulary addTerm(Term term) {
     if(terms == null) terms = Lists.newArrayList();
     int idx = terms.indexOf(term);
     if(idx <= 0) terms.add(term);
     else terms.set(idx, term);
     return this;
+  }
+
+  /**
+   * Update the term (can be renamed).
+   *
+   * @param name
+   * @param term
+   * @return
+   * @throws NoSuchTermException
+   */
+  public Vocabulary updateTerm(String name, Term term) throws NoSuchTermException {
+    Term original = getTerm(name);
+    int idx = terms.indexOf(original);
+    terms.set(idx, term);
+    return this;
+  }
+
+  /**
+   * Remove {@link org.obiba.opal.core.domain.taxonomy.Term} by name (ignore if not found).
+   *
+   * @param name
+   */
+  public void removeTerm(String name) {
+    if(terms == null) return;
+    Term found = null;
+    for(Term term : terms) {
+      if(term.getName().equals(name)) {
+        found = term;
+        break;
+      }
+    }
+    if(found != null) {
+      terms.remove(found);
+    }
   }
 
   @Override
