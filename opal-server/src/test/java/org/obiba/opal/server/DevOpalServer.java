@@ -20,9 +20,12 @@ public class DevOpalServer extends OpalJettyServer {
         OpalServer.setProperties();
         OpalServer.configureSLF4JBridgeHandler();
 
-        //making sure we are not log spammed...
-        Logger logger = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-        logger.setLevel(Level.INFO);
+        //If using slf4j SimpleLogger, use this to change the log level (or set a property externally):
+        //System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "info"); // or "debug", "trace", etc.
+
+        //Previous versions used a different logging binding that could be configured like this:
+        //Logger logger = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        //logger.setLevel(Level.INFO);
 
         new UpgradeCommand().execute(); //this is required to initialize some configuration (mandatory later on)
 
@@ -38,11 +41,8 @@ public class DevOpalServer extends OpalJettyServer {
         Properties props = new Properties();
 
         File sourcePropsFile = new File("src/main/deb/debian/opal.default");
-        InputStream in = new FileInputStream(sourcePropsFile);
-        try {
+        try (InputStream in = new FileInputStream(sourcePropsFile)) {
             props.load(in);
-        } finally {
-            in.close();
         }
 
         String userHome = System.getProperty("user.home");
