@@ -156,6 +156,9 @@ public class FileViewDtoExtension implements ViewDtoExtension {
       tableDtoBuilder.setEntityType(v.getEntityType());
       tableDtoBuilder.addVariables(Dtos.asDto(v));
     }
+    if (!tableDtoBuilder.hasEntityType()) {
+      tableDtoBuilder.setEntityType("Participant");
+    }
     return tableDtoBuilder.build();
   }
 
