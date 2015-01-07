@@ -220,6 +220,8 @@ public class TaxonomyServiceImpl implements TaxonomyService {
 
   private void importDefault(boolean override) {
     importGitHubTaxonomy(MLSTRM_USER, "maelstrom-taxonomies", null, "area-of-information", override);
+    importGitHubTaxonomy(MLSTRM_USER, "maelstrom-taxonomies", null, "target-of-information", override);
+    importGitHubTaxonomy(MLSTRM_USER, "maelstrom-taxonomies", null, "source-of-information", override);
     importGitHubTaxonomy(MLSTRM_USER, "maelstrom-taxonomies", null, "harmonization", override);
   }
 
