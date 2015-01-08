@@ -6,33 +6,33 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.SetMultimap;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.Variable;
-import org.obiba.magma.VariableEntity;
+import org.obiba.magma.concurrent.ConcurrentValueTableReader.ConcurrentReaderCallback;
 import org.obiba.opal.core.support.MessageLogger;
 
-import javax.validation.ValidationException;
 import java.util.*;
 
 /**
  * Service for validation.
- * The validation itself is done inside the ValidationTask.
  */
 public interface ValidationService {
 
     public static final String VALIDATE_ATTRIBUTE = "validate";
 
     /**
-     * @param valueTable table to be validated
+     * @param valueTable table to validate data
      * @param logger
-     * @return new validation task for the given table and listener, or null if validation is not enabled for that table.
+     * @return result of validation, or null if not enabled/required for the given table
      */
-    ValidationTask createValidationTask(ValueTable valueTable, MessageLogger logger);
+    ValidationResult validate(ValueTable valueTable, MessageLogger logger);
 
     /**
+     * Creates a validating ConcurrentReaderCallback wrapping the given one, if validations are configured, or null otherwise.
      * @param valueTable
-     * @return true if validation is enabled for the given table.
+     * @param delegate
+     * @param logger
+     * @return wrapper validating callback, or null
      */
-    boolean isValidationEnabled(ValueTable valueTable);
+    ConcurrentReaderCallback createValidatingCallback(ValueTable valueTable, ConcurrentReaderCallback delegate, MessageLogger logger);
 
     /**
      * Container for validation results.
@@ -85,32 +85,6 @@ public interface ValidationService {
         public Map<String, Set<String>> getVariableRules() {
             return ruleMap;
         }
-    }
-
-    /**
-     * Represents a delayed validation task that is aware of the table under validation.
-     */
-    public interface ValidationTask {
-
-        /**
-         * @return list of names of variables under validation
-         */
-        List<String> getVariableNames();
-
-        /**
-         * Validates the given value for variable.
-         * @param variable
-         * @param value
-         * @param entity
-         * @throws ValidationException if the given value is not valid
-         */
-        void validate(Variable variable, Value value, VariableEntity entity) throws ValidationException;
-
-        /**
-         * Validates the whole table data, collecting and returning the results
-         * @return
-         */
-        ValidationResult validate();
     }
 
 }

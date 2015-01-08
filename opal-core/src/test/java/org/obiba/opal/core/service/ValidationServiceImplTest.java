@@ -4,16 +4,19 @@ import com.google.common.collect.ImmutableSet;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.obiba.magma.*;
+import org.obiba.magma.Datasource;
+import org.obiba.magma.Value;
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
 import org.obiba.magma.support.StaticValueTable;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.service.ValidationService.ValidationResult;
-import org.obiba.opal.core.service.ValidationService.ValidationTask;
 import org.obiba.opal.core.service.validation.ValidatorFactory;
 import org.obiba.opal.core.service.validation.VocabularyConstraint;
 import org.obiba.opal.core.support.SystemOutMessageLogger;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by carlos on 8/5/14.
@@ -24,13 +27,16 @@ public class ValidationServiceImplTest {
     private static final String INVALID_CODE = "foo";
 
     private ValidationServiceImpl validationService;
+    private AtomicBoolean validate;
 
     @Before
     public void setUp() {
-        validationService = new ValidationServiceImpl() {
+        validate = new AtomicBoolean(true); //we want to validate everything by default
+    	validationService = new ValidationServiceImpl() {
             @Override
             public boolean isValidationEnabled(ValueTable valueTable) {
-                return true; //we want to validate everything
+
+                return validate.get(); //we want to validate everything
             }
         };
 
@@ -80,7 +86,7 @@ public class ValidationServiceImplTest {
     @Test
     public void testValidateWithVocabularyFailure() throws Exception {
         ValueTable table = createTable(INVALID_CODE, MagmaHelper.createVocabularyVariable());
-        ValidationResult result = validationService.validateNoTransaction(table, new SystemOutMessageLogger());
+        ValidationResult result = validationService.validate(table, new SystemOutMessageLogger());
 
         Assert.assertTrue("should have failures", result.hasFailures());
         Set<List<String>> pairs = result.getFailurePairs();
@@ -98,7 +104,7 @@ public class ValidationServiceImplTest {
     public void testValidateWithVocabularyNoFailures() throws Exception {
         ValueTable table = createTable(VALID_CODE, MagmaHelper.createVocabularyVariable());
 
-        ValidationResult result = validationService.validateNoTransaction(table, new SystemOutMessageLogger());
+        ValidationResult result = validationService.validate(table, new SystemOutMessageLogger());
         checkVariableRules(result);
 
         Assert.assertFalse("should have no failures", result.hasFailures());
@@ -107,7 +113,7 @@ public class ValidationServiceImplTest {
     @Test
     public void testValidateRepeatableFailure() throws Exception {
         ValueTable table = createMultivalueTable(INVALID_CODE, MagmaHelper.createVocabularyVariable());
-        ValidationResult result = validationService.validateNoTransaction(table, new SystemOutMessageLogger());
+        ValidationResult result = validationService.validate(table, new SystemOutMessageLogger());
 
         Assert.assertTrue("should have failures", result.hasFailures());
         Set<List<String>> pairs = result.getFailurePairs();
@@ -125,17 +131,18 @@ public class ValidationServiceImplTest {
     public void testValidateRepeatableNoFailures() throws Exception {
         ValueTable table = createMultivalueTable(VALID_CODE, MagmaHelper.createVocabularyVariable());
 
-        ValidationResult result = validationService.validateNoTransaction(table, new SystemOutMessageLogger());
+        ValidationResult result = validationService.validate(table, new SystemOutMessageLogger());
         checkVariableRules(result);
 
         Assert.assertFalse("should have no failures", result.hasFailures());
     }
 
     @Test
-    public void testValidateNoValidationNoTask() throws Exception {
+    public void testValidateNoValidationNoResult() throws Exception {
+        validate.set(false); //disable validation
         ValueTable table = createTable(INVALID_CODE, MagmaHelper.createVariable());
-        ValidationTask task = validationService.createValidationTask(table, new SystemOutMessageLogger());
-        Assert.assertNull("should have no validation task", task);
+        ValidationResult result = validationService.validate(table, new SystemOutMessageLogger());
+        Assert.assertNull("should have no validation result", result);
     }
 
     @Test
@@ -164,7 +171,7 @@ public class ValidationServiceImplTest {
     }
 
     private boolean isValid(ValueTable valueTable) {
-        ValidationResult vd = validationService.validateNoTransaction(valueTable, new SystemOutMessageLogger());
+        ValidationResult vd = validationService.validate(valueTable, new SystemOutMessageLogger());
         return vd == null || !vd.hasFailures();
     }
 

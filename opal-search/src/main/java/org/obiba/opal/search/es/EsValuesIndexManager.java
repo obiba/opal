@@ -17,7 +17,10 @@ import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
-import org.obiba.magma.*;
+import org.obiba.magma.Value;
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
+import org.obiba.magma.VariableEntity;
 import org.obiba.magma.concurrent.ConcurrentValueTableReader;
 import org.obiba.magma.concurrent.ConcurrentValueTableReader.ConcurrentReaderCallback;
 import org.obiba.magma.type.BinaryType;
@@ -39,7 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,11 +82,6 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
   @Override
   public IndexSynchronization createSyncTask(ValueTable valueTable, ValueTableIndex index) {
     return new Indexer(valueTable, (EsValueTableValuesIndex) index);
-  }
-
-  private ValidationService.ValidationTask createValidationTask(ValueTable table) {
-    MessageLogger logger = new Slf4jMessageAdapter(log);
-    return validationService.createValidationTask(table, logger);
   }
 
   @Override
@@ -138,14 +135,14 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
 
     @Override
     protected void index() {
-
       MessageCollector.Task collectorTask = createCollectorTask(valueTable);
       ConcurrentReaderCallback callback = new ValuesReaderCallback();
 
-      ValidationService.ValidationTask validationTask = createValidationTask(valueTable);
-      if (validationTask != null) {
-        //if validation is enabled, decorate the values reader callback with a validating one
-        callback = new ValidatingCallback(callback, validationTask);
+      MessageLogger logger = new Slf4jMessageAdapter(log);
+      ConcurrentReaderCallback validatingCallback = validationService.createValidatingCallback(valueTable, callback, logger);
+      if (validatingCallback != null) {
+        //if validation is due, use the validating callback instead
+        callback = validatingCallback;
       }
       boolean success = false;
 
@@ -157,7 +154,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
                   .variablesFilter(index.getVariables()) //
                   .to(callback); //
 
-          if (!validationService.isValidationEnabled(valueTable)) {
+          if (validatingCallback == null) {
               //this was on the original code, but its not desirable for validation
               builder.ignoreReadErrors();
           }
@@ -289,54 +286,6 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
       }
     }
 
-  }
-
-  private class ValidatingCallback implements ConcurrentReaderCallback {
-
-      @NotNull
-      private final ConcurrentReaderCallback delegate;
-
-      @NotNull
-      private final ValidationService.ValidationTask validationTask;
-
-      private List<String> validationVariables;
-
-      public ValidatingCallback(ConcurrentReaderCallback delegate, ValidationService.ValidationTask validationTask) {
-          this.delegate = delegate;
-          this.validationTask = validationTask;
-      }
-
-      @Override
-      public void onBegin(List<VariableEntity> entities, Variable... variables) {
-        delegate.onBegin(entities, variables);
-        this.validationVariables = validationTask.getVariableNames();
-      }
-
-      @Override
-      public void onValues(VariableEntity entity, Variable[] variables, Value... values) {
-
-          for(int i = 0; i<variables.length; i++) {
-              Variable var = variables[i];
-
-              if (!validationVariables.contains(var.getName())) {
-                  continue; //variable not validated: ignore
-              }
-
-              validationTask.validate(var, values[i], entity);
-          }
-
-          delegate.onValues(entity, variables, values);
-      }
-
-      @Override
-      public void onComplete() {
-        delegate.onComplete();
-      }
-
-      @Override
-      public boolean isCancelled() {
-          return delegate.isCancelled();
-      }
   }
 
   private class EsValueTableValuesIndex extends EsValueTableIndex implements ValueTableValuesIndex {
