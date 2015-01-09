@@ -10,7 +10,7 @@ import org.obiba.magma.Variable;
 public enum ConstraintType {
 
     EXTERNAL_VOCABULARY("vocabulary_url"),
-    EMBEDDED_VOCABULARY(null),
+    EMBEDDED_VOCABULARY("strict_categories"),
     MIN_VALUE("min_value"),
     MAX_VALUE("max_value"),
     PAST_DATE("past_date"),
@@ -31,10 +31,6 @@ public enum ConstraintType {
         } catch (NoSuchAttributeException ex) {
             return null;
         }
-    }
-
-    public boolean isAtrributeBased() {
-        return attribute != null;
     }
 
     public String getAttribute() {

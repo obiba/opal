@@ -1,4 +1,6 @@
-package org.obiba.opal.core.support;
+package org.obiba.opal.core;
+
+import org.obiba.opal.core.support.MessageLogger;
 
 import java.util.Date;
 
@@ -6,6 +8,16 @@ import java.util.Date;
  Impl of MessageListener that just System.out.println all the messages
  */
 public class SystemOutMessageLogger implements MessageLogger {
+
+    private final boolean silent;
+
+    public SystemOutMessageLogger() {
+        this(false);
+    }
+
+    public SystemOutMessageLogger(boolean silent) {
+        this.silent = silent;
+    }
 
     @Override
     public void debug(String msgFormat, Object... args) {
@@ -28,6 +40,9 @@ public class SystemOutMessageLogger implements MessageLogger {
     }
 
     private void out(String type, String msgFormat, Object... args) {
+        if (this.silent) {
+            return;
+        }
         String msg = String.format(msgFormat, args);
         String fullMsg = String.format(MESSAGE_FORMAT, new Date(), type, msg);
         System.out.println(fullMsg);

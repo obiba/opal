@@ -1,5 +1,19 @@
 package org.obiba.opal.core.service;
 
+import org.easymock.EasyMock;
+import org.obiba.magma.Datasource;
+import org.obiba.magma.MagmaDate;
+import org.obiba.magma.Value;
+import org.obiba.magma.ValueSet;
+import org.obiba.magma.Variable;
+import org.obiba.magma.support.StaticDatasource;
+import org.obiba.magma.support.StaticValueTable;
+import org.obiba.magma.type.DateTimeType;
+import org.obiba.magma.type.DecimalType;
+import org.obiba.magma.type.IntegerType;
+import org.obiba.magma.type.TextType;
+import org.obiba.opal.core.service.validation.ConstraintType;
+
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
@@ -8,18 +22,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.easymock.EasyMock;
-import org.obiba.magma.*;
-import org.obiba.magma.support.StaticDatasource;
-import org.obiba.magma.support.StaticValueTable;
-import org.obiba.magma.type.*;
-import org.obiba.opal.core.service.validation.ConstraintType;
-
 public class MagmaHelper {
 
 	public static final String VOCAB_VARIABLE = "code";
 	public static final String ENTITY = "Participant";
-	
+
+    private static final String[] VALID_CODES = { "AAA", "BBB", "CCC"}; //redundant (same codes as in vocabulary.csv)
+
     public static URL getVocabularyFileUrl() throws Exception {
         File file = new File("src/test/resources/vocabulary.csv");
         URI uri = file.toURI();
@@ -30,13 +39,24 @@ public class MagmaHelper {
     	return createVocabularyVariable(getVocabularyFileUrl().toExternalForm());
     }
 
+    public static Variable createCategorizedVariable(boolean strictVocabularyFromCategories) throws Exception {
+
+        Variable.Builder builder = new Variable.Builder(VOCAB_VARIABLE, TextType.get(), ENTITY);
+        builder.addCategories(VALID_CODES);
+
+        if (strictVocabularyFromCategories) {
+            builder.addAttribute(ConstraintType.EMBEDDED_VOCABULARY.getAttribute(), "x");
+        }
+
+        return builder.build();
+    }
+
     public static Variable createVariable() {
         Variable.Builder builder = new Variable.Builder(VOCAB_VARIABLE, TextType.get(), ENTITY);
         return builder.build();
     }
 
     public static Variable createVocabularyVariable(String vocabUrl) {
-        System.out.println(vocabUrl);
     	Variable.Builder builder = new Variable.Builder(VOCAB_VARIABLE, TextType.get(), ENTITY);
     	builder.addAttribute(ConstraintType.EXTERNAL_VOCABULARY.getAttribute(), vocabUrl);
     	return builder.build();

@@ -66,7 +66,7 @@ public class ValidationServiceImpl implements ValidationService {
         if (isValidationEnabled(valueTable)) {
             ValidationTask task = new ValidationTask(logger, threadFactory);
             for (Variable var: valueTable.getVariables()) {
-                List<DataConstraint> constraints = validatorFactory.getValidators(valueTable, var);
+                List<DataConstraint> constraints = validatorFactory.getValidators(var);
                 if (constraints != null && constraints.size() > 0) {
                     logger.info("Validators for variable %s: %s", var.getName(), constraints.toString());
                     task.addConstraints(var, constraints);

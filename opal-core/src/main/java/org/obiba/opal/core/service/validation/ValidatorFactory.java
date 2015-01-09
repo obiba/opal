@@ -11,7 +11,6 @@ import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.obiba.magma.Attribute;
-import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.opal.core.service.security.SystemKeyStoreService;
 import org.slf4j.Logger;
@@ -27,7 +26,12 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Knows how to create DataConstraints for a Variable.
@@ -51,13 +55,13 @@ public class ValidatorFactory {
      * @param variable
      * @return list of validators
      */
-    public List<DataConstraint> getValidators(ValueTable valueTable, Variable variable) {
+    public List<DataConstraint> getValidators(Variable variable) {
 
         List<DataConstraint> result = new ArrayList<>();
 
         try {
             for (ConstraintType type: ConstraintType.values()) {
-                DataConstraint dc = getConstraint(type, valueTable, variable);
+                DataConstraint dc = getConstraint(type, variable);
                 if (dc != null) {
                     result.add(dc);
                 }
@@ -72,18 +76,18 @@ public class ValidatorFactory {
         return result;
     }
 
-    private DataConstraint getConstraint(ConstraintType type, ValueTable table, Variable variable) throws Exception {
+    private DataConstraint getConstraint(ConstraintType type, Variable variable) throws Exception {
 
         Attribute attr = type.getAttributeValue(variable);
-        if (attr == null && type.isAtrributeBased()) {
+        if (attr == null) {
             return null;
         }
 
         DataConstraint result = null;
         switch (type) {
             case EMBEDDED_VOCABULARY:
-                if (table.isView() && variable.hasCategories()) {
-                    result = new EmbeddedVocabularyConstraint(variable);
+                if (variable.hasCategories()) {
+                    result = new EmbeddedVocabularyConstraint(variable); //attribute value is irrelevant
                 }
                 break;
             case EXTERNAL_VOCABULARY:

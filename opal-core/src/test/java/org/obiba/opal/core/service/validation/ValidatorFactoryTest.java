@@ -38,12 +38,10 @@ public class ValidatorFactoryTest {
 
     @Test
     public void testGetValidators() throws Exception  {
-        Datasource datasource = MagmaHelper.createDatasource(true);
         Variable variable = MagmaHelper.createVocabularyVariable();
         Set<String> entities = new HashSet<>();
         entities.add(MagmaHelper.ENTITY);
-        ValueTable table = MagmaHelper.createValueTable(datasource, entities, variable);
-		List<DataConstraint> validators = factory.getValidators(table, variable);
+		List<DataConstraint> validators = factory.getValidators(variable);
 		Assert.assertEquals("wrong count", 1, validators.size());
     	checkVocabValidator(validators.get(0));
     }
@@ -53,7 +51,7 @@ public class ValidatorFactoryTest {
     	VocabularyConstraint validator = factory.getVocabularyValidator(MagmaHelper.getVocabularyFileUrl());
     	checkVocabValidator(validator);
     }
-    
+
     private void checkVocabValidator(DataConstraint validator) {
 
         for (String code: VALID_CODES) {
