@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import com.github.gwtbootstrap.client.ui.Alert;
+import com.github.gwtbootstrap.client.ui.Button;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.json.client.JSONArray;
@@ -28,6 +29,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TableValidationPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TableValidationUiHandlers;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -55,6 +57,9 @@ public class TableValidationView
     @UiField
     Label errorMessage;
 
+    @UiField
+    Button validate;
+
     private TableDto table;
 
     //@todo is there a better way than hardcoding the styles?
@@ -62,6 +67,8 @@ public class TableValidationView
 
     @UiField
     HTMLPanel validationResultsPanel;
+
+    private final Translations translations = GWT.create(Translations.class);
 
     @Inject
   public TableValidationView(EventBus eventBus) {
@@ -91,12 +98,12 @@ public class TableValidationView
 
     @UiHandler("validate")
     public void onValidate(ClickEvent event) {
+        validate.setEnabled(false);
         getUiHandlers().onValidate();
     }
 
     @Override
     public void setValidationResult(ValidationResultDto dto) {
-
         if (dto != null) {
             SafeHtml html = buildValidationResultsHtml(dto);
             validationResultsPanel.getElement().setInnerSafeHtml(html);
@@ -104,6 +111,17 @@ public class TableValidationView
             validationResultsPanel.clear();
             validationResultsPanel.getElement().setInnerHTML("");
         }
+    }
+
+    @Override
+    public void setValidationFinished() {
+        validate.setEnabled(true);
+    }
+
+    @Override
+    public void setValidationInProgress() {
+        validationResultsPanel.clear();
+        validationResultsPanel.getElement().setInnerHTML(translations.validationInProgress());
     }
 
     @Override
@@ -173,9 +191,9 @@ public class TableValidationView
         if (rules.size() > 0) {
             Map<String, Set<String>> variableRuleMap = getVariableRuleMap(rules);
             Map<List<String>, List<String>> failedValuesMap = getVariableRuleFailedValuesMap(failures);
-            builder.appendHtmlConstant("<h4>").appendEscaped("Overview").appendHtmlConstant("</h4>");
+            builder.appendHtmlConstant("<h4>").appendEscaped(translations.validationOverviewTitle()).appendHtmlConstant("</h4>");
             builder.append(buildValidationSummaryTable(variableRuleMap, failedValuesMap));
-            builder.appendHtmlConstant("<h4>").appendEscaped("Detail").appendHtmlConstant("</h4>");
+            builder.appendHtmlConstant("<h4>").appendEscaped(translations.validationDetailTitle()).appendHtmlConstant("</h4>");
             addValidationFailureTable(builder, failedValuesMap);
         } else {
             builder.appendEscaped("No validation configured");
@@ -190,7 +208,7 @@ public class TableValidationView
 
         builder.appendHtmlConstant(TABLE_TAG);
         builder.appendHtmlConstant("<TR>");
-        addTableHeader(builder, "Variable");
+        addTableHeader(builder, translations.variableLabel());
 
         for (String constraint: constraints) {
             addTableHeader(builder, constraint);
@@ -225,11 +243,11 @@ public class TableValidationView
     }
 
     private void addValidationCell(SafeHtmlBuilder builder, boolean failure) {
-        String color = "green";
-        String text = "OK";
+        String color = translations.validationOkColor();
+        String text = translations.validationOk();
         if (failure) {
-            color = "red";
-            text = "FAILURE";
+            color = translations.validationFailColor();
+            text = translations.validationFail();
         }
 
         builder.appendHtmlConstant("<font color=\"" + color + "\">");
@@ -240,9 +258,9 @@ public class TableValidationView
     private void addValidationFailureTable(SafeHtmlBuilder builder, Map<List<String>, List<String>> failedValuesMap) {
         builder.appendHtmlConstant(TABLE_TAG);
         builder.appendHtmlConstant("<TR>");
-        addTableHeader(builder, "Variable");
-        addTableHeader(builder, "Constraint");
-        addTableHeader(builder, "Values");
+        addTableHeader(builder, translations.variableLabel());
+        addTableHeader(builder, translations.constraintLabel());
+        addTableHeader(builder, translations.values());
         builder.appendHtmlConstant("</TR>");
 
         for (List<String> key: failedValuesMap.keySet()) {

@@ -2311,4 +2311,36 @@ public interface Translations extends Constants {
     @DefaultStringValue("Validate")
     String validate();
 
+    @Description("Validation overview title")
+    @DefaultStringValue("Overview")
+    String validationOverviewTitle();
+
+    @Description("Validation detail title")
+    @DefaultStringValue("Detail")
+    String validationDetailTitle();
+
+    @Description("Constraint label")
+    @DefaultStringValue("Constraint")
+    String constraintLabel();
+
+    @Description("Validation OK")
+    @DefaultStringValue("OK")
+    String validationOk();
+
+    @Description("Validation Fail")
+    @DefaultStringValue("Failure")
+    String validationFail();
+
+    @Description("Validation OK color")
+    @DefaultStringValue("green")
+    String validationOkColor();
+
+    @Description("Validation Fail color")
+    @DefaultStringValue("red")
+    String validationFailColor();
+
+    @Description("Validation in progres message")
+    @DefaultStringValue("In progress...")
+    String validationInProgress();
+
 }

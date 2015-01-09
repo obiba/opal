@@ -59,6 +59,10 @@ public class TableValidationPresenter
     void setErrorMessage(String title, String msg);
 
     void setTable(TableDto table);
+
+    void setValidationInProgress();
+
+    void setValidationFinished();
   }
 
     private ValidateCommandOptionsDto createValidateOptions() {
@@ -70,9 +74,9 @@ public class TableValidationPresenter
 
     @Override
     public void onValidate() {
-        sendValidateCommandRequest();
         getView().clearErrorMessages(); //clear error messages
-        getView().setValidationResult(null); //clear the view results
+        getView().setValidationInProgress();
+        sendValidateCommandRequest();
     }
 
     /**
@@ -100,6 +104,7 @@ public class TableValidationPresenter
         } else {
             getView().clearErrorMessages();
             getView().setErrorMessage("Unexpected validation job status", status);
+            getView().setValidationFinished();
         }
     }
 
@@ -133,6 +138,7 @@ public class TableValidationPresenter
             return; //ignore results for other tables
         }
         getView().setValidationResult(dto);
+        getView().setValidationFinished();
     }
 
     private class ValidationResultsCallBack implements ResourceCallback<ValidationResultDto> {
