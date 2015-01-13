@@ -28,7 +28,7 @@ public abstract class BaseValidatingCallback implements ConcurrentValueTableRead
     }
 
     @Override
-    public final void onValues(VariableEntity entity, Variable[] variables, Value... values) {
+    public void onValues(VariableEntity entity, Variable[] variables, Value... values) {
         for(int i = 0; i<variables.length; i++) {
             Variable var = variables[i];
 

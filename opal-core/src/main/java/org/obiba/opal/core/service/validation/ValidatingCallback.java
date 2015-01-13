@@ -24,8 +24,8 @@ public class ValidatingCallback extends BaseValidatingCallback {
 
     @Override
     public void onBegin(List<VariableEntity> entities, Variable... variables) {
-        super.onBegin(entities, variables);
         delegate.onBegin(entities, variables);
+        super.onBegin(entities, variables);
     }
 
     @Override
@@ -44,4 +44,9 @@ public class ValidatingCallback extends BaseValidatingCallback {
         this.validationTask.validate(var, value, entity);
     }
 
+    @Override
+    public void onValues(VariableEntity entity, Variable[] variables, Value... values) {
+        super.onValues(entity, variables, values);
+        delegate.onValues(entity, variables, values);
+    }
 }
