@@ -32,6 +32,7 @@ import org.obiba.opal.core.support.yaml.TaxonomyYaml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
@@ -42,6 +43,10 @@ public class TaxonomyServiceImpl implements TaxonomyService {
 
   @Autowired
   private OpalRuntime opalRuntime;
+
+  @NotNull
+  @Value("${org.obiba.opal.taxonomies}")
+  private String taxonomyReferences;
 
   @Autowired
   private TaxonomyPersistenceStrategy taxonomyPersistence;
@@ -219,13 +224,13 @@ public class TaxonomyServiceImpl implements TaxonomyService {
   }
 
   private void importDefault(boolean override) {
-    importGitHubTaxonomy(MLSTRM_USER, "maelstrom-taxonomies", null, "area-of-information", override);
-    importGitHubTaxonomy(MLSTRM_USER, "maelstrom-taxonomies", null, "target-of-information", override);
-    importGitHubTaxonomy(MLSTRM_USER, "maelstrom-taxonomies", null, "source-of-information", override);
-    importGitHubTaxonomy(MLSTRM_USER, "maelstrom-taxonomies", null, "harmonization", override);
+    if (taxonomyReferences.trim().isEmpty()) return;
+
+    for(String uri : taxonomyReferences.split(",")) {
+      importUriTaxonomy(uri.trim(), override);
+    }
   }
 
-  @SuppressWarnings("OverlyLongMethod")
   private Taxonomy importGitHubTaxonomy(@NotNull String username, @NotNull String repo, @Nullable String ref,
       @NotNull String taxonomyFile, boolean override) {
     String user = username;
@@ -239,6 +244,10 @@ public class TaxonomyServiceImpl implements TaxonomyService {
 
     String uri = GITHUB_URL + "/" + user + "/" + repo + "/" + reference + "/" + fileName;
 
+    return importUriTaxonomy(uri, override);
+  }
+
+  private Taxonomy importUriTaxonomy(@NotNull String uri, boolean override) {
     try {
       InputStream input = new URL(uri).openStream();
       TaxonomyYaml yaml = new TaxonomyYaml();
