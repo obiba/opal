@@ -30,7 +30,7 @@ public class OpalGitVersionControlSystem implements OpalVersionControlSystem {
 
   @Override
   public Iterable<CommitInfo> getCommitsInfo(@NotNull String datasource, @NotNull String path) {
-    return gitCommandHandler.execute(new LogsCommand.Builder(OpalGitUtils.getGitDatasourceViewsRepoFolder(datasource),
+    return gitCommandHandler.execute(new LogsCommand.Builder(OpalGitUtils.getGitViewsRepoFolder(datasource),
             OpalGitUtils.getGitViewsWorkFolder()).path(path).excludeDeletedCommits(true).build()
     );
   }
@@ -38,14 +38,14 @@ public class OpalGitVersionControlSystem implements OpalVersionControlSystem {
   @Override
   public CommitInfo getCommitInfo(@NotNull String datasource, @NotNull String path, @NotNull String commitId) {
     return gitCommandHandler.execute(
-        new CommitLogCommand.Builder(OpalGitUtils.getGitDatasourceViewsRepoFolder(datasource),
+        new CommitLogCommand.Builder(OpalGitUtils.getGitViewsRepoFolder(datasource),
             OpalGitUtils.getGitViewsWorkFolder(), path, commitId).build());
   }
 
   @Override
   public String getBlob(@NotNull String datasource, @NotNull String path, @NotNull String commitId) {
     return gitCommandHandler.execute(
-        new FetchBlobCommand.Builder(OpalGitUtils.getGitDatasourceViewsRepoFolder(datasource),
+        new FetchBlobCommand.Builder(OpalGitUtils.getGitViewsRepoFolder(datasource),
             OpalGitUtils.getGitViewsWorkFolder(), path).commitId(commitId).build());
   }
 
@@ -53,7 +53,7 @@ public class OpalGitVersionControlSystem implements OpalVersionControlSystem {
   public Iterable<String> getDiffEntries(@NotNull String datasource, @NotNull String commitId,
       @Nullable String prevCommitId, @Nullable String path) {
     return gitCommandHandler.execute(
-        new DiffAsStringCommand.Builder(OpalGitUtils.getGitDatasourceViewsRepoFolder(datasource),
+        new DiffAsStringCommand.Builder(OpalGitUtils.getGitViewsRepoFolder(datasource),
             OpalGitUtils.getGitViewsWorkFolder(), commitId).path(path).previousCommitId(prevCommitId).build()
     );
   }

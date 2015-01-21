@@ -35,30 +35,68 @@ public final class OpalGitUtils {
 
   private final static String GIT_VIEWS_NAME = "views";
 
-  private final static File GIT_ROOT_PATH = new File(
-      System.getProperty("OPAL_HOME") + File.separatorChar + DATA_FOLDER_NAME + File.separatorChar + GIT_FOLDER_NAME +
-          File.separatorChar + GIT_VIEWS_NAME);
+  private final static String GIT_TAXONOMIES_NAME = "taxonomies";
 
-  private final static File GIT_WORK_PATH = new File(
-      System.getProperty("OPAL_HOME") + File.separatorChar + WORK_FOLDER_NAME + File.separatorChar + GIT_FOLDER_NAME +
-          File.separatorChar + GIT_VIEWS_NAME);
+  public static final String TAXONOMY_FILE_NAME = "taxonomy.yml";
 
-  public static File getGitDatasourceViewsRepoFolder(@Nonnull String datasourceName) {
-    Preconditions.checkArgument(datasourceName != null);
-    return new File(GIT_ROOT_PATH, datasourceName + ".git");
+  private final static File GIT_ROOT_PATH = new File(System.getProperty("OPAL_HOME"),
+      DATA_FOLDER_NAME + File.separatorChar + GIT_FOLDER_NAME);
+
+  private final static File GIT_WORK_PATH = new File(System.getProperty("OPAL_HOME"),
+      WORK_FOLDER_NAME + File.separatorChar + GIT_FOLDER_NAME);
+
+  private final static File GIT_VIEWS_ROOT_PATH = new File(GIT_ROOT_PATH, GIT_VIEWS_NAME);
+
+  private final static File GIT_VIEWS_WORK_PATH = new File(GIT_WORK_PATH, GIT_VIEWS_NAME);
+
+  private final static File GIT_TAXONOMIES_ROOT_PATH = new File(GIT_ROOT_PATH, GIT_TAXONOMIES_NAME);
+
+  private final static File GIT_TAXONOMIES_WORK_PATH = new File(GIT_WORK_PATH, GIT_TAXONOMIES_NAME);
+
+  //
+  // Views
+  //
+
+  public static File getGitViewsRepoFolder(@Nonnull String datasourceName) {
+    return getGitRepoFolder(GIT_VIEWS_ROOT_PATH, datasourceName);
   }
 
   public static File getGitViewsWorkFolder() {
-    if (!GIT_WORK_PATH.exists()) GIT_WORK_PATH.mkdirs();
-    return GIT_WORK_PATH;
-  }
-
-  public static String getViewFilePath(String view) {
-    return view + File.separatorChar + VIEW_FILE_NAME;
+    return ensureGitWorkFolder(GIT_VIEWS_WORK_PATH);
   }
 
   public static String getVariableFilePath(String view, String variable) {
     return view + File.separatorChar + variable + VARIABLE_FILE_EXTENSION;
+  }
+
+  //
+  // Taxonomies
+  //
+
+  public static File getGitTaxonomiesRepoFolder() {
+    return GIT_TAXONOMIES_ROOT_PATH;
+  }
+
+  public static File getGitTaxonomyRepoFolder(@Nonnull String taxonomyName) {
+    return getGitRepoFolder(GIT_TAXONOMIES_ROOT_PATH, taxonomyName);
+  }
+
+  public static File getGitTaxonomiesWorkFolder() {
+    return ensureGitWorkFolder(GIT_TAXONOMIES_WORK_PATH);
+  }
+
+  //
+  // Private methods
+  //
+
+  private static File getGitRepoFolder(File rootPath, @Nonnull String name) {
+    Preconditions.checkArgument(name != null);
+    return new File(rootPath, name + ".git");
+  }
+
+  private static File ensureGitWorkFolder(File workPath) {
+    if(!workPath.exists()) workPath.mkdirs();
+    return workPath;
   }
 
 }

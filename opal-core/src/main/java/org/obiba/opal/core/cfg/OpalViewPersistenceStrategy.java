@@ -59,7 +59,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
       @Nullable VariableOperationContext context) {
     log.debug("WriteViews ds: {} views: {}", datasourceName, views.size());
     OpalWriteViewsCommand.Builder builder = new OpalWriteViewsCommand.Builder(
-        OpalGitUtils.getGitDatasourceViewsRepoFolder(datasourceName), views, comment, context);
+        OpalGitUtils.getGitViewsRepoFolder(datasourceName), views, comment, context);
 
     handler.execute(builder.build());
   }
@@ -73,7 +73,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   @Override
   public void removeView(@NotNull String datasourceName, @NotNull String viewName) {
     log.debug("RemoveView ds: {}, view: {}", datasourceName, viewName);
-    handler.execute(new DeleteFilesCommand.Builder(OpalGitUtils.getGitDatasourceViewsRepoFolder(datasourceName),
+    handler.execute(new DeleteFilesCommand.Builder(OpalGitUtils.getGitViewsRepoFolder(datasourceName),
         OpalGitUtils.getGitViewsWorkFolder(), viewName, "Remove " + viewName).build());
   }
 
@@ -81,7 +81,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   public void removeViews(String datasourceName) {
     log.debug("RemoveViews ds: {}", datasourceName);
     try {
-      FileUtil.delete(OpalGitUtils.getGitDatasourceViewsRepoFolder(datasourceName));
+      FileUtil.delete(OpalGitUtils.getGitViewsRepoFolder(datasourceName));
       FileUtil.delete(new File(OpalGitUtils.getGitViewsWorkFolder(), datasourceName));
     } catch(IOException e) {
       throw new RuntimeException("Failed deleting views in git for datasource: " + datasourceName, e);
@@ -92,7 +92,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   @Override
   public Set<View> readViews(@NotNull String datasourceName) {
     log.debug("ReadViews ds: {}", datasourceName);
-    File datasourceRepo = OpalGitUtils.getGitDatasourceViewsRepoFolder(datasourceName);
+    File datasourceRepo = OpalGitUtils.getGitViewsRepoFolder(datasourceName);
     ImmutableSet.Builder<View> builder = ImmutableSet.builder();
     List<String> viewNames = Lists.newArrayList();
     if(datasourceRepo.exists()) {

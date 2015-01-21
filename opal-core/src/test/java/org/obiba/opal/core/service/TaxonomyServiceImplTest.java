@@ -13,7 +13,6 @@ package org.obiba.opal.core.service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Properties;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -253,13 +252,6 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     @Bean
     public TaxonomyService taxonomyService() {
       return new TaxonomyServiceImpl();
-    }
-
-    @Bean
-    public Properties myProps(){
-      Properties properties = new Properties();
-      properties.setProperty("org.obiba.opal.taxonomies", "https://raw.githubusercontent.com/maelstrom-research/maelstrom-taxonomies/master/area-of-information/taxonomy.yml");
-      return properties;
     }
 
     @Bean

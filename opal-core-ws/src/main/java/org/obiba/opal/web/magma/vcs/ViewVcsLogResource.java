@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.magma.vcs;
 
+import java.io.File;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
@@ -46,14 +47,15 @@ public class ViewVcsLogResource {
   @GET
   @Path("/commits")
   public Response getCommitsInfo() {
-    Iterable<CommitInfo> commitInfos = vcs.getCommitsInfo(datasource, OpalGitUtils.getViewFilePath(view));
+    Iterable<CommitInfo> commitInfos = vcs.getCommitsInfo(datasource, getViewFilePath(view));
     return Response.ok().entity(Dtos.asDto(commitInfos)).build();
   }
 
   @GET
   @Path("/variable/{variableName}/commits")
   public Response getVariableCommitsInfo(@NotNull @PathParam("variableName") String variableName) {
-    Iterable<CommitInfo> commitInfos = vcs.getCommitsInfo(datasource, OpalGitUtils.getVariableFilePath(view, variableName));
+    Iterable<CommitInfo> commitInfos = vcs
+        .getCommitsInfo(datasource, OpalGitUtils.getVariableFilePath(view, variableName));
     return Response.ok().entity(Dtos.asDto(commitInfos)).build();
   }
 
@@ -93,5 +95,9 @@ public class ViewVcsLogResource {
       @NotNull String commitId, @Nullable String prevCommitId) {
     Iterable<String> diffEntries = vcs.getDiffEntries(datasource, commitId, prevCommitId, path);
     return CommitInfo.Builder.createFromObject(commitInfo).diffEntries((List<String>) diffEntries).build();
+  }
+
+  private String getViewFilePath(String view) {
+    return view + File.separatorChar + OpalGitUtils.VIEW_FILE_NAME;
   }
 }
