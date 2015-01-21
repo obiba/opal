@@ -130,44 +130,27 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
 
   @Override
   protected void onReveal() {
-      GWT.log("-------------------------");
     refreshApplicationName();
     refreshAuthClients();
   }
 
   private void refreshAuthClients() {
-
-      //GWT.log("----- " + this.authClients.length());
       if (authClients != null) {
           return; //already fetched
       }
 
-      //if (true) {
-      //    return;
-      //}
       // Fetch all auth clients
       ResourceRequestBuilderFactory.<JsArray<AuthClientDto>>newBuilder() //
         .forResource(UriBuilders.AUTH_CLIENTS.create().build()) //
-        .withCallback(new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-              GWT.log("----" + response.getStatusText());
-              //getView().setApplicationName(response.getText());
-          }
-        }, Response.SC_OK)
-              /*
-        .withCallback(new ResourceCallback<JsArray<AuthClientDto>>() {
-            @Override
-            public void onResource(Response response, JsArray<AuthClientDto> resource) {
-                //GWT.log("---- fooooo ");
-                //handleAuthClients(resource);
-            }
-        } //*/
-      .get().send();
+                .withCallback(new ResourceCallback<JsArray<AuthClientDto>>() {
+                  @Override
+                  public void onResource(Response response, JsArray<AuthClientDto> resource) {
+                    handleAuthClients(resource);
+                  }
+                }).get().send();
   }
 
     private void handleAuthClients(JsArray<AuthClientDto> clients) {
-        GWT.log("----- " + clients.length());
         authClients = clients;
         getView().renderAuthClients(clients);
     }

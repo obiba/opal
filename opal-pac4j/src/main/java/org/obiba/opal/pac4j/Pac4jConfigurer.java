@@ -19,7 +19,6 @@ import java.util.Properties;
 @Component
 public class Pac4jConfigurer {
 
-    //private static final String CALLBACK_URL = "org.obiba.opal.pac4j.clients.callbackUrl";
     private static String callbackUrl;
     private static String callbackPath;
     private static boolean enabled;
@@ -86,16 +85,6 @@ public class Pac4jConfigurer {
             return clientRealm.getClients();
         }
         return null;
-    }
-
-    public static List<Client> getClientList(SecurityManager securityManager) {
-        Clients clients = getClients(securityManager);
-
-        if (clients != null) {
-            return clients.findAllClients();
-        }
-
-        return Collections.emptyList();
     }
 
 }

@@ -2,10 +2,12 @@ package org.obiba.opal.pac4j;
 
 import io.buji.pac4j.ClientFilter;
 import io.buji.pac4j.NoAuthenticationException;
+import org.apache.http.HttpStatus;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.Subject;
+import org.obiba.opal.web.security.AuthenticationResource;
 import org.obiba.shiro.web.filter.AuthenticationExecutor;
 import org.pac4j.core.exception.RequiresHttpAction;
 import org.slf4j.Logger;
@@ -19,7 +21,9 @@ import javax.annotation.PostConstruct;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * Filter for handling the pac4j callback.
@@ -36,9 +40,6 @@ public class Pac4jClientFilter extends ClientFilter {
     @Autowired
     private AuthenticationExecutor authenticationExecutor;
 
-    @Value("${org.obiba.opal.public.url:http://localhost:8080}")
-    private String opalPublicUrl;
-
     @Value("${org.obiba.shiro.authenticationFilter.cookie.sessionId}")
     private String sessionIdCookieName;
 
@@ -52,10 +53,7 @@ public class Pac4jClientFilter extends ClientFilter {
 
     @Override
     public String getSuccessUrl() {
-        //@TODO: find the correct/best url to redirect after successful login
-        //String path = AuthenticationResource.getSucessfulLoginPath();
-        String path = "/";
-        return opalPublicUrl + path;
+        return "/";
     }
 
     /**
@@ -77,6 +75,7 @@ public class Pac4jClientFilter extends ClientFilter {
             HttpServletResponse res = (HttpServletResponse)response;
             String sessionId = SecurityUtils.getSubject().getSession().getId().toString();
             res.addCookie(new Cookie(sessionIdCookieName, sessionId));
+            res.setStatus(HttpStatus.SC_CREATED);
             return onLoginSuccess(token, subject, request, response);
 
         } catch (final NoAuthenticationException e) {

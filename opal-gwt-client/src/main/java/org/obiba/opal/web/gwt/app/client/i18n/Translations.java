@@ -2312,18 +2312,16 @@ public interface Translations extends Constants {
   @DefaultStringValue("Too many repeated errors. Stopping further requests")
   String tooManyRepeatedErrorsLabel();
 
-  @Description("Authorization Clients icon map")
-  @DefaultStringMapValue({ "UNKNOWN", "todo", //
-            "eidClient", "todo", //
-  })
-
-  Map<String, String> authClientsIconMap();
-
   @Description("Authorization Clients title map")
   @DefaultStringMapValue({ "UNKNOWN", "", //
-            "eidClient", "EId", //
+        "eidClient", "EId", //
   })
-
   Map<String, String> authClientsTitleMap();
+
+  @Description("Authorization Clients icon map")
+  @DefaultStringMapValue({ "UNKNOWN", "noimage", //
+        "eidClient", "image/eid_logo.png", //
+  })
+  Map<String, String> authClientsImageMap();
 
 }
