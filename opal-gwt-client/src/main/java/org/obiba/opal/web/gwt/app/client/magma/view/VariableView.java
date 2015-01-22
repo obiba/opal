@@ -501,6 +501,12 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     public void beforeAuthorization() {
       attributesPanel.clear();
 
+      if (variableDto.getAttributesArray() == null || variableDto.getAttributesArray().length() == 0) {
+        attributesPanel.setStyleName("xxlarge-bottom-margin");
+      } else {
+        attributesPanel.removeStyleName("xxlarge-bottom-margin");
+      }
+
       List<String> namespaces = new ArrayList<String>();
       JsArray<AttributeDto> attributesArray = JsArrays.toSafeArray(variableDto.getAttributesArray());
       for(int i = 0; i < attributesArray.length(); i++) {

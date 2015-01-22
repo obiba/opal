@@ -147,7 +147,7 @@
             <ui:msg description="Add Custom Attribute button label">Add custom attribute...</ui:msg>
           </b:NavLink>
         </b:DropdownButton>
-        <g:FlowPanel ui:field="attributesPanel"/>
+        <g:FlowPanel ui:field="attributesPanel" addStyleNames="xxlarge-bottom-margin"/>
 
       </b:Tab>
 
