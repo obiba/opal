@@ -127,12 +127,6 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
     getUiHandlers().onDeleteAttribute(checkColumn.getSelectedItems());
   }
 
-  @UiHandler("editLink")
-
-  public void onEdit(ClickEvent event) {
-    getUiHandlers().onEditAttributes(checkColumn.getSelectedItems());
-  }
-
   public void initColumns() {
     table.setPageSize(Table.DEFAULT_PAGESIZE);
     table.setEmptyTableWidget(new InlineLabel(translations.noAttributesLabel()));

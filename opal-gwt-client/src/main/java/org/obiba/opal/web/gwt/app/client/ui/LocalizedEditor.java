@@ -114,7 +114,7 @@ public class LocalizedEditor extends FlowPanel {
 
   public Map<String, String> getLocalizedTexts() {
     // make sure current edition is applied
-    localizedTexts.put(currentLocale.getName(), editor.getText());
+    if(localizedTexts != null) localizedTexts.put(currentLocale.getName(), editor.getText());
     return localizedTexts;
   }
 
@@ -132,7 +132,7 @@ public class LocalizedEditor extends FlowPanel {
       currentLocale.setActive(false);
       link.setActive(true);
       currentLocale = link;
-      if (type == Type.MARKDOWN) ((MarkdownEditor) editor).showPreview(false);
+      if(type == Type.MARKDOWN) ((MarkdownEditor) editor).showPreview(false);
       editor.setText(localizedTexts.get(currentLocale.getName()));
     }
   }

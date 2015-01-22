@@ -55,6 +55,7 @@ public class VariableTaxonomyModalPresenter
           @Override
           public void onResource(Response response, JsArray<TaxonomyDto> resource) {
             getView().setTaxonomies(JsArrays.toList(resource));
+            applySelectedItems();
           }
         }).send();
   }

@@ -134,6 +134,7 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
   public void initialize(TableDto tableDto, Collection<VariableDto> variableDtos) {
     table = tableDto;
     variables.addAll(variableDtos);
+    selectedItems = null;
     renderLocalizableTexts();
   }
 
@@ -141,7 +142,9 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
     table = tableDto;
     variables.add(variableDto);
     this.selectedItems = selectedItems;
+  }
 
+  protected void applySelectedItems() {
     if(selectedItems.size() == 1) {
       // Fetch locales and render categories
       ResourceRequestBuilderFactory.<JsArray<LocaleDto>>newBuilder()

@@ -38,6 +38,7 @@ public class VariableAttributeModalPresenter
   public void initialize(TableDto tableDto, VariableDto variableDto, final List<JsArray<AttributeDto>> selectedItems) {
     super.initialize(tableDto, variableDto, selectedItems);
     getView().setNamespaceSuggestions(variables);
+    applySelectedItems();
   }
 
   public interface Display extends BaseVariableAttributeModalPresenter.Display {

@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
-import javax.ws.rs.DELETE;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -33,6 +32,7 @@ import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.common.collect.Maps;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -42,6 +42,7 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
 
+import static org.obiba.opal.web.gwt.app.client.magma.variable.presenter.BaseVariableAttributeModalPresenter.stringify;
 import static org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableTaxonomyModalPresenter.Display;
 
 /**
@@ -169,7 +170,7 @@ public class VariableTaxonomyModalView extends ModalPopupViewWithUiHandlers<Vari
   }
 
   private void setTerm(VocabularyDto vocabulary) {
-    if (!termGroup.isVisible() && !valuesGroup.isVisible()) return;
+    if(!termGroup.isVisible() && !valuesGroup.isVisible()) return;
     termChooser.clear();
     if(vocabulary == null || vocabulary.getTermsCount() == 0) {
       enableTermSelection(false);
@@ -220,12 +221,6 @@ public class VariableTaxonomyModalView extends ModalPopupViewWithUiHandlers<Vari
   }
 
   @Override
-  public void setLocalizedTexts(Map<String, String> localizedTexts, List<String> locales) {
-    // TODO set term or open text
-    editor.setLocalizedTexts(localizedTexts, locales);
-  }
-
-  @Override
   public void showError(@Nullable FormField formField, String message) {
     ControlGroup group = null;
     if(formField != null) {
@@ -250,12 +245,26 @@ public class VariableTaxonomyModalView extends ModalPopupViewWithUiHandlers<Vari
 
   @Override
   public void setNamespace(String namespace) {
-    // TODO select taxonomy
+    GWT.log("select taxonomy=" + namespace);
+    taxonomyChooser.setSelectedValue(namespace);
+    setVocabulary(getTaxonomy(namespace));
   }
 
   @Override
   public void setName(String name) {
-    // TODO select vocabulary
+    GWT.log("select vocabulary=" + name);
+    vocabularyChooser.setSelectedValue(name);
+    setTerm(getVocabulary(taxonomyChooser.getSelectedValue(), name));
+  }
+
+  @Override
+  public void setLocalizedTexts(Map<String, String> localizedTexts, List<String> locales) {
+    GWT.log("select term=...");
+    editor.setLocalizedTexts(localizedTexts, locales);
+    if (localizedTexts.keySet().size() == 1 && localizedTexts.keySet().contains("")) {
+      GWT.log("select term=" + localizedTexts.get(""));
+      termChooser.setSelectedValue(localizedTexts.get(""));
+    }
   }
 
   @Override

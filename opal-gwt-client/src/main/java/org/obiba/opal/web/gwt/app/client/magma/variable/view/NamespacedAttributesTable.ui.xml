@@ -28,10 +28,6 @@
       <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false" addStyleNames="actions-select">
 
         <g:FlowPanel addStyleNames="pull-left">
-          <b2:IconAnchor ui:field="editLink" icon="PENCIL" addStyleNames="inline xsmall-indent">
-            <ui:msg description="Edit attribute label">Edit</ui:msg>
-          </b2:IconAnchor>
-
           <b2:IconAnchor ui:field="deleteLink" icon="TRASH" addStyleNames="inline xsmall-indent">
             <ui:msg description="Remove attribute label">Remove</ui:msg>
           </b2:IconAnchor>
