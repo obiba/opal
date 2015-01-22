@@ -31,6 +31,7 @@ import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPr
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewPropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewWhereModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.BaseVariableAttributeModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.ContingencyTablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
@@ -662,14 +663,14 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @Override
   public void onApplyAttribute(List<VariableDto> selectedItems) {
     VariableAttributeModalPresenter attributeEditorPresenter = attributeModalProvider.get();
-    attributeEditorPresenter.setDialogMode(VariableAttributeModalPresenter.Mode.APPLY);
+    attributeEditorPresenter.setDialogMode(BaseVariableAttributeModalPresenter.Mode.APPLY);
     attributeEditorPresenter.initialize(table, selectedItems);
   }
 
   @Override
   public void onDeleteAttribute(List<VariableDto> selectedItems) {
     VariableAttributeModalPresenter attributeEditorPresenter = attributeModalProvider.get();
-    attributeEditorPresenter.setDialogMode(VariableAttributeModalPresenter.Mode.DELETE);
+    attributeEditorPresenter.setDialogMode(BaseVariableAttributeModalPresenter.Mode.DELETE);
     attributeEditorPresenter.initialize(table, selectedItems);
   }
 

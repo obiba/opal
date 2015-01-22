@@ -173,7 +173,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   Button editCategories;
 
   @UiField
-  Button addAttribute;
+  DropdownButton addAttributeButton;
 
   @UiField
   IconAnchor editProperties;
@@ -197,6 +197,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     initWidget(uiBinder.createAndBindUi(this));
 
     deriveBtn.setText(translations.derive());
+    addAttributeButton.setText(translations.addAttribute());
     initCategoryTable();
     scriptNavPanel.showWidget(0);
   }
@@ -324,6 +325,11 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     getUiHandlers().onAddAttribute();
   }
 
+  @UiHandler("addTaxonomy")
+  void onAddTaxonomy(ClickEvent event) {
+    getUiHandlers().onAddTaxonomy();
+  }
+
   @UiHandler("editProperties")
   void onEditProperties(ClickEvent event) {
     getUiHandlers().onEditProperties();
@@ -435,7 +441,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   @Override
   public HasAuthorization getEditAuthorizer() {
-    return new WidgetAuthorizer(remove, scriptHeaderPanel, editProperties, editCategories, addAttribute);
+    return new WidgetAuthorizer(remove, scriptHeaderPanel, editProperties, editCategories, addAttributeButton);
   }
 
   @Override

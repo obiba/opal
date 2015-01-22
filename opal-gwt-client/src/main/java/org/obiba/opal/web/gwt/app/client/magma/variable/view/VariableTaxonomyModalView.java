@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 OBiBa. All rights reserved.
+ * Copyright (c) 2015 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -18,39 +18,42 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.BaseVariableAttributeModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.LocalizedEditor;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.validator.ConstrainedModal;
-import org.obiba.opal.web.model.client.magma.AttributeDto;
-import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.opal.TaxonomyDto;
+import org.obiba.opal.web.model.client.opal.TermDto;
+import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.Paragraph;
-import com.github.gwtbootstrap.client.ui.TextBox;
-import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.google.common.collect.Maps;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.watopi.chosen.client.event.ChosenChangeEvent;
 
-import static org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalPresenter.Display;
+import static org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableTaxonomyModalPresenter.Display;
 
 /**
  *
  */
-public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<VariableAttributeModalUiHandlers>
+public class VariableTaxonomyModalView extends ModalPopupViewWithUiHandlers<VariableAttributeModalUiHandlers>
     implements Display {
 
   private final Translations translations;
 
-  interface Binder extends UiBinder<Widget, VariableAttributeModalView> {}
+  private List<TaxonomyDto> taxonomies;
+
+  interface Binder extends UiBinder<Widget, VariableTaxonomyModalView> {}
 
   @UiField
   Modal modal;
@@ -62,16 +65,16 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
   Button cancelButton;
 
   @UiField
-  ControlGroup nameGroup;
+  Chooser taxonomyChooser;
 
   @UiField
-  Typeahead namespaceTypeahead;
+  Chooser vocabularyChooser;
 
   @UiField
-  TextBox namespace;
+  ControlGroup termGroup;
 
   @UiField
-  TextBox name;
+  Chooser termChooser;
 
   @UiField
   ControlGroup valuesGroup;
@@ -80,24 +83,28 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
   LocalizedEditor editor;
 
   @UiField
-  ControlGroup namespaceGroup;
-
-  @UiField
   Paragraph editAttributeHelp;
 
   @Inject
-  public VariableAttributeModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
+  public VariableTaxonomyModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
     super(eventBus);
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
-    modal.setTitle(translations.addCustomAttribute());
+    modal.setTitle(translations.addTaxonomyAttribute());
     modal.setMinWidth(700);
     new ConstrainedModal(modal);
   }
 
   @UiHandler("saveButton")
   public void onSave(ClickEvent event) {
-    getUiHandlers().save(namespace.getText(), name.getText(), editor.getLocalizedTexts());
+    Map<String, String> values;
+    if(termGroup.isVisible()) {
+      values = Maps.newHashMap();
+      values.put("", termChooser.getSelectedValue());
+    } else {
+      values = editor.getLocalizedTexts();
+    }
+    getUiHandlers().save(taxonomyChooser.getSelectedValue(), vocabularyChooser.getSelectedValue(), values);
   }
 
   @UiHandler("cancelButton")
@@ -105,25 +112,77 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
     getUiHandlers().cancel();
   }
 
-  @Override
-  public void setNamespace(String namespace) {
-    this.namespace.setText(namespace);
+  @UiHandler("taxonomyChooser")
+  public void onTaxonomy(ChosenChangeEvent event) {
+    setVocabulary(getTaxonomy(taxonomyChooser.getSelectedValue()));
+  }
+
+  @UiHandler("vocabularyChooser")
+  public void onVocabulary(ChosenChangeEvent event) {
+    setTerm(getVocabulary(taxonomyChooser.getSelectedValue(), vocabularyChooser.getSelectedValue()));
+  }
+
+  private TaxonomyDto getTaxonomy(String name) {
+    for(TaxonomyDto taxo : taxonomies) {
+      if(taxo.getName().equals(name)) return taxo;
+    }
+    return null;
+  }
+
+  private VocabularyDto getVocabulary(String taxoName, String vocName) {
+    TaxonomyDto taxo = getTaxonomy(taxoName);
+    if(taxo == null) return null;
+
+    for(VocabularyDto voc : JsArrays.toIterable(taxo.getVocabulariesArray())) {
+      if(voc.getName().equals(vocName)) return voc;
+    }
+    return null;
   }
 
   @Override
-  public void setName(String name) {
-    this.name.setText(name);
-  }
-
-  @Override
-  public void setNamespaceSuggestions(List<VariableDto> variableDtos) {
-    MultiWordSuggestOracle oracle = (MultiWordSuggestOracle) namespaceTypeahead.getSuggestOracle();
-    oracle.clear();
-    for(VariableDto dto : variableDtos) {
-      for(AttributeDto attributeDto : JsArrays.toIterable(dto.getAttributesArray())) {
-        oracle.add(attributeDto.getNamespace());
+  public void setTaxonomies(List<TaxonomyDto> taxonomies) {
+    this.taxonomies = taxonomies;
+    taxonomyChooser.clear();
+    TaxonomyDto firstTaxo = null;
+    for(TaxonomyDto taxo : taxonomies) {
+      taxonomyChooser.addItem(taxo.getName());
+      if(firstTaxo == null) {
+        firstTaxo = taxo;
       }
     }
+    setVocabulary(firstTaxo);
+  }
+
+  private void setVocabulary(TaxonomyDto taxonomy) {
+    vocabularyChooser.clear();
+    if(taxonomy == null) return;
+
+    VocabularyDto firstVoc = null;
+    for(VocabularyDto voc : JsArrays.toIterable(taxonomy.getVocabulariesArray())) {
+      vocabularyChooser.addItem(voc.getName());
+      if(firstVoc == null) {
+        firstVoc = voc;
+      }
+    }
+    setTerm(firstVoc);
+  }
+
+  private void setTerm(VocabularyDto vocabulary) {
+    termChooser.clear();
+    if(vocabulary == null || vocabulary.getTermsCount() == 0) {
+      enableTermSelection(false);
+      return;
+    }
+
+    enableTermSelection(true);
+    for(TermDto term : JsArrays.toIterable(vocabulary.getTermsArray())) {
+      termChooser.addItem(term.getName());
+    }
+  }
+
+  private void enableTermSelection(boolean enable) {
+    termGroup.setVisible(enable);
+    valuesGroup.setVisible(!enable);
   }
 
   @Override
@@ -142,7 +201,7 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
         break;
       case UPDATE_MULTIPLE:
         valuesGroup.setVisible(false);
-        nameGroup.setVisible(false);
+        //nameGroup.setVisible(false);
         modal.setTitle(translations.editAttributes());
         editAttributeHelp.setText(translations.editAttributesHelp());
         editAttributeHelp.setVisible(true);
@@ -159,6 +218,7 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
 
   @Override
   public void setLocalizedTexts(Map<String, String> localizedTexts, List<String> locales) {
+    // TODO set term or open text
     editor.setLocalizedTexts(localizedTexts, locales);
   }
 
@@ -168,10 +228,10 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
     if(formField != null) {
       switch(formField) {
         case NAMESPACE:
-          group = namespaceGroup;
+          //group = namespaceGroup;
           break;
         case NAME:
-          group = nameGroup;
+          //group = nameGroup;
           break;
         case VALUE:
           group = valuesGroup;
@@ -183,6 +243,16 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
     } else {
       modal.addAlert(message, AlertType.ERROR, group);
     }
+  }
+
+  @Override
+  public void setNamespace(String namespace) {
+    // TODO select taxonomy
+  }
+
+  @Override
+  public void setName(String name) {
+    // TODO select vocabulary
   }
 
   @Override

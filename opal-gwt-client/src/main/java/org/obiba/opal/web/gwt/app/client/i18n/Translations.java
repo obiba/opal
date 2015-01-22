@@ -864,6 +864,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Add Attribute")
   String addAttribute();
 
+  @Description("Add custom attribute title")
+  @DefaultStringValue("Add Custom Attribute")
+  String addCustomAttribute();
+
+  @Description("Add taxonomy attribute title")
+  @DefaultStringValue("Add Taxonomy Attribute")
+  String addTaxonomyAttribute();
+
   @Description("Edit attribute title")
   @DefaultStringValue("Edit Attribute")
   String editAttribute();

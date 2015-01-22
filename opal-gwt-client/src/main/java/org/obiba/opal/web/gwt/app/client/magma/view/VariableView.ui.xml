@@ -137,9 +137,16 @@
         <b:Heading size="4">
           <ui:msg description="Attributes label">Attributes</ui:msg>
         </b:Heading>
-        <b:Button type="INFO" icon="PLUS" ui:field="addAttribute">
-          <ui:msg description="Add Attribute label">Add Attribute</ui:msg>
-        </b:Button>
+
+        <b:DropdownButton type="INFO" icon="PLUS" ui:field="addAttributeButton"
+            addStyleNames="no-left-margin small-top-margin" visible="false">
+          <b:NavLink ui:field="addTaxonomy">
+            <ui:msg description="Add Variable Button label">Add attribute from taxonomy...</ui:msg>
+          </b:NavLink>
+          <b:NavLink ui:field="addAttribute">
+            <ui:msg description="Add Attribute label">Add custom attribute...</ui:msg>
+          </b:NavLink>
+        </b:DropdownButton>
         <g:FlowPanel ui:field="attributesPanel"/>
 
       </b:Tab>

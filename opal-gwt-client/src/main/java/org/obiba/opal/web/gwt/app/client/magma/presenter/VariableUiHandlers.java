@@ -33,4 +33,6 @@ public interface VariableUiHandlers extends NamespacedAttributesTableUiHandlers 
   void onEditProperties();
 
   void onAddAttribute();
+
+  void onAddTaxonomy();
 }

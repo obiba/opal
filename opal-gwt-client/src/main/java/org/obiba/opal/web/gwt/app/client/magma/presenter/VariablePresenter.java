@@ -29,6 +29,7 @@ import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CategoriesEdit
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.NamespacedAttributesTableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableTaxonomyModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
@@ -74,7 +75,7 @@ import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
 import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 import static com.google.gwt.http.client.Response.SC_OK;
-import static org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalPresenter.Mode;
+import static org.obiba.opal.web.gwt.app.client.magma.variable.presenter.BaseVariableAttributeModalPresenter.Mode;
 
 @SuppressWarnings("OverlyCoupledClass")
 public class VariablePresenter extends PresenterWidget<VariablePresenter.Display>
@@ -102,6 +103,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   private final ModalProvider<VariableAttributeModalPresenter> attributeModalProvider;
 
+  private final ModalProvider<VariableTaxonomyModalPresenter> taxonomyModalProvider;
+
   private TableDto table;
 
   private VariableDto variable;
@@ -123,7 +126,9 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
       ModalProvider<CategoriesEditorModalPresenter> categoriesEditorModalProvider,
       ModalProvider<VariablePropertiesModalPresenter> propertiesEditorModalProvider,
-      ModalProvider<VariableAttributeModalPresenter> attributeModalProvider, TranslationMessages translationMessages) {
+      ModalProvider<VariableAttributeModalPresenter> attributeModalProvider,
+      ModalProvider<VariableTaxonomyModalPresenter> taxonomyModalProvider,
+      TranslationMessages translationMessages) {
     super(eventBus, display);
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
@@ -136,6 +141,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     this.categoriesEditorModalProvider = categoriesEditorModalProvider.setContainer(this);
     this.propertiesEditorModalProvider = propertiesEditorModalProvider.setContainer(this);
     this.attributeModalProvider = attributeModalProvider.setContainer(this);
+    this.taxonomyModalProvider = taxonomyModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -412,9 +418,16 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   @Override
   public void onAddAttribute() {
-    VariableAttributeModalPresenter attributeEditorPresenter = attributeModalProvider.get();
-    attributeEditorPresenter.setDialogMode(Mode.CREATE);
-    attributeEditorPresenter.initialize(table, variable);
+    VariableAttributeModalPresenter presenter = attributeModalProvider.get();
+    presenter.setDialogMode(Mode.CREATE);
+    presenter.initialize(table, variable);
+  }
+
+  @Override
+  public void onAddTaxonomy() {
+    VariableTaxonomyModalPresenter presenter = taxonomyModalProvider.get();
+    presenter.setDialogMode(Mode.CREATE);
+    presenter.initialize(table, variable);
   }
 
   @Override
