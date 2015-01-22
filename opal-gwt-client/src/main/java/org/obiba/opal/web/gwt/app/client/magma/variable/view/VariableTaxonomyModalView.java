@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+import javax.ws.rs.DELETE;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -168,6 +169,7 @@ public class VariableTaxonomyModalView extends ModalPopupViewWithUiHandlers<Vari
   }
 
   private void setTerm(VocabularyDto vocabulary) {
+    if (!termGroup.isVisible() && !valuesGroup.isVisible()) return;
     termChooser.clear();
     if(vocabulary == null || vocabulary.getTermsCount() == 0) {
       enableTermSelection(false);
@@ -208,7 +210,8 @@ public class VariableTaxonomyModalView extends ModalPopupViewWithUiHandlers<Vari
         break;
       case DELETE:
         valuesGroup.setVisible(false);
-        modal.setTitle(translations.deleteAttributes());
+        termGroup.setVisible(false);
+        modal.setTitle(translations.removeAttributes());
         break;
       case UPDATE_SINGLE:
         modal.setTitle(translations.editAttribute());

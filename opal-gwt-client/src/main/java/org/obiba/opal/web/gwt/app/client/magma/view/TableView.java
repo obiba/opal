@@ -42,6 +42,7 @@ import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ButtonGroup;
 import com.github.gwtbootstrap.client.ui.CodeBlock;
+import com.github.gwtbootstrap.client.ui.Dropdown;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.FluidRow;
 import com.github.gwtbootstrap.client.ui.NavLink;
@@ -142,6 +143,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   Alert selectAllItemsAlert;
 
   @UiField
+  Dropdown applyAttributeButton;
+
+  @UiField
   Label selectAllStatus;
 
   @UiField
@@ -208,7 +212,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   FluidRow contingencyTablePanel;
 
   @UiField
-  IconAnchor deleteAttribute;
+  Dropdown deleteAttributeButton;
 
   @UiField
   Button clearCrossVariables;
@@ -257,6 +261,8 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
     progress.setWidth("150px");
     addVariablesButton.setText(translations.addVariables());
+    applyAttributeButton.setText(translations.applyAttribute());
+    deleteAttributeButton.setText(translations.removeAttributes());
   }
 
   @Override
@@ -455,7 +461,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @Override
   public void setWhereScript(String script) {
-    if (Strings.isNullOrEmpty(script)) {
+    if(Strings.isNullOrEmpty(script)) {
       whereScript.setText("// " + translations.noFilter());
     } else {
       whereScript.setText(script);
@@ -517,7 +523,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     getUiHandlers().onEditWhere();
   }
 
-  @UiHandler({"addVariable", "addTableVariable"})
+  @UiHandler({ "addVariable", "addTableVariable" })
   void onAddVariable(ClickEvent event) {
     getUiHandlers().onAddVariable();
   }
@@ -590,11 +596,15 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     getUiHandlers().onApplyCustomAttribute(checkColumn.getSelectedItems());
   }
 
-  @UiHandler("deleteAttribute")
-  void onDeleteAttribute(ClickEvent event) {
-    getUiHandlers().onDeleteAttribute(checkColumn.getSelectedItems());
+  @UiHandler("deleteTaxonomy")
+  void onDeleteTaxonomyAttribute(ClickEvent event) {
+    getUiHandlers().onDeleteTaxonomyAttribute(checkColumn.getSelectedItems());
   }
 
+  @UiHandler("deleteAttribute")
+  void onDeleteCustomAttribute(ClickEvent event) {
+    getUiHandlers().onDeleteCustomAttribute(checkColumn.getSelectedItems());
+  }
 
   @UiHandler("filter")
   void onFilterUpdate(KeyUpEvent event) {

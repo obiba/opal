@@ -149,7 +149,7 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
         break;
       case DELETE:
         valuesGroup.setVisible(false);
-        modal.setTitle(translations.deleteAttributes());
+        modal.setTitle(translations.removeAttributes());
         break;
       case UPDATE_SINGLE:
         modal.setTitle(translations.editAttribute());

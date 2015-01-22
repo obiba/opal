@@ -680,8 +680,15 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   }
 
   @Override
-  public void onDeleteAttribute(List<VariableDto> selectedItems) {
+  public void onDeleteCustomAttribute(List<VariableDto> selectedItems) {
     VariableAttributeModalPresenter presenter = attributeModalProvider.get();
+    presenter.setDialogMode(BaseVariableAttributeModalPresenter.Mode.DELETE);
+    presenter.initialize(table, selectedItems);
+  }
+
+  @Override
+  public void onDeleteTaxonomyAttribute(List<VariableDto> selectedItems) {
+    VariableTaxonomyModalPresenter presenter = taxonomyModalProvider.get();
     presenter.setDialogMode(BaseVariableAttributeModalPresenter.Mode.DELETE);
     presenter.initialize(table, selectedItems);
   }

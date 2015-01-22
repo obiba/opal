@@ -27,7 +27,7 @@
         <o:Chooser ui:field="taxonomyChooser"/>
       </b:Controls>
       <b:HelpBlock>
-        <ui:msg description="Attribute Taxonomy help">A taxonomy.</ui:msg>
+        <ui:msg description="Attribute Taxonomy help">Taxonomy name is attribute's namespace.</ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 
@@ -39,7 +39,7 @@
         <o:Chooser ui:field="vocabularyChooser"/>
       </b:Controls>
       <b:HelpBlock>
-        <ui:msg description="Attribute Vocabulary help">A vocabulary.</ui:msg>
+        <ui:msg description="Attribute Vocabulary help">Vocabulary name is attribute's name.</ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 
@@ -51,7 +51,7 @@
         <o:Chooser ui:field="termChooser"/>
       </b:Controls>
       <b:HelpBlock>
-        <ui:msg description="Attribute Term help">A term.</ui:msg>
+        <ui:msg description="Attribute Term help">Term name is attribute's value.</ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 

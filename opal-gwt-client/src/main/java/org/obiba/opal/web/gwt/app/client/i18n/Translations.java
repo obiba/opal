@@ -37,10 +37,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Name")
   String nameLabel();
 
-  @Description("Namespace label")
-  @DefaultStringValue("Namespace")
-  String namespaceLabel();
-
   @Description("Value Type label")
   @DefaultStringValue("Value Type")
   String valueTypeLabel();
@@ -591,10 +587,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Categories")
   String categoriesLabel();
 
-  @Description("Category label")
-  @DefaultStringValue("Category")
-  String categoryLabel();
-
   @Description("No Categories label")
   @DefaultStringValue("No Categories")
   String noCategoriesLabel();
@@ -602,10 +594,6 @@ public interface Translations extends Constants {
   @Description("Attributes label")
   @DefaultStringValue("Attributes")
   String attributesLabel();
-
-  @Description("Attribute label")
-  @DefaultStringValue("Attribute")
-  String attributeLabel();
 
   @Description("No Attributes label")
   @DefaultStringValue("No Attributes")
@@ -642,14 +630,6 @@ public interface Translations extends Constants {
   @Description("File Selector title")
   @DefaultStringValue("File Selector")
   String fileSelectorTitle();
-
-  @Description("Remove attribute label")
-  @DefaultStringValue("Remove Attribute")
-  String removeAttribute();
-
-  @Description("Remove category label")
-  @DefaultStringValue("Remove Category")
-  String removeCategory();
 
   @Description("Data import Compared Datasources Report instructions")
   @DefaultStringValue(
@@ -884,17 +864,13 @@ public interface Translations extends Constants {
   @DefaultStringValue("Edit the namespace for each selected attribute.")
   String editAttributesHelp();
 
-  @Description("Delete attributes title")
-  @DefaultStringValue("Delete Attributes")
-  String deleteAttributes();
+  @Description("Remove attributes title")
+  @DefaultStringValue("Remove Attributes")
+  String removeAttributes();
 
   @Description("Generate Identifiers label")
   @DefaultStringValue("Generate Identifiers")
   String generateIdentifiers();
-
-  @Description("Properties label")
-  @DefaultStringValue("Properties")
-  String propertiesLabel();
 
   @Description("Cancel label")
   @DefaultStringValue("Cancel")
@@ -919,14 +895,6 @@ public interface Translations extends Constants {
   @Description("KeyType map")
   @DefaultStringMapValue({ "KEY_PAIR", "Key Pair", "CERTIFICATE", "Certificate" })
   Map<String, String> keyTypeMap();
-
-  @Description("Import data label")
-  @DefaultStringValue("Import data...")
-  String importDataLabel();
-
-  @Description("Import data no storage label")
-  @DefaultStringValue("Import data (no storage)")
-  String importDataNoStorageLabel();
 
   @Description("Import Key Pair title")
   @DefaultStringValue("Import Key Pair")
@@ -1380,10 +1348,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("key=value")
   String keyValueLabel();
 
-  @Description("Last Update On label")
-  @DefaultStringValue("Last update {0}")
-  String lastUpdateOnLabel();
-
   @Description("Created label")
   @DefaultStringValue("Created")
   String createdLabel();
@@ -1582,18 +1546,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Original variable")
   String originalVariable();
 
-  @Description("Index Action Index Now")
-  @Constants.DefaultStringValue("Index now")
-  String indexActionIndexNow();
-
-  @Description("Index Action Delete")
-  @Constants.DefaultStringValue("Remove")
-  String indexActionDelete();
-
-  @Description("Index Action Schedule")
-  @Constants.DefaultStringValue("Schedule")
-  String indexActionSchedule();
-
   @Description("Filter Variable label")
   @Constants.DefaultStringValue("Filter variables...")
   String filterVariables();
@@ -1773,10 +1725,6 @@ public interface Translations extends Constants {
   @Description("Update Resource Permissions Modal title")
   @DefaultStringValue("Edit Permission")
   String updateResourcePermissionsModalTile();
-
-  @Description("Add Resource Permissions Modal title")
-  @DefaultStringValue("Add Permission")
-  String addResourcePermissionsModalTile();
 
   @Description("Remove All Subject Permissions Modal title")
   @DefaultStringValue("Remove Permissions")
@@ -2004,29 +1952,13 @@ public interface Translations extends Constants {
   @DefaultStringValue("Public URL")
   String publicUrl();
 
-  @Description("Vocabularies label")
-  @DefaultStringValue("Vocabularies")
-  String vocabulariesLabel();
-
   @Description("Terms label")
   @DefaultStringValue("Terms")
   String termsLabel();
 
-  @Description("New vocabulary name label")
-  @DefaultStringValue("New vocabulary name")
-  String newVocabularyNameLabel();
-
   @Description("Description label")
   @DefaultStringValue("Description")
   String descriptionLabel();
-
-  @Description("Taxonomy label")
-  @DefaultStringValue("Taxonomy")
-  String taxonomyLabel();
-
-  @Description("New term name label")
-  @DefaultStringValue("New term name...")
-  String newTermNameLabel();
 
   @Description("Details label")
   @DefaultStringValue("Details")
@@ -2233,10 +2165,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Failed to start search service: {0}")
   String searchSettingsError();
 
-  @Description("N/A label")
-  @DefaultStringValue("N/A")
-  String NALabel();
-
   @Description("Variable not found label")
   @DefaultStringValue("Variable not found: {0}")
   String variableNotFound();
@@ -2249,17 +2177,9 @@ public interface Translations extends Constants {
   @DefaultStringValue("Variable is not categorical nor continuous: {0}")
   String variableNotCategoricalNorContinuous();
 
-  @Description("NA (total: {N}) label")
-  @DefaultStringValue("N/A (total: {0})")
-  String NATotalLabel();
-
   @Description("Register label")
   @DefaultStringValue("Register")
   String register();
-
-  @Description("Register a data database label")
-  @DefaultStringValue("Register a data database")
-  String registerDataDatabase();
 
   @Description("Set Key pair label")
   @DefaultStringValue("Set Key Pair")
@@ -2348,10 +2268,6 @@ public interface Translations extends Constants {
   @Description("N/A label")
   @DefaultStringValue("N/A")
   String naLabel();
-
-  @Description("Total other label")
-  @DefaultStringValue("Other values...")
-  String totalOtherLabel();
 
   @Description("Approx. Area (Km2) label")
   @DefaultStringValue("Approximate Area (Km2)")

@@ -124,7 +124,7 @@
                 <ui:msg description="Add variables to view label">Add variables to view</ui:msg>
               </b2:IconAnchor>
 
-              <b:Dropdown text="Apply attribute" icon="TAG" ui:field="applyAttributeButton"
+              <b:Dropdown icon="TAG" ui:field="applyAttributeButton"
                   addStyleNames="inline small-indent">
                 <b:NavLink ui:field="applyTaxonomy">
                   <ui:msg description="Apply Taxonomy Attribute button label">Apply attribute from taxonomy...</ui:msg>
@@ -134,10 +134,15 @@
                 </b:NavLink>
               </b:Dropdown>
 
-              <b2:IconAnchor ui:field="deleteAttribute" icon="ERASER"
+              <b:Dropdown icon="ERASER" ui:field="deleteAttributeButton"
                   addStyleNames="inline small-indent">
-                <ui:msg description="Remove attribute label">Remove attribute</ui:msg>
-              </b2:IconAnchor>
+                <b:NavLink ui:field="deleteTaxonomy">
+                  <ui:msg description="Remove Taxonomy Attribute button label">Remove attribute from taxonomy...</ui:msg>
+                </b:NavLink>
+                <b:NavLink ui:field="deleteAttribute">
+                  <ui:msg description="Remove Custom Attribute button label">Remove custom attribute...</ui:msg>
+                </b:NavLink>
+              </b:Dropdown>
 
               <b2:IconAnchor ui:field="deleteVariables" icon="TRASH" addStyleNames="inline small-indent">
                 <ui:msg description="Remove label">Remove</ui:msg>
