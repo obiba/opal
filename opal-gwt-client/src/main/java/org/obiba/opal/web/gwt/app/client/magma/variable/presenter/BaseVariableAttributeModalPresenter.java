@@ -303,7 +303,7 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
     for(Map.Entry<String, String> entry : localizedTexts.entrySet()) {
       AttributeDto existingAttr = findAttribute(attributes, entry.getKey());
       if(existingAttr != null) {
-        existingAttr.setValue(entry.getKey());
+        existingAttr.setValue(entry.getValue());
       } else {
         newAttributes.push(getNewAttribute(entry.getKey(), entry.getValue()));
       }

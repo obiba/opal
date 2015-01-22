@@ -124,10 +124,15 @@
                 <ui:msg description="Add variables to view label">Add variables to view</ui:msg>
               </b2:IconAnchor>
 
-              <b2:IconAnchor ui:field="applyAttribute" icon="TAG"
+              <b:Dropdown text="Apply attribute" icon="TAG" ui:field="applyAttributeButton"
                   addStyleNames="inline small-indent">
-                <ui:msg description="Apply attribute label">Apply attribute</ui:msg>
-              </b2:IconAnchor>
+                <b:NavLink ui:field="applyTaxonomy">
+                  <ui:msg description="Apply Taxonomy Attribute button label">Apply attribute from taxonomy...</ui:msg>
+                </b:NavLink>
+                <b:NavLink ui:field="applyAttribute">
+                  <ui:msg description="Apply Custom Attribute button label">Apply custom attribute...</ui:msg>
+                </b:NavLink>
+              </b:Dropdown>
 
               <b2:IconAnchor ui:field="deleteAttribute" icon="ERASER"
                   addStyleNames="inline small-indent">

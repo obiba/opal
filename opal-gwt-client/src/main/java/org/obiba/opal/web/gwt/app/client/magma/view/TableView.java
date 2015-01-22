@@ -580,9 +580,14 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     crossWithVariable.setText("");
   }
 
+  @UiHandler("applyTaxonomy")
+  void onApplyTaxonomyAttribute(ClickEvent event) {
+    getUiHandlers().onApplyTaxonomyAttribute(checkColumn.getSelectedItems());
+  }
+
   @UiHandler("applyAttribute")
-  void onApplyAttribute(ClickEvent event) {
-    getUiHandlers().onApplyAttribute(checkColumn.getSelectedItems());
+  void onApplyCustomAttribute(ClickEvent event) {
+    getUiHandlers().onApplyCustomAttribute(checkColumn.getSelectedItems());
   }
 
   @UiHandler("deleteAttribute")

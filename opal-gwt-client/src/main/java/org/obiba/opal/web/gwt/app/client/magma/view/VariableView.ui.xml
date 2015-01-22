@@ -141,10 +141,10 @@
         <b:DropdownButton type="INFO" icon="PLUS" ui:field="addAttributeButton"
             addStyleNames="no-left-margin small-top-margin" visible="false">
           <b:NavLink ui:field="addTaxonomy">
-            <ui:msg description="Add Variable Button label">Add attribute from taxonomy...</ui:msg>
+            <ui:msg description="Add Taxonomy Attribute button label">Add attribute from taxonomy...</ui:msg>
           </b:NavLink>
           <b:NavLink ui:field="addAttribute">
-            <ui:msg description="Add Attribute label">Add custom attribute...</ui:msg>
+            <ui:msg description="Add Custom Attribute button label">Add custom attribute...</ui:msg>
           </b:NavLink>
         </b:DropdownButton>
         <g:FlowPanel ui:field="attributesPanel"/>
