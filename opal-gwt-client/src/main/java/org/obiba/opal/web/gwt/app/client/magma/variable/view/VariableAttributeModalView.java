@@ -91,7 +91,6 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
     modal.setTitle(translations.addCustomAttribute());
-    modal.setMinWidth(700);
     new ConstrainedModal(modal);
   }
 

@@ -93,7 +93,6 @@ public class VariableTaxonomyModalView extends ModalPopupViewWithUiHandlers<Vari
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
     modal.setTitle(translations.addTaxonomyAttribute());
-    modal.setMinWidth(700);
     new ConstrainedModal(modal);
   }
 
