@@ -1460,6 +1460,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Select some tables...")
   String selectSomeTables();
 
+  @Description("Select some Terms label")
+  @DefaultStringValue("Select some terms...")
+  String selectSomeTerms();
+
   @Description("File based datasources label")
   @DefaultStringValue("Files")
   String fileBasedDatasources();

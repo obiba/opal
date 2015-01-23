@@ -31,18 +31,19 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
 
-import static org.obiba.opal.web.gwt.app.client.magma.variable.presenter.BaseVariableAttributeModalPresenter.stringify;
 import static org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableTaxonomyModalPresenter.Display;
 
 /**
@@ -76,7 +77,9 @@ public class VariableTaxonomyModalView extends ModalPopupViewWithUiHandlers<Vari
   ControlGroup termGroup;
 
   @UiField
-  Chooser termChooser;
+  Panel termPanel;
+
+  private Chooser termChooser;
 
   @UiField
   ControlGroup valuesGroup;
@@ -93,6 +96,8 @@ public class VariableTaxonomyModalView extends ModalPopupViewWithUiHandlers<Vari
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
     modal.setTitle(translations.addTaxonomyAttribute());
+    termChooser = new Chooser();
+    termPanel.add(termChooser);
     new ConstrainedModal(modal);
   }
 
@@ -101,7 +106,7 @@ public class VariableTaxonomyModalView extends ModalPopupViewWithUiHandlers<Vari
     Map<String, String> values;
     if(termGroup.isVisible()) {
       values = Maps.newHashMap();
-      values.put("", termChooser.getSelectedValue());
+      values.put("", getTermChooserValue());
     } else {
       values = editor.getLocalizedTexts();
     }
@@ -154,38 +159,6 @@ public class VariableTaxonomyModalView extends ModalPopupViewWithUiHandlers<Vari
     setVocabulary(firstTaxo);
   }
 
-  private void setVocabulary(TaxonomyDto taxonomy) {
-    vocabularyChooser.clear();
-    if(taxonomy == null) return;
-
-    VocabularyDto firstVoc = null;
-    for(VocabularyDto voc : JsArrays.toIterable(taxonomy.getVocabulariesArray())) {
-      vocabularyChooser.addItem(voc.getName());
-      if(firstVoc == null) {
-        firstVoc = voc;
-      }
-    }
-    setTerm(firstVoc);
-  }
-
-  private void setTerm(VocabularyDto vocabulary) {
-    if(!termGroup.isVisible() && !valuesGroup.isVisible()) return;
-    termChooser.clear();
-    if(vocabulary == null || vocabulary.getTermsCount() == 0) {
-      enableTermSelection(false);
-      return;
-    }
-
-    enableTermSelection(true);
-    for(TermDto term : JsArrays.toIterable(vocabulary.getTermsArray())) {
-      termChooser.addItem(term.getName());
-    }
-  }
-
-  private void enableTermSelection(boolean enable) {
-    termGroup.setVisible(enable);
-    valuesGroup.setVisible(!enable);
-  }
 
   @Override
   public void hideDialog() {
@@ -244,31 +217,93 @@ public class VariableTaxonomyModalView extends ModalPopupViewWithUiHandlers<Vari
 
   @Override
   public void setNamespace(String namespace) {
-    GWT.log("select taxonomy=" + namespace);
     taxonomyChooser.setSelectedValue(namespace);
     setVocabulary(getTaxonomy(namespace));
   }
 
   @Override
   public void setName(String name) {
-    GWT.log("select vocabulary=" + name);
     vocabularyChooser.setSelectedValue(name);
     setTerm(getVocabulary(taxonomyChooser.getSelectedValue(), name));
   }
 
   @Override
   public void setLocalizedTexts(Map<String, String> localizedTexts, List<String> locales) {
-    GWT.log("select term=...");
     editor.setLocalizedTexts(localizedTexts, locales);
     if (localizedTexts.keySet().size() == 1 && localizedTexts.keySet().contains("")) {
-      GWT.log("select term=" + localizedTexts.get(""));
-      termChooser.setSelectedValue(localizedTexts.get(""));
+      String value = localizedTexts.get("");
+      if (termChooser.isMultipleSelect()) {
+        List<String> values = Lists.newArrayList(value.split(","));
+        for(int i = 0; i < termChooser.getItemCount(); i++) {
+          termChooser.setItemSelected(i, values.contains(termChooser.getValue(i)));
+        }
+      } else {
+        termChooser.setSelectedValue(value);
+      }
     }
   }
 
   @Override
   public void clearErrors() {
     modal.closeAlerts();
+  }
+
+  //
+  // Private methods
+  //
+
+  private void setVocabulary(TaxonomyDto taxonomy) {
+    vocabularyChooser.clear();
+    if(taxonomy == null) return;
+
+    VocabularyDto firstVoc = null;
+    for(VocabularyDto voc : JsArrays.toIterable(taxonomy.getVocabulariesArray())) {
+      vocabularyChooser.addItem(voc.getName());
+      if(firstVoc == null) {
+        firstVoc = voc;
+      }
+    }
+    setTerm(firstVoc);
+  }
+
+  private void setTerm(VocabularyDto vocabulary) {
+    if(!termGroup.isVisible() && !valuesGroup.isVisible()) return;
+    termChooser.clear();
+    if(vocabulary == null || vocabulary.getTermsCount() == 0) {
+      enableTermSelection(false);
+      return;
+    }
+
+    enableTermSelection(true);
+    boolean repeatable = vocabulary.hasRepeatable() && vocabulary.getRepeatable();
+    if (repeatable != termChooser.isMultipleSelect()) {
+      termChooser = new Chooser(repeatable);
+      if (repeatable) termChooser.setPlaceholderText(translations.selectSomeTerms());
+      termPanel.clear();
+      termPanel.add(termChooser);
+    }
+    for(TermDto term : JsArrays.toIterable(vocabulary.getTermsArray())) {
+      termChooser.addItem(term.getName());
+    }
+  }
+
+  private void enableTermSelection(boolean enable) {
+    termGroup.setVisible(enable);
+    valuesGroup.setVisible(!enable);
+  }
+
+  private String getTermChooserValue() {
+    String value = "";
+    if (termChooser.isMultipleSelect()) {
+      for(int i = 0; i < termChooser.getItemCount(); i++) {
+        if(termChooser.isItemSelected(i)) {
+          value += (value.isEmpty() ? "" : ",") + termChooser.getValue(i);
+        }
+      }
+    } else {
+      value = termChooser.getSelectedValue();
+    }
+    return value;
   }
 
 }
