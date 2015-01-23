@@ -11,6 +11,13 @@
   <artifactId>opal-server</artifactId>
   <name>opal-server</name>
 
+  <properties>
+    <install.dir>/usr/share</install.dir>
+    <opal.dir>${install.dir}/opal-server-${project.version}</opal.dir>
+    <package.name>opal-server-${project.version}</package.name>
+    <dist.location>${basedir}/target/${package.name}-dist/${package.name}</dist.location>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>commons-daemon</groupId>
@@ -150,6 +157,184 @@
       <id>ci-build</id>
       <build>
         <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>rpm-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>make-rpm</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <license>see /usr/share/doc/opal/copyright</license>
+                  <group>Applications/Engineering</group>
+                  <packager>OBiBa</packager>
+                  <prefix>/usr/share</prefix>
+                  <changelogFile>/usr/share/changelog</changelogFile>
+                  <targetOS>Linux</targetOS>
+                  <requires>
+                    <require>java-1.7.0-openjdk</require>
+                  </requires>
+
+                  <mappings>
+                    <mapping>
+                      <directory>${opal.dir}/bin</directory>
+                      <filemode>755</filemode>
+                      <username>root</username>
+                      <groupname>root</groupname>
+                      <sources>
+                        <source>
+                          <location>${dist.location}/bin</location>
+                          <excludes>
+                            <exclude>*.bat</exclude>
+                          </excludes>
+                        </source>
+                        <source>
+                          <location>src/main/rpm/update.sh</location>
+                        </source>
+                      </sources>
+                    </mapping>
+                    <mapping>
+                      <directory>${opal.dir}/tools</directory>
+                      <filemode>755</filemode>
+                      <username>root</username>
+                      <groupname>root</groupname>
+                      <sources>
+                        <source>
+                          <location>${dist.location}/tools</location>
+                          <excludes>
+                            <exclude>*.bat</exclude>
+                          </excludes>
+                        </source>
+                      </sources>
+                    </mapping>
+                    <mapping>
+                      <directory>/etc/opal</directory>
+                      <filemode>640</filemode>
+                      <username>opal</username>
+                      <groupname>adm</groupname>
+                      <configuration>true</configuration>
+                      <sources>
+                        <source>
+                          <location>${dist.location}/conf</location>
+                        </source>
+                      </sources>
+                    </mapping>
+                    <mapping>
+                      <directory>/etc/init</directory>
+                      <filemode>644</filemode>
+                      <username>root</username>
+                      <groupname>root</groupname>
+                      <directoryIncluded>false</directoryIncluded>
+                      <sources>
+                        <source>
+                          <location>src/main/rpm/upstart.conf</location>
+                          <destination>opal.conf</destination>
+                        </source>
+                      </sources>
+                    </mapping>
+                    <mapping>
+                      <directory>/etc/default</directory>
+                      <filemode>644</filemode>
+                      <username>root</username>
+                      <groupname>root</groupname>
+                      <directoryIncluded>false</directoryIncluded>
+                      <sources>
+                        <source>
+                          <location>src/main/rpm/opal.default</location>
+                          <destination>opal</destination>
+                          <filter>true</filter>
+                        </source>
+                      </sources>
+                    </mapping>
+                    <mapping>
+                      <directory>${opal.dir}/lib</directory>
+                      <filemode>440</filemode>
+                      <username>root</username>
+                      <groupname>root</groupname>
+                      <sources>
+                        <source>
+                          <location>${dist.location}/lib</location>
+                        </source>
+                      </sources>
+                    </mapping>
+                    <mapping>
+                      <directory>${opal.dir}/tools/lib</directory>
+                      <filemode>440</filemode>
+                      <username>root</username>
+                      <groupname>root</groupname>
+                      <sources>
+                        <source>
+                          <location>${dist.location}/tools/lib</location>
+                        </source>
+                      </sources>
+                    </mapping>
+                    <mapping>
+                      <directory>${opal.dir}/webapp</directory>
+                      <username>root</username>
+                      <groupname>root</groupname>
+                      <sources>
+                        <source>
+                          <location>${dist.location}/webapp</location>
+                        </source>
+                      </sources>
+                    </mapping>
+                    <mapping>
+                      <directory>/usr/share/doc/opal</directory>
+                      <filemode>755</filemode>
+                      <username>opal</username>
+                      <groupname>adm</groupname>
+                      <documentation>true</documentation>
+                      <sources>
+                        <source>
+                          <location>src/main/deb/debian/changelog</location>
+                        </source>
+                        <source>
+                          <location>src/main/rpm/copyright</location>
+                        </source>
+                      </sources>
+                    </mapping>
+                    <mapping>
+                      <directory>/var/lib/opal</directory>
+                      <filemode>740</filemode>
+                      <username>opal</username>
+                      <groupname>adm</groupname>
+                    </mapping>
+                    <mapping>
+                      <directory>/var/log/opal</directory>
+                      <filemode>740</filemode>
+                      <username>opal</username>
+                      <groupname>adm</groupname>
+                    </mapping>
+                    <mapping>
+                      <directory>/tmp/opal</directory>
+                      <filemode>740</filemode>
+                      <username>opal</username>
+                      <groupname>adm</groupname>
+                    </mapping>
+                  </mappings>
+                  <preinstallScriptlet>
+                    <scriptFile>src/main/rpm/preinstall.sh</scriptFile>
+                    <fileEncoding>utf-8</fileEncoding>
+                  </preinstallScriptlet>
+                  <postinstallScriptlet>
+                    <script>
+                      # creates symlinks, making sure the old ones are deleted
+                      rm -f ${install.dir}/opal
+                      rm -f /var/lib/opal/conf
+                      ln -s ${opal.dir} ${install.dir}/opal
+                      ln -s /etc/opal /var/lib/opal/conf
+                      # restart opal if is running
+                      status opal | grep -q "^opal start" > /dev/null
+                      if [ $? ]; then restart opal; fi
+                    </script>
+                  </postinstallScriptlet>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
           <plugin>
             <artifactId>maven-antrun-plugin</artifactId>
             <executions>

@@ -1,0 +1,32 @@
+# Defaults for opal initscript
+# sourced by /etc/init.d/opal
+# installed at /etc/default/opal by the maintainer scripts
+
+# pulled in from the init script; makes things easier.
+NAME=opal
+
+# location of java
+JAVA=/usr/bin/java
+
+# ulimit
+# Increase maximum open files for the opal process
+# Comment this out to use the system default
+MAXOPENFILES=16384
+
+# user id (or id:gid) to be run as
+OPAL_USER=opal
+
+# location of the opal distribution file
+OPAL_DIST=/usr/share/opal
+
+# Opal home location
+OPAL_HOME=/var/lib/opal
+
+# Opal log directory or syslog facility
+OPAL_LOG=/var/log/opal
+
+# arguments to pass to opal.
+OPAL_ARGS=""
+
+# arguments to pass to java
+JAVA_ARGS="-Xms1G -Xmx2G -XX:MaxPermSize=256M -XX:+UseG1GC -Dnewrelic.config.file=$OPAL_HOME/conf/newrelic.yml -javaagent:$OPAL_DIST/lib/newrelic-agent-${newrelic.version}.jar"
