@@ -165,7 +165,7 @@
                 <id>make-rpm</id>
                 <phase>package</phase>
                 <goals>
-                  <goal>run</goal>
+                  <goal>attached-rpm</goal>
                 </goals>
                 <configuration>
                   <license>see /usr/share/doc/opal/copyright</license>
