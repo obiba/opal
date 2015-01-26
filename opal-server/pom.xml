@@ -168,6 +168,9 @@
                   <goal>attached-rpm</goal>
                 </goals>
                 <configuration>
+                  <name>opal</name>
+                  <version>${project.version}</version>
+                  <!--release>${project.version}-b${buildNumber}</release-->
                   <license>see /usr/share/doc/opal/copyright</license>
                   <group>Applications/Engineering</group>
                   <packager>OBiBa</packager>
@@ -406,6 +409,21 @@
                     <!-- Deploy Opal package file in download repo -->
                     <copy todir="${obiba.download.dir}/opal/${opal.deploy.dir}"
                         file="target/opal-server-${project.version}-dist.zip"/>
+                  </target>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-rpm</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target>
+                    <!-- Deploy rpm file in rpm repo -->
+                    <copy todir="${obiba.rpm.dir}/${opal.deploy.dir}">
+                        <fileset dir="target/rpm/opal/RPMS/noarch"/>
+                    </copy>
                   </target>
                 </configuration>
               </execution>
