@@ -81,6 +81,9 @@ public enum ValueRenderer {
   }
 
   protected String getValue(ValueSetsDto.ValueDto value) {
+    if (value == null) {
+      return ""; //avoid a javascript 'NullPointerException' when there is no value
+    }
     return transform(value.getValue());
   }
 
