@@ -22,20 +22,15 @@ public class ValidationServiceImpl implements ValidationService {
     @Autowired
     ValidatorFactory validatorFactory;
 
-    @org.springframework.beans.factory.annotation.Value("${org.obiba.opal.validation.skip:false}")
-    private boolean skipValidation;
+    @org.springframework.beans.factory.annotation.Value("${org.obiba.opal.validation.enabled:false}")
+    private boolean validationEnabled;
 
     @Autowired
     private ThreadFactory threadFactory;
 
     @VisibleForTesting
     boolean isValidationEnabled(ValueTable valueTable) {
-        //@todo improve this when either project or table have attributes
-        if (skipValidation) {
-            return false;
-        }
-
-        return valueTable.isView(); //only views have validation enabled by default
+        return validationEnabled && valueTable.isView();
     }
 
     @Override
