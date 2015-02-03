@@ -131,11 +131,12 @@ public class OpalBootstrapperImpl implements Bootstrapper {
               .withCallback(new ResponseCodeCallback() {
                 @Override
                 public void onResponseCode(Request request, Response response) {
-                  //Window.Location.replace("/");
+                  // do nothing
                 }
               }) //
               .delete().send();
           requestCredentials.invalidate();
+          Window.Location.replace("/");
         }
       }
     });
