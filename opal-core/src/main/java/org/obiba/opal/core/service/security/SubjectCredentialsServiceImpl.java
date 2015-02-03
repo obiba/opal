@@ -180,15 +180,16 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
         }
         break;
       case CERTIFICATE:
+        // OPAL-2688
+        if(newSubject) {
+          subjectCredentials.setCertificateAlias(subjectCredentials.generateCertificateAlias());
+        } else {
+          subjectCredentials.setCertificateAlias(existing.getCertificateAlias());
+        }
         if(subjectCredentials.getCertificate() != null) {
           keyStore = credentialsKeyStoreService.getKeyStore();
-          String alias = subjectCredentials.generateCertificateAlias();
-          subjectCredentials.setCertificateAlias(alias);
-          keyStore.importCertificate(alias, new ByteArrayInputStream(subjectCredentials.getCertificate()));
-        }
-        // OPAL-2688
-        if(!newSubject) {
-          subjectCredentials.setCertificateAlias(existing.getCertificateAlias());
+          keyStore.importCertificate(subjectCredentials.getCertificateAlias(),
+              new ByteArrayInputStream(subjectCredentials.getCertificate()));
         }
         break;
     }
