@@ -96,7 +96,8 @@ public class UriBuilder {
    * @return uriBuilder
    */
   public UriBuilder fromPath(String p) {
-    String cleanedPath = p.startsWith("/") ? p.substring(1) : p;
+    String pDecoded = URL.decode(p);
+    String cleanedPath = pDecoded.startsWith("/") ? pDecoded.substring(1) : pDecoded;
     append(path, cleanedPath.split("/"));
     return this;
   }
