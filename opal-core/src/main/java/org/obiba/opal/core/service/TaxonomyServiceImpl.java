@@ -224,7 +224,7 @@ public class TaxonomyServiceImpl implements TaxonomyService {
   }
 
   private void importDefault(boolean override) {
-    if (taxonomyReferences.trim().isEmpty()) return;
+    if (taxonomyReferences == null || taxonomyReferences.trim().isEmpty()) return;
 
     for(String uri : taxonomyReferences.split(",")) {
       importUriTaxonomy(uri.trim(), override);
