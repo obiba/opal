@@ -41,6 +41,8 @@ import org.rosuda.REngine.REXPGenericVector;
 import org.rosuda.REngine.REXPList;
 import org.rosuda.REngine.REXPString;
 import org.rosuda.REngine.RList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
@@ -53,6 +55,8 @@ import com.google.common.collect.Sets;
  * Assign Magma values (from a datasource, a table or a variable) to a R symbol.
  */
 public class MagmaAssignROperation extends AbstractROperation {
+
+  private static final Logger log = LoggerFactory.getLogger(MagmaAssignROperation.class);
 
   @NotNull
   private final IdentifiersTableService identifiersTableService;
@@ -93,7 +97,7 @@ public class MagmaAssignROperation extends AbstractROperation {
     try {
       for(MagmaRConverter converter : magmaRConverters) {
         if(converter.canResolve(path)) {
-          assign(symbol, converter.asVector(path, withMissings, identifiersMapping));
+          converter.doAssign(symbol, path, withMissings, identifiersMapping);
           return;
         }
       }
@@ -147,6 +151,8 @@ public class MagmaAssignROperation extends AbstractROperation {
      * @return
      */
     boolean canResolve(String path);
+
+    void doAssign(String symbol, String path, boolean withMissings, String identifiersMapping);
 
   }
 
@@ -202,12 +208,69 @@ public class MagmaAssignROperation extends AbstractROperation {
     REXP asVector(boolean withMissings) {
       if(table == null) throw new IllegalStateException("Table must not be null");
       prepareEntities(table);
+      REXP ids = getIdsVector(withMissings);
+      RList list = getVariableVectors();
+      return createDataFrame(ids, list);
+    }
+
+    @Override
+    public void doAssign(String symbol, String path, boolean withMissings, String identifiersMapping) {
+      // OPAL-2710 assigning a data.frame directly fails with a lot of rows
+      resolvePath(path, identifiersMapping);
+      if(table == null) throw new IllegalStateException("Table must not be null");
+      prepareEntities(table);
+      REXP ids = getIdsVector(withMissings);
+      RList list = getVariableVectors();
+
+      String[] names = list.keys();
+      if(names == null && names.length == 0) return;
+
+      doAssignTmpVectors(ids, names, list);
+      doAssignDataFrame(names);
+      doRemoveTmpVectors(names);
+    }
+
+    private void doAssignTmpVectors(REXP ids, String[] names, RList list) {
+      // one temporary vector per variable
+      for(String name : names) {
+        assign(getTmpVectorName(symbol, name), list.at(name));
+      }
+      // one temporary vector for the ids
+      assign(getTmpVectorName(symbol, "row.names"), ids);
+    }
+
+    private void doAssignDataFrame(String... names) {
+      // create the data.frame from the vectors
+      StringBuffer args = new StringBuffer();
+      for(String name : names) {
+        if(args.length() > 0) args.append(", ");
+        args.append("'").append(name).append("'=").append(getTmpVectorName(symbol, name));
+      }
+      args.append(", row.names=").append(getTmpVectorName(symbol, "row.names"));
+      log.info("data.frame arguments: {}", args);
+      eval(symbol + " <- data.frame(" + args + ")", false);
+    }
+
+    private void doRemoveTmpVectors(String... names) {
+      // remove temporary vectors
+      for(String name : names) {
+        eval("base::rm(" + getTmpVectorName(symbol, name) + ")", false);
+      }
+      eval("base::rm(" + getTmpVectorName(symbol, "row.names") + ")", false);
+    }
+
+    private String getTmpVectorName(String symbol, String name) {
+      return ("opal__" + symbol + "__" + name).replace(" ", ".").replace("\"", ".").replace("'", ".");
+    }
+
+    private REXP getIdsVector(boolean withMissings) {
+      return getVector(new VariableEntityValueSource(), getEntities(), withMissings);
+    }
+
+    private RList getVariableVectors() {
       // build a list of vectors
       List<REXP> contents = Lists.newArrayList();
       List<String> names = Lists.newArrayList();
-
-      // entity identifiers
-      REXP ids = getVector(new VariableEntityValueSource(), getEntities(), withMissings);
 
       // vector for each variable
       for(Variable v : filterVariables()) {
@@ -216,8 +279,7 @@ public class MagmaAssignROperation extends AbstractROperation {
         names.add(vvs.getVariable().getName());
       }
 
-      RList list = new RList(contents, names);
-      return createDataFrame(ids, list);
+      return new RList(contents, names);
     }
 
     protected Iterable<Variable> filterVariables() {
@@ -246,14 +308,12 @@ public class MagmaAssignROperation extends AbstractROperation {
      * @see REXP.createDataFrame()
      */
     private REXP createDataFrame(REXP ids, RList values) {
-      return new REXPGenericVector(values, new REXPList(new RList( //
+      return new REXPGenericVector(null, new REXPList(new RList( //
           new REXP[] { //
               new REXPString("data.frame"), //
-              new REXPString(values.keys()), //
               ids }, //
           new String[] { //
               "class", //
-              "names", //
               "row.names" })));
     }
 
@@ -354,6 +414,11 @@ public class MagmaAssignROperation extends AbstractROperation {
       resolvePath(path, identifiersMapping);
       prepareEntities(table);
       return getVector(variableValueSource, getEntities(), withMissings);
+    }
+
+    @Override
+    public void doAssign(String symbol, String path, boolean withMissings, String identifiersMapping) {
+      assign(symbol, asVector(path, withMissings, identifiersMapping));
     }
   }
 
