@@ -48,8 +48,8 @@ public class OpalRSessionManager implements SessionListener, ServiceListener<Opa
 
   @PreDestroy
   public void stop() {
-    for(String sessionId : rSessionMap.keySet()) {
-      doClearRSessions(sessionId);
+    for(String principal : rSessionMap.keySet()) {
+      doClearRSessions(principal);
     }
     rSessionMap.clear();
   }
@@ -76,7 +76,7 @@ public class OpalRSessionManager implements SessionListener, ServiceListener<Opa
    * @return
    */
   public List<OpalRSession> getSubjectRSessions() {
-    return new ImmutableList.Builder<OpalRSession>().addAll(getRSessions(getSubjectSessionId())).build();
+    return new ImmutableList.Builder<OpalRSession>().addAll(getRSessions(getSubjectPrincipal())).build();
   }
 
   /**
@@ -85,14 +85,14 @@ public class OpalRSessionManager implements SessionListener, ServiceListener<Opa
    * @return
    */
   public boolean hasSubjectCurrentRSession() {
-    return getRSessions(getSubjectSessionId()).hasCurrentRSession();
+    return getRSessions(getSubjectPrincipal()).hasCurrentRSession();
   }
 
   /**
    * Check if there is such a R session with the provided identifier (for the invoking Opal user session).
    */
   public boolean hasSubjectRSession(String rSessionId) {
-    return getRSessions(getSubjectSessionId()).hasRSession(rSessionId);
+    return getRSessions(getSubjectPrincipal()).hasRSession(rSessionId);
   }
 
   /**
@@ -101,7 +101,7 @@ public class OpalRSessionManager implements SessionListener, ServiceListener<Opa
    * @param rSessionId
    */
   public void removeSubjectRSession(String rSessionId) {
-    getRSessions(getSubjectSessionId()).removeRSession(rSessionId);
+    getRSessions(getSubjectPrincipal()).removeRSession(rSessionId);
   }
 
   /**
@@ -110,7 +110,7 @@ public class OpalRSessionManager implements SessionListener, ServiceListener<Opa
    * @param rSessionId
    */
   public void setSubjectCurrentRSession(String rSessionId) {
-    getRSessions(getSubjectSessionId()).setCurrentRSession(rSessionId);
+    getRSessions(getSubjectPrincipal()).setCurrentRSession(rSessionId);
   }
 
   /**
@@ -121,7 +121,7 @@ public class OpalRSessionManager implements SessionListener, ServiceListener<Opa
    * @return R session
    */
   public OpalRSession addSubjectCurrentRSession(RConnection connection) {
-    return addCurrentRSession(getSubjectSessionId(), connection);
+    return addCurrentRSession(getSubjectPrincipal(), connection);
   }
 
   /**
@@ -131,7 +131,7 @@ public class OpalRSessionManager implements SessionListener, ServiceListener<Opa
    * @return R session
    */
   public OpalRSession newSubjectCurrentRSession() {
-    return addCurrentRSession(getSubjectSessionId(), opalRService.newConnection());
+    return addCurrentRSession(getSubjectPrincipal(), opalRService.newConnection());
   }
 
   /**
@@ -140,7 +140,7 @@ public class OpalRSessionManager implements SessionListener, ServiceListener<Opa
    * @return
    */
   public OpalRSession getSubjectCurrentRSession() {
-    return getCurrentRSession(getSubjectSessionId());
+    return getCurrentRSession(getSubjectPrincipal());
   }
 
   /**
@@ -150,11 +150,11 @@ public class OpalRSessionManager implements SessionListener, ServiceListener<Opa
    * @return
    */
   public OpalRSession getSubjectRSession(String rSessionId) {
-    return getRSession(getSubjectSessionId(), rSessionId);
+    return getRSession(getSubjectPrincipal(), rSessionId);
   }
 
   public void removeSubjectRSessions() {
-    getRSessions(getSubjectSessionId()).removeRSessions();
+    getRSessions(getSubjectPrincipal()).removeRSessions();
   }
 
   //
@@ -180,16 +180,16 @@ public class OpalRSessionManager implements SessionListener, ServiceListener<Opa
   // private methods
   //
 
-  private synchronized void clearRSessions(String sessionId) {
-    if(rSessionMap.containsKey(sessionId)) {
-      log.debug("clearRSessions({})", sessionId);
-      doClearRSessions(sessionId);
-      rSessionMap.remove(sessionId);
+  private synchronized void clearRSessions(String principal) {
+    if(rSessionMap.containsKey(principal)) {
+      log.debug("clearRSessions({})", principal);
+      doClearRSessions(principal);
+      rSessionMap.remove(principal);
     }
   }
 
-  private void doClearRSessions(String sessionId) {
-    for(OpalRSession rSession : rSessionMap.get(sessionId)) {
+  private void doClearRSessions(String principal) {
+    for(OpalRSession rSession : rSessionMap.get(principal)) {
       try {
         rSession.close();
       } catch(Exception e) {
@@ -198,32 +198,32 @@ public class OpalRSessionManager implements SessionListener, ServiceListener<Opa
     }
   }
 
-  private OpalRSession addCurrentRSession(String sessionId, RConnection connection) {
-    SubjectRSessions rSessions = getRSessions(sessionId);
+  private OpalRSession addCurrentRSession(String principal, RConnection connection) {
+    SubjectRSessions rSessions = getRSessions(principal);
     OpalRSession current = new OpalRSession(connection, transactionalThreadFactory);
     rSessions.addRSession(current);
     return current;
   }
 
-  private OpalRSession getCurrentRSession(String sessionId) {
-    return getRSessions(sessionId).getCurrentRSession();
+  private OpalRSession getCurrentRSession(String principal) {
+    return getRSessions(principal).getCurrentRSession();
   }
 
-  private OpalRSession getRSession(String sessionId, String rSessionId) {
-    return getRSessions(sessionId).getRSession(rSessionId);
+  private OpalRSession getRSession(String principal, String rSessionId) {
+    return getRSessions(principal).getRSession(rSessionId);
   }
 
-  private synchronized SubjectRSessions getRSessions(String sessionId) {
-    SubjectRSessions rSessions = rSessionMap.get(sessionId);
+  private synchronized SubjectRSessions getRSessions(String principal) {
+    SubjectRSessions rSessions = rSessionMap.get(principal);
     if(rSessions == null) {
       rSessions = new SubjectRSessions();
-      rSessionMap.put(sessionId, rSessions);
+      rSessionMap.put(principal, rSessions);
     }
     return rSessions;
   }
 
-  private String getSubjectSessionId() {
-    return SecurityUtils.getSubject().getSession().getId().toString();
+  private String getSubjectPrincipal() {
+    return SecurityUtils.getSubject().getPrincipal().toString();
   }
 
   //
