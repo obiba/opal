@@ -102,8 +102,8 @@ public class SecurityResourceTest {
   }
 
   @Test
-  public void testDeleteSession() {
-    Response response = securityResource.deleteSession();
+  public void testDeleteCurrentSession() {
+    Response response = securityResource.deleteCurrentSession();
     assertThat(response.getStatus()).isEqualTo(Status.OK.getStatusCode());
   }
 

@@ -81,7 +81,14 @@ public class AuthenticationResource extends AbstractSecurityComponent {
 
   @DELETE
   @Path("/session/{id}")
-  public Response deleteSession() {
+  public Response deleteSession(@PathParam("id") String sessionId) {
+    // legacy
+    return deleteCurrentSession();
+  }
+
+  @DELETE
+  @Path("/session/_current")
+  public Response deleteCurrentSession() {
     // Delete the Shiro session
     try {
       SecurityUtils.getSubject().logout();
