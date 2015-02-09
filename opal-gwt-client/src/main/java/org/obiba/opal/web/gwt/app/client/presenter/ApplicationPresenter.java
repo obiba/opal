@@ -9,6 +9,21 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.presenter;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.ContentSlot;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
+import com.gwtplatform.mvp.client.proxy.RevealRootContentEvent;
+import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import org.obiba.opal.web.gwt.app.client.administration.configuration.event.GeneralConfigSavedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.ModalClosedEvent;
@@ -39,26 +54,11 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.UserSessionTracker;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
-
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.HasUiHandlers;
-import com.gwtplatform.mvp.client.Presenter;
-import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.annotations.ContentSlot;
-import com.gwtplatform.mvp.client.annotations.ProxyStandard;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
-import com.gwtplatform.mvp.client.proxy.RevealRootContentEvent;
-import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 
 /**
  *
@@ -120,38 +120,38 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   @Override
   protected void onBind() {
     addRegisteredHandler(FileSelectionRequestEvent.getType(), new FileSelectionRequestEvent.Handler() {
-      @Override
-      public void onFileSelectionRequired(FileSelectionRequestEvent event) {
-        FileSelectorPresenter fsp = fileSelectorProvider.get();
-        fsp.handle(event);
-      }
+        @Override
+        public void onFileSelectionRequired(FileSelectionRequestEvent event) {
+            FileSelectorPresenter fsp = fileSelectorProvider.get();
+            fsp.handle(event);
+        }
     });
     addRegisteredHandler(GeoValueDisplayEvent.getType(), new GeoValueDisplayEvent.Handler() {
 
-      @Override
-      public void onGeoValueDisplay(GeoValueDisplayEvent event) {
-        ValueMapPopupPresenter vmp = valueMapPopupProvider.get();
-        vmp.handle(event);
-      }
+        @Override
+        public void onGeoValueDisplay(GeoValueDisplayEvent event) {
+            ValueMapPopupPresenter vmp = valueMapPopupProvider.get();
+            vmp.handle(event);
+        }
     });
     addRegisteredHandler(FileDownloadRequestEvent.getType(), new FileDownloadRequestEvent.FileDownloadRequestHandler() {
 
-      @Override
-      public void onFileDownloadRequest(FileDownloadRequestEvent event) {
-        getView().getDownloader().setUrl(urlBuilder.buildAbsoluteUrl(event.getUrl()));
-      }
+        @Override
+        public void onFileDownloadRequest(FileDownloadRequestEvent event) {
+            getView().getDownloader().setUrl(urlBuilder.buildAbsoluteUrl(event.getUrl()));
+        }
     });
     addRegisteredHandler(FilesDownloadRequestEvent.getType(),
-        new FilesDownloadRequestEvent.FilesDownloadRequestHandler() {
-          @Override
-          public void onFilesDownloadRequest(FilesDownloadRequestEvent event) {
-            UriBuilder uriBuilder = UriBuilder.create().fromPath(FileDtos.getLink(event.getParent()));
-            for(FileDto child : event.getChildren()) {
-              uriBuilder.query("file", child.getName());
-            }
-            getView().getDownloader().setUrl(urlBuilder.buildAbsoluteUrl(uriBuilder.build()));
-          }
-        });
+            new FilesDownloadRequestEvent.FilesDownloadRequestHandler() {
+                @Override
+                public void onFilesDownloadRequest(FilesDownloadRequestEvent event) {
+                    UriBuilder uriBuilder = UriBuilder.create().fromPath(FileDtos.getLink(event.getParent()));
+                    for (FileDto child : event.getChildren()) {
+                        uriBuilder.query("file", child.getName());
+                    }
+                    getView().getDownloader().setUrl(urlBuilder.buildAbsoluteUrl(uriBuilder.build()));
+                }
+            });
 
     // Update search box on event
     addRegisteredHandler(DatasourceSelectionChangeEvent.getType(),
@@ -207,6 +207,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     refreshApplicationName();
 
     authorize();
+    UserSessionTracker.getInstance().configure();
   }
 
   private void refreshApplicationName() {

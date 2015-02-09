@@ -213,6 +213,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
   @Override
   public Request send() {
     try {
+        UserSessionTracker.getInstance().sessionTouched();
       return build().send();
     } catch(RequestException e) {
       eventBus.fireEvent(new RequestErrorEvent.Builder().exception(e).build());
