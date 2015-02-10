@@ -75,8 +75,7 @@ public class OpalRSessionResourceImpl extends AbstractOpalRSessionResource imple
 
   @Override
   public Response setCurrentRSession() {
-    opalRSessionManager.setSubjectCurrentRSession(rSession.getId());
-    return Response.ok().build();
+    throw new UnsupportedOperationException("Unsupported operation: please upgrade your opal R package.");
   }
 
   @Override

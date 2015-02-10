@@ -57,8 +57,8 @@ public class OpalRSessionsResourceImpl implements OpalRSessionsResource {
   }
 
   @Override
-  public Response newCurrentRSession(UriInfo info) {
-    OpalRSession rSession = opalRSessionManager.newSubjectCurrentRSession();
+  public Response newRSession(UriInfo info) {
+    OpalRSession rSession = opalRSessionManager.newSubjectRSession();
     List<URI> locations = getLocations(info, rSession.getId());
     return Response.created(locations.get(0)).header("X-Alt-Location", locations.get(1)).entity(Dtos.asDto(rSession))
         .build();

@@ -12,6 +12,7 @@ package org.obiba.opal.web.r;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
+import org.obiba.opal.core.DeprecatedOperationException;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -43,12 +44,7 @@ public class OpalRSessionParentResource {
 
   @Path("/current")
   public OpalRSessionResource getCurrentOpalRSessionResource() {
-    if(!opalRSessionManager.hasSubjectCurrentRSession()) {
-      opalRSessionManager.newSubjectCurrentRSession();
-    }
-    OpalRSessionResource resource = applicationContext.getBean("opalRSessionResource", OpalRSessionResource.class);
-    resource.setOpalRSession(opalRSessionManager.getSubjectCurrentRSession());
-    return resource;
+    throw new DeprecatedOperationException("Unsupported operation: please upgrade your opal R package.");
   }
 
 }

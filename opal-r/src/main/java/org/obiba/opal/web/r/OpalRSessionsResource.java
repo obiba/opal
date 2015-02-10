@@ -22,7 +22,7 @@ public interface OpalRSessionsResource {
   Response removeRSessions();
 
   @POST
-  Response newCurrentRSession(@Context UriInfo info);
+  Response newRSession(@Context UriInfo info);
 
   @Autowired
   void setOpalRSessionManager(OpalRSessionManager opalRSessionManager);

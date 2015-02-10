@@ -15,6 +15,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import org.obiba.opal.core.DeprecatedOperationException;
 import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier.ExtensionConfigModificationTask;
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
@@ -63,14 +64,7 @@ public class DataShieldResource {
 
   @Path("/session/current")
   public OpalDataShieldSessionResource getCurrentSession() {
-    if(!opalRSessionManager.hasSubjectCurrentRSession()) {
-      OpalRSession session = opalRSessionManager.newSubjectCurrentRSession();
-      onNewDataShieldSession(session);
-    }
-    OpalDataShieldSessionResource resource = applicationContext
-        .getBean("opalDataShieldSessionResource", OpalDataShieldSessionResource.class);
-    resource.setOpalRSession(opalRSessionManager.getSubjectCurrentRSession());
-    return resource;
+    throw new DeprecatedOperationException("Unsupported operation: please upgrade your opal R package.");
   }
 
   @Path("/env/{name}")

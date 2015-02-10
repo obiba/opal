@@ -10,6 +10,7 @@
 package org.obiba.opal.r.service;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -45,6 +46,10 @@ public class OpalRSession implements RASyncOperationTemplate {
 
   private RSession rSession;
 
+  private Date timestamp;
+
+  private boolean busy = false;
+
   /**
    * R commands to be processed.
    */
@@ -78,6 +83,7 @@ public class OpalRSession implements RASyncOperationTemplate {
       throw new RRuntimeException(e);
     }
     id = UUID.randomUUID().toString();
+    timestamp = new Date();
   }
 
   /**
@@ -87,6 +93,15 @@ public class OpalRSession implements RASyncOperationTemplate {
    */
   public String getId() {
     return id;
+  }
+
+  public void touch() {
+    timestamp = new Date();
+  }
+
+  public boolean hasExpired(long timeout) {
+    Date now = new Date();
+    return !busy && now.getTime() - timestamp.getTime() > timeout;
   }
 
   //
@@ -103,10 +118,13 @@ public class OpalRSession implements RASyncOperationTemplate {
   public void execute(ROperation rop) {
     RConnection connection = null;
     lock.lock();
+    busy = true;
     try {
       connection = newConnection();
       rop.doWithConnection(connection);
     } finally {
+      busy = false;
+      touch();
       lock.unlock();
       if(connection != null) close(connection);
     }
@@ -114,6 +132,7 @@ public class OpalRSession implements RASyncOperationTemplate {
 
   @Override
   public synchronized String executeAsync(ROperation rop) {
+    touch();
     ensureRCommandsConsumer();
     String rCommandId = id + "-" + commandId++;
     RCommand cmd = new RCommand(rCommandId, rop);
@@ -124,11 +143,13 @@ public class OpalRSession implements RASyncOperationTemplate {
 
   @Override
   public Iterable<RCommand> getRCommands() {
+    touch();
     return rCommandList;
   }
 
   @Override
   public boolean hasRCommand(String cmdId) {
+    touch();
     for(RCommand rCommand : rCommandList) {
       if(rCommand.getId().equals(cmdId)) return true;
     }
@@ -137,6 +158,7 @@ public class OpalRSession implements RASyncOperationTemplate {
 
   @Override
   public RCommand getRCommand(String cmdId) {
+    touch();
     for(RCommand rCommand : rCommandList) {
       if(rCommand.getId().equals(cmdId)) return rCommand;
     }
@@ -145,6 +167,7 @@ public class OpalRSession implements RASyncOperationTemplate {
 
   @Override
   public RCommand removeRCommand(String cmdId) {
+    touch();
     RCommand rCommand = getRCommand(cmdId);
     synchronized(rCommand) {
       rCommand.notifyAll();
@@ -157,7 +180,7 @@ public class OpalRSession implements RASyncOperationTemplate {
    * Close the R session.
    */
   public void close() {
-    if(rSession == null) return;
+    if(isClosed()) return;
 
     try {
       newConnection().close();
@@ -177,6 +200,10 @@ public class OpalRSession implements RASyncOperationTemplate {
       rCommandList.clear();
       rCommandQueue.clear();
     }
+  }
+
+  public boolean isClosed() {
+    return rSession == null;
   }
 
   //
