@@ -260,7 +260,8 @@ public class MagmaAssignROperation extends AbstractROperation {
     }
 
     private String getTmpVectorName(String symbol, String name) {
-      return ("opal__" + symbol + "__" + name).replace(" ", ".").replace("\"", ".").replace("'", ".");
+      return ("opal__" + symbol + "__" + name).replace("-", ".").replace("+", ".").replace(" ", ".").replace("\"", ".")
+          .replace("'", ".");
     }
 
     private REXP getIdsVector(boolean withMissings) {
@@ -275,8 +276,10 @@ public class MagmaAssignROperation extends AbstractROperation {
       // vector for each variable
       for(Variable v : filterVariables()) {
         VariableValueSource vvs = table.getVariableValueSource(v.getName());
-        contents.add(getVector(vvs, getEntities(), withMissings));
-        names.add(vvs.getVariable().getName());
+        if (!vvs.getVariable().isRepeatable()) {
+          contents.add(getVector(vvs, getEntities(), withMissings));
+          names.add(vvs.getVariable().getName());
+        }
       }
 
       return new RList(contents, names);
