@@ -76,12 +76,55 @@ public class OpalRSessionManager implements ServiceListener<OpalRService> {
   }
 
   /**
-   * Get the R session identifiers (for the invoking Opal user session).
+   * Get the R sessions.
+   *
+   * @return
+   */
+  public List<OpalRSession> getRSessions() {
+    ImmutableList.Builder<OpalRSession> builder = ImmutableList.builder();
+
+    for(SubjectRSessions rSessions : rSessionMap.values()) {
+      builder.addAll(rSessions);
+    }
+
+    return builder.build();
+  }
+
+  /**
+   * Get the R sessions (for the invoking Opal user session).
    *
    * @return
    */
   public List<OpalRSession> getSubjectRSessions() {
     return new ImmutableList.Builder<OpalRSession>().addAll(getRSessions(getSubjectPrincipal())).build();
+  }
+
+  /**
+   * Get the R session with the provided identifier.
+   *
+   * @param rSessionId
+   */
+  public OpalRSession getRSession(String rSessionId) {
+    for(SubjectRSessions rSessions : rSessionMap.values()) {
+      if (rSessions.hasRSession(rSessionId)) {
+        return rSessions.getRSession(rSessionId);
+      }
+    }
+    throw new NoSuchRSessionException(rSessionId);
+  }
+
+  /**
+   * Remove the R session with the provided identifier.
+   *
+   * @param rSessionId
+   */
+  public void removeRSession(String rSessionId) {
+    for(SubjectRSessions rSessions : rSessionMap.values()) {
+      if (rSessions.hasRSession(rSessionId)) {
+        rSessions.removeRSession(rSessionId);
+        return;
+      }
+    }
   }
 
   /**
