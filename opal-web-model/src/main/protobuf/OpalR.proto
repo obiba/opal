@@ -5,9 +5,18 @@ package OpalR;
 
 option java_package = "org.obiba.opal.web.model";
 
+enum RSessionStatus {
+  WAITING = 0;
+  BUSY = 1;
+}
+
 message RSessionDto {
   required string id = 1;
-  optional string link = 2;
+  required string user = 2;
+  required string creationDate = 3;
+  required string lastAccessDate = 4;
+  required RSessionStatus status = 5;
+  optional string link = 6;
 }
 
 message RPackageDto {

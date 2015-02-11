@@ -85,30 +85,12 @@ public class OpalRSessionManager implements ServiceListener<OpalRService> {
   }
 
   /**
-   * Check if there is such a R session with the provided identifier (for the invoking Opal user session).
-   */
-  public boolean hasSubjectRSession(String rSessionId) {
-    return getRSessions(getSubjectPrincipal()).hasRSession(rSessionId);
-  }
-
-  /**
    * Remove the R session with the provided identifier (for the invoking Opal user session).
    *
    * @param rSessionId
    */
   public void removeSubjectRSession(String rSessionId) {
     getRSessions(getSubjectPrincipal()).removeRSession(rSessionId);
-  }
-
-  /**
-   * Stores a new R session from the provided R connection and set it as the current one (for the invoking Opal user
-   * session).
-   *
-   * @param connection
-   * @return R session
-   */
-  public OpalRSession addSubjectCurrentRSession(RConnection connection) {
-    return addRSession(getSubjectPrincipal(), connection);
   }
 
   /**
@@ -177,7 +159,7 @@ public class OpalRSessionManager implements ServiceListener<OpalRService> {
 
   private OpalRSession addRSession(String principal, RConnection connection) {
     SubjectRSessions rSessions = getRSessions(principal);
-    OpalRSession rSession = new OpalRSession(connection, transactionalThreadFactory);
+    OpalRSession rSession = new OpalRSession(connection, transactionalThreadFactory, principal);
     rSessions.addRSession(rSession);
     return rSession;
   }

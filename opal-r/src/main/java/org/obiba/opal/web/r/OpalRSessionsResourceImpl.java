@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 /**
@@ -59,12 +58,12 @@ public class OpalRSessionsResourceImpl implements OpalRSessionsResource {
   @Override
   public Response newRSession(UriInfo info) {
     OpalRSession rSession = opalRSessionManager.newSubjectRSession();
-    List<URI> locations = getLocations(info, rSession.getId());
-    return Response.created(locations.get(0)).header("X-Alt-Location", locations.get(1)).entity(Dtos.asDto(rSession))
+    URI location = getLocation(info, rSession.getId());
+    return Response.created(location).entity(Dtos.asDto(rSession))
         .build();
   }
 
-  List<URI> getLocations(UriInfo info, String id) {
+  URI getLocation(UriInfo info, String id) {
     List<PathSegment> segments = info.getPathSegments();
     List<PathSegment> patate = segments.subList(0, segments.size() - 1);
     StringBuilder root = new StringBuilder();
@@ -73,7 +72,6 @@ public class OpalRSessionsResourceImpl implements OpalRSessionsResource {
     }
     root.append("/session");
 
-    return ImmutableList.of(info.getBaseUriBuilder().path(root.toString()).path(id).build(),
-        info.getBaseUriBuilder().path(root.toString()).path("current").build());
+    return info.getBaseUriBuilder().path(root.toString()).path(id).build();
   }
 }

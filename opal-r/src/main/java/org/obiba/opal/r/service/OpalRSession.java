@@ -46,6 +46,10 @@ public class OpalRSession implements RASyncOperationTemplate {
 
   private RSession rSession;
 
+  private final String user;
+
+  private final Date created;
+
   private Date timestamp;
 
   private boolean busy = false;
@@ -74,7 +78,7 @@ public class OpalRSession implements RASyncOperationTemplate {
    *
    * @param connection
    */
-  OpalRSession(RConnection connection, TransactionalThreadFactory transactionalThreadFactory) {
+  OpalRSession(RConnection connection, TransactionalThreadFactory transactionalThreadFactory, String user) {
     this.transactionalThreadFactory = transactionalThreadFactory;
     try {
       rSession = connection.detach();
@@ -83,7 +87,9 @@ public class OpalRSession implements RASyncOperationTemplate {
       throw new RRuntimeException(e);
     }
     id = UUID.randomUUID().toString();
-    timestamp = new Date();
+    this.user = user;
+    created = new Date();
+    timestamp = created;
   }
 
   /**
@@ -97,6 +103,22 @@ public class OpalRSession implements RASyncOperationTemplate {
 
   public void touch() {
     timestamp = new Date();
+  }
+
+  public String getUser() {
+    return user;
+  }
+
+  public Date getCreated() {
+    return created;
+  }
+
+  public Date getTimestamp() {
+    return timestamp;
+  }
+
+  public boolean isBusy() {
+    return busy;
   }
 
   public boolean hasExpired(long timeout) {
@@ -119,6 +141,7 @@ public class OpalRSession implements RASyncOperationTemplate {
     RConnection connection = null;
     lock.lock();
     busy = true;
+    touch();
     try {
       connection = newConnection();
       rop.doWithConnection(connection);

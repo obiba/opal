@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.ServiceDto;
 import org.obiba.opal.web.model.client.opal.ServiceStatus;
+import org.obiba.opal.web.model.client.opal.r.RSessionDto;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -128,8 +129,8 @@ public class RAdministrationPresenter
 
   @Override
   public void test() {
-    ResourceRequestBuilderFactory.newBuilder().forResource("/r/sessions").post()//
-        .withCallback(Response.SC_CREATED, new RSessionCreatedCallback())//
+    ResourceRequestBuilderFactory.<RSessionDto>newBuilder().forResource("/r/sessions").post()//
+        .withCallback(new RSessionCreatedCallback())//
         .withCallback(SC_INTERNAL_SERVER_ERROR, new RConnectionFailedCallback()).send();
   }
 
@@ -140,12 +141,13 @@ public class RAdministrationPresenter
         .send();
   }
 
-  private final class RSessionCreatedCallback implements ResponseCodeCallback {
+  private final class RSessionCreatedCallback implements ResourceCallback<RSessionDto> {
+
     @Override
-    public void onResponseCode(Request request, Response response) {
+    public void onResource(Response response, RSessionDto resource) {
       fireEvent(NotificationEvent.newBuilder().info("RIsAlive").build());
       ResourceRequestBuilderFactory.newBuilder() //
-          .forResource("/r/session/current") //
+          .forResource("/r/session/" + resource.getId()) //
           .withCallback(ResponseCodeCallback.NO_OP, SC_OK, SC_INTERNAL_SERVER_ERROR) //
           .delete().send();
     }
