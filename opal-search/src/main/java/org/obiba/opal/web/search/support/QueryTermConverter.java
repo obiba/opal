@@ -85,7 +85,7 @@ public class QueryTermConverter {
       }
 
       jsonAggregation.put(filterName, jsonOperator);
-    } else {
+    } else if(filters.size() == 1) {
       jsonAggregation.put(filterName, convertFilterType(filters.get(0)));
     }
   }
