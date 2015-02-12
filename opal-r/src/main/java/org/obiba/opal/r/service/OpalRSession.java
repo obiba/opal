@@ -121,9 +121,14 @@ public class OpalRSession implements RASyncOperationTemplate {
     return busy;
   }
 
+  /**
+   * Check if the R session is not busy and has expired.
+   * @param timeout in minutes
+   * @return
+   */
   public boolean hasExpired(long timeout) {
     Date now = new Date();
-    return !busy && now.getTime() - timestamp.getTime() > timeout;
+    return !busy && now.getTime() - timestamp.getTime() > timeout * 60 * 1000;
   }
 
   //
