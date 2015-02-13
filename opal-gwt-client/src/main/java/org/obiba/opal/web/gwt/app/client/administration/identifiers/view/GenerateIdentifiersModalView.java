@@ -106,9 +106,8 @@ public class GenerateIdentifiersModalView extends ModalPopupViewWithUiHandlers<G
   // ConfirmationPresenter.Display Methods
   //
   @Override
-  public void show() {
+  public void onShow() {
     size.setFocus(true);
-    super.show();
   }
 
   @Override

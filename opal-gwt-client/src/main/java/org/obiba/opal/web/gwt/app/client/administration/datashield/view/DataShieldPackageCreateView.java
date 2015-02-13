@@ -88,10 +88,9 @@ public class DataShieldPackageCreateView extends ModalPopupViewWithUiHandlers<Da
   }
 
   @Override
-  public void show() {
+  public void onShow() {
     dialog.setTitle(translations.addDataShieldPackage());
     name.setFocus(true);
-    super.show();
   }
 
   @Override

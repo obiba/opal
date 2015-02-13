@@ -57,9 +57,8 @@ public class DataShieldPackageView extends ModalPopupViewWithUiHandlers<ModalUiH
   }
 
   @Override
-  public void show() {
+  public void onShow() {
     dialog.setTitle(translations.dataShieldPackageDescription());
-    super.show();
   }
 
   @UiHandler("closeButton")

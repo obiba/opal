@@ -192,12 +192,6 @@ public class IndexView extends ModalPopupViewWithUiHandlers<IndexUiHandlers> imp
   }
 
   @Override
-  public void show() {
-    //name.setFocus(true);
-    super.show();
-  }
-
-  @Override
   public void hideDialog() {
     dialog.hide();
   }

@@ -128,9 +128,8 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
   }
 
   @Override
-  public void show() {
+  public void onShow() {
     name.setFocus(true);
-    super.show();
   }
 
   @Override

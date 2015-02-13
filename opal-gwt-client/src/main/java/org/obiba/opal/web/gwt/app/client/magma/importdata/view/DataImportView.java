@@ -305,9 +305,8 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
   }
 
   @Override
-  public void show() {
+  public void onShow() {
     stepChain.reset();
-    super.show();
   }
 
   @Override

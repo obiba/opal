@@ -57,9 +57,8 @@ public class CreateFolderModalView extends ModalPopupViewWithUiHandlers<CreateFo
   }
 
   @Override
-  public void show() {
+  public void onShow() {
     folderToCreate.setFocus(true);
-    super.show();
   }
 
   @Override

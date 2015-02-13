@@ -124,9 +124,8 @@ implements Display {
   }
 
   @Override
-  public void show() {
+  public void onShow() {
     reportTemplateName.setFocus(true);
-    super.show();
   }
 
   @Override

@@ -195,9 +195,8 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   }
 
   @Override
-  public void show() {
+  public void onShow() {
     name.setFocus(true);
-    super.show();
   }
 
   @Override

@@ -65,11 +65,10 @@ public class FileUploadModalView extends ModalPopupViewWithUiHandlers<FileUpload
   }
 
   @Override
-  public void show() {
+  public void onShow() {
     setUploading(false);
     // Clears the fileUpload field as there's no way to do this on the widget itself.
     form.reset();
-    super.show();
   }
 
   @Override

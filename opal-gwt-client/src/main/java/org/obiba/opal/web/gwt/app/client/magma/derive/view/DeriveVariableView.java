@@ -125,13 +125,12 @@ public class DeriveVariableView extends ModalPopupViewWithUiHandlers<ModalUiHand
   }
 
   @Override
-  public void show() {
+  public void onShow() {
     if(stepChain == null) {
       stepChain = WizardStepChain.Builder.create(dialog).append(stepControllerBuilder.build()).onNext().onPrevious()
           .build();
     }
     stepChain.reset();
-    super.show();
   }
 
   @Override

@@ -123,13 +123,20 @@ public abstract class ModalViewImpl extends ViewImpl implements PopupView {
   }
 
   @Override
-  public void show() {
-    asModal().show();
+  public final void show() {
   }
 
   @Override
-  public void showAndReposition() {
-    show();
+  public final void showAndReposition() {
+    onShow();
+    asModal().show();
+  }
+
+  /**
+   * Called before the modal is shown.
+   */
+  public void onShow() {
+
   }
 
   /**

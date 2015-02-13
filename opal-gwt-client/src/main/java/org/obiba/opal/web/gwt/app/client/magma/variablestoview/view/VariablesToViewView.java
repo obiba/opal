@@ -291,9 +291,6 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
     renameWithNumber.setValue(false);
     saveButton.setEnabled(true);
     cancelButton.setEnabled(true);
-
-    show();
-    center();
   }
 
   @UiHandler("saveButton")

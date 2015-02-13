@@ -162,9 +162,8 @@ public class VariablesImportView extends ModalPopupViewWithUiHandlers<VariablesI
   }
 
   @Override
-  public void show() {
+  public void onShow() {
     stepChain.reset();
-    super.show();
   }
 
   @Override

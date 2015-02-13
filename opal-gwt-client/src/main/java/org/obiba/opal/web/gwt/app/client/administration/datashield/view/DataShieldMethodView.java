@@ -106,9 +106,8 @@ public class DataShieldMethodView extends ModalPopupViewWithUiHandlers<DataShiel
   }
 
   @Override
-  public void show() {
+  public void onShow() {
     name.setFocus(true);
-    super.show();
   }
 
   @Override
