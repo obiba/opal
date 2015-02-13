@@ -27,7 +27,7 @@ public interface DatasourceTablesResource {
 
   @GET
   @ApiOperation(value = "Returns all tables of all datasources", response = List.class)
-  Response getTables(@Context Request request, @QueryParam("counts") @DefaultValue("false") boolean counts,
+  List<Magma.TableDto> getTables(@Context Request request, @QueryParam("counts") @DefaultValue("false") boolean counts,
       @Nullable @QueryParam("entityType") String entityType);
 
   @GET

@@ -21,7 +21,6 @@ import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.opal.core.domain.VariableNature;
-import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.math.BinarySummaryResource;
 import org.obiba.opal.web.magma.math.CategoricalSummaryResource;
 import org.obiba.opal.web.magma.math.ContinuousSummaryResource;
@@ -108,9 +107,6 @@ public class VariableResourceImpl extends AbstractValueTableResource implements 
 
   @Override
   public SummaryResource getSummary(Request request, String natureStr) {
-
-    TimestampedResponses.evaluate(request, getValueTable());
-
     Variable variable = variableValueSource.getVariable();
     VariableNature nature = natureStr == null
         ? VariableNature.getNature(variable)

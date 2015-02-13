@@ -41,7 +41,7 @@ public interface VariablesResource {
    * @return
    */
   @GET
-  Response getVariables(@Context Request request, @Context UriInfo uriInfo, @QueryParam("script") String script,
+  Iterable<Magma.VariableDto> getVariables(@Context Request request, @Context UriInfo uriInfo, @QueryParam("script") String script,
       @QueryParam("offset") @DefaultValue("0") Integer offset, @Nullable @QueryParam("limit") Integer limit);
 
   @GET

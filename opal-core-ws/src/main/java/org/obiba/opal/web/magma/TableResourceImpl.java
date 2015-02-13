@@ -36,7 +36,6 @@ import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.type.BooleanType;
 import org.obiba.opal.core.service.DataImportService;
 import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
-import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
@@ -73,14 +72,13 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
   }
 
   @Override
-  public Response get(Request request, UriInfo uriInfo, Boolean counts) {
-    TimestampedResponses.evaluate(request, getValueTable());
+  public TableDto get(Request request, UriInfo uriInfo, Boolean counts) {
     String path = uriInfo.getPath(false);
     TableDto.Builder builder = Dtos.asDto(getValueTable(), counts).setLink(path);
     if(getValueTable().isView()) {
       builder.setViewLink(path.replaceFirst("table", "view"));
     }
-    return TimestampedResponses.ok(getValueTable(), builder.build()).build();
+    return builder.build();
   }
 
   @Override
@@ -128,9 +126,6 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
 
   @Override
   public ValueSetResource getValueSet(Request request, String identifier, String select, Boolean filterBinary) {
-    // TODO timestamp is a composite of value set timestamp that fall backs to value table timestamps
-    TimestampedResponses.evaluate(request, getValueTable());
-
     ValueSetResource resource = applicationContext.getBean(ValueSetResource.class);
     resource.setValueTable(getValueTable());
     resource.setEntity(new VariableEntityBean(getValueTable().getEntityType(), identifier));
@@ -140,15 +135,12 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
   @Override
   public Magma.TimestampsDto getValueSetTimestamps(Request request, String identifier) {
     ValueTable table = getValueTable();
-    TimestampedResponses.evaluate(request, table);
     return Dtos.asDto(table.getValueSetTimestamps(new VariableEntityBean(table.getEntityType(), identifier))).build();
   }
 
   @Override
   public ValueSetResource getVariableValueSet(Request request, String identifier, String variable,
       Boolean filterBinary) {
-    TimestampedResponses.evaluate(request, getValueTable());
-
     ValueSetResource resource = applicationContext.getBean(ValueSetResource.class);
     resource.setValueTable(getValueTable());
     resource.setVariableValueSource(getValueTable().getVariableValueSource(variable));
@@ -182,7 +174,6 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
 
   @Override
   public ValueSetsResource getValueSets(Request request) {
-    TimestampedResponses.evaluate(request, getValueTable());
     ValueSetsResource resource = applicationContext.getBean(ValueSetsResource.class);
     resource.setValueTable(getValueTable());
     return resource;
@@ -190,7 +181,6 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
 
   @Override
   public ValueSetsResource getVariableValueSets(Request request, String name) {
-    TimestampedResponses.evaluate(request, getValueTable());
     ValueSetsResource resource = applicationContext.getBean(ValueSetsResource.class);
     resource.setValueTable(getValueTable());
     resource.setVariableValueSource(getValueTable().getVariableValueSource(name));
@@ -199,7 +189,6 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
 
   @Override
   public VariableResource getVariable(Request request, String name) {
-    TimestampedResponses.evaluate(request, getValueTable());
     return getVariableResource(getValueTable().getVariableValueSource(name), name);
   }
 

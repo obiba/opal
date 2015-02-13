@@ -35,7 +35,7 @@ public interface TableResource {
 
   @GET
   @ApiOperation(value = "Get the Table", response = Magma.TableDto.class)
-  Response get(@Context Request request, @Context UriInfo uriInfo,
+  Magma.TableDto get(@Context Request request, @Context UriInfo uriInfo,
       @QueryParam("counts") @DefaultValue("false") Boolean counts);
 
   @PUT

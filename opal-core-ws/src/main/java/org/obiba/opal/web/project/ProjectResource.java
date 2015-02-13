@@ -35,7 +35,6 @@ import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.NoSuchProjectException;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
-import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.security.KeyStoreResource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,22 +66,19 @@ public class ProjectResource {
 
   @GET
   @Transactional(readOnly = true)
-  public Response get(@Context Request request) {
+  public Projects.ProjectDto get(@Context Request request) {
     Project project = getProject();
     Timestamped projectTimestamps = new ProjectTimestamps(project);
-    TimestampedResponses.evaluate(request, projectTimestamps);
-    return TimestampedResponses
-        .ok(projectTimestamps, Dtos.asDto(project, projectService.getProjectDirectoryPath(project))).build();
+    return Dtos.asDto(project, projectService.getProjectDirectoryPath(project));
   }
 
   @GET
   @Path("/summary")
   @Transactional(readOnly = true)
-  public Response getSummary(@Context Request request) {
+  public Projects.ProjectSummaryDto getSummary(@Context Request request) {
     Project project = getProject();
     Datasource ds = project.getDatasource();
-    TimestampedResponses.evaluate(request, ds);
-    return TimestampedResponses.ok(ds, Dtos.asSummaryDto(project)).build();
+    return Dtos.asSummaryDto(project);
   }
 
   @PUT

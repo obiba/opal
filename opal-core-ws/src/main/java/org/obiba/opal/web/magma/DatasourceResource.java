@@ -125,10 +125,8 @@ public class DatasourceResource {
   @GET
   @ApiOperation(value = "Get the datasource", response = Magma.DatasourceDto.class)
   @ApiResponses(@ApiResponse(code = 404, message = "If datasource is not found"))
-  public Response get(@Context Request request) {
-    Datasource ds = getDatasource();
-    TimestampedResponses.evaluate(request, ds);
-    return TimestampedResponses.ok(ds, Dtos.asDto(ds).build()).build();
+  public Magma.DatasourceDto get(@Context Request request) {
+    return Dtos.asDto(getDatasource()).build();
   }
 
   @DELETE

@@ -13,7 +13,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -28,7 +27,6 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
-import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableDto.Builder;
@@ -54,10 +52,8 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 public class VariablesResourceImpl extends AbstractValueTableResource implements VariablesResource {
 
   @Override
-  public Response getVariables(Request request, UriInfo uriInfo, String script, Integer offset,
+  public Iterable<VariableDto> getVariables(Request request, UriInfo uriInfo, String script, Integer offset,
       @Nullable Integer limit) {
-    TimestampedResponses.evaluate(request, getValueTable());
-
     if(offset < 0) {
       throw new InvalidRequestException("IllegalParameterValue", "offset", String.valueOf(limit));
     }
@@ -81,16 +77,11 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
           }
         }, Dtos.asDtoFunc(tableLinkBuilder.build())));
 
-    // The use of "GenericEntity" is required because otherwise JAX-RS can't determine the type using reflection.
-    //noinspection EmptyClass
-    return TimestampedResponses.ok(getValueTable(), new GenericEntity<Iterable<VariableDto>>(entity) {
-      // Nothing to implement. Subclassed to keep generic information at runtime.
-    }).build();
+    return entity;
   }
 
   @Override
   public Response getExcelDictionary(Request request) throws MagmaRuntimeException, IOException {
-    TimestampedResponses.evaluate(request, getValueTable());
     String destinationName = getValueTable().getDatasource().getName() + "." + getValueTable().getName() +
         "-dictionary";
     ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
@@ -103,7 +94,7 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
       Disposables.silentlyDispose(destinationDatasource);
     }
 
-    return TimestampedResponses.ok(getValueTable()).entity(excelOutput.toByteArray()).type("application/vnd.ms-excel")
+    return Response.ok().entity(excelOutput.toByteArray()).type("application/vnd.ms-excel")
         .header("Content-Disposition", "attachment; filename=\"" + destinationName + ".xlsx\"").build();
   }
 

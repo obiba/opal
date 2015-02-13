@@ -17,7 +17,6 @@ import java.util.Locale;
 import java.util.Set;
 
 import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.junit.BeforeClass;
@@ -99,7 +98,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     UriInfo uriInfoMock = mock(UriInfo.class);
     when(uriInfoMock.getPath(false)).thenReturn("/datasource/" + DATASOURCE2 + "/table/Weight");
 
-    checkWeightTableDto((Magma.TableDto) resource.get(null, uriInfoMock, true).getEntity());
+    checkWeightTableDto(resource.get(null, uriInfoMock, true));
   }
 
   @Test
@@ -124,9 +123,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
 
     VariablesResource variablesResource = new VariablesResourceImpl();
     variablesResource.setValueTable(datasource.getValueTable("Weight"));
-    Response r = variablesResource.getVariables(null, uriInfoMock, null, 0, null);
-    @SuppressWarnings("unchecked")
-    List<VariableDto> dtos = ImmutableList.copyOf((Iterable<? extends VariableDto>) r.getEntity());
+    List<VariableDto> dtos = ImmutableList.copyOf(variablesResource.getVariables(null, uriInfoMock, null, 0, null));
 
     for(int i = 0; i < 4; i++) {
       verify(segments.get(i)).getPath();
