@@ -183,12 +183,12 @@ public class RestValueTable extends AbstractValueTable {
 
     @Override
     public void initialise() {
-      entities = getOpalClient()
-          .getResources(VariableEntityDto.class, newReference("entities"), VariableEntityDto.newBuilder());
     }
 
     @Override
     public Set<VariableEntity> getVariableEntities() {
+      ensureEntities();
+
       return ImmutableSet.copyOf(Iterables.transform(entities, new Function<VariableEntityDto, VariableEntity>() {
 
         @Override
@@ -203,6 +203,12 @@ public class RestValueTable extends AbstractValueTable {
       return getEntityType().equals(entityType);
     }
 
+    private void ensureEntities() {
+      if (entities == null) {
+        entities = getOpalClient()
+            .getResources(VariableEntityDto.class, newReference("entities"), VariableEntityDto.newBuilder());
+      }
+    }
   }
 
   private class LazyValueSet extends ValueSetBean {
