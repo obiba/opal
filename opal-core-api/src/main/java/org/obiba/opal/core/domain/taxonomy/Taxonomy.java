@@ -23,6 +23,8 @@ import com.google.common.collect.Lists;
  */
 public class Taxonomy extends TaxonomyEntity {
 
+  private static final long serialVersionUID = -1868460805324793471L;
+
   private List<Vocabulary> vocabularies;
 
   public Taxonomy() {

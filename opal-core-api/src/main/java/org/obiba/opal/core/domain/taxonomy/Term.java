@@ -12,6 +12,8 @@ package org.obiba.opal.core.domain.taxonomy;
 
 public class Term extends TaxonomyEntity {
 
+  private static final long serialVersionUID = -6205259721540166478L;
+
   public Term() {}
 
   public Term(String name) { setName(name); }

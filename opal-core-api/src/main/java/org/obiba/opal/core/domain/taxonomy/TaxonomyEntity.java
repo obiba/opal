@@ -10,13 +10,16 @@
 
 package org.obiba.opal.core.domain.taxonomy;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
-public class TaxonomyEntity {
+public class TaxonomyEntity implements Serializable {
+
+  private static final long serialVersionUID = 276565753582045864L;
 
   @NotNull
   private String name;
