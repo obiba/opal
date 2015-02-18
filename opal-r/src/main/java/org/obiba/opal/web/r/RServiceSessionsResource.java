@@ -12,11 +12,8 @@ package org.obiba.opal.web.r;
 
 import java.util.List;
 
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Response;
 
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
@@ -29,33 +26,19 @@ import com.google.common.collect.Lists;
 
 @Component
 @Scope("request")
-@Path("/service/r")
-public class RServiceResource {
+@Path("/service/r/sessions")
+public class RServiceSessionsResource {
 
   @Autowired
   private OpalRSessionManager opalRSessionManager;
 
   @GET
-  @Path("/sessions")
   public List<OpalR.RSessionDto> getRSessionIds() {
     List<OpalR.RSessionDto> rSessions = Lists.newArrayList();
     for(OpalRSession rSession : opalRSessionManager.getRSessions()) {
       rSessions.add(Dtos.asDto(rSession));
     }
     return rSessions;
-  }
-
-  @GET
-  @Path("/session/{id}")
-  public OpalR.RSessionDto getRSession(@PathParam("id") String id) {
-    return Dtos.asDto(opalRSessionManager.getRSession(id));
-  }
-
-  @DELETE
-  @Path("/session/{id}")
-  public Response removeRSession(@PathParam("id") String id) {
-    opalRSessionManager.removeRSession(id);
-    return Response.ok().build();
   }
 
 }
