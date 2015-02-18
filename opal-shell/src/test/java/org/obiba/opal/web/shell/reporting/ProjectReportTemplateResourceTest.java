@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.junit.After;
@@ -81,7 +82,7 @@ public class ProjectReportTemplateResourceTest {
   public void test_get() {
     Subject subject = mock(Subject.class);
     ThreadContext.bind(subject);
-    when(subject.getPrincipal()).thenReturn(mock(Principal.class));
+    configureMock(subject);
     when(subject.isPermitted("rest:/project/project1/report-template/template3:GET")).thenReturn(true);
 
     ProjectReportTemplateResource resource = createResource("template3", "project1");
@@ -104,7 +105,7 @@ public class ProjectReportTemplateResourceTest {
   public void test_delete() {
     Subject mockSubject = mock(Subject.class);
     ThreadContext.bind(mockSubject);
-    when(mockSubject.getPrincipal()).thenReturn(mock(Principal.class));
+    configureMock(mockSubject);
     when(mockSubject.isPermitted("rest:/project/project1/report-template/template2:GET")).thenReturn(true);
 
     CommandSchedulerService commandSchedulerService = mock(CommandSchedulerService.class);
@@ -192,5 +193,10 @@ public class ProjectReportTemplateResourceTest {
     reportTemplate.setSchedule("schedule");
     reportTemplate.setParameters(new HashMap<String, String>());
     return reportTemplate;
+  }
+
+  private void configureMock(Subject subject) {
+    when(subject.getPrincipal()).thenReturn(mock(Principal.class));
+    when(subject.getSession()).thenReturn(new SimpleSession());
   }
 }

@@ -33,6 +33,7 @@ public abstract class AbstractOpalShell implements OpalShell {
 
   @Override
   public void progress(String message, long current, long end, int percent) {
+    SecurityUtils.getSubject().getSession().touch();
     printf("%s %d%% (%d/%d)", message, percent, current, end);
   }
 
