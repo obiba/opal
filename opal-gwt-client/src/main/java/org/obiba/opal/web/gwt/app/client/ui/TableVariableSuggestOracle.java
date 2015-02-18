@@ -30,8 +30,8 @@ public class TableVariableSuggestOracle extends VariableSuggestOracle {
 
   @Override
   public String getOriginalQuery() {
-    // Filter query for valuetypes: integer, text, decimal, date, datetime
-    return originalQuery + " valueType:(integer OR text OR decimal OR date OR datetime)";
+    // Filter query for value types
+    return originalQuery + " valueType:(integer OR text OR decimal OR date OR datetime OR boolean)";
   }
 
   @Override

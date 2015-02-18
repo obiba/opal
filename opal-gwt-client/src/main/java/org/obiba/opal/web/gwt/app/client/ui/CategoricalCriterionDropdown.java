@@ -58,8 +58,13 @@ public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
 
   private SimplePanel getCategoriesChooserPanel() {
     SimplePanel categoriesPanel = new SimplePanel();
-    for(CategoryDto cat : JsArrays.toIterable(variable.getCategoriesArray())) {
-      categories.addItem(getCategoryItem(cat), cat.getName());
+    if (variable.getValueType().equals("boolean")) {
+      categories.addItem(getCategoryItem("T", "true"), "T");
+      categories.addItem(getCategoryItem("F", "false"), "F");
+    } else {
+      for(CategoryDto cat : JsArrays.toIterable(variable.getCategoriesArray())) {
+        categories.addItem(getCategoryItem(cat), cat.getName());
+      }
     }
 
     categories.addChosenChangeHandler(new UpdateFilterChosenHandler());
@@ -74,20 +79,19 @@ public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
     categories.setVisible(false);
   }
 
-  private String getCategoryItem(CategoryDto cat) {
+  private String getCategoryItem(String catName, String catLabel) {
     // Get the frequency of this category
     int count = 0;
     for(FacetResultDto.TermFrequencyResultDto result : JsArrays
         .toIterable(queryResult.getFacetsArray().get(0).getFrequenciesArray())) {
-      if(result.getTerm().equals(cat.getName())) {
+      if(result.getTerm().equals(catName)) {
         count = result.getCount();
         break;
       }
     }
 
-    StringBuilder labelBuilder = new StringBuilder(cat.getName());
+    StringBuilder labelBuilder = new StringBuilder(catName);
     String freqLabel = count > 0 ? " (" + count + ")" : "";
-    String catLabel = getCategoryLabel(cat);
     // OPAL-2693 max label length: truncate cat label if necessary
     int maxLength = 20 - labelBuilder.length() - freqLabel.length();
 
@@ -100,6 +104,10 @@ public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
       labelBuilder.append(": ").append(catLabel);
     }
     return labelBuilder.append(freqLabel).toString();
+  }
+
+  private String getCategoryItem(CategoryDto cat) {
+    return getCategoryItem(cat.getName(), getCategoryLabel(cat));
   }
 
   private String getCategoryLabel(CategoryDto cat) {
