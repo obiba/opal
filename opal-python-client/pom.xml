@@ -268,7 +268,7 @@
                   <target>
                     <!-- Deploy rpm file in rpm repo -->
                     <copy todir="${obiba.rpm.dir}/${opal.deploy.dir}">
-                      <fileset dir="target/rpm/opal/RPMS/noarch"/>
+                      <fileset dir="target/rpm/opal-python-client/RPMS/noarch"/>
                     </copy>
                   </target>
                 </configuration>
