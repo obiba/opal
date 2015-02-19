@@ -36,6 +36,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
@@ -67,6 +68,12 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
 
   @UiField
   Panel taxonomyPanel;
+
+  @UiField
+  Label author;
+
+  @UiField
+  Label license;
 
   @UiField
   Panel titlePanel;
@@ -147,6 +154,8 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
 
   private void renderTaxonomy(TaxonomyDto taxonomy) {
     taxonomyName.setText(taxonomy.getName());
+    author.setText(taxonomy.hasAuthor() ? taxonomy.getAuthor() : "");
+    license.setText(taxonomy.hasLicense() ? taxonomy.getLicense() : "");
     renderText(titlePanel, taxonomy.getTitleArray());
     renderText(descriptionPanel, taxonomy.getDescriptionArray());
     setVocabularies(taxonomy.getVocabulariesArray());

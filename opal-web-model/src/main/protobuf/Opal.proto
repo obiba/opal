@@ -344,9 +344,11 @@ message TaxonomiesDto {
 
 message TaxonomyDto {
   required string name = 1; // mapped to attribute namespace
-  repeated LocaleTextDto title = 2;
-  repeated LocaleTextDto description = 3;
-  repeated VocabularyDto vocabularies = 4;
+  optional string author = 2;
+  optional string license = 3;
+  repeated LocaleTextDto title = 4;
+  repeated LocaleTextDto description = 5;
+  repeated VocabularyDto vocabularies = 6;
 }
 
 message OpalConf {

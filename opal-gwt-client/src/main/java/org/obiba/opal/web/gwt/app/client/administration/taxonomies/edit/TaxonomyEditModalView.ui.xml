@@ -20,6 +20,34 @@
       </b:HelpBlock>
     </b:ControlGroup>
 
+    <!-- Author -->
+    <b:ControlGroup>
+      <b:ControlLabel>
+        <ui:msg description="Author label">Author</ui:msg>
+      </b:ControlLabel>
+      <b:Controls>
+        <b:TextBox ui:field="author"/>
+      </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="Taxonomy Author help">The taxonomy author can be specified (for copyright).</ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+
+    <!-- License -->
+    <b:ControlGroup>
+      <b:ControlLabel>
+        <ui:msg description="License label">License</ui:msg>
+      </b:ControlLabel>
+      <b:Controls>
+        <b:Typeahead ui:field="licenseTypeahead">
+          <b:TextBox ui:field="license"/>
+        </b:Typeahead>
+      </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="Taxonomy License help">License type that applies to this taxonomy. See suggested <a href="http://creativecommons.org/choose/" target="_blank">Creative Commons Licenses</a>.</ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+
     <!-- Title -->
     <b:ControlGroup>
       <b:ControlLabel>

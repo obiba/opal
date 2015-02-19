@@ -45,6 +45,18 @@
     <o:PropertiesTable ui:field="taxonomyPanel" keyStyleNames="span3">
       <g:FlowPanel>
         <g:Label>
+          <ui:msg description="Author label">Author</ui:msg>
+        </g:Label>
+        <g:Label ui:field="author"></g:Label>
+      </g:FlowPanel>
+      <g:FlowPanel>
+        <g:Label>
+          <ui:msg description="License label">License</ui:msg>
+        </g:Label>
+        <g:Label ui:field="license"></g:Label>
+      </g:FlowPanel>
+      <g:FlowPanel>
+        <g:Label>
           <ui:msg description="Title label">Title</ui:msg>
         </g:Label>
         <g:FlowPanel ui:field="titlePanel"/>

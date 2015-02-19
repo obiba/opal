@@ -16,6 +16,7 @@ import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.core.cfg.NoSuchVocabularyException;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 /**
@@ -25,6 +26,10 @@ public class Taxonomy extends TaxonomyEntity {
 
   private static final long serialVersionUID = -1868460805324793471L;
 
+  private String author;
+
+  private String license;
+
   private List<Vocabulary> vocabularies;
 
   public Taxonomy() {
@@ -32,6 +37,30 @@ public class Taxonomy extends TaxonomyEntity {
 
   public Taxonomy(@NotNull String name) {
     setName(name);
+  }
+
+  public boolean hasAuthor() {
+    return !Strings.isNullOrEmpty(author);
+  }
+
+  public void setAuthor(String author) {
+    this.author = author;
+  }
+
+  public String getAuthor() {
+    return author;
+  }
+
+  public boolean hasLicense() {
+    return !Strings.isNullOrEmpty(license);
+  }
+
+  public void setLicense(String license) {
+    this.license = license;
+  }
+
+  public String getLicense() {
+    return license;
   }
 
   public boolean hasVocabularies() {

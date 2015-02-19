@@ -11,6 +11,7 @@ import org.obiba.opal.web.model.client.opal.GeneralConf;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.http.client.Request;
@@ -39,9 +40,11 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
   }
 
   @Override
-  public void onSave(String name, JsArray<LocaleTextDto> titles, JsArray<LocaleTextDto> descriptions) {
+  public void onSave(String name, String author, String license, JsArray<LocaleTextDto> titles, JsArray<LocaleTextDto> descriptions) {
     final TaxonomyDto dto = TaxonomyDto.create();
     dto.setName(name);
+    if (!Strings.isNullOrEmpty(author)) dto.setAuthor(author);
+    if (!Strings.isNullOrEmpty(license)) dto.setLicense(license);
     dto.setTitleArray(titles);
     dto.setDescriptionArray(descriptions);
 

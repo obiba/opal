@@ -24,6 +24,8 @@ public class Dtos {
   public static Opal.TaxonomyDto asDto(Taxonomy taxonomy) {
     Opal.TaxonomyDto.Builder builder = Opal.TaxonomyDto.newBuilder();
     builder.setName(taxonomy.getName());
+    if (taxonomy.hasAuthor()) builder.setAuthor(taxonomy.getAuthor());
+    if (taxonomy.hasLicense()) builder.setLicense(taxonomy.getLicense());
     builder.addAllTitle(toLocaleTextDtoList(taxonomy.getTitle()));
     builder.addAllDescription(toLocaleTextDtoList(taxonomy.getDescription()));
 
@@ -61,11 +63,15 @@ public class Dtos {
 
   public static Taxonomy fromDto(Opal.TaxonomyDto dto) {
     Taxonomy taxonomy = new Taxonomy(dto.getName());
+    if (dto.hasAuthor()) taxonomy.setAuthor(dto.getAuthor());
+    if (dto.hasLicense()) taxonomy.setLicense(dto.getLicense());
     taxonomy.setTitle(fromLocaleTextDtoList(dto.getTitleList()));
     taxonomy.setDescription(fromLocaleTextDtoList(dto.getDescriptionList()));
 
     for(Opal.VocabularyDto vocabulary : dto.getVocabulariesList()) {
-      taxonomy.addVocabulary(fromDto(vocabulary));
+      if (vocabulary.hasName()) {
+        taxonomy.addVocabulary(fromDto(vocabulary));
+      }
     }
 
     return taxonomy;
@@ -90,7 +96,9 @@ public class Dtos {
   private static List<Term> fromDto(Iterable<Opal.TermDto> termDtos) {
     List<Term> termDto = new ArrayList<>();
     for(Opal.TermDto t : termDtos) {
-      termDto.add(fromDto(t));
+      if (t.hasName()) {
+        termDto.add(fromDto(t));
+      }
     }
     return termDto;
   }

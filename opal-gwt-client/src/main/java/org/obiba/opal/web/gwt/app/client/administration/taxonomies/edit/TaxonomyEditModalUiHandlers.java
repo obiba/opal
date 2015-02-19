@@ -8,6 +8,6 @@ import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface TaxonomyEditModalUiHandlers extends UiHandlers, ModalUiHandlers {
 
-  void onSave(String name, JsArray<LocaleTextDto> titles, JsArray<LocaleTextDto> descriptions);
+  void onSave(String name, String author, String license, JsArray<LocaleTextDto> titles, JsArray<LocaleTextDto> descriptions);
 
 }
