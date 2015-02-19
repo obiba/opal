@@ -91,6 +91,95 @@
       <build>
         <plugins>
           <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>rpm-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>make-rpm</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>attached-rpm</goal>
+                </goals>
+                <configuration>
+                  <name>opal-python-client</name>
+                  <version>${project.version}</version>
+                  <group>Applications/Engineering</group>
+                  <packager>OBiBa</packager>
+                  <changelogFile>/usr/share/doc/opal-python-client/changelog</changelogFile>
+                  <targetOS>Linux</targetOS>
+                  <requires>
+                    <require>python</require>
+                    <require>python-pycurl</require>
+                    <require>python-protobuf</require>
+                    <require>python-argparse</require>
+                    <require>python-cached-property</require>
+                    <require>python-sortedcontainers</require>
+                  </requires>
+
+                  <mappings>
+
+                    <mapping>
+                      <directory>/usr/bin</directory>
+                      <filemode>755</filemode>
+                      <username>root</username>
+                      <groupname>root</groupname>
+                      <sources>
+                        <source>
+                          <location>${basedir}/target/opal-python/bin/scripts</location>
+                          <includes>
+                            <include>opal</include>
+                          </includes>
+                        </source>
+                      </sources>
+                    </mapping>
+
+                    <mapping>
+                      <directory>/usr/share/pyshared/opal</directory>
+                      <filemode>755</filemode>
+                      <username>root</username>
+                      <groupname>root</groupname>
+                      <sources>
+                        <source>
+                          <location>${basedir}/target/opal-python/bin/opal</location>
+                          <includes>
+                            <include>**/*</include>
+                          </includes>
+                        </source>
+                      </sources>
+                    </mapping>
+
+                    <mapping>
+                      <directory>/usr/share/doc/opal-python-client</directory>
+                      <filemode>744</filemode>
+                      <username>root</username>
+                      <groupname>root</groupname>
+                      <documentation>true</documentation>
+                      <sources>
+                        <source>
+                          <location>dist/debian/changelog</location>
+                        </source>
+                        <source>
+                          <location>dist/rpm/copyright</location>
+                        </source>
+                      </sources>
+                    </mapping>
+                  </mappings>
+                  <postinstallScriptlet>
+                    <script>
+                      set -e
+                      # link opal folder to default python lib, /usr/share/pyshared may not be included in the lib path
+                      python_lib=$(python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
+                      if [ -d $python_lib ]; then
+                      rm -f $python_lib/opal
+                      fi
+                      ln -s /usr/share/pyshared/opal $python_lib/opal
+                    </script>
+                  </postinstallScriptlet>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
             <artifactId>maven-antrun-plugin</artifactId>
             <executions>
               <execution>
@@ -166,6 +255,21 @@
                     <property name="python.package.name" value="${project.name}-${project.version}.tar.gz" />
                     <!-- Deploy Python package file in download repo -->
                     <copy todir="${obiba.download.dir}/opal/${opal.deploy.dir}" file="target/${python.package.name}" />
+                  </target>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-rpm</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target>
+                    <!-- Deploy rpm file in rpm repo -->
+                    <copy todir="${obiba.rpm.dir}/${opal.deploy.dir}">
+                      <fileset dir="target/rpm/opal/RPMS/noarch"/>
+                    </copy>
                   </target>
                 </configuration>
               </execution>
