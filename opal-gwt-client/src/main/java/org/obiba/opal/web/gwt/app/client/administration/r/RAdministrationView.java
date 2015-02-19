@@ -45,6 +45,9 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
   Panel permissionsPanel;
 
   @UiField
+  Panel rSessions;
+
+  @UiField
   Panel permissions;
 
   @UiField
@@ -99,6 +102,11 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
 
   @Override
   public void setInSlot(Object slot, IsWidget content) {
+    if(slot == Slots.RSessions) {
+      rSessions.clear();
+      rSessions.add(content);
+    }
+
     if(slot == Slots.Permissions) {
       permissions.clear();
       permissions.add(content);

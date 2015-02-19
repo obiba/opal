@@ -24,10 +24,12 @@
       <ui:msg description="R server admin label">R Server</ui:msg>
     </b:Heading>
     <b:Paragraph>
+      <ui:msg description="R server text">
       Whether the R server can be started and stopped depends on the configuration of the system. Stopping the R
       server will destroy all current client connections.
+      </ui:msg>
     </b:Paragraph>
-    <g:FlowPanel>
+    <g:FlowPanel addStyleNames="large-bottom-margin">
       <b:ButtonGroup>
         <b:Button ui:field="startStopButton" type="INVERSE">
           Start/Stop
@@ -39,6 +41,17 @@
         </b:Button>
       </b:ButtonGroup>
     </g:FlowPanel>
+
+    <b:Heading size="4">
+      <ui:msg description="R sessions label">R Sessions</ui:msg>
+    </b:Heading>
+    <b:Paragraph>
+      <ui:msg description="R sessions text">
+        R server activity monitoring: each R session is a computation unit started by R/DataSHIELD users or the report
+        framework. R sessions without activity for a while will be automatically terminated.
+      </ui:msg>
+    </b:Paragraph>
+    <g:SimplePanel ui:field="rSessions"/>
 
     <g:FlowPanel ui:field="permissionsPanel">
       <b:Heading size="4">

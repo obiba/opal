@@ -2,6 +2,7 @@ package org.obiba.opal.web.gwt.app.client.administration.r;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
+import org.obiba.opal.web.gwt.app.client.administration.r.list.RSessionsPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.support.AclRequest;
@@ -40,14 +41,18 @@ public class RAdministrationPresenter
     extends ItemAdministrationPresenter<RAdministrationPresenter.Display, RAdministrationPresenter.Proxy>
     implements RAdministrationUiHandlers {
 
+  private final RSessionsPresenter rSessionsPresenter;
+
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
 
   @Inject
   public RAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
+      RSessionsPresenter rSessionsPresenter,
       Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
+    this.rSessionsPresenter = rSessionsPresenter;
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.breadcrumbsHelper = breadcrumbsHelper;
     getView().setUiHandlers(this);
@@ -68,6 +73,11 @@ public class RAdministrationPresenter
   @TitleFunction
   public String getTitle() {
     return translations.pageRConfigTitle();
+  }
+
+  @Override
+  protected void onBind() {
+    setInSlot(Display.Slots.RSessions, rSessionsPresenter);
   }
 
   @Override
@@ -191,6 +201,7 @@ public class RAdministrationPresenter
   public interface Display extends View, HasBreadcrumbs, HasUiHandlers<RAdministrationUiHandlers> {
 
     enum Slots {
+      RSessions,
       Permissions
     }
 

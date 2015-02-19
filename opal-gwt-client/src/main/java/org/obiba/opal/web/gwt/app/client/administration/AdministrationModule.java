@@ -68,6 +68,8 @@ import org.obiba.opal.web.gwt.app.client.administration.jvm.JVMView;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.RAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.RAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.r.list.RSessionsPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.r.list.RSessionsView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.TaxonomiesAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.TaxonomiesAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.edit.TaxonomyEditModalPresenter;
@@ -106,10 +108,9 @@ public class AdministrationModule extends AbstractPresenterModule {
   protected void configure() {
     bindPresenter(AdministrationPresenter.class, AdministrationPresenter.Display.class, AdministrationView.class,
         AdministrationPresenter.Proxy.class);
-    bindPresenter(RAdministrationPresenter.class, RAdministrationPresenter.Display.class, RAdministrationView.class,
-        RAdministrationPresenter.Proxy.class);
     configureDatabases();
     configureIndexes();
+    configureR();
     configureDatashield();
     configureUserGroups();
     configureProfiles();
@@ -139,8 +140,7 @@ public class AdministrationModule extends AbstractPresenterModule {
     bindPresenterWidget(VocabularyPresenter.class, VocabularyPresenter.Display.class, VocabularyView.class);
     bindPresenterWidget(VocabularyEditModalPresenter.class, VocabularyEditModalPresenter.Display.class,
         VocabularyEditModalView.class);
-    bindPresenterWidget(TermEditModalPresenter.class, TermEditModalPresenter.Display.class,
-        TermEditModalView.class);
+    bindPresenterWidget(TermEditModalPresenter.class, TermEditModalPresenter.Display.class, TermEditModalView.class);
   }
 
   private void configureUserGroups() {
@@ -158,6 +158,12 @@ public class AdministrationModule extends AbstractPresenterModule {
         SubjectProfilePresenter.Proxy.class);
     bindPresenterWidget(ChangePasswordModalPresenter.class, ChangePasswordModalPresenter.Display.class,
         ChangePasswordModalView.class);
+  }
+
+  private void configureR() {
+    bindPresenter(RAdministrationPresenter.class, RAdministrationPresenter.Display.class, RAdministrationView.class,
+        RAdministrationPresenter.Proxy.class);
+    bindPresenterWidget(RSessionsPresenter.class, RSessionsPresenter.Display.class, RSessionsView.class);
   }
 
   private void configureDatashield() {

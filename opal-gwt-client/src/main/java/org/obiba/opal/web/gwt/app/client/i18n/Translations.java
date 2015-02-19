@@ -103,7 +103,9 @@ public interface Translations extends Constants {
       "SUCCEEDED", "Succeeded", //
       "FAILED", "Failed", //
       "CANCEL_PENDING", "Cancel Pending", //
-      "CANCELED", "Cancelled" //
+      "CANCELED", "Cancelled", //
+      "WAITING", "Waiting", //
+      "BUSY", "Busy" //
   })
   Map<String, String> statusMap();
 
@@ -133,7 +135,8 @@ public interface Translations extends Constants {
       "Disable", "Disable",//
       "Generate identifiers", "Generate identifiers",//
       "Download identifiers", "Download identifiers",//
-      "Unregister", "Unregister"//
+      "Unregister", "Unregister", //
+      "Terminate", "Terminate" //
   })
   Map<String, String> actionMap();
 
@@ -310,6 +313,7 @@ public interface Translations extends Constants {
       "VariableNameNotUnique", "The specified variable name already exists.", //
       "jobCancelled", "Job cancelled.", //
       "jobDeleted", "Job removed.", //
+      "rSessionTerminated", "R session terminated.", //
       "completedJobsDeleted", "All completed jobs removed.", //
       "SetCommandStatus_NotFound", "Job could not be cancelled (not found).", //
       "SetCommandStatus_BadRequest_IllegalStatus", "Job status cannot be set to the specified value.", //
@@ -1355,6 +1359,10 @@ public interface Translations extends Constants {
   @Description("Last Update label")
   @DefaultStringValue("Last updated")
   String lastUpdatedLabel();
+
+  @Description("Last Access label")
+  @DefaultStringValue("Last access")
+  String lastAccessLabel();
 
   @Description("Table last update")
   @DefaultStringValue("Table last update")

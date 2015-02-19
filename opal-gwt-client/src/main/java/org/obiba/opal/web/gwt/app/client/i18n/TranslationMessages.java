@@ -237,16 +237,22 @@ public interface TranslationMessages extends Messages {
   String removingTablesFromViewMayAffectVariables();
 
   @Description(
-      "All the completed jobs(succeeded, failed or cancelled )will be removed from the jobs list. Currently running jobs will be unaffected.<br/><br/>Please confirm that you want to clear the jobs list message")
+      "Clear task list confirm message")
   @DefaultMessage(
-      "All the completed jobs(succeeded, failed or cancelled) will be removed from the jobs list. Currently running jobs will be unaffected.<br/><br/>Please confirm that you want to clear the jobs list")
+      "All the completed jobs(succeeded, failed or cancelled) will be removed from the jobs list. Currently running jobs will be unaffected.<br/><br/>Please confirm that you want to clear the jobs list.")
   String confirmClearJobsList();
 
   @Description(
-      "The task will be cancelled. Changes will be rolled back as much as possible:although cancelled, a task might be partially completed.<br/><br/>Please confirm that you want cancel this task message")
+      "Cancel task confirm message")
   @DefaultMessage(
-      "The task will be cancelled. Changes will be rolled back as much as possible:although cancelled, a task might be partially completed.<br/><br/>Please confirm that you want cancel this task")
+      "The task will be cancelled. Changes will be rolled back as much as possible: although cancelled, a task might be partially completed.<br/><br/>Please confirm that you want to cancel this task.")
   String confirmCancelJob();
+
+  @Description(
+      "Terminate R session confirm message")
+  @DefaultMessage(
+      "The R session will be terminated. Any pending computation will be stopped. Any data structure in R memory will be lost.<br/><br/>Please confirm that you want to terminate this R session.")
+  String confirmTerminateRSession();
 
   @Description(
       "The file that you are uploading already exist in the file system.<br/><br/>Please confirm that you want to replace the existing file message")
