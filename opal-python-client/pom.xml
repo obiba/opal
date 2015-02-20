@@ -110,10 +110,7 @@
                   <requires>
                     <require>python</require>
                     <require>python-pycurl</require>
-                    <require>python-protobuf</require>
-                    <require>python-argparse</require>
-                    <require>python-cached-property</require>
-                    <require>python-sortedcontainers</require>
+                    <require>protobuf-python</require>
                   </requires>
 
                   <mappings>
