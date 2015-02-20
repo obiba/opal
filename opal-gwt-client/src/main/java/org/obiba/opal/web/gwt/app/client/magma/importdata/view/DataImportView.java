@@ -138,14 +138,7 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
         .append(formatSelectionStep)//
         .title(translations.dataImportFormatStep())//
 
-        .append(formatStep, new Skippable() {
-          @Override
-          public boolean skip() {
-            String selection = formatChooser.getSelectedValue();
-            return ImportFormat.GEONAMES_POSTAL_CODES.name().equals(selection) ||
-                ImportFormat.HEALTH_CANADA.name().equals(selection);
-          }
-        })//
+        .append(formatStep)//
         .onValidate(new ValidationHandler() {
 
           @Override
@@ -205,9 +198,7 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
           public boolean skip() {
             String selection = formatChooser.getSelectedValue();
             return ImportFormat.LIMESURVEY.name().equals(selection) || ImportFormat.JDBC.name().equals(selection) ||
-                ImportFormat.REST.name().equals(selection) ||
-                ImportFormat.GEONAMES_POSTAL_CODES.name().equals(selection) ||
-                ImportFormat.HEALTH_CANADA.name().equals(selection);
+                ImportFormat.REST.name().equals(selection);
           }
         })//
         .title(translations.dataImportArchiveStep())//
@@ -223,9 +214,6 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
     formatChooser.addItemToGroup(translations.limesurveyLabel(), ImportFormat.LIMESURVEY.name());
     formatChooser.addItemToGroup(translations.opalRestLabel(), ImportFormat.REST.name());
     formatChooser.addItemToGroup(translations.opalJDBCLabel(), ImportFormat.JDBC.name());
-    formatChooser.addGroup(translations.publicDatasources());
-    formatChooser.addItemToGroup(translations.geonamesPostalCodesLabel(), ImportFormat.GEONAMES_POSTAL_CODES.name());
-    formatChooser.addItemToGroup(translations.healthCanadaLabel(), ImportFormat.HEALTH_CANADA.name());
   }
 
   @Override
@@ -420,12 +408,6 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
         break;
       case SPSS:
         helpSpss.setVisible(true);
-        break;
-      case HEALTH_CANADA:
-        helpHealthCanada.setVisible(true);
-        break;
-      case GEONAMES_POSTAL_CODES:
-        helpGeonamesPostalCodes.setVisible(true);
         break;
     }
   }

@@ -20,7 +20,7 @@ public class ImportConfig {
 
   public enum ImportFormat {
 
-    CSV, EXCEL, XML, LIMESURVEY, REST, JDBC, SPSS, HEALTH_CANADA, GEONAMES_POSTAL_CODES
+    CSV, EXCEL, XML, LIMESURVEY, REST, JDBC, SPSS
 
   }
 

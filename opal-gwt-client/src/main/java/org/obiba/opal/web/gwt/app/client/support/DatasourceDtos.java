@@ -60,10 +60,6 @@ public class DatasourceDtos {
         return createRestDatasourceFactoryDto(importConfig);
       case SPSS:
         return createSpssDatasourceFactoryDto(importConfig);
-      case HEALTH_CANADA:
-        return createHCDatasourceFactoryDto(importConfig);
-      case GEONAMES_POSTAL_CODES:
-        return createGNPostalCodesDatasourceFactoryDto(importConfig);
       default:
         throw new IllegalArgumentException("Import data format not supported: " + importConfig.getImportFormat());
     }

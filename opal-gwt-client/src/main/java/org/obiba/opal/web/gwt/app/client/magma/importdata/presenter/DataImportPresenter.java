@@ -342,12 +342,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       case SPSS:
         submitJob(createImportCommandOptionsDto(importConfig.getSpssFile()));
         break;
-      case HEALTH_CANADA:
-        submitJob(createImportCommandOptionsDto(null));
-        break;
-      case GEONAMES_POSTAL_CODES:
-        submitJob(createImportCommandOptionsDto(null));
-        break;
     }
   }
 
