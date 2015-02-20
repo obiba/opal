@@ -49,7 +49,8 @@ public class ProjectPermissionsUpdateListener implements DatasourceUpdateListene
   public void onRename(@Nonnull ValueTable vt, Variable v, String newName) {
     Iterable<SubjectAclService.Permissions> perms = subjectAclService
         .getNodeHierarchyPermissions("opal", getNode(vt, v), null);
-    onDelete(vt);
+    // remove all permissions related to the variable
+    subjectAclService.deleteNodePermissions(getNode(vt, v));
     String prefix = "/variable/";
     String originalStr = prefix + v.getName();
     String newStr = prefix + newName;
