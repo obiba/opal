@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.session.Session;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.CommandUsage;
 
@@ -33,7 +34,8 @@ public abstract class AbstractOpalShell implements OpalShell {
 
   @Override
   public void progress(String message, long current, long end, int percent) {
-    SecurityUtils.getSubject().getSession().touch();
+    Session session = SecurityUtils.getSubject().getSession(false);
+    if(session != null) session.touch();
     printf("%s %d%% (%d/%d)", message, percent, current, end);
   }
 

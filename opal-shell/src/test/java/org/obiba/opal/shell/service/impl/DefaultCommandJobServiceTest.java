@@ -83,6 +83,7 @@ public class DefaultCommandJobServiceTest {
     }).anyTimes();
 
     expect(mockSubject.getPrincipal()).andReturn("testUser").anyTimes();
+    expect(mockSubject.getSession(false)).andStubReturn(null);
 
     ThreadContext.bind(mockSubject);
     replay(mockSubject);

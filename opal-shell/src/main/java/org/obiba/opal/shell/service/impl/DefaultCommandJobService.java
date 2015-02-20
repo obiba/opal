@@ -24,7 +24,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.subject.support.DelegatingSubject;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.shell.CommandJob;
@@ -125,7 +128,8 @@ public class DefaultCommandJobService implements CommandJobService {
   //
 
   @Override
-  public Integer launchCommand(CommandJob commandJob, Subject owner) {
+  public Integer launchCommand(CommandJob commandJob, Subject originalOwner) {
+    Subject owner = getSessionDetachedSubject(originalOwner);
     commandJob.setId(nextJobId());
     commandJob.setOwner(owner.getPrincipal().toString());
     commandJob.setSubmitTime(getCurrentTime());
@@ -208,6 +212,20 @@ public class DefaultCommandJobService implements CommandJobService {
   //
   // Methods
   //
+
+  /**
+   * Returns a session detached subject. This makes sure the job is immune to sessiontimeouts/logouts (OPAL-2717)
+   *
+   * @param original
+   * @return session detached Subject
+   */
+  protected Subject getSessionDetachedSubject(Subject original) {
+    if(original.getSession(false) != null && original instanceof DelegatingSubject) {
+      //only creates a detached subject if has a session and is a DelegatingSubject
+      return new SessionDetachedSubject((DelegatingSubject) original);
+    }
+    return original;
+  }
 
   public void setExecutor(Executor executor) {
     this.executor = executor;
@@ -323,6 +341,31 @@ public class DefaultCommandJobService implements CommandJobService {
         return -1;
       }
       return o1.getSubmitTime().before(o2.getSubmitTime()) ? 1 : 0;
+    }
+  }
+
+  /**
+   * Shiro's DelegatingSubject impl that is not tied to a session, but only to the principals of a given original session.
+   */
+  static class SessionDetachedSubject extends DelegatingSubject {
+
+    SessionDetachedSubject(DelegatingSubject source) {
+      super(source.getPrincipals(), source.isAuthenticated(), null, null, source.getSecurityManager());
+    }
+
+    @Override
+    public void login(AuthenticationToken token) throws AuthenticationException {
+      //no login allowed
+    }
+
+    @Override
+    public void logout() {
+      //no logout possible
+    }
+
+    @Override
+    protected boolean isSessionCreationEnabled() {
+      return false; //no session creation allowed
     }
   }
 
