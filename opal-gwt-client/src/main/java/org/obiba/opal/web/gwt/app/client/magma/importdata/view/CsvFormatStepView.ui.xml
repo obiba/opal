@@ -24,7 +24,7 @@
       </b:ControlLabel>
       <o:OpalSimplePanel ui:field="selectFilePanel"/>
       <b:HelpBlock>
-        <ui:msg description="CSV File Description label">Data in CSV format are in a text file (.csv)</ui:msg>
+        <ui:msg description="CSV File Description label">Data in "delimiter separated values" format are in a text file (.csv or .tsv)</ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 
