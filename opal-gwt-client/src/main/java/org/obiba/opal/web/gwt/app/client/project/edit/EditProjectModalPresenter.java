@@ -6,7 +6,6 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectCreatedEvent;
@@ -41,7 +40,6 @@ import com.gwtplatform.mvp.client.PopupView;
 import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
 import static com.google.gwt.http.client.Response.SC_CREATED;
 import static com.google.gwt.http.client.Response.SC_OK;
-import static com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE;
 
 public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectModalPresenter.Display>
     implements EditProjectUiHandlers {
@@ -108,36 +106,8 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
   }
 
   private void create() {
-    if(validationHandler.validate()) {
-      // Validate database connection
-      String databaseName = getView().getDatabase().getText();
-      if(Strings.isNullOrEmpty(databaseName)) {
-        createProject();
-        return;
-      }
-
-      if(validationHandler.validate()) {
-        // Validate database connection
-        final String name = getView().getDatabase().getText();
-        ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
-            .forResource(UriBuilders.DATABASE_CONNECTIONS.create().build(name)) //
-            .withCallback(SC_OK, new ResponseCodeCallback() {
-              @Override
-              public void onResponseCode(Request request, Response response) {
-                createProject();
-              }
-            }) //
-            .withCallback(SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
-              @Override
-              public void onResponseCode(Request request, Response response) {
-                getView().showError(Display.FormField.DATABASE, TranslationsUtils
-                    .replaceArguments(translations.userMessageMap().get("FailedToConnectToDatabase"), name));
-                getView().setBusy(false);
-              }
-            }) //
-            .post().send();
-      }
-    }
+    if(!validationHandler.validate()) return;
+    createProject();
   }
 
   private void update() {

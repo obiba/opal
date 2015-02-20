@@ -58,6 +58,9 @@ public class ProjectsResource {
   @POST
   public Response createProject(@Context UriInfo uriInfo, Projects.ProjectFactoryDto projectFactoryDto) {
     Project project = Dtos.fromDto(projectFactoryDto);
+    // verify project does not exists
+    if(projectService.hasProject(project.getName())) throw new IllegalArgumentException("Project already exists");
+    
     projectService.save(project);
     URI projectUri = uriInfo.getBaseUriBuilder().path("project").path(project.getName()).build();
     return Response.created(projectUri)

@@ -22,6 +22,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class ErrorResponseCallback implements ResponseCodeCallback {
 
   private static final Translations translations = GWT.create(Translations.class);
+
   private static final TranslationMessages translationMessages = GWT.create(TranslationMessages.class);
 
   private final Widget widget;
@@ -37,9 +38,14 @@ public class ErrorResponseCallback implements ResponseCodeCallback {
       ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
       Collection<ConstraintViolationErrorDto> violationDtos = parseErrors(error);
       if(violationDtos.isEmpty()) {
-        String defaultMessage = translationMessages
-            .unknownResponse(error.getStatus(), String.valueOf(JsArrays.toList(error.getArgumentsArray())));
-        builder.message(ClientErrorDtoMessageBuilder.get(error).withdefaultMessage(defaultMessage).build());
+        if(translations.userMessageMap().containsKey(error.getStatus())) {
+          builder.message(TranslationsUtils.replaceArguments(translations.userMessageMap().get(error.getStatus()),
+              JsArrays.toList(error.getArgumentsArray())));
+        } else {
+          String defaultMessage = translationMessages
+              .unknownResponse(error.getStatus(), String.valueOf(JsArrays.toList(error.getArgumentsArray())));
+          builder.message(ClientErrorDtoMessageBuilder.get(error).withdefaultMessage(defaultMessage).build());
+        }
       } else {
         builder.violations(violationDtos);
       }
