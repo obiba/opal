@@ -337,9 +337,16 @@ message VocabularyDto {
 
 message TaxonomiesDto {
   message TaxonomySummaryDto {
+    message VocabularySummaryDto {
+      required string name = 1;
+      repeated LocaleTextDto title = 2;
+    }
+
     required string name = 1;
     repeated LocaleTextDto title = 2;
+    repeated VocabularySummaryDto vocabularySummaries = 3;
   }
+
   repeated TaxonomySummaryDto summaries = 1;
 }
 
