@@ -168,7 +168,7 @@
                   <goal>attached-rpm</goal>
                 </goals>
                 <configuration>
-                  <name>opal</name>
+                  <name>opal-server</name>
                   <version>${project.version}</version>
                   <!--release>${project.version}-b${buildNumber}</release-->
                   <license>see /usr/share/doc/opal/copyright</license>
