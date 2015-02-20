@@ -16,6 +16,7 @@ import org.obiba.magma.Timestamped;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
+import org.obiba.magma.math.summary.BinaryVariableSummaryFactory;
 import org.obiba.magma.math.summary.CategoricalVariableSummary;
 import org.obiba.magma.math.summary.CategoricalVariableSummaryFactory;
 import org.obiba.magma.math.summary.ContinuousVariableSummary;
@@ -198,6 +199,9 @@ public abstract class AbstractVariableSummaryCachedService< //
     }
     if(summaryFactory instanceof TextVariableSummaryFactory) {
       return "text";
+    }
+    if(summaryFactory instanceof BinaryVariableSummaryFactory) {
+      return "binary";
     }
     if(summaryFactory instanceof GeoVariableSummaryFactory) {
       return "geo";

@@ -437,7 +437,8 @@ public final class Dtos {
     for(BinaryVariableSummary.Frequency frequency : summary.getFrequencies()) {
       Math.FrequencyDto.Builder freqBuilder = Math.FrequencyDto.newBuilder() //
           .setValue(frequency.getValue()) //
-          .setFreq(frequency.getFreq());
+          .setFreq(frequency.getFreq())//
+          .setMissing(false);
       if(isNumeric(frequency.getPct())) freqBuilder.setPct(frequency.getPct());
       dtoBuilder.addFrequencies(freqBuilder);
     }

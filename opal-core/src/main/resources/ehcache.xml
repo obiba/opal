@@ -52,6 +52,14 @@
       overflowToDisk="true"
       diskPersistent="true"/>
 
+  <cache name="opal-variable-summary-binary"
+      maxElementsInMemory="1"
+      eternal="true"
+      timeToLiveSeconds="0"
+      timeToIdleSeconds="0"
+      overflowToDisk="true"
+      diskPersistent="true"/>
+
   <cache name="opal-variable-summary-geo"
       maxElementsInMemory="1"
       eternal="true"
