@@ -49,6 +49,33 @@ public class Dtos {
     return builder.build();
   }
 
+  public static Opal.TaxonomiesDto.TaxonomySummaryDto asVocabularySummaryDto(Taxonomy taxonomy) {
+    Opal.TaxonomiesDto.TaxonomySummaryDto.Builder builder = Opal.TaxonomiesDto.TaxonomySummaryDto.newBuilder();
+    builder.setName(taxonomy.getName());
+    builder.addAllTitle(toLocaleTextDtoList(taxonomy.getTitle()));
+
+    if(taxonomy.hasVocabularies()) {
+      builder.addAllVocabularySummaries(Iterables.transform(taxonomy.getVocabularies(),
+          new Function<Vocabulary, Opal.TaxonomiesDto.TaxonomySummaryDto.VocabularySummaryDto>() {
+            @Nullable
+            @Override
+            public Opal.TaxonomiesDto.TaxonomySummaryDto.VocabularySummaryDto apply(@Nullable Vocabulary input) {
+              return asSummaryDto(input);
+            }
+          }));
+    }
+
+    return builder.build();
+  }
+
+  private static Opal.TaxonomiesDto.TaxonomySummaryDto.VocabularySummaryDto asSummaryDto(Vocabulary vocabulary){
+    Opal.TaxonomiesDto.TaxonomySummaryDto.VocabularySummaryDto.Builder builder
+        = Opal.TaxonomiesDto.TaxonomySummaryDto.VocabularySummaryDto.newBuilder();
+    builder.setName(vocabulary.getName());
+    builder.addAllTitle(toLocaleTextDtoList(vocabulary.getTitle()));
+    return builder.build();
+  }
+
   private static Iterable<? extends Opal.LocaleTextDto> toLocaleTextDtoList(Map<String, String> map) {
     Collection<Opal.LocaleTextDto> localeTexts = new ArrayList<>();
 
