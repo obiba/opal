@@ -13,7 +13,7 @@
 
   <properties>
     <install.dir>/usr/share</install.dir>
-    <opal.dir>${install.dir}/opal-server-${project.version}</opal.dir>
+    <opal.dir>${install.dir}/opal-server</opal.dir>
     <package.name>opal-server-${project.version}</package.name>
     <dist.location>${basedir}/target/${package.name}-dist/${package.name}</dist.location>
   </properties>
@@ -185,8 +185,6 @@
                     <mapping>
                       <directory>${opal.dir}/bin</directory>
                       <filemode>755</filemode>
-                      <username>root</username>
-                      <groupname>root</groupname>
                       <sources>
                         <source>
                           <location>${dist.location}/bin</location>
@@ -202,8 +200,6 @@
                     <mapping>
                       <directory>${opal.dir}/tools</directory>
                       <filemode>755</filemode>
-                      <username>root</username>
-                      <groupname>root</groupname>
                       <sources>
                         <source>
                           <location>${dist.location}/tools</location>
@@ -228,8 +224,6 @@
                     <mapping>
                       <directory>/etc/init</directory>
                       <filemode>644</filemode>
-                      <username>root</username>
-                      <groupname>root</groupname>
                       <directoryIncluded>false</directoryIncluded>
                       <sources>
                         <source>
@@ -241,8 +235,6 @@
                     <mapping>
                       <directory>/etc/default</directory>
                       <filemode>644</filemode>
-                      <username>root</username>
-                      <groupname>root</groupname>
                       <directoryIncluded>false</directoryIncluded>
                       <sources>
                         <source>
@@ -255,8 +247,6 @@
                     <mapping>
                       <directory>${opal.dir}/lib</directory>
                       <filemode>440</filemode>
-                      <username>root</username>
-                      <groupname>root</groupname>
                       <sources>
                         <source>
                           <location>${dist.location}/lib</location>
@@ -266,8 +256,6 @@
                     <mapping>
                       <directory>${opal.dir}/tools/lib</directory>
                       <filemode>440</filemode>
-                      <username>root</username>
-                      <groupname>root</groupname>
                       <sources>
                         <source>
                           <location>${dist.location}/tools/lib</location>
@@ -276,8 +264,6 @@
                     </mapping>
                     <mapping>
                       <directory>${opal.dir}/webapp</directory>
-                      <username>root</username>
-                      <groupname>root</groupname>
                       <sources>
                         <source>
                           <location>${dist.location}/webapp</location>
@@ -323,16 +309,8 @@
                     <fileEncoding>utf-8</fileEncoding>
                   </preinstallScriptlet>
                   <postinstallScriptlet>
-                    <script>
-                      # creates symlinks, making sure the old ones are deleted
-                      rm -f ${install.dir}/opal
-                      rm -f /var/lib/opal/conf
-                      ln -s ${opal.dir} ${install.dir}/opal
-                      ln -s /etc/opal /var/lib/opal/conf
-                      # restart opal if is running
-                      status opal | grep -q "^opal start" > /dev/null
-                      if [ $? ]; then restart opal; fi
-                    </script>
+                    <scriptFile>src/main/rpm/postinstall.sh</scriptFile>
+                    <fileEncoding>utf-8</fileEncoding>
                   </postinstallScriptlet>
                 </configuration>
               </execution>

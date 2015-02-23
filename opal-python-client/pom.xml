@@ -118,8 +118,6 @@
                     <mapping>
                       <directory>/usr/bin</directory>
                       <filemode>755</filemode>
-                      <username>root</username>
-                      <groupname>root</groupname>
                       <sources>
                         <source>
                           <location>${basedir}/target/opal-python/bin/scripts</location>
@@ -133,8 +131,6 @@
                     <mapping>
                       <directory>/usr/share/pyshared/opal</directory>
                       <filemode>755</filemode>
-                      <username>root</username>
-                      <groupname>root</groupname>
                       <sources>
                         <source>
                           <location>${basedir}/target/opal-python/bin/opal</location>
@@ -148,8 +144,6 @@
                     <mapping>
                       <directory>/usr/share/doc/opal-python-client</directory>
                       <filemode>744</filemode>
-                      <username>root</username>
-                      <groupname>root</groupname>
                       <documentation>true</documentation>
                       <sources>
                         <source>
