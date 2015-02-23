@@ -305,11 +305,11 @@
                     </mapping>
                   </mappings>
                   <preinstallScriptlet>
-                    <scriptFile>src/main/rpm/preinstall.sh</scriptFile>
+                    <scriptFile>src/main/rpm/scripts/preinstall.sh</scriptFile>
                     <fileEncoding>utf-8</fileEncoding>
                   </preinstallScriptlet>
                   <postinstallScriptlet>
-                    <scriptFile>src/main/rpm/postinstall.sh</scriptFile>
+                    <scriptFile>src/main/rpm/scripts/postinstall.sh</scriptFile>
                     <fileEncoding>utf-8</fileEncoding>
                   </postinstallScriptlet>
                 </configuration>
