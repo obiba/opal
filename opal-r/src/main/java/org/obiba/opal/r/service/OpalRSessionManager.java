@@ -247,9 +247,9 @@ public class OpalRSessionManager implements ServiceListener<OpalRService> {
 
     public void removeRSession(String rSessionId) {
       OpalRSession rSession = getRSession(rSessionId);
-      rSessions.remove(rSession);
       try {
         rSession.close();
+        rSessions.remove(rSession);
       } catch(Exception e) {
         log.warn("Failed closing R session: {}", rSessionId, e);
       }

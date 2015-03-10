@@ -123,6 +123,7 @@ public class OpalRSession implements RASyncOperationTemplate {
 
   /**
    * Check if the R session is not busy and has expired.
+   *
    * @param timeout in minutes
    * @return
    */
@@ -260,7 +261,7 @@ public class OpalRSession implements RASyncOperationTemplate {
    */
   private void close(RConnection connection) {
     if(connection == null) return;
-    if (!Strings.isNullOrEmpty(connection.getLastError()) && !connection.getLastError().toLowerCase().equals("ok")) {
+    if(!Strings.isNullOrEmpty(connection.getLastError()) && !connection.getLastError().toLowerCase().equals("ok")) {
       throw new RRuntimeException("Unexpected R server error: " + connection.getLastError());
     }
     try {
