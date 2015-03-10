@@ -16,7 +16,6 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.StatusImageCell;
-import org.obiba.opal.web.gwt.datetime.client.Duration;
 import org.obiba.opal.web.gwt.datetime.client.FormatType;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.model.client.opal.r.RSessionDto;
@@ -133,9 +132,7 @@ public class RSessionsView extends ViewWithUiHandlers<RSessionsUiHandlers> imple
       @Override
       public String getValue(RSessionDto object) {
         if(!object.hasLastAccessDate()) return "-";
-        Moment end = Moment.create(object.getLastAccessDate());
-        Moment start = Moment.create(object.getCreationDate());
-        return end.format(FormatType.MONTH_NAME_TIME_SHORT) + " [" + Duration.create(start, end).humanize() + "]";
+        return Moment.create(object.getLastAccessDate()).fromNow();
       }
     }, translations.lastAccessLabel());
 
@@ -158,10 +155,8 @@ public class RSessionsView extends ViewWithUiHandlers<RSessionsUiHandlers> imple
     actionsColumn.setActionHandler(new ActionHandler<RSessionDto>() {
       @Override
       public void doAction(RSessionDto dto, String actionName) {
-        if(actionName != null) {
-          if(RSessionsPresenter.TERMINATE_ACTION.equals(actionName)) {
-            getUiHandlers().onTerminate(dto);
-          }
+        if(actionName != null && RSessionsPresenter.TERMINATE_ACTION.equals(actionName)) {
+          getUiHandlers().onTerminate(dto);
         }
       }
     });
@@ -191,8 +186,7 @@ public class RSessionsView extends ViewWithUiHandlers<RSessionsUiHandlers> imple
             StatusImageCell.BULLET_ORANGE;
       }
       // Other
-      return "?:" +
-          StatusImageCell.BULLET_BLACK;
+      return "?:" + StatusImageCell.BULLET_BLACK;
     }
   }
 }
