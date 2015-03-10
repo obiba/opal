@@ -89,6 +89,12 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   }
 
   @Override
+  public void beforeRenderProjects() {
+    tablePager.setPagerVisible(false);
+    projectsTable.showLoadingIndicator(projectsDataProvider);
+  }
+
+  @Override
   public void setProjects(JsArray<ProjectDto> projects) {
     renderProjectsTable(JsArrays.toList(projects));
   }
@@ -127,6 +133,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   }
 
   private void renderProjectsTable(List<ProjectDto> projectDtos) {
+    projectsTable.hideLoadingIndicator();
     projectsDataProvider.setList(projectDtos);
     tablePager.firstPage();
     projectsDataProvider.refresh();

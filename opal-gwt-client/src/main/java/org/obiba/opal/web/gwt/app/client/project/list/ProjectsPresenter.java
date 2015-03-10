@@ -95,6 +95,7 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
   }
 
   private void refresh() {
+    getView().beforeRenderProjects();
     ResourceRequestBuilderFactory.<JsArray<ProjectDto>>newBuilder() //
         .forResource("/projects") //
         .withCallback(new ResourceCallback<JsArray<ProjectDto>>() {
@@ -169,6 +170,9 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
   }
 
   public interface Display extends View, HasUiHandlers<ProjectsUiHandlers> {
+
+    void beforeRenderProjects();
+
     void setProjects(JsArray<ProjectDto> projects);
 
     HasAuthorization getAddProjectAuthorizer();
