@@ -132,7 +132,15 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     if(limit < entitiesCount) {
       uriBuilder.query("limit", String.valueOf(limit));
     }
-    resourceRequestBuilder.forResource(uriBuilder.build()).get();
+
+    String target = uriBuilder.build();
+    resourceRequestBuilder.forResource(target);
+    if(target.contains("_transient")) {
+      //for script evaluation, we must use post so the script/categories are passed in the form, otherwise the summary is incorrect
+      resourceRequestBuilder.post();
+    } else {
+      resourceRequestBuilder.get();
+    }
 
     onReset();
   }
