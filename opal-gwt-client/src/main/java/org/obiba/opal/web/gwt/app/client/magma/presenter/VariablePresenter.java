@@ -276,6 +276,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     scriptEditorPresenter.setScript(script);
     scriptEditorPresenter.setRepeatable(variable.getIsRepeatable());
     scriptEditorPresenter.setValueEntityType(variable.getValueType());
+    scriptEditorPresenter.setCategories(variable.getCategoriesArray());
   }
 
   private void authorize() {
