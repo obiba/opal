@@ -18,6 +18,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.apache.http.Header;
 import org.apache.http.HttpMessage;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -49,6 +50,8 @@ import org.apache.http.impl.client.cache.ManagedHttpCacheStorage;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Files;
 import com.google.protobuf.Message;
@@ -57,6 +60,8 @@ import com.google.protobuf.Message;
  * A Java client for Opal RESTful services.
  */
 public class OpalJavaClient {
+
+  private static final Logger log = LoggerFactory.getLogger(OpalJavaClient.class);
 
   private final URI opalURI;
 
@@ -75,6 +80,7 @@ public class OpalJavaClient {
 
     this.opalURI = new URI(uri.endsWith("/") ? uri : uri + "/");
 
+    log.info("Connecting to Opal: {}", opalURI);
     DefaultHttpClient httpClient = new DefaultHttpClient();
     httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, credentials = new UsernamePasswordCredentials(username, password));
     httpClient.getParams().setParameter(ClientPNames.HANDLE_AUTHENTICATION, Boolean.TRUE);
@@ -122,7 +128,10 @@ public class OpalJavaClient {
   }
 
   public void close() {
-    this.client.getConnectionManager().shutdown();
+    if (client != null) {
+      log.info("Disconnecting from Opal: {}", opalURI);
+      this.client.getConnectionManager().shutdown();
+    }
   }
 
   public UriBuilder newUri() {
@@ -234,6 +243,12 @@ public class OpalJavaClient {
   private HttpResponse execute(HttpUriRequest msg) throws ClientProtocolException, IOException {
     msg.addHeader("Accept", "application/x-protobuf, text/html");
     authenticate(msg);
+    log.debug("{} {}", msg.getMethod(), msg.getURI());
+    if(log.isTraceEnabled()) {
+      for(Header allHeader : msg.getAllHeaders()) {
+        log.trace("  {} {}", allHeader.getName(), allHeader.getValue());
+      }
+    }
     try {
       return client.execute(msg, ctx);
     } finally {

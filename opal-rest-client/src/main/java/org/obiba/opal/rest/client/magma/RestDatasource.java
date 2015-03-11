@@ -110,7 +110,7 @@ public class RestDatasource extends AbstractDatasource {
 
   @Override
   protected ValueTable initialiseValueTable(final String tableName) {
-    return new RestValueTable(this, opalClient.getResource(TableDto.class, newReference("table", tableName), TableDto.newBuilder()));
+    return new RestValueTable(this, opalClient.getResource(TableDto.class, newUri("table", tableName).query("counts", "false").build(), TableDto.newBuilder()));
   }
 
   private void refresh() {
@@ -146,6 +146,10 @@ public class RestDatasource extends AbstractDatasource {
 
   URI newReference(String... segments) {
     return uriBuilder().segment(segments).build();
+  }
+
+  UriBuilder newUri(String... segments) {
+    return uriBuilder().segment(segments);
   }
 
   URI buildURI(final URI root, String... segments) {
