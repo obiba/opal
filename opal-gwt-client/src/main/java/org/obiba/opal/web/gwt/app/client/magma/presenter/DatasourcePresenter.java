@@ -255,6 +255,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       }
       getView().renderRows(filteredTables);
     }
+    getView().afterRenderRows();
   }
 
   /**
