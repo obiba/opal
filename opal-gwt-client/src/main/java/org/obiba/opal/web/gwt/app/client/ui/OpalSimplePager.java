@@ -62,7 +62,7 @@ public class OpalSimplePager extends SimplePager {
     if (visible) {
       panel.removeStyleName("simple-pager-total-panel");
       panel.remove(totalBadge);
-    } else if (total > 0 && showTotalWhenNoPager) {
+    } else if (total >= 0 && showTotalWhenNoPager) {
       totalBadge.setText(translationMessages.cellTableTotalCount(total));
       panel.addStyleName("simple-pager-total-panel");
       panel.add(totalBadge);
