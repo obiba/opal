@@ -1,0 +1,35 @@
+#!/bin/sh
+#chkconfig: 2345 80 05
+#description: Rserve
+  
+NAME=Rserver
+USER=rserve
+RSERVER_ADMIN=/var/lib/rserve/rserver-admin-1.0.0/bin/rserver-admin
+RSERVER_HOME=/var/lib/$USER
+  
+case "$1" in
+# Start command
+start)
+ echo "Starting $NAME"
+ cd /tmp
+ sudo -u $USER /usr/bin/env RSERVER_HOME=$RSERVER_HOME $RSERVER_ADMIN > $RSERVER_HOME/stdout.log 2>&1 &
+ ;;
+# Stop command
+stop)
+ echo "Stopping $NAME"
+ killall -u $USER && echo "$NAME stopped successfully"
+ ;;
+# Restart command
+restart)
+ $0 stop
+ sleep 5
+ $0 start
+ ;;
+*)
+ echo "Usage: /etc/init.d/$NAME {start|restart|stop}"
+ exit 1
+ ;;
+esac
+  
+exit 0
+

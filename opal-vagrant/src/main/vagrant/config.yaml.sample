@@ -1,0 +1,49 @@
+---
+
+# To customize the guest VM, copy this file to config.yaml, edit it (comment out what you want to override).
+
+# Every Vagrant virtual environment requires a box to build off of.
+# Make sure the distro (redhat or debian) is aligned with the box.
+
+#box: 'ubuntu/trusty64'
+#distro: 'debian'
+
+# Name of the vitualbox image. This name is unique per host, so a 2nd Opal VM will require a different name
+
+#name: 'opal-server2'
+
+# Disable automatic box update checking. If you disable this, then
+# boxes will only be checked for updates when the user runs
+# `vagrant box outdated`. This is not recommended.
+
+#box_check_update: true
+
+# false will boot with headless mode
+#box_gui: false
+
+# memory in MB of the guest VM
+
+#vm_memory: 8192
+
+# number of cpus in the guest VM
+
+#vm_cpus: 2
+
+# Array of forwarded ports
+# Each item is an array with 2 args to forward a port in the host to a port in the guest 
+# The first argument is the source host port 
+# The second argument is the target guest port
+# ATTENTION: Opal needs at least guest ports 8080 and 8443 to be forwarded to from the host.
+# So remember to always have port forwards for those, otherwise Opal cannot be used outside the VM
+
+#forwarded_ports: [[8080,8080], [8443,8443]]
+
+# Array of synchronized folders
+# Each item is an array with 2 or 3 args that will share a folder to the guest VM. 
+# The first argument is the path on the host to the actual folder. 
+# The second argument the path on the guest to mount the folder. 
+# The optional third argument is a set of non-required options.
+# Example: 
+# synced_folders: [['host_path1', 'guest_path1'], ['host_path2', 'guest_path2']]
+
+#synced_folders: []

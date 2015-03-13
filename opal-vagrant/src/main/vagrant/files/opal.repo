@@ -1,0 +1,9 @@
+[opal]
+name=Opal Repository
+baseurl=https://repo.thehyve.nl/content/repositories/snapshots
+enabled=1
+protect=0
+gpgcheck=0
+metadata_expire=30s
+autorefresh=1
+type=rpm-md
