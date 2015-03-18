@@ -34,6 +34,8 @@ import org.obiba.magma.js.JavascriptVariableValueSource;
 import org.obiba.magma.support.StaticDatasource;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.type.BooleanType;
+import org.obiba.magma.views.View;
+import org.obiba.magma.views.support.AllClause;
 import org.obiba.opal.core.service.DataImportService;
 import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
 import org.obiba.opal.web.model.Magma;
@@ -312,7 +314,8 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
     }
     Variable transientVariable = buildTransientVariable(resolveValueType(valueTypeName), repeatable, script, categories,
         missingCategories);
-    JavascriptVariableValueSource valueSource = new JavascriptVariableValueSource(transientVariable, getValueTable());
+    View transientView = new View("transient", new AllClause(), new AllClause(), getValueTable());
+    JavascriptVariableValueSource valueSource = new JavascriptVariableValueSource(transientVariable, transientView);
     valueSource.initialise();
     return valueSource;
   }
