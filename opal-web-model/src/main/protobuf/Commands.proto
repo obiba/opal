@@ -59,6 +59,7 @@ message CopyCommandOptionsDto {
   repeated string tables = 6;
   optional bool copyNullValues = 7;
   optional string destinationTableName = 8;
+  optional string query = 9;
 }
 
 message ExportCommandOptionsDto {
@@ -73,6 +74,7 @@ message ExportCommandOptionsDto {
   optional bool copyNullValues = 9;
   optional string destinationTableName = 10;
   optional Identifiers.IdentifiersMappingConfigDto idConfig = 11;
+  optional string query = 12;
 }
 
 message ReportCommandOptionsDto {

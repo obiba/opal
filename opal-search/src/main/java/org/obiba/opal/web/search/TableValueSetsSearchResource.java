@@ -33,6 +33,7 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.VariableEntityBean;
+import org.obiba.opal.search.AbstractSearchUtility;
 import org.obiba.opal.search.SearchQueryException;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Search;
@@ -54,7 +55,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 @Path("/datasource/{ds}/table/{table}/valueSets/_search")
 @Api(value = "/datasource/{ds}/table/{table}/valueSets/_search",
     description = "Executes a query on an Elastic Search values index")
-public class TableValueSetsSearchResource extends AbstractVariablesSearchResource {
+public class TableValueSetsSearchResource extends AbstractSearchUtility {
 
 //  private static final Logger log = LoggerFactory.getLogger(TableVariablesSearchResource.class);
 
