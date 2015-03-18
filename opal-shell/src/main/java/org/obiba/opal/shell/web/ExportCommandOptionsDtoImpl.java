@@ -20,6 +20,8 @@ import org.obiba.opal.web.model.Commands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
+
 /**
  * Implementation of {@link org.obiba.opal.shell.commands.options.CopyCommandOptions} based on an instance of {@link org.obiba.opal.web.model.Commands.CopyCommandOptionsDto}.
  */
@@ -110,6 +112,16 @@ public class ExportCommandOptionsDtoImpl implements CopyCommandOptions {
   @Override
   public boolean isName() {
     return dto.hasDestinationTableName();
+  }
+
+  @Override
+  public String getQuery() {
+    return dto.getQuery();
+  }
+
+  @Override
+  public boolean isQuery() {
+    return dto.hasQuery() && !Strings.isNullOrEmpty(dto.getQuery());
   }
 
   @Override

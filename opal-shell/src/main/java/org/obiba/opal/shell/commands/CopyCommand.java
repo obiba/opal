@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -39,11 +40,13 @@ import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.obiba.opal.core.magma.QueryWhereClause;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -64,6 +67,9 @@ import com.google.common.collect.Lists;
 public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommandOptions> {
 
   private static final Logger log = LoggerFactory.getLogger(CopyCommand.class);
+
+  @Autowired
+  ApplicationContext applicationContext;
 
   @Autowired
   private DataExportService dataExportService;
@@ -202,30 +208,43 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   private Set<ValueTable> getValueTables() {
-    HashMap<String, ValueTable> names = new HashMap<>();
+    Map<String, ValueTable> tablesByName = new HashMap<>();
 
     if(options.isSource()) {
       for(ValueTable table : getDatasourceByName(options.getSource()).getValueTables()) {
-        names.put(table.getDatasource().getName() + "." + table.getName(), table);
+        tablesByName.put(table.getDatasource().getName() + "." + table.getName(), table);
       }
     }
 
     if(options.getTables() != null) {
       for(String name : options.getTables()) {
-        if(!names.containsKey(name)) {
-          names.put(name, MagmaEngineTableResolver.valueOf(name).resolveTable());
+        if(!tablesByName.containsKey(name)) {
+          tablesByName.put(name, MagmaEngineTableResolver.valueOf(name).resolveTable());
         }
       }
     }
 
-    if(names.size() == 1 && options.isName()) {
-      String originalName = names.keySet().iterator().next();
+    applyNameOption(tablesByName);
+
+
+    return ImmutableSet.copyOf(tablesByName.values());
+  }
+
+  private void applyNameOption(Map<String, ValueTable> tablesByName) {
+    if(tablesByName.size() == 1 && options.isName()) {
+      String originalName = tablesByName.keySet().iterator().next();
       if(originalName.equals(options.getDestination() + "." + options.getName()))
         throw new IllegalArgumentException("Cannot copy a table into itself: " + originalName);
-      names.put(originalName, new RenameValueTable(options.getName(), names.get(originalName)));
+      tablesByName.put(originalName, new RenameValueTable(options.getName(), tablesByName.get(originalName)));
     }
+  }
 
-    return ImmutableSet.copyOf(names.values());
+  private void applyQueryOption(Map<String, ValueTable> tablesByName) {
+    //if (!options.isQuery()) return;
+
+    QueryWhereClause queryWhereClause = applicationContext.getBean("searchQueryWhereClause", QueryWhereClause.class);
+    //queryWhereClause.setQuery(options.getQuery());
+
   }
 
   private Datasource getDatasourceByName(String datasourceName) {
