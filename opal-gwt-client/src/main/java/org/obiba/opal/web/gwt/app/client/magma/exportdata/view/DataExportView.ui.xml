@@ -49,6 +49,22 @@
       </b:HelpBlock>
     </b:ControlGroup>
 
+    <!--Query-->
+    <b:ControlGroup ui:field="queryPanel" visible="false">
+      <b:ControlLabel>
+        <ui:msg description="Entities Filter field">Entities Filter</ui:msg>
+      </b:ControlLabel>
+      <b:CheckBox ui:field="applyQuery" value="true">
+        <ui:msg description="Apply Query label">Apply query</ui:msg>:
+      </b:CheckBox>
+      <b:Alert close="false" type="INFO" addStyleNames="bottom-margin">
+        <g:Label ui:field="queryLabel"/>
+      </b:Alert>
+      <b:HelpBlock>
+        <ui:msg description="Export Query help">Only export entities matching this query.</ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+
     <!--Identifiers-->
     <b:ControlGroup ui:field="identifiersPanel" visible="false">
       <b:ControlLabel>

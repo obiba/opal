@@ -22,12 +22,15 @@ import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
+import com.github.gwtbootstrap.client.ui.CheckBox;
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -64,6 +67,15 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
   @UiField
   Chooser fileFormat;
 
+  @UiField
+  Panel queryPanel;
+
+  @UiField
+  CheckBox applyQuery;
+
+  @UiField
+  Label queryLabel;
+
   private FileSelectionPresenter.Display fileSelection;
 
   @Inject
@@ -92,6 +104,24 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
 
   private String getSelectedIdentifiersMapping() {
     return identifiers.getSelectedIndex() == 0 ? null : identifiers.getSelectedValue();
+  }
+
+  @UiHandler("applyQuery")
+  public void onCheck(ClickEvent event) {
+    queryLabel.getElement().getParentElement().getParentElement()
+        .setAttribute("style", applyQuery.getValue() ? "" : "opacity: 0.5;");
+  }
+
+  @Override
+  public void setValuesQuery(String query) {
+    queryPanel.setVisible(!Strings.isNullOrEmpty(query) && !"*".equals(query));
+    applyQuery.setValue(queryPanel.isVisible());
+    queryLabel.setText(query);
+  }
+
+  @Override
+  public boolean applyQuery() {
+    return applyQuery.getValue();
   }
 
   @Override

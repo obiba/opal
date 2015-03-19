@@ -2015,7 +2015,8 @@ public interface Translations extends Constants {
       "in", "In", //
       "not_in", "Not in",//
       "select", "Select",//
-      "range", "Range", "values", "Values", //
+      "range", "Range", //
+      "values", "Values", //
       "custom_match_query", "Custom match query",//
       "like", "Like", //
       "not_like", "Not like",//

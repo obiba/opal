@@ -546,6 +546,11 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   }
 
   @Override
+  public String getQueryText() {
+    return filters.getQueryText();
+  }
+
+  @Override
   public ControlGroup getValuesFilterGroup() {
     return valuesFilterGroup;
   }
