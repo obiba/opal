@@ -101,7 +101,7 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
 
   @Override
   public boolean isQuery() {
-    return dto.hasQuery() && !Strings.isNullOrEmpty(dto.getQuery());
+    return dto.hasQuery() && !Strings.isNullOrEmpty(dto.getQuery()) && !"*".equals(dto.getQuery());
   }
 
   @Override
