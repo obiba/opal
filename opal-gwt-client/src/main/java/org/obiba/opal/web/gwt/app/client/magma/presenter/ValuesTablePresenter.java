@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.ValuesQueryEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
@@ -232,6 +233,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   private void applyAllValueSetsFilter(final int offset) {
     if(getView().getValuesFilterGroup().isVisible()) {
       String filters = getView().getQueryString();
+
+      fireEvent(new ValuesQueryEvent(filters, getView().getQueryText()));
 
       ResourceRequestBuilderFactory.<ValueSetsResultDto>newBuilder()
           .forResource(UriBuilders.DATASOURCE_TABLE_VALUESETS_SEARCH.create()//
@@ -562,6 +565,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     void addVariableFilter(CriterionDropdown criterion, boolean removeable, boolean opened);
 
     String getQueryString();
+
+    String getQueryText();
 
     ControlGroup getValuesFilterGroup();
 

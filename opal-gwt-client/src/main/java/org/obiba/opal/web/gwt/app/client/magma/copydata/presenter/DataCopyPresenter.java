@@ -26,6 +26,7 @@ import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.CopyCommandOptionsDto;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
@@ -40,6 +41,8 @@ import com.gwtplatform.mvp.client.PopupView;
 public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Display> implements DataCopyUiHandlers {
 
   private String datasourceName;
+
+  private String valuesQuery;
 
   private Set<TableDto> copyTables = Sets.newHashSet();
 
@@ -122,6 +125,9 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
     dto.setNonIncremental(!getView().isIncremental());
     dto.setCopyNullValues(getView().isCopyNullValues());
     dto.setNoVariables(!getView().isWithVariables());
+    if (!Strings.isNullOrEmpty(valuesQuery) && getView().applyQuery()) {
+      dto.setQuery(valuesQuery);
+    }
 
     return dto;
   }
@@ -163,6 +169,11 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
     }
   }
 
+  public void setValuesQuery(String query, String text) {
+    valuesQuery = query;
+    getView().setValuesQuery(Strings.isNullOrEmpty(query) || "*".equals(query) ? "" : text);
+  }
+
   public void setDatasourceName(String datasourceName) {
     this.datasourceName = datasourceName;
   }
@@ -198,6 +209,10 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
      * Set a collection of datasources retrieved from Opal.
      */
     void setDatasources(List<DatasourceDto> datasources);
+
+    void setValuesQuery(String query);
+
+    boolean applyQuery();
 
     void showNewName(String name);
 

@@ -29,6 +29,7 @@ import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.ExportCommandOptionsDto;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
@@ -54,6 +55,8 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
   private final FileSelectionPresenter fileSelectionPresenter;
 
   private String datasourceName;
+
+  private String valuesQuery;
 
   @Inject
   public DataExportPresenter(Display display, EventBus eventBus, Translations translations,
@@ -110,6 +113,11 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
     } else {
       getView().showExportNAlert(translationMessages.exportNTables(exportTables.size()));
     }
+  }
+
+  public void setValuesQuery(String query, String text) {
+    valuesQuery = query;
+    getView().setValuesQuery(Strings.isNullOrEmpty(query) || "*".equals(query) ? "" : text);
   }
 
   public void setDatasourceName(String name) {
@@ -196,6 +204,9 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
       idConfig.setIgnoreUnknownIdentifier(false);
       dto.setIdConfig(idConfig);
     }
+    if (!Strings.isNullOrEmpty(valuesQuery) && getView().applyQuery()) {
+      dto.setQuery(valuesQuery);
+    }
 
     return dto;
   }
@@ -222,6 +233,10 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
   }
 
   public interface Display extends PopupView, HasUiHandlers<DataExportUiHandlers> {
+
+    void setValuesQuery(String query);
+
+    boolean applyQuery();
 
     void setIdentifiersMappings(JsArray<IdentifiersMappingDto> mappings);
 

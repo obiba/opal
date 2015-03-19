@@ -24,6 +24,7 @@ public class CriteriaPanel extends FlowPanel {
 
   /**
    * Check if there is at least one criterion.
+   *
    * @return
    */
   public boolean hasCriteria() {
@@ -45,6 +46,7 @@ public class CriteriaPanel extends FlowPanel {
 
   /**
    * Get the string representation of the query.
+   *
    * @return
    */
   public String getQueryString() {
@@ -52,6 +54,23 @@ public class CriteriaPanel extends FlowPanel {
     for(int i = 0; i < getWidgetCount(); i++) {
       if(getWidget(i) instanceof CriterionPanel) {
         String queryString = ((CriterionPanel) getWidget(i)).getQueryString();
+        if(!Strings.isNullOrEmpty(queryString)) filters.add(queryString);
+      }
+    }
+
+    return filters.isEmpty() ? "*" : Joiner.on(" AND ").join(filters);
+  }
+
+  /**
+   * Get human readable query string.
+   *
+   * @return
+   */
+  public String getQueryText() {
+    Collection<String> filters = new ArrayList<String>();
+    for(int i = 0; i < getWidgetCount(); i++) {
+      if(getWidget(i) instanceof CriterionPanel) {
+        String queryString = ((CriterionPanel) getWidget(i)).getQueryText();
         if(!Strings.isNullOrEmpty(queryString)) filters.add(queryString);
       }
     }
