@@ -25,11 +25,14 @@ import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -63,6 +66,15 @@ public class DataCopyView extends ModalPopupViewWithUiHandlers<DataCopyUiHandler
   @UiField
   CheckBox copyNullValues;
 
+  @UiField
+  Panel queryPanel;
+
+  @UiField
+  CheckBox applyQuery;
+
+  @UiField
+  Label queryLabel;
+
   @Inject
   public DataCopyView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
@@ -88,6 +100,24 @@ public class DataCopyView extends ModalPopupViewWithUiHandlers<DataCopyUiHandler
         this.datasources.addItem(datasource.getName());
       }
     }
+  }
+
+  @UiHandler("applyQuery")
+  public void onCheck(ClickEvent event) {
+    queryLabel.getElement().getParentElement().getParentElement()
+        .setAttribute("style", applyQuery.getValue() ? "" : "opacity: 0.5;");
+  }
+
+  @Override
+  public void setValuesQuery(String query) {
+    queryPanel.setVisible(!Strings.isNullOrEmpty(query) && !"*".equals(query));
+    applyQuery.setValue(queryPanel.isVisible());
+    queryLabel.setText(query);
+  }
+
+  @Override
+  public boolean applyQuery() {
+    return applyQuery.getValue();
   }
 
   @Override

@@ -47,6 +47,15 @@ public interface CopyCommandOptions extends HelpOption {
   boolean isName();
 
   //
+  // Data Query
+  //
+  @Option(shortName = "q",
+      description = "Query to filter the table entities.")
+  String getQuery();
+
+  boolean isQuery();
+
+  //
   // Values
   // 
 

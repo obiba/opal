@@ -23,6 +23,7 @@ import javax.ws.rs.core.Response;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
+import org.obiba.opal.search.AbstractSearchUtility;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.QuerySearchJsonBuilder;
 import org.obiba.opal.web.ws.SortDir;
@@ -35,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @Scope("request")
 @Path("/datasources/variables")
-public class DatasourcesVariablesSearchResource extends AbstractVariablesSearchResource {
+public class DatasourcesVariablesSearchResource extends AbstractSearchUtility {
 
   private static final Logger log = LoggerFactory.getLogger(DatasourcesVariablesSearchResource.class);
 

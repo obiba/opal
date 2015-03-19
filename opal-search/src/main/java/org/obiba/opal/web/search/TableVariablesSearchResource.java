@@ -25,6 +25,7 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueSetException;
 import org.obiba.magma.ValueTable;
+import org.obiba.opal.search.AbstractSearchUtility;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.EsResultConverter;
 import org.obiba.opal.web.search.support.ItemResultDtoStrategy;
@@ -36,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @Scope("request")
 @Path("/datasource/{ds}/table/{table}/variables/_search")
-public class TableVariablesSearchResource extends AbstractVariablesSearchResource {
+public class TableVariablesSearchResource extends AbstractSearchUtility {
 
   @PathParam("ds")
   private String datasource;

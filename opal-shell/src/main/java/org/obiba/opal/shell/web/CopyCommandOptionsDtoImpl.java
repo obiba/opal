@@ -14,6 +14,8 @@ import java.util.List;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.obiba.opal.web.model.Commands.CopyCommandOptionsDto;
 
+import com.google.common.base.Strings;
+
 /**
  * Implementation of {@link CopyCommandOptions} based on an instance of {@link CopyCommandOptionsDto}.
  */
@@ -90,6 +92,16 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
   @Override
   public boolean isName() {
     return dto.hasDestinationTableName();
+  }
+
+  @Override
+  public String getQuery() {
+    return dto.getQuery();
+  }
+
+  @Override
+  public boolean isQuery() {
+    return dto.hasQuery() && !Strings.isNullOrEmpty(dto.getQuery()) && !"*".equals(dto.getQuery());
   }
 
   @Override

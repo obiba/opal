@@ -70,5 +70,9 @@ public class CriterionPanel extends FlowPanel {
   public String getQueryString() {
     return criterion.getQueryString();
   }
+
+  public String getQueryText() {
+    return criterion.getText();
+  }
 }
 

@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.search;
+package org.obiba.opal.search;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,8 +15,6 @@ import java.util.Collection;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.elasticsearch.rest.RestRequest;
-import org.obiba.opal.search.ValuesIndexManager;
-import org.obiba.opal.search.VariablesIndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.model.Search;
@@ -28,7 +26,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.base.Strings;
 
-public abstract class AbstractVariablesSearchResource {
+/**
+ * Base class for searching in variable or value indices.
+ */
+public abstract class AbstractSearchUtility {
 
   protected static final String DEFAULT_SORT_FIELD = "_score";
 
