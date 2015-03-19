@@ -19,7 +19,8 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter.Da
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter.EntitySelectionHandler;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
-import org.obiba.opal.web.gwt.app.client.ui.CriterionPanel;
+import org.obiba.opal.web.gwt.app.client.ui.CriteriaPanel;
+import org.obiba.opal.web.gwt.app.client.ui.CriterionDropdown;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
@@ -138,7 +139,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   NumericTextBox visibleColumns;
 
   @UiField
-  FlowPanel filters;
+  CriteriaPanel filters;
 
   @UiField(provided = true)
   Typeahead variableTypeahead;
@@ -520,13 +521,28 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   }
 
   @Override
-  public void addVariableFilter(CriterionPanel criterion) {
-    filters.add(criterion);
+  public void clearCriteria() {
+    filters.clear();
   }
 
   @Override
-  public FlowPanel getFiltersPanel() {
-    return filters;
+  public boolean hasCriteria() {
+    return filters.hasCriteria();
+  }
+
+  @Override
+  public void addVariableFilter(CriterionDropdown criterion) {
+    filters.addCriterion(criterion);
+  }
+
+  @Override
+  public void addVariableFilter(CriterionDropdown criterion, boolean removeable, boolean opened) {
+    filters.addCriterion(criterion, removeable, opened);
+  }
+
+  @Override
+  public String getQueryString() {
+    return filters.getQueryString();
   }
 
   @Override

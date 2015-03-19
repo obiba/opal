@@ -35,7 +35,7 @@
             <ui:msg description="Values Filter label">Values Filter</ui:msg>
           </b:ControlLabel>
           <b:Controls>
-            <g:FlowPanel ui:field="filters" addStyleNames="inline-block"/>
+            <o:CriteriaPanel ui:field="filters" addStyleNames="inline-block"/>
             <b:Typeahead ui:field="variableTypeahead">
               <b:TextBox placeholder="More variable criteria..."/>
             </b:Typeahead>
