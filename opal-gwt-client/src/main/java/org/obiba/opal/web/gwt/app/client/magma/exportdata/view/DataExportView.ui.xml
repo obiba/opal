@@ -52,16 +52,14 @@
     <!--Query-->
     <b:ControlGroup ui:field="queryPanel" visible="false">
       <b:ControlLabel>
-        <ui:msg description="Entities Filter field">Entities Filter</ui:msg>
+        <ui:msg description="Values Filter field">Values Filter</ui:msg>
       </b:ControlLabel>
       <b:CheckBox ui:field="applyQuery" value="true">
-        <ui:msg description="Apply Query label">Apply query</ui:msg>:
+        <ui:msg description="Apply Query label">apply query</ui:msg>:
       </b:CheckBox>
-      <b:Alert close="false" type="INFO" addStyleNames="bottom-margin">
-        <g:Label ui:field="queryLabel"/>
-      </b:Alert>
+      <b:CodeBlock ui:field="queryLabel"/>
       <b:HelpBlock>
-        <ui:msg description="Export Query help">Only export entities matching this query.</ui:msg>
+        <ui:msg description="Export Query help">Only export entities which values match this query.</ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 
@@ -74,7 +72,9 @@
         <o:Chooser ui:field="identifiers" addStyleNames="small-indent"/>
       </b:Controls>
       <b:HelpBlock>
-        <ui:msg description="Export Identifiers Mapping help">Select a mapping of identifiers to be used when exporting data.</ui:msg>
+        <ui:msg description="Export Identifiers Mapping help">Select a mapping of identifiers to be used when exporting
+          data.
+        </ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 

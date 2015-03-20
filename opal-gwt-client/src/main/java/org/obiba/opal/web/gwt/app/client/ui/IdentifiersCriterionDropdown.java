@@ -95,7 +95,7 @@ public abstract class IdentifiersCriterionDropdown extends CriterionDropdown {
   }
 
   protected void updateCriterionFilter(String filter) {
-    setText(filter.isEmpty() ? "Identifiers" : "Identifiers: " + filter);
+    setText(filter.isEmpty() ? "ID" : "ID: " + filter);
   }
 
   private void updateMatchCriteriaFilter() {

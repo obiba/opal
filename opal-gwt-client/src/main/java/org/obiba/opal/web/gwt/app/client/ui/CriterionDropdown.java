@@ -42,7 +42,7 @@ public abstract class CriterionDropdown extends DropdownButton {
 
   CriterionDropdown(VariableDto variableDto, @Nonnull String fieldName, @Nullable QueryResultDto termDto) {
     variable = variableDto;
-    this.fieldName = fieldName;
+    this.fieldName = fieldName.replace(' ', '+');
     queryResult = termDto;
 
     setSize(ButtonSize.SMALL);
@@ -159,12 +159,12 @@ public abstract class CriterionDropdown extends DropdownButton {
 
   // TODO: Find the selector that allows to skip the selection of the first input after the li of chosen options...
   private static native void bind(Element e) /*-{
-      $wnd.jQuery(e).next().find('label, li').click(function (w) {
-          w.stopPropagation();
-      });
+    $wnd.jQuery(e).next().find('label, li').click(function (w) {
+      w.stopPropagation();
+    });
 
-      $wnd.jQuery(e).next().find('input').not('input[autocomplete]').click(function (w) {
-          w.stopPropagation();
-      });
+    $wnd.jQuery(e).next().find('input').not('input[autocomplete]').click(function (w) {
+      w.stopPropagation();
+    });
   }-*/;
 }

@@ -223,7 +223,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
 
     @Override
     public String getFieldName(String variable) {
-      return getIndexName() + "-" + variable;
+      return (getIndexName() + "-" + variable).replace(' ','+');
     }
 
     @Override

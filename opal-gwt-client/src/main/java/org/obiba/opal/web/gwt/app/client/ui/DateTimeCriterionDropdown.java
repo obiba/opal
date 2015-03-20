@@ -113,7 +113,7 @@ public abstract class DateTimeCriterionDropdown extends CriterionDropdown {
 
     ControlGroup c2 = new ControlGroup();
     c2.addStyleName("inline-block");
-    c2.addStyleName("dual-indent");
+    c2.addStyleName("large-dual-indent");
     c2.add(toLabel);
     c2.add(to);
 
@@ -186,7 +186,7 @@ public abstract class DateTimeCriterionDropdown extends CriterionDropdown {
 
     DateTimeFormat df = DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_MEDIUM);
     filter += rangeValueChooser.isItemSelected(0)
-        ? "[" + (from.getValue() == null ? "*" : df.format(from.getValue())) + " " +
+        ? " [" + (from.getValue() == null ? "*" : df.format(from.getValue())) + " " +
         translations.criterionFiltersMap().get("to") + " " +
         (to.getValue() == null ? "*" : df.format(to.getValue())) + "]"
         : "(" + (date.getValue() == null ? "" : df.format(date.getValue())) + ")";

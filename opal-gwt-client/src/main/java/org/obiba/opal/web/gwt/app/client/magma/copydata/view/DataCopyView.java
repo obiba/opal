@@ -22,6 +22,7 @@ import org.obiba.opal.web.model.client.magma.DatasourceDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.CheckBox;
+import com.github.gwtbootstrap.client.ui.CodeBlock;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
@@ -30,7 +31,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
@@ -73,7 +73,7 @@ public class DataCopyView extends ModalPopupViewWithUiHandlers<DataCopyUiHandler
   CheckBox applyQuery;
 
   @UiField
-  Label queryLabel;
+  CodeBlock queryLabel;
 
   @Inject
   public DataCopyView(EventBus eventBus, Binder uiBinder, Translations translations) {
@@ -104,8 +104,7 @@ public class DataCopyView extends ModalPopupViewWithUiHandlers<DataCopyUiHandler
 
   @UiHandler("applyQuery")
   public void onCheck(ClickEvent event) {
-    queryLabel.getElement().getParentElement().getParentElement()
-        .setAttribute("style", applyQuery.getValue() ? "" : "opacity: 0.5;");
+    queryLabel.getElement().setAttribute("style", applyQuery.getValue() ? "" : "opacity: 0.5;");
   }
 
   @Override

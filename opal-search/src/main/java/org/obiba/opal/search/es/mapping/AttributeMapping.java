@@ -38,6 +38,6 @@ public class AttributeMapping {
     if(attribute.isLocalised()) {
       field += "-" + attribute.getLocale();
     }
-    return field;
+    return field.replace(' ','+');
   }
 }
