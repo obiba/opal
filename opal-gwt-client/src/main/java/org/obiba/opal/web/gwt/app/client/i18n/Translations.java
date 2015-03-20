@@ -2307,4 +2307,8 @@ public interface Translations extends Constants {
   @Description("Launch garbage collector title")
   @DefaultStringValue("Launch garbage collector")
   String launchGarbageCollectorTitle();
+
+  @Description("Too many repeated errors label")
+  @DefaultStringValue("Too many repeated errors. Stopping further requests")
+  String tooManyRepeatedErrorsLabel();
 }
