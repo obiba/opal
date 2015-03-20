@@ -117,6 +117,8 @@ public class OpalJavaClient {
 
   private final ExtensionRegistryFactory extensionRegistryFactory = new ExtensionRegistryFactory();
 
+  private File cacheFolder;
+
   /**
    * Authenticate by username/password.
    * @param uri
@@ -218,6 +220,14 @@ public class OpalJavaClient {
     if(client != null) {
       log.info("Disconnecting from Opal: {}", opalURI);
       getClient().getConnectionManager().shutdown();
+    }
+    if(cacheStorage != null) {
+      cacheStorage.close();
+      cacheStorage.shutdown();
+    }
+    if (cacheFolder != null && cacheFolder.exists()) {
+      delete(cacheFolder);
+      cacheFolder = null;
     }
   }
 
@@ -409,7 +419,8 @@ public class OpalJavaClient {
     CacheConfig config = new CacheConfig();
     config.setSharedCache(false);
     config.setMaxObjectSizeBytes(MAX_OBJECT_SIZE_BYTES);
-    return new CachingHttpClient(httpClient, new FileResourceFactory(Files.createTempDir()),
+    cacheFolder = Files.createTempDir();
+    return new CachingHttpClient(httpClient, new FileResourceFactory(cacheFolder),
         cacheStorage = new ManagedHttpCacheStorage(config), config);
   }
 
@@ -417,6 +428,19 @@ public class OpalJavaClient {
     if(cacheStorage != null) {
       cacheStorage.cleanResources();
     }
+  }
+
+  @SuppressWarnings("ResultOfMethodCallIgnored")
+  private void delete(File resource) {
+    if(resource.isDirectory()) {
+      File[] childFiles = resource.listFiles();
+      if(childFiles != null) {
+        for(File child : childFiles) {
+          delete(child);
+        }
+      }
+    }
+    resource.delete();
   }
 
   protected static final class ExtensionRegistryFactory {
