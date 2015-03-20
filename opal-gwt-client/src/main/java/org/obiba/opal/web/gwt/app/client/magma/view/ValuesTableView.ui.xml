@@ -41,7 +41,7 @@
             </b:Typeahead>
           </b:Controls>
           <b:HelpBlock>
-            <ui:msg description="Values Filter help">Select some variables and apply value filter on each of them.
+            <ui:msg description="Values Filter help">Select some variables and apply value filter on each of them. Export or Copy the resulting data set.
             </ui:msg>
           </b:HelpBlock>
         </b:ControlGroup>

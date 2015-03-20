@@ -53,7 +53,9 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
 
     rangeValueChooser = new Chooser();
     min = new TextBox();
+    min.addStyleName("bordered");
     max = new TextBox();
+    max.addStyleName("bordered");
     valuesLabel = new ControlLabel();
     values = new TextBox();
 
@@ -123,7 +125,9 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
     max.setWidth("100px");
 
     panel.add(createControlGroup(minLabel, min));
-    panel.add(createControlGroup(maxLabel, max));
+    ControlGroup maxGroup = createControlGroup(maxLabel, max);
+    maxGroup.addStyleName("small-indent");
+    panel.add(maxGroup);
     panel.add(createControlGroup(valuesLabel, values));
 
     return panel;
@@ -206,7 +210,7 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
 
     filter += " " + rangeValueChooser.getItemText(rangeValueChooser.getSelectedIndex()).toLowerCase();
 
-    filter += rangeValueChooser.isItemSelected(0) ? "[" + (min.getText().isEmpty() ? "*" : min.getText()) + " " +
+    filter += rangeValueChooser.isItemSelected(0) ? " [" + (min.getText().isEmpty() ? "*" : min.getText()) + " " +
         translations.criterionFiltersMap().get("to") + " " +
         (max.getText().isEmpty() ? "*" : max.getText()) + "]" : "(" + values.getText() + ")";
 
