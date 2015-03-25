@@ -6,8 +6,10 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.conn.ssl.SSLContexts;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.obiba.magma.Attribute;
@@ -26,6 +28,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,6 +52,8 @@ public class ValidatorFactory {
     private SystemKeyStoreService systemKeyStoreService;
 
     private KeyStore keyStore; //lazily initialized from systemKeyStoreService or injected from unit test
+
+    private boolean devMode = false; //when true, certificate verification is relaxed
 
     /**
      * Returns the list of validators for a given Variable.
@@ -158,28 +164,26 @@ public class ValidatorFactory {
             throw new IllegalStateException("Should not be set manually when systemKeyStoreService is available");
         }
         this.keyStore = keyStore;
+        this.devMode = true;
     }
 
     private CloseableHttpClient getHttpsClient() throws IOException, GeneralSecurityException {
 
-        /*
-         * @Todo: The current code doesn't verify the certificate at all. The plan is to use self-signed certificates
-         * for the mica instances we are connecting to, but to only trust known certificates rather than any
-         * self-signed cert.
-         */
+        X509HostnameVerifier verifier = SSLConnectionSocketFactory.STRICT_HOSTNAME_VERIFIER;
+        SSLContextBuilder builder = SSLContexts.custom();
 
-        // Trust own CA and all self-signed certs
-        SSLContext sslcontext = SSLContexts.custom()
-                .loadTrustMaterial(keyStore, new TrustSelfSignedStrategy())
-                .build();
+        if (devMode) {
+            builder.loadTrustMaterial(keyStore, new TrustAllStrategy()); // Trust all certificates
+            verifier = SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER; //no hostname verification
+        }
+        SSLContext sslcontext = builder.build();
 
         // Allow TLSv1 protocol only
         SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
                 sslcontext,
                 new String[] { "TLSv1" },
                 null,
-                //SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER
-                SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER
+                verifier
         );
 
         return HttpClients.custom()
@@ -203,7 +207,10 @@ public class ValidatorFactory {
 
     @PostConstruct
     public void postConstruct() {
-        if (systemKeyStoreService != null) {
+        devMode = System.getProperty("devmode") != null;
+
+        if (devMode && systemKeyStoreService != null) {
+            //we only need the keystore in dev mode
             keyStore = systemKeyStoreService.getKeyStore().getKeyStore();
         }
 
@@ -212,6 +219,14 @@ public class ValidatorFactory {
         map.put("csv", csvImporter);
         map.put("txt", csvImporter);
         this.importerMap = Collections.unmodifiableMap(map);
+    }
+
+    private static class TrustAllStrategy implements TrustStrategy {
+
+        @Override
+        public boolean isTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+            return true;
+        }
     }
 
 }
