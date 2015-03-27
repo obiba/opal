@@ -24,6 +24,7 @@ import org.eclipse.jetty.ajp.Ajp13SocketConnector;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.GzipHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
@@ -197,6 +198,7 @@ public class OpalJettyServer {
     servletContextHandler.setInitParameter(CONFIG_LOCATION_PARAM, "classpath:/META-INF/spring/opal-server/context.xml");
     servletContextHandler.setInitParameter("resteasy.servlet.mapping.prefix", "/ws");
     servletContextHandler.addServlet(HttpServletDispatcher.class, "/ws/*");
+
     return servletContextHandler;
   }
 
@@ -217,7 +219,11 @@ public class OpalJettyServer {
     ResourceHandler resourceHandler = new ResourceHandler();
     resourceHandler.setBaseResource(new FileResource(new URL(fileUrl)));
     resourceHandler.setAliases(true);
-    return resourceHandler;
+
+    GzipHandler gzipHandler = new GzipHandler();
+    gzipHandler.setHandler(resourceHandler);
+
+    return gzipHandler;
   }
 
   // https://issues.jboss.org/browse/RESTEASY-1012
