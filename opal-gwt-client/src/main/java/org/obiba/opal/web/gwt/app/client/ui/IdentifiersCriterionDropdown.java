@@ -83,12 +83,14 @@ public abstract class IdentifiersCriterionDropdown extends CriterionDropdown {
       if(emptyNotEmpty != null) return emptyNotEmpty;
     }
 
+    String query = "(" + fieldName + ":" + matches.getText() + " OR " + fieldName + ".analyzed:" + matches.getText() + ")";
+
     if(((CheckBox) radioControls.getWidget(1)).getValue() && !matches.getText().isEmpty()) {
-      return fieldName + ":" + matches.getText();
+      return query;
     }
 
     if(((CheckBox) radioControls.getWidget(2)).getValue() && !matches.getText().isEmpty()) {
-      return "NOT " + fieldName + ":" + matches.getText();
+      return "NOT " + query;
     }
 
     return null;
