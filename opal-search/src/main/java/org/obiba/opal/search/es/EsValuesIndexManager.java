@@ -130,10 +130,11 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
         bulkRequest.add(opalSearchService.getClient() //
             .prepareIndex(getName(), valueTable.getEntityType(), identifier) //
             .setSource("{\"identifier\":\"" + identifier + "\"}"));
+
         try {
           XContentBuilder builder = XContentFactory.jsonBuilder().startObject();
           for(int i = 0; i < variables.length; i++) {
-            indexValue(builder, variables[i], values[i]);
+            indexValue(builder, variables[i], values[i], identifier);
           }
           builder.endObject();
 
@@ -141,6 +142,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
               .prepareIndex(getName(), index.getIndexName(), identifier).setParent(identifier).setSource(builder);
           bulkRequest.add(requestBuilder);
           done++;
+
           if(bulkRequest.numberOfActions() >= ES_BATCH_SIZE) {
             bulkRequest = sendAndCheck(bulkRequest);
           }
@@ -149,17 +151,23 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
         }
       }
 
-      private void indexValue(XContentBuilder xcb, Variable variable, Value value) throws IOException {
+      private void indexValue(XContentBuilder xcb, Variable variable, Value value, String identifier) throws IOException {
+        xcb.field("_id.analyzed", identifier); // analyzed copy of _id
+
         String fieldName = index.getFieldName(variable.getName());
+
         if(value.isSequence() && !value.isNull()) {
           List<Object> values = Lists.newArrayList();
+
           for(Value v : value.asSequence().getValue()) {
             values.add(esValue(variable, v));
           }
+
           xcb.field(fieldName, values);
         } else {
           xcb.field(fieldName, esValue(variable, value));
         }
+
         variableSummaryService.stackVariable(getValueTable(), variable, value);
       }
 

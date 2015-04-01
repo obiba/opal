@@ -30,9 +30,18 @@ public class ValueTableMapping {
       mapping.startObject("_parent").field("type", valueTable.getEntityType()).endObject();
 
       mapping.startObject("properties");
+
+      mapping.startObject("_id.analyzed") //
+          .field("type", "string") //
+          .field("index", "analyzed") //
+          .field("index_analyzer", "opal_index_analyzer") //
+          .field("search_analyzer", "opal_search_analyzer");
+      mapping.endObject();
+
       for(Variable variable : valueTable.getVariables()) {
         variableMappings.map(indexName, variable, mapping);
       }
+
       mapping.endObject();// properties
 
       mapping.startObject("_meta") //
@@ -48,6 +57,7 @@ public class ValueTableMapping {
       throw new RuntimeException(e);
     }
   }
+
 
   public XContentBuilder updateTimestamps(String name) {
     try {
