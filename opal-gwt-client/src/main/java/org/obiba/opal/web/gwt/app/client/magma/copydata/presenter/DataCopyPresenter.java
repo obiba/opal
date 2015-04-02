@@ -158,14 +158,15 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
 
   public void setCopyTables(Set<TableDto> tables, boolean allTables) {
     copyTables = tables;
+    int nTables = copyTables.size();
 
-    if(allTables) {
+    if(allTables && nTables > 1) {
       getView().showCopyNAlert(translations.copyAllTables());
-    } else if(copyTables.size() == 1) {
-      getView().showCopyNAlert(translationMessages.copyNTables(copyTables.size()));
+    } else if(nTables == 1) {
+      getView().showCopyNAlert(translationMessages.copyNTables(nTables));
       getView().showNewName(tables.iterator().next().getName());
     } else {
-      getView().showCopyNAlert(translationMessages.copyNTables(copyTables.size()));
+      getView().showCopyNAlert(translationMessages.copyNTables(nTables));
     }
   }
 
