@@ -109,9 +109,8 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
     if (notificationService.isNotificationEnabled()) {
         String subject = String.format("Indexing failed for table %s", valueTable.getTableReference());
         String text = getNotificationEmailText(collectorTask);
-
-        //@todo make from address configurable
-        notificationService.sendNotification(subject, text);
+        String project = valueTable.getDatasource().getName();
+        notificationService.sendProjectNotification(project, subject, text);
     }
   }
 

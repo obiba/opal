@@ -7,8 +7,6 @@ import java.util.List;
  */
 public interface NotificationService {
 
-    public static final String NOTIFICATION_EMAIL_ATTRIBUTE = "notification_email";
-
     /**
      * Sends an email to the target recipient.
      * @param from from email address
@@ -19,11 +17,12 @@ public interface NotificationService {
     void sendEmail(String from, List<String> recipients, String subject, String text);
 
     /**
-     * Sends a notification email to the configured recipient.
+     * Sends a notification email about a project to the configured recipients.
+     * @param project project that the email is about
      * @param subject subject of the email
      * @param text text to be included
      */
-    void sendNotification(String subject, String text);
+    void sendProjectNotification(String project, String subject, String text);
 
     /**
      * @return true if notification is enabled
