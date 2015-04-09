@@ -69,6 +69,8 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
 
   private boolean asTable;
 
+  private boolean self = true;
+
   private ScriptEvaluationCallback scriptEvaluationCallback;
 
   @Inject
@@ -122,6 +124,10 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
     getView().setOriginalTable(originalTable);
   }
 
+  public void setSelf(boolean self) {
+    this.self = self;
+  }
+
   /**
    * Set the variable to be evaluated. Value type and script are extracted from the variable dto.
    *
@@ -138,7 +144,8 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
 
   private void appendVariableLimitArguments(UriBuilder uriBuilder) {
     uriBuilder.query("valueType", originalVariable.getValueType(), //
-        "repeatable", String.valueOf(originalVariable.getIsRepeatable()));
+        "repeatable", String.valueOf(originalVariable.getIsRepeatable()), //
+        "self", String.valueOf(self));
   }
 
   private void appendTable(UriBuilder uriBuilder) {
