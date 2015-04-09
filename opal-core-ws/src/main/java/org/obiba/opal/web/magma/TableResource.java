@@ -117,7 +117,7 @@ public interface TableResource {
   @Path("/variable/_transient")
   VariableResource getTransientVariable(@QueryParam("valueType") @DefaultValue("text") String valueTypeName,
       @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP,
-      @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP,
+      @QueryParam("category") List<String> categoriesQP, @QueryParam("self") @DefaultValue("true") Boolean self, @FormParam("script") String scriptFP,
       @FormParam("category") List<String> categoriesFP, @FormParam("missingCategory") List<String> missingCategory);
 
   /**
@@ -128,8 +128,8 @@ public interface TableResource {
   @Path("/variable/_transient/_compile")
   Response compileTransientVariable(@QueryParam("valueType") @DefaultValue("text") String valueTypeName,
       @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP,
-      @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP,
-      @FormParam("category") List<String> categoriesFP);
+      @QueryParam("category") List<String> categoriesQP, @QueryParam("self") @DefaultValue("true") Boolean self,
+      @FormParam("script") String scriptFP, @FormParam("category") List<String> categoriesFP);
 
   /**
    * Get value sets resource for the transient derived variable.
@@ -137,7 +137,7 @@ public interface TableResource {
   @Path("/valueSets/variable/_transient")
   ValueSetsResource getTransientVariableValueSets(@QueryParam("valueType") @DefaultValue("text") String valueTypeName,
       @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, @QueryParam("script") String scriptQP,
-      @QueryParam("category") List<String> categoriesQP, @FormParam("script") String scriptFP,
+      @QueryParam("category") List<String> categoriesQP, @QueryParam("self") @DefaultValue("true") Boolean self, @FormParam("script") String scriptFP,
       @FormParam("category") List<String> categoriesFP);
 
   /**
@@ -153,6 +153,7 @@ public interface TableResource {
       @QueryParam("repeatable") @DefaultValue("false") Boolean repeatable, //
       @QueryParam("script") String scriptQP, //
       @QueryParam("category") List<String> categoriesQP, //
+      @QueryParam("self") @DefaultValue("true") Boolean self, //
       @FormParam("script") String scriptFP, //
       @FormParam("category") List<String> categoriesFP);
 

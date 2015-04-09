@@ -286,7 +286,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     // Exercise
     ImmutableList<String> categories = ImmutableList.of("CAT1", "CAT2");
     VariableResource variableResource = tableResource
-        .getTransientVariable(TextType.get().getName(), false, script, categories, script, categories, null);
+        .getTransientVariable(TextType.get().getName(), false, script, categories, true, script, categories, null);
 
     // Verify behaviour
     verify(valueTable).getEntityType();
