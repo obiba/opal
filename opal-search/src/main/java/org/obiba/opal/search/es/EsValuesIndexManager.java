@@ -118,7 +118,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
     StringBuilder sb = new StringBuilder();
     for (Message msg: collectorTask.getErrorMessages()) {
         sb.append(msg.toString());
-        sb.append("/n");
+        sb.append("\n");
     }
     return sb.toString();
   }
