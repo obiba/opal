@@ -43,6 +43,9 @@ public class AceEntryPoint implements EntryPoint {
     @Source("js/min-noconflict/worker-javascript.js")
     TextResource scriptWorkerJavascript();
 
+    @Source("js/min-noconflict/ext-searchbox.js")
+    TextResource scriptSearchBox();
+
     @Source("js/beautify.js")
     TextResource scriptBeautify();
   }
@@ -59,6 +62,8 @@ public class AceEntryPoint implements EntryPoint {
     ScriptInjector.fromString(Scripts.INSTANCE.scriptModeJavascript().getText()).setWindow(ScriptInjector.TOP_WINDOW)
         .inject();
     ScriptInjector.fromString(Scripts.INSTANCE.scriptWorkerJavascript().getText()).setWindow(ScriptInjector.TOP_WINDOW)
+        .inject();
+    ScriptInjector.fromString(Scripts.INSTANCE.scriptSearchBox().getText()).setWindow(ScriptInjector.TOP_WINDOW)
         .inject();
     ScriptInjector.fromString(Scripts.INSTANCE.scriptBeautify().getText()).setWindow(ScriptInjector.TOP_WINDOW)
         .inject();
