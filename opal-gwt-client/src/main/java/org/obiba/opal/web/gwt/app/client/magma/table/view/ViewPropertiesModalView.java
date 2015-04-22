@@ -72,6 +72,8 @@ public class ViewPropertiesModalView extends ModalPopupViewWithUiHandlers<ViewPr
     super(eventBus);
     initWidget(uiBinder.createAndBindUi(this));
     dialog.setTitle(translations.editProperties());
+    //tableChooser.setWidth("500px");
+    tableChooser.addStyleName("table-chooser-large");
   }
 
   @UiHandler("closeButton")
