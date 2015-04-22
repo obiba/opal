@@ -48,7 +48,7 @@
       </b:Well>
     </g:FlowPanel>
 
-      <g:FlowPanel addStyleNames="clearfix">
+    <g:FlowPanel addStyleNames="clearfix">
       <g:Image ui:field="refreshPending" url="image/loading.gif" addStyleNames="small-indent"/>
       <o:CollapsiblePanel ui:field="addPanel" addStyleNames="pull-left">
         <b:Row>

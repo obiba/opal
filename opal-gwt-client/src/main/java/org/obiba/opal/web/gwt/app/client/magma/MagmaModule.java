@@ -67,7 +67,7 @@ public class MagmaModule extends AbstractOpalModule {
     bindPresenterWidget(ValuesTablePresenter.class, ValuesTablePresenter.Display.class, ValuesTableView.class);
     bindPresenterWidget(TableValidationPresenter.class, TableValidationPresenter.Display.class, TableValidationView.class);
 
-      bindPresenterWidget(EntityModalPresenter.class, EntityModalPresenter.Display.class, EntityModalView.class);
+    bindPresenterWidget(EntityModalPresenter.class, EntityModalPresenter.Display.class, EntityModalView.class);
     bindPresenterWidget(VariableVcsCommitHistoryPresenter.class, VariableVcsCommitHistoryPresenter.Display.class,
         VariableVcsCommitHistoryView.class);
     bindPresenterWidget(VcsCommitHistoryModalPresenter.class, VcsCommitHistoryModalPresenter.Display.class,

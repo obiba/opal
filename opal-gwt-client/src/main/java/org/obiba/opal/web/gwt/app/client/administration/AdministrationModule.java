@@ -193,8 +193,8 @@ public class AdministrationModule extends AbstractPresenterModule {
     bindPresenterWidget(IndexPresenter.class, IndexPresenter.Display.class, IndexView.class);
     bindPresenterWidget(IndexConfigurationPresenter.class, IndexConfigurationPresenter.Display.class,
         IndexConfigurationView.class);
-      bindPresenterWidget(IndexDetailsPresenter.class, IndexDetailsPresenter.Display.class,
-              IndexDetailsView.class);
+    bindPresenterWidget(IndexDetailsPresenter.class, IndexDetailsPresenter.Display.class,
+        IndexDetailsView.class);
   }
 
   private void configureDatabases() {

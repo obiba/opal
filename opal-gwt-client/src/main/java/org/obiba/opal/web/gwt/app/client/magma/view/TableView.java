@@ -234,9 +234,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiField
   ButtonGroup tableAddVariableGroup;
 
-  @UiField
-  FlowPanel validationResultsPanel;
-
   private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<>();
 
   private final Translations translations;
@@ -626,13 +623,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     getUiHandlers().onVariablesFilterUpdate(filter.getText());
   }
 
-  @UiHandler("validateTableButton")
-  void onValidate(ClickEvent event) {
-    validationResultsPanel.clear();
-    getUiHandlers().onValidate();
-  }
-
-    @Override
+  @Override
   public HandlerRegistration addVariableSortHandler(ColumnSortEvent.Handler handler) {
     return table.addColumnSortHandler(handler);
   }
@@ -711,12 +702,12 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     return tabPanel.getSelectedTab() == VALUES_TAB_INDEX;
   }
 
-    @Override
-    public boolean isValidationTabSelected() {
+  @Override
+  public boolean isValidationTabSelected() {
         return tabPanel.getSelectedTab() == VALIDATION_TAB_INDEX;
     }
 
-    @Override
+  @Override
   public void setIndexStatusVisible(boolean b) {
     indexStatus.setVisible(b);
   }
