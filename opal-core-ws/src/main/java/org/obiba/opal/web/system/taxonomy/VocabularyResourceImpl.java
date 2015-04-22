@@ -18,6 +18,7 @@ import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.domain.taxonomy.Vocabulary;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.taxonomy.Dtos;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -45,6 +46,7 @@ public class VocabularyResourceImpl implements VocabularyResource {
   }
 
   @Override
+  @NoAuthorization
   public Response getVocabulary() {
     Taxonomy taxonomy = taxonomyService.getTaxonomy(taxonomyName);
 
