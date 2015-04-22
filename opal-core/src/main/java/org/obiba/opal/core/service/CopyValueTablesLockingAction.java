@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ThreadFactory;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.Datasource;
@@ -33,6 +34,8 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 /**
@@ -63,7 +66,12 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
     this.identifiersTableService = identifiersTableService;
     this.identifierService = identifierService;
     this.txTemplate = txTemplate;
-    this.sourceTables = sourceTables;
+    this.sourceTables = Sets.filter(sourceTables, new Predicate<ValueTable>() {
+      @Override
+      public boolean apply(@Nullable ValueTable input) {
+        return input != null && !Strings.isNullOrEmpty(input.getName());
+      }
+    });
     this.destination = destination;
     this.allowIdentifierGeneration = allowIdentifierGeneration;
     this.ignoreUnknownIdentifier = ignoreUnknownIdentifier;

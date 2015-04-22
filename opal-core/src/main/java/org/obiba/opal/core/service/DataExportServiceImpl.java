@@ -34,7 +34,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
 /**
  * Default implementation of {@link DataExportService}.
@@ -122,7 +124,12 @@ public class DataExportServiceImpl implements DataExportService {
     private ExportActionTemplate(@NotNull Set<ValueTable> sourceTables, @NotNull Datasource destinationDatasource,
         @NotNull Builder datasourceCopier, boolean incremental, @Nullable String idMapping,
         @Nullable DatasourceCopierProgressListener progressListener) {
-      this.sourceTables = sourceTables;
+      this.sourceTables = Sets.filter(sourceTables, new Predicate<ValueTable>() {
+        @Override
+        public boolean apply(@Nullable ValueTable input) {
+          return input != null && !Strings.isNullOrEmpty(input.getName());
+        }
+      });
       this.destinationDatasource = destinationDatasource;
       this.datasourceCopier = datasourceCopier;
       this.incremental = incremental;
