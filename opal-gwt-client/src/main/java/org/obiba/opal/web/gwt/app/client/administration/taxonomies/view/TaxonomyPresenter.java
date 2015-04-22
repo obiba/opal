@@ -49,6 +49,8 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
 
   private TaxonomyDto taxonomy;
 
+  private boolean editable;
+
   private final TranslationMessages translationMessages;
 
   private final ModalProvider<TaxonomyEditModalPresenter> taxonomyEditModalProvider;
@@ -85,6 +87,11 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
     } else {
       refreshTaxonomy(name);
     }
+  }
+
+  public void setEditable(boolean editable) {
+    this.editable = editable;
+    getView().setEditable(editable);
   }
 
   @Override
@@ -239,6 +246,8 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
     void setTaxonomy(@Nullable TaxonomyDto taxonomy);
 
     void setVocabularies(JsArray<VocabularyDto> vocabularies);
+
+    void setEditable(boolean editable);
   }
 
 }

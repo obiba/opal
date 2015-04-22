@@ -10,10 +10,13 @@ import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.Taxonomy
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.view.VocabularyPresenter;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.TaxonomiesDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 
@@ -33,6 +36,8 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
   private final VocabularyPresenter vocabularyPresenter;
 
   private final ModalProvider<TaxonomyEditModalPresenter> taxonomyEditModalProvider;
+
+  private boolean editable = false;
 
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
@@ -54,11 +59,34 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
   @Override
   protected void onReveal() {
     super.onReveal();
-    refresh();
+    authorize();
   }
 
   void refresh() {
     refresh(null);
+  }
+
+  private void authorize() {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.SYSTEM_CONF_TAXONOMIES.create().build()).post()
+        .authorize(new CompositeAuthorizer(new HasAuthorization() {
+          @Override
+          public void beforeAuthorization() {
+            editable = false;
+          }
+
+          @Override
+          public void authorized() {
+            editable = true;
+            refresh();
+          }
+
+          @Override
+          public void unauthorized() {
+            editable = false;
+            refresh();
+          }
+        }, getView().getTaxonomiesAuthorizer())).send();
   }
 
   /**
@@ -115,6 +143,7 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
       @Override
       public void onTaxonomySelected(TaxonomySelectedEvent event) {
         taxonomyPresenter.setTaxonomy(event.getTaxonomy());
+        taxonomyPresenter.setEditable(editable);
         setInSlot(null, taxonomyPresenter);
       }
     });
@@ -123,6 +152,7 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
       @Override
       public void onVocabularySelected(VocabularySelectedEvent event) {
         vocabularyPresenter.setVocabulary(event.getTaxonomy(), event.getVocabulary());
+        vocabularyPresenter.setEditable(editable);
         setInSlot(null, vocabularyPresenter);
       }
     });
@@ -138,6 +168,7 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
       @Override
       public void onVocabularyDeleted(VocabularyDeletedEvent event) {
         taxonomyPresenter.setTaxonomy(event.getTaxonomy());
+        taxonomyPresenter.setEditable(editable);
         setInSlot(null, taxonomyPresenter);
       }
     });
@@ -146,5 +177,7 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
   public interface Display extends View, HasUiHandlers<TaxonomiesUiHandlers> {
 
     void setTaxonomies(JsArray<TaxonomiesDto.TaxonomySummaryDto> taxonomies, String selection);
+
+    HasAuthorization getTaxonomiesAuthorizer();
   }
 }

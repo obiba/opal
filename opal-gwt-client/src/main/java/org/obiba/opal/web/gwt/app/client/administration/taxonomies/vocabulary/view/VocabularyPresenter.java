@@ -60,6 +60,8 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
 
   private VocabularyDto vocabulary;
 
+  private boolean editable;
+
   @Inject
   public VocabularyPresenter(Display display, EventBus eventBus, Translations translations,
       TranslationMessages translationMessages, ModalProvider<VocabularyEditModalPresenter> vocabularyEditModalProvider,
@@ -76,6 +78,11 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
   public void setVocabulary(TaxonomyDto taxonomy, String name) {
     this.taxonomy = taxonomy;
     refresh(taxonomy.getName(), name);
+  }
+
+  public void setEditable(boolean editable) {
+    this.editable = editable;
+    getView().setEditable(editable);
   }
 
   private void refresh(final String taxonomyName, String name) {
@@ -262,6 +269,7 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
 
     void renderTerms(JsArray<TermDto> terms);
 
+    void setEditable(boolean editable);
   }
 
   private class ConfirmationEventHandler implements ConfirmationEvent.Handler {

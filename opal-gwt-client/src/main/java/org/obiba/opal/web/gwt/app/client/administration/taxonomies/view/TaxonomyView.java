@@ -61,6 +61,9 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
   Button download;
 
   @UiField
+  Button addVocabulary;
+
+  @UiField
   Panel detailsPanel;
 
   @UiField
@@ -150,6 +153,13 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
     dataProvider.setList(JsArrays.toList(vocabularies));
     dataProvider.refresh();
     pager.setPagerVisible(table.getRowCount() > Table.DEFAULT_PAGESIZE);
+  }
+
+  @Override
+  public void setEditable(boolean editable) {
+    remove.setVisible(editable);
+    edit.setVisible(editable);
+    addVocabulary.setVisible(editable);
   }
 
   private void renderTaxonomy(TaxonomyDto taxonomy) {
