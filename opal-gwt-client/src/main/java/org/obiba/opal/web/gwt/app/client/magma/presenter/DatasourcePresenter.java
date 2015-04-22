@@ -144,6 +144,8 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     DataExportPresenter export = dataExportModalProvider.get();
     Set<TableDto> exportTables = new HashSet<TableDto>();
 
+    export.setDatasourceName(datasourceName);
+
     int selectedTablesSize = getView().getSelectedTables().size();
     if(selectedTablesSize > 0) {
       exportTables.addAll(getView().getSelectedTables());
@@ -153,8 +155,6 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       exportTables.addAll(getView().getAllTables());
       export.setExportTables(exportTables, true);
     }
-
-    export.setDatasourceName(datasourceName);
   }
 
   @Override

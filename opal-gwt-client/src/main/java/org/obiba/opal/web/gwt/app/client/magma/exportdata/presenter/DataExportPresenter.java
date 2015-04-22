@@ -113,6 +113,11 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
     } else {
       getView().showExportNAlert(translationMessages.exportNTables(exportTables.size()));
     }
+
+    if (tables.size() == 1) {
+      TableDto table = tables.iterator().next();
+      getView().setFileBaseName(table.getDatasourceName() + "-" + table.getName());
+    }
   }
 
   public void setValuesQuery(String query, String text) {
@@ -242,7 +247,7 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
 
     void setFileWidgetDisplay(FileSelectionPresenter.Display display);
 
-    void setFileBaseName(String username);
+    void setFileBaseName(String fileBaseName);
 
     void showExportNAlert(String message);
 
