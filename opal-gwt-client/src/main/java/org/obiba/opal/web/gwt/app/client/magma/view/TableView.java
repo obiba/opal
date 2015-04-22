@@ -164,6 +164,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   OpalSimplePager pager;
 
   @UiField
+  OpalSimplePager pager2;
+
+  @UiField
   TextBoxClearable filter;
 
   @UiField
@@ -328,6 +331,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     table.setPageSize(Table.DEFAULT_PAGESIZE);
     table.setEmptyTableWidget(new InlineLabel(translationMessages.variableCount(0)));
     pager.setDisplay(table);
+    pager2.setDisplay(table);
     dataProvider.addDataDisplay(table);
 
     filter.setText("");
@@ -344,6 +348,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @Override
   public void beforeRenderRows() {
     pager.setPagerVisible(false);
+    pager2.setPagerVisible(false);
     selectAllItemsAlert.setVisible(false);
     table.showLoadingIndicator(dataProvider);
 
@@ -356,6 +361,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   public void afterRenderRows() {
     boolean enableItem = dataProvider.getList().size() > 0;
     pager.setPagerVisible(dataProvider.getList().size() > Table.DEFAULT_PAGESIZE);
+    pager2.setPagerVisible(dataProvider.getList().size() > Table.DEFAULT_PAGESIZE);
     downloadDictionary.setDisabled(!enableItem);
     exportData.setEnabled(enableItem);
     copyData.setEnabled(enableItem);
@@ -366,6 +372,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   public void renderRows(JsArray<VariableDto> rows) {
     dataProvider.setList(JsArrays.toList(rows));
     pager.firstPage();
+    pager2.firstPage();
     dataProvider.refresh();
   }
 
