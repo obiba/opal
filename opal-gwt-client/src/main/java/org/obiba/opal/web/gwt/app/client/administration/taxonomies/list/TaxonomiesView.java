@@ -2,6 +2,8 @@ package org.obiba.opal.web.gwt.app.client.administration.taxonomies.list;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomiesDto;
 
@@ -74,6 +76,11 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
     if(toSelect != null) getUiHandlers().onTaxonomySelection(toSelect);
     else getUiHandlers().onTaxonomySelection(first);
     if(activeLink != null) activeLink.setActive(true);
+  }
+
+  @Override
+  public HasAuthorization getTaxonomiesAuthorizer() {
+    return new WidgetAuthorizer(addBtn);
   }
 
   private String asText(JsArray<LocaleTextDto> texts) {

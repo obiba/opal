@@ -54,6 +54,15 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
   Heading vocabularyName;
 
   @UiField
+  IconAnchor edit;
+
+  @UiField
+  Button remove;
+
+  @UiField
+  Button addTerm;
+
+  @UiField
   Panel titlePanel;
 
   @UiField
@@ -70,6 +79,8 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
 
   @UiField
   TextBoxClearable filter;
+
+  private ActionsColumn<TermDto> actions;
 
   private final ListDataProvider<TermDto> dataProvider = new ListDataProvider<TermDto>();
 
@@ -103,7 +114,7 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
         return term.getDescriptionArray();
       }
     }, translations.descriptionLabel());
-    table.addColumn(new ActionsColumn<TermDto>(new ActionHandler<TermDto>() {
+    actions = new ActionsColumn<TermDto>(new ActionHandler<TermDto>() {
       @Override
       public void doAction(TermDto object, String actionName) {
         if(ActionsColumn.EDIT_ACTION.equals(actionName)) {
@@ -112,7 +123,7 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
           getUiHandlers().onDeleteTerm(object);
         }
       }
-    }), translations.actionsLabel());
+    });
 
     //table.setSelectionModel(new SingleSelectionModel<VocabularyDto>());
     table.setPageSize(Table.DEFAULT_PAGESIZE);
@@ -162,7 +173,6 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
     getUiHandlers().onAddTerm();
   }
 
-
   @Override
   public void renderVocabulary(TaxonomyDto taxonomy, VocabularyDto vocabulary) {
     back.setTitle(taxonomy.getName());
@@ -174,7 +184,7 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
 
     int idx = getVocabularyIndex(taxonomy, vocabulary);
     previous.setEnabled(idx > 0);
-    next.setEnabled(idx < taxonomy.getVocabulariesCount() -1);
+    next.setEnabled(idx < taxonomy.getVocabulariesCount() - 1);
   }
 
   @Override
@@ -182,6 +192,15 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
     dataProvider.setList(JsArrays.toList(terms));
     dataProvider.refresh();
     pager.setPagerVisible(table.getRowCount() > Table.DEFAULT_PAGESIZE);
+  }
+
+  @Override
+  public void setEditable(boolean editable) {
+    remove.setVisible(editable);
+    edit.setVisible(editable);
+    addTerm.setVisible(editable);
+    if (table.getColumnIndex(actions)>0) table.removeColumn(actions);
+    if (editable) table.addColumn(actions, translations.actionsLabel());
   }
 
   private int getVocabularyIndex(TaxonomyDto taxonomy, VocabularyDto vocabulary) {
