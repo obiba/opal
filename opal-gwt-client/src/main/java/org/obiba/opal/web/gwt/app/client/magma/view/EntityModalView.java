@@ -118,6 +118,7 @@ public class EntityModalView extends ModalPopupViewWithUiHandlers<EntityModalUiH
     dialog.setTitle(translations.entityDetailsModalTitle());
     dialog.setMinWidth(MIN_WIDTH);
     dialog.setMinHeight(MIN_HEIGHT);
+    tableChooser.addStyleName("table-chooser-large");
   }
 
   private void initializeDisplayOptions() {
