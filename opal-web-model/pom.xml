@@ -109,11 +109,9 @@
 
                 <fail message="No protoc binary for your OS: ${os.name}, ${os.arch}." unless="os.protoc" />
 
-                <!-- this must be deleted before, as any failure will prevent the deletion to be run in the end -->
-                <delete file="${basedir}/src/main/protobuf/wrapper.proto" quiet="true" failonerror="false"/>
-
                 <!-- Delete the wrapper.proto upfront, as post-compilation cleanup is not fail-safe -->
-                <delete file="${basedir}/src/main/protobuf/wrapper.proto" />
+		<!-- this must be deleted before, as any failure will prevent the deletion to be run in the end -->
+                <delete file="${basedir}/src/main/protobuf/wrapper.proto" quiet="true" failonerror="false"/>
 
                 <path id="protofiles">
                   <fileset dir="src/main/protobuf">
