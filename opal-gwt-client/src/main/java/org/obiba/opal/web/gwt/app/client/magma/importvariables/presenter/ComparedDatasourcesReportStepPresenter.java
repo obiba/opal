@@ -16,9 +16,9 @@ import java.util.TreeSet;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.ComparedDatasourcesReportStepPresenter.Display.ComparisonResult;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
@@ -66,11 +66,20 @@ public class ComparedDatasourcesReportStepPresenter
       @SuppressWarnings("ParameterHidesMemberVariable") String targetDatasourceName,
       DatasourceCreatedCallback datasourceCreatedCallback, DatasourceFactoryDto factory,
       DatasourceDto datasourceResource) {
+    return compare(sourceDatasourceName, targetDatasourceName, datasourceCreatedCallback, factory, datasourceResource,
+        false);
+  }
+
+  public Request compare(String sourceDatasourceName,
+      @SuppressWarnings("ParameterHidesMemberVariable") String targetDatasourceName,
+      DatasourceCreatedCallback datasourceCreatedCallback, DatasourceFactoryDto factory,
+      DatasourceDto datasourceResource, boolean merge) {
     this.targetDatasourceName = targetDatasourceName;
     getView().clearDisplay();
     authorizedComparedTables = JsArrays.create();
     String resourceUri = UriBuilder.create()
-        .segment("datasource", sourceDatasourceName, "compare", targetDatasourceName).build();
+        .segment("datasource", sourceDatasourceName, "compare", targetDatasourceName)
+        .query("merge", Boolean.toString(merge)).build();
     return ResourceRequestBuilderFactory.<DatasourceCompareDto>newBuilder() //
         .forResource(resourceUri) //
         .get() //

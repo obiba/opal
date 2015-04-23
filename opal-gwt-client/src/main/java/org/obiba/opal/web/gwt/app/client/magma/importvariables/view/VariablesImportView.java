@@ -20,7 +20,6 @@ import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.Variabl
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportUiHandlers;
 import org.obiba.opal.web.gwt.app.client.support.LanguageLocale;
 import org.obiba.opal.web.gwt.app.client.ui.CharacterSetView;
-import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
 import org.obiba.opal.web.gwt.app.client.ui.DatasourceParsingErrorPanel;
 import org.obiba.opal.web.gwt.app.client.ui.DropdownSuggestBox;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
@@ -30,6 +29,7 @@ import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.ResetHandler;
 
+import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.github.gwtbootstrap.client.ui.TextBox;
@@ -42,6 +42,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -82,7 +83,10 @@ public class VariablesImportView extends ModalPopupViewWithUiHandlers<VariablesI
   DatasourceParsingErrorPanel datasourceParsingErrors;
 
   @UiField
-  CollapsiblePanel options;
+  CheckBox merge;
+
+  @UiField
+  Panel spssOptions;
 
   @UiField
   ControlGroup charsetGroup;
@@ -123,7 +127,7 @@ public class VariablesImportView extends ModalPopupViewWithUiHandlers<VariablesI
   }
 
   private void initWizardDialog() {
-    options.setVisible(false);
+    spssOptions.setVisible(false);
 
     stepChain = WizardStepChain.Builder.create(dialog)//
         .append(fileSelectionStep)//
@@ -279,6 +283,11 @@ public class VariablesImportView extends ModalPopupViewWithUiHandlers<VariablesI
   }
 
   @Override
+  public boolean withMerge() {
+    return merge.getValue();
+  }
+
+  @Override
   public HasText getCharsetText() {
     return charsetView.getCharsetText();
   }
@@ -300,7 +309,7 @@ public class VariablesImportView extends ModalPopupViewWithUiHandlers<VariablesI
 
   @Override
   public void showSpssSpecificPanel(boolean show) {
-    options.setVisible(show);
+    spssOptions.setVisible(show);
   }
 
   //
