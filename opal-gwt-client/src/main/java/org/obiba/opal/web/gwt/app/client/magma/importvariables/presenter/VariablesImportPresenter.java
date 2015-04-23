@@ -404,7 +404,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     public void onResource(Response response, DatasourceDto resource) {
       if(response.getStatusCode() == SC_CREATED) {
         comparedDatasourcesReportPresenter
-            .compare(resource.getName(), datasourceName, new DatasourceComparisonSuccessCallback(), factory, resource);
+            .compare(resource.getName(), datasourceName, new DatasourceComparisonSuccessCallback(), factory, resource, getView().withMerge());
       }
     }
 
@@ -489,6 +489,8 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     void hideErrors();
 
     void showError(@Nullable FormField formField, String message);
+
+    boolean withMerge();
 
     HasText getSpssEntityType();
 

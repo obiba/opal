@@ -27,6 +27,7 @@ import org.obiba.magma.NoSuchVariableException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
+import org.obiba.magma.VariableBean;
 import org.obiba.magma.datasource.csv.CsvDatasource;
 import org.obiba.magma.datasource.csv.CsvValueTable;
 import org.obiba.magma.support.MagmaEngineTableResolver;
@@ -44,6 +45,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 
 @NoAuthorization
 @Component
@@ -76,15 +79,15 @@ public class CompareResourceImpl implements CompareResource {
   }
 
   @Override
-  public Response compare(String with) {
+  public Response compare(String with, boolean merge) {
     if(comparedDatasource != null) {
       Datasource withDatasource = getDatasource(with);
-      DatasourceCompareDto dto = createDatasourceCompareDto(comparedDatasource, withDatasource);
+      DatasourceCompareDto dto = createDatasourceCompareDto(comparedDatasource, withDatasource, merge);
       return Response.ok().entity(dto).build();
     }
     if(comparedTable != null) {
       ValueTable withTable = getValueTable(with);
-      TableCompareDto dto = createTableCompareDto(comparedTable, withTable);
+      TableCompareDto dto = createTableCompareDto(comparedTable, withTable, merge);
       return Response.ok().entity(dto).build();
     }
     log.error("Cannot compare because comparedDatasource and comparedTable are both null.");
@@ -103,14 +106,14 @@ public class CompareResourceImpl implements CompareResource {
     return MagmaEngine.get().getDatasource(datasourceName).getValueTable(tableName);
   }
 
-  private DatasourceCompareDto createDatasourceCompareDto(Datasource compared, Datasource with) {
+  private DatasourceCompareDto createDatasourceCompareDto(Datasource compared, Datasource with, boolean merge) {
     DatasourceCompareDto.Builder dtoBuilder = DatasourceCompareDto.newBuilder() //
         .setCompared(Dtos.asDto(compared)) //
         .setWithDatasource(Dtos.asDto(with));
 
     for(ValueTable vt : compared.getValueTables()) {
       TableCompareDto tableCompareDto = with.hasValueTable(vt.getName()) //
-          ? createTableCompareDto(vt, with.getValueTable(vt.getName())) //
+          ? createTableCompareDto(vt, with.getValueTable(vt.getName()), merge) //
           : createTableCompareDtoWhereSecondTableDoesNotExist(vt);
       dtoBuilder.addTableComparisons(tableCompareDto);
     }
@@ -118,20 +121,32 @@ public class CompareResourceImpl implements CompareResource {
     return dtoBuilder.build();
   }
 
-  private TableCompareDto createTableCompareDto(ValueTable compared, ValueTable with) {
+  private TableCompareDto createTableCompareDto(final ValueTable compared, final ValueTable with, boolean merge) {
     Set<Variable> variablesInCompared = asSet(compared.getVariables());
     Set<Variable> variablesInWith = asSet(with.getVariables());
 
-    Collection<Variable> newVariables = new LinkedHashSet<>(variablesInCompared);
-    newVariables.removeAll(variablesInWith);
+    Iterable<Variable> newVariables = Iterables.filter(variablesInCompared, new Predicate<Variable>() {
+      @Override
+      public boolean apply(@Nullable Variable input) {
+        return input != null && !with.hasVariable(input.getName());
+      }
+    });
 
-    Collection<Variable> missingVariables = new LinkedHashSet<>(variablesInWith);
-    missingVariables.removeAll(variablesInCompared);
+    Iterable<Variable> missingVariables = Iterables.filter(variablesInWith, new Predicate<Variable>() {
+      @Override
+      public boolean apply(@Nullable Variable input) {
+        return input != null && !compared.hasVariable(input.getName());
+      }
+    });
 
-    Collection<Variable> existingVariables = new LinkedHashSet<>(variablesInCompared);
-    existingVariables.retainAll(variablesInWith);
+    Iterable<Variable> existingVariables = Iterables.filter(variablesInCompared, new Predicate<Variable>() {
+      @Override
+      public boolean apply(@Nullable Variable input) {
+        return input != null && with.hasVariable(input.getName());
+      }
+    });
 
-    return createTableCompareDto(compared, with, newVariables, missingVariables, existingVariables);
+    return createTableCompareDto(compared, with, newVariables, missingVariables, existingVariables, merge);
   }
 
   private TableCompareDto createTableCompareDtoWhereSecondTableDoesNotExist(ValueTable compared) {
@@ -140,11 +155,11 @@ public class CompareResourceImpl implements CompareResource {
     Iterable<Variable> missingVariables = new LinkedHashSet<>(INITIAL_CAPACITY);
     Iterable<Variable> existingVariables = new LinkedHashSet<>(INITIAL_CAPACITY);
 
-    return createTableCompareDto(compared, null, newVariables, missingVariables, existingVariables);
+    return createTableCompareDto(compared, null, newVariables, missingVariables, existingVariables, false);
   }
 
   private TableCompareDto createTableCompareDto(ValueTable compared, ValueTable with, Iterable<Variable> newVariables,
-      Iterable<Variable> missingVariables, Iterable<Variable> existingVariables) {
+      Iterable<Variable> missingVariables, Iterable<Variable> existingVariables, boolean merge) {
     TableCompareDto.Builder dtoBuilder = TableCompareDto.newBuilder();
     dtoBuilder.setCompared(Dtos.asDto(compared, true, false));
 
@@ -166,14 +181,14 @@ public class CompareResourceImpl implements CompareResource {
       dtoBuilder.addMissingVariables(Dtos.asDto(v));
     }
 
-    return addTableCompareDtoModifications(dtoBuilder, with, existingVariables, conflicts).build();
+    return addTableCompareDtoModifications(dtoBuilder, with, existingVariables, conflicts, merge).build();
   }
 
   private TableCompareDto.Builder addTableCompareDtoModifications(TableCompareDto.Builder dtoBuilder, ValueTable with,
-      Iterable<Variable> existingVariables, Iterable<ConflictDto> conflicts) {
+      Iterable<Variable> existingVariables, Iterable<ConflictDto> conflicts, boolean merge) {
     Set<Variable> unconflicting = getUnconflicting(existingVariables, conflicts);
     if(with != null) {
-      Set<Variable> modifiedVariables = getUnconflictingModified(with, unconflicting);
+      Set<Variable> modifiedVariables = getUnconflictingModified(with, unconflicting, merge);
       for(Variable variable : modifiedVariables) {
         dtoBuilder.addModifiedVariables(Dtos.asDto(variable));
       }
@@ -262,17 +277,26 @@ public class CompareResourceImpl implements CompareResource {
     return unconflicting;
   }
 
-  private Set<Variable> getUnconflictingModified(ValueTable with, Iterable<Variable> variables) {
+  private Set<Variable> getUnconflictingModified(ValueTable with, Iterable<Variable> variables, boolean merge) {
     Set<Variable> modified = new LinkedHashSet<>(INITIAL_CAPACITY);
 
     for(Variable v : variables) {
       Variable withVar = with.getVariable(v.getName());
       if(isModified(v, withVar)) {
-        modified.add(v);
+        if (merge) {
+          modified.add(mergeVariables(withVar, v));
+        } else {
+          modified.add(v);
+        }
       }
     }
 
     return modified;
+  }
+
+  private Variable mergeVariables(Variable original, Variable update) {
+    VariableBean.Builder merge = VariableBean.Builder.sameAs(original).overrideWith(update);
+    return merge.build();
   }
 
   private boolean isModified(Variable compared, Variable with) {
