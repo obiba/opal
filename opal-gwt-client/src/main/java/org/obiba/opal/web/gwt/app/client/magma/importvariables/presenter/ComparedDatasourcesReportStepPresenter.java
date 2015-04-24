@@ -18,7 +18,6 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.ComparedDatasourcesReportStepPresenter.Display.ComparisonResult;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
@@ -289,7 +288,7 @@ public class ComparedDatasourcesReportStepPresenter
   //
   // Interfaces
   //
-  public interface Display extends WizardStepDisplay {
+  public interface Display extends org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay {
 
     enum ComparisonResult {
       CREATION, MODIFICATION, CONFLICT, SAME, FORBIDDEN
