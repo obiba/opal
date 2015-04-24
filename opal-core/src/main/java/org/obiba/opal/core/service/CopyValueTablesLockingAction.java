@@ -136,7 +136,7 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
             }));
             throw new IllegalArgumentException(
                 String.format("Variables do not exist in %s and creating new variables is disabled: %s",
-                                 vars, destinationTable.getTableReference()));
+                                 destinationTable.getTableReference(), vars));
           }
         }
       }
