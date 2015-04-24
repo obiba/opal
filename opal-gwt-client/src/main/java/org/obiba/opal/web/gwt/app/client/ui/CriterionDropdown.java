@@ -48,7 +48,7 @@ public abstract class CriterionDropdown extends DropdownButton {
     this.fieldName = fieldName.replace(' ', '+');
     queryResult = termDto;
 
-    groupId = String.valueOf(Random.nextInt(1000000)); //to be used in radio button names, to make they don't clash
+    groupId = String.valueOf(Random.nextInt(1000000)); //to be used in radio button names, to make sure they don't clash
 
     setSize(ButtonSize.SMALL);
     updateCriterionFilter(translations.criterionFiltersMap().get("all"));
