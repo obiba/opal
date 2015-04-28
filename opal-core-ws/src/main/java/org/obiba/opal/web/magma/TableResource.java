@@ -81,6 +81,8 @@ public interface TableResource {
    * @param unitName optional functional unit name
    * @param generateIds ignored if unit name is not specified, otherwise operation will fail if no entity can be found
    * in the given unit and creating a new entity is not allowed
+   * @param createVariables if true (default), unknown variables will be generated. Otherwise an error occurs if not
+   *                        all variables exist already.
    * @return
    * @throws IOException
    * @throws InterruptedException
@@ -90,6 +92,7 @@ public interface TableResource {
   Response updateValueSet(Magma.ValueSetsDto valueSetsDto, //
       @QueryParam("unit") String unitName, //
       @QueryParam("generateIds") @DefaultValue("false") boolean generateIds, //
+      @QueryParam("createVariables") @DefaultValue("true") boolean createVariables, //
       @QueryParam("ignoreUnknownIds") @DefaultValue("false") boolean ignoreUnknownIds)
       throws IOException, InterruptedException;
 

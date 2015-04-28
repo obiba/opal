@@ -112,4 +112,9 @@ public class ImportCommandOptionsDtoImpl implements ImportCommandOptions {
   public boolean isIncremental() {
     return dto.getIncremental();
   }
+
+  @Override
+  public boolean isCreateVariables() {
+    return dto.getCreateVariables();
+  }
 }

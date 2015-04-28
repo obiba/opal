@@ -152,7 +152,7 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
 
   @Override
   public Response updateValueSet(ValueSetsDto valueSetsDto, String unitName, boolean generateIds,
-      boolean ignoreUnknownIds) throws IOException, InterruptedException {
+      boolean createVariables, boolean ignoreUnknownIds) throws IOException, InterruptedException {
     ValueTable vt = getValueTable();
     try {
       if(dataImportService == null) {
@@ -162,7 +162,8 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
         // static writers will add entities and variables while writing values
         writeValueSets(ds.createWriter(vt.getName(), valueSetsDto.getEntityType()), valueSetsDto);
         dataImportService
-            .importData(ds.getValueTables(), vt.getDatasource().getName(), generateIds, ignoreUnknownIds, null);
+            .importData(ds.getValueTables(), vt.getDatasource().getName(), generateIds,
+                           createVariables, ignoreUnknownIds, null);
       }
     } catch(NoSuchIdentifiersMappingException ex) {
       return Response.status(BAD_REQUEST)

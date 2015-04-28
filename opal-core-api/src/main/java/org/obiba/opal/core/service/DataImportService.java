@@ -34,6 +34,7 @@ public interface DataImportService {
    * @param destinationDatasourceName name of the destination datasource
    * @param allowIdentifierGeneration unknown participant will be created at importation time
    * @param ignoreUnknownIdentifier
+   * @param allowVariableCreation non-existing variables in the destination will be created
    * @param progressListener
    * @throws NoSuchIdentifiersMappingException
    * @throws NonExistentVariableEntitiesException if unitName is null and the source entities do not exist as public
@@ -42,7 +43,8 @@ public interface DataImportService {
    * @throws InterruptedException if the current thread was interrupted
    */
   void importData(String sourceDatasourceName, String destinationDatasourceName, boolean allowIdentifierGeneration,
-      boolean ignoreUnknownIdentifier, @Nullable DatasourceCopierProgressListener progressListener)
+      boolean allowVariableCreation, boolean ignoreUnknownIdentifier,
+      @Nullable DatasourceCopierProgressListener progressListener)
       throws NoSuchIdentifiersMappingException, NoSuchDatasourceException, NoSuchValueTableException,
       NonExistentVariableEntitiesException, IOException, InterruptedException;
 
@@ -52,6 +54,7 @@ public interface DataImportService {
    * @param sourceTableNames
    * @param destinationDatasourceName
    * @param allowIdentifierGeneration
+   * @param allowVariableCreation
    * @param ignoreUnknownIdentifier
    * @param progressListener
    * @throws NoSuchIdentifiersMappingException
@@ -60,7 +63,8 @@ public interface DataImportService {
    * @throws InterruptedException
    */
   void importData(List<String> sourceTableNames, String destinationDatasourceName, boolean allowIdentifierGeneration,
-      boolean ignoreUnknownIdentifier, @Nullable DatasourceCopierProgressListener progressListener)
+      boolean allowVariableCreation, boolean ignoreUnknownIdentifier,
+      @Nullable DatasourceCopierProgressListener progressListener)
       throws NoSuchIdentifiersMappingException, NoSuchDatasourceException, NoSuchValueTableException,
       NonExistentVariableEntitiesException, IOException, InterruptedException;
 
@@ -70,11 +74,12 @@ public interface DataImportService {
    * @param sourceValueTables
    * @param destinationDatasourceName
    * @param allowIdentifierGeneration
+   * @param allowVariableCreation
    * @param ignoreUnknownIdentifier
    * @param progressListener
    */
   void importData(Set<ValueTable> sourceValueTables, String destinationDatasourceName,
-      boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier,
+      boolean allowIdentifierGeneration, boolean allowVariableCreation, boolean ignoreUnknownIdentifier,
       @Nullable DatasourceCopierProgressListener progressListener)
       throws NoSuchIdentifiersMappingException, NonExistentVariableEntitiesException, IOException, InterruptedException;
 
