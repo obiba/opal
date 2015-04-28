@@ -259,8 +259,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
               // Do not show "SearchQueryIsInvalid" errors: the query might be invalid because it is being typed in
               if(errorDto != null && !"SearchQueryIsInvalid".equals(errorDto.getStatus())) {
                 fireEvent(NotificationEvent.newBuilder().error(TranslationsUtils
-                    .replaceArguments(translations.userMessageMap().get(errorDto.getStatus()),
-                        errorDto.getArgumentsArray())).build());
+                        .replaceArguments(translations.userMessageMap().get(errorDto.getStatus()),
+                                errorDto.getArgumentsArray())).build());
               }
             }
           }, Response.SC_BAD_REQUEST)//
@@ -391,6 +391,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         script.append("/)");
         currentVariablesFilterSelect = script.toString();
         link.append(currentVariablesFilterSelect);
+      } else {
+        currentVariablesFilterSelect = ""; //we need to clear currentVariablesFilterSelect, as it will be used later on
       }
       doRequest(offset, link.toString());
     }
