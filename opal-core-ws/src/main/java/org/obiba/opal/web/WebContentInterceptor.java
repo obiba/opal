@@ -20,5 +20,7 @@ public class WebContentInterceptor implements RequestCyclePostProcess {
         MultivaluedMap<String, Object> map = response.getHeaders();
         //making sure IE doesn't cache: https://support.microsoft.com/en-us/kb/234067
         map.put("Expires", Collections.<Object>singletonList("-1"));
+        map.put("Cache-Control", Collections.<Object>singletonList("no-cache"));
+        map.put("Pragma", Collections.<Object>singletonList("no-cache"));
     }
 }
