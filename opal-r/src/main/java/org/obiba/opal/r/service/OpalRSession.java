@@ -19,6 +19,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
+import org.obiba.opal.core.security.SessionDetachedSubject;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.RASyncOperationTemplate;
 import org.obiba.opal.r.ROperation;
@@ -281,7 +284,8 @@ public class OpalRSession implements RASyncOperationTemplate {
   }
 
   private void startRCommandsConsumer() {
-    consumer = transactionalThreadFactory.newThread(rCommandsConsumer);
+    Subject owner = SessionDetachedSubject.asSessionDetachedSubject(SecurityUtils.getSubject());
+    consumer = transactionalThreadFactory.newThread(owner.associateWith(rCommandsConsumer));
     consumer.setName("R Operations Consumer " + rCommandsConsumer);
     consumer.start();
   }
