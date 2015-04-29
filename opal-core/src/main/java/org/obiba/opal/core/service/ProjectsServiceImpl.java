@@ -86,6 +86,7 @@ public class ProjectsServiceImpl implements ProjectService {
         try {
           registerDatasource(project);
         } catch(Exception e) {
+          databaseRegistry.unregister(project.getDatabase(), project.getName());
           log.error("Failed initializing project: {}", project.getName(), e);
         }
       }
