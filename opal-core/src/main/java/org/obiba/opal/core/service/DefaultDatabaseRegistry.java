@@ -274,8 +274,8 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
   @Transactional(propagation = Propagation.NEVER)
   public void unregister(@NotNull String databaseName, String usedByDatasource) {
     // close SessionFactory or JDBC dataSource
-    destroyCache(databaseName);
     registrations.remove(databaseName, usedByDatasource);
+    if(!registrations.containsKey(databaseName)) destroyCache(databaseName);
   }
 
   @Override
