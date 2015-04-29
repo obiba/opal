@@ -82,10 +82,12 @@ public class ProjectsServiceImpl implements ProjectService {
     // so (indeed) there can be no Transactions. The only way to ensure that that is working is by using a TransactionTemplate.
     // Add all project datasources to MagmaEngine
     for(Project project : getProjects()) {
-      try {
-        registerDatasource(project);
-      } catch (Exception e) {
-        log.error("Failed initializing project: {}", project.getName(), e);
+      if (!project.isArchived()) {
+        try {
+          registerDatasource(project);
+        } catch(Exception e) {
+          log.error("Failed initializing project: {}", project.getName(), e);
+        }
       }
     }
   }
