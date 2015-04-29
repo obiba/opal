@@ -31,6 +31,8 @@ import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionStatus;
@@ -46,6 +48,8 @@ import static com.google.common.base.Strings.nullToEmpty;
 public class ProjectsServiceImpl implements ProjectService {
 
   private static final String PROJECTS_DIR = "projects";
+
+  private static final Logger log = LoggerFactory.getLogger(ProjectsServiceImpl.class);
 
   @Autowired
   private OpalRuntime opalRuntime;
@@ -78,7 +82,11 @@ public class ProjectsServiceImpl implements ProjectService {
     // so (indeed) there can be no Transactions. The only way to ensure that that is working is by using a TransactionTemplate.
     // Add all project datasources to MagmaEngine
     for(Project project : getProjects()) {
-      registerDatasource(project);
+      try {
+        registerDatasource(project);
+      } catch (Exception e) {
+        log.error("Failed initializing project: {}", project.getName(), e);
+      }
     }
   }
 
