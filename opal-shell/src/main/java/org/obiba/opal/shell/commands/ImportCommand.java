@@ -192,19 +192,31 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
           ((NonExistentVariableEntitiesException) ex.getCause()).getNonExistentIdentifiers()
       );
     } else {
-      printThrowable(ex, false);
+      printThrowable(ex, true, 0);
     }
   }
 
-  private void printThrowable(Throwable ex, boolean withStack) {
-    if(!Strings.isNullOrEmpty(ex.getMessage())) getShell().printf(ex.getMessage());
-    if(withStack) {
-      for(StackTraceElement elem : ex.getStackTrace()) {
-        getShell().printf(elem.toString());
-      }
+  private void printThrowable(Throwable ex, boolean withStack, int depth) {
+    //only prints message for the top exception
+    if (depth == 0 && !Strings.isNullOrEmpty(ex.getMessage())) getShell().printf(ex.getMessage());
+
+    StringBuilder sb = new StringBuilder();
+    if (depth > 0) {
+      sb.append("Caused by: ");
+      sb.append(ex.toString()).append("\n");
     }
-    if(ex.getCause() != null) {
-      printThrowable(ex.getCause(), withStack);
+
+    if (withStack) {
+      for(StackTraceElement elem : ex.getStackTrace()) {
+        sb.append(elem.toString()).append("\n");
+      }
+      getShell().printf(sb.toString());
+    }
+
+    Throwable cause = ex.getCause();
+    //we only recurse if there is a cause and not the exception itself (quite common cause of endless loops)
+    if (cause != null && cause != ex) {
+      printThrowable(cause, withStack, depth + 1);
     }
   }
 
