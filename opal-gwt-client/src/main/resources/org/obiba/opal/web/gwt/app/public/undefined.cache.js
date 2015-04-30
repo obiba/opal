@@ -1,0 +1,1 @@
+ui.onScriptDownloaded(alert('Please use one of these browsers:\n  -Chrome\n  -Firefox\n  -Internet Explorer 8, 9, 10 or 11\nIf your browser is in this list and you still see this warning, \nthen your browser was not properly recognized.\nIn that case, use one of the others.'));
