@@ -99,8 +99,12 @@ public class OpalJettyServer {
     // OPAL-2687
     String excludedProtocols = properties.getProperty("org.obiba.opal.ssl.excludedProtocols");
 
+    // OPAL-2752
+    String includedCipherSuites = properties.getProperty("org.obiba.opal.ssl.includedCipherSuites");
+
     configureHttpConnector(httpPort == null ? null : Integer.valueOf(httpPort), maxIdleTime);
-    configureSslConnector(httpsPort == null ? null : Integer.valueOf(httpsPort), maxIdleTime, excludedProtocols);
+    configureSslConnector(httpsPort == null ? null : Integer.valueOf(httpsPort), maxIdleTime, excludedProtocols,
+        includedCipherSuites);
     configureAjpConnector(ajpPort == null ? null : Integer.valueOf(ajpPort));
 
     // OPAL-2652
@@ -145,7 +149,8 @@ public class OpalJettyServer {
     jettyServer.addConnector(httpConnector);
   }
 
-  private void configureSslConnector(@Nullable Integer httpsPort, int maxIdleTime, String excludedProtocols) {
+  private void configureSslConnector(@Nullable Integer httpsPort, int maxIdleTime, String excludedProtocols,
+      String includedCipherSuites) {
     if(httpsPort == null || httpsPort <= 0) return;
 
     SslContextFactory jettySsl = new SslContextFactory() {
@@ -166,6 +171,11 @@ public class OpalJettyServer {
     if(!Strings.isNullOrEmpty(excludedProtocols)) {
       String[] protocols = excludedProtocols.split("\\s*,\\s*");
       if(protocols.length > 0) jettySsl.addExcludeProtocols(protocols);
+    }
+
+    if(!Strings.isNullOrEmpty(includedCipherSuites)) {
+      String[] ciphers = includedCipherSuites.split("\\s*,\\s*");
+      if(ciphers.length > 0) jettySsl.setIncludeCipherSuites(ciphers);
     }
 
     jettySsl.setAllowRenegotiate(false);
