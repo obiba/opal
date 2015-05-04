@@ -168,6 +168,7 @@ public class OpalJettyServer {
       if(protocols.length > 0) jettySsl.addExcludeProtocols(protocols);
     }
 
+    jettySsl.setAllowRenegotiate(false);
     jettySsl.setWantClientAuth(true);
     jettySsl.setNeedClientAuth(false);
 
