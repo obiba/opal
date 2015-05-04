@@ -1749,7 +1749,7 @@
     <janino.version>2.5.10</janino.version>
     <javassist.version>3.19.0-GA</javassist.version>
     <javax-el.version>2.2.5</javax-el.version>
-    <jetty.version>8.1.16.v20140903</jetty.version>
+    <jetty.version>8.1.17.v20150415</jetty.version>
     <jetty-util.version>6.1.22</jetty-util.version>
     <jewelcli.version>0.6</jewelcli.version>
     <jgit.version>3.6.2.201501210735-r</jgit.version>
