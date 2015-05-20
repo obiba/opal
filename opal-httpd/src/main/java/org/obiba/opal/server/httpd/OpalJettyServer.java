@@ -9,17 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.server.httpd;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.EnumSet;
-import java.util.Properties;
-
-import javax.annotation.Nullable;
-import javax.servlet.ServletContext;
-
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.jetty.ajp.Ajp13SocketConnector;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
@@ -38,6 +29,8 @@ import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
 import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
 import org.jboss.resteasy.plugins.spring.SpringContextLoaderSupport;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.pac4j.Pac4jClientFilter;
+import org.obiba.opal.pac4j.Pac4jConfigurer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -47,13 +40,17 @@ import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.filter.DelegatingFilterProxy;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
+import javax.annotation.Nullable;
+import javax.servlet.ServletContext;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.EnumSet;
+import java.util.Properties;
 
-import static javax.servlet.DispatcherType.ERROR;
-import static javax.servlet.DispatcherType.FORWARD;
-import static javax.servlet.DispatcherType.INCLUDE;
-import static javax.servlet.DispatcherType.REQUEST;
+import static javax.servlet.DispatcherType.*;
 import static org.springframework.web.context.ContextLoader.CONFIG_LOCATION_PARAM;
 
 /**
@@ -118,7 +115,12 @@ public class OpalJettyServer {
     handlers.addHandler(createDistFileHandler("/webapp"));
     // Add webapp extensions
     handlers.addHandler(createExtensionFileHandler(OpalRuntime.WEBAPP_EXTENSION));
-    handlers.addHandler(createServletHandler());
+    ServletContextHandler servletContextHandler = createServletHandler();
+
+    //check/configure pac4j extra auth clients related servlets/filters
+    configurePac4j(servletContextHandler, properties);
+
+    handlers.addHandler(servletContextHandler);
     jettyServer.setHandler(handlers);
   }
 
@@ -190,7 +192,7 @@ public class OpalJettyServer {
     jettyServer.addConnector(sslConnector);
   }
 
-  private Handler createServletHandler() {
+  private ServletContextHandler createServletHandler() {
     servletContextHandler = new ServletContextHandler(ServletContextHandler.NO_SECURITY);
     servletContextHandler.setContextPath("/");
 
@@ -213,7 +215,17 @@ public class OpalJettyServer {
     return servletContextHandler;
   }
 
-  private Handler createDistFileHandler(String directory) throws IOException, URISyntaxException {
+    public static final void configurePac4j(ServletContextHandler handler, Properties properties) {
+
+        if (Pac4jConfigurer.init(properties)) {
+            String pac4jCallbackPath = Pac4jConfigurer.getCallbackPath();
+            handler.addServlet(HttpServletDispatcher.class, pac4jCallbackPath);
+            handler.addFilter(Pac4jClientFilter.Wrapper.class, pac4jCallbackPath, EnumSet.of(REQUEST, FORWARD));
+        }
+    }
+
+
+    private Handler createDistFileHandler(String directory) throws IOException, URISyntaxException {
     return createFileHandler("file://" + System.getProperty("OPAL_DIST") + directory);
   }
 

@@ -38,6 +38,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.net.URI;
+
 @Component
 @Path("/auth")
 public class AuthenticationResource extends AbstractSecurityComponent {
@@ -60,16 +62,25 @@ public class AuthenticationResource extends AbstractSecurityComponent {
       String sessionId = SecurityUtils.getSubject().getSession().getId().toString();
       log.info("Successful session creation for user '{}' at ip: '{}': session ID is '{}'.", username,
           servletRequest.getRemoteAddr(), sessionId);
-      return Response.created(
-          UriBuilder.fromPath("/").path(AuthenticationResource.class).path(AuthenticationResource.class, "checkSession")
-              .build(sessionId)).build();
-
+      return Response.created(getSucessfulLoginUri(sessionId)).build();
     } catch(AuthenticationException e) {
       log.info("Authentication failure of user '{}' at ip: '{}': {}", username, servletRequest.getRemoteAddr(),
           e.getMessage());
       // When a request contains credentials and they are invalid, the a 403 (Forbidden) should be returned.
       return Response.status(Status.FORBIDDEN).build();
     }
+  }
+
+    public static URI getSucessfulLoginUri(String sessionId) {
+        return UriBuilder.fromPath("/")
+                .path(AuthenticationResource.class)
+                .path(AuthenticationResource.class, "checkSession")
+                .build(sessionId);
+
+    }
+
+  public static String getSucessfulLoginPath() {
+      return getSucessfulLoginUri(SecurityUtils.getSubject().getSession().getId().toString()).getPath();
   }
 
   @HEAD

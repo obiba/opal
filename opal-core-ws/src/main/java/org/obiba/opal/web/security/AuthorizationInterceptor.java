@@ -140,7 +140,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
     }
   }
 
-  private void addPermissionUris(Iterable<URI> resourceUris) {
+  public void addPermissionUris(Iterable<URI> resourceUris) {
     for(URI resourceUri : resourceUris) {
       String resource = requestAttributeProvider.getResourcePath(resourceUri);
       if(!getSubject().isPermitted("rest:" + resource + ":*")) {
