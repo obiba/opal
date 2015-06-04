@@ -102,7 +102,8 @@ public class RestValueTable extends AbstractValueTable {
     if(!hasValueSet(entity)) {
       throw new NoSuchValueSetException(this, entity);
     }
-    return new LazyValueSet(this, entity);
+
+    return new ValueSetBean(this, entity);
   }
 
   @Override
@@ -211,14 +212,16 @@ public class RestValueTable extends AbstractValueTable {
     }
   }
 
-  private class LazyValueSet extends ValueSetBean {
+  private class LazyValueSet {
 
     private ValueSetsDto valueSet;
 
     private Timestamps timestamps;
 
-    private LazyValueSet(ValueTable table, VariableEntity entity) {
-      super(table, entity);
+    private VariableEntity variableEntity;
+
+    private LazyValueSet(VariableEntity variableEntity) {
+      this.variableEntity = variableEntity;
     }
 
     public Value get(Variable variable) {
@@ -281,7 +284,7 @@ public class RestValueTable extends AbstractValueTable {
       }
     }
 
-    @Override
+
     public Timestamps getTimestamps() {
       if(timestamps != null) return timestamps;
       loadTimestamps();
@@ -291,7 +294,7 @@ public class RestValueTable extends AbstractValueTable {
     synchronized private void loadTimestamps() {
       try {
         Magma.TimestampsDto tsDto = getOpalClient().getResource(Magma.TimestampsDto.class,
-            newUri("valueSet", getVariableEntity().getIdentifier(), "timestamps").build(),
+            newUri("valueSet", variableEntity.getIdentifier(), "timestamps").build(),
             Magma.TimestampsDto.newBuilder());
         timestamps = new ValueSetTimestamps(tsDto);
       } catch(RuntimeException e) {
@@ -303,7 +306,7 @@ public class RestValueTable extends AbstractValueTable {
     synchronized ValueSetsDto loadValueSet() {
       if(valueSet == null) {
         valueSet = getOpalClient().getResource(ValueSetsDto.class,
-            newUri("valueSet", getVariableEntity().getIdentifier()).query("filterBinary", "true").build(),
+            newUri("valueSet", variableEntity.getIdentifier()).query("filterBinary", "true").build(),
             ValueSetsDto.newBuilder());
         timestamps = new ValueSetTimestamps(valueSet.getValueSets(0).getTimestamps());
       }
@@ -385,7 +388,7 @@ public class RestValueTable extends AbstractValueTable {
     @NotNull
     @Override
     public Value getValue(ValueSet valueSet) {
-      return ((LazyValueSet) valueSet).get(variable);
+      return new LazyValueSet(valueSet.getVariableEntity()).get(variable);
     }
 
     @Override
