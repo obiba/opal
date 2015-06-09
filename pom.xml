@@ -1764,8 +1764,8 @@
     <liquibase.version>1.9.4</liquibase.version>
     <logback.version>1.1.2</logback.version>
     <logstash-logback.version>4.0</logstash-logback.version>
-    <magma.version>1.11-SNAPSHOT</magma.version>
     <public-datasources.version>1.2.0</public-datasources.version>
+    <magma.version>1.11-SNAPSHOT</magma.version>
     <mail.version>1.5.0-b01</mail.version>
     <mockftpserver.version>2.5</mockftpserver.version>
     <mockito.version>1.10.8</mockito.version>
@@ -1773,7 +1773,7 @@
     <mongodb-driver.version>2.13.0</mongodb-driver.version>
     <mysql-connector-java.version>5.1.34</mysql-connector-java.version>
     <newrelic.version>3.4.2</newrelic.version>
-    <obiba-commons.version>1.7.1</obiba-commons.version>
+    <obiba-commons.version>1.7-SNAPSHOT</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <opencsv.version>2.3</opencsv.version>
     <orientdb.version>1.6.4</orientdb.version>
