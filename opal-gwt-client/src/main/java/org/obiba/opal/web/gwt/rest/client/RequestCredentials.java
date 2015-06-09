@@ -120,6 +120,7 @@ public class RequestCredentials {
 
   public void invalidate() {
     Cookies.removeCookie(OPALSID, "/");
+    Cookies.removeCookie(OBIBASID, "/");
   }
 
   private static String toHexString(byte... bytes) {
