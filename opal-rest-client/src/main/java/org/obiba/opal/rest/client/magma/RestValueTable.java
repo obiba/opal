@@ -29,7 +29,6 @@ import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueSource;
-import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
@@ -157,7 +156,7 @@ public class RestValueTable extends AbstractValueTable {
   }
 
   void refresh() {
-    getSources().clear();
+    clearSources();
     initialise();
   }
 
