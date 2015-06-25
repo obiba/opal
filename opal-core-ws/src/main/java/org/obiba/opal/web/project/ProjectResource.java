@@ -96,10 +96,13 @@ public class ProjectResource {
   @Transactional
   public Response delete(@QueryParam("archive") @DefaultValue("false") boolean archive) throws FileSystemException {
     try {
-      Datasource ds = getProject().getDatasource();
+      Project project = getProject();
+      Datasource ds = project.hasDatasource() ? project.getDatasource() : null;
       projectService.delete(name, archive);
-      for(DatasourceUpdateListener listener : datasourceUpdateListeners) {
-        listener.onDelete(ds);
+      if (ds != null) {
+        for(DatasourceUpdateListener listener : datasourceUpdateListeners) {
+          listener.onDelete(ds);
+        }
       }
     } catch(NoSuchProjectException e) {
       // silently ignore project not found
