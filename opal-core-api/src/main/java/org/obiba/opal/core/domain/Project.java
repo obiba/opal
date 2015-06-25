@@ -136,6 +136,11 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
     return MagmaEngine.get().getDatasource(name);
   }
 
+  @Transient
+  public boolean hasDatasource() {
+    return MagmaEngine.get().hasDatasource(name);
+  }
+
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this).add("name", name).add("database", database).toString();
