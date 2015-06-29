@@ -21,6 +21,8 @@ import javax.annotation.Nullable;
 import javax.servlet.ServletContext;
 
 import org.eclipse.jetty.ajp.Ajp13SocketConnector;
+import org.eclipse.jetty.security.ConstraintAware;
+import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -33,6 +35,7 @@ import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlets.GzipFilter;
 import org.eclipse.jetty.util.resource.FileResource;
+import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
 import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
@@ -191,26 +194,54 @@ public class OpalJettyServer {
   }
 
   private Handler createServletHandler() {
-    servletContextHandler = new ServletContextHandler(ServletContextHandler.NO_SECURITY);
+    servletContextHandler = new ServletContextHandler(ServletContextHandler.SECURITY);
     servletContextHandler.setContextPath("/");
 
-    servletContextHandler.addEventListener(new ResteasyBootstrap());
-    servletContextHandler.addEventListener(new Spring4ContextLoaderListener());
-    servletContextHandler.addEventListener(new RequestContextListener());
-
-    servletContextHandler.addFilter(OpalVersionFilter.class, "/*", EnumSet.of(REQUEST));
-    FilterHolder authenticationFilterHolder = new FilterHolder(DelegatingFilterProxy.class);
-    authenticationFilterHolder.setName("authenticationFilter");
-    authenticationFilterHolder.setInitParameters(ImmutableMap.of("targetFilterLifecycle", "true"));
-    servletContextHandler.addFilter(authenticationFilterHolder, "/ws/*", EnumSet.of(REQUEST, FORWARD, INCLUDE, ERROR));
-
-    servletContextHandler.addFilter(GzipFilter.class, "/*", EnumSet.of(REQUEST));
+    initEventListeners();
+    initNotAllowedMethods();
+    initFilters();
 
     servletContextHandler.setInitParameter(CONFIG_LOCATION_PARAM, "classpath:/META-INF/spring/opal-server/context.xml");
     servletContextHandler.setInitParameter("resteasy.servlet.mapping.prefix", "/ws");
     servletContextHandler.addServlet(HttpServletDispatcher.class, "/ws/*");
 
     return servletContextHandler;
+  }
+
+  private void initEventListeners() {
+    servletContextHandler.addEventListener(new ResteasyBootstrap());
+    servletContextHandler.addEventListener(new Spring4ContextLoaderListener());
+    servletContextHandler.addEventListener(new RequestContextListener());
+  }
+
+  private void initFilters() {
+    servletContextHandler.addFilter(OpalVersionFilter.class, "/*", EnumSet.of(REQUEST));
+
+    FilterHolder authenticationFilterHolder = new FilterHolder(DelegatingFilterProxy.class);
+    authenticationFilterHolder.setName("authenticationFilter");
+    authenticationFilterHolder.setInitParameters(ImmutableMap.of("targetFilterLifecycle", "true"));
+    servletContextHandler.addFilter(authenticationFilterHolder, "/ws/*", EnumSet.of(REQUEST, FORWARD, INCLUDE, ERROR));
+
+    servletContextHandler.addFilter(GzipFilter.class, "/*", EnumSet.of(REQUEST));
+  }
+
+  private void initNotAllowedMethods() {
+    ConstraintAware securityHandler = (ConstraintAware) servletContextHandler.getSecurityHandler();
+    securityHandler.addConstraintMapping(newMethodConstraintMapping("TRACE"));
+    securityHandler.addConstraintMapping(newMethodConstraintMapping("TRACK"));
+  }
+
+  private ConstraintMapping newMethodConstraintMapping(String method) {
+    Constraint constraint = new Constraint();
+    constraint.setName("Disable " + method);
+    constraint.setAuthenticate(true);
+
+    ConstraintMapping mapping = new ConstraintMapping();
+    mapping.setConstraint(constraint);
+    mapping.setMethod(method);
+    mapping.setPathSpec("/");
+
+    return mapping;
   }
 
   private Handler createDistFileHandler(String directory) throws IOException, URISyntaxException {
