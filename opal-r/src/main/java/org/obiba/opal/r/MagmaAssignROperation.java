@@ -223,7 +223,7 @@ public class MagmaAssignROperation extends AbstractROperation {
       RList list = getVariableVectors();
 
       String[] names = list.keys();
-      if(names == null && names.length == 0) return;
+      if(names == null || names.length == 0) return;
 
       doAssignTmpVectors(ids, names, list);
       doAssignDataFrame(names);
