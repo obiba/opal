@@ -302,6 +302,14 @@ public enum UriBuilders {
     }
   },
 
+  SYSTEM_CONF_TAXONOMIES_IMPORT_GITHUB {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "conf", "taxonomies", "import", "_github");
+
+    }
+  },
+
   SYSTEM_CONF_TAXONOMIES_SUMMARIES {
     @Override
     public UriBuilder create() {
