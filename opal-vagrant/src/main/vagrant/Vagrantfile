@@ -1,0 +1,108 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+def parse_vagrant_config(
+  config_file=File.expand_path(File.join(File.dirname(__FILE__), 'config.yaml'))
+)
+  require 'yaml'
+  config = {
+    'name'              => 'opal-server',
+    'distro'            => 'redhat',
+  	'box'				=> 'puppetlabs/centos-6.5-64-puppet',
+    'box_check_update'	=> true,
+    'box_gui'			=> false,
+    'forwarded_ports' 	=> [[8080,8080], [8443,8443]],
+    'vm_memory'			=> 8192,
+    'vm_cpus'			=> 4,
+    'synced_folders'	=> []
+  }
+
+  if File.exists?(config_file)
+    overrides = YAML.load_file(config_file)
+    config.merge!(overrides)
+  end
+  config
+end
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+	v_config = parse_vagrant_config
+
+  # All Vagrant configuration is done here. The most common configuration
+  # options are documented and commented below. For a complete reference,
+  # please see the online documentation at vagrantup.com.
+
+  # Every Vagrant virtual environment requires a box to build off of.
+  config.vm.box = v_config['box']
+
+	if Vagrant.has_plugin?("vagrant-cachier")
+    	# Configure cached packages to be shared between instances of the same base box.
+	    # More info on http://fgrehm.viewdocs.io/vagrant-cachier/usage
+    	config.cache.scope = :box
+  	end
+
+	v_config['forwarded_ports'].each do |i|
+  		# Create a forwarded port mapping which allows access to a specific port
+  		# within the machine from a port on the host machine. In the example below,
+  		# accessing "localhost:8080" will access port 80 on the guest machine.
+  		# config.vm.network "forwarded_port", guest: 80, host: 8080
+		config.vm.network "forwarded_port", guest: i[1], host: i[0]
+	end
+
+  # Create a public network, which generally matched to bridged network.
+  # Bridged networks make the machine appear as another physical device on
+  # your network.
+  # config.vm.network "public_network"
+
+  # If true, then any SSH connections made will enable agent forwarding.
+  # Default value: false
+  # config.ssh.forward_agent = true
+
+	# Disable automatic box update checking. If you disable this, then
+  	# boxes will only be checked for updates when the user runs
+	# `vagrant box outdated`. This is not recommended.
+	config.vm.box_check_update = v_config['box_check_update']
+	
+	v_config['synced_folders'].each do |i|
+		# Share an additional folder to the guest VM. 
+		# The first argument is the path on the host to the actual folder. 
+		# The second argument the path on the guest to mount the folder. 
+		# The optional third argument is a set of non-required options.
+		# config.vm.synced_folder "../data", "/vagrant_data"
+		config.vm.synced_folder *i
+	end
+
+  	#VirtualBox provider:
+	config.vm.provider "virtualbox" do |v|
+		v.name = v_config['name']
+		v.gui = v_config['box_gui'] #boot headless or not
+	  	v.memory = v_config['vm_memory']
+  		v.cpus = v_config['vm_cpus']
+	end
+
+    #if v_config['distro'] == 'redhat'
+    #    config.vm.provision "shell" do |s|
+    #        s.inline = 'yum "$@"'
+    #        s.args = ['install', '-y', 'puppet']
+    #    end
+    #end
+
+    config.vm.provision "shell" do |s|
+        s.inline = 'puppet "$@"'
+        s.args = ['module', 'install', 'puppetlabs-firewall']
+    end
+
+  # Enable provisioning with Puppet stand alone.  Puppet manifests
+  # are contained in a directory path relative to this Vagrantfile.
+  # You will need to create the manifests directory and a manifest in
+  # the file default.pp in the manifests_path directory.
+  #
+  config.vm.provision "puppet" do |puppet|
+     puppet.manifests_path = "manifests"
+     puppet.manifest_file  = "#{v_config['distro']}.pp"
+  end
+
+end

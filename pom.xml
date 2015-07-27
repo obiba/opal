@@ -42,6 +42,7 @@
     <module>opal-datashield</module>
     <module>opal-search</module>
     <module>opal-upgrade</module>
+    <module>opal-vagrant</module>
   </modules>
 
   <dependencyManagement>
