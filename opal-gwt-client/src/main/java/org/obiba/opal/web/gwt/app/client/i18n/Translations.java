@@ -577,6 +577,9 @@ public interface Translations extends Constants {
       "CannotCopyAllTablesWithinProject", "This action would be applied to all tables. You cannot copy multiple " +
       "tables within the same project. Copy each table individually or create a new project.",//
       "IdentifierMappingFailed", "Identifiers mapping failed : {0}.",//
+      "TaxonomyGitUserRequired", "Github user or organization name is required.", //
+      "TaxonomyGitRepositoryRequired", "Github repository name is required.", //
+      "TaxonomyGitImportFailed", "Failed to import taxonomy. Please make sure all Github related information is correct.",
       "TaxonomyNotFound", "No such taxonomy with name: {0}.", //
       "VocabularyNotFound", "No such vocabulary in taxonomy '{0}' with name: {1}.", //
       "TermNotFound", "No such term in taxonomy '{0}' and vocabulary '{1}' with name: {2}.", //
@@ -1643,6 +1646,10 @@ public interface Translations extends Constants {
   @Description("Page Taxonomies title")
   @DefaultStringValue("Taxonomies")
   String pageTaxonomiesTitle();
+
+  @Description("Import Github Taxonomy")
+  @DefaultStringValue("Import Github Taxonomy")
+  String importGitTaxonomy();
 
   @Description("Add Taxonomy")
   @DefaultStringValue("Add Taxonomy")

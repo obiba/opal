@@ -74,6 +74,8 @@ import org.obiba.opal.web.gwt.app.client.administration.taxonomies.TaxonomiesAdm
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.TaxonomiesAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.edit.TaxonomyEditModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.edit.TaxonomyEditModalView;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.git.TaxonomyGitImportModalPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.git.TaxonomyGitImportModalView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.list.TaxonomiesPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.list.TaxonomiesView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.term.edit.TermEditModalPresenter;
@@ -137,6 +139,8 @@ public class AdministrationModule extends AbstractPresenterModule {
     bindPresenterWidget(TaxonomyPresenter.class, TaxonomyPresenter.Display.class, TaxonomyView.class);
     bindPresenterWidget(TaxonomyEditModalPresenter.class, TaxonomyEditModalPresenter.Display.class,
         TaxonomyEditModalView.class);
+    bindPresenterWidget(TaxonomyGitImportModalPresenter.class, TaxonomyGitImportModalPresenter.Display.class,
+        TaxonomyGitImportModalView.class);
     bindPresenterWidget(VocabularyPresenter.class, VocabularyPresenter.Display.class, VocabularyView.class);
     bindPresenterWidget(VocabularyEditModalPresenter.class, VocabularyEditModalPresenter.Display.class,
         VocabularyEditModalView.class);
