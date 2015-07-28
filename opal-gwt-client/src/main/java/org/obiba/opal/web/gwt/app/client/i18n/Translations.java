@@ -579,8 +579,9 @@ public interface Translations extends Constants {
       "IdentifierMappingFailed", "Identifiers mapping failed : {0}.",//
       "TaxonomyGitUserRequired", "Github user or organization name is required.", //
       "TaxonomyGitRepositoryRequired", "Github repository name is required.", //
-      "TaxonomyGitImportFailed", "Failed to import taxonomy. Please make sure all Github related information is correct.",
+      "TaxonomyImportFailed", "Failed to import taxonomy. Please make sure all Github related information is correct.",
       "TaxonomyNotFound", "No such taxonomy with name: {0}.", //
+      "TaxonomyAlreadyExists", "A taxonomy with the name '{0}' already exists. To override, click on 'Override existing taxonomy' option.", //
       "VocabularyNotFound", "No such vocabulary in taxonomy '{0}' with name: {1}.", //
       "TermNotFound", "No such term in taxonomy '{0}' and vocabulary '{1}' with name: {2}.", //
       "IllegalArgument", "{0}" //

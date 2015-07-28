@@ -60,6 +60,11 @@
       </b:HelpBlock>
     </b:ControlGroup>
 
+    <b:ControlGroup>
+      <b:CheckBox ui:field="overrideExisting">
+        <ui:msg description="Override existing taxonomy label">Override existing taxonomy</ui:msg>
+      </b:CheckBox>
+    </b:ControlGroup>
 
     <b:ModalFooter>
       <b:Button type="PRIMARY" ui:field="importRepo">

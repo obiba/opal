@@ -10,6 +10,7 @@
 
 package org.obiba.opal.core.service;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Collections;
@@ -80,8 +81,20 @@ public class TaxonomyServiceImpl implements TaxonomyService {
 
   @Override
   public Taxonomy importGitHubTaxonomy(@NotNull String username, @NotNull String repo, @Nullable String ref,
-      @NotNull String taxonomyFile) {
-    return importGitHubTaxonomy(username, repo, ref, taxonomyFile, true);
+      @NotNull String taxonomyFile, boolean override) {
+
+    String user = username;
+    if(Strings.isNullOrEmpty(username)) user = MLSTRM_USER;
+    if(Strings.isNullOrEmpty(repo)) throw new IllegalArgumentException("GitHub repository is required");
+    String reference = ref;
+    if(Strings.isNullOrEmpty(ref)) reference = "master";
+    String fileName = taxonomyFile;
+    if(Strings.isNullOrEmpty(taxonomyFile)) fileName = TAXONOMY_YAML;
+    if(!fileName.endsWith(".yml")) fileName = taxonomyFile + "/" + TAXONOMY_YAML;
+
+    String uri = GITHUB_URL + "/" + user + "/" + repo + "/" + reference + "/" + fileName;
+
+    return importUriTaxonomy(uri, override);
   }
 
   @Override
@@ -92,13 +105,16 @@ public class TaxonomyServiceImpl implements TaxonomyService {
       InputStream input = fileObj.getContent().getInputStream();
       TaxonomyYaml yaml = new TaxonomyYaml();
       Taxonomy taxonomy = yaml.load(input);
-      saveTaxonomy(taxonomy);
-      return taxonomy;
-    } catch(Exception e) {
-      log.error("Failed loading taxonomy from: " + file, e);
+      String name = taxonomy.getName();
+      if(!hasTaxonomy(name)) {
+        saveTaxonomy(taxonomy);
+        return taxonomy;
+      } else {
+        throw new TaxonomyAlreadyExistsException(name);
+      }
+    } catch(IOException e) {
+      throw new TaxonomyImportException(e);
     }
-
-    return null;
   }
 
   @Override
@@ -231,35 +247,21 @@ public class TaxonomyServiceImpl implements TaxonomyService {
     }
   }
 
-  private Taxonomy importGitHubTaxonomy(@NotNull String username, @NotNull String repo, @Nullable String ref,
-      @NotNull String taxonomyFile, boolean override) {
-    String user = username;
-    if(Strings.isNullOrEmpty(username)) user = MLSTRM_USER;
-    if(Strings.isNullOrEmpty(repo)) throw new IllegalArgumentException("GitHub repository is required");
-    String reference = ref;
-    if(Strings.isNullOrEmpty(ref)) reference = "master";
-    String fileName = taxonomyFile;
-    if(Strings.isNullOrEmpty(taxonomyFile)) fileName = TAXONOMY_YAML;
-    if(!fileName.endsWith(".yml")) fileName = taxonomyFile + "/" + TAXONOMY_YAML;
-
-    String uri = GITHUB_URL + "/" + user + "/" + repo + "/" + reference + "/" + fileName;
-
-    return importUriTaxonomy(uri, override);
-  }
-
   private Taxonomy importUriTaxonomy(@NotNull String uri, boolean override) {
     try {
       InputStream input = new URL(uri).openStream();
       TaxonomyYaml yaml = new TaxonomyYaml();
       Taxonomy taxonomy = yaml.load(input);
-      if(override || !hasTaxonomy(taxonomy.getName())) {
+      String name = taxonomy.getName();
+      if(override || !hasTaxonomy(name)) {
         saveTaxonomy(taxonomy);
         return taxonomy;
+      } else {
+        throw new TaxonomyAlreadyExistsException(name);
       }
-    } catch(Exception e) {
-      log.error("Failed loading taxonomy from: " + uri, e);
+    } catch(IOException e) {
+      throw new TaxonomyImportException(e);
     }
-    return null;
   }
 
   private FileObject resolveFileInFileSystem(String path) throws FileSystemException {

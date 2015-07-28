@@ -38,7 +38,7 @@ public interface TaxonomyService extends SystemService {
    * @return null if import failed
    */
   Taxonomy importGitHubTaxonomy(@NotNull String username, @NotNull String repo, @Nullable String ref,
-      @NotNull String taxonomyFile);
+      @NotNull String taxonomyFile, boolean override);
 
   /**
    * Import a {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} from a file in Opal's file system.

@@ -68,8 +68,9 @@ public class TaxonomiesResource {
   public Response importTaxonomyFromGitHub(@Context UriInfo uriInfo,
       @QueryParam("user") @DefaultValue("maelstrom-research") String username, @QueryParam("repo") String repo,
       @QueryParam("ref") @DefaultValue("master") String ref,
-      @QueryParam("file") @DefaultValue("taxonomy.yml") String file) {
-    Taxonomy taxonomy = taxonomyService.importGitHubTaxonomy(username, repo, ref, file);
+      @QueryParam("file") @DefaultValue("taxonomy.yml") String file,
+      @QueryParam("override") @DefaultValue("false") boolean override) {
+    Taxonomy taxonomy = taxonomyService.importGitHubTaxonomy(username, repo, ref, file, override);
     if(taxonomy == null) return Response.status(Response.Status.BAD_REQUEST).build();
 
     URI uri = uriInfo.getBaseUriBuilder().path("/system/conf/taxonomy").path(taxonomy.getName()).build();

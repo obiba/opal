@@ -6,6 +6,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 
+import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
@@ -49,6 +50,9 @@ public class TaxonomyGitImportModalView extends ModalPopupViewWithUiHandlers<Tax
   @UiField
   ControlGroup repositoryGroup;
 
+  @UiField
+  CheckBox overrideExisting;
+
   @Inject
   public TaxonomyGitImportModalView(EventBus eventBus) {
     super(eventBus);
@@ -63,7 +67,8 @@ public class TaxonomyGitImportModalView extends ModalPopupViewWithUiHandlers<Tax
 
   @UiHandler("importRepo")
   void onSave(ClickEvent event) {
-    getUiHandlers().onImport(user.getText(), repository.getText(), reference.getText(), file.getText());
+    getUiHandlers().onImport(user.getText(), repository.getText(), reference.getText(), file.getText(),
+        overrideExisting.getValue());
   }
 
   @UiHandler("cancel")
