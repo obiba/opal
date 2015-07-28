@@ -20,6 +20,7 @@ import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.DatasourceUpdateListener;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory;
+import org.obiba.magma.datasource.jdbc.JdbcDatasourceFactory;
 import org.obiba.magma.support.EntitiesPredicate;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.database.Database;
@@ -301,22 +302,36 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
     String databaseName = database.getName();
     Preconditions.checkArgument(database.getUsage() == Database.Usage.STORAGE,
         "Cannot create DatasourceFactory for non storage database " + databaseName + ": " + database.getUsage());
-    register(database.getName(), datasourceName);
+    register(databaseName, datasourceName);
 
     SqlSettings sqlSettings = database.getSqlSettings();
+
     if(sqlSettings != null) {
-      if(sqlSettings.getSqlSchema() != SqlSettings.SqlSchema.HIBERNATE) {
-        throw new IllegalArgumentException(
-            "Cannot create datasource for non Hibernate storage database " + databaseName + ": " +
-                sqlSettings.getSqlSchema());
+      switch(sqlSettings.getSqlSchema()) {
+        case HIBERNATE:
+          return new HibernateDatasourceFactory(datasourceName,
+              new DatabaseSessionFactoryProvider(datasourceName, this, database.getName()));
+
+        case JDBC:
+          JdbcDatasourceFactory dsFactory = new JdbcDatasourceFactory();
+          dsFactory.setName(datasourceName);
+          dsFactory.setDataSource(getDataSource(databaseName, datasourceName));
+          dsFactory.setDatasourceSettings(sqlSettings.getJdbcDatasourceSettings());
+          return dsFactory;
+
+        default:
+          throw new IllegalArgumentException(
+              "Cannot create datasource for non SQL storage database " + databaseName + ": " +
+                  sqlSettings.getSqlSchema());
       }
-      return new HibernateDatasourceFactory(datasourceName,
-          new DatabaseSessionFactoryProvider(datasourceName, this, database.getName()));
     }
+
     MongoDbSettings mongoDbSettings = database.getMongoDbSettings();
+
     if(mongoDbSettings != null) {
       return mongoDbSettings.createMongoDBDatasourceFactory(datasourceName);
     }
+
     throw new IllegalArgumentException("Unknown datasource config for database " + database.getClass());
   }
 
