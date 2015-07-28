@@ -6,6 +6,9 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyImportedEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
@@ -14,7 +17,10 @@ import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.common.base.Strings;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -26,12 +32,15 @@ import com.gwtplatform.mvp.client.PopupView;
 public class TaxonomyGitImportModalPresenter extends ModalPresenterWidget<TaxonomyGitImportModalPresenter.Display>
     implements TaxonomyGitImportModalUiHandlers {
 
-  protected ValidationHandler validationHandler;
+  private final Translations translations;
+
+  private ValidationHandler validationHandler;
 
   @Inject
-  public TaxonomyGitImportModalPresenter(EventBus eventBus, Display display) {
+  public TaxonomyGitImportModalPresenter(EventBus eventBus, Display display, Translations translations) {
     super(eventBus, display);
     getView().setUiHandlers(this);
+    this.translations = translations;
   }
 
   @Override
@@ -40,13 +49,13 @@ public class TaxonomyGitImportModalPresenter extends ModalPresenterWidget<Taxono
   }
 
   @Override
-  public void onImport(String name, String repository, String reference, String file) {
+  public void onImport(String user, String repository, String reference, String file, boolean override) {
     if(!validationHandler.validate()) return;
-    
+
     ResourceRequestBuilderFactory.newBuilder()
         .forResource(
-            UriBuilders.SYSTEM_CONF_TAXONOMIES_IMPORT_GITHUB.create().query("user", name).query("repo", repository)
-                .query("ref", reference).query("file", file).build())
+            UriBuilders.SYSTEM_CONF_TAXONOMIES_IMPORT_GITHUB.create().query("user", user).query("repo", repository)
+                .query("ref", reference).query("file", file).query("override", String.valueOf(override)).build())
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
@@ -57,14 +66,21 @@ public class TaxonomyGitImportModalPresenter extends ModalPresenterWidget<Taxono
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            if(response.getText() != null && response.getText().length() != 0) {
-              getView().showError(null, response.getText());
+            String message = response.getText();
+            ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
+
+            if (errorDto != null) {
+              getView().showError(null, TranslationsUtils.replaceArguments(
+                  translations.userMessageMap().get(errorDto.getStatus()),
+                  JsArrays.toList(errorDto.getArgumentsArray())));
+            } else if(Strings.isNullOrEmpty(message)) {
+              getView().showError(null, message);
             } else {
-              getView().showError("TaxonomyGitImportFailed");
+              getView().showError("TaxonomyImportFailed");
             }
 
           }
-        }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR) //
+        }, Response.SC_CONFLICT, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR) //
         .post().send();
   }
 

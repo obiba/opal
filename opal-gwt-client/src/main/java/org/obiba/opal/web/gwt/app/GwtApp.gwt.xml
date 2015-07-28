@@ -9,7 +9,7 @@
 
   <!-- Logging -->
   <inherits name="com.google.gwt.logging.Logging"/>
-  <set-property name="gwt.logging.enabled" value="FALSE"/>
+  <set-property name="gwt.logging.enabled" value="TRUE"/>
 
   <!-- Guava Collections -->
   <inherits name='com.google.common.collect.Collect'/>
@@ -127,7 +127,7 @@
 
   <!-- This will limit the compile to a single browser: -->
   <!-- Firefox 3.x -->
-  <!--<set-property name='user.agent' value='gecko1_8'/>-->
+  <set-property name='user.agent' value='gecko1_8'/>
   <!-- Chrome -->
   <!--<set-property name='user.agent' value='safari'/>-->
 
