@@ -211,7 +211,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
           @Override
           public void onResponseCode(Request request, Response response) {
             getView().removeFormat(ImportFormat.LIMESURVEY);
-            getView().removeFormat(ImportFormat.JDBC);
           }
         }, Response.SC_FORBIDDEN, Response.SC_INTERNAL_SERVER_ERROR) //
         .get().send();
