@@ -350,6 +350,29 @@ public enum UriBuilders {
     }
   },
 
+  SYSTEM_CONF_TAXONOMY_COMMITS_INFO {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "conf", "taxonomy", "{}", "commits");
+
+    }
+  },
+
+  SYSTEM_CONF_TAXONOMY_COMMIT_INFO {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "conf", "taxonomy", "{}", "commit", "{}", "{}");
+
+    }
+  },
+
+  SYSTEM_CONF_TAXONOMY_GIT_RESTORE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "conf", "taxonomy", "{}", "restore", "{}");
+    }
+  },
+
   SYSTEM_CONF_TAXONOMY_VOCABULARIES {
     @Override
     public UriBuilder create() {

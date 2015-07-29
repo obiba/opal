@@ -21,13 +21,18 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.VcsCommitHistoryModalPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
+import org.obiba.opal.web.model.client.opal.VcsCommitInfoDto;
+import org.obiba.opal.web.model.client.opal.VcsCommitInfosDto;
 import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
 import com.google.common.base.Strings;
@@ -45,6 +50,8 @@ import static com.google.gwt.http.client.Response.SC_OK;
 
 public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display> implements TaxonomyUiHandlers {
 
+  static final String HEAD_REVISION = "head";
+
   private Runnable actionRequiringConfirmation;
 
   private TaxonomyDto taxonomy;
@@ -57,14 +64,18 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
 
   private final ModalProvider<VocabularyEditModalPresenter> vocabularyEditModalProvider;
 
+  private final ModalProvider<VcsCommitHistoryModalPresenter> vcsHistoryModalProvider;
+
   @Inject
   public TaxonomyPresenter(Display display, EventBus eventBus, TranslationMessages translationMessages,
       ModalProvider<TaxonomyEditModalPresenter> taxonomyEditModalProvider,
-      ModalProvider<VocabularyEditModalPresenter> vocabularyEditModalProvider) {
+      ModalProvider<VocabularyEditModalPresenter> vocabularyEditModalProvider,
+      ModalProvider<VcsCommitHistoryModalPresenter> vcsHistoryModalProvider) {
     super(eventBus, display);
     this.translationMessages = translationMessages;
     this.taxonomyEditModalProvider = taxonomyEditModalProvider.setContainer(this);
     this.vocabularyEditModalProvider = vocabularyEditModalProvider.setContainer(this);
+    this.vcsHistoryModalProvider = vcsHistoryModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -73,6 +84,7 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
     super.onBind();
     initUiComponents();
     addHandlers();
+    getView().getActions().setActionHandler(new TaxonomyCommitInfoActionHandler());
   }
 
   @Override
@@ -219,6 +231,19 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
     }
   }
 
+  private void retrieveCommitInfos() {
+    String requestUri = UriBuilders.SYSTEM_CONF_TAXONOMY_COMMITS_INFO.create()
+        .build(taxonomy.getName());
+
+    ResourceRequestBuilderFactory.<VcsCommitInfosDto>newBuilder()//
+        .forResource(requestUri).withCallback(new ResourceCallback<VcsCommitInfosDto>() {
+      @Override
+      public void onResource(Response response, VcsCommitInfosDto commitInfos) {
+        getView().setData(commitInfos.getCommitInfosArray());
+      }
+    }).get().send();
+  }
+
   private class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
     @Override
@@ -237,17 +262,68 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
     public void onResource(Response response, TaxonomyDto resource) {
       taxonomy = resource;
       getView().setTaxonomy(resource);
+      retrieveCommitInfos();
       authorize();
     }
   }
 
   public interface Display extends View, HasUiHandlers<TaxonomyUiHandlers> {
+    String DIFF_ACTION = "CommitDiff";
+    String DIFF_CURRENT_ACTION = "DiffWithCurrent";
+    String RESTORE_ACTION = "Restore";
+
+    void setData(JsArray<VcsCommitInfoDto> commitInfos);
 
     void setTaxonomy(@Nullable TaxonomyDto taxonomy);
 
     void setVocabularies(JsArray<VocabularyDto> vocabularies);
 
     void setEditable(boolean editable);
+
+    HasActionHandler<VcsCommitInfoDto> getActions();
   }
 
+  private class TaxonomyCommitInfoActionHandler implements ActionHandler<VcsCommitInfoDto> {
+
+    @Override
+    public void doAction(VcsCommitInfoDto commitInfo, String actionName) {
+      switch(actionName) {
+        case Display.DIFF_ACTION:
+          showCommitInfo(commitInfo, false);
+          break;
+        case Display.DIFF_CURRENT_ACTION:
+          showCommitInfo(commitInfo, true);
+          break;
+        case Display.RESTORE_ACTION:
+          restore(commitInfo);
+          break;
+      }
+    }
+
+    private void showCommitInfo(VcsCommitInfoDto dto, boolean withCurrent) {
+      String requestUri = UriBuilders.SYSTEM_CONF_TAXONOMY_COMMIT_INFO.create()
+          .build(taxonomy.getName(), withCurrent ? HEAD_REVISION : "", dto.getCommitId());
+
+      ResourceRequestBuilderFactory.<VcsCommitInfoDto>newBuilder()//
+          .forResource(requestUri).withCallback(new ResourceCallback<VcsCommitInfoDto>() {
+        @Override
+        public void onResource(Response response, VcsCommitInfoDto resource) {
+          vcsHistoryModalProvider.get().setCommitInfo(resource);
+        }
+      }).get().send();
+    }
+
+    private void restore(VcsCommitInfoDto dto) {
+      String requestUri = UriBuilders.SYSTEM_CONF_TAXONOMY_GIT_RESTORE.create()
+          .build(taxonomy.getName(), dto.getCommitId());
+
+      ResourceRequestBuilderFactory.<VcsCommitInfoDto>newBuilder()//
+          .forResource(requestUri).withCallback(SC_OK, new ResponseCodeCallback() {
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          refreshTaxonomy(taxonomy.getName());
+        }
+      }).put().send();
+    }
+  }
 }

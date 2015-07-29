@@ -13,27 +13,37 @@ import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.LocaleTextColumn;
+import org.obiba.opal.web.gwt.datetime.client.FormatType;
+import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
+import org.obiba.opal.web.model.client.opal.VcsCommitInfoDto;
 import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.CellTable;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -49,7 +59,11 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
 
   private final TranslationMessages translationMessages;
 
-  private final Translations translations;
+  private static final Translations translations = GWT.create(Translations.class);
+
+  private static final int DEFAULT_PAGE_SIZE = 5;
+
+  private static final int DEFAULT_HISTORY_CHANGE_PAGE_SIZE = 10;
 
   @UiField
   IconAnchor edit;
@@ -93,17 +107,47 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
   @UiField
   TextBoxClearable filter;
 
+  @UiField
+  CellTable<VcsCommitInfoDto> commitInfoTable;
+
+  @UiField
+  OpalSimplePager commitInfoTablePager;
+
+  private final ListDataProvider<VcsCommitInfoDto> commitInfoDataProvider = new ListDataProvider<VcsCommitInfoDto>();
+
   private final ListDataProvider<VocabularyDto> dataProvider = new ListDataProvider<VocabularyDto>();
 
   @Inject
-  public TaxonomyView(Binder uiBinder, Translations translations, TranslationMessages translationMessages) {
+  public TaxonomyView(Binder uiBinder, TranslationMessages translationMessages) {
     initWidget(uiBinder.createAndBindUi(this));
     this.translationMessages = translationMessages;
-    this.translations = translations;
     initializeVocabulariesTable();
     initializeFilter();
+    createTableColumns();
+    commitInfoTablePager.setDisplay(commitInfoTable);
   }
 
+  @Override
+  public void setData(JsArray<VcsCommitInfoDto> commitInfos) {
+    commitInfoDataProvider.setList(JsArrays.toList(commitInfos));
+    commitInfoTablePager.firstPage();
+    commitInfoDataProvider.refresh();
+    commitInfoTablePager.setPageSize(DEFAULT_HISTORY_CHANGE_PAGE_SIZE);
+    commitInfoTablePager.setPagerVisible(commitInfoDataProvider.getList().size() > DEFAULT_HISTORY_CHANGE_PAGE_SIZE);
+  }
+
+  @Override
+  public HasActionHandler<VcsCommitInfoDto> getActions() {
+    return Columns.ACTIONS;
+  }
+
+  private void createTableColumns() {
+    commitInfoTable.addColumn(Columns.DATE, translations.commitInfoMap().get("Date"));
+    commitInfoTable.addColumn(Columns.AUTHOR, translations.commitInfoMap().get("Author"));
+    commitInfoTable.addColumn(Columns.ACTIONS, translations.actionsLabel());
+    commitInfoDataProvider.addDataDisplay(commitInfoTable);
+    commitInfoTable.setEmptyTableWidget(new Label(translations.noVcsCommitHistoryAvailable()));
+  }
   private void initializeVocabulariesTable() {
     dataProvider.addDataDisplay(table);
 
@@ -128,7 +172,7 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
     }, translations.termsLabel());
 
     //table.setSelectionModel(new SingleSelectionModel<VocabularyDto>());
-    table.setPageSize(Table.DEFAULT_PAGESIZE);
+    table.setPageSize(DEFAULT_PAGE_SIZE);
     table.setEmptyTableWidget(new com.google.gwt.user.client.ui.InlineLabel(translationMessages.vocabularyCount(0)));
     pager.setDisplay(table);
   }
@@ -152,7 +196,7 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
   public void setVocabularies(JsArray<VocabularyDto> vocabularies) {
     dataProvider.setList(JsArrays.toList(vocabularies));
     dataProvider.refresh();
-    pager.setPagerVisible(table.getRowCount() > Table.DEFAULT_PAGESIZE);
+    pager.setPagerVisible(table.getRowCount() > DEFAULT_PAGE_SIZE);
   }
 
   @Override
@@ -227,6 +271,46 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
     public String getValue(VocabularyDto object) {
       return object.getName();
     }
+  }
+
+  private static final class Columns {
+
+    static final Column<VcsCommitInfoDto, String> DATE = new TextColumn<VcsCommitInfoDto>() {
+
+      @Override
+      public String getValue(VcsCommitInfoDto commitInfo) {
+        Moment m = Moment.create(commitInfo.getDate());
+        return TranslationsUtils
+            .replaceArguments(translations.momentWithAgo(), m.format(FormatType.MONTH_NAME_TIME_SHORT), m.fromNow());
+      }
+    };
+
+    static final Column<VcsCommitInfoDto, String> AUTHOR = new TextColumn<VcsCommitInfoDto>() {
+
+      @Override
+      public String getValue(VcsCommitInfoDto commitInfo) {
+        return commitInfo.getAuthor();
+      }
+    };
+
+    static final ActionsColumn<VcsCommitInfoDto> ACTIONS = new ActionsColumn<VcsCommitInfoDto>(
+        new ActionsProvider<VcsCommitInfoDto>() {
+
+          @Override
+          public String[] allActions() {
+            return new String[] { DIFF_ACTION, DIFF_CURRENT_ACTION, RESTORE_ACTION };
+          }
+
+          @Override
+          public String[] getActions(VcsCommitInfoDto value) {
+            return value.getIsCurrent() ? getHeadOnlyActions() : allActions();
+          }
+
+          private String[] getHeadOnlyActions() {
+            return new String[] { DIFF_ACTION };
+          }
+        });
+
   }
 
 }

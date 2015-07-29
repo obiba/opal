@@ -10,6 +10,11 @@
 
 package org.obiba.opal.web.system.taxonomy;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -18,10 +23,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import org.obiba.git.CommitInfo;
 import org.obiba.opal.core.cfg.NoSuchTaxonomyException;
 import org.obiba.opal.core.cfg.TaxonomyService;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.support.yaml.TaxonomyYaml;
+import org.obiba.opal.core.vcs.OpalGitUtils;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.taxonomy.Dtos;
 import org.obiba.opal.web.ws.security.NoAuthorization;
@@ -29,6 +36,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 @Component
 @Scope("request")
@@ -75,6 +84,36 @@ public class TaxonomyResource {
     return Response.ok().build();
   }
 
+  @GET
+  @Path("/commits")
+  public Response getCommitsInfo() {
+    Iterable<CommitInfo> commitInfos = taxonomyService.getCommitsInfo(name);
+    return Response.ok().entity(org.obiba.opal.web.magma.vcs.Dtos.asDto(commitInfos)).build();
+  }
+
+  @GET
+  @Path("/commit/{commitId}")
+  public Response getCommitInfo(@NotNull @PathParam("commitId") String commitId) {
+    CommitInfo commitInfo = getVariableDiffInternal(taxonomyService.getCommitInfo(name, commitId), commitId, null);
+    return Response.ok().entity(org.obiba.opal.web.magma.vcs.Dtos.asDto(commitInfo)).build();
+  }
+
+  @GET
+  @Path("/commit/head/{commitId}")
+  public Response getCommitInfoFromHead(@NotNull @PathParam("commitId") String commitId) {
+    CommitInfo commitInfo = getVariableDiffInternal(taxonomyService.getCommitInfo(name, commitId),
+        OpalGitUtils.HEAD_COMMIT_ID, commitId);
+    return Response.ok().entity(org.obiba.opal.web.magma.vcs.Dtos.asDto(commitInfo)).build();
+  }
+
+  @PUT
+  @Path("/restore/{commitId}")
+  public Response restoreCommit(@NotNull @PathParam("commitId") String commitId) {
+    String blob = taxonomyService.getBlob(name, commitId);
+    taxonomyService.importInputStreamTaxonomy(new ByteArrayInputStream(blob.getBytes(StandardCharsets.UTF_8)), name, true);
+    return Response.ok().build();
+  }
+
   @Path("vocabularies")
   public VocabulariesResource getVocabularies() {
     VocabulariesResource resource = applicationContext.getBean(VocabulariesResource.class);
@@ -88,5 +127,11 @@ public class TaxonomyResource {
     resource.setTaxonomyName(name);
     resource.setVocabularyName(vocabularyName);
     return resource;
+  }
+
+  private CommitInfo getVariableDiffInternal(@NotNull CommitInfo commitInfo, @NotNull String commitId,
+      @Nullable String prevCommitId) {
+    Iterable<String> diffEntries = taxonomyService.getDiffEntries(name, commitId, prevCommitId);
+    return CommitInfo.Builder.createFromObject(commitInfo).diffEntries((List<String>) diffEntries).build();
   }
 }

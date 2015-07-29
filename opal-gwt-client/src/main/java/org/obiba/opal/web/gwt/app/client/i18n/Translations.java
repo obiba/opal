@@ -131,6 +131,7 @@ public interface Translations extends Constants {
       "Permissions", "Permissions", //
       "CommitDiff", "Diff", //
       "DiffWithCurrent", "Diff with current",//
+      "Restore", "Restore",//
       "Enable", "Enable",//
       "Disable", "Disable",//
       "Generate identifiers", "Generate identifiers",//
@@ -579,7 +580,7 @@ public interface Translations extends Constants {
       "IdentifierMappingFailed", "Identifiers mapping failed : {0}.",//
       "TaxonomyGitUserRequired", "Github user or organization name is required.", //
       "TaxonomyGitRepositoryRequired", "Github repository name is required.", //
-      "TaxonomyImportFailed", "Failed to import taxonomy. Please make sure all Github related information is correct.",
+      "TaxonomyImportFailed", "Failed to import taxonomy. Please make sure all import related information is correct.",
       "TaxonomyNotFound", "No such taxonomy with name: {0}.", //
       "TaxonomyAlreadyExists", "A taxonomy with the name '{0}' already exists. To override, click on 'Override existing taxonomy' option.", //
       "VocabularyNotFound", "No such vocabulary in taxonomy '{0}' with name: {1}.", //
