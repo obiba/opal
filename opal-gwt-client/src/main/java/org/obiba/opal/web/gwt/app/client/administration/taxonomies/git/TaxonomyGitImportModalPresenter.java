@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
@@ -52,17 +53,20 @@ public class TaxonomyGitImportModalPresenter extends ModalPresenterWidget<Taxono
   public void onImport(String user, String repository, String reference, String file, boolean override) {
     if(!validationHandler.validate()) return;
 
+    UriBuilder uriBuilder = UriBuilders.SYSTEM_CONF_TAXONOMIES_IMPORT_GITHUB.create().query("user", user)
+        .query("repo", repository).query("override", String.valueOf(override));
+
+    if (!Strings.isNullOrEmpty(reference)) uriBuilder.query("ref", reference);
+    if (!Strings.isNullOrEmpty(file)) uriBuilder.query("file", file);
+
     ResourceRequestBuilderFactory.newBuilder()
-        .forResource(
-            UriBuilders.SYSTEM_CONF_TAXONOMIES_IMPORT_GITHUB.create().query("user", user).query("repo", repository)
-                .query("ref", reference).query("file", file).query("override", String.valueOf(override)).build())
-        .withCallback(new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            getView().hideDialog();
-            getEventBus().fireEvent(new TaxonomyImportedEvent());
-          }
-        }, Response.SC_OK, Response.SC_CREATED) //
+        .forResource(uriBuilder.build()).withCallback(new ResponseCodeCallback() {
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        getView().hideDialog();
+        getEventBus().fireEvent(new TaxonomyImportedEvent());
+      }
+    }, Response.SC_OK, Response.SC_CREATED) //
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {

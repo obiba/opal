@@ -23,6 +23,7 @@ import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
+import org.obiba.git.CommitInfo;
 import org.obiba.opal.core.cfg.NoSuchTaxonomyException;
 import org.obiba.opal.core.cfg.NoSuchVocabularyException;
 import org.obiba.opal.core.cfg.TaxonomyService;
@@ -102,18 +103,22 @@ public class TaxonomyServiceImpl implements TaxonomyService {
     FileObject fileObj = resolveFileInFileSystem(file);
 
     try {
-      InputStream input = fileObj.getContent().getInputStream();
-      TaxonomyYaml yaml = new TaxonomyYaml();
-      Taxonomy taxonomy = yaml.load(input);
-      String name = taxonomy.getName();
-      if(!hasTaxonomy(name)) {
-        saveTaxonomy(taxonomy);
-        return taxonomy;
-      } else {
-        throw new TaxonomyAlreadyExistsException(name);
-      }
+      return importInputStreamTaxonomy(fileObj.getContent().getInputStream(), null, false);
     } catch(IOException e) {
       throw new TaxonomyImportException(e);
+    }
+  }
+
+  @Override
+  public Taxonomy importInputStreamTaxonomy(@NotNull InputStream input, @Nullable String name, boolean override) {
+    TaxonomyYaml yaml = new TaxonomyYaml();
+    Taxonomy taxonomy = yaml.load(input);
+    String taxonomyName = Strings.isNullOrEmpty(name) ? taxonomy.getName() : name;
+    if(override || !hasTaxonomy(taxonomyName)) {
+      saveTaxonomy(taxonomy);
+      return taxonomy;
+    } else {
+      throw new TaxonomyAlreadyExistsException(taxonomyName);
     }
   }
 
@@ -175,6 +180,27 @@ public class TaxonomyServiceImpl implements TaxonomyService {
         taxonomies.remove(taxonomy);
       }
     }
+  }
+
+  @Override
+  public Iterable<CommitInfo> getCommitsInfo(@NotNull String name) {
+    return taxonomyPersistence.getCommitsInfo(name);
+  }
+
+  @Override
+  public CommitInfo getCommitInfo(@NotNull String name, @NotNull String  commitId) {
+    return taxonomyPersistence.getCommitInfo(name, commitId);
+  }
+
+  @Override
+  public String getBlob(@NotNull String name, @NotNull String commitId) {
+    return taxonomyPersistence.getBlob(name, commitId);
+  }
+
+  @Override
+  public Iterable<String> getDiffEntries(@NotNull String name, @NotNull String commitId,
+      @Nullable String prevCommitId) {
+    return taxonomyPersistence.getDiffEntries(name, commitId, prevCommitId);
   }
 
   @Override

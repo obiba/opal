@@ -22,7 +22,12 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.obiba.core.util.FileUtil;
+import org.obiba.git.CommitInfo;
+import org.obiba.git.command.CommitLogCommand;
+import org.obiba.git.command.DiffAsStringCommand;
+import org.obiba.git.command.FetchBlobCommand;
 import org.obiba.git.command.GitCommandHandler;
+import org.obiba.git.command.LogsCommand;
 import org.obiba.git.command.ReadFilesCommand;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.support.yaml.TaxonomyYaml;
@@ -41,6 +46,8 @@ import com.google.common.collect.Sets;
 public class TaxonomyPersistenceStrategyImpl implements TaxonomyPersistenceStrategy {
 
   private static final Logger log = LoggerFactory.getLogger(TaxonomyPersistenceStrategyImpl.class);
+
+  private static final String DEFAULT_TAXONOMY_FILE = "taxonomy.yml";
 
   @Autowired
   private GitCommandHandler handler;
@@ -93,6 +100,35 @@ public class TaxonomyPersistenceStrategyImpl implements TaxonomyPersistenceStrat
     }
 
     return taxonomies;
+  }
+
+  @Override
+  public Iterable<CommitInfo> getCommitsInfo(@NotNull String name) {
+      return handler.execute(new LogsCommand.Builder(OpalGitUtils.getGitTaxonomyRepoFolder(name),
+            OpalGitUtils.getGitTaxonomiesWorkFolder()).path(DEFAULT_TAXONOMY_FILE).excludeDeletedCommits(true).build()
+    );
+  }
+
+  @Override
+  public CommitInfo getCommitInfo(@NotNull String name, @NotNull String commitId) {
+    return handler.execute(
+        new CommitLogCommand.Builder(OpalGitUtils.getGitTaxonomyRepoFolder(name),
+            OpalGitUtils.getGitTaxonomiesWorkFolder(), DEFAULT_TAXONOMY_FILE, commitId).build());
+  }
+
+  @Override
+  public String getBlob(@NotNull String name, @NotNull String commitId) {
+    return handler.execute(
+        new FetchBlobCommand.Builder(OpalGitUtils.getGitTaxonomyRepoFolder(name),
+            OpalGitUtils.getGitTaxonomiesWorkFolder(), DEFAULT_TAXONOMY_FILE).commitId(commitId).build());
+  }
+
+  @Override
+  public Iterable<String> getDiffEntries(@NotNull String name, @NotNull String commitId,
+      @Nullable String prevCommitId) {
+    return handler.execute(new DiffAsStringCommand.Builder(OpalGitUtils.getGitTaxonomyRepoFolder(name),
+        OpalGitUtils.getGitTaxonomiesWorkFolder(), commitId).path(DEFAULT_TAXONOMY_FILE).previousCommitId(prevCommitId)
+        .build());
   }
 
   private Collection<Taxonomy> readGitTaxonomy(File taxoRepo) {

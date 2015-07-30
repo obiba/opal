@@ -81,6 +81,10 @@
       <artifactId>obiba-core</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.obiba.commons</groupId>
+      <artifactId>obiba-git</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.eclipse.jgit</groupId>
       <artifactId>org.eclipse.jgit</artifactId>
     </dependency>

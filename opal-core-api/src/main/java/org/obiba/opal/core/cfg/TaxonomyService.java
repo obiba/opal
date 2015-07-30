@@ -10,10 +10,13 @@
 
 package org.obiba.opal.core.cfg;
 
+import java.io.InputStream;
+
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileSystemException;
+import org.obiba.git.CommitInfo;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.domain.taxonomy.Vocabulary;
 import org.obiba.opal.core.service.SystemService;
@@ -47,6 +50,14 @@ public interface TaxonomyService extends SystemService {
    * @return
    */
   Taxonomy importFileTaxonomy(@NotNull String file) throws FileSystemException;
+
+  /**
+   * Import a {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} from an InputStream.
+   *
+   * @param file
+   * @return
+   */
+  Taxonomy importInputStreamTaxonomy(@NotNull InputStream input, @Nullable String name, boolean override);
 
   /**
    * Get all {@link org.obiba.opal.core.domain.taxonomy.Taxonomy}s.
@@ -155,4 +166,40 @@ public interface TaxonomyService extends SystemService {
    */
   void deleteVocabulary(@NotNull String taxonomy, @NotNull String vocabulary) throws NoSuchTaxonomyException;
 
+
+  /**
+   * Returns the commit history
+   *
+   * @param name
+   * @return
+   */
+  Iterable<CommitInfo> getCommitsInfo(@NotNull String name);
+
+  /**
+   * Returns the info of a given commit
+   *
+   * @param name
+   * @param commitId
+   * @return
+   */
+  CommitInfo getCommitInfo(@NotNull String name, @NotNull String commitId);
+
+  /**
+   * Returns the blob (content) of a given commit
+   *
+   * @param name
+   * @param commitId
+   * @return
+   */
+  String getBlob(@NotNull String name, @NotNull String commitId);
+
+  /**
+   * Returns the diff entries between two commits
+   *
+   * @param name
+   * @param commitId
+   * @param prevCommitId
+   * @return
+   */
+  Iterable<String> getDiffEntries(@NotNull String name, @NotNull String commitId, @Nullable String prevCommitId);
 }
