@@ -23,6 +23,7 @@ import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.VariableEntity;
+import org.obiba.magma.datasource.mongodb.MongoDBDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
 import org.obiba.magma.views.View;
@@ -72,6 +73,7 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
         return input != null && !Strings.isNullOrEmpty(input.getName());
       }
     });
+
     this.destination = destination;
     this.allowIdentifierGeneration = allowIdentifierGeneration;
     this.ignoreUnknownIdentifier = ignoreUnknownIdentifier;

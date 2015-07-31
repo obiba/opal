@@ -20,8 +20,14 @@ public class MongoDbSettings {
 
   private String properties;
 
+  private int batchSize = 1;
+
   public MongoDBDatasourceFactory createMongoDBDatasourceFactory(String datasourceName) {
-    return new MongoDBDatasourceFactory(datasourceName, url, username, password, properties);
+    MongoDBDatasourceFactory factory = new MongoDBDatasourceFactory(datasourceName, url, username, password,
+        properties);
+    factory.setBatchSize(batchSize);
+
+    return factory;
   }
 
   public String getPassword() {
@@ -57,6 +63,14 @@ public class MongoDbSettings {
     this.username = username;
   }
 
+  public int getBatchSize() {
+    return batchSize;
+  }
+
+  public void setBatchSize(int batchSize) {
+    this.batchSize = batchSize;
+  }
+
   @SuppressWarnings("ParameterHidesMemberVariable")
   public static class Builder {
 
@@ -88,6 +102,11 @@ public class MongoDbSettings {
 
     public Builder properties(String properties) {
       settings.properties = properties;
+      return this;
+    }
+
+    public Builder batchSize(int batchSize) {
+      settings.batchSize = batchSize;
       return this;
     }
 
