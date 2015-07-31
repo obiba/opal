@@ -89,6 +89,9 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
   TextArea properties;
 
   @UiField
+  TextBox batchSize;
+
+  @UiField
   Panel defaultStorageGroup;
 
   @UiField
@@ -257,6 +260,10 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
   @Override
   public HasText getUsername() {
     return username;
+  }
+
+  public HasText getBatchSize() {
+    return batchSize;
   }
 
   @Override

@@ -71,6 +71,9 @@ public class Dtos {
     settings.setUsername(dto.getUsername());
     settings.setPassword(dto.getPassword());
     settings.setProperties(dto.getProperties());
+
+    if (dto.hasBatchSize()) settings.setBatchSize(dto.getBatchSize());
+
     return settings;
   }
 
@@ -153,6 +156,9 @@ public class Dtos {
         .setUrl(db.getUrl());
     if(!Strings.isNullOrEmpty(db.getUsername())) builder.setUsername(db.getUsername());
     if(!Strings.isNullOrEmpty(db.getProperties())) builder.setProperties(db.getProperties());
+
+    builder.setBatchSize(db.getBatchSize());
+
     return builder;
   }
 

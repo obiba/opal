@@ -57,4 +57,5 @@ message MongoDbSettingsDto {
   optional string username = 2;
   optional string password = 3;
   optional string properties = 4;
+  optional int32 batchSize = 5;
 }

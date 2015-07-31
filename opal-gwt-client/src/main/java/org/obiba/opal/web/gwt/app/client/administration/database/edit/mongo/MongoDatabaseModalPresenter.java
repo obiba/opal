@@ -26,6 +26,7 @@ import org.obiba.opal.web.model.client.database.MongoDbSettingsDto;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasVisibility;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -63,6 +64,7 @@ public class MongoDatabaseModalPresenter extends AbstractDatabaseModalPresenter<
     getView().getUsername().setText(mongoSettings.getUsername());
     getView().getPassword().setText(mongoSettings.getPassword());
     getView().getProperties().setText(mongoSettings.getProperties());
+    getView().getBatchSize().setText(Integer.toString(mongoSettings.getBatchSize()));
   }
 
   @Override
@@ -86,6 +88,7 @@ public class MongoDatabaseModalPresenter extends AbstractDatabaseModalPresenter<
     mongoDto.setUsername(getView().getUsername().getText());
     mongoDto.setPassword(getView().getPassword().getText());
     mongoDto.setProperties(getView().getProperties().getText());
+    mongoDto.setBatchSize(Integer.valueOf(getView().getBatchSize().getText()));
 
     dto.setMongoDbSettings(mongoDto);
     return dto;
@@ -134,6 +137,7 @@ public class MongoDatabaseModalPresenter extends AbstractDatabaseModalPresenter<
 
     HasVisibility getDefaultStorageGroupVisibility();
 
+    HasText getBatchSize();
   }
 
 }
