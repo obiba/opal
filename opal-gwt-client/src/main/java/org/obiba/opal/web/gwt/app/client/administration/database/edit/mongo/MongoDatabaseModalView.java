@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
 import org.obiba.opal.web.gwt.app.client.validator.ConstrainedModal;
 
 import com.github.gwtbootstrap.client.ui.CheckBox;
@@ -89,7 +90,7 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
   TextArea properties;
 
   @UiField
-  TextBox batchSize;
+  NumericTextBox batchSize;
 
   @UiField
   Panel defaultStorageGroup;
@@ -262,7 +263,7 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
     return username;
   }
 
-  public HasText getBatchSize() {
+  public NumericTextBox getBatchSize() {
     return batchSize;
   }
 
