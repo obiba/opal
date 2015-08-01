@@ -17,12 +17,15 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.edit.AbstractDatabaseModalPresenter;
+import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredValueValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.database.MongoDbSettingsDto;
+
+import com.google.common.base.Strings;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -64,7 +67,7 @@ public class MongoDatabaseModalPresenter extends AbstractDatabaseModalPresenter<
     getView().getUsername().setText(mongoSettings.getUsername());
     getView().getPassword().setText(mongoSettings.getPassword());
     getView().getProperties().setText(mongoSettings.getProperties());
-    getView().getBatchSize().setText(Integer.toString(mongoSettings.getBatchSize()));
+    getView().getBatchSize().setValue(mongoSettings.getBatchSize());
   }
 
   @Override
@@ -88,7 +91,9 @@ public class MongoDatabaseModalPresenter extends AbstractDatabaseModalPresenter<
     mongoDto.setUsername(getView().getUsername().getText());
     mongoDto.setPassword(getView().getPassword().getText());
     mongoDto.setProperties(getView().getProperties().getText());
-    mongoDto.setBatchSize(Integer.valueOf(getView().getBatchSize().getText()));
+
+    if(!getView().getBatchSize().getText().isEmpty())
+      mongoDto.setBatchSize(getView().getBatchSize().getNumberValue().intValue());
 
     dto.setMongoDbSettings(mongoDto);
     return dto;
@@ -137,7 +142,7 @@ public class MongoDatabaseModalPresenter extends AbstractDatabaseModalPresenter<
 
     HasVisibility getDefaultStorageGroupVisibility();
 
-    HasText getBatchSize();
+    NumericTextBox getBatchSize();
   }
 
 }

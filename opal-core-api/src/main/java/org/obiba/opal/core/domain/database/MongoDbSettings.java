@@ -3,6 +3,7 @@ package org.obiba.opal.core.domain.database;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
+import org.obiba.magma.datasource.mongodb.MongoDBDatasource;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasourceFactory;
 
 public class MongoDbSettings {
@@ -68,6 +69,7 @@ public class MongoDbSettings {
   }
 
   public void setBatchSize(int batchSize) {
+    if (batchSize < 1 || batchSize > MongoDBDatasource.MAX_BATCH_SIZE) throw new IllegalArgumentException("batchSize");
     this.batchSize = batchSize;
   }
 
