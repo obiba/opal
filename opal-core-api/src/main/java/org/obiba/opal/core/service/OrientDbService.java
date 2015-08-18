@@ -1,5 +1,7 @@
 package org.obiba.opal.core.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -66,9 +68,15 @@ public interface OrientDbService {
 
   void createIndex(Class<?> clazz, OClass.INDEX_TYPE indexType, OType type, @NotNull String... propertyPath);
 
-  void copyToDocument(Object obj, ORecord<?> document);
+  void copyToDocument(Object obj, ORecord document);
 
-  <T> T fromDocument(Class<T> clazz, ORecord<?> document);
+  <T> T fromDocument(Class<T> clazz, ORecord document);
+
+  void exportDatabase(File target) throws IOException;
+
+  void importDatabase(File source) throws IOException;
+
+  void dropDatabase();
 
   interface WithinDocumentTxCallback<T> {
 

@@ -109,7 +109,6 @@
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.apache.shiro.tools</groupId>
       <artifactId>shiro-tools-hasher</artifactId>
@@ -120,12 +119,15 @@
       <artifactId>obiba-password-hasher</artifactId>
       <classifier>cli</classifier>
     </dependency>
-
+    <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-config-migrator</artifactId>
+      <classifier>cli</classifier>
+    </dependency>
     <dependency>
       <groupId>com.newrelic.agent.java</groupId>
       <artifactId>newrelic-agent</artifactId>
     </dependency>
-
   </dependencies>
 
   <build>

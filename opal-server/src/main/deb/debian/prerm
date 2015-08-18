@@ -16,9 +16,33 @@ set -e
 # for details, see http://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
+NAME=opal
 
 case "$1" in
-    remove|upgrade|deconfigure)
+    remove|deconfigure)
+    ;;
+
+    upgrade)
+        # Read configuration variable file if it is present
+        [ -r /etc/default/$NAME ] && . /etc/default/$NAME
+
+        if which service >/dev/null 2>&1; then
+                service opal stop
+        elif which invoke-rc.d >/dev/null 2>&1; then
+                invoke-rc.d opal stop
+        else
+                /etc/init.d/opal stop
+        fi
+
+        EXPORT_FILE=$OPAL_HOME/data/orientdb/opal-config.export
+
+        echo "prerm migration check ..."
+
+        JAR_CMD="java -jar /usr/share/opal-*/tools/lib/opal-config-migrator-*-cli.jar"
+        $JAR_CMD --check $OPAL_HOME/data/orientdb/opal-config && \
+        { $JAR_CMD $OPAL_HOME/data/orientdb/opal-config $EXPORT_FILE  && \
+        echo "prerm legacy export completed ..." && \
+        mv $OPAL_HOME/data/orientdb/opal-config $OPAL_HOME/data/orientdb/opal-config.bak || exit 1; }
     ;;
 
     failed-upgrade)

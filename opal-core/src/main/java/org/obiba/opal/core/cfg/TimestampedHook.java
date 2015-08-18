@@ -10,7 +10,7 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 public class TimestampedHook extends ORecordHookAbstract {
 
   @Override
-  public RESULT onRecordBeforeCreate(ORecord<?> record) {
+  public RESULT onRecordBeforeCreate(ORecord record) {
     if(record instanceof ODocument) {
       Date now = new Date();
       ((ODocument) record).field("created", now);
@@ -21,7 +21,7 @@ public class TimestampedHook extends ORecordHookAbstract {
   }
 
   @Override
-  public RESULT onRecordBeforeUpdate(ORecord<?> record) {
+  public RESULT onRecordBeforeUpdate(ORecord record) {
     if(record.isDirty() && record instanceof ODocument) {
       ((ODocument) record).field("updated", new Date());
       return RESULT.RECORD_CHANGED;
