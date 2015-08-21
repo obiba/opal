@@ -262,14 +262,16 @@ public class OrientDbServiceImpl implements OrientDbService {
   }
 
   private <T> Iterable<T> fromDocuments(Iterable<ODocument> documents, final Class<T> clazz) {
-    serverFactory.getDocumentTx(); //needed to attach db to current thread since documents could have been loaded from a different thread.
+    try(ODatabaseDocumentTx db = serverFactory.getDocumentTx()) {
+      Iterable<T> res = Iterables.transform(documents, new Function<ODocument, T>() {
+        @Override
+        public T apply(ODocument document) {
+          return fromDocument(clazz, document);
+        }
+      });
 
-    return Iterables.transform(documents, new Function<ODocument, T>() {
-      @Override
-      public T apply(ODocument document) {
-        return fromDocument(clazz, document);
-      }
-    });
+      return Lists.newArrayList(res); //consume iterable to trigger lazy loading
+    }
   }
 
   @Override

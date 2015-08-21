@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.orientechnologies.orient.core.db.ODatabaseRecordThreadLocal;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
+import com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.server.OServer;
 
@@ -32,6 +32,8 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
   private String url;
 
   private OServer server;
+
+  private OPartitionedDatabasePoolFactory poolFactory;
 
   // TODO: wait for this issue to be fixed to change admin password
   // https://github.com/orientechnologies/orientdb/pull/1870
@@ -59,6 +61,7 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
     server = new OServer() //
         .startup(LocalOrientDbServerFactory.class.getResourceAsStream("/orientdb-server-config.xml")) //
         .activate();
+    poolFactory = new OPartitionedDatabasePoolFactory();
 
     ensureDatabaseExists();
   }
@@ -80,12 +83,9 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
   public ODatabaseDocumentTx getDocumentTx() {
     //TODO cache password
 //    String password = opalConfigurationService.getOpalConfiguration().getDatabasePassword();
-//    log.info("Open OrientDB connection with {} / {}", USERNAME, password);
-//    return ODatabaseDocumentPool.global().acquire(url, USERNAME, password);
-    ODatabaseDocumentTx db = ODatabaseDocumentPool.global().acquire(url, USERNAME, PASSWORD);
-    ODatabaseRecordThreadLocal.INSTANCE.set(db);
+    log.trace("Open OrientDB connection with username: {}", USERNAME);
 
-    return db;
+    return poolFactory.get(url, USERNAME, PASSWORD).acquire();
   }
 
   private void ensureDatabaseExists() {
