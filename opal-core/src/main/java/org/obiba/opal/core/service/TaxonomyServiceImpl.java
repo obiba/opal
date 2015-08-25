@@ -118,7 +118,7 @@ public class TaxonomyServiceImpl implements TaxonomyService {
       saveTaxonomy(taxonomy);
       return taxonomy;
     } else {
-      throw new TaxonomyAlreadyExistsException(taxonomyName);
+      return null;
     }
   }
 
@@ -278,16 +278,14 @@ public class TaxonomyServiceImpl implements TaxonomyService {
       InputStream input = new URL(uri).openStream();
       TaxonomyYaml yaml = new TaxonomyYaml();
       Taxonomy taxonomy = yaml.load(input);
-      String name = taxonomy.getName();
-      if(override || !hasTaxonomy(name)) {
+      if(override || !hasTaxonomy(taxonomy.getName())) {
         saveTaxonomy(taxonomy);
         return taxonomy;
-      } else {
-        throw new TaxonomyAlreadyExistsException(name);
       }
     } catch(IOException e) {
       throw new TaxonomyImportException(e);
     }
+    return null;
   }
 
   private FileObject resolveFileInFileSystem(String path) throws FileSystemException {
