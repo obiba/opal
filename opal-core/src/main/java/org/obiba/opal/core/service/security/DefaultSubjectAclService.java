@@ -205,37 +205,37 @@ public class DefaultSubjectAclService implements SubjectAclService {
   private Iterable<SubjectAcl> find(Subject subject) {
     return orientDbService
         .list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() + " where principal = ? and type = ?",
-            subject.getPrincipal(), subject.getType());
+            subject.getPrincipal(), subject.getType().toString());
   }
 
   private Iterable<SubjectAcl> find(String domain, String node, SubjectType type) {
     return orientDbService.list(SubjectAcl.class,
         "select from " + SubjectAcl.class.getSimpleName() + " where domain = ? and node = ? and type = ?", domain, node,
-        type);
+        type.toString());
   }
 
   private Iterable<SubjectAcl> findLike(String domain, String node, SubjectType type) {
     return orientDbService.list(SubjectAcl.class,
         "select from " + SubjectAcl.class.getSimpleName() + " where domain = ? and node like ? and type = ?", domain,
-        node + "%", type);
+        node + "%", type.toString());
   }
 
   private Iterable<SubjectAcl> find(String domain, SubjectType type) {
     return orientDbService
         .list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() + " where domain = ? and type = ?",
-            domain, type);
+            domain, type.toString());
   }
 
   private Iterable<SubjectAcl> find(@NotNull String domain, @NotNull String node, @NotNull Subject subject) {
     return orientDbService.list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() +
         " where domain = ? and node = ? and principal = ? and type = ?", domain, node, subject.getPrincipal(),
-        subject.getType());
+        subject.getType().toString());
   }
 
   private Iterable<SubjectAcl> findLike(@NotNull String domain, @NotNull String node, @NotNull Subject subject) {
     return orientDbService.list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() +
         " where domain = ? and node like ? and principal = ? and type = ?", domain, node + "%", subject.getPrincipal(),
-        subject.getType());
+        subject.getType().toString());
   }
 
   private Iterable<SubjectAcl> find(@NotNull String domain, @NotNull String node) {
