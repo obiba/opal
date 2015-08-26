@@ -68,7 +68,9 @@ public abstract class AbstractRSymbolResourceImpl extends AbstractOpalRSessionRe
 
   @Override
   public Response putRScript(UriInfo uri, String script, boolean async) {
-    return assignSymbol(uri, new RScriptROperation(name + " <- " + script), async);
+    RScriptROperation rop = new RScriptROperation(name + " <- " + script);
+    rop.setIgnoreResult(true);
+    return assignSymbol(uri, rop, async);
   }
 
   @Override
