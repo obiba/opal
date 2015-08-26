@@ -68,7 +68,7 @@
         <b:ControlLabel for="batchSize">
           <ui:msg description="Batch Size label">Batch Size</ui:msg>
         </b:ControlLabel>
-        <o:NumericTextBox ui:field="batchSize" value="1" min="1" max="1000"/>
+        <o:NumericTextBox ui:field="batchSize"/>
       </b:ControlGroup>
     </o:CollapsiblePanel>
 
