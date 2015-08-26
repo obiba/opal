@@ -41,4 +41,9 @@ public class RestrictedAssignmentROperation extends AbstractRestrictedRScriptROp
     DataShieldLog.userLog("assigning '{}' with {}", symbol, script);
     eval(String.format("base::assign('%s', value={%s})", symbol, script));
   }
+
+  @Override
+  public boolean isIgnoreResult() {
+    return true;
+  }
 }

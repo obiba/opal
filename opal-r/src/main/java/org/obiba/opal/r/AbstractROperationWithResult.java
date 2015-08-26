@@ -22,6 +22,16 @@ public abstract class AbstractROperationWithResult extends AbstractROperation im
 
   private REXP result;
 
+  private boolean ignoreResult;
+
+  public void setIgnoreResult(boolean ignoreResult) {
+    this.ignoreResult = ignoreResult;
+  }
+
+  public boolean isIgnoreResult() {
+    return ignoreResult;
+  }
+
   @Override
   public REXP getResult() {
     if(!hasResult()) throw new NoSuchElementException();
@@ -30,12 +40,12 @@ public abstract class AbstractROperationWithResult extends AbstractROperation im
 
   @Override
   public boolean hasResult() {
-    return result != null;
+    return !isIgnoreResult() && result != null;
   }
 
   @Override
   public boolean hasRawResult() {
-    return result != null && result.isRaw();
+    return !isIgnoreResult() && result != null && result.isRaw();
   }
 
   @Override
