@@ -97,15 +97,12 @@
     <o:CollapsiblePanel ui:field="jdbcOptions">
       <b:ControlGroup ui:field="defaultEntityTypeGroup">
         <b:ControlLabel for="defaultEntityType">
-          <ui:msg description="Entity Type label">Entity Type</ui:msg>
+          <ui:msg description="Default Entity Type label">Default Entity Type</ui:msg>
           <o:RequiredIcon/>
         </b:ControlLabel>
         <b:TextBox ui:field="defaultEntityType" b:id="defaultEntityType"/>
         <b:HelpBlock>
-          <ui:msg description="Entity type help label">For example:</ui:msg>
-          <i>
-            Participant
-          </i>
+          <ui:msg description="Default Entity type help label">Entity type to be used if no variables description tables is available.</ui:msg>
         </b:HelpBlock>
       </b:ControlGroup>
 

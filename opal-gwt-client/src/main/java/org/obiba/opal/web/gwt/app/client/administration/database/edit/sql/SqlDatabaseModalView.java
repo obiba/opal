@@ -533,13 +533,19 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
 
   @Override
   public void toggleJdbcOptions(boolean show) {
-    if(!show) {
-      defaultCreatedTimestampColumn.setValue(null);
-      defaultUpdatedTimestampColumn.setValue(null);
-      useMetadataTables.setValue(false);
-    }
-    jdbcOptions.setVisible(show);
+    boolean storage = getUsageValue() == Usage.STORAGE;
+    defaultEntityType.setValue(show ? "Participant" : null);
+    // set default jdbc options when usage is storage
+    defaultCreatedTimestampColumn.setValue(show && storage ? "_created" : null);
+    defaultUpdatedTimestampColumn.setValue(show && storage ? "_updated" : null);
+    useMetadataTables.setValue(show && storage);
+    // do not show jdbc options when usage is storage
+    jdbcOptions.setVisible(show && !storage);
     jdbcOptions.setOpen(true);
   }
 
+  private Usage getUsageValue() {
+    int selectedIndex = usage.getSelectedIndex();
+    return selectedIndex < 0 ? null : Usage.valueOf(usage.getValue(selectedIndex));
+  }
 }
