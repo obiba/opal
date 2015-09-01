@@ -129,6 +129,9 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   TextBox defaultEntityType;
 
   @UiField
+  TextBox defaultEntityIdColumn;
+
+  @UiField
   TextBox defaultCreatedTimestampColumn;
 
   @UiField
@@ -471,6 +474,11 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   }
 
   @Override
+  public HasText getDefaultEntityIdColumn() {
+    return defaultEntityIdColumn;
+  }
+
+  @Override
   public HasText getDefaultCreatedTimestampColumn() {
     return defaultCreatedTimestampColumn;
   }
@@ -536,8 +544,9 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
     boolean storage = getUsageValue() == Usage.STORAGE;
     defaultEntityType.setValue(show ? "Participant" : null);
     // set default jdbc options when usage is storage
-    defaultCreatedTimestampColumn.setValue(show && storage ? "_created" : null);
-    defaultUpdatedTimestampColumn.setValue(show && storage ? "_updated" : null);
+    defaultEntityIdColumn.setValue(show && storage ? "opal_id" : null);
+    defaultCreatedTimestampColumn.setValue(show && storage ? "opal_created" : null);
+    defaultUpdatedTimestampColumn.setValue(show && storage ? "opal_updated" : null);
     useMetadataTables.setValue(show && storage);
     // do not show jdbc options when usage is storage
     jdbcOptions.setVisible(show && !storage);

@@ -103,6 +103,8 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
     if(SqlSettingsDto.SqlSchema.JDBC.getName().equals(sqlSettings.getSqlSchema().getName()) &&
         jdbcDatasourceSettings != null) {
       getView().getDefaultEntityType().setText(jdbcDatasourceSettings.getDefaultEntityType());
+      getView().getDefaultEntityIdColumn()
+          .setText(jdbcDatasourceSettings.getDefaultEntityIdColumnName());
       getView().getDefaultCreatedTimestampColumn()
           .setText(jdbcDatasourceSettings.getDefaultCreatedTimestampColumnName());
       getView().getDefaultUpdatedTimestampColumn()
@@ -173,6 +175,7 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
   private JdbcDatasourceSettingsDto getJdbcDatasourceSettingsDto() {
     JdbcDatasourceSettingsDto jdbcSettings = JdbcDatasourceSettingsDto.create();
     jdbcSettings.setDefaultEntityType(getView().getDefaultEntityType().getText());
+    jdbcSettings.setDefaultEntityIdColumnName(getView().getDefaultEntityIdColumn().getText());
     jdbcSettings.setDefaultCreatedTimestampColumnName(getView().getDefaultCreatedTimestampColumn().getText());
     jdbcSettings.setDefaultUpdatedTimestampColumnName(getView().getDefaultUpdatedTimestampColumn().getText());
     jdbcSettings.setUseMetadataTables(getView().getUseMetadataTables().getValue());
@@ -274,6 +277,8 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
     HasText getDefaultEntityType();
 
     HasEnabled getDefaultEntityTypeEnabled();
+
+    HasText getDefaultEntityIdColumn();
 
     HasText getDefaultCreatedTimestampColumn();
 

@@ -58,6 +58,7 @@ public class Dtos {
   private static JdbcDatasourceSettings fromDto(@NotNull Magma.JdbcDatasourceSettingsDto dto) {
     JdbcDatasourceSettings jdbcSettings = new JdbcDatasourceSettings();
     jdbcSettings.setDefaultEntityType(dto.getDefaultEntityType());
+    jdbcSettings.setDefaultEntityIdColumnName(dto.getDefaultEntityIdColumnName());
     jdbcSettings.setDefaultCreatedTimestampColumnName(dto.getDefaultCreatedTimestampColumnName());
     jdbcSettings.setDefaultUpdatedTimestampColumnName(dto.getDefaultUpdatedTimestampColumnName());
     jdbcSettings.setUseMetadataTables(dto.getUseMetadataTables());
@@ -139,13 +140,14 @@ public class Dtos {
   private static Magma.JdbcDatasourceSettingsDto.Builder asDto(JdbcDatasourceSettings jdbcSettings) {
     Magma.JdbcDatasourceSettingsDto.Builder builder = Magma.JdbcDatasourceSettingsDto.newBuilder();
     builder.setDefaultEntityType(jdbcSettings.getDefaultEntityType());
-    String defaultCreatedTimestampColumnName = jdbcSettings.getDefaultCreatedTimestampColumnName();
-    if(!Strings.isNullOrEmpty(defaultCreatedTimestampColumnName)) {
-      builder.setDefaultCreatedTimestampColumnName(defaultCreatedTimestampColumnName);
+    if(jdbcSettings.isEntityIdColumnNameProvided()) {
+      builder.setDefaultEntityIdColumnName(jdbcSettings.getDefaultEntityIdColumnName());
     }
-    String defaultUpdatedTimestampColumnName = jdbcSettings.getDefaultUpdatedTimestampColumnName();
-    if(!Strings.isNullOrEmpty(defaultUpdatedTimestampColumnName)) {
-      builder.setDefaultUpdatedTimestampColumnName(defaultUpdatedTimestampColumnName);
+    if(jdbcSettings.isCreatedTimestampColumnNameProvided()) {
+      builder.setDefaultCreatedTimestampColumnName(jdbcSettings.getDefaultCreatedTimestampColumnName());
+    }
+    if(jdbcSettings.isUpdatedTimestampColumnNameProvided()) {
+      builder.setDefaultUpdatedTimestampColumnName(jdbcSettings.getDefaultUpdatedTimestampColumnName());
     }
     builder.setUseMetadataTables(jdbcSettings.isUseMetadataTables());
     return builder;

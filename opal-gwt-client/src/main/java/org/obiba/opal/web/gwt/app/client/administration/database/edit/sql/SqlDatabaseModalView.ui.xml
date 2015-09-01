@@ -107,8 +107,18 @@
       </b:ControlGroup>
 
       <b:ControlGroup>
+        <b:ControlLabel for="defaultEntityIdColumn">
+          <ui:msg description="Entity Id column label">Entity Identifier Column</ui:msg>
+        </b:ControlLabel>
+        <b:TextBox ui:field="defaultEntityIdColumn" b:id="defaultEntityIdColumn"/>
+        <b:HelpBlock>
+          <ui:msg description="Entity Id help label">The default column name for identifying the entity.</ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
+
+      <b:ControlGroup>
         <b:ControlLabel for="defaultCreatedTimestampColumn">
-          <ui:msg description="Creation timestamp column label">Creation timestamp column</ui:msg>
+          <ui:msg description="Creation timestamp column label">Creation Timestamp Column</ui:msg>
         </b:ControlLabel>
         <b:TextBox ui:field="defaultCreatedTimestampColumn" b:id="defaultCreatedTimestampColumn"/>
         <b:HelpBlock>
@@ -118,7 +128,7 @@
 
       <b:ControlGroup>
         <b:ControlLabel for="defaultUpdatedTimestampColumn">
-          <ui:msg description="Update timestamp column label">Update timestamp column</ui:msg>
+          <ui:msg description="Update timestamp column label">Update Timestamp Column</ui:msg>
         </b:ControlLabel>
         <b:TextBox ui:field="defaultUpdatedTimestampColumn" b:id="defaultUpdatedTimestampColumn"/>
         <b:HelpBlock>

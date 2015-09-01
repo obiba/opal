@@ -73,6 +73,7 @@ message JdbcDatasourceSettingsDto {
   repeated JdbcValueTableSettingsDto tableSettings = 4;
   optional string defaultCreatedTimestampColumnName = 5;
   optional string defaultUpdatedTimestampColumnName = 6;
+  optional string defaultEntityIdColumnName = 7;
 }
 
 message JdbcValueTableSettingsDto {

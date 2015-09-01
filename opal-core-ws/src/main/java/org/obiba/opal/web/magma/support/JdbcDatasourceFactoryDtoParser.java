@@ -66,6 +66,9 @@ public class JdbcDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDto
     if(dto.hasDefaultUpdatedTimestampColumnName()) {
       settings.setDefaultUpdatedTimestampColumnName(dto.getDefaultUpdatedTimestampColumnName());
     }
+    if (dto.hasDefaultEntityIdColumnName()) {
+      settings.setDefaultEntityIdColumnName(dto.getDefaultEntityIdColumnName());
+    }
     return settings;
   }
 
