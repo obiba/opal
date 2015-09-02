@@ -473,7 +473,7 @@ public interface Translations extends Constants {
       "IdentifiersAreMissing", "Some identifiers are missing.",//
       "SystemIdentifiersAreMissing", "Some system identifiers are missing.",//
       "DriverIsRequired", "A driver is required.",//
-      "DefaultEntityTypeIsRequired", "Default Entity Type is required for Custom SQL schema.",//
+      "DefaultEntityTypeIsRequired", "Default Entity Type is required for Tabular SQL schema.",//
       "DatabaseUsageIsRequired", "Database usage is required.",//
       "SQLSchemaIsRequired", "SQL schema is required.",//
       "LimeSurveyDatabaseIsRequired", "LimeSurvey database is required.",//
@@ -947,7 +947,7 @@ public interface Translations extends Constants {
   @Description("Datasource Type map")
   @DefaultStringMapValue({ "mongodb", "MongoDB", //
       "hibernate", "Opal SQL", //
-      "jdbc", "Custom SQL", //
+      "jdbc", "Tabular SQL", //
       "fs", "XML", //
       "csv", "CSV", //
       "excel", "Excel", //
@@ -1907,12 +1907,12 @@ public interface Translations extends Constants {
   @DefaultStringValue("Opal SQL")
   String hibernateDatasourceLabel();
 
-  @Description("Custom SQL label")
-  @DefaultStringValue("Custom SQL Options")
+  @Description("Tabular SQL label")
+  @DefaultStringValue("Tabular SQL Schema Options")
   String jdbcOptionsLabel();
 
-  @Description("Custom SQL label")
-  @DefaultStringValue("Custom SQL")
+  @Description("Tabular SQL label")
+  @DefaultStringValue("Tabular SQL")
   String jdbcDatasourceLabel();
 
   @Description("Update entities filter label")

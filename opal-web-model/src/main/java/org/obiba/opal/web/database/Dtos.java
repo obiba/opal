@@ -62,6 +62,7 @@ public class Dtos {
     jdbcSettings.setDefaultCreatedTimestampColumnName(dto.getDefaultCreatedTimestampColumnName());
     jdbcSettings.setDefaultUpdatedTimestampColumnName(dto.getDefaultUpdatedTimestampColumnName());
     jdbcSettings.setUseMetadataTables(dto.getUseMetadataTables());
+    jdbcSettings.setMultipleDatasources(dto.getMultipleDatasources());
     return jdbcSettings;
   }
 
@@ -150,6 +151,9 @@ public class Dtos {
       builder.setDefaultUpdatedTimestampColumnName(jdbcSettings.getDefaultUpdatedTimestampColumnName());
     }
     builder.setUseMetadataTables(jdbcSettings.isUseMetadataTables());
+    if(jdbcSettings.isMultipleDatasources()) {
+      builder.setMultipleDatasources(jdbcSettings.isMultipleDatasources());
+    }
     return builder;
   }
 

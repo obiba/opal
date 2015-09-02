@@ -179,6 +179,7 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
     jdbcSettings.setDefaultCreatedTimestampColumnName(getView().getDefaultCreatedTimestampColumn().getText());
     jdbcSettings.setDefaultUpdatedTimestampColumnName(getView().getDefaultUpdatedTimestampColumn().getText());
     jdbcSettings.setUseMetadataTables(getView().getUseMetadataTables().getValue());
+    jdbcSettings.setMultipleDatasources(getView().getUsage().getValue() != Usage.IMPORT);
     return jdbcSettings;
   }
 

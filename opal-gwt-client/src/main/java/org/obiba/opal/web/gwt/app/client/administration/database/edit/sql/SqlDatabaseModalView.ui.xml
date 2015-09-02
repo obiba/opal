@@ -95,24 +95,16 @@
     </o:CollapsiblePanel>
 
     <o:CollapsiblePanel ui:field="jdbcOptions">
-      <b:ControlGroup ui:field="defaultEntityTypeGroup">
-        <b:ControlLabel for="defaultEntityType">
-          <ui:msg description="Default Entity Type label">Default Entity Type</ui:msg>
-          <o:RequiredIcon/>
-        </b:ControlLabel>
-        <b:TextBox ui:field="defaultEntityType" b:id="defaultEntityType"/>
-        <b:HelpBlock>
-          <ui:msg description="Default Entity type help label">Entity type to be used if no variables description tables is available.</ui:msg>
-        </b:HelpBlock>
-      </b:ControlGroup>
+
 
       <b:ControlGroup>
         <b:ControlLabel for="defaultEntityIdColumn">
           <ui:msg description="Entity Id column label">Entity Identifier Column</ui:msg>
+          <o:RequiredIcon/>
         </b:ControlLabel>
         <b:TextBox ui:field="defaultEntityIdColumn" b:id="defaultEntityIdColumn"/>
         <b:HelpBlock>
-          <ui:msg description="Entity Id help label">The default column name for identifying the entity.</ui:msg>
+          <ui:msg description="Entity Id help label">The column name for identifying the entity.</ui:msg>
         </b:HelpBlock>
       </b:ControlGroup>
 
@@ -122,7 +114,7 @@
         </b:ControlLabel>
         <b:TextBox ui:field="defaultCreatedTimestampColumn" b:id="defaultCreatedTimestampColumn"/>
         <b:HelpBlock>
-          <ui:msg description="Creation timestamp help label">The default column name for creation timestamps.</ui:msg>
+          <ui:msg description="Creation timestamp help label">The column name for entity values insertion date time.</ui:msg>
         </b:HelpBlock>
       </b:ControlGroup>
 
@@ -132,7 +124,7 @@
         </b:ControlLabel>
         <b:TextBox ui:field="defaultUpdatedTimestampColumn" b:id="defaultUpdatedTimestampColumn"/>
         <b:HelpBlock>
-          <ui:msg description="Update timestamp help label">The default a column name for update timestamps.</ui:msg>
+          <ui:msg description="Update timestamp help label">The column name for entity values last update date time, required for performing incremental imports.</ui:msg>
         </b:HelpBlock>
       </b:ControlGroup>
 
@@ -144,6 +136,17 @@
           <ui:msg description="With variables help label">If checked, the variables description will be fetched from
             database.
           </ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
+
+      <b:ControlGroup ui:field="defaultEntityTypeGroup">
+        <b:ControlLabel for="defaultEntityType">
+          <ui:msg description="Default Entity Type label">Default Entity Type</ui:msg>
+          <o:RequiredIcon/>
+        </b:ControlLabel>
+        <b:TextBox ui:field="defaultEntityType" b:id="defaultEntityType"/>
+        <b:HelpBlock>
+          <ui:msg description="Default Entity type help label">Entity type to be used if no variables description tables is available.</ui:msg>
         </b:HelpBlock>
       </b:ControlGroup>
     </o:CollapsiblePanel>

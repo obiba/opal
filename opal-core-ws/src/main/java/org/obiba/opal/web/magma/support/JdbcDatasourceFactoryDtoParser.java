@@ -53,6 +53,7 @@ public class JdbcDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDto
       settings.setDefaultEntityType(dto.getDefaultEntityType());
     }
     settings.setUseMetadataTables(dto.getUseMetadataTables());
+    settings.setMultipleDatasources(dto.getMultipleDatasources());
     ImmutableSet<String> mappedTables = new ImmutableSet.Builder<String>().addAll(dto.getMappedTablesList()).build();
     settings.setMappedTables(mappedTables);
     ImmutableSet.Builder<JdbcValueTableSettings> tableSettings = new ImmutableSet.Builder<>();
