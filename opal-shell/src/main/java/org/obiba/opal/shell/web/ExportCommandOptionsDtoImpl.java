@@ -105,6 +105,16 @@ public class ExportCommandOptionsDtoImpl implements CopyCommandOptions {
   }
 
   @Override
+  public boolean isOutFormat() {
+    return dto.hasFormat();
+  }
+
+  @Override
+  public String getOutFormat() {
+    return dto.getFormat();
+  }
+
+  @Override
   public String getName() {
     return dto.getDestinationTableName();
   }

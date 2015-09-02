@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.File
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -24,6 +25,8 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.database.DatabaseDto;
+import org.obiba.opal.web.model.client.database.SqlSettingsDto;
 import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingConfigDto;
 import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -81,6 +84,7 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
     fileSelectionPresenter.bind();
     fileSelectionPresenter.getView().setFile("/home/" + credentials.getUsername() + "/export");
     getView().setFileWidgetDisplay(fileSelectionPresenter.getView());
+    updateFormatChooser();
   }
 
   private void initFileSelectionType() {
@@ -128,6 +132,34 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
   public void setDatasourceName(String name) {
     datasourceName = name;
     getView().setFileBaseName(datasourceName);
+  }
+
+  private void updateFormatChooser() {
+    // Remove JDBC formats if no database of this type exists
+    ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder()
+        .forResource(UriBuilders.DATABASES_SQL.create().build())
+        .withCallback(new ResourceCallback<JsArray<DatabaseDto>>() {
+
+          @Override
+          public void onResource(Response response, JsArray<DatabaseDto> resource) {
+            JsArray<DatabaseDto> databases = JsArrays.create();
+            for(int i = 0; i < resource.length(); i++) {
+              SqlSettingsDto sqlSettingsDto = resource.get(i).getSqlSettings();
+              if(sqlSettingsDto.getSqlSchema().getName().equals(SqlSettingsDto.SqlSchema.JDBC.getName()) &&
+                  resource.get(i).getUsage().getName().equals(DatabaseDto.Usage.EXPORT.getName())) {
+                databases.push(resource.get(i));
+              }
+            }
+            getView().setDatabases(databases);
+          }
+        })//
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().removeFormat(ImportConfig.ImportFormat.JDBC);
+          }
+        }, Response.SC_FORBIDDEN, Response.SC_INTERNAL_SERVER_ERROR) //
+        .get().send();
   }
 
   private void initIdentifiersMappings() {
@@ -178,17 +210,17 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
   }
 
   @Override
-  public void onSubmit(String fileFormat, String outFile, String idMapping) {
+  public void onSubmit(String dataFormat, String out, String idMapping) {
     getView().hideDialog();
 
     UriBuilder uriBuilder = UriBuilders.PROJECT_COMMANDS_EXPORT.create();
     ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build(datasourceName)).post() //
         .withResourceBody(
-            ExportCommandOptionsDto.stringify(createExportCommandOptions(fileFormat, outFile, idMapping))) //
-        .withCallback(Response.SC_CREATED, new SuccessResponseCodeCallBack(outFile)).send();
+            ExportCommandOptionsDto.stringify(createExportCommandOptions(dataFormat, out, idMapping))) //
+        .withCallback(Response.SC_CREATED, new SuccessResponseCodeCallBack(out)).send();
   }
 
-  private ExportCommandOptionsDto createExportCommandOptions(String fileFormat, String outFile, String idMapping) {
+  private ExportCommandOptionsDto createExportCommandOptions(String dataFormat, String out, String idMapping) {
     ExportCommandOptionsDto dto = ExportCommandOptionsDto.create();
 
     JsArrayString selectedTables = JavaScriptObject.createArray().cast();
@@ -198,8 +230,8 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
     }
 
     dto.setTablesArray(selectedTables);
-    dto.setFormat(fileFormat);
-    dto.setOut(outFile);
+    dto.setFormat(dataFormat);
+    dto.setOut(out);
     dto.setNonIncremental(true);
     dto.setNoVariables(false);
     if(idMapping != null) {
@@ -239,6 +271,8 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
 
   public interface Display extends PopupView, HasUiHandlers<DataExportUiHandlers> {
 
+    void removeFormat(ImportConfig.ImportFormat format);
+
     void setValuesQuery(String query);
 
     boolean applyQuery();
@@ -252,6 +286,10 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
     void showExportNAlert(String message);
 
     void hideDialog();
+
+    void setDatabases(JsArray<DatabaseDto> databases);
+
+    String getSelectedDatabase();
   }
 
 }

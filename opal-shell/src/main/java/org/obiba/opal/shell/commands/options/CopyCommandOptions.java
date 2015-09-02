@@ -31,11 +31,15 @@ public interface CopyCommandOptions extends HelpOption {
 
   boolean isDestination();
 
-  @Option(shortName = "o", description = "Copy to file: CSV if file is a directory or file has suffix csv, " +
-      "Excel if file has suffix xls or xlsx, XML if file has suffix zip.")
+  @Option(shortName = "o", description = "Depending on the output format, can be a file/folder path or a registered database name.")
   String getOut();
 
   boolean isOut();
+
+  @Option(shortName = "of", description = "Output data format.")
+  String getOutFormat();
+
+  boolean isOutFormat();
 
   //
   // Table transformation

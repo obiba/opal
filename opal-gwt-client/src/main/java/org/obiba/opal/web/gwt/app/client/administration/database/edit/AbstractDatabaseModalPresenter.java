@@ -39,11 +39,9 @@ public abstract class AbstractDatabaseModalPresenter<TView extends AbstractDatab
   }
 
   public enum Usage {
-    IMPORT(translations.importLabel(), SqlSchema.values()),
-    STORAGE(translations.storageLabel(), SqlSchema.HIBERNATE, SqlSchema.JDBC);
-
-    // no support for export to database yet
-    //EXPORT(translations.exportLabel(), SqlSchema.HIBERNATE, SqlSchema.JDBC);
+    IMPORT(translations.importLabel(), SqlSchema.JDBC, SqlSchema.LIMESURVEY),
+    STORAGE(translations.storageLabel(), SqlSchema.HIBERNATE, SqlSchema.JDBC),
+    EXPORT(translations.exportLabel(), SqlSchema.JDBC);
 
     private final String label;
 
@@ -176,8 +174,8 @@ public abstract class AbstractDatabaseModalPresenter<TView extends AbstractDatab
         return DatabaseDto.Usage.IMPORT;
       case STORAGE:
         return DatabaseDto.Usage.STORAGE;
-//      case EXPORT:
-//        return DatabaseDto.Usage.EXPORT;
+      case EXPORT:
+        return DatabaseDto.Usage.EXPORT;
       default:
         throw new IllegalArgumentException("Unknown database usage: " + usage);
     }

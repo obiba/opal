@@ -298,10 +298,8 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
 
   @NotNull
   @Override
-  public DatasourceFactory createDataSourceFactory(@NotNull String datasourceName, @NotNull Database database) {
+  public DatasourceFactory createDatasourceFactory(@NotNull String datasourceName, @NotNull Database database) {
     String databaseName = database.getName();
-    Preconditions.checkArgument(database.getUsage() == Database.Usage.STORAGE,
-        "Cannot create DatasourceFactory for non storage database " + databaseName + ": " + database.getUsage());
     register(databaseName, datasourceName);
 
     SqlSettings sqlSettings = database.getSqlSettings();

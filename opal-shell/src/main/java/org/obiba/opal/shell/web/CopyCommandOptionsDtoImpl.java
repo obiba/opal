@@ -85,6 +85,16 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
   }
 
   @Override
+  public String getOutFormat() {
+    return null;
+  }
+
+  @Override
+  public boolean isOutFormat() {
+    return false;
+  }
+
+  @Override
   public String getName() {
     return dto.getDestinationTableName();
   }

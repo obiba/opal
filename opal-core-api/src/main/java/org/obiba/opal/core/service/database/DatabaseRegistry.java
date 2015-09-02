@@ -48,7 +48,7 @@ public interface DatabaseRegistry extends SystemService {
   Database getIdentifiersDatabase() throws IdentifiersDatabaseNotFoundException;
 
   @NotNull
-  DatasourceFactory createDataSourceFactory(@NotNull String datasourceName, @NotNull Database database);
+  DatasourceFactory createDatasourceFactory(@NotNull String datasourceName, @NotNull Database database);
 
   @Nullable
   Database getDefaultStorageDatabase();

@@ -1891,6 +1891,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Storage")
   String storageLabel();
 
+  @Description("Export label")
+  @DefaultStringValue("Export")
+  String exportLabel();
+
   @Description("Opal SQL label")
   @DefaultStringValue("Opal SQL")
   String hibernateDatasourceLabel();

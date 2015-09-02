@@ -13,12 +13,14 @@ import java.util.Date;
 
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportUiHandlers;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
@@ -31,11 +33,13 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.watopi.chosen.client.event.ChosenChangeEvent;
 
 /**
  * View of the dialog used to export data from Opal.
@@ -65,7 +69,16 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
   SimplePanel filePanel;
 
   @UiField
-  Chooser fileFormat;
+  Chooser dataFormat;
+
+  @UiField
+  Panel destinationFolder;
+
+  @UiField
+  Panel destinationDatabase;
+
+  @UiField
+  ListBox database;
 
   @UiField
   Panel queryPanel;
@@ -88,8 +101,18 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
   }
 
   private void initWidgets() {
-    fileFormat.addItemToGroup(translations.csvLabel(), ImportConfig.ImportFormat.CSV.name());
-    fileFormat.addItemToGroup(translations.opalXmlLabel(), ImportConfig.ImportFormat.XML.name());
+    dataFormat.addItemToGroup(translations.csvLabel(), ImportConfig.ImportFormat.CSV.name());
+    dataFormat.addItemToGroup(translations.opalXmlLabel(), ImportConfig.ImportFormat.XML.name());
+    dataFormat.addItemToGroup(translations.sqlLabel(), ImportConfig.ImportFormat.JDBC.name());
+    dataFormat.addChosenChangeHandler(new ChosenChangeEvent.ChosenChangeHandler() {
+      @Override
+      public void onChange(ChosenChangeEvent event) {
+        boolean fileBased = isFileBasedDataFormat();
+        destinationFolder.setVisible(fileBased);
+        destinationDatabase.setVisible(!fileBased);
+      }
+    });
+    destinationDatabase.setVisible(false);
   }
 
   @UiHandler("cancelButton")
@@ -99,7 +122,8 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
 
   @UiHandler("submitButton")
   public void onSubmit(ClickEvent event) {
-    getUiHandlers().onSubmit(getFileFormat(), getOutFile(), getSelectedIdentifiersMapping());
+    getUiHandlers().onSubmit(getDataFormat(), isFileBasedDataFormat() ? getOutFile() : getSelectedDatabase(),
+        getSelectedIdentifiersMapping());
   }
 
   private String getSelectedIdentifiersMapping() {
@@ -109,6 +133,32 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
   @UiHandler("applyQuery")
   public void onCheck(ClickEvent event) {
     queryLabel.getElement().setAttribute("style", applyQuery.getValue() ? "" : "opacity: 0.5;");
+  }
+
+  @Override
+  public void removeFormat(ImportConfig.ImportFormat format) {
+    for(int i = 0; i < dataFormat.getItemCount(); i++) {
+      if(dataFormat.getValue(i).equals(format.name())) {
+        dataFormat.removeItem(i);
+        break;
+      }
+    }
+  }
+
+  @Override
+  public void setDatabases(JsArray<DatabaseDto> databases) {
+    database.clear();
+
+    if(databases.length() == 0) removeFormat(ImportConfig.ImportFormat.JDBC);
+
+    for(DatabaseDto dto : JsArrays.toIterable(databases)) {
+      database.addItem(dto.getName());
+    }
+  }
+
+  @Override
+  public String getSelectedDatabase() {
+    return database.getItemText(database.getSelectedIndex());
   }
 
   @Override
@@ -134,6 +184,10 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
     identifiersPanel.setVisible(mappings.length() > 0);
   }
 
+  private boolean isFileBasedDataFormat() {
+    return ImportConfig.ImportFormat.valueOf(dataFormat.getSelectedValue()) != ImportConfig.ImportFormat.JDBC;
+  }
+
   private String getOutFile() {
     Date date = new Date();
     DateTimeFormat dateFormat = DateTimeFormat.getFormat("yyyyMMddHHmmss");
@@ -144,15 +198,15 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
     }
     suffix += fileBaseName + "-" + dateFormat.format(date);
 
-    if("xml".equalsIgnoreCase(getFileFormat())) {
+    if("xml".equalsIgnoreCase(getDataFormat())) {
       return fileSelection.getFile() + suffix + ".zip";
     }
 
     return fileSelection.getFile() + suffix;
   }
 
-  private String getFileFormat() {
-    return fileFormat.getValue(fileFormat.getSelectedIndex());
+  private String getDataFormat() {
+    return dataFormat.getValue(dataFormat.getSelectedIndex());
   }
 
   @Override
@@ -161,7 +215,7 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
     fileSelection = display;
     fileSelection.setEnabled(true);
     fileSelection.setFieldWidth("20em");
-    fileFormat.setEnabled(true);
+    dataFormat.setEnabled(true);
   }
 
   @Override

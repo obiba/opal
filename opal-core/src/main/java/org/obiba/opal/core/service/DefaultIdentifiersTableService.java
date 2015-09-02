@@ -114,7 +114,7 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   public Datasource getDatasource() throws IdentifiersDatabaseNotFoundException {
     if(datasource == null) {
       DatasourceFactory datasourceFactory = databaseRegistry
-          .createDataSourceFactory(getDatasourceName(), databaseRegistry.getIdentifiersDatabase());
+          .createDatasourceFactory(getDatasourceName(), databaseRegistry.getIdentifiersDatabase());
       Initialisables.initialise(datasourceFactory);
       datasource = datasourceFactory.create();
       Initialisables.initialise(datasource);

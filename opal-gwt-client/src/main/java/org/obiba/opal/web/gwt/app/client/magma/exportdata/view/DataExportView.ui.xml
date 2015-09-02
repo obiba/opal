@@ -22,19 +22,19 @@
     <!--Format-->
     <b:ControlGroup>
       <b:ControlLabel>
-        <ui:msg description="File format field">Data Format</ui:msg>
+        <ui:msg description="Data format field">Data Format</ui:msg>
         <o:RequiredIcon/>
       </b:ControlLabel>
       <b:Controls>
-        <o:Chooser ui:field="fileFormat"></o:Chooser>
+        <o:Chooser ui:field="dataFormat"></o:Chooser>
       </b:Controls>
       <b:HelpBlock>
-        <ui:msg description="Export Format help">File format under which the data will be exported.</ui:msg>
+        <ui:msg description="Export Format help">Format under which the data will be exported.</ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 
-    <!--Destination-->
-    <b:ControlGroup>
+    <!--Destination Folder-->
+    <b:ControlGroup ui:field="destinationFolder">
       <b:ControlLabel>
         <ui:msg description="Destination Folder field">Destination Folder</ui:msg>
         <o:RequiredIcon/>
@@ -45,6 +45,21 @@
       <b:HelpBlock>
         <ui:msg description="Destination Folder help">Data will be exported in the selected folder in a zip
           of XML files or in a folder with CSV files.
+        </ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+
+    <!--Destination Database-->
+    <b:ControlGroup ui:field="destinationDatabase">
+      <b:ControlLabel>
+        <ui:msg description="Destination Database field">Destination Database</ui:msg>
+        <o:RequiredIcon/>
+      </b:ControlLabel>
+      <b:Controls>
+        <o:Chooser ui:field="database"/>
+      </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="Destination Database help">Data will be exported in the selected SQL database.
         </ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>

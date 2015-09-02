@@ -216,7 +216,7 @@ public class ProjectsServiceImpl implements ProjectService {
         DatasourceFactory dataSourceFactory = null;
         if(project.hasDatabase()) {
           Database database = databaseRegistry.getDatabase(project.getDatabase());
-          dataSourceFactory = databaseRegistry.createDataSourceFactory(project.getName(), database);
+          dataSourceFactory = databaseRegistry.createDatasourceFactory(project.getName(), database);
         } else {
           dataSourceFactory = new NullDatasourceFactory();
           dataSourceFactory.setName(project.getName());

@@ -67,8 +67,6 @@ public class JdbcStepPresenter extends PresenterWidget<JdbcStepPresenter.Display
     ImportConfig importConfig = new ImportConfig();
     importConfig.setImportFormat(ImportFormat.JDBC);
     importConfig.setDatabase(getView().getSelectedDatabase());
-    importConfig.put("defaultEntityType", "");
-    importConfig.put("useMetadataTables", "");
     return importConfig;
   }
 

@@ -11,6 +11,9 @@ package org.obiba.opal.shell.commands;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,8 +44,10 @@ import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.support.AllClause;
+import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.magma.QueryWhereClause;
 import org.obiba.opal.core.service.DataExportService;
+import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,11 +75,16 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
   private static final Logger log = LoggerFactory.getLogger(CopyCommand.class);
 
+  private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
+
   @Autowired
   ApplicationContext applicationContext;
 
   @Autowired
   private DataExportService dataExportService;
+
+  @Autowired
+  private DatabaseRegistry databaseRegistry;
 
   @NotNull
   private final FileDatasourceFactory fileDatasourceFactory;
@@ -117,6 +127,9 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
         e.printStackTrace(System.err);
       } finally {
         if(options.isOut()) {
+          if(options.getOutFormat().equalsIgnoreCase("jdbc") && destinationDatasource != null) {
+            databaseRegistry.unregister(options.getOut(), destinationDatasource.getName());
+          }
           Disposables.silentlyDispose(destinationDatasource);
         }
       }
@@ -200,12 +213,26 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     if(options.isDestination()) {
       destinationDatasource = getDatasourceByName(options.getDestination());
     } else {
-      destinationDatasource = fileDatasourceFactory.createDatasource(getOutputFile());
-      if(destinationDatasource == null) {
-        throw new IllegalArgumentException("Unknown output datasource type");
-      }
-      Initialisables.initialise(destinationDatasource);
+      destinationDatasource = createDestinationDatasource();
     }
+    return destinationDatasource;
+  }
+
+  private Datasource createDestinationDatasource() throws IOException {
+    Datasource destinationDatasource = null;
+
+    if(options.getOutFormat().equalsIgnoreCase("jdbc")) {
+      Database database = databaseRegistry.getDatabase(options.getOut());
+
+      destinationDatasource = databaseRegistry.createDatasourceFactory(DATE_FORMAT.format(new Date()), database).create();
+    } else {
+      destinationDatasource = fileDatasourceFactory.createDatasource(getOutputFile());
+    }
+
+    if(destinationDatasource == null) {
+      throw new IllegalArgumentException("Unknown output datasource type");
+    }
+    Initialisables.initialise(destinationDatasource);
     return destinationDatasource;
   }
 
@@ -229,7 +256,6 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     applyQueryOption(tablesByName);
     applyNameOption(tablesByName);
 
-
     return ImmutableSet.copyOf(tablesByName.values());
   }
 
@@ -243,11 +269,11 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   private void applyQueryOption(Map<String, ValueTable> tablesByName) {
-    if (!options.isQuery()) return;
+    if(!options.isQuery()) return;
 
     // make views with query where clause
     Map<String, View> viewsByName = Maps.newHashMap();
-    for (Map.Entry<String, ValueTable> entry : tablesByName.entrySet()) {
+    for(Map.Entry<String, ValueTable> entry : tablesByName.entrySet()) {
       ValueTable table = entry.getValue();
       QueryWhereClause queryWhereClause = applicationContext.getBean("searchQueryWhereClause", QueryWhereClause.class);
       queryWhereClause.setQuery(options.getQuery());
@@ -258,7 +284,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     }
 
     // replace original tables by corresponding views
-    for (Map.Entry<String, View> entry : viewsByName.entrySet()) {
+    for(Map.Entry<String, View> entry : viewsByName.entrySet()) {
       tablesByName.put(entry.getKey(), entry.getValue());
     }
   }
