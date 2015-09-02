@@ -213,7 +213,7 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
     formatChooser.addGroup(translations.remoteServerBasedDatasources());
     formatChooser.addItemToGroup(translations.limesurveyLabel(), ImportFormat.LIMESURVEY.name());
     formatChooser.addItemToGroup(translations.opalRestLabel(), ImportFormat.REST.name());
-    formatChooser.addItemToGroup(translations.opalJDBCLabel(), ImportFormat.JDBC.name());
+    formatChooser.addItemToGroup(translations.sqlLabel(), ImportFormat.JDBC.name());
   }
 
   @Override

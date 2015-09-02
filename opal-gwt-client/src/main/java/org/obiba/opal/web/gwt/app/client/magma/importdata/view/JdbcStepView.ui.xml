@@ -17,7 +17,7 @@
   <g:FlowPanel>
     <g:FlowPanel styleName="input">
       <g:Label addStyleNames="key">
-        <ui:msg description="Jdbc Database label">Jdbc Database</ui:msg>
+        <ui:msg description="Jdbc Database label">SQL Database</ui:msg>
       </g:Label>
       <o:Chooser ui:field="database"/>
     </g:FlowPanel>

@@ -675,18 +675,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("LimeSurvey Options")
   String limesurveyOptionsLabel();
 
-  @Description("JDBC label")
-  @DefaultStringValue("JDBC")
-  String opalJDBCLabel();
-
-  @Description("Health Canada label")
-  @DefaultStringValue("Health Canada")
-  String healthCanadaLabel();
-
-  @Description("Geonames Postal Codes label")
-  @DefaultStringValue("Postal Codes")
-  String geonamesPostalCodesLabel();
-
   @Description("Error label")
   @DefaultStringValue("Error")
   String errorLabel();
