@@ -10,8 +10,9 @@ import opal.entity
 import opal.import_opal
 import opal.import_csv
 import opal.import_xml
-import opal.import_limesurvey
 import opal.import_spss
+import opal.import_limesurvey
+import opal.import_sql
 import opal.import_ids
 import opal.import_idsmap
 import opal.export_xml
@@ -72,10 +73,12 @@ add_subcommand('import-csv', 'Import data from a CSV file.', opal.import_csv.add
                opal.import_csv.do_command)
 add_subcommand('import-xml', 'Import data from a ZIP file.', opal.import_xml.add_arguments,
                opal.import_xml.do_command)
-add_subcommand('import-limesurvey', 'Import data from a LimeSurvey database.', opal.import_limesurvey.add_arguments,
-               opal.import_limesurvey.do_command)
 add_subcommand('import-spss', 'Import data from a SPSS file.', opal.import_spss.add_arguments,
                opal.import_spss.do_command)
+add_subcommand('import-limesurvey', 'Import data from a LimeSurvey database.', opal.import_limesurvey.add_arguments,
+               opal.import_limesurvey.do_command)
+add_subcommand('import-sql', 'Import data from a SQL database.', opal.import_sql.add_arguments,
+               opal.import_sql.do_command)
 add_subcommand('import-ids', 'Import system identifiers.', opal.import_ids.add_arguments,
                opal.import_ids.do_command)
 add_subcommand('import-ids-map', 'Import identifiers mappings.', opal.import_idsmap.add_arguments,
