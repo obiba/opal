@@ -60,7 +60,6 @@ message FsDatasourceFactoryDto {
 
 message JdbcDatasourceFactoryDto {
   required string database = 1;
-  required JdbcDatasourceSettingsDto settings = 2;
   extend DatasourceFactoryDto {
     optional JdbcDatasourceFactoryDto params = 1003;
   }

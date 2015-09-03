@@ -101,8 +101,10 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
   }
 
   private void initWidgets() {
+    dataFormat.addGroup(translations.fileBasedDatasources());
     dataFormat.addItemToGroup(translations.csvLabel(), ImportConfig.ImportFormat.CSV.name());
     dataFormat.addItemToGroup(translations.opalXmlLabel(), ImportConfig.ImportFormat.XML.name());
+    dataFormat.addGroup(translations.remoteServerBasedDatasources());
     dataFormat.addItemToGroup(translations.sqlLabel(), ImportConfig.ImportFormat.JDBC.name());
     dataFormat.addChosenChangeHandler(new ChosenChangeEvent.ChosenChangeHandler() {
       @Override

@@ -542,11 +542,11 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   @Override
   public void toggleJdbcOptions(boolean show) {
     boolean storage = getUsageValue() == Usage.STORAGE;
-    defaultEntityType.setValue(show ? "Participant" : null);
+    defaultEntityType.setValue("Participant");
     // set default jdbc options when usage is storage
-    defaultEntityIdColumn.setValue(show && storage ? "opal_id" : null);
-    defaultCreatedTimestampColumn.setValue(show && storage ? "opal_created" : null);
-    defaultUpdatedTimestampColumn.setValue(show && storage ? "opal_updated" : null);
+    defaultEntityIdColumn.setValue(show && storage ? "opal_id" : "id");
+    defaultCreatedTimestampColumn.setValue(show && storage ? "opal_created" : "created");
+    defaultUpdatedTimestampColumn.setValue(show && storage ? "opal_updated" : "updated");
     useMetadataTables.setValue(show && storage);
     // do not show jdbc options when usage is storage
     jdbcOptions.setVisible(show && !storage);

@@ -63,7 +63,7 @@
           <g:FlowPanel addStyleNames="small-top-margin" ui:field="helpJDBC" visible="false">
             <g:Label styleName="help-block">
               <ui:msg description="JDBC Information">This format imports variable dictionaries and data from a
-                flat schema SQL database.
+                SQL database with a tabular schema.
               </ui:msg>
             </g:Label>
           </g:FlowPanel>

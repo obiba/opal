@@ -9,19 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.datasource.presenter;
 
-import org.obiba.opal.web.gwt.app.client.validator.RequiredOptionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidatablePresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.JdbcDatasourceFactoryDto;
-import org.obiba.opal.web.model.client.magma.JdbcDatasourceSettingsDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
@@ -42,10 +38,6 @@ public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<Jdbc
   @Inject
   public JdbcDatasourceFormPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
-
-    addValidator(new RequiredOptionValidator(RequiredOptionValidator
-        .asSet(getView().getUseMetadataTablesOption(), getView().getDoNotUseMetadataTablesOption()),
-        "MustIndicateWhetherJdbcDatasourceShouldUseMetadataTables"));
   }
 
   @Override
@@ -74,7 +66,6 @@ public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<Jdbc
   public DatasourceFactoryDto getDatasourceFactory() {
     JdbcDatasourceFactoryDto extensionDto = JdbcDatasourceFactoryDto.create();
     extensionDto.setDatabase(getView().getSelectedDatabase());
-    extensionDto.setSettings(getSettings());
 
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
     dto.setExtension(JdbcDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, extensionDto);
@@ -87,22 +78,6 @@ public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<Jdbc
     return "jdbc".equalsIgnoreCase(type);
   }
 
-  private JdbcDatasourceSettingsDto getSettings() {
-    JdbcDatasourceSettingsDto settingsDto = JdbcDatasourceSettingsDto.create();
-    settingsDto.setDefaultEntityType("Participant");
-    settingsDto.setUseMetadataTables(getView().getUseMetadataTablesOption().getValue());
-
-    if(getView().getDefaultCreatedTimestampColumnName().getText().trim().length() != 0) {
-      settingsDto.setDefaultCreatedTimestampColumnName(getView().getDefaultCreatedTimestampColumnName().getText());
-    }
-
-    if(getView().getDefaultUpdatedTimestampColumnName().getText().trim().length() != 0) {
-      settingsDto.setDefaultUpdatedTimestampColumnName(getView().getDefaultUpdatedTimestampColumnName().getText());
-    }
-
-    return settingsDto;
-  }
-
   //
   // Interfaces and Inner Classes
   //
@@ -113,21 +88,9 @@ public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<Jdbc
 
     String getSelectedDatabase();
 
-    HasValue<Boolean> getUseMetadataTablesOption();
-
-    HasValue<Boolean> getDoNotUseMetadataTablesOption();
-
-    HasText getDefaultCreatedTimestampColumnName();
-
-    HasText getDefaultUpdatedTimestampColumnName();
-
   }
 
   @Override
   public void clearForm() {
-    getView().getDefaultCreatedTimestampColumnName().setText("");
-    getView().getDefaultUpdatedTimestampColumnName().setText("");
-    getView().getDoNotUseMetadataTablesOption().setValue(true);
-    getView().getUseMetadataTablesOption().setValue(false);
   }
 }

@@ -104,7 +104,7 @@
         </b:ControlLabel>
         <b:TextBox ui:field="defaultEntityIdColumn" b:id="defaultEntityIdColumn"/>
         <b:HelpBlock>
-          <ui:msg description="Entity Id help label">The column name for identifying the entity.</ui:msg>
+          <ui:msg description="Entity Id help label">The column name for identifying the entity. Make sure it will not conflict with a variable column name.</ui:msg>
         </b:HelpBlock>
       </b:ControlGroup>
 
@@ -114,7 +114,7 @@
         </b:ControlLabel>
         <b:TextBox ui:field="defaultCreatedTimestampColumn" b:id="defaultCreatedTimestampColumn"/>
         <b:HelpBlock>
-          <ui:msg description="Creation timestamp help label">The column name for entity values insertion date time.</ui:msg>
+          <ui:msg description="Creation timestamp help label">The column name for entity values insertion date time. Make sure it will not conflict with a variable column name.</ui:msg>
         </b:HelpBlock>
       </b:ControlGroup>
 
@@ -124,7 +124,7 @@
         </b:ControlLabel>
         <b:TextBox ui:field="defaultUpdatedTimestampColumn" b:id="defaultUpdatedTimestampColumn"/>
         <b:HelpBlock>
-          <ui:msg description="Update timestamp help label">The column name for entity values last update date time, required for performing incremental imports.</ui:msg>
+          <ui:msg description="Update timestamp help label">The column name for entity values last update date time, required for performing incremental imports. Make sure it will not conflict with a variable column name.</ui:msg>
         </b:HelpBlock>
       </b:ControlGroup>
 

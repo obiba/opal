@@ -24,7 +24,6 @@ import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.ExcelDatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.HibernateDatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.JdbcDatasourceFactoryDto;
-import org.obiba.opal.web.model.Magma.JdbcDatasourceSettingsDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 
 import com.googlecode.protobuf.format.JsonFormat;
@@ -121,7 +120,7 @@ public class DtosTest {
     String json = JsonFormat.printToString(buildDatasourceFactoryDto());
     // non regression check for protobuf json format patch about nested extensions
     assertThat(
-        "{\"Magma.ExcelDatasourceFactoryDto.params\": {\"file\": \"/toto/tata.xlsx\"},\"Magma.JdbcDatasourceFactoryDto.params\": {\"database\": \"MyDatabase\",\"settings\": {\"defaultEntityType\": \"Participant\",\"useMetadataTables\": true}},\"Magma.HibernateDatasourceFactoryDto.params\": {}}")
+        "{\"Magma.ExcelDatasourceFactoryDto.params\": {\"file\": \"/toto/tata.xlsx\"},\"Magma.JdbcDatasourceFactoryDto.params\": {\"database\": \"MyDatabase\"},\"Magma.HibernateDatasourceFactoryDto.params\": {}}")
         .isEqualTo(json);
   }
 
@@ -134,10 +133,6 @@ public class DtosTest {
 
     JdbcDatasourceFactoryDto.Builder jdbcBuilder = JdbcDatasourceFactoryDto.newBuilder();
     jdbcBuilder.setDatabase("MyDatabase");
-    JdbcDatasourceSettingsDto.Builder settingsBuilder = JdbcDatasourceSettingsDto.newBuilder();
-    settingsBuilder.setDefaultEntityType("Participant");
-    settingsBuilder.setUseMetadataTables(true);
-    jdbcBuilder.setSettings(settingsBuilder.build());
     builder.setExtension(JdbcDatasourceFactoryDto.params, jdbcBuilder.build());
 
     builder.setExtension(HibernateDatasourceFactoryDto.params, HibernateDatasourceFactoryDto.newBuilder().build());

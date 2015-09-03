@@ -41,18 +41,6 @@ public class JdbcDatasourceFormView extends ViewImpl implements JdbcDatasourceFo
   @UiField
   ListBox database;
 
-  @UiField
-  TextBox defaultCreatedTimestampColumnName;
-
-  @UiField
-  TextBox defaultUpdatedTimestampColumnName;
-
-  @UiField
-  RadioButton useMetadataTablesOption;
-
-  @UiField
-  RadioButton doNotUseMetadataTablesOption;
-
   public JdbcDatasourceFormView() {
     widget = uiBinder.createAndBindUi(this);
   }
@@ -68,26 +56,6 @@ public class JdbcDatasourceFormView extends ViewImpl implements JdbcDatasourceFo
     for(DatabaseDto dto : JsArrays.toIterable(resource)) {
       database.addItem(dto.getName());
     }
-  }
-
-  @Override
-  public HasValue<Boolean> getUseMetadataTablesOption() {
-    return useMetadataTablesOption;
-  }
-
-  @Override
-  public HasValue<Boolean> getDoNotUseMetadataTablesOption() {
-    return doNotUseMetadataTablesOption;
-  }
-
-  @Override
-  public HasText getDefaultCreatedTimestampColumnName() {
-    return defaultCreatedTimestampColumnName;
-  }
-
-  @Override
-  public HasText getDefaultUpdatedTimestampColumnName() {
-    return defaultUpdatedTimestampColumnName;
   }
 
   @Override
