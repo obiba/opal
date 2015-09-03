@@ -131,7 +131,8 @@ public final class Dtos {
 
   @SuppressWarnings("ConstantConditions")
   public static AttributeDto.Builder asDto(Attribute from) {
-    AttributeDto.Builder a = AttributeDto.newBuilder().setName(from.getName()).setValue(from.getValue().toString());
+    AttributeDto.Builder a = AttributeDto.newBuilder().setName(from.getName())
+        .setValue(from.getValue().isNull() ? "" : from.getValue().toString());
     if(from.isLocalised()) {
       a.setLocale(from.getLocale().toString());
     }
