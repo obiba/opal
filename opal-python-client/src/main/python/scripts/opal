@@ -16,6 +16,7 @@ import opal.import_ids
 import opal.import_idsmap
 import opal.export_xml
 import opal.export_csv
+import opal.export_sql
 import opal.copy_table
 import opal.delete_table
 import opal.user
@@ -83,6 +84,8 @@ add_subcommand('export-xml', 'Export data to a zip of Opal XML files.', opal.exp
                opal.export_xml.do_command)
 add_subcommand('export-csv', 'Export data to a folder of CSV files.', opal.export_csv.add_arguments,
                opal.export_csv.do_command)
+add_subcommand('export-sql', 'Export data to a SQL database.', opal.export_sql.add_arguments,
+               opal.export_sql.do_command)
 add_subcommand('copy-table', 'Copy a table into another table.', opal.copy_table.add_arguments, opal.copy_table.do_command)
 add_subcommand('delete-table', 'Delete some tables.', opal.delete_table.add_arguments, opal.delete_table.do_command)
 add_subcommand('user', 'Manage users.', opal.user.add_arguments, opal.user.do_command)

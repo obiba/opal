@@ -21,7 +21,7 @@ def add_arguments(parser):
 
 def do_command(args):
     """
-    Execute import data command
+    Execute export data command
     """
     # Build and send request
     try:
