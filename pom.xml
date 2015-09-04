@@ -583,6 +583,12 @@
         <artifactId>mysql-connector-java</artifactId>
         <version>${mysql-connector-java.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>${postgresql.version}</version>
+      </dependency>
+
 
       <!-- Logging framework -->
       <dependency>
@@ -1780,6 +1786,7 @@
     <opencsv.version>2.3</opencsv.version>
     <orientdb.version>2.1.0</orientdb.version>
     <ow2-spec.version>1.0.13</ow2-spec.version>
+    <postgresql.version>9.4-1202-jdbc42</postgresql.version>
     <protobuf-java-format.version>1.2.1-obiba</protobuf-java-format.version>
     <protobuf.version>2.5.0</protobuf.version>
     <protostuff.version>1.0.1</protostuff.version>

@@ -70,13 +70,15 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
 
   private String guessValidationQuery() {
     switch(driverClass) {
-      case "com.mysql.jdbc.Driver":
-        return "select 1";
       case "org.hsqldb.jdbcDriver":
       case "org.hsqldb.jdbc.JDBCDriver":
         return "select 1 from INFORMATION_SCHEMA.SYSTEM_USERS";
+      case "oracle.jdbc.driver.OracleDriver":
+        return "select 1 from dual";
+      case "com.ibm.db2.jcc.DB2Driver":
+        return "select 1 from sysibm.sysdummy1";
       default:
-        throw new IllegalArgumentException("Unsupported JDBC driver: " + driverClass);
+        return "select 1";
     }
   }
 

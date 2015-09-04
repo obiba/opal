@@ -194,6 +194,8 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
     String defaultName = isIdentifiers ? "opal_ids" : "opal_data";
     if(getDriver().getText() == null || "com.mysql.jdbc.Driver".equals(getDriver().getText())) {
       url.setText("jdbc:mysql://localhost:3306/" + defaultName);
+    } else if ("org.postgresql.Driver".equals(getDriver().getText())) {
+      url.setText("jdbc:postgresql://localhost:5432/" + defaultName);
     }
   }
 
