@@ -29,6 +29,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.collect.Maps;
+import org.elasticsearch.common.lease.Releasable;
 import org.elasticsearch.http.HttpRequest;
 import org.elasticsearch.rest.RestChannel;
 import org.elasticsearch.rest.RestResponse;
@@ -184,7 +185,7 @@ public class ValueTableIndexResource extends IndexResource {
     JaxRsRestRequest request = new JaxRsRestRequest(getValueTableIndex(datasource, table), servletRequest, body, "_search");
     esProvider.getRest()
         .dispatchRequest(request,
-            new RestChannel(request) {
+            new RestChannel(request, true) {
 
               @Override
               public void sendResponse(RestResponse response) {
@@ -210,11 +211,11 @@ public class ValueTableIndexResource extends IndexResource {
 
   private Response convert(RestResponse response) throws IOException {
     byte[] entity;
-    if(response.contentThreadSafe()) {
-      entity = response.content().toBytes();
-    } else {
+    if(response.content() instanceof Releasable) {
       entity = new byte[response.content().length()];
       System.arraycopy(response.content().toBytes(), 0, entity, 0, response.content().length());
+    } else {
+      entity = response.content().toBytes();
     }
     return Response.status(response.status().getStatus()).entity(entity).type(response.contentType()).build();
   }
@@ -273,11 +274,6 @@ public class ValueTableIndexResource extends IndexResource {
     @Override
     public boolean hasContent() {
       return body != null && body.length() > 0;
-    }
-
-    @Override
-    public boolean contentUnsafe() {
-      return false;
     }
 
     @Override

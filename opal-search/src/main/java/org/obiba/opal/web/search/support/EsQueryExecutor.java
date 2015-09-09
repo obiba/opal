@@ -20,6 +20,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.collect.ImmutableMap;
+import org.elasticsearch.common.lease.Releasable;
 import org.elasticsearch.http.HttpRequest;
 import org.elasticsearch.rest.RestChannel;
 import org.elasticsearch.rest.RestRequest;
@@ -63,7 +64,7 @@ public class EsQueryExecutor {
     final CountDownLatch latch = new CountDownLatch(1);
     final AtomicReference<byte[]> ref = new AtomicReference<>();
 
-    elasticSearchProvider.getRest().dispatchRequest(esRestRequest, new RestChannel(esRestRequest) {
+    elasticSearchProvider.getRest().dispatchRequest(esRestRequest, new RestChannel(esRestRequest, true) {
 
       @Override
       public void sendResponse(RestResponse response) {
@@ -94,11 +95,11 @@ public class EsQueryExecutor {
 
   private byte[] convert(RestResponse response) throws IOException {
     byte[] entity;
-    if(response.contentThreadSafe()) {
-      entity = response.content().toBytes();
-    } else {
+    if(response.content() instanceof Releasable) {
       entity = new byte[response.content().length()];
       System.arraycopy(response.content().toBytes(), 0, entity, 0, response.content().length());
+    } else {
+      entity = response.content().toBytes();
     }
     return entity;
   }
@@ -156,11 +157,6 @@ public class EsQueryExecutor {
     @Override
     public boolean hasContent() {
       return body != null && body.length() > 0;
-    }
-
-    @Override
-    public boolean contentUnsafe() {
-      return false;
     }
 
     @Override

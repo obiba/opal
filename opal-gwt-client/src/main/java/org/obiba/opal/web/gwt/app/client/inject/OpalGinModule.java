@@ -61,7 +61,7 @@ public class OpalGinModule extends AbstractPresenterModule {
 
     bindConstant().annotatedWith(DefaultPlace.class).to(Places.DASHBOARD);
 
-    install(new DefaultModule(OpalPlaceManager.class));
+    install(new DefaultModule.Builder().placeManager(OpalPlaceManager.class).build());
     bindPresenter(ApplicationPresenter.class, ApplicationPresenter.Display.class, ApplicationView.class,
         ApplicationPresenter.Proxy.class);
     bindSingletonPresenterWidget(NotificationPresenter.class, NotificationPresenter.Display.class,
