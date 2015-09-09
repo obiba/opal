@@ -1764,7 +1764,7 @@
     <joda-time.version>2.8.2</joda-time.version>
     <jotm.version>2.2.3</jotm.version>
     <jpa.version>1.0.2</jpa.version>
-    <json.version>20141113</json.version>
+    <json.version>20140107</json.version>
     <jsr305.version>2.0.3</jsr305.version>
     <jta.version>1.1</jta.version>
     <junit.version>4.12</junit.version>
