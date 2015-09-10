@@ -113,7 +113,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
       return list();
     }
     return orientDbService.list(Database.class,
-        "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ? and usage = ?", false, usage);
+        "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ? and usage = ?", false, usage.toString());
   }
 
   @Override
