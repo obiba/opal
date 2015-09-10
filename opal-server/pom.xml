@@ -170,6 +170,7 @@
                 </goals>
                 <configuration>
                   <name>opal-server</name>
+                  <needarch>noarch</needarch>
                   <version>${project.version}</version>
                   <!--release>${project.version}-b${buildNumber}</release-->
                   <license>see /usr/share/doc/opal/copyright</license>
@@ -183,15 +184,27 @@
                   </requires>
 
                   <mappings>
+                    <!-- Add init.d files  -->
+                    <mapping>
+                      <directory>/etc/init.d</directory>
+                      <directoryIncluded>false</directoryIncluded>
+                      <filemode>755</filemode>
+                      <configuration>true</configuration>
+                      <sources>
+                        <source>
+                          <location>src/main/rpm/init.d</location>
+                          <includes>
+                            <include>opal</include>
+                          </includes>
+                        </source>
+                      </sources>
+                    </mapping>
                     <mapping>
                       <directory>${opal.dir}/bin</directory>
                       <filemode>755</filemode>
                       <sources>
                         <source>
-                          <location>${dist.location}/bin</location>
-                          <excludes>
-                            <exclude>*.bat</exclude>
-                          </excludes>
+                          <location>src/main/rpm/opal.sh</location>
                         </source>
                         <source>
                           <location>src/main/rpm/update.sh</location>
@@ -247,7 +260,7 @@
                     </mapping>
                     <mapping>
                       <directory>${opal.dir}/lib</directory>
-                      <filemode>440</filemode>
+                      <filemode>755</filemode>
                       <sources>
                         <source>
                           <location>${dist.location}/lib</location>
@@ -256,7 +269,7 @@
                     </mapping>
                     <mapping>
                       <directory>${opal.dir}/tools/lib</directory>
-                      <filemode>440</filemode>
+                      <filemode>755</filemode>
                       <sources>
                         <source>
                           <location>${dist.location}/tools/lib</location>
