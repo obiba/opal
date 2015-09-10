@@ -1777,7 +1777,7 @@
     <mockftpserver.version>2.6</mockftpserver.version>
     <mockito.version>1.10.8</mockito.version>
     <mongeez.version>0.9.4</mongeez.version>
-    <mongodb-driver.version>2.13.0</mongodb-driver.version>
+    <mongodb-driver.version>3.0.3</mongodb-driver.version>
     <mysql-connector-java.version>5.1.36</mysql-connector-java.version>
     <newrelic.version>3.20.0</newrelic.version>
     <obiba-commons.version>1.7-SNAPSHOT</obiba-commons.version>
