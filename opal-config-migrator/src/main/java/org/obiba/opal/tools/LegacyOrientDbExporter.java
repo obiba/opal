@@ -14,7 +14,7 @@ public class LegacyOrientDbExporter {
   public static void main(String[] args) {
     boolean check = false;
 
-    if(args.length < 2 || args.length > 3 || ((check = "--check".equals(args[0])) && args.length > 2) ) {
+    if(args.length < 2 || args.length > 3 || ((check = "--check".equals(args[0])) && args.length > 2)) {
 
       System.out.println("Usage: java -jar <opal-config-migrator>.jar [--check] <opal_config_dir> [target_file]");
       System.exit(1);
@@ -24,37 +24,38 @@ public class LegacyOrientDbExporter {
     OServer server;
     String orientDbHome = !check ? args[0] : args[1];
     String file = !check ? args[1] : null;
+    System.setProperty("ORIENTDB_HOME", orientDbHome);
+    System.setProperty("ORIENTDB_ROOT_PASSWORD", USERNAME);
 
     try {
-      System.setProperty("ORIENTDB_HOME", orientDbHome);
-      System.setProperty("ORIENTDB_ROOT_PASSWORD", USERNAME);
-
       server = new OServer() //
           .startup(LegacyOrientDbExporter.class.getResourceAsStream("/orientdb-server-config.xml")) //
           .activate();
-
-      try(ODatabaseDocumentTx db = ODatabaseDocumentPool.global()
-          .acquire("local:" + orientDbHome, USERNAME, PASSWORD)) {
-
-        if(!check) {
-          ODatabaseExport export = new ODatabaseExport(db, file, new OCommandOutputListener() {
-            @Override
-            public void onMessage(String s) {
-              System.out.println(s);
-            }
-          });
-
-          export.exportDatabase();
-          export.close();
-        }
-      }
-
-      server.shutdown();
-
-      if(!check) System.out.println("Legacy OrientDb exporter completed successfully.");
-      else System.out.println("Legacy OrientDb exporter check completed successfully.");
     } catch(Exception e) {
-      throw new RuntimeException(e);
+      throw new RuntimeException("Error starting up embedded OrientDb server", e);
     }
+
+    try(ODatabaseDocumentTx db = ODatabaseDocumentPool.global().acquire("local:" + orientDbHome, USERNAME, PASSWORD)) {
+      if(!check) {
+        ODatabaseExport export;
+        export = new ODatabaseExport(db, file, new OCommandOutputListener() {
+          @Override
+          public void onMessage(String s) {
+            System.out.println(s);
+          }
+        });
+
+        export.exportDatabase();
+        export.close();
+      }
+    } catch(Exception e) {
+      if(!check) throw new RuntimeException("Error exporting legacy OrientDb database", e);
+
+      System.out.println("Invalid OrientDb version detected. Exiting.");
+      System.exit(1);
+    }
+
+    server.shutdown();
+    System.out.println("Legacy OrientDb exporter completed successfully.");
   }
 }
