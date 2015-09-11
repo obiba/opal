@@ -73,7 +73,6 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
         Usage usage = getView().getUsage().getValue();
         getView().toggleDefaultStorage(usage == Usage.STORAGE);
         getView().setSupportedSqlSchemas(usage.getSupportedSqlSchemas());
-        getView().setSupportedDrivers(usage.getSupportedDrivers());
       }
     });
 
@@ -261,8 +260,6 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
     void setAvailableDrivers(JsArray<JdbcDriverDto> availableDrivers);
 
     void setSupportedSqlSchemas(SqlSchema... sqlSchemas);
-
-    void setSupportedDrivers(String... driverNames);
 
     void showError(@Nullable FormField formField, String message);
 

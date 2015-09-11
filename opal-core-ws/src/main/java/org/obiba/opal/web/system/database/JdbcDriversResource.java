@@ -40,12 +40,19 @@ public class JdbcDriversResource {
         .setDriverName("MySQL") //
         .setDriverClass("com.mysql.jdbc.Driver") //
         .setJdbcUrlTemplate("jdbc:mysql://{hostname}:{port}/{databaseName}") //
-        .setJdbcUrlExample("jdbc:mysql://localhost:3306/opal").build());
+        .setJdbcUrlExample("jdbc:mysql://localhost:3306/opal") //
+        .addSupportedSchemas("hibernate") //
+        .addSupportedSchemas("jdbc") //
+        .addSupportedSchemas("limesurvey") //
+        .build());
     drivers.add(Database.JdbcDriverDto.newBuilder() //
         .setDriverName("PostgreSQL") //
         .setDriverClass("org.postgresql.Driver") //
         .setJdbcUrlTemplate("jdbc:postgresql://{hostname}:{port}/{databaseName}") //
-        .setJdbcUrlExample("jdbc:postgresql://localhost:5432/opal").build());
+        .setJdbcUrlExample("jdbc:postgresql://localhost:5432/opal") //
+        .addSupportedSchemas("jdbc") //
+        .addSupportedSchemas("limesurvey") //
+        .build());
     return drivers;
   }
 

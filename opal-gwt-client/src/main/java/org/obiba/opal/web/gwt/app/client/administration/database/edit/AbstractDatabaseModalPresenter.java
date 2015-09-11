@@ -43,22 +43,17 @@ public abstract class AbstractDatabaseModalPresenter<TView extends AbstractDatab
   }
 
   public enum Usage {
-    IMPORT(translations.importLabel(), new SqlSchema[] { SqlSchema.JDBC, SqlSchema.LIMESURVEY },
-        new String[] { MYSQL, POSTGRESQL }),
-    STORAGE(translations.storageLabel(), new SqlSchema[] { SqlSchema.HIBERNATE, SqlSchema.JDBC },
-        new String[] { MYSQL }),
-    EXPORT(translations.exportLabel(), new SqlSchema[] { SqlSchema.JDBC }, new String[] { MYSQL, POSTGRESQL });
+    IMPORT(translations.importLabel(), SqlSchema.JDBC, SqlSchema.LIMESURVEY),
+    STORAGE(translations.storageLabel(), SqlSchema.HIBERNATE, SqlSchema.JDBC),
+    EXPORT(translations.exportLabel(), SqlSchema.JDBC);
 
     private final String label;
 
     private final SqlSchema[] supportedSqlSchemas;
 
-    private final String[] supportedDrivers;
-
-    Usage(String label, SqlSchema[] supportedSqlSchemas, String[] supportedDrivers) {
+    Usage(String label, SqlSchema... supportedSqlSchemas) {
       this.label = label;
       this.supportedSqlSchemas = supportedSqlSchemas;
-      this.supportedDrivers = supportedDrivers;
     }
 
     public String getLabel() {
@@ -69,9 +64,6 @@ public abstract class AbstractDatabaseModalPresenter<TView extends AbstractDatab
       return supportedSqlSchemas;
     }
 
-    public String[] getSupportedDrivers() {
-      return supportedDrivers;
-    }
   }
 
   public enum SqlSchema {
