@@ -9,8 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.server;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -20,7 +26,9 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.io.FileUtils;
 import org.obiba.core.util.FileUtil;
+import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.upgrade.v2_0_x.ConfigFolderUpgrade;
 import org.obiba.opal.core.upgrade.v2_0_x.database.Opal2PropertiesConfigurator;
 import org.obiba.runtime.upgrade.UpgradeException;
@@ -35,7 +43,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
 
 /**
  * Command to perform an upgrade (i.e., invoke the upgrade manager).
@@ -48,10 +58,17 @@ public class UpgradeCommand {
 
   private static final String[] OPAL2_CONTEXT_PATHS = { "classpath:/META-INF/spring/opal-server/upgrade-2.0.0.xml" };
 
+  private String opalConfigPath = Paths.get(System.getenv("OPAL_HOME"), "data", "orientdb", "opal-config").toString();
+
   public void execute() {
     if(needToUpgradeToOpal2()) {
       opal2Upgrade();
     }
+
+    if(needUpgradeOrientDb()) {
+      upgradeOrientDb();
+    }
+
     standardUpgrade();
   }
 
@@ -67,6 +84,102 @@ public class UpgradeCommand {
 
   private boolean needToUpgradeToOpal2() {
     return !hasVersionInConfigXml() && hasDatasourceInConfigProperties();
+  }
+
+  private boolean needUpgradeOrientDb() {
+    log.info("Checking orientdb upgrade");
+    String errorMsg = runOpalMigrator("--check", opalConfigPath);
+
+    if(errorMsg == null) {
+      log.info("Older version detected. Upgrade needed.");
+      return true;
+    }
+
+    log.info("Upgrade not needed.");
+    return false;
+  }
+
+  private void upgradeOrientDb() {
+    log.info("Upgrading orientdb");
+    File exportFile = null;
+    File tmpFile = null;
+    Path configBackup = Paths.get(String.format("%s.bak", opalConfigPath));
+    Path config = Paths.get(opalConfigPath);
+
+    try {
+      tmpFile = File.createTempFile("opal_orientdb_export", null);
+      String exportFilePrefix = tmpFile.getAbsolutePath();
+      exportFile = Paths.get(exportFilePrefix + ".gz").toFile();
+      String errorMsg = runOpalMigrator(opalConfigPath, exportFilePrefix);
+
+      if(errorMsg == null) {
+        Files.move(config, configBackup, StandardCopyOption.ATOMIC_MOVE);
+      } else {
+        throw new RuntimeException("Error exporting orientdb: " + errorMsg);
+      }
+    } catch(IOException e) {
+      if(exportFile != null && exportFile.exists()) exportFile.delete();
+
+      throw Throwables.propagate(e);
+    } finally {
+      if(tmpFile != null) tmpFile.delete();
+    }
+
+    try(ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(CONTEXT_PATHS)) {
+      OrientDbService orientDbService = ctx.getBean("orientDbService", OrientDbService.class);
+      orientDbService.importDatabase(exportFile);
+      log.info("Upgraded orientdb successfully");
+
+      try {
+        FileUtils.deleteDirectory(configBackup.toFile());
+      } catch(Exception e) {
+        log.error("Error cleaning up orientdb upgrade back up directory. Ignoring.", e);
+      }
+    } catch(IOException e) {
+      //roll back
+      try {
+        FileUtils.deleteDirectory(config.toFile());
+        Files.move(configBackup, config, StandardCopyOption.ATOMIC_MOVE);
+      } catch(Exception ex) {
+        log.error("Error in orientdb upgrade rollback. Ignoring.", ex);
+      }
+
+      throw Throwables.propagate(e);
+    } finally {
+      if(exportFile != null && exportFile.exists()) exportFile.delete();
+    }
+  }
+
+  private String runOpalMigrator(String... args) {
+    String dist = System.getenv("OPAL_DIST");
+    String formattedArgs = Joiner.on(" ").join(args);
+
+    log.debug("Running Opal config migrator with args: {}", formattedArgs);
+
+    ProcessBuilder pb = new ProcessBuilder("bash", "-c",
+        String.format("java -jar opal-config-migrator-*-cli.jar %s", formattedArgs));
+    pb.redirectErrorStream(true);
+    pb.directory(Paths.get(dist, "tools", "lib").toFile());
+
+    try {
+      Process p = pb.start();
+      p.waitFor();
+      BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+      String line;
+      StringBuilder stringBuilder = new StringBuilder();
+
+      while((line = br.readLine()) != null) {
+        stringBuilder.append(line + "\n");
+      }
+
+      if(p.exitValue() == 0) {
+        return null;
+      }
+
+      return stringBuilder.toString();
+    } catch(IOException | InterruptedException e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   /**
