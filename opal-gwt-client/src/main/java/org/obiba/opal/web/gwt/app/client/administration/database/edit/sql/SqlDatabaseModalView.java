@@ -200,6 +200,8 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
 
   @Override
   public void initUrl() {
+    if (!name.isEnabled()) return;
+    
     String defaultName = isIdentifiers ? "opal_ids" : "opal_data";
     if(getDriver().getText() == null || "com.mysql.jdbc.Driver".equals(getDriver().getText())) {
       url.setText("jdbc:mysql://localhost:3306/" + defaultName);
