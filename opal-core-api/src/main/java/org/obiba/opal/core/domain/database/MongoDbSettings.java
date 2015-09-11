@@ -21,7 +21,7 @@ public class MongoDbSettings {
 
   private String properties;
 
-  private int batchSize = 1;
+  private int batchSize = 100;
 
   public MongoDBDatasourceFactory createMongoDBDatasourceFactory(String datasourceName) {
     MongoDBDatasourceFactory factory = new MongoDBDatasourceFactory(datasourceName, url, username, password,
