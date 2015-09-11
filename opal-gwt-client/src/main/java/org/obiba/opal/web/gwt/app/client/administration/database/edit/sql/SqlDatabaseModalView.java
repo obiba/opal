@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.database.edit.sql;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.edit.AbstractDatabaseModalPresenter;
@@ -28,6 +30,7 @@ import com.github.gwtbootstrap.client.ui.TextArea;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -148,6 +151,8 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   private boolean isIdentifiers;
 
   private String selectedDriver;
+
+  private JsArray<JdbcDriverDto> availableDrivers;
 
   @Inject
   public SqlDatabaseModalView(EventBus eventBus, Binder uiBinder, Translations translations) {
@@ -333,7 +338,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   }
 
   @Override
-  public void setAvailableSqlSchemas(SqlSchema... sqlSchemas) {
+  public void setSupportedSqlSchemas(SqlSchema... sqlSchemas) {
     sqlSchema.clear();
     if(sqlSchemas != null) {
       for(SqlSchema schema : sqlSchemas) {
@@ -341,6 +346,20 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
       }
       getSqlSchema().setValue(sqlSchemas[0]);
     }
+  }
+
+  @Override
+  public void setSupportedDrivers(String... driverNames) {
+    driver.clear();
+    List<String> driverNamesArray = Lists.newArrayList(driverNames);
+    for(JdbcDriverDto driverDto : JsArrays.toIterable(availableDrivers)) {
+      if (driverNamesArray.contains(driverDto.getDriverName())) {
+        driver.addItem(driverDto.getDriverName(), driverDto.getDriverClass());
+      }
+    }
+    // select MySQL by default but do not override previously selected driver if any
+    getDriver().setText(selectedDriver == null ? "com.mysql.jdbc.Driver" : selectedDriver);
+    initUrl();
   }
 
   @Override
@@ -359,7 +378,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
         for(int i = 0; i < count; i++) {
           if(usage.getValue(i).equals(selectedUsage.name())) {
             usage.setSelectedIndex(i);
-            setAvailableSqlSchemas(selectedUsage.getSupportedSqlSchemas());
+            setSupportedSqlSchemas(selectedUsage.getSupportedSqlSchemas());
             toggleDefaultStorage(selectedUsage == Usage.STORAGE);
             break;
           }
@@ -522,11 +541,8 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
 
   @Override
   public void setAvailableDrivers(JsArray<JdbcDriverDto> availableDrivers) {
-    for(JdbcDriverDto driverDto : JsArrays.toIterable(availableDrivers)) {
-      driver.addItem(driverDto.getDriverName(), driverDto.getDriverClass());
-    }
-    // select MySQL by default but do not override previously selected driver if any
-    getDriver().setText(selectedDriver == null ? "com.mysql.jdbc.Driver" : selectedDriver);
+    this.availableDrivers = availableDrivers;
+    setSupportedDrivers(getUsageValue().getSupportedDrivers());
   }
 
   @Override

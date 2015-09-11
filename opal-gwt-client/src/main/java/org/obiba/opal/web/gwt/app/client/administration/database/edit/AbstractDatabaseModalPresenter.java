@@ -34,22 +34,31 @@ import static com.google.gwt.http.client.Response.SC_OK;
 public abstract class AbstractDatabaseModalPresenter<TView extends AbstractDatabaseModalPresenter.Display>
     extends ModalPresenterWidget<TView> implements DatabaseUiHandlers {
 
+  private static final String MYSQL = "MySQL";
+
+  private static final String POSTGRESQL = "PostgreSQL";
+
   public enum Mode {
     CREATE, UPDATE
   }
 
   public enum Usage {
-    IMPORT(translations.importLabel(), SqlSchema.JDBC, SqlSchema.LIMESURVEY),
-    STORAGE(translations.storageLabel(), SqlSchema.HIBERNATE, SqlSchema.JDBC),
-    EXPORT(translations.exportLabel(), SqlSchema.JDBC);
+    IMPORT(translations.importLabel(), new SqlSchema[] { SqlSchema.JDBC, SqlSchema.LIMESURVEY },
+        new String[] { MYSQL, POSTGRESQL }),
+    STORAGE(translations.storageLabel(), new SqlSchema[] { SqlSchema.HIBERNATE, SqlSchema.JDBC },
+        new String[] { MYSQL }),
+    EXPORT(translations.exportLabel(), new SqlSchema[] { SqlSchema.JDBC }, new String[] { MYSQL, POSTGRESQL });
 
     private final String label;
 
     private final SqlSchema[] supportedSqlSchemas;
 
-    Usage(String label, SqlSchema... supportedSqlSchemas) {
+    private final String[] supportedDrivers;
+
+    Usage(String label, SqlSchema[] supportedSqlSchemas, String[] supportedDrivers) {
       this.label = label;
       this.supportedSqlSchemas = supportedSqlSchemas;
+      this.supportedDrivers = supportedDrivers;
     }
 
     public String getLabel() {
@@ -58,6 +67,10 @@ public abstract class AbstractDatabaseModalPresenter<TView extends AbstractDatab
 
     public SqlSchema[] getSupportedSqlSchemas() {
       return supportedSqlSchemas;
+    }
+
+    public String[] getSupportedDrivers() {
+      return supportedDrivers;
     }
   }
 

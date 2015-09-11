@@ -21,7 +21,7 @@
     </b:Heading>
 
     <b:Paragraph>
-      Databases can have different purposes: storage or import.
+      <ui:msg description="Databases help">Databases can have different purposes: storage, import or export.</ui:msg>
     </b:Paragraph>
 
     <b:DropdownButton ui:field="registerDataDatabase" addStyleNames="small-top-margin" icon="PLUS" type="INFO">
