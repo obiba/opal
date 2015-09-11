@@ -1,0 +1,166 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:          opal
+# Required-Start:    $network $local_fs $remote_fs
+# Required-Stop:     $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Opal server
+# Description:       Start/stop Opal server.
+### END INIT INFO
+
+#
+# init.d / servicectl compatibility (openSUSE)
+#
+if [ -f /etc/rc.status ]; then
+    . /etc/rc.status
+    rc_reset
+fi
+
+#
+# Source function library.
+#
+if [ -f /etc/rc.d/init.d/functions ]; then
+    . /etc/rc.d/init.d/functions
+fi
+
+# Sets the default values for elasticsearch variables used in this script
+MAX_OPEN_FILES=65535
+MAX_MAP_COUNT=262144
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+DESC=opal             # Introduce a short description here
+NAME=opal             # Introduce the short server's name here
+OPAL_USER=opal        # User to use to run the service
+OPAL_GROUP=adm        # Group to use to run the service
+DAEMON=daemon         # CentOS daemon is a function in '/lib/lsb/init-functions'
+DAEMON_ARGS=""        # Arguments to run the daemon with
+MAIN_CLASS=org.obiba.opal.server.OpalServer
+PID_DIR=/var/run/$NAME
+SCRIPTNAME=/etc/init.d/$NAME
+
+# Read configuration variable file if it is present
+[ -r /etc/default/$NAME ] && . /etc/default/$NAME
+
+exec="$OPAL_DIST/bin/$NAME.sh"
+pidfile="$PID_DIR/${NAME}.pid"
+
+export OPAL_DIST
+export OPAL_HOME
+export OPAL_LOG
+export JAVA_ARGS
+export JAVA_HOME
+
+lockfile=/var/lock/subsys/$NAME
+
+# backwards compatibility for old config sysconfig files, pre 0.90.1
+if [ -n $USER ] && [ -z $OPAL_USER ] ; then
+   OPAL_USER=$USER
+fi
+
+checkJava() {
+    if [ -x "$JAVA_HOME/bin/java" ]; then
+        JAVA="$JAVA_HOME/bin/java"
+    else
+        JAVA=`which java`
+    fi
+
+    if [ ! -x "$JAVA" ]; then
+        echo "Could not find any executable java binary. Please install java in your PATH or set JAVA_HOME"
+        exit 1
+    fi
+}
+
+start() {
+    checkJava
+    [ -x $exec ] || exit 5
+
+    if [ -n "$MAX_OPEN_FILES" ]; then
+        ulimit -n $MAX_OPEN_FILES
+    fi
+
+    if [ -n "$MAX_MAP_COUNT" -a -f /proc/sys/vm/max_map_count ]; then
+        sysctl -q -w vm.max_map_count=$MAX_MAP_COUNT
+    fi
+
+    # Ensure that the PID_DIR exists (it is cleaned at OS startup time)
+    if [ -n "$PID_DIR" ] && [ ! -e "$PID_DIR" ]; then
+        mkdir -p "$PID_DIR" && chown "$OPAL_USER":"$OPAL_GROUP" "$PID_DIR"
+    fi
+    if [ -n "$pidfile" ] && [ ! -e "$pidfile" ]; then
+        touch "$pidfile" && chown "$OPAL_USER":"$OPAL_GROUP" "$pidfile"
+    fi
+
+    cd $OPAL_HOME
+    daemon --user $OPAL_USER --pidfile $pidfile $exec -p $pidfile
+    retval=$?
+    echo
+    [ $retval -eq 0 ] && touch $lockfile
+    return $retval
+}
+
+stop() {
+    echo -n $"Stopping $NAME: "
+    # stop it here, often "killproc $NAME"
+    killproc -p $pidfile -d 86400 $NAME
+    retval=$?
+    echo
+    [ $retval -eq 0 ] && rm -f $lockfile
+    return $retval
+}
+
+restart() {
+    stop
+    start
+}
+
+reload() {
+    restart
+}
+
+force_reload() {
+    restart
+}
+
+rh_status() {
+    # run checks to determine if the service is running or use generic status
+    status -p $pidfile $NAME
+}
+
+rh_status_q() {
+    rh_status >/dev/null 2>&1
+}
+
+
+case "$1" in
+    start)
+        rh_status && exit 0
+        $1
+        ;;
+    stop)
+        rh_status || exit 0
+        $1
+        ;;
+    restart)
+        $1
+        ;;
+    reload)
+        rh_status || exit 7
+        $1
+        ;;
+    force-reload)
+        force_reload
+        ;;
+    status)
+        rh_status
+        ;;
+    condrestart|try-restart)
+        rh_status || exit 0
+        restart
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload}"
+        exit 2
+esac
+exit $?
+
