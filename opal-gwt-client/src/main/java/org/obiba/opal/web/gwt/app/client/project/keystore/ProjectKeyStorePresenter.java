@@ -23,6 +23,8 @@ import com.gwtplatform.mvp.client.View;
 public class ProjectKeyStorePresenter extends PresenterWidget<ProjectKeyStorePresenter.Display>
     implements ProjectKeyStoreUiHandlers {
 
+  private static final String ENCRYPTION_KEYS_SLOT = "encryption_keys";
+
   // TODO use a provider once encryption key authorization is implemented
   private final EncryptionKeysPresenter encryptionKeysPresenter;
 
@@ -37,7 +39,7 @@ public class ProjectKeyStorePresenter extends PresenterWidget<ProjectKeyStorePre
   @Override
   protected void onBind() {
     super.onBind();
-    setInSlot(null, encryptionKeysPresenter);
+    setInSlot(ENCRYPTION_KEYS_SLOT, encryptionKeysPresenter);
   }
 
   public void initialize(ProjectDto projectDto) {

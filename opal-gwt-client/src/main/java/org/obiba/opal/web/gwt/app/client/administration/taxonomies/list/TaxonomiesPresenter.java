@@ -33,6 +33,8 @@ import com.gwtplatform.mvp.client.View;
 
 public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Display> implements TaxonomiesUiHandlers {
 
+  private final String DETAILS_SLOT = "details";
+
   private final TaxonomyPresenter taxonomyPresenter;
 
   private final VocabularyPresenter vocabularyPresenter;
@@ -163,7 +165,7 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
       public void onTaxonomySelected(TaxonomySelectedEvent event) {
         taxonomyPresenter.setTaxonomy(event.getTaxonomy());
         taxonomyPresenter.setEditable(editable);
-        setInSlot(null, taxonomyPresenter);
+        setInSlot(DETAILS_SLOT, taxonomyPresenter);
       }
     });
 
@@ -172,7 +174,7 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
       public void onVocabularySelected(VocabularySelectedEvent event) {
         vocabularyPresenter.setVocabulary(event.getTaxonomy(), event.getVocabulary());
         vocabularyPresenter.setEditable(editable);
-        setInSlot(null, vocabularyPresenter);
+        setInSlot(DETAILS_SLOT, vocabularyPresenter);
       }
     });
 
@@ -188,7 +190,7 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
       public void onVocabularyDeleted(VocabularyDeletedEvent event) {
         taxonomyPresenter.setTaxonomy(event.getTaxonomy());
         taxonomyPresenter.setEditable(editable);
-        setInSlot(null, taxonomyPresenter);
+        setInSlot(DETAILS_SLOT, taxonomyPresenter);
       }
     });
   }

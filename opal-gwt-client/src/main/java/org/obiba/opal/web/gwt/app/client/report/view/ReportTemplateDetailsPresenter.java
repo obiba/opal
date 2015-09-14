@@ -398,6 +398,9 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
   }
 
   private final class PermissionsUpdate implements HasAuthorization {
+
+    private static final String PERMISSIONS_SLOT = "permissions";
+
     @Override
     public void unauthorized() {
 
@@ -415,7 +418,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
       resourcePermissionsPresenter.initialize(ResourcePermissionType.REPORT_TEMPLATE,
           ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_REPORTTEMPLATE, reportTemplate.getProject(),
           reportTemplate.getName());
-      setInSlot(null, resourcePermissionsPresenter);
+      setInSlot(PERMISSIONS_SLOT, resourcePermissionsPresenter);
     }
   }
 

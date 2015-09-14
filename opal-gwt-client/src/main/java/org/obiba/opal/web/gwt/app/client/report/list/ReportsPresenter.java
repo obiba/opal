@@ -13,8 +13,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
@@ -42,6 +40,9 @@ import com.gwtplatform.mvp.client.View;
 
 public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> implements ReportsUiHandlers {
 
+  private static final String DETAILS_SLOT = "details";
+
+
   private final ReportTemplateDetailsPresenter reportTemplateDetailsPresenter;
 
   private final ModalProvider<ReportTemplateEditModalPresenter> reportTemplateUpdateModalPresenterProvider;
@@ -50,7 +51,6 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
 
   private Runnable actionRequiringConfirmation;
 
-  @Nullable
   private String project;
 
   @Inject
@@ -77,7 +77,7 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
 
   @Override
   protected void onBind() {
-    setInSlot(null, reportTemplateDetailsPresenter);
+    setInSlot(DETAILS_SLOT, reportTemplateDetailsPresenter);
     addHandlers();
   }
 

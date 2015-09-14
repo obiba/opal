@@ -443,6 +443,9 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
    * Update permissions on authorization.
    */
   private final class PermissionsUpdate implements HasAuthorization {
+
+    private static final String PERMISSIONS_SLOT = "permissions";
+
     @Override
     public void unauthorized() {
 
@@ -458,7 +461,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
       resourcePermissionsPresenter.initialize(ResourcePermissionType.DATASOURCE,
           ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_DATASOURCE, datasourceName);
-      setInSlot(null, resourcePermissionsPresenter);
+      setInSlot(PERMISSIONS_SLOT, resourcePermissionsPresenter);
     }
   }
 
