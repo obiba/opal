@@ -24,7 +24,6 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
@@ -96,12 +95,18 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
   private void initializeTermsTable() {
     dataProvider.addDataDisplay(table);
 
-    table.addColumn(new TextColumn<TermDto>() {
+
+    table.addColumn(new LocaleTextColumn<TermDto>() {
+      @Override
+      protected JsArray<LocaleTextDto> getLocaleText(TermDto term) {
+        return term.getKeywordsArray();
+      }
+
       @Override
       public String getValue(TermDto object) {
-        return object.getName();
+        return object.getName() + super.getValue(object);
       }
-    }, translations.nameLabel());
+    }, translations.nameKeywordsLabel());
     table.addColumn(new LocaleTextColumn<TermDto>() {
       @Override
       protected JsArray<LocaleTextDto> getLocaleText(TermDto term) {
@@ -114,12 +119,6 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
         return term.getDescriptionArray();
       }
     }, translations.descriptionLabel());
-    table.addColumn(new LocaleTextColumn<TermDto>() {
-      @Override
-      protected JsArray<LocaleTextDto> getLocaleText(TermDto term) {
-        return term.getKeywordsArray();
-      }
-    }, translations.keywordsLabel());
     actions = new ActionsColumn<TermDto>(new ActionHandler<TermDto>() {
       @Override
       public void doAction(TermDto object, String actionName) {
