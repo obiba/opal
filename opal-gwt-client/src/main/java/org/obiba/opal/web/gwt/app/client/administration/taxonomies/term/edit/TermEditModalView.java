@@ -52,6 +52,9 @@ public class TermEditModalView extends ModalPopupViewWithUiHandlers<TermEditModa
   @UiField
   LocalizedEditor descriptions;
 
+  @UiField
+  LocalizedEditor keywords;
+
   @Inject
   public TermEditModalView(EventBus eventBus) {
     super(eventBus);
@@ -66,9 +69,8 @@ public class TermEditModalView extends ModalPopupViewWithUiHandlers<TermEditModa
 
   @Override
   public void setMode(TermEditModalPresenter.EDIT_MODE editionMode) {
-    modal.setTitle(editionMode == TermEditModalPresenter.EDIT_MODE.CREATE
-        ? translations.addTerm()
-        : translations.editTerm());
+    modal.setTitle(
+        editionMode == TermEditModalPresenter.EDIT_MODE.CREATE ? translations.addTerm() : translations.editTerm());
   }
 
   @Override
@@ -76,11 +78,13 @@ public class TermEditModalView extends ModalPopupViewWithUiHandlers<TermEditModa
     name.setText(term.getName());
     titles.setLocaleTexts(term.getTitleArray(), JsArrays.toList(locales));
     descriptions.setLocaleTexts(term.getDescriptionArray(), JsArrays.toList(locales));
+    keywords.setLocaleTexts(term.getKeywordsArray(), JsArrays.toList(locales));
   }
 
   @UiHandler("save")
   void onSave(ClickEvent event) {
-    getUiHandlers().onSave(name.getText(), titles.getLocaleTexts(), descriptions.getLocaleTexts());
+    getUiHandlers()
+        .onSave(name.getText(), titles.getLocaleTexts(), descriptions.getLocaleTexts(), keywords.getLocaleTexts());
   }
 
   @UiHandler("cancel")
@@ -88,12 +92,9 @@ public class TermEditModalView extends ModalPopupViewWithUiHandlers<TermEditModa
     modal.hide();
   }
 
-
   @Override
   public void showError(@Nullable FormField formField, String message) {
     modal.addAlert(message, AlertType.ERROR);
   }
-
-
 
 }

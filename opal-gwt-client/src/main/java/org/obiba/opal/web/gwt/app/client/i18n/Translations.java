@@ -1975,6 +1975,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Description")
   String descriptionLabel();
 
+  @Description("Keywords label")
+  @DefaultStringValue("Keywords")
+  String keywordsLabel();
+
   @Description("Details label")
   @DefaultStringValue("Details")
   String details();

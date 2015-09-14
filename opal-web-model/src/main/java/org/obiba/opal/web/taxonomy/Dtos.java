@@ -109,6 +109,7 @@ public class Dtos {
     builder.setName(term.getName());
     builder.addAllTitle(toLocaleTextDtoList(term.getTitle()));
     builder.addAllDescription(toLocaleTextDtoList(term.getDescription()));
+    builder.addAllKeywords(toLocaleTextDtoList(term.getKeywords()));
     if(term.hasTerms()) builder.addAllTerms(asDto(term.getTerms()));
     return builder.build();
   }
@@ -135,6 +136,7 @@ public class Dtos {
     Term term = new Term(from.getName());
     term.setTitle(fromLocaleTextDtoList(from.getTitleList()));
     term.setDescription(fromLocaleTextDtoList(from.getDescriptionList()));
+    term.setKeywords(fromLocaleTextDtoList(from.getKeywordsList()));
     term.setTerms(fromDto(from.getTermsList()));
     return term;
   }

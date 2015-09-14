@@ -18,6 +18,7 @@ import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface TermEditModalUiHandlers extends UiHandlers, ModalUiHandlers {
 
-  void onSave(String name, JsArray<LocaleTextDto> titles, JsArray<LocaleTextDto> descriptions);
+  void onSave(String name, JsArray<LocaleTextDto> titles, JsArray<LocaleTextDto> descriptions,
+      JsArray<LocaleTextDto> keywords);
 
 }

@@ -55,11 +55,13 @@ public class TermEditModalPresenter extends ModalPresenterWidget<TermEditModalPr
   }
 
   @Override
-  public void onSave(String name, JsArray<LocaleTextDto> titles, JsArray<LocaleTextDto> descriptions) {
+  public void onSave(String name, JsArray<LocaleTextDto> titles, JsArray<LocaleTextDto> descriptions,
+      JsArray<LocaleTextDto> keywords) {
     final TermDto dto = TermDto.create();
     dto.setName(name);
     dto.setTitleArray(titles);
     dto.setDescriptionArray(descriptions);
+    dto.setKeywordsArray(keywords);
 
     if(mode == EDIT_MODE.EDIT) {
       ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder().forResource(

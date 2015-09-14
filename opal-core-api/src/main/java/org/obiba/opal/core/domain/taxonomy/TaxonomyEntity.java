@@ -37,6 +37,8 @@ public class TaxonomyEntity implements Serializable {
 
   private Map<String, String> description = new HashMap<>();
 
+  private Map<String, String> keywords = new HashMap<>();
+
   public Map<String, String> getTitle() {
     return title;
   }
@@ -65,4 +67,17 @@ public class TaxonomyEntity implements Serializable {
     return this;
   }
 
+  public void setKeywords(Map<String, String> keywords) {
+    this.keywords = keywords;
+  }
+
+  public TaxonomyEntity addKeywords(Locale locale, String value) {
+    if(keywords == null) keywords = new HashMap<>();
+    keywords.put(locale.toLanguageTag(), value);
+    return this;
+  }
+
+  public Map<String, String> getKeywords() {
+    return keywords;
+  }
 }

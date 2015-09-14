@@ -114,6 +114,12 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
         return term.getDescriptionArray();
       }
     }, translations.descriptionLabel());
+    table.addColumn(new LocaleTextColumn<TermDto>() {
+      @Override
+      protected JsArray<LocaleTextDto> getLocaleText(TermDto term) {
+        return term.getKeywordsArray();
+      }
+    }, translations.keywordsLabel());
     actions = new ActionsColumn<TermDto>(new ActionHandler<TermDto>() {
       @Override
       public void doAction(TermDto object, String actionName) {

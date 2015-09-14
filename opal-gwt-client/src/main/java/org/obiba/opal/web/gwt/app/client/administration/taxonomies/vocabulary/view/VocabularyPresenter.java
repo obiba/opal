@@ -250,7 +250,8 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
     for(String token : filter.toLowerCase().split(" ")) {
       if(!Strings.isNullOrEmpty(token)) {
         if(!name.contains(token) && !textsContains(term.getTitleArray(), token) &&
-            !textsContains(term.getDescriptionArray(), token)) return false;
+            !textsContains(term.getDescriptionArray(), token) && !textsContains(term.getKeywordsArray(), token))
+          return false;
       }
     }
     return true;

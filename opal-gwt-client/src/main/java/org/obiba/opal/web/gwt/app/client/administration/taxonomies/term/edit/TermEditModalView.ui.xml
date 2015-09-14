@@ -56,6 +56,19 @@
       </b:HelpBlock>
     </b:ControlGroup>
 
+    <!-- Keywords -->
+    <b:ControlGroup>
+      <b:ControlLabel>
+        <ui:msg description="Keywords label">Keywords</ui:msg>
+      </b:ControlLabel>
+      <b:Controls>
+        <o:LocalizedEditor ui:field="keywords" type="PLAIN_LONG"/>
+      </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="Term Keywords help">Optional list of keywords of the term. Can be useful when building variable search requests.</ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+
     <b:ModalFooter>
       <b:Button type="PRIMARY" ui:field="save">
         <ui:msg description="Save label">Save</ui:msg>
