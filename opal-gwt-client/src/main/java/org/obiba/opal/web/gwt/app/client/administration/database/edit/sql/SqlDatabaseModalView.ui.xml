@@ -152,10 +152,18 @@
     </o:CollapsiblePanel>
 
     <o:CollapsiblePanel ui:field="advancedOptions">
-      <b:ControlLabel for="properties">
-        <ui:msg description="Properties label">Properties</ui:msg>
-      </b:ControlLabel>
-      <b:TextArea ui:field="properties" b:id="properties" alternateSize="XLARGE"/>
+      <b:ControlGroup>
+        <b:ControlLabel for="batchSize">
+          <ui:msg description="Batch Size label">Batch Size</ui:msg>
+        </b:ControlLabel>
+        <o:NumericTextBox ui:field="batchSize"/>
+      </b:ControlGroup>
+      <b:ControlGroup>
+        <b:ControlLabel for="properties">
+          <ui:msg description="Properties label">Properties</ui:msg>
+        </b:ControlLabel>
+        <b:TextArea ui:field="properties" b:id="properties" alternateSize="XLARGE"/>
+      </b:ControlGroup>
     </o:CollapsiblePanel>
 
     <b:ModalFooter>

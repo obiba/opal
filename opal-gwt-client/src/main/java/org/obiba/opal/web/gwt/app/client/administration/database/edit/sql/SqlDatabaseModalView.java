@@ -11,6 +11,9 @@ package org.obiba.opal.web.gwt.app.client.administration.database.edit.sql;
 
 import javax.annotation.Nullable;
 
+import org.obiba.magma.datasource.jdbc.JdbcDatasource;
+import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
+import org.obiba.magma.datasource.mongodb.MongoDBDatasource;
 import org.obiba.opal.web.gwt.app.client.administration.database.edit.AbstractDatabaseModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.edit.DatabaseUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -18,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
 import org.obiba.opal.web.gwt.app.client.validator.ConstrainedModal;
 import org.obiba.opal.web.model.client.database.JdbcDriverDto;
 
@@ -138,6 +142,9 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   TextBox defaultUpdatedTimestampColumn;
 
   @UiField
+  NumericTextBox batchSize;
+
+  @UiField
   CheckBox useMetadataTables;
 
   @UiField
@@ -150,6 +157,8 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   private String selectedDriver;
 
   private JsArray<JdbcDriverDto> availableDrivers;
+
+  private final int DEFAULT_BATCH_SIZE = 100;
 
   @Inject
   public SqlDatabaseModalView(EventBus eventBus, Binder uiBinder, Translations translations) {
@@ -193,6 +202,10 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
         initDrivers();
       }
     });
+
+    batchSize.setMax(JdbcDatasourceSettings.MAX_BATCH_SIZE);
+    batchSize.setMin(1);
+    batchSize.setValue(DEFAULT_BATCH_SIZE);
   }
 
   @Override
@@ -530,6 +543,10 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   @Override
   public HasEnabled getUseMetadataTablesEnabled() {
     return useMetadataTables;
+  }
+
+  public NumericTextBox getBatchSize() {
+    return batchSize;
   }
 
   @Override
