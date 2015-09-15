@@ -74,6 +74,7 @@ message JdbcDatasourceSettingsDto {
   optional string defaultUpdatedTimestampColumnName = 6;
   optional string defaultEntityIdColumnName = 7;
   optional bool multipleDatasources = 8;
+  optional int32 batchSize = 9;
 }
 
 message JdbcValueTableSettingsDto {

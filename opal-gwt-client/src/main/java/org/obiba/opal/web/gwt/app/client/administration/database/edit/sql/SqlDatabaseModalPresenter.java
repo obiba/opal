@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.edit.AbstractDatabaseModalPresenter;
+import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
@@ -110,6 +111,7 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
       getView().getDefaultUpdatedTimestampColumn()
           .setText(jdbcDatasourceSettings.getDefaultUpdatedTimestampColumnName());
       getView().getUseMetadataTables().setValue(jdbcDatasourceSettings.getUseMetadataTables());
+      getView().getBatchSize().setValue(jdbcDatasourceSettings.getBatchSize());
     } else if(SqlSettingsDto.SqlSchema.LIMESURVEY.getName().equals(sqlSettings.getSqlSchema().getName()) &&
         sqlSettings.getLimesurveyDatasourceSettings() != null) {
       getView().getTablePrefix().setText(sqlSettings.getLimesurveyDatasourceSettings().getTablePrefix());
@@ -180,6 +182,10 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
     jdbcSettings.setDefaultUpdatedTimestampColumnName(getView().getDefaultUpdatedTimestampColumn().getText());
     jdbcSettings.setUseMetadataTables(getView().getUseMetadataTables().getValue());
     jdbcSettings.setMultipleDatasources(getView().getUsage().getValue() == Usage.STORAGE);
+
+    if(!getView().getBatchSize().getText().isEmpty())
+      jdbcSettings.setBatchSize(getView().getBatchSize().getNumberValue().intValue());
+
     return jdbcSettings;
   }
 
@@ -305,6 +311,7 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
 
     HasVisibility getSqlSchemaGroupVisibility();
 
+    NumericTextBox getBatchSize();
   }
 
 }
