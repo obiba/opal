@@ -1793,7 +1793,7 @@
     <REngine.version>0.6-8.1</REngine.version>
     <resteasy.version>3.0.12.Final</resteasy.version>
     <rhino-js.version>1.7.7</rhino-js.version>
-    <shiro.version>1.2.4</shiro.version>
+    <shiro.version>1.2.3-java8</shiro.version>
     <shiro-extras.version>1.0.3-obiba</shiro-extras.version>
     <slf4j.version>1.7.12</slf4j.version>
     <snakeyaml.version>1.16</snakeyaml.version>
