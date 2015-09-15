@@ -318,6 +318,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
           return dsFactory;
 
         default:
+          unregister(databaseName, datasourceName);
           throw new IllegalArgumentException(
               "Cannot create datasource for non SQL storage database " + databaseName + ": " +
                   sqlSettings.getSqlSchema());
@@ -330,6 +331,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
       return mongoDbSettings.createMongoDBDatasourceFactory(datasourceName);
     }
 
+    unregister(databaseName, datasourceName);
     throw new IllegalArgumentException("Unknown datasource config for database " + database.getClass());
   }
 

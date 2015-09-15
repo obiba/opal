@@ -89,6 +89,8 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   @NotNull
   private final FileDatasourceFactory fileDatasourceFactory;
 
+  private String destinationDatasourceName;
+
   public CopyCommand() {
     fileDatasourceFactory = new MultipleFileCsvDatasourceFactory();
     fileDatasourceFactory.setNext(new SingleFileCsvDatasourceFactory()) //
@@ -127,8 +129,8 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
         e.printStackTrace(System.err);
       } finally {
         if(options.isOut()) {
-          if(options.getOutFormat().equalsIgnoreCase("jdbc") && destinationDatasource != null) {
-            databaseRegistry.unregister(options.getOut(), destinationDatasource.getName());
+          if(options.getOutFormat().equalsIgnoreCase("jdbc") && !Strings.isNullOrEmpty(destinationDatasourceName)) {
+            databaseRegistry.unregister(options.getOut(), destinationDatasourceName);
           }
           Disposables.silentlyDispose(destinationDatasource);
         }
@@ -219,12 +221,12 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   private Datasource createDestinationDatasource() throws IOException {
-    Datasource destinationDatasource = null;
+    Datasource destinationDatasource;
 
     if(options.getOutFormat().equalsIgnoreCase("jdbc")) {
       Database database = databaseRegistry.getDatabase(options.getOut());
-
       destinationDatasource = databaseRegistry.createDatasourceFactory(DATE_FORMAT.format(new Date()), database).create();
+      destinationDatasourceName = destinationDatasource.getName();
     } else {
       destinationDatasource = fileDatasourceFactory.createDatasource(getOutputFile());
     }
@@ -232,6 +234,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     if(destinationDatasource == null) {
       throw new IllegalArgumentException("Unknown output datasource type");
     }
+
     Initialisables.initialise(destinationDatasource);
     return destinationDatasource;
   }
