@@ -21,65 +21,70 @@ NAME=opal
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
 
 case "$1" in
-    1)
+  1)
 
-   	  # Create opal user if it doesn't exist.
-      if ! id opal > /dev/null 2>&1 ; then
-        adduser --system --home /var/lib/opal --no-create-home --disabled-password opal
-      fi
+    # Create opal user if it doesn't exist.
+    if ! id opal > /dev/null 2>&1 ; then
+      adduser --system --home /var/lib/opal --no-create-home --disabled-password opal
+    fi
 
-      # Opal file structure on Debian
-      # /etc/opal: configuration
-      # /usr/share/opal: executable
-      # /var/lib/opal: data runtime
-      # /var/log: logs
+    # Opal file structure on Debian
+    # /etc/opal: configuration
+    # /usr/share/opal: executable
+    # /var/lib/opal: data runtime
+    # /var/log: logs
 
-      rm -f /usr/share/opal
-      ln -s /usr/share/opal-* /usr/share/opal
+    rm -f /usr/share/opal
+    ln -s /usr/share/opal-* /usr/share/opal
 
-      if [ ! -e /var/lib/opal/conf ] ; then
-        ln -s /etc/opal /var/lib/opal/conf
-      fi
+    if [ ! -e /var/lib/opal/conf ] ; then
+      ln -s /etc/opal /var/lib/opal/conf
+    fi
 
-      EXPORT_FILE=$OPAL_HOME/data/orientdb/opal-config.export
+    EXPORT_FILE=$OPAL_HOME/data/orientdb/opal-config.export
 
-      JAR_CMD="java -jar /usr/share/opal-*/tools/lib/opal-config-migrator-*-cli.jar"
+    JAR_CMD="java -jar /usr/share/opal-*/tools/lib/opal-config-migrator-*-cli.jar"
 
-      [ -r $OPAL_HOME/data/orientdb/opal-config ] && $JAR_CMD --check $OPAL_HOME/data/orientdb/opal-config && \
-          { $JAR_CMD $OPAL_HOME/data/orientdb/opal-config $EXPORT_FILE  && \
-              echo "Legacy export completed ..." && \
-              mv $OPAL_HOME/data/orientdb/opal-config $OPAL_HOME/data/orientdb/opal-config.bak || exit 1; }
+    [ -r $OPAL_HOME/data/orientdb/opal-config ] && $JAR_CMD --check $OPAL_HOME/data/orientdb/opal-config && \
+        { $JAR_CMD $OPAL_HOME/data/orientdb/opal-config $EXPORT_FILE  && \
+            echo "Legacy export completed ..." && \
+            mv $OPAL_HOME/data/orientdb/opal-config $OPAL_HOME/data/orientdb/opal-config.bak || exit 1; }
 
-      [ -r $EXPORT_FILE.gz ] && { \
-      java -cp "/usr/share/opal/lib/*" -DOPAL_HOME=$OPAL_HOME org.obiba.opal.core.tools.OrientDbUtil import $EXPORT_FILE.gz && \
-      rm $EXPORT_FILE.gz && \
-      rm -Rf $OPAL_HOME/data/orientdb/opal-config.bak || { mv $OPAL_HOME/data/orientdb/opal-config.bak $OPAL_HOME/data/orientdb/opal-config; \
-      exit 1; }; }
+    [ -r $EXPORT_FILE.gz ] && { \
+    java -cp "/usr/share/opal/lib/*" -DOPAL_HOME=$OPAL_HOME org.obiba.opal.core.tools.OrientDbUtil import $EXPORT_FILE.gz && \
+    rm $EXPORT_FILE.gz && \
+    rm -Rf $OPAL_HOME/data/orientdb/opal-config.bak || { mv $OPAL_HOME/data/orientdb/opal-config.bak $OPAL_HOME/data/orientdb/opal-config; \
+    exit 1; }; }
 
-      chown -R opal:adm /var/lib/opal /var/log/opal /etc/opal /tmp/opal
-      chmod -R 750      /var/lib/opal /var/log/opal /etc/opal/ /tmp/opal
-      chmod +x /usr/share/opal/tools/shiro-hasher
-      find /etc/opal/ -type f | xargs chmod 640
+    chown -R opal:adm /var/lib/opal /var/log/opal /etc/opal /tmp/opal
+    chmod -R 750      /var/lib/opal /var/log/opal /etc/opal/ /tmp/opal
+    chmod +x /usr/share/opal/tools/shiro-hasher
+    find /etc/opal/ -type f | xargs chmod 640
 
-      # if upgrading to 2.0, delete old log4j config
-      if [ -f "/etc/opal/log4j.properties" ]; then
-        mv /etc/opal/log4j.properties /etc/opal/log4j.properties.old
-      fi
+    # if upgrading to 2.0, delete old log4j config
+    if [ -f "/etc/opal/log4j.properties" ]; then
+      mv /etc/opal/log4j.properties /etc/opal/log4j.properties.old
+    fi
 
-      # if upgrading to 2.0, move opal-config.xml to data dir
-      if [ -f "/etc/opal/opal-config.xml" ]; then
-        cp /etc/opal/opal-config.xml /etc/opal/opal-config.xml.opal1-backup
-        mv /etc/opal/opal-config.xml /var/lib/opal/data/opal-config.xml
-      fi
+    # if upgrading to 2.0, move opal-config.xml to data dir
+    if [ -f "/etc/opal/opal-config.xml" ]; then
+      cp /etc/opal/opal-config.xml /etc/opal/opal-config.xml.opal1-backup
+      mv /etc/opal/opal-config.xml /var/lib/opal/data/opal-config.xml
+    fi
 
-      # auto start on reboot
-      chkconfig --add opal
-    ;;
+    # auto start on reboot
+    chkconfig --add opal
 
-    *)
-        echo "postinst called with unknown argument \`$1'" >&2
-        exit 1
-    ;;
+    # start opal
+    echo "### You can start opal service by executing:"
+    echo "sudo /etc/init.d/opal start"
+
+  ;;
+
+  *)
+    echo "postinst called with unknown argument \`$1'" >&2
+    exit 1
+  ;;
 esac
 
 exit 0

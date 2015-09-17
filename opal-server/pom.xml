@@ -172,17 +172,12 @@
                   <name>opal-server</name>
                   <needarch>noarch</needarch>
                   <version>${project.version}</version>
-                  <!--release>${project.version}-b${buildNumber}</release-->
                   <license>see /usr/share/doc/opal/copyright</license>
                   <group>Applications/Engineering</group>
                   <packager>OBiBa</packager>
                   <prefix>/usr/share</prefix>
                   <changelogFile>/usr/share/changelog</changelogFile>
                   <targetOS>Linux</targetOS>
-                  <requires>
-                    <require>java-1.7.0-openjdk</require>
-                  </requires>
-
                   <mappings>
                     <!-- Add init.d files  -->
                     <mapping>
@@ -326,6 +321,14 @@
                     <scriptFile>src/main/rpm/scripts/postinstall.sh</scriptFile>
                     <fileEncoding>utf-8</fileEncoding>
                   </postinstallScriptlet>
+                  <preremoveScriptlet>
+                    <scriptFile>src/main/rpm/scripts/prerm.sh</scriptFile>
+                    <fileEncoding>utf-8</fileEncoding>
+                  </preremoveScriptlet>
+                  <postremoveScriptlet>
+                    <scriptFile>src/main/rpm/scripts/postrm.sh</scriptFile>
+                    <fileEncoding>utf-8</fileEncoding>
+                  </postremoveScriptlet>
                 </configuration>
               </execution>
             </executions>

@@ -37,11 +37,10 @@ OPAL_DIST=$(readlink -f $OPAL_BIN_DIR/..)
 
 export OPAL_DIST
 
-export OPAL_LOG=$OPAL_HOME/logs
-
 echo "JAVA_OPTS=$JAVA_OPTS"
 echo "OPAL_HOME=$OPAL_HOME"
 echo "OPAL_DIST=$OPAL_DIST"
+echo "OPAL_LOG=$OPAL_LOG"
 
 if [ -z "$OPAL_HOME" ]
 then
@@ -71,8 +70,8 @@ fi
 JAVA_DEBUG=-agentlib:jdwp=transport=dt_socket,server=y,address=8000,suspend=n
 
 # Add $JAVA_DEBUG to this line to enable remote JVM debugging (for developers)
-java $JAVA_OPTS -cp "$CLASSPATH" -DOPAL_HOME="${OPAL_HOME}" \
-  -DOPAL_DIST=${OPAL_DIST} -DOPAL_LOG=${OPAL_LOG}  org.obiba.opal.server.OpalServer "$@" <&- &
+exec java $JAVA_OPTS -cp "$CLASSPATH" -DOPAL_HOME="${OPAL_HOME}" \
+  -DOPAL_DIST=${OPAL_DIST} -DOPAL_LOG=${OPAL_LOG}  org.obiba.opal.server.OpalServer "$@" >$OPAL_LOG/stdout.log 2>&1 &
 
 # On CentOS 'daemon' function does not initialize the pidfile
 pidfile=$(getPidFile $@)
