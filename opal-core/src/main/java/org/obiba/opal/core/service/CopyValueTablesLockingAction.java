@@ -23,7 +23,6 @@ import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.VariableEntity;
-import org.obiba.magma.datasource.mongodb.MongoDBDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
 import org.obiba.magma.views.View;
@@ -111,6 +110,11 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
 
   private class CopyAction implements Action {
     @Override
+    public boolean isTransactional() {
+      return destination.isTransactional();
+    }
+
+    @Override
     public void execute() throws Exception {
       for(ValueTable valueTable : sourceTables) {
         if(Thread.interrupted()) {
@@ -128,7 +132,7 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
                   @NotNull
                   @Override
                   public Thread newThread(@NotNull Runnable r) {
-                    return new TransactionalThread(r);
+                    return isTransactional() ? new TransactionalThread(r) : new Thread(r);
                   }
                 }) //
                 .withProgressListener(progressListener) //

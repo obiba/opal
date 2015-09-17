@@ -41,6 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.jta.JtaTransactionManager;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -75,6 +76,9 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
 
   @Autowired
   private IdentifiersTableService identifiersTableService;
+
+  @Autowired
+  private JtaTransactionManager jtaTransactionManager;
 
   private final LoadingCache<String, DataSource> dataSourceCache = CacheBuilder.newBuilder() //
       .removalListener(new DataSourceRemovalListener()) //
@@ -167,6 +171,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
       ConstraintViolation<Database> violation = ConstraintViolationImpl
           .forBeanValidation("{org.obiba.opal.core.validator.Unique.message}", "must be unique", Database.class,
               database, database, database, PathImpl.createPathFromString("name"), null, null);
+
       throw new ConstraintViolationException(ImmutableSet.of(violation));
     }
   }
@@ -315,6 +320,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
           dsFactory.setName(datasourceName);
           dsFactory.setDataSource(getDataSource(databaseName, datasourceName));
           dsFactory.setDatasourceSettings(sqlSettings.getJdbcDatasourceSettings());
+          dsFactory.setDataSourceTransactionManager(jtaTransactionManager);
           return dsFactory;
 
         default:

@@ -12,7 +12,6 @@ package org.obiba.opal.core.runtime.jdbc;
 import java.util.Set;
 
 import javax.sql.DataSource;
-import javax.transaction.TransactionManager;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory;
@@ -25,6 +24,7 @@ import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.jta.JtaTransactionManager;
 
 import static org.hibernate.cfg.AvailableSettings.*;
 
@@ -35,7 +35,7 @@ public class SessionFactoryFactory {
   private ApplicationContext applicationContext;
 
   @Autowired
-  private TransactionManager jtaTransactionManager;
+  private JtaTransactionManager jtaTransactionManager;
 
   // need to run outside the transaction so HBM2DDL_AUTO can change auto-commit to update schema
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -57,6 +57,7 @@ public class SessionFactoryFactory {
     factory.getHibernateProperties().setProperty(AUTO_CLOSE_SESSION, "true");
     factory.getHibernateProperties().setProperty(FLUSH_BEFORE_COMPLETION, "true");
     factory.getHibernateProperties().setProperty(DIALECT_RESOLVERS, MagmaDialectResolver.class.getName());
+
     return ((LocalSessionFactoryBean) applicationContext.getAutowireCapableBeanFactory()
         .initializeBean(factory, dataSource.hashCode() + "-sessionFactory")).getObject();
   }

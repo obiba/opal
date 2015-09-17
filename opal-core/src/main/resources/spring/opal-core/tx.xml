@@ -5,11 +5,11 @@
 
   <tx:annotation-driven/>
 
-  <bean id="jtaTransactionManager" class="org.obiba.opal.core.tx.JotmFactoryBean"/>
+  <bean id="jotm" class="org.obiba.opal.core.tx.JotmFactoryBean"/>
 
   <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
-    <property name="transactionManager" ref="jtaTransactionManager"/>
-    <property name="userTransaction" ref="jtaTransactionManager"/>
+    <property name="transactionManager" ref="jotm"/>
+    <property name="userTransaction" ref="jotm"/>
     <!-- Set a very high timeout (10 days) -->
     <property name="defaultTimeout" value="864000"/>
     <property name="allowCustomIsolationLevels" value="true"/>
