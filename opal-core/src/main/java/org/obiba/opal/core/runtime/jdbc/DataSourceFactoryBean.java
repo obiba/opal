@@ -10,13 +10,14 @@
 package org.obiba.opal.core.runtime.jdbc;
 
 import javax.sql.DataSource;
-import javax.transaction.TransactionManager;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.dbcp.managed.BasicManagedDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.jta.JtaTransactionManager;
 
 import com.google.common.base.Strings;
 
@@ -40,10 +41,10 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
 
   protected String connectionProperties;
 
-  private TransactionManager jtaTransactionManager;
+  private JtaTransactionManager jtaTransactionManager;
 
   @Autowired
-  public void setJtaTransactionManager(TransactionManager jtaTransactionManager) {
+  public void setJtaTransactionManager(JtaTransactionManager jtaTransactionManager) {
     this.jtaTransactionManager = jtaTransactionManager;
   }
 
@@ -51,7 +52,7 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
   public DataSource getObject() {
     log.debug("Configure DataSource for {}", url);
     BasicManagedDataSource dataSource = new BasicManagedDataSource();
-    dataSource.setTransactionManager(jtaTransactionManager);
+    dataSource.setTransactionManager(jtaTransactionManager.getTransactionManager());
     dataSource.setDriverClassName(driverClass);
     dataSource.setUrl(url);
     setConnectionProperties(dataSource);
@@ -65,6 +66,7 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
     dataSource.setTestOnReturn(false);
     dataSource.setDefaultAutoCommit(false);
     dataSource.setValidationQuery(guessValidationQuery());
+
     return dataSource;
   }
 
@@ -82,7 +84,7 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
     }
   }
 
-  private void setConnectionProperties(BasicManagedDataSource dataSource) {
+  private void setConnectionProperties(BasicDataSource dataSource) {
     if("com.mysql.jdbc.Driver".equals(driverClass)) {
       if(Strings.isNullOrEmpty(connectionProperties)) {
         connectionProperties = "characterEncoding=UTF-8";

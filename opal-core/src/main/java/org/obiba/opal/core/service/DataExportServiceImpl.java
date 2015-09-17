@@ -160,6 +160,11 @@ public class DataExportServiceImpl implements DataExportService {
 
     private class ExportAction implements Action {
       @Override
+      public boolean isTransactional() {
+        return destinationDatasource.isTransactional();
+      }
+
+      @Override
       public void execute() throws Exception {
         try {
           for(ValueTable table : sourceTables) {

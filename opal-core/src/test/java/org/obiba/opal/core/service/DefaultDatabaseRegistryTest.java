@@ -5,7 +5,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.sql.DataSource;
-import javax.transaction.TransactionManager;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
@@ -30,6 +29,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
+import org.springframework.transaction.jta.JtaTransactionManager;
 
 import com.google.common.base.Predicate;
 
@@ -442,8 +442,8 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     }
 
     @Bean
-    public TransactionManager transactionManager() {
-      return EasyMock.createMock(TransactionManager.class);
+    public JtaTransactionManager jtaTransactionManager() {
+      return EasyMock.createMock(JtaTransactionManager.class);
     }
 
     @Bean(name = "hibernate")

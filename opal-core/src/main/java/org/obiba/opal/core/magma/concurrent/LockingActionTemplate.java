@@ -28,7 +28,9 @@ public abstract class LockingActionTemplate {
 
     try {
       MagmaEngine.get().lock(lockNames);
-      doInTransaction(getAction());
+      Action action = getAction();
+      if(action.isTransactional()) doInTransaction(getAction());
+      else action.execute();
     } catch(ActionRuntimeException ex) {
       throw new InvocationTargetException(ex.getCause());
     } catch(Exception ex) {
@@ -65,6 +67,8 @@ public abstract class LockingActionTemplate {
   // 
 
   public interface Action {
+
+    boolean isTransactional();
 
     void execute() throws Exception;
   }
