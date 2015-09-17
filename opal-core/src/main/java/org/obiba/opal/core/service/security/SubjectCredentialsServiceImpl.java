@@ -188,8 +188,11 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
         }
         if(subjectCredentials.getCertificate() != null) {
           keyStore = credentialsKeyStoreService.getKeyStore();
-          keyStore.importCertificate(subjectCredentials.getCertificateAlias(),
-              new ByteArrayInputStream(subjectCredentials.getCertificate()));
+          try {
+            keyStore.importCertificate(subjectCredentials.getCertificateAlias(), new ByteArrayInputStream(subjectCredentials.getCertificate()));
+          } catch (Exception e) {
+            throw new CertificateException(e);
+          }
         }
         break;
     }

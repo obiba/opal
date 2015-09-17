@@ -490,6 +490,7 @@ public interface Translations extends Constants {
       "OldPasswordMismatch", "Your old password is invalid.",//
       "PasswordNotChanged", "You must choose a different password than your current password.",//
       "PasswordIsRequired", "A password is required.",//
+      "InvalidCertificate", "The certificate is not valid.",//
       "CertificateIsRequired", "A certificate is required.",//
       "UsageIsRequired", "Database usage is required.",//
       "SqlSchemaIsRequired", "Database SQL schema is required.",//
