@@ -408,7 +408,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
     @Override
     public void beforeAuthorization() {
-      clearSlot(null);
+      clearSlot(PERMISSIONS_SLOT);
     }
 
     @Override

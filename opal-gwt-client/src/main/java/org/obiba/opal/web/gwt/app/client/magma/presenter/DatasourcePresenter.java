@@ -453,7 +453,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
     @Override
     public void beforeAuthorization() {
-      clearSlot(null);
+      clearSlot(PERMISSIONS_SLOT);
     }
 
     @Override

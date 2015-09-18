@@ -153,7 +153,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   public void setInSlot(Object slot, IsWidget content) {
     permissionsPanel.clear();
     if(content != null) {
-      permissionsPanel.add(content);
+      permissionsPanel.add(content.asWidget());
     }
   }
 
