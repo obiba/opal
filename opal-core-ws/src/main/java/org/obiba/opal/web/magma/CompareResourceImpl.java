@@ -304,6 +304,8 @@ public class CompareResourceImpl implements CompareResource {
         isModified(compared.getOccurrenceGroup(), with.getOccurrenceGroup()) ||
         isModified(compared.getReferencedEntityType(), with.getReferencedEntityType()) ||
         isModified(compared.getUnit(), with.getUnit()) ||
+        compared.isRepeatable() != with.isRepeatable() ||
+        compared.getIndex() != with.getIndex() ||
         areCategoriesModified(compared.getCategories(), with.getCategories()) ||
         areAttributesModified(compared.getAttributes(), with.getAttributes());
   }
