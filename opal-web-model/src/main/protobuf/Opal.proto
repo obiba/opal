@@ -324,8 +324,8 @@ message TermDto {
   required string name = 1;
   repeated LocaleTextDto title = 2;
   repeated LocaleTextDto description = 3;
-  repeated LocaleTextDto keywords = 4;
-  repeated TermDto terms = 5;
+  repeated TermDto terms = 4;
+  repeated LocaleTextDto keywords = 5;
 }
 
 message VocabularyDto {
