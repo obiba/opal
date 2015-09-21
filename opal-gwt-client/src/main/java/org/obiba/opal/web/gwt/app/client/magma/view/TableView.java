@@ -146,6 +146,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   Dropdown applyAttributeButton;
 
   @UiField
+  IconAnchor deleteVariables;
+
+  @UiField
   Label selectAllStatus;
 
   @UiField
@@ -625,7 +628,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @Override
   public HasAuthorization getEditAuthorizer() {
-    return new WidgetAuthorizer(edit, editWhere, tableDto.hasViewLink() ? addVariablesButton : tableAddVariableGroup);
+    return new WidgetAuthorizer(edit, editWhere, tableDto.hasViewLink() ? addVariablesButton : tableAddVariableGroup, applyAttributeButton, deleteAttributeButton, deleteVariables);
   }
 
   @Override

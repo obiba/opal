@@ -33,7 +33,7 @@
 
     <b:TabPanel tabPosition="above" ui:field="tabPanel">
       <b:Tab heading="Dictionary" active="true">
-        <g:FlowPanel addStyleNames="small-bottom-margin">
+        <g:FlowPanel addStyleNames="small-bottom-margin clearfix">
           <o:OpalSimplePager ui:field="pager" showTotalWhenNoPager="true" location="RIGHT"
               addStyleNames="pull-right small-top-margin small-indent"/>
           <b:Controls addStyleNames="pull-right small-top-margin">
