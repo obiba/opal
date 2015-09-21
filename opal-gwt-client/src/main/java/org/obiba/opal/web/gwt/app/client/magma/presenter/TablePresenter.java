@@ -941,7 +941,9 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
           if(response.getStatusCode() == SC_OK) {
             gotoDatasource();
           } else {
-            String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
+            String errorMessage = response.getText().isEmpty() ? response.getStatusCode() == SC_FORBIDDEN
+                ? "Forbidden"
+                : "UnknownError" : response.getText();
             fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
           }
         }
@@ -961,7 +963,9 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
           if(response.getStatusCode() == SC_OK) {
             gotoDatasource();
           } else {
-            String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
+            String errorMessage = response.getText().isEmpty() ? response.getStatusCode() == SC_FORBIDDEN
+                ? "Forbidden"
+                : "UnknownError" : response.getText();
             fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
           }
         }
@@ -1017,8 +1021,9 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
                       .revealPlace(ProjectPlacesHelper.getTablePlace(table.getDatasourceName(), table.getName()));
                 }
               } else {
-
-                String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
+                String errorMessage = response.getText().isEmpty() ? response.getStatusCode() == SC_FORBIDDEN
+                    ? "Forbidden"
+                    : "UnknownError" : response.getText();
                 fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
               }
 

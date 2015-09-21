@@ -590,7 +590,9 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
           if(response.getStatusCode() == SC_OK) {
             gotoTable();
           } else {
-            String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
+            String errorMessage = response.getText().isEmpty() ? response.getStatusCode() == SC_FORBIDDEN
+                ? "Forbidden"
+                : "UnknownError" : response.getText();
             fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
           }
         }
@@ -612,7 +614,9 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
           if(response.getStatusCode() == SC_OK) {
             gotoTable();
           } else {
-            String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
+            String errorMessage = response.getText().isEmpty() ? response.getStatusCode() == SC_FORBIDDEN
+                ? "Forbidden"
+                : "UnknownError" : response.getText();
             fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
           }
         }

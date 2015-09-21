@@ -586,7 +586,8 @@ public interface Translations extends Constants {
       "TaxonomyAlreadyExists", "A taxonomy with the name '{0}' already exists. To override, click on 'Override existing taxonomy' option.", //
       "VocabularyNotFound", "No such vocabulary in taxonomy '{0}' with name: {1}.", //
       "TermNotFound", "No such term in taxonomy '{0}' and vocabulary '{1}' with name: {2}.", //
-      "IllegalArgument", "{0}" //
+      "IllegalArgument", "{0}", //
+      "Forbidden", "Operation not allowed." //
 
   })
   Map<String, String> userMessageMap();

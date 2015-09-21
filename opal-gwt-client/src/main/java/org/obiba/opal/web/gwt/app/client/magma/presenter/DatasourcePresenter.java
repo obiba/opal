@@ -418,8 +418,11 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
                   initDatasource();
                 }
               } else {
-                String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
+                String errorMessage = response.getText().isEmpty() ? response.getStatusCode() == SC_FORBIDDEN
+                    ? "Forbidden"
+                    : "UnknownError" : response.getText();
                 fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
+                initDatasource();
               }
 
             }

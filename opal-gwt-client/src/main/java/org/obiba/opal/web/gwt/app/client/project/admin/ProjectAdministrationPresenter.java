@@ -174,7 +174,9 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
             PlaceRequest projectsRequest = new PlaceRequest.Builder().nameToken(Places.PROJECTS).build();
             placeManager.revealPlace(projectsRequest);
           } else {
-            String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
+            String errorMessage = response.getText().isEmpty() ? response.getStatusCode() == SC_FORBIDDEN
+                ? "Forbidden"
+                : "UnknownError" : response.getText();
             fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
           }
         }
