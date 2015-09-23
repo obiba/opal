@@ -36,7 +36,7 @@ SCRIPTNAME=/etc/init.d/$NAME
 # Depend on lsb-base (>= 3.0-6) to ensure that this file is present.
 . /lib/lsb/init-functions
 
-DAEMON_ARGS="--name=$NAME --user=$OPAL_USER --pidfile=$PIDFILE --inherit --env=OPAL_HOME=$OPAL_HOME --env=OPAL_LOG=$OPAL_LOG --output=$OPAL_LOG/stdout.log --chdir=$OPAL_HOME"
+DAEMON_ARGS="--name=$NAME --user=$OPAL_USER --pidfile=$PIDFILE --inherit --env=OPAL_HOME=$OPAL_HOME --env=OPAL_DIST=$OPAL_DIST --env=OPAL_LOG=$OPAL_LOG --output=$OPAL_LOG/stdout.log --chdir=$OPAL_HOME"
 CLASSPATH="$OPAL_HOME/conf:$OPAL_DIST/lib/*"
 
 # Get the status of the daemon process
