@@ -20,13 +20,15 @@ CYGWIN*) cygwin=true;;
 esac
 
 if [ -z "$JAVA_OPTS" ]
+then
   if [ ! -z "$JAVA_ARGS" ]
   then
     JAVA_OPTS=$JAVA_ARGS
+  else
+    # Set default JAVA_OPTS
+    JAVA_OPTS="-Xmx2G -XX:MaxPermSize=128M"
   fi
-then
-  # Set default JAVA_OPTS
-  JAVA_OPTS="-Xmx2G -XX:MaxPermSize=128M"
+
   export JAVA_OPTS
 fi
 
