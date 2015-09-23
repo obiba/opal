@@ -109,8 +109,7 @@ public class DefaultOpalFileSystem implements OpalFileSystem {
     }
   }
 
-  @Override
-  public File convertVirtualFileToLocal(FileObject virtualFile) {
+  private File convertVirtualFileToLocal(FileObject virtualFile) {
     Assert.notNull(virtualFile, "A virtualFile is required.");
     makeSureThatFileCanBeConverted(virtualFile);
 
@@ -142,9 +141,7 @@ public class DefaultOpalFileSystem implements OpalFileSystem {
     return File.createTempFile("temp_local_vfs_", "." + virtualFileName.getExtension());
   }
 
-  @SuppressWarnings("ChainOfInstanceofChecks")
-  @Override
-  public boolean isLocalFile(@NotNull FileObject virtualFile) {
+  private boolean isLocalFile(@NotNull FileObject virtualFile) {
     Preconditions.checkNotNull(virtualFile);
     FileObject currentFile = virtualFile;
     while(true) {

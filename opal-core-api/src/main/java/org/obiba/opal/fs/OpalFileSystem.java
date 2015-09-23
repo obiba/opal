@@ -40,22 +40,6 @@ public interface OpalFileSystem {
   File getLocalFile(FileObject virtualFile);
 
   /**
-   * Converts a remote file of the Virtual File System (VFS) by copying its content to a local temporary file.
-   *
-   * @param virtualFile The VFS file to "make local".
-   * @return A local temporary java.io.File which has the same content has the source VFS file.
-   */
-  File convertVirtualFileToLocal(FileObject virtualFile);
-
-  /**
-   * Checks if a specific file of the Virtual File System (VFS) is a local file.
-   *
-   * @param virtualFile The file to check.
-   * @return True if a local file, false if not.
-   */
-  boolean isLocalFile(FileObject virtualFile);
-
-  /**
    * Converts the path of a file in the Virtual File System (VFS) to an "obfuscated" path an returns it.
    *
    * @param virtualFile The file for which we want to get an obfuscated path.

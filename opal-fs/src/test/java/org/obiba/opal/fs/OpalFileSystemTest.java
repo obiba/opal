@@ -78,20 +78,12 @@ public class OpalFileSystemTest {
   @Test
   public void testLocalFile() throws FileSystemException {
     log.info("file: {}", fsLocal.getRoot().resolveFile("temp.pem"));
-    fsLocal.getLocalFile(fsLocalRoot.resolveFile("temp.pem"));
-    assertThat(fsLocal.isLocalFile(fsLocalRoot.resolveFile("temp.pem"))).isTrue();
-  }
-
-  @Test
-  public void testFtpFileNotLocalFile() throws FileSystemException {
-    assumeTrue(runningOsIsWindows());
-    assertThat(fsFtp.isLocalFile(fsFtpRoot.resolveFile("/temp/file2.txt"))).isFalse();
+    assertThat(fsLocal.getLocalFile(fsLocalRoot.resolveFile("temp.pem"))).isNotNull();
   }
 
   @Test
   public void getLocalFileFromFtp() throws IOException {
     assumeTrue(runningOsIsWindows());
-    assertThat(fsFtp.isLocalFile(fsFtpRoot.resolveFile("/temp/file2.txt"))).isFalse();
     File localFile = fsFtp.getLocalFile(fsFtpRoot.resolveFile("/temp/file2.txt"));
     List<String> lines = CharStreams.readLines(new FileReader(localFile));
     assertThat(lines.get(0)).isEqualTo("this is the file content");
