@@ -38,16 +38,6 @@ public class SecuredOpalFileSystem implements OpalFileSystem {
   }
 
   @Override
-  public File convertVirtualFileToLocal(FileObject virtualFile) {
-    return delegate.convertVirtualFileToLocal(virtualFile);
-  }
-
-  @Override
-  public boolean isLocalFile(FileObject virtualFile) {
-    return delegate.isLocalFile(virtualFile);
-  }
-
-  @Override
   public String getObfuscatedPath(FileObject virtualFile) {
     return delegate.getObfuscatedPath(virtualFile);
   }
