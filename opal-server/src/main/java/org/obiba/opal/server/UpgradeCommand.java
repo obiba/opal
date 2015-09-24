@@ -11,6 +11,7 @@ package org.obiba.opal.server;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
@@ -152,15 +153,28 @@ public class UpgradeCommand {
 
   private String runOpalMigrator(String... args) {
     String dist = System.getenv("OPAL_DIST");
-    if (Strings.isNullOrEmpty(dist)) throw new RuntimeException("Cannot locate opal tools directory: OPAL_DIST is not defined.");
+    if(Strings.isNullOrEmpty(dist))
+      throw new RuntimeException("Cannot locate opal tools directory: OPAL_DIST is not defined.");
     String formattedArgs = Joiner.on(" ").join(args);
 
-    log.debug("Running Opal config migrator with args: {}", formattedArgs);
+    File toolsDir = Paths.get(dist, "tools", "lib").toFile();
+    if(!toolsDir.exists() || !toolsDir.isDirectory())
+      throw new RuntimeException("No such directory: " + toolsDir.getAbsolutePath());
 
-    ProcessBuilder pb = new ProcessBuilder("bash", "-c",
-        String.format("java -jar opal-config-migrator-*-cli.jar %s", formattedArgs));
+    File[] jars = toolsDir.listFiles(new FilenameFilter() {
+      @Override
+      public boolean accept(File dir, String name) {
+        return name.startsWith("opal-config-migrator-") && name.endsWith("-cli.jar");
+      }
+    });
+    if(jars == null || jars.length == 0) throw new RuntimeException(
+        String.format("Cannot find any opal-config-migrator-*-cli.jar file in '%s'", toolsDir.getAbsolutePath()));
+
+
+    log.info("Running Opal config migrator command: java -jar {} {}", jars[0].getName(), formattedArgs);
+    ProcessBuilder pb = new ProcessBuilder("java", "-jar", jars[0].getName(), formattedArgs);
     pb.redirectErrorStream(true);
-    pb.directory(Paths.get(dist, "tools", "lib").toFile());
+    pb.directory(toolsDir);
 
     try {
       Process p = pb.start();
