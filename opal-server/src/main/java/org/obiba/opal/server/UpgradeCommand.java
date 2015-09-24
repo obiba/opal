@@ -152,6 +152,7 @@ public class UpgradeCommand {
 
   private String runOpalMigrator(String... args) {
     String dist = System.getenv("OPAL_DIST");
+    if (Strings.isNullOrEmpty(dist)) throw new RuntimeException("Cannot locate opal tools directory: OPAL_DIST is not defined.");
     String formattedArgs = Joiner.on(" ").join(args);
 
     log.debug("Running Opal config migrator with args: {}", formattedArgs);
