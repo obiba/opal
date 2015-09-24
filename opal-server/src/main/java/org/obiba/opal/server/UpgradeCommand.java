@@ -18,6 +18,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -47,6 +49,7 @@ import org.xml.sax.SAXException;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
 
 /**
  * Command to perform an upgrade (i.e., invoke the upgrade manager).
@@ -89,15 +92,17 @@ public class UpgradeCommand {
 
   private boolean needUpgradeOrientDb() {
     log.info("Checking orientdb upgrade");
-    String errorMsg = runOpalMigrator("--check", opalConfigPath);
+    ProcessResult result = executeOpalMigrator("--check", opalConfigPath);
 
-    if(errorMsg == null) {
+    if(result.exitCode == 0) {
       log.info("Older version detected. Upgrade needed.");
       return true;
+    } else if(result.exitCode == 65) {
+      log.info("Upgrade not needed");
+      return false;
     }
 
-    log.info("Upgrade not needed.");
-    return false;
+    throw new RuntimeException(result.output);
   }
 
   private void upgradeOrientDb() {
@@ -111,13 +116,9 @@ public class UpgradeCommand {
       tmpFile = File.createTempFile("opal_orientdb_export", null);
       String exportFilePrefix = tmpFile.getAbsolutePath();
       exportFile = Paths.get(exportFilePrefix + ".gz").toFile();
-      String errorMsg = runOpalMigrator(opalConfigPath, exportFilePrefix);
 
-      if(errorMsg == null) {
-        Files.move(config, configBackup, StandardCopyOption.ATOMIC_MOVE);
-      } else {
-        throw new RuntimeException("Error exporting orientdb: " + errorMsg);
-      }
+      exportOpalConfig(opalConfigPath, exportFilePrefix);
+      Files.move(config, configBackup, StandardCopyOption.ATOMIC_MOVE);
     } catch(IOException e) {
       if(exportFile != null && exportFile.exists()) exportFile.delete();
 
@@ -151,7 +152,12 @@ public class UpgradeCommand {
     }
   }
 
-  private String runOpalMigrator(String... args) {
+  private void exportOpalConfig(String opalConfigPath, String exportFilePrefix) {
+    ProcessResult result = executeOpalMigrator(opalConfigPath, exportFilePrefix);
+    if(result.exitCode != 0) throw new RuntimeException(result.output);
+  }
+
+  private ProcessResult executeOpalMigrator(String... args) {
     ProcessBuilder pb = getOpalMigratorProcessBuilder(args);
 
     try {
@@ -165,11 +171,7 @@ public class UpgradeCommand {
         stringBuilder.append(line + "\n");
       }
 
-      if(p.exitValue() == 0) {
-        return null;
-      }
-
-      return stringBuilder.toString();
+      return new ProcessResult(p.exitValue(), stringBuilder.toString());
     } catch(IOException | InterruptedException e) {
       throw Throwables.propagate(e);
     }
@@ -179,7 +181,6 @@ public class UpgradeCommand {
     String dist = System.getenv("OPAL_DIST");
     if(Strings.isNullOrEmpty(dist))
       throw new RuntimeException("Cannot locate opal tools directory: OPAL_DIST is not defined.");
-    String formattedArgs = Joiner.on(" ").join(args);
 
     File toolsDir = Paths.get(dist, "tools", "lib").toFile();
     if(!toolsDir.exists() || !toolsDir.isDirectory())
@@ -194,8 +195,12 @@ public class UpgradeCommand {
     if(jars == null || jars.length == 0) throw new RuntimeException(
         String.format("Cannot find any opal-config-migrator-*-cli.jar file in '%s'", toolsDir.getAbsolutePath()));
 
-    log.info("Running Opal config migrator command: java -jar {} {}", jars[0].getName(), formattedArgs);
-    ProcessBuilder pb = new ProcessBuilder("java", "-jar", jars[0].getName(), formattedArgs);
+    List<String> processArgs = Lists.newArrayList("java", "-jar", jars[0].getName());
+    processArgs.addAll(Arrays.asList(args));
+
+    log.info("Running Opal config migrator command: {}", Joiner.on(" ").join(processArgs));
+
+    ProcessBuilder pb = new ProcessBuilder(processArgs);
     pb.redirectErrorStream(true);
     pb.directory(toolsDir);
 
@@ -290,4 +295,13 @@ public class UpgradeCommand {
     }
   }
 
+  private class ProcessResult {
+    int exitCode;
+    String output;
+
+    ProcessResult(int exitCode, String output) {
+      this.exitCode = exitCode;
+      this.output = output;
+    }
+  }
 }

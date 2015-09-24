@@ -15,9 +15,8 @@ public class LegacyOrientDbExporter {
     boolean check = false;
 
     if(args.length < 2 || args.length > 3 || ((check = "--check".equals(args[0])) && args.length > 2)) {
-
       System.out.println("Usage: java -jar <opal-config-migrator>.jar [--check] <opal_config_dir> [target_file]");
-      System.exit(1);
+      System.exit(64);
     }
 
     System.out.println("Legacy OrientDb exporter ... " + (check ? "dry run" : "exporting"));
@@ -52,7 +51,7 @@ public class LegacyOrientDbExporter {
       if(!check) throw new RuntimeException("Error exporting legacy OrientDb database", e);
 
       System.out.println("Invalid OrientDb version detected. Exiting.");
-      System.exit(1);
+      System.exit(65);
     }
 
     server.shutdown();
