@@ -3,9 +3,13 @@ package org.obiba.opal.core.service;
 import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +32,10 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 import com.orientechnologies.orient.core.index.OCompositeKey;
 import com.orientechnologies.common.exception.OException;
 import com.orientechnologies.orient.core.command.OCommandOutputListener;
@@ -76,7 +84,10 @@ public class OrientDbServiceImpl implements OrientDbService {
   @Autowired
   private OrientDbServerFactory serverFactory;
 
-  private final Gson gson = new GsonBuilder().setDateFormat(DATE_PATTERN).create();
+  private final Gson gson = new GsonBuilder() //
+      .setDateFormat(DATE_PATTERN) //
+      .registerTypeAdapter(Date.class, new DateDeserializer()) //
+      .create();
 
   @Override
   public <T> T execute(WithinDocumentTxCallback<T> callback) {
@@ -424,5 +435,24 @@ public class OrientDbServiceImpl implements OrientDbService {
       indexName.append(".").append(prop);
     }
     return indexName.toString();
+  }
+
+  private class DateDeserializer implements JsonDeserializer<Date> {
+
+    @Override
+    public Date deserialize(JsonElement jsonElement, Type typeOF, JsonDeserializationContext context)
+        throws JsonParseException {
+
+      try {
+        return new SimpleDateFormat(DATE_PATTERN).parse(jsonElement.getAsString());
+      } catch(ParseException e) {
+      }
+
+      try {
+        return new Date(jsonElement.getAsLong());
+      } catch(NumberFormatException e) {
+        throw new JsonParseException("Unparseable date: " + jsonElement.getAsString());
+      }
+    }
   }
 }
