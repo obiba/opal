@@ -152,29 +152,7 @@ public class UpgradeCommand {
   }
 
   private String runOpalMigrator(String... args) {
-    String dist = System.getenv("OPAL_DIST");
-    if(Strings.isNullOrEmpty(dist))
-      throw new RuntimeException("Cannot locate opal tools directory: OPAL_DIST is not defined.");
-    String formattedArgs = Joiner.on(" ").join(args);
-
-    File toolsDir = Paths.get(dist, "tools", "lib").toFile();
-    if(!toolsDir.exists() || !toolsDir.isDirectory())
-      throw new RuntimeException("No such directory: " + toolsDir.getAbsolutePath());
-
-    File[] jars = toolsDir.listFiles(new FilenameFilter() {
-      @Override
-      public boolean accept(File dir, String name) {
-        return name.startsWith("opal-config-migrator-") && name.endsWith("-cli.jar");
-      }
-    });
-    if(jars == null || jars.length == 0) throw new RuntimeException(
-        String.format("Cannot find any opal-config-migrator-*-cli.jar file in '%s'", toolsDir.getAbsolutePath()));
-
-
-    log.info("Running Opal config migrator command: java -jar {} {}", jars[0].getName(), formattedArgs);
-    ProcessBuilder pb = new ProcessBuilder("java", "-jar", jars[0].getName(), formattedArgs);
-    pb.redirectErrorStream(true);
-    pb.directory(toolsDir);
+    ProcessBuilder pb = getOpalMigratorProcessBuilder(args);
 
     try {
       Process p = pb.start();
@@ -195,6 +173,33 @@ public class UpgradeCommand {
     } catch(IOException | InterruptedException e) {
       throw Throwables.propagate(e);
     }
+  }
+
+  private ProcessBuilder getOpalMigratorProcessBuilder(String... args) {
+    String dist = System.getenv("OPAL_DIST");
+    if(Strings.isNullOrEmpty(dist))
+      throw new RuntimeException("Cannot locate opal tools directory: OPAL_DIST is not defined.");
+    String formattedArgs = Joiner.on(" ").join(args);
+
+    File toolsDir = Paths.get(dist, "tools", "lib").toFile();
+    if(!toolsDir.exists() || !toolsDir.isDirectory())
+      throw new RuntimeException("No such directory: " + toolsDir.getAbsolutePath());
+
+    File[] jars = toolsDir.listFiles(new FilenameFilter() {
+      @Override
+      public boolean accept(File dir, String name) {
+        return name.startsWith("opal-config-migrator-") && name.endsWith("-cli.jar");
+      }
+    });
+    if(jars == null || jars.length == 0) throw new RuntimeException(
+        String.format("Cannot find any opal-config-migrator-*-cli.jar file in '%s'", toolsDir.getAbsolutePath()));
+
+    log.info("Running Opal config migrator command: java -jar {} {}", jars[0].getName(), formattedArgs);
+    ProcessBuilder pb = new ProcessBuilder("java", "-jar", jars[0].getName(), formattedArgs);
+    pb.redirectErrorStream(true);
+    pb.directory(toolsDir);
+
+    return pb;
   }
 
   /**
