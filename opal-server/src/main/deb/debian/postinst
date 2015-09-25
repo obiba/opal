@@ -73,6 +73,7 @@ case "$1" in
       [ -r $EXPORT_FILE.gz ] && { \
       java -cp "/usr/share/opal/lib/*" -DOPAL_HOME=$OPAL_HOME org.obiba.opal.core.tools.OrientDbUtil import $EXPORT_FILE.gz && \
       rm $EXPORT_FILE.gz && \
+      chown -R opal:adm $OPAL_HOME/data/orientdb && \
       rm -Rf $OPAL_HOME/data/orientdb/opal-config.bak || { mv $OPAL_HOME/data/orientdb/opal-config.bak $OPAL_HOME/data/orientdb/opal-config; \
       exit 1; }; }
 
