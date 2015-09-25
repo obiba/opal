@@ -198,7 +198,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
 
   private void printThrowable(Throwable ex, boolean withStack, int depth) {
     //only prints message for the top exception
-    if (depth == 0 && !Strings.isNullOrEmpty(ex.getMessage())) getShell().printf(ex.getMessage());
+    if (depth == 0 && !Strings.isNullOrEmpty(ex.getMessage())) getShell().printf("%s\n",ex.getMessage());
 
     StringBuilder sb = new StringBuilder();
     if (depth > 0) {
@@ -210,7 +210,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       for(StackTraceElement elem : ex.getStackTrace()) {
         sb.append(elem.toString()).append("\n");
       }
-      getShell().printf(sb.toString());
+      getShell().printf("%s",sb.toString());
     }
 
     Throwable cause = ex.getCause();
