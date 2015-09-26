@@ -57,10 +57,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Sets;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
 
@@ -70,7 +66,6 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 @Transactional
 @Scope("request")
 @Path("/datasource/{name}")
-@Api(value = "/datasource/{name}", description = "Operations on a specific datasource")
 public class DatasourceResource {
 
   @PathParam("name")
@@ -123,16 +118,11 @@ public class DatasourceResource {
   }
 
   @GET
-  @ApiOperation(value = "Get the datasource", response = Magma.DatasourceDto.class)
-  @ApiResponses(@ApiResponse(code = 404, message = "If datasource is not found"))
   public Magma.DatasourceDto get(@Context Request request) {
     return Dtos.asDto(getDatasource()).build();
   }
 
   @DELETE
-  @ApiOperation(value = "Delete the datasource if this one is transient (not valid for project datasources)")
-  @ApiResponses({ @ApiResponse(code = 400, message = "If datasource is not transient"),
-      @ApiResponse(code = 404, message = "If datasource is not found") })
   public Response removeDatasource() {
     Datasource ds = null;
     if(MagmaEngine.get().hasTransientDatasource(name)) {
@@ -185,8 +175,6 @@ public class DatasourceResource {
 
   @POST
   @Path("/views")
-  @ApiOperation(value = "Add a view to the datasource")
-  @ApiResponses(@ApiResponse(code = 404, message = "If datasource is not found"))
   public Response createView(ViewDto viewDto, @Context UriInfo uriInfo,
       @Nullable @QueryParam("comment") String comment) {
 

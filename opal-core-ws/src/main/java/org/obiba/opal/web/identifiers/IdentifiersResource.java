@@ -20,13 +20,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Sets;
-import com.wordnik.swagger.annotations.Api;
 
 @Component
 @Transactional
 @Scope("request")
 @Path("/identifiers")
-@Api(value = "/identifiers", description = "Operations about identifiers")
 public class IdentifiersResource extends AbstractIdentifiersResource {
 
   @Autowired

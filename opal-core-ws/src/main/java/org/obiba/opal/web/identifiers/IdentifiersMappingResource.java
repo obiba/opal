@@ -61,8 +61,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
 
 import au.com.bytecode.opencsv.CSVWriter;
 
@@ -70,8 +68,6 @@ import au.com.bytecode.opencsv.CSVWriter;
 @Transactional
 @Scope("request")
 @Path("/identifiers/mapping/{name}")
-@Api(value = "/identifiers/mapping/{name}",
-    description = "Operations about a specific identifiers mapping")
 public class IdentifiersMappingResource extends AbstractIdentifiersResource {
 
   @Autowired
@@ -100,7 +96,6 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
   }
 
   @GET
-  @ApiOperation(value = "Get a specific identifiers mapping for an entity type")
   public Magma.VariableDto get(@QueryParam("type") String entityType) {
     ensureEntityType(entityType);
     ValueTable table = getValueTable(entityType);
@@ -110,7 +105,6 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
   }
 
   @DELETE
-  @ApiOperation(value = "Delete a specific identifiers mapping for an entity type")
   public Response delete(@QueryParam("type") String entityType) {
     ensureEntityType(entityType);
 
@@ -126,7 +120,6 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
 
   @GET
   @Path("/entities")
-  @ApiOperation(value = "Get identifiers as entities")
   public List<Magma.VariableEntityDto> getUnitEntities(@QueryParam("type") String entityType) {
     ensureEntityType(entityType);
     return Lists.newArrayList(Iterables
@@ -228,7 +221,6 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
   @Path("/_export")
   @Produces("text/csv")
   @AuthenticatedByCookie
-  @ApiOperation(value = "Get identifiers mapping in CSV", produces = "text/csv")
   public Response getVectorCSVValues(@QueryParam("type") String entityType) throws MagmaRuntimeException, IOException {
     ensureEntityType(entityType);
     ValueTable table = getValueTable(entityType);
@@ -258,7 +250,6 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
   @Path("/entities/_export")
   @Produces("text/plain")
   @AuthenticatedByCookie
-  @ApiOperation(value = "Get identifiers in plain text", produces = "text/plain")
   public Response getVectorValues(@QueryParam("type") String entityType) throws MagmaRuntimeException, IOException {
     ensureEntityType(entityType);
     ValueTable table = getValueTable(entityType);

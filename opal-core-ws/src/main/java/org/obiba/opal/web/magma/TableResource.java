@@ -21,8 +21,6 @@ import javax.ws.rs.core.UriInfo;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.web.model.Magma;
 
-import com.wordnik.swagger.annotations.ApiOperation;
-
 public interface TableResource {
 
   void setLocales(Set<Locale> locales);
@@ -34,7 +32,6 @@ public interface TableResource {
   ValueTable getValueTable();
 
   @GET
-  @ApiOperation(value = "Get the Table", response = Magma.TableDto.class)
   Magma.TableDto get(@Context Request request, @Context UriInfo uriInfo,
       @QueryParam("counts") @DefaultValue("false") Boolean counts);
 
