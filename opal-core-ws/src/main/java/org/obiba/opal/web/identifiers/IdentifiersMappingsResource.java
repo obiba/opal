@@ -56,8 +56,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
 
 import au.com.bytecode.opencsv.CSVWriter;
 
@@ -65,7 +63,6 @@ import au.com.bytecode.opencsv.CSVWriter;
 @Transactional
 @Scope("request")
 @Path("/identifiers/mappings")
-@Api(value = "/identifiers/mappings", description = "Operations about identifiers mappings")
 public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
 
   @Autowired
@@ -91,7 +88,6 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
   }
 
   @GET
-  @ApiOperation(value = "Get the identifiers mappings")
   public List<IdentifiersMappingDto> getIdentifiersMappings(final @QueryParam("type") List<String> entityTypes) {
     Map<String, List<String>> idsMappings = getIdentifiersMappings();
     List<IdentifiersMappingDto> dtos = Lists.newArrayList();
@@ -252,7 +248,6 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
   @Path("/_export")
   @Produces("text/csv")
   @AuthenticatedByCookie
-  @ApiOperation(value = "Get identifiers mapping in CSV", produces = "text/csv")
   public Response getVectorCSVValues(@QueryParam("type") String entityType) throws MagmaRuntimeException, IOException {
     ensureEntityType(entityType);
     ValueTable table = getValueTable(entityType);

@@ -47,14 +47,10 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
 
 @Component
 @Scope("request")
 @Path("/datasource/{ds}/table/{table}/valueSets/_search")
-@Api(value = "/datasource/{ds}/table/{table}/valueSets/_search",
-    description = "Executes a query on an Elastic Search values index")
 public class TableValueSetsSearchResource extends AbstractSearchUtility {
 
 //  private static final Logger log = LoggerFactory.getLogger(TableVariablesSearchResource.class);
@@ -69,7 +65,6 @@ public class TableValueSetsSearchResource extends AbstractSearchUtility {
   @GET
   @POST
   @Transactional(readOnly = true)
-  @ApiOperation("Returns a list of valueSets corresponding to specified query")
   public Response search(@Context UriInfo uriInfo, @QueryParam("query") String query,
       @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("10") int limit,
       @QueryParam("select") String select) throws JSONException {

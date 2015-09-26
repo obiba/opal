@@ -125,10 +125,6 @@
       <groupId>org.mozilla</groupId>
       <artifactId>rhino</artifactId>
     </dependency>
-    <dependency>
-      <groupId>com.wordnik</groupId>
-      <artifactId>swagger-jaxrs_2.10</artifactId>
-    </dependency>
   </dependencies>
 
   <build>

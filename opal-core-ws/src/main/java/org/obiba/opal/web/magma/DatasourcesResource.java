@@ -31,21 +31,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Lists;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
 
 @Component
 @Transactional
 @Path("/datasources")
-@Api(value = "/datasources", description = "Operations about datasources")
 public class DatasourcesResource {
 
   @Autowired
   private ApplicationContext applicationContext;
 
   @GET
-  @ApiOperation(value = "Get all datasources",
-      notes = "The Identifiers datasource will not be returned here", response = List.class)
   public List<Magma.DatasourceDto> getDatasources() {
     List<Magma.DatasourceDto> datasources = Lists.newArrayList();
     for(Datasource from : MagmaEngine.get().getDatasources()) {
@@ -59,8 +54,6 @@ public class DatasourcesResource {
 
   @GET
   @Path("/tables")
-  @ApiOperation(value = "Get all tables of all datasources",
-      notes = "The Identifiers datasource will not be returned here", response = List.class)
   public List<Magma.TableDto> getTables(@Nullable @QueryParam("entityType") String entityType) {
     List<Magma.TableDto> tables = Lists.newArrayList();
     for(Datasource datasource : MagmaEngine.get().getDatasources()) {
@@ -71,7 +64,6 @@ public class DatasourcesResource {
 
   @GET
   @Path("/count")
-  @ApiOperation(value = "Get the number of datasources", response = Integer.class)
   public Response getDatasourcesCount() {
     return Response.ok().entity(String.valueOf(MagmaEngine.get().getDatasources().size())).build();
 
