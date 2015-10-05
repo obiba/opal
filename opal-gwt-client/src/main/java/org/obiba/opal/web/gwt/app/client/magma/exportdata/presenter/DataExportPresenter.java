@@ -234,6 +234,7 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
     dto.setOut(out);
     dto.setNonIncremental(true);
     dto.setNoVariables(false);
+    dto.setCopyNullValues(true);
     if(idMapping != null) {
       IdentifiersMappingConfigDto idConfig = IdentifiersMappingConfigDto.create();
       idConfig.setName(idMapping);
