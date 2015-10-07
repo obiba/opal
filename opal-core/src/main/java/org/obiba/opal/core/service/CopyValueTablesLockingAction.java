@@ -116,7 +116,7 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
 
     @Override
     public void execute() throws Exception {
-      for(ValueTable valueTable : sourceTables) {
+      for(final ValueTable valueTable : sourceTables) {
         if(Thread.interrupted()) {
           throw new InterruptedException("Thread interrupted");
         }
@@ -132,7 +132,7 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
                   @NotNull
                   @Override
                   public Thread newThread(@NotNull Runnable r) {
-                    return isTransactional() ? new TransactionalThread(r) : new Thread(r);
+                    return new TransactionalThread(r);
                   }
                 }) //
                 .withProgressListener(progressListener) //

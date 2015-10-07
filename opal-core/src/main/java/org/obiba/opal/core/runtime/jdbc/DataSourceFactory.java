@@ -27,15 +27,25 @@ public class DataSourceFactory {
   public DataSource createDataSource(@NotNull Database database) {
     DataSourceFactoryBean factoryBean = applicationContext.getAutowireCapableBeanFactory()
         .createBean(DataSourceFactoryBean.class);
+
     SqlSettings sqlSettings = database.getSqlSettings();
+
     if(sqlSettings == null) {
       throw new IllegalArgumentException("Cannot create a JDBC DataSource without SqlSettings");
     }
+
     factoryBean.setDriverClass(sqlSettings.getDriverClass());
     factoryBean.setUrl(sqlSettings.getUrl());
     factoryBean.setUsername(sqlSettings.getUsername());
     factoryBean.setPassword(sqlSettings.getPassword());
     factoryBean.setConnectionProperties(sqlSettings.getProperties());
+
+    if(database.getSqlSettings().getSqlSchema() == SqlSettings.SqlSchema.HIBERNATE) {
+      factoryBean.setManaged(true);
+    } else {
+      factoryBean.setManaged(false);
+    }
+
     return factoryBean.getObject();
   }
 

@@ -39,6 +39,8 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
 
   protected String password;
 
+  protected boolean managed;
+
   protected String connectionProperties;
 
   private JtaTransactionManager jtaTransactionManager;
@@ -51,8 +53,15 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
   @Override
   public DataSource getObject() {
     log.debug("Configure DataSource for {}", url);
-    BasicManagedDataSource dataSource = new BasicManagedDataSource();
-    dataSource.setTransactionManager(jtaTransactionManager.getTransactionManager());
+    BasicDataSource dataSource = null;
+
+    if(managed) {
+      dataSource = new BasicManagedDataSource();
+      ((BasicManagedDataSource)dataSource).setTransactionManager(jtaTransactionManager.getTransactionManager());
+    } else {
+      dataSource = new BasicDataSource();
+    }
+
     dataSource.setDriverClassName(driverClass);
     dataSource.setUrl(url);
     setConnectionProperties(dataSource);
@@ -129,5 +138,9 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
 
   protected String getUrl() {
     return url;
+  }
+
+  public void setManaged(boolean managed) {
+    this.managed = managed;
   }
 }

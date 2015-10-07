@@ -38,6 +38,7 @@ import org.obiba.opal.core.service.database.NoSuchDatabaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -316,11 +317,12 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
               new DatabaseSessionFactoryProvider(datasourceName, this, database.getName()));
 
         case JDBC:
+          DataSource datasource = getDataSource(databaseName, datasourceName);
           JdbcDatasourceFactory dsFactory = new JdbcDatasourceFactory();
           dsFactory.setName(datasourceName);
-          dsFactory.setDataSource(getDataSource(databaseName, datasourceName));
+          dsFactory.setDataSource(datasource);
           dsFactory.setDatasourceSettings(sqlSettings.getJdbcDatasourceSettings());
-          dsFactory.setDataSourceTransactionManager(jtaTransactionManager);
+          dsFactory.setDataSourceTransactionManager(new DataSourceTransactionManager(datasource));
           return dsFactory;
 
         default:
