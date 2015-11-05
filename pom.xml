@@ -1734,7 +1734,7 @@
     <fest.version>2.0M10</fest.version>
     <gin.version>2.1.2</gin.version>
     <gson.version>2.3.1</gson.version>
-    <guava.version>19.0-rc1</guava.version>
+    <guava.version>19.0-rc2</guava.version>
     <gwt.version>2.7.0</gwt.version>
     <gwt-bootstrap.version>2.3.2.0</gwt-bootstrap.version>
     <gwt-dnd.version>3.3.4</gwt-dnd.version>
