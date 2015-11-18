@@ -38,6 +38,8 @@ public class OpalRService implements Service, ROperationTemplate, HasServiceList
 
   private static final Logger log = LoggerFactory.getLogger(OpalRService.class);
 
+  public static final int DEFAULT_RSERVE_PORT = 6311;
+
   @Value("${org.obiba.rserver.port}")
   private Integer rServerPort;
 
@@ -87,7 +89,7 @@ public class OpalRService implements Service, ROperationTemplate, HasServiceList
     try {
       conn = newRConnection();
     } catch(RserveException e) {
-      log.error("Error while connecting to R: {}", e.getMessage());
+      log.error("Error while connecting to R ({}:{}): {}", getHost(), getPort(), e.getMessage());
       throw new RRuntimeException(e);
     }
 
@@ -159,13 +161,20 @@ public class OpalRService implements Service, ROperationTemplate, HasServiceList
   }
 
   public String getRServerResourceUrl() {
-    String hostname = host.trim().length() > 0 ? host.trim() : "localhost";
-    return "http://" + hostname +":" + rServerPort + "/rserver";
+    return "http://" + getHost() +":" + rServerPort + "/rserver";
   }
 
   private RServerState getRServerState() {
     RestTemplate restTemplate = new RestTemplate();
     return restTemplate.getForObject(getRServerResourceUrl(), RServerState.class);
+  }
+
+  private String getHost() {
+    return host.trim().isEmpty() ? "127.0.0.1" : host.trim();
+  }
+
+  private int getPort() {
+    return port == null ? DEFAULT_RSERVE_PORT : port;
   }
 
   /**
@@ -177,11 +186,7 @@ public class OpalRService implements Service, ROperationTemplate, HasServiceList
   private RConnection newRConnection() throws RserveException {
     RConnection conn;
 
-    if(host.trim().length() > 0) {
-      conn = port == null ? new RConnection(host.trim()) : new RConnection(host.trim(), port);
-    } else {
-      conn = new RConnection();
-    }
+    conn = new RConnection(getHost(), getPort());
 
     if(conn.needLogin()) {
       conn.login(username, password);
