@@ -24,15 +24,6 @@ public class DataShieldExprTest {
       .put("An integer", "5L")//
       .put("A negative number", "-0.43151402098822")//
       .put("An embedded symbol", "A$B$C.D")//
-      .put("A subset symbol", "A[2,1]")//
-      .put("An open row subset symbol", "A[,1]")//
-      .put("An open column subset symbol", "A[1,]")//
-      .put("A subset symbol with range", "A[,1:2]")//
-      .put("A subset symbol with function call", "D[,func(D[,1])]")//
-      .put("A subset symbol with spaces", "A[ , 1 ]")//
-      .put("An empty subset symbol", "A[]")//
-      .put("An almost empty subset symbol", "A[,]")//
-      .put("A subset value symbol", "A[[1]]")//
       .put("A formula", "A ~ B")//
       .put("A function invocation", "A()")//
       .put("An operator on symbols", "A + B")//
@@ -41,8 +32,6 @@ public class DataShieldExprTest {
       .put("A formula with operators", "A ~ B + (C * D)^4 : E %in% F")//
       .put("Grouping", "(A + B) * (C - D)")//
       .put("Function with a single parameter", "A(B)")//
-      .put("Function with a subset parameter", "A(B[,2])")//
-      .put("Function with a subset parameter and a simple parameter", "A(B[,2], C)")//
       .put("Function with a function invocation as parameter", "A(B())")//
       .put("Function with multiple parameters", "A(B, C)")//
       .put("Function with multiple kinds of parameters", "A(B, C(), D, E(F(G/H)), A + B * C())")//
@@ -146,19 +135,6 @@ public class DataShieldExprTest {
           child.jjtAccept(this, sb);
         }
         sb.append(" )");
-        return sb;
-      }
-
-      @Override
-      public Object visit(ASTsubsetCall node, Object data) {
-        StringBuilder sb = (StringBuilder) data;
-        sb.append(node.value).append("[ ");
-        for(int i = 0; i < node.jjtGetNumChildren(); i++) {
-          Node child = node.jjtGetChild(i);
-          if(i > 0) sb.append(' ');
-          child.jjtAccept(this, sb);
-        }
-        sb.append(" ]");
         return sb;
       }
 
