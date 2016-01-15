@@ -18,6 +18,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -27,8 +28,8 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.session.InvalidSessionException;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
-import org.jboss.resteasy.util.HttpHeaderNames;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
@@ -91,13 +92,21 @@ public class AuthenticationResource extends AbstractSecurityComponent {
   public Response deleteCurrentSession() {
     // Delete the Shiro session
     try {
+      Session session = SecurityUtils.getSubject().getSession();
+      Object cookieValue = session.getAttribute(HttpHeaders.SET_COOKIE);
       SecurityUtils.getSubject().logout();
-      return Response.ok().header(HttpHeaderNames.SET_COOKIE,
-          new NewCookie(OBIBA_ID_COOKIE_NAME, null, "/", null, "Obiba session deleted", 0, false)).build();
+
+      if(cookieValue != null) {
+        NewCookie cookie = NewCookie.valueOf(cookieValue.toString());
+        if (OBIBA_ID_COOKIE_NAME.equals(cookie.getName())) {
+          return Response.ok().header(HttpHeaders.SET_COOKIE,
+              new NewCookie(OBIBA_ID_COOKIE_NAME, null, "/", cookie.getDomain(), "Obiba session deleted", 0, cookie.isSecure())).build();
+        }
+      }
     } catch(InvalidSessionException e) {
       // Ignore
-      return Response.ok().build();
     }
+    return Response.ok().build();
   }
 
   @GET
