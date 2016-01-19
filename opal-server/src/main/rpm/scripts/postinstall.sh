@@ -23,11 +23,6 @@ NAME=opal
 case "$1" in
   1)
 
-    # Create opal user if it doesn't exist.
-    if ! id opal > /dev/null 2>&1 ; then
-      adduser --system --home /var/lib/opal --no-create-home --disabled-password opal
-    fi
-
     # Opal file structure on Debian
     # /etc/opal: configuration
     # /usr/share/opal: executable
