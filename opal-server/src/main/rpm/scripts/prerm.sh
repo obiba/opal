@@ -18,38 +18,39 @@ set -e
 
 NAME=opal
 
-case "$1" in
+stopOpalServer() {
+  if which service >/dev/null 2>&1; then
+    service opal stop
+  elif which invoke-rc.d >/dev/null 2>&1; then
+    invoke-rc.d opal stop
+  else
+    /etc/init.d/opal stop
+  fi
+}
 
-  0)
+migrationCheck() {
+  EXPORT_FILE=$OPAL_HOME/data/orientdb/opal-config.export
+  echo "prerm migration check ..."
+  JAR_CMD="java -jar /usr/share/opal-*/tools/lib/opal-config-migrator-*-cli.jar"
+  $JAR_CMD --check $OPAL_HOME/data/orientdb/opal-config && \
+  { $JAR_CMD $OPAL_HOME/data/orientdb/opal-config $EXPORT_FILE  && \
+  echo "prerm legacy export completed ..." && \
+  mv $OPAL_HOME/data/orientdb/opal-config $OPAL_HOME/data/orientdb/opal-config.bak || exit 1; }
+}
+
+if [ "$1" -eq 0 ] || [ "$1" -ge 2 ]; then
+  stopOpalServer
+
+  if [ "$1" -ge 2 ]; then
+    # upgrading
+    migrationCheck
+  fi
+
+  if [ "$1" -eq 0 ]; then
+    # removing
     chkconfig --del opal
+  fi
 
-    # Read configuration variable file if it is present
-    [ -r /etc/default/$NAME ] && . /etc/default/$NAME
-
-    if which service >/dev/null 2>&1; then
-            service opal stop
-    elif which invoke-rc.d >/dev/null 2>&1; then
-            invoke-rc.d opal stop
-    else
-            /etc/init.d/opal stop
-    fi
-
-    # TODO once purge/upgade is implemented uncomment the following
-
-#    EXPORT_FILE=$OPAL_HOME/data/orientdb/opal-config.export
-#    echo "prerm migration check ..."
-#    JAR_CMD="java -jar /usr/share/opal-*/tools/lib/opal-config-migrator-*-cli.jar"
-#    $JAR_CMD --check $OPAL_HOME/data/orientdb/opal-config && \
-#    { $JAR_CMD $OPAL_HOME/data/orientdb/opal-config $EXPORT_FILE  && \
-#    echo "prerm legacy export completed ..." && \
-#    mv $OPAL_HOME/data/orientdb/opal-config $OPAL_HOME/data/orientdb/opal-config.bak || exit 1; }
-  ;;
-
-  *)
-    echo "prerm called with unknown argument \`$1'" >&2
-    exit 1
-  ;;
-esac
-
+fi
 
 exit 0

@@ -23,11 +23,6 @@ case "$1" in
     userdel -f opal || true
     rm -rf /var/lib/opal /var/log/opal /tmp/opal /etc/opal /usr/share/opal
   ;;
-
-  *)
-    echo "postrm called with unknown argument \`$1'" >&2
-    exit 1
-  ;;
 esac
 
 exit 0
