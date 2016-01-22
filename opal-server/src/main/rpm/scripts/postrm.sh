@@ -17,11 +17,10 @@ set -e
 # for details, see http://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
-
 case "$1" in
 	0)
     userdel -f opal || true
-    rm -rf /var/lib/opal /var/log/opal /tmp/opal /etc/opal /usr/share/opal
+    rm -rf /run/opal /var/log/opal /tmp/opal
   ;;
 esac
 

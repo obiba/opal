@@ -28,10 +28,13 @@ stopOpalServer() {
   fi
 }
 
-migrationCheck() {
+backupOrientDb() {
+  # Read configuration variable file if it is present
+  [ -r /etc/default/$NAME ] && . /etc/default/$NAME
+
   EXPORT_FILE=$OPAL_HOME/data/orientdb/opal-config.export
   echo "prerm migration check ..."
-  JAR_CMD="java -jar /usr/share/opal-*/tools/lib/opal-config-migrator-*-cli.jar"
+  JAR_CMD="java -jar /usr/share/opal/tools/lib/opal-config-migrator-*-cli.jar"
   $JAR_CMD --check $OPAL_HOME/data/orientdb/opal-config && \
   { $JAR_CMD $OPAL_HOME/data/orientdb/opal-config $EXPORT_FILE  && \
   echo "prerm legacy export completed ..." && \
@@ -43,7 +46,7 @@ if [ "$1" -eq 0 ] || [ "$1" -ge 2 ]; then
 
   if [ "$1" -ge 2 ]; then
     # upgrading
-    migrationCheck
+    backupOrientDb
   fi
 
   if [ "$1" -eq 0 ]; then
