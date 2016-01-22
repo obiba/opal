@@ -4,6 +4,8 @@
 
 set -e
 
+NAME=opal
+
 # summary of how this script can be called:
 #        * <postinst> `configure' <most-recently-configured-version>
 #        * <old-postinst> `abort-upgrade' <new version>
@@ -16,11 +18,10 @@ set -e
 # for details, see http://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
-NAME=opal
-
-[ -r /etc/default/$NAME ] && . /etc/default/$NAME
-
 installOrUpdate() {
+
+  [ -r /etc/default/$NAME ] && . /etc/default/$NAME
+
   # Opal file structure on Debian
   # /etc/opal: configuration
   # /usr/share/opal: executable
@@ -28,7 +29,8 @@ installOrUpdate() {
   # /var/log: logs
 
   rm -f /usr/share/opal
-  ln -s /usr/share/opal-* /usr/share/opal
+  new_release="$(ls -t /usr/share/ |grep opal-server|head -1)"
+  ln -s /usr/share/${new_release} /usr/share/opal
 
   if [ ! -e /var/lib/opal/conf ] ; then
     ln -s /etc/opal /var/lib/opal/conf
@@ -36,7 +38,7 @@ installOrUpdate() {
 
   EXPORT_FILE=$OPAL_HOME/data/orientdb/opal-config.export
 
-  JAR_CMD="java -jar /usr/share/opal-*/tools/lib/opal-config-migrator-*-cli.jar"
+  JAR_CMD="java -jar /usr/share/opal/tools/lib/opal-config-migrator-*-cli.jar"
 
   [ -r $OPAL_HOME/data/orientdb/opal-config ] && $JAR_CMD --check $OPAL_HOME/data/orientdb/opal-config && \
       { $JAR_CMD $OPAL_HOME/data/orientdb/opal-config $EXPORT_FILE  && \

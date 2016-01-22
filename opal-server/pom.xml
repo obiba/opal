@@ -12,7 +12,7 @@
 
   <properties>
     <install.dir>/usr/share</install.dir>
-    <opal.dir>${install.dir}/opal-server</opal.dir>
+    <opal.dir>${install.dir}/opal-server-${project.version}</opal.dir>
     <package.name>opal-server-${project.version}</package.name>
     <dist.location>${basedir}/target/${package.name}-dist/${package.name}</dist.location>
   </properties>
