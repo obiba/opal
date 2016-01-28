@@ -23,6 +23,7 @@ import org.obiba.opal.r.service.OpalRService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +44,7 @@ public class OpalRResource {
   private OpalRService opalRService;
 
   @Autowired
-  private OpalRSessionsResource opalRSessionsResource;
+  private ApplicationContext applicationContext;
 
   @POST
   @Path("/execute")
@@ -68,7 +69,9 @@ public class OpalRResource {
 
   @Path("/sessions")
   public OpalRSessionsResource getSessionsResource() {
-    return opalRSessionsResource;
+    OpalRSessionsResource resource = applicationContext
+        .getBean("opalRSessionsResource", OpalRSessionsResource.class);
+    return resource;
   }
 
 }

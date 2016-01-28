@@ -17,14 +17,10 @@ import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.DeprecatedOperationException;
 import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier.ExtensionConfigModificationTask;
-import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration.Environment;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
-import org.obiba.opal.r.RScriptROperation;
-import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
-import org.obiba.opal.web.datashield.support.DataShieldROptionsScriptBuilder;
 import org.obiba.opal.web.model.DataShield.DataShieldConfigDto;
 import org.obiba.opal.web.r.OpalRSessionsResource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,14 +40,13 @@ public class DataShieldResource {
   private OpalRSessionManager opalRSessionManager;
 
   @Autowired
-  private OpalRSessionsResource opalRSessionsResource;
-
-  @Autowired
   private ApplicationContext applicationContext;
 
   @Path("/sessions")
   public OpalRSessionsResource getSessions() {
-    return opalRSessionsResource;
+    OpalRSessionsResource resource = applicationContext
+        .getBean("opalDatashieldSessionsResource", OpalRSessionsResource.class);
+    return resource;
   }
 
   @Path("/session/{id}")
@@ -95,13 +90,6 @@ public class DataShieldResource {
     return getConfig();
   }
 
-  protected void onNewDataShieldSession(OpalRSession session) {
-    DatashieldConfiguration config = configurationSupplier.get();
-    if (config.hasOptions()) {
-      session.execute(
-          new RScriptROperation(DataShieldROptionsScriptBuilder.newBuilder().setROptions(config.getOptions()).build()));
-    }
-    DataShieldLog.userLog("created a datashield session {}", session.getId());
-  }
+
 
 }
