@@ -20,6 +20,8 @@ import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.model.OpalR;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +30,8 @@ import com.google.common.collect.Lists;
 /**
  * Handles the list and the creation of the R sessions of the invoking Opal user.
  */
-@Component
+@Component("opalRSessionsResource")
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Transactional
 public class OpalRSessionsResourceImpl implements OpalRSessionsResource {
 
@@ -58,9 +61,14 @@ public class OpalRSessionsResourceImpl implements OpalRSessionsResource {
   @Override
   public Response newRSession(UriInfo info) {
     OpalRSession rSession = opalRSessionManager.newSubjectRSession();
+    onNewRSession(rSession);
     URI location = getLocation(info, rSession.getId());
     return Response.created(location).entity(Dtos.asDto(rSession))
         .build();
+  }
+
+  protected void onNewRSession(OpalRSession rSession) {
+    // nothing
   }
 
   URI getLocation(UriInfo info, String id) {
