@@ -39,6 +39,8 @@ public class TaxonomyEntity implements Serializable {
 
   private Map<String, String> keywords = new HashMap<>();
 
+  private Map<String, String> attributes = new HashMap<>();
+
   public Map<String, String> getTitle() {
     return title;
   }
@@ -71,7 +73,7 @@ public class TaxonomyEntity implements Serializable {
     this.keywords = keywords;
   }
 
-  public TaxonomyEntity addKeywords(Locale locale, String value) {
+  public TaxonomyEntity addKeyword(Locale locale, String value) {
     if(keywords == null) keywords = new HashMap<>();
     keywords.put(locale.toLanguageTag(), value);
     return this;
@@ -80,4 +82,29 @@ public class TaxonomyEntity implements Serializable {
   public Map<String, String> getKeywords() {
     return keywords;
   }
+
+  public void setAttributes(Map<String, String> attributes) {
+    this.attributes = attributes;
+  }
+
+  public TaxonomyEntity addAttribute(String key, String value) {
+    if(attributes == null) attributes = new HashMap<>();
+    keywords.put(key, value);
+    return this;
+  }
+
+  public Map<String, String> getAttributes() {
+    return attributes;
+  }
+
+  /**
+   * Get the attribute value if exists.
+   *
+   * @return null if there is no such attribute key entry.
+   */
+  public String getAttributeValue(String key) {
+    if (attributes == null || attributes.isEmpty()) return null;
+    return attributes.get(key);
+  }
+
 }
