@@ -326,7 +326,7 @@ message TermDto {
   repeated LocaleTextDto description = 3;
   repeated TermDto terms = 4;
   repeated LocaleTextDto keywords = 5;
-  repeated LocaleTextDto attributes = 6;
+  repeated EntryDto attributes = 6;
 }
 
 message VocabularyDto {
@@ -336,7 +336,7 @@ message VocabularyDto {
   required bool repeatable = 4 [default = false]; // allows the corresponding attribute name to be applied multiple times
   repeated TermDto terms = 5;
   repeated LocaleTextDto keywords = 6;
-  repeated LocaleTextDto attributes = 7;
+  repeated EntryDto attributes = 7;
 }
 
 message TaxonomiesDto {
@@ -362,7 +362,7 @@ message TaxonomyDto {
   repeated LocaleTextDto description = 5;
   repeated VocabularyDto vocabularies = 6;
   repeated LocaleTextDto keywords = 7;
-  repeated LocaleTextDto attributes = 8;
+  repeated EntryDto attributes = 8;
 }
 
 message OpalConf {
