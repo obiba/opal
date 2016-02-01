@@ -89,7 +89,7 @@ public class TaxonomyEntity implements Serializable {
 
   public TaxonomyEntity addAttribute(String key, String value) {
     if(attributes == null) attributes = new HashMap<>();
-    keywords.put(key, value);
+    attributes.put(key, value);
     return this;
   }
 
