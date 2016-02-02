@@ -365,6 +365,11 @@ message TaxonomyDto {
   repeated EntryDto attributes = 8;
 }
 
+message TaxonomyBundleDto {
+  required string target = 1;
+  required TaxonomyDto taxonomy = 2;
+}
+
 message OpalConf {
   required GeneralConf general = 1;
   repeated TaxonomyDto taxonomies = 2;
