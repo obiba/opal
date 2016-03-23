@@ -42,7 +42,7 @@ public class HibernateDatasourceFactoryDtoParser extends AbstractDatasourceFacto
   @NotNull
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto, DatasourceEncryptionStrategy encryptionStrategy) {
-    DatabaseSessionFactoryProvider sessionFactoryProvider = null;
+    DatabaseSessionFactoryProvider sessionFactoryProvider;
     HibernateDatasourceFactoryDto factoryDto = dto.getExtension(HibernateDatasourceFactoryDto.params);
     if(factoryDto.getKey()) {
       sessionFactoryProvider = new DatabaseSessionFactoryProvider(identifiersTableService.getDatasourceName(),

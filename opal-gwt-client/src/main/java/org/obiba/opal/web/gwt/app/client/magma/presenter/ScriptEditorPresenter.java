@@ -143,7 +143,7 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
     public VariableDto create() {
       String selectedScript = getView().getSelectedScript();
       VariableDto derived = VariableDto.create();
-      String script = null;
+      String script;
 
       if(Strings.isNullOrEmpty(selectedScript)) {
         derived.setValueType(getValueEntityType().getLabel());

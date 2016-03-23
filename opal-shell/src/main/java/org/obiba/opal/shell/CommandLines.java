@@ -48,7 +48,7 @@ public class CommandLines {
     String deliminator = WHITESPACE_AND_QUOTE;
     StringTokenizer parser = new StringTokenizer(commandLine, deliminator, true);
 
-    String token = null;
+    String token;
     while(parser.hasMoreTokens()) {
       token = parser.nextToken(deliminator);
       if(token.equals(QUOTE_ONLY)) {

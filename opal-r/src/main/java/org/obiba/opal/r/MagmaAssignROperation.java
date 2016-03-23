@@ -286,7 +286,7 @@ public class MagmaAssignROperation extends AbstractROperation {
     }
 
     protected Iterable<Variable> filterVariables() {
-      List<Variable> filteredVariables = null;
+      List<Variable> filteredVariables;
 
       if(Strings.isNullOrEmpty(variableFilter)) {
         filteredVariables = Lists.newArrayList(table.getVariables());

@@ -55,7 +55,7 @@ public abstract class AttributeColumn<T> extends Column<T, String> {
 
   private String getLabels(T object) {
     JsArray<AttributeDto> attributes = JsArrays.toSafeArray(getAttributes(object));
-    AttributeDto attribute = null;
+    AttributeDto attribute;
     StringBuilder labels = new StringBuilder();
 
     for(int i = 0; i < attributes.length(); i++) {
