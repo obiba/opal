@@ -241,7 +241,7 @@ public class MagmaAssignROperation extends AbstractROperation {
 
     private void doAssignDataFrame(String... names) {
       // create the data.frame from the vectors
-      StringBuffer args = new StringBuffer();
+      StringBuilder args = new StringBuilder();
       for(String name : names) {
         if(args.length() > 0) args.append(", ");
         args.append("'").append(name).append("'=").append(getTmpVectorName(symbol, name));

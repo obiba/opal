@@ -176,7 +176,7 @@ public class RReportServiceImpl implements ReportService {
    * @throws IOException
    */
   private void writeFileToR(OpalRSession rSession, File file) throws IOException {
-    StringBuffer script = new StringBuffer("writeLines(");
+    StringBuilder script = new StringBuilder("writeLines(");
     String content = readFileInString(file.getAbsolutePath());
     script.append("'").append(content.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n")).append("', '")
         .append(file.getName()).append("')");
