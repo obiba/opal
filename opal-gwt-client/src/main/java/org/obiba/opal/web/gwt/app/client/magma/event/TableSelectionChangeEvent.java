@@ -25,7 +25,7 @@ public class TableSelectionChangeEvent extends GwtEvent<TableSelectionChangeEven
 
   }
 
-  private static final Type<Handler> TYPE = new Type<Handler>();
+  private static final Type<Handler> TYPE = new Type<>();
 
   private final String datasourceName;
 

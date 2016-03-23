@@ -94,7 +94,7 @@ public class TableComparePanel extends FlowPanel {
 
     addTab(variableChangesPanel, translations.conflictedVariablesLabel(), variableConflictsDetails);
 
-    JsArrayDataProvider<ConflictDto> dataProvider = new JsArrayDataProvider<ConflictDto>();
+    JsArrayDataProvider<ConflictDto> dataProvider = new JsArrayDataProvider<>();
     dataProvider.addDataDisplay(variableConflictsDetails);
     dataProvider.setArray(conflicts);
   }
@@ -106,7 +106,7 @@ public class TableComparePanel extends FlowPanel {
 
     addTab(variableChangesPanel, tabTitle, variablesDetails);
 
-    JsArrayDataProvider<VariableDto> dataProvider = new JsArrayDataProvider<VariableDto>();
+    JsArrayDataProvider<VariableDto> dataProvider = new JsArrayDataProvider<>();
     dataProvider.addDataDisplay(variablesDetails);
     dataProvider.setArray(variables);
   }

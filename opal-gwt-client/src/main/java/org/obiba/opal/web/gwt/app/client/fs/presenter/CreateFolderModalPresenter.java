@@ -105,7 +105,7 @@ public class CreateFolderModalPresenter extends ModalPresenterWidget<CreateFolde
     @Override
     protected Set<FieldValidator> getValidators() {
       if(validators == null) {
-        validators = new LinkedHashSet<FieldValidator>();
+        validators = new LinkedHashSet<>();
         validators.add(new RequiredTextValidator(getView().getFolderName(), "FolderNameIsRequired",
             Display.FormField.NAME.name()));
         validators

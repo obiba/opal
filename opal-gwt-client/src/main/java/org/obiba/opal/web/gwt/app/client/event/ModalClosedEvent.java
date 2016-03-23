@@ -9,7 +9,7 @@ public class ModalClosedEvent extends GwtEvent<ModalClosedEvent.Handler> {
     void onModalClosed(ModalClosedEvent event);
   }
 
-  private static final Type<Handler> TYPE = new Type<Handler>();
+  private static final Type<Handler> TYPE = new Type<>();
 
   private final Object source;
 

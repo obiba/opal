@@ -40,8 +40,8 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
 
   @Override
   protected void initializeValueMapEntries() {
-    valueMapEntries = new ArrayList<ValueMapEntry>();
-    entryRangeMap = new HashMap<ValueMapEntry, Range<N>>();
+    valueMapEntries = new ArrayList<>();
+    entryRangeMap = new HashMap<>();
 
     addMissingCategoriesMapping();
 
@@ -157,7 +157,7 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
 
   @Override
   protected DerivedVariableGenerator getDerivedVariableGenerator() {
-    return new DerivedNumericalVariableGenerator<N>(originalVariable, valueMapEntries, entryRangeMap);
+    return new DerivedNumericalVariableGenerator<>(originalVariable, valueMapEntries, entryRangeMap);
   }
 
   public static <N extends Number & Comparable<N>> Range<N> buildRange(@Nullable N lower, @Nullable N upper) {

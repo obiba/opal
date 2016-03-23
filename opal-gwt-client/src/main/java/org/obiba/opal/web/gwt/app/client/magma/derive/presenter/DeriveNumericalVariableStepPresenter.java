@@ -367,7 +367,7 @@ public class DeriveNumericalVariableStepPresenter
       @Override
       public NumericalVariableDerivationHelper<?> newDerivationHelper(VariableDto originalVariable,
           VariableDto destinationVariable) {
-        return new NumericalVariableDerivationHelper<Long>(originalVariable, destinationVariable);
+        return new NumericalVariableDerivationHelper<>(originalVariable, destinationVariable);
       }
 
       @SuppressWarnings("unchecked")
@@ -404,7 +404,7 @@ public class DeriveNumericalVariableStepPresenter
       @Override
       public NumericalVariableDerivationHelper<? extends Number> newDerivationHelper(VariableDto originalVariable,
           VariableDto destinationVariable) {
-        return new NumericalVariableDerivationHelper<Double>(originalVariable, destinationVariable);
+        return new NumericalVariableDerivationHelper<>(originalVariable, destinationVariable);
       }
 
       @SuppressWarnings("unchecked")

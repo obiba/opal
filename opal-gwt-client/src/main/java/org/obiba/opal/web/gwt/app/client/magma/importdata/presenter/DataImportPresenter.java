@@ -419,7 +419,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
     private Iterable<Map.Entry<HasType<ControlGroupType>, String>> getErrorEntries() {
       Set<Map.Entry<HasType<ControlGroupType>, String>> entries
-          = new HashSet<Map.Entry<HasType<ControlGroupType>, String>>();
+          = new HashSet<>();
 
       switch(getView().getImportFormat()) {
         case CSV:

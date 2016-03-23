@@ -20,7 +20,7 @@ public class DatasourcesRefreshEvent extends GwtEvent<DatasourcesRefreshEvent.Ha
 
   }
 
-  private static final Type<Handler> TYPE = new Type<Handler>();
+  private static final Type<Handler> TYPE = new Type<>();
 
   public DatasourcesRefreshEvent() {
   }

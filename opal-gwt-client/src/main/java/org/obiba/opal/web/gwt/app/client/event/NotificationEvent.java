@@ -34,7 +34,7 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
 
   }
 
-  private static final Type<Handler> TYPE = new Type<Handler>();
+  private static final Type<Handler> TYPE = new Type<>();
 
   private NotificationType notificationType;
 
@@ -62,7 +62,7 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
 
     this.notificationType = notificationType;
     this.messages = messages;
-    this.messageArgs = messageArgs != null ? new ArrayList<String>(messageArgs) : new ArrayList<String>();
+    this.messageArgs = messageArgs != null ? new ArrayList<>(messageArgs) : new ArrayList<String>();
     this.notificationCloseHandler = notificationCloseHandler;
   }
 
@@ -135,12 +135,12 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
   }
 
   public List<String> getMessages() {
-    return messages == null ? (messages = new ArrayList<String>()) : messages;
+    return messages == null ? (messages = new ArrayList<>()) : messages;
   }
 
   public List<String> getMessageArgs() {
     if(messageArgs == null) {
-      messageArgs = new ArrayList<String>();
+      messageArgs = new ArrayList<>();
     }
     return Collections.unmodifiableList(messageArgs);
   }

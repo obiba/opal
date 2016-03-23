@@ -148,7 +148,7 @@ public class ContingencyTablePresenter extends PresenterWidget<ContingencyTableP
   }
 
   private List<String> getCategories(VariableDto variable) {
-    List<String> categories = new ArrayList<String>();
+    List<String> categories = new ArrayList<>();
 
     if("boolean".equals(variable.getValueType())) {
       categories.add("true");

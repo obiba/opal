@@ -113,9 +113,9 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
   @UiField
   OpalSimplePager commitInfoTablePager;
 
-  private final ListDataProvider<VcsCommitInfoDto> commitInfoDataProvider = new ListDataProvider<VcsCommitInfoDto>();
+  private final ListDataProvider<VcsCommitInfoDto> commitInfoDataProvider = new ListDataProvider<>();
 
-  private final ListDataProvider<VocabularyDto> dataProvider = new ListDataProvider<VocabularyDto>();
+  private final ListDataProvider<VocabularyDto> dataProvider = new ListDataProvider<>();
 
   @Inject
   public TaxonomyView(Binder uiBinder, TranslationMessages translationMessages) {
@@ -293,23 +293,23 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
       }
     };
 
-    static final ActionsColumn<VcsCommitInfoDto> ACTIONS = new ActionsColumn<VcsCommitInfoDto>(
-        new ActionsProvider<VcsCommitInfoDto>() {
+    static final ActionsColumn<VcsCommitInfoDto> ACTIONS = new ActionsColumn<>(
+            new ActionsProvider<VcsCommitInfoDto>() {
 
-          @Override
-          public String[] allActions() {
-            return new String[] { DIFF_ACTION, DIFF_CURRENT_ACTION, RESTORE_ACTION };
-          }
+              @Override
+              public String[] allActions() {
+                return new String[]{DIFF_ACTION, DIFF_CURRENT_ACTION, RESTORE_ACTION};
+              }
 
-          @Override
-          public String[] getActions(VcsCommitInfoDto value) {
-            return value.getIsCurrent() ? getHeadOnlyActions() : allActions();
-          }
+              @Override
+              public String[] getActions(VcsCommitInfoDto value) {
+                return value.getIsCurrent() ? getHeadOnlyActions() : allActions();
+              }
 
-          private String[] getHeadOnlyActions() {
-            return new String[] { DIFF_ACTION };
-          }
-        });
+              private String[] getHeadOnlyActions() {
+                return new String[]{DIFF_ACTION};
+              }
+            });
 
   }
 

@@ -142,7 +142,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
   @Override
   public void onExportData() {
     DataExportPresenter export = dataExportModalProvider.get();
-    Set<TableDto> exportTables = new HashSet<TableDto>();
+    Set<TableDto> exportTables = new HashSet<>();
 
     export.setDatasourceName(datasourceName);
 

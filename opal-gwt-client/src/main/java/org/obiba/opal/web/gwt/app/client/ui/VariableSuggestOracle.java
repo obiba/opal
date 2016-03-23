@@ -183,14 +183,14 @@ public class VariableSuggestOracle extends SuggestOracle {
             if(response.getStatusCode() == com.google.gwt.http.client.Response.SC_OK) {
               QueryResultDto resultDto = JsonUtils.unsafeEval(response.getText());
 
-              suggestions = new ArrayList<VariableSuggestion>();
+              suggestions = new ArrayList<>();
               if(resultDto.getHitsArray() != null && resultDto.getHitsArray().length() > 0) {
                 for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
                   ItemFieldsDto itemDto = (ItemFieldsDto) resultDto.getHitsArray().get(i)
                       .getExtension("Search.ItemFieldsDto.item");
 
                   JsArray<EntryDto> fields = itemDto.getFieldsArray();
-                  Map<String, String> attributes = new HashMap<String, String>();
+                  Map<String, String> attributes = new HashMap<>();
                   for(int j = 0; j < fields.length(); j++) {
                     if("label-en".equals(fields.get(j).getKey()) ||
                         "label".equals(fields.get(j).getKey()) && !attributes.containsKey("label")) {

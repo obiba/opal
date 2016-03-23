@@ -21,7 +21,7 @@ import com.google.gwt.event.shared.GwtEvent;
  */
 public class RequestCredentialsExpiredEvent extends GwtEvent<RequestCredentialsExpiredEvent.Handler> {
 
-  private static final Type<Handler> TYPE = new Type<Handler>();
+  private static final Type<Handler> TYPE = new Type<>();
 
   public interface Handler extends EventHandler {
     void onCredentialsExpired(RequestCredentialsExpiredEvent e);

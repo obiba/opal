@@ -76,13 +76,13 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     this.display = display;
     singleSelectionModel = single;
 
-    selectionModel = single ? new SingleSelectionModel<T>(new ProvidesKey<T>() {
+    selectionModel = single ? new SingleSelectionModel<>(new ProvidesKey<T>() {
 
       @Override
       public Object getKey(T item) {
         return display.getItemKey(item);
       }
-    }) : new MultiSelectionModel<T>(new ProvidesKey<T>() {
+    }) : new MultiSelectionModel<>(new ProvidesKey<T>() {
 
       @Override
       public Object getKey(T item) {
@@ -171,7 +171,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
    * @return List of items in the same order as they appear on screen
    */
   public List<T> getSelectedItems() {
-    List<T> list = new LinkedList<T>();
+    List<T> list = new LinkedList<>();
     for(T tc : display.getDataProvider().getList()) {
       if(selectionModel.isSelected(tc)) {
         list.add(tc);

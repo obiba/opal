@@ -43,7 +43,7 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
   private final Translations translations;
 
   @ContentSlot
-  public static final GwtEvent.Type<RevealContentHandler<?>> BOOKMARKS = new GwtEvent.Type<RevealContentHandler<?>>();
+  public static final GwtEvent.Type<RevealContentHandler<?>> BOOKMARKS = new GwtEvent.Type<>();
 
   @Inject
   public DashboardPresenter(Display display, EventBus eventBus, Proxy proxy, Translations translations,

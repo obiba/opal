@@ -22,7 +22,7 @@ public class FileSelectionEvent extends GwtEvent<FileSelectionEvent.Handler> {
   // Static Variables
   //
 
-  private static final Type<Handler> TYPE = new Type<Handler>();
+  private static final Type<Handler> TYPE = new Type<>();
 
   //
   // Instance Variables

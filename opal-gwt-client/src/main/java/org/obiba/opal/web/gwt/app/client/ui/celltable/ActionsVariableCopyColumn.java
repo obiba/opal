@@ -11,7 +11,7 @@ public class ActionsVariableCopyColumn<T> extends Column<T, T> implements HasAct
   }
 
   public ActionsVariableCopyColumn(ActionsProvider<T> actionsProvider) {
-    super(new ActionsCell<T>(actionsProvider));
+    super(new ActionsCell<>(actionsProvider));
     setCellStyleNames("row-actions");
   }
 

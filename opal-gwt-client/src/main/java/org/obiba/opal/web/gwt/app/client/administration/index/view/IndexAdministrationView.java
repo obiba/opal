@@ -121,7 +121,7 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
   private final PlaceManager placeManager;
 
-  private final ListDataProvider<TableIndexStatusDto> dataProvider = new ListDataProvider<TableIndexStatusDto>();
+  private final ListDataProvider<TableIndexStatusDto> dataProvider = new ListDataProvider<>();
 
   private final CheckboxColumn<TableIndexStatusDto> checkboxColumn;
 
@@ -137,22 +137,22 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
     indexTablePager.setDisplay(indexTable);
 
-    checkboxColumn = new CheckboxColumn<TableIndexStatusDto>(new TableIndexStatusDtoDisplay());
-    ActionsIndexColumn<TableIndexStatusDto> actionsColumn = new ActionsIndexColumn<TableIndexStatusDto>(
-        new ActionsProvider<TableIndexStatusDto>() {
+    checkboxColumn = new CheckboxColumn<>(new TableIndexStatusDtoDisplay());
+    ActionsIndexColumn<TableIndexStatusDto> actionsColumn = new ActionsIndexColumn<>(
+            new ActionsProvider<TableIndexStatusDto>() {
 
-          private final String[] all = new String[] { REMOVE_ACTION, INDEX_ACTION };
+              private final String[] all = new String[]{REMOVE_ACTION, INDEX_ACTION};
 
-          @Override
-          public String[] allActions() {
-            return all;
-          }
+              @Override
+              public String[] allActions() {
+                return all;
+              }
 
-          @Override
-          public String[] getActions(TableIndexStatusDto value) {
-            return allActions();
-          }
-        }
+              @Override
+              public String[] getActions(TableIndexStatusDto value) {
+                return allActions();
+              }
+            }
     );
 
     indexTable.addColumn(checkboxColumn, checkboxColumn.getCheckColumnHeader());

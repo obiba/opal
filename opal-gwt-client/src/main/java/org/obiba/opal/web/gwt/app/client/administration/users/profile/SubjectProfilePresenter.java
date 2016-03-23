@@ -34,7 +34,7 @@ public class SubjectProfilePresenter extends Presenter<SubjectProfilePresenter.D
   public interface Proxy extends ProxyPlace<SubjectProfilePresenter> {}
 
   @ContentSlot
-  public static final GwtEvent.Type<RevealContentHandler<?>> BOOKMARKS = new GwtEvent.Type<RevealContentHandler<?>>();
+  public static final GwtEvent.Type<RevealContentHandler<?>> BOOKMARKS = new GwtEvent.Type<>();
 
   private SubjectProfileDto profile;
 

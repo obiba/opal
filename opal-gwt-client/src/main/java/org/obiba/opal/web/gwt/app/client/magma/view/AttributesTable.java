@@ -91,7 +91,7 @@ public class AttributesTable extends Table<AttributeDto> {
   }
 
   public void initProvider(JsArray<AttributeDto> attributes) {
-    JsArrayDataProvider<AttributeDto> provider = new JsArrayDataProvider<AttributeDto>();
+    JsArrayDataProvider<AttributeDto> provider = new JsArrayDataProvider<>();
     provider.setArray(JsArrays.toSafeArray(attributes));
     provider.addDataDisplay(this);
     setupSort(provider);

@@ -63,7 +63,7 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
 
   @Override
   protected void initializeValueMapEntries() {
-    valueMapEntries = new ArrayList<ValueMapEntry>();
+    valueMapEntries = new ArrayList<>();
     if(groupMethod == null) return;
 
     groupMethod.initializeValueMapEntries(getValueMapEntries(), fromDate, toDate);

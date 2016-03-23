@@ -20,7 +20,7 @@ public class ViewCreationRequiredEvent extends GwtEvent<ViewCreationRequiredEven
   // Static Variables
   //
 
-  private static final Type<Handler> TYPE = new Type<Handler>();
+  private static final Type<Handler> TYPE = new Type<>();
 
   //
   // Instance Variables

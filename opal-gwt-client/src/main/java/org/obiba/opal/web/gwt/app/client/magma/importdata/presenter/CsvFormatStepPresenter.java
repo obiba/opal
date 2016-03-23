@@ -58,7 +58,7 @@ import static org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig.Im
 public class CsvFormatStepPresenter extends PresenterWidget<CsvFormatStepPresenter.Display>
     implements DataImportPresenter.DataConfigFormatStepPresenter, CsvFormatStepUiHandlers {
 
-  private final Collection<String> availableCharsets = new ArrayList<String>();
+  private final Collection<String> availableCharsets = new ArrayList<>();
 
   private final FileSelectionPresenter csvFileSelectionPresenter;
 
@@ -226,9 +226,9 @@ public class CsvFormatStepPresenter extends PresenterWidget<CsvFormatStepPresent
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      errors = new HashMap<HasType<ControlGroupType>, String>();
+      errors = new HashMap<>();
 
-      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+      Set<FieldValidator> validators = new LinkedHashSet<>();
 
       addTableValidators(validators);
       addEntityTypeValidator(validators);

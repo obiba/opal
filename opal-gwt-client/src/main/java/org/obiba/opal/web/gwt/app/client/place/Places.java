@@ -67,7 +67,7 @@ public final class Places {
 
     private final String place;
 
-    private final Map<String, String> params = new HashMap<String, String>();
+    private final Map<String, String> params = new HashMap<>();
 
     public Place(String name) {
       place = name;

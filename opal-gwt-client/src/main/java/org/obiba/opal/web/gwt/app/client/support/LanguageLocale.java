@@ -84,7 +84,7 @@ public enum LanguageLocale {
   // Private Members
   //
 
-  private final static Collection<String> localeNames = new ArrayList<String>();
+  private final static Collection<String> localeNames = new ArrayList<>();
 
   static {
     for(LanguageLocale locale : LanguageLocale.values()) {

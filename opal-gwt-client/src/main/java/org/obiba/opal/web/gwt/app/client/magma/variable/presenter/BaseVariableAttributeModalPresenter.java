@@ -66,7 +66,7 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
 
   protected TableDto table;
 
-  protected final List<VariableDto> variables = new ArrayList<VariableDto>();
+  protected final List<VariableDto> variables = new ArrayList<>();
 
   protected List<JsArray<AttributeDto>> selectedItems;
 
@@ -125,7 +125,7 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
   }
 
   public void initialize(TableDto tableDto, VariableDto variableDto) {
-    Collection<VariableDto> variableDtos = new ArrayList<VariableDto>();
+    Collection<VariableDto> variableDtos = new ArrayList<>();
     variableDtos.add(variableDto);
 
     initialize(tableDto, variableDtos);
@@ -153,14 +153,14 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
         @Override
         public void onResource(Response response, JsArray<LocaleDto> resource) {
           List<LocaleDto> localeDtos = JsArrays.toList(resource);
-          locales = new ArrayList<String>();
+          locales = new ArrayList<>();
           for(LocaleDto localeDto : localeDtos) {
             locales.add(localeDto.getName());
           }
 
           // Add item locale if it contains more locale
           List<AttributeDto> attributes = JsArrays.toList(selectedItems.get(0));
-          Map<String, String> localeTexts = new HashMap<String, String>();
+          Map<String, String> localeTexts = new HashMap<>();
           for(AttributeDto attribute : attributes) {
             boolean found = false;
             for(String locale : locales) {
@@ -203,7 +203,7 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
   //
 
   private void renderLocalizableTexts() {
-    locales = new ArrayList<String>();
+    locales = new ArrayList<>();
 
     // Fetch locales and render categories
     ResourceRequestBuilderFactory.<JsArray<LocaleDto>>newBuilder()
@@ -423,7 +423,7 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      validators = new LinkedHashSet<FieldValidator>();
+      validators = new LinkedHashSet<>();
 
       if(dialogMode == Mode.UPDATE_MULTIPLE) {
         validators.add(new AttributeConflictValidator("AttributeConflictExists"));

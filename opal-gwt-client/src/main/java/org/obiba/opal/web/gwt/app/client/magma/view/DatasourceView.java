@@ -124,7 +124,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   @UiField
   Panel permissionsPanel;
 
-  private final ListDataProvider<TableDto> dataProvider = new ListDataProvider<TableDto>();
+  private final ListDataProvider<TableDto> dataProvider = new ListDataProvider<>();
 
   private final Translations translations;
 
@@ -230,7 +230,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   }
 
   private void initializeColumns() {
-    checkColumn = new CheckboxColumn<TableDto>(new DatasourceCheckStatusDisplay());
+    checkColumn = new CheckboxColumn<>(new DatasourceCheckStatusDisplay());
     table.addColumn(checkColumn, checkColumn.getCheckColumnHeader());
     table.setColumnWidth(checkColumn, 1, Style.Unit.PX);
     table.addColumn(new NameColumn(), translations.nameLabel());
@@ -247,7 +247,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   }
 
   private void initializeSortableColumns() {
-    typeSortHandler = new ColumnSortEvent.ListHandler<TableDto>(dataProvider.getList());
+    typeSortHandler = new ColumnSortEvent.ListHandler<>(dataProvider.getList());
     typeSortHandler.setComparator(table.getColumn(SORTABLE_COLUMN_NAME), new NameComparator());
     typeSortHandler.setComparator(table.getColumn(SORTABLE_COLUMN_VARIABLES), new VariablesComparator());
     typeSortHandler.setComparator(table.getColumn(SORTABLE_COLUMN_ENTITIES), new EntitiesComparator());

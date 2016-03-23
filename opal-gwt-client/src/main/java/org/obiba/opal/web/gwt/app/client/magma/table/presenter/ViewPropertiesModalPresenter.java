@@ -204,11 +204,11 @@ public class ViewPropertiesModalPresenter extends ModalPresenterWidget<ViewPrope
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+      Set<FieldValidator> validators = new LinkedHashSet<>();
       validators.add(new RequiredTextValidator(getView().getName(), "NameIsRequired", Display.FormField.NAME.name()));
       validators.add(
-          new MinimumSizeCollectionValidator<TableDto>(getView().getSelectedTables(), 1, "TableSelectionRequired",
-              Display.FormField.TABLES.name()));
+              new MinimumSizeCollectionValidator<>(getView().getSelectedTables(), 1, "TableSelectionRequired",
+                      Display.FormField.TABLES.name()));
       validators
           .add(new MatchingTableEntitiesValidator(getView().getSelectedTables(), Display.FormField.TABLES.name()));
       return validators;

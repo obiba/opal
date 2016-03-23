@@ -60,7 +60,7 @@ public class DataShieldPackageAdministrationView extends ViewImpl
   @UiField
   CellTable<RPackageDto> packagesTable;
 
-  private final JsArrayDataProvider<RPackageDto> packagesDataProvider = new JsArrayDataProvider<RPackageDto>();
+  private final JsArrayDataProvider<RPackageDto> packagesDataProvider = new JsArrayDataProvider<>();
 
   private ActionsPackageRColumn<RPackageDto> actionsColumn;
 
@@ -117,9 +117,9 @@ public class DataShieldPackageAdministrationView extends ViewImpl
       }
     }, translations.versionLabel());
 
-    actionsColumn = new ActionsPackageRColumn<RPackageDto>(
-        new ConstantActionsProvider<RPackageDto>(ActionsPackageRColumn.REMOVE_ACTION,
-            ActionsPackageRColumn.PUBLISH_ACTION));
+    actionsColumn = new ActionsPackageRColumn<>(
+            new ConstantActionsProvider<RPackageDto>(ActionsPackageRColumn.REMOVE_ACTION,
+                    ActionsPackageRColumn.PUBLISH_ACTION));
     packagesTable.addColumn(actionsColumn, translations.actionsLabel());
     packagesTable.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
   }

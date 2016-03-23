@@ -144,7 +144,7 @@ public class DeriveConclusionPresenter extends DerivationPresenter<DeriveConclus
     protected Set<FieldValidator> getValidators() {
 
       if(validators == null) {
-        validators = new LinkedHashSet<FieldValidator>();
+        validators = new LinkedHashSet<>();
 
         validators.add(new RequiredTextValidator(getView().getDerivedName(), "DerivedVariableNameRequired",
             FormField.NAME.name()));

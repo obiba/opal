@@ -18,7 +18,7 @@ public class ActionsIndexColumn<T> extends Column<T, T> implements HasActionHand
   }
 
   public ActionsIndexColumn(ActionsProvider<T> actionsProvider) {
-    super(new ActionsCell<T>(actionsProvider));
+    super(new ActionsCell<>(actionsProvider));
     setCellStyleNames("row-actions");
   }
 

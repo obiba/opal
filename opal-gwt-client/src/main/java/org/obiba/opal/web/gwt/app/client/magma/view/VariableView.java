@@ -125,7 +125,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   @UiField
   OpalSimplePager categoryTablePager;
 
-  JsArrayDataProvider<CategoryDto> categoryProvider = new JsArrayDataProvider<CategoryDto>();
+  JsArrayDataProvider<CategoryDto> categoryProvider = new JsArrayDataProvider<>();
 
   @UiField
   FlowPanel attributesPanel;
@@ -490,7 +490,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   private class NamespacedAttributesTableAuthorization implements HasAuthorization {
     private VariableDto variableDto;
 
-    private List<NamespacedAttributesTable> attributesTables = new ArrayList<NamespacedAttributesTable>();
+    private List<NamespacedAttributesTable> attributesTables = new ArrayList<>();
 
     private NamespacedAttributesTableAuthorization(VariableDto variableDto) {
 
@@ -507,7 +507,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
         attributesPanel.removeStyleName("xxlarge-bottom-margin");
       }
 
-      List<String> namespaces = new ArrayList<String>();
+      List<String> namespaces = new ArrayList<>();
       JsArray<AttributeDto> attributesArray = JsArrays.toSafeArray(variableDto.getAttributesArray());
       for(int i = 0; i < attributesArray.length(); i++) {
         String namespace = attributesArray.get(i).getNamespace();
@@ -532,7 +532,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
         attributesTable.getActions().setActionHandler(new ActionHandler<JsArray<AttributeDto>>() {
           @Override
           public void doAction(JsArray<AttributeDto> object, String actionName) {
-            ArrayList<JsArray<AttributeDto>> selectedItems = new ArrayList<JsArray<AttributeDto>>();
+            ArrayList<JsArray<AttributeDto>> selectedItems = new ArrayList<>();
             selectedItems.add(object);
 
             if(actionName.equalsIgnoreCase(REMOVE_ACTION)) {

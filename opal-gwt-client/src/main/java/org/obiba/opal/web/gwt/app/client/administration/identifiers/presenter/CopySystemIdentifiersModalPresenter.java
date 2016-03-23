@@ -136,7 +136,7 @@ public class CopySystemIdentifiersModalPresenter
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+      Set<FieldValidator> validators = new LinkedHashSet<>();
       validators.add(
           new RequiredTextValidator(getView().getTable(), "IdentifiersAreRequired", Display.FormField.TABLE.name()));
       return validators;

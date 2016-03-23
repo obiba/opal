@@ -172,7 +172,7 @@ public class ViewWhereModalPresenter extends ModalPresenterWidget<ViewWhereModal
     }
 
     private List<JavaScriptErrorDto> extractJavaScriptErrors(ClientErrorDto errorDto) {
-      List<JavaScriptErrorDto> javaScriptErrors = new ArrayList<JavaScriptErrorDto>();
+      List<JavaScriptErrorDto> javaScriptErrors = new ArrayList<>();
 
       JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) errorDto
           .getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);

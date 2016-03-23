@@ -68,9 +68,9 @@ public class SubjectCredentialsAdministrationView extends ViewWithUiHandlers<Sub
   private final static Translations translations = GWT.create(Translations.class);
 
   private final ListDataProvider<SubjectCredentialsDto> userDataProvider
-      = new ListDataProvider<SubjectCredentialsDto>();
+      = new ListDataProvider<>();
 
-  private final ListDataProvider<GroupDto> groupDataProvider = new ListDataProvider<GroupDto>();
+  private final ListDataProvider<GroupDto> groupDataProvider = new ListDataProvider<>();
 
   @Inject
   public SubjectCredentialsAdministrationView(Binder uiBinder) {
@@ -189,22 +189,22 @@ public class SubjectCredentialsAdministrationView extends ViewWithUiHandlers<Sub
       }
     };
 
-    static final ActionsColumn<SubjectCredentialsDto> ACTIONS = new ActionsColumn<SubjectCredentialsDto>(
-        new ActionsProvider<SubjectCredentialsDto>() {
+    static final ActionsColumn<SubjectCredentialsDto> ACTIONS = new ActionsColumn<>(
+            new ActionsProvider<SubjectCredentialsDto>() {
 
-          @Override
-          public String[] allActions() {
-            return new String[] { EDIT_ACTION, REMOVE_ACTION, ENABLE_ACTION, DISABLE_ACTION };
-          }
+              @Override
+              public String[] allActions() {
+                return new String[]{EDIT_ACTION, REMOVE_ACTION, ENABLE_ACTION, DISABLE_ACTION};
+              }
 
-          @Override
-          public String[] getActions(SubjectCredentialsDto value) {
-            if(value.getEnabled()) {
-              return new String[] { EDIT_ACTION, REMOVE_ACTION, DISABLE_ACTION };
-            }
-            return new String[] { EDIT_ACTION, REMOVE_ACTION, ENABLE_ACTION };
-          }
-        });
+              @Override
+              public String[] getActions(SubjectCredentialsDto value) {
+                if (value.getEnabled()) {
+                  return new String[]{EDIT_ACTION, REMOVE_ACTION, DISABLE_ACTION};
+                }
+                return new String[]{EDIT_ACTION, REMOVE_ACTION, ENABLE_ACTION};
+              }
+            });
 
   }
 
@@ -226,11 +226,11 @@ public class SubjectCredentialsAdministrationView extends ViewWithUiHandlers<Sub
       }
     };
 
-    static final ActionsColumn<GroupDto> ACTIONS = new ActionsColumn<GroupDto>(new ActionsProvider<GroupDto>() {
+    static final ActionsColumn<GroupDto> ACTIONS = new ActionsColumn<>(new ActionsProvider<GroupDto>() {
 
       @Override
       public String[] allActions() {
-        return new String[] { REMOVE_ACTION };
+        return new String[]{REMOVE_ACTION};
       }
 
       @Override

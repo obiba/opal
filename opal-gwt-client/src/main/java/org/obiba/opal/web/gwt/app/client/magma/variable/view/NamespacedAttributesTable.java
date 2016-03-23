@@ -89,9 +89,9 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
   @UiField
   Table<JsArray<AttributeDto>> table;
 
-  private final ListDataProvider<JsArray<AttributeDto>> provider = new ListDataProvider<JsArray<AttributeDto>>();
+  private final ListDataProvider<JsArray<AttributeDto>> provider = new ListDataProvider<>();
 
-  private final Map<String, JsArray<AttributeDto>> attributesMap = new HashMap<String, JsArray<AttributeDto>>();
+  private final Map<String, JsArray<AttributeDto>> attributesMap = new HashMap<>();
 
   public NamespacedAttributesTable(JsArray<AttributeDto> attributes, String namespace,
       TranslationMessages translationMessages) {
@@ -150,7 +150,7 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
 
   void refreshProvider() {
     JsArray<JsArray<AttributeDto>> rows = JsArrays.create().cast();
-    List<String> keys = new ArrayList<String>(attributesMap.keySet());
+    List<String> keys = new ArrayList<>(attributesMap.keySet());
 
     Collections.sort(keys);
     for(String key : keys) {
@@ -166,15 +166,15 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
 
   public void addEditableColumns() {
     // Add checkcolumn
-    checkColumn = new CheckboxColumn<JsArray<AttributeDto>>(new CheckAttributesDisplay());
+    checkColumn = new CheckboxColumn<>(new CheckAttributesDisplay());
     table.insertColumn(0, checkColumn, checkColumn.getCheckColumnHeader());
     table.setColumnWidth(checkColumn, 1, Style.Unit.PX);
 
-    actionsColumn = new ActionsColumn<JsArray<AttributeDto>>(new ActionsProvider<JsArray<AttributeDto>>() {
+    actionsColumn = new ActionsColumn<>(new ActionsProvider<JsArray<AttributeDto>>() {
 
       @Override
       public String[] allActions() {
-        return new String[] { EDIT_ACTION, REMOVE_ACTION };
+        return new String[]{EDIT_ACTION, REMOVE_ACTION};
       }
 
       @Override

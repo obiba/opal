@@ -244,7 +244,7 @@ public class IdentifiersMappingModalPresenter extends ModalPresenterWidget<Ident
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+      Set<FieldValidator> validators = new LinkedHashSet<>();
       validators
           .add(new RequiredTextValidator(getView().getVariableName(), "NameIsRequired", Display.FormField.NAME.name()));
       return validators;

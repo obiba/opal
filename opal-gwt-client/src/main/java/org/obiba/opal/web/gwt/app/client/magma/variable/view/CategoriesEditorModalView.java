@@ -77,7 +77,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
   interface Binder extends UiBinder<Widget, CategoriesEditorModalView> {}
 
-  private final ListDataProvider<CategoryDto> dataProvider = new ListDataProvider<CategoryDto>();
+  private final ListDataProvider<CategoryDto> dataProvider = new ListDataProvider<>();
 
   private CheckboxColumn<CategoryDto> checkActionCol;
 
@@ -164,7 +164,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   @UiHandler("deleteLink")
   void onDelete(ClickEvent event) {
     // Remove selected items from table
-    List<CategoryDto> categories = new ArrayList<CategoryDto>();
+    List<CategoryDto> categories = new ArrayList<>();
     for(CategoryDto categoryDto : dataProvider.getList()) {
       if(!checkActionCol.getSelectionModel().isSelected(categoryDto)) {
         categories.add(categoryDto);
@@ -189,8 +189,8 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
   @UiHandler("moveUpLink")
   void onMoveUp(ClickEvent event) {
-    List<CategoryDto> categories = new ArrayList<CategoryDto>();
-    Collection<CategoryDto> reordered = new ArrayList<CategoryDto>();
+    List<CategoryDto> categories = new ArrayList<>();
+    Collection<CategoryDto> reordered = new ArrayList<>();
 
     int i = 0;
     int pos = 0;
@@ -213,8 +213,8 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
   @UiHandler("moveDownLink")
   void onMoveDown(ClickEvent event) {
-    List<CategoryDto> categories = new ArrayList<CategoryDto>();
-    Collection<CategoryDto> reordered = new ArrayList<CategoryDto>();
+    List<CategoryDto> categories = new ArrayList<>();
+    Collection<CategoryDto> reordered = new ArrayList<>();
 
     int i = 0;
     int pos = 0;
@@ -245,7 +245,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   }
 
   private void addEditableColumns(Iterable<LocaleDto> locales) {
-    checkActionCol = new CheckboxColumn<CategoryDto>(new CategoryDtoDisplay());
+    checkActionCol = new CheckboxColumn<>(new CategoryDtoDisplay());
     table.addColumn(checkActionCol, checkActionCol.getCheckColumnHeader());
     table.setColumnWidth(checkActionCol, 1, Style.Unit.PX);
 
@@ -339,7 +339,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
   private void addCategory() {
     dialog.clearAlert(nameGroup);
-    List<CategoryDto> existingCat = new ArrayList<CategoryDto>(dataProvider.getList());
+    List<CategoryDto> existingCat = new ArrayList<>(dataProvider.getList());
 
     // Validate that the new name does not conflicts with an existing one
     if(!validateName(existingCat)) return;

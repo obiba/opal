@@ -66,7 +66,7 @@ public class AlertPanel extends FlowPanel {
   public static class Builder {
     private final AlertPanel alert;
 
-    private final List<String> messageList = new ArrayList<String>();
+    private final List<String> messageList = new ArrayList<>();
 
     Builder() {
       alert = new AlertPanel();

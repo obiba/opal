@@ -25,7 +25,7 @@ public class SummaryRequiredEvent extends GwtEvent<SummaryRequiredEvent.Handler>
 
   }
 
-  private static final Type<Handler> TYPE = new Type<Handler>();
+  private static final Type<Handler> TYPE = new Type<>();
 
   private final UriBuilder uri;
 

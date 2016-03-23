@@ -121,7 +121,7 @@ public class ChangePasswordModalPresenter extends ModalPresenterWidget<ChangePas
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+      Set<FieldValidator> validators = new LinkedHashSet<>();
 
       validators.add(new RequiredTextValidator(getView().getOldPassword(), "OldPasswordIsRequired",
           Display.FormField.OLD_PASSWORD.name()));

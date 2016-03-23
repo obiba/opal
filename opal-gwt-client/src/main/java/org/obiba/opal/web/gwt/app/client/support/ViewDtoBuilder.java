@@ -44,7 +44,7 @@ public class ViewDtoBuilder {
 
   public ViewDtoBuilder fromTables(TableDto... tableDtos) {
     if(tableDtos != null) {
-      List<TableDto> list = new ArrayList<TableDto>();
+      List<TableDto> list = new ArrayList<>();
       for(TableDto tableDto : tableDtos) {
         list.add(tableDto);
       }

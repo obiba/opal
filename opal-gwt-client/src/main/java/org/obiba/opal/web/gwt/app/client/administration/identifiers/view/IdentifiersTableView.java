@@ -207,7 +207,7 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
   }
 
   private void createAndInitializeValueSetsTable(JsArray<VariableDto> variables) {
-    valueSetsTable = new Table<ValueSetsDto.ValueSetDto>();
+    valueSetsTable = new Table<>();
     valueSetsTable.setPageSize(PAGE_SIZE);
     valueSetsTable.addColumn(new TextColumn<ValueSetsDto.ValueSetDto>() {
 
@@ -228,7 +228,7 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
   }
 
   private void createAndInitializeVariablesTable() {
-    variablesTable = new Table<VariableDto>();
+    variablesTable = new Table<>();
     variablesTable.setPageSize(PAGE_SIZE);
     variablesTable.addColumn(new TextColumn<VariableDto>() {
       @Override

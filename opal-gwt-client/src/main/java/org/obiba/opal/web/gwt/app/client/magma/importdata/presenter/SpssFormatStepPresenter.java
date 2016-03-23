@@ -124,9 +124,9 @@ public class SpssFormatStepPresenter extends PresenterWidget<SpssFormatStepPrese
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      errors = new HashMap<HasType<ControlGroupType>, String>();
+      errors = new HashMap<>();
 
-      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+      Set<FieldValidator> validators = new LinkedHashSet<>();
 
       validators.add(new ConditionValidator(fileExtensionCondition(getView().getSelectedFile()), "SpssFileRequired",
           Display.FormField.FILE.name()));

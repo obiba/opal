@@ -194,7 +194,7 @@ public class ImportIdentifiersMappingModalPresenter
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+      Set<FieldValidator> validators = new LinkedHashSet<>();
       validators
           .add(new RequiredTextValidator(getView().getVariableName(), "NameIsRequired", Display.FormField.NAME.name()));
       validators.add(new RequiredTextValidator(getView().getSystemIdentifiers(), "SystemIdentifiersAreRequired",

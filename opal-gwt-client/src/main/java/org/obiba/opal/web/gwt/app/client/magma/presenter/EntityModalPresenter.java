@@ -56,7 +56,7 @@ public class EntityModalPresenter extends ModalPresenterWidget<EntityModalPresen
 
   private TableDto selectedTable;
 
-  private Map<String, VariableDto> variablesMap = new HashMap<String, VariableDto>();
+  private Map<String, VariableDto> variablesMap = new HashMap<>();
 
   private final ModalProvider<ValueSequencePopupPresenter> valueSequencePopupProvider;
 
@@ -150,7 +150,7 @@ public class EntityModalPresenter extends ModalPresenterWidget<EntityModalPresen
       }
 
       private void buildVariableMap(List<VariableDto> variables, TableDto table) {
-        variablesMap = new HashMap<String, VariableDto>();
+        variablesMap = new HashMap<>();
 
         for(VariableDto v : variables) {
           //VariableDto variable = variables.get(i);
@@ -179,7 +179,7 @@ public class EntityModalPresenter extends ModalPresenterWidget<EntityModalPresen
                 JsArray<ValueSetsDto.ValueSetDto> valueSetList = valueSets.getValueSetsArray();
                 JsArray<ValueSetsDto.ValueDto> values = valueSetList.get(0).getValuesArray();
 
-                List<VariableValueRow> rows = new ArrayList<VariableValueRow>();
+                List<VariableValueRow> rows = new ArrayList<>();
                 int variableCount = variables.length();
 
                 for(int i = 0; i < variableCount; i++) {
@@ -231,7 +231,7 @@ public class EntityModalPresenter extends ModalPresenterWidget<EntityModalPresen
 
     @SuppressWarnings("unchecked")
     private List<JavaScriptErrorDto> extractJavaScriptErrors(ClientErrorDto errorDto) {
-      List<JavaScriptErrorDto> javaScriptErrors = new ArrayList<JavaScriptErrorDto>();
+      List<JavaScriptErrorDto> javaScriptErrors = new ArrayList<>();
 
       JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) errorDto
           .getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);

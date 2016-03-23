@@ -153,7 +153,7 @@ public class ValueSequencePopupView extends ModalPopupViewWithUiHandlers<ValueSe
 
     // find the max number of occurrences among the group
     // and build the dataset
-    List<ValueOccurrence> occurrences = new ArrayList<ValueOccurrence>();
+    List<ValueOccurrence> occurrences = new ArrayList<>();
     ValueSetDto valueSet = valueSets.getValueSetsArray().get(0);
     int max = 0;
     for(int i = 0; i < valueSet.getValuesArray().length(); i++) {
@@ -251,7 +251,7 @@ public class ValueSequencePopupView extends ModalPopupViewWithUiHandlers<ValueSe
     valuesTable.addColumn(occColumn, "#");
     valuesTable.setColumnWidth(occColumn, 1, Unit.PX);
 
-    dataProvider = new ListDataProvider<ValueOccurrence>();
+    dataProvider = new ListDataProvider<>();
     dataProvider.addDataDisplay(valuesTable);
   }
 

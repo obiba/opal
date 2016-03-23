@@ -32,7 +32,7 @@ public class OpenTextualVariableDerivationHelper extends CategoricalVariableDeri
 
   @Override
   public void initializeValueMapEntries() {
-    valueMapEntries = new ArrayList<ValueMapEntry>();
+    valueMapEntries = new ArrayList<>();
 
     if(method == Method.AUTOMATICALLY) {
 

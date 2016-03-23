@@ -70,7 +70,7 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
   FlowPanel assignMethods;
 
   private final JsArrayDataProvider<DataShieldMethodDto> methodsDataProvider
-      = new JsArrayDataProvider<DataShieldMethodDto>();
+      = new JsArrayDataProvider<>();
 
   private ActionsColumn<DataShieldMethodDto> actionsColumn;
 
@@ -146,8 +146,8 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
       }
     }, translations.versionLabel());
 
-    actionsColumn = new ActionsColumn<DataShieldMethodDto>(
-        new ConstantActionsProvider<DataShieldMethodDto>(EDIT_ACTION, REMOVE_ACTION));
+    actionsColumn = new ActionsColumn<>(
+            new ConstantActionsProvider<DataShieldMethodDto>(EDIT_ACTION, REMOVE_ACTION));
     methodsTable.addColumn(actionsColumn, translations.actionsLabel());
   }
 

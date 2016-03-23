@@ -32,9 +32,9 @@ public class RadioGroup<T> implements HasValue<T> {
 
   private final SimpleEventBus bus = new SimpleEventBus();
 
-  private final ArrayList<HasValue<Boolean>> buttons = new ArrayList<HasValue<Boolean>>();
+  private final ArrayList<HasValue<Boolean>> buttons = new ArrayList<>();
 
-  private final ArrayList<T> values = new ArrayList<T>();
+  private final ArrayList<T> values = new ArrayList<>();
 
   private final Comparator<T> comparator;
 

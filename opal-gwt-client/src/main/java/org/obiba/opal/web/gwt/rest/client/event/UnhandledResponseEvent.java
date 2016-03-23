@@ -20,7 +20,7 @@ import com.google.gwt.http.client.Response;
  */
 public class UnhandledResponseEvent extends GwtEvent<UnhandledResponseEvent.Handler> {
 
-  private static final Type<Handler> TYPE = new Type<Handler>();
+  private static final Type<Handler> TYPE = new Type<>();
 
   public interface Handler extends EventHandler {
     void onUnhandledResponse(UnhandledResponseEvent e);

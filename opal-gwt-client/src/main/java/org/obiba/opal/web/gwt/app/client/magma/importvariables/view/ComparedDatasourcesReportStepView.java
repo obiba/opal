@@ -51,7 +51,7 @@ public class ComparedDatasourcesReportStepView extends ViewImpl
 
   private TableComparisonsTable tableList;
 
-  private List<TableComparison> tableComparisons = new ArrayList<TableComparison>();
+  private List<TableComparison> tableComparisons = new ArrayList<>();
 
   private ListDataProvider<TableComparison> tableComparisonsProvider;
 
@@ -82,18 +82,18 @@ public class ComparedDatasourcesReportStepView extends ViewImpl
       }
     };
     tableList.setPageSize(100);
-    tableComparisonsProvider = new ListDataProvider<TableComparison>(tableComparisons);
+    tableComparisonsProvider = new ListDataProvider<>(tableComparisons);
     tableComparisonsProvider.addDataDisplay(tableList);
     tableList.setEmptyTableWidget(tableList.getLoadingIndicator());
 
-    SelectionModel<TableComparison> selectionModel = new MultiSelectionModel<TableComparison>(
-        new ProvidesKey<TableComparison>() {
+    SelectionModel<TableComparison> selectionModel = new MultiSelectionModel<>(
+            new ProvidesKey<TableComparison>() {
 
-          @Override
-          public Object getKey(TableComparison item) {
-            return item.getTableName();
-          }
-        });
+              @Override
+              public Object getKey(TableComparison item) {
+                return item.getTableName();
+              }
+            });
     tableList.setSelectionModel(selectionModel);
     tableList.getTableNameColumn().setFieldUpdater(new TableComparisonFieldUpdater());
 

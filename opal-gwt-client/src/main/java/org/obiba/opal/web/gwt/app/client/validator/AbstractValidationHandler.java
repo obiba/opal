@@ -30,8 +30,8 @@ public abstract class AbstractValidationHandler implements ValidationHandler {
   @Override
   public boolean validate() {
 
-    List<String> messages = new ArrayList<String>();
-    List<String> args = new ArrayList<String>();
+    List<String> messages = new ArrayList<>();
+    List<String> args = new ArrayList<>();
 
     String message;
     for(FieldValidator validator : getValidators()) {

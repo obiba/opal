@@ -114,7 +114,7 @@ public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplate
   @UiField
   Label emails;
 
-  JsArrayDataProvider<ReportDto> dataProvider = new JsArrayDataProvider<ReportDto>();
+  JsArrayDataProvider<ReportDto> dataProvider = new JsArrayDataProvider<>();
 
   private HasActionHandler<ReportDto> actionsColumn;
 
@@ -154,7 +154,7 @@ public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplate
       }
     }, translations.lastModifiedLabel());
 
-    actionsColumn = new ActionsColumn<ReportDto>(DOWNLOAD_ACTION, ActionsColumn.REMOVE_ACTION);
+    actionsColumn = new ActionsColumn<>(DOWNLOAD_ACTION, ActionsColumn.REMOVE_ACTION);
     producedReportsTable.addColumn((ActionsColumn) actionsColumn, translations.actionsLabel());
     producedReportsTable.setEmptyTableWidget(noReports);
     dataProvider.addDataDisplay(producedReportsTable);

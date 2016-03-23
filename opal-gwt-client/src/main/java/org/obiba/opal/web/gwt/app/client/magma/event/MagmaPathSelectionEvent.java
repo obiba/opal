@@ -26,7 +26,7 @@ public class MagmaPathSelectionEvent extends GwtEvent<MagmaPathSelectionEvent.Ha
 
   }
 
-  private static final Type<Handler> TYPE = new Type<Handler>();
+  private static final Type<Handler> TYPE = new Type<>();
 
   private final Object source;
 

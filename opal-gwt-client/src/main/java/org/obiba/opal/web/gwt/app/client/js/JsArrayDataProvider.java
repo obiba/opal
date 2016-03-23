@@ -21,7 +21,7 @@ public class JsArrayDataProvider<T extends JavaScriptObject> extends ListDataPro
   }
 
   public ColumnSortEvent.ListHandler<T> newSortHandler() {
-    return new ColumnSortEvent.ListHandler<T>(getList());
+    return new ColumnSortEvent.ListHandler<>(getList());
   }
 
 }

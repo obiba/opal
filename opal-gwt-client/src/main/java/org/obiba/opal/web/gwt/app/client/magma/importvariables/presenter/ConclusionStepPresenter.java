@@ -63,7 +63,7 @@ public class ConclusionStepPresenter extends PresenterWidget<ConclusionStepPrese
     super(eventBus, display);
     this.placeManager = placeManager;
 
-    resourceRequests = new LinkedHashSet<ResourceRequestPresenter<? extends JavaScriptObject>>();
+    resourceRequests = new LinkedHashSet<>();
   }
 
   //
@@ -79,8 +79,8 @@ public class ConclusionStepPresenter extends PresenterWidget<ConclusionStepPrese
 
   public <T extends JavaScriptObject> void addResourceRequest(String resourceName, String resourceLink,
       ResourceRequestBuilder<T> requestBuilder) {
-    ResourceRequestPresenter<T> resourceRequestPresenter = new ResourceRequestPresenter<T>(new ResourceRequestView(),
-        getEventBus(), requestBuilder, new ImportVariablesResponseCodeCallback());
+    ResourceRequestPresenter<T> resourceRequestPresenter = new ResourceRequestPresenter<>(new ResourceRequestView(),
+            getEventBus(), requestBuilder, new ImportVariablesResponseCodeCallback());
     resourceRequestPresenter.getView().setResourceName(resourceName);
     resourceRequestPresenter.getView().setResourceClickHandler(new TableResourceClickHandler(resourceLink));
     resourceRequestPresenter.setSuccessCodes(200, 201);

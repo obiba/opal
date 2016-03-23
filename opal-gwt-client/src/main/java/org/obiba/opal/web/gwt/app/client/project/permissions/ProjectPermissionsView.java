@@ -85,7 +85,7 @@ public class ProjectPermissionsView extends ViewWithUiHandlers<ProjectPermission
 
   private final static Translations translations = GWT.create(Translations.class);
 
-  private final ListDataProvider<Acl> permissionsDataProvider = new ListDataProvider<Acl>();
+  private final ListDataProvider<Acl> permissionsDataProvider = new ListDataProvider<>();
 
   private Subject currentSubject;
 
@@ -170,8 +170,8 @@ public class ProjectPermissionsView extends ViewWithUiHandlers<ProjectPermission
   private void initTypeColumn() {
     typeColumn = new TypeColumn(nodeToTypeMapper);
     permissionsTable.insertColumn(1, typeColumn, translations.typeLabel());
-    ColumnSortEvent.ListHandler<Acl> typeSortHandler = new ColumnSortEvent.ListHandler<Acl>(
-        permissionsDataProvider.getList());
+    ColumnSortEvent.ListHandler<Acl> typeSortHandler = new ColumnSortEvent.ListHandler<>(
+            permissionsDataProvider.getList());
     typeSortHandler.setComparator(typeColumn, resourceTypeComparator);
     permissionsTable.getColumnSortList().push(typeColumn);
     permissionsTable.addColumnSortHandler(typeSortHandler);
@@ -264,11 +264,11 @@ public class ProjectPermissionsView extends ViewWithUiHandlers<ProjectPermission
       }
     };
 
-    static final ActionsColumn<Acl> ACTIONS = new ActionsColumn<Acl>(new ActionsProvider<Acl>() {
+    static final ActionsColumn<Acl> ACTIONS = new ActionsColumn<>(new ActionsProvider<Acl>() {
 
       @Override
       public String[] allActions() {
-        return new String[] { ActionsColumn.REMOVE_ACTION };
+        return new String[]{ActionsColumn.REMOVE_ACTION};
       }
 
       @Override

@@ -204,7 +204,7 @@ public class DataShieldMethodPresenter extends ModalPresenterWidget<DataShieldMe
     @Override
     protected Set<FieldValidator> getValidators() {
       if(validators == null) {
-        validators = new LinkedHashSet<FieldValidator>();
+        validators = new LinkedHashSet<>();
         validators.add(new RequiredTextValidator(getView().getName(), "DataShieldMethodNameIsRequired"));
         validators.add(new ConditionalValidator(getView().isScript(),
             new RequiredTextValidator(getView().getScript(), "DataShieldRScriptIsRequired")));

@@ -54,7 +54,7 @@ public class EncryptionKeysView extends ViewWithUiHandlers<EncryptionKeysUiHandl
 
   private final Translations translations;
 
-  private final ListDataProvider<KeyDto> keyPairsDataProvider = new ListDataProvider<KeyDto>();
+  private final ListDataProvider<KeyDto> keyPairsDataProvider = new ListDataProvider<>();
 
   @Inject
   public EncryptionKeysView(Binder uiBinder, Translations translations) {
@@ -124,11 +124,11 @@ public class EncryptionKeysView extends ViewWithUiHandlers<EncryptionKeysUiHandl
       }
     };
 
-    final ActionsColumn<KeyDto> actionsColumn = new ActionsColumn<KeyDto>(new ActionsProvider<KeyDto>() {
+    final ActionsColumn<KeyDto> actionsColumn = new ActionsColumn<>(new ActionsProvider<KeyDto>() {
 
       @Override
       public String[] allActions() {
-        return new String[] { DOWNLOAD_CERTIFICATE_ACTION, ActionsColumn.REMOVE_ACTION };
+        return new String[]{DOWNLOAD_CERTIFICATE_ACTION, ActionsColumn.REMOVE_ACTION};
       }
 
       @Override

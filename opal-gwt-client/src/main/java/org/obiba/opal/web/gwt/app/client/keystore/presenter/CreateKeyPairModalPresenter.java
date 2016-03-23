@@ -96,7 +96,7 @@ public class CreateKeyPairModalPresenter extends ModalPresenterWidget<CreateKeyP
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+      Set<FieldValidator> validators = new LinkedHashSet<>();
 
       if(keystoreType == KeystoreType.PROJECT) {
         validators.add(

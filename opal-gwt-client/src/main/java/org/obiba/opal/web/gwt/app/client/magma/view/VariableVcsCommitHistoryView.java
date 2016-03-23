@@ -53,7 +53,7 @@ public class VariableVcsCommitHistoryView extends ViewWithUiHandlers<UiHandlers>
   @UiField
   OpalSimplePager commitInfoTablePager;
 
-  private final ListDataProvider<VcsCommitInfoDto> commitInfoDataProvider = new ListDataProvider<VcsCommitInfoDto>();
+  private final ListDataProvider<VcsCommitInfoDto> commitInfoDataProvider = new ListDataProvider<>();
 
   @Inject
   public VariableVcsCommitHistoryView() {
@@ -112,23 +112,23 @@ public class VariableVcsCommitHistoryView extends ViewWithUiHandlers<UiHandlers>
       }
     };
 
-    static final ActionsColumn<VcsCommitInfoDto> ACTIONS = new ActionsColumn<VcsCommitInfoDto>(
-        new ActionsProvider<VcsCommitInfoDto>() {
+    static final ActionsColumn<VcsCommitInfoDto> ACTIONS = new ActionsColumn<>(
+            new ActionsProvider<VcsCommitInfoDto>() {
 
-          @Override
-          public String[] allActions() {
-            return new String[] { DIFF_ACTION, DIFF_CURRENT_ACTION, ActionsColumn.EDIT_ACTION };
-          }
+              @Override
+              public String[] allActions() {
+                return new String[]{DIFF_ACTION, DIFF_CURRENT_ACTION, ActionsColumn.EDIT_ACTION};
+              }
 
-          @Override
-          public String[] getActions(VcsCommitInfoDto value) {
-            return value.getIsCurrent() ? getHeadOnlyActions() : allActions();
-          }
+              @Override
+              public String[] getActions(VcsCommitInfoDto value) {
+                return value.getIsCurrent() ? getHeadOnlyActions() : allActions();
+              }
 
-          private String[] getHeadOnlyActions() {
-            return new String[] { DIFF_ACTION };
-          }
-        });
+              private String[] getHeadOnlyActions() {
+                return new String[]{DIFF_ACTION};
+              }
+            });
 
   }
 

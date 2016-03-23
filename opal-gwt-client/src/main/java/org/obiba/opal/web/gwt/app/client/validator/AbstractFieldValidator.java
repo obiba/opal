@@ -24,7 +24,7 @@ public abstract class AbstractFieldValidator implements FieldValidator {
 
   private String errorMessageKey;
 
-  private List<String> args = new ArrayList<String>();
+  private List<String> args = new ArrayList<>();
 
   private String id;
 

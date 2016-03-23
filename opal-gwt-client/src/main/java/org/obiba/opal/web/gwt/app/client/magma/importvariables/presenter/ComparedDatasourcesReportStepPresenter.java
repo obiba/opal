@@ -245,7 +245,7 @@ public class ComparedDatasourcesReportStepPresenter
     }
 
     private Set<TableCompareDto> sortComparedTables(JsArray<TableCompareDto> comparedTables) {
-      Set<TableCompareDto> tree = new TreeSet<TableCompareDto>(new Comparator<TableCompareDto>() {
+      Set<TableCompareDto> tree = new TreeSet<>(new Comparator<TableCompareDto>() {
         @Override
         public int compare(TableCompareDto table1, TableCompareDto table2) {
           return table1.getCompared().getName().compareTo(table2.getCompared().getName());

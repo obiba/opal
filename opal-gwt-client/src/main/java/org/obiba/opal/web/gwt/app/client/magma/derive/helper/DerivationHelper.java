@@ -63,7 +63,7 @@ public abstract class DerivationHelper {
   @Nullable
   public static List<String> getDestinationCategories(@Nullable VariableDto destination) {
     if(destination == null) return null;
-    List<String> categories = new ArrayList<String>();
+    List<String> categories = new ArrayList<>();
     for(CategoryDto categoryDto : JsArrays.toIterable(destination.getCategoriesArray())) {
       categories.add(categoryDto.getName());
     }
@@ -133,7 +133,7 @@ public abstract class DerivationHelper {
   }
 
   public List<String> getMapStepWarnings() {
-    List<String> warnings = new ArrayList<String>();
+    List<String> warnings = new ArrayList<>();
     VariableDto derivedVariable = getDerivedVariable();
     if(derivedVariable != null) {
       //noinspection ConstantConditions
@@ -147,7 +147,7 @@ public abstract class DerivationHelper {
   }
 
   public List<String> getMapStepErrors() {
-    return new ArrayList<String>();
+    return new ArrayList<>();
   }
 
   @Nullable

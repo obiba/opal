@@ -91,7 +91,7 @@ public class ValueMapGrid extends FlowPanel {
 
     if(dataProvider == null) {
       initializeTable();
-      dataProvider = new ListDataProvider<ValueMapEntry>(valueMapEntries);
+      dataProvider = new ListDataProvider<>(valueMapEntries);
       dataProvider.addDataDisplay(table);
     } else {
       dataProvider.setList(valueMapEntries);
@@ -118,7 +118,7 @@ public class ValueMapGrid extends FlowPanel {
       table = null;
     }
 
-    table = new Table<ValueMapEntry>(pager.getPageSize());
+    table = new Table<>(pager.getPageSize());
     // not supposed to be empty except while being populated
     table.setEmptyTableWidget(table.getLoadingIndicator());
     table.addStyleName("small-top-margin");

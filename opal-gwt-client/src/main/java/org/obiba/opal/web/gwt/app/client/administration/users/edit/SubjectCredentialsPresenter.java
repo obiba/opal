@@ -156,7 +156,7 @@ public class SubjectCredentialsPresenter extends ModalPresenterWidget<SubjectCre
         return validators;
       }
 
-      validators = new LinkedHashSet<FieldValidator>();
+      validators = new LinkedHashSet<>();
       if(dialogMode == Mode.CREATE) {
         validators.add(new RequiredTextValidator(getView().getName(), "SubjectCredentialNameIsRequired",
             Display.FormField.NAME.name()));

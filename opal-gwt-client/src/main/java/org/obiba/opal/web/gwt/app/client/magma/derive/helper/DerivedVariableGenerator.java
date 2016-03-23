@@ -44,7 +44,7 @@ public abstract class DerivedVariableGenerator {
   @SuppressWarnings("PMD.AvoidStringBufferField")
   protected StringBuilder scriptBuilder;
 
-  protected final Map<String, CategoryDto> newCategoriesMap = new LinkedHashMap<String, CategoryDto>();
+  protected final Map<String, CategoryDto> newCategoriesMap = new LinkedHashMap<>();
 
   private boolean categoryValuesAppended;
 

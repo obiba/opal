@@ -95,9 +95,9 @@ public class XmlFormatStepPresenter extends PresenterWidget<XmlFormatStepPresent
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      errors = new HashMap<HasType<ControlGroupType>, String>();
+      errors = new HashMap<>();
 
-      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+      Set<FieldValidator> validators = new LinkedHashSet<>();
 
       validators.add(
           new ConditionValidator(fileExtensionCondition(xmlFileSelectionPresenter.getSelectedFile()), "ZipFileRequired",

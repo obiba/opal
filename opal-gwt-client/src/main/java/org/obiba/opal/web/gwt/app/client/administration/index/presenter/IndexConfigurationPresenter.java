@@ -184,7 +184,7 @@ public class IndexConfigurationPresenter extends ModalPresenterWidget<IndexConfi
     @Override
     protected Set<FieldValidator> getValidators() {
       if(validators == null) {
-        validators = new LinkedHashSet<FieldValidator>();
+        validators = new LinkedHashSet<>();
         validators
             .add(new RequiredTextValidator(getView().getClusterName(), "ClusterNameIsRequired", CLUSTER_NAME.name()));
         validators.add(new ConditionValidator(nbShardsIsNotEmpty(), "ShardsIsRequired", SHARDS.name()));

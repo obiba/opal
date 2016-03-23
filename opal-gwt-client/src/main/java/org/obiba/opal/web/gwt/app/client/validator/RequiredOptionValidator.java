@@ -40,7 +40,7 @@ public class RequiredOptionValidator extends AbstractFieldValidator {
       throw new IllegalArgumentException("empty options");
     }
 
-    this.options = new HashSet<TakesValue<Boolean>>();
+    this.options = new HashSet<>();
     this.options.addAll(options);
   }
 
@@ -63,7 +63,7 @@ public class RequiredOptionValidator extends AbstractFieldValidator {
   //
 
   public static Set<TakesValue<Boolean>> asSet(TakesValue<Boolean>... options) {
-    Set<TakesValue<Boolean>> optionSet = new HashSet<TakesValue<Boolean>>();
+    Set<TakesValue<Boolean>> optionSet = new HashSet<>();
     optionSet.addAll(Arrays.asList(options));
     return optionSet;
   }

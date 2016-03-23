@@ -39,7 +39,7 @@ public class CategoriesTable extends Table<CategoryDto> {
     initColumns();
 
     if(variableDto != null) {
-      JsArrayDataProvider<CategoryDto> provider = new JsArrayDataProvider<CategoryDto>();
+      JsArrayDataProvider<CategoryDto> provider = new JsArrayDataProvider<>();
       provider.setArray(JsArrays.toSafeArray(variableDto.getCategoriesArray()));
       provider.addDataDisplay(this);
     }

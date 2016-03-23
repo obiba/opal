@@ -31,7 +31,7 @@ public class PasswordFieldValidators {
 
   private final HasText password;
 
-  private final Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+  private final Set<FieldValidator> validators = new LinkedHashSet<>();
 
   public PasswordFieldValidators(HasText password, HasText confirmation, String passwordForm) {
     this.password = password;

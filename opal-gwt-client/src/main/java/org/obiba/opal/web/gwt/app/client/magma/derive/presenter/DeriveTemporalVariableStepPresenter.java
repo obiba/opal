@@ -52,7 +52,7 @@ public class DeriveTemporalVariableStepPresenter
 
   @Override
   List<DefaultWizardStepController.Builder> getWizardStepBuilders(WizardStepController.StepInHandler stepInHandler) {
-    List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<DefaultWizardStepController.Builder>();
+    List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<>();
     stepBuilders.add(getView().getMethodStepController() //
         .onStepIn(stepInHandler) //
         .onValidate(new ValidationHandler() {

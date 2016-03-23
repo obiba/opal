@@ -34,7 +34,7 @@ public abstract class AbstractVariablesFilter {
 
   protected TableDto table;
 
-  protected List<VariableDto> results = new ArrayList<VariableDto>();
+  protected List<VariableDto> results = new ArrayList<>();
 
   public abstract void filter(EventBus eventBus, TableDto table);
 

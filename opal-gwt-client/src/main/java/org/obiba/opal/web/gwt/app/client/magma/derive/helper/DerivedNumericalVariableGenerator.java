@@ -43,8 +43,8 @@ public class DerivedNumericalVariableGenerator<N extends Number & Comparable<N>>
   private void appendGroupMethod() {
     // group method
     // ImmutableSortedSet.Builder<Range<N>> ranges = ImmutableSortedSet.naturalOrder();
-    Collection<Range<N>> ranges = new ArrayList<Range<N>>();
-    Collection<ValueMapEntry> outliers = new ArrayList<ValueMapEntry>();
+    Collection<Range<N>> ranges = new ArrayList<>();
+    Collection<ValueMapEntry> outliers = new ArrayList<>();
     for(ValueMapEntry entry : valueMapEntries) {
       if(entry.getType() == ValueMapEntryType.CATEGORY_NAME || entry.getType() == ValueMapEntryType.DISTINCT_VALUE) {
         outliers.add(entry);

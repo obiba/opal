@@ -185,7 +185,7 @@ public class SubjectCredentialsView extends ModalPopupViewWithUiHandlers<Subject
 
       @Override
       public List<String> getValue() {
-        List<String> selected = new ArrayList<String>();
+        List<String> selected = new ArrayList<>();
         for(String group : groups.getSelectedItemsTexts()) {
           selected.add(group);
         }
