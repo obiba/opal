@@ -13,6 +13,9 @@ import com.google.common.base.Throwables;
 
 public class OrientDbUtil {
 
+  private OrientDbUtil() {
+  }
+
   public static void main(String[] args) {
     if(args.length != 2) {
       throw new IllegalArgumentException("invalid args");

@@ -11,6 +11,9 @@ public class LegacyOrientDbExporter {
 
   private static final String PASSWORD = "admin";
 
+  private LegacyOrientDbExporter() {
+  }
+
   public static void main(String[] args) {
     boolean check = false;
 
