@@ -60,16 +60,16 @@ public class DiffTable extends DefaultFlexTable {
     Widget lineStartWidget;
 
     if(line.charAt(0) == '+') {
-      setWidget(row, 1, new Label(bLineNumber++ + ""));
+      setWidget(row, 1, new Label(Integer.toString(bLineNumber++)));
       lineStartWidget = new Label("+");
       style = "diff-add";
     } else if(line.charAt(0) == '-') {
-      setWidget(row, 0, new Label(aLineNumber++ + ""));
+      setWidget(row, 0, new Label(Integer.toString(aLineNumber++)));
       lineStartWidget = new Label("-");
       style = "diff-rm";
     } else {
-      setWidget(row, 0, new Label(aLineNumber++ + ""));
-      setWidget(row, 1, new Label(bLineNumber++ + ""));
+      setWidget(row, 0, new Label(Integer.toString(aLineNumber++)));
+      setWidget(row, 1, new Label(Integer.toString(bLineNumber++)));
       lineStartWidget = new HTMLPanel(new SafeHtmlBuilder().appendHtmlConstant("&nbsp;").toSafeHtml());
     }
 

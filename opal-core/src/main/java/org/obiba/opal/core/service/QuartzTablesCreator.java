@@ -191,7 +191,7 @@ public class QuartzTablesCreator {
    * @param statements the list that will contain the individual statements
    */
   public static void splitSqlScript(String script, char delim, Collection<String> statements) {
-    splitSqlScript(script, "" + delim, DEFAULT_COMMENT_PREFIX, statements);
+    splitSqlScript(script, Character.toString(delim), DEFAULT_COMMENT_PREFIX, statements);
   }
 
   /**

@@ -130,7 +130,7 @@ public class GenerateIdentifiersModalView extends ModalPopupViewWithUiHandlers<G
 
   @Override
   public void setDefault(int sizeNb, String prefixStr) {
-    size.setValue(sizeNb + "");
+    size.setValue(Integer.toString(sizeNb));
     prefix.setText(prefixStr);
     sampleIdentifier.setText(generateSampleIdentifier());
   }
