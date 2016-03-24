@@ -82,7 +82,7 @@ public class TableSelectionEvent extends GwtEvent<TableSelectionEvent.Handler> {
    */
   @Nullable
   public TableDto getSelectedTable() {
-    return selectedTables != null && selectedTables.size() > 0 ? selectedTables.get(0) : null;
+    return selectedTables != null && !selectedTables.isEmpty() ? selectedTables.get(0) : null;
   }
 
   //

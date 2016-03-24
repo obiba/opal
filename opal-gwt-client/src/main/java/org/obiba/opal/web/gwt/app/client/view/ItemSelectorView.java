@@ -169,7 +169,7 @@ public class ItemSelectorView extends ViewImpl implements ItemSelectorPresenter.
 
   private void addItemAndClear() {
     String item = itemInputDisplay.getItem();
-    if(item.trim().length() != 0) {
+    if(!item.trim().isEmpty()) {
       addItem(item);
       itemInputDisplay.clear();
     }

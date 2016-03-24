@@ -109,7 +109,7 @@ public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDa
   private CsvDatasourceFactoryDto createCsvDatasourceFactoryDto() {
     CsvDatasourceFactoryDto extensionDto = CsvDatasourceFactoryDto.create();
 
-    if(getView().getRowText().getText().trim().length() != 0) {
+    if(!getView().getRowText().getText().trim().isEmpty()) {
       extensionDto.setFirstRow(Integer.parseInt(getView().getRowText().getText()));
     }
 

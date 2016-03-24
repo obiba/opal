@@ -70,7 +70,7 @@ public class BranchingWizardStepController extends DefaultWizardStepController {
 
   @Override
   public boolean hasNext() {
-    return nextCandidates.size() > 0 || super.hasNext();
+    return !nextCandidates.isEmpty() || super.hasNext();
   }
 
   private void addNext(WizardStepController ctrl, Condition condition) {

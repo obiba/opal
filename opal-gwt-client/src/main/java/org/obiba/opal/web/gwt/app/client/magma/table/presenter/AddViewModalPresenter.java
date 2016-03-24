@@ -231,7 +231,7 @@ public class AddViewModalPresenter extends ModalPresenterWidget<AddViewModalPres
     public void onResponseCode(Request request, Response response) {
       getView().clearErrors();
 
-      if(response.getText() != null && response.getText().length() != 0) {
+      if(response.getText() != null && !response.getText().isEmpty()) {
         try {
           ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
           getView().showError(null, errorDto.getStatus());

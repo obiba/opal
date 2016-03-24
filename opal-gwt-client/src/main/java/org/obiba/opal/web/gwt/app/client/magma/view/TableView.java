@@ -362,7 +362,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @Override
   public void afterRenderRows() {
-    boolean enableItem = dataProvider.getList().size() > 0;
+    boolean enableItem = !dataProvider.getList().isEmpty();
     pager.setPagerVisible(dataProvider.getList().size() > Table.DEFAULT_PAGESIZE);
     pager2.setPagerVisible(dataProvider.getList().size() > Table.DEFAULT_PAGESIZE);
     downloadDictionary.setDisabled(!enableItem);

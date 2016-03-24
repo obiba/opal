@@ -81,7 +81,7 @@ public class ResourceRequestPresenter<T extends JavaScriptObject>
       public void onResponseCode(Request request, Response response) {
         getView().failed();
 
-        if(response.getText() != null && response.getText().length() != 0) {
+        if(response.getText() != null && !response.getText().isEmpty()) {
           try {
             ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
             getView().showErrorMessage(errorDto.getStatus());

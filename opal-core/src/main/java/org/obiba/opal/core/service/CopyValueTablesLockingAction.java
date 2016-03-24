@@ -181,7 +181,7 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
         nonExistentVariableEntities.removeAll(entitiesInKeysTable);
       }
 
-      if(nonExistentVariableEntities.size() > 0) {
+      if(!nonExistentVariableEntities.isEmpty()) {
         try(ValueTableWriter keysTableWriter = identifiersTableService
             .createIdentifiersTableWriter(valueTable.getEntityType())) {
           for(VariableEntity ve : nonExistentVariableEntities) {

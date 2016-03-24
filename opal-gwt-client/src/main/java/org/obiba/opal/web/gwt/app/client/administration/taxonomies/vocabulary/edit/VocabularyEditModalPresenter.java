@@ -78,7 +78,7 @@ public class VocabularyEditModalPresenter extends ModalPresenterWidget<Vocabular
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
-              if(response.getText() != null && response.getText().length() != 0) {
+              if(response.getText() != null && !response.getText().isEmpty()) {
                 fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
               }
             }
@@ -98,7 +98,7 @@ public class VocabularyEditModalPresenter extends ModalPresenterWidget<Vocabular
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
-              if(response.getText() != null && response.getText().length() != 0) {
+              if(response.getText() != null && !response.getText().isEmpty()) {
                 fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
               }
             }

@@ -83,7 +83,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
   public void postProcess(HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response) {
     if(GET.equals(request.getHttpMethod()) || OPTIONS.equals(request.getHttpMethod())) {
       Set<String> allowed = allowed(request, resourceMethod);
-      if(allowed != null && allowed.size() > 0) {
+      if(allowed != null && !allowed.isEmpty()) {
         response.getMetadata().add(ALLOW_HTTP_HEADER, asHeader(allowed));
       }
     } else if(HttpMethod.DELETE.equals(request.getHttpMethod()) && response.getStatus() == HttpStatus.SC_OK) {

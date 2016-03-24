@@ -55,7 +55,7 @@ public class FrequencyChartFactory {
 
   public Chart createValueChart(String title) {
     Chart chart = createChart(title, "Count");
-    if(values.size() > 0)
+    if(!values.isEmpty())
       chart.addSeries(chart.createSeries().setName("Count").setPoints(values.toArray(new Number[values.size()]))
 
       );
@@ -64,7 +64,7 @@ public class FrequencyChartFactory {
 
   public Chart createPercentageChart(String title) {
     Chart chart = createChart(title, "%");
-    if(values.size() > 0) {
+    if(!values.isEmpty()) {
       chart.addSeries(chart.createSeries().setName("%").setPoints(percentages.toArray(new Number[percentages.size()])));
     }
 

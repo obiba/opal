@@ -257,7 +257,7 @@ public enum VectorType {
       }
 
       String str = value.toString();
-      strs[i] = str != null && str.length() > 0 ? str : null;
+      strs[i] = str != null && !str.isEmpty() ? str : null;
       i++;
     }
 

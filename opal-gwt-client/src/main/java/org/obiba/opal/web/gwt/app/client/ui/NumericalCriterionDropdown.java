@@ -182,7 +182,7 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
     }
 
     // VALUES
-    if(rangeValueChooser.isItemSelected(1) && values.getText().length() > 0) {
+    if(rangeValueChooser.isItemSelected(1) && !values.getText().isEmpty()) {
       // Parse numbers
       String[] numbers = values.getText().trim().split(",");
       String valuesQuery = fieldName + ":(" + Joiner.on(" OR ").join(numbers) + ")";

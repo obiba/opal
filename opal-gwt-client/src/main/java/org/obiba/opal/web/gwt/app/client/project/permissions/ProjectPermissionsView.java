@@ -106,7 +106,7 @@ public class ProjectPermissionsView extends ViewWithUiHandlers<ProjectPermission
   @Override
   public void setData(@Nonnull List<Subject> subjects) {
     renderUsersAndGroups(subjects);
-    permissionsRow.setVisible(subjects.size() > 0);
+    permissionsRow.setVisible(!subjects.isEmpty());
     emptyHelp.setVisible(!permissionsRow.isVisible());
   }
 

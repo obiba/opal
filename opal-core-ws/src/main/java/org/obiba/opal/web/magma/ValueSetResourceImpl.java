@@ -248,7 +248,7 @@ public class ValueSetResourceImpl extends AbstractValueTableResource implements 
     for(Attribute attr : variable.getAttributes()) {
       if("filename".equalsIgnoreCase(attr.getName()) || "file-name".equalsIgnoreCase(attr.getName())) {
         String name = variable.getAttributeStringValue(attr.getName());
-        if(name.length() > 0) {
+        if(!name.isEmpty()) {
           return name;
         }
       }
@@ -264,7 +264,7 @@ public class ValueSetResourceImpl extends AbstractValueTableResource implements 
         if(extension.startsWith(".")) {
           extension = extension.substring(1);
         }
-        if(extension.length() > 0) {
+        if(!extension.isEmpty()) {
           return extension;
         }
       }

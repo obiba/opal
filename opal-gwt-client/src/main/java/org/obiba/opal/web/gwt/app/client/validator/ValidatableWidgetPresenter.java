@@ -38,7 +38,7 @@ public abstract class ValidatableWidgetPresenter<D extends PopupView> extends Mo
       }
     }
 
-    if(messages.size() > 0) {
+    if(!messages.isEmpty()) {
       getEventBus().fireEvent(NotificationEvent.newBuilder().error(messages).build());
       return false;
     } else {

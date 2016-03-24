@@ -18,7 +18,7 @@ public enum DatasourceFileType {
 
   public static DatasourceFileType getFileType(String filename) {
     DatasourceFileType type = INVALID;
-    int position = filename.length() > 0 ? filename.lastIndexOf('.') : -1;
+    int position = !filename.isEmpty() ? filename.lastIndexOf('.') : -1;
 
     if(position > -1) {
       try {

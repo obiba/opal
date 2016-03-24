@@ -180,7 +180,7 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
     try {
       if(datasource != null) {
         Datasource ds = MagmaEngine.get().getDatasource(datasource);
-        if(tableList != null && tableList.size() > 0) {
+        if(tableList != null && !tableList.isEmpty()) {
           for(String table : tableList) {
             importIdentifiersFromTable(ds.getValueTable(table));
           }
@@ -366,7 +366,7 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
       for(int i = 1; i < header.size(); i++) {
         // do not export ids that have no private mappings
         Map<String, String> privateMapping = mapIds.get(systemId);
-        if(privateMapping.size() > 0) {
+        if(!privateMapping.isEmpty()) {
           ids.add(Strings.nullToEmpty(privateMapping.get(header.get(i))));
         }
       }

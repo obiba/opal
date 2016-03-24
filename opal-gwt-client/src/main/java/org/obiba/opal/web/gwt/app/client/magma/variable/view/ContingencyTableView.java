@@ -129,7 +129,7 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
 
     int nbVariableCategories = variableCategories.size();
 
-    if(facets.size() > 0) {
+    if(!facets.isEmpty()) {
       addStatistics(parentTable, facets, variableFacetTotals, crossFacetTotals);
     } else {
       parentTable.setWidget(2, 0, new Label(translations.noResultsFound()));

@@ -72,7 +72,7 @@ public class IdentifiersMaps implements Iterable<IdentifiersMaps.IdentifiersMap>
     }
 
     public boolean hasPrivateIdentifier() {
-      return privateIdentifier != null && privateIdentifier.length() > 0;
+      return privateIdentifier != null && !privateIdentifier.isEmpty();
     }
 
   }

@@ -129,7 +129,7 @@ public class OrientDbServiceImpl implements OrientDbService {
       throws ConstraintViolationException {
     //noinspection ConstantConditions
     Preconditions.checkArgument(beansByTemplate != null, "beansByTemplate cannot be null");
-    Preconditions.checkArgument(beansByTemplate.size() > 0, "beansByTemplate cannot be empty");
+    Preconditions.checkArgument(!beansByTemplate.isEmpty(), "beansByTemplate cannot be empty");
 
     for(HasUniqueProperties bean : beansByTemplate.values()) {
       defaultBeanValidator.validate(bean);

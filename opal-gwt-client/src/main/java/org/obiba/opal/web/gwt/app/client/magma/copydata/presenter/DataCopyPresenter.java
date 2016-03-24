@@ -147,7 +147,7 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
               }
             }
 
-            if(datasources.size() > 0) {
+            if(!datasources.isEmpty()) {
               getView().setDatasources(datasources);
             } else {
               getView().showError(null, translations.userMessageMap().get("NoDataToCopy"));

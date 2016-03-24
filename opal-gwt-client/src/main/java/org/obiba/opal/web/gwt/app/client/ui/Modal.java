@@ -526,7 +526,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     }
 
     public void showCurrent() {
-      if(currentlyShown.size() > 0) {
+      if(!currentlyShown.isEmpty()) {
         Modal current = currentlyShown.peek();
         current.show();
       }
