@@ -182,7 +182,7 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
         }
       };
 
-      UriBuilder uri = UriBuilders.PROJECT.create().query("archive", archive + "");
+      UriBuilder uri = UriBuilders.PROJECT.create().query("archive", Boolean.toString(archive));
       ResourceRequestBuilderFactory.newBuilder() //
           .forResource(uri.build(projectDto.getName())) //
           .withCallback(callbackHandler, SC_OK, SC_FORBIDDEN, SC_INTERNAL_SERVER_ERROR, SC_NOT_FOUND) //

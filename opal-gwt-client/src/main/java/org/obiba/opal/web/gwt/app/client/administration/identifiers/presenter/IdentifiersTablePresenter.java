@@ -101,8 +101,8 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
 
   @Override
   public void onIdentifiersRequest(TableDto identifiersTable, String select, final int offset, int limit) {
-    String uri = UriBuilders.IDENTIFIERS_TABLE_VALUESETS.create().query("select", select).query("offset", "" + offset)
-        .query("limit", "" + limit).build(identifiersTable.getName());
+    String uri = UriBuilders.IDENTIFIERS_TABLE_VALUESETS.create().query("select", select).query("offset", Integer.toString(offset))
+        .query("limit", Integer.toString(limit)).build(identifiersTable.getName());
     ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder() //
         .forResource(uri) //
         .withCallback(new ResourceCallback<ValueSetsDto>() {
