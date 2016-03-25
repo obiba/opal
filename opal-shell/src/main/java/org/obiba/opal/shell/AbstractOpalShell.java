@@ -48,7 +48,7 @@ public abstract class AbstractOpalShell implements OpalShell {
         break;
       }
 
-      if(cmdline.trim().length() > 0) {
+      if(!cmdline.trim().isEmpty()) {
         String args[] = CommandLines.parseArguments(cmdline.trim());
         String commandName = args[0];
 
@@ -130,7 +130,7 @@ public abstract class AbstractOpalShell implements OpalShell {
 
         CommandUsage usage = commandRegistry.getCommandUsage(commandName);
         printf("%s\n\n", usage.description());
-        if(usage.syntax().length() > 0) {
+        if(!usage.syntax().isEmpty()) {
           printf("%s\n\n", usage.syntax());
         }
       }

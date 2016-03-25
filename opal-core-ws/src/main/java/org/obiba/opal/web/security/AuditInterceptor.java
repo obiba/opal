@@ -57,7 +57,7 @@ public class AuditInterceptor implements RequestCyclePostProcess {
     // TODO get the remote IP
     StringBuilder sb = new StringBuilder(request.getUri().getPath(true));
     MultivaluedMap<String, String> params =  request.getUri().getQueryParameters();
-    if (params.size() > 0) {
+    if (!params.isEmpty()) {
       sb.append(" queryParams:").append(params.toString());
     }
 

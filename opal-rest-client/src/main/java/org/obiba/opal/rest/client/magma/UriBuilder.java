@@ -70,7 +70,7 @@ public class UriBuilder {
   }
 
   private boolean hasQuery() {
-    return query.size() > 0;
+    return !query.isEmpty();
   }
 
   private String query() {
@@ -86,7 +86,7 @@ public class UriBuilder {
   }
 
   private String path() {
-    StringBuilder sb = new StringBuilder(pathSegments.size() > 0 ? pathSegments.get(0) : "");
+    StringBuilder sb = new StringBuilder(!pathSegments.isEmpty() ? pathSegments.get(0) : "");
     for(int i = 1; i < pathSegments.size(); i++) {
       sb.append('/').append(pathSegments.get(i));
     }

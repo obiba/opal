@@ -50,7 +50,7 @@ public class Vocabulary extends TaxonomyEntity {
   }
 
   public boolean hasTerms() {
-    return terms != null && terms.size() > 0;
+    return terms != null && !terms.isEmpty();
   }
 
   public boolean hasTerm(String name) {

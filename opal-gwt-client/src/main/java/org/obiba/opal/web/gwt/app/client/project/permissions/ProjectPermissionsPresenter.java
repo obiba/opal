@@ -102,7 +102,7 @@ public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissi
           @Override
           public void onResource(Response response, JsArray<Acl> acls) {
             List<Acl> subjectAcls = JsArrays.toList(acls);
-            if(subjectAcls.size() > 0) {
+            if(!subjectAcls.isEmpty()) {
               getView().setSubjectData(subject, subjectAcls);
             } else {
               // refresh and select another subject if any
@@ -185,7 +185,7 @@ public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissi
             List<Subject> subjectList = JsArrays.toList(subjects);
             getView().setData(subjectList);
 
-            if(subjectList.size() > 0) {
+            if(!subjectList.isEmpty()) {
               selectFirstUser(subjectList);
             }
           }

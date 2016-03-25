@@ -197,14 +197,14 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
   public RequestBuilder build() {
     builder = new InnerRequestBuilder(method, uri);
     builder.setCallback(new InnerCallback());
-    if(accept.size() > 0) {
+    if(!accept.isEmpty()) {
       builder.setHeader("Accept", buildAcceptHeader());
     }
     if(body != null) {
       builder.setHeader("Content-Type", contentType);
       builder.setRequestData(body);
     }
-    if(form != null && form.size() > 0) builder.setRequestData(encodeForm());
+    if(form != null && !form.isEmpty()) builder.setRequestData(encodeForm());
     if(credentials != null) credentials.provideCredentials(builder);
     return builder;
   }
@@ -309,7 +309,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
       if(response.getStatusCode() >= Response.SC_BAD_REQUEST) return;
 
       Set<HttpMethod> allowed = getAllowedMethods(response);
-      if(allowed.size() > 0) {
+      if(!allowed.isEmpty()) {
         authorizationCache.put(uri, allowed);
       }
     }
@@ -317,7 +317,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
     private Set<HttpMethod> getAllowedMethods(Response response) {
       Set<HttpMethod> allowed = new LinkedHashSet<>();
       String header = response.getHeader("Allow");
-      if(header != null && header.length() > 0) {
+      if(header != null && !header.isEmpty()) {
         for(String string : header.split(",")) {
           allowed.add(HttpMethod.valueOf(string.trim()));
         }
@@ -328,7 +328,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
 
     private void setOpalVersion(Response response) {
       String header = response.getHeader("X-Opal-Version");
-      if(header != null && header.length() > 0) {
+      if(header != null && !header.isEmpty()) {
         //noinspection AssignmentToStaticFieldFromInstanceMethod
         version = header;
       }

@@ -181,7 +181,7 @@ public class ValueMapEntry {
 
   private static String buildOpenTextLabel(String text) {
     // one word, normalize case
-    if(text.indexOf(' ') == -1 && text.length() > 0) {
+    if(text.indexOf(' ') == -1 && !text.isEmpty()) {
       StringBuilder b = new StringBuilder(text.toLowerCase());
       b.replace(0, 1, b.substring(0, 1).toUpperCase());
       return b.toString();

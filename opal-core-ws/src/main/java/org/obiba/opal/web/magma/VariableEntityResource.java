@@ -49,7 +49,7 @@ public class VariableEntityResource {
   @NoAuthorization
   public Response exists() {
     VariableEntityTablesResource resource = getVariableEntityTablesResource();
-    if(resource.getTables(1).size() > 0) {
+    if(!resource.getTables(1).isEmpty()) {
       return Response.ok().entity(Dtos.asDto(getVariableEntity()).build()).build();
     }
     return Response.status(Response.Status.NOT_FOUND).build();

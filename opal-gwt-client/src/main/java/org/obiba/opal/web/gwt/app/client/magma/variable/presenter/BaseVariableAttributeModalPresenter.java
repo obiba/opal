@@ -468,7 +468,7 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
       return new HasBooleanValue() {
         @Override
         public Boolean getValue() {
-          return Strings.isNullOrEmpty(namespace) || namespace.trim().length() > 0;
+          return Strings.isNullOrEmpty(namespace) || !namespace.trim().isEmpty();
         }
       };
     }

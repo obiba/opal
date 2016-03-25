@@ -64,7 +64,7 @@ public class Taxonomy extends TaxonomyEntity {
   }
 
   public boolean hasVocabularies() {
-    return vocabularies != null && vocabularies.size() > 0;
+    return vocabularies != null && !vocabularies.isEmpty();
   }
 
   public List<Vocabulary> getVocabularies() {

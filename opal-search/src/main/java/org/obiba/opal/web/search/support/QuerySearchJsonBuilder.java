@@ -112,8 +112,8 @@ public class QuerySearchJsonBuilder {
     JSONObject jsonQuery = new JSONObject();
     jsonQuery.accumulate("query", new JSONObject().put("query_string", buildQueryStringJson()));
     jsonQuery.put("sort", buildSortJson());
-    if(fields != null && fields.size() > 0) jsonQuery.put("partial_fields", buildFields());
-    if(filterTypes != null && filterTypes.size() > 0) jsonQuery.put("filter", buildFilter());
+    if(fields != null && !fields.isEmpty()) jsonQuery.put("partial_fields", buildFields());
+    if(filterTypes != null && !filterTypes.isEmpty()) jsonQuery.put("filter", buildFilter());
     jsonQuery.put("from", from);
     jsonQuery.put("size", size);
     if (hasFacets()) jsonQuery.put("facets", buildFacetsJson());
@@ -162,7 +162,7 @@ public class QuerySearchJsonBuilder {
   }
 
   private boolean hasFacets() {
-    return facets != null && facets.size() > 0;
+    return facets != null && !facets.isEmpty();
   }
 
 }

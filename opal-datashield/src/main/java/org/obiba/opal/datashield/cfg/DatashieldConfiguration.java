@@ -117,7 +117,7 @@ public class DatashieldConfiguration implements OpalConfigurationExtension, Seri
   }
 
   private Object readResolve() throws ObjectStreamException {
-    if(aggregatingMethods != null && aggregatingMethods.size() > 0) {
+    if(aggregatingMethods != null && !aggregatingMethods.isEmpty()) {
       environments.add(new DataShieldEnvironment(Environment.AGGREGATE, aggregatingMethods));
       aggregatingMethods = null;
     }

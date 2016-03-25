@@ -249,7 +249,7 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
       }
     }
 
-    if(messages.size() > 0) {
+    if(!messages.isEmpty()) {
       getView().showErrors(messages);
       getView().setErrors(messages, validatorIds);
       return false;
@@ -262,7 +262,7 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
     dto.setName(getView().getName().getText());
     dto.setProject(project);
     String schedule = getView().getSchedule().getText();
-    if(schedule != null && schedule.trim().length() > 0) {
+    if(schedule != null && !schedule.trim().isEmpty()) {
       dto.setCron(getView().getSchedule().getText());
     }
     dto.setDesign(getView().getDesignFile());

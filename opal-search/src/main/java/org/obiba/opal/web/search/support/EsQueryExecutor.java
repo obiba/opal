@@ -156,7 +156,7 @@ public class EsQueryExecutor {
 
     @Override
     public boolean hasContent() {
-      return body != null && body.length() > 0;
+      return body != null && !body.isEmpty();
     }
 
     @Override

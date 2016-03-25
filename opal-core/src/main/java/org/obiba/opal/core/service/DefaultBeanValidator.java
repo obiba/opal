@@ -35,7 +35,7 @@ public class DefaultBeanValidator {
   //TODO replace this by Spring/Hibernate-validator method validation with @Valid once Spring 4 is released
   public <T> void validate(T object, Class<?>... groups) throws ConstraintViolationException {
     Set<ConstraintViolation<T>> violations = validator.validate(object, groups);
-    if(violations.size() > 0) {
+    if(!violations.isEmpty()) {
       throw new ConstraintViolationException(violations);
     }
   }

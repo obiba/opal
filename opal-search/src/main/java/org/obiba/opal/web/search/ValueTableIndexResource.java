@@ -273,7 +273,7 @@ public class ValueTableIndexResource extends IndexResource {
 
     @Override
     public boolean hasContent() {
-      return body != null && body.length() > 0;
+      return body != null && !body.isEmpty();
     }
 
     @Override

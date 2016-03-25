@@ -235,7 +235,7 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
   public void onCreateFolder() {
     String newFolder = getView().getCreateFolderName().getText().trim();
     FileDto currentFolder = getCurrentFolder();
-    if(currentFolder != null && newFolder.length() != 0) {
+    if(currentFolder != null && !newFolder.isEmpty()) {
       createFolder(currentFolder.getPath(), newFolder);
     }
   }
