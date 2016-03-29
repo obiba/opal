@@ -165,7 +165,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   public String toString() {
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
 
     sb.append("copy");
 
@@ -413,7 +413,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     return outputFile;
   }
 
-  private void appendOption(StringBuffer sb, String option, boolean optionSpecified, String value) {
+  private void appendOption(StringBuilder sb, String option, boolean optionSpecified, String value) {
     if(optionSpecified) {
       sb.append(" --");
       sb.append(option);
@@ -422,14 +422,14 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     }
   }
 
-  private void appendFlag(StringBuffer sb, String flag, boolean value) {
+  private void appendFlag(StringBuilder sb, String flag, boolean value) {
     if(value) {
       sb.append(" --");
       sb.append(flag);
     }
   }
 
-  private void appendUnparsedList(StringBuffer sb, Iterable<String> unparsedList) {
+  private void appendUnparsedList(StringBuilder sb, Iterable<String> unparsedList) {
     for(String unparsed : unparsedList) {
       sb.append(' ');
       sb.append(unparsed);

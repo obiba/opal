@@ -143,7 +143,7 @@ public class ImportIdentifiersMappingModalPresenter
     String[] mappedIds = identifiers.split("\\n");
 
     // not empty and same length
-    StringBuffer str = new StringBuffer();
+    StringBuilder str = new StringBuilder();
     for(int i = 0; i < systemIds.length; i++) {
       String sId = systemIds[i].trim();
       String mId = mappedIds[i].trim();
