@@ -68,7 +68,7 @@ public class DerivedNumericalVariableGenerator<N extends Number & Comparable<N>>
 
     boolean first = true;
     Range<N> previousRange = null;
-    N bound = null;
+    N bound;
     for(Range<N> range : ranges) {
       if(previousRange != null && !previousRange.isConnected(range)) {
         appendBound(previousRange.upperEndpoint(), first);

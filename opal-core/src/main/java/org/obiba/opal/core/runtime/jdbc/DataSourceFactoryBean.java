@@ -53,7 +53,7 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
   @Override
   public DataSource getObject() {
     log.debug("Configure DataSource for {}", url);
-    BasicDataSource dataSource = null;
+    BasicDataSource dataSource;
 
     if(managed) {
       dataSource = new BasicManagedDataSource();

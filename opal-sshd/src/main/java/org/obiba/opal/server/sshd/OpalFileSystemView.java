@@ -52,7 +52,7 @@ public class OpalFileSystemView implements FileSystemView {
   }
 
   private FileObject resolve(String file) {
-    FileObject resolved = null;
+    FileObject resolved;
     try {
       resolved = opalfs.getRoot().resolveFile(file, NameScope.DESCENDENT_OR_SELF);
     } catch(FileSystemException e) {

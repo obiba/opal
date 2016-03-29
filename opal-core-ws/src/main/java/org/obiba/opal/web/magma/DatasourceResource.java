@@ -124,7 +124,7 @@ public class DatasourceResource {
 
   @DELETE
   public Response removeDatasource() {
-    Datasource ds = null;
+    Datasource ds;
     if(MagmaEngine.get().hasTransientDatasource(name)) {
       ds = MagmaEngine.get().getTransientDatasourceInstance(name);
       MagmaEngine.get().removeTransientDatasource(name);

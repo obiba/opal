@@ -99,7 +99,7 @@ public class MimetypesFileExtensionsMap {
 
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
-    String line = null;
+    String line;
     try {
       while((line = reader.readLine()) != null) {
         if(!line.startsWith("#")) {

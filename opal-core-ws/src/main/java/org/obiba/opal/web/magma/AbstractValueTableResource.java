@@ -62,7 +62,7 @@ abstract class AbstractValueTableResource {
   }
 
   Iterable<Variable> filterVariables(String script, Integer offset, @Nullable Integer limit) {
-    List<Variable> filteredVariables = null;
+    List<Variable> filteredVariables;
 
     if(script != null) {
       JavascriptClause jsClause = new JavascriptClause(script);

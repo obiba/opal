@@ -213,7 +213,7 @@ public class ProjectsServiceImpl implements ProjectService {
     return transactionTemplate.execute(new TransactionCallback<DatasourceFactory>() {
       @Override
       public DatasourceFactory doInTransaction(TransactionStatus status) {
-        DatasourceFactory dataSourceFactory = null;
+        DatasourceFactory dataSourceFactory;
         if(project.hasDatabase()) {
           Database database = databaseRegistry.getDatabase(project.getDatabase());
           dataSourceFactory = databaseRegistry.createDatasourceFactory(project.getName(), database);

@@ -29,7 +29,7 @@ public class ClientErrorDtos {
    * @return status field of the ClientErrorDto
    */
   public static String getStatus(String jsonClientErrorDto) {
-    String errorStatus = null;
+    String errorStatus;
     if(jsonClientErrorDto != null && !jsonClientErrorDto.isEmpty()) {
       try {
         ClientErrorDto errorDto = JsonUtils.unsafeEval(jsonClientErrorDto);

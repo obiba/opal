@@ -175,7 +175,7 @@ public class DefaultOpalFileSystem implements OpalFileSystem {
   }
 
   private MessageDigest getDigester() {
-    MessageDigest digester = null;
+    MessageDigest digester;
     try {
       digester = MessageDigest.getInstance("MD5");
     } catch(NoSuchAlgorithmException e) {
