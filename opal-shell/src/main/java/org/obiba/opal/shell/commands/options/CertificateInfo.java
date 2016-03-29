@@ -77,7 +77,7 @@ public class CertificateInfo {
 
   private boolean isCertificateCorrect() {
     shell.printf(" %s\n", getConfirmationQuestion());
-    String ans = "no";
+    String ans;
     boolean helpUser = false;
     do {
       if(helpUser) shell.printf(" Please respond with one of the following: 'yes', 'y', 'no', 'n'. Case is ignored.\n");

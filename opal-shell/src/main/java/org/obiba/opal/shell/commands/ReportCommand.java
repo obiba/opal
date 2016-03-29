@@ -73,7 +73,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     getShell().progress("Prepare report", 0, 3, 0);
     // Get the report template.
     String name = getOptions().getName();
-    ReportTemplate reportTemplate = null;
+    ReportTemplate reportTemplate;
     try {
       reportTemplate = reportTemplateService.getReportTemplate(name, getOptions().getProject());
     } catch(NoSuchReportTemplateException e) {

@@ -123,7 +123,7 @@ public class ValueMapEntry {
   }
 
   public static Builder fromRange(@Nullable Number lower, @Nullable Number upper) {
-    String value = "";
+    String value;
     ValueMapEntryType type = ValueMapEntryType.RANGE;
 
     //noinspection IfStatementWithTooManyBranches

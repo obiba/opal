@@ -190,7 +190,7 @@ public class ExportCommandOptionsDtoImpl implements CopyCommandOptions {
   private String addFileExtensionIfMissing(String outputFilePath, String outputFileFormat) {
     String modifiedPath = outputFilePath;
 
-    FileObject file = null;
+    FileObject file;
     try {
       file = resolveFileInFileSystem(outputFilePath);
 

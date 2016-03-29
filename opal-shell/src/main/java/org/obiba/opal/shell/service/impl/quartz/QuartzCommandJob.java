@@ -71,7 +71,7 @@ public class QuartzCommandJob implements Job {
   //
 
   private void autowireSelf(JobExecutionContext context) throws JobExecutionException {
-    ApplicationContext applicationContext = null;
+    ApplicationContext applicationContext;
     try {
       applicationContext = (ApplicationContext) context.getScheduler().getContext().get("applicationContext");
     } catch(SchedulerException ex) {

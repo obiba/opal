@@ -157,7 +157,7 @@ public class TableValueSetsSearchResource extends AbstractSearchUtility {
   }
 
   protected Iterable<Variable> filterVariables(String script) {
-    List<Variable> filteredVariables = null;
+    List<Variable> filteredVariables;
 
     if(StringUtils.isEmpty(script)) {
       filteredVariables = Lists.newArrayList(getValueTable().getVariables());

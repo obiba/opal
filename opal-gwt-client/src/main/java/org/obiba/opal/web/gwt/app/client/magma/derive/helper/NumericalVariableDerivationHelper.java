@@ -121,7 +121,7 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
   public void addValueMapEntry(@Nullable N lower, @Nullable N upper, String newValue) {
     if(lower == null && upper == null) return;
 
-    ValueMapEntry entry = null;
+    ValueMapEntry entry;
     String nv = newValue == null ? "" : newValue;
 
     if(lower != null && lower.equals(upper)) {
