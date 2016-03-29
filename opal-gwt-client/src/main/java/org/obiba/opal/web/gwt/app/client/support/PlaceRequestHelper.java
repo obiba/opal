@@ -8,6 +8,9 @@ import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 
 public class PlaceRequestHelper {
 
+  private PlaceRequestHelper() {
+  }
+
   public static PlaceRequest.Builder createRequestBuilder(PlaceRequest request) {
     PlaceRequest.Builder builder = createRequestBuilderWithNameToken(request);
 

@@ -18,6 +18,9 @@ public class ValueRenderingHelper {
 
   private static final long GB = MB * KB;
 
+  private ValueRenderingHelper() {
+  }
+
   public static String getSizeWithUnit(double size) {
     if(size < KB) {
       return (long) size + " B";
