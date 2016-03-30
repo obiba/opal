@@ -27,7 +27,7 @@ public class BooleanVariableDerivationHelper extends DerivationHelper {
 
   @Override
   protected void initializeValueMapEntries() {
-    valueMapEntries = new ArrayList<ValueMapEntry>();
+    valueMapEntries = new ArrayList<>();
     valueMapEntries
         .add(ValueMapEntry.fromDistinct(Boolean.TRUE.toString()).label(translations.trueLabel()).newValue("1").build());
     valueMapEntries.add(

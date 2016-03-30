@@ -51,7 +51,7 @@ public class SubjectProfilesAdministrationView extends ViewImpl
 
   private final static Translations translations = GWT.create(Translations.class);
 
-  private final ListDataProvider<SubjectProfileDto> profilesDataProvider = new ListDataProvider<SubjectProfileDto>();
+  private final ListDataProvider<SubjectProfileDto> profilesDataProvider = new ListDataProvider<>();
 
   private ActionsColumn<SubjectProfileDto> actionsColumn;
 
@@ -95,16 +95,16 @@ public class SubjectProfilesAdministrationView extends ViewImpl
 
     }, translations.lastUpdatedLabel());
     profilesTable
-        .addColumn(actionsColumn = new ActionsColumn<SubjectProfileDto>(new ActionsProvider<SubjectProfileDto>() {
+        .addColumn(actionsColumn = new ActionsColumn<>(new ActionsProvider<SubjectProfileDto>() {
 
           @Override
           public String[] allActions() {
-            return new String[] { REMOVE_ACTION };
+            return new String[]{REMOVE_ACTION};
           }
 
           @Override
           public String[] getActions(SubjectProfileDto value) {
-            return new String[] { REMOVE_ACTION };
+            return new String[]{REMOVE_ACTION};
           }
         }), translations.actionsLabel());
 

@@ -54,7 +54,7 @@ public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissi
 
   private final static Translations translations = GWT.create(Translations.class);
 
-  private final ListDataProvider<Acl> permissionsDataProvider = new ListDataProvider<Acl>();
+  private final ListDataProvider<Acl> permissionsDataProvider = new ListDataProvider<>();
 
   @Inject
   public ResourcePermissionsView(Binder uiBinder) {
@@ -131,19 +131,19 @@ public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissi
       }
     };
 
-    static final ActionsColumn<Acl> ACTIONS = new ActionsColumn<Acl>(new ActionsProvider<Acl>() {
+    static final ActionsColumn<Acl> ACTIONS = new ActionsColumn<>(new ActionsProvider<Acl>() {
 
       @Override
       public String[] allActions() {
-        return new String[] { ActionsColumn.EDIT_ACTION, ActionsColumn.REMOVE_ACTION };
+        return new String[]{ActionsColumn.EDIT_ACTION, ActionsColumn.REMOVE_ACTION};
       }
 
       @Override
       public String[] getActions(Acl value) {
         String action = value.getActions(0);
-        if(ResourcePermissionType.PROJECT.hasPermission(action) ||
-            ResourcePermissionType.VARIABLE.hasPermission(action)) {
-          return new String[] { ActionsColumn.REMOVE_ACTION };
+        if (ResourcePermissionType.PROJECT.hasPermission(action) ||
+                ResourcePermissionType.VARIABLE.hasPermission(action)) {
+          return new String[]{ActionsColumn.REMOVE_ACTION};
         }
 
         return allActions();

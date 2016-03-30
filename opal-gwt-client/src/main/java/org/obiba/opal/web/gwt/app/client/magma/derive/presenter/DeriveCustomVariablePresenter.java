@@ -94,7 +94,7 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
 
   @Override
   List<DefaultWizardStepController.Builder> getWizardStepBuilders(WizardStepController.StepInHandler stepInHandler) {
-    List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<DefaultWizardStepController.Builder>();
+    List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<>();
     stepBuilders.add(getView().getDeriveStepController());
     return stepBuilders;
   }

@@ -107,7 +107,7 @@ public class InnerAutoCompleteTextArea extends TextArea {
 
   public void initializeText(String value) {
     super.setText(value);
-    suggestions = new ArrayList<String>();
+    suggestions = new ArrayList<>();
     previousText = "";
     currentSuggestionPosition = 0;
     currentSuggestion = "";

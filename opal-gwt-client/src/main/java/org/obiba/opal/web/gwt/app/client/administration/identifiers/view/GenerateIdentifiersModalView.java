@@ -200,7 +200,7 @@ public class GenerateIdentifiersModalView extends ModalPopupViewWithUiHandlers<G
   private void initializeTexts() {
     dialog.setTitle(translations.generateIdentifiers());
     updateDescriptionText();
-    List<String> args = new ArrayList<String>();
+    List<String> args = new ArrayList<>();
     args.clear();
     args.add(String.valueOf(MIN_IDENTIFIER_SIZE));
     args.add(String.valueOf(MAX_IDENTIFIER_SIZE));
@@ -210,7 +210,7 @@ public class GenerateIdentifiersModalView extends ModalPopupViewWithUiHandlers<G
   }
 
   private void updateDescriptionText() {
-    List<String> args = new ArrayList<String>();
+    List<String> args = new ArrayList<>();
     args.add(String.valueOf(affectedEntities));
     String rawMessage = affectedEntities > 1
         ? translations.specifyGenerateIdentifiers()

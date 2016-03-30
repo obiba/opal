@@ -425,7 +425,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
    * Closes the alerts along with the highlighted groups
    */
   public void closeAlerts() {
-    Collection<Alert> alerts = new ArrayList<Alert>();
+    Collection<Alert> alerts = new ArrayList<>();
     for(Widget anAlertPlace : alertPlace) {
       alerts.add((Alert) anAlertPlace);
     }
@@ -503,7 +503,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
 
   private static class ModalStack {
 
-    private final Stack<Modal> currentlyShown = new Stack<Modal>();
+    private final Stack<Modal> currentlyShown = new Stack<>();
 
     public boolean isEmpty() {
       return currentlyShown.isEmpty();

@@ -57,7 +57,7 @@ public class DeriveBooleanVariableStepPresenter
 
   @Override
   List<DefaultWizardStepController.Builder> getWizardStepBuilders(WizardStepController.StepInHandler stepInHandler) {
-    List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<DefaultWizardStepController.Builder>();
+    List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<>();
     stepBuilders.add(getView().getMapStepController() //
         .onStepIn(stepInHandler) //
         .onValidate(new MapStepValidationHandler() {

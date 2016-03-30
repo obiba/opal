@@ -408,7 +408,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
         @Override
         public void onVariableResourceCallback() {
-          List<VariableDto> variables = new ArrayList<VariableDto>();
+          List<VariableDto> variables = new ArrayList<>();
           for(VariableDto result : results) {
             variables.add(result);
           }

@@ -91,7 +91,7 @@ public class GeneralConfModalPresenter extends ModalPresenterWidget<GeneralConfM
     @Override
     protected Set<FieldValidator> getValidators() {
       if(validators == null) {
-        validators = new LinkedHashSet<FieldValidator>();
+        validators = new LinkedHashSet<>();
         validators.add(new RequiredTextValidator(getView().getName(), "NameIsRequired", FormField.NAME.name()));
         validators.add(
             new ConditionValidator(languagesSizeCondition(), "LanguageIsRequired", Display.FormField.LANGUAGES.name()));

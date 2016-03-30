@@ -26,7 +26,7 @@ public class VariableSelectionChangeEvent extends GwtEvent<VariableSelectionChan
 
   }
 
-  private static final Type<Handler> TYPE = new Type<Handler>();
+  private static final Type<Handler> TYPE = new Type<>();
 
   private final String datasourceName;
 

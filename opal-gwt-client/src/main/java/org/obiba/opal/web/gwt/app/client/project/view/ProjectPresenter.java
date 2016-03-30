@@ -82,27 +82,27 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   @ContentSlot
   public static final GwtEvent.Type<RevealContentHandler<?>> BOOKMARK_ICON
-      = new GwtEvent.Type<RevealContentHandler<?>>();
+      = new GwtEvent.Type<>();
 
   @ContentSlot
-  public static final GwtEvent.Type<RevealContentHandler<?>> TABLES_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
+  public static final GwtEvent.Type<RevealContentHandler<?>> TABLES_PANE = new GwtEvent.Type<>();
 
   @ContentSlot
-  public static final GwtEvent.Type<RevealContentHandler<?>> FILES_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
+  public static final GwtEvent.Type<RevealContentHandler<?>> FILES_PANE = new GwtEvent.Type<>();
 
   @ContentSlot
   public static final GwtEvent.Type<RevealContentHandler<?>> REPORTS_PANE
-      = new GwtEvent.Type<RevealContentHandler<?>>();
+      = new GwtEvent.Type<>();
 
   @ContentSlot
-  public static final GwtEvent.Type<RevealContentHandler<?>> TASKS_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
+  public static final GwtEvent.Type<RevealContentHandler<?>> TASKS_PANE = new GwtEvent.Type<>();
 
   @ContentSlot
-  public static final GwtEvent.Type<RevealContentHandler<?>> ADMIN_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
+  public static final GwtEvent.Type<RevealContentHandler<?>> ADMIN_PANE = new GwtEvent.Type<>();
 
   @ContentSlot
   public static final GwtEvent.Type<RevealContentHandler<?>> PERMISSION_PANE
-      = new GwtEvent.Type<RevealContentHandler<?>>();
+      = new GwtEvent.Type<>();
 
   private final Provider<MagmaPresenter> magmaPresenterProvider;
 

@@ -18,7 +18,7 @@ public class SessionCreatedEvent extends GwtEvent<SessionCreatedEvent.Handler> {
     void onSessionCreated(SessionCreatedEvent event);
   }
 
-  private static final Type<Handler> TYPE = new Type<Handler>();
+  private static final Type<Handler> TYPE = new Type<>();
 
   private final String uri;
 

@@ -29,7 +29,7 @@ public class LocaleChooser extends Chooser {
 
   private static final Translations translations = GWT.create(Translations.class);
 
-  private final Map<String, String> localeMap = new HashMap<String, String>();
+  private final Map<String, String> localeMap = new HashMap<>();
 
   @UiConstructor
   public LocaleChooser(boolean isMultipleSelect) {
@@ -67,7 +67,7 @@ public class LocaleChooser extends Chooser {
   }
 
   public List<String> getSelectedLocales() {
-    List<String> locales = new ArrayList<String>();
+    List<String> locales = new ArrayList<>();
     for(int i = 0; i < getItemCount(); i++) {
       if(isItemSelected(i)) {
         locales.add(localeMap.get(getValue(i)));

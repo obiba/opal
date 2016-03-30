@@ -20,7 +20,7 @@ public class TableSelectionRequiredEvent extends GwtEvent<TableSelectionRequired
   // Static Variables
   //
 
-  private static final Type<Handler> TYPE = new Type<Handler>();
+  private static final Type<Handler> TYPE = new Type<>();
 
   //
   // Instance Variables

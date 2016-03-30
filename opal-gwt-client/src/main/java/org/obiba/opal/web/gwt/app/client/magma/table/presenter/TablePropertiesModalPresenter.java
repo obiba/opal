@@ -197,7 +197,7 @@ public class TablePropertiesModalPresenter extends ModalPresenterWidget<TablePro
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+      Set<FieldValidator> validators = new LinkedHashSet<>();
       validators.add(new RequiredTextValidator(getView().getName(), "NameIsRequired", Display.FormField.NAME.name()));
       validators.add(new RequiredTextValidator(getView().getEntityType(), "EntityTypeIsRequired",
           Display.FormField.ENTITY_TYPE.name()));

@@ -54,7 +54,7 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
 
   private String preSelectedVariable;
 
-  private final Map<String, VariableDto> variablesByName = new HashMap<String, VariableDto>();
+  private final Map<String, VariableDto> variablesByName = new HashMap<>();
 
   @Inject
   public DeriveFromVariablePresenter(EventBus eventBus, Display view) {
@@ -185,7 +185,7 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
   @Override
   List<DefaultWizardStepController.Builder> getWizardStepBuilders(
       @Nullable WizardStepController.StepInHandler stepInHandler) {
-    List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<DefaultWizardStepController.Builder>();
+    List<DefaultWizardStepController.Builder> stepBuilders = new ArrayList<>();
     stepBuilders.add(getView().getDeriveFromVariableStepController(wizardType != DeriveVariablePresenter.FromWizardType)
         .onValidate(new ValidationHandler() {
           @Override

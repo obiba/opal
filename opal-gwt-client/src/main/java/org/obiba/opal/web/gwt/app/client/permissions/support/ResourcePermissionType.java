@@ -57,5 +57,5 @@ public enum ResourcePermissionType {
     Collections.addAll(this.permissions, permissions);
   }
 
-  private final ArrayList<AclAction> permissions = new ArrayList<AclAction>();
+  private final ArrayList<AclAction> permissions = new ArrayList<>();
 }

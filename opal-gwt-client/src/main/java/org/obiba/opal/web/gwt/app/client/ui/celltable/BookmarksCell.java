@@ -46,7 +46,7 @@ public class BookmarksCell extends AbstractCell<BookmarkDto> {
 
   private CompositeCell<BookmarkDto> createBookmarks(BookmarkDto bookmarkDto) {
     List<LinkDto> linksDto = JsArrays.toList(bookmarkDto.getLinksArray());
-    List<HasCell<BookmarkDto, ?>> hasCells = new ArrayList<HasCell<BookmarkDto, ?>>();
+    List<HasCell<BookmarkDto, ?>> hasCells = new ArrayList<>();
     int upper = linksDto.size() - 1;
     int count = 0;
 
@@ -55,7 +55,7 @@ public class BookmarksCell extends AbstractCell<BookmarkDto> {
       if (count++ < upper) hasCells.add(new Separator());
     }
 
-    return new CompositeCell<BookmarkDto>(hasCells);
+    return new CompositeCell<>(hasCells);
   }
 
   private class Bookmark implements HasCell<BookmarkDto, String> {

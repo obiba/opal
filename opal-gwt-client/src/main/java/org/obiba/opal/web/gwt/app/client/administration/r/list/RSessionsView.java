@@ -101,7 +101,7 @@ public class RSessionsView extends ViewWithUiHandlers<RSessionsUiHandlers> imple
     addTableColumns();
     addTablePager();
 
-    dataProvider = new ListDataProvider<RSessionDto>();
+    dataProvider = new ListDataProvider<>();
     dataProvider.addDataDisplay(table);
   }
 
@@ -138,11 +138,11 @@ public class RSessionsView extends ViewWithUiHandlers<RSessionsUiHandlers> imple
 
     table.addColumn(new StatusColumn(), translations.statusLabel());
 
-    actionsColumn = new ActionsColumn<RSessionDto>(new ActionsProvider<RSessionDto>() {
+    actionsColumn = new ActionsColumn<>(new ActionsProvider<RSessionDto>() {
 
       @Override
       public String[] allActions() {
-        return new String[] { RSessionsPresenter.TERMINATE_ACTION };
+        return new String[]{RSessionsPresenter.TERMINATE_ACTION};
       }
 
       @Override

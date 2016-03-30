@@ -91,7 +91,7 @@ public class DataShieldPackageCreatePresenter extends ModalPresenterWidget<DataS
     @Override
     protected Set<FieldValidator> getValidators() {
       if(validators == null) {
-        validators = new LinkedHashSet<FieldValidator>();
+        validators = new LinkedHashSet<>();
         validators.add(new RequiredTextValidator(getView().getName(), "DataShieldPackageNameIsRequired"));
       }
       return validators;

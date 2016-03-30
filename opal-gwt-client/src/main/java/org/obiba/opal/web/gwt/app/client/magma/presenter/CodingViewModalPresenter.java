@@ -51,7 +51,7 @@ import com.gwtplatform.mvp.client.View;
 
 public class CodingViewModalPresenter extends PresenterWidget<CodingViewModalPresenter.Display> {
 
-  private final Collection<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+  private final Collection<FieldValidator> validators = new LinkedHashSet<>();
 
   private TableDto table;
 
@@ -141,7 +141,7 @@ public class CodingViewModalPresenter extends PresenterWidget<CodingViewModalPre
     }
 
     private boolean validCodingView() {
-      List<String> messages = new ArrayList<String>();
+      List<String> messages = new ArrayList<>();
       String message;
       for(FieldValidator validator : validators) {
         message = validator.validate();

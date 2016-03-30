@@ -31,7 +31,7 @@ public class TableChooser extends Chooser {
 
   private static final Translations translations = GWT.create(Translations.class);
 
-  private final Map<String, TableDto> tableDtoMap = new HashMap<String, TableDto>();
+  private final Map<String, TableDto> tableDtoMap = new HashMap<>();
 
   @UiConstructor
   public TableChooser(boolean isMultipleSelect) {
@@ -45,7 +45,7 @@ public class TableChooser extends Chooser {
 
   public void addTableSelections(JsArray<TableDto> tables) {
     tableDtoMap.clear();
-    HashMap<String, List<TableDto>> datasourceMap = new LinkedHashMap<String, List<TableDto>>();
+    HashMap<String, List<TableDto>> datasourceMap = new LinkedHashMap<>();
     for(TableDto table : JsArrays.toIterable(tables)) {
       if(!datasourceMap.containsKey(table.getDatasourceName())) {
         datasourceMap.put(table.getDatasourceName(), new ArrayList<TableDto>());
@@ -93,7 +93,7 @@ public class TableChooser extends Chooser {
   }
 
   public List<TableDto> getSelectedTables() {
-    List<TableDto> tables = new ArrayList<TableDto>();
+    List<TableDto> tables = new ArrayList<>();
     for(int i = 0; i < getItemCount(); i++) {
       if(isItemSelected(i)) {
         tables.add(tableDtoMap.get(getValue(i)));

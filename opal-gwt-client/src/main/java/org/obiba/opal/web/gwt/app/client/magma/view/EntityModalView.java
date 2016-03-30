@@ -102,7 +102,7 @@ public class EntityModalView extends ModalPopupViewWithUiHandlers<EntityModalUiH
   private final Translations translations = GWT.create(Translations.class);
 
   private final ListDataProvider<EntityModalPresenter.VariableValueRow> dataProvider
-      = new ListDataProvider<EntityModalPresenter.VariableValueRow>();
+      = new ListDataProvider<>();
 
   private final ValueSelectionHandlerImpl valueSelectionHandler;
 

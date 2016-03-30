@@ -156,7 +156,7 @@ public class CsvFormatStepView extends AbstractCsvOptionsViewWithUiHandlers<CsvF
   }
 
   private List<String> toList(JsArrayString jsArrayString) {
-    List<String> list = new ArrayList<String>();
+    List<String> list = new ArrayList<>();
     for(int i = 0; i < jsArrayString.length(); i++) {
       list.add(jsArrayString.get(i));
     }

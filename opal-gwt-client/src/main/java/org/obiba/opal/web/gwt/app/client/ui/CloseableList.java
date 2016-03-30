@@ -28,7 +28,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class CloseableList extends UList {
 
-  private final List<ItemRemovedHandler> itemRemovedHandlers = new ArrayList<ItemRemovedHandler>();
+  private final List<ItemRemovedHandler> itemRemovedHandlers = new ArrayList<>();
 
   private ItemValidator itemValidator;
 

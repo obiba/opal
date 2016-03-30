@@ -64,7 +64,7 @@ public class DefaultSuggestBox extends SuggestBox {
 
   private static final class DefaultMultiWordSuggestOracle extends MultiWordSuggestOracle {
 
-    private final List<String> defaults = new ArrayList<String>();
+    private final List<String> defaults = new ArrayList<>();
 
     private boolean withDefaults = true;
 

@@ -50,7 +50,7 @@ public class DatasourceParsingErrorPanel extends FlowPanel {
 
   @SuppressWarnings("unchecked")
   private Iterable<DatasourceParsingErrorDto> extractDatasourceParsingErrors(ClientErrorDto dto) {
-    Collection<DatasourceParsingErrorDto> datasourceParsingErrors = new ArrayList<DatasourceParsingErrorDto>();
+    Collection<DatasourceParsingErrorDto> datasourceParsingErrors = new ArrayList<>();
     JsArray<DatasourceParsingErrorDto> errors = (JsArray<DatasourceParsingErrorDto>) dto
         .getExtension(ClientErrorDtoExtensions.errors);
     if(errors != null) {

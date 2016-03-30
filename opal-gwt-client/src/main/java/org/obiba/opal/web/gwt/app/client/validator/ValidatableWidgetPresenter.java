@@ -22,14 +22,14 @@ import com.gwtplatform.mvp.client.View;
 
 public abstract class ValidatableWidgetPresenter<D extends PopupView> extends ModalPresenterWidget<D> {
 
-  private final List<FieldValidator> validators = new ArrayList<FieldValidator>();
+  private final List<FieldValidator> validators = new ArrayList<>();
 
   public ValidatableWidgetPresenter(EventBus eventBus, D display) {
     super(eventBus, display);
   }
 
   protected boolean validate() {
-    List<String> messages = new ArrayList<String>();
+    List<String> messages = new ArrayList<>();
     String message;
     for(FieldValidator validator : validators) {
       message = validator.validate();

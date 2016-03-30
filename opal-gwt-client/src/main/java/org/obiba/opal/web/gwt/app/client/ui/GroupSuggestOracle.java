@@ -113,7 +113,7 @@ public class GroupSuggestOracle extends SuggestOracle {
           @Override
           public void onResource(com.google.gwt.http.client.Response response, JsArray<GroupDto> resources) {
             if(response.getStatusCode() == com.google.gwt.http.client.Response.SC_OK) {
-              List<GroupSuggestion> suggestions = new ArrayList<GroupSuggestion>();
+              List<GroupSuggestion> suggestions = new ArrayList<>();
               for(int i = 0; i < resources.length(); i++) {
                 if(resources.get(i).getName().toLowerCase().contains(query.toLowerCase())) {
                   suggestions.add(convertToFormattedSuggestions(query, resources.get(i)));

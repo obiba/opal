@@ -22,7 +22,7 @@ public class ActionsPackageRColumn<T> extends Column<T, T> implements HasActionH
   }
 
   public ActionsPackageRColumn(ActionsProvider<T> actionsProvider) {
-    super(new ActionsCell<T>(actionsProvider));
+    super(new ActionsCell<>(actionsProvider));
     setCellStyleNames("row-actions");
   }
 

@@ -21,7 +21,7 @@ public class SessionEndedEvent extends GwtEvent<SessionEndedEvent.Handler> {
     void onSessionEnded(SessionEndedEvent event);
   }
 
-  private static final Type<Handler> TYPE = new Type<Handler>();
+  private static final Type<Handler> TYPE = new Type<>();
 
   public SessionEndedEvent() {
   }

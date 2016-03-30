@@ -73,7 +73,7 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
 
   private TableDto table;
 
-  private List<VariableDto> variables = new LinkedList<VariableDto>();
+  private List<VariableDto> variables = new LinkedList<>();
 
   private VariableCopyValidationHandler variableCopyValidationHandler;
 
@@ -163,7 +163,7 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
 
       private void updateVariableList() {
         List<VariableDto> viewVariables = getView().getVariables(false);
-        Collection<VariableDto> removeVariables = new LinkedList<VariableDto>();
+        Collection<VariableDto> removeVariables = new LinkedList<>();
         for(VariableDto v : variables) {
           boolean keep = false;
           for(VariableDto viewVariable : viewVariables) {
@@ -382,7 +382,7 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
     @Override
     protected Set<FieldValidator> getValidators() {
       if(validators == null) {
-        validators = new LinkedHashSet<FieldValidator>();
+        validators = new LinkedHashSet<>();
 
         validators.add(new RequiredTextValidator(getView().getViewName(), "ViewNameRequired", FormField.NAME.name()));
         validators.add(new ConditionValidator(
@@ -452,11 +452,11 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
 
     @Override
     protected boolean hasError() {
-      Collection<String> names = new HashSet<String>();
+      Collection<String> names = new HashSet<>();
 
       for(VariableDto var : variables) {
         if(!names.add(var.getName())) {
-          List<String> args = new ArrayList<String>();
+          List<String> args = new ArrayList<>();
           args.add(var.getName());
           setArgs(args);
           return true;

@@ -32,7 +32,7 @@ public final class DatasourceParsingErrorDtos {
   }
 
   private static Collection<String> createErrorCollection(Iterable<DatasourceParsingErrorDto> errors) {
-    Collection<String> errorCollection = new ArrayList<String>();
+    Collection<String> errorCollection = new ArrayList<>();
     for(DatasourceParsingErrorDto dto : errors) {
       errorCollection.add(getErrorMessage(dto));
     }
@@ -42,7 +42,7 @@ public final class DatasourceParsingErrorDtos {
 
   @SuppressWarnings("unchecked")
   private static Iterable<DatasourceParsingErrorDto> extractDatasourceParsingErrors(ClientErrorDto dto) {
-    Collection<DatasourceParsingErrorDto> datasourceParsingErrors = new ArrayList<DatasourceParsingErrorDto>();
+    Collection<DatasourceParsingErrorDto> datasourceParsingErrors = new ArrayList<>();
     JsArray<DatasourceParsingErrorDto> errors = (JsArray<DatasourceParsingErrorDto>) dto
         .getExtension(DatasourceParsingErrorDto.ClientErrorDtoExtensions.errors);
     if(errors != null) {

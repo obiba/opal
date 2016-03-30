@@ -81,7 +81,7 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
 
   private ActionsColumn<TermDto> actions;
 
-  private final ListDataProvider<TermDto> dataProvider = new ListDataProvider<TermDto>();
+  private final ListDataProvider<TermDto> dataProvider = new ListDataProvider<>();
 
   @Inject
   public VocabularyView(ViewUiBinder viewUiBinder, Translations translations, TranslationMessages translationMessages) {
@@ -119,10 +119,10 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
         return term.getDescriptionArray();
       }
     }, translations.descriptionLabel());
-    actions = new ActionsColumn<TermDto>(new ActionHandler<TermDto>() {
+    actions = new ActionsColumn<>(new ActionHandler<TermDto>() {
       @Override
       public void doAction(TermDto object, String actionName) {
-        if(ActionsColumn.EDIT_ACTION.equals(actionName)) {
+        if (ActionsColumn.EDIT_ACTION.equals(actionName)) {
           getUiHandlers().onEditTerm(object);
         } else {
           getUiHandlers().onDeleteTerm(object);

@@ -19,7 +19,7 @@ import com.google.gwt.event.shared.GwtEvent;
 
 public class GeoValueDisplayEvent extends GwtEvent<GeoValueDisplayEvent.Handler> {
 
-  private static final Type<Handler> TYPE = new Type<Handler>();
+  private static final Type<Handler> TYPE = new Type<>();
 
   private final VariableDto variable;
 

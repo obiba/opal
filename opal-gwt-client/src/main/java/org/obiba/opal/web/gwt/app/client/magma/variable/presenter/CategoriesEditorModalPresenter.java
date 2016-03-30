@@ -78,7 +78,7 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
   public void onSave() {
     // Validate category names
     JsArray<CategoryDto> categories = JsArrays.toSafeArray(getView().getCategories());
-    Collection<String> names = new HashSet<String>();
+    Collection<String> names = new HashSet<>();
     for(CategoryDto categoryDto : JsArrays.toIterable(categories)) {
       if(!names.add(categoryDto.getName())) {
         getView().showError(translationMessages.categoryNameDuplicated(categoryDto.getName()), null);

@@ -59,7 +59,7 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
 
   private final DatabaseListColumns columns;
 
-  private final ListDataProvider<DatabaseDto> dataProvider = new ListDataProvider<DatabaseDto>();
+  private final ListDataProvider<DatabaseDto> dataProvider = new ListDataProvider<>();
 
   @Inject
   public IdentifiersDatabaseView(Binder uiBinder, Translations translations) {

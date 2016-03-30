@@ -122,7 +122,7 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
 
   private JsArray<DatasourceDto> datasources;
 
-  private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
+  private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<>();
 
   private final TextInputCell cell = new TextInputCell();
 
@@ -194,8 +194,8 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
       }
     }, translations.scriptLabel());
 
-    actionsColumn = new ActionsVariableCopyColumn<VariableDto>(
-        new ConstantActionsProvider<VariableDto>(ActionsVariableCopyColumn.REMOVE_ACTION));
+    actionsColumn = new ActionsVariableCopyColumn<>(
+            new ConstantActionsProvider<VariableDto>(ActionsVariableCopyColumn.REMOVE_ACTION));
     table.addColumn(actionsColumn, translations.actionsLabel());
 
     table.setPageSize(PAGE_SIZE);
@@ -274,7 +274,7 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
   }
 
   private List<String> toList(JsArrayString jsArrayString) {
-    List<String> list = new ArrayList<String>();
+    List<String> list = new ArrayList<>();
     for(int i = 0; i < jsArrayString.length(); i++) {
       list.add(jsArrayString.get(i));
     }
@@ -326,7 +326,7 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
 
   @Override
   public void removeVariable(VariableDto object) {
-    List<VariableDto> list = new LinkedList<VariableDto>(dataProvider.getList());
+    List<VariableDto> list = new LinkedList<>(dataProvider.getList());
     for(int i = 0; i < list.size(); i++) {
       if(list.get(i).getName().equals(object.getName())) {
         list.remove(i);
@@ -349,7 +349,7 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
 
   @Override
   public List<VariableDto> getVariables(boolean withNewNames) {
-    List<VariableDto> list = new LinkedList<VariableDto>();
+    List<VariableDto> list = new LinkedList<>();
     if(dataProvider.getList().size() == 1 && !singleVariable.getText().isEmpty()) {
       VariableDto v = dataProvider.getList().get(0);
       v.setName(singleVariable.getText());

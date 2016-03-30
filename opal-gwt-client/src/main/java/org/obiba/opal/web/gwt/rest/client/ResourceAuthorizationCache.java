@@ -18,7 +18,7 @@ import java.util.Set;
  */
 public class ResourceAuthorizationCache {
 
-  private final Map<String, Set<HttpMethod>> cache = new HashMap<String, Set<HttpMethod>>();
+  private final Map<String, Set<HttpMethod>> cache = new HashMap<>();
 
   public Set<HttpMethod> get(String resource) {
     return cache.get(normalize(resource));

@@ -115,7 +115,7 @@ public class TaxonomyGitImportModalPresenter extends ModalPresenterWidget<Taxono
         return validators;
       }
 
-      validators = new LinkedHashSet<FieldValidator>();
+      validators = new LinkedHashSet<>();
       validators.add(new RequiredTextValidator(getView().getUser(), "TaxonomyGitUserRequired",
           Display.FormField.USER.name()));
       validators.add(new RequiredTextValidator(getView().getRepository(), "TaxonomyGitRepositoryRequired", Display.FormField.REPOSITORY.name()));

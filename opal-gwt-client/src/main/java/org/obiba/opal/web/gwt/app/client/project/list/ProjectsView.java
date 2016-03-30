@@ -67,7 +67,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   @UiField
   TextBoxClearable filter;
 
-  private final ListDataProvider<ProjectDto> projectsDataProvider = new ListDataProvider<ProjectDto>();
+  private final ListDataProvider<ProjectDto> projectsDataProvider = new ListDataProvider<>();
 
   private final PlaceManager placeManager;
 
@@ -121,7 +121,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     projectsTable.addColumn(new DescriptionColumn(), translations.descriptionLabel());
     projectsTable.addColumn(new LastUpdatedColumn(), translations.lastUpdatedLabel());
     projectsDataProvider.addDataDisplay(projectsTable);
-    typeSortHandler = new ListHandler<ProjectDto>(projectsDataProvider.getList());
+    typeSortHandler = new ListHandler<>(projectsDataProvider.getList());
     typeSortHandler.setComparator(projectsTable.getColumn(SORTABLE_COLUMN_NAME), new NameComparator());
     typeSortHandler.setComparator(projectsTable.getColumn(SORTABLE_COLUMN_LAST_UPDATED), new LastUpdateComparator());
 

@@ -126,7 +126,7 @@ public class DeriveConclusionView extends ViewImpl implements DeriveConclusionPr
 
   @Override
   public void populateDatasources(JsArray<DatasourceDto> datasources) {
-    viewSuggestions = new HashMap<String, List<String>>();
+    viewSuggestions = new HashMap<>();
 
     datasourceNameBox.clear();
     for(DatasourceDto ds : JsArrays.toIterable(datasources)) {

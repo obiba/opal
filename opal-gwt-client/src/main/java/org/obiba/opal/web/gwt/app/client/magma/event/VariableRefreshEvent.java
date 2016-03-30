@@ -23,7 +23,7 @@ public class VariableRefreshEvent extends GwtEvent<VariableRefreshEvent.Handler>
 
   }
 
-  private static final Type<Handler> TYPE = new Type<Handler>();
+  private static final Type<Handler> TYPE = new Type<>();
 
   public VariableRefreshEvent() {
 

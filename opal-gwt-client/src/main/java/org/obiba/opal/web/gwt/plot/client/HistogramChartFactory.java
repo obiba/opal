@@ -29,7 +29,7 @@ public class HistogramChartFactory {
 
   private final List<Point> values = Lists.newArrayList();
 
-  private List<String> categories = new ArrayList<String>();
+  private List<String> categories = new ArrayList<>();
 
   public void push(double density, double lower, double upper) {
     categories.add(lower + " - " + upper);

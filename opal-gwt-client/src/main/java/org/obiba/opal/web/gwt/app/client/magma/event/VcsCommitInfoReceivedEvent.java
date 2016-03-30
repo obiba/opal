@@ -25,7 +25,7 @@ public class VcsCommitInfoReceivedEvent extends GwtEvent<VcsCommitInfoReceivedEv
 
   }
 
-  private static final Type<Handler> TYPE = new Type<Handler>();
+  private static final Type<Handler> TYPE = new Type<>();
 
   private final VcsCommitInfoDto commitInfoDto;
 

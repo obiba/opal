@@ -59,7 +59,7 @@ public class ErrorResponseCallback implements ResponseCodeCallback {
 
   @SuppressWarnings("unchecked")
   private Collection<ConstraintViolationErrorDto> parseErrors(ClientErrorDto error) {
-    Collection<ConstraintViolationErrorDto> violations = new ArrayList<ConstraintViolationErrorDto>();
+    Collection<ConstraintViolationErrorDto> violations = new ArrayList<>();
     JsArray<ConstraintViolationErrorDto> errors = (JsArray<ConstraintViolationErrorDto>) error
         .getExtension(ConstraintViolationErrorDto.ClientErrorDtoExtensions.errors);
     if(errors != null) {

@@ -50,7 +50,7 @@ public class CriteriaPanel extends FlowPanel {
    * @return
    */
   public String getQueryString() {
-    Collection<String> filters = new ArrayList<String>();
+    Collection<String> filters = new ArrayList<>();
     for(int i = 0; i < getWidgetCount(); i++) {
       if(getWidget(i) instanceof CriterionPanel) {
         String queryString = ((CriterionPanel) getWidget(i)).getQueryString();
@@ -67,7 +67,7 @@ public class CriteriaPanel extends FlowPanel {
    * @return
    */
   public String getQueryText() {
-    Collection<String> filters = new ArrayList<String>();
+    Collection<String> filters = new ArrayList<>();
     for(int i = 0; i < getWidgetCount(); i++) {
       if(getWidget(i) instanceof CriterionPanel) {
         String queryString = ((CriterionPanel) getWidget(i)).getQueryText();

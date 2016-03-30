@@ -138,7 +138,7 @@ public class LocalizedEditor extends FlowPanel {
   }
 
   private Map<String, String> toMap(JsArray<LocaleTextDto> texts) {
-    Map<String, String> textMap = new HashMap<String, String>();
+    Map<String, String> textMap = new HashMap<>();
 
     for(LocaleTextDto text : JsArrays.toIterable(texts)) {
       textMap.put(text.getLocale(), text.getText());

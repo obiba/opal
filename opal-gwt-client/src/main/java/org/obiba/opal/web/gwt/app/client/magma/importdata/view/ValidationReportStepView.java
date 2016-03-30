@@ -48,7 +48,7 @@ public class ValidationReportStepView extends Composite {
   @UiField
   Label validationLabel;
 
-  private final ListDataProvider<TableCompareError> dataProvider = new ListDataProvider<TableCompareError>();
+  private final ListDataProvider<TableCompareError> dataProvider = new ListDataProvider<>();
 
   //
   // Constructors

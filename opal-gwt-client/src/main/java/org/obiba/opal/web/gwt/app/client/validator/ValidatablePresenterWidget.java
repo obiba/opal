@@ -24,11 +24,11 @@ public abstract class ValidatablePresenterWidget<D extends View> extends Present
 
   public ValidatablePresenterWidget(EventBus eventBus, D display) {
     super(eventBus, display);
-    validators = new ArrayList<FieldValidator>();
+    validators = new ArrayList<>();
   }
 
   protected boolean validate() {
-    List<String> messages = new ArrayList<String>();
+    List<String> messages = new ArrayList<>();
     String message;
     for(FieldValidator validator : validators) {
       message = validator.validate();

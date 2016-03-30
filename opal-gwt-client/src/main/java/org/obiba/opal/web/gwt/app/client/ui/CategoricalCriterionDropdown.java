@@ -167,7 +167,7 @@ public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
   }
 
   private Collection<String> getSelectedCategories() {
-    Collection<String> selectedCategories = new ArrayList<String>();
+    Collection<String> selectedCategories = new ArrayList<>();
     for(int i = 0; i < categories.getItemCount(); i++) {
       if(categories.isItemSelected(i)) {
         selectedCategories.add(categories.getValue(i));

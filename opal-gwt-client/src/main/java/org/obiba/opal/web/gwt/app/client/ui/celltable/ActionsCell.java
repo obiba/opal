@@ -81,13 +81,13 @@ public class ActionsCell<T> extends AbstractCell<T> implements HasActionHandler<
 
   private CompositeCell<T> createCompositeCell(String... actionNames) {
 
-    List<HasCell<T, ?>> hasCells = new ArrayList<HasCell<T, ?>>();
+    List<HasCell<T, ?>> hasCells = new ArrayList<>();
 
     for(String actionName : actionNames) {
       hasCells.add(new Action(actionName));
     }
 
-    return new CompositeCell<T>(hasCells);
+    return new CompositeCell<>(hasCells);
   }
 
   private class Action implements HasCell<T, String> {

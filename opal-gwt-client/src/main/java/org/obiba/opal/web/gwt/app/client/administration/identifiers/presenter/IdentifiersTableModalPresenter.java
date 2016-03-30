@@ -132,7 +132,7 @@ public class IdentifiersTableModalPresenter extends ModalPresenterWidget<Identif
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+      Set<FieldValidator> validators = new LinkedHashSet<>();
       validators.add(new RequiredTextValidator(getView().getEntityType(), "EntityTypeIsRequired",
           Display.FormField.ENTITY_TYPE.name()));
       return validators;

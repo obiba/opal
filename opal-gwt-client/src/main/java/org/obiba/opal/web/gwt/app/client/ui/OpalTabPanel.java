@@ -7,7 +7,7 @@ import com.github.gwtbootstrap.client.ui.TabPanel;
 
 public class OpalTabPanel extends TabPanel {
 
-  private Map<Integer, Object> data = new HashMap<Integer, Object>();
+  private Map<Integer, Object> data = new HashMap<>();
 
   public OpalTabPanel setData(int index, Object value) {
     data.put(index, value);

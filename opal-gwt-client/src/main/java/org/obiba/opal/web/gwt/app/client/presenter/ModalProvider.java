@@ -42,7 +42,7 @@ public class ModalProvider<TPresenter extends ModalPresenterWidget<?>> implement
   private TPresenter modal;
 
   private final Map<TPresenter, ModalListData<TPresenter>> modals
-      = new HashMap<TPresenter, ModalListData<TPresenter>>();
+      = new HashMap<>();
 
   @Inject
   public ModalProvider(EventBus eventBus, Provider<TPresenter> modalProvider) {
@@ -88,7 +88,7 @@ public class ModalProvider<TPresenter extends ModalPresenterWidget<?>> implement
     if(modal == null) create();
     HandlerRegistration closeHandler = eventBus.addHandler(ModalClosedEvent.getType(), new ModalClosedHandler());
     container.addToPopupSlot(modal);
-    modals.put(modal, new ModalListData<TPresenter>(modal, closeHandler));
+    modals.put(modal, new ModalListData<>(modal, closeHandler));
     return modal;
   }
 

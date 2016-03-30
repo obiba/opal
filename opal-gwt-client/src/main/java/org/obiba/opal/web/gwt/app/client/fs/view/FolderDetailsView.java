@@ -64,7 +64,7 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
 
   private CheckboxColumn<FileDto> checkColumn;
 
-  private final ListDataProvider<FileDto> dataProvider = new ListDataProvider<FileDto>();
+  private final ListDataProvider<FileDto> dataProvider = new ListDataProvider<>();
 
   private boolean displaysFiles = true;
 
@@ -175,7 +175,7 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
   private void addCheckColumn() {
     if(checkColumn != null) table.removeColumn(checkColumn);
 
-    checkColumn = new CheckboxColumn<FileDto>(new FileDtoDisplay(), singleSelectionModel);
+    checkColumn = new CheckboxColumn<>(new FileDtoDisplay(), singleSelectionModel);
     checkColumn.setActionHandler(new ActionHandler<Integer>() {
       @Override
       public void doAction(Integer object, String actionName) {
@@ -220,7 +220,7 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
         }
       }));
 
-      fileSelectionHandlers = new ArrayList<FileSelectionHandler>();
+      fileSelectionHandlers = new ArrayList<>();
 
       setFieldUpdater(new FieldUpdater<FileDto, String>() {
         @Override

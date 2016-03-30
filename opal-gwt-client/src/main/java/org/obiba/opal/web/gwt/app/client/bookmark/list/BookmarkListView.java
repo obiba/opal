@@ -49,7 +49,7 @@ public class BookmarkListView extends ViewWithUiHandlers<BookmarkListUiHandlers>
 
   private final Translations translations;
 
-  private final ListDataProvider<BookmarkDto> dataProvider = new ListDataProvider<BookmarkDto>();
+  private final ListDataProvider<BookmarkDto> dataProvider = new ListDataProvider<>();
 
   private CreateColumn createColumn;
 
@@ -107,7 +107,7 @@ public class BookmarkListView extends ViewWithUiHandlers<BookmarkListUiHandlers>
     dataProvider.addDataDisplay(table);
     //table.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
     pager.setDisplay(table);
-    typeSortHandler = new ColumnSortEvent.ListHandler<BookmarkDto>(dataProvider.getList());
+    typeSortHandler = new ColumnSortEvent.ListHandler<>(dataProvider.getList());
     typeSortHandler.setComparator(table.getColumn(SORTABLE_COLUMN_RESOURCE), new ResourceComparator());
     typeSortHandler.setComparator(table.getColumn(SORTABLE_COLUMN_CREATED), new LastUpdateComparator());
     table.getHeader(SORTABLE_COLUMN_RESOURCE).setHeaderStyleNames("sortable-header-column");

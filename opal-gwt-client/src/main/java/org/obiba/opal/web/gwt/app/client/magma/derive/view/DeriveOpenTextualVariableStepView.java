@@ -89,7 +89,7 @@ public class DeriveOpenTextualVariableStepView extends ViewImpl
   public DeriveOpenTextualVariableStepView() {
     value = new SuggestBox(valueOracle = new MultiWordSuggestOracleWithDisplay());
     widget = uiBinder.createAndBindUi(this);
-    radioGroup = new RadioGroup<Method>();
+    radioGroup = new RadioGroup<>();
     radioGroup.addButton(auto, Method.AUTOMATICALLY);
     radioGroup.addButton(manual, Method.MANUAL);
     auto.setValue(true);
@@ -164,7 +164,7 @@ public class DeriveOpenTextualVariableStepView extends ViewImpl
 
   private static class MultiWordSuggestOracleWithDisplay extends MultiWordSuggestOracle {
 
-    final Map<String, String> map = new HashMap<String, String>();
+    final Map<String, String> map = new HashMap<>();
 
     public void add(String value, String frequency) {
       add(value);

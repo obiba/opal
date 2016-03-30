@@ -131,7 +131,7 @@ public class TasksView extends ViewImpl implements Display {
     addTableColumns();
     addTablePager();
 
-    dataProvider = new ListDataProvider<CommandStateDto>();
+    dataProvider = new ListDataProvider<>();
     dataProvider.addDataDisplay(table);
   }
 
@@ -179,17 +179,17 @@ public class TasksView extends ViewImpl implements Display {
 
     table.addColumn(new StatusColumn(), translations.statusLabel());
 
-    actionsColumn = new ActionsColumn<CommandStateDto>(new ActionsProvider<CommandStateDto>() {
+    actionsColumn = new ActionsColumn<>(new ActionsProvider<CommandStateDto>() {
 
       @Override
       public String[] allActions() {
-        return new String[] { LOG_ACTION, CANCEL_ACTION };
+        return new String[]{LOG_ACTION, CANCEL_ACTION};
       }
 
       @Override
       public String[] getActions(CommandStateDto value) {
-        return "NOT_STARTED".equals(value.getStatus()) || "IN_PROGRESS".equals(value.getStatus()) ? new String[] {
-            LOG_ACTION, CANCEL_ACTION } : new String[] { LOG_ACTION };
+        return "NOT_STARTED".equals(value.getStatus()) || "IN_PROGRESS".equals(value.getStatus()) ? new String[]{
+                LOG_ACTION, CANCEL_ACTION} : new String[]{LOG_ACTION};
       }
     });
     table.addColumn(actionsColumn, translations.actionsLabel());

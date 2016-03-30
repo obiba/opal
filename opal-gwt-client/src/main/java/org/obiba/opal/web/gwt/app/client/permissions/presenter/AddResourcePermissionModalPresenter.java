@@ -73,7 +73,7 @@ public class AddResourcePermissionModalPresenter
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+      Set<FieldValidator> validators = new LinkedHashSet<>();
       validators.add(
           new RequiredTextValidator(getView().getPrincipal(), "NameIsRequired", Display.FormField.PRINCIPAL.name()));
       validators.add(new DuplicateSubjectValidator(getView().getPrincipal().getText(), currentSubjectType.getName(),

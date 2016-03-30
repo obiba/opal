@@ -25,7 +25,7 @@ public class SummaryReceivedEvent extends GwtEvent<SummaryReceivedEvent.Handler>
 
   }
 
-  private static final Type<Handler> TYPE = new Type<Handler>();
+  private static final Type<Handler> TYPE = new Type<>();
 
   private final String resourceUri;
 

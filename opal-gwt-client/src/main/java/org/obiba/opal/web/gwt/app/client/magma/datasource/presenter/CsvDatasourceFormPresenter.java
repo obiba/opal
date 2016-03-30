@@ -51,7 +51,7 @@ public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDa
 
   private final FileSelectionPresenter csvFileSelectionPresenter;
 
-  private final List<String> availableCharsets = new ArrayList<String>();
+  private final List<String> availableCharsets = new ArrayList<>();
 
   private HasText selectedFile;
 

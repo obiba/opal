@@ -68,11 +68,11 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     implements ApplicationUiHandlers {
 
   @ContentSlot
-  public static final GwtEvent.Type<RevealContentHandler<?>> WORKBENCH = new GwtEvent.Type<RevealContentHandler<?>>();
+  public static final GwtEvent.Type<RevealContentHandler<?>> WORKBENCH = new GwtEvent.Type<>();
 
   @ContentSlot
   public static final GwtEvent.Type<RevealContentHandler<?>> NOTIFICATION
-      = new GwtEvent.Type<RevealContentHandler<?>>();
+      = new GwtEvent.Type<>();
 
   @ProxyStandard
   public interface Proxy extends com.gwtplatform.mvp.client.proxy.Proxy<ApplicationPresenter> {}

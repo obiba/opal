@@ -95,7 +95,7 @@ public class JsArrays {
 
       @Override
       public Iterator<T> iterator() {
-        return new JsArrayIterator<T>(array);
+        return new JsArrayIterator<>(array);
       }
 
     };
@@ -115,7 +115,7 @@ public class JsArrays {
   }
 
   public static <T extends JavaScriptObject> List<T> toList(@Nullable JsArray<T> jsArray) {
-    return new JavaScriptObjectList<T>(toSafeArray(jsArray));
+    return new JavaScriptObjectList<>(toSafeArray(jsArray));
   }
 
   public static List<String> toList(JsArrayString jsArray) {
@@ -154,7 +154,7 @@ public class JsArrays {
     if(length < 0) {
       throw new IndexOutOfBoundsException("length '" + length + "'is invalid");
     }
-    return new JavaScriptObjectRangeList<T>(array, start, length);
+    return new JavaScriptObjectRangeList<>(array, start, length);
   }
 
   @SuppressWarnings("unchecked")

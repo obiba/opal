@@ -299,7 +299,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   private final class ViewImportValidator extends ViewValidationHandler {
     @Override
     protected Set<FieldValidator> getValidators() {
-      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+      Set<FieldValidator> validators = new LinkedHashSet<>();
       validators.add(new ImportableValidator());
       return validators;
     }
@@ -313,7 +313,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   private final class ViewValidator extends ViewValidationHandler {
     @Override
     protected Set<FieldValidator> getValidators() {
-      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+      Set<FieldValidator> validators = new LinkedHashSet<>();
       DatasourceFileType fileType = DatasourceFileType.getFileType(getView().getSelectedFile());
       validators.add(new FileTypeValidator(fileType, Display.FormField.FILE_SELECTION.name()));
 

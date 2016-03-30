@@ -122,9 +122,9 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
   private void populateCategoricalContingencyTable(DefaultFlexTable parentTable) {
     // Process the resource to have a map by category X crossCategory
     Map<String, Map<String, FacetResultDto.TermFrequencyResultDto>> facets
-        = new HashMap<String, Map<String, FacetResultDto.TermFrequencyResultDto>>();
-    Map<String, Integer> variableFacetTotals = new HashMap<String, Integer>();
-    Map<String, Integer> crossFacetTotals = new HashMap<String, Integer>();
+        = new HashMap<>();
+    Map<String, Integer> variableFacetTotals = new HashMap<>();
+    Map<String, Integer> crossFacetTotals = new HashMap<>();
     initStatsticsMaps(facets, variableFacetTotals, crossFacetTotals);
 
     int nbVariableCategories = variableCategories.size();
@@ -190,7 +190,7 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
 
     for(FacetResultDto facetResultDto : JsArrays.toIterable(queryResult.getFacetsArray())) {
       Map<String, FacetResultDto.TermFrequencyResultDto> termByFacets
-          = new HashMap<String, FacetResultDto.TermFrequencyResultDto>();
+          = new HashMap<>();
 
       int total = 0;
       for(FacetResultDto.TermFrequencyResultDto termFrequencyResultDto : JsArrays
@@ -220,7 +220,7 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
 
   private void populateContinuousContingencyTable(DefaultFlexTable parentTable) {
     Map<String, FacetResultDto.StatisticalResultDto> continuousFacets
-        = new HashMap<String, FacetResultDto.StatisticalResultDto>();
+        = new HashMap<>();
     for(FacetResultDto facetResultDto : JsArrays.toIterable(queryResult.getFacetsArray())) {
       continuousFacets.put(facetResultDto.getFacet(), facetResultDto.getStatistics());
     }

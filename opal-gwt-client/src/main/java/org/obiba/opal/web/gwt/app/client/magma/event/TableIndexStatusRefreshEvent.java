@@ -20,7 +20,7 @@ public class TableIndexStatusRefreshEvent extends GwtEvent<TableIndexStatusRefre
 
   }
 
-  private static final Type<Handler> TYPE = new Type<Handler>();
+  private static final Type<Handler> TYPE = new Type<>();
 
   public TableIndexStatusRefreshEvent() {
   }

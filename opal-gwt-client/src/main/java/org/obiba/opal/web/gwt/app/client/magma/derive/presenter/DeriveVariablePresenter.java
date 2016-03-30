@@ -461,7 +461,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
       VariableDto derived = derivationPresenter.getDerivedVariable();
 
       // Build the ViewDto for the request.
-      List<TableDto> tableDtos = new ArrayList<TableDto>();
+      List<TableDto> tableDtos = new ArrayList<>();
       tableDtos.add(table);
       ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().setName(destinationView).fromTables(tableDtos);
       viewDtoBuilder.defaultVariableListView();

@@ -39,7 +39,7 @@ public final class NotificationMessageBuilder {
   }
 
   private List<String> getMessages() {
-    List<String> translatedMessages = new ArrayList<String>();
+    List<String> translatedMessages = new ArrayList<>();
     for(String message : notificationEvent.getMessages()) {
       if(translations.userMessageMap().containsKey(message)) {
         String msg = TranslationsUtils

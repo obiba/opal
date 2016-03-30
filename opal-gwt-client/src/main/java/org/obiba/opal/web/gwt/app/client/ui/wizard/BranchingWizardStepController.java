@@ -52,7 +52,7 @@ public class BranchingWizardStepController extends DefaultWizardStepController {
     }
   }
 
-  private final List<Candidate> nextCandidates = new ArrayList<Candidate>();
+  private final List<Candidate> nextCandidates = new ArrayList<>();
 
   public BranchingWizardStepController(WizardStep step, Skippable skippable) {
     super(step, skippable);

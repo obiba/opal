@@ -53,9 +53,9 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   private List<String> destinationCategories;
 
-  private final Map<String, Double> countByCategoryName = new HashMap<String, Double>();
+  private final Map<String, Double> countByCategoryName = new HashMap<>();
 
-  protected final Collection<ValueMapEntry> missingValueMapEntries = new ArrayList<ValueMapEntry>();
+  protected final Collection<ValueMapEntry> missingValueMapEntries = new ArrayList<>();
 
   protected int index = 1;
 
@@ -85,7 +85,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   @Override
   public void initializeValueMapEntries() {
-    valueMapEntries = new ArrayList<ValueMapEntry>();
+    valueMapEntries = new ArrayList<>();
 
     destinationCategories = getDestinationCategories(getDestination());
 

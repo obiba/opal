@@ -26,7 +26,7 @@ public class RequestAdministrationPermissionEvent extends GwtEvent<RequestAdmini
     void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event);
   }
 
-  private static final Type<Handler> TYPE = new Type<Handler>();
+  private static final Type<Handler> TYPE = new Type<>();
 
   private final HasAuthorization authorization;
 

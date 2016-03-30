@@ -14,7 +14,7 @@ import com.google.gwt.event.shared.GwtEvent;
 
 public class RequestDatasourceFormsEvent extends GwtEvent<RequestDatasourceFormsEvent.Handler> {
 
-  private static final Type<Handler> TYPE = new Type<Handler>();
+  private static final Type<Handler> TYPE = new Type<>();
 
   private final HasDatasourceForms datasourceForms;
 
