@@ -86,7 +86,19 @@
       </b:Button>
     </g:FlowPanel>
 
-    <o:Table ui:field="table"/>
+    <g:FlowPanel>
+      <b:Alert ui:field="saveChangesAlert" close="false" visible="false" addStyleNames="actions-select">
+        <g:FlowPanel addStyleNames="pull-left">
+          <b2:IconAnchor ui:field="saveChanges" icon="SAVE" addStyleNames="inline">
+            <ui:msg description="Save changes">Save changes</ui:msg>
+          </b2:IconAnchor>
+          <b2:IconAnchor ui:field="resetChanges" icon="REMOVE" visible="true" addStyleNames="inline small-indent">
+            <ui:msg description="Reset label">Reset</ui:msg>
+          </b2:IconAnchor>
+        </g:FlowPanel>
+      </b:Alert>
+      <o:Table ui:field="table"/>
+    </g:FlowPanel>
 
     <g:FlowPanel addStyleNames="top-margin">
       <b:Heading size="4" addStyleNames="inline-block">

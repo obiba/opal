@@ -9,6 +9,10 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.view;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomySelectedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularyDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularyUpdatedEvent;
@@ -106,7 +110,6 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
                     }
                   }) //
                   .withCallback(SC_NOT_FOUND, new ResponseCodeCallback() {
-
                     @Override
                     public void onResponseCode(Request request, Response response) {
                       fireEvent(NotificationEvent.newBuilder().error("TaxonomyNotFound").args(taxonomyName).build());
@@ -116,6 +119,7 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
             } else {
               getView().renderVocabulary(taxonomy, resource);
             }
+            getView().setDirty(false);
           }
         }).withCallback(SC_NOT_FOUND, new VocabularyNotFoundCallback(taxonomy.getName(), name)) //
         .send();
@@ -231,9 +235,71 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
     }
   }
 
+  @Override
+  public void onMoveUpTerm(TermDto termDto) {
+    List<TermDto> terms = JsArrays.toList(vocabulary.getTermsArray());
+    int idx = terms.indexOf(termDto);
+
+    if(idx > 0) {
+      Collections.swap(terms, idx, idx - 1);
+      getView().setDirty(true);
+      getView().renderVocabulary(taxonomy, vocabulary);
+    }
+  }
+
+  @Override
+  public void onMoveDownTerm(TermDto termDto) {
+    List<TermDto> terms = JsArrays.toList(vocabulary.getTermsArray());
+    int idx = terms.indexOf(termDto);
+
+    if(idx > -1 && idx < terms.size() - 1) {
+      Collections.swap(terms, idx, idx + 1);
+      getView().setDirty(true);
+      getView().renderVocabulary(taxonomy, vocabulary);
+    }
+  }
+
+  @Override
+  public void onSortTerms(final boolean isAscending) {
+    Collections.sort(JsArrays.toList(vocabulary.getTermsArray()), new Comparator<TermDto>() {
+      @Override
+      public int compare(TermDto o1, TermDto o2) {
+        return (isAscending ? 1 : -1) * o1.getName().compareTo(o2.getName());
+      }
+    });
+
+    getView().setDirty(true);
+    getView().renderVocabulary(taxonomy, vocabulary);
+  }
+
+  @Override
+  public void onSaveChanges() {
+    saveVocabulary();
+  }
+
+  @Override
+  public void onResetChanges() {
+    refresh(taxonomy.getName(), vocabulary.getName());
+  }
+
   //
   // Private methods
   //
+
+  private void saveVocabulary() {
+    ResourceRequestBuilderFactory.newBuilder() //
+        .forResource(
+            UriBuilders.SYSTEM_CONF_TAXONOMY_VOCABULARY.create().build(taxonomy.getName(), vocabulary.getName()))
+        .withResourceBody(VocabularyDto.stringify(vocabulary))//
+        .withCallback(SC_OK, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            fireEvent(new VocabularyUpdatedEvent(taxonomy.getName(), vocabulary.getName()));
+          }
+        }) //
+        .withCallback(SC_NOT_FOUND, new VocabularyNotFoundCallback(taxonomy.getName(), vocabulary.getName())) //
+        .put().send();
+  }
 
   private void addHandlers() {
     addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler());
@@ -271,6 +337,8 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
     void renderTerms(JsArray<TermDto> terms);
 
     void setEditable(boolean editable);
+
+    void setDirty(boolean isDirty);
   }
 
   private class ConfirmationEventHandler implements ConfirmationEvent.Handler {

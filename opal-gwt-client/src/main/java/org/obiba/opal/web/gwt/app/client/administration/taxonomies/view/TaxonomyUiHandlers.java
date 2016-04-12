@@ -10,6 +10,8 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.taxonomies.view;
 
+import org.obiba.opal.web.model.client.opal.VocabularyDto;
+
 import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface TaxonomyUiHandlers extends UiHandlers {
@@ -24,5 +26,15 @@ public interface TaxonomyUiHandlers extends UiHandlers {
 
   void onAddVocabulary();
 
+  void onSaveChanges();
+
+  void onResetChanges();
+
   void onFilterUpdate(String filter);
+
+  void onMoveUpVocabulary(VocabularyDto vocabularyDto);
+
+  void onMoveDownVocabulary(VocabularyDto vocabularyDto);
+
+  void onSortVocabularies(boolean isAscending);
 }
