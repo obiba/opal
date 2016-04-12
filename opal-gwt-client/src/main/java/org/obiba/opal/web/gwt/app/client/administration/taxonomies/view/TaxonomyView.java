@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.taxonomies.view;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
@@ -18,8 +20,10 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsSortableColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.LocaleTextColumn;
@@ -30,11 +34,15 @@ import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.opal.VcsCommitInfoDto;
 import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
+import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CellTable;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
+import com.google.common.base.Strings;
+import com.google.common.base.Supplier;
+import com.google.common.collect.Lists;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -44,6 +52,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -76,6 +85,15 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
 
   @UiField
   Button addVocabulary;
+
+  @UiField
+  IconAnchor saveChanges;
+
+  @UiField
+  IconAnchor resetChanges;
+
+  @UiField
+  Alert saveChangesAlert;
 
   @UiField
   Panel detailsPanel;
@@ -116,6 +134,8 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
   private final ListDataProvider<VcsCommitInfoDto> commitInfoDataProvider = new ListDataProvider<VcsCommitInfoDto>();
 
   private final ListDataProvider<VocabularyDto> dataProvider = new ListDataProvider<VocabularyDto>();
+
+  private ActionsColumn<VocabularyDto> actions;
 
   @Inject
   public TaxonomyView(Binder uiBinder, TranslationMessages translationMessages) {
@@ -171,7 +191,35 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
       }
     }, translations.termsLabel());
 
-    //table.setSelectionModel(new SingleSelectionModel<VocabularyDto>());
+    actions = new ActionsSortableColumn<VocabularyDto>(new Supplier<List<VocabularyDto>>() {
+      @Override
+      public List<VocabularyDto> get() {
+        return Strings.isNullOrEmpty(filter.getText()) ? dataProvider.getList() : Lists.<VocabularyDto>newArrayList();
+      }
+    });
+    actions.setActionHandler(new ActionHandler<VocabularyDto>() {
+      @Override
+      public void doAction(VocabularyDto object, String actionName) {
+        switch (actionName) {
+          case ActionsSortableColumn.MOVE_UP_ACTION:
+            getUiHandlers().onMoveUpVocabulary(object);
+            break;
+          case ActionsSortableColumn.MOVE_DOWN_ACTION:
+            getUiHandlers().onMoveDownVocabulary(object);
+            break;
+          default:
+            throw new IllegalArgumentException(actionName);
+        }
+      }
+    });
+
+    table.addColumnSortHandler(new ColumnSortEvent.Handler() {
+      @Override
+      public void onColumnSort(ColumnSortEvent columnSortEvent) {
+        getUiHandlers().onSortVocabularies(columnSortEvent.isSortAscending());
+      }
+    });
+
     table.setPageSize(DEFAULT_PAGE_SIZE);
     table.setEmptyTableWidget(new com.google.gwt.user.client.ui.InlineLabel(translationMessages.vocabularyCount(0)));
     pager.setDisplay(table);
@@ -204,6 +252,15 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
     remove.setVisible(editable);
     edit.setVisible(editable);
     addVocabulary.setVisible(editable);
+    //saveChanges.setVisible(false);
+
+    if (table.getColumnIndex(actions)>0) table.removeColumn(actions);
+    if (editable) table.addColumn(actions, translations.actionsLabel());
+  }
+
+  @Override
+  public void setDirty(boolean isDirty) {
+    saveChangesAlert.setVisible(isDirty);
   }
 
   private void renderTaxonomy(TaxonomyDto taxonomy) {
@@ -247,6 +304,16 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
   @UiHandler("addVocabulary")
   public void onAddVocabulary(ClickEvent event) {
     getUiHandlers().onAddVocabulary();
+  }
+
+  @UiHandler("saveChanges")
+  public void onSaveChanges(ClickEvent event) {
+    getUiHandlers().onSaveChanges();
+  }
+
+  @UiHandler("resetChanges")
+  public void onResetChanges(ClickEvent event) {
+    getUiHandlers().onResetChanges();
   }
 
   @UiHandler("filter")
@@ -310,7 +377,5 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
             return new String[] { DIFF_ACTION };
           }
         });
-
   }
-
 }

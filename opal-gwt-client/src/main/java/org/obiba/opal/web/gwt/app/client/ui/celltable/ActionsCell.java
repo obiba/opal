@@ -42,8 +42,6 @@ public class ActionsCell<T> extends AbstractCell<T> implements HasActionHandler<
 
   private ActionHandler<T> actionHandler;
 
-  private final CompositeCell<T> delegate;
-
   public ActionsCell(ActionsProvider<T> actionsProvider) {
     super("click", "keydown");
     this.actionsProvider = actionsProvider;
@@ -60,18 +58,18 @@ public class ActionsCell<T> extends AbstractCell<T> implements HasActionHandler<
         }
       }
     };
-    delegate = createCompositeCell(actionsProvider.allActions());
+
   }
 
   @Override
   public void render(Context context, T value, SafeHtmlBuilder sb) {
-    delegate.render(context, value, sb);
+    createCompositeCell(value).render(context, value, sb);
   }
 
   @Override
   public void onBrowserEvent(Context context, Element parent, T value, NativeEvent event,
       ValueUpdater<T> valueUpdater) {
-    delegate.onBrowserEvent(context, parent, value, event, valueUpdater);
+    createCompositeCell(value).onBrowserEvent(context, parent, value, event, valueUpdater);
   }
 
   @Override
@@ -79,11 +77,10 @@ public class ActionsCell<T> extends AbstractCell<T> implements HasActionHandler<
     this.actionHandler = actionHandler;
   }
 
-  private CompositeCell<T> createCompositeCell(String... actionNames) {
-
+  private CompositeCell<T> createCompositeCell(T value) {
     List<HasCell<T, ?>> hasCells = new ArrayList<HasCell<T, ?>>();
 
-    for(String actionName : actionNames) {
+    for(String actionName : actionsProvider.getActions(value)) {
       hasCells.add(new Action(actionName));
     }
 
@@ -118,7 +115,5 @@ public class ActionsCell<T> extends AbstractCell<T> implements HasActionHandler<
       }
       return null;
     }
-
   }
-
 }
