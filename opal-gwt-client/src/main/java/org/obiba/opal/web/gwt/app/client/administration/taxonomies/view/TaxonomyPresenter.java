@@ -9,10 +9,15 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.taxonomies.view;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.edit.TaxonomyEditModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyDeletedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularySelectedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.edit.VocabularyEditModalPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
@@ -152,6 +157,16 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
   }
 
   @Override
+  public void onSaveChanges() {
+    saveTaxonomy();
+  }
+
+  @Override
+  public void onResetChanges() {
+    refreshTaxonomy(taxonomy.getName());
+  }
+
+  @Override
   public void onFilterUpdate(String filter) {
     if(Strings.isNullOrEmpty(filter)) {
       getView().setVocabularies(taxonomy.getVocabulariesArray());
@@ -164,6 +179,68 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
       }
       getView().setVocabularies(filtered);
     }
+  }
+
+  @Override
+  public void onMoveUpVocabulary(VocabularyDto vocabularyDto) {
+    List<VocabularyDto> vocabularies = JsArrays.toList(taxonomy.getVocabulariesArray());
+    int idx = vocabularies.indexOf(vocabularyDto);
+
+    if(idx > 0) {
+      Collections.swap(vocabularies, idx, idx - 1);
+      getView().setDirty(true);
+      getView().setTaxonomy(taxonomy);
+    }
+  }
+
+  @Override
+  public void onMoveDownVocabulary(VocabularyDto vocabularyDto) {
+    List<VocabularyDto> vocabularies = JsArrays.toList(taxonomy.getVocabulariesArray());
+    int idx = vocabularies.indexOf(vocabularyDto);
+
+    if(idx > -1 && idx < vocabularies.size() - 1) {
+      Collections.swap(vocabularies, idx, idx + 1);
+      getView().setDirty(true);
+      getView().setTaxonomy(taxonomy);
+    }
+  }
+
+  @Override
+  public void onSortVocabularies(final boolean isAscending) {
+    Collections.sort(JsArrays.toList(taxonomy.getVocabulariesArray()), new Comparator<VocabularyDto>() {
+      @Override
+      public int compare(VocabularyDto o1, VocabularyDto o2) {
+        return (isAscending ? 1 : -1) * o1.getName().compareTo(o2.getName());
+      }
+    });
+
+    getView().setDirty(true);
+    getView().setTaxonomy(taxonomy);
+  }
+
+  private void saveTaxonomy() {
+    UriBuilders.SYSTEM_CONF_TAXONOMY.create().build(taxonomy.getName());
+    fireEvent(new TaxonomyUpdatedEvent(taxonomy.getName()));
+    ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder().forResource(
+        UriBuilders.SYSTEM_CONF_TAXONOMY.create()
+            .build(taxonomy.getName()))//
+        .withResourceBody(TaxonomyDto.stringify(taxonomy))//
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getEventBus().fireEvent(new TaxonomyUpdatedEvent(taxonomy.getName()));
+            getView().setDirty(false);
+          }
+        }, Response.SC_OK, Response.SC_CREATED)//
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if(response.getText() != null && !response.getText().isEmpty()) {
+              fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+            }
+          }
+        }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR)//
+        .put().send();
   }
 
   private boolean vocabularyMatches(VocabularyDto vocabulary, String filter) {
@@ -262,6 +339,7 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
     public void onResource(Response response, TaxonomyDto resource) {
       taxonomy = resource;
       getView().setTaxonomy(resource);
+      getView().setDirty(false);
       retrieveCommitInfos();
       authorize();
     }
@@ -279,6 +357,8 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
     void setVocabularies(JsArray<VocabularyDto> vocabularies);
 
     void setEditable(boolean editable);
+
+    void setDirty(boolean isDirty);
 
     HasActionHandler<VcsCommitInfoDto> getActions();
   }

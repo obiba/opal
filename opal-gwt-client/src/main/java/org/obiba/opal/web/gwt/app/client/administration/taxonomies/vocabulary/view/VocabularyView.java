@@ -1,5 +1,7 @@
 package org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.view;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -8,22 +10,28 @@ import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsSortableColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.LocaleTextColumn;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.opal.TermDto;
 import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
+import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
+import com.google.common.base.Strings;
+import com.google.common.base.Supplier;
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
@@ -79,6 +87,15 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
   @UiField
   TextBoxClearable filter;
 
+  @UiField
+  IconAnchor saveChanges;
+
+  @UiField
+  Alert saveChangesAlert;
+
+  @UiField
+  IconAnchor resetChanges;
+
   private ActionsColumn<TermDto> actions;
 
   private final ListDataProvider<TermDto> dataProvider = new ListDataProvider<TermDto>();
@@ -95,8 +112,12 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
   private void initializeTermsTable() {
     dataProvider.addDataDisplay(table);
 
-
     table.addColumn(new LocaleTextColumn<TermDto>() {
+      {
+        this.setSortable(true);
+        this.setDefaultSortAscending(false);
+      }
+
       @Override
       protected JsArray<LocaleTextDto> getLocaleText(TermDto term) {
         return term.getKeywordsArray();
@@ -119,14 +140,39 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
         return term.getDescriptionArray();
       }
     }, translations.descriptionLabel());
-    actions = new ActionsColumn<TermDto>(new ActionHandler<TermDto>() {
+    actions = new ActionsSortableColumn<TermDto>(new Supplier<List<TermDto>>() {
+      @Override
+      public List<TermDto> get() {
+        return Strings.isNullOrEmpty(filter.getText()) ? dataProvider.getList() : Lists.<TermDto>newArrayList();
+      }
+    }, ActionsColumn.EDIT_ACTION,
+        ActionsColumn.REMOVE_ACTION);
+    actions.setActionHandler(new ActionHandler<TermDto>() {
       @Override
       public void doAction(TermDto object, String actionName) {
-        if(ActionsColumn.EDIT_ACTION.equals(actionName)) {
-          getUiHandlers().onEditTerm(object);
-        } else {
-          getUiHandlers().onDeleteTerm(object);
+        switch(actionName) {
+          case ActionsColumn.EDIT_ACTION:
+            getUiHandlers().onEditTerm(object);
+            break;
+          case ActionsColumn.REMOVE_ACTION:
+            getUiHandlers().onDeleteTerm(object);
+            break;
+          case ActionsSortableColumn.MOVE_UP_ACTION:
+            getUiHandlers().onMoveUpTerm(object);
+            break;
+          case ActionsSortableColumn.MOVE_DOWN_ACTION:
+            getUiHandlers().onMoveDownTerm(object);
+            break;
+          default:
+            throw new IllegalArgumentException(actionName);
         }
+      }
+    });
+
+    table.addColumnSortHandler(new ColumnSortEvent.Handler() {
+      @Override
+      public void onColumnSort(ColumnSortEvent columnSortEvent) {
+        getUiHandlers().onSortTerms(columnSortEvent.isSortAscending());
       }
     });
 
@@ -141,6 +187,11 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
     filter.getTextBox().setPlaceholder(translations.filterTerms());
     filter.getTextBox().addStyleName("input-xlarge");
     filter.getClear().setTitle(translations.clearFilter());
+  }
+
+  @Override
+  public void setDirty(boolean isDirty) {
+    saveChangesAlert.setVisible(isDirty);
   }
 
   @UiHandler("remove")
@@ -176,6 +227,16 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
   @UiHandler("addTerm")
   void onAddTerm(ClickEvent event) {
     getUiHandlers().onAddTerm();
+  }
+
+  @UiHandler("saveChanges")
+  public void onSaveChanges(ClickEvent event) {
+    getUiHandlers().onSaveChanges();
+  }
+
+  @UiHandler("resetChanges")
+  public void onResetChanges(ClickEvent event) {
+    getUiHandlers().onResetChanges();
   }
 
   @Override
