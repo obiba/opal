@@ -135,6 +135,8 @@ public interface Translations extends Constants {
       "Enable", "Enable",//
       "Disable", "Disable",//
       "Generate identifiers", "Generate identifiers",//
+      "MoveUp", "Move up",//
+      "MoveDown", "Move down",//
       "Download identifiers", "Download identifiers",//
       "Unregister", "Unregister", //
       "Terminate", "Terminate" //

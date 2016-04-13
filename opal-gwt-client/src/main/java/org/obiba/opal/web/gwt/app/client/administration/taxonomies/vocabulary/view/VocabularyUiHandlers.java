@@ -24,4 +24,13 @@ public interface VocabularyUiHandlers extends UiHandlers {
 
   void onFilterUpdate(String filter);
 
+  void onMoveUpTerm(TermDto termDto);
+
+  void onMoveDownTerm(TermDto termDto);
+
+  void onSortTerms(boolean isAscending);
+
+  void onSaveChanges();
+
+  void onResetChanges();
 }
