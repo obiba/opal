@@ -11,12 +11,12 @@
 package org.obiba.opal.core.cfg;
 
 import java.io.InputStream;
+import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileSystemException;
-import org.obiba.git.CommitInfo;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.domain.taxonomy.Vocabulary;
 import org.obiba.opal.core.service.SystemService;
@@ -24,12 +24,23 @@ import org.obiba.opal.core.service.SystemService;
 /**
  * Create, update and delete {@link Taxonomy}.
  */
-public interface TaxonomyService extends SystemService {
+public interface TaxonomyService extends SystemService, GitService {
 
   /**
    * Import the taxonomies defined by Maelstrom and OBiBa.
    */
   void importDefault();
+
+  /**
+   * Import a list of {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} objects from a GitHub repository zipball.
+   *
+   * @param username default to maelstrom-research
+   * @param repo
+   * @param ref default to master
+   * @return empty list if import failed
+   */
+  List<Taxonomy> importGitHubTaxonomies(@NotNull String username, @NotNull String repo, @NotNull String ref,
+      boolean override);
 
   /**
    * Import a {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} from a GitHub repository.
@@ -165,41 +176,4 @@ public interface TaxonomyService extends SystemService {
    * @throws NoSuchTaxonomyException
    */
   void deleteVocabulary(@NotNull String taxonomy, @NotNull String vocabulary) throws NoSuchTaxonomyException;
-
-
-  /**
-   * Returns the commit history
-   *
-   * @param name
-   * @return
-   */
-  Iterable<CommitInfo> getCommitsInfo(@NotNull String name);
-
-  /**
-   * Returns the info of a given commit
-   *
-   * @param name
-   * @param commitId
-   * @return
-   */
-  CommitInfo getCommitInfo(@NotNull String name, @NotNull String commitId);
-
-  /**
-   * Returns the blob (content) of a given commit
-   *
-   * @param name
-   * @param commitId
-   * @return
-   */
-  String getBlob(@NotNull String name, @NotNull String commitId);
-
-  /**
-   * Returns the diff entries between two commits
-   *
-   * @param name
-   * @param commitId
-   * @param prevCommitId
-   * @return
-   */
-  Iterable<String> getDiffEntries(@NotNull String name, @NotNull String commitId, @Nullable String prevCommitId);
 }
