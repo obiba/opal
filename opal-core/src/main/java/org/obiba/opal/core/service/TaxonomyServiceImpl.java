@@ -16,6 +16,10 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
@@ -24,6 +28,7 @@ import javax.validation.constraints.NotNull;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.git.CommitInfo;
+import org.obiba.opal.core.cfg.GithubService;
 import org.obiba.opal.core.cfg.NoSuchTaxonomyException;
 import org.obiba.opal.core.cfg.NoSuchVocabularyException;
 import org.obiba.opal.core.cfg.TaxonomyService;
@@ -41,7 +46,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 @Component
-public class TaxonomyServiceImpl implements TaxonomyService {
+public class TaxonomyServiceImpl implements TaxonomyService, GithubService {
 
   @Autowired
   private OpalRuntime opalRuntime;
@@ -61,6 +66,8 @@ public class TaxonomyServiceImpl implements TaxonomyService {
 
   private static final String GITHUB_URL = "https://raw.githubusercontent.com";
 
+  private static final String GITHUB_API_ZIPBALL_URL = "https://api.github.com/repos/%s/%s/zipball/%s";
+
   private List<Taxonomy> taxonomies = Lists.newArrayList();
 
   @Override
@@ -78,6 +85,16 @@ public class TaxonomyServiceImpl implements TaxonomyService {
   @Override
   public void importDefault() {
     importDefault(true);
+  }
+
+  @Override
+  public List<Taxonomy> importGitHubTaxonomies(@NotNull String username, @NotNull String repo,
+      @NotNull String ref, boolean override) {
+    String user = username;
+    if(Strings.isNullOrEmpty(username)) user = MLSTRM_USER;
+    if(Strings.isNullOrEmpty(repo)) throw new IllegalArgumentException("GitHub repository is required");
+    if(Strings.isNullOrEmpty(ref)) throw new IllegalArgumentException("GitHub ref name is required");
+    return importZipball(String.format(GITHUB_API_ZIPBALL_URL, user, repo, ref), override);
   }
 
   @Override
@@ -270,6 +287,31 @@ public class TaxonomyServiceImpl implements TaxonomyService {
 
     for(String uri : taxonomyReferences.split(",")) {
       importUriTaxonomy(uri.trim(), override);
+    }
+  }
+
+  private List<Taxonomy> importZipball(@NotNull String uri, boolean override) {
+    try {
+      List<Taxonomy> taxonomies = Lists.newArrayList();
+      InputStream input = new URL(uri).openStream();
+      ZipInputStream zipIn = new ZipInputStream(input);
+      ZipEntry entry;
+
+      while((entry = zipIn.getNextEntry()) != null) {
+        Matcher matcher = Pattern.compile("/(.*?\\.yml)$").matcher(entry.getName());
+        if(matcher.find()) {
+          TaxonomyYaml yaml = new TaxonomyYaml();
+          Taxonomy taxonomy = yaml.load(zipIn);
+          if(override || !hasTaxonomy(taxonomy.getName())) {
+            saveTaxonomy(taxonomy);
+            taxonomies.add(taxonomy);
+          }
+        }
+      }
+
+      return taxonomies;
+    } catch(IOException e) {
+      throw new TaxonomyImportException(e);
     }
   }
 

@@ -29,6 +29,7 @@ import org.obiba.git.command.FetchBlobCommand;
 import org.obiba.git.command.GitCommandHandler;
 import org.obiba.git.command.LogsCommand;
 import org.obiba.git.command.ReadFilesCommand;
+import org.obiba.opal.core.cfg.GithubService;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.support.yaml.TaxonomyYaml;
 import org.obiba.opal.core.vcs.OpalGitUtils;
@@ -43,7 +44,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 @Component
-public class TaxonomyPersistenceStrategyImpl implements TaxonomyPersistenceStrategy {
+public class TaxonomyPersistenceStrategyImpl implements TaxonomyPersistenceStrategy, GithubService {
 
   private static final Logger log = LoggerFactory.getLogger(TaxonomyPersistenceStrategyImpl.class);
 
