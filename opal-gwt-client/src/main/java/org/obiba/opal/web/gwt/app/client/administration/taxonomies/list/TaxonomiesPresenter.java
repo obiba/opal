@@ -142,6 +142,11 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
     taxonomyGitImportModalPresenterModalProvider.get();
   }
 
+  @Override
+  public void onImportGithubMaelstromTaxonomies() {
+    taxonomyGitImportModalPresenterModalProvider.get().setTagInfo("maelstrom-research", "maelstrom-taxonomies");
+  }
+
   private void addHandlers() {
     addRegisteredHandler(TaxonomyUpdatedEvent.getType(), new TaxonomyUpdatedEvent.TaxonomyUpdatedHandler() {
 

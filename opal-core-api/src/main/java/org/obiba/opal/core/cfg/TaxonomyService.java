@@ -43,6 +43,15 @@ public interface TaxonomyService extends SystemService, GitService {
       boolean override);
 
   /**
+   * Retrieves {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} tag names from a GitHub repository.
+   *
+   * @param username default to maelstrom-research
+   * @param repo
+   * @return null if import failed
+   */
+  List<String> getGitHubTaxonomyTags(@NotNull String username, @NotNull String repo);
+
+  /**
    * Import a {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} from a GitHub repository.
    *
    * @param username default to maelstrom-research

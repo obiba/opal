@@ -22,6 +22,16 @@ public final class Dtos {
 
   private Dtos() {}
 
+  public static Opal.VcsTagsInfoDto asDto(List<String> tags) {
+    Opal.VcsTagsInfoDto.Builder tagsDto = Opal.VcsTagsInfoDto.newBuilder();
+
+    for (String tag : tags) {
+      tagsDto.addNames(tag);
+    }
+
+    return tagsDto.build();
+  }
+
   public static Opal.VcsCommitInfosDto asDto(Iterable<CommitInfo> commitInfos) {
     Collection<Opal.VcsCommitInfoDto> commitInfoDtos = new ArrayList<>();
     for(CommitInfo commitInfo : commitInfos) {

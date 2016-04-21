@@ -375,6 +375,10 @@ message OpalConf {
   repeated TaxonomyDto taxonomies = 2;
 }
 
+message VcsTagsInfoDto {
+  repeated string names = 1;
+}
+
 message VcsCommitInfosDto {
   repeated VcsCommitInfoDto commitInfos = 1;
 }

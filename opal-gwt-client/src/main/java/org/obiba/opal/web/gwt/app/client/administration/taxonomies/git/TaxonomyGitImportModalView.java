@@ -3,25 +3,33 @@ package org.obiba.opal.web.gwt.app.client.administration.taxonomies.git;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
 public class TaxonomyGitImportModalView extends ModalPopupViewWithUiHandlers<TaxonomyGitImportModalUiHandlers>
     implements TaxonomyGitImportModalPresenter.Display {
+
+  private boolean tagMode = false;
 
   interface ViewUiBinder extends UiBinder<Widget, TaxonomyGitImportModalView> {}
 
@@ -53,6 +61,21 @@ public class TaxonomyGitImportModalView extends ModalPopupViewWithUiHandlers<Tax
   @UiField
   CheckBox overrideExisting;
 
+  @UiField
+  Chooser tags;
+
+  @UiField
+  FlowPanel filePanel;
+
+  @UiField
+  FlowPanel tagPanel;
+
+  @UiField
+  Image fetchingTagsProgress;
+
+  @UiField
+  Button importRepo;
+
   @Inject
   public TaxonomyGitImportModalView(EventBus eventBus) {
     super(eventBus);
@@ -67,7 +90,8 @@ public class TaxonomyGitImportModalView extends ModalPopupViewWithUiHandlers<Tax
 
   @UiHandler("importRepo")
   void onSave(ClickEvent event) {
-    getUiHandlers().onImport(user.getText(), repository.getText(), reference.getText(), file.getText(),
+    String ref = tagMode ? tags.getSelectedValue() : reference.getText();
+    getUiHandlers().onImport(user.getText(), repository.getText(), ref, file.getText(),
         overrideExisting.getValue());
   }
 
@@ -87,12 +111,33 @@ public class TaxonomyGitImportModalView extends ModalPopupViewWithUiHandlers<Tax
   }
 
   @Override
+  public void addTags(JsArrayString tagNames) {
+    fetchingTagsProgress.setVisible(false);
+    importRepo.setEnabled(true);
+    for(String name : JsArrays.toIterable(tagNames)) {
+      tags.addItem(name);
+    }
+    tags.setEnabled(tagNames.length() > 1);
+  }
+
+  @Override
+  public void setTagInfo(String user, String repo) {
+    tagMode = true;
+    this.user.setText(user);
+    repository.setText(repo);
+    filePanel.setVisible(!tagMode);
+    importRepo.setEnabled(!tagMode);
+    tagPanel.setVisible(tagMode);
+  }
+
+  @Override
   public void hideDialog() {
     modal.hide();
   }
 
   @Override
   public void showError(String messageKey) {
+    fetchingTagsProgress.setVisible(false);
     showError(null, translations.userMessageMap().get(messageKey));
   }
 

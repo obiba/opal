@@ -16,6 +16,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -42,6 +43,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
@@ -65,6 +68,8 @@ public class TaxonomyServiceImpl implements TaxonomyService, GitService {
   private static final String TAXONOMY_YAML = "taxonomy.yml";
 
   private static final String GITHUB_URL = "https://raw.githubusercontent.com";
+
+  private static final String GITHUB_API_REF_URL = "https://api.github.com/repos/%s/%s/tags";
 
   private static final String GITHUB_API_ZIPBALL_URL = "https://api.github.com/repos/%s/%s/zipball/%s";
 
@@ -95,6 +100,27 @@ public class TaxonomyServiceImpl implements TaxonomyService, GitService {
     if(Strings.isNullOrEmpty(repo)) throw new IllegalArgumentException("GitHub repository is required");
     if(Strings.isNullOrEmpty(ref)) throw new IllegalArgumentException("GitHub ref name is required");
     return importZipball(String.format(GITHUB_API_ZIPBALL_URL, user, repo, ref), override);
+  }
+
+  @Override
+  public List<String> getGitHubTaxonomyTags(@NotNull String username, @NotNull String repo) {
+    String user = username;
+    if(Strings.isNullOrEmpty(username)) user = MLSTRM_USER;
+    if(Strings.isNullOrEmpty(repo)) throw new IllegalArgumentException("GitHub repository is required");
+    List<String> tags = Lists.newArrayList();
+
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      List<Map<String, String>> tagsInfo = mapper.readValue(new URL(String.format(GITHUB_API_REF_URL, user, repo)),
+          new TypeReference<List<Map<String, Object>>>() {});
+      for (Map<String, String> tag : tagsInfo) {
+        tags.add(tag.get("name"));
+      }
+
+      return tags;
+    } catch(IOException e) {
+      throw new TaxonomyImportException(e);
+    }
   }
 
   @Override
