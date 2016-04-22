@@ -220,6 +220,7 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
       }
     });
 
+    table.getHeader(0).setHeaderStyleNames("sortable-header-column");
     table.setPageSize(DEFAULT_PAGE_SIZE);
     table.setEmptyTableWidget(new com.google.gwt.user.client.ui.InlineLabel(translationMessages.vocabularyCount(0)));
     pager.setDisplay(table);

@@ -45,7 +45,7 @@
           <b:TextBox ui:field="reference"/>
         </b:Controls>
         <b:HelpBlock>
-          <ui:msg description="Taxonomy Git Ref help">Repository branch name (e.g. master) or a commit id.</ui:msg>
+          <ui:msg description="Taxonomy Git Ref help">Repository branch name (e.g. master), release version (1.0) or a commit id.</ui:msg>
         </b:HelpBlock>
       </b:ControlGroup>
 
@@ -58,7 +58,7 @@
           <b:TextBox ui:field="file"/>
         </b:Controls>
         <b:HelpBlock>
-          <ui:msg description="Taxonomy Git File Path help">Taxonomy YAML file name (e.g. taxonomy.yml or scale/taxonomy.yml).</ui:msg>
+          <ui:msg description="Taxonomy Git File Path help">Taxonomy YAML file name (e.g. taxonomy.yml or scales/taxonomy.yml). Leave this field empty to import all taxonomy files.</ui:msg>
         </b:HelpBlock>
       </b:ControlGroup>
     </g:FlowPanel>
@@ -73,7 +73,7 @@
         <o:Chooser ui:field="tags" name="tags" enabled="false"/>
         <b:HelpBlock>
           <ui:msg description="Taxonomy Git tags help label">
-            Taxonomy released versions.
+            Select a version to import.
           </ui:msg>
         </b:HelpBlock>
       </b:ControlGroup>

@@ -1647,6 +1647,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Import Github Taxonomy")
   String importGitTaxonomy();
 
+  @Description("Import Maelstrom Taxonomy")
+  @DefaultStringValue("Import Maelstrom-Research Taxonomies")
+  String importMaelstromTaxonomies();
+
   @Description("Add Taxonomy")
   @DefaultStringValue("Add Taxonomy")
   String addTaxonomy();

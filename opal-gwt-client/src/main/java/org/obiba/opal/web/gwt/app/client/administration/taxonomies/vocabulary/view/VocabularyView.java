@@ -114,8 +114,8 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
 
     table.addColumn(new LocaleTextColumn<TermDto>() {
       {
-        this.setSortable(true);
-        this.setDefaultSortAscending(false);
+        setSortable(true);
+        setDefaultSortAscending(false);
       }
 
       @Override
@@ -176,6 +176,7 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
       }
     });
 
+    table.getHeader(0).setHeaderStyleNames("sortable-header-column");
     //table.setSelectionModel(new SingleSelectionModel<VocabularyDto>());
     table.setPageSize(Table.DEFAULT_PAGESIZE);
     table.setEmptyTableWidget(new com.google.gwt.user.client.ui.InlineLabel(translationMessages.termCount(0)));
