@@ -123,6 +123,7 @@ public class TaxonomyGitImportModalView extends ModalPopupViewWithUiHandlers<Tax
   @Override
   public void setTagInfo(String user, String repo) {
     tagMode = true;
+    modal.setTitle(translations.importMaelstromTaxonomies());
     this.user.setText(user);
     repository.setText(repo);
     filePanel.setVisible(!tagMode);
