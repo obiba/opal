@@ -73,7 +73,8 @@
         <o:Chooser ui:field="tags" name="tags" enabled="false"/>
         <b:HelpBlock>
           <ui:msg description="Taxonomy Git tags help label">
-            Select a version to import.
+            Select a version to import from <a href="https://github.com/maelstrom-research/maelstrom-taxonomies"
+              target="_blank">Maelstrom-Research</a> GitHub repository.
           </ui:msg>
         </b:HelpBlock>
       </b:ControlGroup>
