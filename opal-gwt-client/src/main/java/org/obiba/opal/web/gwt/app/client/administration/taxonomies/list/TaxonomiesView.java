@@ -106,6 +106,11 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
     getUiHandlers().onImportGithubTaxonomies();
   }
 
+  @UiHandler("importGithubMaelstrom")
+  void onImportGithubMaelstromTaxonomies(ClickEvent event) {
+    getUiHandlers().onImportGithubMaelstromTaxonomies();
+  }
+
   private class TaxonomyClickHandler implements ClickHandler {
 
     private final TaxonomiesDto.TaxonomySummaryDto taxonomy;

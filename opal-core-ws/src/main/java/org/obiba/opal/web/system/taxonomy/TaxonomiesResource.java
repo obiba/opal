@@ -63,6 +63,14 @@ public class TaxonomiesResource {
     return builder.build();
   }
 
+  @GET
+  @Path("tags/_github")
+  public Opal.VcsTagsInfoDto getTaxonomyGitHubTags(
+      @QueryParam("user") @DefaultValue("maelstrom-research") String username, @QueryParam("repo") String repo) {
+    
+    return org.obiba.opal.web.magma.vcs.Dtos.asDto(taxonomyService.getGitHubTaxonomyTags(username, repo));
+  }
+
   @POST
   @Path("import/_github")
   public Response importTaxonomyFromGitHub(@Context UriInfo uriInfo,
@@ -73,7 +81,7 @@ public class TaxonomiesResource {
 
     if (Strings.isNullOrEmpty(file)) {
       List<Taxonomy> taxonomies = taxonomyService.importGitHubTaxonomies(username, repo, ref, override);
-      if(taxonomies.isEmpty()) return Response.status(Response.Status.BAD_REQUEST).build();
+      if(override && taxonomies.isEmpty()) return Response.status(Response.Status.BAD_REQUEST).build();
       URI uri = uriInfo.getBaseUriBuilder().path("/system/conf/taxonomies").build();
       return Response.created(uri).build();
     }

@@ -14,4 +14,5 @@ public interface TaxonomiesUiHandlers extends UiHandlers {
 
   void onImportGithubTaxonomies();
 
+  void onImportGithubMaelstromTaxonomies();
 }

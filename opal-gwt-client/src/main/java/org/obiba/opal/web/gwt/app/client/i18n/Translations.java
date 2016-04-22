@@ -584,6 +584,8 @@ public interface Translations extends Constants {
       "TaxonomyGitUserRequired", "Github user or organization name is required.", //
       "TaxonomyGitRepositoryRequired", "Github repository name is required.", //
       "TaxonomyImportFailed", "Failed to import taxonomy. Please make sure all import related information is correct.",
+      "TaxonomyTagsImportFailed", "Failed to retrieve taxonomy released versions. Please contact technical support.",
+      "TaxonomyNoTagsFound", "There are no released versions available. Please contact your administrator for further assistance.", //
       "TaxonomyNotFound", "No such taxonomy with name: {0}.", //
       "TaxonomyAlreadyExists", "A taxonomy with the name '{0}' already exists. To override, click on 'Override existing taxonomy' option.", //
       "VocabularyNotFound", "No such vocabulary in taxonomy '{0}' with name: {1}.", //

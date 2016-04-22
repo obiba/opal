@@ -1,4 +1,5 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
@@ -7,58 +8,76 @@
 
   <o:Modal ui:field="modal" closeVisible="true" keyboard="true" animation="false">
     <!-- Name -->
-    <b:ControlGroup ui:field="userGroup">
-      <b:ControlLabel>
-        <ui:msg description="User label">User</ui:msg>
-        <o:RequiredIcon/>
-      </b:ControlLabel>
-      <b:Controls>
-        <b:TextBox ui:field="user"/>
-      </b:Controls>
-      <b:HelpBlock>
-        <ui:msg description="Taxonomy Import User help">Github user or organization name.</ui:msg>
-      </b:HelpBlock>
-    </b:ControlGroup>
+    <g:FlowPanel ui:field="filePanel" visible="true">
+      <b:ControlGroup ui:field="userGroup">
+        <b:ControlLabel>
+          <ui:msg description="User label">User</ui:msg>
+          <o:RequiredIcon/>
+        </b:ControlLabel>
+        <b:Controls>
+          <b:TextBox ui:field="user"/>
+        </b:Controls>
+        <b:HelpBlock>
+          <ui:msg description="Taxonomy Import User help">Github user or organization name.</ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
 
-    <!-- Repository -->
-    <b:ControlGroup ui:field="repositoryGroup">
-      <b:ControlLabel>
-        <ui:msg description="Repository label">Repository</ui:msg>
-        <o:RequiredIcon/>
-      </b:ControlLabel>
-      <b:Controls>
-        <b:TextBox ui:field="repository"/>
-      </b:Controls>
-      <b:HelpBlock>
-        <ui:msg description="Taxonomy Author help">Github repository name.</ui:msg>
-      </b:HelpBlock>
-    </b:ControlGroup>
+      <!-- Repository -->
+      <b:ControlGroup ui:field="repositoryGroup">
+        <b:ControlLabel>
+          <ui:msg description="Repository label">Repository</ui:msg>
+          <o:RequiredIcon/>
+        </b:ControlLabel>
+        <b:Controls>
+          <b:TextBox ui:field="repository"/>
+        </b:Controls>
+        <b:HelpBlock>
+          <ui:msg description="Taxonomy Author help">Github repository name.</ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
 
-    <!-- Reference -->
-    <b:ControlGroup>
-      <b:ControlLabel>
-        <ui:msg description="License label">Reference</ui:msg>
-      </b:ControlLabel>
-      <b:Controls>
-        <b:TextBox ui:field="reference"/>
-      </b:Controls>
-      <b:HelpBlock>
-        <ui:msg description="Taxonomy Git Ref help">Repository branch name (e.g. master) or a commit id.</ui:msg>
-      </b:HelpBlock>
-    </b:ControlGroup>
+      <!-- Reference -->
+      <b:ControlGroup>
+        <b:ControlLabel>
+          <ui:msg description="License label">Reference</ui:msg>
+        </b:ControlLabel>
+        <b:Controls>
+          <b:TextBox ui:field="reference"/>
+        </b:Controls>
+        <b:HelpBlock>
+          <ui:msg description="Taxonomy Git Ref help">Repository branch name (e.g. master) or a commit id.</ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
 
-    <!-- File Path -->
-    <b:ControlGroup>
-      <b:ControlLabel>
-        <ui:msg description="Title label">File</ui:msg>
-      </b:ControlLabel>
-      <b:Controls>
-        <b:TextBox ui:field="file"/>
-      </b:Controls>
-      <b:HelpBlock>
-        <ui:msg description="Taxonomy Git File Path help">Taxonomy YAML file name (e.g. taxonomy.yml or scale/taxonomy.yml).</ui:msg>
-      </b:HelpBlock>
-    </b:ControlGroup>
+      <!-- File Path -->
+      <b:ControlGroup>
+        <b:ControlLabel>
+          <ui:msg description="Title label">File</ui:msg>
+        </b:ControlLabel>
+        <b:Controls>
+          <b:TextBox ui:field="file"/>
+        </b:Controls>
+        <b:HelpBlock>
+          <ui:msg description="Taxonomy Git File Path help">Taxonomy YAML file name (e.g. taxonomy.yml or scale/taxonomy.yml).</ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
+    </g:FlowPanel>
+
+    <g:FlowPanel ui:field="tagPanel" visible="false">
+      <g:Image ui:field="fetchingTagsProgress" visible="true" url="image/loading.gif"/>
+
+      <b:ControlGroup ui:field="tagsGroup">
+        <b:ControlLabel for="tags">
+          <ui:msg description="Taxonomy Git Tags">Released Versions</ui:msg>
+        </b:ControlLabel>
+        <o:Chooser ui:field="tags" name="tags" enabled="false"/>
+        <b:HelpBlock>
+          <ui:msg description="Taxonomy Git tags help label">
+            Taxonomy released versions.
+          </ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
+    </g:FlowPanel>
 
     <b:ControlGroup>
       <b:CheckBox ui:field="overrideExisting">
