@@ -37,7 +37,7 @@ case "$1" in
         if [ ! -f "$tfile" ]; then
           return 1
         fi
-        cat /etc/opal/shiro.ini | sed -e "s/^administrator\s*=.*,/administrator=$adminpw,/" > $tfile && \
+        cat /etc/opal/shiro.ini | sed -e "s,^administrator\s*=.*\,,administrator=$adminpw\,," > $tfile && \
           mv $tfile /etc/opal/shiro.ini
         # clear password in db_get so it won't be re-encoded during next upgrade
         db_set opal-server/admin_password ""
