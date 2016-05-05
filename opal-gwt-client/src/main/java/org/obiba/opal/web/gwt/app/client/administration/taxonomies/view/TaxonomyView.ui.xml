@@ -53,7 +53,10 @@
         <g:Label>
           <ui:msg description="License label">License</ui:msg>
         </g:Label>
-        <g:Label ui:field="license"></g:Label>
+        <g:FlowPanel>
+          <g:Label ui:field="license"></g:Label>
+          <g:Anchor ui:field="licenseLink"></g:Anchor>
+        </g:FlowPanel>
       </g:FlowPanel>
       <g:FlowPanel>
         <g:Label>

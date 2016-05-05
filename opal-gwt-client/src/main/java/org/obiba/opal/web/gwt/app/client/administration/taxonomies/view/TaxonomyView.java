@@ -54,6 +54,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
@@ -109,6 +110,9 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
 
   @UiField
   Label license;
+
+  @UiField
+  Anchor licenseLink;
 
   @UiField
   Panel titlePanel;
@@ -267,10 +271,34 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
   private void renderTaxonomy(TaxonomyDto taxonomy) {
     taxonomyName.setText(taxonomy.getName());
     author.setText(taxonomy.hasAuthor() ? taxonomy.getAuthor() : "");
-    license.setText(taxonomy.hasLicense() ? taxonomy.getLicense() : "");
+    renderLicense(taxonomy);
     renderText(titlePanel, taxonomy.getTitleArray());
     renderText(descriptionPanel, taxonomy.getDescriptionArray());
     setVocabularies(taxonomy.getVocabulariesArray());
+  }
+
+  private void renderLicense(TaxonomyDto taxonomy) {
+    license.setText("");
+    licenseLink.setText("");
+    if (!taxonomy.hasLicense()) return;
+
+    if (taxonomy.getLicense().startsWith("CC ")) {
+      renderCreativeCommonsLicense(taxonomy);
+    } else {
+      license.setText(taxonomy.getLicense());
+    }
+  }
+
+  private void renderCreativeCommonsLicense(TaxonomyDto taxonomy) {
+    String[] licenseParts = taxonomy.getLicense().split(" ");
+    if (licenseParts.length == 3) {
+      licenseLink.setText(taxonomy.getLicense());
+      licenseLink.setHref(
+          "https://creativecommons.org/licenses/" + licenseParts[1].toLowerCase() + "/" + licenseParts[2] + "/");
+      licenseLink.setTarget("_blank");
+    } else {
+      license.setText(taxonomy.getLicense());
+    }
   }
 
   private void renderText(Panel panel, JsArray<LocaleTextDto> texts) {
