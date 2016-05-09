@@ -49,7 +49,11 @@ public class ProjectReportTemplateResourceTest {
 
   @Before
   public void before() {
-    new MagmaEngine();
+    try {
+      new MagmaEngine();
+    } catch (Exception e) {
+      // ignore
+    }
 
     reportTemplateService = mock(ReportTemplateService.class);
     reportTemplateScheduler = mock(ReportTemplateScheduler.class);
