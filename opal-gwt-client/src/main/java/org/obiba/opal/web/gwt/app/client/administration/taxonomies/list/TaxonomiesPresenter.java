@@ -126,18 +126,6 @@ public class TaxonomiesPresenter extends PresenterWidget<TaxonomiesPresenter.Dis
   }
 
   @Override
-  public void onImportDefaultTaxonomies() {
-    ResourceRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.SYSTEM_CONF_TAXONOMIES_IMPORT_DEFAULT.create().build()).post()
-        .withCallback(new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            refresh();
-          }
-        }, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_NOT_FOUND).send();
-  }
-
-  @Override
   public void onImportGithubTaxonomies() {
     taxonomyGitImportModalPresenterModalProvider.get();
   }

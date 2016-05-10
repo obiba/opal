@@ -10,8 +10,6 @@ public interface TaxonomiesUiHandlers extends UiHandlers {
 
   void onAddTaxonomy();
 
-  void onImportDefaultTaxonomies();
-
   void onImportGithubTaxonomies();
 
   void onImportGithubMaelstromTaxonomies();
