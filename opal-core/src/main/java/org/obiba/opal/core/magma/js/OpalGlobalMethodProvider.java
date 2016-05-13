@@ -62,7 +62,9 @@ public class OpalGlobalMethodProvider extends AbstractGlobalMethodProvider {
           context.push(RequireCache.class, cache);
         }
         log.debug("Loading file at path: {}", file.getAbsolutePath());
-        context.evaluateReader(thisObj, new FileReader(file), file.getName(), 1, null);
+        FileReader reader = new FileReader(file);
+        context.evaluateReader(thisObj, reader, file.getName(), 1, null);
+        reader.close();
         cache.addLibrary(file.getAbsolutePath());
       } catch(FileNotFoundException e) {
         throw new RuntimeException("Javascript library not found: " + fileName, e);
