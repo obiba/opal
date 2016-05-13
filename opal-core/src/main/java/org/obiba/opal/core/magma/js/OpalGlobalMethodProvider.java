@@ -34,6 +34,12 @@ public class OpalGlobalMethodProvider extends AbstractGlobalMethodProvider {
   }
 
   public static void source(Context ctx, Scriptable thisObj, Object[] args, Function funObj) {
+    String optLevel = System.getProperty("rhino.opt.level");
+    if (optLevel != null) {
+      try {
+        ctx.setOptimizationLevel(Integer.parseInt(optLevel));
+      } catch(Exception e) {}
+    }
 
     for(Object arg : args) {
       String fileName = Context.toString(arg);
