@@ -422,8 +422,8 @@ public interface TranslationMessages extends Messages {
   String nVariablesLabel(@PluralCount int nb);
 
   @Description("Errors remaining message")
-  @DefaultMessage("There are still {0} errors remaining. Please contact your administrator for further help.")
-  String errorsRemainingMessage(int nb);
+  @DefaultMessage("There are still {0} errors remaining. <a href=\"{1}\" target=\"_blank\">Click to download the list of errors</a>. Please contact your administrator for further help. ")
+  String errorsRemainingMessage(int nb, String downloadUrl);
 
   @Description("/{0} entities label")
   @DefaultMessage("/{0} entities")
