@@ -17,6 +17,16 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import com.google.common.base.Strings;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionUpdatedEvent;
@@ -57,17 +67,6 @@ import org.obiba.opal.web.model.client.magma.StaticDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
-
-import com.google.common.base.Strings;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.HasUiHandlers;
 
 import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
 import static com.google.gwt.http.client.Response.SC_CREATED;
@@ -213,9 +212,8 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
   private void createTransientDatasource() {
     if(!Strings.isNullOrEmpty(transientDatasourceName)) deleteTransientDatasource();
-
     DatasourceFactoryDto factory = createDatasourceFactoryDto(getView().getSelectedFile());
-    ResponseCodeCallback errorCallback = new TransientDatasourceFailureCallback();
+    ResponseCodeCallback errorCallback = new TransientDatasourceFailureCallback(datasourceName);
 
     ResourceRequestBuilderFactory.<DatasourceDto>newBuilder() //
         .forResource(UriBuilders.PROJECT_TRANSIENT_DATASOURCE.create().build(datasourceName)) //
@@ -431,7 +429,10 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
   private final class TransientDatasourceFailureCallback implements ResponseCodeCallback {
 
-    TransientDatasourceFailureCallback() {
+    private String datasourceName;
+
+    TransientDatasourceFailureCallback(String datasourceName) {
+      this.datasourceName = datasourceName;
     }
 
     @Override
@@ -450,7 +451,16 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
                   datasourceParsingErrorDto.getArgumentsArray()));
 
           if(++count >= MAX_ERROR_ALERTS && actualErrors != MAX_ERROR_ALERTS) {
-            getView().showError(null, translationMessages.errorsRemainingMessage(actualErrors - MAX_ERROR_ALERTS));
+            String resource = UriBuilders.PROJECT_TRANSIENT_DATASOURCE.create()//
+                .segment("_last-errors")//
+                .build(datasourceName);
+            String downloadUrl = ResourceRequestBuilderFactory.newBuilder()//
+                .forResource(resource) //
+                .getUri();
+            getView().showError(null, translationMessages.errorsRemainingMessage(
+                actualErrors - MAX_ERROR_ALERTS,
+                downloadUrl
+            ));
             break;
           }
         }
