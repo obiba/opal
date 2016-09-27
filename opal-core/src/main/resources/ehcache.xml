@@ -20,6 +20,12 @@
       overflowToDisk="true"
       diskPersistent="true"/>
 
+  <cache name="opal-datasource-parse-error-log"
+         maxElementsInMemory="1"
+         timeToLiveSeconds="600"
+         overflowToDisk="true"
+         diskPersistent="false"/>
+
   <cache name="opal-variable-summary-categorical"
       maxElementsInMemory="1"
       eternal="true"
