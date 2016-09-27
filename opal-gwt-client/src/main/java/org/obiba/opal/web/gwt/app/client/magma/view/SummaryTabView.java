@@ -78,6 +78,9 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
   IconAnchor refreshSummaryLink;
 
   @UiField
+  IconAnchor runSummaryLink;
+
+  @UiField
   IconAnchor fullSummaryLink;
 
   @UiField
@@ -270,13 +273,15 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
   public void requestingSummary(int limit, int entitiesCount) {
     summary.clear();
     summary.add(new Image("image/loading.gif"));
-
     limitTextBox.setValue(String.valueOf(limit));
+
     if(limit < entitiesCount) {
       showLimitBox(entitiesCount);
     } else {
       hideLimitBox();
     }
+
+    runSummaryLink.setVisible(false);
     previewSummary.setVisible(true);
     cancelSummaryLink.setVisible(true);
   }
@@ -338,6 +343,11 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
 
   @UiHandler("refreshSummaryLink")
   public void onRefreshSummary(ClickEvent event) {
+    getUiHandlers().onRefreshSummary();
+  }
+
+  @UiHandler("runSummaryLink")
+  public void onRunSummary(ClickEvent event) {
     getUiHandlers().onRefreshSummary();
   }
 

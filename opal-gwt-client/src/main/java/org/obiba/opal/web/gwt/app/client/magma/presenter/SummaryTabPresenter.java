@@ -9,6 +9,19 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
+import java.util.Map;
+
+import com.google.common.collect.Maps;
+import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.gwtplatform.mvp.client.HasUiHandlers;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.event.SummaryReceivedEvent;
@@ -23,24 +36,15 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.http.client.URL;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
-import com.gwtplatform.mvp.client.HasUiHandlers;
-import com.gwtplatform.mvp.client.PresenterWidget;
-import com.gwtplatform.mvp.client.View;
+import static org.obiba.opal.web.gwt.rest.client.UriUtils.removeQueryParam;
+import static org.obiba.opal.web.gwt.rest.client.UriUtils.updateQueryParams;
 
 /**
  *
  */
 public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Display> implements SummaryTabUiHandlers {
 
-  public final static int DEFAULT_LIMIT = 500;
+  public final static int DEFAULT_LIMIT = 50;
 
   private final static int MIN_LIMIT = 10;
 
@@ -72,6 +76,7 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
   public SummaryTabPresenter(EventBus eventBus, Display display, Translations translations) {
     super(eventBus, display);
     getView().setUiHandlers(this);
+    getView().setLimit(DEFAULT_LIMIT);
     this.translations = translations;
   }
 
@@ -105,12 +110,19 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
   public void onFullSummary() {
     getView().setLimit(entitiesCount);
     cancelPendingSummaryRequest();
-    // Remove queries from the url
     String uri = resourceRequestBuilder.getResource();
-    if(uri.contains("?")) {
-      uri = uri.substring(0, uri.indexOf("?"));
+    uri = removeQueryParam(uri, "limit");
+    Map<String, String> args = Maps.newHashMap();
+    args.put("resetCache", "true");
+    uri = updateQueryParams(uri, args);
+
+    if(uri.contains("_transient")) {
+      //for script evaluation, we must use post so the script/categories are passed in the form, otherwise the summary is incorrect
+      resourceRequestBuilder.forResource(uri).post();
+    } else {
+      resourceRequestBuilder.forResource(uri).get();
     }
-    resourceRequestBuilder.forResource(uri).get();
+
     limit = entitiesCount;
     onReset();
   }
@@ -126,21 +138,17 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
   public void onRefreshSummary() {
     cancelPendingSummaryRequest();
     String uri = resourceRequestBuilder.getResource();
-    // Remove queries from the url
-    if(uri.contains("?")) {
-      uri = uri.substring(0, uri.indexOf("?"));
-    }
-    // We have to decode the uri only because we rebuild a uri through uribuilder to truncate query paramaters
-    // and add new ones... Ideally, we would have access to the UriBuilder directly.
-    UriBuilder uriBuilder = UriBuilder.create().fromPath(URL.decodeQueryString(uri));
-    uriBuilder.query("resetCache", "true");
+    uri = removeQueryParam(uri, "limit");
 
+    Map<String, String> args = Maps.newHashMap();
+    args.put("resetCache", "true");
     limit = Math.max(getView().getLimit().intValue(), Math.min(MIN_LIMIT, entitiesCount));
+
     if(limit < entitiesCount) {
-      uriBuilder.query("limit", String.valueOf(limit));
+      args.put("limit", String.valueOf(limit));
     }
 
-    String target = uriBuilder.build();
+    String target = updateQueryParams(uri, args);
     resourceRequestBuilder.forResource(target);
     if(target.contains("_transient")) {
       //for script evaluation, we must use post so the script/categories are passed in the form, otherwise the summary is incorrect
@@ -190,6 +198,7 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     if (blockSummaryRequests()) return;
 
     getView().requestingSummary(limit, entitiesCount);
+
     summaryRequest = resourceRequestBuilder //
         .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
           @Override
