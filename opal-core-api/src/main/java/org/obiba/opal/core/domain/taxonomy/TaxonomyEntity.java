@@ -17,6 +17,9 @@ import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
 public class TaxonomyEntity implements Serializable {
 
   private static final long serialVersionUID = 276565753582045864L;
@@ -30,6 +33,8 @@ public class TaxonomyEntity implements Serializable {
   }
 
   public void setName(@NotNull String name) {
+    Preconditions.checkArgument(!Strings.isNullOrEmpty(name), "name");
+
     this.name = name;
   }
 

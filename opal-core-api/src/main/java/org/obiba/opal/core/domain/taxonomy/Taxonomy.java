@@ -14,10 +14,9 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
-import org.obiba.opal.core.cfg.NoSuchVocabularyException;
-
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import org.obiba.opal.core.cfg.NoSuchVocabularyException;
 
 /**
  * A taxonomies is a set of vocabularies that allows to describe the attributes.

@@ -14,9 +14,8 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
-import org.obiba.opal.core.cfg.NoSuchTermException;
-
 import com.google.common.collect.Lists;
+import org.obiba.opal.core.cfg.NoSuchTermException;
 
 public class Vocabulary extends TaxonomyEntity {
 
@@ -29,7 +28,7 @@ public class Vocabulary extends TaxonomyEntity {
   public Vocabulary() {
   }
 
-  public Vocabulary(String name) {
+  public Vocabulary(@NotNull String name) {
     setName(name);
   }
 
