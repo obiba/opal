@@ -1,7 +1,18 @@
+/*
+ * Copyright (c) 2016 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.obiba.opal.web.gwt.rest.client;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -63,6 +74,16 @@ public class UriBuilder {
     return this;
   }
 
+  public UriBuilder query(Map<String, String> queryItems) {
+    Preconditions.checkArgument(queryItems != null);
+
+    for(Map.Entry<String, String> entry : queryItems.entrySet()) {
+      append(query, entry.getKey(), entry.getValue());
+    }
+
+    return this;
+  }
+
   /**
    * Return url
    *
@@ -95,10 +116,11 @@ public class UriBuilder {
    * @param path
    * @return uriBuilder
    */
-  public UriBuilder fromPath(String p) {
-    String pDecoded = URL.decode(p);
+  public UriBuilder fromPath(String path) {
+    String pDecoded = URL.decode(path);
     String cleanedPath = pDecoded.startsWith("/") ? pDecoded.substring(1) : pDecoded;
-    append(path, cleanedPath.split("/"));
+    append(this.path, cleanedPath.split("/"));
+
     return this;
   }
 

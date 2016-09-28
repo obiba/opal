@@ -241,7 +241,6 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
 
       summaryTabPresenter.setRequestBuilder(requestBuilder, originalTable.getValueSetCount());
       summaryTabPresenter.forgetSummary();
-      summaryTabPresenter.onReset();
     }
 
     private ResourceRequestBuilder<SummaryStatisticsDto> requestSummaryBuilder(String link) {

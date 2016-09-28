@@ -25,8 +25,15 @@
           </g:customCell>
 
           <g:customCell>
+            <b2:IconAnchor icon="PLAY" ui:field="runSummaryLink" addStyleNames="inline xsmall-indent"
+                           visible="true">
+              <ui:msg description="Run summary label">Run</ui:msg>
+            </b2:IconAnchor>
+          </g:customCell>
+
+          <g:customCell>
             <b2:IconAnchor icon="REFRESH" ui:field="refreshSummaryLink" addStyleNames="inline xsmall-indent"
-                visible="true">
+                visible="false">
               <ui:msg description="Refresh summary label">Refresh</ui:msg>
             </b2:IconAnchor>
           </g:customCell>
@@ -40,7 +47,7 @@
 
           <g:customCell>
             <b2:IconAnchor icon="PAUSE" ui:field="cancelSummaryLink" addStyleNames="inline xsmall-indent"
-                visible="true">
+                visible="false">
               <ui:msg description="Cancel Pending Summary label">Cancel</ui:msg>
             </b2:IconAnchor>
           </g:customCell>
