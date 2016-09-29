@@ -1,8 +1,24 @@
 package org.obiba.opal.web.gwt.app.client.administration.taxonomies.edit;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import com.google.common.base.Strings;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
+import com.gwtplatform.mvp.client.PopupView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -10,16 +26,6 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.GeneralConf;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
-
-import com.google.common.base.Strings;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.HasUiHandlers;
-import com.gwtplatform.mvp.client.PopupView;
 
 public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEditModalPresenter.Display>
     implements TaxonomyEditModalUiHandlers {
@@ -41,6 +47,8 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
 
   @Override
   public void onSave(String name, String author, String license, JsArray<LocaleTextDto> titles, JsArray<LocaleTextDto> descriptions) {
+    if (!new ViewValidator().validate()) return;
+
     final TaxonomyDto dto = TaxonomyDto.create();
     dto.setName(name);
     if (!Strings.isNullOrEmpty(author)) dto.setAuthor(author);
@@ -48,7 +56,7 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
     dto.setTitleArray(titles);
     dto.setDescriptionArray(descriptions);
 
-    if(mode == EDIT_MODE.EDIT) {
+    if (mode == EDIT_MODE.EDIT) {
       dto.setVocabulariesArray(originalTaxonomy.getVocabulariesArray());
 
       ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder().forResource(
@@ -64,7 +72,7 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
-              if(response.getText() != null && !response.getText().isEmpty()) {
+              if (response.getText() != null && !response.getText().isEmpty()) {
                 fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
               }
             }
@@ -84,7 +92,7 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
-              if(response.getText() != null && !response.getText().isEmpty()) {
+              if (response.getText() != null && !response.getText().isEmpty()) {
                 fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
               }
             }
@@ -112,11 +120,32 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
         }).get().send();
   }
 
+  private final class ViewValidator extends ViewValidationHandler {
+
+    private ViewValidator() {}
+
+    @Override
+    protected Set<FieldValidator> getValidators() {
+      Set<FieldValidator> validators = new LinkedHashSet<>();
+      validators.add(
+          new RequiredTextValidator(getView().getName(), "NameIsRequired", Display.FormField.NAME.name()));
+
+      return validators;
+    }
+
+    @Override
+    protected void showMessage(String id, String message) {
+      getView().showError(Display.FormField.valueOf(id), message);
+    }
+  }
+
   public interface Display extends PopupView, HasUiHandlers<TaxonomyEditModalUiHandlers> {
 
     enum FormField {
-      VOCABULARY
+      NAME
     }
+
+    HasText getName();
 
     void setMode(EDIT_MODE editionMode);
 

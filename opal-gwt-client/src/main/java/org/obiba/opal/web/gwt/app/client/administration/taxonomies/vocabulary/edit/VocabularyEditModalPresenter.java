@@ -10,10 +10,25 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.edit;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
+import com.gwtplatform.mvp.client.PopupView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularyUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -22,15 +37,6 @@ import org.obiba.opal.web.model.client.opal.GeneralConf;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.opal.VocabularyDto;
-
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.HasUiHandlers;
-import com.gwtplatform.mvp.client.PopupView;
 
 public class VocabularyEditModalPresenter extends ModalPresenterWidget<VocabularyEditModalPresenter.Display>
     implements VocabularyEditModalUiHandlers {
@@ -54,14 +60,16 @@ public class VocabularyEditModalPresenter extends ModalPresenterWidget<Vocabular
 
   @Override
   public void onSave(String name, boolean repeatable, JsArray<LocaleTextDto> titles,
-      JsArray<LocaleTextDto> descriptions) {
+                     JsArray<LocaleTextDto> descriptions) {
+    if(!new ViewValidator().validate()) return;
+
     final VocabularyDto dto = VocabularyDto.create();
     dto.setName(name);
     dto.setTitleArray(titles);
     dto.setDescriptionArray(descriptions);
     dto.setRepeatable(repeatable);
 
-    if(mode == EDIT_MODE.EDIT) {
+    if (mode == EDIT_MODE.EDIT) {
       dto.setTermsArray(originalVocabulary.getTermsArray());
 
       ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder().forResource(
@@ -78,7 +86,7 @@ public class VocabularyEditModalPresenter extends ModalPresenterWidget<Vocabular
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
-              if(response.getText() != null && !response.getText().isEmpty()) {
+              if (response.getText() != null && !response.getText().isEmpty()) {
                 fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
               }
             }
@@ -98,7 +106,7 @@ public class VocabularyEditModalPresenter extends ModalPresenterWidget<Vocabular
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
-              if(response.getText() != null && !response.getText().isEmpty()) {
+              if (response.getText() != null && !response.getText().isEmpty()) {
                 fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
               }
             }
@@ -127,11 +135,32 @@ public class VocabularyEditModalPresenter extends ModalPresenterWidget<Vocabular
         }).get().send();
   }
 
+  private final class ViewValidator extends ViewValidationHandler {
+
+    private ViewValidator() {}
+
+    @Override
+    protected Set<FieldValidator> getValidators() {
+      Set<FieldValidator> validators = new LinkedHashSet<>();
+      validators.add(
+          new RequiredTextValidator(getView().getName(), "NameIsRequired", Display.FormField.NAME.name()));
+
+      return validators;
+    }
+
+    @Override
+    protected void showMessage(String id, String message) {
+      getView().showError(Display.FormField.valueOf(id), message);
+    }
+  }
+
   public interface Display extends PopupView, HasUiHandlers<VocabularyEditModalUiHandlers> {
 
     enum FormField {
-      VOCABULARY
+      NAME
     }
+
+    HasText getName();
 
     void setMode(EDIT_MODE editionMode);
 

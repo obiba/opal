@@ -10,9 +10,24 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.taxonomies.term.edit;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
+import com.gwtplatform.mvp.client.PopupView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularyUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -22,15 +37,6 @@ import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.opal.TermDto;
 import org.obiba.opal.web.model.client.opal.VocabularyDto;
-
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.HasUiHandlers;
-import com.gwtplatform.mvp.client.PopupView;
 
 public class TermEditModalPresenter extends ModalPresenterWidget<TermEditModalPresenter.Display>
     implements TermEditModalUiHandlers {
@@ -56,14 +62,16 @@ public class TermEditModalPresenter extends ModalPresenterWidget<TermEditModalPr
 
   @Override
   public void onSave(String name, JsArray<LocaleTextDto> titles, JsArray<LocaleTextDto> descriptions,
-      JsArray<LocaleTextDto> keywords) {
+                     JsArray<LocaleTextDto> keywords) {
+    if(!new ViewValidator().validate()) return;
+
     final TermDto dto = TermDto.create();
     dto.setName(name);
     dto.setTitleArray(titles);
     dto.setDescriptionArray(descriptions);
     dto.setKeywordsArray(keywords);
 
-    if(mode == EDIT_MODE.EDIT) {
+    if (mode == EDIT_MODE.EDIT) {
       ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder().forResource(
           UriBuilders.SYSTEM_CONF_TAXONOMY_VOCABULARY_TERM.create()
               .build(originalTaxonomy.getName(), originalVocabulary.getName(), originalTerm.getName()))//
@@ -79,7 +87,7 @@ public class TermEditModalPresenter extends ModalPresenterWidget<TermEditModalPr
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
-              if(response.getText() != null && !response.getText().isEmpty()) {
+              if (response.getText() != null && !response.getText().isEmpty()) {
                 fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
               }
             }
@@ -101,7 +109,7 @@ public class TermEditModalPresenter extends ModalPresenterWidget<TermEditModalPr
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
-              if(response.getText() != null && !response.getText().isEmpty()) {
+              if (response.getText() != null && !response.getText().isEmpty()) {
                 fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
               }
             }
@@ -131,11 +139,32 @@ public class TermEditModalPresenter extends ModalPresenterWidget<TermEditModalPr
         }).get().send();
   }
 
+  private final class ViewValidator extends ViewValidationHandler {
+
+    private ViewValidator() {}
+
+    @Override
+    protected Set<FieldValidator> getValidators() {
+      Set<FieldValidator> validators = new LinkedHashSet<>();
+      validators.add(
+          new RequiredTextValidator(getView().getName(), "NameIsRequired", Display.FormField.NAME.name()));
+
+      return validators;
+    }
+
+    @Override
+    protected void showMessage(String id, String message) {
+      getView().showError(Display.FormField.valueOf(id), message);
+    }
+  }
+
   public interface Display extends PopupView, HasUiHandlers<TermEditModalUiHandlers> {
 
     enum FormField {
-      VOCABULARY
+      NAME
     }
+
+    HasText getName();
 
     void setMode(EDIT_MODE editionMode);
 

@@ -24,7 +24,9 @@ public class Term extends TaxonomyEntity {
 
   public Term() {}
 
-  public Term(String name) { setName(name); }
+  public Term(@NotNull String name) {
+    setName(name);
+  }
 
   public List<Term> getTerms() {
     return terms;
