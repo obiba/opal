@@ -89,7 +89,7 @@ public class ProjectTransientDatasourcesResource {
   public Response createDatasource(Magma.DatasourceFactoryDto factoryDto) {
     String uid = null;
     try {
-      if (getSessionId() != null) getDatasourceParseErrorLogCache().remove(getSessionId());
+      safeRemoveParseErrorLogCache();
       DatasourceFactory factory = datasourceFactoryRegistry.parse(factoryDto, getDatasourceEncryptionStrategy());
       uid = MagmaEngine.get().addTransientDatasource(factory);
       Datasource ds = MagmaEngine.get().getTransientDatasourceInstance(uid);
@@ -99,10 +99,26 @@ public class ProjectTransientDatasourcesResource {
       MagmaEngine.get().removeTransientDatasource(uid);
 
       if (e instanceof DatasourceParsingException) {
-        cacheDatarsourceParseErrorLog((DatasourceParsingException) e);
+        safeCacheParseErrorLog((DatasourceParsingException) e);
       }
 
       throw e;
+    }
+  }
+
+  private void safeCacheParseErrorLog(DatasourceParsingException parseException) {
+    try {
+      cacheDatarsourceParseErrorLog(parseException);
+    } catch (Exception e) {
+      log.warn("Error caching error log cache.", e);
+    }
+  }
+
+  private void safeRemoveParseErrorLogCache() {
+    try {
+      if (getSessionId() != null) getDatasourceParseErrorLogCache().remove(getSessionId());
+    } catch (Exception e) {
+      log.warn("Error removing parse error log cache.", e);
     }
   }
 
