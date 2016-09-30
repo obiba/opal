@@ -24,13 +24,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import com.google.common.collect.Sets;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.Variable;
-import org.obiba.magma.VariableEntity;
+import org.obiba.magma.*;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.search.AbstractSearchUtility;
@@ -144,7 +142,7 @@ public class TableValueSetsSearchResource extends AbstractSearchUtility {
     }));
 
     ImmutableList.Builder<Magma.ValueSetsDto.ValueSetDto> valueSetDtoBuilder = ImmutableList.builder();
-    Iterable<Magma.ValueSetsDto.ValueSetDto> transform = Iterables.transform(variableEntities,
+    Iterable<Magma.ValueSetsDto.ValueSetDto> transform = Iterables.transform(getValueTable().getValueSets(Sets.newLinkedHashSet(variableEntities)),
         new VariableEntityValueSetDtoFunction(getValueTable(), variables, uriInfoPath, true));
 
     for(Magma.ValueSetsDto.ValueSetDto valueSetDto : transform) {
