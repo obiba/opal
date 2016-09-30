@@ -121,7 +121,7 @@ public class ValueSetsResourceImpl extends AbstractValueTableResource implements
 
     ImmutableList.Builder<ValueSetDto> valueSetDtoBuilder = ImmutableList.builder();
     ValueTable valueTable = getValueTable();
-    for(ValueSetDto dto : Iterables.transform(valueTable.getValueSets(Sets.newLinkedHashSet(variableEntities)),
+    for(ValueSetDto dto : Iterables.transform(valueTable.getValueSets(variableEntities),
         new VariableEntityValueSetDtoFunction(valueTable, variables, uriInfo.getPath(), filterBinary))) {
       valueSetDtoBuilder.add(dto);
     }
@@ -142,7 +142,7 @@ public class ValueSetsResourceImpl extends AbstractValueTableResource implements
       addValueSetDtosFromVectorSource(uriInfo, variableEntities, variable, filterBinary,
           variableValueSource.asVectorSource(), builder);
     } else {
-      for (ValueSet valueSet : getValueTable().getValueSets(Sets.newLinkedHashSet(variableEntities))) {
+      for (ValueSet valueSet : getValueTable().getValueSets(variableEntities)) {
         Value value = variableValueSource.getValue(valueSet);
         builder.addValueSets(getValueSetDto(uriInfo, valueSet.getVariableEntity(), variable, filterBinary, value));
       }

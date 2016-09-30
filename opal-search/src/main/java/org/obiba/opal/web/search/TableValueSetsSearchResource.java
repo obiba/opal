@@ -142,7 +142,7 @@ public class TableValueSetsSearchResource extends AbstractSearchUtility {
     }));
 
     ImmutableList.Builder<Magma.ValueSetsDto.ValueSetDto> valueSetDtoBuilder = ImmutableList.builder();
-    Iterable<Magma.ValueSetsDto.ValueSetDto> transform = Iterables.transform(getValueTable().getValueSets(Sets.newLinkedHashSet(variableEntities)),
+    Iterable<Magma.ValueSetsDto.ValueSetDto> transform = Iterables.transform(getValueTable().getValueSets(variableEntities),
         new VariableEntityValueSetDtoFunction(getValueTable(), variables, uriInfoPath, true));
 
     for(Magma.ValueSetsDto.ValueSetDto valueSetDto : transform) {
