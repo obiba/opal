@@ -19,6 +19,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import com.google.common.collect.Sets;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
@@ -120,7 +121,7 @@ public class ValueSetsResourceImpl extends AbstractValueTableResource implements
 
     ImmutableList.Builder<ValueSetDto> valueSetDtoBuilder = ImmutableList.builder();
     ValueTable valueTable = getValueTable();
-    for(ValueSetDto dto : Iterables.transform(variableEntities,
+    for(ValueSetDto dto : Iterables.transform(valueTable.getValueSets(variableEntities),
         new VariableEntityValueSetDtoFunction(valueTable, variables, uriInfo.getPath(), filterBinary))) {
       valueSetDtoBuilder.add(dto);
     }
@@ -141,14 +142,10 @@ public class ValueSetsResourceImpl extends AbstractValueTableResource implements
       addValueSetDtosFromVectorSource(uriInfo, variableEntities, variable, filterBinary,
           variableValueSource.asVectorSource(), builder);
     } else {
-      builder.addAllValueSets(Iterables.transform(variableEntities, new Function<VariableEntity, ValueSetDto>() {
-        @Override
-        public ValueSetDto apply(VariableEntity fromEntity) {
-          ValueSet valueSet = getValueTable().getValueSet(fromEntity);
-          Value value = variableValueSource.getValue(valueSet);
-          return getValueSetDto(uriInfo, fromEntity, variable, filterBinary, value);
-        }
-      }));
+      for (ValueSet valueSet : getValueTable().getValueSets(variableEntities)) {
+        Value value = variableValueSource.getValue(valueSet);
+        builder.addValueSets(getValueSetDto(uriInfo, valueSet.getVariableEntity(), variable, filterBinary, value));
+      }
     }
 
     return builder.build();

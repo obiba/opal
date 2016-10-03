@@ -23,7 +23,7 @@ import com.google.common.collect.Iterables;
 
 import static org.obiba.opal.web.magma.Dtos.asDto;
 
-public class VariableEntityValueSetDtoFunction implements Function<VariableEntity, Magma.ValueSetsDto.ValueSetDto> {
+public class VariableEntityValueSetDtoFunction implements Function<ValueSet, Magma.ValueSetsDto.ValueSetDto> {
 
   private final ValueTable valueTable;
 
@@ -42,16 +42,14 @@ public class VariableEntityValueSetDtoFunction implements Function<VariableEntit
   }
 
   @Override
-  public Magma.ValueSetsDto.ValueSetDto apply(final VariableEntity fromEntity) {
-    final ValueSet valueSet = valueTable.getValueSet(fromEntity);
-
+  public Magma.ValueSetsDto.ValueSetDto apply(final ValueSet valueSet) {
     Iterable<Magma.ValueSetsDto.ValueDto> valueDtosIter = Iterables
         .transform(variables, new Function<Variable, Magma.ValueSetsDto.ValueDto>() {
 
           @Override
           public Magma.ValueSetsDto.ValueDto apply(Variable fromVariable) {
             String link = uriInfoPath.replace("valueSets",
-                "valueSet/entity/" + fromEntity.getIdentifier() + "/variable/" + fromVariable.getName() +
+                "valueSet/entity/" + valueSet.getVariableEntity().getIdentifier() + "/variable/" + fromVariable.getName() +
                     "/value");
             Value value = valueTable.getVariableValueSource(fromVariable.getName()).getValue(valueSet);
             return asDto(link, value, filterBinary).build();
