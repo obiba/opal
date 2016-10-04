@@ -146,11 +146,12 @@
           </execution>
         </executions>
         <configuration>
-          <extraJvmArgs>-Xmx1024M -Xss1024k -XX:MaxPermSize=1024M</extraJvmArgs>
+          <extraJvmArgs>-Xmx1024M -Xss1024k</extraJvmArgs>
           <runTarget>org.obiba.opal.web.gwt.app.GwtApp/index.html</runTarget>
           <hostedWebapp>war</hostedWebapp>
           <extraParam>true</extraParam>
           <includes>**/*Gwt*Suite.java</includes>
+          <sourceLevel>1.7</sourceLevel>
           <!--<style>DETAILED</style>-->
         </configuration>
       </plugin>

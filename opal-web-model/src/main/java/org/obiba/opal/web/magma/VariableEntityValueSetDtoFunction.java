@@ -43,26 +43,20 @@ public class VariableEntityValueSetDtoFunction implements Function<ValueSet, Mag
 
   @Override
   public Magma.ValueSetsDto.ValueSetDto apply(final ValueSet valueSet) {
-    Iterable<Magma.ValueSetsDto.ValueDto> valueDtosIter = Iterables
-        .transform(variables, new Function<Variable, Magma.ValueSetsDto.ValueDto>() {
-
-          @Override
-          public Magma.ValueSetsDto.ValueDto apply(Variable fromVariable) {
-            String link = uriInfoPath.replace("valueSets",
-                "valueSet/entity/" + valueSet.getVariableEntity().getIdentifier() + "/variable/" + fromVariable.getName() +
-                    "/value");
-            Value value = valueTable.getVariableValueSource(fromVariable.getName()).getValue(valueSet);
-            return asDto(link, value, filterBinary).build();
-          }
-        });
-
-    // Do not add iterable directly otherwise the values will be fetched as many times it is iterated
-    // (i.e. 2 times, see AbstractMessageLite.addAll()).
     ImmutableList.Builder<Magma.ValueSetsDto.ValueDto> valueDtos = ImmutableList.builder();
-    for(Magma.ValueSetsDto.ValueDto dto : valueDtosIter) {
-      valueDtos.add(dto);
+    Function<Variable, Magma.ValueSetsDto.ValueDto> variableToValueDto = new Function<Variable, Magma.ValueSetsDto.ValueDto>() {
+      @Override
+      public Magma.ValueSetsDto.ValueDto apply(Variable fromVariable) {
+        String link = uriInfoPath.replace("valueSets",
+            "valueSet/entity/" + valueSet.getVariableEntity().getIdentifier() + "/variable/" + fromVariable.getName() +
+                "/value");
+        Value value = valueTable.getVariableValueSource(fromVariable.getName()).getValue(valueSet);
+        return asDto(link, value, filterBinary).build();
+      }
+    };
+    for (Variable variable : variables) {
+      valueDtos.add(variableToValueDto.apply(variable));
     }
-
     return asDto(valueSet).addAllValues(valueDtos.build()) //
         .setTimestamps(asDto(valueSet.getTimestamps())).build();
   }
