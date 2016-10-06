@@ -14,8 +14,6 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 
-@Unique(compoundProperties = @Unique.CompoundProperty(name = "url",
-    properties = { "sqlSettings.url", "mongoDbSettings.url" }))
 public class Database extends AbstractTimestamped implements HasUniqueProperties {
 
   public enum Usage {

@@ -79,11 +79,12 @@ message JdbcDatasourceSettingsDto {
 
 message JdbcValueTableSettingsDto {
   required string sqlTableName = 1;
-  optional string magmaTableName = 2;
+  optional string opalTableName = 2;
   required string entityType = 3;
-  repeated string entityIdentifierColumns = 4;
+  optional string entityIdentifierColumn = 4;
   optional string createdTimestampColumnName = 5;
   optional string updatedTimestampColumnName = 6;
+  optional string entityIdentifiersWhere = 7;
 }
 
 message HibernateDatasourceFactoryDto {

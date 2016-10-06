@@ -3,7 +3,9 @@ package org.obiba.opal.web.database;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
+import com.google.common.collect.Sets;
 import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
+import org.obiba.magma.datasource.jdbc.JdbcValueTableSettings;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbSettings;
 import org.obiba.opal.core.domain.database.SqlSettings;
@@ -65,9 +67,27 @@ public class Dtos {
     jdbcSettings.setMultipleDatasources(dto.getMultipleDatasources());
     jdbcSettings.setBatchSize(dto.getBatchSize());
 
+    if (dto.getMappedTablesCount() > 0) jdbcSettings.setMappedTables(Sets.newLinkedHashSet(dto.getMappedTablesList()));
+
     if (dto.hasBatchSize()) jdbcSettings.setBatchSize(dto.getBatchSize());
 
+    if (dto.getTableSettingsCount() > 0) {
+      dto.getTableSettingsList().forEach(settingsDto ->
+        jdbcSettings.addTableSettings(fromDto(settingsDto, dto.getDefaultEntityType(), dto.getDefaultEntityIdColumnName())));
+    }
+
     return jdbcSettings;
+  }
+
+  private static JdbcValueTableSettings fromDto(@NotNull Magma.JdbcValueTableSettingsDto dto, String defaultEntityType, String defaultEntityIdColumn ) {
+    JdbcValueTableSettings settings = new JdbcValueTableSettings(dto.getSqlTableName(),
+        dto.hasOpalTableName() ? dto.getOpalTableName() : dto.getSqlTableName(),
+        dto.hasEntityType() ? dto.getEntityType() : defaultEntityType,
+        dto.hasEntityIdentifierColumn() ? dto.getEntityIdentifierColumn() : defaultEntityIdColumn);
+    if (dto.hasCreatedTimestampColumnName()) settings.setCreatedTimestampColumnName(dto.getCreatedTimestampColumnName());
+    if (dto.hasUpdatedTimestampColumnName()) settings.setUpdatedTimestampColumnName(dto.getUpdatedTimestampColumnName());
+    if (dto.hasEntityIdentifiersWhere()) settings.setEntityIdentifiersWhere(dto.getEntityIdentifiersWhere());
+    return settings;
   }
 
   @Nullable
@@ -145,13 +165,13 @@ public class Dtos {
   private static Magma.JdbcDatasourceSettingsDto.Builder asDto(JdbcDatasourceSettings jdbcSettings) {
     Magma.JdbcDatasourceSettingsDto.Builder builder = Magma.JdbcDatasourceSettingsDto.newBuilder();
     builder.setDefaultEntityType(jdbcSettings.getDefaultEntityType());
-    if(jdbcSettings.isEntityIdColumnNameProvided()) {
+    if(jdbcSettings.hasEntityIdColumnName()) {
       builder.setDefaultEntityIdColumnName(jdbcSettings.getDefaultEntityIdColumnName());
     }
-    if(jdbcSettings.isCreatedTimestampColumnNameProvided()) {
+    if(jdbcSettings.hasCreatedTimestampColumnName()) {
       builder.setDefaultCreatedTimestampColumnName(jdbcSettings.getDefaultCreatedTimestampColumnName());
     }
-    if(jdbcSettings.isUpdatedTimestampColumnNameProvided()) {
+    if(jdbcSettings.hasUpdatedTimestampColumnName()) {
       builder.setDefaultUpdatedTimestampColumnName(jdbcSettings.getDefaultUpdatedTimestampColumnName());
     }
     builder.setUseMetadataTables(jdbcSettings.isUseMetadataTables());
@@ -161,6 +181,22 @@ public class Dtos {
 
     builder.setBatchSize(jdbcSettings.getBatchSize());
 
+    if(jdbcSettings.hasMappedTables()) jdbcSettings.getMappedTables().forEach(t -> builder.addMappedTables(t));
+
+    jdbcSettings.getTableSettings().forEach(settings -> builder.addTableSettings(asDto(settings)));
+
+    return builder;
+  }
+
+  private static Magma.JdbcValueTableSettingsDto.Builder asDto(JdbcValueTableSettings jdbcSettings) {
+    Magma.JdbcValueTableSettingsDto.Builder builder = Magma.JdbcValueTableSettingsDto.newBuilder();
+    builder.setSqlTableName(jdbcSettings.getSqlTableName());
+    builder.setEntityType(jdbcSettings.getEntityType());
+    builder.setOpalTableName(jdbcSettings.getMagmaTableName());
+    builder.setEntityIdentifierColumn(jdbcSettings.getEntityIdentifierColumn());
+    if(jdbcSettings.hasCreatedTimestampColumnName()) builder.setCreatedTimestampColumnName(jdbcSettings.getCreatedTimestampColumnName());
+    if(jdbcSettings.hasUpdatedTimestampColumnName()) builder.setUpdatedTimestampColumnName(jdbcSettings.getUpdatedTimestampColumnName());
+    if(jdbcSettings.hasEntityIdentifiersWhere()) builder.setEntityIdentifiersWhere(jdbcSettings.getEntityIdentifiersWhere());
     return builder;
   }
 
