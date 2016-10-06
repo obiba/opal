@@ -166,51 +166,6 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   }
 
   @Test
-  public void test_create_database_with_same_url() {
-    Database database = createSqlDatabase();
-    databaseRegistry.create(database);
-
-    Database database2 = createSqlDatabase();
-    database2.setName("new database");
-    try {
-      databaseRegistry.create(database2);
-      fail("Should throw ConstraintViolationException");
-    } catch(ConstraintViolationException e) {
-      Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
-      assertThat(violations).hasSize(1);
-      ConstraintViolation<?> violation = violations.iterator().next();
-      assertThat(violation.getMessage()).isEqualTo("must be unique");
-      assertThat(violation.getMessageTemplate()).isEqualTo("{org.obiba.opal.core.validator.Unique.message}");
-      assertThat(violation.getPropertyPath().toString()).isEqualTo("url");
-    }
-  }
-
-  @Test
-  @SuppressWarnings("ConstantConditions")
-  public void test_update_database_with_same_url() {
-    Database database = createSqlDatabase();
-    databaseRegistry.create(database);
-
-    Database database2 = createSqlDatabase();
-    database2.setName("new database");
-    database2.getSqlSettings().setUrl("new url");
-    databaseRegistry.create(database2);
-
-    database2.getSqlSettings().setUrl(database.getSqlSettings().getUrl());
-    try {
-      databaseRegistry.update(database2);
-      fail("Should throw ConstraintViolationException");
-    } catch(ConstraintViolationException e) {
-      Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
-      assertThat(violations).hasSize(1);
-      ConstraintViolation<?> violation = violations.iterator().next();
-      assertThat(violation.getMessage()).isEqualTo("must be unique");
-      assertThat(violation.getMessageTemplate()).isEqualTo("{org.obiba.opal.core.validator.Unique.message}");
-      assertThat(violation.getPropertyPath().toString()).isEqualTo("url");
-    }
-  }
-
-  @Test
   public void test_get_identifiers_database() {
     Database database = Database.Builder.create().name("sql database").usage(Usage.STORAGE).usedForIdentifiers(true)
         .build();
