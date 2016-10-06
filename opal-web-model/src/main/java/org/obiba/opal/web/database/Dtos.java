@@ -80,13 +80,15 @@ public class Dtos {
   }
 
   private static JdbcValueTableSettings fromDto(@NotNull Magma.JdbcValueTableSettingsDto dto, String defaultEntityType, String defaultEntityIdColumn ) {
-    JdbcValueTableSettings settings = new JdbcValueTableSettings(dto.getSqlTableName(),
-        dto.hasOpalTableName() ? dto.getOpalTableName() : dto.getSqlTableName(),
+    JdbcValueTableSettings settings = new JdbcValueTableSettings(dto.getSqlTable(),
+        dto.hasOpalTable() ? dto.getOpalTable() : dto.getSqlTable(),
         dto.hasEntityType() ? dto.getEntityType() : defaultEntityType,
         dto.hasEntityIdentifierColumn() ? dto.getEntityIdentifierColumn() : defaultEntityIdColumn);
-    if (dto.hasCreatedTimestampColumnName()) settings.setCreatedTimestampColumnName(dto.getCreatedTimestampColumnName());
-    if (dto.hasUpdatedTimestampColumnName()) settings.setUpdatedTimestampColumnName(dto.getUpdatedTimestampColumnName());
+    if (dto.hasCreatedTimestampColumn()) settings.setCreatedTimestampColumnName(dto.getCreatedTimestampColumn());
+    if (dto.hasUpdatedTimestampColumn()) settings.setUpdatedTimestampColumnName(dto.getUpdatedTimestampColumn());
     if (dto.hasEntityIdentifiersWhere()) settings.setEntityIdentifiersWhere(dto.getEntityIdentifiersWhere());
+    if (dto.hasExcludedColumns()) settings.setExcludedColumns(dto.getExcludedColumns());
+    if (dto.hasIncludedColumns()) settings.setIncludedColumns(dto.getIncludedColumns());
     return settings;
   }
 
@@ -190,13 +192,15 @@ public class Dtos {
 
   private static Magma.JdbcValueTableSettingsDto.Builder asDto(JdbcValueTableSettings jdbcSettings) {
     Magma.JdbcValueTableSettingsDto.Builder builder = Magma.JdbcValueTableSettingsDto.newBuilder();
-    builder.setSqlTableName(jdbcSettings.getSqlTableName());
+    builder.setSqlTable(jdbcSettings.getSqlTableName());
     builder.setEntityType(jdbcSettings.getEntityType());
-    builder.setOpalTableName(jdbcSettings.getMagmaTableName());
+    builder.setOpalTable(jdbcSettings.getMagmaTableName());
     builder.setEntityIdentifierColumn(jdbcSettings.getEntityIdentifierColumn());
-    if(jdbcSettings.hasCreatedTimestampColumnName()) builder.setCreatedTimestampColumnName(jdbcSettings.getCreatedTimestampColumnName());
-    if(jdbcSettings.hasUpdatedTimestampColumnName()) builder.setUpdatedTimestampColumnName(jdbcSettings.getUpdatedTimestampColumnName());
+    if(jdbcSettings.hasCreatedTimestampColumnName()) builder.setCreatedTimestampColumn(jdbcSettings.getCreatedTimestampColumnName());
+    if(jdbcSettings.hasUpdatedTimestampColumnName()) builder.setUpdatedTimestampColumn(jdbcSettings.getUpdatedTimestampColumnName());
     if(jdbcSettings.hasEntityIdentifiersWhere()) builder.setEntityIdentifiersWhere(jdbcSettings.getEntityIdentifiersWhere());
+    if(jdbcSettings.hasExcludedColumns()) builder.setExcludedColumns(jdbcSettings.getExcludedColumns());
+    if(jdbcSettings.hasIncludedColumns()) builder.setIncludedColumns(jdbcSettings.getIncludedColumns());
     return builder;
   }
 
