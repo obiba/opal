@@ -38,7 +38,6 @@
     <module>opal-gwt-client</module>
     <module>opal-rest-client</module>
     <module>opal-python-client</module>
-    <module>opal-php-client</module>
     <module>opal-datashield</module>
     <module>opal-search</module>
     <module>opal-upgrade</module>
