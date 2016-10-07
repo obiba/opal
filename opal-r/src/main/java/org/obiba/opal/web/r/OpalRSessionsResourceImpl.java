@@ -16,6 +16,7 @@ import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import com.google.common.base.Strings;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.model.OpalR;
@@ -61,7 +62,9 @@ public class OpalRSessionsResourceImpl implements OpalRSessionsResource {
   @Override
   public Response newRSession(UriInfo info, String restore) {
     OpalRSession rSession = opalRSessionManager.newSubjectRSession();
-    opalRSessionManager.restoreSubjectRSession(rSession.getId(), restore);
+    if(!Strings.isNullOrEmpty(restore)) {
+      opalRSessionManager.restoreSubjectRSession(rSession.getId(), restore);
+    }
     onNewRSession(rSession);
     URI location = getLocation(info, rSession.getId());
     return Response.created(location).entity(Dtos.asDto(rSession))

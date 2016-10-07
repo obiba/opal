@@ -28,7 +28,7 @@ public interface OpalRSessionResource {
 
   /**
    * Destroy the R session and optionally save the associated workspace.
-   * @param save
+   * @param saveId
    * @return
    */
   @DELETE
