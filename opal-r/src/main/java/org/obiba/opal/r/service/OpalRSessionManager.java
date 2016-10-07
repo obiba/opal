@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.r.service;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -18,8 +19,12 @@ import java.util.Map;
 import javax.annotation.PreDestroy;
 
 import org.apache.shiro.SecurityUtils;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.ServiceListener;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
+import org.obiba.opal.r.FileReadROperation;
+import org.obiba.opal.r.FileWriteROperation;
+import org.obiba.opal.r.RScriptROperation;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,6 +142,24 @@ public class OpalRSessionManager implements ServiceListener<OpalRService> {
   }
 
   /**
+   * Save the workspace of the R session and store it within opal server data.
+   * @param rSessionId
+   * @param saveSessionId
+   */
+  public void saveSubjectRSession(String rSessionId, String saveId) {
+    getRSessions(getSubjectPrincipal()).saveRSession(rSessionId, saveId);
+  }
+
+  /**
+   * Restore a previously saved user's R session into the current R session.
+   * @param rSessionId
+   * @param restoreId
+   */
+  public void restoreSubjectRSession(String rSessionId, String restoreId) {
+    getRSessions(getSubjectPrincipal()).restoreRSession(rSessionId, restoreId);
+  }
+
+  /**
    * Creates a new R connection, stores the corresponding R session.
    *
    * @return R session
@@ -243,6 +266,26 @@ public class OpalRSessionManager implements ServiceListener<OpalRService> {
 
     private void addRSession(OpalRSession rSession) {
       rSessions.add(rSession);
+    }
+
+    public void saveRSession(String rSessionId, String saveId) {
+      OpalRSession rSession = getRSession(rSessionId);
+      String rscript = "base::save.image()";
+      RScriptROperation rop = new RScriptROperation(rscript, false);
+      rSession.execute(rop);
+      FileReadROperation readop = new FileReadROperation(".RData", new File(rSession.getWorkspace(saveId), ".RData"));
+      rSession.execute(readop);
+    }
+
+    public void restoreRSession(String rSessionId, String restoreId) {
+      OpalRSession rSession = getRSession(rSessionId);
+      File source = new File(rSession.getWorkspace(restoreId), ".RData");
+      if (!source.exists()) return;
+      FileWriteROperation writeop = new FileWriteROperation(".RData", source);
+      rSession.execute(writeop);
+      String rscript = "base::load('.RData')";
+      RScriptROperation rop = new RScriptROperation(rscript, false);
+      rSession.execute(rop);
     }
 
     public void removeRSession(String rSessionId) {

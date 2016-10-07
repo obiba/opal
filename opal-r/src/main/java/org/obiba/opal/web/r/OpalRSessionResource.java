@@ -26,8 +26,13 @@ public interface OpalRSessionResource {
   @GET
   OpalR.RSessionDto getRSession();
 
+  /**
+   * Destroy the R session and optionally save the associated workspace.
+   * @param save
+   * @return
+   */
   @DELETE
-  Response removeRSession();
+  Response removeRSession(@QueryParam("save") String saveId);
 
   @PUT
   @Path("/current")

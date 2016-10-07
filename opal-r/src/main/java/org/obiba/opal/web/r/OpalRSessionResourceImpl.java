@@ -68,7 +68,10 @@ public class OpalRSessionResourceImpl extends AbstractOpalRSessionResource imple
   }
 
   @Override
-  public Response removeRSession() {
+  public Response removeRSession(String saveId) {
+    if(!Strings.isNullOrEmpty(saveId)) {
+      opalRSessionManager.saveSubjectRSession(rSession.getId(), saveId);
+    }
     opalRSessionManager.removeSubjectRSession(rSession.getId());
     return Response.ok().build();
   }
