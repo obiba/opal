@@ -142,22 +142,13 @@ public class OpalRSession implements RASyncOperationTemplate {
   /**
    * Get the {@link File} directory specific to this user's R session. Create it if it does not exist.
    *
-   * @return
-   */
-  public File getWorkspace() {
-    File ws = new File(R_DATA, getUser() + File.separatorChar + getId());
-    if (!ws.exists()) ws.mkdirs();
-    return ws;
-  }
-
-  /**
-   * Get the {@link File} directory specific to this user's R session for a previous R session. Do not create it if
-   * does not exist.
    * @param sessionId
    * @return
    */
   public File getWorkspace(String sessionId) {
-    return new File(R_DATA, getUser() + File.separatorChar + sessionId);
+    File ws = new File(R_DATA, getUser() + File.separatorChar + (Strings.isNullOrEmpty(sessionId) ? getId() : sessionId));
+    if (!ws.exists()) ws.mkdirs();
+    return ws;
   }
 
   //
