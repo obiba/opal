@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.r;
 
+import org.apache.commons.io.IOUtils;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RFileInputStream;
@@ -131,14 +132,8 @@ public abstract class AbstractROperation implements ROperation {
    */
   protected void writeFile(String fileName, InputStream in) {
     byte [] b = new byte[8192];
-    try {
-      RFileOutputStream out = connection.createFile(fileName);
-      int c = in.read(b) ;
-      while( c >= 0 ){
-        out.write( b, 0, c ) ;
-        c = in.read(b) ;
-      }
-      out.close();
+    try (RFileOutputStream out = connection.createFile(fileName);) {
+      IOUtils.copy(in, out);
       in.close();
     } catch (IOException e) {
       log.warn("Failed creating file '{}'", fileName, e);
@@ -168,16 +163,9 @@ public abstract class AbstractROperation implements ROperation {
    * @param out local stream
    */
   protected void readFile(String fileName, OutputStream out) {
-    byte [] b = new byte[8192];
-    try{
-      RFileInputStream in = connection.openFile(fileName);
-      int c = in.read(b) ;
-      while( c >= 0 ){
-        out.write( b, 0, c ) ;
-        c = in.read(b) ;
-      }
+    try (RFileInputStream in = connection.openFile(fileName)) {
+      IOUtils.copy(in, out);
       out.close();
-      in.close();
     } catch( IOException e){
       log.warn("Failed reading file '{}'", fileName, e);
       throw new RRuntimeException(e);

@@ -146,8 +146,8 @@ public class OpalRSessionManager implements ServiceListener<OpalRService> {
    * @param rSessionId
    * @param saveSessionId
    */
-  public void saveSubjectRSession(String rSessionId, String saveSessionId) {
-    getRSessions(getSubjectPrincipal()).saveRSession(rSessionId, saveSessionId);
+  public void saveSubjectRSession(String rSessionId, String saveId) {
+    getRSessions(getSubjectPrincipal()).saveRSession(rSessionId, saveId);
   }
 
   /**
@@ -268,12 +268,12 @@ public class OpalRSessionManager implements ServiceListener<OpalRService> {
       rSessions.add(rSession);
     }
 
-    public void saveRSession(String rSessionId, String saveSessionId) {
+    public void saveRSession(String rSessionId, String saveId) {
       OpalRSession rSession = getRSession(rSessionId);
       String rscript = "base::save.image()";
       RScriptROperation rop = new RScriptROperation(rscript, false);
       rSession.execute(rop);
-      FileReadROperation readop = new FileReadROperation(".RData", new File(rSession.getWorkspace(saveSessionId), ".RData"));
+      FileReadROperation readop = new FileReadROperation(".RData", new File(rSession.getWorkspace(saveId), ".RData"));
       rSession.execute(readop);
     }
 

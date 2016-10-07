@@ -32,7 +32,7 @@ public interface OpalRSessionResource {
    * @return
    */
   @DELETE
-  Response removeRSession(@QueryParam("save") String save);
+  Response removeRSession(@QueryParam("save") String saveId);
 
   @PUT
   @Path("/current")
