@@ -120,13 +120,7 @@ public class DataShieldEnvironment {
     return ImmutableList.<ROperation>builder()//
         .add(ROperations.eval(String.format("base::rm(%s)", environment.symbol()), null))//
         .add(ROperations.assign(environment.symbol(), "base::new.env()"))//
-        .addAll(Iterables.transform(getMethods(), new Function<DataShieldMethod, ROperation>() {
-
-          @Override
-          public ROperation apply(DataShieldMethod input) {
-            return input.assign(environment);
-          }
-        }))//
+        .addAll(Iterables.transform(getMethods(), input -> input.assign(environment)))//
             // Protect the contents of the environment
         .add(ROperations.eval(String.format("base::lockEnvironment(%s, bindings=TRUE)", environment.symbol()), null))//
             // Protect the contents of the environment

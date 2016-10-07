@@ -11,9 +11,13 @@ package org.obiba.opal.r;
 
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.Rserve.RConnection;
+import org.rosuda.REngine.Rserve.RFileInputStream;
+import org.rosuda.REngine.Rserve.RFileOutputStream;
 import org.rosuda.REngine.Rserve.RserveException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
 
 /**
  * Handles a R connection and provides some utility methods to handle operations on it.
@@ -102,6 +106,82 @@ public abstract class AbstractROperation implements ROperation {
     }
 
     return evaled;
+  }
+
+  /**
+   * Write a file on the R server from a local file.
+   *
+   * @param fileName R server file name
+   * @param in local file
+   */
+  protected void writeFile(String fileName, File in) {
+    try {
+      writeFile(fileName, new BufferedInputStream(new FileInputStream(in)));
+    } catch (FileNotFoundException e) {
+      log.warn("Failed creating file '{}' from file {}", fileName, in.getName(), e);
+      throw new RRuntimeException(e);
+    }
+  }
+
+  /**
+   * Write a file on the R server from a input stream.
+   *
+   * @param fileName R server file name
+   * @param in local stream
+   */
+  protected void writeFile(String fileName, InputStream in) {
+    byte [] b = new byte[8192];
+    try {
+      RFileOutputStream out = connection.createFile(fileName);
+      int c = in.read(b) ;
+      while( c >= 0 ){
+        out.write( b, 0, c ) ;
+        c = in.read(b) ;
+      }
+      out.close();
+      in.close();
+    } catch (IOException e) {
+      log.warn("Failed creating file '{}'", fileName, e);
+      throw new RRuntimeException(e);
+    }
+  }
+
+  /**
+   * Read a file on the R server into a local file.
+   *
+   * @param fileName R server file name
+   * @param out local file
+   */
+  protected void readFile(String fileName, File out) {
+    try {
+      readFile(fileName, new BufferedOutputStream(new FileOutputStream(out)));
+    } catch (FileNotFoundException e) {
+      log.warn("Failed creating file '{}' from '{}'", out, fileName, e);
+      throw new RRuntimeException(e);
+    }
+  }
+
+  /**
+   * Read a file on the R server into a output stream.
+   *
+   * @param fileName R server file name
+   * @param out local stream
+   */
+  protected void readFile(String fileName, OutputStream out) {
+    byte [] b = new byte[8192];
+    try{
+      RFileInputStream in = connection.openFile(fileName);
+      int c = in.read(b) ;
+      while( c >= 0 ){
+        out.write( b, 0, c ) ;
+        c = in.read(b) ;
+      }
+      out.close();
+      in.close();
+    } catch( IOException e){
+      log.warn("Failed reading file '{}'", fileName, e);
+      throw new RRuntimeException(e);
+    }
   }
 
   /**

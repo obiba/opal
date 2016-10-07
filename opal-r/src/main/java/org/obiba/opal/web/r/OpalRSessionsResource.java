@@ -5,6 +5,7 @@ import java.util.List;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -22,7 +23,7 @@ public interface OpalRSessionsResource {
   Response removeRSessions();
 
   @POST
-  Response newRSession(@Context UriInfo info);
+  Response newRSession(@Context UriInfo info, @QueryParam("restore") String restore);
 
   @Autowired
   void setOpalRSessionManager(OpalRSessionManager opalRSessionManager);

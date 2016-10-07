@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.r.service;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -21,6 +22,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.security.SessionDetachedSubject;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.RASyncOperationTemplate;
@@ -40,6 +42,8 @@ import com.google.common.base.Strings;
 public class OpalRSession implements RASyncOperationTemplate {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRSession.class);
+
+  public static final File R_DATA = new File(System.getenv().get("OPAL_HOME"), "data" + File.separatorChar + "R");
 
   private final TransactionalThreadFactory transactionalThreadFactory;
 
@@ -135,6 +139,27 @@ public class OpalRSession implements RASyncOperationTemplate {
     return !busy && now.getTime() - timestamp.getTime() > timeout * 60 * 1000;
   }
 
+  /**
+   * Get the {@link File} directory specific to this user's R session. Create it if it does not exist.
+   *
+   * @return
+   */
+  public File getWorkspace() {
+    File ws = new File(R_DATA, getUser() + File.separatorChar + getId());
+    if (!ws.exists()) ws.mkdirs();
+    return ws;
+  }
+
+  /**
+   * Get the {@link File} directory specific to this user's R session for a previous R session. Do not create it if
+   * does not exist.
+   * @param sessionId
+   * @return
+   */
+  public File getWorkspace(String sessionId) {
+    return new File(R_DATA, getUser() + File.separatorChar + sessionId);
+  }
+
   //
   // ROperationTemplate methods
   //
@@ -142,8 +167,6 @@ public class OpalRSession implements RASyncOperationTemplate {
   /**
    * Executes the R operation on the current R session of the invoking Opal user. If no current R session is defined, a
    * {@link NoSuchRSessionException} is thrown.
-   *
-   * @see #hasSubjectCurrentRSession(), {@link #setSubjectCurrentRSession(String)}
    */
   @Override
   public void execute(ROperation rop) {

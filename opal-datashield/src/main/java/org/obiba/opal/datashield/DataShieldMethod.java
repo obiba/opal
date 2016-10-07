@@ -17,10 +17,10 @@ import org.obiba.opal.r.ROperation;
  */
 public interface DataShieldMethod {
 
-  public String getName();
+  String getName();
 
-  public ROperation assign(Environment env);
+  ROperation assign(Environment env);
 
-  public String invoke(Environment env);
+  String invoke(Environment env);
 
 }

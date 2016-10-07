@@ -59,8 +59,9 @@ public class OpalRSessionsResourceImpl implements OpalRSessionsResource {
   }
 
   @Override
-  public Response newRSession(UriInfo info) {
+  public Response newRSession(UriInfo info, String restore) {
     OpalRSession rSession = opalRSessionManager.newSubjectRSession();
+    opalRSessionManager.restoreSubjectRSession(rSession.getId(), restore);
     onNewRSession(rSession);
     URI location = getLocation(info, rSession.getId());
     return Response.created(location).entity(Dtos.asDto(rSession))
