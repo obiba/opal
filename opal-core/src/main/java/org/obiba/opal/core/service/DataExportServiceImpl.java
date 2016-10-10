@@ -198,7 +198,7 @@ public class DataExportServiceImpl implements DataExportService {
 
         // Go ahead and copy the result to the destination datasource.
         MultithreadedDatasourceCopier.Builder.newCopier().from(tableToCopy).to(destinationDatasource)
-            .withCopier(datasourceCopier).withReaders(4).withProgressListener(progressListener)
+            .withCopier(datasourceCopier).withReaders(8).withProgressListener(progressListener)
             .withThreads(threadFactory).build().copy();
       }
 

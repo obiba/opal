@@ -21,6 +21,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
+import com.google.common.base.Stopwatch;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
@@ -61,6 +62,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
+import static org.obiba.opal.shell.commands.CommandResultCode.SUCCESS;
 
 /**
  * Provides ability to copy Magma tables to an existing datasource or a file based datasource.
@@ -104,6 +107,8 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   public int execute() {
     int errorCode = CommandResultCode.CRITICAL_ERROR; // initialize as non-zero (error)
 
+    Stopwatch stopwatch = Stopwatch.createStarted();
+
     if(validateOptions()) {
       Datasource destinationDatasource = null;
 
@@ -135,6 +140,14 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
           Disposables.silentlyDispose(destinationDatasource);
         }
       }
+    }
+
+    if(errorCode != SUCCESS) {
+      getShell().printf("Copy failed.\n");
+      log.info("Copy failed in {}", stopwatch.stop());
+    } else {
+      getShell().printf("Copy done.\n");
+      log.info("Copy succeed in {}", stopwatch.stop());
     }
 
     return errorCode;
