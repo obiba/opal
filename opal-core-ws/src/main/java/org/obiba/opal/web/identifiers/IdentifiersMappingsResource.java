@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
@@ -339,69 +340,21 @@ public class IdentifiersMappingsResource extends AbstractIdentifiersResource {
 
     ImmutableList.Builder<String> builder = ImmutableList.builder();
     builder.add("ID");
-    builder.addAll(Iterables.transform(table.getVariables(), new Function<Variable, String>() {
-
-      @Override
-      public String apply(Variable input) {
-        return input.getName();
-      }
-    }));
+    ImmutableList<Variable> variables = ImmutableList.copyOf(table.getVariables());
+    builder.addAll(variables.stream().map(Variable::getName).collect(Collectors.toList()));
 
     // header
     ImmutableList<String> header = builder.build();
     writer.writeNext(header.toArray(new String[header.size()]));
 
-    Map<String, Map<String, String>> mapIds = getSystemPrivateIdsMapping(table);
-
-    writeMappingValues(writer, header, mapIds);
-  }
-
-  private void writeMappingValues(CSVWriter writer, ImmutableList<String> header,
-      Map<String, Map<String, String>> mapIds) {
-    List<String> sysIds = new ArrayList<>(mapIds.keySet());
-    Collections.sort(sysIds);
-    for(String systemId : sysIds) {
-      List<String> ids = new ArrayList<>();
-      ids.add(systemId);
-      for(int i = 1; i < header.size(); i++) {
-        // do not export ids that have no private mappings
-        Map<String, String> privateMapping = mapIds.get(systemId);
-        if(!privateMapping.isEmpty()) {
-          ids.add(Strings.nullToEmpty(privateMapping.get(header.get(i))));
-        }
+    table.getValueSets().forEach(vs -> {
+      String[] row = new String[header.size()];
+      row[0] = vs.getVariableEntity().getIdentifier();
+      for (int i = 0; i < variables.size(); i++) {
+        row[i+1] = vs.getValueTable().getValue(variables.get(i), vs).toString();
       }
-
-      writer.writeNext(ids.toArray(new String[ids.size()]));
-    }
-  }
-
-  private Iterable<IdentifiersMaps.IdentifiersMap> getUnitIdentifiers(ValueTable valueTable, String name) {
-    return Iterables.filter(new IdentifiersMaps(valueTable, name), new Predicate<IdentifiersMaps.IdentifiersMap>() {
-      @Override
-      public boolean apply(@Nullable IdentifiersMaps.IdentifiersMap input) {
-        return input != null && input.hasPrivateIdentifier();
-      }
+      writer.writeNext(row);
     });
   }
 
-  private Map<String, Map<String, String>> getSystemPrivateIdsMapping(ValueTable table) {
-    // Build map of id with private ids by variable
-    Map<String, Map<String, String>> mapIds = new HashMap<>();
-
-    for(Variable variable : table.getVariables()) {
-      String name = variable.getName();
-      for(IdentifiersMaps.IdentifiersMap unitId : getUnitIdentifiers(table, name)) {
-        if(!mapIds.containsKey(unitId.getSystemIdentifier())) {
-          Map<String, String> mappings = new HashMap<>();
-          mappings.put(name, null);
-          mapIds.put(unitId.getSystemIdentifier(), mappings);
-        }
-
-        if(unitId.hasPrivateIdentifier()) {
-          mapIds.get(unitId.getSystemIdentifier()).put(name, unitId.getPrivateIdentifier());
-        }
-      }
-    }
-    return mapIds;
-  }
 }

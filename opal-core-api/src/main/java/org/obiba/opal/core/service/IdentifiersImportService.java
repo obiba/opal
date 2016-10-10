@@ -35,7 +35,7 @@ public interface IdentifiersImportService {
   /**
    * Import identifiers from identifiers tables of a given data datasource.
    * @param idMapping
-   * @param sourceDatasource
+   * @param dataDatasource
    * @param select
    * @throws IOException
    */
@@ -45,7 +45,7 @@ public interface IdentifiersImportService {
   /**
    * Import the identifiers of the given data table's entities (table values are ignored).
    *
-   * @param sourceValueTable
+   * @param dataValueTable
    * @throws java.io.IOException
    */
   void importIdentifiers(ValueTable dataValueTable) throws IOException;
