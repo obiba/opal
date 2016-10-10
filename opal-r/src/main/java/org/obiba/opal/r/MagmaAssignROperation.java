@@ -9,26 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.r;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-
-import javax.validation.constraints.NotNull;
-
-import org.obiba.magma.AbstractVariableValueSource;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.MagmaRuntimeException;
-import org.obiba.magma.Value;
-import org.obiba.magma.ValueSet;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueType;
-import org.obiba.magma.Variable;
-import org.obiba.magma.VariableEntity;
-import org.obiba.magma.VariableValueSource;
-import org.obiba.magma.VectorSource;
+import com.google.common.base.Function;
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import org.obiba.magma.*;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
@@ -36,20 +23,13 @@ import org.obiba.magma.support.MagmaEngineVariableResolver;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.magma.IdentifiersMappingView;
 import org.obiba.opal.core.service.IdentifiersTableService;
-import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.REXPGenericVector;
-import org.rosuda.REngine.REXPList;
-import org.rosuda.REngine.REXPString;
-import org.rosuda.REngine.RList;
+import org.rosuda.REngine.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import javax.validation.constraints.NotNull;
+import java.util.*;
+import java.util.stream.StreamSupport;
 
 /**
  * Assign Magma values (from a datasource, a table or a variable) to a R symbol.
@@ -209,8 +189,7 @@ public class MagmaAssignROperation extends AbstractROperation {
       if(table == null) throw new IllegalStateException("Table must not be null");
       prepareEntities(table);
       REXP ids = getIdsVector(withMissings);
-      RList list = getVariableVectors();
-      return createDataFrame(ids, list);
+      return createDataFrame(ids);
     }
 
     @Override
@@ -270,17 +249,17 @@ public class MagmaAssignROperation extends AbstractROperation {
 
     private RList getVariableVectors() {
       // build a list of vectors
-      List<REXP> contents = Lists.newArrayList();
-      List<String> names = Lists.newArrayList();
+      List<REXP> contents = Collections.synchronizedList(Lists.newArrayList());
+      List<String> names = Collections.synchronizedList(Lists.newArrayList());
 
       // vector for each variable
-      for(Variable v : filterVariables()) {
-        VariableValueSource vvs = table.getVariableValueSource(v.getName());
-        if (!vvs.getVariable().isRepeatable()) {
-          contents.add(getVector(vvs, getEntities(), withMissings));
-          names.add(vvs.getVariable().getName());
-        }
-      }
+      StreamSupport.stream(filterVariables().spliterator(), true) //
+          .map(v -> table.getVariableValueSource(v.getName())) //
+          .filter(vvs -> !vvs.getVariable().isRepeatable()) //
+          .forEach(vvs -> {
+            contents.add(getVector(vvs, getEntities(), withMissings));
+            names.add(vvs.getVariable().getName());
+          });
 
       return new RList(contents, names);
     }
@@ -306,11 +285,9 @@ public class MagmaAssignROperation extends AbstractROperation {
 
     /**
      * @param ids
-     * @param values
      * @return
-     * @see REXP.createDataFrame()
      */
-    private REXP createDataFrame(REXP ids, RList values) {
+    private REXP createDataFrame(REXP ids) {
       return new REXPGenericVector(null, new REXPList(new RList( //
           new REXP[] { //
               new REXPString("data.frame"), //
