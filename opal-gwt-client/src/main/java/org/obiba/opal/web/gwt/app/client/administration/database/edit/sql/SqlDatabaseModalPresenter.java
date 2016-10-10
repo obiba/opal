@@ -123,7 +123,6 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
     getView().getNameGroupVisibility().setVisible(false);
     getView().getUsageGroupVisibility().setVisible(false);
     getView().getDefaultStorageGroupVisibility().setVisible(false);
-    getView().getSqlSchemaGroupVisibility().setVisible(false);
   }
 
   @Override
