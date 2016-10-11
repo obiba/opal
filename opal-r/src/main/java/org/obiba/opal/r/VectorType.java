@@ -155,9 +155,20 @@ public enum VectorType {
    * @return
    */
   public REXP asVector(VariableValueSource vvs, SortedSet<VariableEntity> entities, boolean withMissings) {
-    Variable variable = vvs.getVariable();
+    return asVector(vvs.getVariable(), vvs.asVectorSource().getValues(entities), entities, withMissings);
+  }
+
+  /**
+   * Build R vector from directly provided values (in entities order).
+   *
+   * @param variable
+   * @param values
+   * @param entities
+   * @param withMissings
+   * @return
+   */
+  public REXP asVector(Variable variable, Iterable<Value> values, SortedSet<VariableEntity> entities, boolean withMissings) {
     int size = entities.size();
-    Iterable<Value> values = vvs.asVectorSource().getValues(entities);
     return variable.isRepeatable()
         ? asValueSequencesVector(variable, size, values, withMissings)
         : asValuesVector(variable, size, values, withMissings);

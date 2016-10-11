@@ -11,10 +11,7 @@ package org.obiba.opal.r;
 
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import org.obiba.magma.*;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
@@ -29,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
@@ -146,6 +144,11 @@ public class MagmaAssignROperation extends AbstractROperation {
       return vt.asVector(vvs, entities, withMissings);
     }
 
+    protected REXP getVector(Variable variable, Iterable<Value> values, SortedSet<VariableEntity> entities, boolean withMissings) {
+      VectorType vt = VectorType.forValueType(variable.getValueType());
+      return vt.asVector(variable, values, entities, withMissings);
+    }
+
     protected ValueTable applyIdentifiersMapping(ValueTable table, String idMapping) {
       // If the table contains an entity that requires identifiers separation, create a "identifers view" of the table (replace
       // public (system) identifiers with private identifiers).
@@ -248,7 +251,15 @@ public class MagmaAssignROperation extends AbstractROperation {
     }
 
     private RList getVariableVectors() {
-      // build a list of vectors
+      return table.isView() ? getVariableVectorsFromView() : getVariableVectorsFromRawTable();
+    }
+
+    /**
+     * Parallelize vector extraction per variable as it is safe and optimal to do so for a raw table.
+     *
+     * @return
+     */
+    private RList getVariableVectorsFromRawTable() {
       List<REXP> contents = Collections.synchronizedList(Lists.newArrayList());
       List<String> names = Collections.synchronizedList(Lists.newArrayList());
 
@@ -264,21 +275,56 @@ public class MagmaAssignROperation extends AbstractROperation {
       return new RList(contents, names);
     }
 
+    /**
+     * Parallelize vector extraction per value set as it is safe and optimal to do so for a view (some derive variables
+     * can refer to each other in the same value set).
+     *
+     * @return
+     */
+    private RList getVariableVectorsFromView() {
+      List<REXP> contents = Lists.newArrayList();
+      List<String> names = Lists.newArrayList();
+      SortedSet<VariableEntity> entities = getEntities();
+      Iterable<Variable> variables = filterVariables();
+      Map<String, Map<String, Value>> variableValues = Maps.newConcurrentMap();
+      variables.forEach(variable -> variableValues.put(variable.getName(), Maps.newConcurrentMap()));
+
+      // parallelize value set extraction
+      StreamSupport.stream(table.getValueSets(entities).spliterator(), true) //
+      .forEach(valueSet ->
+        variables.forEach(variable -> {
+          Value value = table.getValue(variable, valueSet);
+          variableValues.get(variable.getName()).put(valueSet.getVariableEntity().getIdentifier(), value);
+        })
+      );
+
+      // vector for each variable, values in the same order as entities
+      variables.forEach(v -> {
+        Map<String, Value> entityValueMap = variableValues.get(v.getName());
+        List<Value> values = entities.stream().map(e -> entityValueMap.get(e.getIdentifier())).collect(Collectors.toList());
+        contents.add(getVector(v, values, entities, withMissings));
+        names.add(v.getName());
+      });
+
+      return new RList(contents, names);
+    }
+
+    /**
+     * Get the non repeatable variables filtered by a select clause (if any).
+     *
+     * @return
+     */
     protected Iterable<Variable> filterVariables() {
       List<Variable> filteredVariables;
+      List<Variable> nonRepeatableVariables = StreamSupport.stream(table.getVariables().spliterator(), false) //
+      .filter(v -> !v.isRepeatable()).collect(Collectors.toList());
 
       if(Strings.isNullOrEmpty(variableFilter)) {
-        filteredVariables = Lists.newArrayList(table.getVariables());
+        filteredVariables = nonRepeatableVariables;
       } else {
         JavascriptClause jsClause = new JavascriptClause(variableFilter);
         jsClause.initialise();
-
-        filteredVariables = new ArrayList<>();
-        for(Variable variable : table.getVariables()) {
-          if(jsClause.select(variable)) {
-            filteredVariables.add(variable);
-          }
-        }
+        filteredVariables = nonRepeatableVariables.stream().filter(v -> jsClause.select(v)).collect(Collectors.toList());
       }
       return filteredVariables;
     }
@@ -344,14 +390,8 @@ public class MagmaAssignROperation extends AbstractROperation {
           }
 
           @Override
-          public Iterable<Value> getValues(
-              @SuppressWarnings("ParameterHidesMemberVariable") SortedSet<VariableEntity> entities) {
-            return Iterables.transform(getEntities(), new Function<VariableEntity, Value>() {
-              @Override
-              public Value apply(@NotNull VariableEntity input) {
-                return TextType.get().valueOf(input.getIdentifier());
-              }
-            });
+          public Iterable<Value> getValues(SortedSet<VariableEntity> entities) {
+            return entities.stream().map(e -> TextType.get().valueOf(e.getIdentifier())).collect(Collectors.toList());
           }
         };
       }
