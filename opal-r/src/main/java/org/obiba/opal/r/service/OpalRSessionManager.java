@@ -9,26 +9,18 @@
  ******************************************************************************/
 package org.obiba.opal.r.service;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PreDestroy;
-
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.core.util.FileUtil;
-import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.ServiceListener;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.FileReadROperation;
 import org.obiba.opal.r.FileWriteROperation;
 import org.obiba.opal.r.RScriptROperation;
-import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPString;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.slf4j.Logger;
@@ -38,9 +30,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import javax.annotation.PreDestroy;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Maps R Sessions with its invoking Opal user (through its Opal Session). Current R session of an Opal user is the last
@@ -50,6 +43,10 @@ import com.google.common.collect.Maps;
 public class OpalRSessionManager implements ServiceListener<OpalRService> {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRSessionManager.class);
+
+  static final File R_DATA = new File(System.getenv().get("OPAL_HOME"), "data" + File.separatorChar + "R");
+
+  private static final long R_DATA_LIFESPAN = 30*24*3600*1000;
 
   @Value("${org.obiba.opal.r.sessionTimeout}")
   private Long rSessionTimeout;
@@ -193,10 +190,32 @@ public class OpalRSessionManager implements ServiceListener<OpalRService> {
    */
   @Scheduled(fixedDelay = 60 * 1000)
   public void checkRSessions() {
-    for(String principal : rSessionMap.keySet()) {
-      checkRSessions(principal);
-    }
+    rSessionMap.keySet().forEach(this::checkRSessions);
   }
+
+  /**
+   * Remove old saved R sessions directories.
+   */
+  @Scheduled(fixedDelay = 3600 * 1000)
+  public void cleanSavedRSessions() {
+    if (!R_DATA.exists()) return;
+    long now = System.currentTimeMillis();
+    Lists.newArrayList(R_DATA.listFiles()).stream() //
+        .filter(File::isDirectory) //
+        .forEach(userFolder ->
+          Lists.newArrayList(userFolder.listFiles()).stream() //
+              .filter(File::isDirectory) //
+              .filter(folder -> now - folder.lastModified() > R_DATA_LIFESPAN)
+              .forEach(folder -> {
+                try {
+                  FileUtil.delete(folder);
+                } catch (IOException e) {
+                  // ignore
+                }
+              })
+        );
+  }
+
 
   //
   // private methods

@@ -43,8 +43,6 @@ public class OpalRSession implements RASyncOperationTemplate {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRSession.class);
 
-  public static final File R_DATA = new File(System.getenv().get("OPAL_HOME"), "data" + File.separatorChar + "R");
-
   private final TransactionalThreadFactory transactionalThreadFactory;
 
   private final String id;
@@ -146,7 +144,7 @@ public class OpalRSession implements RASyncOperationTemplate {
    * @return
    */
   public File getWorkspace(String sessionId) {
-    File ws = new File(R_DATA, getUser() + File.separatorChar + (Strings.isNullOrEmpty(sessionId) ? getId() : sessionId));
+    File ws = new File(OpalRSessionManager.R_DATA, getUser() + File.separatorChar + (Strings.isNullOrEmpty(sessionId) ? getId() : sessionId));
     if (!ws.exists()) ws.mkdirs();
     return ws;
   }
