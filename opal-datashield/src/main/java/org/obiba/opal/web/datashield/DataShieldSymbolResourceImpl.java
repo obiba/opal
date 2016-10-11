@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.datashield;
 
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -59,6 +61,11 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
   public Response putString(UriInfo uri, String content, boolean async) {
     DataShieldLog.userLog("creating text symbol '{}' as '{}'", getName(), content);
     return super.putString(uri, content, async);
+  }
+
+  @Override
+  public Response putRData(@Context UriInfo uri, String content, @DefaultValue("false") boolean async) {
+    return Response.status(Status.FORBIDDEN).build();
   }
 
   @Override

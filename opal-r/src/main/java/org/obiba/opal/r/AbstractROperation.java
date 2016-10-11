@@ -11,6 +11,7 @@ package org.obiba.opal.r;
 
 import org.apache.commons.io.IOUtils;
 import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RFileInputStream;
 import org.rosuda.REngine.Rserve.RFileOutputStream;
@@ -50,6 +51,16 @@ public abstract class AbstractROperation implements ROperation {
       connection.assign(sym, ct);
     } catch(RserveException e) {
       log.warn("Failed assigning '{}' with: {}", sym, ct, e);
+      throw new RRuntimeException(e);
+    }
+  }
+
+  protected void assign(String sym, byte[] ct, boolean serialized) {
+    try {
+      connection.assign(sym, ct);
+      if (serialized) assign(sym, eval(String.format("unserialize(%s)", sym), false));
+    } catch (REngineException e) {
+      log.warn("Failed assigning '{}' with: byte[{}]", sym, ct == null ? 0 : ct.length, e);
       throw new RRuntimeException(e);
     }
   }

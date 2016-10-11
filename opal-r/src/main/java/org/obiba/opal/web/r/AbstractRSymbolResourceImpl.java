@@ -12,15 +12,14 @@ package org.obiba.opal.web.r;
 import java.net.URI;
 
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.obiba.opal.core.service.IdentifiersTableService;
-import org.obiba.opal.r.MagmaAssignROperation;
-import org.obiba.opal.r.ROperation;
-import org.obiba.opal.r.RScriptROperation;
-import org.obiba.opal.r.StringAssignROperation;
+import org.obiba.opal.r.*;
 import org.obiba.opal.r.service.OpalRSession;
 
 /**
@@ -64,6 +63,12 @@ public abstract class AbstractRSymbolResourceImpl extends AbstractOpalRSessionRe
   @Override
   public Response putString(UriInfo uri, String content, boolean async) {
     return assignSymbol(uri, new StringAssignROperation(name, content), async);
+  }
+
+  @Override
+  public Response putRData(@Context UriInfo uri, String content, @DefaultValue("false") boolean async) {
+    DataAssignROperation rop = new DataAssignROperation(name, content);
+    return assignSymbol(uri, rop, async);
   }
 
   @Override
