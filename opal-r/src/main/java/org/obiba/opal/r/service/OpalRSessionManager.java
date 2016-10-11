@@ -18,13 +18,18 @@ import java.util.Map;
 
 import javax.annotation.PreDestroy;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.shiro.SecurityUtils;
+import org.obiba.core.util.FileUtil;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.ServiceListener;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.FileReadROperation;
 import org.obiba.opal.r.FileWriteROperation;
 import org.obiba.opal.r.RScriptROperation;
+import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPString;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -144,7 +149,7 @@ public class OpalRSessionManager implements ServiceListener<OpalRService> {
   /**
    * Save the workspace of the R session and store it within opal server data.
    * @param rSessionId
-   * @param saveSessionId
+   * @param saveId
    */
   public void saveSubjectRSession(String rSessionId, String saveId) {
     getRSessions(getSubjectPrincipal()).saveRSession(rSessionId, saveId);
@@ -255,6 +260,97 @@ public class OpalRSessionManager implements ServiceListener<OpalRService> {
 
     private final List<OpalRSession> rSessions = Collections.synchronizedList(new ArrayList<OpalRSession>());
 
+    void saveRSession(String rSessionId, String saveId) {
+      OpalRSession rSession = getRSession(rSessionId);
+      saveRSessionFiles(rSession, saveId);
+      saveRSessionImage(rSession, saveId);
+    }
+
+    void restoreRSession(String rSessionId, String restoreId) {
+      OpalRSession rSession = getRSession(rSessionId);
+      restoreSessionImage(rSession, restoreId);
+      restoreSessionFiles(rSession, restoreId);
+    }
+
+    void removeRSession(String rSessionId) {
+      OpalRSession rSession = getRSession(rSessionId);
+      try {
+        rSession.close();
+        rSessions.remove(rSession);
+      } catch(Exception e) {
+        log.warn("Failed closing R session: {}", rSessionId, e);
+      }
+    }
+
+    void removeRSessions() {
+      for(OpalRSession rSession : rSessions) {
+        try {
+          rSession.close();
+        } catch(Exception e) {
+          log.warn("Failed closing R session: {}", rSession.getId(), e);
+        }
+      }
+      rSessions.clear();
+    }
+
+    void clean() {
+      List<OpalRSession> toRemove = Lists.newArrayList();
+      for(OpalRSession rSession : rSessions) {
+        if(rSession.isClosed()) {
+          toRemove.add(rSession);
+        }
+      }
+      rSessions.removeAll(toRemove);
+    }
+
+    private void saveRSessionFiles(OpalRSession rSession, String saveId) {
+      // save the files (if any)
+      String rscript = "list.files(path = '.', recursive = TRUE)";
+      RScriptROperation rop = new RScriptROperation(rscript, false);
+      rSession.execute(rop);
+      if (!rop.hasResult()) return;
+      REXPString files = (REXPString) rop.getResult();
+      Lists.newArrayList(files.asStrings()).forEach(file -> {
+        FileReadROperation readop = new FileReadROperation(file, new File(rSession.getWorkspace(saveId), file));
+        rSession.execute(readop);
+      });
+    }
+
+    private void saveRSessionImage(OpalRSession rSession, String saveId) {
+      // then save the memory image
+      String rscript = "base::save.image()";
+      RScriptROperation rop = new RScriptROperation(rscript, false);
+      rSession.execute(rop);
+      FileReadROperation readop = new FileReadROperation(".RData", new File(rSession.getWorkspace(saveId), ".RData"));
+      rSession.execute(readop);
+    }
+
+    private void restoreSessionImage(OpalRSession rSession, String restoreId) {
+      File source = new File(rSession.getWorkspace(restoreId), ".RData");
+      if (!source.exists()) return;
+      FileWriteROperation writeop = new FileWriteROperation(".RData", source);
+      rSession.execute(writeop);
+      String rscript = "base::load('.RData')";
+      RScriptROperation rop = new RScriptROperation(rscript, false);
+      rSession.execute(rop);
+    }
+
+    private void restoreSessionFiles(OpalRSession rSession, String restoreId) {
+      File source = rSession.getWorkspace(restoreId);
+      FileUtils.listFiles(source, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE).forEach(file -> {
+        String destination = file.getAbsolutePath().replace(source.getAbsolutePath(), "");
+        if (destination.startsWith("/")) destination = destination.substring(1);
+        if (destination.contains("/")) {
+          // make sure destination directory exists
+          String rscript = String.format("base::dir.create('%s', showWarnings=FALSE, recursive=TRUE)", destination.substring(0, destination.lastIndexOf("/")));
+          RScriptROperation rop = new RScriptROperation(rscript, false);
+          rSession.execute(rop);
+        }
+        FileWriteROperation writeop = new FileWriteROperation(destination, file);
+        rSession.execute(writeop);
+      });
+    }
+
     private boolean hasRSession(String rSessionId) {
       for(OpalRSession rs : rSessions) {
         if(rs.getId().equals(rSessionId)) {
@@ -266,57 +362,6 @@ public class OpalRSessionManager implements ServiceListener<OpalRService> {
 
     private void addRSession(OpalRSession rSession) {
       rSessions.add(rSession);
-    }
-
-    public void saveRSession(String rSessionId, String saveId) {
-      OpalRSession rSession = getRSession(rSessionId);
-      String rscript = "base::save.image()";
-      RScriptROperation rop = new RScriptROperation(rscript, false);
-      rSession.execute(rop);
-      FileReadROperation readop = new FileReadROperation(".RData", new File(rSession.getWorkspace(saveId), ".RData"));
-      rSession.execute(readop);
-    }
-
-    public void restoreRSession(String rSessionId, String restoreId) {
-      OpalRSession rSession = getRSession(rSessionId);
-      File source = new File(rSession.getWorkspace(restoreId), ".RData");
-      if (!source.exists()) return;
-      FileWriteROperation writeop = new FileWriteROperation(".RData", source);
-      rSession.execute(writeop);
-      String rscript = "base::load('.RData')";
-      RScriptROperation rop = new RScriptROperation(rscript, false);
-      rSession.execute(rop);
-    }
-
-    public void removeRSession(String rSessionId) {
-      OpalRSession rSession = getRSession(rSessionId);
-      try {
-        rSession.close();
-        rSessions.remove(rSession);
-      } catch(Exception e) {
-        log.warn("Failed closing R session: {}", rSessionId, e);
-      }
-    }
-
-    public void removeRSessions() {
-      for(OpalRSession rSession : rSessions) {
-        try {
-          rSession.close();
-        } catch(Exception e) {
-          log.warn("Failed closing R session: {}", rSession.getId(), e);
-        }
-      }
-      rSessions.clear();
-    }
-
-    public void clean() {
-      List<OpalRSession> toRemove = Lists.newArrayList();
-      for(OpalRSession rSession : rSessions) {
-        if(rSession.isClosed()) {
-          toRemove.add(rSession);
-        }
-      }
-      rSessions.removeAll(toRemove);
     }
 
     private OpalRSession getRSession(String rSessionId) {

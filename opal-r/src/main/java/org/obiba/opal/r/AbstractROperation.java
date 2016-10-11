@@ -160,6 +160,7 @@ public abstract class AbstractROperation implements ROperation {
    */
   protected void readFile(String fileName, File out) {
     try {
+      if (!out.getParentFile().exists()) out.getParentFile().mkdirs();
       readFile(fileName, new BufferedOutputStream(new FileOutputStream(out)));
     } catch (FileNotFoundException e) {
       log.warn("Failed creating file '{}' from '{}'", out, fileName, e);
