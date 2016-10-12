@@ -22,7 +22,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
-import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.security.SessionDetachedSubject;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.RASyncOperationTemplate;
@@ -144,7 +143,7 @@ public class OpalRSession implements RASyncOperationTemplate {
    * @return
    */
   public File getWorkspace(String sessionId) {
-    File ws = new File(OpalRSessionManager.R_DATA, getUser() + File.separatorChar + (Strings.isNullOrEmpty(sessionId) ? getId() : sessionId));
+    File ws = new File(OpalRSessionManager.R_WORKSPACES, getUser() + File.separatorChar + (Strings.isNullOrEmpty(sessionId) ? getId() : sessionId));
     if (!ws.exists()) ws.mkdirs();
     return ws;
   }

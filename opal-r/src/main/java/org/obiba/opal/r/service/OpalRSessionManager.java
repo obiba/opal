@@ -44,7 +44,9 @@ public class OpalRSessionManager implements ServiceListener<OpalRService> {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRSessionManager.class);
 
-  static final File R_DATA = new File(System.getenv().get("OPAL_HOME"), "data" + File.separatorChar + "R");
+  static final File R_WORKSPACES = new File(System.getenv().get("OPAL_HOME"), "data" + File.separatorChar + "R" + File.separatorChar + "workspaces");
+
+  private static final String R_IMAGE_FILE = ".RData";
 
   private static final long R_DATA_LIFESPAN = 30*24*3600*1000;
 
@@ -198,9 +200,9 @@ public class OpalRSessionManager implements ServiceListener<OpalRService> {
    */
   @Scheduled(fixedDelay = 3600 * 1000)
   public void cleanSavedRSessions() {
-    if (!R_DATA.exists()) return;
+    if (!R_WORKSPACES.exists()) return;
     long now = System.currentTimeMillis();
-    Lists.newArrayList(R_DATA.listFiles()).stream() //
+    Lists.newArrayList(R_WORKSPACES.listFiles()).stream() //
         .filter(File::isDirectory) //
         .forEach(userFolder ->
           Lists.newArrayList(userFolder.listFiles()).stream() //
@@ -281,6 +283,15 @@ public class OpalRSessionManager implements ServiceListener<OpalRService> {
 
     void saveRSession(String rSessionId, String saveId) {
       OpalRSession rSession = getRSession(rSessionId);
+      // make sure the session storage folder is empty
+      File store = rSession.getWorkspace(saveId);
+      Lists.newArrayList(store.listFiles()).forEach(file -> {
+        try {
+          FileUtil.delete(file);
+        } catch (IOException e) {
+          // ignore
+        }
+      });
       saveRSessionFiles(rSession, saveId);
       saveRSessionImage(rSession, saveId);
     }
@@ -340,16 +351,16 @@ public class OpalRSessionManager implements ServiceListener<OpalRService> {
       String rscript = "base::save.image()";
       RScriptROperation rop = new RScriptROperation(rscript, false);
       rSession.execute(rop);
-      FileReadROperation readop = new FileReadROperation(".RData", new File(rSession.getWorkspace(saveId), ".RData"));
+      FileReadROperation readop = new FileReadROperation(R_IMAGE_FILE, new File(rSession.getWorkspace(saveId), R_IMAGE_FILE));
       rSession.execute(readop);
     }
 
     private void restoreSessionImage(OpalRSession rSession, String restoreId) {
-      File source = new File(rSession.getWorkspace(restoreId), ".RData");
+      File source = new File(rSession.getWorkspace(restoreId), R_IMAGE_FILE);
       if (!source.exists()) return;
-      FileWriteROperation writeop = new FileWriteROperation(".RData", source);
+      FileWriteROperation writeop = new FileWriteROperation(R_IMAGE_FILE, source);
       rSession.execute(writeop);
-      String rscript = "base::load('.RData')";
+      String rscript = String.format("base::load('%s')", R_IMAGE_FILE);
       RScriptROperation rop = new RScriptROperation(rscript, false);
       rSession.execute(rop);
     }
