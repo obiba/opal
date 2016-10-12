@@ -48,7 +48,7 @@ public class OpalRSessionManager implements ServiceListener<OpalRService> {
 
   private static final String R_IMAGE_FILE = ".RData";
 
-  private static final long R_DATA_LIFESPAN = 30*24*3600*1000;
+  private static final long R_DATA_LIFESPAN = 30*24*3600; // 30 days (in seconds)
 
   @Value("${org.obiba.opal.r.sessionTimeout}")
   private Long rSessionTimeout;
@@ -198,17 +198,18 @@ public class OpalRSessionManager implements ServiceListener<OpalRService> {
   /**
    * Remove old saved R sessions directories.
    */
-  @Scheduled(fixedDelay = 3600 * 1000)
+  @Scheduled(fixedDelay = 60 * 1000)
   public void cleanSavedRSessions() {
     if (!R_WORKSPACES.exists()) return;
-    long now = System.currentTimeMillis();
+    long now = System.currentTimeMillis()/1000;
     Lists.newArrayList(R_WORKSPACES.listFiles()).stream() //
         .filter(File::isDirectory) //
         .forEach(userFolder ->
           Lists.newArrayList(userFolder.listFiles()).stream() //
               .filter(File::isDirectory) //
-              .filter(folder -> now - folder.lastModified() > R_DATA_LIFESPAN)
+              .filter(folder -> now - folder.lastModified()/1000 > R_DATA_LIFESPAN)
               .forEach(folder -> {
+                log.info("Removing R workspace: {}", folder.getAbsolutePath());
                 try {
                   FileUtil.delete(folder);
                 } catch (IOException e) {
