@@ -1,12 +1,6 @@
 package org.obiba.opal.web.r;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -41,7 +35,7 @@ public interface RSymbolResource {
    * @param async
    * @return
    */
-  @PUT
+  @POST
   @Consumes("application/x-rdata")
   Response putRData(@Context UriInfo uri, String content, @QueryParam("async") @DefaultValue("false") boolean async);
 
