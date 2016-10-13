@@ -15,7 +15,7 @@ import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
 import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.web.datashield.support.DataShieldROptionsScriptBuilder;
-import org.obiba.opal.web.r.OpalRSessionsResourceImpl;
+import org.obiba.opal.web.r.RSessionsResourceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -25,10 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Handles the list and the creation of the Datashield sessions of the invoking Opal user.
  */
-@Component("opalDatashieldSessionsResource")
+@Component("datashieldSessionsResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Transactional
-public class OpalDatashieldSessionsResourceImpl extends OpalRSessionsResourceImpl {
+public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
 
   @Autowired
   private DatashieldConfigurationSupplier configurationSupplier;

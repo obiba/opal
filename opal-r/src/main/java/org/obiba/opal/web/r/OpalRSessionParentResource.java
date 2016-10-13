@@ -36,14 +36,14 @@ public class OpalRSessionParentResource {
   private ApplicationContext applicationContext;
 
   @Path("/{id}")
-  public OpalRSessionResource getOpalRSessionResource(@PathParam("id") String id) {
-    OpalRSessionResource resource = applicationContext.getBean("opalRSessionResource", OpalRSessionResource.class);
+  public RSessionResource getOpalRSessionResource(@PathParam("id") String id) {
+    RSessionResource resource = applicationContext.getBean("opalRSessionResource", RSessionResource.class);
     resource.setOpalRSession(opalRSessionManager.getSubjectRSession(id));
     return resource;
   }
 
   @Path("/current")
-  public OpalRSessionResource getCurrentOpalRSessionResource() {
+  public RSessionResource getCurrentOpalRSessionResource() {
     throw new DeprecatedOperationException("Unsupported operation: please upgrade your opal R package.");
   }
 

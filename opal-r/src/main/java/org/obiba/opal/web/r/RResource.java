@@ -36,9 +36,9 @@ import com.google.common.base.Strings;
 @Component
 @Transactional
 @Path("/r")
-public class OpalRResource {
+public class RResource {
 
-  private static final Logger log = LoggerFactory.getLogger(OpalRResource.class);
+  private static final Logger log = LoggerFactory.getLogger(RResource.class);
 
   @Autowired
   private OpalRService opalRService;
@@ -68,9 +68,9 @@ public class OpalRResource {
   }
 
   @Path("/sessions")
-  public OpalRSessionsResource getSessionsResource() {
-    OpalRSessionsResource resource = applicationContext
-        .getBean("opalRSessionsResource", OpalRSessionsResource.class);
+  public RSessionsResource getSessionsResource() {
+    RSessionsResource resource = applicationContext
+        .getBean("opalRSessionsResource", RSessionsResource.class);
     return resource;
   }
 

@@ -24,7 +24,7 @@ import org.obiba.opal.datashield.expr.NoBinaryOpsValidator;
 import org.obiba.opal.datashield.expr.ParseException;
 import org.obiba.opal.r.ROperationWithResult;
 import org.obiba.opal.r.RScriptROperation;
-import org.obiba.opal.web.r.OpalRSessionResourceImpl;
+import org.obiba.opal.web.r.AbstractRSessionResource;
 import org.obiba.opal.web.r.RSymbolResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -33,11 +33,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Component("opalDataShieldSessionResource")
+@Component("dataShieldSessionResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Transactional
-public class OpalDataShieldSessionResourceImpl extends OpalRSessionResourceImpl
-    implements OpalDataShieldSessionResource {
+public class DataShieldSessionResourceImpl extends AbstractRSessionResource implements DataShieldSessionResource {
 
   @Autowired
   private DatashieldConfigurationSupplier configurationSupplier;
@@ -85,11 +84,6 @@ public class OpalDataShieldSessionResourceImpl extends OpalRSessionResourceImpl
     resource.setOpalRSession(getOpalRSession());
     resource.setIdentifiersTableService(identifiersTableService);
     return resource;
-  }
-
-  @Override
-  public Response execute(String script, boolean async, String body) {
-    return Response.noContent().build();
   }
 
 }

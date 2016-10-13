@@ -34,7 +34,7 @@ import com.google.common.collect.Lists;
 @Component("opalRSessionsResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Transactional
-public class OpalRSessionsResourceImpl implements OpalRSessionsResource {
+public class RSessionsResourceImpl implements RSessionsResource {
 
   private OpalRSessionManager opalRSessionManager;
 

@@ -24,7 +24,7 @@ import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.model.OpalR;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public interface OpalRSessionsResource {
+public interface RSessionsResource {
 
   @GET
   List<OpalR.RSessionDto> getRSessionIds();

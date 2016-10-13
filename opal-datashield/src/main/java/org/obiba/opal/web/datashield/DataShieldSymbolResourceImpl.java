@@ -9,13 +9,7 @@
  */
 package org.obiba.opal.web.datashield;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-
+import com.google.common.base.Supplier;
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.RestrictedAssignmentROperation;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
@@ -28,7 +22,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Supplier;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 @Component("dataShieldSymbolResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -61,11 +58,6 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
   public Response putString(UriInfo uri, String content, boolean async) {
     DataShieldLog.userLog("creating text symbol '{}' as '{}'", getName(), content);
     return super.putString(uri, content, async);
-  }
-
-  @Override
-  public Response putRData(@Context UriInfo uri, String content, @DefaultValue("false") boolean async) {
-    return Response.status(Status.FORBIDDEN).build();
   }
 
   @Override

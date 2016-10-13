@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.web.r;
 
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
@@ -19,6 +21,7 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MagmaEngineVariableResolver;
+import org.obiba.opal.r.DataAssignROperation;
 import org.obiba.opal.r.MagmaRRuntimeException;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -27,10 +30,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.ImmutableSet;
 
-@Component("securedRSymbolResource")
+@Component("opalRSymbolResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Transactional
-public class SecuredRSymbolResourceImpl extends AbstractRSymbolResourceImpl implements SecuredRSymbolResource {
+public class OpalRSymbolResourceImpl extends AbstractRSymbolResourceImpl implements OpalRSymbolResource {
 
   @Override
   public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean missings, String identifiers,
@@ -46,6 +49,12 @@ public class SecuredRSymbolResourceImpl extends AbstractRSymbolResourceImpl impl
     }
 
     return super.putMagma(uri, path, variableFilter, missings, identifiers, async);
+  }
+
+  @Override
+  public Response putRData(@Context UriInfo uri, String content, @DefaultValue("false") boolean async) {
+    DataAssignROperation rop = new DataAssignROperation(getName(), content);
+    return assignSymbol(uri, rop, async);
   }
 
   private Iterable<ValueTable> getValueTables(String path) {

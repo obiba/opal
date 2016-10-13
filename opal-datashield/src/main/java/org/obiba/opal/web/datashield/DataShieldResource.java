@@ -22,7 +22,7 @@ import org.obiba.opal.datashield.cfg.DatashieldConfiguration.Environment;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.model.DataShield.DataShieldConfigDto;
-import org.obiba.opal.web.r.OpalRSessionsResource;
+import org.obiba.opal.web.r.RSessionsResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -43,22 +43,22 @@ public class DataShieldResource {
   private ApplicationContext applicationContext;
 
   @Path("/sessions")
-  public OpalRSessionsResource getSessions() {
-    OpalRSessionsResource resource = applicationContext
-        .getBean("opalDatashieldSessionsResource", OpalRSessionsResource.class);
+  public RSessionsResource getSessions() {
+    RSessionsResource resource = applicationContext
+        .getBean("datashieldSessionsResource", RSessionsResource.class);
     return resource;
   }
 
   @Path("/session/{id}")
-  public OpalDataShieldSessionResource getSession(@PathParam("id") String id) {
-    OpalDataShieldSessionResource resource = applicationContext
-        .getBean("opalDataShieldSessionResource", OpalDataShieldSessionResource.class);
+  public DataShieldSessionResource getSession(@PathParam("id") String id) {
+    DataShieldSessionResource resource = applicationContext
+        .getBean("dataShieldSessionResource", DataShieldSessionResource.class);
     resource.setOpalRSession(opalRSessionManager.getSubjectRSession(id));
     return resource;
   }
 
   @Path("/session/current")
-  public OpalDataShieldSessionResource getCurrentSession() {
+  public DataShieldSessionResource getCurrentSession() {
     throw new DeprecatedOperationException("Unsupported operation: please upgrade your opal R package.");
   }
 

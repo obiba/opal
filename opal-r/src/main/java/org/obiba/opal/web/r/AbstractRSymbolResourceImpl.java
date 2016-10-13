@@ -12,8 +12,6 @@ package org.obiba.opal.web.r;
 import java.net.URI;
 
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -26,7 +24,7 @@ import org.obiba.opal.r.service.OpalRSession;
  * Handles web services on the symbols of the current R session of the invoking Opal user. A current R session must be
  * defined, otherwise the web service calls will fail with a 404 status.
  */
-public abstract class AbstractRSymbolResourceImpl extends AbstractOpalRSessionResource implements RSymbolResource {
+public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
 
   private String name;
 
@@ -45,6 +43,10 @@ public abstract class AbstractRSymbolResourceImpl extends AbstractOpalRSessionRe
     this.rSession = rSession;
   }
 
+  protected OpalRSession getRSession() {
+    return rSession;
+  }
+
   @Override
   public void setIdentifiersTableService(IdentifiersTableService identifiersTableService) {
     this.identifiersTableService = identifiersTableService;
@@ -57,18 +59,12 @@ public abstract class AbstractRSymbolResourceImpl extends AbstractOpalRSessionRe
 
   @Override
   public Response getSymbol() {
-    return executeScript(rSession, name);
+    return RSessionResourceHelper.executeScript(rSession, name);
   }
 
   @Override
   public Response putString(UriInfo uri, String content, boolean async) {
     return assignSymbol(uri, new StringAssignROperation(name, content), async);
-  }
-
-  @Override
-  public Response putRData(@Context UriInfo uri, String content, @DefaultValue("false") boolean async) {
-    DataAssignROperation rop = new DataAssignROperation(name, content);
-    return assignSymbol(uri, rop, async);
   }
 
   @Override
@@ -91,7 +87,7 @@ public abstract class AbstractRSymbolResourceImpl extends AbstractOpalRSessionRe
     return Response.ok().build();
   }
 
-  private Response assignSymbol(UriInfo uri, ROperation rop, boolean async) {
+  protected Response assignSymbol(UriInfo uri, ROperation rop, boolean async) {
     if(async) {
       String id = rSession.executeAsync(rop);
       return Response.created(getSymbolURI(uri)).entity(id).type(MediaType.TEXT_PLAIN_TYPE).build();
@@ -105,7 +101,4 @@ public abstract class AbstractRSymbolResourceImpl extends AbstractOpalRSessionRe
     return info.getRequestUri();
   }
 
-  protected OpalRSession getRSession() {
-    return rSession;
-  }
 }

@@ -37,19 +37,6 @@ public interface RSymbolResource {
   @Consumes(MediaType.TEXT_PLAIN)
   Response putString(@Context UriInfo uri, String content, @QueryParam("async") @DefaultValue("false") boolean async);
 
-  /**
-   * Push a R data object into the R server: content is expected to be the serialized form of the R object, base64 encoded.
-   *
-   * @param uri
-   * @param content
-   * @param async
-   * @return
-   */
-  @POST
-  @Consumes("application/x-rdata")
-  Response putRData(@Context UriInfo uri, String content, @QueryParam("async") @DefaultValue("false") boolean async);
-
-
   @PUT
   @Consumes("application/x-rscript")
   Response putRScript(@Context UriInfo uri, String script, @QueryParam("async") @DefaultValue("false") boolean async);

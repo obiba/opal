@@ -18,9 +18,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.obiba.opal.web.r.OpalRSessionResource;
+import org.obiba.opal.web.r.RSessionResource;
 
-public interface OpalDataShieldSessionResource extends OpalRSessionResource {
+public interface DataShieldSessionResource extends RSessionResource {
 
   @POST
   @Path("/aggregate")
