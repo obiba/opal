@@ -63,8 +63,12 @@ public class OpalRSessionResourceImpl extends AbstractRSessionResource implement
       return Response.status(Response.Status.BAD_REQUEST) //
         .entity("Destination file must be relative to R workspace.").build();
     String dest = prepareDestinationInR(destination, file.getName().getBaseName());
-    FileWriteROperation rop = new FileWriteROperation(dest, opalRuntime.getFileSystem().getLocalFile(file));
-    getOpalRSession().execute(rop);
+    try {
+      FileWriteROperation rop = new FileWriteROperation(dest, opalRuntime.getFileSystem().getLocalFile(file));
+      getOpalRSession().execute(rop);
+    } catch (Exception e) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("Cannot write file to R workspace: " + source).build();
+    }
     return Response.ok().build();
   }
 
