@@ -52,11 +52,13 @@ public class OpalRSessionResourceImpl extends AbstractRSessionResource implement
     if (Strings.isNullOrEmpty(source)) return Response.status(Response.Status.BAD_REQUEST) //
       .entity("Source file is missing.").build();
     // source file must exists and be accessible
-    FileObject file = resolveFileInFileSystem(source);
+    String sourcePath = source;
+    if (source.startsWith("~")) sourcePath = source.replaceFirst("~", "/home/" + getOpalRSession().getUser());
+    FileObject file = resolveFileInFileSystem(sourcePath);
     if (!file.exists()) return Response.status(Response.Status.NOT_FOUND) //
-        .entity("The file does not exist: " + source).build();
+        .entity("The file does not exist: " + sourcePath).build();
     if (file.getType() != FileType.FILE) return Response.status(Response.Status.BAD_REQUEST) //
-        .entity("The file must not be a folder: " + source).build();
+        .entity("The file must not be a folder: " + sourcePath).build();
     // destination must be relative
     if (!Strings.isNullOrEmpty(destination) &&
         (destination.startsWith("~") || destination.startsWith("/") || destination.startsWith("$")))
@@ -82,7 +84,9 @@ public class OpalRSessionResourceImpl extends AbstractRSessionResource implement
         .entity("Source file must be relative to R workspace.").build();
     String sourceName = source;
     if (source.contains("/")) sourceName = source.substring(source.lastIndexOf("/") + 1);
-    FileObject dest = resolveFileInFileSystem(destination);
+    String destinationPath = destination;
+    if (destination.startsWith("~")) destinationPath = destination.replaceFirst("~", "/home/" + getOpalRSession().getUser());
+    FileObject dest = resolveFileInFileSystem(destinationPath);
     if ((dest.exists() && !dest.isWriteable()) || (!dest.exists() && !dest.getParent().isWriteable())) return Response.status(Response.Status.BAD_REQUEST) //
         .entity("Destination file is not accessible for writing.").build();
     File file = prepareDestinationInOpal(dest, sourceName);
