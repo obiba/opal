@@ -10,6 +10,11 @@
 
 package org.obiba.opal.web.r;
 
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.obiba.opal.core.runtime.OpalRuntime;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -21,5 +26,28 @@ public interface OpalRSessionResource extends RSessionResource {
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   Response execute(@QueryParam("script") String script, @QueryParam("async") @DefaultValue("false") boolean async,
                    String body);
+
+
+  /**
+   * Push a file from the opal file system into the R session workspace.
+   *
+   * @param source
+   * @param destination
+   * @return
+   */
+  @PUT
+  @Path("/file/_push")
+  Response pushFile(@QueryParam("source") String source, @QueryParam("destination") String destination) throws FileSystemException;
+
+  /**
+   * Pull a file from the R session workspace to the opal file system.
+   *
+   * @param source
+   * @param destination
+   * @return
+   */
+  @PUT
+  @Path("/file/_pull")
+  Response pullFile(@QueryParam("source") String source, @QueryParam("destination") String destination) throws FileSystemException;
 
 }
