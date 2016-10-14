@@ -44,7 +44,8 @@ public class OpalRSessionManager implements ServiceListener<OpalRService> {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRSessionManager.class);
 
-  static final File R_WORKSPACES = new File(System.getenv().get("OPAL_HOME"), "data" + File.separatorChar + "R" + File.separatorChar + "workspaces");
+  static final String WORKSPACES_FORMAT = System.getenv().get("OPAL_HOME") + File.separatorChar + "data"
+      + File.separatorChar + "R" + File.separatorChar + "workspaces" + File.separatorChar  + "%s";
 
   private static final String R_IMAGE_FILE = ".RData";
 
@@ -200,29 +201,34 @@ public class OpalRSessionManager implements ServiceListener<OpalRService> {
    */
   @Scheduled(fixedDelay = 60 * 1000)
   public void cleanSavedRSessions() {
-    if (!R_WORKSPACES.exists()) return;
-    long now = System.currentTimeMillis()/1000;
-    Lists.newArrayList(R_WORKSPACES.listFiles()).stream() //
-        .filter(File::isDirectory) //
-        .forEach(userFolder ->
-          Lists.newArrayList(userFolder.listFiles()).stream() //
-              .filter(File::isDirectory) //
-              .filter(folder -> now - folder.lastModified()/1000 > R_DATA_LIFESPAN)
-              .forEach(folder -> {
-                log.info("Removing R workspace: {}", folder.getAbsolutePath());
-                try {
-                  FileUtil.delete(folder);
-                } catch (IOException e) {
-                  // ignore
-                }
-              })
-        );
+    File workspaces = new File(String.format(WORKSPACES_FORMAT, ""));
+    if (!workspaces.exists()) return;
+    Lists.newArrayList(workspaces.listFiles()).forEach(ws -> cleanSavedRSessions(ws));
   }
-
 
   //
   // private methods
   //
+
+  private void cleanSavedRSessions(File workspaces) {
+    if (!workspaces.exists()) return;
+    long now = System.currentTimeMillis()/1000;
+    Lists.newArrayList(workspaces.listFiles()).stream() //
+        .filter(File::isDirectory) //
+        .forEach(userFolder ->
+            Lists.newArrayList(userFolder.listFiles()).stream() //
+                .filter(File::isDirectory) //
+                .filter(folder -> now - folder.lastModified()/1000 > R_DATA_LIFESPAN)
+                .forEach(folder -> {
+                  log.info("Removing R workspace: {}", folder.getAbsolutePath());
+                  try {
+                    FileUtil.delete(folder);
+                  } catch (IOException e) {
+                    // ignore
+                  }
+                })
+        );
+  }
 
   private synchronized void checkRSessions(String principal) {
     if(!rSessionMap.containsKey(principal)) return;

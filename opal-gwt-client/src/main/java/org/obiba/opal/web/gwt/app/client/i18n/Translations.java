@@ -53,6 +53,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("ID")
   String idLabel();
 
+  @Description("Context label")
+  @DefaultStringValue("Context")
+  String contextLabel();
+
   @Description("Type label")
   @DefaultStringValue("Type")
   String typeLabel();

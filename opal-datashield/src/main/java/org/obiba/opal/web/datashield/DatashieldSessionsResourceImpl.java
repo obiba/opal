@@ -34,6 +34,7 @@ public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
   private DatashieldConfigurationSupplier configurationSupplier;
 
   protected void onNewRSession(OpalRSession rSession) {
+    rSession.setExecutionContext("datashield");
     DatashieldConfiguration config = configurationSupplier.get();
     if (config.hasOptions()) {
       rSession.execute(

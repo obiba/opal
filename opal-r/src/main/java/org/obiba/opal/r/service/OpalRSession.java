@@ -42,6 +42,8 @@ public class OpalRSession implements RASyncOperationTemplate {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRSession.class);
 
+  private static final String DEFAULT_CONTEXT = "default";
+
   private final TransactionalThreadFactory transactionalThreadFactory;
 
   private final String id;
@@ -57,6 +59,8 @@ public class OpalRSession implements RASyncOperationTemplate {
   private Date timestamp;
 
   private boolean busy = false;
+
+  private String executionContext = DEFAULT_CONTEXT;
 
   /**
    * R commands to be processed.
@@ -125,6 +129,14 @@ public class OpalRSession implements RASyncOperationTemplate {
     return busy;
   }
 
+  public void setExecutionContext(String executionContext) {
+    this.executionContext = executionContext;
+  }
+
+  public String getExecutionContext() {
+    return Strings.isNullOrEmpty(executionContext) ? DEFAULT_CONTEXT : executionContext;
+  }
+
   /**
    * Check if the R session is not busy and has expired.
    *
@@ -143,7 +155,7 @@ public class OpalRSession implements RASyncOperationTemplate {
    * @return
    */
   public File getWorkspace(String sessionId) {
-    File ws = new File(OpalRSessionManager.R_WORKSPACES, getUser() + File.separatorChar + (Strings.isNullOrEmpty(sessionId) ? getId() : sessionId));
+    File ws = new File(getWorkspaces(), getUser() + File.separatorChar + (Strings.isNullOrEmpty(sessionId) ? getId() : sessionId));
     if (!ws.exists()) ws.mkdirs();
     return ws;
   }
@@ -252,6 +264,15 @@ public class OpalRSession implements RASyncOperationTemplate {
   //
   // private methods
   //
+
+  /**
+   * Get the workspaces directory for the current execution context.
+   *
+   * @return
+   */
+  private File getWorkspaces() {
+    return new File(String.format(String.format(OpalRSessionManager.WORKSPACES_FORMAT, getExecutionContext())));
+  }
 
   /**
    * Creates a new R connection from the last R session state.

@@ -30,7 +30,8 @@ public class Dtos {
         .setCreationDate(DateTimeType.get().valueOf(rSession.getCreated()).toString()) //
         .setLastAccessDate(DateTimeType.get().valueOf(rSession.getTimestamp()).toString()) //
         .setStatus(rSession.isBusy() ? OpalR.RSessionStatus.BUSY : OpalR.RSessionStatus.WAITING) //
-        .setLink(ub.build(rSession.getId()).toString())
+        .setLink(ub.build(rSession.getId()).toString()) //
+        .setContext(rSession.getExecutionContext()) //
         .build();
   }
 

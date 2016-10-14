@@ -116,6 +116,13 @@ public class RSessionsView extends ViewWithUiHandlers<RSessionsUiHandlers> imple
     table.addColumn(new TextColumn<RSessionDto>() {
       @Override
       public String getValue(RSessionDto object) {
+        return object.getContext();
+      }
+    }, translations.contextLabel());
+
+    table.addColumn(new TextColumn<RSessionDto>() {
+      @Override
+      public String getValue(RSessionDto object) {
         return object.getUser();
       }
     }, translations.userLabel());

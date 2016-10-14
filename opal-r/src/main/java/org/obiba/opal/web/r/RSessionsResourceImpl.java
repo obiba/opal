@@ -62,17 +62,17 @@ public class RSessionsResourceImpl implements RSessionsResource {
   @Override
   public Response newRSession(UriInfo info, String restore) {
     OpalRSession rSession = opalRSessionManager.newSubjectRSession();
+    onNewRSession(rSession);
     if(!Strings.isNullOrEmpty(restore)) {
       opalRSessionManager.restoreSubjectRSession(rSession.getId(), restore);
     }
-    onNewRSession(rSession);
     URI location = getLocation(info, rSession.getId());
     return Response.created(location).entity(Dtos.asDto(rSession))
         .build();
   }
 
   protected void onNewRSession(OpalRSession rSession) {
-    // nothing
+    rSession.setExecutionContext("R");
   }
 
   URI getLocation(UriInfo info, String id) {
