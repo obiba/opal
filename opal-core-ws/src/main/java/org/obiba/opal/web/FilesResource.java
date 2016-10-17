@@ -138,9 +138,9 @@ public class FilesResource {
   /**
    * Copy or move a file to the current folder.
    *
-   * @param path
+   * @param destinationPath
    * @param action 'copy' (default) or 'move'
-   * @param file
+   * @param sourcesPath
    * @return
    * @throws IOException
    */

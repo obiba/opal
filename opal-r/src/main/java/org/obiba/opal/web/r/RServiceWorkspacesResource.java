@@ -13,6 +13,8 @@ package org.obiba.opal.web.r;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.obiba.core.util.FileUtil;
+import org.obiba.magma.security.Authorizer;
+import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.model.OpalR;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,8 @@ import java.util.stream.Collectors;
 @Path("/service/r/workspaces")
 public class RServiceWorkspacesResource {
 
+  private final static Authorizer authorizer = new ShiroAuthorizer();
+
   @Autowired
   private OpalRSessionManager opalRSessionManager;
 
@@ -51,6 +55,7 @@ public class RServiceWorkspacesResource {
             Lists.newArrayList(userFolders).stream() //
                 .filter(File::isDirectory) //
                 .filter(file -> Strings.isNullOrEmpty(user) || file.getName().equals(user)) //
+                .filter(file -> isUserHomeFolderReadable(file.getName())) //
                 .forEach(userFolder -> {
               File[] workspaces = userFolder.listFiles();
               if (workspaces != null) {
@@ -75,6 +80,7 @@ public class RServiceWorkspacesResource {
             Lists.newArrayList(userFolders).stream() //
                 .filter(File::isDirectory) //
                 .filter(file -> Strings.isNullOrEmpty(user) || file.getName().equals(user)) //
+                .filter(file -> isUserHomeFolderReadable(file.getName())) //
                 .forEach(userFolder -> {
                   File[] workspaces = userFolder.listFiles();
                   if (workspaces != null) {
@@ -93,6 +99,11 @@ public class RServiceWorkspacesResource {
           }
         });
     return Response.ok().build();
+  }
+
+  private boolean isUserHomeFolderReadable(String user) {
+    return authorizer
+        .isPermitted("rest:/files/home/" + user + ":GET");
   }
 
 }
