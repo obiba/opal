@@ -48,6 +48,9 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
   Panel rSessions;
 
   @UiField
+  Panel rWorkspaces;
+
+  @UiField
   Panel permissions;
 
   @UiField
@@ -106,7 +109,10 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
       rSessions.clear();
       rSessions.add(content);
     }
-
+    if(slot == Slots.RWorkspaces) {
+      rWorkspaces.clear();
+      rWorkspaces.add(content);
+    }
     if(slot == Slots.Permissions) {
       permissions.clear();
       permissions.add(content);

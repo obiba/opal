@@ -30,11 +30,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class DatashieldSessionsResourceImpl extends RSessionsResourceImpl {
 
+  static final String DS_CONTEXT = "DataSHIELD";
+
   @Autowired
   private DatashieldConfigurationSupplier configurationSupplier;
 
   protected void onNewRSession(OpalRSession rSession) {
-    rSession.setExecutionContext("datashield");
+    rSession.setExecutionContext(DS_CONTEXT);
     DatashieldConfiguration config = configurationSupplier.get();
     if (config.hasOptions()) {
       rSession.execute(

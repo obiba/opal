@@ -11,9 +11,13 @@ package org.obiba.opal.web.r;
 
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.commons.io.FileUtils;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.web.model.OpalR;
+
+import java.io.File;
+import java.util.Date;
 
 /**
  * Utility class for building R related Dtos.
@@ -32,6 +36,22 @@ public class Dtos {
         .setStatus(rSession.isBusy() ? OpalR.RSessionStatus.BUSY : OpalR.RSessionStatus.WAITING) //
         .setLink(ub.build(rSession.getId()).toString()) //
         .setContext(rSession.getExecutionContext()) //
+        .build();
+  }
+
+  public static OpalR.RWorkspaceDto asDto(String executionContext, String user, File workspace) {
+    long size = 0;
+    try {
+      size = FileUtils.sizeOf(workspace);
+    } catch (Exception e) {
+      // may happen if folder is written/deleted while iterating content
+    }
+    return OpalR.RWorkspaceDto.newBuilder() //
+        .setName(workspace.getName()) //
+        .setUser(user) //
+        .setLastAccessDate(DateTimeType.get().valueOf(new Date(workspace.lastModified())).toString()) //
+        .setContext(executionContext) //
+        .setSize(size) //
         .build();
   }
 

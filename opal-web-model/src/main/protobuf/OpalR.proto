@@ -35,3 +35,11 @@ message RCommandDto {
   optional string endDate = 7;
   optional string error = 8;
 }
+
+message RWorkspaceDto {
+  required string name = 1;
+  required string user = 2;
+  required string lastAccessDate = 3;
+  required string context = 4;
+  required int64 size = 5;
+}

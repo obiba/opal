@@ -13,6 +13,7 @@ package org.obiba.opal.web.gwt.app.client.administration.r;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.administration.r.list.RSessionsPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.r.list.RWorkspacesPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.support.AclRequest;
@@ -53,16 +54,19 @@ public class RAdministrationPresenter
 
   private final RSessionsPresenter rSessionsPresenter;
 
+  private final RWorkspacesPresenter rWorkspacesPresenter;
+
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
 
   @Inject
   public RAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
-      RSessionsPresenter rSessionsPresenter,
+      RSessionsPresenter rSessionsPresenter, RWorkspacesPresenter rWorkspacesPresenter,
       Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     this.rSessionsPresenter = rSessionsPresenter;
+    this.rWorkspacesPresenter = rWorkspacesPresenter;
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.breadcrumbsHelper = breadcrumbsHelper;
     getView().setUiHandlers(this);
@@ -88,6 +92,7 @@ public class RAdministrationPresenter
   @Override
   protected void onBind() {
     setInSlot(Display.Slots.RSessions, rSessionsPresenter);
+    setInSlot(Display.Slots.RWorkspaces, rWorkspacesPresenter);
   }
 
   @Override
@@ -212,6 +217,7 @@ public class RAdministrationPresenter
 
     enum Slots {
       RSessions,
+      RWorkspaces,
       Permissions
     }
 

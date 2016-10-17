@@ -48,6 +48,14 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Cancel Job")
   String cancelJob();
 
+  @Description("Terminate Session label")
+  @DefaultMessage("Terminate Session")
+  String terminateSession();
+
+  @Description("Remove Workspace label")
+  @DefaultMessage("Remove Workspace")
+  String removeWorkspace();
+
   @Description("Replace File label")
   @DefaultMessage("Replace File")
   String replaceExistingFile();
@@ -253,6 +261,12 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage(
       "The R session will be terminated. Any pending computation will be stopped. Any data structure in R memory will be lost.<br/><br/>Please confirm that you want to terminate this R session.")
   String confirmTerminateRSession();
+
+  @Description(
+      "Remove R workspace confirm message")
+  @DefaultMessage(
+      "The R workspace will be removed. Any data files stored in this workspace will be lost.<br/><br/>Please confirm that you want to remove this R workspace.")
+  String confirmRemoveRWorkspace();
 
   @Description(
       "The file that you are uploading already exist in the file system.<br/><br/>Please confirm that you want to replace the existing file message")

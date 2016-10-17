@@ -10,16 +10,7 @@
 
 package org.obiba.opal.reporting.service.r;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Map;
-import java.util.regex.Pattern;
-
+import com.google.common.base.Strings;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.r.FileReadROperation;
@@ -36,7 +27,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Strings;
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 @Component
 public class RReportServiceImpl implements ReportService {
@@ -126,7 +120,7 @@ public class RReportServiceImpl implements ReportService {
     try {
       File reportDesignFile = new File(reportDesign);
       rSession = opalRSessionManager.newSubjectRSession();
-      rSession.setExecutionContext("report");
+      rSession.setExecutionContext("Report");
       String originalWorkDir = getRWorkDir(rSession);
       prepareRSession(rSession, parameters, reportDesignFile);
       runReport(rSession, reportDesignFile.getName());

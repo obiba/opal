@@ -9,14 +9,9 @@
  */
 package org.obiba.opal.web.r;
 
-import java.net.URI;
-import java.util.List;
-
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import org.obiba.core.util.FileUtil;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.model.OpalR;
@@ -26,7 +21,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Lists;
+import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Handles the list and the creation of the R sessions of the invoking Opal user.
@@ -35,6 +37,8 @@ import com.google.common.collect.Lists;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Transactional
 public class RSessionsResourceImpl implements RSessionsResource {
+
+  static final String R_CONTEXT = "R";
 
   private OpalRSessionManager opalRSessionManager;
 
@@ -47,9 +51,7 @@ public class RSessionsResourceImpl implements RSessionsResource {
   @Override
   public List<OpalR.RSessionDto> getRSessionIds() {
     List<OpalR.RSessionDto> rSessions = Lists.newArrayList();
-    for(OpalRSession rSession : opalRSessionManager.getSubjectRSessions()) {
-      rSessions.add(Dtos.asDto(rSession));
-    }
+    rSessions.addAll(opalRSessionManager.getSubjectRSessions().stream().map(Dtos::asDto).collect(Collectors.toList()));
     return rSessions;
   }
 
@@ -63,7 +65,7 @@ public class RSessionsResourceImpl implements RSessionsResource {
   public Response newRSession(UriInfo info, String restore) {
     OpalRSession rSession = opalRSessionManager.newSubjectRSession();
     onNewRSession(rSession);
-    if(!Strings.isNullOrEmpty(restore)) {
+    if (!Strings.isNullOrEmpty(restore)) {
       opalRSessionManager.restoreSubjectRSession(rSession.getId(), restore);
     }
     URI location = getLocation(info, rSession.getId());
@@ -72,14 +74,14 @@ public class RSessionsResourceImpl implements RSessionsResource {
   }
 
   protected void onNewRSession(OpalRSession rSession) {
-    rSession.setExecutionContext("R");
+    rSession.setExecutionContext(R_CONTEXT);
   }
 
   URI getLocation(UriInfo info, String id) {
     List<PathSegment> segments = info.getPathSegments();
     List<PathSegment> patate = segments.subList(0, segments.size() - 1);
     StringBuilder root = new StringBuilder();
-    for(PathSegment s : patate) {
+    for (PathSegment s : patate) {
       root.append('/').append(s.getPath());
     }
     root.append("/session");

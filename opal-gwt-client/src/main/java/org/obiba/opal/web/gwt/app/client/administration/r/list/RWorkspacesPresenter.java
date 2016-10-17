@@ -9,16 +9,6 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.r.list;
 
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.model.client.opal.r.RSessionDto;
-
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -27,20 +17,29 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.model.client.opal.r.RWorkspaceDto;
 
 /**
  *
  */
-public class RSessionsPresenter extends PresenterWidget<RSessionsPresenter.Display> implements  RSessionsUiHandlers {
+public class RWorkspacesPresenter extends PresenterWidget<RWorkspacesPresenter.Display> implements  RWorkspacesUiHandlers {
 
-  public static final String TERMINATE_ACTION = "Terminate";
+  public static final String REMOVE_ACTION = "Remove";
 
   private Runnable actionRequiringConfirmation;
 
   private final TranslationMessages translationMessages;
 
   @Inject
-  public RSessionsPresenter(Display display, EventBus eventBus, TranslationMessages translationMessages) {
+  public RWorkspacesPresenter(Display display, EventBus eventBus, TranslationMessages translationMessages) {
     super(eventBus, display);
     this.translationMessages = translationMessages;
     getView().setUiHandlers(this);
@@ -60,10 +59,10 @@ public class RSessionsPresenter extends PresenterWidget<RSessionsPresenter.Displ
 
   @Override
   public void onRefresh() {
-    ResourceRequestBuilderFactory.<JsArray<RSessionDto>>newBuilder().forResource("/service/r/sessions").get()
-        .withCallback(new ResourceCallback<JsArray<RSessionDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<RWorkspaceDto>>newBuilder().forResource("/service/r/workspaces").get()
+        .withCallback(new ResourceCallback<JsArray<RWorkspaceDto>>() {
           @Override
-          public void onResource(Response response, JsArray<RSessionDto> resource) {
+          public void onResource(Response response, JsArray<RWorkspaceDto> resource) {
             getView().renderRows(resource);
           }
 
@@ -76,7 +75,7 @@ public class RSessionsPresenter extends PresenterWidget<RSessionsPresenter.Displ
   }
 
   @Override
-  public void onTerminate(final RSessionDto session) {
+  public void onRemove(final RWorkspaceDto workspace) {
     actionRequiringConfirmation = new Runnable() {
       @Override
       public void run() {
@@ -85,7 +84,7 @@ public class RSessionsPresenter extends PresenterWidget<RSessionsPresenter.Displ
           @Override
           public void onResponseCode(Request request, Response response) {
             if(response.getStatusCode() == Response.SC_OK) {
-              getEventBus().fireEvent(NotificationEvent.newBuilder().info("rSessionTerminated").build());
+              getEventBus().fireEvent(NotificationEvent.newBuilder().info("rWorkspaceRemoved").build());
             } else {
               getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
             }
@@ -93,24 +92,25 @@ public class RSessionsPresenter extends PresenterWidget<RSessionsPresenter.Displ
           }
         };
         UriBuilder uriBuilder = UriBuilder.create();
-        uriBuilder.segment("service", "r", "session", session.getId());
+        uriBuilder.segment("service", "r", "workspaces").query("context", workspace.getContext())
+        .query("user", workspace.getUser()).query("name", workspace.getName());
         ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).delete()
             .withCallback(Response.SC_OK, callbackHandler).send();
       }
     };
 
     getEventBus().fireEvent(ConfirmationRequiredEvent
-        .createWithMessages(actionRequiringConfirmation, translationMessages.terminateSession(),
-            translationMessages.confirmTerminateRSession()));
+        .createWithMessages(actionRequiringConfirmation, translationMessages.removeWorkspace(),
+            translationMessages.confirmRemoveRWorkspace()));
   }
 
   //
   // Inner Classes / Interfaces
   //
 
-  public interface Display extends View, HasUiHandlers<RSessionsUiHandlers> {
+  public interface Display extends View, HasUiHandlers<RWorkspacesUiHandlers> {
 
-    void renderRows(JsArray<RSessionDto> rows);
+    void renderRows(JsArray<RWorkspaceDto> rows);
 
   }
 
