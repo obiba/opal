@@ -115,9 +115,9 @@ public class RReportServiceImpl implements ReportService {
 
   private void renderWithRServer(Map<String, String> parameters, String reportDesign, String reportOutput)
       throws IOException, REXPMismatchException {
-    String report = "";
     OpalRSession rSession = null;
     try {
+      prepareRServer();
       File reportDesignFile = new File(reportDesign);
       rSession = opalRSessionManager.newSubjectRSession();
       rSession.setExecutionContext("Report");
@@ -140,11 +140,31 @@ public class RReportServiceImpl implements ReportService {
         writeFileToR(rSession, file);
       }
     }
-    execute(rSession, "if (!require(opal)) { install.packages(c('opal','ggplot2','haven','opaladdons'), repos=c('http://cran.rstudio.com/', 'http://cran.obiba.org'), dependencies=TRUE) }");
+    ensurePackage(rSession, "opal");
+    ensurePackage(rSession, "opaladdons"); // required
+    ensurePackage(rSession, "ggplot2");
     String options = buildOptions(parameters);
     if(!Strings.isNullOrEmpty(options)) {
       execute(rSession, options);
     }
+  }
+
+  /**
+   * Prepare R server in another session, otherwise newly installed packages could fail loading.
+   */
+  private void prepareRServer() {
+    OpalRSession rSession = opalRSessionManager.newSubjectRSession();
+    rSession.setExecutionContext("Report");
+    ensurePackage(rSession, "opal");
+    ensurePackage(rSession, "opaladdons");
+    ensurePackage(rSession, "ggplot2");
+    rSession.close();
+  }
+
+  private void ensurePackage(OpalRSession rSession, String packageName) {
+    String cmd = String.format("if (!require(%s)) { install.packages('%s', repos=c('http://cran.rstudio.com/', 'http://cran.obiba.org'), dependencies=TRUE) }",
+        packageName, packageName);
+    execute(rSession, cmd);
   }
 
   private RScriptROperation runReport(OpalRSession rSession, String reportDesign) {
