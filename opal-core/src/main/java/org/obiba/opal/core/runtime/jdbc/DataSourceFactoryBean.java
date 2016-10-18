@@ -94,7 +94,7 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
   }
 
   private void setConnectionProperties(BasicDataSource dataSource) {
-    if("com.mysql.jdbc.Driver".equals(driverClass)) {
+    if("com.mysql.jdbc.Driver".equals(driverClass) || "org.mariadb.jdbc.Driver".equals(driverClass)) {
       if(Strings.isNullOrEmpty(connectionProperties)) {
         connectionProperties = "characterEncoding=UTF-8";
       } else {

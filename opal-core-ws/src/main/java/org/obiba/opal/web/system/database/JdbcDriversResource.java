@@ -56,6 +56,15 @@ public class JdbcDriversResource {
         .addSupportedSchemas("limesurvey") //
         .build());
     drivers.add(Database.JdbcDriverDto.newBuilder() //
+        .setDriverName("MariaDB") //
+        .setDriverClass("org.mariadb.jdbc.Driver") //
+        .setJdbcUrlTemplate("jdbc:mariadb://{hostname}:{port}/{databaseName}") //
+        .setJdbcUrlExample("jdbc:mariadb://localhost:3306/opal") //
+        .addSupportedSchemas("hibernate") //
+        .addSupportedSchemas("jdbc") //
+        .addSupportedSchemas("limesurvey") //
+        .build());
+    drivers.add(Database.JdbcDriverDto.newBuilder() //
         .setDriverName("PostgreSQL") //
         .setDriverClass("org.postgresql.Driver") //
         .setJdbcUrlTemplate("jdbc:postgresql://{hostname}:{port}/{databaseName}") //

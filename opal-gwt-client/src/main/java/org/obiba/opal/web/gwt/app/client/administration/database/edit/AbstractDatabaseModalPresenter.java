@@ -54,7 +54,7 @@ public abstract class AbstractDatabaseModalPresenter<TView extends AbstractDatab
 
   public enum Usage {
     IMPORT(translations.importLabel(), SqlSchema.JDBC, SqlSchema.LIMESURVEY),
-    STORAGE(translations.storageLabel(), SqlSchema.HIBERNATE, SqlSchema.JDBC),
+    STORAGE(translations.storageLabel(), SqlSchema.JDBC, SqlSchema.HIBERNATE),
     EXPORT(translations.exportLabel(), SqlSchema.JDBC);
 
     private final String label;

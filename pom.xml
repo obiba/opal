@@ -586,7 +586,12 @@
         <version>${commons-math.version}</version>
       </dependency>
 
-      <!-- If we need MySQL -->
+      <!-- If we need SQL drivers -->
+      <dependency>
+        <groupId>org.mariadb.jdbc</groupId>
+        <artifactId>mariadb-java-client</artifactId>
+        <version>${mariadb-connector-java.version}</version>
+      </dependency>
       <dependency>
         <groupId>mysql</groupId>
         <artifactId>mysql-connector-java</artifactId>
@@ -1780,6 +1785,7 @@
     <public-datasources.version>1.2.0</public-datasources.version>
     <magma.version>1.13-SNAPSHOT</magma.version>
     <mail.version>1.5.0-b01</mail.version>
+    <mariadb-connector-java.version>1.5.4</mariadb-connector-java.version>
     <mockftpserver.version>2.6</mockftpserver.version>
     <mockito.version>1.10.8</mockito.version>
     <mongeez.version>0.9.4</mongeez.version>
