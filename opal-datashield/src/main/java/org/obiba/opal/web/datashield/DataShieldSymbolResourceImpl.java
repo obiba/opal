@@ -86,4 +86,9 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
       return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
     }
   }
+
+  @Override
+  protected boolean withIdColumn() {
+    return false;
+  }
 }

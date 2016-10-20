@@ -78,7 +78,7 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean missings, String identifiers,
       boolean async) {
     return assignSymbol(uri,
-        new MagmaAssignROperation(name, path, variableFilter, missings, identifiers, identifiersTableService), async);
+        new MagmaAssignROperation(name, path, variableFilter, missings, identifiers, identifiersTableService, withIdColumn()), async);
   }
 
   @Override
@@ -101,4 +101,12 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
     return info.getRequestUri();
   }
 
+  /**
+   * Whether the entity ID is a column in the R data.frame when assigning a {@link org.obiba.magma.ValueTable}.
+   *
+   * @return
+   */
+  protected boolean withIdColumn() {
+    return true;
+  }
 }

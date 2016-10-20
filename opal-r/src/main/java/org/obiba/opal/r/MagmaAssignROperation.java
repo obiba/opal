@@ -36,6 +36,8 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   private static final Logger log = LoggerFactory.getLogger(MagmaAssignROperation.class);
 
+  private static final String ID_COLUMN = "opal_id";
+
   @NotNull
   private final IdentifiersTableService identifiersTableService;
 
@@ -51,6 +53,8 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   private final String identifiersMapping;
 
+  private final boolean withIdColumn;
+
   private SortedSet<VariableEntity> entities;
 
   private final Set<MagmaRConverter> magmaRConverters = Sets
@@ -58,7 +62,7 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   @SuppressWarnings("ConstantConditions")
   public MagmaAssignROperation(@NotNull String symbol, @NotNull String path, String variableFilter,
-      boolean withMissings, String identifiersMapping, @NotNull IdentifiersTableService identifiersTableService) {
+      boolean withMissings, String identifiersMapping, @NotNull IdentifiersTableService identifiersTableService, boolean withIdColumn) {
     if(symbol == null) throw new IllegalArgumentException("symbol cannot be null");
     if(path == null) throw new IllegalArgumentException("path cannot be null");
     if(identifiersTableService == null) throw new IllegalArgumentException("identifiers table service cannot be null");
@@ -67,6 +71,7 @@ public class MagmaAssignROperation extends AbstractROperation {
     this.variableFilter = variableFilter;
     this.withMissings = withMissings;
     this.identifiersMapping = identifiersMapping;
+    this.withIdColumn = withIdColumn;
     this.identifiersTableService = identifiersTableService;
   }
 
@@ -218,17 +223,20 @@ public class MagmaAssignROperation extends AbstractROperation {
         assign(getTmpVectorName(symbol, name), list.at(name));
       }
       // one temporary vector for the ids
-      assign(getTmpVectorName(symbol, "row.names"), ids);
+      assign(getTmpVectorName(symbol, withIdColumn ? ID_COLUMN : "row.names"), ids);
     }
 
     private void doAssignDataFrame(String... names) {
       // create the data.frame from the vectors
       StringBuilder args = new StringBuilder();
+      if (withIdColumn)
+        args.append("'").append(ID_COLUMN).append("'=").append(getTmpVectorName(symbol, ID_COLUMN));
       for(String name : names) {
         if(args.length() > 0) args.append(", ");
         args.append("'").append(name).append("'=").append(getTmpVectorName(symbol, name));
       }
-      args.append(", row.names=").append(getTmpVectorName(symbol, "row.names"));
+      if (!withIdColumn)
+        args.append(", row.names=").append(getTmpVectorName(symbol, "row.names"));
       log.info("data.frame arguments: {}", args);
       eval(symbol + " <- data.frame(" + args + ")", false);
     }
@@ -238,7 +246,7 @@ public class MagmaAssignROperation extends AbstractROperation {
       for(String name : names) {
         eval("base::rm(" + getTmpVectorName(symbol, name) + ")", false);
       }
-      eval("base::rm(" + getTmpVectorName(symbol, "row.names") + ")", false);
+      eval("base::rm(" + getTmpVectorName(symbol, withIdColumn ? ID_COLUMN : "row.names") + ")", false);
     }
 
     private String getTmpVectorName(String symbol, String name) {
