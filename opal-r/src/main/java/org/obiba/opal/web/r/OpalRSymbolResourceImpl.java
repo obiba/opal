@@ -36,7 +36,7 @@ import com.google.common.collect.ImmutableSet;
 public class OpalRSymbolResourceImpl extends AbstractRSymbolResourceImpl implements OpalRSymbolResource {
 
   @Override
-  public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean missings, String identifiers,
+  public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean withMissings, Boolean withIdentifiers, Boolean withTimestamps, String identifiersMapping,
       boolean async) {
     if(path == null) {
       return Response.status(Response.Status.BAD_REQUEST).build();
@@ -48,7 +48,7 @@ public class OpalRSymbolResourceImpl extends AbstractRSymbolResourceImpl impleme
       }
     }
 
-    return super.putMagma(uri, path, variableFilter, missings, identifiers, async);
+    return super.putMagma(uri, path, variableFilter, withMissings, withIdentifiers, withTimestamps, identifiersMapping, async);
   }
 
   @Override

@@ -9,16 +9,18 @@
  */
 package org.obiba.opal.web.r;
 
-import java.net.URI;
+import org.obiba.opal.core.service.IdentifiersTableService;
+import org.obiba.opal.r.MagmaAssignROperation;
+import org.obiba.opal.r.ROperation;
+import org.obiba.opal.r.RScriptROperation;
+import org.obiba.opal.r.StringAssignROperation;
+import org.obiba.opal.r.service.OpalRSession;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-
-import org.obiba.opal.core.service.IdentifiersTableService;
-import org.obiba.opal.r.*;
-import org.obiba.opal.r.service.OpalRSession;
+import java.net.URI;
 
 /**
  * Handles web services on the symbols of the current R session of the invoking Opal user. A current R session must be
@@ -75,10 +77,12 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   }
 
   @Override
-  public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean missings, String identifiers,
-      boolean async) {
+  public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean withMissings, Boolean withIdentifiers, Boolean withTimestamps, String identifiersMapping,
+                           boolean async) {
+    boolean wIds = withIdentifiers == null ? withIdColumn() : withIdentifiers;
+    boolean wTs = withTimestamps == null ? withTimestampsColumns() : withTimestamps;
     return assignSymbol(uri,
-        new MagmaAssignROperation(name, path, variableFilter, missings, identifiers, identifiersTableService, withIdColumn()), async);
+        new MagmaAssignROperation(name, path, variableFilter, withMissings, wIds, wTs, identifiersMapping, identifiersTableService), async);
   }
 
   @Override
@@ -88,7 +92,7 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   }
 
   protected Response assignSymbol(UriInfo uri, ROperation rop, boolean async) {
-    if(async) {
+    if (async) {
       String id = rSession.executeAsync(rop);
       return Response.created(getSymbolURI(uri)).entity(id).type(MediaType.TEXT_PLAIN_TYPE).build();
     } else {
@@ -108,5 +112,14 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
    */
   protected boolean withIdColumn() {
     return true;
+  }
+
+  /**
+   * Whether the value set timestamps are to be columns in the R data.frame when assigning a {@link org.obiba.magma.ValueTable}.
+   *
+   * @return
+   */
+  protected boolean withTimestampsColumns() {
+    return false;
   }
 }

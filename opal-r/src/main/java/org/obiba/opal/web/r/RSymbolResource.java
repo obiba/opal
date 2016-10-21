@@ -10,14 +10,14 @@
 
 package org.obiba.opal.web.r;
 
+import org.obiba.opal.core.service.IdentifiersTableService;
+import org.obiba.opal.r.service.OpalRSession;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-
-import org.obiba.opal.core.service.IdentifiersTableService;
-import org.obiba.opal.r.service.OpalRSession;
 
 public interface RSymbolResource {
 
@@ -41,11 +41,25 @@ public interface RSymbolResource {
   @Consumes("application/x-rscript")
   Response putRScript(@Context UriInfo uri, String script, @QueryParam("async") @DefaultValue("false") boolean async);
 
+  /**
+   * Assign value table variables to a R data.frame.
+   *
+   * @param uri
+   * @param path
+   * @param variableFilter
+   * @param withMissings Include values corresponding to "missing" categories.
+   * @param withIdentifiers Include the entity ID as a column.
+   * @param withTimestamps Include the value set timestamps  as columns.
+   * @param identifiersMapping Identifiers mapping to be used.
+   * @param async
+   * @return
+   */
   @PUT
   @Consumes("application/x-opal")
   Response putMagma(@Context UriInfo uri, String path, @QueryParam("variables") String variableFilter,
-      @QueryParam("missings") @DefaultValue("false") Boolean missings, @QueryParam("identifiers") String identifiers,
-      @QueryParam("async") @DefaultValue("false") boolean async);
+                    @QueryParam("missings") @DefaultValue("false") Boolean withMissings, @QueryParam("withIdentifiers") Boolean withIdentifiers,
+                    @QueryParam("withTimestamps") Boolean withTimestamps, @QueryParam("identifiers") String identifiersMapping,
+                    @QueryParam("async") @DefaultValue("false") boolean async);
 
   @DELETE
   Response rm();
