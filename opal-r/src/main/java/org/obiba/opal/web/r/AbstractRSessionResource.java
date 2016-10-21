@@ -69,6 +69,14 @@ public abstract class AbstractRSessionResource implements RSessionResource {
   }
 
   @Override
+  public Response saveWorkspace(String saveId) {
+    if(!Strings.isNullOrEmpty(saveId)) {
+      opalRSessionManager.saveSubjectRSession(rSession.getId(), saveId);
+    }
+    return Response.status(Strings.isNullOrEmpty(saveId) ? Response.Status.BAD_REQUEST : Response.Status.OK).build();
+  }
+
+  @Override
   public Response setCurrentRSession() {
     throw new UnsupportedOperationException("Unsupported operation: please upgrade your opal R package.");
   }

@@ -79,4 +79,8 @@ public interface RSessionResource {
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   Response getRCommandResult(@PathParam("rid") String rid, @QueryParam("rm") @DefaultValue("true") boolean remove,
       @QueryParam("wait") @DefaultValue("false") boolean wait);
+
+  @POST
+  @Path("/workspaces")
+  Response saveWorkspace(@QueryParam("save") String saveId);
 }
