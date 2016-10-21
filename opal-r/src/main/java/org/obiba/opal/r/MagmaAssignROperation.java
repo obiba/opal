@@ -255,7 +255,7 @@ public class MagmaAssignROperation extends AbstractROperation {
       if (!withIdColumn)
         args.append(", row.names=").append(getTmpVectorName(symbol, "row.names"));
       log.info("data.frame arguments: {}", args);
-      eval(symbol + " <- data.frame(" + args + ")", false);
+      eval(String.format("base::assign('%s', data.frame(%s))", symbol, args), false);
     }
 
     private void doRemoveTmpVectors(String... names) {
