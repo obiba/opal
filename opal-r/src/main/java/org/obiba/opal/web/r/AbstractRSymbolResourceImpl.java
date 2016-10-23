@@ -77,12 +77,11 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   }
 
   @Override
-  public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean withMissings, Boolean withIdentifiers, Boolean withTimestamps, String identifiersMapping,
+  public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean withMissings,
+                           String idName, String updatedName, String identifiersMapping,
                            boolean async) {
-    boolean wIds = withIdentifiers == null ? withIdColumn() : withIdentifiers;
-    boolean wTs = withTimestamps == null ? withTimestampsColumns() : withTimestamps;
     return assignSymbol(uri,
-        new MagmaAssignROperation(name, path, variableFilter, withMissings, wIds, wTs, identifiersMapping, identifiersTableService), async);
+        new MagmaAssignROperation(name, path, variableFilter, withMissings, idName, updatedName, identifiersMapping, identifiersTableService), async);
   }
 
   @Override
@@ -105,21 +104,4 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
     return info.getRequestUri();
   }
 
-  /**
-   * Whether the entity ID is a column in the R data.frame when assigning a {@link org.obiba.magma.ValueTable}.
-   *
-   * @return
-   */
-  protected boolean withIdColumn() {
-    return true;
-  }
-
-  /**
-   * Whether the value set timestamps are to be columns in the R data.frame when assigning a {@link org.obiba.magma.ValueTable}.
-   *
-   * @return
-   */
-  protected boolean withTimestampsColumns() {
-    return false;
-  }
 }

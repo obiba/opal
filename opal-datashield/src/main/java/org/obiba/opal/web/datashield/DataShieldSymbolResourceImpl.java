@@ -36,10 +36,11 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
   private Supplier<DatashieldConfiguration> configSupplier;
 
   @Override
-  public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean withMissings, Boolean withIdentifiers, Boolean withTimestamps, String identifiersMapping,
+  public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean withMissings, String idName,
+                           String updatedName, String identifiersMapping,
       boolean async) {
     DataShieldLog.userLog("creating symbol '{}' from opal data '{}'", getName(), path);
-    return super.putMagma(uri, path, variableFilter, withMissings, false, false, identifiersMapping, async);
+    return super.putMagma(uri, path, variableFilter, withMissings, null, null, identifiersMapping, async);
   }
 
   @Override
@@ -85,15 +86,5 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
     } catch(ParseException e) {
       return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
     }
-  }
-
-  @Override
-  protected boolean withIdColumn() {
-    return false;
-  }
-
-  @Override
-  protected boolean withTimestampsColumns() {
-    return false;
   }
 }

@@ -48,8 +48,8 @@ public interface RSymbolResource {
    * @param path
    * @param variableFilter
    * @param withMissings Include values corresponding to "missing" categories.
-   * @param withIdentifiers Include the entity ID as a column.
-   * @param withTimestamps Include the value set timestamps  as columns.
+   * @param idName Include the entity ID as a column.
+   * @param updatedName Include the value set last update timestamp as a column.
    * @param identifiersMapping Identifiers mapping to be used.
    * @param async
    * @return
@@ -57,8 +57,8 @@ public interface RSymbolResource {
   @PUT
   @Consumes("application/x-opal")
   Response putMagma(@Context UriInfo uri, String path, @QueryParam("variables") String variableFilter,
-                    @QueryParam("missings") @DefaultValue("false") Boolean withMissings, @QueryParam("withIdentifiers") Boolean withIdentifiers,
-                    @QueryParam("withTimestamps") Boolean withTimestamps, @QueryParam("identifiers") String identifiersMapping,
+                    @QueryParam("missings") @DefaultValue("false") Boolean withMissings, @QueryParam("id") String idName,
+                    @QueryParam("updated") String updatedName, @QueryParam("identifiers") String identifiersMapping,
                     @QueryParam("async") @DefaultValue("false") boolean async);
 
   @DELETE

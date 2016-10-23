@@ -9,9 +9,11 @@
  */
 package org.obiba.opal.r;
 
-import com.google.common.base.Function;
 import com.google.common.base.Strings;
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.obiba.magma.*;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
@@ -37,12 +39,6 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   private static final Logger log = LoggerFactory.getLogger(MagmaAssignROperation.class);
 
-  private static final String ID_COLUMN = "opal_id";
-
-  private static final String CREATED_COLUMN = "opal_created";
-
-  private static final String UPDATED_COLUMN = "opal_updated";
-
   @NotNull
   private final IdentifiersTableService identifiersTableService;
 
@@ -58,9 +54,9 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   private final String identifiersMapping;
 
-  private final boolean withIdColumn;
+  private final String idColumnName;
 
-  private final boolean withTimestampsColumns;
+  private final String updatedColumnName;
 
   private SortedSet<VariableEntity> entities;
 
@@ -69,7 +65,8 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   @SuppressWarnings("ConstantConditions")
   public MagmaAssignROperation(@NotNull String symbol, @NotNull String path, String variableFilter,
-      boolean withMissings, boolean withIdentifiers, boolean withTimestamps, String identifiersMapping, @NotNull IdentifiersTableService identifiersTableService) {
+      boolean withMissings, String idColumnName, String updatedColumnName, String identifiersMapping,
+                               @NotNull IdentifiersTableService identifiersTableService) {
     if(symbol == null) throw new IllegalArgumentException("symbol cannot be null");
     if(path == null) throw new IllegalArgumentException("path cannot be null");
     if(identifiersTableService == null) throw new IllegalArgumentException("identifiers table service cannot be null");
@@ -78,8 +75,8 @@ public class MagmaAssignROperation extends AbstractROperation {
     this.variableFilter = variableFilter;
     this.withMissings = withMissings;
     this.identifiersMapping = identifiersMapping;
-    this.withIdColumn = withIdentifiers;
-    this.withTimestampsColumns = withTimestamps;
+    this.idColumnName = idColumnName;
+    this.updatedColumnName = updatedColumnName;
     this.identifiersTableService = identifiersTableService;
   }
 
@@ -109,6 +106,14 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   void prepareEntities(ValueTable table) {
     setEntities(ImmutableSortedSet.copyOf(table.getVariableEntities()));
+  }
+
+  private boolean withIdColumn() {
+    return !Strings.isNullOrEmpty(idColumnName);
+  }
+
+  private boolean withUpdatedColumn() {
+    return !Strings.isNullOrEmpty(updatedColumnName);
   }
 
   @Override
@@ -180,8 +185,6 @@ public class MagmaAssignROperation extends AbstractROperation {
    */
   private class ValueTableRConverter extends AbstractMagmaRConverter {
 
-    private static final String ENTITY_ID_SYMBOL = "ID__";
-
     private ValueTable table;
 
     @Override
@@ -230,29 +233,27 @@ public class MagmaAssignROperation extends AbstractROperation {
       for(String name : names) {
         assign(getTmpVectorName(symbol, name), list.at(name));
       }
-      if (withTimestampsColumns) {
-        assign(getTmpVectorName(symbol, CREATED_COLUMN), getCreatedVector(withMissings));
-        assign(getTmpVectorName(symbol, UPDATED_COLUMN), getUpdatedVector(withMissings));
+      if (withUpdatedColumn()) {
+        assign(getTmpVectorName(symbol, updatedColumnName), getUpdatedVector(withMissings));
       }
       // one temporary vector for the ids
-      assign(getTmpVectorName(symbol, withIdColumn ? ID_COLUMN : "row.names"), ids);
+      assign(getTmpVectorName(symbol, withIdColumn() ? idColumnName : "row.names"), ids);
     }
 
     private void doAssignDataFrame(String... names) {
       // create the data.frame from the vectors
       StringBuilder args = new StringBuilder();
-      if (withIdColumn)
-        args.append("'").append(ID_COLUMN).append("'=").append(getTmpVectorName(symbol, ID_COLUMN));
-      if (withTimestampsColumns) {
+      if (withIdColumn())
+        args.append("'").append(idColumnName).append("'=").append(getTmpVectorName(symbol, idColumnName));
+      if (withUpdatedColumn()) {
         if(args.length() > 0) args.append(", ");
-        args.append("'").append(CREATED_COLUMN).append("'=").append(getTmpVectorName(symbol, CREATED_COLUMN));
-        args.append(", '").append(UPDATED_COLUMN).append("'=").append(getTmpVectorName(symbol, UPDATED_COLUMN));
+        args.append("'").append(updatedColumnName).append("'=").append(getTmpVectorName(symbol, updatedColumnName));
       }
       for(String name : names) {
         if(args.length() > 0) args.append(", ");
         args.append("'").append(name).append("'=").append(getTmpVectorName(symbol, name));
       }
-      if (!withIdColumn)
+      if (!withIdColumn())
         args.append(", row.names=").append(getTmpVectorName(symbol, "row.names"));
       log.info("data.frame arguments: {}", args);
       eval(String.format("base::assign('%s', data.frame(%s))", symbol, args), false);
@@ -263,7 +264,10 @@ public class MagmaAssignROperation extends AbstractROperation {
       for(String name : names) {
         eval("base::rm(" + getTmpVectorName(symbol, name) + ")", false);
       }
-      eval("base::rm(" + getTmpVectorName(symbol, withIdColumn ? ID_COLUMN : "row.names") + ")", false);
+      eval("base::rm(" + getTmpVectorName(symbol, withIdColumn() ? idColumnName : "row.names") + ")", false);
+      if (withUpdatedColumn()) {
+        eval("base::rm(" + getTmpVectorName(symbol, updatedColumnName) + ")", false);
+      }
     }
 
     private String getTmpVectorName(String symbol, String name) {
@@ -272,15 +276,11 @@ public class MagmaAssignROperation extends AbstractROperation {
     }
 
     private REXP getIdsVector(boolean withMissings) {
-      return getVector(new VariableEntityValueSource(), getEntities(), withMissings);
-    }
-
-    private REXP getCreatedVector(boolean withMissings) {
-      return getVector(new ValueSetCreatedValueSource(), getEntities(), withMissings);
+      return getVector(new VariableEntityValueSource(idColumnName), getEntities(), withMissings);
     }
 
     private REXP getUpdatedVector(boolean withMissings) {
-      return getVector(new ValueSetUpdatedValueSource(), getEntities(), withMissings);
+      return getVector(new ValueSetUpdatedValueSource(updatedColumnName), getEntities(), withMissings);
     }
 
     private RList getVariableVectors() {
@@ -391,9 +391,16 @@ public class MagmaAssignROperation extends AbstractROperation {
      * Represents the entity identifiers as values of a variable.
      */
     private class VariableEntityValueSource extends AbstractVariableValueSource implements VariableValueSource {
+
+      private final Variable variable;
+
+      VariableEntityValueSource(String name) {
+        this.variable = Variable.Builder.newVariable(Strings.isNullOrEmpty(name) ? "opal_id" : name, TextType.get(), table.getEntityType()).build();
+      }
+
       @Override
       public Variable getVariable() {
-        return Variable.Builder.newVariable(ID_COLUMN, TextType.get(), table.getEntityType()).build();
+        return variable;
       }
 
       @NotNull
@@ -430,50 +437,17 @@ public class MagmaAssignROperation extends AbstractROperation {
       }
     }
 
-    private class ValueSetCreatedValueSource extends AbstractVariableValueSource implements VariableValueSource {
-      @Override
-      public Variable getVariable() {
-        return Variable.Builder.newVariable(CREATED_COLUMN, DateTimeType.get(), table.getEntityType()).build();
-      }
-
-      @NotNull
-      @Override
-      public ValueType getValueType() {
-        return DateTimeType.get();
-      }
-
-      @NotNull
-      @Override
-      public Value getValue(ValueSet valueSet) {
-        return valueSet.getTimestamps().getCreated();
-      }
-
-      @Override
-      public boolean supportVectorSource() {
-        return true;
-      }
-
-      @NotNull
-      @Override
-      public VectorSource asVectorSource() {
-        return new VectorSource() {
-          @Override
-          public ValueType getValueType() {
-            return DateTimeType.get();
-          }
-
-          @Override
-          public Iterable<Value> getValues(SortedSet<VariableEntity> entities) {
-            return entities.stream().map(e -> table.getValueSet(e).getTimestamps().getCreated()).collect(Collectors.toList());
-          }
-        };
-      }
-    }
-
     private class ValueSetUpdatedValueSource extends AbstractVariableValueSource implements VariableValueSource {
+
+      private final Variable variable;
+
+      ValueSetUpdatedValueSource(String name) {
+        this.variable = Variable.Builder.newVariable(name, DateTimeType.get(), table.getEntityType()).build();
+      }
+
       @Override
       public Variable getVariable() {
-        return Variable.Builder.newVariable(UPDATED_COLUMN, DateTimeType.get(), table.getEntityType()).build();
+        return variable;
       }
 
       @NotNull
