@@ -13,6 +13,8 @@ import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.VariableEntity;
 
+import java.util.List;
+
 /**
  * Interface that defines the contract of mapping private VariableEntity to public instances and for creating public
  * identifiers if possible.
@@ -30,4 +32,6 @@ public interface PrivateVariableEntityMap {
   VariableEntity createPublicEntity(@NotNull VariableEntity privateEntity);
 
   VariableEntity createPrivateEntity(@NotNull VariableEntity publicEntity);
+
+  List<VariableEntity> createPrivateEntities(@NotNull List<VariableEntity> publicEntities);
 }

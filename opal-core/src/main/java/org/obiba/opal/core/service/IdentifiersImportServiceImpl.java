@@ -10,6 +10,9 @@
 package org.obiba.opal.core.service;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
@@ -58,22 +61,19 @@ public class IdentifiersImportServiceImpl implements IdentifiersImportService {
   public int importIdentifiers(@NotNull IdentifiersMapping idMapping, @NotNull IdentifierGenerator pIdentifier) {
     IdentifierGenerator localParticipantIdentifier = pIdentifier == null ? participantIdentifier : pIdentifier;
 
-    int count = 0;
-
     ValueTable identifiersTable = identifiersTableService.ensureIdentifiersTable(idMapping.getEntityType());
     Variable variable = identifiersTableService.ensureIdentifiersMapping(idMapping);
     PrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(identifiersTable, variable,
         localParticipantIdentifier);
 
-    for(IdentifiersMaps.IdentifiersMap unitId : new IdentifiersMaps(identifiersTable, idMapping.getName())) {
-      // Create a private entity for each missing unitIdentifier
-      if(!unitId.hasPrivateIdentifier()) {
-        entityMap.createPrivateEntity(unitId.getSystemEntity());
-        count++;
-      }
-    }
+    List<VariableEntity> systemEntities = StreamSupport.stream(new IdentifiersMaps(identifiersTable, idMapping.getName()).spliterator(), true) //
+    .filter(unitId -> !unitId.hasPrivateIdentifier()) //
+    .map(IdentifiersMaps.IdentifiersMap::getSystemEntity)//
+    .collect(Collectors.toList());
 
-    return count;
+    entityMap.createPrivateEntities(systemEntities);
+
+    return systemEntities.size();
   }
 
   @Override

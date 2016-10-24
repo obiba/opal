@@ -17,6 +17,8 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
@@ -236,7 +238,7 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
     }
 
     return Response.ok(values.toByteArray(), "text/csv").header("Content-Disposition",
-        "attachment; filename=\"" + table.getName() + "-" + variable.getName() + ".csv\"").build();
+        "attachment; filename=\"" + table.getEntityType() + "-" + variable.getName() + ".csv\"").build();
   }
 
   /**
@@ -265,7 +267,7 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
     }
 
     return Response.ok(values.toByteArray(), "text/plain").header("Content-Disposition",
-        "attachment; filename=\"" + table.getName() + "-" + variable.getName() + ".txt\"").build();
+        "attachment; filename=\"" + table.getEntityType() + "-" + variable.getName() + ".txt\"").build();
   }
 
   //
@@ -328,14 +330,10 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
     return MagmaEngine.get().getTransientDatasourceInstance(uid);
   }
 
-  private Iterable<IdentifiersMaps.IdentifiersMap> getUnitIdentifiers(String entityType) {
-    return Iterables
-        .filter(new IdentifiersMaps(getValueTable(entityType), name), new Predicate<IdentifiersMaps.IdentifiersMap>() {
-          @Override
-          public boolean apply(@Nullable IdentifiersMaps.IdentifiersMap input) {
-            return input != null && input.hasPrivateIdentifier();
-          }
-        });
+  private List<IdentifiersMaps.IdentifiersMap> getUnitIdentifiers(String entityType) {
+    return StreamSupport.stream(new IdentifiersMaps(getValueTable(entityType), name).spliterator(), true) //
+    .filter(map -> map != null && map.hasPrivateIdentifier()) //
+    .collect(Collectors.toList());
   }
 
   @Override
@@ -349,15 +347,19 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
   private void writeCSVValues(CSVWriter writer, ValueTable table, Variable variable) {
     // header
     writer.writeNext(new String[] { table.getEntityType(), variable.getName() });
-    for(IdentifiersMaps.IdentifiersMap unitId : getUnitIdentifiers(table.getEntityType())) {
-      writer.writeNext(new String[] { unitId.getSystemIdentifier(), unitId.getPrivateIdentifier() });
-    }
+    getUnitIdentifiers(table.getEntityType()) //
+        .forEach(unitId -> writer.writeNext(new String[] { unitId.getSystemIdentifier(), unitId.getPrivateIdentifier() }));
   }
 
   private void writePlainValues(Writer writer, ValueTable table) throws IOException {
-    for(IdentifiersMaps.IdentifiersMap unitId : getUnitIdentifiers(table.getEntityType())) {
-      writer.write(unitId.getPrivateIdentifier() + "\n");
-    }
+    getUnitIdentifiers(table.getEntityType()) //
+    .forEach(unitId -> {
+      try {
+        writer.write(unitId.getPrivateIdentifier() + "\n");
+      } catch (IOException e) {
+        // ignore
+      }
+    });
   }
 
 }
