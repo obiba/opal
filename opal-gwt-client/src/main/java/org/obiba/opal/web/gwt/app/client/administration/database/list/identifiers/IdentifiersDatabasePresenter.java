@@ -100,7 +100,7 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
   public void createSql() {
     DatabaseDto dto = createDefaultIdentifiersDatabaseDto();
     SqlSettingsDto sqlSettingsDto = SqlSettingsDto.create();
-    sqlSettingsDto.setSqlSchema(SqlSettingsDto.SqlSchema.HIBERNATE);
+    sqlSettingsDto.setSqlSchema(SqlSettingsDto.SqlSchema.JDBC);
     dto.setSqlSettings(sqlSettingsDto);
     sqlDatabaseModalProvider.get().createNewIdentifierDatabase(dto);
   }
