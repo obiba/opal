@@ -121,11 +121,9 @@ public class RReportServiceImpl implements ReportService {
       File reportDesignFile = new File(reportDesign);
       rSession = opalRSessionManager.newSubjectRSession();
       rSession.setExecutionContext("Report");
-      String originalWorkDir = getRWorkDir(rSession);
       prepareRSession(rSession, parameters, reportDesignFile);
       runReport(rSession, reportDesignFile.getName());
       readFileFromR(rSession, reportDesignFile.getName().replace(".Rmd", ".html"), reportOutput);
-      cleanRWorkDir(rSession, originalWorkDir);
     } finally {
       if(rSession != null) opalRSessionManager.removeSubjectRSession(rSession.getId());
     }
@@ -158,7 +156,7 @@ public class RReportServiceImpl implements ReportService {
     ensurePackage(rSession, "opal");
     ensurePackage(rSession, "opaladdons");
     ensurePackage(rSession, "ggplot2");
-    rSession.close();
+    opalRSessionManager.removeSubjectRSession(rSession.getId());
   }
 
   private void ensurePackage(OpalRSession rSession, String packageName) {
@@ -204,16 +202,5 @@ public class RReportServiceImpl implements ReportService {
   private void readFileFromR(OpalRSession rSession, String name, String reportOutput) throws REXPMismatchException {
     FileReadROperation rop = new FileReadROperation(name, new File(reportOutput));
     rSession.execute(rop);
-  }
-
-  private String getRWorkDir(OpalRSession rSession) throws REXPMismatchException {
-    String script = "getwd()";
-    RScriptROperation rop = execute(rSession, script);
-    return rop.getResult().asString();
-  }
-
-  private void cleanRWorkDir(OpalRSession rSession, String workDir) {
-    String script = "unlink('" + workDir + "', recursive=TRUE)";
-    execute(rSession, script);
   }
 }

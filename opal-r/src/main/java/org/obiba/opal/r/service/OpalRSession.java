@@ -27,6 +27,8 @@ import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.r.RASyncOperationTemplate;
 import org.obiba.opal.r.ROperation;
 import org.obiba.opal.r.RRuntimeException;
+import org.obiba.opal.r.RScriptROperation;
+import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RSession;
 import org.rosuda.REngine.Rserve.RserveException;
@@ -57,6 +59,8 @@ public class OpalRSession implements RASyncOperationTemplate {
   private final Date created;
 
   private Date timestamp;
+
+  private String originalWorkDir;
 
   private boolean busy = false;
 
@@ -98,6 +102,12 @@ public class OpalRSession implements RASyncOperationTemplate {
     this.user = user;
     created = new Date();
     timestamp = created;
+
+    try {
+      originalWorkDir = getRWorkDir();
+    } catch (Exception e) {
+      // ignore
+    }
   }
 
   /**
@@ -238,6 +248,12 @@ public class OpalRSession implements RASyncOperationTemplate {
     if(isClosed()) return;
 
     try {
+      cleanRWorkDir();
+    } catch(Exception e) {
+      // ignore
+    }
+
+    try {
       newConnection().close();
     } catch(Exception e) {
       // ignore
@@ -264,6 +280,19 @@ public class OpalRSession implements RASyncOperationTemplate {
   //
   // private methods
   //
+
+
+  private String getRWorkDir() throws REXPMismatchException {
+    RScriptROperation rop = new RScriptROperation("getwd()", false);
+    execute(rop);
+    return rop.getResult().asString();
+  }
+
+  private void cleanRWorkDir() {
+    if (Strings.isNullOrEmpty(originalWorkDir)) return;
+    RScriptROperation rop = new RScriptROperation(String.format("unlink('%s', recursive=TRUE)", originalWorkDir), false);
+    execute(rop);
+  }
 
   /**
    * Get the workspaces directory for the current execution context.
