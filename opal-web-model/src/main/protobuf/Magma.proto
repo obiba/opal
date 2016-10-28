@@ -87,6 +87,7 @@ message JdbcValueTableSettingsDto {
   optional string entityIdentifiersWhere = 7;
   optional string excludedColumns = 8;
   optional string includedColumns = 9;
+  optional bool repeatables = 10;
 }
 
 message HibernateDatasourceFactoryDto {

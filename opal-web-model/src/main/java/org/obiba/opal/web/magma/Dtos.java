@@ -65,25 +65,12 @@ public final class Dtos {
   // private static final Logger log = LoggerFactory.getLogger(Dtos.class);
 
   public static final Function<VariableEntity, VariableEntityDto> variableEntityAsDtoFunc
-      = new Function<VariableEntity, VariableEntityDto>() {
-
-    @Override
-    public VariableEntityDto apply(VariableEntity from) {
-      return asDto(from).build();
-    }
-
-  };
+      = from -> asDto(from).build();
 
   private Dtos() {}
 
   public static Function<Variable, VariableDto.Builder> asDtoFunc(final LinkDto tableLink) {
-    return new Function<Variable, VariableDto.Builder>() {
-
-      @Override
-      public VariableDto.Builder apply(Variable from) {
-        return asDto(tableLink, from);
-      }
-    };
+    return from -> asDto(tableLink, from);
   }
 
   @SuppressWarnings("PMD.NcssMethodCount")
@@ -111,9 +98,7 @@ public final class Dtos {
     if(tableLink != null) {
       var.setParentLink(tableLink);
     }
-//    if(index != null) {
-//      var.setIndex(index);
-//    }
+    var.setIndex(from.getIndex());
     return var;
   }
 
