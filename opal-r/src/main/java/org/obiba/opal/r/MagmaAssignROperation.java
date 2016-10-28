@@ -243,20 +243,22 @@ public class MagmaAssignROperation extends AbstractROperation {
     private void doAssignDataFrame(String... names) {
       // create the data.frame from the vectors
       StringBuilder args = new StringBuilder();
-      if (withIdColumn())
-        args.append("'").append(idColumnName).append("'=").append(getTmpVectorName(symbol, idColumnName));
+      if (withIdColumn()) {
+        args.append(String.format("'%s'=%s", idColumnName, getTmpVectorName(symbol, idColumnName)));
+      }
+
       if (withUpdatedColumn()) {
         if(args.length() > 0) args.append(", ");
-        args.append("'").append(updatedColumnName).append("'=").append(getTmpVectorName(symbol, updatedColumnName));
+        args.append(String.format("'%s'=%s", updatedColumnName, getTmpVectorName(symbol, updatedColumnName)));
       }
       for(String name : names) {
         if(args.length() > 0) args.append(", ");
-        args.append("'").append(name).append("'=").append(getTmpVectorName(symbol, name));
+        args.append(String.format("'%s'=%s", name, getTmpVectorName(symbol, name)));
       }
       if (!withIdColumn())
-        args.append(", row.names=").append(getTmpVectorName(symbol, "row.names"));
+        args.append(String.format(", row.names=%s", getTmpVectorName(symbol, "row.names")));
       log.info("data.frame arguments: {}", args);
-      eval(String.format("base::assign('%s', data.frame(%s))", symbol, args), false);
+      eval(String.format("base::assign('%s', data.frame(%s, stringsAsFactors=FALSE))", symbol, args), false);
     }
 
     private void doRemoveTmpVectors(String... names) {

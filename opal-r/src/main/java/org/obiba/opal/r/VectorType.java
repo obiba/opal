@@ -254,7 +254,6 @@ public enum VectorType {
   /**
    * Build a R vector of strings.
    *
-   * @param variable
    * @param size
    * @param values
    * @return
