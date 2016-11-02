@@ -72,6 +72,12 @@
       <groupId>org.obiba.opal</groupId>
       <artifactId>opal-web-model</artifactId>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.jayway.jsonpath</groupId>
+          <artifactId>json-path</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
