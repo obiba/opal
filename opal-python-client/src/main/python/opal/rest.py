@@ -39,6 +39,7 @@ Examples of Opal web services on which GET can be performed:
 """
 
 import sys
+import ast
 import opal.core
 
 
@@ -52,6 +53,7 @@ def add_arguments(parser):
     parser.add_argument('--accept', '-a', required=False, help='Accept header (default is application/json)')
     parser.add_argument('--content-type', '-ct', required=False,
                         help='Content-Type header (default is application/json)')
+    parser.add_argument('--headers', '-hs', required=False, help='Custom headers in the form of: { "Key2": "Value2", "Key2": "Value2" }')
     parser.add_argument('--json', '-j', action='store_true', help='Pretty JSON formatting of the response')
 
 
@@ -73,6 +75,11 @@ def do_command(args):
             request.content_type(args.content_type)
             print 'Enter content:'
             request.content(sys.stdin.read())
+
+        if args.headers:
+            headers = ast.literal_eval(args.headers)
+            for key in headers.keys():
+                request.header(key, headers[key])
 
         if args.verbose:
             request.verbose()
