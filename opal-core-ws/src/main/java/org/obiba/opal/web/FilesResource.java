@@ -9,63 +9,18 @@
  */
 package org.obiba.opal.web;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.UUID;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
-import javax.activation.MimetypesFileTypeMap;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-
+import com.google.common.base.Strings;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSelector;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileType;
-import org.apache.commons.vfs2.Selectors;
+import org.apache.commons.vfs2.*;
 import org.codehaus.jettison.json.JSONArray;
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.core.util.StreamUtil;
-import org.obiba.opal.core.domain.OpalGeneralConfig;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.security.OpalPermissions;
-import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.AclAction;
@@ -75,8 +30,23 @@ import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import javax.activation.MimetypesFileTypeMap;
+import javax.annotation.Nullable;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+import java.io.*;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Component
 @Path("/files")
@@ -89,6 +59,8 @@ public class FilesResource {
   private SubjectAclService subjectAclService;
 
   private final MimetypesFileTypeMap mimeTypes = new MimetypesFileTypeMap();
+
+  private final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
 
   @Autowired
   public void setOpalRuntime(OpalRuntime opalRuntime) {
@@ -120,18 +92,21 @@ public class FilesResource {
   @GET
   @Path("/")
   @AuthenticatedByCookie
-  public Response getFileSystemRoot() throws IOException {
-    return getFile("/", null);
+  public Response getFileSystemRoot(@HeaderParam("X-File-Key") String password) throws IOException {
+    return getFile("/", null, password);
   }
 
   @GET
   @Path("/{path:.*}")
   @AuthenticatedByCookie
-  public Response getFile(@PathParam("path") String path, @QueryParam("file") List<String> children)
+  public Response getFile(@PathParam("path") String path, @QueryParam("file") List<String> children, @HeaderParam("X-File-Key") String fileKey)
       throws IOException {
+    if (!Strings.isNullOrEmpty(fileKey) && fileKey.length()<8) {
+      return Response.status(Status.BAD_REQUEST).entity("The file key is too short (minimum 8 characters).").build();
+    }
     FileObject file = resolveFileInFileSystem(path);
     return file.exists()
-        ? file.getType() == FileType.FILE ? getFile(file) : getFolder(file, children)
+        ? file.getType() == FileType.FILE ? getFile(file, fileKey) : getFolder(file, children, fileKey)
         : getPathNotExistResponse(path);
   }
 
@@ -400,16 +375,23 @@ public class FilesResource {
     return opalRuntime.getFileSystem().getRoot().resolveFile(path);
   }
 
-  private Response getFile(FileObject file) {
+  private Response getFile(FileObject file, String key) throws IOException {
     File localFile = opalRuntime.getFileSystem().getLocalFile(file);
-    String mimeType = mimeTypes.getContentType(localFile);
+    File output = localFile;
+    if (!Strings.isNullOrEmpty(key)) {
+      File tmpDir = new File(System.getProperty("java.io.tmpdir"), "opal-" + dateTimeFormatter.format(System.currentTimeMillis()));
+      tmpDir.mkdirs();
+      tmpDir.deleteOnExit();
+      output = org.obiba.core.util.FileUtil.zip(localFile, new File(tmpDir, localFile.getName() + ".zip"), key);
+    }
 
-    return Response.ok(localFile, mimeType)
-        .header("Content-Disposition", getContentDispositionOfAttachment(localFile.getName())).build();
+    String mimeType = mimeTypes.getContentType(output);
+    return Response.ok(output, mimeType)
+        .header("Content-Disposition", getContentDispositionOfAttachment(output.getName())).build();
   }
 
-  private Response getFolder(FileObject folder, Collection<String> children) throws IOException {
-    SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
+  private Response getFolder(FileObject folder, Collection<String> children, String key) throws IOException {
+    // TODO refactor with ZipBuilder and handle encryption key
     String folderName = folder.getName().getBaseName();
     File compressedFolder = new File(System.getProperty("java.io.tmpdir"),
         ("".equals(folderName) ? "filesystem" : folderName) + "_" +

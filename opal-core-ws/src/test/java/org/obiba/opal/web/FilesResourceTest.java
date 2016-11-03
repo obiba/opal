@@ -232,7 +232,7 @@ public class FilesResourceTest {
 
   @SuppressWarnings("unchecked")
   private void checkCompressedFolder(String folderPath, String... expectedFolderContentArray) throws IOException {
-    Response response = filesResource.getFile(folderPath, null);
+    Response response = filesResource.getFile(folderPath, null, null);
     ZipFile zipfile = new ZipFile(((File) response.getEntity()).getPath());
 
     // Check that all folders and files exist in the compressed archive that represents the folder.
