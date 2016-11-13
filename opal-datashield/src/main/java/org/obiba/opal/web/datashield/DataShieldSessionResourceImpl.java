@@ -32,6 +32,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Component("dataShieldSessionResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -46,6 +47,9 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
 
   @Autowired
   private IdentifiersTableService identifiersTableService;
+
+  @Autowired
+  private TransactionTemplate txTemplate;
 
   @Override
   public Response aggregate(@QueryParam("async") @DefaultValue("false") boolean async, String body) {
@@ -83,6 +87,7 @@ public class DataShieldSessionResourceImpl extends AbstractRSessionResource impl
     resource.setName(name);
     resource.setOpalRSession(getOpalRSession());
     resource.setIdentifiersTableService(identifiersTableService);
+    resource.setTransactionTemplate(txTemplate);
     return resource;
   }
 

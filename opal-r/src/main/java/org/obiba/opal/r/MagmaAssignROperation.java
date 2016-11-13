@@ -26,6 +26,9 @@ import org.obiba.opal.core.service.IdentifiersTableService;
 import org.rosuda.REngine.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
@@ -41,6 +44,9 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   @NotNull
   private final IdentifiersTableService identifiersTableService;
+
+  @NotNull
+  private final TransactionTemplate transactionTemplate;
 
   @NotNull
   private final String symbol;
@@ -65,11 +71,11 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   @SuppressWarnings("ConstantConditions")
   public MagmaAssignROperation(@NotNull String symbol, @NotNull String path, String variableFilter,
-      boolean withMissings, String idColumnName, String updatedColumnName, String identifiersMapping,
-                               @NotNull IdentifiersTableService identifiersTableService) {
-    if(symbol == null) throw new IllegalArgumentException("symbol cannot be null");
-    if(path == null) throw new IllegalArgumentException("path cannot be null");
-    if(identifiersTableService == null) throw new IllegalArgumentException("identifiers table service cannot be null");
+                               boolean withMissings, String idColumnName, String updatedColumnName, String identifiersMapping,
+                               @NotNull IdentifiersTableService identifiersTableService, @NotNull TransactionTemplate transactionTemplate) {
+    if (symbol == null) throw new IllegalArgumentException("symbol cannot be null");
+    if (path == null) throw new IllegalArgumentException("path cannot be null");
+    if (identifiersTableService == null) throw new IllegalArgumentException("identifiers table service cannot be null");
     this.symbol = symbol;
     this.path = path;
     this.variableFilter = variableFilter;
@@ -78,25 +84,26 @@ public class MagmaAssignROperation extends AbstractROperation {
     this.idColumnName = idColumnName;
     this.updatedColumnName = updatedColumnName;
     this.identifiersTableService = identifiersTableService;
+    this.transactionTemplate = transactionTemplate;
   }
 
   @Override
   public void doWithConnection() {
     try {
-      for(MagmaRConverter converter : magmaRConverters) {
-        if(converter.canResolve(path)) {
+      for (MagmaRConverter converter : magmaRConverters) {
+        if (converter.canResolve(path)) {
           converter.doAssign(symbol, path, withMissings, identifiersMapping);
           return;
         }
       }
-    } catch(MagmaRuntimeException e) {
+    } catch (MagmaRuntimeException e) {
       throw new MagmaRRuntimeException("Failed resolving path '" + path + "'", e);
     }
     throw new MagmaRRuntimeException("No R converter found for path '" + path + "'");
   }
 
   private SortedSet<VariableEntity> getEntities() {
-    if(entities == null) throw new IllegalStateException("call setEntities() first");
+    if (entities == null) throw new IllegalStateException("call setEntities() first");
     return entities;
   }
 
@@ -170,7 +177,7 @@ public class MagmaAssignROperation extends AbstractROperation {
     protected ValueTable applyIdentifiersMapping(ValueTable table, String idMapping) {
       // If the table contains an entity that requires identifiers separation, create a "identifers view" of the table (replace
       // public (system) identifiers with private identifiers).
-      if(!Strings.isNullOrEmpty(idMapping) &&
+      if (!Strings.isNullOrEmpty(idMapping) &&
           identifiersTableService.hasIdentifiersMapping(table.getEntityType(), idMapping)) {
         // Make a view that converts opal identifiers to unit identifiers
         return new IdentifiersMappingView(idMapping, IdentifiersMappingView.Policy.UNIT_IDENTIFIERS_ARE_PUBLIC, table,
@@ -205,7 +212,7 @@ public class MagmaAssignROperation extends AbstractROperation {
      * @return
      */
     REXP asVector(boolean withMissings) {
-      if(table == null) throw new IllegalStateException("Table must not be null");
+      if (table == null) throw new IllegalStateException("Table must not be null");
       prepareEntities(table);
       REXP ids = getIdsVector(withMissings);
       return createDataFrame(ids);
@@ -215,13 +222,13 @@ public class MagmaAssignROperation extends AbstractROperation {
     public void doAssign(String symbol, String path, boolean withMissings, String identifiersMapping) {
       // OPAL-2710 assigning a data.frame directly fails with a lot of rows
       resolvePath(path, identifiersMapping);
-      if(table == null) throw new IllegalStateException("Table must not be null");
+      if (table == null) throw new IllegalStateException("Table must not be null");
       prepareEntities(table);
       REXP ids = getIdsVector(withMissings);
       RList list = getVariableVectors();
 
       String[] names = list.keys();
-      if(names == null || names.length == 0) return;
+      if (names == null || names.length == 0) return;
 
       doAssignTmpVectors(ids, names, list);
       doAssignDataFrame(names);
@@ -230,7 +237,7 @@ public class MagmaAssignROperation extends AbstractROperation {
 
     private void doAssignTmpVectors(REXP ids, String[] names, RList list) {
       // one temporary vector per variable
-      for(String name : names) {
+      for (String name : names) {
         assign(getTmpVectorName(symbol, name), list.at(name));
       }
       if (withUpdatedColumn()) {
@@ -248,11 +255,11 @@ public class MagmaAssignROperation extends AbstractROperation {
       }
 
       if (withUpdatedColumn()) {
-        if(args.length() > 0) args.append(", ");
+        if (args.length() > 0) args.append(", ");
         args.append(String.format("'%s'=%s", updatedColumnName, getTmpVectorName(symbol, updatedColumnName)));
       }
-      for(String name : names) {
-        if(args.length() > 0) args.append(", ");
+      for (String name : names) {
+        if (args.length() > 0) args.append(", ");
         args.append(String.format("'%s'=%s", name, getTmpVectorName(symbol, name)));
       }
       if (!withIdColumn())
@@ -263,7 +270,7 @@ public class MagmaAssignROperation extends AbstractROperation {
 
     private void doRemoveTmpVectors(String... names) {
       // remove temporary vectors
-      for(String name : names) {
+      for (String name : names) {
         eval("base::rm(" + getTmpVectorName(symbol, name) + ")", false);
       }
       eval("base::rm(" + getTmpVectorName(symbol, withIdColumn() ? idColumnName : "row.names") + ")", false);
@@ -302,10 +309,15 @@ public class MagmaAssignROperation extends AbstractROperation {
       StreamSupport.stream(filterVariables().spliterator(), true) //
           .map(v -> table.getVariableValueSource(v.getName())) //
           .filter(vvs -> !vvs.getVariable().isRepeatable()) //
-          .forEach(vvs -> {
-            contents.add(getVector(vvs, getEntities(), withMissings));
-            names.add(vvs.getVariable().getName());
-          });
+          .forEach(vvs ->
+              transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+                @Override
+                protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
+                  contents.add(getVector(vvs, getEntities(), withMissings));
+                  names.add(vvs.getVariable().getName());
+                }
+              })
+          );
 
       return new RList(contents, names);
     }
@@ -326,12 +338,12 @@ public class MagmaAssignROperation extends AbstractROperation {
 
       // parallelize value set extraction
       StreamSupport.stream(table.getValueSets(entities).spliterator(), true) //
-      .forEach(valueSet ->
-        variables.forEach(variable -> {
-          Value value = table.getValue(variable, valueSet);
-          variableValues.get(variable.getName()).put(valueSet.getVariableEntity().getIdentifier(), value);
-        })
-      );
+          .forEach(valueSet ->
+              variables.forEach(variable -> {
+                Value value = table.getValue(variable, valueSet);
+                variableValues.get(variable.getName()).put(valueSet.getVariableEntity().getIdentifier(), value);
+              })
+          );
 
       // vector for each variable, values in the same order as entities
       variables.forEach(v -> {
@@ -352,9 +364,9 @@ public class MagmaAssignROperation extends AbstractROperation {
     protected Iterable<Variable> filterVariables() {
       List<Variable> filteredVariables;
       List<Variable> nonRepeatableVariables = StreamSupport.stream(table.getVariables().spliterator(), false) //
-      .filter(v -> !v.isRepeatable()).collect(Collectors.toList());
+          .filter(v -> !v.isRepeatable()).collect(Collectors.toList());
 
-      if(Strings.isNullOrEmpty(variableFilter)) {
+      if (Strings.isNullOrEmpty(variableFilter)) {
         filteredVariables = nonRepeatableVariables;
       } else {
         JavascriptClause jsClause = new JavascriptClause(variableFilter);
@@ -370,18 +382,18 @@ public class MagmaAssignROperation extends AbstractROperation {
      */
     private REXP createDataFrame(REXP ids) {
       return new REXPGenericVector(null, new REXPList(new RList( //
-          new REXP[] { //
+          new REXP[]{ //
               new REXPString("data.frame"), //
-              ids }, //
-          new String[] { //
+              ids}, //
+          new String[]{ //
               "class", //
-              "row.names" })));
+              "row.names"})));
     }
 
     private void resolvePath(String path, String idMapping) {
       MagmaEngineReferenceResolver resolver = MagmaEngineTableResolver.valueOf(path);
 
-      if(resolver.getDatasourceName() == null) {
+      if (resolver.getDatasourceName() == null) {
         throw new MagmaRRuntimeException("Datasource is not defined in path: " + path);
       }
       Datasource ds = MagmaEngine.get().getDatasource(resolver.getDatasourceName());
@@ -506,11 +518,11 @@ public class MagmaAssignROperation extends AbstractROperation {
     private void resolvePath(String path, String idMapping) {
       MagmaEngineVariableResolver resolver = MagmaEngineVariableResolver.valueOf(path);
 
-      if(resolver.getVariableName() == null) {
+      if (resolver.getVariableName() == null) {
         throw new MagmaRRuntimeException("Variable is not defined in path: " + path);
       }
 
-      if(resolver.getDatasourceName() == null) {
+      if (resolver.getDatasourceName() == null) {
         throw new MagmaRRuntimeException("Datasource is not defined in path: " + path);
       }
 

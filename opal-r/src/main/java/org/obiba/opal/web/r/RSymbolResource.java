@@ -12,6 +12,7 @@ package org.obiba.opal.web.r;
 
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.r.service.OpalRSession;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -26,6 +27,8 @@ public interface RSymbolResource {
   void setOpalRSession(OpalRSession rSession);
 
   void setIdentifiersTableService(IdentifiersTableService identifiersTableService);
+
+  void setTransactionTemplate(TransactionTemplate transactionTemplate);
 
   String getName();
 
