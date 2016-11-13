@@ -15,6 +15,8 @@ import org.obiba.opal.r.ROperation;
 import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.StringAssignROperation;
 import org.obiba.opal.r.service.OpalRSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
@@ -27,6 +29,8 @@ import java.net.URI;
  * defined, otherwise the web service calls will fail with a 404 status.
  */
 public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
+
+  private TransactionTemplate transactionTemplate;
 
   private String name;
 
@@ -52,6 +56,11 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   @Override
   public void setIdentifiersTableService(IdentifiersTableService identifiersTableService) {
     this.identifiersTableService = identifiersTableService;
+  }
+
+  @Override
+  public void setTransactionTemplate(TransactionTemplate transactionTemplate) {
+    this.transactionTemplate = transactionTemplate;
   }
 
   @Override
@@ -81,7 +90,7 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
                            String idName, String updatedName, String identifiersMapping,
                            boolean async) {
     return assignSymbol(uri,
-        new MagmaAssignROperation(name, path, variableFilter, withMissings, idName, updatedName, identifiersMapping, identifiersTableService), async);
+        new MagmaAssignROperation(name, path, variableFilter, withMissings, idName, updatedName, identifiersMapping, identifiersTableService, transactionTemplate), async);
   }
 
   @Override

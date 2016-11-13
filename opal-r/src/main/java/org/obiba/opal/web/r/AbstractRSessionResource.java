@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
 
@@ -46,6 +47,9 @@ public abstract class AbstractRSessionResource implements RSessionResource {
 
   @Autowired
   private IdentifiersTableService identifiersTableService;
+
+  @Autowired
+  private TransactionTemplate txTemplate;
 
   private OpalRSession rSession;
 
@@ -197,6 +201,7 @@ public abstract class AbstractRSessionResource implements RSessionResource {
     resource.setName(name);
     resource.setOpalRSession(rSession);
     resource.setIdentifiersTableService(identifiersTableService);
+    resource.setTransactionTemplate(txTemplate);
     return resource;
   }
 
