@@ -179,17 +179,17 @@ public class EsResultConverter {
 
     private void convertStats(JSONObject jsonStatistical, Search.FacetResultDto.Builder dtoResultBuilder)
         throws JSONException {
-
-      if(countAboveThreshold(jsonStatistical.getInt("count"))) {
+      int count = jsonStatistical.getInt("count");
+      if(countAboveThreshold(count)) {
         Search.FacetResultDto.StatisticalResultDto dtoStatistical = Search.FacetResultDto.StatisticalResultDto
-            .newBuilder().setCount(jsonStatistical.getInt("count")).setTotal(
-                (float) jsonStatistical.getDouble("sum")) //
-            .setMin((float) jsonStatistical.getDouble("min")) //
-            .setMax((float) jsonStatistical.getDouble("max")) //
-            .setMean((float) jsonStatistical.getDouble("avg")) //
-            .setSumOfSquares((float) jsonStatistical.getDouble("sum_of_squares")) //
-            .setVariance((float) jsonStatistical.getDouble("variance")) //
-            .setStdDeviation((float) jsonStatistical.getDouble("std_deviation")).build();
+            .newBuilder().setCount(count) //
+            .setTotal(jsonStatistical.isNull("sum") ? 0 : (float) jsonStatistical.getDouble("sum")) //
+            .setMin(jsonStatistical.isNull("min") ? 0 : (float) jsonStatistical.getDouble("min")) //
+            .setMax(jsonStatistical.isNull("max") ? 0 : (float) jsonStatistical.getDouble("max")) //
+            .setMean(jsonStatistical.isNull("avg") ? 0 : (float) jsonStatistical.getDouble("avg")) //
+            .setSumOfSquares(jsonStatistical.isNull("sum_of_squares") ? 0 : (float) jsonStatistical.getDouble("sum_of_squares")) //
+            .setVariance(jsonStatistical.isNull("variance") ? 0 : (float) jsonStatistical.getDouble("variance")) //
+            .setStdDeviation(jsonStatistical.isNull("std_deviation") ? 0 : (float) jsonStatistical.getDouble("std_deviation")).build();
 
         dtoResultBuilder.setStatistics(dtoStatistical);
       }

@@ -20,6 +20,8 @@ import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.IndexManagerHelper;
 import org.obiba.opal.web.search.support.SearchQueryExecutorFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -33,6 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Scope("request")
 @Path("/datasource/{ds}/table/{table}/facets")
 public class ValueTableFacetsResource {
+
+  private static final Logger log = LoggerFactory.getLogger(ValueTableFacetsResource.class);
 
   @Autowired
   protected ElasticSearchProvider esProvider;
@@ -65,7 +69,8 @@ public class ValueTableFacetsResource {
     } catch(UnsupportedOperationException e) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     } catch(JSONException e) {
-      return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+      log.error("Error when extracting facet from {}.{}", datasource, table, e);
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }
 }
