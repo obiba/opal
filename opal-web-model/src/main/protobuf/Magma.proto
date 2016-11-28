@@ -139,6 +139,7 @@ message SpssDatasourceFactoryDto {
   optional string characterSet = 2;
   optional string entityType = 3;
   optional string locale = 4;
+  optional string idVariable = 5;
   extend DatasourceFactoryDto {
     optional SpssDatasourceFactoryDto params = 1009;
   }
