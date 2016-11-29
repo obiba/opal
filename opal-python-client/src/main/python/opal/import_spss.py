@@ -17,6 +17,7 @@ def add_arguments(parser):
     parser.add_argument('--characterSet', '-c', required=False, help='Character set.')
     parser.add_argument('--locale', '-l', required=False, help='SPSS file locale (e.g. fr, en...).')
     parser.add_argument('--type', '-ty', required=False, help='Entity type (e.g. Participant)')
+    parser.add_argument('--idVariable', '-iv', required=False, help='SPSS variable that provides the entity ID. If not specified, first variable values are considered to be the entity identifiers.')
 
     # non specific import arguments
     opal.io.add_import_arguments(parser)
@@ -34,7 +35,7 @@ def do_command(args):
                                               policy=args.policy, verbose=args.verbose)
         # print result
         extension_factory = OpalExtensionFactory(characterSet=args.characterSet, path=args.path,
-                                                 locale=args.locale, entityType=args.type)
+                                                 locale=args.locale, entityType=args.type, idVariable=args.idVariable)
 
         response = importer.submit(extension_factory)
 
@@ -55,11 +56,12 @@ def do_command(args):
 
 
 class OpalExtensionFactory(opal.io.OpalImporter.ExtensionFactoryInterface):
-    def __init__(self, characterSet, path, locale, entityType):
+    def __init__(self, characterSet, path, locale, entityType, idVariable):
         self.characterSet = characterSet
         self.path = path
         self.locale = locale
         self.entityType = entityType
+        self.idVariable = idVariable
 
 
     def add(self, factory):
@@ -77,3 +79,6 @@ class OpalExtensionFactory(opal.io.OpalImporter.ExtensionFactoryInterface):
 
         if self.entityType:
             factory.entityType = self.entityType
+
+        if self.idVariable:
+            factory.idVariable = self.idVariable
