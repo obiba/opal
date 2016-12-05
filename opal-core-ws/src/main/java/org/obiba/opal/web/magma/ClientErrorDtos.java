@@ -101,7 +101,7 @@ public class ClientErrorDtos {
     if(exception instanceof WrappedException)
       message = ((WrappedException) exception).getWrappedException().getMessage();
     return getErrorMessage(responseStatus, errorStatus) //
-        .addArguments(message) //
+        .addArguments(message == null ? "" : message) //
         .addExtension(JavaScriptErrorDto.errors, newErrorDto(exception).build()).build();
   }
 
@@ -135,7 +135,7 @@ public class ClientErrorDtos {
     if(exception instanceof WrappedException)
       message = ((WrappedException) exception).getWrappedException().getMessage();
     JavaScriptErrorDto.Builder builder = JavaScriptErrorDto.newBuilder() //
-        .setMessage(message) //
+        .setMessage(message == null ? "" : message) //
         .setSourceName(exception.sourceName()) //
         .setLineNumber(exception.lineNumber()); //
     if(exception.lineSource() != null) {
