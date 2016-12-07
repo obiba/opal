@@ -39,10 +39,12 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.ZipEntry;
@@ -376,18 +378,25 @@ public class FilesResource {
   }
 
   private Response getFile(FileObject file, String key) throws IOException {
-    File localFile = opalRuntime.getFileSystem().getLocalFile(file);
-    File output = localFile;
-    if (!Strings.isNullOrEmpty(key)) {
-      File tmpDir = new File(System.getProperty("java.io.tmpdir"), "opal-" + dateTimeFormatter.format(System.currentTimeMillis()));
-      tmpDir.mkdirs();
-      tmpDir.deleteOnExit();
-      output = org.obiba.core.util.FileUtil.zip(localFile, new File(tmpDir, localFile.getName() + ".zip"), key);
-    }
+    final File localFile = opalRuntime.getFileSystem().getLocalFile(file);
+    String fileName = Strings.isNullOrEmpty(key) ? localFile.getName() : localFile.getName() + ".zip";
+    String mimeType = mimeTypes.getContentType(fileName);
 
-    String mimeType = mimeTypes.getContentType(output);
-    return Response.ok(output, mimeType)
-        .header("Content-Disposition", getContentDispositionOfAttachment(output.getName())).build();
+    StreamingOutput stream = os -> {
+      File output = localFile;
+      if (!Strings.isNullOrEmpty(key)) {
+        File tmpDir = new File(System.getProperty("java.io.tmpdir"), "opal-" + dateTimeFormatter.format(System.currentTimeMillis()));
+        tmpDir.mkdirs();
+        output = org.obiba.core.util.FileUtil.zip(localFile, new File(tmpDir, localFile.getName() + ".zip"), key);
+      }
+      Files.copy(output.toPath(), os);
+      if (!Strings.isNullOrEmpty(key)) {
+        output.getParentFile().delete();
+      }
+    };
+
+    return Response.ok(stream, mimeType)
+        .header("Content-Disposition", getContentDispositionOfAttachment(fileName)).build();
   }
 
   private Response getFolder(FileObject folder, Collection<String> children, String key) throws IOException {
@@ -396,12 +405,15 @@ public class FilesResource {
     File compressedFolder = new File(System.getProperty("java.io.tmpdir"),
         ("".equals(folderName) ? "filesystem" : folderName) + "_" +
             dateTimeFormatter.format(System.currentTimeMillis()) + ".zip");
-    compressedFolder.deleteOnExit();
     String mimeType = mimeTypes.getContentType(compressedFolder);
-
     compressFolder(compressedFolder, folder, children);
 
-    return Response.ok(compressedFolder, mimeType)
+    StreamingOutput stream = os -> {
+      Files.copy(compressedFolder.toPath(), os);
+      compressedFolder.delete();
+    };
+
+    return Response.ok(stream, mimeType)
         .header("Content-Disposition", getContentDispositionOfAttachment(compressedFolder.getName())).build();
   }
 
@@ -453,13 +465,7 @@ public class FilesResource {
     // Get the children for the current folder (list of files & folders).
     List<FileObject> children = Arrays.asList(parentFolder.getChildren());
 
-    Collections.sort(children, new Comparator<FileObject>() {
-
-      @Override
-      public int compare(FileObject arg0, FileObject arg1) {
-        return arg0.getName().compareTo(arg1.getName());
-      }
-    });
+    Collections.sort(children, (arg0, arg1) -> arg0.getName().compareTo(arg1.getName()));
 
     // Loop through all children.
     for(FileObject child : children) {
