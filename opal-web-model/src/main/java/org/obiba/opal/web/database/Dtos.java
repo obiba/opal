@@ -99,7 +99,7 @@ public class Dtos {
     if (dto.hasEntityIdentifiersWhere()) settings.setEntityIdentifiersWhere(dto.getEntityIdentifiersWhere());
     if (dto.hasExcludedColumns()) settings.setExcludedColumns(dto.getExcludedColumns());
     if (dto.hasIncludedColumns()) settings.setIncludedColumns(dto.getIncludedColumns());
-    settings.setRepeatables(dto.getRepeatables());
+    settings.setMultilines(dto.getMultilines() || dto.getRepeatables());
     return settings;
   }
 
@@ -212,7 +212,7 @@ public class Dtos {
     if(jdbcSettings.hasEntityIdentifiersWhere()) builder.setEntityIdentifiersWhere(jdbcSettings.getEntityIdentifiersWhere());
     if(jdbcSettings.hasExcludedColumns()) builder.setExcludedColumns(jdbcSettings.getExcludedColumns());
     if(jdbcSettings.hasIncludedColumns()) builder.setIncludedColumns(jdbcSettings.getIncludedColumns());
-    builder.setRepeatables(jdbcSettings.isRepeatables());
+    builder.setMultilines(jdbcSettings.isMultilines() || jdbcSettings.isRepeatables());
     return builder;
   }
 
