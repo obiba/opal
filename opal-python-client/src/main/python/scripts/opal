@@ -38,7 +38,7 @@ def add_opal_arguments(parser):
     """
     Add Opal access arguments
     """
-    parser.add_argument('--opal', '-o', required=False, help='Opal server base url')
+    parser.add_argument('--opal', '-o', required=False, default='http://localhost:8080', help='Opal server base url (default: http://localhost:8080)')
     parser.add_argument('--user', '-u', required=False, help='User name')
     parser.add_argument('--password', '-p', required=False, help='User password')
     parser.add_argument('--ssl-cert', '-sc', required=False, help='Certificate (public key) file')
