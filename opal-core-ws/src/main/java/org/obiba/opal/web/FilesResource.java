@@ -42,6 +42,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 import java.io.*;
+import java.io.FileFilter;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -377,6 +378,13 @@ public class FilesResource {
     return opalRuntime.getFileSystem().getRoot().resolveFile(path);
   }
 
+  FileObject resolveFileInFileSystem(File localFile) throws FileSystemException {
+    FileObject root = opalRuntime.getFileSystem().getRoot();
+    File localRoot = opalRuntime.getFileSystem().getLocalFile(root);
+    String path = localFile.getAbsolutePath().replace(localRoot.getAbsolutePath(), "");
+    return root.resolveFile(path);
+  }
+
   private Response getFile(FileObject file, String key) throws IOException {
     final File localFile = opalRuntime.getFileSystem().getLocalFile(file);
     String fileName = Strings.isNullOrEmpty(key) ? localFile.getName() : localFile.getName() + ".zip";
@@ -384,6 +392,7 @@ public class FilesResource {
 
     StreamingOutput stream = os -> {
       File output = localFile;
+      // if file key is provided, file is encrypted in a zip
       if (!Strings.isNullOrEmpty(key)) {
         File tmpDir = new File(System.getProperty("java.io.tmpdir"), "opal-" + dateTimeFormatter.format(System.currentTimeMillis()));
         tmpDir.mkdirs();
@@ -400,21 +409,35 @@ public class FilesResource {
   }
 
   private Response getFolder(FileObject folder, Collection<String> children, String key) throws IOException {
-    // TODO refactor with ZipBuilder and handle encryption key
-    String folderName = folder.getName().getBaseName();
-    File compressedFolder = new File(System.getProperty("java.io.tmpdir"),
-        ("".equals(folderName) ? "filesystem" : folderName) + "_" +
-            dateTimeFormatter.format(System.currentTimeMillis()) + ".zip");
-    String mimeType = mimeTypes.getContentType(compressedFolder);
-    compressFolder(compressedFolder, folder, children);
+    final File localFolder = opalRuntime.getFileSystem().getLocalFile(folder);
+    final String fileName = localFolder.getName() + ".zip";
+    String mimeType = mimeTypes.getContentType(fileName);
 
     StreamingOutput stream = os -> {
-      Files.copy(compressedFolder.toPath(), os);
-      compressedFolder.delete();
+      File tmpDir = new File(System.getProperty("java.io.tmpdir"), "opal-" + dateTimeFormatter.format(System.currentTimeMillis()));
+      tmpDir.mkdirs();
+      File output = org.obiba.core.util.FileUtil.zip(localFolder, pathname -> {
+        // check read access
+        try {
+          FileObject fileObject = resolveFileInFileSystem(pathname);
+          if (!fileObject.isReadable()) return false;
+        } catch (FileSystemException e) {
+          return false;
+        }
+        // check first level filter
+        if (children == null || children.isEmpty()) return true;
+        if (pathname.getParentFile().equals(localFolder)) {
+          return children.contains(pathname.getName());
+        }
+        // anything else is ok
+        return true;
+      }, new File(tmpDir, fileName), key);
+      Files.copy(output.toPath(), os);
+      tmpDir.delete();
     };
 
     return Response.ok(stream, mimeType)
-        .header("Content-Disposition", getContentDispositionOfAttachment(compressedFolder.getName())).build();
+        .header("Content-Disposition", getContentDispositionOfAttachment(fileName)).build();
   }
 
   private Response getFileDetails(FileObject file) throws FileSystemException {
@@ -537,44 +560,6 @@ public class FilesResource {
       StreamUtil.copy(uploadedFileStream, localFileStream);
     } catch(IOException couldNotWriteUploadedFile) {
       throw new RuntimeException("Could not write uploaded file to Opal file system", couldNotWriteUploadedFile);
-    }
-  }
-
-  private void compressFolder(File compressedFile, FileObject folder, Collection<String> children) throws IOException {
-    ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(compressedFile));
-    addFolder(folder, outputStream, children);
-    outputStream.close();
-  }
-
-  private void addFolder(FileObject folder, ZipOutputStream outputStream, Collection<String> children)
-      throws IOException {
-    addFolder(folder.getParent().getName().getPath(), folder, outputStream, children);
-  }
-
-  private void addFolder(String basePath, FileObject folder, ZipOutputStream outputStream, Collection<String> children)
-      throws IOException {
-    int baseLength = "/".equals(basePath) ? 1 : basePath.length() + 1;
-
-    // Add the folder.
-    outputStream.putNextEntry(new ZipEntry(folder.getName().getPath().substring(baseLength) + "/"));
-
-    // Add its children files and subfolders.
-    FileObject[] files = folder.getChildren();
-    for(FileObject file : files) {
-      if(children == null || children.isEmpty() || children.contains(file.getName().getBaseName())) {
-        // only add files for which download is authorized
-        if(file.isReadable()) {
-          if(file.getType() == FileType.FOLDER) {
-            addFolder(basePath, file, outputStream, null);
-          } else {
-            outputStream.putNextEntry(new ZipEntry(file.getName().getPath().substring(baseLength)));
-            try(FileInputStream inputStream = new FileInputStream(opalRuntime.getFileSystem().getLocalFile(file))) {
-              StreamUtil.copy(inputStream, outputStream);
-              outputStream.closeEntry();
-            }
-          }
-        }
-      }
     }
   }
 
