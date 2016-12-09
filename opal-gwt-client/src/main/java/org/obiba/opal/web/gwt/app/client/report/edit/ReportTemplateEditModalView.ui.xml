@@ -35,9 +35,17 @@
         <g:SimplePanel ui:field="designFilePanel"/>
         <b:HelpBlock>
           <ui:msg description="R Markdown File help">The main R Markdown file must ends with ".Rmd" suffix. R Markdown
-            child
-            files will be automatically found relatively to this file.
+            child files will be automatically found relatively to this file.
           </ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
+      <b:ControlGroup>
+        <b:ControlLabel>
+          <ui:msg description="Format label">Format</ui:msg>
+        </b:ControlLabel>
+        <b:TextBox name="format" ui:field="format"/>
+        <b:HelpBlock>
+          <ui:msg description="Report Format help">The format of the generated report (default is html).</ui:msg>
         </b:HelpBlock>
       </b:ControlGroup>
       <b:ControlGroup>

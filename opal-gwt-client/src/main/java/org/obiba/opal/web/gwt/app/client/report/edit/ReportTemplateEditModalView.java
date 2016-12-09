@@ -65,6 +65,9 @@ implements Display {
   TextBox reportTemplateName;
 
   @UiField
+  TextBox format;
+
+  @UiField
   TextBox schedule;
 
   @UiField
@@ -167,6 +170,11 @@ implements Display {
   }
 
   @Override
+  public HasText getFormat() {
+    return format;
+  }
+
+  @Override
   public String getDesignFile() {
     return fileSelection.getFile();
   }
@@ -180,6 +188,7 @@ implements Display {
   public void clear() {
     setDesignFile("");
     setName("");
+    setFormat("html");
     setSchedule("");
   }
 
@@ -187,6 +196,7 @@ implements Display {
   public void setReportTemplate(ReportTemplateDto reportTemplate) {
     setDesignFile(reportTemplate.getDesign());
     setName(reportTemplate.getName());
+    setFormat(reportTemplate.getFormat());
     setSchedule(reportTemplate.getCron());
   }
 
@@ -200,6 +210,10 @@ implements Display {
 
   private void setName(String name) {
     reportTemplateName.setText(name != null ? name : "");
+  }
+
+  private void setFormat(String formatName) {
+    format.setText(formatName != null ? formatName : "");
   }
 
   private void setDesignFile(String designFile) {

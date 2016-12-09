@@ -109,6 +109,9 @@ public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplate
   Label schedule;
 
   @UiField
+  Label format;
+
+  @UiField
   Label parameters;
 
   @UiField
@@ -194,6 +197,7 @@ public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplate
     this.reportTemplate = reportTemplate;
     design.setText(reportTemplate.getDesign());
     schedule.setText(reportTemplate.getCron());
+    format.setText(reportTemplate.getFormat());
     parameters.setText(getReportParamsList(JsArrays.toSafeArray(reportTemplate.getParametersArray())));
     emails.setText(getEmailList(JsArrays.toSafeArray(reportTemplate.getEmailNotificationArray())));
     reportTemplateName.setText(reportTemplate.getName());

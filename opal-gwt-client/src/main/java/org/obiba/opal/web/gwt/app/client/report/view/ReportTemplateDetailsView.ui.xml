@@ -56,6 +56,12 @@
       </g:FlowPanel>
       <g:FlowPanel>
         <g:Label>
+          <ui:msg description="Format label">Format</ui:msg>
+        </g:Label>
+        <g:Label ui:field="format"/>
+      </g:FlowPanel>
+      <g:FlowPanel>
+        <g:Label>
           <ui:msg description="R Options label">R Options</ui:msg>
         </g:Label>
         <g:Label ui:field="parameters"/>

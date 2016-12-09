@@ -123,7 +123,8 @@ public class RReportServiceImpl implements ReportService {
       rSession.setExecutionContext("Report");
       prepareRSession(rSession, parameters, reportDesignFile);
       runReport(rSession, reportDesignFile.getName());
-      readFileFromR(rSession, reportDesignFile.getName().replace(".Rmd", ".html"), reportOutput);
+      String suffix = reportOutput.substring(reportOutput.lastIndexOf('.'));
+      readFileFromR(rSession, reportDesignFile.getName().replace(".Rmd", suffix), reportOutput);
     } finally {
       if(rSession != null) opalRSessionManager.removeSubjectRSession(rSession.getId());
     }

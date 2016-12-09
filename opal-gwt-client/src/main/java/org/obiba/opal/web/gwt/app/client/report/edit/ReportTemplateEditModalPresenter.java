@@ -84,9 +84,6 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
     suggestions.put("opal.username", new ArrayList<String>());
     suggestions.put("opal.password", new ArrayList<String>());
     suggestions.put("opal.url", new ArrayList<String>());
-    suggestions.put("opal.report.style", Lists
-        .newArrayList("NULL", "Default", "Amelia", "Cerulean", "Cosmo", "Cyborg", "Flatly", "Journal", "Readable",
-            "Simplex", "Slate", "Spacelab", "United"));
     parametersSelectorPresenter.getView().setItemInputDisplay(new KeyValueItemInputView(suggestions) {
       @Override
       public String renderItem(String item) {
@@ -269,7 +266,11 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
     for(String email : emailSelectorPresenter.getView().getItems()) {
       dto.addEmailNotification(email);
     }
-    dto.setFormat("html");
+    String format = "html";
+    if (getView().getFormat().getText() != null && !getView().getFormat().getText().trim().isEmpty()) {
+      format = getView().getFormat().getText();
+    }
+    dto.setFormat(format);
     ParameterDto parameterDto;
     for(String parameterStr : parametersSelectorPresenter.getView().getItems()) {
       parameterDto = ParameterDto.create();
@@ -354,6 +355,8 @@ public class ReportTemplateEditModalPresenter extends ModalPresenterWidget<Repor
     HasText getName();
 
     String getDesignFile();
+
+    HasText getFormat();
 
     HasText getSchedule();
 
