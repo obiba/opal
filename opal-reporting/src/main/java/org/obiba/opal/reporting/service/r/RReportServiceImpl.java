@@ -167,8 +167,7 @@ public class RReportServiceImpl implements ReportService {
 
   private RScriptROperation runReport(OpalRSession rSession, String reportDesign) {
     StringBuilder script = new StringBuilder();
-    script.append("opal.report('").append(reportDesign).append("', boot_style=getOption('").append(REPORT_STYLE_OPTION)
-        .append("'),  progress=TRUE)");
+    script.append("opal.report('").append(reportDesign).append("', progress=TRUE)");
     return execute(rSession, script.toString());
   }
 
