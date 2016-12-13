@@ -131,7 +131,6 @@ public class FilesResource {
 
     // destination check
     FileObject destinationFile = resolveFileInFileSystem(destinationPath);
-    if(!destinationFile.exists()) getPathNotExistResponse(destinationPath);
     if(!destinationFile.isWriteable())
       return Response.status(Status.FORBIDDEN).entity("Destination file is not writable: " + destinationPath).build();
 
@@ -140,48 +139,108 @@ public class FilesResource {
       return Response.status(Status.BAD_REQUEST).entity("Source file is missing").build();
 
     // filter actions: copy, move
-    if("move".equals(action.toLowerCase())) {
-      return moveTo(destinationFile, sourcesPath);
-    }
-
-    if("copy".equals(action.toLowerCase())) {
-      return copyFrom(destinationFile, sourcesPath);
-    }
+    if("move".equals(action.toLowerCase())) return moveTo(destinationFile, sourcesPath);
+    if("copy".equals(action.toLowerCase())) return copyFrom(destinationFile, sourcesPath);
 
     return Response.status(Status.BAD_REQUEST).entity("Unexpected file action: " + action).build();
   }
 
-  private Response moveTo(FileObject destinationFolder, Iterable<String> sourcesPath) throws IOException {
+  private Response moveTo(FileObject destinationFile, List<String> sourcesPath) throws IOException {
+    if (sourcesPath.size()>1) {
+      // several files or folders can only be moved into an existing folder
+      return moveToFolder(destinationFile, sourcesPath);
+    }
+
+    // one file or folder can be renamed and/or moved
+    if (destinationFile.exists() && FileType.FOLDER.equals(destinationFile.getType()))
+      return moveToFolder(destinationFile, sourcesPath);
+
+    return renameTo(destinationFile, sourcesPath.get(0));
+  }
+
+  /**
+   * Move source files and folders into an existing folder.
+   *
+   * @param destinationFolder
+   * @param sourcesPath
+   * @return
+   * @throws IOException
+   */
+  private Response moveToFolder(FileObject destinationFolder, Iterable<String> sourcesPath) throws IOException {
     // destination check
     String destinationPath = destinationFolder.getName().getPath();
+    if(!destinationFolder.exists()) return getPathNotExistResponse(destinationPath);
     if(destinationFolder.getType() != FileType.FOLDER)
       return Response.status(Status.BAD_REQUEST).entity("Destination must be a folder: " + destinationPath).build();
 
     // sources check
     for(String sourcePath : sourcesPath) {
-      FileObject sourceFile = resolveFileInFileSystem(sourcePath);
-      if(!sourceFile.exists()) getPathNotExistResponse(sourcePath);
-      if(!sourceFile.isReadable()) {
-        return Response.status(Status.FORBIDDEN).entity("Source file is not readable: " + sourcePath).build();
-      }
-      if(!sourceFile.isWriteable()) {
-        return Response.status(Status.FORBIDDEN).entity("Source file cannot be moved: " + sourcePath).build();
-      }
+      Response check = checkSourceFile(resolveFileInFileSystem(sourcePath));
+      if (check != null) return check;
     }
 
     // do action
     for(String sourcePath : sourcesPath) {
-      FileObject sourceFile = resolveFileInFileSystem(sourcePath);
-      FileObject destinationFile = resolveFileInFileSystem(destinationPath + "/" + sourceFile.getName().getBaseName());
-      sourceFile.moveTo(destinationFile);
+      if (!sourcePath.equals(destinationPath)) {
+        FileObject sourceFile = resolveFileInFileSystem(sourcePath);
+        FileObject destinationFile = resolveFileInFileSystem(destinationPath + "/" + sourceFile.getName().getBaseName());
+        sourceFile.moveTo(destinationFile);
+      }
     }
 
     return Response.ok().build();
   }
 
+  /**
+   * Rename a file of folder. Can be moved if the parent folder is different.
+   *
+   * @param destinationFile
+   * @param sourcePath
+   * @return
+   * @throws IOException
+   */
+  private Response renameTo(FileObject destinationFile, String sourcePath) throws IOException {
+    // check source
+    FileObject sourceFile = resolveFileInFileSystem(sourcePath);
+    Response check = checkSourceFile(sourceFile);
+    if (check != null) return check;
+
+    String destinationPath = destinationFile.getName().getPath();
+    if(sourceFile.getType() == FileType.FOLDER && destinationFile.getType() == FileType.FILE)
+      return Response.status(Status.BAD_REQUEST).entity("Cannot rename a folder into an existing file: " + destinationPath).build();
+    if(!destinationFile.getParent().isWriteable()) {
+      return Response.status(Status.FORBIDDEN).entity("Source file cannot be moved: " + sourcePath).build();
+    }
+
+    // cannot rename to itself
+    if (!destinationPath.equals(sourcePath)) sourceFile.moveTo(destinationFile);
+
+    return Response.ok().build();
+  }
+
+  /**
+   * Check that source file is readable and writeable.
+   *
+   * @param sourceFile
+   * @return
+   * @throws IOException
+   */
+  private Response checkSourceFile(FileObject sourceFile) throws IOException {
+    String sourcePath = sourceFile.getName().getPath();
+    if(!sourceFile.exists()) getPathNotExistResponse(sourcePath);
+    if(!sourceFile.isReadable()) {
+      return Response.status(Status.FORBIDDEN).entity("Source file is not readable: " + sourcePath).build();
+    }
+    if(!sourceFile.isWriteable()) {
+      return Response.status(Status.FORBIDDEN).entity("Source file cannot be moved: " + sourcePath).build();
+    }
+    return null;
+  }
+
   private Response copyFrom(FileObject destinationFolder, Iterable<String> sourcesPath) throws IOException {
     // destination check
     String destinationPath = destinationFolder.getName().getPath();
+    if(!destinationFolder.exists()) return getPathNotExistResponse(destinationPath);
     if(destinationFolder.getType() != FileType.FOLDER)
       return Response.status(Status.BAD_REQUEST).entity("Destination must be a folder: " + destinationPath).build();
 
@@ -196,10 +255,12 @@ public class FilesResource {
 
     // do action
     for(String sourcePath : sourcesPath) {
-      FileObject sourceFile = resolveFileInFileSystem(sourcePath);
-      FileObject destinationFile = resolveFileInFileSystem(destinationPath + "/" + sourceFile.getName().getBaseName());
-      FileSelector selector = sourceFile.getType() == FileType.FOLDER ? Selectors.SELECT_ALL : Selectors.SELECT_SELF;
-      destinationFile.copyFrom(sourceFile, selector);
+      if (!sourcePath.equals(destinationPath)) {
+        FileObject sourceFile = resolveFileInFileSystem(sourcePath);
+        FileObject destinationFile = resolveFileInFileSystem(destinationPath + "/" + sourceFile.getName().getBaseName());
+        FileSelector selector = sourceFile.getType() == FileType.FOLDER ? Selectors.SELECT_ALL : Selectors.SELECT_SELF;
+        destinationFile.copyFrom(sourceFile, selector);
+      }
     }
 
     return Response.ok().build();
