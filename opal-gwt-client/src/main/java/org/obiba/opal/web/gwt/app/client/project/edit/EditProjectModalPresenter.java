@@ -151,8 +151,8 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
     if(!Strings.isNullOrEmpty(tags)) {
       JsArrayString arr = JavaScriptObject.createArray().cast();
       dto.setTagsArray(arr);
-      for(String t : tags.split(" ")) {
-        arr.push(t);
+      for(String t : tags.split(",")) {
+        arr.push(t.trim());
       }
     }
     dto.setDatabase(getView().getDatabase().getText());
@@ -208,6 +208,10 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
     return dto;
   }
 
+  public void setTag(String tag) {
+    getView().setTag(tag);
+  }
+
   private class ProjectValidationHandler extends ViewValidationHandler {
 
     private Set<FieldValidator> validators;
@@ -258,6 +262,8 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
     }
 
     void setProject(ProjectDto project);
+
+    void setTag(String tag);
 
     HasText getName();
 

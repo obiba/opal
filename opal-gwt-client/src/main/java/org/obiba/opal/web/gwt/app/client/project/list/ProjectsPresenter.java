@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.project.list;
 
+import com.google.common.collect.Lists;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
@@ -42,6 +43,9 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
+import java.util.Collections;
+import java.util.List;
+
 public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, ProjectsPresenter.Proxy>
     implements ProjectsUiHandlers {
 
@@ -52,6 +56,8 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
   private final PlaceManager placeManager;
 
   private JsArray<ProjectDto> projects;
+
+  private List<String> tags = Lists.newArrayList();
 
   private String projectsFilter;
 
@@ -102,6 +108,14 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
           @Override
           public void onResource(Response response, JsArray<ProjectDto> resource) {
             projects = JsArrays.toSafeArray(resource);
+            tags.clear();
+            for (ProjectDto project : JsArrays.toIterable(projects)) {
+              for (String tag : JsArrays.toIterable(project.getTagsArray())) {
+                if (!tags.contains(tag)) tags.add(tag);
+              }
+            }
+            Collections.sort(tags);
+            getView().setTags(tags);
             onProjectsFilterUpdate(projectsFilter);
           }
         }) //
@@ -134,6 +148,7 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
   public void showAddProject() {
     EditProjectModalPresenter presenter = addProjectModalProvider.get();
     presenter.setProjects(projects);
+    presenter.setTag(getView().getSelectedTag());
   }
 
   @Override
@@ -143,9 +158,9 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
       getView().setProjects(projects);
     } else {
       JsArray<ProjectDto> filtered = JsArrays.create();
-      for(ProjectDto table : JsArrays.toIterable(projects)) {
-        if(tableMatches(table, filter)) {
-          filtered.push(table);
+      for(ProjectDto project : JsArrays.toIterable(projects)) {
+        if(projectMatches(project, filter)) {
+          filtered.push(project);
         }
       }
       getView().setProjects(filtered);
@@ -159,7 +174,7 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
    * @param filter
    * @return
    */
-  private boolean tableMatches(ProjectDto project, String filter) {
+  private boolean projectMatches(ProjectDto project, String filter) {
     String name = project.getName().toLowerCase();
     for(String token : filter.toLowerCase().split(" ")) {
       if(!Strings.isNullOrEmpty(token)) {
@@ -173,9 +188,13 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
 
     void beforeRenderProjects();
 
+    void setTags(List<String> tags);
+
     void setProjects(JsArray<ProjectDto> projects);
 
     HasAuthorization getAddProjectAuthorizer();
+
+    String getSelectedTag();
   }
 
   private class ProjectUpdatedHandler

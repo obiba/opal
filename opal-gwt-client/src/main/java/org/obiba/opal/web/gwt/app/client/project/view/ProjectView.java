@@ -88,7 +88,7 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   }
 
   @Override
-  public void   setProject(ProjectDto project) {
+  public void setProject(ProjectDto project) {
     if(titleCrumbs.getWidgetCount() > 1) {
       titleCrumbs.remove(1);
     }

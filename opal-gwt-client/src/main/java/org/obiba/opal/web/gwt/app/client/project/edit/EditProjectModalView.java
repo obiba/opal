@@ -96,9 +96,14 @@ public class EditProjectModalView extends ModalPopupViewWithUiHandlers<EditProje
     name.setEnabled(false);
     title.setText(project.getTitle());
     description.setText(project.getDescription());
-    if(project.getTagsArray() != null) tags.setText(project.getTagsArray().join(" "));
+    if(project.getTagsArray() != null) tags.setText(project.getTagsArray().join(", "));
     // database will be set when databases list will be available
     database.setEnabled(!DatasourceDtos.hasPersistedTables(project.getDatasource()));
+  }
+
+  @Override
+  public void setTag(String tag) {
+    tags.setText(tag);
   }
 
   @Override

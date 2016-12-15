@@ -63,7 +63,7 @@
       </b:ControlLabel>
       <b:TextBox ui:field="tags" b:id="tags"/>
       <b:HelpBlock>
-        <ui:msg description="Project Tags help">Optional space separated keywords.</ui:msg>
+        <ui:msg description="Project Tags help">Optional comma separated keywords.</ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 

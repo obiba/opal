@@ -24,9 +24,13 @@
     <b:Paragraph>
       <ui:msg description="Projects text">
         A project is a repository of data and dictionaries. In a project, data can be imported, exported, analysed and
-        transformed. Projects also offer access controls to the dictionaries, the summaries and the individual data.
+        transformed. Projects also offer access controls to the dictionaries, the summaries and the individual data. Projects
+        can be grouped by tag.
       </ui:msg>
     </b:Paragraph>
+
+    <o:NavTabsPanel ui:field="tabs" addStyleNames="top-margin">
+    </o:NavTabsPanel>
 
     <g:FlowPanel addStyleNames="small-bottom-margin">
       <o:OpalSimplePager ui:field="tablePager" showTotalWhenNoPager="true" location="RIGHT"

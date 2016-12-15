@@ -10,13 +10,24 @@
 
 package org.obiba.opal.web.gwt.app.client.project.list;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.github.gwtbootstrap.client.ui.TabPanel;
+import com.google.common.collect.Lists;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.Strings;
+import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
+import org.obiba.opal.web.gwt.app.client.ui.NavTabsPanel;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
@@ -56,6 +67,9 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   private static final short MAX_CHARACTERS = 100;
 
   @UiField
+  NavTabsPanel tabs;
+
+  @UiField
   OpalSimplePager tablePager;
 
   @UiField
@@ -75,6 +89,10 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
   private ListHandler<ProjectDto> typeSortHandler;
 
+  private List<String> tags = Lists.newArrayList();
+
+  private int selectedTagTab = 0;
+
 //  private final Provider<BookmarkIconPresenter> bookmarkIconPresenterProvider;
 
   @Inject
@@ -84,6 +102,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     this.translations = translations;
 //    this.bookmarkIconPresenterProvider = bookmarkIconPresenterProvider;
     initWidget(uiBinder.createAndBindUi(this));
+    initTabs();
     initProjectsTable();
     initializeFilter();
   }
@@ -95,8 +114,24 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   }
 
   @Override
+  public void setTags(List<String> tags) {
+    renderTagTabs(tags);
+  }
+
+  @Override
   public void setProjects(JsArray<ProjectDto> projects) {
     renderProjectsTable(JsArrays.toList(projects));
+  }
+
+  @Override
+  public String getSelectedTag() {
+    if (selectedTagTab>0) {
+      int tagIdx = selectedTagTab - 1;
+      String tag = tags.get(tagIdx);
+      return tag;
+    } else {
+      return "";
+    }
   }
 
   @Override
@@ -112,6 +147,16 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   @UiHandler("filter")
   void onFilterUpdate(KeyUpEvent event) {
     getUiHandlers().onProjectsFilterUpdate(filter.getText());
+  }
+
+  private void initTabs() {
+    tabs.addSelectionHandler(new SelectionHandler<Integer>() {
+      @Override
+      public void onSelection(SelectionEvent<Integer> event) {
+        selectedTagTab = event.getSelectedItem();
+        getUiHandlers().onProjectsFilterUpdate(filter.getText());
+      }
+    });
   }
 
   private void initProjectsTable() {
@@ -132,7 +177,31 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     projectsTable.addColumnSortHandler(typeSortHandler);
   }
 
-  private void renderProjectsTable(List<ProjectDto> projectDtos) {
+  private void renderTagTabs(List<String> tags) {
+    this.tags = tags;
+    tabs.clear();
+    tabs.add(new SimplePanel(), new Anchor(translations.allProjectsLabel()));
+    //tabs.setVisible(!tags.isEmpty());
+    if (!tags.isEmpty()) {
+      for (String tag : tags) {
+        tabs.add(new SimplePanel(), new Anchor(tag));
+      }
+    }
+    selectedTagTab = 0;
+    tabs.selectTab(selectedTagTab, false);
+  }
+
+  private void renderProjectsTable(List<ProjectDto> projects) {
+    List<ProjectDto> projectDtos = Lists.newArrayList();
+    String selectedTag = getSelectedTag();
+    if (!selectedTag.isEmpty()) {
+      for (ProjectDto project : projects) {
+        List<String> tags = JsArrays.toList(project.getTagsArray());
+        if (tags.contains(selectedTag)) projectDtos.add(project);
+      }
+    } else {
+      projectDtos = projects;
+    }
     projectsTable.hideLoadingIndicator();
     projectsDataProvider.setList(projectDtos);
     tablePager.firstPage();
@@ -180,29 +249,6 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
       return projectDto;
     }
 
-//    private Widget newProjectLink(final ProjectDto project) {
-//      Anchor link = new Anchor(project.getTitle());
-//      link.setTitle(project.getName());
-//      link.addClickHandler(new ClickHandler() {
-//        @Override
-//        public void onClick(ClickEvent event) {
-//          getUiHandlers().onProjectSelection(project);
-//        }
-//      });
-//
-//      Heading head = new Heading(5);
-//      head.addStyleName("inline-block small-right-indent no-top-margin");
-//      head.add(getBookmarkIconWidget(project));
-//      head.add(link);
-//      return head;
-//    }
-//
-//    private Widget getBookmarkIconWidget(ProjectDto project) {
-//      BookmarkIconPresenter bookmarkIconPresenter = bookmarkIconPresenterProvider.get();
-//      bookmarkIconPresenter.setBookmarkable(UriBuilders.DATASOURCE.create().build(project.getName()));
-//      bookmarkIconPresenter.addStyleName("small-right-indent");
-//      return bookmarkIconPresenter.asWidget();
-//    }
   }
 
   private static final class TitleColumn extends TextColumn<ProjectDto> {
