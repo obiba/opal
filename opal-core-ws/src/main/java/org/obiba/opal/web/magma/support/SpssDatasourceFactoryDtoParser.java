@@ -32,21 +32,11 @@ public class SpssDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDto
     factory.setName(dto.getName());
     factory.setFile(resolveLocalFile(spssDto.getFile()));
 
-    if(spssDto.hasCharacterSet()) {
-      factory.setCharacterSet(spssDto.getCharacterSet());
-    }
-
-    if(spssDto.hasEntityType()) {
-      factory.setEntityType(spssDto.getEntityType());
-    }
-
-    if(spssDto.hasLocale()) {
-      factory.setLocale(spssDto.getLocale());
-    }
-
-    if(spssDto.hasIdVariable()) {
-      factory.setIdVariable(spssDto.getIdVariable());
-    }
+    if(spssDto.hasCharacterSet()) factory.setCharacterSet(spssDto.getCharacterSet());
+    if(spssDto.hasEntityType()) factory.setEntityType(spssDto.getEntityType());
+    if(spssDto.hasLocale()) factory.setLocale(spssDto.getLocale());
+    if(spssDto.hasIdVariable()) factory.setIdVariable(spssDto.getIdVariable());
+    if(spssDto.hasMultilines()) factory.setMultilines(spssDto.getMultilines());
 
     return factory;
   }

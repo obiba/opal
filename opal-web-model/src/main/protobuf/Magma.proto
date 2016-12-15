@@ -37,6 +37,7 @@ message CsvDatasourceFactoryDto {
   optional string separator = 4;
   optional string quote = 5;
   optional int32 firstRow = 6;
+  optional bool multilines = 7;
   extend DatasourceFactoryDto {
     optional CsvDatasourceFactoryDto params = 1001;
   }
@@ -87,8 +88,7 @@ message JdbcValueTableSettingsDto {
   optional string entityIdentifiersWhere = 7;
   optional string excludedColumns = 8;
   optional string includedColumns = 9;
-  optional bool repeatables = 10; // deprecated
-  optional bool multilines = 11;
+  optional bool multilines = 10;
 }
 
 message HibernateDatasourceFactoryDto {
@@ -141,6 +141,7 @@ message SpssDatasourceFactoryDto {
   optional string entityType = 3;
   optional string locale = 4;
   optional string idVariable = 5;
+  optional bool multilines = 6;
   extend DatasourceFactoryDto {
     optional SpssDatasourceFactoryDto params = 1009;
   }

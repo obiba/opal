@@ -90,17 +90,17 @@ public class Dtos {
   }
 
   private static JdbcValueTableSettings fromDto(@NotNull Magma.JdbcValueTableSettingsDto dto, String defaultEntityType, String defaultEntityIdColumn ) {
-    JdbcValueTableSettings settings = new JdbcValueTableSettings(dto.getSqlTable(),
-        dto.hasOpalTable() ? dto.getOpalTable() : dto.getSqlTable(),
-        dto.hasEntityType() ? dto.getEntityType() : defaultEntityType,
-        dto.hasEntityIdentifierColumn() ? dto.getEntityIdentifierColumn() : defaultEntityIdColumn);
-    if (dto.hasCreatedTimestampColumn()) settings.setCreatedTimestampColumnName(dto.getCreatedTimestampColumn());
-    if (dto.hasUpdatedTimestampColumn()) settings.setUpdatedTimestampColumnName(dto.getUpdatedTimestampColumn());
-    if (dto.hasEntityIdentifiersWhere()) settings.setEntityIdentifiersWhere(dto.getEntityIdentifiersWhere());
-    if (dto.hasExcludedColumns()) settings.setExcludedColumns(dto.getExcludedColumns());
-    if (dto.hasIncludedColumns()) settings.setIncludedColumns(dto.getIncludedColumns());
-    settings.setMultilines(dto.getMultilines() || dto.getRepeatables());
-    return settings;
+    JdbcValueTableSettings.Builder builder = JdbcValueTableSettings.newSettings(dto.getSqlTable()) //
+        .tableName(dto.hasOpalTable() ? dto.getOpalTable() : dto.getSqlTable()) //
+        .entityType(dto.hasEntityType() ? dto.getEntityType() : defaultEntityType) //
+        .entityIdentifierColumn(dto.hasEntityIdentifierColumn() ? dto.getEntityIdentifierColumn() : defaultEntityIdColumn);
+    if (dto.hasCreatedTimestampColumn()) builder.createdTimestampColumn(dto.getCreatedTimestampColumn());
+    if (dto.hasUpdatedTimestampColumn()) builder.updatedTimestampColumn(dto.getUpdatedTimestampColumn());
+    if (dto.hasEntityIdentifiersWhere()) builder.entityIdentifiersWhere(dto.getEntityIdentifiersWhere());
+    if (dto.hasExcludedColumns()) builder.excludedColumns(dto.getExcludedColumns());
+    if (dto.hasIncludedColumns()) builder.includedColumns(dto.getIncludedColumns());
+    builder.multilines(dto.getMultilines());
+    return builder.build();
   }
 
   @Nullable
@@ -212,7 +212,7 @@ public class Dtos {
     if(jdbcSettings.hasEntityIdentifiersWhere()) builder.setEntityIdentifiersWhere(jdbcSettings.getEntityIdentifiersWhere());
     if(jdbcSettings.hasExcludedColumns()) builder.setExcludedColumns(jdbcSettings.getExcludedColumns());
     if(jdbcSettings.hasIncludedColumns()) builder.setIncludedColumns(jdbcSettings.getIncludedColumns());
-    builder.setMultilines(jdbcSettings.isMultilines() || jdbcSettings.isRepeatables());
+    builder.setMultilines(jdbcSettings.isMultilines());
     return builder;
   }
 

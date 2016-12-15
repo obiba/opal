@@ -35,21 +35,12 @@ public class CsvDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoP
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto, DatasourceEncryptionStrategy encryptionStrategy) {
     CsvDatasourceFactory factory = new CsvDatasourceFactory();
     CsvDatasourceFactoryDto csvDto = dto.getExtension(CsvDatasourceFactoryDto.params);
-    if(csvDto.hasBundle()) {
-      factory.setBundle(resolveLocalFile(csvDto.getBundle()));
-    }
-    if(csvDto.hasSeparator()) {
-      factory.setSeparator(csvDto.getSeparator());
-    }
-    if(csvDto.hasQuote()) {
-      factory.setQuote(csvDto.getQuote());
-    }
-    if(csvDto.hasFirstRow()) {
-      factory.setFirstRow(csvDto.getFirstRow());
-    }
-    if(csvDto.hasCharacterSet()) {
-      factory.setCharacterSet(csvDto.getCharacterSet());
-    }
+    if(csvDto.hasBundle()) factory.setBundle(resolveLocalFile(csvDto.getBundle()));
+    if(csvDto.hasSeparator()) factory.setSeparator(csvDto.getSeparator());
+    if(csvDto.hasQuote()) factory.setQuote(csvDto.getQuote());
+    if(csvDto.hasFirstRow()) factory.setFirstRow(csvDto.getFirstRow());
+    if(csvDto.hasCharacterSet()) factory.setCharacterSet(csvDto.getCharacterSet());
+    if(csvDto.hasMultilines()) factory.setMultilines(csvDto.getMultilines());
     factory.setName(dto.getName());
     addTableBundles(factory, csvDto);
     return factory;
