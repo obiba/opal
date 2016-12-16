@@ -517,6 +517,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
     private Datasource getMultipleFileCsvDatasource(File directory) throws IOException {
       CsvDatasource ds = new CsvDatasource(directory.getName());
+      ds.setMultilines(options.getMultilines());
       for(ValueTable table : getValueTables()) {
         File tableDir = new File(directory, table.getName());
         if(tableDir.exists() || tableDir.mkdir()) {
@@ -549,6 +550,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
     private Datasource getSingleFileCsvDatasource(String name, File csvFile) throws IOException {
       CsvDatasource ds = new CsvDatasource(name);
+      ds.setMultilines(options.getMultilines());
 
       // one table only
       Set<ValueTable> tables = getValueTables();

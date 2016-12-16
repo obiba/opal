@@ -135,6 +135,11 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
   }
 
   @Override
+  public boolean getMultilines() {
+    return false;
+  }
+
+  @Override
   public boolean isMultiplex() {
     return false;
   }

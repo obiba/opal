@@ -71,10 +71,11 @@ message ExportCommandOptionsDto {
   optional bool noVariables = 6;
   repeated string tables = 7;
   optional string format = 8;
-  optional bool copyNullValues = 9;
+  optional bool copyNullValues = 9 [default = true];
   optional string destinationTableName = 10;
   optional Identifiers.IdentifiersMappingConfigDto idConfig = 11;
   optional string query = 12;
+  optional bool multilines = 13 [default = true];
 }
 
 message ReportCommandOptionsDto {

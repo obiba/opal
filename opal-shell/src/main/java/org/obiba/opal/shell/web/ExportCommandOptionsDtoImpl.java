@@ -155,6 +155,11 @@ public class ExportCommandOptionsDtoImpl implements CopyCommandOptions {
   }
 
   @Override
+  public boolean getMultilines() {
+    return dto.getMultilines();
+  }
+
+  @Override
   public boolean isMultiplex() {
     return false;
   }

@@ -86,6 +86,9 @@ public interface CopyCommandOptions extends HelpOption {
   @Option(longName = "copy-null", shortName = "n", description = "Copy null values.")
   boolean getCopyNullValues();
 
+  @Option(longName = "multilines", shortName = "m", description = "Multiple lines per entity when value set has value sequences.")
+  boolean getMultilines();
+
   //
   // Variable transformations
   //

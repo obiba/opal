@@ -177,13 +177,14 @@ class OpalExporter:
     """
 
     @classmethod
-    def build(cls, client, datasource, tables, output, incremental=None, identifiers=None, verbose=None):
+    def build(cls, client, datasource, tables, output, incremental=None, multilines=True, identifiers=None, verbose=None):
         setattr(cls, 'client', client)
         setattr(cls, 'datasource', datasource)
         setattr(cls, 'tables', tables)
         setattr(cls, 'output', output)
         setattr(cls, 'incremental', incremental)
         setattr(cls, 'identifiers', identifiers)
+        setattr(cls, 'multilines', multilines)
         setattr(cls, 'verbose', verbose)
         return cls()
 
@@ -197,6 +198,7 @@ class OpalExporter:
         options.format = format
         options.out = self.output
         options.nonIncremental = not self.incremental
+        options.multilines = self.multilines
         options.noVariables = False
         if self.tables:
             tables2export = self.tables
