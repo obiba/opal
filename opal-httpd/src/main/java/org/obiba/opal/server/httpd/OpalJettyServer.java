@@ -253,7 +253,7 @@ public class OpalJettyServer {
     log.info("Creating a file handler for the following URL : {}", fileUrl);
     ResourceHandler resourceHandler = new ResourceHandler();
     resourceHandler.setBaseResource(new PathResource(new URL(fileUrl)));
-    //resourceHandler.setWelcomeFiles(new String[]{"index.html"});
+    resourceHandler.setRedirectWelcome(true);
 
     GzipHandler gzipHandler = new GzipHandler();
     gzipHandler.setHandler(resourceHandler);
