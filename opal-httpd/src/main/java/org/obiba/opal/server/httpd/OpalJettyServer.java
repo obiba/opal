@@ -64,9 +64,8 @@ public class OpalJettyServer {
 
   private static final String MAX_FORM_CONTENT_SIZE = "200000";
 
-  private static String[] GZIP_MIME_TYPES = { "text/css", "text/html", "text/plain", "text/csv", "text/xml",
-      "application/json", "application/x-protobuf+json", "application/javascript", "application/dicom",
-      "image/gif", "image/png", "image/jpeg" };
+  private static String[] GZIP_MIME_TYPES = { "text/css", "text/html", "text/plain", "text/csv",
+      "application/xml", "application/json", "application/x-protobuf+json", "application/javascript" };
 
   private Server jettyServer;
 
