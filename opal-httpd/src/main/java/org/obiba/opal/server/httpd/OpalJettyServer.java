@@ -9,32 +9,19 @@
  */
 package org.obiba.opal.server.httpd;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.EnumSet;
-import java.util.Properties;
-
-import javax.annotation.Nullable;
-import javax.servlet.ServletContext;
-
-import org.eclipse.jetty.ajp.Ajp13SocketConnector;
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
+import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.security.ConstraintAware;
 import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.GzipHandler;
+import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
-import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
+import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlets.GzipFilter;
-import org.eclipse.jetty.util.resource.FileResource;
+import org.eclipse.jetty.util.resource.PathResource;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
@@ -50,13 +37,17 @@ import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.filter.DelegatingFilterProxy;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
+import javax.annotation.Nullable;
+import javax.servlet.ServletContext;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.EnumSet;
+import java.util.Properties;
 
-import static javax.servlet.DispatcherType.ERROR;
-import static javax.servlet.DispatcherType.FORWARD;
-import static javax.servlet.DispatcherType.INCLUDE;
-import static javax.servlet.DispatcherType.REQUEST;
+import static javax.servlet.DispatcherType.*;
 import static org.springframework.web.context.ContextLoader.CONFIG_LOCATION_PARAM;
 
 /**
@@ -73,13 +64,20 @@ public class OpalJettyServer {
 
   private static final String MAX_FORM_CONTENT_SIZE = "200000";
 
+  private static String[] GZIP_MIME_TYPES = { "text/css", "text/html", "text/plain", "text/csv",
+      "application/xml", "application/json", "application/x-protobuf+json", "application/javascript" };
+
   private Server jettyServer;
 
   private ServletContextHandler servletContextHandler;
 
+  private String httpPort;
+
+  private String httpsPort;
+
   public void start() throws Exception {
     init();
-    log.info("Starting Opal HTTP/s Server on port {}", jettyServer.getConnectors()[0].getPort());
+    log.info("Starting Opal HTTP/s Server on ports {}/{}", httpPort, httpsPort);
     jettyServer.start();
   }
 
@@ -89,14 +87,12 @@ public class OpalJettyServer {
 
   private void init() throws IOException, URISyntaxException {
     jettyServer = new Server();
-    jettyServer.setSendServerVersion(false);
     // OPAL-342: We will manually stop the Jetty server instead of relying its shutdown hook
     jettyServer.setStopAtShutdown(false);
 
     Properties properties = loadProperties();
-    String httpPort = properties.getProperty("org.obiba.opal.http.port");
-    String httpsPort = properties.getProperty("org.obiba.opal.https.port");
-    String ajpPort = properties.getProperty("org.obiba.opal.ajp.port");
+    httpPort = properties.getProperty("org.obiba.opal.http.port");
+    httpsPort = properties.getProperty("org.obiba.opal.https.port");
     int maxIdleTime = Integer.valueOf(properties.getProperty("org.obiba.opal.maxIdleTime", MAX_IDLE_TIME));
 
     // OPAL-2687
@@ -105,10 +101,9 @@ public class OpalJettyServer {
     // OPAL-2752
     String includedCipherSuites = properties.getProperty("org.obiba.opal.ssl.includedCipherSuites");
 
-    configureHttpConnector(httpPort == null ? null : Integer.valueOf(httpPort), maxIdleTime);
-    configureSslConnector(httpsPort == null ? null : Integer.valueOf(httpsPort), maxIdleTime, excludedProtocols,
-        includedCipherSuites);
-    configureAjpConnector(ajpPort == null ? null : Integer.valueOf(ajpPort));
+    configureHttpConnector(httpPort == null ? null : Integer.valueOf(httpPort), createHttpConfiguration(maxIdleTime));
+    configureSslConnector(httpsPort == null ? null : Integer.valueOf(httpsPort), createHttpConfiguration(maxIdleTime),
+        excludedProtocols, includedCipherSuites);
 
     // OPAL-2652
     int maxFormContentSize = Integer
@@ -122,6 +117,7 @@ public class OpalJettyServer {
     // Add webapp extensions
     handlers.addHandler(createExtensionFileHandler(OpalRuntime.WEBAPP_EXTENSION));
     handlers.addHandler(createServletHandler());
+
     jettyServer.setHandler(handlers);
   }
 
@@ -135,27 +131,35 @@ public class OpalJettyServer {
     }
   }
 
-  private void configureAjpConnector(@Nullable Integer ajpPort) {
-    if(ajpPort == null || ajpPort <= 0) return;
-    Connector ajp = new Ajp13SocketConnector();
-    ajp.setPort(ajpPort);
-    jettyServer.addConnector(ajp);
-  }
-
-  private void configureHttpConnector(@Nullable Integer httpPort, int maxIdleTime) {
+  private void configureHttpConnector(@Nullable Integer httpPort, HttpConfiguration httpConfig) {
     if(httpPort == null || httpPort <= 0) return;
-
-    Connector httpConnector = new SelectChannelConnector();
+    ServerConnector httpConnector = new ServerConnector(jettyServer, new HttpConnectionFactory(httpConfig));
     httpConnector.setPort(httpPort);
-    httpConnector.setMaxIdleTime(maxIdleTime);
-    httpConnector.setRequestHeaderSize(REQUEST_HEADER_SIZE);
     jettyServer.addConnector(httpConnector);
   }
 
-  private void configureSslConnector(@Nullable Integer httpsPort, int maxIdleTime, String excludedProtocols,
+  private void configureSslConnector(@Nullable Integer httpsPort, HttpConfiguration httpConfig, String excludedProtocols,
       String includedCipherSuites) {
     if(httpsPort == null || httpsPort <= 0) return;
+    httpConfig.setSecureScheme("https");
+    httpConfig.setSecurePort(httpsPort);
+    httpConfig.addCustomizer(new SecureRequestCustomizer());
+    ServerConnector sslConnector = new ServerConnector(jettyServer,
+        new SslConnectionFactory(createSslContext(excludedProtocols, includedCipherSuites), HttpVersion.HTTP_1_1.asString()),
+        new HttpConnectionFactory(httpConfig));
+    sslConnector.setPort(httpsPort);
+    jettyServer.addConnector(sslConnector);
+  }
 
+  private HttpConfiguration createHttpConfiguration(int maxIdleTime) {
+    HttpConfiguration httpConfig = new HttpConfiguration();
+    httpConfig.setSendServerVersion(false);
+    httpConfig.setRequestHeaderSize(REQUEST_HEADER_SIZE);
+    httpConfig.setIdleTimeout(maxIdleTime);
+    return httpConfig;
+  }
+
+  private SslContextFactory createSslContext(String excludedProtocols, String includedCipherSuites) {
     SslContextFactory jettySsl = new SslContextFactory() {
 
       @Override
@@ -164,12 +168,13 @@ public class OpalJettyServer {
             .getRequiredWebApplicationContext(servletContextHandler.getServletContext())
             .getBean(org.obiba.ssl.SslContextFactory.class);
         setSslContext(sslContextFactory.createSslContext());
+        super.doStart();
       }
 
-      @Override
-      public void checkKeyStore() {
-      }
     };
+    jettySsl.setWantClientAuth(true);
+    jettySsl.setNeedClientAuth(false);
+    jettySsl.setRenegotiationAllowed(false);
 
     if(!Strings.isNullOrEmpty(excludedProtocols)) {
       String[] protocols = excludedProtocols.split("\\s*,\\s*");
@@ -181,16 +186,7 @@ public class OpalJettyServer {
       if(ciphers.length > 0) jettySsl.setIncludeCipherSuites(ciphers);
     }
 
-    jettySsl.setAllowRenegotiate(false);
-    jettySsl.setWantClientAuth(true);
-    jettySsl.setNeedClientAuth(false);
-
-    Connector sslConnector = new SslSelectChannelConnector(jettySsl);
-    sslConnector.setPort(httpsPort);
-    sslConnector.setMaxIdleTime(maxIdleTime);
-    sslConnector.setRequestHeaderSize(REQUEST_HEADER_SIZE);
-
-    jettyServer.addConnector(sslConnector);
+    return jettySsl;
   }
 
   private Handler createServletHandler() {
@@ -205,7 +201,11 @@ public class OpalJettyServer {
     servletContextHandler.setInitParameter("resteasy.servlet.mapping.prefix", "/ws");
     servletContextHandler.addServlet(HttpServletDispatcher.class, "/ws/*");
 
-    return servletContextHandler;
+    GzipHandler gzipHandler = new GzipHandler();
+    gzipHandler.setHandler(servletContextHandler);
+    gzipHandler.setIncludedMimeTypes(GZIP_MIME_TYPES);
+
+    return gzipHandler;
   }
 
   private void initEventListeners() {
@@ -248,24 +248,25 @@ public class OpalJettyServer {
     return createFileHandler("file://" + System.getProperty("OPAL_DIST") + directory);
   }
 
+  private Handler createFileHandler(String fileUrl) throws IOException, URISyntaxException {
+    log.info("Creating a file handler for the following URL : {}", fileUrl);
+    ResourceHandler resourceHandler = new ResourceHandler();
+    resourceHandler.setBaseResource(new PathResource(new URL(fileUrl)));
+    resourceHandler.setRedirectWelcome(true);
+
+    GzipHandler gzipHandler = new GzipHandler();
+    gzipHandler.setHandler(resourceHandler);
+    gzipHandler.setIncludedMimeTypes(GZIP_MIME_TYPES);
+
+    return gzipHandler;
+  }
+
   private Handler createExtensionFileHandler(String filePath) throws IOException, URISyntaxException {
     File file = new File(filePath);
     if(!file.exists() && !file.mkdirs()) {
       throw new RuntimeException("Cannot create extensions directory: " + file.getAbsolutePath());
     }
     return createFileHandler("file://" + filePath);
-  }
-
-  private Handler createFileHandler(String fileUrl) throws IOException, URISyntaxException {
-    log.info("Creating a file handler for the following URL : {}", fileUrl);
-    ResourceHandler resourceHandler = new ResourceHandler();
-    resourceHandler.setBaseResource(new FileResource(new URL(fileUrl)));
-    resourceHandler.setAliases(true);
-
-    GzipHandler gzipHandler = new GzipHandler();
-    gzipHandler.setHandler(resourceHandler);
-
-    return gzipHandler;
   }
 
   // https://issues.jboss.org/browse/RESTEASY-1012

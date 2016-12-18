@@ -42,7 +42,7 @@ public class OpalSslContextFactory implements SslContextFactory {
   public SSLContext createSslContext() {
     OpalKeyStore opalKeystore = prepareServerKeystore();
     try {
-      SSLContext ctx = SSLContext.getInstance("TLSv1");
+      SSLContext ctx = SSLContext.getInstance("TLSv1.2");
       ctx.init(new KeyManager[] { new X509ExtendedKeyManagerImpl(opalKeystore) },
           new TrustManager[] { credentialsTrustManager }, null);
       return ctx;
