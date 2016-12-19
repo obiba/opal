@@ -382,9 +382,8 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
 
       Element settingsElement = (Element) element.getElementsByTagName("settings").item(0);
 
-      JdbcDatasourceSettings settings = new JdbcDatasourceSettings();
-      settings.setDefaultEntityType(getChildTextContent(settingsElement, "defaultEntityType"));
-      settings.setUseMetadataTables(Boolean.valueOf(getChildTextContent(settingsElement, "useMetadataTables")));
+      JdbcDatasourceSettings settings = JdbcDatasourceSettings.newSettings(getChildTextContent(settingsElement, "defaultEntityType"))
+          .useMetadataTables(Boolean.valueOf(getChildTextContent(settingsElement, "useMetadataTables"))).build();
       database.getSqlSettings().setJdbcDatasourceSettings(settings);
       databaseRegistry.create(database);
 

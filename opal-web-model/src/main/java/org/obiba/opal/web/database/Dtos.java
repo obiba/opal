@@ -23,6 +23,8 @@ import org.obiba.opal.web.model.Magma;
 
 import com.google.common.base.Strings;
 
+import java.util.stream.Collectors;
+
 import static org.obiba.opal.web.model.Database.DatabaseDto;
 import static org.obiba.opal.web.model.Database.MongoDbSettingsDto;
 import static org.obiba.opal.web.model.Database.SqlSettingsDto;
@@ -68,38 +70,35 @@ public class Dtos {
 
   @Nullable
   private static JdbcDatasourceSettings fromDto(@NotNull Magma.JdbcDatasourceSettingsDto dto) {
-    JdbcDatasourceSettings jdbcSettings = new JdbcDatasourceSettings();
-    jdbcSettings.setDefaultEntityType(dto.getDefaultEntityType());
-    jdbcSettings.setDefaultEntityIdColumnName(dto.getDefaultEntityIdColumnName());
-    jdbcSettings.setDefaultCreatedTimestampColumnName(dto.getDefaultCreatedTimestampColumnName());
-    jdbcSettings.setDefaultUpdatedTimestampColumnName(dto.getDefaultUpdatedTimestampColumnName());
-    jdbcSettings.setUseMetadataTables(dto.getUseMetadataTables());
-    jdbcSettings.setMultipleDatasources(dto.getMultipleDatasources());
-    jdbcSettings.setBatchSize(dto.getBatchSize());
+    JdbcDatasourceSettings.Builder builder = JdbcDatasourceSettings.newSettings(dto.getDefaultEntityType())
+        .entityIdentifierColumn(dto.getDefaultEntityIdColumnName())
+        .createdTimestampColumn(dto.getDefaultCreatedTimestampColumnName())
+        .updatedTimestampColumn(dto.getDefaultUpdatedTimestampColumnName())
+        .useMetadataTables(dto.getUseMetadataTables())
+        .multipleDatasources(dto.getMultipleDatasources())
+        .multilines(dto.getMultilines());
 
-    if (dto.getMappedTablesCount() > 0) jdbcSettings.setMappedTables(Sets.newLinkedHashSet(dto.getMappedTablesList()));
-
-    if (dto.hasBatchSize()) jdbcSettings.setBatchSize(dto.getBatchSize());
-
+    if (dto.getMappedTablesCount() > 0) builder.mappedTables(Sets.newLinkedHashSet(dto.getMappedTablesList()));
+    if (dto.hasBatchSize()) builder.batchSize(dto.getBatchSize());
     if (dto.getTableSettingsCount() > 0) {
-      dto.getTableSettingsList().forEach(settingsDto ->
-        jdbcSettings.addTableSettings(fromDto(settingsDto, dto.getDefaultEntityType(), dto.getDefaultEntityIdColumnName())));
+      builder.tableSettings(dto.getTableSettingsList().stream().map(settingsDto ->
+        fromDto(settingsDto, dto.getDefaultEntityType(), dto.getDefaultEntityIdColumnName())).collect(Collectors.toSet()));
     }
 
-    return jdbcSettings;
+    return builder.build();
   }
 
   private static JdbcValueTableSettings fromDto(@NotNull Magma.JdbcValueTableSettingsDto dto, String defaultEntityType, String defaultEntityIdColumn ) {
     JdbcValueTableSettings.Builder builder = JdbcValueTableSettings.newSettings(dto.getSqlTable()) //
         .tableName(dto.hasOpalTable() ? dto.getOpalTable() : dto.getSqlTable()) //
         .entityType(dto.hasEntityType() ? dto.getEntityType() : defaultEntityType) //
-        .entityIdentifierColumn(dto.hasEntityIdentifierColumn() ? dto.getEntityIdentifierColumn() : defaultEntityIdColumn);
+        .entityIdentifierColumn(dto.hasEntityIdentifierColumn() ? dto.getEntityIdentifierColumn() : defaultEntityIdColumn)
+        .multilines(dto.getMultilines());
     if (dto.hasCreatedTimestampColumn()) builder.createdTimestampColumn(dto.getCreatedTimestampColumn());
     if (dto.hasUpdatedTimestampColumn()) builder.updatedTimestampColumn(dto.getUpdatedTimestampColumn());
     if (dto.hasEntityIdentifiersWhere()) builder.entityIdentifiersWhere(dto.getEntityIdentifiersWhere());
     if (dto.hasExcludedColumns()) builder.excludedColumns(dto.getExcludedColumns());
     if (dto.hasIncludedColumns()) builder.includedColumns(dto.getIncludedColumns());
-    builder.multilines(dto.getMultilines());
     return builder.build();
   }
 

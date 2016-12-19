@@ -181,6 +181,8 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
     jdbcSettings.setDefaultUpdatedTimestampColumnName(getView().getDefaultUpdatedTimestampColumn().getText());
     jdbcSettings.setUseMetadataTables(getView().getUseMetadataTables().getValue());
     jdbcSettings.setMultipleDatasources(getView().getUsage().getValue() == Usage.STORAGE);
+    // multilines are detected at import/storage and forced at export
+    jdbcSettings.setMultilines(getView().getUsage().getValue() == Usage.EXPORT);
 
     if(!getView().getBatchSize().getText().isEmpty())
       jdbcSettings.setBatchSize(getView().getBatchSize().getNumberValue().intValue());

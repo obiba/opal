@@ -76,6 +76,7 @@ message JdbcDatasourceSettingsDto {
   optional string defaultEntityIdColumnName = 7;
   optional bool multipleDatasources = 8;
   optional int32 batchSize = 9;
+  optional bool multilines = 10 [default = false];
 }
 
 message JdbcValueTableSettingsDto {
@@ -88,7 +89,7 @@ message JdbcValueTableSettingsDto {
   optional string entityIdentifiersWhere = 7;
   optional string excludedColumns = 8;
   optional string includedColumns = 9;
-  optional bool multilines = 10;
+  optional bool multilines = 10 [default = false];
 }
 
 message HibernateDatasourceFactoryDto {
