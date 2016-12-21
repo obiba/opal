@@ -1,3 +1,9 @@
+# OBiBa acknowledgments
+
+If you are using OBiBa software, please cite our work in your code, websites, publications or reports.
+
+"The work presented herein was made possible using the OBiBa suite (www.obiba.org), a  software suite developed by Maelstrom Research (www.maelstrom-research.org)"
+
 # Opal [![Build Status](http://ci.obiba.org/view/Opal/job/Opal/badge/icon)](http://ci.obiba.org/view/Opal/job/Opal/)
 
 Opal is OBiBa’s core database application for biobanks or epidemiological studies.
