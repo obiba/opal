@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2017 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 define("ace/mode/css", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text", "ace/tokenizer", "ace/mode/css_highlight_rules", "ace/mode/matching_brace_outdent", "ace/worker/worker_client", "ace/mode/behaviour/css", "ace/mode/folding/cstyle"], function (e, t, n) {
     var r = e("../lib/oop"), i = e("./text").Mode, s = e("../tokenizer").Tokenizer, o = e("./css_highlight_rules").CssHighlightRules, u = e("./matching_brace_outdent").MatchingBraceOutdent, a = e("../worker/worker_client").WorkerClient, f = e("./behaviour/css").CssBehaviour, l = e("./folding/cstyle").FoldMode, c = function () {
         this.$tokenizer = new s((new o).getRules(), "i"), this.$outdent = new u, this.$behaviour = new f, this.foldingRules = new l

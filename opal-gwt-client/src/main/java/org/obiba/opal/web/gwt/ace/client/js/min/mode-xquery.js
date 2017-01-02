@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2017 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 define("ace/mode/xquery", ["require", "exports", "module", "ace/worker/worker_client", "ace/lib/oop", "ace/mode/text", "ace/tokenizer", "ace/mode/xquery_highlight_rules", "ace/range", "ace/mode/behaviour/cstyle", "ace/mode/folding/cstyle"], function (e, t, n) {
     var r = e("../worker/worker_client").WorkerClient, i = e("../lib/oop"), s = e("./text").Mode, o = e("../tokenizer").Tokenizer, u = e("./xquery_highlight_rules").XQueryHighlightRules, a = e("../range").Range, f = e("./behaviour/cstyle").CstyleBehaviour, l = e("./folding/cstyle").FoldMode, c = function (e) {
         this.$tokenizer = new o((new u).getRules()), this.$behaviour = new f(e), this.foldingRules = new l

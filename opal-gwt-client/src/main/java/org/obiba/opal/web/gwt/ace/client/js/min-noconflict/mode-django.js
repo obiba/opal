@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2017 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 ace.define("ace/mode/django", ["require", "exports", "module", "ace/lib/oop", "ace/mode/html", "ace/mode/text_highlight_rules", "ace/tokenizer", "ace/mode/html_highlight_rules"], function (e, t, n) {
     var r = e("../lib/oop"), i = e("./html").Mode, s = e("../tokenizer").Tokenizer, o = e("./html_highlight_rules").HtmlHighlightRules, u = e("./text_highlight_rules").TextHighlightRules, a = function () {
         this.$rules = {start: [

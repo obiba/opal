@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2017 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 ace.define("ace/mode/r", ["require", "exports", "module", "ace/range", "ace/lib/oop", "ace/mode/text", "ace/tokenizer", "ace/mode/text_highlight_rules", "ace/mode/r_highlight_rules", "ace/mode/matching_brace_outdent", "ace/unicode"], function (e, t, n) {
     var r = e("../range").Range, i = e("../lib/oop"), s = e("./text").Mode, o = e("../tokenizer").Tokenizer, u = e("./text_highlight_rules").TextHighlightRules, a = e("./r_highlight_rules").RHighlightRules, f = e("./matching_brace_outdent").MatchingBraceOutdent, l = e("../unicode"), c = function () {
         this.$tokenizer = new o((new a).getRules()), this.$outdent = new f

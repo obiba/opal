@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2017 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 define("ace/keyboard/vim", ["require", "exports", "module", "ace/keyboard/vim/commands", "ace/keyboard/vim/maps/util", "ace/lib/useragent"], function (e, t, n) {
     var r = e("./vim/commands"), i = r.coreCommands, s = e("./vim/maps/util"), o = e("../lib/useragent"), u = {i: {command: i.start}, I: {command: i.startBeginning}, a: {command: i.append}, A: {command: i.appendEnd}, "ctrl-f": {command: "gotopagedown"}, "ctrl-b": {command: "gotopageup"}};
     t.handler = {handleMacRepeat: function (e, t, n) {

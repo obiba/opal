@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2017 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 ace.define("ace/mode/luapage", ["require", "exports", "module", "ace/lib/oop", "ace/mode/html", "ace/mode/lua", "ace/tokenizer", "ace/mode/luapage_highlight_rules"], function (e, t, n) {
     var r = e("../lib/oop"), i = e("./html").Mode, s = e("./lua").Mode, o = e("../tokenizer").Tokenizer, u = e("./luapage_highlight_rules").LuaPageHighlightRules, a = function () {
         var e = new u;

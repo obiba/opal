@@ -1,14 +1,11 @@
 /*
- * rdoc.js
+ * Copyright (c) 2017 OBiBa. All rights reserved.
  *
- * Copyright (C) 2009-11 by RStudio, Inc.
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
  *
- * This program is licensed to you under the terms of version 3 of the
- * GNU Affero General Public License. This program is distributed WITHOUT
- * ANY EXPRESS OR IMPLIED WARRANTY, INCLUDING THOSE OF NON-INFRINGEMENT,
- * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Please refer to the
- * AGPL (http://www.gnu.org/licenses/agpl-3.0.txt) for more details.
- *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 define('ace/mode/rdoc', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/text_highlight_rules', 'ace/mode/rdoc_highlight_rules', 'ace/mode/matching_brace_outdent'], function (require, exports, module) {
 

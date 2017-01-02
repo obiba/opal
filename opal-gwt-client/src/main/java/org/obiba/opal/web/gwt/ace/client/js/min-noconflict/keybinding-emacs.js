@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2017 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 ace.define("ace/keyboard/emacs", ["require", "exports", "module", "ace/lib/dom", "ace/keyboard/hash_handler", "ace/lib/keys"], function (e, t, n) {
     var r = e("../lib/dom"), i = function (e, t) {
         var n = this.scroller.getBoundingClientRect(), r = Math.floor((e + this.scrollLeft - n.left - this.$padding) / this.characterWidth), i = Math.floor((t + this.scrollTop - n.top) / this.lineHeight);

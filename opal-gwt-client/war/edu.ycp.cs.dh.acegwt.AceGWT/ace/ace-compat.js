@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2017 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 define("pilot/index", ["require", "exports", "module", "pilot/browser_focus", "pilot/dom", "pilot/event", "pilot/event_emitter", "pilot/fixoldbrowsers", "pilot/keys", "pilot/lang", "pilot/oop", "pilot/useragent", "pilot/canon"], function (a, b, c) {
     a("pilot/browser_focus"), a("pilot/dom"), a("pilot/event"), a("pilot/event_emitter"), a("pilot/fixoldbrowsers"), a("pilot/keys"), a("pilot/lang"), a("pilot/oop"), a("pilot/useragent"), a("pilot/canon")
 }), define("pilot/browser_focus", ["require", "exports", "module", "ace/lib/browser_focus"], function (a, b, c) {

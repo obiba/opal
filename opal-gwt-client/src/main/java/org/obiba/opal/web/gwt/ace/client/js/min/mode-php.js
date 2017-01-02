@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2017 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 define("ace/mode/php", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text", "ace/tokenizer", "ace/mode/php_highlight_rules", "ace/mode/matching_brace_outdent", "ace/range", "ace/worker/worker_client", "ace/mode/behaviour/cstyle", "ace/mode/folding/cstyle", "ace/unicode"], function (e, t, n) {
     var r = e("../lib/oop"), i = e("./text").Mode, s = e("../tokenizer").Tokenizer, o = e("./php_highlight_rules").PhpHighlightRules, u = e("./php_highlight_rules").PhpLangHighlightRules, a = e("./matching_brace_outdent").MatchingBraceOutdent, f = e("../range").Range, l = e("../worker/worker_client").WorkerClient, c = e("./behaviour/cstyle").CstyleBehaviour, h = e("./folding/cstyle").FoldMode, p = e("../unicode"), d = function (e) {
         var t = e && e.inline, n = t ? u : o;

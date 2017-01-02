@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2017 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 ace.define("ace/mode/svg", ["require", "exports", "module", "ace/lib/oop", "ace/mode/xml", "ace/mode/javascript", "ace/tokenizer", "ace/mode/svg_highlight_rules", "ace/mode/folding/mixed", "ace/mode/folding/xml", "ace/mode/folding/cstyle"], function (e, t, n) {
     var r = e("../lib/oop"), i = e("./xml").Mode, s = e("./javascript").Mode, o = e("../tokenizer").Tokenizer, u = e("./svg_highlight_rules").SvgHighlightRules, a = e("./folding/mixed").FoldMode, f = e("./folding/xml").FoldMode, l = e("./folding/cstyle").FoldMode, c = function () {
         i.call(this), this.highlighter = new u, this.$tokenizer = new o(this.highlighter.getRules()), this.$embeds = this.highlighter.getEmbeds(), this.createModeDelegates({"js-": s}), this.foldingRules = new a(new f({}), {"js-": new l})

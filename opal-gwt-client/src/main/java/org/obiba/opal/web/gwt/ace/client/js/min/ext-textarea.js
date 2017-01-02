@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2017 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 define("ace/ext/textarea", ["require", "exports", "module", "ace/lib/event", "ace/lib/useragent", "ace/lib/net", "ace/ace", "ace/theme/textmate", "ace/mode/text"], function (e, t, n) {
     function a(e, t) {
         for (var n in t)e.style[n] = t[n]
