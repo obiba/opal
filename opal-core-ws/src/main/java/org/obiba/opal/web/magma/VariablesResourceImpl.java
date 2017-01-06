@@ -98,6 +98,26 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
   }
 
   @Override
+  public Response setVariableOrder(List<String> variables) {
+    List<VariableDto> orderedVariables = Lists.newArrayListWithExpectedSize(variables != null ? variables.size() : 0);
+    List<Variable> currentOrderVariables = orderVariables(Lists.newArrayList(getValueTable().getVariables()));
+    int i = 1;
+    if (variables != null && !variables.isEmpty()) {
+      for (String name : variables) {
+        if (getValueTable().hasVariable(name)) {
+          orderedVariables.add(Dtos.asDto(getValueTable().getVariable(name)).setIndex(i++).build());
+        }
+      }
+    }
+    for (Variable v : currentOrderVariables) {
+      if (variables == null || !variables.contains(v.getName())) orderedVariables.add(Dtos.asDto(v).setIndex(i++).build());
+    }
+
+    if (!orderedVariables.isEmpty()) addOrUpdateTableVariables(orderedVariables);
+    return Response.ok().build();
+  }
+
+  @Override
   public Response addOrUpdateVariables(List<VariableDto> variables, @Nullable String comment) {
 
     // @TODO Check if table can be modified and respond with "IllegalTableModification"

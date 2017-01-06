@@ -98,7 +98,7 @@ abstract class AbstractValueTableResource {
     return filteredVariables.subList(fromIndex, toIndex);
   }
 
-  private Iterable<Variable> orderVariables(List<Variable> variables) {
+  protected List<Variable> orderVariables(List<Variable> variables) {
     Collections.sort(variables, new Comparator<Variable>() {
       @Override
       public int compare(Variable o1, Variable o2) {

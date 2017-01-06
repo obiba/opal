@@ -15,13 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -60,6 +54,10 @@ public interface VariablesResource {
   @AuthenticatedByCookie
   @AuthorizeResource
   Response getExcelDictionary(@Context Request request) throws MagmaRuntimeException, IOException;
+
+  @PUT
+  @Path("/_order")
+  Response setVariableOrder(@QueryParam("variable") List<String> variables);
 
   @POST
   Response addOrUpdateVariables(List<Magma.VariableDto> variables, @Nullable @QueryParam("comment") String comment);
