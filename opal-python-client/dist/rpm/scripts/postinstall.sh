@@ -11,7 +11,7 @@ case "$1" in
     fi
   ;;
 
-  1)
+  [1-2])
     if [ -d $python_lib ]; then
       rm -f $python_lib/opal
     fi
