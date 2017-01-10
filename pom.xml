@@ -1752,7 +1752,7 @@
     <gwt-log.version>3.3.2</gwt-log.version>
     <gwt-visualization.version>1.0.2</gwt-visualization.version>
     <gwtopenlayers.version>1.0</gwtopenlayers.version>
-    <gwtp.version>1.5</gwtp.version>
+    <gwtp.version>1.5.3</gwtp.version>
     <gwtquery.version>1.4.3</gwtquery.version>
     <hibernate.version>4.3.11.Final</hibernate.version>
     <hibernate-validator.version>5.0.1.Final</hibernate-validator.version>
