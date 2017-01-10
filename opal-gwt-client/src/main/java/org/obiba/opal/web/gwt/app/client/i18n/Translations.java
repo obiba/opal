@@ -588,6 +588,7 @@ public interface Translations extends Constants {
       "IdentifierMappingFailed", "Identifiers mapping failed : {0}.",//
       "TaxonomyGitUserRequired", "Github user or organization name is required.", //
       "TaxonomyGitRepositoryRequired", "Github repository name is required.", //
+      "TaxonomyGitDownloadKeyRequired", "A download key is required.", //
       "TaxonomyImportFailed", "Failed to import taxonomy. Please make sure all import related information is correct.",
       "TaxonomyTagsImportFailed", "Failed to retrieve taxonomy released versions. Please contact technical support.",
       "TaxonomyNoTagsFound", "There are no released versions available. Please contact your administrator for further assistance.", //

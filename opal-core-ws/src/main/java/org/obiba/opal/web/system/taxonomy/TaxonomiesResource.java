@@ -77,26 +77,20 @@ public class TaxonomiesResource {
       @QueryParam("user") @DefaultValue("maelstrom-research") String username, @QueryParam("repo") String repo,
       @QueryParam("ref") @DefaultValue("master") String ref,
       @QueryParam("file") String file,
-      @QueryParam("override") @DefaultValue("false") boolean override) {
+      @QueryParam("override") @DefaultValue("false") boolean override,
+      @QueryParam("key") String key) {
 
     if (Strings.isNullOrEmpty(file)) {
-      List<Taxonomy> taxonomies = taxonomyService.importGitHubTaxonomies(username, repo, ref, override);
+      List<Taxonomy> taxonomies = taxonomyService.importGitHubTaxonomies(username, repo, ref, override, key);
       if(override && taxonomies.isEmpty()) return Response.status(Response.Status.BAD_REQUEST).build();
       URI uri = uriInfo.getBaseUriBuilder().path("/system/conf/taxonomies").build();
       return Response.created(uri).build();
     }
 
-    Taxonomy taxonomy = taxonomyService.importGitHubTaxonomy(username, repo, ref, file, override);
+    Taxonomy taxonomy = taxonomyService.importGitHubTaxonomy(username, repo, ref, file, override, key);
     if(taxonomy == null) return Response.status(Response.Status.BAD_REQUEST).build();
     URI uri = uriInfo.getBaseUriBuilder().path("/system/conf/taxonomy").path(taxonomy.getName()).build();
     return Response.created(uri).build();
-  }
-
-  @POST
-  @Path("import/_default")
-  public Response importDefaultTaxonomies() {
-    taxonomyService.importDefault();
-    return Response.ok().build();
   }
 
   @POST

@@ -15,15 +15,16 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.HasValue;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyImportedEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
-import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
+import org.obiba.opal.web.gwt.app.client.validator.*;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -46,9 +47,15 @@ import com.gwtplatform.mvp.client.PopupView;
 public class TaxonomyGitImportModalPresenter extends ModalPresenterWidget<TaxonomyGitImportModalPresenter.Display>
     implements TaxonomyGitImportModalUiHandlers {
 
+  private static final String MLSTR_USER = "maelstrom-research";
+
+  private static final String MLSTR_REPO = "maelstrom-taxonomies";
+
   private final Translations translations;
 
   private ValidationHandler validationHandler;
+
+  private boolean downloadKeyRequired = false;
 
   @Inject
   public TaxonomyGitImportModalPresenter(EventBus eventBus, Display display, Translations translations) {
@@ -57,9 +64,10 @@ public class TaxonomyGitImportModalPresenter extends ModalPresenterWidget<Taxono
     this.translations = translations;
   }
 
-  public TaxonomyGitImportModalPresenter setTagInfo(String user, String repo) {
-    getView().setTagInfo(user, repo);
-    getTags(user, repo);
+  public TaxonomyGitImportModalPresenter showMaelstromForm() {
+    downloadKeyRequired = true;
+    getView().showMaelstromForm(MLSTR_USER, MLSTR_REPO);
+    getTags(MLSTR_USER, MLSTR_REPO);
     return this;
   }
 
@@ -69,7 +77,7 @@ public class TaxonomyGitImportModalPresenter extends ModalPresenterWidget<Taxono
   }
 
   @Override
-  public void onImport(String user, String repository, String reference, String file, boolean override) {
+  public void onImport(String user, String repository, String reference, String file, boolean override, String downloadKey) {
     if(!validationHandler.validate()) return;
 
     UriBuilder uriBuilder = UriBuilders.SYSTEM_CONF_TAXONOMIES_IMPORT_GITHUB.create().query("user", user)
@@ -77,6 +85,7 @@ public class TaxonomyGitImportModalPresenter extends ModalPresenterWidget<Taxono
 
     if (!Strings.isNullOrEmpty(reference)) uriBuilder.query("ref", reference);
     if (!Strings.isNullOrEmpty(file)) uriBuilder.query("file", file);
+    if (!Strings.isNullOrEmpty(downloadKey)) uriBuilder.query("key", downloadKey);
 
     ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build())
       .withCallback(new ResponseCodeCallback() {
@@ -145,15 +154,19 @@ public class TaxonomyGitImportModalPresenter extends ModalPresenterWidget<Taxono
   }
 
   public interface Display extends PopupView, HasUiHandlers<TaxonomyGitImportModalUiHandlers> {
+
     HasText getUser();
+
     HasText getRepository();
+
+    HasText getDownloadKey();
 
     void addTags(JsArrayString tagNames);
 
-    void setTagInfo(String user, String repo);
+    void showMaelstromForm(String user, String repo);
 
     enum FormField {
-      USER, REPOSITORY
+      USER, REPOSITORY, DOWNLOAD_KEY
     }
 
     void hideDialog();
@@ -179,6 +192,8 @@ public class TaxonomyGitImportModalPresenter extends ModalPresenterWidget<Taxono
       validators.add(new RequiredTextValidator(getView().getUser(), "TaxonomyGitUserRequired",
           Display.FormField.USER.name()));
       validators.add(new RequiredTextValidator(getView().getRepository(), "TaxonomyGitRepositoryRequired", Display.FormField.REPOSITORY.name()));
+      if (downloadKeyRequired)
+        validators.add(new RequiredTextValidator(getView().getDownloadKey(), "TaxonomyGitDownloadKeyRequired", Display.FormField.DOWNLOAD_KEY.name()));
       return validators;
     }
 
@@ -186,5 +201,6 @@ public class TaxonomyGitImportModalPresenter extends ModalPresenterWidget<Taxono
     protected void showMessage(String id, String message) {
       getView().showError(Display.FormField.valueOf(id), message);
     }
+
   }
 }
