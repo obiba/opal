@@ -75,7 +75,7 @@
 
     <g:FlowPanel ui:field="mrPanel" visible="false">
       <b:Paragraph>
-        <ui:msg description="MR Taxonomies text">Maelstrom Research provides variable classifications that were elaborated after the analysis of a large amount of epidemiological studies.
+        <ui:msg description="MR Taxonomies text"><a href="https://maelstrom-research.org" target="_blank">Maelstrom Research</a> provides variable classifications that were elaborated after the analysis of a large amount of epidemiological studies.
         </ui:msg>
       </b:Paragraph>
 
