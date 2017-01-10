@@ -10,22 +10,10 @@
 
 package org.obiba.opal.core.service;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
-import javax.annotation.Nullable;
-import javax.annotation.PostConstruct;
-import javax.validation.constraints.NotNull;
-
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.git.CommitInfo;
@@ -37,16 +25,22 @@ import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.domain.taxonomy.Vocabulary;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.support.yaml.TaxonomyYaml;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
+import javax.annotation.Nullable;
+import javax.annotation.PostConstruct;
+import javax.validation.constraints.NotNull;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 @Component
 public class TaxonomyServiceImpl implements TaxonomyService, GitService {
@@ -54,16 +48,12 @@ public class TaxonomyServiceImpl implements TaxonomyService, GitService {
   @Autowired
   private OpalRuntime opalRuntime;
 
-  @NotNull
-  @Value("${org.obiba.opal.taxonomies}")
-  private String taxonomyReferences;
-
   @Autowired
   private TaxonomyPersistenceStrategy taxonomyPersistence;
 
-  private static final Logger log = LoggerFactory.getLogger(TaxonomyServiceImpl.class);
-
   private static final String MLSTRM_USER = "maelstrom-research";
+
+  private static final String MLSTRM_REPO = "maelstrom-taxonomies";
 
   private static final String TAXONOMY_YAML = "taxonomy.yml";
 
@@ -79,7 +69,6 @@ public class TaxonomyServiceImpl implements TaxonomyService, GitService {
   @PostConstruct
   public void start() {
     taxonomies = Collections.synchronizedList(Lists.newArrayList(taxonomyPersistence.readTaxonomies()));
-    importDefault(false);
     sort();
   }
 
@@ -88,25 +77,30 @@ public class TaxonomyServiceImpl implements TaxonomyService, GitService {
   }
 
   @Override
-  public void importDefault() {
-    importDefault(true);
-  }
-
-  @Override
   public List<Taxonomy> importGitHubTaxonomies(@NotNull String username, @NotNull String repo,
-      @NotNull String ref, boolean override) {
+      @NotNull String ref, boolean override, String key) {
     String user = username;
     if(Strings.isNullOrEmpty(username)) user = MLSTRM_USER;
-    if(Strings.isNullOrEmpty(repo)) throw new IllegalArgumentException("GitHub repository is required");
-    if(Strings.isNullOrEmpty(ref)) throw new IllegalArgumentException("GitHub ref name is required");
+    if(Strings.isNullOrEmpty(repo)) throw new IllegalArgumentException("GitHub repository is required.");
+    if(Strings.isNullOrEmpty(ref)) throw new IllegalArgumentException("GitHub ref name is required.");
+
+    // check for activation code
+    if (MLSTRM_USER.equals(username) || repo.equals(MLSTRM_REPO)) {
+      checkDownloadKey(key);
+    }
+
     return importZipball(String.format(GITHUB_API_ZIPBALL_URL, user, repo, ref), override);
+  }
+
+  private void checkDownloadKey(String activation) {
+    if (Strings.isNullOrEmpty(activation)) throw new IllegalArgumentException("A download key code is required. Please contact Maelstrom Research at info@maelstrom-research.org.");
   }
 
   @Override
   public List<String> getGitHubTaxonomyTags(@NotNull String username, @NotNull String repo) {
     String user = username;
     if(Strings.isNullOrEmpty(username)) user = MLSTRM_USER;
-    if(Strings.isNullOrEmpty(repo)) throw new IllegalArgumentException("GitHub repository is required");
+    if(Strings.isNullOrEmpty(repo)) throw new IllegalArgumentException("GitHub repository is required.");
     List<String> tags = Lists.newArrayList();
 
     try {
@@ -125,16 +119,21 @@ public class TaxonomyServiceImpl implements TaxonomyService, GitService {
 
   @Override
   public Taxonomy importGitHubTaxonomy(@NotNull String username, @NotNull String repo, @Nullable String ref,
-      @NotNull String taxonomyFile, boolean override) {
+      @NotNull String taxonomyFile, boolean override, String key) {
 
     String user = username;
     if(Strings.isNullOrEmpty(username)) user = MLSTRM_USER;
-    if(Strings.isNullOrEmpty(repo)) throw new IllegalArgumentException("GitHub repository is required");
+    if(Strings.isNullOrEmpty(repo)) throw new IllegalArgumentException("GitHub repository is required.");
     String reference = ref;
     if(Strings.isNullOrEmpty(ref)) reference = "master";
     String fileName = taxonomyFile;
     if(Strings.isNullOrEmpty(taxonomyFile)) fileName = TAXONOMY_YAML;
     if(!fileName.endsWith(".yml")) fileName = taxonomyFile + "/" + TAXONOMY_YAML;
+
+    // check for activation code
+    if (MLSTRM_USER.equals(username) || repo.equals(MLSTRM_REPO)) {
+      checkDownloadKey(key);
+    }
 
     String uri = GITHUB_URL + "/" + user + "/" + repo + "/" + reference + "/" + fileName;
 
@@ -298,22 +297,7 @@ public class TaxonomyServiceImpl implements TaxonomyService, GitService {
   //
 
   private void sort() {
-    Collections.sort(taxonomies, new Comparator<Taxonomy>() {
-
-      @Override
-      public int compare(Taxonomy t1, Taxonomy t2) {
-        return t1.getName().compareTo(t2.getName());
-      }
-
-    });
-  }
-
-  private void importDefault(boolean override) {
-    if (taxonomyReferences == null || taxonomyReferences.trim().isEmpty()) return;
-
-    for(String uri : taxonomyReferences.split(",")) {
-      importUriTaxonomy(uri.trim(), override);
-    }
+    Collections.sort(taxonomies, (t1, t2) -> t1.getName().compareTo(t2.getName()));
   }
 
   private List<Taxonomy> importZipball(@NotNull String uri, boolean override) {

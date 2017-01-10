@@ -27,20 +27,29 @@ import org.obiba.opal.core.service.SystemService;
 public interface TaxonomyService extends SystemService, GitService {
 
   /**
-   * Import the taxonomies defined by Maelstrom and OBiBa.
-   */
-  void importDefault();
-
-  /**
    * Import a list of {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} objects from a GitHub repository zipball.
    *
    * @param username default to maelstrom-research
    * @param repo
    * @param ref default to master
+   * @param key Download key for MR taxonomies
    * @return empty list if import failed
    */
   List<Taxonomy> importGitHubTaxonomies(@NotNull String username, @NotNull String repo, @NotNull String ref,
-      boolean override);
+      boolean override, @Nullable String key);
+
+  /**
+   * Import a {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} from a GitHub repository.
+   *
+   * @param username default to maelstrom-research
+   * @param repo
+   * @param ref default to master
+   * @param taxonomyFile default to taxonomy.yml
+   * @param key Download key for MR taxonomies
+   * @return null if import failed
+   */
+  Taxonomy importGitHubTaxonomy(@NotNull String username, @NotNull String repo, @Nullable String ref,
+                                @NotNull String taxonomyFile, boolean override, @Nullable String key);
 
   /**
    * Retrieves {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} tag names from a GitHub repository.
@@ -50,18 +59,6 @@ public interface TaxonomyService extends SystemService, GitService {
    * @return null if import failed
    */
   List<String> getGitHubTaxonomyTags(@NotNull String username, @NotNull String repo);
-
-  /**
-   * Import a {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} from a GitHub repository.
-   *
-   * @param username default to maelstrom-research
-   * @param repo
-   * @param ref default to master
-   * @param taxonomyFile default to taxonomy.yml
-   * @return null if import failed
-   */
-  Taxonomy importGitHubTaxonomy(@NotNull String username, @NotNull String repo, @Nullable String ref,
-      @NotNull String taxonomyFile, boolean override);
 
   /**
    * Import a {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} from a file in Opal's file system.
@@ -74,7 +71,9 @@ public interface TaxonomyService extends SystemService, GitService {
   /**
    * Import a {@link org.obiba.opal.core.domain.taxonomy.Taxonomy} from an InputStream.
    *
-   * @param file
+   * @param input
+   * @param name
+   * @param override
    * @return
    */
   Taxonomy importInputStreamTaxonomy(@NotNull InputStream input, @Nullable String name, boolean override);

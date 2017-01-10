@@ -69,6 +69,12 @@ public class TaxonomyGitImportModalView extends ModalPopupViewWithUiHandlers<Tax
   ControlGroup repositoryGroup;
 
   @UiField
+  ControlGroup downloadKeyGroup;
+
+  @UiField
+  ControlGroup overrideGroup;
+
+  @UiField
   CheckBox overrideExisting;
 
   @UiField
@@ -78,7 +84,19 @@ public class TaxonomyGitImportModalView extends ModalPopupViewWithUiHandlers<Tax
   FlowPanel filePanel;
 
   @UiField
+  FlowPanel mrPanel;
+
+  @UiField
+  TextBox downloadKey;
+
+  @UiField
   FlowPanel tagPanel;
+
+  @UiField
+  FlowPanel acceptedPanel;
+
+  @UiField
+  CheckBox accepted;
 
   @UiField
   Image fetchingTagsProgress;
@@ -98,11 +116,16 @@ public class TaxonomyGitImportModalView extends ModalPopupViewWithUiHandlers<Tax
     return modal;
   }
 
+  @UiHandler("accepted")
+  void onAccepted(ClickEvent event) {
+    importRepo.setEnabled(accepted.getValue());
+  }
+
   @UiHandler("importRepo")
   void onSave(ClickEvent event) {
     String ref = tagMode ? tags.getSelectedValue() : reference.getText();
     getUiHandlers().onImport(user.getText(), repository.getText(), ref, file.getText(),
-        overrideExisting.getValue());
+        overrideExisting.getValue(), downloadKey.getValue());
   }
 
   @UiHandler("cancel")
@@ -121,19 +144,29 @@ public class TaxonomyGitImportModalView extends ModalPopupViewWithUiHandlers<Tax
   }
 
   @Override
+  public HasText getDownloadKey() {
+    return downloadKey;
+  }
+
+  @Override
   public void addTags(JsArrayString tagNames) {
     fetchingTagsProgress.setVisible(false);
-    importRepo.setEnabled(true);
+    boolean latest = true;
     for(String name : JsArrays.toIterable(tagNames)) {
-      tags.addItem(name);
+      tags.addItem(name + (latest ? " (latest)" : ""), name);
+      latest = false;
     }
     tags.setEnabled(tagNames.length() > 1);
   }
 
   @Override
-  public void setTagInfo(String user, String repo) {
+  public void showMaelstromForm(String user, String repo) {
     tagMode = true;
     modal.setTitle(translations.importMaelstromTaxonomies());
+    mrPanel.setVisible(true);
+    overrideExisting.setValue(true);
+    overrideExisting.setVisible(false);
+    acceptedPanel.setVisible(true);
     this.user.setText(user);
     repository.setText(repo);
     filePanel.setVisible(!tagMode);
@@ -163,6 +196,8 @@ public class TaxonomyGitImportModalView extends ModalPopupViewWithUiHandlers<Tax
         case REPOSITORY:
           group = repositoryGroup;
           break;
+        case DOWNLOAD_KEY:
+          group = downloadKeyGroup;
       }
     }
     if(group == null) {
