@@ -25,6 +25,7 @@ import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.domain.taxonomy.Vocabulary;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.support.yaml.TaxonomyYaml;
+import org.obiba.opal.core.tools.LuhnValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -92,8 +93,9 @@ public class TaxonomyServiceImpl implements TaxonomyService, GitService {
     return importZipball(String.format(GITHUB_API_ZIPBALL_URL, user, repo, ref), override);
   }
 
-  private void checkDownloadKey(String activation) {
-    if (Strings.isNullOrEmpty(activation)) throw new IllegalArgumentException("A download key code is required. Please contact Maelstrom Research at info@maelstrom-research.org.");
+  private void checkDownloadKey(String key) {
+    if (Strings.isNullOrEmpty(key)) throw new IllegalArgumentException("A download key code is required. Please contact Maelstrom Research at info@maelstrom-research.org.");
+    if (!LuhnValidator.validate(key)) throw new IllegalArgumentException("A valid download key code is required. Please contact Maelstrom Research at info@maelstrom-research.org.");
   }
 
   @Override

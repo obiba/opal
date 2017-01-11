@@ -78,20 +78,6 @@
         <ui:msg description="MR Taxonomies text"><a href="https://maelstrom-research.org" target="_blank">Maelstrom Research</a> provides variable classifications that were elaborated after the analysis of a large amount of epidemiological studies.
         </ui:msg>
       </b:Paragraph>
-
-      <!-- Download Key -->
-      <b:ControlGroup ui:field="downloadKeyGroup">
-        <b:ControlLabel>
-          <ui:msg description="Download Key label">Download Key</ui:msg>
-        </b:ControlLabel>
-        <b:Controls>
-          <b:TextBox ui:field="downloadKey"/>
-        </b:Controls>
-        <b:HelpBlock>
-          <ui:msg description="Taxonomy Git Download Key help">The download key that can be obtained from the
-            <a href="https://taxonomies.maelstrom-research.org" target="_blank">Maelstrom Research Download Request Form</a>.</ui:msg>
-        </b:HelpBlock>
-      </b:ControlGroup>
     </g:FlowPanel>
 
     <g:FlowPanel ui:field="tagPanel" visible="false">
@@ -118,10 +104,27 @@
 
 
     <g:FlowPanel ui:field="acceptedPanel" visible="false">
+
       <b:Paragraph>
         <ui:msg description="MR Taxonomies License text">These taxonomies are available under the <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">Creative Commons License with Non Commercial and No Derivatives</a> constraints and are free for academic.
         </ui:msg>
       </b:Paragraph>
+
+      <!-- Download Key -->
+      <b:ControlGroup ui:field="downloadKeyGroup">
+        <b:ControlLabel>
+          <ui:msg description="Download Key label">Download Key</ui:msg>
+        </b:ControlLabel>
+        <b:Controls>
+          <b:TextBox ui:field="downloadKey"/>
+        </b:Controls>
+        <b:HelpBlock>
+          <ui:msg description="Taxonomy Git Download Key help">The download key that can be obtained from the
+            <a href="https://taxonomies.maelstrom-research.org" target="_blank">Download Request Form</a>.</ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
+
+      <!-- Accepted -->
       <b:ControlGroup ui:field="acceptedGroup">
         <b:CheckBox ui:field="accepted">
           <ui:msg description="License Accepted label">I have read and accepted the license terms.</ui:msg>
