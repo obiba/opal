@@ -45,4 +45,14 @@ public class LuhnValidatorTest {
   public void test_validate_trim() {
     assertThat(LuhnValidator.validate("  4916284958948122  ")).isTrue();
   }
+
+  @Test
+  public void test_validate_length() {
+    assertThat(LuhnValidator.validate("4929750633404868", 16)).isTrue();
+  }
+
+  @Test
+  public void test_validate_zeros() {
+    assertThat(LuhnValidator.validate("0000000000000")).isFalse();
+  }
 }

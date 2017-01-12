@@ -95,7 +95,7 @@ public class TaxonomyServiceImpl implements TaxonomyService, GitService {
 
   private void checkDownloadKey(String key) {
     if (Strings.isNullOrEmpty(key)) throw new IllegalArgumentException("A download key code is required. Please contact Maelstrom Research at info@maelstrom-research.org.");
-    if (!LuhnValidator.validate(key)) throw new IllegalArgumentException("A valid download key code is required. Please contact Maelstrom Research at info@maelstrom-research.org.");
+    if (!LuhnValidator.validate(key, 16)) throw new IllegalArgumentException("A valid download key code is required. Please contact Maelstrom Research at info@maelstrom-research.org.");
   }
 
   @Override
