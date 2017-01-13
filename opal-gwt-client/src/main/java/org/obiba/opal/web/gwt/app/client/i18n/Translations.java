@@ -1733,6 +1733,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("All tables")
   String allTablesLabel();
 
+  @Description("Encrypt Download Modal title")
+  @DefaultStringValue("Download")
+  String downloadModalTitle();
+
   @Description("Create Folder Modal title")
   @DefaultStringValue("Create Folder")
   String createFolderModalTitle();

@@ -16,9 +16,7 @@ import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FilesCheckedEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FilesDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
@@ -59,6 +57,8 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
 
   private final ModalProvider<CreateFolderModalPresenter> createFolderModalProvider;
 
+  private final ModalProvider<EncryptDownloadModalPresenter> encryptDownloadModalProvider;
+
   private Runnable actionRequiringConfirmation;
 
   private List<FileDto> checkedFiles;
@@ -72,7 +72,8 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
   public FileExplorerPresenter(Display display, EventBus eventBus, FilePathPresenter filePathPresenter,
       FilePlacesPresenter filePlacesPresenter, FolderDetailsPresenter folderDetailsPresenter,
       ModalProvider<FileUploadModalPresenter> fileUploadModalProvider,
-      ModalProvider<CreateFolderModalPresenter> createFolderModalProvider, TranslationMessages translationMessages) {
+      ModalProvider<CreateFolderModalPresenter> createFolderModalProvider, TranslationMessages translationMessages,
+      ModalProvider<EncryptDownloadModalPresenter> encryptDownloadModalProvider) {
     super(eventBus, display);
     this.filePathPresenter = filePathPresenter;
     this.filePlacesPresenter = filePlacesPresenter;
@@ -80,6 +81,7 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
     this.translationMessages = translationMessages;
     this.fileUploadModalProvider = fileUploadModalProvider.setContainer(this);
     this.createFolderModalProvider = createFolderModalProvider.setContainer(this);
+    this.encryptDownloadModalProvider = encryptDownloadModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -328,11 +330,7 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
   public void onDownload() {
     if(!hasCheckedFiles()) return;
 
-    if(checkedFiles.size() == 1) {
-      fireEvent(new FileDownloadRequestEvent(FileDtos.getLink(checkedFiles.get(0))));
-    } else {
-      fireEvent(new FilesDownloadRequestEvent(FileDtos.getParent(checkedFiles.get(0)), checkedFiles));
-    }
+    encryptDownloadModalProvider.get().setFiles(checkedFiles);
   }
 
   @Override

@@ -15,6 +15,7 @@ import java.util.List;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
 import com.gwtplatform.dispatch.annotation.GenEvent;
+import com.gwtplatform.dispatch.annotation.Optional;
 import com.gwtplatform.dispatch.annotation.Order;
 
 @GenEvent
@@ -25,4 +26,8 @@ public class FilesDownloadRequest {
 
   @Order(1)
   List<FileDto> children;
+
+  @Optional
+  @Order(2)
+  String password;
 }
