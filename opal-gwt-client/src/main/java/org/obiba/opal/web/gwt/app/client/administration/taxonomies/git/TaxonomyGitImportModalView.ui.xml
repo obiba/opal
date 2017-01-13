@@ -16,7 +16,7 @@
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <o:Modal ui:field="modal" closeVisible="true" keyboard="true" animation="false">
+  <o:Modal ui:field="modal" closeVisible="true" keyboard="true" animation="false" minHeight="550">
     <!-- Name -->
     <g:FlowPanel ui:field="filePanel" visible="true">
       <b:ControlGroup ui:field="userGroup">
@@ -75,7 +75,7 @@
 
     <g:FlowPanel ui:field="mrPanel" visible="false">
       <b:Paragraph>
-        <ui:msg description="MR Taxonomies text"><a href="https://maelstrom-research.org" target="_blank">Maelstrom Research</a> provides variable classifications that were elaborated after the analysis of a large amount of epidemiological studies.
+        <ui:msg description="MR Taxonomies text">The <a href="https://maelstrom-research.org" target="_blank">Maelstrom Research</a> variable classification taxonomies allow annotating study and harmonized variables to facilitate metadata browsing and enhance data discoverability on the <a href="http://www.obiba.org/pages/products/mica/" target="_blank">Mica</a> data web portal.
         </ui:msg>
       </b:Paragraph>
     </g:FlowPanel>
@@ -88,11 +88,6 @@
           <ui:msg description="Taxonomy Git Tags">Released Versions</ui:msg>
         </b:ControlLabel>
         <o:Chooser ui:field="tags" name="tags" enabled="false"/>
-        <b:HelpBlock>
-          <ui:msg description="Taxonomy Git tags help label">
-            Select a version to import.
-          </ui:msg>
-        </b:HelpBlock>
       </b:ControlGroup>
     </g:FlowPanel>
 
@@ -109,6 +104,14 @@
         <ui:msg description="MR Taxonomies License text">These taxonomies are available under the <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">Creative Commons License with Non Commercial and No Derivatives</a> constraints and are free for academic.
         </ui:msg>
       </b:Paragraph>
+      <b:Paragraph>
+        <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank"><img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a>
+      </b:Paragraph>
+
+      <b:Paragraph>
+        A download key can be obtained using the
+        <a href="https://taxonomies.maelstrom-research.org" target="_blank" class="btn btn-primary">Download Request Form</a>
+      </b:Paragraph>
 
       <!-- Download Key -->
       <b:ControlGroup ui:field="downloadKeyGroup">
@@ -118,10 +121,6 @@
         <b:Controls>
           <b:TextBox ui:field="downloadKey"/>
         </b:Controls>
-        <b:HelpBlock>
-          <ui:msg description="Taxonomy Git Download Key help">The download key that can be obtained from the
-            <a href="https://taxonomies.maelstrom-research.org" target="_blank">Download Request Form</a>.</ui:msg>
-        </b:HelpBlock>
       </b:ControlGroup>
 
       <!-- Accepted -->
