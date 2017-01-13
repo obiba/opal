@@ -14,7 +14,6 @@ import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.CloseableList;
-import org.obiba.opal.web.gwt.app.client.ui.HasUrl;
 import org.obiba.opal.web.gwt.app.client.ui.ListItem;
 import org.obiba.opal.web.gwt.app.client.ui.SuggestListBox;
 import org.obiba.opal.web.gwt.app.client.ui.VariableSearchListItem;
@@ -27,17 +26,21 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.Dropdown;
 import com.github.gwtbootstrap.client.ui.FluidContainer;
 import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.Tooltip;
 import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.common.base.Strings;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.Frame;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.NamedFrame;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.Widget;
@@ -76,9 +79,6 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
   @UiField
   Panel workbench;
 
-  @UiField
-  Frame frame;
-
   @UiField(provided = true)
   SuggestListBox search;
 
@@ -97,6 +97,15 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
   @UiField
   Brand applicationName;
 
+  @UiField
+  FlowPanel panel;
+
+  private FormPanel form;
+
+  private NamedFrame frame;
+
+  private TextBox xFileKey;
+
   private final VariableSuggestOracle oracle;
 
   @Inject
@@ -113,6 +122,7 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
     resizeTooltip.setText(translations.switchScreenDisplay());
 
     initSearchWidget();
+    initDownloadWidgets();
   }
 
   private void initSearchWidget() {
@@ -140,6 +150,18 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
     });
   }
 
+  private void initDownloadWidgets() {
+    frame = new NamedFrame("frame");
+    frame.setVisible(false);
+    xFileKey = new TextBox();
+    xFileKey.setName("xFileKey");
+    form = new FormPanel(frame);
+    form.add(xFileKey);
+    form.setVisible(false);
+    panel.add(form);
+    panel.add(frame);
+  }
+
   @Override
   public void setInSlot(Object slot, IsWidget content) {
     if(ApplicationPresenter.WORKBENCH == slot) {
@@ -152,14 +174,15 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
   }
 
   @Override
-  public HasUrl getDownloader() {
-    return new HasUrl() {
-
-      @Override
-      public void setUrl(String url) {
-        frame.setUrl(url);
-      }
-    };
+  public void setDownloadInfo(String url, String password) {
+    if (!Strings.isNullOrEmpty(password)) {
+      xFileKey.setText(password);
+      form.setAction(url);
+      form.setMethod(FormPanel.METHOD_POST);
+      form.submit();
+    } else {
+      frame.setUrl(url);
+    }
   }
 
   @Override

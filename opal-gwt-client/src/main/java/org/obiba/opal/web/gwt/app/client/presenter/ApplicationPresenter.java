@@ -30,7 +30,6 @@ import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectHiddenEvent;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
-import org.obiba.opal.web.gwt.app.client.ui.HasUrl;
 import org.obiba.opal.web.gwt.app.client.ui.VariableSearchListItem;
 import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
@@ -138,7 +137,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
       @Override
       public void onFileDownloadRequest(FileDownloadRequestEvent event) {
-        getView().getDownloader().setUrl(urlBuilder.buildAbsoluteUrl(event.getUrl()));
+        getView().setDownloadInfo(urlBuilder.buildAbsoluteUrl(event.getUrl()), event.getPassword());
       }
     });
     addRegisteredHandler(FilesDownloadRequestEvent.getType(),
@@ -149,7 +148,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
             for(FileDto child : event.getChildren()) {
               uriBuilder.query("file", child.getName());
             }
-            getView().getDownloader().setUrl(urlBuilder.buildAbsoluteUrl(uriBuilder.build()));
+            getView().setDownloadInfo(urlBuilder.buildAbsoluteUrl(uriBuilder.build()), event.getPassword());
           }
         });
 
@@ -310,7 +309,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   public interface Display extends View, HasUiHandlers<ApplicationUiHandlers> {
 
-    HasUrl getDownloader();
+    void setDownloadInfo(String Url, String password);
 
     HasAuthorization getAdministrationAuthorizer();
 
