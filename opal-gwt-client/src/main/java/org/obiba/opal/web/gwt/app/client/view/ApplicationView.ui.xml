@@ -15,7 +15,7 @@
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <g:FlowPanel addStyleNames="main">
+  <g:FlowPanel addStyleNames="main" ui:field="panel">
     <b:ResponsiveNavbar position="TOP" scrollspy="false">
       <b:Brand href="#" ui:field="applicationName">Opal</b:Brand>
       <b:Nav>
@@ -79,6 +79,5 @@
         </b:FluidRow>
       </b:FluidContainer>
     </b:Footer>
-    <g:Frame ui:field="frame" visible="false"></g:Frame>
   </g:FlowPanel>
 </ui:UiBinder>

@@ -28,6 +28,7 @@ def add_arguments(parser):
     """
     parser.add_argument('path', help='File path in Opal file system.')
     parser.add_argument('--download', '-dl', action='store_true', help='Download file, or folder (as a zip file).')
+    parser.add_argument('--download-password', '-dlp', help='Password to encrypt the file content.')
     parser.add_argument('--upload', '-up', required=False, help='Upload a local file to a folder in Opal file system.')
     parser.add_argument('--delete', '-dt', action='store_true', help='Delete a file on Opal file system.')
     parser.add_argument('--force', '-f', action='store_true', help='Skip confirmation.')
@@ -51,7 +52,7 @@ def do_command(args):
 
         # send request
         if args.download:
-            response = request.get().resource(file.get_ws()).send()
+            response = request.get().resource(file.get_ws()).header('X-File-Key', args.download_password).send()
         elif args.upload:
             #boundary = 'OpalPythonClient'
             #request.post().content_type('multipart/form-data; boundary=' + boundary).accept('text/html')
