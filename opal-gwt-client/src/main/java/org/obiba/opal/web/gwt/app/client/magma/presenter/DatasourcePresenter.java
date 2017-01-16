@@ -221,6 +221,11 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
   }
 
   @Override
+  public void onRefresh() {
+    initDatasource();
+  }
+
+  @Override
   public void onDownloadDictionary() {
     downloadMetadata();
   }

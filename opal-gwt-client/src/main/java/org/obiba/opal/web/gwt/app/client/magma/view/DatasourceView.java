@@ -199,6 +199,11 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     getUiHandlers().onAddView();
   }
 
+  @UiHandler("refreshButton")
+  void onRefresh(ClickEvent event) {
+    getUiHandlers().onRefresh();
+  }
+
   @UiHandler("deleteTables")
   void onDeleteTables(ClickEvent event) {
     getUiHandlers().onDeleteTables(checkColumn.getSelectedItems());

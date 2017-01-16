@@ -63,6 +63,9 @@
               <ui:msg description="Add view label">Add view...</ui:msg>
             </b:NavLink>
           </b:DropdownButton>
+          <b:Button ui:field="refreshButton" icon="REFRESH" addStyleNames="small-top-margin small-indent">
+            <ui:msg description="Refresh tables list">Refresh</ui:msg>
+          </b:Button>
         </g:FlowPanel>
 
         <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false" addStyleNames="actions-select">

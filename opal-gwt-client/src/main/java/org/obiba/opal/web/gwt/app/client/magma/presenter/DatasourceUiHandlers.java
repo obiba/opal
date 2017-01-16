@@ -30,6 +30,8 @@ public interface DatasourceUiHandlers extends UiHandlers {
 
   void onAddView();
 
+  void onRefresh();
+
   void onDownloadDictionary();
 
   void onDeleteTables(List<TableDto> tables);
