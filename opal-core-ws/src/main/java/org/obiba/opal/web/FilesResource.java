@@ -128,8 +128,8 @@ public class FilesResource {
   @Path("/{path:.*}")
   @AuthenticatedByCookie
   public Response getFileFromForm(@PathParam("path") String path, @QueryParam("file") List<String> children,
-      @Nullable @FormParam("xFileKey") String xFileKey) throws IOException {
-    return getFileInternal(path, children, xFileKey);
+      @Nullable @FormParam("key") String fileKey) throws IOException {
+    return getFileInternal(path, children, fileKey);
   }
 
   @GET

@@ -154,7 +154,7 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
     frame = new NamedFrame("frame");
     frame.setVisible(false);
     xFileKey = new TextBox();
-    xFileKey.setName("xFileKey");
+    xFileKey.setName("key");
     form = new FormPanel(frame);
     form.add(xFileKey);
     form.setVisible(false);
