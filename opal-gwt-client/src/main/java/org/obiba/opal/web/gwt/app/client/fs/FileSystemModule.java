@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.fs;
 
 import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderModalPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.EncryptDownloadModalPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FilePathPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FilePlacesPresenter;
@@ -18,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadModalPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.view.CreateFolderModalView;
+import org.obiba.opal.web.gwt.app.client.fs.view.EncryptDownloadModalView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FileExplorerView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FilePathView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FilePlacesView;
@@ -41,6 +43,8 @@ public class FileSystemModule extends AbstractPresenterModule {
     bindPresenterWidget(FilePathPresenter.class, FilePathPresenter.Display.class, FilePathView.class);
     bindPresenterWidget(CreateFolderModalPresenter.class, CreateFolderModalPresenter.Display.class,
         CreateFolderModalView.class);
+    bindPresenterWidget(EncryptDownloadModalPresenter.class, EncryptDownloadModalPresenter.Display.class,
+        EncryptDownloadModalView.class);
     bindPresenterWidget(FileUploadModalPresenter.class, FileUploadModalPresenter.Display.class,
         FileUploadModalView.class);
     bindPresenterWidget(FileSelectorPresenter.class, FileSelectorPresenter.Display.class, FileSelectorView.class);

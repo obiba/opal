@@ -8,19 +8,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.fs.event;
+package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
-import com.gwtplatform.dispatch.annotation.GenEvent;
-import com.gwtplatform.dispatch.annotation.Optional;
-import com.gwtplatform.dispatch.annotation.Order;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
-@GenEvent
-public class FileDownloadRequest {
+public interface EncryptDownloadModalUiHandlers extends ModalUiHandlers {
 
-  @Order(0)
-  String url;
-
-  @Optional @Order(1)
-  String password;
-
+  void onDownload();
+  void onViewPassword();
+  String onGeneratePassword();
 }

@@ -9,13 +9,54 @@
  */
 package org.obiba.opal.web;
 
-import com.google.common.base.Strings;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.UUID;
+
+import javax.activation.MimetypesFileTypeMap;
+import javax.annotation.Nullable;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.core.UriInfo;
+
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.vfs2.*;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSelector;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.Selectors;
 import org.codehaus.jettison.json.JSONArray;
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.core.util.StreamUtil;
@@ -32,24 +73,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.activation.MimetypesFileTypeMap;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.StreamingOutput;
-import javax.ws.rs.core.UriInfo;
-import java.io.*;
-import java.io.FileFilter;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import com.google.common.base.Strings;
 
 @Component
 @Path("/files")
@@ -99,11 +123,24 @@ public class FilesResource {
     return getFile("/", null, password);
   }
 
+
+  @POST
+  @Path("/{path:.*}")
+  @AuthenticatedByCookie
+  public Response getFileFromForm(@PathParam("path") String path, @QueryParam("file") List<String> children,
+      @Nullable @FormParam("xFileKey") String xFileKey) throws IOException {
+    return getFileInternal(path, children, xFileKey);
+  }
+
   @GET
   @Path("/{path:.*}")
   @AuthenticatedByCookie
   public Response getFile(@PathParam("path") String path, @QueryParam("file") List<String> children, @HeaderParam("X-File-Key") String fileKey)
       throws IOException {
+    return getFileInternal(path, children, fileKey);
+  }
+
+  private Response getFileInternal(String path, List<String> children, String fileKey) throws IOException {
     if (!Strings.isNullOrEmpty(fileKey) && fileKey.length()<8) {
       return Response.status(Status.BAD_REQUEST).entity("The file key is too short (minimum 8 characters).").build();
     }
