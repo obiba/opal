@@ -101,7 +101,7 @@
     <g:FlowPanel ui:field="acceptedPanel" visible="false">
 
       <b:Paragraph>
-        <ui:msg description="MR Taxonomies License text">These taxonomies are available under the <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">Creative Commons License with Non Commercial and No Derivatives</a> constraints and are free for academic.
+        <ui:msg description="MR Taxonomies License text">These taxonomies are available under the <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License</a>.
         </ui:msg>
       </b:Paragraph>
       <b:Paragraph>
