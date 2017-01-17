@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.derive.helper.DerivedVariableGenerator;
 import org.obiba.opal.web.gwt.app.client.magma.derive.helper.VariableDuplicationHelper;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveVariablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.SummaryRequiredEvent;
@@ -327,8 +328,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   @Override
   public void onSaveScript() {
-    VariableDuplicationHelper variableDuplicationHelper = new VariableDuplicationHelper(variable);
-    VariableDto newVariable = variableDuplicationHelper.getDerivedVariable();
+    VariableDto newVariable = DerivedVariableGenerator.copyVariable(variable, true, null);
     VariableDtos.setScript(newVariable, scriptEditorPresenter.getScript());
     newVariable.setValueType(scriptEditorPresenter.getValueEntityType().getLabel());
     newVariable.setIsRepeatable(scriptEditorPresenter.isRepeatable());
