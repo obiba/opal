@@ -8,26 +8,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.fs.presenter;
+package org.obiba.opal.web.gwt.app.client.fs.event;
 
-import com.gwtplatform.mvp.client.UiHandlers;
+import org.obiba.opal.web.model.client.opal.FileDto;
 
-public interface FileExplorerUiHandlers extends UiHandlers {
+import com.gwtplatform.dispatch.annotation.GenEvent;
 
-  void onAddFolder();
-
-  void onUploadFile();
-
-  void onDelete();
-
-  void onRename();
-
-  void onDownload();
-
-  void onCopy();
-
-  void onCut();
-
-  void onPaste();
-
+@GenEvent
+public class FileRenameRequest {
+  FileDto folder;
+  FileDto file;
+  String name;
 }

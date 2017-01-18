@@ -10,24 +10,8 @@
 
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
-import com.gwtplatform.mvp.client.UiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
-public interface FileExplorerUiHandlers extends UiHandlers {
-
-  void onAddFolder();
-
-  void onUploadFile();
-
-  void onDelete();
-
+public interface RenameModalUiHandlers extends ModalUiHandlers {
   void onRename();
-
-  void onDownload();
-
-  void onCopy();
-
-  void onCut();
-
-  void onPaste();
-
 }
