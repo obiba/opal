@@ -55,6 +55,7 @@ public class RenameModalPresenter extends ModalPresenterWidget<RenameModalPresen
   public void initialize(FileDto folder, FileDto file) {
     currentFolder = folder;
     selectedFile = file;
+    getView().getName().setText(selectedFile.getName());
   }
 
   @Override
