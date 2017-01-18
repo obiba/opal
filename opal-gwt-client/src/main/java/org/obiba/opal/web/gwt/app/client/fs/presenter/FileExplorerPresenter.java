@@ -130,6 +130,7 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
         checkedFiles = null;
         updateCurrentFolderAuthorizations();
         updateCheckedFilesAuthorizations();
+        updateCheckedFilesRenameAuthorization();
       }
 
       private void updateCurrentFolderAuthorizations() {
@@ -304,7 +305,7 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
    * Authorize delete if all that is selected can be deleted.
    */
   private void updateCheckedFilesRenameAuthorization() {
-    if(!hasCheckedFiles()) return;
+    if(!hasCheckedFiles()) getView().getFileRenameAuthorizer().unauthorized();
 
     if(checkedFiles.size() == 1 && checkedFiles.get(0).getWritable()) {
       getView().getFileRenameAuthorizer().authorized();
