@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileUploadedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FilesCheckedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -92,6 +93,16 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
       public void onFileDeleted(FileDeletedEvent event) {
         // Refresh the current folder
         updateTable(currentFolder);
+      }
+    });
+
+    addRegisteredHandler(FolderRefreshEvent.getType(), new FolderRefreshEvent.FolderRefreshHandler() {
+
+      @Override
+      public void onFolderRefresh(FolderRefreshEvent event) {
+        // Refresh the current folder
+        FileDto fileDto = event.getFolder();
+        updateTable(fileDto != null ? fileDto : currentFolder);
       }
     });
   }

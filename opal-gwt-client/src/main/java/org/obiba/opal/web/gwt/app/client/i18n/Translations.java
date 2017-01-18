@@ -597,8 +597,9 @@ public interface Translations extends Constants {
       "VocabularyNotFound", "No such vocabulary in taxonomy '{0}' with name: {1}.", //
       "TermNotFound", "No such term in taxonomy '{0}' and vocabulary '{1}' with name: {2}.", //
       "IllegalArgument", "{0}", //
-      "Forbidden", "Operation not allowed." //
-
+      "Forbidden", "Operation not allowed.", //
+      "FileAlreadyExists", "File '{0}' already exists.", //
+      "FolderAlreadyExists", "Folder '{0}' already exists." //
   })
   Map<String, String> userMessageMap();
 

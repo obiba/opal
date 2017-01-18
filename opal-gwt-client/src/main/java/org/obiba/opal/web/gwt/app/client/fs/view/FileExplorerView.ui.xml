@@ -42,8 +42,10 @@
         </b:Button>
       </b:ButtonGroup>
       <b:ButtonGroup>
-        <b:Button icon="TRASH" title="Remove" ui:field="remove">
-        </b:Button>
+        <b:Button enabled="false" icon="PENCIL" title="Rename" ui:field="rename"/>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:Button icon="TRASH" title="Remove" ui:field="remove"/>
       </b:ButtonGroup>
       <b:ButtonGroup visible="false">
         <b:Button icon="BOOKMARK_EMPTY" title="Bookmark" ui:field="bookmark">

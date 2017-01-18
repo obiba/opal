@@ -16,7 +16,9 @@ import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileRenameRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FilesCheckedEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
@@ -30,8 +32,10 @@ import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -59,6 +63,8 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
 
   private final ModalProvider<EncryptDownloadModalPresenter> encryptDownloadModalProvider;
 
+  private final ModalProvider<RenameModalPresenter> renameModalPresenterModalProvider;
+
   private Runnable actionRequiringConfirmation;
 
   private List<FileDto> checkedFiles;
@@ -73,7 +79,8 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
       FilePlacesPresenter filePlacesPresenter, FolderDetailsPresenter folderDetailsPresenter,
       ModalProvider<FileUploadModalPresenter> fileUploadModalProvider,
       ModalProvider<CreateFolderModalPresenter> createFolderModalProvider, TranslationMessages translationMessages,
-      ModalProvider<EncryptDownloadModalPresenter> encryptDownloadModalProvider) {
+      ModalProvider<EncryptDownloadModalPresenter> encryptDownloadModalProvider,
+      ModalProvider<RenameModalPresenter> renameModalPresenterModalProvider) {
     super(eventBus, display);
     this.filePathPresenter = filePathPresenter;
     this.filePlacesPresenter = filePlacesPresenter;
@@ -82,6 +89,7 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
     this.fileUploadModalProvider = fileUploadModalProvider.setContainer(this);
     this.createFolderModalProvider = createFolderModalProvider.setContainer(this);
     this.encryptDownloadModalProvider = encryptDownloadModalProvider.setContainer(this);
+    this.renameModalPresenterModalProvider = renameModalPresenterModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -122,6 +130,7 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
         checkedFiles = null;
         updateCurrentFolderAuthorizations();
         updateCheckedFilesAuthorizations();
+        updateCheckedFilesRenameAuthorization();
       }
 
       private void updateCurrentFolderAuthorizations() {
@@ -147,6 +156,49 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
         updateCheckedFilesAuthorizations();
       }
     });
+
+    addRegisteredHandler(FileRenameRequestEvent.getType(), new FileRenameRequestEvent.FileRenameRequestHandler() {
+
+      private FileDto findFolderWithSameName(FileDto folder, String name) {
+        JsArray<FileDto> files = folder.getChildrenArray();
+        for(int i = 0; i < files.length(); i++) {
+          FileDto f = files.get(i);
+          if(!FileDto.FileType.FILE.isFileType(f.getType()) && name.equals(f.getName())) {
+            return f;
+          }
+        }
+
+        return null;
+      }
+
+      @Override
+      public void onFileRenameRequest(FileRenameRequestEvent event) {
+        final FileDto folder = event.getFolder();
+        FileDto file = event.getFile();
+        String newName = event.getName();
+        final FileDto folderWithSameName = findFolderWithSameName(folder, newName);
+        String requestUrl = "/files" + folder.getPath() + "/" +
+            (folderWithSameName == null ? newName : folderWithSameName.getName());
+
+        ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if(response.getStatusCode() == Response.SC_OK) {
+              getEventBus().fireEvent(new FolderRefreshEvent(folderWithSameName == null ? folder : folderWithSameName));
+            } else {
+              getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+            }
+          }
+        };
+
+        UriBuilder uriBuilder = UriBuilder.create().fromPath(requestUrl);
+        uriBuilder.query("action", FileAction.MOVE.toString().toLowerCase());
+        uriBuilder.query("file", URL.encodePathSegment(file.getPath()));
+        ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).put()
+            .withCallback(Response.SC_OK, callbackHandler)
+            .send();
+      }
+    });
   }
 
   private FileDto getCurrentFolder() {
@@ -158,6 +210,7 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
       updateCheckedFilesDownloadAuthorization();
       updateCheckedFilesCopyAuthorization();
       updateCheckedFilesCutAuthorization();
+      updateCheckedFilesRenameAuthorization();
       updateCheckedFilesDeleteAuthorization();
     } else {
       getView().getFileDownloadAuthorizer().unauthorized();
@@ -251,6 +304,19 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
   /**
    * Authorize delete if all that is selected can be deleted.
    */
+  private void updateCheckedFilesRenameAuthorization() {
+    if(!hasCheckedFiles()) getView().getFileRenameAuthorizer().unauthorized();
+
+    if(checkedFiles.size() == 1 && checkedFiles.get(0).getWritable()) {
+      getView().getFileRenameAuthorizer().authorized();
+    } else {
+      getView().getFileRenameAuthorizer().unauthorized();
+    }
+  }
+
+  /**
+   * Authorize delete if all that is selected can be deleted.
+   */
   private void updateCheckedFilesDeleteAuthorization() {
     if(!hasCheckedFiles()) return;
 
@@ -329,7 +395,6 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
   @Override
   public void onDownload() {
     if(!hasCheckedFiles()) return;
-
     encryptDownloadModalProvider.get().setFiles(checkedFiles);
   }
 
@@ -338,6 +403,13 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
     filesClipboard = checkedFiles;
     currentAction = FileAction.COPY;
     getView().showFilesInClipboard(filesClipboard);
+  }
+
+
+  @Override
+  public void onRename() {
+    if(!hasCheckedFiles()) return;
+    renameModalPresenterModalProvider.get().initialize(getCurrentFolder(), checkedFiles.get(0));
   }
 
   @Override
@@ -388,6 +460,8 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
     HasAuthorization getFileUploadAuthorizer();
 
     HasAuthorization getFileDownloadAuthorizer();
+
+    HasAuthorization getFileRenameAuthorizer();
 
     HasAuthorization getFileDeleteAuthorizer();
 

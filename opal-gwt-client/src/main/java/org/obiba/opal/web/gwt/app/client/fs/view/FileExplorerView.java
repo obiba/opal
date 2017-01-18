@@ -19,7 +19,6 @@ import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.NavLink;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -65,6 +64,9 @@ public class FileExplorerView extends ViewWithUiHandlers<FileExplorerUiHandlers>
   @UiField
   Button addFolder;
 
+  @UiField
+  Button rename;
+
   @Inject
   public FileExplorerView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
@@ -102,6 +104,11 @@ public class FileExplorerView extends ViewWithUiHandlers<FileExplorerUiHandlers>
   @Override
   public HasAuthorization getFileDownloadAuthorizer() {
     return new WidgetAuthorizer(false, download);
+  }
+
+  @Override
+  public HasAuthorization getFileRenameAuthorizer() {
+    return new WidgetAuthorizer(false, rename);
   }
 
   @Override
@@ -143,6 +150,11 @@ public class FileExplorerView extends ViewWithUiHandlers<FileExplorerUiHandlers>
   @UiHandler("download")
   void onDownload(ClickEvent event) {
     getUiHandlers().onDownload();
+  }
+
+  @UiHandler("rename")
+  void onRename(ClickEvent event) {
+    getUiHandlers().onRename();
   }
 
   @UiHandler("remove")
