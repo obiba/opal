@@ -44,7 +44,7 @@ public class AuthenticationExecutorImpl extends AbstractAuthenticationExecutor {
     boolean ensuredProfile = subjectSession != null && subjectSession.getAttribute(ENSURED_PROFILE) != null;
     if(!ensuredProfile) {
       String username = principal.toString();
-      log.info("Ensure HOME folder for {}", username);
+      log.debug("Ensure HOME folder for {}", username);
       subjectProfileService.ensureProfile(subject.getPrincipals());
       if(subjectSession != null) {
         subjectSession.setAttribute(ENSURED_PROFILE, true);
