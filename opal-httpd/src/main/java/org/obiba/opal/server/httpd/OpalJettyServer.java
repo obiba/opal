@@ -45,6 +45,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.Properties;
 
@@ -247,7 +248,7 @@ public class OpalJettyServer {
   }
 
   private Handler createDistFileHandler(String directory) throws IOException, URISyntaxException {
-    return createFileHandler("file://" + System.getProperty("OPAL_DIST") + directory);
+    return createFileHandler("file://" + resolveOpalDistPath() + directory);
   }
 
   private Handler createFileHandler(String fileUrl) throws IOException, URISyntaxException {
@@ -271,8 +272,18 @@ public class OpalJettyServer {
     return createFileHandler("file://" + filePath);
   }
 
+  /**
+   * Make sure there are no symbolic links in the Opal distribution folder path.
+   * 
+   * @return
+   * @throws IOException
+   */
+  private String resolveOpalDistPath() throws IOException {
+    return new File(System.getProperty("OPAL_DIST")).toPath().toRealPath().toString();
+  }
+
   // https://issues.jboss.org/browse/RESTEASY-1012
-  public static class Spring4ContextLoaderListener extends ContextLoaderListener {
+  static class Spring4ContextLoaderListener extends ContextLoaderListener {
 
     private final SpringContextLoaderSupport springContextLoaderSupport = new SpringContextLoaderSupport();
 
