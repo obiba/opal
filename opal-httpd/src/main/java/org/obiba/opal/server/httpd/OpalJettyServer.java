@@ -15,6 +15,7 @@ import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.security.ConstraintAware;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.handler.AllowSymLinkAliasChecker;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
@@ -192,6 +193,7 @@ public class OpalJettyServer {
   private Handler createServletHandler() {
     servletContextHandler = new ServletContextHandler(ServletContextHandler.SECURITY);
     servletContextHandler.setContextPath("/");
+    servletContextHandler.addAliasCheck(new AllowSymLinkAliasChecker());
 
     initEventListeners();
     initNotAllowedMethods();
