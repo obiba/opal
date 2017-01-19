@@ -23,6 +23,9 @@
           <ui:msg description="Encrypt file label">Encrypt file content</ui:msg>
         </b:CheckBox>
       </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="Encrypt file help">Decryption can be done using the free software <a href="http://www.7-zip.org/" target="_blank">7-zip</a> available on all platforms.</ui:msg>
+      </b:HelpBlock>
     </b:ControlGroup>
 
 
