@@ -85,6 +85,7 @@ public class JavaScriptViewDtoExtension implements ViewDtoExtension {
       for(ValueTable vt : fromTables) {
         if(hasTableAccess(vt)) viewDtoBuilder.addFrom(toStringReference(vt));
       }
+      viewDtoBuilder.addAllInnerFrom(((JoinTable) from).getInnerTableReferences());
     } else {
       if(hasTableAccess(from)) viewDtoBuilder.addFrom(toStringReference(from));
     }

@@ -9,25 +9,7 @@
  */
 package org.obiba.opal.web.magma;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Locale;
-import java.util.Set;
-
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-
+import com.google.common.collect.Sets;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceUpdateListener;
 import org.obiba.magma.MagmaEngine;
@@ -40,7 +22,6 @@ import org.obiba.opal.core.security.OpalPermissions;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.Schedule;
-import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.ViewDto;
@@ -56,9 +37,15 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Sets;
-
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import javax.ws.rs.core.Response.Status;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Locale;
+import java.util.Set;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 

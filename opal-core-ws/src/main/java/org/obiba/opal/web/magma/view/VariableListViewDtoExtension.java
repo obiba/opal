@@ -93,6 +93,7 @@ public class VariableListViewDtoExtension implements ViewDtoExtension {
       for(ValueTable vt : fromTables) {
         viewDtoBuilder.addFrom(toStringReference(vt));
       }
+      viewDtoBuilder.addAllInnerFrom(((JoinTable) from).getInnerTableReferences());
     } else {
       viewDtoBuilder.addFrom(toStringReference(from));
     }

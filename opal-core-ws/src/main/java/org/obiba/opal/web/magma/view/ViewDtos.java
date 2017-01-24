@@ -16,6 +16,7 @@ import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 
+import com.google.common.collect.Lists;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.js.views.JavascriptClause;
@@ -46,8 +47,12 @@ public final class ViewDtos {
   public View fromDto(@NotNull ViewDto viewDto) {
     List<ValueTable> fromTables = getFromTables(viewDto);
     View.Builder builder = View.Builder
-        .newView(viewDto.getName(), (ValueTable[]) fromTables.toArray(new ValueTable[fromTables.size()]));
+        .newView(viewDto.getName(), fromTables);
 
+    if (viewDto.getInnerFromCount() > 0) {
+      builder.innerFrom(viewDto.getInnerFromList());
+    }
+    
     if(viewDto.hasWhere()) {
       WhereClause whereClause = new JavascriptClause(viewDto.getWhere());
       builder.where(whereClause);

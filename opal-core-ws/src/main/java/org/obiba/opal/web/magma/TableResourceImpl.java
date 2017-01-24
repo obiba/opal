@@ -314,7 +314,7 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
         missingCategories);
     ValueTable transientView = self
         ? getValueTable()
-        : new View("transient", new AllClause(), new AllClause(), getValueTable());
+        : View.Builder.newView("transient", getValueTable()).build();
     JavascriptVariableValueSource valueSource = new JavascriptVariableValueSource(transientVariable, transientView);
     valueSource.initialise();
     return valueSource;

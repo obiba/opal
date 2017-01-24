@@ -264,6 +264,7 @@ message ViewDto {
   optional string name = 2;
   optional string datasourceName = 3;
   optional string where = 4;
+  repeated string innerFrom = 5;
   extensions 1000 to max;
 }
 
