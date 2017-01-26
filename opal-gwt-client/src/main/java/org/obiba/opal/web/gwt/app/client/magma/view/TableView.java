@@ -147,6 +147,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   Alert selectAllItemsAlert;
 
   @UiField
+  Alert selectItemTipsAlert;
+
+  @UiField
   Dropdown applyAttributeButton;
 
   @UiField
@@ -567,6 +570,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiHandler("deleteVariables")
   void onDeleteVariables(ClickEvent event) {
     getUiHandlers().onDeleteVariables(checkColumn.getSelectedItems());
+    checkColumn.clearSelection();
   }
 
   @UiHandler("clearIndexLink")
@@ -793,7 +797,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
     @Override
     public Alert getSelectTipsAlert() {
-      return null;
+      return selectItemTipsAlert;
     }
   }
 

@@ -243,8 +243,8 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
       return;
 
     int selectedSize = selectionModel.getSelectedSet().size();
-
-    boolean allSelected = selectedSize == display.getDataProvider().getList().size();
+    int count = display.getDataProvider().getList().size();
+    boolean allSelected = selectedSize == count;
 
     if(display.getSelectActionsAlert() != null && selectedSize == 0) {
       display.getSelectActionsAlert().setVisible(false);
@@ -255,7 +255,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     }
 
     if(display.getSelectTipsAlert() != null) {
-      display.getSelectTipsAlert().setVisible(selectedSize == 0);
+      display.getSelectTipsAlert().setVisible(count > 0 && selectedSize == 0);
     }
   }
 
@@ -293,13 +293,14 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
   private void doAction() {
     // Count the number of selected items on the current page.
     int nbSelected = selectionModel.getSelectedSet().size();
+    int count = display.getDataProvider().getList().size();
 
     if(display.getSelectActionsAlert() != null) {
       display.getSelectActionsAlert().setVisible(nbSelected > 0);
     }
 
     if(display.getSelectTipsAlert() != null) {
-      display.getSelectTipsAlert().setVisible(nbSelected == 0);
+      display.getSelectTipsAlert().setVisible(count > 0 && nbSelected == 0);
     }
 
     if(actionHandler != null) {

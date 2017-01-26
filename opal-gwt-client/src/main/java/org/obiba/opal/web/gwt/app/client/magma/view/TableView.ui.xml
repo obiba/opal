@@ -160,6 +160,11 @@
             </g:FlowPanel>
 
           </b:Alert>
+          <b:Alert ui:field="selectItemTipsAlert" close="false" visible="true" addStyleNames="alert-info actions-select">
+            <g:Label>
+              <ui:msg description="Select variables tips label">Select variables to add to view, manage attributes or remove.</ui:msg>
+            </g:Label>
+          </b:Alert>
           <o:Table ui:field="table" addStyleNames="pull-left"/>
         </g:FlowPanel>
         <o:OpalSimplePager ui:field="pager2" showTotalWhenNoPager="false" location="RIGHT"

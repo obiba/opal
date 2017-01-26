@@ -104,6 +104,9 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   Alert selectAllItemsAlert;
 
   @UiField
+  Alert selectItemTipsAlert;
+
+  @UiField
   Label selectAllStatus;
 
   @UiField
@@ -207,6 +210,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   @UiHandler("deleteTables")
   void onDeleteTables(ClickEvent event) {
     getUiHandlers().onDeleteTables(checkColumn.getSelectedItems());
+    checkColumn.clearSelection();
   }
 
   @UiHandler("exportSelectionAnchor")
@@ -457,7 +461,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
 
     @Override
     public Alert getSelectTipsAlert() {
-      return null;
+      return selectItemTipsAlert;
     }
   }
 

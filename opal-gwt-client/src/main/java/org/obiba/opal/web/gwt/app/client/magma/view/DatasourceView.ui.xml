@@ -95,6 +95,12 @@
           </g:FlowPanel>
         </b:Alert>
 
+        <b:Alert ui:field="selectItemTipsAlert" close="false" visible="true" addStyleNames="alert-info actions-select">
+          <g:Label>
+            <ui:msg description="Select tables tips label">Select tables to export, copy or remove.</ui:msg>
+          </g:Label>
+        </b:Alert>
+
         <o:Table ui:field="table"/>
       </b:Tab>
 

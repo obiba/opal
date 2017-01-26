@@ -83,7 +83,7 @@
       </b:Alert>
       <b:Alert ui:field="selectItemTipsAlert" close="false" visible="true" addStyleNames="alert-info actions-select">
         <g:Label>
-          <ui:msg description="Select table references label">Select items to move up/down or remove.</ui:msg>
+          <ui:msg description="Select table references tips label">Select tables to move up/down or remove.</ui:msg>
         </g:Label>
       </b:Alert>
     </g:FlowPanel>

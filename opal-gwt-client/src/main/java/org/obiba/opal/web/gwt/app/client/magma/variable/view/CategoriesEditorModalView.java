@@ -109,6 +109,9 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   Alert selectAllItemsAlert;
 
   @UiField
+  Alert selectItemTipsAlert;
+
+  @UiField
   Label selectAllStatus;
 
   @UiField
@@ -415,7 +418,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
     @Override
     public Alert getSelectTipsAlert() {
-      return null;
+      return selectItemTipsAlert;
     }
   }
 }

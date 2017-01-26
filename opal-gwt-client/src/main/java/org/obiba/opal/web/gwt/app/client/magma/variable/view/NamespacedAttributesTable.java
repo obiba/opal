@@ -125,6 +125,7 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
   @UiHandler("deleteLink")
   public void onDelete(ClickEvent event) {
     getUiHandlers().onDeleteAttribute(checkColumn.getSelectedItems());
+    checkColumn.clearSelection();
   }
 
   public void initColumns() {
