@@ -246,12 +246,16 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
 
     boolean allSelected = selectedSize == display.getDataProvider().getList().size();
 
-    if(display.getAlert() != null && selectedSize == 0) {
-      display.getAlert().setVisible(false);
+    if(display.getSelectActionsAlert() != null && selectedSize == 0) {
+      display.getSelectActionsAlert().setVisible(false);
     } else if(allSelected) {
       updateStatusAlertWhenAllSelected(selectedSize);
     } else if(selectedSize > 0) {
       updateStatusAlertWhenNotAllSelected(selectedSize);
+    }
+
+    if(display.getSelectTipsAlert() != null) {
+      display.getSelectTipsAlert().setVisible(selectedSize == 0);
     }
   }
 
@@ -288,10 +292,14 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
 
   private void doAction() {
     // Count the number of selected items on the current page.
-    Integer nbSelected = selectionModel.getSelectedSet().size();
+    int nbSelected = selectionModel.getSelectedSet().size();
 
-    if(display.getAlert() != null) {
-      display.getAlert().setVisible(nbSelected > 0);
+    if(display.getSelectActionsAlert() != null) {
+      display.getSelectActionsAlert().setVisible(nbSelected > 0);
+    }
+
+    if(display.getSelectTipsAlert() != null) {
+      display.getSelectTipsAlert().setVisible(nbSelected == 0);
     }
 
     if(actionHandler != null) {
@@ -341,6 +349,15 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
      */
     String getNItemLabel(int nb);
 
-    Alert getAlert();
+    /**
+     * @return The actions panel after selection was made.
+     */
+    Alert getSelectActionsAlert();
+
+    /**
+     * @return The info panel when no selection is made.
+     */
+    Alert getSelectTipsAlert();
+
   }
 }

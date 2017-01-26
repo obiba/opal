@@ -451,8 +451,13 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     }
 
     @Override
-    public Alert getAlert() {
+    public Alert getSelectActionsAlert() {
       return selectAllItemsAlert;
+    }
+
+    @Override
+    public Alert getSelectTipsAlert() {
+      return null;
     }
   }
 

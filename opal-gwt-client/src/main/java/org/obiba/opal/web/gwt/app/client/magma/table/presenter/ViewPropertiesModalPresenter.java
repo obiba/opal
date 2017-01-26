@@ -37,7 +37,6 @@ import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -88,10 +87,10 @@ public class ViewPropertiesModalPresenter extends ModalPresenterWidget<ViewPrope
   }
 
   @Override
-  public void onSave(final String name, List<TableDto> referencedTables) {
+  public void onSave(final String name, List<TableDto> referencedTables, List<String> innerFrom) {
     if(!validationHandler.validate()) return;
 
-    ViewDto dto = getViewDto(name, referencedTables);
+    ViewDto dto = getViewDto(name, referencedTables, innerFrom);
 
     UriBuilder ub = UriBuilders.DATASOURCE_VIEW.create().query("comment", view.getName().equals(name)
         ? TranslationsUtils.replaceArguments(translations.updateComment(), name)
@@ -114,7 +113,7 @@ public class ViewPropertiesModalPresenter extends ModalPresenterWidget<ViewPrope
     }, Response.SC_OK, Response.SC_BAD_REQUEST, Response.SC_FORBIDDEN).send();
   }
 
-  private ViewDto getViewDto(String name, List<TableDto> referencedTables) {
+  private ViewDto getViewDto(String name, List<TableDto> referencedTables, List<String> innerFrom) {
     ViewDto v = ViewDto.create();
     v.setName(name);
     JsArrayString tables = JavaScriptObject.createArray().cast();
@@ -122,6 +121,7 @@ public class ViewPropertiesModalPresenter extends ModalPresenterWidget<ViewPrope
       tables.push(tableDto.getDatasourceName() + "." + tableDto.getName());
     }
     v.setFromArray(tables);
+    if (!innerFrom.isEmpty()) v.setInnerFromArray(JsArrays.fromIterable(innerFrom));
     if(view.hasWhere()) v.setWhere(view.getWhere());
 
     v.setExtension(VariableListViewDto.ViewDtoExtensions.view,
@@ -137,7 +137,7 @@ public class ViewPropertiesModalPresenter extends ModalPresenterWidget<ViewPrope
           public void onResource(Response response, JsArray<TableDto> resource) {
             JsArray<TableDto> tables = JsArrays.toSafeArray(resource);
             TableDto viewTableDto = findViewTabledto(tables);
-            getView().addSelectableTables(filterTables(tables, viewTableDto), view.getFromArray());
+            getView().prepareTables(filterTables(tables, viewTableDto), view.getFromArray(), view.getInnerFromArray());
           }
 
           /**
@@ -191,7 +191,7 @@ public class ViewPropertiesModalPresenter extends ModalPresenterWidget<ViewPrope
 
     void renderProperties(ViewDto view);
 
-    void addSelectableTables(JsArray<TableDto> tables, JsArrayString selections);
+    void prepareTables(JsArray<TableDto> tables, JsArrayString froms, JsArrayString innerFroms);
 
     void showError(String message, @Nullable FormField id);
 

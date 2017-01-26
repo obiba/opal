@@ -603,6 +603,14 @@ public interface Translations extends Constants {
   })
   Map<String, String> userMessageMap();
 
+  @Description("No Tables label")
+  @DefaultStringValue("No Tables")
+  String noTablesLabel();
+
+  @Description("Inner Join label")
+  @DefaultStringValue("Inner")
+  String innerJoinLabel();
+
   @Description("Missing label")
   @DefaultStringValue("Missing")
   String missingLabel();

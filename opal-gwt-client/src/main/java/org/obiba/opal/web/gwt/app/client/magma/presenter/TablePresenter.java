@@ -366,7 +366,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     if(tableIsView()) {
       showViewProperties(table);
     } else {
-      getView().setFromTables(null);
+      getView().setFromTables(null, null);
       getView().setWhereScript(null);
     }
 
@@ -389,7 +389,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            getView().setFromTables(null);
+            getView().setFromTables(null, null);
             getView().setWhereScript(null);
           }
         }, SC_FORBIDDEN, SC_INTERNAL_SERVER_ERROR, SC_NOT_FOUND)//
@@ -842,7 +842,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     @Override
     public void onResource(Response response, JsArray<ViewDto> resource) {
       ViewDto viewDto = ViewDto.get(JsArrays.toSafeArray(resource));
-      getView().setFromTables(viewDto.getFromArray());
+      getView().setFromTables(viewDto.getFromArray(), viewDto.getInnerFromArray());
       getView().setWhereScript(viewDto.hasWhere() ? viewDto.getWhere() : null);
     }
   }
@@ -903,7 +903,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
     void setIndexStatusAlert(TableIndexStatusDto statusDto);
 
-    void setFromTables(JsArrayString tables);
+    void setFromTables(JsArrayString tables, JsArrayString innerTables);
 
     void setWhereScript(String script);
 

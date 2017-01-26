@@ -243,8 +243,13 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
     }
 
     @Override
-    public Alert getAlert() {
+    public Alert getSelectActionsAlert() {
       return selectAllItemsAlert;
+    }
+
+    @Override
+    public Alert getSelectTipsAlert() {
+      return null;
     }
   }
 }

@@ -170,6 +170,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
         categories.add(categoryDto);
       }
     }
+    checkActionCol.clearSelection();
 
     dataProvider.setList(categories);
     dataProvider.refresh();
@@ -408,8 +409,13 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     }
 
     @Override
-    public Alert getAlert() {
+    public Alert getSelectActionsAlert() {
       return selectAllItemsAlert;
+    }
+
+    @Override
+    public Alert getSelectTipsAlert() {
+      return null;
     }
   }
 }

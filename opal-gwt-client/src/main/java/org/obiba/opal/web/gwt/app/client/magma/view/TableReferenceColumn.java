@@ -8,15 +8,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.magma.table.presenter;
+package org.obiba.opal.web.gwt.app.client.magma.view;
 
-import java.util.List;
-
-import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
+import com.google.gwt.user.cellview.client.TextColumn;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
-public interface ViewPropertiesModalUiHandlers extends ModalUiHandlers {
-
-  void onSave(String name, List<TableDto> referencedTables, List<String> innerFrom);
-
+/**
+ * A column for rendering the reference name of the TableDto.
+ */
+public class TableReferenceColumn extends TextColumn<TableDto> {
+  @Override
+  public String getValue(TableDto object) {
+    return object.getDatasourceName() + "." + object.getName();
+  }
 }

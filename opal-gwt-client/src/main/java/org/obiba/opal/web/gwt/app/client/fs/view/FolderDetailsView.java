@@ -293,7 +293,12 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
     }
 
     @Override
-    public Alert getAlert() {
+    public Alert getSelectActionsAlert() {
+      return null;
+    }
+
+    @Override
+    public Alert getSelectTipsAlert() {
       return null;
     }
   }

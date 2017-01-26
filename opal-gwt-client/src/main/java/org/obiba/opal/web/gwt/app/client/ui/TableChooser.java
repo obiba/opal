@@ -102,6 +102,15 @@ public class TableChooser extends Chooser {
     return tables;
   }
 
+  public TableDto getSelectedTable() {
+    for(int i = 0; i < getItemCount(); i++) {
+      if(isItemSelected(i)) {
+        return tableDtoMap.get(getValue(i));
+      }
+    }
+    return null;
+  }
+
   private void addDatasourceTableSelections(HashMap<String, List<TableDto>> datasourceMap) {
     for(String ds : datasourceMap.keySet()) {
       addGroup(ds);

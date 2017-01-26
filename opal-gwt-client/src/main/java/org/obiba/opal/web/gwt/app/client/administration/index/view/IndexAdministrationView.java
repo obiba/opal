@@ -330,8 +330,13 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     }
 
     @Override
-    public Alert getAlert() {
+    public Alert getSelectActionsAlert() {
       return selectAllAlert;
+    }
+
+    @Override
+    public Alert getSelectTipsAlert() {
+      return null;
     }
   }
 

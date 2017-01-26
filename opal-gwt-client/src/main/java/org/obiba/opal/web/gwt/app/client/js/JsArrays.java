@@ -225,6 +225,12 @@ public class JsArrays {
     }
 
     @Override
+    public boolean add(String s) {
+      array.push(s);
+      return true;
+    }
+
+    @Override
     public int size() {
       return array.length();
     }

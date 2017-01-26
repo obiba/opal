@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
+import com.github.gwtbootstrap.client.ui.constants.IconType;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -82,6 +83,9 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements TablePresenter.Display {
 
@@ -446,16 +450,18 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   }
 
   @Override
-  public void setFromTables(JsArrayString tableNames) {
+  public void setFromTables(JsArrayString tableNames, JsArrayString innerTables) {
     if(propertiesTable.getRowCount() > 2) {
       propertiesTable.removeProperty(2);
     }
+    List<String> innerTablesList = new ArrayList<String>(JsArrays.toList(innerTables));
     if(tableNames != null) {
       FlowPanel fromTableLinks = new FlowPanel();
       for(int i = 0; i < tableNames.length(); i++) {
         String tableFullName = tableNames.get(i);
-        Anchor a = new Anchor();
+        IconAnchor a = new IconAnchor();
         a.setText(tableFullName);
+        a.setIcon(innerTablesList.contains(tableFullName) ? IconType.CIRCLE_BLANK : IconType.CIRCLE);
         MagmaPath.Parser parser = MagmaPath.Parser.parse(tableFullName);
         a.setHref("#" + placeManager
             .buildHistoryToken(ProjectPlacesHelper.getTablePlace(parser.getDatasource(), parser.getTable())));
@@ -781,8 +787,13 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     }
 
     @Override
-    public Alert getAlert() {
+    public Alert getSelectActionsAlert() {
       return selectAllItemsAlert;
+    }
+
+    @Override
+    public Alert getSelectTipsAlert() {
+      return null;
     }
   }
 
