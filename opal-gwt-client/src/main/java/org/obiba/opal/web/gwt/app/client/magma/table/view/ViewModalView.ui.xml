@@ -94,6 +94,20 @@
         When a table is flagged as being "inner", its entities will not contribute to the view's entities: this is equivalent to a SQL inner join.</ui:msg>
     </b:HelpBlock>
 
+    <b:ControlGroup ui:field="fileSelectionGroup">
+      <b:ControlLabel for="fileSelectionPanel">
+        <ui:msg description="View Variables label">Variables</ui:msg>
+      </b:ControlLabel>
+      <b:Controls>
+        <o:OpalSimplePanel ui:field="fileSelectionPanel" o:id="fileSelectionPanel"></o:OpalSimplePanel>
+        <b:HelpBlock>
+          <ui:msg description="View Variables help">Provide derived variables from a view XML or a table dictionary in
+            Excel, optional.
+          </ui:msg>
+        </b:HelpBlock>
+      </b:Controls>
+    </b:ControlGroup>
+
     <b:ModalFooter>
       <b:Button ui:field="saveButton" type="PRIMARY">
         <ui:msg description="Save label">Save</ui:msg>

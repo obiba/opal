@@ -16,7 +16,6 @@ import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
@@ -37,11 +36,12 @@ import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewPropertiesModalPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewPropertiesModalUiHandlers;
+import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.magma.view.TableReferenceColumn;
 import org.obiba.opal.web.gwt.app.client.magma.view.TableReferencesTable;
 import org.obiba.opal.web.gwt.app.client.ui.*;
@@ -56,10 +56,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class ViewPropertiesModalView extends ModalPopupViewWithUiHandlers<ViewPropertiesModalUiHandlers>
-    implements ViewPropertiesModalPresenter.Display {
+public class ViewModalView extends ModalPopupViewWithUiHandlers<ViewModalUiHandlers>
+    implements ViewModalPresenter.Display {
 
-  interface Binder extends UiBinder<Widget, ViewPropertiesModalView> {}
+  interface Binder extends UiBinder<Widget, ViewModalView> {}
 
   private static final int DEFAULT_PAGE_SIZE = 10;
 
@@ -114,6 +114,12 @@ public class ViewPropertiesModalView extends ModalPopupViewWithUiHandlers<ViewPr
   @UiField
   IconAnchor moveDownLink;
 
+  @UiField
+  ControlGroup fileSelectionGroup;
+
+  @UiField
+  OpalSimplePanel fileSelectionPanel;
+
   private Translations translations;
 
   private TranslationMessages translationMessages;
@@ -125,13 +131,12 @@ public class ViewPropertiesModalView extends ModalPopupViewWithUiHandlers<ViewPr
   private List<String> innerTableReferences = new ArrayList<String>();
 
   @Inject
-  public ViewPropertiesModalView(Binder uiBinder, EventBus eventBus, Translations translations, TranslationMessages translationMessages) {
+  public ViewModalView(Binder uiBinder, EventBus eventBus, Translations translations, TranslationMessages translationMessages) {
     super(eventBus);
     this.translations = translations;
     this.translationMessages = translationMessages;
     initWidget(uiBinder.createAndBindUi(this));
-    dialog.setTitle(translations.editProperties());
-    //tableChooser.addStyleName("table-chooser-large");
+    dialog.setTitle(translations.addViewTitle());
 
     table.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.DISABLED);
     table.setSelectionModel(new SingleSelectionModel<TableDto>());
@@ -234,6 +239,8 @@ public class ViewPropertiesModalView extends ModalPopupViewWithUiHandlers<ViewPr
   @Override
   public void renderProperties(ViewDto view) {
     name.setText(view.getName());
+    fileSelectionGroup.setVisible(false);
+    dialog.setTitle(translations.editProperties());
   }
 
   @Override
@@ -256,8 +263,13 @@ public class ViewPropertiesModalView extends ModalPopupViewWithUiHandlers<ViewPr
 
     if(group == null) {
       dialog.addAlert(msg, AlertType.ERROR);
-    } else if(group.equals(FormField.NAME)) dialog.addAlert(msg, AlertType.ERROR, nameGroup);
-    else dialog.addAlert(msg, AlertType.ERROR, tablesGroup);
+    } else if(group.equals(FormField.NAME)) {
+      dialog.addAlert(msg, AlertType.ERROR, nameGroup);
+    } else if(group.equals(FormField.FILE_SELECTION)) {
+      dialog.addAlert(msg, AlertType.ERROR, fileSelectionGroup);
+    } else {
+      dialog.addAlert(msg, AlertType.ERROR, tablesGroup);
+    }
   }
 
   @Override
@@ -273,6 +285,12 @@ public class ViewPropertiesModalView extends ModalPopupViewWithUiHandlers<ViewPr
         return dataProvider.getList();
       }
     };
+  }
+
+  @Override
+  public void setFileSelectionDisplay(FileSelectionPresenter.Display display) {
+    fileSelectionPanel.setWidget(display.asWidget());
+    display.setFieldWidth("20em");
   }
 
   private String toReference(TableDto tableDto) {

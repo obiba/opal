@@ -10,8 +10,13 @@
 
 package org.obiba.opal.web.gwt.app.client.magma.table.presenter;
 
-import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
+import java.util.List;
 
-public interface AddViewModalUiHandlers extends ModalUiHandlers {
-  void createView();
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
+import org.obiba.opal.web.model.client.magma.TableDto;
+
+public interface ViewModalUiHandlers extends ModalUiHandlers {
+
+  void onSave(String name, List<TableDto> referencedTables, List<String> innerFrom);
+
 }

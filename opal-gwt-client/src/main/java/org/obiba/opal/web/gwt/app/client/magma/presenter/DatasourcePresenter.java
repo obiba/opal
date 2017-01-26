@@ -24,8 +24,8 @@ import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEv
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.table.presenter.AddViewModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewModalPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
@@ -66,7 +66,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   private final ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider;
 
-  private final ModalProvider<AddViewModalPresenter> createViewModalProvider;
+  private final ModalProvider<ViewModalPresenter> createViewModalProvider;
 
   private final ModalProvider<DataExportPresenter> dataExportModalProvider;
 
@@ -88,7 +88,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
   public DatasourcePresenter(Display display, EventBus eventBus,
       ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider,
       ModalProvider<DataExportPresenter> dataExportModalProvider,
-      ModalProvider<AddViewModalPresenter> createViewModalProvider,
+      ModalProvider<ViewModalPresenter> createViewModalProvider,
       ModalProvider<DataCopyPresenter> dataCopyModalProvider,
       Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, TranslationMessages translationMessages) {
     super(eventBus, display);
@@ -217,7 +217,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   @Override
   public void onAddView() {
-    createViewModalProvider.get().setDatasourceName(datasourceName);
+    createViewModalProvider.get().initialize(datasourceName);
   }
 
   @Override

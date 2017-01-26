@@ -30,7 +30,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.ValuesQueryEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewPropertiesModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewWhereModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.BaseVariableAttributeModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.ContingencyTablePresenter;
@@ -104,7 +104,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider;
 
-  private final ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider;
+  private final ModalProvider<ViewModalPresenter> viewPropertiesModalProvider;
 
   private final ModalProvider<ViewWhereModalPresenter> viewWhereModalProvider;
 
@@ -155,7 +155,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, ModalProvider<IndexPresenter> indexPresenter,
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
       ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider,
-      ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider,
+      ModalProvider<ViewModalPresenter> viewPropertiesModalProvider,
       ModalProvider<ViewWhereModalPresenter> viewWhereModalProvider,
       ModalProvider<AddVariablesModalPresenter> addVariablesModalProvider,
       ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider,
@@ -546,7 +546,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
           .withCallback(new ResourceCallback<ViewDto>() {
             @Override
             public void onResource(Response response, ViewDto viewDto) {
-              ViewPropertiesModalPresenter p = viewPropertiesModalProvider.get();
+              ViewModalPresenter p = viewPropertiesModalProvider.get();
               p.initialize(viewDto);
             }
           }).send();

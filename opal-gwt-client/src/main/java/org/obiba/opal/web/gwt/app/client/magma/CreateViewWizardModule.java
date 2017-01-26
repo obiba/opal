@@ -10,8 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.magma;
 
 import org.obiba.opal.web.gwt.app.client.inject.AbstractOpalModule;
-import org.obiba.opal.web.gwt.app.client.magma.table.presenter.AddViewModalPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.table.view.AddViewModalView;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.view.VariablesToViewView;
 
@@ -22,8 +20,6 @@ public class CreateViewWizardModule extends AbstractOpalModule {
 
   @Override
   protected void configure() {
-    bindPresenterWidget(AddViewModalPresenter.class, AddViewModalPresenter.Display.class, AddViewModalView.class);
-
     bindPresenterWidget(VariablesToViewPresenter.class, VariablesToViewPresenter.Display.class,
         VariablesToViewView.class);
   }
