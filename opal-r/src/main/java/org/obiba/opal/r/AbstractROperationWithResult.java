@@ -9,10 +9,10 @@
  */
 package org.obiba.opal.r;
 
-import java.util.NoSuchElementException;
-
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPRaw;
+
+import java.util.NoSuchElementException;
 
 /**
  * Implements ROperationWithResult with local result storage. Overrides {@code #eval(String)} and saves the returned

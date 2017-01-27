@@ -9,12 +9,7 @@
  */
 package org.obiba.opal.r;
 
-import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
-
-import javax.ws.rs.core.MultivaluedMap;
 import java.io.File;
-import java.util.List;
-import java.util.Map.Entry;
 
 /**
  * Read a file from R into a local file.

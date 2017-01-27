@@ -9,42 +9,17 @@
  */
 package org.obiba.opal.r.magma;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.obiba.magma.*;
+import org.obiba.magma.type.*;
+import org.obiba.opal.core.domain.VariableNature;
+import org.obiba.opal.r.MagmaRRuntimeException;
+import org.rosuda.REngine.*;
+
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
-
-import org.obiba.magma.Category;
-import org.obiba.magma.Value;
-import org.obiba.magma.ValueSequence;
-import org.obiba.magma.ValueType;
-import org.obiba.magma.Variable;
-import org.obiba.magma.VariableEntity;
-import org.obiba.magma.VariableValueSource;
-import org.obiba.magma.type.BinaryType;
-import org.obiba.magma.type.BooleanType;
-import org.obiba.magma.type.DateTimeType;
-import org.obiba.magma.type.DateType;
-import org.obiba.magma.type.DecimalType;
-import org.obiba.magma.type.IntegerType;
-import org.obiba.magma.type.LineStringType;
-import org.obiba.magma.type.LocaleType;
-import org.obiba.magma.type.PointType;
-import org.obiba.magma.type.PolygonType;
-import org.obiba.magma.type.TextType;
-import org.obiba.opal.core.domain.VariableNature;
-import org.obiba.opal.r.MagmaRRuntimeException;
-import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.REXPDouble;
-import org.rosuda.REngine.REXPFactor;
-import org.rosuda.REngine.REXPInteger;
-import org.rosuda.REngine.REXPList;
-import org.rosuda.REngine.REXPLogical;
-import org.rosuda.REngine.REXPRaw;
-import org.rosuda.REngine.REXPString;
-import org.rosuda.REngine.RList;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 /**
  * A utility class for mapping {@code ValueType} to R {@code REXP}.

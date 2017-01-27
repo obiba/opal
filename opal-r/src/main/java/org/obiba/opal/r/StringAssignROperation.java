@@ -9,12 +9,11 @@
  */
 package org.obiba.opal.r;
 
-import java.util.List;
-import java.util.Map.Entry;
+import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
 
 import javax.ws.rs.core.MultivaluedMap;
-
-import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
+import java.util.List;
+import java.util.Map.Entry;
 
 /**
  * Assign textual values to symbols in R.

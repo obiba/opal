@@ -9,8 +9,7 @@
  */
 package org.obiba.opal.r.service;
 
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.HasServiceListener;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
@@ -28,7 +27,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import com.google.common.collect.Lists;
+import java.util.List;
 
 /**
  * Gets connection to the R server.
