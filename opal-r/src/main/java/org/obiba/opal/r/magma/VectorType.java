@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.r;
+package org.obiba.opal.r.magma;
 
 import java.util.List;
 import java.util.Map;
@@ -32,6 +32,7 @@ import org.obiba.magma.type.PointType;
 import org.obiba.magma.type.PolygonType;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.domain.VariableNature;
+import org.obiba.opal.r.MagmaRRuntimeException;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPDouble;
 import org.rosuda.REngine.REXPFactor;
