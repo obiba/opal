@@ -300,6 +300,11 @@ public enum VectorType {
     asAttributesMap(variable).forEach((name, content) -> {
       names.add(name);
       contents.add(new REXPString(content));
+      if (name.equals("spss::format")) {
+        // to help haven R package to write spss format
+        names.add("format.spss");
+        contents.add(new REXPString(content));
+      }
     });
 
     if (levels != null) {
