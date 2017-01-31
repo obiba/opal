@@ -63,4 +63,15 @@ public interface OpalRSymbolResource extends RSymbolResource {
                        @QueryParam("async") @DefaultValue("false") boolean async,
                        @QueryParam("destination") String destination);
 
+
+  /**
+   * Save the R symbol representing a tibble into a file in the R session with a file extension supported by the
+   * R package haven (SPSS, SAS or Stata file).
+   *
+   * @param destination
+   * @return
+   */
+  @PUT
+  @Path("/_save")
+  Response saveRData(@QueryParam("destination") String destination);
 }

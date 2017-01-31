@@ -59,6 +59,7 @@ class ValueTableRTibbleConverter extends ValueTableRConverter {
       args.append(String.format("'%s'=%s", name, getTmpVectorName(getSymbol(), name)));
     }
     log.info("tibble arguments: {}", args);
+    magmaAssignROperation.doEnsurePackage("tibble");
     magmaAssignROperation.doEval("library(tibble)");
     magmaAssignROperation.doEval(String.format("base::assign('%s', tibble(%s))", getSymbol(), args));
   }

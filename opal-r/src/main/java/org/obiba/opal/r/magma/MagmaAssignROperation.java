@@ -100,6 +100,10 @@ public class MagmaAssignROperation extends AbstractROperation {
     return eval(script, false);
   }
 
+  REXP doEnsurePackage(String packageName) {
+    return ensurePackage(packageName);
+  }
+
   IdentifiersTableService getIdentifiersTableService() {
     return identifiersTableService;
   }

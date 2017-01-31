@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.r;
 
+import com.google.common.base.Strings;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
@@ -17,6 +20,7 @@ import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MagmaEngineVariableResolver;
 import org.obiba.opal.r.DataAssignROperation;
+import org.obiba.opal.r.DataSaveROperation;
 import org.obiba.opal.r.MagmaRRuntimeException;
 import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.magma.MagmaAssignROperation;
@@ -65,6 +69,18 @@ public class OpalRSymbolResourceImpl extends AbstractRSymbolResourceImpl impleme
         MagmaAssignROperation.RClass.TIBBLE,async);
   }
 
+  @Override
+  public Response saveRData(String destination) {
+    // destination must be relative
+    if (!Strings.isNullOrEmpty(destination) &&
+        (destination.startsWith("~") || destination.startsWith("/") || destination.startsWith("$")))
+      return Response.status(Response.Status.BAD_REQUEST) //
+          .entity("Destination file must be relative to R workspace.").build();
+    DataSaveROperation rop = new DataSaveROperation(getName(), destination);
+    getRSession().execute(rop);
+    return Response.ok().build();
+  }
+
   //
   // Private methods
   //
@@ -98,4 +114,5 @@ public class OpalRSymbolResourceImpl extends AbstractRSymbolResourceImpl impleme
     return SecurityUtils.getSubject().isPermitted("rest:/datasource/" + valueTable.getDatasource().getName() +
         "/table/" + valueTable.getName() + "/valueSet:GET");
   }
+
 }

@@ -185,6 +185,18 @@ public abstract class AbstractROperation implements ROperation {
   }
 
   /**
+   * Ensure that a R package is installed: check it is available, if not install it.
+   *
+   * @param packageName
+   * @return
+   */
+  protected REXP ensurePackage(String packageName) {
+    String cmd = String.format("if (!require(%s)) { install.packages('%s', repos=c('http://cran.rstudio.com/', 'http://cran.obiba.org'), dependencies=TRUE) }",
+        packageName, packageName);
+    return eval(cmd, false);
+  }
+
+  /**
    * Get the current R connection.
    *
    * @return
