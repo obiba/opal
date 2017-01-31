@@ -10,16 +10,60 @@
 package org.obiba.opal.r;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import org.obiba.magma.ValueType;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPLogical;
 import org.rosuda.REngine.REXPRaw;
 
 import java.util.Base64;
+import java.util.List;
 
 /**
  * Save a R object (of class tibble) into a file in the R session.
  */
 public class DataSaveROperation extends AbstractROperation {
+
+  private enum WriteCmd {
+
+    WRITE_SAS("write_sas","sas7bdat"),
+
+    WRITE_DTA("write_dta","dta"),
+
+    WRITE_SAV("write_sav","sav"),
+
+    WRITE_CSV("write.table","csv","tsv") {
+      @Override
+      public String getCommand(String symbol, String path) {
+        if (path.endsWith(".tsv"))
+          return String.format("%s(%s, file='%s', row.names=FALSE, sep='\\t')", command, symbol, path);
+        else
+          return String.format("%s(%s, file='%s', row.names=FALSE, sep=',')", command, symbol, path);
+      }
+    };
+
+    protected final String command;
+
+    protected final List<String> extensions;
+
+    WriteCmd(String cmd, String... extensions) {
+      this.command = cmd;
+      this.extensions = Lists.newArrayList(extensions);
+    }
+
+    public String getCommand(String symbol, String path) {
+      return String.format("%s(%s, '%s')", command, symbol, path);
+    }
+
+    public static WriteCmd forPath(String path) {
+      for (WriteCmd cmd : WriteCmd.values()) {
+        for (String extension : cmd.extensions) {
+          if (path.endsWith("." + extension)) return cmd;
+        }
+      }
+      throw new IllegalArgumentException("Cannot find a R writer for file: " + path);
+    }
+  }
 
   private final String symbol;
 
@@ -34,11 +78,7 @@ public class DataSaveROperation extends AbstractROperation {
   public void doWithConnection() {
     if(Strings.isNullOrEmpty(destination)) return;
     // extract destination file
-    String writeCmd;
-    if (destination.endsWith(".sas7bdat")) writeCmd = "write_sas";
-    else if (destination.endsWith(".sav")) writeCmd = "write_sav";
-    else if (destination.endsWith(".dat")) writeCmd = "write_dta";
-    else return;
+    WriteCmd writeCmd = WriteCmd.forPath(destination);
     String path = prepareDestinationInR();
     // make sure haven is available
     ensurePackage("haven");
@@ -53,8 +93,7 @@ public class DataSaveROperation extends AbstractROperation {
     } else {
       throw new IllegalArgumentException(symbol + "Cannot determine if " + symbol + " is a tibble.");
     }
-    String cmd = String.format("%s(%s, '%s')", writeCmd, symbol, path);
-    eval(cmd, false);
+    eval(writeCmd.getCommand(symbol, path), false);
   }
 
   private String prepareDestinationInR() {
