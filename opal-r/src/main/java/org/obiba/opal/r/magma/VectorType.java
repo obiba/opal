@@ -46,6 +46,18 @@ public enum VectorType {
       return variable == null ? new REXPLogical(bools) : new REXPLogical(bools, getVariableRAttributes(variable, null));
     }
 
+    @Override
+    protected REXP getCategoriesRAttributes(Variable variable, List<String> labels, REXPList attr) {
+      byte bools[] = new byte[labels.size()];
+      for (int i=0; i<labels.size(); i++) {
+        try {
+          bools[i] = Boolean.parseBoolean(labels.get(i)) ? REXPLogical.TRUE : REXPLogical.FALSE;
+        } catch (NumberFormatException e) {
+          bools[i] = REXPLogical.NA;
+        }
+      }
+      return new REXPLogical(bools, attr);
+    }
   },
 
   ints(IntegerType.get()) {
@@ -64,6 +76,19 @@ public enum VectorType {
       return variable == null ? new REXPInteger(ints) : new REXPInteger(ints, getVariableRAttributes(variable, null));
     }
 
+    @Override
+    protected REXP getCategoriesRAttributes(Variable variable, List<String> labels, REXPList attr) {
+      int ints[] = new int[labels.size()];
+      for (int i=0; i<labels.size(); i++) {
+        try {
+          ints[i] = Integer.parseInt(labels.get(i));
+        } catch (NumberFormatException e) {
+          ints[i] = REXPInteger.NA;
+        }
+      }
+      return new REXPInteger(ints, attr);
+    }
+
   },
 
   doubles(DecimalType.get()) {
@@ -80,6 +105,19 @@ public enum VectorType {
         }
       }
       return variable == null ? new REXPDouble(doubles) : new REXPDouble(doubles, getVariableRAttributes(variable, null));
+    }
+
+    @Override
+    protected REXP getCategoriesRAttributes(Variable variable, List<String> labels, REXPList attr) {
+      double doubles[] = new double[labels.size()];
+      for (int i=0; i<labels.size(); i++) {
+        try {
+          doubles[i] = Double.parseDouble(labels.get(i));
+        } catch (NumberFormatException e) {
+          doubles[i] = REXPDouble.NA;
+        }
+      }
+      return new REXPDouble(doubles, attr);
     }
   },
 
@@ -287,18 +325,30 @@ public enum VectorType {
    * @param variable
    * @return
    */
-  protected REXPString getCategoriesRAttributes(Variable variable) {
+  protected REXP getCategoriesRAttributes(Variable variable) {
     List<String> contents = Lists.newArrayList();
     List<String> names = Lists.newArrayList();
     variable.getCategories().forEach(cat -> {
-      contents.add(getLabel(cat));
-      names.add(cat.getName());
+      contents.add(cat.getName());
+      names.add(getLabel(cat));
     });
-    return new REXPString(contents.toArray(new String[contents.size()]), new REXPList(
+    return getCategoriesRAttributes(variable, contents, new REXPList(
         new RList(
             new REXP[]{
                 new REXPString(names.toArray(new String[names.size()]))
             }, new String[]{"names"})));
+  }
+
+  /**
+   * Get the R attributes from category labels. To be overridden to match the R data type.
+   *
+   * @param variable
+   * @param labels
+   * @param attr
+   * @return
+   */
+  protected REXP getCategoriesRAttributes(Variable variable, List<String> labels, REXPList attr) {
+    return new REXPString(labels.toArray(new String[labels.size()]), attr);
   }
 
   /**
