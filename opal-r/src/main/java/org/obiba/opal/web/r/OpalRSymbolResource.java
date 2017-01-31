@@ -10,10 +10,9 @@
 
 package org.obiba.opal.web.r;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.POST;
-import javax.ws.rs.QueryParam;
+import org.apache.commons.vfs2.FileSystemException;
+
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -31,5 +30,37 @@ public interface OpalRSymbolResource extends RSymbolResource {
   @POST
   @Consumes("application/x-rdata")
   Response putRData(@Context UriInfo uri, String content, @QueryParam("async") @DefaultValue("false") boolean async);
+
+  /**
+   * Import the R data associated to symbol into the given project.
+   *
+   * @param project
+   * @return
+   * @throws FileSystemException
+   */
+  @PUT
+  @Path("/_import")
+  Response importMagma(@QueryParam("project") String project);
+
+  /**
+   * Export a {@link org.obiba.magma.ValueTable} as R tibble.
+   *
+   * @param uri
+   * @param path
+   * @param variableFilter
+   * @param idName
+   * @param updatedName
+   * @param identifiersMapping
+   * @param destination
+   * @return
+   * @throws FileSystemException
+   */
+  @PUT
+  @Path("/_export")
+  Response exportMagma(@Context UriInfo uri, String path, @QueryParam("variables") String variableFilter,
+                       @QueryParam("id") String idName, @QueryParam("updated") String updatedName,
+                       @QueryParam("identifiers") String identifiersMapping,
+                       @QueryParam("async") @DefaultValue("false") boolean async,
+                       @QueryParam("destination") String destination);
 
 }

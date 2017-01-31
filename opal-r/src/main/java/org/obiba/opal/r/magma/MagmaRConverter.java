@@ -10,31 +10,17 @@
 
 package org.obiba.opal.r.magma;
 
-import org.rosuda.REngine.REXP;
-
 /**
  * Provides a R vector from a Magma fully qualified path.
  */
 public interface MagmaRConverter {
 
   /**
-   * Build a R vector from the Magma fully-qualified path.
+   * Perform the assignment.
    *
+   * @param symbol
    * @param path
-   * @param withMissings
-   * @param identifiersMapping
-   * @return
    */
-  REXP asVector(String path, boolean withMissings, String identifiersMapping);
-
-  /**
-   * Check if path can be resolved as a datasource, table or variable.
-   *
-   * @param path
-   * @return
-   */
-  boolean canResolve(String path);
-
-  void doAssign(String symbol, String path, boolean withMissings, String identifiersMapping);
+  void doAssign(String symbol, String path);
 
 }
