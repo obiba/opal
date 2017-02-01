@@ -26,19 +26,19 @@ public class DataSaveROperation extends AbstractROperation {
 
   private enum WriteCmd {
 
-    WRITE_SAS("write_sas","sas7bdat"),
+    SAS("haven::write_sas","sas7bdat"),
 
-    WRITE_DTA("write_dta","dta"),
+    DTA("haven::write_dta","dta"),
 
-    WRITE_SAV("write_sav","sav"),
+    SAV("haven::write_sav","sav"),
 
-    WRITE_CSV("write.table","csv","tsv") {
+    CSV("utils::write.table","csv","tsv") {
       @Override
       public String getCommand(String symbol, String path) {
         if (path.endsWith(".tsv"))
-          return String.format("%s(%s, file='%s', row.names=FALSE, sep='\\t')", command, symbol, path);
+          return String.format("%s(`%s`, file='%s', row.names=FALSE, sep='\\t')", command, symbol, path);
         else
-          return String.format("%s(%s, file='%s', row.names=FALSE, sep=',')", command, symbol, path);
+          return String.format("%s(`%s`, file='%s', row.names=FALSE, sep=',')", command, symbol, path);
       }
     };
 
@@ -52,7 +52,7 @@ public class DataSaveROperation extends AbstractROperation {
     }
 
     public String getCommand(String symbol, String path) {
-      return String.format("%s(%s, '%s')", command, symbol, path);
+      return String.format("%s(`%s`, '%s')", command, symbol, path);
     }
 
     public static WriteCmd forPath(String path) {
@@ -86,12 +86,12 @@ public class DataSaveROperation extends AbstractROperation {
     ensurePackage("tibble");
     eval("library(tibble)", false);
     // ensure symbol refers to a tibble
-    REXP isTibble = eval(String.format("is.tibble(%s)", symbol), false);
+    REXP isTibble = eval(String.format("is.tibble(`%s`)", symbol), false);
     if (isTibble.isLogical()) {
       REXPLogical isTibbleLogical = (REXPLogical) isTibble;
       if (isTibbleLogical.length() == 0 || !isTibbleLogical.isTRUE()[0]) throw new IllegalArgumentException(symbol + " is not a tibble.");
     } else {
-      throw new IllegalArgumentException(symbol + "Cannot determine if " + symbol + " is a tibble.");
+      throw new IllegalArgumentException("Cannot determine if " + symbol + " is a tibble.");
     }
     eval(writeCmd.getCommand(symbol, path), false);
   }

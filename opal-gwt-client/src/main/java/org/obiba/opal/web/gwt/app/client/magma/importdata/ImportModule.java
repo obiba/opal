@@ -10,28 +10,8 @@
 package org.obiba.opal.web.gwt.app.client.magma.importdata;
 
 import org.obiba.opal.web.gwt.app.client.inject.AbstractOpalModule;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.ArchiveStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.CsvFormatStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DatasourceValuesStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.IdentifiersMappingSelectionStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.JdbcStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.LimesurveyStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.NoFormatStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.RestStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.SpssFormatStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.XmlFormatStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.view.ArchiveStepView;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.view.CsvFormatStepView;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.view.DataImportView;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.view.DatasourceValuesStepView;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.view.IdentifiersMappingSelectionStepView;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.view.JdbcStepView;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.view.LimesurveyStepView;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.view.NoFormatStepView;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.view.RestStepView;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.view.SpssFormatStepView;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.view.XmlFormatStepView;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.*;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.view.*;
 
 /**
  * Bind concrete implementations to interfaces within the import wizard.
@@ -52,6 +32,7 @@ public class ImportModule extends AbstractOpalModule {
     bind(CsvFormatStepPresenter.Display.class).to(CsvFormatStepView.class);
     bind(XmlFormatStepPresenter.Display.class).to(XmlFormatStepView.class);
     bind(SpssFormatStepPresenter.Display.class).to(SpssFormatStepView.class);
+    bind(RHavenStepPresenter.Display.class).to(RHavenStepView.class);
     bind(LimesurveyStepPresenter.Display.class).to(LimesurveyStepView.class);
     bind(JdbcStepPresenter.Display.class).to(JdbcStepView.class);
     bind(RestStepPresenter.Display.class).to(RestStepView.class);

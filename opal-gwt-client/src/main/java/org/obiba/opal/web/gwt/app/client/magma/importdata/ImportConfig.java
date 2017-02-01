@@ -18,9 +18,11 @@ import com.google.common.collect.Maps;
 @SuppressWarnings("UnusedDeclaration")
 public class ImportConfig {
 
+
+
   public enum ImportFormat {
 
-    CSV, EXCEL, XML, LIMESURVEY, REST, JDBC, SPSS
+    CSV, EXCEL, XML, LIMESURVEY, REST, JDBC, SPSS, RHAVEN
 
   }
 
@@ -76,6 +78,8 @@ public class ImportConfig {
 
   private String locale;
 
+  private String idColumn;
+
   @SuppressWarnings({ "PMD.NcssMethodCount", "OverlyLongMethod" })
   public void clear() {
     importFormat = null;
@@ -96,6 +100,7 @@ public class ImportConfig {
     csvFile = null;
     spssFile = null;
     locale = null;
+    idColumn = null;
 
     transientDatasourceName = null;
     database = null;
@@ -327,5 +332,13 @@ public class ImportConfig {
 
   public void setLocale(String locale) {
     this.locale = locale;
+  }
+
+  public void setIdColumn(String idColumn) {
+    this.idColumn = idColumn;
+  }
+
+  public String getIdColumn() {
+    return idColumn;
   }
 }

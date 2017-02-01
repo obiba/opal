@@ -22,20 +22,36 @@
         <b:ControlLabel>
           <ui:msg description="Data File label">Data File</ui:msg>
         </b:ControlLabel>
-        <g:SimplePanel ui:field="selectSpssFilePanel"/>
+        <g:SimplePanel ui:field="selectFilePanel"/>
         <g:Label styleName="help-block">
-          <ui:msg description="SPSS File Description label">Data in SPSS format are packaged in a file with suffix .sav.
+          <ui:msg description="R Haven File Description label">Data in SAS, SPSS or STATA format are packaged in a file with suffix .sas7bdat, .sav or .dta.
           </ui:msg>
         </g:Label>
       </b:ControlGroup>
     </g:FlowPanel>
 
+
+    <g:FlowPanel>
+      <b:ControlGroup ui:field="idGroup">
+        <b:ControlLabel>
+          <ui:msg description="Identifier Column">Identifier Column</ui:msg>
+        </b:ControlLabel>
+        <g:TextBox name="id" ui:field="idColumn">id</g:TextBox>
+      </b:ControlGroup>
+      <b:HelpBlock>
+        <ui:msg description="Id column help">Name of the column that identifies the entity. If not provided, the first column
+          will be selected as the entity IDs provider.
+        </ui:msg>
+      </b:HelpBlock>
+    </g:FlowPanel>
+
     <o:CollapsiblePanel>
+
 
       <g:FlowPanel>
         <b:ControlGroup ui:field="localeGroup">
           <b:ControlLabel>
-            <ui:msg description="Label Locale">Label Locale</ui:msg>
+            <ui:msg description="Label locale">Label Locale</ui:msg>
           </b:ControlLabel>
           <o:DropdownSuggestBox ui:field="localeNameBox"/>
         </b:ControlGroup>

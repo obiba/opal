@@ -364,6 +364,7 @@ public interface Translations extends Constants {
       "XMLFileSuffixInvalid", "Invalid XML file suffix: .xml is expected.", //
       "ZipFileRequired", "A Zip file is required.", //
       "SpssFileRequired", "An SPSS file is required.", //
+      "RHavenFileRequired", "An SAS, SPSS or STATA file is required.", //
       "ZipFileSuffixInvalid", "Invalid Zip file suffix: .zip is expected.",//
       "InvalidFileType", "Invalid file type. Supported file types are: xls, xlsx, and sav.",//
       "ReportTemplateWasNotFound", "The specified report template could not be found.",//
@@ -683,6 +684,10 @@ public interface Translations extends Constants {
   @Description("SPSS label")
   @DefaultStringValue("SPSS")
   String spssLabel();
+
+  @Description("RHaven label")
+  @DefaultStringValue("SAS/SPSS/STATA (R)")
+  String rHavenLabel();
 
   @Description("Opal REST label")
   @DefaultStringValue("Opal")

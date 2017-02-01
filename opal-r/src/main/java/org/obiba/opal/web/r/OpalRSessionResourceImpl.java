@@ -55,8 +55,8 @@ public class OpalRSessionResourceImpl extends AbstractRSessionResource implement
     String sourcePath = source;
     if (source.startsWith("~")) sourcePath = source.replaceFirst("~", "/home/" + getOpalRSession().getUser());
     FileObject file = resolveFileInFileSystem(sourcePath);
-    if (!file.exists()) return Response.status(Response.Status.NOT_FOUND) //
-        .entity("The file does not exist: " + sourcePath).build();
+    if (!file.exists() || !file.isReadable()) return Response.status(Response.Status.NOT_FOUND) //
+        .entity("The file does not exist or is not readable: " + sourcePath).build();
     if (file.getType() != FileType.FILE) return Response.status(Response.Status.BAD_REQUEST) //
         .entity("The file must not be a folder: " + sourcePath).build();
     // destination must be relative

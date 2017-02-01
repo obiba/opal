@@ -41,7 +41,14 @@
           <g:FlowPanel addStyleNames="small-top-margin" ui:field="helpSpss" visible="false">
             <g:Label styleName="help-block">
               <ui:msg description="SPSS information">This format expects the file to be a valid SPSS binary file
-                containing the variable dictionary and optionally the variable data.
+                containing the variables and the data.
+              </ui:msg>
+            </g:Label>
+          </g:FlowPanel>
+          <g:FlowPanel addStyleNames="small-top-margin" ui:field="helpRHaven" visible="false">
+            <g:Label styleName="help-block">
+              <ui:msg description="RHaven information">This format expects the file to be a valid SAS, SPSS or STATA file
+                containing the variables and the data.
               </ui:msg>
             </g:Label>
           </g:FlowPanel>

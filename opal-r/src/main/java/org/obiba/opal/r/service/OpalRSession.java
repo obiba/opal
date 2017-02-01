@@ -174,7 +174,7 @@ public class OpalRSession implements RASyncOperationTemplate {
    * {@link NoSuchRSessionException} is thrown.
    */
   @Override
-  public void execute(ROperation rop) {
+  public synchronized void execute(ROperation rop) {
     RConnection connection = null;
     lock.lock();
     busy = true;

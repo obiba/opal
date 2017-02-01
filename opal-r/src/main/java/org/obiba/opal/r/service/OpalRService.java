@@ -103,7 +103,7 @@ public class OpalRService implements Service, ROperationTemplate, HasServiceList
    * Creates a new R connection, do the operation with it and closes the R connection when done.
    */
   @Override
-  public void execute(ROperation rop) {
+  public synchronized void execute(ROperation rop) {
     RConnection connection = newConnection();
     try {
       rop.doWithConnection(connection);
