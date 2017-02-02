@@ -30,7 +30,7 @@ class RValueSet extends ValueSetBean {
   public REXP getREXP() {
     if (rexp == null) {
       // subset tibble: get the row(s) matching the entity id (result is a tibble)
-      String cmd = String.format("`%s`[`%s`$`%s`=='%s',]", getRValueTable().getName(), getRValueTable().getName(),
+      String cmd = String.format("`%s`[`%s`$`%s`=='%s',]", getRValueTable().getSymbol(), getRValueTable().getSymbol(),
           getRValueTable().getIdColumn(), getVariableEntity().getIdentifier());
       setREXP(getRValueTable().execute(cmd));
     }

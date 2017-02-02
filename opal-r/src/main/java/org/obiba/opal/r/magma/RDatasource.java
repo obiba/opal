@@ -76,11 +76,11 @@ public class RDatasource extends AbstractDatasource {
 
   @Override
   protected Set<String> getValueTableNames() {
-    return Sets.newHashSet(symbol);
+    return Sets.newHashSet(symbol.replaceAll(" ", "_"));
   }
 
   @Override
   protected ValueTable initialiseValueTable(String tableName) {
-    return new RValueTable(this, tableName, entityType, idColumn);
+    return new RValueTable(this, tableName, symbol, entityType, idColumn);
   }
 }

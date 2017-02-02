@@ -17,6 +17,8 @@ import org.obiba.opal.r.ROperationWithResult;
 import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.service.OpalRSession;
 import org.rosuda.REngine.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -26,10 +28,15 @@ import java.util.List;
  */
 public class RValueTable extends AbstractValueTable {
 
+  private static final Logger log = LoggerFactory.getLogger(RValueTable.class);
+
+  private final String symbol;
+
   private int idPosition;
 
-  public RValueTable(@NotNull RDatasource datasource, @NotNull String name, String entityType, String idColumn) {
+  public RValueTable(@NotNull RDatasource datasource, @NotNull String name, @NotNull String symbol, String entityType, String idColumn) {
     super(datasource, name);
+    this.symbol = symbol;
     this.idPosition = 0;
     setVariableEntityProvider(new RVariableEntityProvider(this, entityType, idColumn));
   }
@@ -51,6 +58,10 @@ public class RValueTable extends AbstractValueTable {
     return super.getValueSetsBatch(entities);
   }
 
+  String getSymbol() {
+    return symbol;
+  }
+
   boolean isMultilines() {
     return ((RVariableEntityProvider)getVariableEntityProvider()).isMultilines();
   }
@@ -68,32 +79,31 @@ public class RValueTable extends AbstractValueTable {
   //
 
   private void checkIsTibble() {
-    REXP isTibble = execute(String.format("is.tibble(`%s`)", getName()));
+    REXP isTibble = execute(String.format("is.tibble(`%s`)", getSymbol()));
     if (isTibble.isLogical()) {
       REXPLogical isTibbleLogical = (REXPLogical) isTibble;
-      if (isTibbleLogical.length() == 0 || !isTibbleLogical.isTRUE()[0]) throw new IllegalArgumentException(getName() + " is not a tibble.");
+      if (isTibbleLogical.length() == 0 || !isTibbleLogical.isTRUE()[0]) throw new IllegalArgumentException(getSymbol() + " is not a tibble.");
     } else {
-      throw new IllegalArgumentException("Cannot determine if " + getName() + " is a tibble.");
+      throw new IllegalArgumentException("Cannot determine if " + getSymbol() + " is a tibble.");
     }
   }
 
   private void initialiseVariables() {
-    REXPGenericVector tibble = (REXPGenericVector) execute(String.format("`%s`[0,]", getName()));
-    RList columns = tibble.asList();
-    REXPVector colnames = (REXPVector) tibble.getAttribute("names");
+    REXPGenericVector columnDescs = (REXPGenericVector) execute(String.format("lapply(colnames(`%s`), function(n) { list(name=n,class=class(`%s`[[n]]),type=tibble::type_sum(`%s`[[n]]), attributes=attributes(`%s`[[n]])) })",
+        getSymbol(), getSymbol(), getSymbol(), getSymbol()));
+    RList columns = columnDescs.asList();
     try {
-      int pos = 1;
-      for (String colname : colnames.asStrings()) {
-        if (!getIdColumn().equals(colname)) {
-          REXP attr = execute(String.format("attributes(`%s`$`%s`)", getName(), colname));
-          addVariableValueSource(new RVariableValueSource(this, colname, pos, (REXP)columns.get(pos - 1), attr));
-        }
+      for (int i=0; i<columns.size(); i++) {
+        RList column = ((REXPGenericVector)columns.at(i)).asList();
+        String colname = column.at("name").asString();
+        if (!getIdColumn().equals(colname))
+          addVariableValueSource(new RVariableValueSource(this, column, i + 1));
         else
-          idPosition = pos;
-        pos++;
+          idPosition = i + 1;
       }
     } catch (REXPMismatchException e) {
       // ignore
+      log.error("Variable init failure for tibble {}", getSymbol(), e);
     }
   }
 

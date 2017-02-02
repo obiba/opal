@@ -13,13 +13,11 @@ package org.obiba.opal.r.magma;
 import com.google.common.collect.Lists;
 import org.obiba.magma.*;
 import org.obiba.magma.type.*;
-import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.REXPGenericVector;
-import org.rosuda.REngine.REXPMismatchException;
-import org.rosuda.REngine.RList;
+import org.rosuda.REngine.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.List;
 import java.util.SortedSet;
 
@@ -30,29 +28,69 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
 
   private static final Logger log = LoggerFactory.getLogger(RVariableValueSource.class);
 
+  public static final String EPOCH = "1970-01-01";
+
   private RValueTable valueTable;
 
-  private final String colname;
+  private final String colName;
+
+  private final String colClass;
+
+  private final List<String> colTypes;
 
   private final int position;
 
   private Variable variable;
 
-  RVariableValueSource(RValueTable valueTable, String colname, int position, REXP col, REXP attr) {
+  RVariableValueSource(RValueTable valueTable, RList column, int position) throws REXPMismatchException {
     this.valueTable = valueTable;
-    this.colname = colname;
+    this.colName = column.at("name").asString();
+    this.colClass = column.at("class").asString();
+    this.colTypes = Lists.newArrayList(column.at("type").asString().split("\\+"));
+    REXP colAttr = column.at("attributes");
     this.position = position;
-    initialiseVariable(col, attr);
+    initialiseVariable(colAttr);
   }
 
-  private void initialiseVariable(REXP col, REXP attr) {
-    ValueType type = TextType.get();
-    if (col.isInteger()) type = IntegerType.get();
-    else if (col.isNumeric()) type = DecimalType.get();
-    else if (col.isLogical()) type = BooleanType.get();
-    else if (col.isRaw()) type = BinaryType.get();
-    this.variable = VariableBean.Builder.newVariable(colname, type, valueTable.getEntityType())
+  private void initialiseVariable(REXP attr) {
+    this.variable = VariableBean.Builder.newVariable(colName, extractValueType(attr), valueTable.getEntityType())
         .addAttributes(extractAttributes(attr)).addCategories(extractCategories(attr)).build();
+  }
+
+  private ValueType extractValueType(REXP attr) {
+    ValueType type = TextType.get();
+    if (isNumeric()) type = isInteger() ? IntegerType.get() : DecimalType.get();
+    else if (isInteger()) type = IntegerType.get();
+    else if (isDate()) type = DateType.get();
+    else if (isDateTime()) type = DateTimeType.get();
+    else if (isBoolean()) type = BooleanType.get();
+    else if (isBinary()) type = BinaryType.get();
+    log.info("Tibble '{}' has column '{}' of class {} mapped to {}", valueTable.getSymbol(), colName, colClass, type.getName());
+    return type;
+  }
+
+  private boolean isNumeric() {
+    return "numeric".equals(colClass);
+  }
+
+  private boolean isInteger() {
+    return "integer".equals(colClass) || isNumeric() && colTypes.contains("int");
+  }
+
+  private boolean isBoolean() {
+    return "logical".equals(colClass);
+  }
+
+  private boolean isBinary() {
+    return "raw".equals(colClass);
+  }
+
+  private boolean isDate() {
+    return "Date".equals(colClass);
+  }
+
+  private boolean isDateTime() {
+    return "POSIXct".equals(colClass) || "POSIXt".equals(colClass);
   }
 
   private List<Attribute> extractAttributes(REXP attr) {
@@ -80,24 +118,29 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
 
     } catch (REXPMismatchException e) {
       // ignore
-      log.warn("Error while parsing variable attributes: {}", colname, e);
+      log.warn("Error while parsing variable attributes: {}", colName, e);
     }
     return attributes;
   }
 
   private List<Category> extractCategories(REXP attr) {
+    if ("labelled".equals(colClass))
+      return extractCategoriesFromLabels(extractAttribute(attr, "labels"));
+    else if ("factor".equals(colClass))
+      return extractCategoriesFromLevels(extractAttribute(attr, "levels"));
+    return Lists.newArrayList();
+  }
+
+  private List<Category> extractCategoriesFromLabels(REXP labels) {
     List<Category> categories = Lists.newArrayList();
-    if (attr == null || !attr.isList()) return categories;
+    if (labels == null) return categories;
     try {
-      RList rList = attr.asList();
-      if (!rList.isNamed() || !rList.containsKey("labels")) return categories;
-      REXP catNames = rList.at("labels");
       String[] catLabels = null;
-      if (catNames.hasAttribute("names")) {
-        catLabels = catNames.getAttribute("names").asStrings();
+      if (labels.hasAttribute("names")) {
+        catLabels = labels.getAttribute("names").asStrings();
       }
       int i = 0;
-      for (String name : catNames.asStrings()) {
+      for (String name : labels.asStrings()) {
         Category.Builder builder = Category.Builder.newCategory(name);
         if (catLabels != null) {
           builder.addAttribute("label", catLabels[i]);
@@ -107,9 +150,25 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
       }
     } catch (REXPMismatchException e) {
       // ignore
-      log.warn("Error while parsing variable categories: {}", colname, e);
+      log.warn("Error while parsing variable categories: {}", colName, e);
     }
     return categories;
+  }
+
+  private List<Category> extractCategoriesFromLevels(REXP levels) {
+    log.warn("Extracting '{}' categories factor levels not implemented yet", colName);
+    return Lists.newArrayList();
+  }
+
+    private REXP extractAttribute(REXP attr, String attrName) {
+    if (attr == null || !attr.isList()) return null;
+    try {
+      RList rList = attr.asList();
+      if (!rList.isNamed() || !rList.containsKey(attrName)) return null;
+      return rList.at(attrName);
+    } catch (REXPMismatchException e) {
+      return null;
+    }
   }
 
   @Override
@@ -136,9 +195,13 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
       REXP vector = (REXP) vectors.get(position - 1);
       try {
         String strValue = vector.asString();
-        return "NaN".equals(strValue) ? variable.getValueType().nullValue() : variable.getValueType().valueOf(strValue);
+        if (isDate())
+          return getDateFromEpoch(strValue);
+        else if (isDateTime())
+          return getDateTimeFromEpoch(strValue);
+        return "NaN".equals(strValue) ? getValueType().nullValue() : getValueType().valueOf(strValue);
       } catch (REXPMismatchException e) {
-        return variable.getValueType().nullValue();
+        return getValueType().nullValue();
       }
     }
     // TODO extract values at variable position
@@ -153,5 +216,31 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   @Override
   public VectorSource asVectorSource() throws VectorSourceNotSupportedException {
     return this;
+  }
+
+  /**
+   * R dates are serialized as a number of days since epoch (1970-01-01).
+   *
+   * @param strValue
+   * @return
+   */
+  private Value getDateFromEpoch(String strValue) {
+    if ("NaN".equals(strValue)) return getValueType().nullValue();
+    try {
+      Date value = new Date(Long.parseLong(strValue.replaceAll("\\.0$", "")) * 24 * 3600 * 1000);
+      return getValueType().valueOf(value);
+    } catch (Exception e) {
+      return getValueType().nullValue();
+    }
+  }
+
+  private Value getDateTimeFromEpoch(String strValue) {
+    if ("NaN".equals(strValue)) return getValueType().nullValue();
+    try {
+      Date value = new Date(Long.parseLong(strValue.replaceAll("\\.0$", "")));
+      return getValueType().valueOf(value);
+    } catch (Exception e) {
+      return getValueType().nullValue();
+    }
   }
 }

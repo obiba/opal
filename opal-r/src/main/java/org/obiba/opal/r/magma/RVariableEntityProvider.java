@@ -58,7 +58,7 @@ class RVariableEntityProvider implements VariableEntityProvider {
     if (entities == null || entities.isEmpty()) {
       entities = Sets.newLinkedHashSet();
       initialiseIdColumn();
-      REXP idVector = valueTable.execute(String.format("`%s`$`%s`", valueTable.getName(), idColumn));
+      REXP idVector = valueTable.execute(String.format("`%s`$`%s`", valueTable.getSymbol(), idColumn));
       if (idVector instanceof REXPVector) {
         int length = ((REXPVector)idVector).length();
         boolean isDouble = idVector instanceof REXPDouble;
@@ -81,7 +81,7 @@ class RVariableEntityProvider implements VariableEntityProvider {
 
   void initialiseIdColumn() {
     if (Strings.isNullOrEmpty(idColumn)) {
-      REXPVector colnames = (REXPVector) valueTable.execute(String.format("colnames(`%s`)", valueTable.getName()));
+      REXPVector colnames = (REXPVector) valueTable.execute(String.format("colnames(`%s`)", valueTable.getSymbol()));
       try {
         idColumn = colnames.asStrings()[0];
       } catch (REXPMismatchException e) {
