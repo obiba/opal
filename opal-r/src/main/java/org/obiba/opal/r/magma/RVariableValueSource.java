@@ -13,13 +13,18 @@ package org.obiba.opal.r.magma;
 import com.google.common.collect.Lists;
 import org.obiba.magma.*;
 import org.obiba.magma.type.*;
-import org.rosuda.REngine.*;
+import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPGenericVector;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.RList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
+import java.util.stream.Collectors;
 
 /**
  * The R variable represents the column of a tibble.
@@ -52,9 +57,47 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
     initialiseVariable(colAttr);
   }
 
+  @Override
+  public Variable getVariable() {
+    return variable;
+  }
+
+  @Override
+  public ValueType getValueType() {
+    return variable.getValueType();
+  }
+
+  @Override
+  public Iterable<Value> getValues(SortedSet<VariableEntity> entities) {
+    return null;
+  }
+
+  @Override
+  public Value getValue(ValueSet valueSet) {
+    Map<Integer, List<String>> columnValues = ((RValueSet) valueSet).getValuesByPosition();
+    if (!columnValues.containsKey(position))
+      return variable.isRepeatable() ? getValueType().nullSequence() : getValueType().nullValue();
+    return getValue(columnValues.get(position));
+  }
+
+  @Override
+  public boolean supportVectorSource() {
+    return true;
+  }
+
+  @Override
+  public VectorSource asVectorSource() throws VectorSourceNotSupportedException {
+    return this;
+  }
+
+  //
+  // Private methods
+  //
+
   private void initialiseVariable(REXP attr) {
     this.variable = VariableBean.Builder.newVariable(colName, extractValueType(attr), valueTable.getEntityType())
-        .addAttributes(extractAttributes(attr)).addCategories(extractCategories(attr)).build();
+        .addAttributes(extractAttributes(attr)).addCategories(extractCategories(attr))
+        .repeatable(valueTable.isMultilines()).occurrenceGroup(valueTable.isMultilines() ? valueTable.getSymbol() : null).build();
   }
 
   private ValueType extractValueType(REXP attr) {
@@ -160,7 +203,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
     return Lists.newArrayList();
   }
 
-    private REXP extractAttribute(REXP attr, String attrName) {
+  private REXP extractAttribute(REXP attr, String attrName) {
     if (attr == null || !attr.isList()) return null;
     try {
       RList rList = attr.asList();
@@ -171,51 +214,20 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
     }
   }
 
-  @Override
-  public Variable getVariable() {
-    return variable;
+  private Value getValue(List<String> strValues) {
+    if (strValues == null || strValues.size() == 0)
+      return variable.isRepeatable() ? getValueType().nullSequence() : getValueType().nullValue();
+    return variable.isRepeatable() ?
+        getValueType().sequenceOf(Lists.newArrayList(strValues).stream().map(this::getSingleValue).collect(Collectors.toList())) :
+        getSingleValue(strValues.get(0));
   }
 
-  @Override
-  public ValueType getValueType() {
-    return variable.getValueType();
-  }
-
-  @Override
-  public Iterable<Value> getValues(SortedSet<VariableEntity> entities) {
-    return null;
-  }
-
-  @Override
-  public Value getValue(ValueSet valueSet) {
-    REXP rexp = ((RValueSet) valueSet).getREXP();
-    if (rexp instanceof REXPGenericVector) {
-      REXPGenericVector tibble = (REXPGenericVector) rexp;
-      RList vectors = tibble.asList();
-      REXP vector = (REXP) vectors.get(position - 1);
-      try {
-        String strValue = vector.asString();
-        if (isDate())
-          return getDateFromEpoch(strValue);
-        else if (isDateTime())
-          return getDateTimeFromEpoch(strValue);
-        return "NaN".equals(strValue) ? getValueType().nullValue() : getValueType().valueOf(strValue);
-      } catch (REXPMismatchException e) {
-        return getValueType().nullValue();
-      }
-    }
-    // TODO extract values at variable position
-    return variable.getValueType().nullValue();
-  }
-
-  @Override
-  public boolean supportVectorSource() {
-    return true;
-  }
-
-  @Override
-  public VectorSource asVectorSource() throws VectorSourceNotSupportedException {
-    return this;
+  private Value getSingleValue(String strValue) {
+    if (isDate())
+      return getDateFromEpoch(strValue);
+    else if (isDateTime())
+      return getDateTimeFromEpoch(strValue);
+    return "NaN".equals(strValue) ? getValueType().nullValue() : getValueType().valueOf(strValue);
   }
 
   /**

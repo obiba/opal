@@ -36,7 +36,7 @@
         <b:ControlLabel>
           <ui:msg description="Identifier Column">Identifier Column</ui:msg>
         </b:ControlLabel>
-        <g:TextBox name="id" ui:field="idColumn">id</g:TextBox>
+        <g:TextBox name="id" ui:field="idColumn"/>
       </b:ControlGroup>
       <b:HelpBlock>
         <ui:msg description="Id column help">Name of the column that identifies the entity. If not provided, the first column
@@ -46,9 +46,7 @@
     </g:FlowPanel>
 
     <o:CollapsiblePanel>
-
-
-      <g:FlowPanel>
+      <g:FlowPanel visible="false">
         <b:ControlGroup ui:field="localeGroup">
           <b:ControlLabel>
             <ui:msg description="Label locale">Label Locale</ui:msg>
@@ -56,8 +54,7 @@
           <o:DropdownSuggestBox ui:field="localeNameBox"/>
         </b:ControlGroup>
       </g:FlowPanel>
-
-      <g:FlowPanel>
+      <g:FlowPanel visible="false">
         <g:Label>
           <ui:msg description="Character set label">Character Set</ui:msg>
         </g:Label>

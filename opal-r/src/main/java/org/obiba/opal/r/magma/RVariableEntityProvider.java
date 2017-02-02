@@ -61,13 +61,9 @@ class RVariableEntityProvider implements VariableEntityProvider {
       REXP idVector = valueTable.execute(String.format("`%s`$`%s`", valueTable.getSymbol(), idColumn));
       if (idVector instanceof REXPVector) {
         int length = ((REXPVector)idVector).length();
-        boolean isDouble = idVector instanceof REXPDouble;
         try {
           for (String id : idVector.asStrings()) {
-            String identifier = id;
-            if (isDouble && id.endsWith(".0")) {
-              identifier = id.substring(0, id.lastIndexOf(".0"));
-            }
+            String identifier = normalizeId(id);
             entities.add(new VariableEntityBean(entityType, identifier));
           }
         } catch (REXPMismatchException e) {
@@ -77,6 +73,11 @@ class RVariableEntityProvider implements VariableEntityProvider {
       }
     }
     return entities;
+  }
+
+  static String normalizeId(String id) {
+    return id.endsWith(".0") ?
+      id.substring(0, id.lastIndexOf(".0")) : id;
   }
 
   void initialiseIdColumn() {

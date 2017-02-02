@@ -139,7 +139,10 @@ public class RHavenStepPresenter extends PresenterWidget<RHavenStepPresenter.Dis
       return new HasBooleanValue() {
         @Override
         public Boolean getValue() {
-          return selectedFile.toLowerCase().endsWith(".sav");
+          String path = selectedFile.toLowerCase();
+          return path.endsWith(".sav") ||
+              path.endsWith(".sas7bdat") ||
+              path.endsWith(".dta");
         }
       };
     }

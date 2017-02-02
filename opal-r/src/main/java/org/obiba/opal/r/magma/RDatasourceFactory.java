@@ -90,6 +90,8 @@ public class RDatasourceFactory extends AbstractDatasourceFactory {
     final OpalRSession rSession = Strings.isNullOrEmpty(rSessionId) ?
         opalRSessionManager.newSubjectRSession() : opalRSessionManager.getSubjectRSession(rSessionId);
 
+    if(Strings.isNullOrEmpty(rSessionId)) rSession.setExecutionContext("Import");
+
     if (Strings.isNullOrEmpty(file)) return new RDatasource(getName(), rSession, symbol, entityType, idColumn);
 
     try {

@@ -10,9 +10,9 @@
 
 package org.obiba.opal.r.magma;
 
-import com.google.common.base.Strings;
 import org.obiba.magma.*;
-import org.obiba.magma.support.*;
+import org.obiba.magma.support.AbstractValueTable;
+import org.obiba.magma.support.NullTimestamps;
 import org.obiba.opal.r.ROperationWithResult;
 import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.service.OpalRSession;
@@ -39,6 +39,7 @@ public class RValueTable extends AbstractValueTable {
     this.symbol = symbol;
     this.idPosition = 0;
     setVariableEntityProvider(new RVariableEntityProvider(this, entityType, idColumn));
+    setEntityBatchSize(1000);
   }
 
   @Override
@@ -55,7 +56,7 @@ public class RValueTable extends AbstractValueTable {
 
   @Override
   protected ValueSetBatch getValueSetsBatch(List<VariableEntity> entities) {
-    return super.getValueSetsBatch(entities);
+    return new RValueSetBatch(this, entities);
   }
 
   String getSymbol() {
