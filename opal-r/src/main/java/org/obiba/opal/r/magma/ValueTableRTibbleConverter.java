@@ -32,8 +32,8 @@ class ValueTableRTibbleConverter extends ValueTableRConverter {
     resolvePath(path);
     if (getValueTable() == null) throw new IllegalStateException("Table must not be null");
     magmaAssignROperation.setEntities(getValueTable());
-    REXP ids = getIdsVector(true);
     RList list = getVariableVectors();
+    REXP ids = getIdsVector(true);
 
     String[] names = list.keys();
     if (names == null || names.length == 0) return;
@@ -73,10 +73,6 @@ class ValueTableRTibbleConverter extends ValueTableRConverter {
   protected String getIdColumnName() {
     String col = super.getIdColumnName();
     return Strings.isNullOrEmpty(col) ? "id" : col;
-  }
-
-  protected RList getVariableVectors() {
-    return getVariableVectorsByRows();
   }
 
   @Override

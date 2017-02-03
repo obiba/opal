@@ -32,8 +32,11 @@ class ValueTableRDataFrameConverter extends ValueTableRConverter {
     resolvePath(path);
     if (getValueTable() == null) throw new IllegalStateException("Table must not be null");
     magmaAssignROperation.setEntities(getValueTable());
-    REXP ids = getIdsVector(withMissings());
     RList list = getVariableVectors();
+    if (!withIdColumn() && hasMultilines()) {
+      throw new IllegalArgumentException("Id column name is missing (there are multiple rows per entity).");
+    }
+    REXP ids = getIdsVector(withMissings());
 
     String[] names = list.keys();
     if (names == null || names.length == 0) return;
@@ -62,6 +65,7 @@ class ValueTableRDataFrameConverter extends ValueTableRConverter {
     }
     if (!withIdColumn())
       args.append(String.format(", row.names=%s", getTmpVectorName(getSymbol(), "row.names")));
+
     log.info("data.frame arguments: {}", args);
     magmaAssignROperation.doEval(String.format("base::assign('%s', data.frame(%s, stringsAsFactors=FALSE))", getSymbol(), args));
   }

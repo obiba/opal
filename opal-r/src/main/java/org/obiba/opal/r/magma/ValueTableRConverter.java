@@ -11,6 +11,7 @@
 package org.obiba.opal.r.magma;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.obiba.magma.*;
@@ -24,8 +25,6 @@ import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.RList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
@@ -44,8 +43,14 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
 
   private ValueTable table;
 
+  private final Map<String, Integer> lineCounts = Maps.newConcurrentMap();
+
   ValueTableRConverter(MagmaAssignROperation magmaAssignROperation) {
     super(magmaAssignROperation);
+  }
+
+  protected boolean hasMultilines() {
+    return !lineCounts.isEmpty();
   }
 
   protected void doAssignTmpVectors(REXP ids, String[] names, RList list) {
@@ -105,6 +110,10 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
   protected SortedSet<VariableEntity> getEntities() {
     return magmaAssignROperation.getEntities();
   }
+
+  protected List<VariableEntity> getEntitiesAsList() {
+    return ImmutableList.copyOf(magmaAssignROperation.getEntities());
+  }
   
   protected boolean withMissings() {
     return magmaAssignROperation.withMissings();
@@ -115,45 +124,43 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
   }
 
   protected REXP getIdsVector(boolean withMissings) {
-    return getVector(new VariableEntityValueSource(getIdColumnName()), getEntities(), withMissings);
+    return getUnaryVector(new VariableEntityValueSource(getIdColumnName()), withMissings);
   }
 
   protected REXP getUpdatedVector(boolean withMissings) {
-    return getVector(new ValueSetUpdatedValueSource(getUpdatedColumnName()), getEntities(), withMissings);
+    return getUnaryVector(new ValueSetUpdatedValueSource(getUpdatedColumnName()), withMissings);
+  }
+
+  private REXP getUnaryVector(VariableValueSource vvs, boolean withMissings) {
+    if (lineCounts.isEmpty())
+      return getVector(vvs, getEntities(), withMissings);
+    else {
+      List<Value> values = Lists.newArrayList();
+      List<Value> vValues = ImmutableList.copyOf(vvs.asVectorSource().getValues(getEntities()));
+      List<String> ids = getEntitiesAsList().stream().map(VariableEntity::getIdentifier).collect(Collectors.toList());
+
+      for (int i=0; i<ids.size(); i++) {
+        Value val = vValues.get(i);
+        String id = ids.get(i);
+        if (lineCounts.containsKey(id)) {
+          for (int j=0; j<lineCounts.get(id); j++) {
+            values.add(val);
+          }
+        } else {
+          values.add(val);
+        }
+      }
+
+      return getVector(vvs.getVariable(), values, getEntities(), withMissings, false);
+    }
   }
 
   protected RList getVariableVectors() {
-    return table.isView() ? getVariableVectorsByRows() : getVariableVectorsByColumns();
+    return getVariableVectorsByRows();
   }
 
   protected ValueTable getValueTable() {
     return table;
-  }
-
-  /**
-   * Parallelize vector extraction per variable as it is safe and optimal to do so for a raw table.
-   *
-   * @return
-   */
-  private RList getVariableVectorsByColumns() {
-    List<REXP> contents = Collections.synchronizedList(Lists.newArrayList());
-    List<String> names = Collections.synchronizedList(Lists.newArrayList());
-
-    // vector for each variable
-    StreamSupport.stream(filterVariables().spliterator(), true) //
-        .map(v -> table.getVariableValueSource(v.getName())) //
-        .filter(vvs -> !vvs.getVariable().isRepeatable()) //
-        .forEach(vvs ->
-            magmaAssignROperation.getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
-              @Override
-              protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
-                contents.add(getVector(vvs, getEntities(), withMissings()));
-                names.add(vvs.getVariable().getName());
-              }
-            })
-        );
-
-    return new RList(contents, names);
   }
 
   /**
@@ -174,15 +181,44 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
     StreamSupport.stream(table.getValueSets(entities).spliterator(), true) //
         .forEach(valueSet ->
             variables.forEach(variable -> {
+              String identifier = valueSet.getVariableEntity().getIdentifier();
               Value value = table.getValue(variable, valueSet);
-              variableValues.get(variable.getName()).put(valueSet.getVariableEntity().getIdentifier(), value);
+              if (variable.isRepeatable()) {
+                int seqSize = value.asSequence().getSize();
+                if (!lineCounts.containsKey(identifier)) {
+                  lineCounts.put(identifier, seqSize);
+                } else {
+                  lineCounts.put(identifier, Math.max(lineCounts.get(identifier), seqSize));
+                }
+              }
+              variableValues.get(variable.getName()).put(identifier, value);
             })
         );
 
     // vector for each variable, values in the same order as entities
     variables.forEach(v -> {
       Map<String, Value> entityValueMap = variableValues.get(v.getName());
-      List<Value> values = entities.stream().map(e -> entityValueMap.get(e.getIdentifier())).collect(Collectors.toList());
+      List<Value> values = Lists.newArrayListWithExpectedSize(entities.size());
+
+      entities.forEach(e -> {
+        Value value = entityValueMap.get(e.getIdentifier());
+        if (lineCounts.containsKey(e.getIdentifier())) {
+          if (value.isSequence()) {
+            values.addAll(value.asSequence().getValues());
+            for (int i = value.asSequence().getSize(); i<lineCounts.get(e.getIdentifier()); i++) {
+              values.add(value.getValueType().nullValue());
+            }
+          } else {
+            // repeat the non sequence value over the multiple lines
+            for (int i=0; i<lineCounts.get(e.getIdentifier()); i++) {
+              values.add(value);
+            }
+          }
+        } else {
+          values.add(value);
+        }
+      });
+
       contents.add(getVector(v, values, entities, withMissings(), withFactors()));
       names.add(v.getName());
     });
@@ -191,22 +227,22 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
   }
 
   /**
-   * Get the non repeatable variables filtered by a select clause (if any).
+   * Filter the variables by a select clause (if any).
    *
    * @return
    */
   private Iterable<Variable> filterVariables() {
     List<Variable> filteredVariables;
-    List<Variable> nonRepeatableVariables = StreamSupport.stream(table.getVariables().spliterator(), false) //
-        .filter(v -> !v.isRepeatable()).collect(Collectors.toList());
+    List<Variable> allVariables = Lists.newArrayList(table.getVariables());
 
     if (Strings.isNullOrEmpty(magmaAssignROperation.getVariableFilter())) {
-      filteredVariables = nonRepeatableVariables;
+      filteredVariables = allVariables;
     } else {
       JavascriptClause jsClause = new JavascriptClause(magmaAssignROperation.getVariableFilter());
       jsClause.initialise();
-      filteredVariables = nonRepeatableVariables.stream().filter(v -> jsClause.select(v)).collect(Collectors.toList());
+      filteredVariables = allVariables.stream().filter(v -> jsClause.select(v)).collect(Collectors.toList());
     }
+    Collections.sort(filteredVariables, (o1, o2) -> o1.getIndex() - o2.getIndex());
     return filteredVariables;
   }
 
