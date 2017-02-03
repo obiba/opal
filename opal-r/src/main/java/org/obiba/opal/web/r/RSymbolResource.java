@@ -54,6 +54,7 @@ public interface RSymbolResource {
    * @param idName Include the entity ID as a column.
    * @param updatedName Include the value set last update timestamp as a column.
    * @param identifiersMapping Identifiers mapping to be used.
+   * @param rClass R data frame class (can be "data.frame" (default) or "tibble").
    * @param async
    * @return
    */
@@ -62,6 +63,7 @@ public interface RSymbolResource {
   Response putMagma(@Context UriInfo uri, String path, @QueryParam("variables") String variableFilter,
                     @QueryParam("missings") @DefaultValue("false") Boolean withMissings, @QueryParam("id") String idName,
                     @QueryParam("updated") String updatedName, @QueryParam("identifiers") String identifiersMapping,
+                    @QueryParam("class") @DefaultValue("data.frame") String rClass,
                     @QueryParam("async") @DefaultValue("false") boolean async);
 
   @DELETE

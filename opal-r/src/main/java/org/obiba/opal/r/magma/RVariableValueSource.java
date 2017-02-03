@@ -117,7 +117,9 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   }
 
   private boolean isInteger() {
-    return "integer".equals(colClass) || isNumeric() && colTypes.contains("int");
+    return "integer".equals(colClass)
+        || isNumeric() && colTypes.contains("int")
+        || hasCategories() && (colTypes.contains("dbl") || colTypes.contains("int"));
   }
 
   private boolean isBoolean() {
@@ -134,6 +136,10 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
 
   private boolean isDateTime() {
     return "POSIXct".equals(colClass) || "POSIXt".equals(colClass);
+  }
+
+  private boolean hasCategories() {
+    return "labelled".equals(colClass) || "factor".equals(colClass);
   }
 
   private List<Attribute> extractAttributes(REXP attr) {
@@ -184,7 +190,8 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
       }
       int i = 0;
       for (String name : labels.asStrings()) {
-        Category.Builder builder = Category.Builder.newCategory(name);
+        String catName = isInteger() && name.endsWith(".0") ? name.substring(0, name.length() - 2) : name;
+        Category.Builder builder = Category.Builder.newCategory(catName);
         if (catLabels != null) {
           builder.addAttribute("label", catLabels[i]);
         }

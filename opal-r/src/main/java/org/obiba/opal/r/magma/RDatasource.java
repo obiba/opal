@@ -13,6 +13,7 @@ package org.obiba.opal.r.magma;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.support.AbstractDatasource;
 import org.obiba.opal.r.AbstractROperation;
 import org.obiba.opal.r.DataReadROperation;
@@ -28,6 +29,10 @@ import java.util.Set;
  * file system) it will be copied to the R session and the R haven package will be used to reate a tibble from it.
  */
 public class RDatasource extends AbstractDatasource {
+
+  private static final String DEFAULT_ENTITY_TYPE = "Participant";
+
+  private static final String DEFAULT_ID_COLUMN = "entity_id";
 
   private final OpalRSession rSession;
 
@@ -48,7 +53,7 @@ public class RDatasource extends AbstractDatasource {
     this.rSession = rSession;
     this.file = file;
     this.symbol = symbol;
-    this.entityType = entityType;
+    this.entityType = Strings.isNullOrEmpty(entityType) ? DEFAULT_ENTITY_TYPE : entityType;
     this.idColumn = idColumn;
   }
 
@@ -82,5 +87,14 @@ public class RDatasource extends AbstractDatasource {
   @Override
   protected ValueTable initialiseValueTable(String tableName) {
     return new RValueTable(this, tableName, symbol, entityType, idColumn);
+  }
+
+  @Override
+  public ValueTableWriter createWriter(@NotNull String tableName, @NotNull String entityType) {
+    RValueTable valueTable = new RValueTable(this, tableName, tableName,
+        Strings.isNullOrEmpty(entityType) ? this.entityType : entityType,
+        DEFAULT_ID_COLUMN);
+
+    return new RValueTableWriter(valueTable);
   }
 }

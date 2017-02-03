@@ -41,10 +41,10 @@ public class OpalRSymbolResourceImpl extends AbstractRSymbolResourceImpl impleme
 
   @Override
   public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean withMissings, String idName,
-                           String updatedName, String identifiersMapping, boolean async) {
+                           String updatedName, String identifiersMapping, String rClass, boolean async) {
     Response check = checkValueTable(path);
     if (check != null) return check;
-    return super.putMagma(uri, path, variableFilter, withMissings, idName, updatedName, identifiersMapping, async);
+    return super.putMagma(uri, path, variableFilter, withMissings, idName, updatedName, identifiersMapping, rClass, async);
   }
 
   @Override

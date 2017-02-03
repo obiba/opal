@@ -22,7 +22,7 @@ import javax.validation.constraints.NotNull;
 import java.util.SortedSet;
 
 /**
- * Assign Magma values (from a datasource, a table or a variable) to a R symbol.
+ * Assign Magma values (from a table or a variable) to a R symbol.
  */
 public class MagmaAssignROperation extends AbstractROperation {
 

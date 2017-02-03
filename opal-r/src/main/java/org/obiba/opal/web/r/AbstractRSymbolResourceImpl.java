@@ -87,9 +87,9 @@ public abstract class AbstractRSymbolResourceImpl implements RSymbolResource {
   @Override
   public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean withMissings,
                            String idName, String updatedName, String identifiersMapping,
-                           boolean async) {
+                           String rClass, boolean async) {
     return assignMagmaSymbol(uri, path, variableFilter, withMissings, idName, updatedName, identifiersMapping,
-        MagmaAssignROperation.RClass.DATA_FRAME, async);
+        "tibble".equals(rClass) ? MagmaAssignROperation.RClass.TIBBLE : MagmaAssignROperation.RClass.DATA_FRAME, async);
   }
 
   @Override
