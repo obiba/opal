@@ -96,7 +96,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
 
   private void initialiseVariable(REXP attr) {
     this.variable = VariableBean.Builder.newVariable(colName, extractValueType(attr), valueTable.getEntityType())
-        .addAttributes(extractAttributes(attr)).addCategories(extractCategories(attr))
+        .addAttributes(extractAttributes(attr)).addCategories(extractCategories(attr)).index(position)
         .repeatable(valueTable.isMultilines()).occurrenceGroup(valueTable.isMultilines() ? valueTable.getSymbol() : null).build();
   }
 
