@@ -349,6 +349,7 @@ public enum VectorType {
       for (Attribute attr : attributeAware.getAttributes()) {
         String name = attr.getName();
         if (attr.hasNamespace()) name = attr.getNamespace() + "::" + name;
+        if (name.equals("class")) continue;
         if (!attributesMap.containsKey(name)) {
           attributesMap.put(name, Maps.newHashMap());
         }
