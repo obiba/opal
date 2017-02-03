@@ -246,7 +246,8 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   private Value getDateFromEpoch(String strValue) {
     if ("NaN".equals(strValue)) return getValueType().nullValue();
     try {
-      Date value = new Date(Long.parseLong(strValue.replaceAll("\\.0$", "")) * 24 * 3600 * 1000);
+      Double dbl = Double.parseDouble(strValue);
+      Date value = new Date(dbl.longValue() * 24 * 3600 * 1000);
       return getValueType().valueOf(value);
     } catch (Exception e) {
       return getValueType().nullValue();
@@ -256,7 +257,8 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   private Value getDateTimeFromEpoch(String strValue) {
     if ("NaN".equals(strValue)) return getValueType().nullValue();
     try {
-      Date value = new Date(Long.parseLong(strValue.replaceAll("\\.0$", "")));
+      Double dbl = Double.parseDouble(strValue);
+      Date value = new Date(dbl.longValue() * 1000);
       return getValueType().valueOf(value);
     } catch (Exception e) {
       return getValueType().nullValue();
