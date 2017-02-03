@@ -167,6 +167,32 @@ message MongoDBDatasourceFactoryDto {
   }
 }
 
+message RSessionDatasourceFactoryDto {
+  required string session = 1;
+  required string symbol = 2;
+  optional string characterSet = 3;
+  optional string entityType = 4;
+  optional string locale = 5;
+  optional string idColumn = 6;
+  optional bool multilines = 7;
+  extend DatasourceFactoryDto {
+    optional RSessionDatasourceFactoryDto params = 1013;
+  }
+}
+
+message RHavenDatasourceFactoryDto {
+  required string file = 1;
+  required string symbol = 2;
+  optional string characterSet = 3;
+  optional string entityType = 4;
+  optional string locale = 5;
+  optional string idColumn = 6;
+  optional bool multilines = 7;
+  extend DatasourceFactoryDto {
+    optional RHavenDatasourceFactoryDto params = 1014;
+  }
+}
+
 message DatasourceParsingErrorDto {
   required string defaultMessage = 1;
   required string key = 2;

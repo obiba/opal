@@ -10,12 +10,11 @@
 
 package org.obiba.opal.r.service;
 
-import java.util.Date;
-
+import com.google.common.base.Strings;
 import org.obiba.opal.r.ROperation;
 import org.obiba.opal.r.ROperationWithResult;
 
-import com.google.common.base.Strings;
+import java.util.Date;
 
 /**
  * A R command is for deferred execution of an ROperation.

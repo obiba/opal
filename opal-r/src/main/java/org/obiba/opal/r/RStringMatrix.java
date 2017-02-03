@@ -9,11 +9,11 @@
  */
 package org.obiba.opal.r;
 
-import java.util.Iterator;
-
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.RList;
+
+import java.util.Iterator;
 
 public class RStringMatrix implements RMatrix<String> {
 

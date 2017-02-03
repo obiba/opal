@@ -9,17 +9,7 @@
  */
 package org.obiba.opal.r.service;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
+import com.google.common.base.Strings;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.obiba.opal.core.security.SessionDetachedSubject;
@@ -35,7 +25,12 @@ import org.rosuda.REngine.Rserve.RserveException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
+import java.io.File;
+import java.util.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Reference to a R session.
@@ -179,7 +174,7 @@ public class OpalRSession implements RASyncOperationTemplate {
    * {@link NoSuchRSessionException} is thrown.
    */
   @Override
-  public void execute(ROperation rop) {
+  public synchronized void execute(ROperation rop) {
     RConnection connection = null;
     lock.lock();
     busy = true;

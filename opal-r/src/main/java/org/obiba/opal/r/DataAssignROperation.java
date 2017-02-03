@@ -9,14 +9,9 @@
  */
 package org.obiba.opal.r;
 
-import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
 import org.rosuda.REngine.REXPRaw;
-import org.rosuda.REngine.REXPString;
 
-import javax.ws.rs.core.MultivaluedMap;
 import java.util.Base64;
-import java.util.List;
-import java.util.Map.Entry;
 
 /**
  * Assign a serialized R object value to symbol in R.

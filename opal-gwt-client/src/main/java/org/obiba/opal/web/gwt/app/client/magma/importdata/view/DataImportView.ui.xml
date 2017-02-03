@@ -9,6 +9,7 @@
   -->
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
@@ -31,19 +32,29 @@
             </g:Label>
           </g:FlowPanel>
           <g:FlowPanel addStyleNames="small-top-margin" ui:field="helpOpalXml" visible="false">
-            <g:Label styleName="help-block">
+            <b:HelpBlock>
               <ui:msg description="Opal XML information">This format comes as a .zip file containing a folder for each
                 table having: the full data dictionary in a XML file, a XML data
                 file per entity. This is the file format used when exporting data from Onyx.
               </ui:msg>
-            </g:Label>
+            </b:HelpBlock>
           </g:FlowPanel>
           <g:FlowPanel addStyleNames="small-top-margin" ui:field="helpSpss" visible="false">
             <g:Label styleName="help-block">
               <ui:msg description="SPSS information">This format expects the file to be a valid SPSS binary file
-                containing the variable dictionary and optionally the variable data.
+                containing the variables and the data.
               </ui:msg>
             </g:Label>
+          </g:FlowPanel>
+          <g:FlowPanel addStyleNames="small-top-margin" ui:field="helpRHaven" visible="false">
+            <b:HelpBlock>
+              <ui:msg description="RHaven information">This format expects the file to be a valid SAS, SPSS or STATA file
+                containing the variables and the data. This import procedure requires a functional R server with the
+                <a href="https://cran.r-project.org/web/packages/tibble/" target="_blank">tibble</a> and
+                <a href="https://cran.r-project.org/web/packages/haven/" target="_blank">haven</a> packages installed.
+                Note that this is still an experimental feature: value type mappings with R could change in a future release.
+              </ui:msg>
+            </b:HelpBlock>
           </g:FlowPanel>
           <g:FlowPanel addStyleNames="small-top-margin" ui:field="helpLimeSurvey" visible="false">
             <g:Label styleName="help-block">

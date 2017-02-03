@@ -11,6 +11,7 @@
 package org.obiba.opal.r.magma;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.obiba.magma.*;
@@ -20,11 +21,10 @@ import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.r.MagmaRRuntimeException;
-import org.rosuda.REngine.*;
+import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.RList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
@@ -37,148 +37,130 @@ import java.util.stream.StreamSupport;
 /**
  * Build a R vector from a table: list of vectors of variables.
  */
-class ValueTableRConverter extends AbstractMagmaRConverter {
+abstract class ValueTableRConverter extends AbstractMagmaRConverter {
 
   private static final Logger log = LoggerFactory.getLogger(ValueTableRConverter.class);
 
   private ValueTable table;
 
+  private final Map<String, Integer> lineCounts = Maps.newConcurrentMap();
+
   ValueTableRConverter(MagmaAssignROperation magmaAssignROperation) {
     super(magmaAssignROperation);
   }
 
-  @Override
-  public boolean canResolve(String path) {
-    return path != null && path.contains(".") && !path.contains(":");
+  protected boolean hasMultilines() {
+    return !lineCounts.isEmpty();
   }
 
-  @Override
-  public REXP asVector(String path, boolean withMissings, String identifiersMapping) {
-    resolvePath(path, identifiersMapping);
-    return asVector(withMissings);
-  }
-
-  /**
-   * Build a R vector from an already set ValueTable.
-   *
-   * @param withMissings
-   * @return
-   */
-  private REXP asVector(boolean withMissings) {
-    if (table == null) throw new IllegalStateException("Table must not be null");
-    magmaAssignROperation.setEntities(table);
-    REXP ids = getIdsVector(withMissings);
-    return createDataFrame(ids);
-  }
-
-  @Override
-  public void doAssign(String symbol, String path, boolean withMissings, String identifiersMapping) {
-    // OPAL-2710 assigning a data.frame directly fails with a lot of rows
-    resolvePath(path, identifiersMapping);
-    if (table == null) throw new IllegalStateException("Table must not be null");
-    magmaAssignROperation.setEntities(table);
-    REXP ids = getIdsVector(withMissings);
-    RList list = getVariableVectors();
-
-    String[] names = list.keys();
-    if (names == null || names.length == 0) return;
-
-    doAssignTmpVectors(ids, names, list);
-    doAssignDataFrame(names);
-    doRemoveTmpVectors(names);
-  }
-
-  private void doAssignTmpVectors(REXP ids, String[] names, RList list) {
+  protected void doAssignTmpVectors(REXP ids, String[] names, RList list) {
     // one temporary vector per variable
     for (String name : names) {
-      magmaAssignROperation.doAssign(getTmpVectorName(magmaAssignROperation.getSymbol(), name), list.at(name));
+      magmaAssignROperation.doAssign(getTmpVectorName(getSymbol(), name), list.at(name));
     }
-    if (magmaAssignROperation.withUpdatedColumn()) {
-      magmaAssignROperation.doAssign(getTmpVectorName(magmaAssignROperation.getSymbol(), magmaAssignROperation.getUpdatedColumnName()),
-          getUpdatedVector(magmaAssignROperation.withMissings()));
+    // one temporary vector for the timestamp
+    if (withUpdatedColumn()) {
+      magmaAssignROperation.doAssign(getTmpVectorName(getSymbol(), getUpdatedColumnName()),
+          getUpdatedVector(withMissings()));
     }
     // one temporary vector for the ids
-    magmaAssignROperation.doAssign(getTmpVectorName(magmaAssignROperation.getSymbol(),
-        magmaAssignROperation.withIdColumn() ? magmaAssignROperation.getIdColumnName() : "row.names"), ids);
+    magmaAssignROperation.doAssign(getTmpVectorName(getSymbol(),
+        withIdColumn() ? getIdColumnName() : "row.names"), ids);
   }
 
-  private void doAssignDataFrame(String... names) {
-    // create the data.frame from the vectors
-    StringBuilder args = new StringBuilder();
-    if (magmaAssignROperation.withIdColumn()) {
-      args.append(String.format("'%s'=%s", magmaAssignROperation.getIdColumnName(),
-          getTmpVectorName(magmaAssignROperation.getSymbol(), magmaAssignROperation.getIdColumnName())));
-    }
 
-    if (magmaAssignROperation.withUpdatedColumn()) {
-      if (args.length() > 0) args.append(", ");
-      args.append(String.format("'%s'=%s", magmaAssignROperation.getUpdatedColumnName(),
-          getTmpVectorName(magmaAssignROperation.getSymbol(), magmaAssignROperation.getUpdatedColumnName())));
-    }
-    for (String name : names) {
-      if (args.length() > 0) args.append(", ");
-      args.append(String.format("'%s'=%s", name, getTmpVectorName(magmaAssignROperation.getSymbol(), name)));
-    }
-    if (!magmaAssignROperation.withIdColumn())
-      args.append(String.format(", row.names=%s", getTmpVectorName(magmaAssignROperation.getSymbol(), "row.names")));
-    log.info("data.frame arguments: {}", args);
-    magmaAssignROperation.doEval(String.format("base::assign('%s', data.frame(%s, stringsAsFactors=FALSE))", magmaAssignROperation.getSymbol(), args));
-  }
-
-  private void doRemoveTmpVectors(String... names) {
+  protected void doRemoveTmpVectors(String... names) {
     // remove temporary vectors
     for (String name : names) {
-      magmaAssignROperation.doEval("base::rm(" + getTmpVectorName(magmaAssignROperation.getSymbol(), name) + ")");
+      magmaAssignROperation.doEval("base::rm(" + getTmpVectorName(getSymbol(), name) + ")");
     }
-    magmaAssignROperation.doEval("base::rm(" + getTmpVectorName(magmaAssignROperation.getSymbol(),
-        magmaAssignROperation.withIdColumn() ? magmaAssignROperation.getIdColumnName() : "row.names") + ")");
-    if (magmaAssignROperation.withUpdatedColumn()) {
-      magmaAssignROperation.doEval("base::rm(" + getTmpVectorName(magmaAssignROperation.getSymbol(),
-          magmaAssignROperation.getUpdatedColumnName()) + ")");
+    magmaAssignROperation.doEval("base::rm(" + getTmpVectorName(getSymbol(),
+        withIdColumn() ? getIdColumnName() : "row.names") + ")");
+    if (withUpdatedColumn()) {
+      magmaAssignROperation.doEval("base::rm(" + getTmpVectorName(getSymbol(),
+          getUpdatedColumnName()) + ")");
     }
   }
 
-  private String getTmpVectorName(String symbol, String name) {
+  protected String getTmpVectorName(String symbol, String name) {
     return ("opal__" + symbol + "__" + name).replace("-", ".").replace("+", ".").replace(" ", ".").replace("\"", ".")
         .replace("'", ".");
   }
 
-  private REXP getIdsVector(boolean withMissings) {
-    return getVector(new VariableEntityValueSource(magmaAssignROperation.getIdColumnName()), magmaAssignROperation.getEntities(), withMissings);
+  protected String getSymbol() {
+    return magmaAssignROperation.getSymbol();
   }
 
-  private REXP getUpdatedVector(boolean withMissings) {
-    return getVector(new ValueSetUpdatedValueSource(magmaAssignROperation.getUpdatedColumnName()), magmaAssignROperation.getEntities(), withMissings);
+  protected boolean withIdColumn() {
+    return magmaAssignROperation.withIdColumn();
+  }
+  
+  protected String getIdColumnName() {
+    return magmaAssignROperation.getIdColumnName();
   }
 
-  private RList getVariableVectors() {
-    return table.isView() ? getVariableVectorsFromView() : getVariableVectorsFromRawTable();
+  protected boolean withUpdatedColumn() {
+    return magmaAssignROperation.withUpdatedColumn();
   }
 
-  /**
-   * Parallelize vector extraction per variable as it is safe and optimal to do so for a raw table.
-   *
-   * @return
-   */
-  private RList getVariableVectorsFromRawTable() {
-    List<REXP> contents = Collections.synchronizedList(Lists.newArrayList());
-    List<String> names = Collections.synchronizedList(Lists.newArrayList());
+  protected String getUpdatedColumnName() {
+    return magmaAssignROperation.getUpdatedColumnName();
+  }
+  
+  protected SortedSet<VariableEntity> getEntities() {
+    return magmaAssignROperation.getEntities();
+  }
 
-    // vector for each variable
-    StreamSupport.stream(filterVariables().spliterator(), true) //
-        .map(v -> table.getVariableValueSource(v.getName())) //
-        .filter(vvs -> !vvs.getVariable().isRepeatable()) //
-        .forEach(vvs ->
-            magmaAssignROperation.getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
-              @Override
-              protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
-                contents.add(getVector(vvs, magmaAssignROperation.getEntities(), magmaAssignROperation.withMissings()));
-                names.add(vvs.getVariable().getName());
-              }
-            })
-        );
+  protected List<VariableEntity> getEntitiesAsList() {
+    return ImmutableList.copyOf(magmaAssignROperation.getEntities());
+  }
+  
+  protected boolean withMissings() {
+    return magmaAssignROperation.withMissings();
+  }
 
-    return new RList(contents, names);
+  protected boolean  withFactors() {
+    return true;
+  }
+
+  protected REXP getIdsVector(boolean withMissings) {
+    return getUnaryVector(new VariableEntityValueSource(getIdColumnName()), withMissings);
+  }
+
+  protected REXP getUpdatedVector(boolean withMissings) {
+    return getUnaryVector(new ValueSetUpdatedValueSource(getUpdatedColumnName()), withMissings);
+  }
+
+  private REXP getUnaryVector(VariableValueSource vvs, boolean withMissings) {
+    if (lineCounts.isEmpty())
+      return getVector(vvs, getEntities(), withMissings);
+    else {
+      List<Value> values = Lists.newArrayList();
+      List<Value> vValues = ImmutableList.copyOf(vvs.asVectorSource().getValues(getEntities()));
+      List<String> ids = getEntitiesAsList().stream().map(VariableEntity::getIdentifier).collect(Collectors.toList());
+
+      for (int i=0; i<ids.size(); i++) {
+        Value val = vValues.get(i);
+        String id = ids.get(i);
+        if (lineCounts.containsKey(id)) {
+          for (int j=0; j<lineCounts.get(id); j++) {
+            values.add(val);
+          }
+        } else {
+          values.add(val);
+        }
+      }
+
+      return getVector(vvs.getVariable(), values, getEntities(), withMissings, false);
+    }
+  }
+
+  protected RList getVariableVectors() {
+    return getVariableVectorsByRows();
+  }
+
+  protected ValueTable getValueTable() {
+    return table;
   }
 
   /**
@@ -187,10 +169,10 @@ class ValueTableRConverter extends AbstractMagmaRConverter {
    *
    * @return
    */
-  private RList getVariableVectorsFromView() {
+  protected RList getVariableVectorsByRows() {
     List<REXP> contents = Lists.newArrayList();
     List<String> names = Lists.newArrayList();
-    SortedSet<VariableEntity> entities = magmaAssignROperation.getEntities();
+    SortedSet<VariableEntity> entities = getEntities();
     Iterable<Variable> variables = filterVariables();
     Map<String, Map<String, Value>> variableValues = Maps.newConcurrentMap();
     variables.forEach(variable -> variableValues.put(variable.getName(), Maps.newConcurrentMap()));
@@ -199,16 +181,45 @@ class ValueTableRConverter extends AbstractMagmaRConverter {
     StreamSupport.stream(table.getValueSets(entities).spliterator(), true) //
         .forEach(valueSet ->
             variables.forEach(variable -> {
+              String identifier = valueSet.getVariableEntity().getIdentifier();
               Value value = table.getValue(variable, valueSet);
-              variableValues.get(variable.getName()).put(valueSet.getVariableEntity().getIdentifier(), value);
+              if (variable.isRepeatable()) {
+                int seqSize = value.asSequence().getSize();
+                if (!lineCounts.containsKey(identifier)) {
+                  lineCounts.put(identifier, seqSize);
+                } else {
+                  lineCounts.put(identifier, Math.max(lineCounts.get(identifier), seqSize));
+                }
+              }
+              variableValues.get(variable.getName()).put(identifier, value);
             })
         );
 
     // vector for each variable, values in the same order as entities
     variables.forEach(v -> {
       Map<String, Value> entityValueMap = variableValues.get(v.getName());
-      List<Value> values = entities.stream().map(e -> entityValueMap.get(e.getIdentifier())).collect(Collectors.toList());
-      contents.add(getVector(v, values, entities, magmaAssignROperation.withMissings()));
+      List<Value> values = Lists.newArrayListWithExpectedSize(entities.size());
+
+      entities.forEach(e -> {
+        Value value = entityValueMap.get(e.getIdentifier());
+        if (lineCounts.containsKey(e.getIdentifier())) {
+          if (value.isSequence()) {
+            values.addAll(value.asSequence().getValues());
+            for (int i = value.asSequence().getSize(); i<lineCounts.get(e.getIdentifier()); i++) {
+              values.add(value.getValueType().nullValue());
+            }
+          } else {
+            // repeat the non sequence value over the multiple lines
+            for (int i=0; i<lineCounts.get(e.getIdentifier()); i++) {
+              values.add(value);
+            }
+          }
+        } else {
+          values.add(value);
+        }
+      });
+
+      contents.add(getVector(v, values, entities, withMissings(), withFactors()));
       names.add(v.getName());
     });
 
@@ -216,40 +227,26 @@ class ValueTableRConverter extends AbstractMagmaRConverter {
   }
 
   /**
-   * Get the non repeatable variables filtered by a select clause (if any).
+   * Filter the variables by a select clause (if any).
    *
    * @return
    */
   private Iterable<Variable> filterVariables() {
     List<Variable> filteredVariables;
-    List<Variable> nonRepeatableVariables = StreamSupport.stream(table.getVariables().spliterator(), false) //
-        .filter(v -> !v.isRepeatable()).collect(Collectors.toList());
+    List<Variable> allVariables = Lists.newArrayList(table.getVariables());
 
     if (Strings.isNullOrEmpty(magmaAssignROperation.getVariableFilter())) {
-      filteredVariables = nonRepeatableVariables;
+      filteredVariables = allVariables;
     } else {
       JavascriptClause jsClause = new JavascriptClause(magmaAssignROperation.getVariableFilter());
       jsClause.initialise();
-      filteredVariables = nonRepeatableVariables.stream().filter(v -> jsClause.select(v)).collect(Collectors.toList());
+      filteredVariables = allVariables.stream().filter(v -> jsClause.select(v)).collect(Collectors.toList());
     }
+    Collections.sort(filteredVariables, (o1, o2) -> o1.getIndex() - o2.getIndex());
     return filteredVariables;
   }
 
-  /**
-   * @param ids
-   * @return
-   */
-  private REXP createDataFrame(REXP ids) {
-    return new REXPGenericVector(null, new REXPList(new RList( //
-        new REXP[]{ //
-            new REXPString("data.frame"), //
-            ids}, //
-        new String[]{ //
-            "class", //
-            "row.names"})));
-  }
-
-  private void resolvePath(String path, String idMapping) {
+  protected void resolvePath(String path) {
     MagmaEngineReferenceResolver resolver = MagmaEngineTableResolver.valueOf(path);
 
     if (resolver.getDatasourceName() == null) {
@@ -257,7 +254,7 @@ class ValueTableRConverter extends AbstractMagmaRConverter {
     }
     Datasource ds = MagmaEngine.get().getDatasource(resolver.getDatasourceName());
 
-    table = applyIdentifiersMapping(ds.getValueTable(resolver.getTableName()), idMapping);
+    table = applyIdentifiersMapping(ds.getValueTable(resolver.getTableName()));
   }
 
   /**

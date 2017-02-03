@@ -97,6 +97,9 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
   FlowPanel helpSpss;
 
   @UiField
+  FlowPanel helpRHaven;
+
+  @UiField
   FlowPanel helpLimeSurvey;
 
   @UiField
@@ -210,6 +213,7 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
     formatChooser.addItemToGroup(translations.csvLabel(), ImportFormat.CSV.name());
     formatChooser.addItemToGroup(translations.opalXmlLabel(), ImportFormat.XML.name());
     formatChooser.addItemToGroup(translations.spssLabel(), ImportFormat.SPSS.name());
+    formatChooser.addItemToGroup(translations.rHavenLabel(), ImportFormat.RHAVEN.name());
     formatChooser.addGroup(translations.remoteServerBasedDatasources());
     formatChooser.addItemToGroup(translations.limesurveyLabel(), ImportFormat.LIMESURVEY.name());
     formatChooser.addItemToGroup(translations.opalRestLabel(), ImportFormat.REST.name());
@@ -409,6 +413,9 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
       case SPSS:
         helpSpss.setVisible(true);
         break;
+      case RHAVEN:
+        helpRHaven.setVisible(true);
+        break;
     }
   }
 
@@ -419,6 +426,7 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
     helpJDBC.setVisible(false);
     helpOpalRest.setVisible(false);
     helpSpss.setVisible(false);
+    helpRHaven.setVisible(false);
     helpHealthCanada.setVisible(false);
     helpGeonamesPostalCodes.setVisible(false);
   }

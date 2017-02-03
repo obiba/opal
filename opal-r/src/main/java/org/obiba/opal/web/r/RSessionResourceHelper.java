@@ -35,8 +35,10 @@ class RSessionResourceHelper {
    */
   static Response executeScript(ROperationTemplate ropTemplate, String script, boolean async) {
     if(script == null) return Response.status(Status.BAD_REQUEST).build();
+    return executeScript(ropTemplate, new RScriptROperation(script), async);
+  }
 
-    ROperationWithResult rop = new RScriptROperation(script);
+  static Response executeScript(ROperationTemplate ropTemplate, ROperationWithResult rop, boolean async) {
     if(async && ropTemplate instanceof RASyncOperationTemplate) {
       String id = ((RASyncOperationTemplate)ropTemplate).executeAsync(rop);
       return Response.ok().entity(id).type(MediaType.TEXT_PLAIN_TYPE).build();
@@ -45,13 +47,13 @@ class RSessionResourceHelper {
       if(rop.hasResult() && rop.hasRawResult()) {
         return Response.ok().entity(rop.getRawResult().asBytes()).build();
       }
-      log.error("R Script '{}' has result: {}, has raw result: {}", script, rop.hasResult(), rop.hasRawResult());
+      log.error("R Script '{}' has result: {}, has raw result: {}", rop, rop.hasResult(), rop.hasRawResult());
       return Response.status(Status.INTERNAL_SERVER_ERROR).build();
     }
   }
 
-  static Response executeScript(ROperationTemplate rSession, String script) {
-    return executeScript(rSession, script, false);
+  static Response executeScript(ROperationTemplate ropTemplate, String script) {
+    return executeScript(ropTemplate, script, false);
   }
 
 }

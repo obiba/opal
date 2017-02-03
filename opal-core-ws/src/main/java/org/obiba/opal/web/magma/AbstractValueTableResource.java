@@ -10,16 +10,9 @@
 
 package org.obiba.opal.web.magma;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
@@ -28,9 +21,8 @@ import org.obiba.magma.js.views.JavascriptClause;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import javax.annotation.Nullable;
+import java.util.*;
 
 abstract class AbstractValueTableResource {
 
@@ -99,12 +91,7 @@ abstract class AbstractValueTableResource {
   }
 
   protected List<Variable> orderVariables(List<Variable> variables) {
-    Collections.sort(variables, new Comparator<Variable>() {
-      @Override
-      public int compare(Variable o1, Variable o2) {
-        return o1.getIndex() - o2.getIndex();
-      }
-    });
+    Collections.sort(variables, (o1, o2) -> o1.getIndex() - o2.getIndex());
     return variables;
   }
 

@@ -11,24 +11,24 @@ package org.obiba.opal.r.magma;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Sets;
-import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.r.AbstractROperation;
-import org.obiba.opal.r.MagmaRRuntimeException;
 import org.rosuda.REngine.REXP;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.validation.constraints.NotNull;
-import java.util.Set;
 import java.util.SortedSet;
 
 /**
- * Assign Magma values (from a datasource, a table or a variable) to a R symbol.
+ * Assign Magma values (from a table or a variable) to a R symbol.
  */
 public class MagmaAssignROperation extends AbstractROperation {
+
+  public enum RClass {
+    DATA_FRAME, TIBBLE, VECTOR
+  }
 
   @NotNull
   private final IdentifiersTableService identifiersTableService;
@@ -52,18 +52,17 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   private final String updatedColumnName;
 
+  private final RClass rClass;
+
   private SortedSet<VariableEntity> entities;
 
-  private final Set<MagmaRConverter> magmaRConverters = Sets
-      .newHashSet((MagmaRConverter) new ValueTableRConverter(this), (MagmaRConverter) new VariableRConverter(this));
-
-  @SuppressWarnings("ConstantConditions")
   public MagmaAssignROperation(@NotNull String symbol, @NotNull String path, String variableFilter,
-                               boolean withMissings, String idColumnName, String updatedColumnName, String identifiersMapping,
+                               boolean withMissings, String idColumnName, String updatedColumnName, String identifiersMapping, RClass rClass,
                                @NotNull IdentifiersTableService identifiersTableService, @NotNull TransactionTemplate transactionTemplate) {
     if (symbol == null) throw new IllegalArgumentException("symbol cannot be null");
     if (path == null) throw new IllegalArgumentException("path cannot be null");
-    if (identifiersTableService == null) throw new IllegalArgumentException("identifiers table service cannot be null");
+    if (!Strings.isNullOrEmpty(identifiersMapping) && identifiersTableService == null)
+      throw new IllegalArgumentException("identifiers table service cannot be null");
     this.symbol = symbol;
     this.path = path;
     this.variableFilter = variableFilter;
@@ -73,21 +72,24 @@ public class MagmaAssignROperation extends AbstractROperation {
     this.updatedColumnName = updatedColumnName;
     this.identifiersTableService = identifiersTableService;
     this.transactionTemplate = transactionTemplate;
+    this.rClass = path.contains(":") ? RClass.VECTOR : RClass.VECTOR.equals(rClass) ? RClass.DATA_FRAME : rClass;
   }
 
   @Override
   public void doWithConnection() {
-    try {
-      for (MagmaRConverter converter : magmaRConverters) {
-        if (converter.canResolve(path)) {
-          converter.doAssign(symbol, path, withMissings, identifiersMapping);
-          return;
-        }
-      }
-    } catch (MagmaRuntimeException e) {
-      throw new MagmaRRuntimeException("Failed resolving path '" + path + "'", e);
+    MagmaRConverter converter;
+    switch (rClass) {
+      case VECTOR:
+        converter = new VariableRConverter(this);
+        break;
+      case DATA_FRAME:
+        converter = new ValueTableRDataFrameConverter(this);
+        break;
+      default:
+        converter = new ValueTableRTibbleConverter(this);
     }
-    throw new MagmaRRuntimeException("No R converter found for path '" + path + "'");
+
+    converter.doAssign(symbol, path);
   }
 
   void doAssign(String sym, REXP ct) {
@@ -96,6 +98,10 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   REXP doEval(String script) {
     return eval(script, false);
+  }
+
+  REXP doEnsurePackage(String packageName) {
+    return ensurePackage(packageName);
   }
 
   IdentifiersTableService getIdentifiersTableService() {
@@ -115,7 +121,7 @@ public class MagmaAssignROperation extends AbstractROperation {
     this.entities = ImmutableSortedSet.copyOf(table.getVariableEntities());
   }
 
-  public String getSymbol() {
+  String getSymbol() {
     return symbol;
   }
 
@@ -135,8 +141,12 @@ public class MagmaAssignROperation extends AbstractROperation {
     return !Strings.isNullOrEmpty(updatedColumnName);
   }
 
-  public boolean withMissings() {
+  boolean withMissings() {
     return withMissings;
+  }
+
+  String getIdentifiersMapping() {
+    return identifiersMapping;
   }
 
   String getVariableFilter() {

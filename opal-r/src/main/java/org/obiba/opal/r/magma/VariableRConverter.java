@@ -32,8 +32,8 @@ class VariableRConverter extends AbstractMagmaRConverter {
   }
 
   @Override
-  public boolean canResolve(String path) {
-    return path != null && path.contains(".") && path.contains(":");
+  public void doAssign(String symbol, String path) {
+    magmaAssignROperation.doAssign(symbol, asVector(path, magmaAssignROperation.withMissings(), magmaAssignROperation.getIdentifiersMapping()));
   }
 
   private void resolvePath(String path, String idMapping) {
@@ -47,19 +47,14 @@ class VariableRConverter extends AbstractMagmaRConverter {
       throw new MagmaRRuntimeException("Datasource is not defined in path: " + path);
     }
 
-    table = applyIdentifiersMapping(resolver.resolveTable((ValueTable) null), idMapping);
+    table = applyIdentifiersMapping(resolver.resolveTable((ValueTable) null));
     variableValueSource = table.getVariableValueSource(resolver.getVariableName());
   }
 
-  @Override
-  public REXP asVector(String path, boolean withMissings, String identifiersMapping) {
+  private REXP asVector(String path, boolean withMissings, String identifiersMapping) {
     resolvePath(path, identifiersMapping);
     magmaAssignROperation.setEntities(table);
     return getVector(variableValueSource, magmaAssignROperation.getEntities(), withMissings);
   }
 
-  @Override
-  public void doAssign(String symbol, String path, boolean withMissings, String identifiersMapping) {
-    magmaAssignROperation.doAssign(symbol, asVector(path, withMissings, identifiersMapping));
-  }
 }

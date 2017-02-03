@@ -80,6 +80,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   private final SpssFormatStepPresenter spssFormatStepPresenter;
 
+  private final RHavenStepPresenter rHavenStepPresenter;
+
   private final LimesurveyStepPresenter limesurveyStepPresenter;
 
   private final JdbcStepPresenter jdbcStepPresenter;
@@ -110,6 +112,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       CsvFormatStepPresenter csvFormatStepPresenter, XmlFormatStepPresenter xmlFormatStepPresenter, //
       LimesurveyStepPresenter limesurveyStepPresenter, JdbcStepPresenter jdbcStepPresenter, //
       SpssFormatStepPresenter spssFormatStepPresenter,//
+      RHavenStepPresenter rHavenStepPresenter,//
       RestStepPresenter restStepPresenter,//
       NoFormatStepPresenter noFormatStepPresenter,//
       IdentifiersMappingSelectionStepPresenter identifiersMappingSelectionStepPresenter, //
@@ -120,6 +123,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     this.csvFormatStepPresenter = csvFormatStepPresenter;
     this.xmlFormatStepPresenter = xmlFormatStepPresenter;
     this.spssFormatStepPresenter = spssFormatStepPresenter;
+    this.rHavenStepPresenter = rHavenStepPresenter;
     this.limesurveyStepPresenter = limesurveyStepPresenter;
     this.jdbcStepPresenter = jdbcStepPresenter;
     this.restStepPresenter = restStepPresenter;
@@ -173,6 +177,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     csvFormatStepPresenter.bind();
     xmlFormatStepPresenter.bind();
     spssFormatStepPresenter.bind();
+    rHavenStepPresenter.bind();
     limesurveyStepPresenter.bind();
     jdbcStepPresenter.bind();
     restStepPresenter.bind();
@@ -250,6 +255,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     csvFormatStepPresenter.unbind();
     xmlFormatStepPresenter.unbind();
     spssFormatStepPresenter.unbind();
+    rHavenStepPresenter.unbind();
     limesurveyStepPresenter.unbind();
     jdbcStepPresenter.unbind();
     restStepPresenter.unbind();
@@ -313,6 +319,10 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         formatStepPresenter = spssFormatStepPresenter;
         getView().setFormatStepDisplay(spssFormatStepPresenter.getView());
         break;
+      case RHAVEN:
+        formatStepPresenter = rHavenStepPresenter;
+        getView().setFormatStepDisplay(rHavenStepPresenter.getView());
+        break;
       default:
         noFormatStepPresenter.setImportFormat(getView().getImportFormat());
         formatStepPresenter = noFormatStepPresenter;
@@ -340,6 +350,9 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         submitJob(createRestImportCommandOptionsDto());
         break;
       case SPSS:
+        submitJob(createImportCommandOptionsDto(importConfig.getSpssFile()));
+        break;
+      case RHAVEN:
         submitJob(createImportCommandOptionsDto(importConfig.getSpssFile()));
         break;
     }
@@ -433,6 +446,9 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
           break;
         case SPSS:
           entries = spssFormatStepPresenter.getErrors().entrySet();
+          break;
+        case RHAVEN:
+          entries = rHavenStepPresenter.getErrors().entrySet();
           break;
       }
       return entries;

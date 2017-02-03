@@ -9,13 +9,13 @@
  */
 package org.obiba.opal.r;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Exception thrown when a R try-error statement fails.
