@@ -144,7 +144,11 @@ public enum VectorType {
     @Override
     protected void addTypeRAttributes(Variable variable, List<String> names, List<REXP> contents) {
       names.add("class");
-      contents.add(new REXPString("POSIXct"));
+      contents.add(new REXPString(new String[] {"POSIXct", "POSIXt"}));
+      if (!names.contains("tzone")) {
+        names.add("tzone");
+        contents.add(new REXPString("UTC"));
+      }
     }
   },
 
