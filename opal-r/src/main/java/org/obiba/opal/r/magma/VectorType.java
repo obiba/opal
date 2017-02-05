@@ -19,6 +19,7 @@ import org.obiba.opal.core.domain.VariableNature;
 import org.obiba.opal.r.MagmaRRuntimeException;
 import org.rosuda.REngine.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -122,9 +123,61 @@ public enum VectorType {
     }
   },
 
-  datetimes(DateTimeType.get()),
+  datetimes(DateTimeType.get()) {
+    @Override
+    protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings) {
+      int ints[] = new int[values.size()];
+      int i = 0;
+      for (Value value : values) {
+        // do not support categories in this type
+        if (value.isNull()) {
+          ints[i++] = REXPInteger.NA;
+        } else {
+          Date d = (Date) value.getValue();
+          double t = ((double)d.getTime()) / 1000;
+          ints[i++] = Long.valueOf(Math.round(t)).intValue();
+        }
+      }
+      return variable == null ? new REXPInteger(ints) : new REXPInteger(ints, getVariableRAttributes(variable, null));
+    }
 
-  dates(DateType.get()),
+    @Override
+    protected void addTypeRAttributes(Variable variable, List<String> names, List<REXP> contents) {
+      names.add("class");
+      contents.add(new REXPString("POSIXct"));
+    }
+  },
+
+  dates(DateType.get()) {
+    @Override
+    protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings) {
+      int ints[] = new int[values.size()];
+      int i = 0;
+      for (Value value : values) {
+        // do not support categories in this type
+        if (value.isNull()) {
+          ints[i++] = REXPInteger.NA;
+        } else {
+          Object val = value.getValue();
+          Date date;
+          if (val instanceof MagmaDate) {
+            date = ((MagmaDate)val).asDate();
+          } else {
+            date = (Date) val;
+          }
+          double d = ((double)date.getTime()) / (24 * 3600 * 1000);
+          ints[i++] = Long.valueOf(Math.round(d)).intValue();
+        }
+      }
+      return variable == null ? new REXPInteger(ints) : new REXPInteger(ints, getVariableRAttributes(variable, null));
+    }
+
+    @Override
+    protected void addTypeRAttributes(Variable variable, List<String> names, List<REXP> contents) {
+      names.add("class");
+      contents.add(new REXPString("Date"));
+    }
+  },
 
   locales(LocaleType.get()),
 
@@ -267,8 +320,10 @@ public enum VectorType {
     List<REXP> contents = Lists.newArrayList();
     List<String> names = Lists.newArrayList();
     asAttributesMap(variable).forEach((name, content) -> {
-      names.add(name);
-      contents.add(new REXPString(content));
+      if (!name.equals("class")) { // exclude class attribute as it is an interpreted by R
+        names.add(name);
+        contents.add(new REXPString(content));
+      }
       if (name.equals("spss::format")) {
         // to help haven R package to write spss format
         names.add("format.spss");
@@ -286,12 +341,26 @@ public enum VectorType {
       contents.add(new REXPString("labelled"));
       names.add("labels");
       contents.add(getCategoriesRAttributes(variable));
+    } else {
+      addTypeRAttributes(variable, names, contents);
     }
 
     RList attrs = new RList(contents, names);
 
     return new REXPList(attrs);
   }
+
+  /**
+   * Allow adding type specific R attributes.
+   *
+   * @param variable
+   * @param names
+   * @param contents
+   */
+  protected void addTypeRAttributes(Variable variable, List<String> names, List<REXP> contents) {
+    // no-op
+  }
+
 
   /**
    * Build the R attributes that describe the categories of the variable.
@@ -349,7 +418,6 @@ public enum VectorType {
       for (Attribute attr : attributeAware.getAttributes()) {
         String name = attr.getName();
         if (attr.hasNamespace()) name = attr.getNamespace() + "::" + name;
-        if (name.equals("class")) continue;
         if (!attributesMap.containsKey(name)) {
           attributesMap.put(name, Maps.newHashMap());
         }
