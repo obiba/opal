@@ -24,7 +24,7 @@
         </b:ControlLabel>
         <g:SimplePanel ui:field="selectFilePanel"/>
         <g:Label styleName="help-block">
-          <ui:msg description="R Haven File Description label">Data in SAS, SPSS or STATA format are packaged in a file with suffix .sas7bdat, .sav or .dta.
+          <ui:msg description="R Haven File Description label">Data in SAS, SPSS or Stata format are packaged in a file with suffix .sas7bdat, .sav or .dta.
           </ui:msg>
         </g:Label>
       </b:ControlGroup>

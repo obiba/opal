@@ -10,8 +10,6 @@
 package org.obiba.opal.web.r;
 
 import com.google.common.base.Strings;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
@@ -22,8 +20,6 @@ import org.obiba.magma.support.MagmaEngineVariableResolver;
 import org.obiba.opal.r.DataAssignROperation;
 import org.obiba.opal.r.DataSaveROperation;
 import org.obiba.opal.r.MagmaRRuntimeException;
-import org.obiba.opal.r.RScriptROperation;
-import org.obiba.opal.r.magma.MagmaAssignROperation;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -51,22 +47,6 @@ public class OpalRSymbolResourceImpl extends AbstractRSymbolResourceImpl impleme
   public Response putRData(@Context UriInfo uri, String content, @DefaultValue("false") boolean async) {
     DataAssignROperation rop = new DataAssignROperation(getName(), content);
     return assignSymbol(uri, rop, async);
-  }
-
-  @Override
-  public Response importMagma(String project) {
-    RScriptROperation rop = new RScriptROperation(getName(), false);
-    getRSession().execute(rop);
-    return Response.status(rop.hasResult() ? Response.Status.OK : Response.Status.BAD_REQUEST).build();
-  }
-
-  @Override
-  public Response exportMagma(@Context UriInfo uri, String path, String variableFilter, String idName,
-                              String updatedName, String identifiersMapping, boolean async, String destination) {
-    Response check = checkValueTable(path);
-    if (check != null) return check;
-    return assignMagmaSymbol(uri, path, variableFilter, true, idName, updatedName, identifiersMapping,
-        MagmaAssignROperation.RClass.TIBBLE,async);
   }
 
   @Override

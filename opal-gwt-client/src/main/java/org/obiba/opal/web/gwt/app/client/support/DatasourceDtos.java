@@ -169,9 +169,7 @@ public class DatasourceDtos {
     factoryDto.setFile(file);
     String symbol = file.substring(file.lastIndexOf('/') + 1, file.lastIndexOf('.'));
     factoryDto.setSymbol(symbol);
-    factoryDto.setCharacterSet(importConfig.getCharacterSet());
     factoryDto.setEntityType(importConfig.getEntityType());
-    factoryDto.setLocale(importConfig.getLocale());
     factoryDto.setIdColumn(importConfig.getIdColumn());
 
     return createAndConfigureDatasourceFactoryDto(importConfig,

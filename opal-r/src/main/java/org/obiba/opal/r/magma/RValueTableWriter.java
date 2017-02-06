@@ -10,12 +10,17 @@
 
 package org.obiba.opal.r.magma;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Writes a tibble in a R session.
@@ -23,6 +28,10 @@ import javax.validation.constraints.NotNull;
 public class RValueTableWriter implements ValueTableWriter {
 
   private final RValueTable valueTable;
+
+  private List<Variable> variables = Collections.synchronizedList(Lists.newArrayList());
+
+  private Map<String, Map<String, Value>> variableEntityValues = Maps.newConcurrentMap();
 
   public RValueTableWriter(RValueTable valueTable) {
     this.valueTable = valueTable;
@@ -47,7 +56,7 @@ public class RValueTableWriter implements ValueTableWriter {
 
     @Override
     public void writeVariable(@NotNull Variable variable) {
-
+      variables.add(variable);
     }
 
     @Override
@@ -71,7 +80,9 @@ public class RValueTableWriter implements ValueTableWriter {
 
     @Override
     public void writeValue(@NotNull Variable variable, Value value) {
-
+      if (!variableEntityValues.containsKey(entity.getIdentifier()))
+        variableEntityValues.put(entity.getIdentifier(), Maps.newHashMap());
+      variableEntityValues.get(entity.getIdentifier()).put(variable.getName(), value);
     }
 
     @Override

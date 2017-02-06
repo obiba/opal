@@ -420,6 +420,7 @@ public enum VectorType {
     Map<String, Map<String, String>> attributesMap = Maps.newHashMap();
     if (attributeAware.hasAttributes()) {
       for (Attribute attr : attributeAware.getAttributes()) {
+        if (Strings.isNullOrEmpty(attr.getValue().toString())) continue;
         String name = attr.getName();
         if (attr.hasNamespace()) name = attr.getNamespace() + "::" + name;
         if (!attributesMap.containsKey(name)) {
@@ -434,7 +435,7 @@ public enum VectorType {
       String content = localeMap.entrySet()
           .stream()
           .map(entry -> (Strings.isNullOrEmpty(entry.getKey()) ? "" : "(" + entry.getKey() + ") ") + entry.getValue())
-          .collect(Collectors.joining("; "));
+          .collect(Collectors.joining(" | "));
       rval.put(name, content);
     });
     return rval;

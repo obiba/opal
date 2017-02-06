@@ -48,11 +48,8 @@ public class RHavenDatasourceFactoryDtoParser extends AbstractDatasourceFactoryD
     factory.setOpalRuntime(opalRuntime);
     factory.setOpalRSessionManager(opalRSessionManager);
 
-    if(rDto.hasCharacterSet()) factory.setCharacterSet(rDto.getCharacterSet());
     if(rDto.hasEntityType()) factory.setEntityType(rDto.getEntityType());
-    if(rDto.hasLocale()) factory.setLocale(rDto.getLocale());
     if(rDto.hasIdColumn()) factory.setIdColumn(rDto.getIdColumn());
-    if(rDto.hasMultilines()) factory.setMultilines(rDto.getMultilines());
 
     return factory;
   }

@@ -10,6 +10,7 @@
 
 package org.obiba.opal.r.magma;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.obiba.magma.*;
 import org.obiba.magma.type.*;
@@ -20,10 +21,9 @@ import org.rosuda.REngine.RList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -159,7 +159,11 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
           namespace = nsn[0];
         }
         if (value.isString() && value.length() > 0) {
-          attributes.add(Attribute.Builder.newAttribute(name).withNamespace(namespace).withValue(value.asStrings()[0]).build());
+          String strValue = value.asStrings()[0];
+          if (Strings.isNullOrEmpty(namespace) && ("label".equals(name) || "description".equals(name)))
+            attributes.addAll(extractLocalizedAttributes(namespace, name, strValue));
+          else
+            attributes.add(Attribute.Builder.newAttribute(name).withNamespace(namespace).withValue(strValue).build());
         } else {
           log.info("Attribute value is a {}", value.getClass().getName());
         }
@@ -168,6 +172,21 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
     } catch (REXPMismatchException e) {
       // ignore
       log.warn("Error while parsing variable attributes: {}", colName, e);
+    }
+    return attributes;
+  }
+
+  private List<Attribute> extractLocalizedAttributes(String namespace, String name, String value) {
+    List<Attribute> attributes = Lists.newArrayList();
+    String[] strValues = value.split("\\|");
+    Pattern pattern = Pattern.compile("\\(([a-z]+)\\) (.+)");
+    for (String strValue : strValues) {
+      Matcher matcher = pattern.matcher(strValue);
+      if (matcher.find())
+        attributes.add(Attribute.Builder.newAttribute(name).withNamespace(namespace)
+            .withLocale(matcher.group(1)).withValue(matcher.group(2)).build());
+      else
+        attributes.add(Attribute.Builder.newAttribute(name).withNamespace(namespace).withValue(strValue).build());
     }
     return attributes;
   }
@@ -193,7 +212,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
         String catName = isInteger() && name.endsWith(".0") ? name.substring(0, name.length() - 2) : name;
         Category.Builder builder = Category.Builder.newCategory(catName);
         if (catLabels != null) {
-          builder.addAttribute("label", catLabels[i]);
+          extractLocalizedAttributes(null,"label", catLabels[i]).forEach(builder::addAttribute);
         }
         categories.add(builder.build());
         i++;

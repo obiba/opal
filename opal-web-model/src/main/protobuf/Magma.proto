@@ -142,7 +142,6 @@ message SpssDatasourceFactoryDto {
   optional string entityType = 3;
   optional string locale = 4;
   optional string idVariable = 5;
-  optional bool multilines = 6;
   extend DatasourceFactoryDto {
     optional SpssDatasourceFactoryDto params = 1009;
   }
@@ -170,11 +169,8 @@ message MongoDBDatasourceFactoryDto {
 message RSessionDatasourceFactoryDto {
   required string session = 1;
   required string symbol = 2;
-  optional string characterSet = 3;
-  optional string entityType = 4;
-  optional string locale = 5;
-  optional string idColumn = 6;
-  optional bool multilines = 7;
+  optional string entityType = 3;
+  optional string idColumn = 4;
   extend DatasourceFactoryDto {
     optional RSessionDatasourceFactoryDto params = 1013;
   }
@@ -183,11 +179,8 @@ message RSessionDatasourceFactoryDto {
 message RHavenDatasourceFactoryDto {
   required string file = 1;
   required string symbol = 2;
-  optional string characterSet = 3;
-  optional string entityType = 4;
-  optional string locale = 5;
-  optional string idColumn = 6;
-  optional bool multilines = 7;
+  optional string entityType = 3;
+  optional string idColumn = 4;
   extend DatasourceFactoryDto {
     optional RHavenDatasourceFactoryDto params = 1014;
   }
