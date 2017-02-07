@@ -9,12 +9,14 @@
  */
 package org.obiba.opal.core.runtime;
 
+import java.util.Collection;
 import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.core.service.SystemService;
 import org.obiba.opal.fs.OpalFileSystem;
+import org.obiba.opal.spi.genotype.GenotypeService;
 
 public interface OpalRuntime extends SystemService {
 
@@ -47,5 +49,29 @@ public interface OpalRuntime extends SystemService {
    */
   @NotNull
   Service getService(String name) throws NoSuchServiceException;
+
+  /**
+   * Check that a genotype service exists.
+   *
+   * @param name
+   * @return
+   */
+  boolean hasGenotypeService(String name);
+
+  /**
+   * Get the {@link GenotypeService} from name.
+   *
+   * @param name
+   * @return
+   * @throws java.util.NoSuchElementException
+   */
+  GenotypeService getGenotypeService(String name);
+
+  /**
+   * Get all genotype services.
+   *
+   * @return
+   */
+  Collection<GenotypeService> getGenotypeServices();
 
 }

@@ -10,6 +10,9 @@
 package org.obiba.opal.core.runtime;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.util.Collection;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -31,6 +34,8 @@ import org.obiba.opal.core.tx.TransactionalThread;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
 import org.obiba.opal.fs.security.SecuredOpalFileSystem;
+import org.obiba.opal.spi.genotype.GenotypeService;
+import org.obiba.opal.spi.genotype.GenotypeServiceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +81,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
     initMagmaEngine();
     initServices();
     initFileSystem();
+    initServicePlugins();
   }
 
   @Override
@@ -150,6 +156,21 @@ public class DefaultOpalRuntime implements OpalRuntime {
     return opalFileSystem;
   }
 
+  @Override
+  public boolean hasGenotypeService(String name) {
+    return GenotypeServiceLoader.get().hasService(name);
+  }
+
+  @Override
+  public GenotypeService getGenotypeService(String name) {
+    return GenotypeServiceLoader.get().getService(name);
+  }
+
+  @Override
+  public Collection<GenotypeService> getGenotypeServices() {
+    return GenotypeServiceLoader.get().getServices();
+  }
+
   private void initExtensions() {
     // Make sure some extensions folder exists
     initExtension(MAGMA_JS_EXTENSION);
@@ -215,6 +236,27 @@ public class DefaultOpalRuntime implements OpalRuntime {
       }
       syncFs.notifyAll();
     }
+  }
+
+  private void initServicePlugins() {
+    String home = System.getProperty("OPAL_HOME");
+    File pluginsDir = new File(home, "conf" + File.separator + "plugins");
+    Properties defaultProperties = new Properties();
+    defaultProperties.put("OPAL_HOME", home);
+    GenotypeServiceLoader.get().getServices().forEach(plugin -> {
+      try {
+        File pluginProps = new File(pluginsDir, plugin.getName() + ".properties");
+        if (pluginProps.exists()) {
+          Properties pluginProperties = new Properties(defaultProperties);
+          pluginProperties.load(new FileInputStream(pluginProps));
+        } else {
+          plugin.configure(defaultProperties);
+        }
+        plugin.start();
+      } catch (Exception e) {
+        log.warn("Error initializing/starting plugin service: {}", plugin.getClass(), e);
+      }
+    });
   }
 
   private void ensureFolder(String path) throws FileSystemException {
