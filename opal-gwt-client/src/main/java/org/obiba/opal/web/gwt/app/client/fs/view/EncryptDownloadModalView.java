@@ -60,7 +60,7 @@ public class EncryptDownloadModalView extends ModalPopupViewWithUiHandlers<Encry
   public EncryptDownloadModalView(EventBus eventBus, Binder binder, Translations translations) {
     super(eventBus);
     initWidget(binder.createAndBindUi(this));
-    dialog.setTitle(translations.downloadModalTitle());
+    dialog.setTitle(translations.downloadFileModalTitle());
     password.setStyleName("password-vertical-align");
   }
 

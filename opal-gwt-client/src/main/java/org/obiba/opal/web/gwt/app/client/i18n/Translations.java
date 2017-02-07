@@ -1747,16 +1747,20 @@ public interface Translations extends Constants {
   @DefaultStringValue("All tables")
   String allTablesLabel();
 
-  @Description("Encrypt Download Modal title")
-  @DefaultStringValue("Download")
-  String downloadModalTitle();
+  @Description("Download Modal title")
+  @DefaultStringValue("Download File")
+  String downloadFileModalTitle();
+
+  @Description("Rename Modal title")
+  @DefaultStringValue("Rename File")
+  String renameFileModalTitle();
 
   @Description("Create Folder Modal title")
   @DefaultStringValue("Create Folder")
   String createFolderModalTitle();
 
   @Description("Upload File Modal title")
-  @DefaultStringValue("File Upload")
+  @DefaultStringValue("Upload File")
   String uploadFileModalTitle();
 
   @Description("Change Password Modal title")

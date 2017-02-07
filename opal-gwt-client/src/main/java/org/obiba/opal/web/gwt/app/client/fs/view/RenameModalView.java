@@ -53,7 +53,7 @@ public class RenameModalView extends ModalPopupViewWithUiHandlers<RenameModalUiH
   public RenameModalView(EventBus eventBus, Binder binder, Translations translations) {
     super(eventBus);
     initWidget(binder.createAndBindUi(this));
-    dialog.setTitle(translations.downloadModalTitle());
+    dialog.setTitle(translations.renameFileModalTitle());
   }
 
   @Override
