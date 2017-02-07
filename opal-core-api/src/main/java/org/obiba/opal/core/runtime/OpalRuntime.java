@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.core.service.SystemService;
 import org.obiba.opal.fs.OpalFileSystem;
-import org.obiba.opal.spi.genotype.GenotypeService;
+import org.obiba.opal.spi.genotype.GenotypeStoreService;
 
 public interface OpalRuntime extends SystemService {
 
@@ -56,22 +56,22 @@ public interface OpalRuntime extends SystemService {
    * @param name
    * @return
    */
-  boolean hasGenotypeService(String name);
+  boolean hasGenotypeStoreService(String name);
 
   /**
-   * Get the {@link GenotypeService} from name.
+   * Get the {@link GenotypeStoreService} from name.
    *
    * @param name
    * @return
    * @throws java.util.NoSuchElementException
    */
-  GenotypeService getGenotypeService(String name);
+  GenotypeStoreService getGenotypeStoreService(String name);
 
   /**
    * Get all genotype services.
    *
    * @return
    */
-  Collection<GenotypeService> getGenotypeServices();
+  Collection<GenotypeStoreService> getGenotypeStoreServices();
 
 }

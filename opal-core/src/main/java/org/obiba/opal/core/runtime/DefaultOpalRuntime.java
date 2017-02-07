@@ -34,8 +34,8 @@ import org.obiba.opal.core.tx.TransactionalThread;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
 import org.obiba.opal.fs.security.SecuredOpalFileSystem;
-import org.obiba.opal.spi.genotype.GenotypeService;
-import org.obiba.opal.spi.genotype.GenotypeServiceLoader;
+import org.obiba.opal.spi.genotype.GenotypeStoreService;
+import org.obiba.opal.spi.genotype.GenotypeStoreServiceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -157,18 +157,18 @@ public class DefaultOpalRuntime implements OpalRuntime {
   }
 
   @Override
-  public boolean hasGenotypeService(String name) {
-    return GenotypeServiceLoader.get().hasService(name);
+  public boolean hasGenotypeStoreService(String name) {
+    return GenotypeStoreServiceLoader.get().hasService(name);
   }
 
   @Override
-  public GenotypeService getGenotypeService(String name) {
-    return GenotypeServiceLoader.get().getService(name);
+  public GenotypeStoreService getGenotypeStoreService(String name) {
+    return GenotypeStoreServiceLoader.get().getService(name);
   }
 
   @Override
-  public Collection<GenotypeService> getGenotypeServices() {
-    return GenotypeServiceLoader.get().getServices();
+  public Collection<GenotypeStoreService> getGenotypeStoreServices() {
+    return GenotypeStoreServiceLoader.get().getServices();
   }
 
   private void initExtensions() {
@@ -243,7 +243,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
     File pluginsDir = new File(home, "conf" + File.separator + "plugins");
     Properties defaultProperties = new Properties();
     defaultProperties.put("OPAL_HOME", home);
-    GenotypeServiceLoader.get().getServices().forEach(plugin -> {
+    GenotypeStoreServiceLoader.get().getServices().forEach(plugin -> {
       try {
         File pluginProps = new File(pluginsDir, plugin.getName() + ".properties");
         if (pluginProps.exists()) {

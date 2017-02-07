@@ -19,7 +19,7 @@ import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.fs.OpalFileSystem;
-import org.obiba.opal.spi.genotype.GenotypeService;
+import org.obiba.opal.spi.genotype.GenotypeStoreService;
 
 /**
  * Upgrade purpose only to fix injection dependencies.
@@ -52,17 +52,17 @@ public class OpalRuntimeMock implements OpalRuntime {
   }
 
   @Override
-  public boolean hasGenotypeService(String name) {
+  public boolean hasGenotypeStoreService(String name) {
     return false;
   }
 
   @Override
-  public GenotypeService getGenotypeService(String name) {
+  public GenotypeStoreService getGenotypeStoreService(String name) {
     throw new NoSuchElementException(name);
   }
 
   @Override
-  public Collection<GenotypeService> getGenotypeServices() {
+  public Collection<GenotypeStoreService> getGenotypeStoreServices() {
     return Lists.newArrayList();
   }
 

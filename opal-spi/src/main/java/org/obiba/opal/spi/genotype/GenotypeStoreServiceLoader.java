@@ -15,21 +15,21 @@ import org.obiba.opal.spi.ServicePluginLoader;
 import java.util.ServiceLoader;
 
 /**
- * {@link GenotypeService} loader.
+ * {@link GenotypeStoreService} loader.
  */
-public class GenotypeServiceLoader extends ServicePluginLoader<GenotypeService> {
+public class GenotypeStoreServiceLoader extends ServicePluginLoader<GenotypeStoreService> {
 
-  private static GenotypeServiceLoader loader;
+  private static GenotypeStoreServiceLoader loader;
 
-  private ServiceLoader<GenotypeService> serviceLoader = ServiceLoader.load(GenotypeService.class);
+  private ServiceLoader<GenotypeStoreService> serviceLoader = ServiceLoader.load(GenotypeStoreService.class);
 
-  public static synchronized GenotypeServiceLoader get() {
-    if (loader == null) loader = new GenotypeServiceLoader();
+  public static synchronized GenotypeStoreServiceLoader get() {
+    if (loader == null) loader = new GenotypeStoreServiceLoader();
     return loader;
   }
 
   @Override
-  protected ServiceLoader<GenotypeService> getServiceLoader() {
+  protected ServiceLoader<GenotypeStoreService> getServiceLoader() {
     return serviceLoader;
   }
 }

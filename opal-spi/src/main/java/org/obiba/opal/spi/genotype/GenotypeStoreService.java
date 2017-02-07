@@ -18,7 +18,7 @@ import java.util.NoSuchElementException;
 /**
  * {@link ServicePlugin} to handle the genotype data.
  */
-public interface GenotypeService extends ServicePlugin {
+public interface GenotypeStoreService extends ServicePlugin {
 
   /**
    * Get the registered store names.
