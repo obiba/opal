@@ -23,13 +23,12 @@
           <ui:msg description="Data File label">Data File</ui:msg>
         </b:ControlLabel>
         <g:SimplePanel ui:field="selectFilePanel"/>
-        <g:Label styleName="help-block">
+        <g:Label styleName="help-block" ui:field="selectFileHelp">
           <ui:msg description="R Haven File Description label">Data in SAS, SPSS or Stata format are packaged in a file with suffix .sas7bdat, .sav or .dta.
           </ui:msg>
         </g:Label>
       </b:ControlGroup>
     </g:FlowPanel>
-
 
     <g:FlowPanel>
       <b:ControlGroup ui:field="idGroup">
@@ -45,11 +44,24 @@
       </b:HelpBlock>
     </g:FlowPanel>
 
+    <g:FlowPanel>
+      <b:ControlGroup ui:field="selectAdditionalFileGroup">
+        <b:ControlLabel>
+          <ui:msg description="Formats File label">Formats File</ui:msg>
+        </b:ControlLabel>
+        <g:SimplePanel ui:field="selectAdditionalFilePanel"/>
+        <g:Label styleName="help-block">
+          <ui:msg description="R Haven Catalog File Description label">SAS catalog file (formats definition), if any.
+          </ui:msg>
+        </g:Label>
+      </b:ControlGroup>
+    </g:FlowPanel>
+
     <o:CollapsiblePanel>
-      <g:FlowPanel visible="false">
+      <g:FlowPanel>
         <b:ControlGroup ui:field="localeGroup">
           <b:ControlLabel>
-            <ui:msg description="Label locale">Label Locale</ui:msg>
+            <ui:msg description="Label locale">Locale</ui:msg>
           </b:ControlLabel>
           <o:DropdownSuggestBox ui:field="localeNameBox"/>
         </b:ControlGroup>

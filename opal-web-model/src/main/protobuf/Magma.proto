@@ -181,6 +181,8 @@ message RHavenDatasourceFactoryDto {
   required string symbol = 2;
   optional string entityType = 3;
   optional string idColumn = 4;
+  optional string catFile = 5;
+  optional string locale = 6;
   extend DatasourceFactoryDto {
     optional RHavenDatasourceFactoryDto params = 1014;
   }

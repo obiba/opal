@@ -35,7 +35,7 @@
       <g:FlowPanel>
         <b:ControlGroup ui:field="localeGroup">
           <b:ControlLabel>
-            <ui:msg description="Label Locale">Label Locale</ui:msg>
+            <ui:msg description="Label Locale">Locale</ui:msg>
           </b:ControlLabel>
           <o:DropdownSuggestBox ui:field="localeNameBox"/>
         </b:ControlGroup>

@@ -363,8 +363,10 @@ public interface Translations extends Constants {
       "XMLFileRequired", "An XML file is required.", //
       "XMLFileSuffixInvalid", "Invalid XML file suffix: .xml is expected.", //
       "ZipFileRequired", "A Zip file is required.", //
-      "SpssFileRequired", "An SPSS file is required.", //
-      "RHavenFileRequired", "A SAS, SPSS or Stata file is required.", //
+      "SpssFileRequired", "A SPSS file is required.", //
+      "RSPSSFileRequired", "A SPSS file is required.", //
+      "RSASFileRequired", "A SAS file is required.", //
+      "RStataFileRequired", "A Stata file is required.", //
       "ZipFileSuffixInvalid", "Invalid Zip file suffix: .zip is expected.",//
       "InvalidFileType", "Invalid file type. Supported file types are: xls, xlsx, and sav.",//
       "ReportTemplateWasNotFound", "The specified report template could not be found.",//
@@ -685,9 +687,29 @@ public interface Translations extends Constants {
   @DefaultStringValue("SPSS")
   String spssLabel();
 
-  @Description("RHaven label")
-  @DefaultStringValue("SAS/SPSS/Stata (experimental)")
-  String rHavenLabel();
+  @Description("RSPSS label")
+  @DefaultStringValue("SPSS (R)")
+  String rSPSSLabel();
+
+  @Description("RSPSS help")
+  @DefaultStringValue("Data in SPSS format are packaged in a file with suffix .sav.")
+  String rSPSSHelp();
+
+  @Description("RSAS label")
+  @DefaultStringValue("SAS (R)")
+  String rSASLabel();
+
+  @Description("RSAS help")
+  @DefaultStringValue("Data in SAS format are packaged in a file with suffix .sas7bdat.")
+  String rSASHelp();
+
+  @Description("RStata label")
+  @DefaultStringValue("Stata (R)")
+  String rStataLabel();
+
+  @Description("RStata help")
+  @DefaultStringValue("Data in Stata format are packaged in a file with suffix .dta.")
+  String rStataHelp();
 
   @Description("Opal REST label")
   @DefaultStringValue("Opal")

@@ -34,6 +34,17 @@ public class ConditionValidator extends AbstractFieldValidator {
     super(errorMessageKey, id);
     this.condition = condition;
   }
+
+  public ConditionValidator(HasValue<Boolean> condition, ErrorMessageProvider errorMessageProvider) {
+    super(errorMessageProvider);
+    this.condition = condition;
+  }
+
+  public ConditionValidator(HasValue<Boolean> condition, ErrorMessageProvider errorMessageProvider, String id) {
+    super(errorMessageProvider, id);
+    this.condition = condition;
+  }
+
   //
   // AbstractFieldValidator Methods
   //

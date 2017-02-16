@@ -46,9 +46,29 @@
               </ui:msg>
             </g:Label>
           </g:FlowPanel>
-          <g:FlowPanel addStyleNames="small-top-margin" ui:field="helpRHaven" visible="false">
+          <g:FlowPanel addStyleNames="small-top-margin" ui:field="helpRSASHaven" visible="false">
             <b:HelpBlock>
-              <ui:msg description="RHaven information">This format expects the file to be a valid SAS, SPSS or Stata file
+              <ui:msg description="RHaven information">This format expects the file to be a valid SAS file
+                containing the variables and the data. This import procedure requires a functional R server with the
+                <a href="https://cran.r-project.org/web/packages/tibble/" target="_blank">tibble</a> and
+                <a href="https://cran.r-project.org/web/packages/haven/" target="_blank">haven</a> packages installed.
+                Note that this is still an experimental feature: value type mappings with R could change in a future release.
+              </ui:msg>
+            </b:HelpBlock>
+          </g:FlowPanel>
+          <g:FlowPanel addStyleNames="small-top-margin" ui:field="helpRSPSSHaven" visible="false">
+            <b:HelpBlock>
+              <ui:msg description="RHaven information">This format expects the file to be a valid SPSS file
+                containing the variables and the data. This import procedure requires a functional R server with the
+                <a href="https://cran.r-project.org/web/packages/tibble/" target="_blank">tibble</a> and
+                <a href="https://cran.r-project.org/web/packages/haven/" target="_blank">haven</a> packages installed.
+                Note that this is still an experimental feature: value type mappings with R could change in a future release.
+              </ui:msg>
+            </b:HelpBlock>
+          </g:FlowPanel>
+          <g:FlowPanel addStyleNames="small-top-margin" ui:field="helpRStataHaven" visible="false">
+            <b:HelpBlock>
+              <ui:msg description="RHaven information">This format expects the file to be a valid Stata file
                 containing the variables and the data. This import procedure requires a functional R server with the
                 <a href="https://cran.r-project.org/web/packages/tibble/" target="_blank">tibble</a> and
                 <a href="https://cran.r-project.org/web/packages/haven/" target="_blank">haven</a> packages installed.

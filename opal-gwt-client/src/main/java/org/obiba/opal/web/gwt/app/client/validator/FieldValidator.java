@@ -29,4 +29,10 @@ public interface FieldValidator {
    * @return
    */
   String getId();
+
+  interface ErrorMessageProvider {
+
+    String getKey();
+
+  }
 }

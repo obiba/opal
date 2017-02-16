@@ -45,6 +45,8 @@ public class RDatasourceFactory extends AbstractDatasourceFactory {
 
   private String file;
 
+  private String categoryFile;
+
   public void setOpalRSessionManager(OpalRSessionManager opalRSessionManager) {
     this.opalRSessionManager = opalRSessionManager;
   }
@@ -85,31 +87,52 @@ public class RDatasourceFactory extends AbstractDatasourceFactory {
     this.file = file;
   }
 
+  /**
+   * SAS specifies categories (formats) outside of the main data file.
+   *
+   * @param categoryFile
+   */
+  public void setCategoryFile(String categoryFile) {
+    this.categoryFile = categoryFile;
+  }
+
   @Override
   protected Datasource internalCreate() {
     final OpalRSession rSession = Strings.isNullOrEmpty(rSessionId) ?
         opalRSessionManager.newSubjectRSession() : opalRSessionManager.getSubjectRSession(rSessionId);
 
-    if(Strings.isNullOrEmpty(rSessionId)) rSession.setExecutionContext("Import");
+    if (Strings.isNullOrEmpty(rSessionId)) rSession.setExecutionContext("Import");
 
-    if (Strings.isNullOrEmpty(file)) return new RDatasource(getName(), rSession, symbol, entityType, idColumn);
+    RDatasource ds;
 
-    try {
-      FileObject fileObj = resolveFileInFileSystem(file);
-      if (!fileObj.exists() || !fileObj.isReadable()) throw new IllegalArgumentException("File does not exist or cannot be read: " + file);
-      return new RDatasource(getName(), rSession, opalRuntime.getFileSystem().getLocalFile(fileObj), symbol, entityType, idColumn) {
-        @Override
-        protected void onDispose() {
-          opalRSessionManager.removeRSession(rSession.getId());
-        }
-      };
-    } catch (FileSystemException e) {
-      throw new IllegalArgumentException("Failed resolving file path: " + file);
-    }
+    if (Strings.isNullOrEmpty(file)) ds = new RDatasource(getName(), rSession, symbol, entityType, idColumn);
+    else
+      try {
+        FileObject fileObj = resolveFileInFileSystem(file);
+        if (!fileObj.exists() || !fileObj.isReadable())
+          throw new IllegalArgumentException("File does not exist or cannot be read: " + file);
+
+        FileObject catFileObj = resolveFileInFileSystem(categoryFile);
+
+        ds = new RDatasource(getName(), rSession, opalRuntime.getFileSystem().getLocalFile(fileObj),
+            catFileObj != null && catFileObj.exists() && catFileObj.isReadable() ? opalRuntime.getFileSystem().getLocalFile(catFileObj) : null,
+            symbol, entityType, idColumn) {
+          @Override
+          protected void onDispose() {
+            opalRSessionManager.removeRSession(rSession.getId());
+          }
+        };
+      } catch (FileSystemException e) {
+        throw new IllegalArgumentException("Failed resolving file path: " + file);
+      }
+
+      ds.setLocale(locale);
+
+      return ds;
   }
 
   FileObject resolveFileInFileSystem(String path) throws FileSystemException {
+    if (Strings.isNullOrEmpty(path)) return null;
     return opalRuntime.getFileSystem().getRoot().resolveFile(path);
   }
-
 }

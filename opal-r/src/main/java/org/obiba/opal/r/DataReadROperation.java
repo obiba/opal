@@ -38,8 +38,10 @@ public class DataReadROperation extends AbstractROperation {
       this.extensions = Lists.newArrayList(extensions);
     }
 
-    public String getCommand(String path) {
-      return String.format("%s('%s')", command, path);
+    public String getCommand(DataReadROperation op) {
+      return Strings.isNullOrEmpty(op.categorySource) ?
+          String.format("%s('%s')", command, op.source) :
+          String.format("%s('%s', '%s')", command, op.source, op.categorySource) ;
     }
 
     public static ReadCmd forPath(String path) {
@@ -56,9 +58,12 @@ public class DataReadROperation extends AbstractROperation {
 
   private final String source;
 
-  public DataReadROperation(String symbol, String source) {
+  private final String categorySource;
+
+  public DataReadROperation(String symbol, String source, String categorySource) {
     this.symbol = symbol;
     this.source = source;
+    this.categorySource = categorySource;
   }
 
   @Override
@@ -71,7 +76,7 @@ public class DataReadROperation extends AbstractROperation {
     eval("library(haven)", false);
     ensurePackage("tibble");
     eval("library(tibble)", false);
-    eval(String.format("base::assign('%s', %s)", symbol, readCmd.getCommand(source)), false);
+    eval(String.format("base::assign('%s', %s)", symbol, readCmd.getCommand(this)), false);
   }
 
   @Override

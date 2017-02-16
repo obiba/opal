@@ -58,7 +58,7 @@ public class XmlFormatStepPresenter extends PresenterWidget<XmlFormatStepPresent
   public ImportConfig getImportConfig() {
     ImportConfig importConfig = new ImportConfig();
     importConfig.setFormat(ImportFormat.XML);
-    importConfig.setXmlFile(getView().getSelectedFile());
+    importConfig.setFile(getView().getSelectedFile());
 
     return importConfig;
   }

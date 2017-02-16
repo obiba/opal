@@ -185,6 +185,8 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
       if (matcher.find())
         attributes.add(Attribute.Builder.newAttribute(name).withNamespace(namespace)
             .withLocale(matcher.group(1)).withValue(matcher.group(2)).build());
+      else if (Strings.isNullOrEmpty(namespace) && ("label".equals(name) || "description".equals(name)))
+        attributes.add(Attribute.Builder.newAttribute(name).withLocale(valueTable.getDefaultLocale()).withValue(strValue).build());
       else
         attributes.add(Attribute.Builder.newAttribute(name).withNamespace(namespace).withValue(strValue).build());
     }

@@ -157,7 +157,7 @@ public class CsvFormatStepPresenter extends PresenterWidget<CsvFormatStepPresent
     importConfig.setFormat(ImportFormat.CSV);
     importConfig.setDestinationTableName(getView().getSelectedTable().getText());
     importConfig.setDestinationEntityType(getView().getSelectedEntityType().getText());
-    importConfig.setCsvFile(getSelectedFile());
+    importConfig.setFile(getSelectedFile());
     importConfig.setRow(Integer.parseInt(getView().getRowText().getText()));
     importConfig.setField(getView().getFieldSeparator().getText());
     importConfig.setQuote(getView().getQuote().getText());

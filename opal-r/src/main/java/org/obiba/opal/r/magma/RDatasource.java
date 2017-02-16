@@ -38,20 +38,24 @@ public class RDatasource extends AbstractDatasource {
 
   private final File file;
 
+  private final File categoryFile;
+
   private final String symbol;
 
   private final String entityType;
 
   private final String idColumn;
+  private String locale;
 
   public RDatasource(@NotNull String name, OpalRSession rSession, String symbol, String entityType, String idColumn) {
-    this(name, rSession, null, symbol, entityType, idColumn);
+    this(name, rSession, null, null, symbol, entityType, idColumn);
   }
 
-  public RDatasource(@NotNull String name, OpalRSession rSession, File file, String symbol, String entityType, String idColumn) {
+  public RDatasource(@NotNull String name, OpalRSession rSession, File file, File categoryFile, String symbol, String entityType, String idColumn) {
     super(name, "r");
     this.rSession = rSession;
     this.file = file;
+    this.categoryFile = categoryFile;
     this.symbol = symbol;
     this.entityType = Strings.isNullOrEmpty(entityType) ? DEFAULT_ENTITY_TYPE : entityType;
     this.idColumn = idColumn;
@@ -68,10 +72,12 @@ public class RDatasource extends AbstractDatasource {
     });
     // create tibble if file is provided
     if (file != null) {
-      // copy file to R session
+      // copy file(s) to R session
       getRSession().execute(new FileWriteROperation(file.getName(), file));
+      if (hasCategoryFile())
+        getRSession().execute(new FileWriteROperation(categoryFile.getName(), categoryFile));
       // read it into the symbol
-      getRSession().execute(new DataReadROperation(symbol, file.getName()));
+      getRSession().execute(new DataReadROperation(symbol, file.getName(), hasCategoryFile() ? categoryFile.getName() : null));
     }
   }
 
@@ -96,5 +102,17 @@ public class RDatasource extends AbstractDatasource {
         DEFAULT_ID_COLUMN);
 
     return new RValueTableWriter(valueTable);
+  }
+
+  private boolean hasCategoryFile() {
+    return categoryFile != null;
+  }
+
+  public void setLocale(String locale) {
+    this.locale = locale;
+  }
+
+  public String getLocale() {
+    return Strings.isNullOrEmpty(locale) ? "en" : locale;
   }
 }

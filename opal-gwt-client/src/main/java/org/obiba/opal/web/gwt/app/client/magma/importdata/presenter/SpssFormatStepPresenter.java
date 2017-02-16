@@ -71,7 +71,7 @@ public class SpssFormatStepPresenter extends PresenterWidget<SpssFormatStepPrese
   public ImportConfig getImportConfig() {
     ImportConfig importData = new ImportConfig();
     importData.setFormat(ImportFormat.SPSS);
-    importData.setSpssFile(getView().getSelectedFile());
+    importData.setFile(getView().getSelectedFile());
     importData.setCharacterSet(getView().getCharsetText().getText());
     importData.setDestinationEntityType(getView().getEntityType().getText());
     importData.setLocale(getView().getLocale());

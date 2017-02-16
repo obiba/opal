@@ -13,6 +13,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
 @SuppressWarnings("UnusedDeclaration")
@@ -22,7 +23,7 @@ public class ImportConfig {
 
   public enum ImportFormat {
 
-    CSV, EXCEL, XML, LIMESURVEY, REST, JDBC, SPSS, RHAVEN
+    CSV, EXCEL, XML, LIMESURVEY, REST, JDBC, SPSS, RSPSS, RSAS, RSTATA
 
   }
 
@@ -32,7 +33,9 @@ public class ImportConfig {
 
   private Integer limit;
 
-  private String xmlFile;
+  private String file;
+
+  private String additionalFile;
 
   private String destinationDatasourceName;
 
@@ -55,10 +58,6 @@ public class ImportConfig {
   private String quote;
 
   private String field;
-
-  private String csvFile;
-
-  private String spssFile;
 
   private String transientDatasourceName;
 
@@ -84,7 +83,7 @@ public class ImportConfig {
   public void clear() {
     importFormat = null;
     incremental = false;
-    xmlFile = null;
+    file = null;
     destinationDatasourceName = null;
     destinationTableName = null;
     characterSet = null;
@@ -97,8 +96,6 @@ public class ImportConfig {
     row = 0;
     quote = null;
     field = null;
-    csvFile = null;
-    spssFile = null;
     locale = null;
     idColumn = null;
 
@@ -117,12 +114,24 @@ public class ImportConfig {
     return importFormat;
   }
 
-  public void setXmlFile(String xmlFile) {
-    this.xmlFile = xmlFile;
+  public void setFile(String file) {
+    this.file = file;
   }
 
-  public String getXmlFile() {
-    return xmlFile;
+  public String getFile() {
+    return file;
+  }
+
+  public void setAdditionalFile(String additionalFile) {
+    this.additionalFile = additionalFile;
+  }
+
+  public String getAdditionalFile() {
+    return additionalFile;
+  }
+
+  public boolean hasAdditionalFile() {
+    return !Strings.isNullOrEmpty(additionalFile);
   }
 
   public void setDestinationDatasourceName(@Nullable String destinationDatasourceName) {
@@ -207,14 +216,6 @@ public class ImportConfig {
 
   public void setRow(int row) {
     this.row = row;
-  }
-
-  public String getCsvFile() {
-    return csvFile;
-  }
-
-  public void setCsvFile(String csvFile) {
-    this.csvFile = csvFile;
   }
 
   public String getQuote() {
@@ -319,11 +320,7 @@ public class ImportConfig {
   }
 
   public String getSpssFile() {
-    return spssFile;
-  }
-
-  public void setSpssFile(String spssFile) {
-    this.spssFile = spssFile;
+    return file;
   }
 
   public String getLocale() {

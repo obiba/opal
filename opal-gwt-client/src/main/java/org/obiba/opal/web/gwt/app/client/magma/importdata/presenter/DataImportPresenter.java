@@ -319,7 +319,10 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         formatStepPresenter = spssFormatStepPresenter;
         getView().setFormatStepDisplay(spssFormatStepPresenter.getView());
         break;
-      case RHAVEN:
+      case RSPSS:
+      case RSAS:
+      case RSTATA:
+        rHavenStepPresenter.setImportFormat(getView().getImportFormat());
         formatStepPresenter = rHavenStepPresenter;
         getView().setFormatStepDisplay(rHavenStepPresenter.getView());
         break;
@@ -335,10 +338,10 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     this.importConfig = importConfig;
     switch(importConfig.getImportFormat()) {
       case XML:
-        submitJob(createImportCommandOptionsDto(importConfig.getXmlFile()));
+        submitJob(createImportCommandOptionsDto(importConfig.getFile()));
         break;
       case CSV:
-        submitJob(createImportCommandOptionsDto(importConfig.getCsvFile()));
+        submitJob(createImportCommandOptionsDto(importConfig.getFile()));
         break;
       case LIMESURVEY:
         submitJob(createLimesurveyImportCommandOptionsDto());
@@ -350,10 +353,12 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         submitJob(createRestImportCommandOptionsDto());
         break;
       case SPSS:
-        submitJob(createImportCommandOptionsDto(importConfig.getSpssFile()));
+        submitJob(createImportCommandOptionsDto(importConfig.getFile()));
         break;
-      case RHAVEN:
-        submitJob(createImportCommandOptionsDto(importConfig.getSpssFile()));
+      case RSPSS:
+      case RSAS:
+      case RSTATA:
+        submitJob(createImportCommandOptionsDto(importConfig.getFile()));
         break;
     }
   }
@@ -447,7 +452,9 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         case SPSS:
           entries = spssFormatStepPresenter.getErrors().entrySet();
           break;
-        case RHAVEN:
+        case RSPSS:
+        case RSAS:
+        case RSTATA:
           entries = rHavenStepPresenter.getErrors().entrySet();
           break;
       }

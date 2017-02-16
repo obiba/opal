@@ -22,7 +22,7 @@ public abstract class AbstractFieldValidator implements FieldValidator {
   // Instance Variables
   //
 
-  private String errorMessageKey;
+  private ErrorMessageProvider errorMessageKeyProvider;
 
   private List<String> args = new ArrayList<String>();
 
@@ -33,11 +33,19 @@ public abstract class AbstractFieldValidator implements FieldValidator {
   //
 
   public AbstractFieldValidator(String errorMessageKey) {
-    this.errorMessageKey = errorMessageKey;
+    this(new StaticErrorMessageProvider(errorMessageKey));
   }
 
   public AbstractFieldValidator(String errorMessageKey, String id) {
-    this.errorMessageKey = errorMessageKey;
+    this(new StaticErrorMessageProvider(errorMessageKey), id);
+  }
+
+  public AbstractFieldValidator(ErrorMessageProvider errorMessageProvider) {
+    this.errorMessageKeyProvider = errorMessageProvider;
+  }
+
+  public AbstractFieldValidator(ErrorMessageProvider errorMessageProvider, String id) {
+    this.errorMessageKeyProvider = errorMessageProvider;
     this.id = id;
   }
 
@@ -48,7 +56,7 @@ public abstract class AbstractFieldValidator implements FieldValidator {
   @Nullable
   @Override
   public final String validate() {
-    return hasError() ? errorMessageKey : null;
+    return hasError() ? errorMessageKeyProvider.getKey() : null;
   }
 
   public void setArgs(List<String> args) {
@@ -56,7 +64,7 @@ public abstract class AbstractFieldValidator implements FieldValidator {
   }
 
   public void setErrorMessageKey(String value) {
-    errorMessageKey = value;
+    errorMessageKeyProvider = new StaticErrorMessageProvider(value);
   }
 
   public List<String> getArgs() {
@@ -78,4 +86,18 @@ public abstract class AbstractFieldValidator implements FieldValidator {
   //
 
   protected abstract boolean hasError();
+
+  public static class StaticErrorMessageProvider implements ErrorMessageProvider {
+
+    private final String errorMessageKey;
+
+    public StaticErrorMessageProvider(String errorMessageKey) {
+      this.errorMessageKey = errorMessageKey;
+    }
+
+    @Override
+    public String getKey() {
+      return errorMessageKey;
+    }
+  }
 }

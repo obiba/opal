@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * A value table based on a tibble.
@@ -120,6 +121,10 @@ public class RValueTable extends AbstractValueTable {
   @Override
   public Timestamps getTimestamps() {
     return NullTimestamps.get();
+  }
+
+  String getDefaultLocale() {
+    return ((RDatasource) getDatasource()).getLocale();
   }
 
   private OpalRSession getRSession() {

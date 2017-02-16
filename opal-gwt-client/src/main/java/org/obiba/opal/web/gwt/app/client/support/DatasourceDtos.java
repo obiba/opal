@@ -47,7 +47,9 @@ public class DatasourceDtos {
         return createRestDatasourceFactoryDto(importConfig);
       case SPSS:
         return createSpssDatasourceFactoryDto(importConfig);
-      case RHAVEN:
+      case RSPSS:
+      case RSAS:
+      case RSTATA:
         return createRHavenDatasourceFactoryDto(importConfig);
       default:
         throw new IllegalArgumentException("Import data format not supported: " + importConfig.getImportFormat());
@@ -85,7 +87,7 @@ public class DatasourceDtos {
 
     CsvDatasourceTableBundleDto bundleDto = CsvDatasourceTableBundleDto.create();
     bundleDto.setName(importConfig.getDestinationTableName());
-    bundleDto.setData(importConfig.getCsvFile());
+    bundleDto.setData(importConfig.getFile());
     bundleDto.setEntityType(importConfig.getEntityType());
     if(importConfig.getDestinationDatasourceName() != null) {
       bundleDto.setRefTable(importConfig.getDestinationDatasourceName() + "." + importConfig.getDestinationTableName());
@@ -109,7 +111,7 @@ public class DatasourceDtos {
   private static DatasourceFactoryDto createXMLDatasourceFactoryDto(ImportConfig importConfig) {
 
     FsDatasourceFactoryDto factoryDto = FsDatasourceFactoryDto.create();
-    factoryDto.setFile(importConfig.getXmlFile());
+    factoryDto.setFile(importConfig.getFile());
     factoryDto.setOnyxWrapper(true);
     return createAndConfigureDatasourceFactoryDto(importConfig,
         FsDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
@@ -154,7 +156,7 @@ public class DatasourceDtos {
 
   private static DatasourceFactoryDto createSpssDatasourceFactoryDto(ImportConfig importConfig) {
     SpssDatasourceFactoryDto factoryDto = SpssDatasourceFactoryDto.create();
-    factoryDto.setFile(importConfig.getSpssFile());
+    factoryDto.setFile(importConfig.getFile());
     factoryDto.setCharacterSet(importConfig.getCharacterSet());
     factoryDto.setEntityType(importConfig.getEntityType());
     factoryDto.setLocale(importConfig.getLocale());
@@ -165,8 +167,9 @@ public class DatasourceDtos {
 
   private static DatasourceFactoryDto createRHavenDatasourceFactoryDto(ImportConfig importConfig) {
     RHavenDatasourceFactoryDto factoryDto = RHavenDatasourceFactoryDto.create();
-    String file = importConfig.getSpssFile();
+    String file = importConfig.getFile();
     factoryDto.setFile(file);
+    if (importConfig.hasAdditionalFile()) factoryDto.setCatFile(importConfig.getAdditionalFile());
     String symbol = file.substring(file.lastIndexOf('/') + 1, file.lastIndexOf('.'));
     factoryDto.setSymbol(symbol);
     factoryDto.setEntityType(importConfig.getEntityType());

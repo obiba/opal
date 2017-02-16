@@ -42,20 +42,29 @@ public class RHavenStepPresenter extends PresenterWidget<RHavenStepPresenter.Dis
 
   private final FileSelectionPresenter fileSelectionPresenter;
 
+  private final FileSelectionPresenter additionalFileSelectionPresenter;
+
   private ViewValidator viewValidator;
+
+  private ImportFormat importFormat;
 
   @Inject
   public RHavenStepPresenter(EventBus eventBus, Display display,
-                             FileSelectionPresenter fileSelectionPresenter) {
+                             FileSelectionPresenter fileSelectionPresenter,
+                             FileSelectionPresenter additionalFileSelectionPresenter) {
     super(eventBus, display);
     this.fileSelectionPresenter = fileSelectionPresenter;
+    this.additionalFileSelectionPresenter = additionalFileSelectionPresenter;
   }
 
   @Override
   protected void onBind() {
     fileSelectionPresenter.setFileSelectionType(FileSelectionType.FILE_OR_FOLDER);
     fileSelectionPresenter.bind();
-    getView().setFileSelectorWidgetDisplay(fileSelectionPresenter.getView());
+    // TODO file selector that would not be a singleton
+    additionalFileSelectionPresenter.setFileSelectionType(FileSelectionType.FILE_OR_FOLDER);
+    additionalFileSelectionPresenter.bind();
+    getView().setFileSelectorWidgetDisplays(fileSelectionPresenter.getView(), null);
     setDefaultCharset();
     viewValidator = new ViewValidator();
   }
@@ -63,8 +72,9 @@ public class RHavenStepPresenter extends PresenterWidget<RHavenStepPresenter.Dis
   @Override
   public ImportConfig getImportConfig() {
     ImportConfig importData = new ImportConfig();
-    importData.setFormat(ImportFormat.RHAVEN);
-    importData.setSpssFile(getView().getSelectedFile());
+    importData.setFormat(importFormat);
+    importData.setFile(getView().getSelectedFile());
+    importData.setAdditionalFile(getView().getSelectedCategoryFile());
     importData.setCharacterSet(getView().getCharsetText().getText());
     importData.setDestinationEntityType(getView().getEntityType().getText());
     importData.setLocale(getView().getLocale());
@@ -82,16 +92,25 @@ public class RHavenStepPresenter extends PresenterWidget<RHavenStepPresenter.Dis
     return viewValidator.getErrors();
   }
 
+  public void setImportFormat(ImportFormat importFormat) {
+    this.importFormat = importFormat;
+    getView().setImportFormat(importFormat);
+  }
+
   public interface Display extends View, WizardStepDisplay, CharacterSetDisplay {
+
+    void setImportFormat(ImportFormat importFormat);
 
     enum FormField {
       FILE,
       LOCALE
     }
 
-    void setFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
+    void setFileSelectorWidgetDisplays(FileSelectionPresenter.Display display, FileSelectionPresenter.Display additionalDisplay);
 
     String getSelectedFile();
+
+    String getSelectedCategoryFile();
 
     HasText getIdColumn();
 
@@ -124,7 +143,20 @@ public class RHavenStepPresenter extends PresenterWidget<RHavenStepPresenter.Dis
 
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
-      validators.add(new ConditionValidator(fileExtensionCondition(getView().getSelectedFile()), "RHavenFileRequired",
+      validators.add(new ConditionValidator(fileExtensionCondition(getView().getSelectedFile()), new FieldValidator.ErrorMessageProvider() {
+        @Override
+        public String getKey() {
+          switch(importFormat) {
+            case RSAS:
+              return "RSASFileRequired";
+            case RSPSS:
+              return "RSPSSFileRequired";
+            case RSTATA:
+              return "RStataFileRequired";
+          }
+          return "";
+        }
+      },
           Display.FormField.FILE.name()));
 
       ConditionValidator localeValidator = new ConditionValidator(localeCondition(getView().getLocale()),
@@ -140,9 +172,11 @@ public class RHavenStepPresenter extends PresenterWidget<RHavenStepPresenter.Dis
         @Override
         public Boolean getValue() {
           String path = selectedFile.toLowerCase();
-          return path.endsWith(".sav") ||
-              path.endsWith(".sas7bdat") ||
-              path.endsWith(".dta");
+          if (ImportFormat.RSPSS.equals(importFormat))
+            return path.endsWith(".sav");
+          if (ImportFormat.RSAS.equals(importFormat))
+            return path.endsWith(".sas7bdat");
+          return path.endsWith(".dta");
         }
       };
     }
