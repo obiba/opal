@@ -85,9 +85,6 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
   WizardStep valuesStep;
 
   @UiField
-  WizardStep archiveStep;
-
-  @UiField
   FlowPanel helpCsv;
 
   @UiField
@@ -201,16 +198,6 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
           }
         })
         .title(translations.dataImportValuesStep())//
-
-        .append(archiveStep, new Skippable() {
-          @Override
-          public boolean skip() {
-            String selection = formatChooser.getSelectedValue();
-            return ImportFormat.LIMESURVEY.name().equals(selection) || ImportFormat.JDBC.name().equals(selection) ||
-                ImportFormat.REST.name().equals(selection);
-          }
-        })//
-        .title(translations.dataImportArchiveStep())//
         .onNext().onPrevious().build();
   }
 
@@ -281,10 +268,6 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
       case Values:
         valuesStep.removeStepContent();
         valuesStep.add(wContent);
-        break;
-      case Archive:
-        archiveStep.removeStepContent();
-        archiveStep.add(wContent);
         break;
     }
   }

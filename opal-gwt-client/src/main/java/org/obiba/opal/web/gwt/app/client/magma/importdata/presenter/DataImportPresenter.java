@@ -96,8 +96,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   private final DatasourceValuesStepPresenter datasourceValuesStepPresenter;
 
-  private final ArchiveStepPresenter archiveStepPresenter;
-
   private final Translations translations;
 
   private TransientDatasourceHandler transientDatasourceHandler;
@@ -130,7 +128,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     this.noFormatStepPresenter = noFormatStepPresenter;
     this.identifiersMappingSelectionStepPresenter = identifiersMappingSelectionStepPresenter;
     this.comparedDatasourcesReportPresenter = comparedDatasourcesReportPresenter;
-    this.archiveStepPresenter = archiveStepPresenter;
     this.datasourceValuesStepPresenter = datasourceValuesStepPresenter;
     this.translations = translations;
     getView().setUiHandlers(this);
@@ -167,7 +164,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   private void setInSlotPresenters() {
     setInSlot(Display.Slots.Unit, identifiersMappingSelectionStepPresenter);
     setInSlot(Display.Slots.Values, datasourceValuesStepPresenter);
-    setInSlot(Display.Slots.Archive, archiveStepPresenter);
     setInSlot(Display.Slots.Limesurvey, limesurveyStepPresenter);
     setInSlot(Display.Slots.Jdbc, jdbcStepPresenter);
     setInSlot(Display.Slots.Rest, restStepPresenter);
@@ -244,9 +240,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   @Override
   protected void onFinish() {
-    ImportConfig dataToImport = transientDatasourceHandler.getImportConfig();
-    archiveStepPresenter.updateImportData(dataToImport);
-    launchImport(dataToImport);
+    launchImport(transientDatasourceHandler.getImportConfig());
   }
 
   @Override
