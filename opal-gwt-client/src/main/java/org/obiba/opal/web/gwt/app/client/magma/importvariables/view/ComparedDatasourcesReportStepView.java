@@ -127,8 +127,10 @@ public class ComparedDatasourcesReportStepView extends ViewImpl
 
   @Override
   public void addTableComparison(TableCompareDto tableCompareData, ComparisonResult comparisonResult) {
-    tableComparisons.add(new TableComparison(tableCompareData, comparisonResult));
+    TableComparison tableComparison = new TableComparison(tableCompareData, comparisonResult);
+    tableComparisons.add(tableComparison);
     tableComparisonsProvider.refresh();
+    tableList.getSelectionModel().setSelected(tableComparison, tableComparison.isSelectable());
     tableList.setVisible(true);
   }
 
