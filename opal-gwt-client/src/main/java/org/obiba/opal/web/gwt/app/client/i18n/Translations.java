@@ -700,7 +700,7 @@ public interface Translations extends Constants {
   String rSASLabel();
 
   @Description("RSAS help")
-  @DefaultStringValue("Data in SAS format are packaged in a file with suffix .sas7bdat.")
+  @DefaultStringValue("Data in SAS format are packaged in a file with suffix .sas7bdat. If there is a file in the parent folder with same base name and suffix .sas7bcat, it will be automatically used as the catalog file.")
   String rSASHelp();
 
   @Description("RStata label")

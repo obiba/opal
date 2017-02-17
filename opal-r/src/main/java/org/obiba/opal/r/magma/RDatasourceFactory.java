@@ -112,7 +112,13 @@ public class RDatasourceFactory extends AbstractDatasourceFactory {
         if (!fileObj.exists() || !fileObj.isReadable())
           throw new IllegalArgumentException("File does not exist or cannot be read: " + file);
 
-        FileObject catFileObj = resolveFileInFileSystem(categoryFile);
+        FileObject catFileObj;
+        if (Strings.isNullOrEmpty(categoryFile)) {
+          // try to guess a category file
+          catFileObj = resolveFileInFileSystem(file.replaceAll("\\.sas7bdat$", ".sas7bcat"));
+        } else {
+          catFileObj = resolveFileInFileSystem(categoryFile);
+        }
 
         ds = new RDatasource(getName(), rSession, opalRuntime.getFileSystem().getLocalFile(fileObj),
             catFileObj != null && catFileObj.exists() && catFileObj.isReadable() ? opalRuntime.getFileSystem().getLocalFile(catFileObj) : null,
