@@ -12,6 +12,8 @@ package org.obiba.opal.web.datashield;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -27,6 +29,7 @@ import org.rosuda.REngine.REXPMismatchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 
 import com.google.common.base.Function;
@@ -53,8 +56,8 @@ public abstract class RPackageResource {
   private static final String[] defaultFields = new String[] { "Title", "Description", "Author", "Maintainer",
       "Date/Publication", AGGREGATE_METHODS, ASSIGN_METHODS, OPTIONS };
 
-  private static final String[] defaultRepos = new String[] { "http://cran.obiba.org", //"http://cran.datashield.org",
-      "http://cran.rstudio.com" };
+  @Value("${org.obiba.opal.r.repos}")
+  private String defaultRepos;
 
   @Autowired
   protected OpalRService opalRService;
@@ -103,8 +106,12 @@ public abstract class RPackageResource {
     }
   }
 
+  private List<String> getDefaultRepos() {
+    return Lists.newArrayList(defaultRepos.split(",")).stream().map(r -> r.trim()).collect(Collectors.toList());
+  }
+
   private String getInstallPackagesCommand(String name) {
-    String repos = StringUtils.collectionToDelimitedString(Lists.newArrayList(defaultRepos), ",", "'", "'");
+    String repos = StringUtils.collectionToDelimitedString(getDefaultRepos(), ",", "'", "'");
     return "install.packages('" + name + "', repos=c(" + repos + "), dependencies=TRUE)";
   }
 

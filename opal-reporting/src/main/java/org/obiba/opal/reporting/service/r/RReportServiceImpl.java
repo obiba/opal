@@ -11,6 +11,7 @@
 package org.obiba.opal.reporting.service.r;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.r.FileReadROperation;
@@ -25,19 +26,24 @@ import org.rosuda.REngine.REXPMismatchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Component
 public class RReportServiceImpl implements ReportService {
 
   private static final Logger log = LoggerFactory.getLogger(RReportServiceImpl.class);
 
-  private static final String REPORT_STYLE_OPTION = "opal.report.style";
+  @Value("${org.obiba.opal.r.repos}")
+  private String defaultRepos;
 
   @Autowired
   private OpalRSessionManager opalRSessionManager;
@@ -161,8 +167,9 @@ public class RReportServiceImpl implements ReportService {
   }
 
   private void ensurePackage(OpalRSession rSession, String packageName) {
-    String cmd = String.format("if (!require(%s)) { install.packages('%s', repos=c('http://cran.rstudio.com/', 'http://cran.obiba.org'), dependencies=TRUE) }",
-        packageName, packageName);
+    String repos = StringUtils.collectionToDelimitedString(getDefaultRepos(), ",", "'", "'");
+    String cmd = String.format("if (!require(%s)) { install.packages('%s', repos=c(%s), dependencies=TRUE) }",
+        packageName, packageName, repos);
     execute(rSession, cmd);
   }
 
@@ -202,5 +209,9 @@ public class RReportServiceImpl implements ReportService {
   private void readFileFromR(OpalRSession rSession, String name, String reportOutput) throws REXPMismatchException {
     FileReadROperation rop = new FileReadROperation(name, new File(reportOutput));
     rSession.execute(rop);
+  }
+
+  private List<String> getDefaultRepos() {
+    return Lists.newArrayList(defaultRepos.split(",")).stream().map(r -> r.trim()).collect(Collectors.toList());
   }
 }
