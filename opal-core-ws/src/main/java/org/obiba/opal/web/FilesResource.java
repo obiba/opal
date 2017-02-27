@@ -113,7 +113,7 @@ public class FilesResource {
     FileObject file = resolveFileInFileSystem(path);
     return file.exists()
         ? file.getType() == FileType.FILE ? getFileDetails(file) : getFolderDetails(file)
-        : getPathNotExistResponse(path);
+        : getPathNotExistResponse("/" + path);
   }
 
   @GET
@@ -358,6 +358,7 @@ public class FilesResource {
     URI fileUri = uriInfo.getBaseUriBuilder().path(FilesResource.class).path(folderPath).path(fileName).build();
     return Response.created(fileUri)//
         .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(fileUri, AclAction.FILES_ALL))//
+        .entity("<html><body>OK</body></html>")//
         .build();
   }
 
