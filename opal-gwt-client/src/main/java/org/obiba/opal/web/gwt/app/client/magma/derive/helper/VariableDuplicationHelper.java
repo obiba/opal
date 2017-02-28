@@ -14,8 +14,15 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 public class VariableDuplicationHelper extends DerivationHelper {
 
+  private int valueAt = -1;
+
   public VariableDuplicationHelper(VariableDto originalVariable) {
     this(originalVariable, null);
+  }
+
+  public VariableDuplicationHelper(VariableDto originalVariable, int valueAt) {
+    this(originalVariable, null);
+    this.valueAt = valueAt;
   }
 
   public VariableDuplicationHelper(VariableDto originalVariable, VariableDto destination) {
@@ -30,7 +37,13 @@ public class VariableDuplicationHelper extends DerivationHelper {
   @Override
   public VariableDto getDerivedVariable() {
     VariableDto derived = DerivedVariableGenerator.copyVariable(originalVariable, true, originalVariable.getLink());
-    VariableDtos.setScript(derived, "$('" + originalVariable.getName() + "')");
+    String script = "$('" + originalVariable.getName() + "')";
+    if (valueAt>=0) {
+      script = script + ".valueAt(" + valueAt + ")";
+      derived.setName(derived.getName() + "_" + (valueAt + 1));
+      derived.setIsRepeatable(false);
+    }
+    VariableDtos.setScript(derived, script);
     return derived;
   }
 

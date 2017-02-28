@@ -1585,6 +1585,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Add selected variables to view")
   String addVariablesToViewTitle();
 
+  @Description("Add selected variable to view label")
+  @DefaultStringValue("Add selected variable to view")
+  String addVariableToViewTitle();
+
   @Description("Add variable label")
   @DefaultStringValue("Add Variable")
   String addVariable();

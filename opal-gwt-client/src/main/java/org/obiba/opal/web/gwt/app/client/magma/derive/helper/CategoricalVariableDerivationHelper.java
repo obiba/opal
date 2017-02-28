@@ -59,23 +59,30 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   protected int index = 1;
 
+  private int valueAt = -1;
+
   public CategoricalVariableDerivationHelper(VariableDto originalVariable) {
-    this(originalVariable, null, null, true);
+    this(originalVariable, null, null, true, -1);
+  }
+
+  public CategoricalVariableDerivationHelper(VariableDto originalVariable, int valueAt) {
+    this(originalVariable, null, null, true, valueAt);
   }
 
   public CategoricalVariableDerivationHelper(VariableDto originalVariable, boolean recodeCategoriesName) {
-    this(originalVariable, null, null, recodeCategoriesName);
+    this(originalVariable, null, null, recodeCategoriesName, -1);
   }
 
   public CategoricalVariableDerivationHelper(VariableDto originalVariable, @Nullable VariableDto destination,
       @Nullable SummaryStatisticsDto summaryStatisticsDto) {
-    this(originalVariable, destination, summaryStatisticsDto, true);
+    this(originalVariable, destination, summaryStatisticsDto, true, -1);
   }
 
-  public CategoricalVariableDerivationHelper(VariableDto originalVariable, @Nullable VariableDto destination,
-      @Nullable SummaryStatisticsDto summaryStatisticsDto, boolean recodeCategoriesName) {
+  private CategoricalVariableDerivationHelper(VariableDto originalVariable, @Nullable VariableDto destination,
+                                              @Nullable SummaryStatisticsDto summaryStatisticsDto, boolean recodeCategoriesName, int valueAt) {
     super(originalVariable, destination);
     this.recodeCategoriesName = recodeCategoriesName;
+    this.valueAt = valueAt;
     //noinspection RedundantCast
     categoricalSummaryDto = summaryStatisticsDto == null
         ? null
@@ -234,7 +241,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   @Override
   protected DerivedVariableGenerator getDerivedVariableGenerator() {
-    return new DerivedCategoricalVariableGenerator(originalVariable, valueMapEntries);
+    return new DerivedCategoricalVariableGenerator(originalVariable, valueMapEntries, valueAt);
   }
 
   private boolean estimateIsMissing(CategoryDto cat) {
@@ -251,13 +258,21 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   public static class DerivedCategoricalVariableGenerator extends DerivedVariableGenerator {
 
+    public DerivedCategoricalVariableGenerator(VariableDto originalVariable, List<ValueMapEntry> valueMapEntries, int valueAt) {
+      super(originalVariable, valueMapEntries, valueAt);
+    }
+
     public DerivedCategoricalVariableGenerator(VariableDto originalVariable, List<ValueMapEntry> valueMapEntries) {
       super(originalVariable, valueMapEntries);
     }
 
     @Override
     protected void generateScript() {
-      scriptBuilder.append("$('").append(originalVariable.getName()).append("').map({");
+      scriptBuilder.append("$('").append(originalVariable.getName()).append("')");
+      if (getValueAt()>=0) {
+        scriptBuilder.append(".valueAt(").append(getValueAt()).append(")");
+      }
+      scriptBuilder.append(".map({");
       appendCategoryValueMapEntries();
       appendDistinctValueMapEntries();
       scriptBuilder.append("\n  }");

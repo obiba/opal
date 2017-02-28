@@ -41,6 +41,8 @@ public abstract class DerivedVariableGenerator {
 
   protected final List<ValueMapEntry> valueMapEntries;
 
+  private final int valueAt;
+
   @SuppressWarnings("PMD.AvoidStringBufferField")
   protected StringBuilder scriptBuilder;
 
@@ -48,9 +50,15 @@ public abstract class DerivedVariableGenerator {
 
   private boolean categoryValuesAppended;
 
+
   public DerivedVariableGenerator(VariableDto originalVariable, List<ValueMapEntry> valueMapEntries) {
+    this(originalVariable, valueMapEntries, -1);
+  }
+
+  public DerivedVariableGenerator(VariableDto originalVariable, List<ValueMapEntry> valueMapEntries, int valueAt) {
     this.originalVariable = originalVariable;
     this.valueMapEntries = valueMapEntries;
+    this.valueAt = valueAt;
   }
 
   @SuppressWarnings("unchecked")
@@ -59,6 +67,11 @@ public abstract class DerivedVariableGenerator {
     VariableDto derived = destination == null
         ? copyVariable(originalVariable)
         : copyVariable(destination, true, originalVariable.getLink());
+
+    if (valueAt>=0) {
+      derived.setIsRepeatable(false);
+      derived.setName(derived.getName() + "_" + (valueAt + 1));
+    }
 
     scriptBuilder = new StringBuilder();
     newCategoriesMap.clear();
@@ -84,6 +97,10 @@ public abstract class DerivedVariableGenerator {
     }
 
     return derived;
+  }
+
+  protected int getValueAt() {
+    return valueAt;
   }
 
   protected abstract void generateScript();

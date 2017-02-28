@@ -49,6 +49,17 @@
         </b:ControlGroup>
       </g:FlowPanel>
 
+      <!-- Per Occurrence -->
+      <g:FlowPanel ui:field="perOccurrencePanel">
+        <b:CheckBox ui:field="perOccurrence">
+          <ui:msg description="Split repeatable variable per occurrence label">Split variable per occurrence</ui:msg>
+        </b:CheckBox>
+        <b:HelpBlock addStyleNames="help-block">
+          <ui:msg description="Split repeatable variable per occurrence help label">A repeatable has a sequence of values. This option will create a derived variable per occurrence.
+          </ui:msg>
+        </b:HelpBlock>
+      </g:FlowPanel>
+
       <!-- Derived variable: Single -->
       <g:FlowPanel ui:field="singleVariablePanel">
         <b:ControlGroup ui:field="variableGroup">
@@ -60,29 +71,25 @@
       </g:FlowPanel>
 
       <!-- Derived variables: Multiple -->
-      <g:VerticalPanel width="100%" addStyleNames="content">
-        <g:FlowPanel ui:field="multipleVariablePanel">
-          <b:ControlGroup ui:field="variablesGroup">
-            <b:ControlLabel>
-              <ui:msg description="Derived variables label">Derived variables</ui:msg>
-            </b:ControlLabel>
-            <g:InlineLabel ui:field="noVariables">
-              <ui:msg description="No Variables label">No Variables</ui:msg>
-            </g:InlineLabel>
-            <o:OpalSimplePager ui:field="pager" showTotalWhenNoPager="true" location="RIGHT" addStyleNames="pull-right small-bottom-margin"/>
-            <v:VariableEditableTable ui:field="table" width="100%" addStyleNames="bottom-margin"/>
-          </b:ControlGroup>
-        </g:FlowPanel>
+      <g:FlowPanel ui:field="multipleVariablePanel">
+        <b:ControlGroup ui:field="variablesGroup">
+          <b:ControlLabel>
+            <ui:msg description="Derived variables label">Derived variables</ui:msg>
+          </b:ControlLabel>
+          <g:InlineLabel ui:field="noVariables">
+            <ui:msg description="No Variables label">No Variables</ui:msg>
+          </g:InlineLabel>
+          <o:OpalSimplePager ui:field="pager" showTotalWhenNoPager="true" location="RIGHT" addStyleNames="pull-right small-bottom-margin"/>
+          <v:VariableEditableTable ui:field="table" width="100%" addStyleNames="bottom-margin"/>
+        </b:ControlGroup>
+      </g:FlowPanel>
 
-        <g:FlowPanel>
-          <b:HelpBlock>
-            <ui:msg description="Derived variable help label">
-              Derived variable name can be different from the original variable. If a variable with same name already
-              exists in the view, it will be overridden.
-            </ui:msg>
-          </b:HelpBlock>
-        </g:FlowPanel>
-      </g:VerticalPanel>
+      <b:HelpBlock>
+        <ui:msg description="Derived variable help label">
+          Derived variable name can be different from the original variable. If a variable with same name already
+          exists in the view, it will be overridden.
+        </ui:msg>
+      </b:HelpBlock>
 
       <!-- Rename -->
       <g:FlowPanel ui:field="renameWithNumberPanel">

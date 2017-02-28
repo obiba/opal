@@ -171,7 +171,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       copyTables.addAll(getView().getAllTables());
     }
 
-    // Display error when copying multiple tables but there is only one project (cannot rename tables)
+    // Display error when copying multiple tables but there is only one project (cannot renameCategories tables)
     if(copyTables.size() > 1) {
       checkDatasourceCountBeforeInitModal(copyTables, allTables, selectedTablesSize);
     } else {

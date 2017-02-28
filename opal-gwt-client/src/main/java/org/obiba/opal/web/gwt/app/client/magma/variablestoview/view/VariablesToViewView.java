@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.ui.EditableListBox;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsVariableCopyColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ConstantActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.EditableColumn;
@@ -100,6 +101,9 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
   TextBox singleVariable;
 
   @UiField
+  CheckBox perOccurrence;
+
+  @UiField
   CheckBox renameWithNumber;
 
   @UiField
@@ -116,6 +120,9 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
 
   @UiField
   ControlGroup variablesGroup;
+
+  @UiField
+  FlowPanel perOccurrencePanel;
 
   @UiField
   FlowPanel renameWithNumberPanel;
@@ -196,6 +203,14 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
 
     actionsColumn = new ActionsVariableCopyColumn<VariableDto>(
         new ConstantActionsProvider<VariableDto>(ActionsVariableCopyColumn.REMOVE_ACTION));
+    actionsColumn.setActionHandler(new ActionHandler<VariableDto>() {
+      @Override
+      public void doAction(VariableDto object, String actionName) {
+        if(actionName.equals(ActionsVariableCopyColumn.REMOVE_ACTION)) {
+          removeVariable(object);
+        }
+      }
+    });
     table.addColumn(actionsColumn, translations.actionsLabel());
 
     table.setPageSize(PAGE_SIZE);
@@ -225,6 +240,7 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
     } else {
       singleVariablePanel.setVisible(true);
       multipleVariablePanel.setVisible(false);
+      dialog.setTitle(translations.addVariableToViewTitle());
       singleVariable.setText(dataProvider.getList().get(0).getName());
     }
 
@@ -232,21 +248,22 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
       saveButton.setEnabled(false);
     }
     updateRenameCheckboxVisibility(originalVariables);
-
   }
 
-  @Override
-  public void updateRenameCheckboxVisibility(List<VariableDto> originalVariables) {
-
-    // Show rename categories to number only if there is at least one variable with categories
+  private void updateRenameCheckboxVisibility(List<VariableDto> originalVariables) {
+    // Show renameCategories categories to number only if there is at least one variable with categories
     boolean isRenameEnabled = false;
+    boolean hasRepeatable = false;
     for(VariableDto originalVariable : originalVariables) {
       if(VariableDtos.hasCategories(originalVariable) && ("text".equals(originalVariable.getValueType()) ||
           "integer".equals(originalVariable.getValueType()) && !VariableDtos.allCategoriesMissing(originalVariable))) {
         isRenameEnabled = true;
-        break;
+      }
+      if (originalVariable.getIsRepeatable()) {
+        hasRepeatable = true;
       }
     }
+    perOccurrencePanel.setVisible(hasRepeatable);
     renameWithNumberPanel.setVisible(isRenameEnabled);
   }
 
@@ -303,9 +320,14 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
     hideDialog();
   }
 
+  @UiHandler("perOccurrence")
+  public void onPerOccurrenceClicked(ClickEvent event) {
+    getUiHandlers().perOccurrence();
+  }
+
   @UiHandler("renameWithNumber")
   public void onRenameButtonClicked(ClickEvent event) {
-    getUiHandlers().rename();
+    getUiHandlers().renameCategories();
   }
 
   @Override
@@ -319,13 +341,7 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
     if(datasources.length() > 0) displayViewsFor(name);
   }
 
-  @Override
-  public ActionsVariableCopyColumn<VariableDto> getActions() {
-    return actionsColumn;
-  }
-
-  @Override
-  public void removeVariable(VariableDto object) {
+  private void removeVariable(VariableDto object) {
     List<VariableDto> list = new LinkedList<VariableDto>(dataProvider.getList());
     for(int i = 0; i < list.size(); i++) {
       if(list.get(i).getName().equals(object.getName())) {
@@ -378,8 +394,18 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
   }
 
   @Override
-  public boolean isRenameSelected() {
+  public boolean isRenameCategoriesSelected() {
     return renameWithNumber.getValue();
+  }
+
+  @Override
+  public boolean isPerOccurrence() {
+    return perOccurrence.getValue();
+  }
+
+  @Override
+  public int getPerOccurrenceCount() {
+    return 10;
   }
 
   @Override

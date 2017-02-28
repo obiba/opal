@@ -97,17 +97,37 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
   }
 
   @Override
-  public void rename() {
-    boolean renameCategory = getView().isRenameSelected();
+  public void renameCategories() {
+    updateDerivedVariables();
+  }
+
+  @Override
+  public void perOccurrence() {
+    updateDerivedVariables();
+  }
+
+  private void updateDerivedVariables() {
+    boolean perOccurrence = getView().isPerOccurrence();
+    int max = getView().getPerOccurrenceCount();
+    boolean renameCategories = getView().isRenameCategoriesSelected();
     JsArray<VariableDto> derivedVariables = JsArrays.create();
 
     for(VariableDto variable : variables) {
-      if(renameCategory) {
+      if(perOccurrence && variable.getIsRepeatable()) {
+        for (int i=0; i<max; i++) {
+          if (renameCategories) {
+            derivedVariables.push(getDerivedVariable(variable, i));
+          } else {
+            derivedVariables.push(new VariableDuplicationHelper(variable, i).getDerivedVariable());
+          }
+        }
+      } else if(renameCategories) {
         // Keep new name if changed
-        derivedVariables.push(getDerivedVariable(variable, renameCategory));
+        derivedVariables.push(getDerivedVariable(variable));
       } else {
         derivedVariables.push(new VariableDuplicationHelper(variable).getDerivedVariable());
       }
+
     }
 
     getView().renderRows(variables, derivedVariables, false);
@@ -127,59 +147,6 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
 
     getView().renderRows(variables, derivedVariables, true);
     getView().showDialog();
-  }
-
-  @Override
-  protected void onBind() {
-    addEventHandlers();
-  }
-
-  private void addEventHandlers() {
-    // Remove action
-    getView().getActions().setActionHandler(new ActionHandler<VariableDto>() {
-      @Override
-      public void doAction(VariableDto object, String actionName) {
-        if(actionName.equals(ActionsVariableCopyColumn.REMOVE_ACTION)) {
-          getView().removeVariable(object);
-
-          updateVariableList();
-
-          // Prepare the array of variableDto
-          boolean renameCategory = getView().isRenameSelected();
-          JsArray<VariableDto> derivedVariables = JsArrays.create();
-
-          for(VariableDto variable : variables) {
-            if(renameCategory) {
-              // Keep new name if changed
-              derivedVariables.push(getDerivedVariable(variable, renameCategory));
-            } else {
-              derivedVariables.push(new VariableDuplicationHelper(variable).getDerivedVariable());
-            }
-          }
-
-          getView().renderRows(variables, derivedVariables, false);
-        }
-      }
-
-      private void updateVariableList() {
-        List<VariableDto> viewVariables = getView().getVariables(false);
-        Collection<VariableDto> removeVariables = new LinkedList<VariableDto>();
-        for(VariableDto v : variables) {
-          boolean keep = false;
-          for(VariableDto viewVariable : viewVariables) {
-            if(v.getName().equals(viewVariable.getName())) {
-              keep = true;
-              break;
-            }
-          }
-
-          if(!keep) {
-            removeVariables.add(v);
-          }
-        }
-        variables.removeAll(removeVariables);
-      }
-    });
   }
 
   private void createOrUpdateViewWithVariables() {
@@ -206,15 +173,19 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
         .send();
   }
 
-  private VariableDto getDerivedVariable(VariableDto variable, boolean recodeName) {
+
+  private VariableDto getDerivedVariable(VariableDto variable) {
+    return getDerivedVariable(variable, -1);
+  }
+
+  private VariableDto getDerivedVariable(VariableDto variable, int valueAt) {
     if(VariableDtos.hasCategories(variable) && ("text".equals(variable.getValueType()) ||
         "integer".equals(variable.getValueType()) && !VariableDtos.allCategoriesMissing(variable))) {
-      CategoricalVariableDerivationHelper derivationHelper = new CategoricalVariableDerivationHelper(variable,
-          recodeName);
+      CategoricalVariableDerivationHelper derivationHelper = new CategoricalVariableDerivationHelper(variable, valueAt);
       derivationHelper.initializeValueMapEntries();
       return derivationHelper.getDerivedVariable();
     }
-    return new VariableDuplicationHelper(variable).getDerivedVariable();
+    return new VariableDuplicationHelper(variable, valueAt).getDerivedVariable();
   }
 
   private class CreateViewCallBack implements ResponseCodeCallback {
@@ -356,19 +327,17 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
 
     void renderRows(List<VariableDto> originalVariables, JsArray<VariableDto> rows, boolean clearNames);
 
-    ActionsVariableCopyColumn<VariableDto> getActions();
-
-    void removeVariable(VariableDto object);
-
     HasText getViewName();
 
     List<VariableDto> getVariables(boolean withNewNames);
 
     String getDatasourceName();
 
-    boolean isRenameSelected();
+    boolean isRenameCategoriesSelected();
 
-    void updateRenameCheckboxVisibility(List<VariableDto> originalVariables);
+    boolean isPerOccurrence();
+
+    int getPerOccurrenceCount();
 
     void clearErrors();
 
