@@ -51,9 +51,10 @@
 
       <!-- Per Occurrence -->
       <g:FlowPanel ui:field="perOccurrencePanel">
-        <b:CheckBox ui:field="perOccurrence">
+        <b:CheckBox ui:field="perOccurrence" addStyleNames="inline-block">
           <ui:msg description="Split repeatable variable per occurrence label">Split variable per occurrence</ui:msg>
         </b:CheckBox>
+        <o:NumericTextBox ui:field="occurrenceCount" min="1" max="50" enabled="false" addStyleNames="span1 inline-box"/>
         <b:HelpBlock addStyleNames="help-block">
           <ui:msg description="Split repeatable variable per occurrence help label">A repeatable has a sequence of values. This option will create a derived variable per occurrence.
           </ui:msg>

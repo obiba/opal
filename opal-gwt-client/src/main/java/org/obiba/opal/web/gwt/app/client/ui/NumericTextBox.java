@@ -145,6 +145,10 @@ public class NumericTextBox extends TextBox {
     return (T) numberType.parseValue(getValue());
   }
 
+  public boolean hasValue() {
+    return !getText().isEmpty();
+  }
+
   /**
    *
    */

@@ -15,16 +15,14 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewUiHandlers;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
-import org.obiba.opal.web.gwt.app.client.ui.Chooser;
-import org.obiba.opal.web.gwt.app.client.ui.EditableListBox;
-import org.obiba.opal.web.gwt.app.client.ui.Modal;
-import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
-import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
+import org.obiba.opal.web.gwt.app.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsVariableCopyColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ConstantActionsProvider;
@@ -64,6 +62,8 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
     implements VariablesToViewPresenter.Display {
 
   private static final int SCRIPT_MAX_LENGTH = 150;
+
+  private static final int OCCURRENCE_COUNT_DEFAULT = 5;
 
   private final Widget widget;
 
@@ -125,6 +125,9 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
   FlowPanel perOccurrencePanel;
 
   @UiField
+  NumericTextBox occurrenceCount;
+
+  @UiField
   FlowPanel renameWithNumberPanel;
 
   private JsArray<DatasourceDto> datasources;
@@ -154,6 +157,13 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
 
   private void initWidgets() {
     dialog.setTitle(translations.addVariablesToViewTitle());
+    occurrenceCount.setValue("" + OCCURRENCE_COUNT_DEFAULT);
+    occurrenceCount.addKeyUpHandler(new KeyUpHandler() {
+      @Override
+      public void onKeyUp(KeyUpEvent event) {
+        getUiHandlers().perOccurrence();
+      }
+    });
     addTableColumns();
   }
 
@@ -322,6 +332,7 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
 
   @UiHandler("perOccurrence")
   public void onPerOccurrenceClicked(ClickEvent event) {
+    occurrenceCount.setEnabled(perOccurrence.getValue());
     getUiHandlers().perOccurrence();
   }
 
@@ -405,7 +416,10 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
 
   @Override
   public int getPerOccurrenceCount() {
-    return 10;
+    try {
+      if (occurrenceCount.hasValue()) return Integer.parseInt(occurrenceCount.getValue());
+    } catch (Exception e) {}
+    return 1;
   }
 
   @Override
