@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.core.service.SystemService;
 import org.obiba.opal.fs.OpalFileSystem;
-import org.obiba.opal.spi.genotype.GenotypeStoreService;
+import org.obiba.opal.spi.vcf.VCFStoreService;
 
 public interface OpalRuntime extends SystemService {
 
@@ -51,27 +51,27 @@ public interface OpalRuntime extends SystemService {
   Service getService(String name) throws NoSuchServiceException;
 
   /**
-   * Check that a genotype service exists.
+   * Check that a vcf service exists.
    *
    * @param name
    * @return
    */
-  boolean hasGenotypeStoreService(String name);
+  boolean hasVCFStoreService(String name);
 
   /**
-   * Get the {@link GenotypeStoreService} from name.
+   * Get the {@link VCFStoreService} from name.
    *
    * @param name
    * @return
    * @throws java.util.NoSuchElementException
    */
-  GenotypeStoreService getGenotypeStoreService(String name);
+  VCFStoreService getVCFStoreService(String name);
 
   /**
-   * Get all genotype services.
+   * Get all vcf services.
    *
    * @return
    */
-  Collection<GenotypeStoreService> getGenotypeStoreServices();
+  Collection<VCFStoreService> getVCFStoreServices();
 
 }

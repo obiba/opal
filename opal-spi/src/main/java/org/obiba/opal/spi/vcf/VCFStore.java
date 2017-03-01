@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.spi.genotype;
+package org.obiba.opal.spi.vcf;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -16,9 +16,9 @@ import java.util.Collection;
 import java.util.NoSuchElementException;
 
 /**
- * A genotype store gives access to the VCF files collection and associated summary and operations.
+ * A vcf store gives access to the VCF files collection and associated summary and operations.
  */
-public interface GenotypeStore {
+public interface VCFStore {
 
   /**
    * The store has a unique name.

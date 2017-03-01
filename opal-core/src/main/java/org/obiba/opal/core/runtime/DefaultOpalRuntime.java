@@ -34,8 +34,8 @@ import org.obiba.opal.core.tx.TransactionalThread;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
 import org.obiba.opal.fs.security.SecuredOpalFileSystem;
-import org.obiba.opal.spi.genotype.GenotypeStoreService;
-import org.obiba.opal.spi.genotype.GenotypeStoreServiceLoader;
+import org.obiba.opal.spi.vcf.VCFStoreService;
+import org.obiba.opal.spi.vcf.VCFStoreServiceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -157,18 +157,18 @@ public class DefaultOpalRuntime implements OpalRuntime {
   }
 
   @Override
-  public boolean hasGenotypeStoreService(String name) {
-    return GenotypeStoreServiceLoader.get().hasService(name);
+  public boolean hasVCFStoreService(String name) {
+    return VCFStoreServiceLoader.get().hasService(name);
   }
 
   @Override
-  public GenotypeStoreService getGenotypeStoreService(String name) {
-    return GenotypeStoreServiceLoader.get().getService(name);
+  public VCFStoreService getVCFStoreService(String name) {
+    return VCFStoreServiceLoader.get().getService(name);
   }
 
   @Override
-  public Collection<GenotypeStoreService> getGenotypeStoreServices() {
-    return GenotypeStoreServiceLoader.get().getServices();
+  public Collection<VCFStoreService> getVCFStoreServices() {
+    return VCFStoreServiceLoader.get().getServices();
   }
 
   private void initExtensions() {
@@ -243,7 +243,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
     File pluginsDir = new File(home, "conf" + File.separator + "plugins");
     Properties defaultProperties = new Properties();
     defaultProperties.put("OPAL_HOME", home);
-    GenotypeStoreServiceLoader.get().getServices().forEach(plugin -> {
+    VCFStoreServiceLoader.get().getServices().forEach(plugin -> {
       try {
         File pluginProps = new File(pluginsDir, plugin.getName() + ".properties");
         if (pluginProps.exists()) {

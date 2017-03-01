@@ -19,7 +19,7 @@ import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.fs.OpalFileSystem;
-import org.obiba.opal.spi.genotype.GenotypeStoreService;
+import org.obiba.opal.spi.vcf.VCFStoreService;
 
 /**
  * Upgrade purpose only to fix injection dependencies.
@@ -52,17 +52,17 @@ public class OpalRuntimeMock implements OpalRuntime {
   }
 
   @Override
-  public boolean hasGenotypeStoreService(String name) {
+  public boolean hasVCFStoreService(String name) {
     return false;
   }
 
   @Override
-  public GenotypeStoreService getGenotypeStoreService(String name) {
+  public VCFStoreService getVCFStoreService(String name) {
     throw new NoSuchElementException(name);
   }
 
   @Override
-  public Collection<GenotypeStoreService> getGenotypeStoreServices() {
+  public Collection<VCFStoreService> getVCFStoreServices() {
     return Lists.newArrayList();
   }
 
