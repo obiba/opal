@@ -27,7 +27,7 @@ public interface VCFStoreService extends ServicePlugin {
    *
    * @return
    */
-  Collection<String> getStores();
+  Collection<String> getStoreNames();
 
   /**
    * Check {@link VCFStore} existence.
