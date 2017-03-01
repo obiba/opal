@@ -241,8 +241,11 @@ public class DefaultOpalRuntime implements OpalRuntime {
   private void initServicePlugins() {
     String home = System.getProperty("OPAL_HOME");
     File pluginsDir = new File(home, "conf" + File.separator + "plugins");
+    File vcfStoresDir = new File(home, "conf" + File.separator + "vcf-stores");
+    vcfStoresDir.mkdirs();
     Properties defaultProperties = new Properties();
     defaultProperties.put("OPAL_HOME", home);
+    defaultProperties.put(VCFStoreService.DATA_DIR_PROPERTY, vcfStoresDir.getAbsolutePath());
     VCFStoreServiceLoader.get().getServices().forEach(plugin -> {
       try {
         File pluginProps = new File(pluginsDir, plugin.getName() + ".properties");

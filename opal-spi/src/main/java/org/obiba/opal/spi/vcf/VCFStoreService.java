@@ -20,6 +20,8 @@ import java.util.NoSuchElementException;
  */
 public interface VCFStoreService extends ServicePlugin {
 
+  public static final String DATA_DIR_PROPERTY = "data.dir";
+
   /**
    * Get the registered store names.
    *
