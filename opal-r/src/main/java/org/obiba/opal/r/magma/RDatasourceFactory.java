@@ -113,7 +113,7 @@ public class RDatasourceFactory extends AbstractDatasourceFactory {
           throw new IllegalArgumentException("File does not exist or cannot be read: " + file);
 
         FileObject catFileObj;
-        if (Strings.isNullOrEmpty(categoryFile)) {
+        if (Strings.isNullOrEmpty(categoryFile) && file.endsWith(".sas7bdat")) {
           // try to guess a category file
           catFileObj = resolveFileInFileSystem(file.replaceAll("\\.sas7bdat$", ".sas7bcat"));
         } else {
