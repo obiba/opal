@@ -78,6 +78,15 @@ public interface VCFStore {
   OutputStream readVCF(String name) throws NoSuchElementException, IOException;
 
   /**
+   * Read the VCF stored with the given name, with a subset applied to the provided samples. The returned stream is a compressed VCF file.
+   *
+   * @param name
+   * @param samples The sample IDs.
+   * @return
+   */
+  OutputStream readVCF(String name, Collection<String> samples) throws NoSuchElementException, IOException;
+
+  /**
    * Some metrics about the VCF.
    */
   interface VCFSummary {
