@@ -23,6 +23,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-spi</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-api</artifactId>
     </dependency>

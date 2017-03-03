@@ -9,30 +9,59 @@
  */
 package org.obiba.opal.core.runtime;
 
-import java.util.Set;
-
-import javax.validation.constraints.NotNull;
-
 import org.obiba.opal.core.service.SystemService;
 import org.obiba.opal.fs.OpalFileSystem;
+import org.obiba.opal.spi.vcf.VCFStoreService;
+
+import javax.validation.constraints.NotNull;
+import java.io.File;
+import java.util.Collection;
+import java.util.Set;
 
 public interface OpalRuntime extends SystemService {
 
-  String EXTENSIONS = System.getProperty("OPAL_HOME") + "/extensions";
+  String DATA_DIR = System.getProperty("OPAL_HOME") + File.separator + "data";
 
-  String MAGMA_JS_EXTENSION = EXTENSIONS + "/magma-js";
+  String WORK_DIR = System.getProperty("OPAL_HOME") + File.separator + "work";
 
-  String WEBAPP_EXTENSION = EXTENSIONS + "/webapp";
+  String PLUGINS_DIR = System.getProperty("OPAL_HOME") + File.separator + "plugins";
 
-  Set<Service> getServices();
+  String PLUGIN_PROPERTIES = "plugin.properties";
+
+  String EXTENSIONS_DIR = System.getProperty("OPAL_HOME") + File.separator + "extensions";
+
+  String MAGMA_JS_EXTENSION = EXTENSIONS_DIR + File.separator + "magma-js";
+
+  String WEBAPP_EXTENSION = EXTENSIONS_DIR + File.separator + "webapp";
+
+  //
+  // File system
+  //
 
   /**
    * For test purpose.
+   *
    * @return
    */
   boolean hasFileSystem();
 
+  /**
+   * Get the opal file system.
+   *
+   * @return
+   */
   OpalFileSystem getFileSystem();
+
+  //
+  // Core services
+  //
+
+  /**
+   * Get the core services.
+   *
+   * @return
+   */
+  Set<Service> getServices();
 
   /**
    * True if service with given name is available in Opal Runtime.
@@ -47,5 +76,33 @@ public interface OpalRuntime extends SystemService {
    */
   @NotNull
   Service getService(String name) throws NoSuchServiceException;
+
+  //
+  // VCF Store Service plugins
+  //
+
+  /**
+   * Get all vcf services.
+   *
+   * @return
+   */
+  Collection<VCFStoreService> getVCFStoreServices();
+
+  /**
+   * Check that a vcf service exists.
+   *
+   * @param name
+   * @return
+   */
+  boolean hasVCFStoreService(String name);
+
+  /**
+   * Get the {@link VCFStoreService} from name.
+   *
+   * @param name
+   * @return
+   * @throws java.util.NoSuchElementException
+   */
+  VCFStoreService getVCFStoreService(String name);
 
 }
