@@ -142,8 +142,7 @@ public abstract class AbstractROperation implements ROperation {
    * @param in local stream
    */
   protected void writeFile(String fileName, InputStream in) {
-    byte [] b = new byte[8192];
-    try (RFileOutputStream out = connection.createFile(fileName);) {
+    try (OutputStream out = new BufferedOutputStream(connection.createFile(fileName));) {
       IOUtils.copy(in, out);
       in.close();
     } catch (IOException e) {
@@ -175,7 +174,7 @@ public abstract class AbstractROperation implements ROperation {
    * @param out local stream
    */
   protected void readFile(String fileName, OutputStream out) {
-    try (RFileInputStream in = connection.openFile(fileName)) {
+    try (InputStream in = new BufferedInputStream(connection.openFile(fileName))) {
       IOUtils.copy(in, out);
       out.close();
     } catch( IOException e){
