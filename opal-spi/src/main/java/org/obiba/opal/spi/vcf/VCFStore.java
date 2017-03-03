@@ -103,21 +103,21 @@ public interface VCFStore {
      *
      * @return
      */
-    Collection<String> sampleIds();
+    Collection<String> getSampleIds();
 
     /**
      * Number of variants.
      *
      * @return
      */
-    int variantsCount();
+    int getVariantsCount();
 
     /**
      * Number of genotypes.
      *
      * @return
      */
-    int genotypesCount();
+    int getGenotypesCount();
 
     /**
      * Compressed file equivalent approximate size.
