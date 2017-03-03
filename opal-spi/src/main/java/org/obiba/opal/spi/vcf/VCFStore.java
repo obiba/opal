@@ -10,6 +10,7 @@
 
 package org.obiba.opal.spi.vcf;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
@@ -52,12 +53,14 @@ public interface VCFStore {
   VCFSummary getVCFSummary(String name) throws NoSuchElementException;
 
   /**
-   * Store a VCF with an associated name. The underlying VCF file is expected to be compressed.
+   * Store a VCF with an associated file name: the file name suffix specifies if it is a compressed VCF file.
+   * Subsequent requests will refer to the base name of the provided file name. Example: written file "file_example.vcf.gz" will
+   * be referred as "file_example".
    *
    * @param name
    * @param vcf
    */
-  void writeVCF(String name, InputStream vcf);
+  void writeVCF(String name, InputStream vcf) throws IOException;
 
   /**
    * Delete the VCF associated to the name.
@@ -67,12 +70,12 @@ public interface VCFStore {
   void deleteVCF(String name);
 
   /**
-   * Read the VCF stored with the given name.
+   * Read the VCF stored with the given name. The returned stream is a compressed VCF file.
    *
    * @param name
    * @return
    */
-  OutputStream readVCF(String name) throws NoSuchElementException;
+  OutputStream readVCF(String name) throws NoSuchElementException, IOException;
 
   /**
    * Some metrics about the VCF.
