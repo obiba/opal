@@ -91,6 +91,15 @@ public class DefaultOpalRuntime implements OpalRuntime {
   @Override
   @PreDestroy
   public void stop() {
+    for (VCFStoreService service : vcfStoreServices) {
+      try {
+        if (service.isRunning()) service.stop();
+      } catch (RuntimeException e) {
+        //noinspection StringConcatenationArgumentToLogCall
+        log.warn("Error stopping service plugin " + service.getClass(), e);
+      }
+    }
+
     for (Service service : services) {
       try {
         if (service.isRunning()) service.stop();
