@@ -254,7 +254,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
         .forEach(service -> {
           try {
             Plugin plugin = pluginsMap.get(service.getName());
-            service.configure(plugin.getProperties("vcf-stores"));
+            service.configure(plugin.getProperties());
             service.start();
             vcfStoreServices.add(service);
           } catch (Exception e) {
@@ -302,7 +302,14 @@ public class DefaultOpalRuntime implements OpalRuntime {
     }
 
     public String getName() {
-      return directory.getName();
+      try (FileInputStream in = new FileInputStream(properties)) {
+        Properties prop = new Properties();
+        prop.load(in);
+        return prop.getProperty("name", directory.getName());
+      } catch (Exception e) {
+        log.warn("Failed reading properties: {}", properties.getAbsolutePath(), e);
+        return directory.getName();
+      }
     }
 
     public boolean isValid() {
@@ -311,8 +318,8 @@ public class DefaultOpalRuntime implements OpalRuntime {
           && lib.exists() && lib.isDirectory() && lib.canRead();
     }
 
-    public Properties getProperties(String pluginType) {
-      Properties prop = getDefaultProperties(pluginType);
+    public Properties getProperties() {
+      Properties prop = getDefaultProperties();
       try (FileInputStream in = new FileInputStream(properties)) {
         prop.load(in);
         return prop;
@@ -322,19 +329,18 @@ public class DefaultOpalRuntime implements OpalRuntime {
       }
     }
 
-    private Properties getDefaultProperties(String pluginType) {
+    private Properties getDefaultProperties() {
+      String name = getName();
       String home = System.getProperty("OPAL_HOME");
       Properties defaultProperties = new Properties();
       defaultProperties.put("OPAL_HOME", home);
-      File dataDir = new File(home, "data" + File.separator + pluginType + File.separator + getName());
+      File dataDir = new File(home, "data" + File.separator + name);
       dataDir.mkdirs();
       defaultProperties.put("data.dir", dataDir.getAbsolutePath());
-      File workDir = new File(home, "work" + File.separator + pluginType + File.separator + getName());
+      File workDir = new File(home, "work" + File.separator + name);
       workDir.mkdirs();
       defaultProperties.put("work.dir", workDir.getAbsolutePath());
-      File installDir = new File(home, "plugins" + File.separator + getName());
-      installDir.mkdirs();
-      defaultProperties.put("install.dir", installDir.getAbsolutePath());
+      defaultProperties.put("install.dir", directory.getAbsolutePath());
       return defaultProperties;
     }
 
