@@ -28,8 +28,8 @@ class ValueTableRDataFrameConverter extends ValueTableRConverter {
 
   @Override
   public void doAssign(String symbol, String path) {
-    // OPAL-2710 assigning a data.frame directly fails with a lot of rows
-    resolvePath(path);
+    if (magmaAssignROperation.hasValueTable()) setValueTable(magmaAssignROperation.getValueTable());
+    else resolvePath(path);
     if (getValueTable() == null) throw new IllegalStateException("Table must not be null");
     magmaAssignROperation.setEntities(getValueTable());
     RList list = getVariableVectors();

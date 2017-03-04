@@ -12,13 +12,16 @@ package org.obiba.opal.r.magma;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.support.AbstractDatasource;
+import org.obiba.magma.support.StaticValueTable;
 import org.obiba.opal.r.AbstractROperation;
 import org.obiba.opal.r.DataReadROperation;
 import org.obiba.opal.r.FileWriteROperation;
 import org.obiba.opal.r.service.OpalRSession;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
@@ -36,6 +39,8 @@ public class RDatasource extends AbstractDatasource {
 
   private final OpalRSession rSession;
 
+  private TransactionTemplate txTemplate;
+
   private final File file;
 
   private final File categoryFile;
@@ -45,12 +50,46 @@ public class RDatasource extends AbstractDatasource {
   private final String entityType;
 
   private final String idColumn;
+
   private String locale;
 
+  /**
+   * Empty datasource with file to be written to.
+   *  @param name
+   * @param rSession
+   * @param txTemplate
+   */
+  public RDatasource(@NotNull String name, OpalRSession rSession, File file, TransactionTemplate txTemplate) {
+    this(name, rSession, file, null, null, null, null);
+    // make sure it is a file to be written
+    file.delete();
+    this.txTemplate = txTemplate;
+  }
+
+  /**
+   * Datasource based on a tibble named by the symbol.
+   *
+   * @param name
+   * @param rSession
+   * @param symbol
+   * @param entityType
+   * @param idColumn
+   */
   public RDatasource(@NotNull String name, OpalRSession rSession, String symbol, String entityType, String idColumn) {
     this(name, rSession, null, null, symbol, entityType, idColumn);
   }
 
+  /**
+   * Datasource based on the provided data file(s) from which a tibble will be created.
+   *
+   * @param name
+   * @param rSession
+   * @param file
+   * @param categoryFile
+   * @param symbol
+   * @param entityType
+   * @param idColumn
+   */
   public RDatasource(@NotNull String name, OpalRSession rSession, File file, File categoryFile, String symbol, String entityType, String idColumn) {
     super(name, "r");
     this.rSession = rSession;
@@ -59,6 +98,7 @@ public class RDatasource extends AbstractDatasource {
     this.symbol = symbol;
     this.entityType = Strings.isNullOrEmpty(entityType) ? DEFAULT_ENTITY_TYPE : entityType;
     this.idColumn = idColumn;
+    this.txTemplate = null;
   }
 
   @Override
@@ -71,7 +111,7 @@ public class RDatasource extends AbstractDatasource {
       }
     });
     // create tibble if file is provided
-    if (file != null) {
+    if (file != null && file.exists()) {
       // copy file(s) to R session
       getRSession().execute(new FileWriteROperation(file.getName(), file));
       if (hasCategoryFile())
@@ -87,7 +127,7 @@ public class RDatasource extends AbstractDatasource {
 
   @Override
   protected Set<String> getValueTableNames() {
-    return Sets.newHashSet(symbol.replaceAll(" ", "_"));
+    return Strings.isNullOrEmpty(symbol) ? Sets.newHashSet() : Sets.newHashSet(symbol.replaceAll(" ", "_"));
   }
 
   @Override
@@ -97,11 +137,7 @@ public class RDatasource extends AbstractDatasource {
 
   @Override
   public ValueTableWriter createWriter(@NotNull String tableName, @NotNull String entityType) {
-    RValueTable valueTable = new RValueTable(this, tableName, tableName,
-        Strings.isNullOrEmpty(entityType) ? this.entityType : entityType,
-        DEFAULT_ID_COLUMN);
-
-    return new RValueTableWriter(valueTable);
+    return new RValueTableWriter(tableName, entityType, file, getRSession(), txTemplate);
   }
 
   private boolean hasCategoryFile() {
@@ -115,4 +151,5 @@ public class RDatasource extends AbstractDatasource {
   public String getLocale() {
     return Strings.isNullOrEmpty(locale) ? "en" : locale;
   }
+
 }

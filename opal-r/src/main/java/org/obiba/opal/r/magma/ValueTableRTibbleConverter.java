@@ -29,7 +29,8 @@ class ValueTableRTibbleConverter extends ValueTableRConverter {
 
   @Override
   public void doAssign(String symbol, String path) {
-    resolvePath(path);
+    if (magmaAssignROperation.hasValueTable()) setValueTable(magmaAssignROperation.getValueTable());
+    else resolvePath(path);
     if (getValueTable() == null) throw new IllegalStateException("Table must not be null");
     magmaAssignROperation.setEntities(getValueTable());
     RList list = getVariableVectors();

@@ -49,6 +49,9 @@ import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.magma.QueryWhereClause;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
+import org.obiba.opal.r.magma.RDatasource;
+import org.obiba.opal.r.service.OpalRSession;
+import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +65,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import static org.obiba.opal.shell.commands.CommandResultCode.SUCCESS;
 
@@ -89,6 +93,12 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   @Autowired
   private DatabaseRegistry databaseRegistry;
 
+  @Autowired
+  private OpalRSessionManager opalRSessionManager;
+
+  @Autowired
+  private TransactionTemplate txTemplate;
+
   @NotNull
   private final FileDatasourceFactory fileDatasourceFactory;
 
@@ -99,6 +109,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     fileDatasourceFactory.setNext(new SingleFileCsvDatasourceFactory()) //
         .setNext(new ExcelDatasourceFactory()) //
         .setNext(new FsDatasourceFactory()) //
+        .setNext(new RHavenDatasourceFactory())
         .setNext(new NullDatasourceFactory());
   }
 
@@ -601,6 +612,27 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     public Datasource internalCreateDatasource(FileObject outputFile) {
       if("/dev/null".equals(outputFile.getName().getPath())) {
         return new NullDatasource("/dev/null");
+      }
+      return null;
+    }
+  }
+
+  class RHavenDatasourceFactory extends FileDatasourceFactory {
+    @Nullable
+    @Override
+    protected Datasource internalCreateDatasource(FileObject outputFile) throws IOException {
+      if (outputFile.getName().getExtension().startsWith("sav")
+          || outputFile.getName().getExtension().startsWith("sas7bdat")
+          || outputFile.getName().getExtension().startsWith("dta")) {
+        final OpalRSession rSession = opalRSessionManager.newSubjectRSession();
+        rSession.setExecutionContext("Export");
+        RDatasource ds = new RDatasource(outputFile.getName().getBaseName(), rSession, getLocalFile(outputFile), txTemplate) {
+          @Override
+          protected void onDispose() {
+            opalRSessionManager.removeRSession(rSession.getId());
+          }
+        };
+        return ds;
       }
       return null;
     }

@@ -159,6 +159,10 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
     return getVariableVectorsByRows();
   }
 
+  protected void setValueTable(ValueTable table) {
+    this.table = table;
+  }
+
   protected ValueTable getValueTable() {
     return table;
   }
