@@ -15,7 +15,7 @@
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <o:Modal ui:field="modal" resizable="true" closeVisible="true" keyboard="true" animation="false">
+  <o:Modal ui:field="modal" resizable="true" closeVisible="true" keyboard="true" animation="false" minHeight="500">
 
     <b:Alert ui:field="exportNTable" close="false" visible="true" type="INFO"/>
 
@@ -43,8 +43,9 @@
         <g:SimplePanel ui:field="filePanel"/>
       </b:Controls>
       <b:HelpBlock>
-        <ui:msg description="Destination Folder help">Data will be exported in the selected folder in a zip
-          of XML files or in a folder with CSV files.
+        <ui:msg description="Destination Folder help">Data will be exported in the selected folder, with a timestamp in the name. Exporting in SAS, SPSS or Stata is still an experimental feature;
+          it requires a functional R server with the <a href="https://cran.r-project.org/web/packages/tibble/" target="_blank">tibble</a> and
+          <a href="https://cran.r-project.org/web/packages/haven/" target="_blank">haven</a> packages installed.
         </ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>

@@ -11,88 +11,66 @@
 package org.obiba.opal.r.magma;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import org.obiba.magma.Value;
-import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.Variable;
-import org.obiba.magma.VariableEntity;
+import org.obiba.magma.*;
+import org.obiba.magma.support.StaticDatasource;
+import org.obiba.magma.support.StaticValueTable;
+import org.obiba.opal.r.DataSaveROperation;
+import org.obiba.opal.r.FileReadROperation;
+import org.obiba.opal.r.service.OpalRSession;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.validation.constraints.NotNull;
-import java.util.Collections;
+import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Writes a tibble in a R session.
  */
 public class RValueTableWriter implements ValueTableWriter {
 
-  private final RValueTable valueTable;
+  private final String tableName;
 
-  private List<Variable> variables = Collections.synchronizedList(Lists.newArrayList());
+  private final StaticDatasource datasource;
 
-  private Map<String, Map<String, Value>> variableEntityValues = Maps.newConcurrentMap();
+  private final ValueTableWriter valueTableWriter;
 
-  public RValueTableWriter(RValueTable valueTable) {
-    this.valueTable = valueTable;
+  private final File destination;
+
+  private final OpalRSession rSession;
+
+  private final TransactionTemplate txTemplate;
+
+  public RValueTableWriter(String tableName, String entityType, File destination, OpalRSession rSession, TransactionTemplate txTemplate) {
+    this.tableName = tableName;
+    this.datasource = new StaticDatasource(destination.getName());
+    this.valueTableWriter = datasource.createWriter(tableName, entityType);
+    this.destination = destination;
+    this.rSession = rSession;
+    this.txTemplate = txTemplate;
   }
 
   @Override
   public VariableWriter writeVariables() {
-    return new RVariableWriter();
+    return valueTableWriter.writeVariables();
   }
 
   @Override
   public ValueSetWriter writeValueSet(@NotNull VariableEntity entity) {
-    return new RValueSetWriter(entity);
+    return valueTableWriter.writeValueSet(entity);
   }
 
   @Override
   public void close() {
-
-  }
-
-  private class RVariableWriter implements VariableWriter {
-
-    @Override
-    public void writeVariable(@NotNull Variable variable) {
-      variables.add(variable);
-    }
-
-    @Override
-    public void removeVariable(@NotNull Variable variable) {
-      throw new UnsupportedOperationException("Cannot remove a R variable (column in a tibble)");
-    }
-
-    @Override
-    public void close() {
-
-    }
-  }
-
-  private class RValueSetWriter implements ValueSetWriter {
-
-    private final VariableEntity entity;
-
-    private RValueSetWriter(VariableEntity entity) {
-      this.entity = entity;
-    }
-
-    @Override
-    public void writeValue(@NotNull Variable variable, Value value) {
-      if (!variableEntityValues.containsKey(entity.getIdentifier()))
-        variableEntityValues.put(entity.getIdentifier(), Maps.newHashMap());
-      variableEntityValues.get(entity.getIdentifier()).put(variable.getName(), value);
-    }
-
-    @Override
-    public void remove() {
-      throw new UnsupportedOperationException("Cannot remove a R value set (row in a tibble)");
-    }
-
-    @Override
-    public void close() {
-
+    valueTableWriter.close();
+    ValueTable valueTable = datasource.getValueTable(tableName);
+    if (valueTable.getValueSetCount()>0) {
+      String symbol = "D";
+      // push table to a R tibble
+      rSession.execute(new MagmaAssignROperation(symbol, valueTable, txTemplate));
+      // save tibble in file in R
+      rSession.execute(new DataSaveROperation(symbol, destination.getName()));
+      // read back file from R to opal
+      rSession.execute(new FileReadROperation(destination.getName(), destination));
     }
   }
 }

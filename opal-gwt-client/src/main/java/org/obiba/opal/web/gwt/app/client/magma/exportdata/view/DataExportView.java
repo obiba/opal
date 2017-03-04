@@ -104,6 +104,9 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
     dataFormat.addGroup(translations.fileBasedDatasources());
     dataFormat.addItemToGroup(translations.csvLabel(), ImportConfig.ImportFormat.CSV.name());
     dataFormat.addItemToGroup(translations.opalXmlLabel(), ImportConfig.ImportFormat.XML.name());
+    dataFormat.addItemToGroup(translations.rSPSSLabel(), ImportConfig.ImportFormat.RSPSS.name());
+    dataFormat.addItemToGroup(translations.rSASLabel(), ImportConfig.ImportFormat.RSAS.name());
+    dataFormat.addItemToGroup(translations.rStataLabel(), ImportConfig.ImportFormat.RSTATA.name());
     dataFormat.addGroup(translations.remoteServerBasedDatasources());
     dataFormat.addItemToGroup(translations.sqlLabel(), ImportConfig.ImportFormat.JDBC.name());
     dataFormat.addChosenChangeHandler(new ChosenChangeEvent.ChosenChangeHandler() {
@@ -200,8 +203,14 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
     }
     suffix += fileBaseName + "-" + dateFormat.format(date);
 
-    if("xml".equalsIgnoreCase(getDataFormat())) {
+    if(ImportConfig.ImportFormat.XML.name().equals(getDataFormat())) {
       return fileSelection.getFile() + suffix + ".zip";
+    } else if(ImportConfig.ImportFormat.RSPSS.name().equals(getDataFormat())) {
+      return fileSelection.getFile() + suffix + ".sav";
+    } else if(ImportConfig.ImportFormat.RSAS.name().equals(getDataFormat())) {
+      return fileSelection.getFile() + suffix + ".sas7bdat";
+    } else if(ImportConfig.ImportFormat.RSTATA.name().equals(getDataFormat())) {
+      return fileSelection.getFile() + suffix + ".dta";
     }
 
     return fileSelection.getFile() + suffix;

@@ -42,6 +42,8 @@ public class MagmaAssignROperation extends AbstractROperation {
   @NotNull
   private final String path;
 
+  private final ValueTable valueTable;
+
   private final String variableFilter;
 
   private final boolean withMissings;
@@ -56,6 +58,21 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   private SortedSet<VariableEntity> entities;
 
+  public MagmaAssignROperation(@NotNull String symbol, @NotNull ValueTable valueTable, TransactionTemplate txTemplate) {
+    if (symbol == null) throw new IllegalArgumentException("symbol cannot be null");
+    this.symbol = symbol;
+    this.path = "";
+    this.valueTable = valueTable;
+    this.variableFilter = "";
+    this.withMissings = true;
+    this.identifiersMapping = "";
+    this.identifiersTableService = null;
+    this.idColumnName = "id";
+    this.updatedColumnName = "";
+    this.transactionTemplate = txTemplate;
+    this.rClass = RClass.TIBBLE;
+  }
+
   public MagmaAssignROperation(@NotNull String symbol, @NotNull String path, String variableFilter,
                                boolean withMissings, String idColumnName, String updatedColumnName, String identifiersMapping, RClass rClass,
                                @NotNull IdentifiersTableService identifiersTableService, @NotNull TransactionTemplate transactionTemplate) {
@@ -65,6 +82,7 @@ public class MagmaAssignROperation extends AbstractROperation {
       throw new IllegalArgumentException("identifiers table service cannot be null");
     this.symbol = symbol;
     this.path = path;
+    this.valueTable = null;
     this.variableFilter = variableFilter;
     this.withMissings = withMissings;
     this.identifiersMapping = identifiersMapping;
@@ -123,6 +141,14 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   String getSymbol() {
     return symbol;
+  }
+
+  boolean hasValueTable() {
+    return valueTable != null;
+  }
+
+  ValueTable getValueTable() {
+    return valueTable;
   }
 
   String getIdColumnName() {
