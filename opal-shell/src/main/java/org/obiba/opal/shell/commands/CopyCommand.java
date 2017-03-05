@@ -25,6 +25,7 @@ import com.google.common.base.Stopwatch;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
+import org.obiba.core.util.FileUtil;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceCopierProgressListener;
 import org.obiba.magma.MagmaEngine;
@@ -553,7 +554,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
     @Override
     protected Datasource internalCreateDatasource(FileObject outputFile) throws IOException {
-      if(outputFile.getName().getExtension().startsWith("csv")) {
+      if("csv".equals(outputFile.getName().getExtension())) {
         return getSingleFileCsvDatasource(outputFile.getName().getBaseName(), getLocalFile(outputFile));
       }
       return null;
@@ -621,12 +622,23 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     @Nullable
     @Override
     protected Datasource internalCreateDatasource(FileObject outputFile) throws IOException {
-      if (outputFile.getName().getExtension().startsWith("sav")
-          || outputFile.getName().getExtension().startsWith("sas7bdat")
-          || outputFile.getName().getExtension().startsWith("dta")) {
+      String ext = outputFile.getName().getExtension();
+      if ("sav".equals(ext) || "sas7bdat".equals(ext) || "dta".equals(ext)) {
         final OpalRSession rSession = opalRSessionManager.newSubjectRSession();
         rSession.setExecutionContext("Export");
-        RDatasource ds = new RDatasource(outputFile.getName().getBaseName(), rSession, getLocalFile(outputFile), txTemplate) {
+        List<File> outFiles = Lists.newArrayList();
+        File outFile = getLocalFile(outputFile);
+        FileUtil.delete(outFile);
+        if (getValueTables().size() == 1) {
+          outFiles.add(outFile);
+        } else {
+          String outputPath = outFile.getAbsolutePath().replaceAll("\\." + ext + "$", "");
+          getValueTables().forEach(vt -> {
+            outFiles.add(new File(outputPath, vt.getName() + "." + ext));
+          });
+        }
+        getValueTables().size();
+        RDatasource ds = new RDatasource(outputFile.getName().getBaseName(), rSession, outFiles, txTemplate) {
           @Override
           protected void onDispose() {
             opalRSessionManager.removeRSession(rSession.getId());
