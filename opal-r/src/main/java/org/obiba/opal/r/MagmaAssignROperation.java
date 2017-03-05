@@ -339,9 +339,14 @@ public class MagmaAssignROperation extends AbstractROperation {
       // parallelize value set extraction
       StreamSupport.stream(table.getValueSets(entities).spliterator(), true) //
           .forEach(valueSet ->
-              variables.forEach(variable -> {
-                Value value = table.getValue(variable, valueSet);
-                variableValues.get(variable.getName()).put(valueSet.getVariableEntity().getIdentifier(), value);
+              transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+                @Override
+                protected void doInTransactionWithoutResult(TransactionStatus status) {
+                  variables.forEach(variable -> {
+                    Value value = table.getValue(variable, valueSet);
+                    variableValues.get(variable.getName()).put(valueSet.getVariableEntity().getIdentifier(), value);
+                  });
+                }
               })
           );
 
