@@ -25,6 +25,8 @@ import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.RList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
@@ -184,18 +186,23 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
     // parallelize value set extraction
     StreamSupport.stream(table.getValueSets(entities).spliterator(), true) //
         .forEach(valueSet ->
-            variables.forEach(variable -> {
-              String identifier = valueSet.getVariableEntity().getIdentifier();
-              Value value = table.getValue(variable, valueSet);
-              if (variable.isRepeatable()) {
-                int seqSize = value.asSequence().getSize();
-                if (!lineCounts.containsKey(identifier)) {
-                  lineCounts.put(identifier, seqSize);
-                } else {
-                  lineCounts.put(identifier, Math.max(lineCounts.get(identifier), seqSize));
-                }
+            magmaAssignROperation.getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
+              @Override
+              protected void doInTransactionWithoutResult(TransactionStatus status) {
+                variables.forEach(variable -> {
+                  String identifier = valueSet.getVariableEntity().getIdentifier();
+                  Value value = table.getValue(variable, valueSet);
+                  if (variable.isRepeatable()) {
+                    int seqSize = value.asSequence().getSize();
+                    if (!lineCounts.containsKey(identifier)) {
+                      lineCounts.put(identifier, seqSize);
+                    } else {
+                      lineCounts.put(identifier, Math.max(lineCounts.get(identifier), seqSize));
+                    }
+                  }
+                  variableValues.get(variable.getName()).put(identifier, value);
+                });
               }
-              variableValues.get(variable.getName()).put(identifier, value);
             })
         );
 
