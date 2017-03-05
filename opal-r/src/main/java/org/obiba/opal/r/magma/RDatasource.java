@@ -25,6 +25,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -43,6 +44,8 @@ public class RDatasource extends AbstractDatasource {
 
   private final File file;
 
+  private List<File> outputFiles;
+
   private final File categoryFile;
 
   private final String symbol;
@@ -54,15 +57,14 @@ public class RDatasource extends AbstractDatasource {
   private String locale;
 
   /**
-   * Empty datasource with file to be written to.
+   * Empty datasource with files to be written to.
    *  @param name
    * @param rSession
    * @param txTemplate
    */
-  public RDatasource(@NotNull String name, OpalRSession rSession, File file, TransactionTemplate txTemplate) {
-    this(name, rSession, file, null, null, null, null);
-    // make sure it is a file to be written
-    file.delete();
+  public RDatasource(@NotNull String name, OpalRSession rSession, List<File> files, TransactionTemplate txTemplate) {
+    this(name, rSession, null, null, null, null, null);
+    this.outputFiles = files;
     this.txTemplate = txTemplate;
   }
 
@@ -137,7 +139,12 @@ public class RDatasource extends AbstractDatasource {
 
   @Override
   public ValueTableWriter createWriter(@NotNull String tableName, @NotNull String entityType) {
-    return new RValueTableWriter(tableName, entityType, file, getRSession(), txTemplate);
+    File outputFile;
+    if (outputFiles.size() == 1)
+      outputFile = outputFiles.get(0);
+    else
+      outputFile = outputFiles.stream().filter(f -> f.getName().startsWith(tableName + ".")).findFirst().get();
+    return new RValueTableWriter(tableName, entityType, outputFile, getRSession(), txTemplate);
   }
 
   private boolean hasCategoryFile() {
