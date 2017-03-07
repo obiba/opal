@@ -13,7 +13,9 @@ package org.obiba.opal.web.vcf;
 import org.obiba.opal.web.model.Plugins;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import java.util.List;
 
 /**
@@ -49,13 +51,14 @@ public interface VCFStoreResource {
    * Add a VCF file at the specified location in Opal file system. If name is not provided, the base name of the file
    * will be used.
    *
+   * @param uriInfo
    * @param vcfPath
    * @param name Optional VCF file base name
    * @return
    */
   @POST
   @Path("/vcfs")
-  Response addVCF(@QueryParam("file") String vcfPath, @QueryParam("name") String name);
+  Response addVCF(@Context UriInfo uriInfo, @QueryParam("file") String vcfPath, @QueryParam("name") String name);
 
   /**
    * Delete a VCF file. Does not fail if such VCF is not found.

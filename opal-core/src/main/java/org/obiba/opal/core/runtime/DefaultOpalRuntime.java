@@ -180,6 +180,11 @@ public class DefaultOpalRuntime implements OpalRuntime {
   }
 
   @Override
+  public boolean hasVCFStoreServices() {
+    return vcfStoreServices.size()>0;
+  }
+
+  @Override
   public Collection<VCFStoreService> getVCFStoreServices() {
     return vcfStoreServices;
   }
