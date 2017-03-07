@@ -82,8 +82,9 @@ public class VCFStoreResourceImpl implements VCFStoreResource {
       String vcfName = name;
       if (Strings.isNullOrEmpty(name)) vcfName = vcfFile.getName();
       store.writeVCF(vcfName, new FileInputStream(vcfFile));
-      String realVcfName = vcfName.replaceAll("\\.vcf\\.gz$", "").replaceAll("\\.vcf$", "");
-      URI vcfUri = uriInfo.getBaseUriBuilder().path("project").path(name).path("vcf-store").path(realVcfName).build();
+      //String realVcfName = vcfName.replaceAll("\\.vcf\\.gz$", "").replaceAll("\\.vcf$", "");
+      //URI vcfUri = uriInfo.getBaseUriBuilder().path("project").path(name).path("vcf-store").path(realVcfName).build();
+      //return Response.created(vcfUri).build();
       return Response.ok().build();
     } catch (FileNotFoundException e) {
       // not supposed to happen as file was verified
