@@ -29,6 +29,13 @@ public interface VCFStore {
   String getName();
 
   /**
+   * The sample IDs of all the VCFs.
+   *
+   * @return
+   */
+  Collection<String> getSampleIds();
+
+  /**
    * Get the names of the VCF that are stored.
    *
    * @return
@@ -87,7 +94,7 @@ public interface VCFStore {
   OutputStream readVCF(String name, Collection<String> samples) throws NoSuchElementException, IOException;
 
   /**
-   * Some metrics about the VCF.
+   * Some metrics about a VCF file.
    */
   interface VCFSummary {
 

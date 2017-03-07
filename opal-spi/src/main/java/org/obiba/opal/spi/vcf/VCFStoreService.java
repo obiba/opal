@@ -22,6 +22,10 @@ public interface VCFStoreService extends ServicePlugin {
 
   public static final String DATA_DIR_PROPERTY = "data.dir";
 
+  public static final String WORK_DIR_PROPERTY = "work.dir";
+
+  public static final String INSTALL_DIR_PROPERTY = "install.dir";
+
   /**
    * Get the registered store names.
    *
