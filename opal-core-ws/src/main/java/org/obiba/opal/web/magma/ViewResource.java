@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.magma;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -22,8 +23,6 @@ import javax.ws.rs.core.Response;
 import org.obiba.opal.web.model.Magma;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
-
-import edu.umd.cs.findbugs.annotations.Nullable;
 
 public interface ViewResource extends TableResource {
 

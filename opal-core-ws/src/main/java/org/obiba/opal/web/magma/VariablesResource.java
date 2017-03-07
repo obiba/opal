@@ -27,7 +27,7 @@ import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.AuthorizeResource;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 
 public interface VariablesResource {
 

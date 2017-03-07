@@ -12,7 +12,7 @@ package org.obiba.opal.web.gwt.app.client.keystore.presenter.commands;
 
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 
 public interface KeystoreCommand {
   void execute(@Nullable ResponseCodeCallback success, @Nullable ResponseCodeCallback failure);

@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Joiner;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 
 @Component("variablesViewResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)

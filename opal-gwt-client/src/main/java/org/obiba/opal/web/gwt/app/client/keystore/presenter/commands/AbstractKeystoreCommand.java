@@ -14,7 +14,7 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.PrivateKeyForm;
 import org.obiba.opal.web.model.client.opal.PublicKeyForm;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 
 public abstract class AbstractKeystoreCommand implements KeystoreCommand {
 

@@ -19,7 +19,7 @@ import javax.ws.rs.core.Response;
 
 import org.obiba.opal.web.model.Magma;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 
 public interface VariableViewResource extends VariableResource {
 

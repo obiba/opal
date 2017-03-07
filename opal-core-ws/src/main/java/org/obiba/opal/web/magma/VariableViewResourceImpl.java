@@ -33,7 +33,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 
 @Component("variableViewResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)

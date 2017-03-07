@@ -44,7 +44,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStream;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 
 @Component
 public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
