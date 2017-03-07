@@ -52,6 +52,11 @@ public class OpalRuntimeMock implements OpalRuntime {
   }
 
   @Override
+  public boolean hasVCFStoreServices() {
+    return false;
+  }
+
+  @Override
   public boolean hasVCFStoreService(String name) {
     return false;
   }

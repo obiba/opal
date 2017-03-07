@@ -77,21 +77,23 @@ public interface VCFStore {
   void deleteVCF(String name);
 
   /**
-   * Read the VCF stored with the given name. The returned stream is a compressed VCF file.
+   * Read the VCF stored with the given name. The stream is a compressed VCF file.
    *
    * @param name
+   * @param out The stream to write to.
    * @return
    */
-  OutputStream readVCF(String name) throws NoSuchElementException, IOException;
+  void readVCF(String name, OutputStream out) throws NoSuchElementException, IOException;
 
   /**
    * Read the VCF stored with the given name, with a subset applied to the provided samples. The returned stream is a compressed VCF file.
    *
    * @param name
+   * @param out The stream to write to.
    * @param samples The sample IDs.
    * @return
    */
-  OutputStream readVCF(String name, Collection<String> samples) throws NoSuchElementException, IOException;
+  void readVCF(String name, OutputStream out, Collection<String> samples) throws NoSuchElementException, IOException;
 
   /**
    * Some metrics about a VCF file.

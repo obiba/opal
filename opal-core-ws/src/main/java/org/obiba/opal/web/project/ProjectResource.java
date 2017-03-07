@@ -37,6 +37,7 @@ import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.security.KeyStoreResource;
+import org.obiba.opal.web.vcf.VCFStoreResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
@@ -115,6 +116,13 @@ public class ProjectResource {
     KeyStoreResource resource = applicationContext.getBean(KeyStoreResource.class);
     OpalKeyStore keyStore = projectsKeyStoreService.getKeyStore(getProject());
     resource.setKeyStore(keyStore);
+    return resource;
+  }
+
+  @Path("/vcf-store")
+  public VCFStoreResource getVCFStoreResource() {
+    VCFStoreResource resource = applicationContext.getBean(VCFStoreResource.class);
+    resource.setName(name);
     return resource;
   }
 

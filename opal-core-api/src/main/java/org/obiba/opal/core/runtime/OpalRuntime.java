@@ -82,6 +82,13 @@ public interface OpalRuntime extends SystemService {
   //
 
   /**
+   * Check if there is any VCF store plugin loaded.
+   *
+   * @return
+   */
+  boolean hasVCFStoreServices();
+
+  /**
    * Get all vcf services.
    *
    * @return
