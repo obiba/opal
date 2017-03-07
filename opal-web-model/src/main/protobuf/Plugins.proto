@@ -1,0 +1,17 @@
+package Plugins;
+
+option java_package = "org.obiba.opal.web.model";
+
+message VCFStoreDto {
+    required string name = 1;
+    repeated string vcf = 2; // VCF file names
+    required int32 samplesCount = 3;
+}
+
+message VCFSummaryDto {
+    required string name = 1; // VCF file name
+    required int64 size = 2; // VCF file size
+    required int32 samplesCount = 3;
+    required int32 variantsCount = 4;
+    required int32 genotypesCount = 5;
+}
