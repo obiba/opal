@@ -12,10 +12,17 @@ package org.obiba.opal.core.runtime;
 import org.obiba.opal.core.service.SystemService;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.spi.vcf.VCFStoreService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
+import java.io.FileInputStream;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Collection;
+import java.util.Properties;
 import java.util.Set;
 
 public interface OpalRuntime extends SystemService {
@@ -78,6 +85,40 @@ public interface OpalRuntime extends SystemService {
   Service getService(String name) throws NoSuchServiceException;
 
   //
+  // Plugins
+  //
+
+  /**
+   * Check if there is any plugin registered in the system.
+   *
+   * @return
+   */
+  boolean hasPlugins();
+
+  /**
+   * Get the plugins registered in the system.
+   *
+   * @return
+   */
+  Collection<Plugin> getPlugins();
+
+  /**
+   * Check if there is a plugin with given name.
+   *
+   * @param name
+   * @return
+   */
+  boolean hasPlugin(String name);
+
+  /**
+   * Get the plugin registered in the system with the given name.
+   *
+   * @param name
+   * @return
+   */
+  Plugin getPlugin(String name);
+
+  //
   // VCF Store Service plugins
   //
 
@@ -111,5 +152,4 @@ public interface OpalRuntime extends SystemService {
    * @throws java.util.NoSuchElementException
    */
   VCFStoreService getVCFStoreService(String name);
-
 }

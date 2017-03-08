@@ -12,11 +12,13 @@ package org.obiba.opal.core.upgrade.support;
 
 import java.util.Collection;
 import java.util.NoSuchElementException;
+import java.util.Properties;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.Plugin;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.spi.vcf.VCFStoreService;
@@ -48,7 +50,27 @@ public class OpalRuntimeMock implements OpalRuntime {
 
   @Override
   public Service getService(String name) throws NoSuchServiceException {
-    return null;
+    throw new NoSuchServiceException(name);
+  }
+
+  @Override
+  public boolean hasPlugins() {
+    return false;
+  }
+
+  @Override
+  public Collection<Plugin> getPlugins() {
+    return Lists.newArrayList();
+  }
+
+  @Override
+  public boolean hasPlugin(String name) {
+    return false;
+  }
+
+  @Override
+  public Plugin getPlugin(String name) {
+    throw new NoSuchElementException(name);
   }
 
   @Override
