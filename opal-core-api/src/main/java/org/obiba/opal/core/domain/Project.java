@@ -51,6 +51,8 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
 
   private String database;
 
+  private String vcfStoreService;
+
   public Project() {
   }
 
@@ -129,6 +131,18 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
 
   public boolean hasDatabase() {
     return !Strings.isNullOrEmpty(database);
+  }
+
+  public boolean hasVCFStoreService() {
+    return !Strings.isNullOrEmpty(vcfStoreService);
+  }
+
+  public String getVCFStoreService() {
+    return vcfStoreService;
+  }
+
+  public void setVCFStoreService(String vcfStore) {
+    this.vcfStoreService = vcfStore;
   }
 
   @Transient
@@ -242,6 +256,11 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
 
     public Builder database(String database) {
       project.setDatabase(database);
+      return this;
+    }
+
+    public Builder vcfStoreService(String service) {
+      project.setVCFStoreService(service);
       return this;
     }
 

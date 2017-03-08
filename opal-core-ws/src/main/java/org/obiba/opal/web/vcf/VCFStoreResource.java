@@ -24,11 +24,12 @@ import java.util.List;
 public interface VCFStoreResource {
 
   /**
-   * The store name.
+   * The store name for the VCF store service.
    *
+   * @param serviceName
    * @param name
    */
-  void setName(String name);
+  void setVCFStore(String serviceName, String name);
 
   /**
    * Get the {@link org.obiba.opal.spi.vcf.VCFStore} details.

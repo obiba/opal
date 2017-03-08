@@ -10,6 +10,7 @@
 package org.obiba.opal.web.project;
 
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -31,10 +32,12 @@ import org.obiba.magma.Timestamped;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.support.UnionTimestamps;
 import org.obiba.opal.core.domain.Project;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.NoSuchProjectException;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
+import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.security.KeyStoreResource;
 import org.obiba.opal.web.vcf.VCFStoreResource;
@@ -48,6 +51,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Scope("request")
 @Path("/project/{name}")
 public class ProjectResource {
+
+  @Autowired
+  private OpalRuntime opalRuntime;
 
   @Autowired
   private ProjectService projectService;
@@ -69,7 +75,6 @@ public class ProjectResource {
   @Transactional(readOnly = true)
   public Projects.ProjectDto get(@Context Request request) {
     Project project = getProject();
-    Timestamped projectTimestamps = new ProjectTimestamps(project);
     return Dtos.asDto(project, projectService.getProjectDirectoryPath(project));
   }
 
@@ -78,7 +83,6 @@ public class ProjectResource {
   @Transactional(readOnly = true)
   public Projects.ProjectSummaryDto getSummary(@Context Request request) {
     Project project = getProject();
-    Datasource ds = project.getDatasource();
     return Dtos.asSummaryDto(project);
   }
 
@@ -105,8 +109,11 @@ public class ProjectResource {
           listener.onDelete(ds);
         }
       }
-    } catch(NoSuchProjectException e) {
-      // silently ignore project not found
+      if (project.hasVCFStoreService() && opalRuntime.hasVCFStoreService(project.getVCFStoreService())) {
+        opalRuntime.getVCFStoreService(project.getVCFStoreService()).deleteStore(project.getName());
+      }
+    } catch(Exception e) {
+      // silently ignore project not found and other errors
     }
     return Response.ok().build();
   }
@@ -121,8 +128,16 @@ public class ProjectResource {
 
   @Path("/vcf-store")
   public VCFStoreResource getVCFStoreResource() {
+    Project project = getProject();
+    if (!opalRuntime.hasVCFStoreServices()) throw new NoSuchElementException("No VCF store service is available");
+    if (!project.hasVCFStoreService()) {
+      // for now get the first one. Some day, the service type will be a project admin choice
+      VCFStoreService service = opalRuntime.getVCFStoreServices().iterator().next();
+      project.setVCFStoreService(service.getName());
+      projectService.save(project);
+    }
     VCFStoreResource resource = applicationContext.getBean(VCFStoreResource.class);
-    resource.setName(name);
+    resource.setVCFStore(project.getVCFStoreService(), name);
     return resource;
   }
 
