@@ -2384,4 +2384,32 @@ public interface Translations extends Constants {
   @Description("Too many repeated errors label")
   @DefaultStringValue("Too many repeated errors. Stopping further requests")
   String tooManyRepeatedErrorsLabel();
+
+  @Description("Genotypes VCF file column header")
+  @DefaultStringValue("VCF File")
+  String vcfFileColumnHeader();
+
+  @Description("Genotypes Samples count column header")
+  @DefaultStringValue("Samples")
+  String vcfSamplesCountColumnHeader();
+
+  @Description("Genotypes Participants count column header")
+  @DefaultStringValue("Participants")
+  String vcfParticipantsCountColumnHeader();
+
+  @Description("Genotypes Orphan count column header")
+  @DefaultStringValue("Orphan Samples")
+  String vcfOrphanSamplesCountColumnHeader();
+
+  @Description("Genotypes Genotypes count column header")
+  @DefaultStringValue("Genotypes")
+  String vcfGenotypesCountColumnHeader();
+
+  @Description("Genotypes Variants count column header")
+  @DefaultStringValue("Variants")
+  String vcfVariantsCountColumnHeader();
+
+  @Description("Genotypes Controls count column header")
+  @DefaultStringValue("Controls")
+  String vcfControlsCountColumnHeader();
 }
