@@ -15,6 +15,7 @@ message ProjectDto {
   optional bool archived = 8 [default = false];
   optional string database = 9;
   optional Magma.TimestampsDto timestamps = 10;
+  optional string vcfStoreService = 11;
 }
 
 message ProjectFactoryDto {
@@ -23,6 +24,7 @@ message ProjectFactoryDto {
   optional string description = 3;
   optional string database = 4;
   repeated string tags = 5;
+  optional string vcfStoreService = 6;
 }
 
 message ProjectSummaryDto {

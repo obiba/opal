@@ -40,15 +40,10 @@ public class Dtos {
         .setDirectory(directory) //
         .setLink(UriBuilder.fromPath("/").path(ProjectResource.class).build(project.getName()).toString())
         .setArchived(project.isArchived());
-    if(project.hasDescription()) {
-      builder.setDescription(project.getDescription());
-    }
-    if(project.hasTags()) {
-      builder.addAllTags(project.getTags());
-    }
-    if(project.hasDatabase()) {
-      builder.setDatabase(project.getDatabase());
-    }
+    if(project.hasDescription()) builder.setDescription(project.getDescription());
+    if(project.hasTags()) builder.addAllTags(project.getTags());
+    if(project.hasDatabase()) builder.setDatabase(project.getDatabase());
+    if(project.hasVCFStoreService()) builder.setVcfStoreService(project.getVCFStoreService());
     Datasource datasource = project.getDatasource();
     builder.setDatasource(org.obiba.opal.web.magma.Dtos.asDto(datasource)
         .setLink(UriBuilder.fromPath("/").path(DatasourceResource.class).build(project.getName()).toString()));
@@ -64,6 +59,7 @@ public class Dtos {
         .title(projectDto.getTitle()) //
         .description(projectDto.getDescription()) //
         .database(projectDto.getDatabase()) //
+        .vcfStoreService(projectDto.getVcfStoreService()) //
         .archived(projectDto.getArchived()) //
         .tags(projectDto.getTagsList()) //
         .build();
@@ -75,6 +71,7 @@ public class Dtos {
         .title(projectFactoryDto.getTitle()) //
         .description(projectFactoryDto.getDescription()) //
         .database(projectFactoryDto.getDatabase()) //
+        .vcfStoreService(projectFactoryDto.getVcfStoreService()) //
         .tags(projectFactoryDto.getTagsList()) //
         .build();
   }

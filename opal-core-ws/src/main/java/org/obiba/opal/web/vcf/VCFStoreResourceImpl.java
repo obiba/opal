@@ -16,6 +16,7 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.spi.vcf.VCFStore;
 import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.model.Plugins;
@@ -53,10 +54,9 @@ public class VCFStoreResourceImpl implements VCFStoreResource {
   private VCFStore store;
 
   @Override
-  public void setName(String name) {
+  public void setVCFStore(String serviceName, String name) {
     if (!opalRuntime.hasVCFStoreServices()) throw new NoSuchElementException("No VCF store service is available");
-    // for now get the first one. Some day, the service type will be a project property
-    VCFStoreService service = opalRuntime.getVCFStoreServices().iterator().next();
+    VCFStoreService service = opalRuntime.getVCFStoreService(serviceName);
     if (!service.hasStore(name)) service.createStore(name);
     store = service.getStore(name);
   }
