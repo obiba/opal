@@ -11,6 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.project.view;
 
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 import org.obiba.opal.web.gwt.app.client.bookmark.icon.BookmarkIconPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -25,6 +26,8 @@ import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.project.admin.ProjectAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectHiddenEvent;
+import org.obiba.opal.web.gwt.app.client.project.genotypes.ProjectGenotypesPresenter;
+import org.obiba.opal.web.gwt.app.client.project.genotypes.ProjectGenotypesView;
 import org.obiba.opal.web.gwt.app.client.project.permissions.ProjectPermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.report.list.ReportsPresenter;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
@@ -60,11 +63,14 @@ import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 public class ProjectPresenter extends Presenter<ProjectPresenter.Display, ProjectPresenter.Proxy>
     implements ProjectUiHandlers, FolderUpdatedEvent.FolderUpdatedHandler {
 
+  Logger logger = Logger.getLogger("ProjectPresenter");
+
   public interface Display extends View, HasUiHandlers<ProjectUiHandlers>, HasTabPanel {
 
     enum ProjectTab {
       TABLES,
       FILES,
+      GENOTYPES,
       REPORTS,
       TASKS,
       PERMISSIONS,
@@ -91,6 +97,9 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   public static final GwtEvent.Type<RevealContentHandler<?>> FILES_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
 
   @ContentSlot
+  public static final GwtEvent.Type<RevealContentHandler<?>> GENOTYPES_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
+
+  @ContentSlot
   public static final GwtEvent.Type<RevealContentHandler<?>> REPORTS_PANE
       = new GwtEvent.Type<RevealContentHandler<?>>();
 
@@ -107,6 +116,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   private final Provider<MagmaPresenter> magmaPresenterProvider;
 
   private final Provider<FileExplorerPresenter> fileExplorerPresenterProvider;
+
+  private final Provider<ProjectGenotypesPresenter> projectGenotypesPresenterProvider;
 
   private final Provider<ReportsPresenter> reportsPresenterProvider;
 
@@ -128,6 +139,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private FileExplorerPresenter fileExplorerPresenter;
 
+  private ProjectGenotypesPresenter projectGenotypesPresenter;
+
   private ReportsPresenter reportsPresenter;
 
   private TasksPresenter tasksPresenter;
@@ -144,6 +157,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
   public ProjectPresenter(EventBus eventBus, Display display, Proxy proxy, PlaceManager placeManager,
       Provider<MagmaPresenter> magmaPresenterProvider, Provider<FileExplorerPresenter> fileExplorerPresenterProvider,
+      Provider<ProjectGenotypesPresenter> projectGenotypesPresenterProvider,
       Provider<ReportsPresenter> reportsPresenterProvider, Provider<TasksPresenter> tasksPresenterProvider,
       Provider<ProjectAdministrationPresenter> projectAdministrationPresenterProvider,
       Provider<ProjectPermissionsPresenter> projectResourcePermissionsProvider,
@@ -153,6 +167,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     this.placeManager = placeManager;
     this.magmaPresenterProvider = magmaPresenterProvider;
     this.fileExplorerPresenterProvider = fileExplorerPresenterProvider;
+    this.projectGenotypesPresenterProvider = projectGenotypesPresenterProvider;
     this.reportsPresenterProvider = reportsPresenterProvider;
     this.tasksPresenterProvider = tasksPresenterProvider;
     this.projectAdministrationPresenterProvider = projectAdministrationPresenterProvider;
@@ -239,6 +254,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   @Override
   public void onTabSelected(int index) {
+    logger.info("ZZZZZ");
+
     String queryPathParam = (String) getView().getTabData(index);
     selectTab(index, queryPathParam);
 
@@ -261,6 +278,9 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
         break;
       case FILES:
         onFilesTabSelected(queryPathParam);
+        break;
+      case GENOTYPES:
+        onGenotypesTabSelected(queryPathParam);
         break;
       case REPORTS:
         onReportsTabSelected();
@@ -296,6 +316,15 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     fireEvent(Strings.isNullOrEmpty(path)
         ? new FolderRequestEvent(FileDtos.project(projectName))
         : new FolderRequestEvent(FileDtos.create(path.split("/"))));
+  }
+
+  private void onGenotypesTabSelected(String path) {
+    logger.info("onGenotypesTabSelected");
+    if(projectGenotypesPresenter == null) {
+      projectGenotypesPresenter = projectGenotypesPresenterProvider.get();
+      setInSlot(GENOTYPES_PANE, projectGenotypesPresenter);
+      projectGenotypesPresenter.initialize(project);
+    }
   }
 
   private void onReportsTabSelected() {
