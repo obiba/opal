@@ -32,6 +32,7 @@ import org.obiba.magma.Timestamped;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.support.UnionTimestamps;
 import org.obiba.opal.core.domain.Project;
+import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.NoSuchProjectException;
@@ -129,7 +130,7 @@ public class ProjectResource {
   @Path("/vcf-store")
   public VCFStoreResource getVCFStoreResource() {
     Project project = getProject();
-    if (!opalRuntime.hasVCFStoreServices()) throw new NoSuchElementException("No VCF store service is available");
+    if (!opalRuntime.hasVCFStoreServices()) throw new NoSuchServiceException(VCFStoreService.SERVICE_TYPE);
     if (!project.hasVCFStoreService()) {
       // for now get the first one. Some day, the service type will be a project admin choice
       VCFStoreService service = opalRuntime.getVCFStoreServices().iterator().next();

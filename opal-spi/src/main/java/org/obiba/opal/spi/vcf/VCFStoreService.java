@@ -20,6 +20,8 @@ import java.util.NoSuchElementException;
  */
 public interface VCFStoreService extends ServicePlugin {
 
+  public static final String SERVICE_TYPE = "vcf-store";
+
   public static final String DATA_DIR_PROPERTY = "data.dir";
 
   public static final String WORK_DIR_PROPERTY = "work.dir";

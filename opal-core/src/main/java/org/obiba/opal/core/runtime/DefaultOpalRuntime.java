@@ -194,7 +194,9 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   @Override
   public VCFStoreService getVCFStoreService(String name) {
-    return vcfStoreServices.stream().filter(s -> name.equals(s.getName())).findFirst().get();
+    Optional<VCFStoreService> service = vcfStoreServices.stream().filter(s -> name.equals(s.getName())).findFirst();
+    if (!service.isPresent()) throw new NoSuchServiceException(VCFStoreService.SERVICE_TYPE);
+    return service.get();
   }
 
   @Override
