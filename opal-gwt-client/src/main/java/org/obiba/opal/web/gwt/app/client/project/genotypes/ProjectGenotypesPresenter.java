@@ -23,13 +23,8 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.VCFSummaryDto;
 
-import java.util.logging.Logger;
-
 public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesPresenter.Display>
     implements ProjectGenotypesUiHandlers {
-
-  Logger logger = Logger.getLogger("ProjectGenotypesPresenter");
-
 
   private ProjectDto projectDto;
 
@@ -75,19 +70,16 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   }
 
   public void refresh() {
-    // TODO handle wrong or missing project name
-
+    getView().beforeRenderRows();
     ResourceRequestBuilderFactory.<JsArray<VCFSummaryDto>>newBuilder()
         .forResource(UriBuilders.PROJECT_VCF_STORE_VCFS.create().build(projectDto.getName()))
         .withCallback(new ResourceCallback<JsArray<VCFSummaryDto>>() {
           @Override
           public void onResource(Response response, JsArray<VCFSummaryDto> summaries) {
             getView().renderRows(summaries);
+            getView().afterRenderRows();
           }
-        })
-        .get()
-        .send();
-
+        }).get().send();
   }
 
   public interface Display extends View, HasUiHandlers<ProjectGenotypesUiHandlers> {

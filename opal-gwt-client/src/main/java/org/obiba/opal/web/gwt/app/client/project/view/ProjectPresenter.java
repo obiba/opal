@@ -312,8 +312,9 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     if(projectGenotypesPresenter == null) {
       projectGenotypesPresenter = projectGenotypesPresenterProvider.get();
       setInSlot(GENOTYPES_PANE, projectGenotypesPresenter);
-      projectGenotypesPresenter.initialize(project);
     }
+
+    projectGenotypesPresenter.initialize(project);
   }
 
   private void onReportsTabSelected() {

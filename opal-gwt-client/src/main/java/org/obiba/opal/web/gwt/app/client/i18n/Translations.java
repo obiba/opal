@@ -143,7 +143,8 @@ public interface Translations extends Constants {
       "MoveDown", "Move down",//
       "Download identifiers", "Download identifiers",//
       "Unregister", "Unregister", //
-      "Terminate", "Terminate" //
+      "Terminate", "Terminate", //
+      "Statistics", "Statistics" //
   })
   Map<String, String> actionMap();
 

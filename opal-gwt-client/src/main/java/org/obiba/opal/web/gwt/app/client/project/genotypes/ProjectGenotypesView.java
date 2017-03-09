@@ -23,7 +23,6 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
@@ -95,28 +94,6 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   private ColumnSortEvent.ListHandler<VCFSummaryDto> typeSortHandler;
 
-  @Override
-  public void beforeRenderRows() {
-    tablePager.setPagerVisible(false);
-    vcfFilesTable.showLoadingIndicator(dataProvider);
-    initializeFilter();
-  }
-
-  @Override
-  public void renderRows(JsArray<VCFSummaryDto> rows) {
-    dataProvider.setList(JsArrays.toList(rows));
-    typeSortHandler.setList(dataProvider.getList());
-    ColumnSortEvent.fire(vcfFilesTable, vcfFilesTable.getColumnSortList());
-    tablePager.firstPage();
-  }
-
-  @Override
-  public void afterRenderRows() {
-    dataProvider.refresh();
-    tablePager.setPagerVisible(vcfFilesTable.getRowCount() > Table.DEFAULT_PAGESIZE);
-    vcfFilesTable.hideLoadingIndicator();
-  }
-
   interface Binder extends UiBinder<Widget, ProjectGenotypesView> {
   }
 
@@ -126,12 +103,29 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     this.translations = translations;
     this.translationMessages = translationMessages;
     addTableColumns();
+    initializeFilter();
   }
 
   @Override
-  public void setInSlot(Object slot, IsWidget content) {
-    if (content != null) {
-    }
+  public void beforeRenderRows() {
+    tablePager.setPagerVisible(false);
+    vcfFilesTable.showLoadingIndicator(dataProvider);
+    initializeFilter();
+  }
+
+  @Override
+  public void afterRenderRows() {
+    dataProvider.refresh();
+    tablePager.setPagerVisible(vcfFilesTable.getRowCount() > Table.DEFAULT_PAGESIZE);
+    vcfFilesTable.hideLoadingIndicator();
+  }
+
+  @Override
+  public void renderRows(JsArray<VCFSummaryDto> rows) {
+    dataProvider.setList(JsArrays.toList(rows));
+    typeSortHandler.setList(dataProvider.getList());
+    ColumnSortEvent.fire(vcfFilesTable, vcfFilesTable.getColumnSortList());
+    tablePager.firstPage();
   }
 
   private void initializeFilter() {
@@ -156,8 +150,8 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     dataProvider.addDataDisplay(vcfFilesTable);
     initializeSortableColumns();
     vcfFilesTable.setSelectionModel(new SingleSelectionModel<VCFSummaryDto>());
-    vcfFilesTable.setEmptyTableWidget(new InlineLabel(translationMessages.vcfFilesCount(0)));
     vcfFilesTable.setPageSize(Table.DEFAULT_PAGESIZE);
+    vcfFilesTable.setEmptyTableWidget(new InlineLabel(translationMessages.vcfFilesCount(0)));
     tablePager.setDisplay(vcfFilesTable);
   }
 
@@ -187,12 +181,12 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
     @Override
     public Table<VCFSummaryDto> getTable() {
-      return null;
+      return vcfFilesTable;
     }
 
     @Override
     public Object getItemKey(VCFSummaryDto item) {
-      return vcfFilesTable;
+      return item.getName();
     }
 
     @Override
@@ -299,9 +293,9 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   private class GenotypesActionsColumn extends ActionsColumn<VCFSummaryDto> {
 
-    private static final String DOWNLOAD_ACTION = "Download";
+    public static final String DOWNLOAD_ACTION = "Download";
 
-    private static final String STATISTICS_ACTION = "Statistics";
+    public static final String STATISTICS_ACTION = "Statistics";
 
     private GenotypesActionsColumn() {
       super(new ActionsProvider<VCFSummaryDto>() {

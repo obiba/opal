@@ -96,11 +96,11 @@
       </b:Row>
     </g:FlowPanel>
 
-    <g:FlowPanel>
-      <b:Button icon="UPLOAD" ui:field="importVCF" addStyleNames="pull-left">
-        <ui:msg description="Genotypes Import vcfFile label">Import VCF Files</ui:msg>
-      </b:Button>
+    <b:Button icon="UPLOAD" ui:field="importVCF" addStyleNames="pull-left">
+      <ui:msg description="Genotypes Import vcfFile label">Import VCF Files</ui:msg>
+    </b:Button>
 
+    <g:FlowPanel>
       <b:Button icon="DOWNLOAD" ui:field="downloadVCF" addStyleNames="pull-right">
         <ui:msg description="Genotypes Download vcfFile label">Download VCF Files</ui:msg>
       </b:Button>
@@ -112,9 +112,9 @@
           <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
         </b:InputAddOn>
       </b:Controls>
-
-      <o:Table ui:field="vcfFilesTable" addStyleNames="small-top-margin"/>
     </g:FlowPanel>
+
+    <o:Table ui:field="vcfFilesTable" addStyleNames="small-top-margin"/>
   </g:FlowPanel>
 
 </ui:UiBinder>
