@@ -11,6 +11,8 @@
 package org.obiba.opal.web.gwt.app.client.project.genotypes;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -21,9 +23,16 @@ import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersTableModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportPresenter;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.EncryptDownloadModalPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfFileUploadRequestEvent;
 import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.VCFSummaryDto;
@@ -32,8 +41,16 @@ import java.util.logging.Logger;
 
 import static com.google.gwt.http.client.Response.*;
 
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
 public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesPresenter.Display>
     implements ProjectGenotypesUiHandlers {
+
+  private static final String ENTITY_TYPE_PARAM = "entityType";
+
+  private static final String ENTITY_TYPE = "Sample";
 
   private ProjectDto projectDto;
 
@@ -42,9 +59,17 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   private final ModalProvider<ProjectImportVcfFileModalPresenter> vcfFileUploadModalPresenterModalProvider;
 
+  private final ModalProvider<ProjectGenotypeEditMappingTableModalPresenter> projectGenotypeEditMappingTableModalPresenterModalProvider;
+
+  private List<TableDto> sampleTables = Lists.newArrayList();
+
+  private static Logger logger = Logger.getLogger("ProjectGenotypesPresenter");
+
   @Inject
   public ProjectGenotypesPresenter(Display display, EventBus eventBus,
                                    ModalProvider<ProjectImportVcfFileModalPresenter> vcfFileUploadModalPresenterModalProvider) {
+                                   ModalProvider<ProjectImportVcfFileModalPresenter> importVcfFileModalPresenterModalProvider,
+                                   ModalProvider<ProjectGenotypeEditMappingTableModalPresenter> editMappingTableModalPresenterModalProvider) {
     super(eventBus, display);
     getView().setUiHandlers(this);
     this.vcfFileUploadModalPresenterModalProvider = vcfFileUploadModalPresenterModalProvider.setContainer(this);
@@ -59,6 +84,8 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
         uploadVcfFile(event.getFile(), event.getName());
       }
     });
+    projectImportVcfFileModalPresenterModalProvider = importVcfFileModalPresenterModalProvider.setContainer(this);
+    projectGenotypeEditMappingTableModalPresenterModalProvider = editMappingTableModalPresenterModalProvider.setContainer(this);
   }
 
   @Override
@@ -73,11 +100,17 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   @Override
   public void onDownloadVcfFiles() {
+
   }
 
   @Override
   public void onImportVcfFiles() {
     vcfFileUploadModalPresenterModalProvider.get();
+  }
+
+  @Override
+  public void onEditMappingTable() {
+    projectGenotypeEditMappingTableModalPresenterModalProvider.get();
   }
 
   @Override
@@ -154,6 +187,21 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
     public void onResponseCode(Request request, Response response) {
       logger.info("Somthing happened");
     }
+  }
+
+  private void refreshMappingTable() {
+    Map<String, String> params = Maps.newHashMap();
+    params.put(ENTITY_TYPE_PARAM, ENTITY_TYPE);
+
+    ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder()
+        .forResource(UriBuilders.DATASOURCE_TABLES.create().query(params).build(projectDto.getName()))
+        .withCallback(new ResourceCallback<JsArray<TableDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<TableDto> resource) {
+            sampleTables = JsArrays.toList(resource);
+            logger.info(sampleTables.size() + " mapping tables");
+          }
+        }).get().send();
   }
 
   public interface Display extends View, HasUiHandlers<ProjectGenotypesUiHandlers> {

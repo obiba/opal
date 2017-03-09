@@ -1616,6 +1616,10 @@ public interface Translations extends Constants {
   @Constants.DefaultStringValue("Filter tables...")
   String filterTables();
 
+  @Description("Filter VCFs label")
+  @Constants.DefaultStringValue("Filter VCFs...")
+  String filterVCFs();
+
   @Description("Filter Project label")
   @Constants.DefaultStringValue("Filter projects...")
   String filterProjects();
@@ -2029,6 +2033,10 @@ public interface Translations extends Constants {
   @Description("Project Database Name label")
   @DefaultStringValue("Project tables (dictionaries and data) are stored in the database:")
   String projectDatabaseName();
+
+  @Description("Genotype Edit Mapping Modal title")
+  @DefaultStringValue("Edit Mapping")
+  String projectGenotypeEditMappingeModalTitle();
 
   @Description("Default Character Set label")
   @DefaultStringValue("Default Character Set")

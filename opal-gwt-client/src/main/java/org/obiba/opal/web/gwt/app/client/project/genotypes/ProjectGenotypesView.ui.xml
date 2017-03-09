@@ -25,6 +25,7 @@
               <ui:msg description="Genotypes Genotypes Summary label">Summary</ui:msg>
             </b:Heading>
           </g:FlowPanel>
+
           <o:PropertiesTable keyStyleNames="span2">
             <o:PropertyPanel>
               <g:Label>
@@ -58,6 +59,10 @@
             <b:Heading size="4" addStyleNames="inline-block small-top-margin">
               <ui:msg description="Genotypes Mapping Table label">Mapping Table</ui:msg>
             </b:Heading>
+
+            <b:Button ui:field="editMapping" addStyleNames="pull-right">
+              <ui:msg description="Genotypes Edit Mapping Table label">Edit</ui:msg>
+            </b:Button>
           </g:FlowPanel>
 
           <o:PropertiesTable keyStyleNames="span2">
