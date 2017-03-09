@@ -57,7 +57,7 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
 
   public static final String INI_REALM = "opal-ini-realm";
 
-  private static final long SESSION_VALIDATION_INTERVAL = 3600000l; // 1 hour
+  private static final long SESSION_VALIDATION_INTERVAL = 300000l; // 5 minutes
 
   @Autowired
   private Set<Realm> realms;
