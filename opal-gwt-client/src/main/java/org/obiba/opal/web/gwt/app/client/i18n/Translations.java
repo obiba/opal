@@ -143,7 +143,8 @@ public interface Translations extends Constants {
       "MoveDown", "Move down",//
       "Download identifiers", "Download identifiers",//
       "Unregister", "Unregister", //
-      "Terminate", "Terminate" //
+      "Terminate", "Terminate", //
+      "Statistics", "Statistics" //
   })
   Map<String, String> actionMap();
 
@@ -499,6 +500,7 @@ public interface Translations extends Constants {
       "OldPasswordIsRequired", "Old password is required.",//
       "OldPasswordMismatch", "Your old password is invalid.",//
       "PasswordNotChanged", "You must choose a different password than your current password.",//
+      "NameIsRequired", "A name is required.",//
       "PasswordIsRequired", "A password is required.",//
       "InvalidCertificate", "The certificate is not valid.",//
       "CertificateIsRequired", "A certificate is required.",//

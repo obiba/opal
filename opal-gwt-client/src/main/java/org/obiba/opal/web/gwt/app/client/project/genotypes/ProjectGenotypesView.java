@@ -35,14 +35,19 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.model.client.opal.VCFSummaryDto;
 
+import java.util.Comparator;
+
 public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiHandlers>
     implements ProjectGenotypesPresenter.Display {
+
+  private static final int SORTABLE_COLUMN_VCF_FILE = 1;
 
   @UiField
   Label participants;
@@ -77,6 +82,9 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   @UiField
   OpalSimplePager tablePager;
 
+  @UiField
+  TextBoxClearable filter;
+
   private final Translations translations;
 
   private final TranslationMessages translationMessages;
@@ -87,14 +95,6 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   private ColumnSortEvent.ListHandler<VCFSummaryDto> typeSortHandler;
 
-  @Override
-  public void renderRows(JsArray<VCFSummaryDto> rows) {
-    dataProvider.setList(JsArrays.toList(rows));
-    typeSortHandler.setList(dataProvider.getList());
-    ColumnSortEvent.fire(vcfFilesTable, vcfFilesTable.getColumnSortList());
-    tablePager.firstPage();
-  }
-
   interface Binder extends UiBinder<Widget, ProjectGenotypesView> {
   }
 
@@ -104,12 +104,36 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     this.translations = translations;
     this.translationMessages = translationMessages;
     addTableColumns();
+    initializeFilter();
   }
 
   @Override
-  public void setInSlot(Object slot, IsWidget content) {
-    if (content != null) {
-    }
+  public void beforeRenderRows() {
+    tablePager.setPagerVisible(false);
+    vcfFilesTable.showLoadingIndicator(dataProvider);
+    initializeFilter();
+  }
+
+  @Override
+  public void afterRenderRows() {
+    dataProvider.refresh();
+    tablePager.setPagerVisible(vcfFilesTable.getRowCount() > Table.DEFAULT_PAGESIZE);
+    vcfFilesTable.hideLoadingIndicator();
+  }
+
+  @Override
+  public void renderRows(JsArray<VCFSummaryDto> rows) {
+    dataProvider.setList(JsArrays.toList(rows));
+    typeSortHandler.setList(dataProvider.getList());
+    ColumnSortEvent.fire(vcfFilesTable, vcfFilesTable.getColumnSortList());
+    tablePager.firstPage();
+  }
+
+  private void initializeFilter() {
+    filter.setText("");
+    filter.getTextBox().setPlaceholder(translations.filterTables());
+    filter.getTextBox().addStyleName("input-xlarge");
+    filter.getClear().setTitle(translations.clearFilter());
   }
 
   @UiHandler("downloadVCF")
@@ -127,8 +151,8 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     dataProvider.addDataDisplay(vcfFilesTable);
     initializeSortableColumns();
     vcfFilesTable.setSelectionModel(new SingleSelectionModel<VCFSummaryDto>());
-    vcfFilesTable.setEmptyTableWidget(new InlineLabel(translationMessages.tableCount(0)));
     vcfFilesTable.setPageSize(Table.DEFAULT_PAGESIZE);
+    vcfFilesTable.setEmptyTableWidget(new InlineLabel(translationMessages.vcfFilesCount(0)));
     tablePager.setDisplay(vcfFilesTable);
   }
 
@@ -147,19 +171,23 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   }
 
   private void initializeSortableColumns() {
-
+    typeSortHandler = new ColumnSortEvent.ListHandler<VCFSummaryDto>(dataProvider.getList());
+    typeSortHandler.setComparator(vcfFilesTable.getColumn(SORTABLE_COLUMN_VCF_FILE), new VCFFileNameComparator());
+    vcfFilesTable.getHeader(SORTABLE_COLUMN_VCF_FILE).setHeaderStyleNames("sortable-header-column");
+    vcfFilesTable.getColumnSortList().push(vcfFilesTable.getColumn(SORTABLE_COLUMN_VCF_FILE));
+    vcfFilesTable.addColumnSortHandler(typeSortHandler);
   }
 
   private class ProjectGenotypesCheckStatusDisplay implements CheckboxColumn.Display<VCFSummaryDto> {
 
     @Override
     public Table<VCFSummaryDto> getTable() {
-      return null;
+      return vcfFilesTable;
     }
 
     @Override
     public Object getItemKey(VCFSummaryDto item) {
-      return vcfFilesTable;
+      return item.getName();
     }
 
     @Override
@@ -256,11 +284,19 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     };
   }
 
+  private static final class VCFFileNameComparator implements Comparator<VCFSummaryDto> {
+
+    @Override
+    public int compare(VCFSummaryDto o1, VCFSummaryDto o2) {
+      return o1.getName().compareTo(o2.getName());
+    }
+  }
+
   private class GenotypesActionsColumn extends ActionsColumn<VCFSummaryDto> {
 
-    private static final String DOWNLOAD_ACTION = "Download";
+    public static final String DOWNLOAD_ACTION = "Download";
 
-    private static final String STATISTICS_ACTION = "Statistics";
+    public static final String STATISTICS_ACTION = "Statistics";
 
     private GenotypesActionsColumn() {
       super(new ActionsProvider<VCFSummaryDto>() {
