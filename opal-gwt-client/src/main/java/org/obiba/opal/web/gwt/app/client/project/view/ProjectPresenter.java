@@ -10,38 +10,6 @@
 
 package org.obiba.opal.web.gwt.app.client.project.view;
 
-import java.util.Arrays;
-import java.util.logging.Logger;
-
-import org.obiba.opal.web.gwt.app.client.bookmark.icon.BookmarkIconPresenter;
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
-import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.event.MagmaPathSelectionEvent;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
-import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
-import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
-import org.obiba.opal.web.gwt.app.client.project.admin.ProjectAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.project.event.ProjectHiddenEvent;
-import org.obiba.opal.web.gwt.app.client.project.genotypes.ProjectGenotypesPresenter;
-import org.obiba.opal.web.gwt.app.client.project.genotypes.ProjectGenotypesView;
-import org.obiba.opal.web.gwt.app.client.project.permissions.ProjectPermissionsPresenter;
-import org.obiba.opal.web.gwt.app.client.report.list.ReportsPresenter;
-import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
-import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
-import org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter;
-import org.obiba.opal.web.gwt.app.client.ui.HasTabPanel;
-import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.opal.ProjectDto;
-
 import com.google.common.base.Strings;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.http.client.Request;
@@ -56,14 +24,38 @@ import com.gwtplatform.mvp.client.annotations.ContentSlot;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
+import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
+import org.obiba.opal.web.gwt.app.client.bookmark.icon.BookmarkIconPresenter;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.event.MagmaPathSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
+import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.project.admin.ProjectAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.project.event.ProjectHiddenEvent;
+import org.obiba.opal.web.gwt.app.client.project.genotypes.ProjectGenotypesPresenter;
+import org.obiba.opal.web.gwt.app.client.project.permissions.ProjectPermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.report.list.ReportsPresenter;
+import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
+import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
+import org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter;
+import org.obiba.opal.web.gwt.app.client.ui.HasTabPanel;
+import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.opal.ProjectDto;
+
+import java.util.Arrays;
 
 public class ProjectPresenter extends Presenter<ProjectPresenter.Display, ProjectPresenter.Proxy>
     implements ProjectUiHandlers, FolderUpdatedEvent.FolderUpdatedHandler {
 
-  Logger logger = Logger.getLogger("ProjectPresenter");
 
   public interface Display extends View, HasUiHandlers<ProjectUiHandlers>, HasTabPanel {
 
@@ -254,8 +246,6 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   @Override
   public void onTabSelected(int index) {
-    logger.info("ZZZZZ");
-
     String queryPathParam = (String) getView().getTabData(index);
     selectTab(index, queryPathParam);
 
@@ -319,7 +309,6 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   }
 
   private void onGenotypesTabSelected(String path) {
-    logger.info("onGenotypesTabSelected");
     if(projectGenotypesPresenter == null) {
       projectGenotypesPresenter = projectGenotypesPresenterProvider.get();
       setInSlot(GENOTYPES_PANE, projectGenotypesPresenter);
