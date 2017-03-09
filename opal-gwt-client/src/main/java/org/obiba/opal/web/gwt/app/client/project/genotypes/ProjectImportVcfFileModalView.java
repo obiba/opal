@@ -21,9 +21,11 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePanel;
 
 import javax.annotation.Nullable;
 
@@ -41,6 +43,10 @@ public class ProjectImportVcfFileModalView extends ModalPopupViewWithUiHandlers<
   ControlGroup nameGroup;
   @UiField
   TextBox name;
+  @UiField
+  OpalSimplePanel vcfFilePanel;
+  @UiField
+  ControlGroup fileGroup;
 
   @Inject
   public ProjectImportVcfFileModalView(EventBus eventBus, Binder binder, Translations translations) {
@@ -69,6 +75,12 @@ public class ProjectImportVcfFileModalView extends ModalPopupViewWithUiHandlers<
   }
 
   @Override
+  public void setFileSelectorWidgetDisplay(FileSelectionPresenter.Display display) {
+    vcfFilePanel.setWidget(display.asWidget());
+    display.setFieldWidth("20em");
+  }
+
+  @Override
   public HasText getName() {
     return name;
   }
@@ -83,8 +95,11 @@ public class ProjectImportVcfFileModalView extends ModalPopupViewWithUiHandlers<
     ControlGroup group = null;
     if(formField != null) {
       switch(formField) {
+        case FILE:
+          group = fileGroup ;
+          break;
         case NAME:
-          group = nameGroup;
+          group = nameGroup ;
           break;
       }
     }

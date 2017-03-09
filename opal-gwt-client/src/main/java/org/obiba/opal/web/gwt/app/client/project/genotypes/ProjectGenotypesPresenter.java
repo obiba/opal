@@ -10,34 +10,55 @@
 
 package org.obiba.opal.web.gwt.app.client.project.genotypes;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.EncryptDownloadModalPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersTableModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfFileUploadRequestEvent;
+import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.VCFSummaryDto;
+
+import java.util.logging.Logger;
+
+import static com.google.gwt.http.client.Response.*;
 
 public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesPresenter.Display>
     implements ProjectGenotypesUiHandlers {
 
   private ProjectDto projectDto;
 
-  private final ModalProvider<ProjectImportVcfFileModalPresenter> projectImportVcfFileModalPresenterModalProvider;
+  private static Logger logger = Logger.getLogger("ProjectGenotypesPresenter");
+
+
+  private final ModalProvider<ProjectImportVcfFileModalPresenter> vcfFileUploadModalPresenterModalProvider;
 
   @Inject
   public ProjectGenotypesPresenter(Display display, EventBus eventBus,
-                                   ModalProvider<ProjectImportVcfFileModalPresenter> importVcfFileModalPresenterModalProvider) {
+                                   ModalProvider<ProjectImportVcfFileModalPresenter> vcfFileUploadModalPresenterModalProvider) {
     super(eventBus, display);
     getView().setUiHandlers(this);
-    projectImportVcfFileModalPresenterModalProvider = importVcfFileModalPresenterModalProvider.setContainer(this);
+    this.vcfFileUploadModalPresenterModalProvider = vcfFileUploadModalPresenterModalProvider.setContainer(this);
+    initializeEventListeners();
+  }
+
+  private void initializeEventListeners() {
+    addRegisteredHandler(VcfFileUploadRequestEvent.getType(), new VcfFileUploadRequestEvent.VcfFileUploadRequestHandler() {
+
+      @Override
+      public void onVcfFileUploadRequest(VcfFileUploadRequestEvent event) {
+        uploadVcfFile(event.getFile(), event.getName());
+      }
+    });
   }
 
   @Override
@@ -52,17 +73,16 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   @Override
   public void onDownloadVcfFiles() {
-
   }
 
   @Override
   public void onImportVcfFiles() {
-    projectImportVcfFileModalPresenterModalProvider.get();
+    vcfFileUploadModalPresenterModalProvider.get();
   }
 
   @Override
   public void onRemoveVcfFile(VCFSummaryDto vcfSummaryDto) {
-
+    removeVcfFile(vcfSummaryDto.getName());
   }
 
   @Override
@@ -85,7 +105,55 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
             getView().renderRows(summaries);
             getView().afterRenderRows();
           }
-        }).get().send();
+        })
+        .get()
+        .send();
+  }
+
+  private void removeVcfFile(String name) {
+    logger.info("Remove VCF file " + name);
+    ResourceRequestBuilderFactory
+            .newBuilder()
+            .forResource(UriBuilders.PROJECT_VCF_STORE_VCF.create().build(projectDto.getName(), name))
+            .delete()
+            .withCallback(new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                logger.info("Deleted file");
+                refresh();
+              }
+            }, SC_NO_CONTENT)
+            .withCallback(new ErrorResponseCallback(), SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR)
+            .send();
+  }
+
+  private void uploadVcfFile(String file, String name) {
+    logger.info("Upload requested " + file + " " + name);
+    UriBuilder uri = UriBuilders.PROJECT_VCF_STORE_VCFS
+            .create()
+            .query("file", file);
+
+    if (!Strings.isNullOrEmpty(name)) uri.query("name", name);
+
+    ResourceRequestBuilderFactory
+            .newBuilder()
+            .forResource(uri.build(projectDto.getName()))
+            .post()
+            .withCallback(SC_OK, new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                refresh();
+              }
+            })
+            .withCallback(new ErrorResponseCallback(), SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR)
+            .send();
+  }
+
+  private static class ErrorResponseCallback implements ResponseCodeCallback {
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      logger.info("Somthing happened");
+    }
   }
 
   public interface Display extends View, HasUiHandlers<ProjectGenotypesUiHandlers> {

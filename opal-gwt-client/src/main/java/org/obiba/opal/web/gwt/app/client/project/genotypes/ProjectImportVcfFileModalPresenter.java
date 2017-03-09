@@ -10,43 +10,64 @@
 package org.obiba.opal.web.gwt.app.client.project.genotypes;
 
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
-import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
+import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfFileUploadRequestEvent;
+import org.obiba.opal.web.gwt.app.client.validator.*;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 
 public class ProjectImportVcfFileModalPresenter extends ModalPresenterWidget<ProjectImportVcfFileModalPresenter.Display>
     implements ProjectImportVcfFileModalUiHandlers {
 
+
+  private static Logger logger = Logger.getLogger("ProjectImportVcfFileModalPresenter");
+
   private final ValidationHandler validationHandler;
 
+  private final FileSelectionPresenter fileSelectionPresenter;
+
   @Inject
-  public ProjectImportVcfFileModalPresenter(Display display, EventBus eventBus) {
+  public ProjectImportVcfFileModalPresenter(Display display,
+                                            EventBus eventBus,
+                                            FileSelectionPresenter fileSelection) {
     super(eventBus, display);
     getView().setUiHandlers(this);
+    fileSelectionPresenter = fileSelection;
     validationHandler = new ModalValidationHandler();
+
   }
 
   @Override
   protected void onBind() {
+    fileSelectionPresenter.bind();
+    fileSelectionPresenter.setFileSelectionType(FileSelectorPresenter.FileSelectionType.FILE);
+    getView().setFileSelectorWidgetDisplay(fileSelectionPresenter.getView());
+  }
+
+  @Override
+  protected void onUnbind() {
+    fileSelectionPresenter.unbind();
   }
 
   @Override
   public void onImport() {
     getView().clearErrors();
     if(validationHandler.validate()) {
-
+      fireEvent(new VcfFileUploadRequestEvent.Builder(fileSelectionPresenter.getSelectedFile())
+              .name(getView().getName().getText())
+              .build());
+      getView().hideDialog();
     }
-
   }
 
   private class ModalValidationHandler extends ViewValidationHandler {
@@ -57,10 +78,20 @@ public class ProjectImportVcfFileModalPresenter extends ModalPresenterWidget<Pro
     protected Set<FieldValidator> getValidators() {
       if(validators == null) {
         validators = new LinkedHashSet<>();
-        validators.add(new RequiredTextValidator(getView().getName(),
-                "NameIsRequired", Display.FormField.NAME.name()));
+        validators.add(new ConditionValidator(vcfFileExtensionCondition(fileSelectionPresenter.getSelectedFile()),
+                "VCFFileRequired",
+                Display.FormField.FILE.name()));
       }
       return validators;
+    }
+
+    private HasValue<Boolean> vcfFileExtensionCondition(final String selectedFile) {
+      return new HasBooleanValue() {
+        @Override
+        public Boolean getValue() {
+          return selectedFile.toLowerCase().endsWith(".vcf") || selectedFile.toLowerCase().endsWith(".vcf.gz");
+        }
+      };
     }
 
     @Override
@@ -73,8 +104,11 @@ public class ProjectImportVcfFileModalPresenter extends ModalPresenterWidget<Pro
   public interface Display extends PopupView, HasUiHandlers<ProjectImportVcfFileModalUiHandlers> {
 
     enum FormField {
+      FILE,
       NAME
     }
+
+    void setFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
 
     HasText getName();
 
