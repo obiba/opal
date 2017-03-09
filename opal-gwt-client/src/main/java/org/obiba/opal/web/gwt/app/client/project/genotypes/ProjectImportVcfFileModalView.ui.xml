@@ -16,6 +16,18 @@
 
   <o:Modal ui:field="dialog" closeVisible="true" keyboard="true" animation="false">
 
+    <b:ControlGroup ui:field="fileGroup">
+      <b:ControlLabel>
+        <ui:msg description="Genotypes Import file name label">Name</ui:msg>
+      </b:ControlLabel>
+      <b:Controls>
+        <o:OpalSimplePanel ui:field="vcfFilePanel"/>
+      </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="Genotypes Import file content help">The file readable name.</ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+
     <b:ControlGroup ui:field="nameGroup">
       <b:ControlLabel>
         <ui:msg description="Genotypes Import file name label">Name</ui:msg>
@@ -30,7 +42,7 @@
 
     <b:ModalFooter>
       <b:Button ui:field="importButton" type="PRIMARY">
-        <ui:msg description="Genotypes Importdownload label">Download</ui:msg>
+        <ui:msg description="Genotypes Import  label">Import</ui:msg>
       </b:Button>
       <b:Button ui:field="cancelButton">
         <ui:msg description="Cancel button label">Cancel</ui:msg>
