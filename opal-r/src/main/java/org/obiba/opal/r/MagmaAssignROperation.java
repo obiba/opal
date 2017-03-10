@@ -302,8 +302,8 @@ public class MagmaAssignROperation extends AbstractROperation {
      * @return
      */
     private RList getVariableVectorsFromRawTable() {
-      List<REXP> contents = Collections.synchronizedList(Lists.newArrayList());
-      List<String> names = Collections.synchronizedList(Lists.newArrayList());
+      List<REXP> contents = Lists.newArrayList();
+      List<String> names = Lists.newArrayList();
 
       // vector for each variable
       StreamSupport.stream(filterVariables().spliterator(), true) //
@@ -313,13 +313,25 @@ public class MagmaAssignROperation extends AbstractROperation {
               transactionTemplate.execute(new TransactionCallbackWithoutResult() {
                 @Override
                 protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
-                  contents.add(getVector(vvs, getEntities(), withMissings));
-                  names.add(vvs.getVariable().getName());
+                  addVariableVector(names, vvs.getVariable().getName(), contents, getVector(vvs, getEntities(), withMissings));
                 }
               })
           );
 
       return new RList(contents, names);
+    }
+
+    /**
+     * Add both variable name and vector of values to the provided lists in a atomic way.
+     *
+     * @param names
+     * @param name
+     * @param contents
+     * @param vector
+     */
+    private synchronized void addVariableVector(List<String> names, String name, List<REXP> contents, REXP vector) {
+      contents.add(vector);
+      names.add(name);
     }
 
     /**
