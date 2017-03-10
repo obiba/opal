@@ -331,7 +331,7 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
   }
 
   private List<IdentifiersMaps.IdentifiersMap> getUnitIdentifiers(String entityType) {
-    return StreamSupport.stream(new IdentifiersMaps(getValueTable(entityType), name).spliterator(), true) //
+    return StreamSupport.stream(new IdentifiersMaps(getValueTable(entityType), name).spliterator(), false) //
     .filter(map -> map != null && map.hasPrivateIdentifier()) //
     .collect(Collectors.toList());
   }
