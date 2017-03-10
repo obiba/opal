@@ -21,29 +21,19 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
-import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersTableModalPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportPresenter;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.EncryptDownloadModalPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfFileUploadRequestEvent;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.VCFSummaryDto;
-
-import java.util.logging.Logger;
-
-import static com.google.gwt.http.client.Response.*;
 
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import static com.google.gwt.http.client.Response.*;
 
 public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesPresenter.Display>
     implements ProjectGenotypesUiHandlers {
@@ -52,10 +42,9 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   private static final String ENTITY_TYPE = "Sample";
 
-  private ProjectDto projectDto;
-
   private static Logger logger = Logger.getLogger("ProjectGenotypesPresenter");
 
+  private ProjectDto projectDto;
 
   private final ModalProvider<ProjectImportVcfFileModalPresenter> vcfFileUploadModalPresenterModalProvider;
 
@@ -63,16 +52,14 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   private List<TableDto> sampleTables = Lists.newArrayList();
 
-  private static Logger logger = Logger.getLogger("ProjectGenotypesPresenter");
-
   @Inject
   public ProjectGenotypesPresenter(Display display, EventBus eventBus,
-                                   ModalProvider<ProjectImportVcfFileModalPresenter> vcfFileUploadModalPresenterModalProvider) {
-                                   ModalProvider<ProjectImportVcfFileModalPresenter> importVcfFileModalPresenterModalProvider,
+                                   ModalProvider<ProjectImportVcfFileModalPresenter> vcfFileUploadModalPresenterModalProvider,
                                    ModalProvider<ProjectGenotypeEditMappingTableModalPresenter> editMappingTableModalPresenterModalProvider) {
     super(eventBus, display);
     getView().setUiHandlers(this);
     this.vcfFileUploadModalPresenterModalProvider = vcfFileUploadModalPresenterModalProvider.setContainer(this);
+    this.projectGenotypeEditMappingTableModalPresenterModalProvider = editMappingTableModalPresenterModalProvider.setContainer(this);
     initializeEventListeners();
   }
 
@@ -84,8 +71,6 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
         uploadVcfFile(event.getFile(), event.getName());
       }
     });
-    projectImportVcfFileModalPresenterModalProvider = importVcfFileModalPresenterModalProvider.setContainer(this);
-    projectGenotypeEditMappingTableModalPresenterModalProvider = editMappingTableModalPresenterModalProvider.setContainer(this);
   }
 
   @Override
@@ -100,7 +85,6 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   @Override
   public void onDownloadVcfFiles() {
-
   }
 
   @Override
@@ -146,40 +130,40 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   private void removeVcfFile(String name) {
     logger.info("Remove VCF file " + name);
     ResourceRequestBuilderFactory
-            .newBuilder()
-            .forResource(UriBuilders.PROJECT_VCF_STORE_VCF.create().build(projectDto.getName(), name))
-            .delete()
-            .withCallback(new ResponseCodeCallback() {
-              @Override
-              public void onResponseCode(Request request, Response response) {
-                logger.info("Deleted file");
-                refresh();
-              }
-            }, SC_NO_CONTENT)
-            .withCallback(new ErrorResponseCallback(), SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR)
-            .send();
+        .newBuilder()
+        .forResource(UriBuilders.PROJECT_VCF_STORE_VCF.create().build(projectDto.getName(), name))
+        .delete()
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            logger.info("Deleted file");
+            refresh();
+          }
+        }, SC_NO_CONTENT)
+        .withCallback(new ErrorResponseCallback(), SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR)
+        .send();
   }
 
   private void uploadVcfFile(String file, String name) {
     logger.info("Upload requested " + file + " " + name);
     UriBuilder uri = UriBuilders.PROJECT_VCF_STORE_VCFS
-            .create()
-            .query("file", file);
+        .create()
+        .query("file", file);
 
     if (!Strings.isNullOrEmpty(name)) uri.query("name", name);
 
     ResourceRequestBuilderFactory
-            .newBuilder()
-            .forResource(uri.build(projectDto.getName()))
-            .post()
-            .withCallback(SC_OK, new ResponseCodeCallback() {
-              @Override
-              public void onResponseCode(Request request, Response response) {
-                refresh();
-              }
-            })
-            .withCallback(new ErrorResponseCallback(), SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR)
-            .send();
+        .newBuilder()
+        .forResource(uri.build(projectDto.getName()))
+        .post()
+        .withCallback(SC_OK, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            refresh();
+          }
+        })
+        .withCallback(new ErrorResponseCallback(), SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR)
+        .send();
   }
 
   private static class ErrorResponseCallback implements ResponseCodeCallback {
