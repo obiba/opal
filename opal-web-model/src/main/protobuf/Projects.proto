@@ -16,6 +16,7 @@ message ProjectDto {
   optional string database = 9;
   optional Magma.TimestampsDto timestamps = 10;
   optional string vcfStoreService = 11;
+  optional GenotypesMappingDto genotypesMapping = 12;
 }
 
 message ProjectFactoryDto {
@@ -25,6 +26,15 @@ message ProjectFactoryDto {
   optional string database = 4;
   repeated string tags = 5;
   optional string vcfStoreService = 6;
+  optional GenotypesMappingDto genotypesMapping = 7;
+}
+
+message GenotypesMappingDto {
+  required string projectName = 1;
+  required string tableName = 2;
+  required string participantIdVariable = 3;
+  required string sampleIdVariable = 4;
+  required string sampleRoleVariable = 5;
 }
 
 message ProjectSummaryDto {

@@ -20,6 +20,7 @@ import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
+import org.obiba.opal.core.domain.GenotypesMapping;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.web.magma.DatasourceResource;
 import org.obiba.opal.web.model.Magma;
@@ -44,6 +45,8 @@ public class Dtos {
     if(project.hasTags()) builder.addAllTags(project.getTags());
     if(project.hasDatabase()) builder.setDatabase(project.getDatabase());
     if(project.hasVCFStoreService()) builder.setVcfStoreService(project.getVCFStoreService());
+    if(project.hasGenotypesMapping()) builder.setGenotypesMapping(asGenotypesMappingDto(project.getGenotypesMapping()));
+
     Datasource datasource = project.getDatasource();
     builder.setDatasource(org.obiba.opal.web.magma.Dtos.asDto(datasource)
         .setLink(UriBuilder.fromPath("/").path(DatasourceResource.class).build(project.getName()).toString()));
@@ -54,26 +57,36 @@ public class Dtos {
   }
 
   public static Project fromDto(ProjectDto projectDto) {
-    return Project.Builder.create() //
+    Project.Builder builder = Project.Builder.create() //
         .name(projectDto.getName()) //
         .title(projectDto.getTitle()) //
         .description(projectDto.getDescription()) //
         .database(projectDto.getDatabase()) //
         .vcfStoreService(projectDto.getVcfStoreService()) //
         .archived(projectDto.getArchived()) //
-        .tags(projectDto.getTagsList()) //
-        .build();
+        .tags(projectDto.getTagsList());
+
+    if (projectDto.hasGenotypesMapping()) {
+      builder.genotypesMapping(fromGenotypesMappingDto(projectDto.getGenotypesMapping()));
+    }
+
+    return builder.build();
   }
 
   public static Project fromDto(Projects.ProjectFactoryDto projectFactoryDto) {
-    return Project.Builder.create() //
+    Project.Builder builder = Project.Builder.create() //
         .name(projectFactoryDto.getName()) //
         .title(projectFactoryDto.getTitle()) //
         .description(projectFactoryDto.getDescription()) //
         .database(projectFactoryDto.getDatabase()) //
         .vcfStoreService(projectFactoryDto.getVcfStoreService()) //
-        .tags(projectFactoryDto.getTagsList()) //
-        .build();
+        .tags(projectFactoryDto.getTagsList());
+
+    if (projectFactoryDto.hasGenotypesMapping()) {
+      builder.genotypesMapping(fromGenotypesMappingDto(projectFactoryDto.getGenotypesMapping()));
+    }
+
+    return builder.build();
   }
 
   @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
@@ -109,5 +122,25 @@ public class Dtos {
     Value lastUpdate = ts.getLastUpdate();
     if(!lastUpdate.isNull()) builder.setLastUpdate(lastUpdate.toString());
     return builder.build();
+  }
+  
+  private static GenotypesMapping fromGenotypesMappingDto(Projects.GenotypesMappingDto dto) {
+    return GenotypesMapping.newBuilder()
+            .projectName(dto.getProjectName())
+            .tableName(dto.getTableName())
+            .participantIdVariable(dto.getParticipantIdVariable())
+            .sampleIdVariable(dto.getSampleIdVariable())
+            .sampleRoleVariable(dto.getSampleRoleVariable())
+            .build();
+  } 
+  
+  private static Projects.GenotypesMappingDto asGenotypesMappingDto(GenotypesMapping genotypesMapping) {
+    return Projects.GenotypesMappingDto.newBuilder()
+            .setProjectName(genotypesMapping.getProjectName())
+            .setTableName(genotypesMapping.getTableName())
+            .setParticipantIdVariable(genotypesMapping.getParticipantIdVariable())
+            .setSampleIdVariable(genotypesMapping.getSampleIdVariable())
+            .setSampleRoleVariable(genotypesMapping.getSampleRoleVariable())
+            .build();
   }
 }
