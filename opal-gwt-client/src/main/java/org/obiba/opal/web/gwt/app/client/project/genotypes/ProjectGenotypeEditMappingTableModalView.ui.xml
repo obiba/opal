@@ -16,6 +16,16 @@
 
   <o:Modal ui:field="dialog" closeVisible="true" keyboard="true" animation="false">
 
+    <b:ControlGroup ui:field="mappingTableGroup">
+      <b:ControlLabel for="mappingTable">
+        <ui:msg description="Mapping Table label">Table</ui:msg>
+      </b:ControlLabel>
+      <o:Chooser ui:field="mappingTable" name="mappingTable"/>
+      <b:HelpBlock>
+        <ui:msg description="Database Title help">Genotype's mapping table.</ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+
     <b:ControlGroup ui:field="participantIdVariableGroup">
       <b:ControlLabel>
         <ui:msg description="Genotypes Participant ID variable name label">Participant ID Variable</ui:msg>
