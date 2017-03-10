@@ -66,7 +66,7 @@ public class IdentifiersImportServiceImpl implements IdentifiersImportService {
     PrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(identifiersTable, variable,
         localParticipantIdentifier);
 
-    List<VariableEntity> systemEntities = StreamSupport.stream(new IdentifiersMaps(identifiersTable, idMapping.getName()).spliterator(), true) //
+    List<VariableEntity> systemEntities = StreamSupport.stream(new IdentifiersMaps(identifiersTable, idMapping.getName()).spliterator(), false) //
     .filter(unitId -> !unitId.hasPrivateIdentifier()) //
     .map(IdentifiersMaps.IdentifiersMap::getSystemEntity)//
     .collect(Collectors.toList());
