@@ -53,6 +53,8 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
 
   private String vcfStoreService;
 
+  private GenotypesMapping genotypesMapping;
+
   public Project() {
   }
 
@@ -160,6 +162,18 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
     return MoreObjects.toStringHelper(this).add("name", name).add("database", database).toString();
   }
 
+  public boolean hasGenotypesMapping() {
+    return genotypesMapping != null;
+  }
+
+  public GenotypesMapping getGenotypesMapping() {
+    return genotypesMapping;
+  }
+
+  public void setGenotypesMapping(GenotypesMapping genotypesMapping) {
+    this.genotypesMapping = genotypesMapping;
+  }
+
   @Override
   public boolean equals(Object o) {
     if(this == o) return true;
@@ -261,6 +275,11 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
 
     public Builder vcfStoreService(String service) {
       project.setVCFStoreService(service);
+      return this;
+    }
+
+    public Builder genotypesMapping(GenotypesMapping value) {
+      project.setGenotypesMapping(value);
       return this;
     }
 
