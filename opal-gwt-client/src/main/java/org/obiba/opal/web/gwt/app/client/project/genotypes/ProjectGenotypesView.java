@@ -11,6 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.project.genotypes;
 
 import com.github.gwtbootstrap.client.ui.Alert;
+import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.google.gwt.core.client.JsArray;
@@ -85,6 +86,9 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   @UiField
   TextBoxClearable filter;
 
+  @UiField
+  Button editMapping;
+
   private final Translations translations;
 
   private final TranslationMessages translationMessages;
@@ -131,7 +135,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   private void initializeFilter() {
     filter.setText("");
-    filter.getTextBox().setPlaceholder(translations.filterTables());
+    filter.getTextBox().setPlaceholder(translations.filterVCFs());
     filter.getTextBox().addStyleName("input-xlarge");
     filter.getClear().setTitle(translations.clearFilter());
   }
@@ -144,6 +148,11 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   @UiHandler("importVCF")
   public void importVCFClick(ClickEvent event) {
     getUiHandlers().onImportVcfFiles();
+  }
+
+  @UiHandler("editMapping")
+  public void editMappingClick(ClickEvent event) {
+    getUiHandlers().onEditMappingTable();
   }
 
   private void addTableColumns() {

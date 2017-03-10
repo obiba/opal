@@ -19,6 +19,8 @@ public interface ProjectGenotypesUiHandlers extends UiHandlers {
 
   void onImportVcfFiles();
 
+  void onEditMappingTable();
+
   void onRemoveVcfFile(VCFSummaryDto vcfSummaryDto);
 
   void onDownloadVcfFile(VCFSummaryDto vcfSummaryDto);
