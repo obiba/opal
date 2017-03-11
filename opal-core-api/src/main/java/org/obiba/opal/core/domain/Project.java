@@ -19,11 +19,7 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.Timestamped;
-import org.obiba.magma.Timestamps;
-import org.obiba.magma.Value;
+import org.obiba.magma.*;
 import org.obiba.magma.type.DateTimeType;
 
 import com.google.common.base.MoreObjects;

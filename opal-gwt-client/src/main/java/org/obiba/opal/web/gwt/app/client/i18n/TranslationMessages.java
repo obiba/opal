@@ -193,6 +193,11 @@ public interface TranslationMessages extends Messages {
   @AlternateMessage({ "=0", "No tables", "one", "1 table" })
   String tableCount(@PluralCount int count);
 
+  @Description("VCF file count label")
+  @DefaultMessage("{0} VCF files")
+  @AlternateMessage({ "=0", "No VCF file", "one", "1 VCF file" })
+  String vcfFilesCount(@PluralCount int count);
+
   @Description("Variable count label")
   @DefaultMessage("{0} variables")
   @AlternateMessage({ "=0", "No variables", "one", "1 variable" })
@@ -414,6 +419,11 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("{0} Categories")
   @AlternateMessage({ "one", "1 Category" })
   String nCategoriesLabel(@PluralCount int nb);
+
+  @Description("N VCFs label")
+  @DefaultMessage("{0} VCF files")
+  @AlternateMessage({ "one", "1 VCF file" })
+  String nVCFsLabel(@PluralCount int nb);
 
   @Description("N Attributes label")
   @DefaultMessage("{0} Attributes")

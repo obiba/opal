@@ -11,7 +11,7 @@ package org.obiba.opal.core.cfg;
 
 public class NoSuchVocabularyException extends RuntimeException {
 
-  private static final long serialVersionUID = -6357540199499515674L;
+  private static final long serialVersionUID = -7817050458810429487L;
 
   private final String taxonomyName;
 

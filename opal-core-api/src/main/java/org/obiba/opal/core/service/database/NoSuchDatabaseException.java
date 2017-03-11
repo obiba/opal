@@ -11,7 +11,7 @@ package org.obiba.opal.core.service.database;
 
 public class NoSuchDatabaseException extends RuntimeException {
 
-  private static final long serialVersionUID = -6357540199499515674L;
+  private static final long serialVersionUID = 1405868474652412700L;
 
   private final String databaseName;
 

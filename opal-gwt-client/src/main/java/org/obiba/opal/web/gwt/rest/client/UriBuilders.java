@@ -159,6 +159,13 @@ public enum UriBuilders {
     }
   },
 
+  DATASOURCES_TABLES {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasources", "tables");
+    }
+  },
+
   DATASOURCE_TABLES_EXCEL {
     @Override
     public UriBuilder create() {
@@ -437,6 +444,48 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("project", "{}", "keystore", "{}", "certificate");
+    }
+  },
+
+  PROJECT_VCF_STORE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "vcf-store");
+    }
+  },
+
+  PROJECT_VCF_STORE_VCFS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "vcf-store", "vcfs");
+    }
+  },
+
+  PROJECT_VCF_STORE_IMPORT {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "commands", "_import_vcf");
+    }
+  },
+
+  PROJECT_VCF_STORE_VCF {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "vcf-store", "vcf", "{}");
+    }
+  },
+
+  PROJECT_VCF_STORE_VCF_DOWNLOAD {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "vcf-store", "vcf", "{}", "_download");
+    }
+  },
+
+  PROJECT_VCF_STORE_SAMPLES {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "vcf-store", "samples");
     }
   },
 
