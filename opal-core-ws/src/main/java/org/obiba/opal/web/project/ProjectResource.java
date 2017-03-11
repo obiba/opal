@@ -9,22 +9,6 @@
  */
 package org.obiba.opal.web.project;
 
-import java.util.Arrays;
-import java.util.NoSuchElementException;
-import java.util.Set;
-
-import javax.annotation.Nonnull;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceUpdateListener;
@@ -35,7 +19,6 @@ import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.security.OpalKeyStore;
-import org.obiba.opal.core.service.NoSuchProjectException;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
 import org.obiba.opal.spi.vcf.VCFStoreService;
@@ -47,6 +30,14 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Nonnull;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
+import java.util.Arrays;
+import java.util.Set;
 
 @Component
 @Scope("request")

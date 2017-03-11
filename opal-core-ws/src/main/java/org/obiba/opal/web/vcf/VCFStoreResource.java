@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.vcf;
 
+import org.obiba.opal.core.support.vcf.VCFSamplesSummaryBuilder;
 import org.obiba.opal.web.model.Plugins;
 
 import javax.ws.rs.*;
@@ -40,6 +41,45 @@ public interface VCFStoreResource {
   Plugins.VCFStoreDto get();
 
   /**
+   * Get a specific {@link org.obiba.opal.spi.vcf.VCFStore.VCFSamplesMapping} associated to a project.
+   *
+   * @param projectName
+   * @return
+   */
+  @GET
+  @Path("/samples")
+  Plugins.VCFSamplesMappingDto getSamplesMapping();
+
+  /**
+   * Update or create a specific {@link org.obiba.opal.spi.vcf.VCFStore.VCFSamplesMapping}.
+   *
+   * @param projectName
+   * @return
+   */
+  @PUT
+  @Path("/samples")
+  Response putSamplesMapping(Plugins.VCFSamplesMappingDto vcfSamplesMappingDto);
+
+  /**
+   * Delete a specific {@link org.obiba.opal.spi.vcf.VCFStore.VCFSamplesMapping} associated to a project.
+   *
+   * @param projectName
+   * @return
+   */
+  @DELETE
+  @Path("/samples")
+  Response deleteSamplesMapping();
+
+  /**
+   * Get the {@link org.obiba.opal.spi.vcf.VCFStore.VCFSummary} list.
+   *
+   * @return
+   */
+  @GET
+  @Path("/summary")
+  Plugins.VCFSamplesSummaryDto getSummary();
+
+  /**
    * Get the {@link org.obiba.opal.spi.vcf.VCFStore.VCFSummary} list.
    *
    * @return
@@ -67,5 +107,4 @@ public interface VCFStoreResource {
   @GET
   @Path("/vcf/{vcfName}")
   Plugins.VCFSummaryDto getVCF(@PathParam("vcfName") String vcfName);
-
 }

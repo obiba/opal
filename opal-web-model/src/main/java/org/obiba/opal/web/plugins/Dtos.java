@@ -11,7 +11,9 @@
 package org.obiba.opal.web.plugins;
 
 import com.google.common.collect.Lists;
+import org.obiba.opal.core.domain.VCFSamplesMapping;
 import org.obiba.opal.core.runtime.Plugin;
+import org.obiba.opal.core.support.vcf.VCFSamplesSummaryBuilder;
 import org.obiba.opal.spi.vcf.VCFStore;
 import org.obiba.opal.web.model.Plugins;
 
@@ -44,14 +46,48 @@ public class Dtos {
     return builder.build();
   }
 
-  public static Plugins.VCFSummaryDto asDto(VCFStore.VCFSummary summary) {
+  public static Plugins.VCFSummaryDto asDto(VCFStore.VCFSummary summary, VCFSamplesSummaryBuilder.Stats stats) {
     Plugins.VCFSummaryDto.Builder builder = Plugins.VCFSummaryDto.newBuilder();
     builder.setName(summary.getName()) //
         .setSize(summary.size()) //
         .setSamplesCount(summary.getSampleIds().size()) //
         .setGenotypesCount(summary.getGenotypesCount()) //
-        .setVariantsCount(summary.getVariantsCount());
+        .setVariantsCount(summary.getVariantsCount())
+        .setSamplesSummary(Plugins.VCFSamplesSummaryDto.newBuilder()
+          .setParticipants(stats.getParticipants())
+          .setOrphanSamples(stats.getOrphanSamples())
+          .setControlSamples(stats.getControlSamples())
+        );
     return builder.build();
   }
 
+  public static VCFSamplesMapping fromDto(Plugins.VCFSamplesMappingDto dto) {
+    return VCFSamplesMapping.newBuilder()
+      .projectName(dto.getProjectName())
+      .tableName(dto.getTableReference())
+      .participantIdVariable(dto.getParticipantIdVariable())
+      .sampleIdVariable(dto.getSampleIdVariable())
+      .sampleRoleVariable(dto.getSampleRoleVariable())
+      .build();
+  }
+
+  public static Plugins.VCFSamplesMappingDto asDto(VCFSamplesMapping sampleMappings) {
+    return Plugins.VCFSamplesMappingDto.newBuilder()
+      .setProjectName(sampleMappings.getProjectName())
+      .setTableReference(sampleMappings.getTableReference())
+      .setParticipantIdVariable(sampleMappings.getParticipantIdVariable())
+      .setSampleIdVariable(sampleMappings.getSampleIdVariable())
+      .setSampleRoleVariable(sampleMappings.getSampleRoleVariable())
+      .build();
+  }
+
+  public static Plugins.VCFSamplesSummaryDto fromDto(VCFSamplesSummaryBuilder.Stats stats) {
+    Plugins.VCFSamplesSummaryDto.Builder builder = Plugins.VCFSamplesSummaryDto.newBuilder();
+    builder.setParticipants(stats.getParticipants());
+    builder.setParticipantsWithGenotype(stats.getParticipantsWithGenotypes());
+    builder.setSamples(stats.getSamples());
+    builder.setControlSamples(stats.getControlSamples());
+
+    return builder.build();
+  }
 }
