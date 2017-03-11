@@ -11,7 +11,6 @@
 package org.obiba.opal.web.gwt.app.client.project.genotypes;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
@@ -23,13 +22,14 @@ import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.project.genotypes.event.GenotypesMappingEditRequestEvent;
 import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfFileUploadRequestEvent;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.opal.GenotypesMappingDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.VCFSummaryDto;
 
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -50,7 +50,7 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   private final ModalProvider<ProjectGenotypeEditMappingTableModalPresenter> projectGenotypeEditMappingTableModalPresenterModalProvider;
 
-  private List<TableDto> sampleTables = Lists.newArrayList();
+  private JsArray<TableDto> mappingTables = JsArrays.create();
 
   @Inject
   public ProjectGenotypesPresenter(Display display, EventBus eventBus,
@@ -69,6 +69,13 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
       @Override
       public void onVcfFileUploadRequest(VcfFileUploadRequestEvent event) {
         uploadVcfFile(event.getFile(), event.getName());
+      }
+    });
+
+    addRegisteredHandler(GenotypesMappingEditRequestEvent.getType(), new GenotypesMappingEditRequestEvent.GenotypesMappingEditRequestHandler() {
+      @Override
+      public void onGenotypesMappingEditRequest(GenotypesMappingEditRequestEvent event) {
+        updateGenotypesMapping(event.getGenotypesMapping());
       }
     });
   }
@@ -94,7 +101,10 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   @Override
   public void onEditMappingTable() {
-    projectGenotypeEditMappingTableModalPresenterModalProvider.get();
+    ProjectGenotypeEditMappingTableModalPresenter presenter = projectGenotypeEditMappingTableModalPresenterModalProvider.create();
+    presenter.setMappingTables(mappingTables);
+    presenter.setGenotypesMapping(currentGenotypesMapping());
+    projectGenotypeEditMappingTableModalPresenterModalProvider.show();
   }
 
   @Override
@@ -113,6 +123,7 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   }
 
   public void refresh() {
+    refreshMappingTable();
     getView().beforeRenderRows();
     ResourceRequestBuilderFactory.<JsArray<VCFSummaryDto>>newBuilder()
         .forResource(UriBuilders.PROJECT_VCF_STORE_VCFS.create().build(projectDto.getName()))
@@ -124,6 +135,46 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
           }
         })
         .get()
+        .send();
+  }
+
+  private void refreshMappingTable() {
+    getView().setGenotypesMapping(currentGenotypesMapping());
+    Map<String, String> params = Maps.newHashMap();
+    params.put(ENTITY_TYPE_PARAM, ENTITY_TYPE);
+
+    ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder()
+        .forResource(UriBuilders.DATASOURCE_TABLES.create().query(params).build(projectDto.getName()))
+        .withCallback(new ResourceCallback<JsArray<TableDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<TableDto> resource) {
+            mappingTables = resource;
+            logger.info(mappingTables.length() + " mapping tables");
+          }
+        }).get().send();
+  }
+
+  private GenotypesMappingDto currentGenotypesMapping() {
+    GenotypesMappingDto genotypesMappingDto = !projectDto.hasGenotypesMapping() ? GenotypesMappingDto.create() : projectDto.getGenotypesMapping();
+    genotypesMappingDto.setProjectName(projectDto.getName());
+    return genotypesMappingDto;
+  }
+
+  private void updateGenotypesMapping(GenotypesMappingDto dto) {
+    projectDto.setGenotypesMapping(dto);
+
+    ResourceRequestBuilderFactory
+        .newBuilder()
+        .forResource(UriBuilders.PROJECT.create().build(projectDto.getName()))
+        .withResourceBody(ProjectDto.stringify(projectDto))
+        .put()
+        .withCallback(SC_OK, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            logger.info("Updated mapping table");
+            refresh();
+          }
+        })
         .send();
   }
 
@@ -140,7 +191,6 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
             refresh();
           }
         }, SC_NO_CONTENT)
-        .withCallback(new ErrorResponseCallback(), SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR)
         .send();
   }
 
@@ -162,33 +212,12 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
             refresh();
           }
         })
-        .withCallback(new ErrorResponseCallback(), SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR)
         .send();
   }
 
-  private static class ErrorResponseCallback implements ResponseCodeCallback {
-    @Override
-    public void onResponseCode(Request request, Response response) {
-      logger.info("Somthing happened");
-    }
-  }
-
-  private void refreshMappingTable() {
-    Map<String, String> params = Maps.newHashMap();
-    params.put(ENTITY_TYPE_PARAM, ENTITY_TYPE);
-
-    ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder()
-        .forResource(UriBuilders.DATASOURCE_TABLES.create().query(params).build(projectDto.getName()))
-        .withCallback(new ResourceCallback<JsArray<TableDto>>() {
-          @Override
-          public void onResource(Response response, JsArray<TableDto> resource) {
-            sampleTables = JsArrays.toList(resource);
-            logger.info(sampleTables.size() + " mapping tables");
-          }
-        }).get().send();
-  }
-
   public interface Display extends View, HasUiHandlers<ProjectGenotypesUiHandlers> {
+
+    void setGenotypesMapping(GenotypesMappingDto dto);
 
     void beforeRenderRows();
 

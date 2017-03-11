@@ -9,16 +9,20 @@
  */
 package org.obiba.opal.web.gwt.app.client.project.genotypes;
 
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.project.genotypes.event.GenotypesMappingEditRequestEvent;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
+import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.opal.GenotypesMappingDto;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashSet;
@@ -28,6 +32,8 @@ public class ProjectGenotypeEditMappingTableModalPresenter extends ModalPresente
     implements ProjectGenotypeEditMappingTableModalUiHandlers {
 
   private final ValidationHandler validationHandler;
+
+  private String projectName;
 
   @Inject
   public ProjectGenotypeEditMappingTableModalPresenter(Display display, EventBus eventBus) {
@@ -40,11 +46,28 @@ public class ProjectGenotypeEditMappingTableModalPresenter extends ModalPresente
   protected void onBind() {
   }
 
+  public void setMappingTables(JsArray<TableDto> availableMappingTables) {
+    getView().setAvailableMappingTables(availableMappingTables);
+  }
+
+  public void setGenotypesMapping(GenotypesMappingDto currentGenotypesMapping) {
+    projectName = currentGenotypesMapping.getProjectName();
+    getView().setGenotypesMappingDto(currentGenotypesMapping);
+  }
+
   @Override
   public void onSaveEdit() {
     getView().clearErrors();
     if(validationHandler.validate()) {
+      GenotypesMappingDto genotypeDto = GenotypesMappingDto.create();
+      genotypeDto.setParticipantIdVariable(getView().getParticipantIdVariable().getText());
+      genotypeDto.setSampleIdVariable(getView().getSampleIdVariable().getText());
+      genotypeDto.setSampleRoleVariable(getView().getSampleRoleVariable().getText());
+      genotypeDto.setTableName(getView().getMappingTable().getText());
+      genotypeDto.setProjectName(projectName);
+      fireEvent(new GenotypesMappingEditRequestEvent(genotypeDto));
 
+      getView().hideDialog();
     }
   }
 
@@ -56,6 +79,8 @@ public class ProjectGenotypeEditMappingTableModalPresenter extends ModalPresente
     protected Set<FieldValidator> getValidators() {
       if(validators == null) {
         validators = new LinkedHashSet<>();
+        validators.add(new RequiredTextValidator(getView().getMappingTable(),
+            "MappingTableIsRequired", Display.FormField.MAPPING_TABLE.name()));
         validators.add(new RequiredTextValidator(getView().getParticipantIdVariable(),
             "ParticipantIdVariableIsRequired", Display.FormField.PARTICIPANT_ID_VARIABLE.name()));
         validators.add(new RequiredTextValidator(getView().getSampleIdVariable(),
@@ -76,16 +101,23 @@ public class ProjectGenotypeEditMappingTableModalPresenter extends ModalPresente
   public interface Display extends PopupView, HasUiHandlers<ProjectGenotypeEditMappingTableModalUiHandlers> {
 
     enum FormField {
+      MAPPING_TABLE,
       PARTICIPANT_ID_VARIABLE,
       SAMPLE_ID_VARIABLE,
       SAMPLE_ROLE_VARIABLE
     }
+
+    HasText getMappingTable();
 
     HasText getParticipantIdVariable();
 
     HasText getSampleIdVariable();
 
     HasText getSampleRoleVariable();
+
+    void setAvailableMappingTables(JsArray<TableDto> availableMappingTables);
+
+    void setGenotypesMappingDto(GenotypesMappingDto dto);
 
     void clearErrors();
 

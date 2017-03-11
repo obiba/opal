@@ -41,6 +41,7 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
+import org.obiba.opal.web.model.client.opal.GenotypesMappingDto;
 import org.obiba.opal.web.model.client.opal.VCFSummaryDto;
 
 import java.util.Comparator;
@@ -109,6 +110,15 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     this.translationMessages = translationMessages;
     addTableColumns();
     initializeFilter();
+  }
+
+  @Override
+  public void setGenotypesMapping(GenotypesMappingDto genotypesMapping) {
+    project.setText(genotypesMapping.getProjectName());
+    table.setText(genotypesMapping.getTableName());
+    participantId.setText(genotypesMapping.getParticipantIdVariable());
+    sampleId.setText(genotypesMapping.getSampleIdVariable());
+    sampleRole.setText(genotypesMapping.getSampleRoleVariable());
   }
 
   @Override
