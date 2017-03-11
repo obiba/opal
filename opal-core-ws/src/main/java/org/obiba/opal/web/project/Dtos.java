@@ -9,27 +9,21 @@
  */
 package org.obiba.opal.web.project;
 
-import java.util.Set;
-
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.core.UriBuilder;
-
-import org.obiba.magma.Datasource;
-import org.obiba.magma.Timestamped;
-import org.obiba.magma.Timestamps;
-import org.obiba.magma.Value;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.VariableEntity;
+import com.google.common.collect.Sets;
+import org.obiba.magma.*;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.web.magma.DatasourceResource;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Projects;
 
-import com.google.common.collect.Sets;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.core.UriBuilder;
+import java.util.Set;
 
 import static org.obiba.opal.web.model.Projects.ProjectDto;
 
 public class Dtos {
+
 
   private Dtos() {}
 
@@ -44,6 +38,8 @@ public class Dtos {
     if(project.hasTags()) builder.addAllTags(project.getTags());
     if(project.hasDatabase()) builder.setDatabase(project.getDatabase());
     if(project.hasVCFStoreService()) builder.setVcfStoreService(project.getVCFStoreService());
+    if(project.hasVCFSamplesMapping()) builder.setVcfSamplesMapping(org.obiba.opal.web.plugins.Dtos.fromDto(project.getVCFSamplesMapping()));
+
     Datasource datasource = project.getDatasource();
     builder.setDatasource(org.obiba.opal.web.magma.Dtos.asDto(datasource)
         .setLink(UriBuilder.fromPath("/").path(DatasourceResource.class).build(project.getName()).toString()));
@@ -54,26 +50,37 @@ public class Dtos {
   }
 
   public static Project fromDto(ProjectDto projectDto) {
-    return Project.Builder.create() //
+    Project.Builder builder = Project.Builder.create() //
         .name(projectDto.getName()) //
         .title(projectDto.getTitle()) //
         .description(projectDto.getDescription()) //
         .database(projectDto.getDatabase()) //
         .vcfStoreService(projectDto.getVcfStoreService()) //
         .archived(projectDto.getArchived()) //
-        .tags(projectDto.getTagsList()) //
-        .build();
+        .tags(projectDto.getTagsList());
+
+
+    if (projectDto.hasVcfSamplesMapping()) {
+      builder.vcfSamplesMapping(org.obiba.opal.web.plugins.Dtos.fromDto(projectDto.getVcfSamplesMapping()));
+    }
+
+    return builder.build();
   }
 
   public static Project fromDto(Projects.ProjectFactoryDto projectFactoryDto) {
-    return Project.Builder.create() //
+    Project.Builder builder = Project.Builder.create() //
         .name(projectFactoryDto.getName()) //
         .title(projectFactoryDto.getTitle()) //
         .description(projectFactoryDto.getDescription()) //
         .database(projectFactoryDto.getDatabase()) //
         .vcfStoreService(projectFactoryDto.getVcfStoreService()) //
-        .tags(projectFactoryDto.getTagsList()) //
-        .build();
+        .tags(projectFactoryDto.getTagsList());
+
+    if (projectFactoryDto.hasVcfSamplesMapping()) {
+      builder.vcfSamplesMapping(org.obiba.opal.web.plugins.Dtos.fromDto(projectFactoryDto.getVcfSamplesMapping()));
+    }
+
+    return builder.build();
   }
 
   @SuppressWarnings("StaticMethodOnlyUsedInOneClass")

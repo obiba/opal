@@ -33,6 +33,13 @@ public interface VCFStore {
    *
    * @return
    */
+  Collection<String> getSampleIds(String vcfFile);
+
+  /**
+   * The sample IDs of all the VCFs.
+   *
+   * @return
+   */
   Collection<String> getSampleIds();
 
   /**

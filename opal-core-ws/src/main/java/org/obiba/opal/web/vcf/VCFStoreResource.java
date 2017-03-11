@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.vcf;
 
+import org.obiba.opal.core.support.vcf.VCFSamplesSummaryBuilder;
 import org.obiba.opal.web.model.Plugins;
 
 import javax.ws.rs.*;
@@ -32,12 +33,28 @@ public interface VCFStoreResource {
   void setVCFStore(String serviceName, String name);
 
   /**
+   * Sets the VCF summary sample builder
+   *
+   * @param summaryBuilder
+   */
+  void setVCFSamplesSummaryBuilder(VCFSamplesSummaryBuilder summaryBuilder);
+
+  /**
    * Get the {@link org.obiba.opal.spi.vcf.VCFStore} details.
    *
    * @return
    */
   @GET
   Plugins.VCFStoreDto get();
+
+  /**
+   * Get the {@link org.obiba.opal.spi.vcf.VCFStore.VCFSummary} list.
+   *
+   * @return
+   */
+  @GET
+  @Path("/summary")
+  Plugins.VCFSamplesSummaryDto getSummary();
 
   /**
    * Get the {@link org.obiba.opal.spi.vcf.VCFStore.VCFSummary} list.

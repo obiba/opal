@@ -10,7 +10,6 @@
 package org.obiba.opal.web.project;
 
 import java.util.Arrays;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -35,9 +34,9 @@ import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.security.OpalKeyStore;
-import org.obiba.opal.core.service.NoSuchProjectException;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
+import org.obiba.opal.core.support.vcf.VCFSamplesSummaryBuilder;
 import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.security.KeyStoreResource;
@@ -139,6 +138,11 @@ public class ProjectResource {
     }
     VCFStoreResource resource = applicationContext.getBean(VCFStoreResource.class);
     resource.setVCFStore(project.getVCFStoreService(), name);
+    resource.setVCFSamplesSummaryBuilder(
+      new VCFSamplesSummaryBuilder()
+        .datasource(project.getDatasource())
+        .mappings(project.getVCFSamplesMapping())
+    );
     return resource;
   }
 
