@@ -10,7 +10,6 @@
 package org.obiba.opal.web.project;
 
 import java.util.Arrays;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -35,9 +34,9 @@ import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.security.OpalKeyStore;
-import org.obiba.opal.core.service.NoSuchProjectException;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
+import org.obiba.opal.core.support.genotypes.GenotypesSummaryBuilder;
 import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.security.KeyStoreResource;
@@ -140,6 +139,21 @@ public class ProjectResource {
     VCFStoreResource resource = applicationContext.getBean(VCFStoreResource.class);
     resource.setVCFStore(project.getVCFStoreService(), name);
     return resource;
+  }
+
+  @GET
+  @Transactional(readOnly = true)
+  @Path("/genotypes/summary")
+  public Projects.GenotypesSummaryDto getGenotypesSummary() {
+    Project project = getProject();
+    VCFStoreService service = opalRuntime.getVCFStoreService(project.getVCFStoreService());
+    GenotypesSummaryBuilder summaryBuilder =
+      new GenotypesSummaryBuilder()
+        .datasource(project.getDatasource())
+        .mappings(project.getGenotypesMapping())
+        .store(service.getStore(project.getName()));
+
+    return Dtos.asGenotypesSummary(summaryBuilder.buildSummary());
   }
 
   private Project getProject() {

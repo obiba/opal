@@ -143,7 +143,8 @@ public interface Translations extends Constants {
       "MoveDown", "Move down",//
       "Download identifiers", "Download identifiers",//
       "Unregister", "Unregister", //
-      "Terminate", "Terminate" //
+      "Terminate", "Terminate", //
+      "Statistics", "Statistics" //
   })
   Map<String, String> actionMap();
 
@@ -360,6 +361,7 @@ public interface Translations extends Constants {
       "DatasourceNameDisallowedChars", "Datasource names cannot contain colon or period characters.", //
       "ViewNameDisallowedChars", "View names cannot contain colon or period characters.", //
       "CSVFileRequired", "A CSV file is required.", //
+      "VCFFileRequired", "A VCF or a zipped (.gz) file is required.", //
       "XMLFileRequired", "An XML file is required.", //
       "XMLFileSuffixInvalid", "Invalid XML file suffix: .xml is expected.", //
       "ZipFileRequired", "A Zip file is required.", //
@@ -499,6 +501,7 @@ public interface Translations extends Constants {
       "OldPasswordIsRequired", "Old password is required.",//
       "OldPasswordMismatch", "Your old password is invalid.",//
       "PasswordNotChanged", "You must choose a different password than your current password.",//
+      "NameIsRequired", "A name is required.",//
       "PasswordIsRequired", "A password is required.",//
       "InvalidCertificate", "The certificate is not valid.",//
       "CertificateIsRequired", "A certificate is required.",//
@@ -1613,6 +1616,10 @@ public interface Translations extends Constants {
   @Constants.DefaultStringValue("Filter tables...")
   String filterTables();
 
+  @Description("Filter VCFs label")
+  @Constants.DefaultStringValue("Filter VCFs...")
+  String filterVCFs();
+
   @Description("Filter Project label")
   @Constants.DefaultStringValue("Filter projects...")
   String filterProjects();
@@ -2027,6 +2034,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Project tables (dictionaries and data) are stored in the database:")
   String projectDatabaseName();
 
+  @Description("Genotype Edit Mapping Modal title")
+  @DefaultStringValue("Edit Mapping")
+  String projectGenotypeEditMappingeModalTitle();
+
   @Description("Default Character Set label")
   @DefaultStringValue("Default Character Set")
   String defaultCharsetLabel();
@@ -2384,4 +2395,32 @@ public interface Translations extends Constants {
   @Description("Too many repeated errors label")
   @DefaultStringValue("Too many repeated errors. Stopping further requests")
   String tooManyRepeatedErrorsLabel();
+
+  @Description("Genotypes VCF file column header")
+  @DefaultStringValue("VCF File")
+  String vcfFileColumnHeader();
+
+  @Description("Genotypes Samples count column header")
+  @DefaultStringValue("Samples")
+  String vcfSamplesCountColumnHeader();
+
+  @Description("Genotypes Participants count column header")
+  @DefaultStringValue("Participants")
+  String vcfParticipantsCountColumnHeader();
+
+  @Description("Genotypes Orphan count column header")
+  @DefaultStringValue("Orphan Samples")
+  String vcfOrphanSamplesCountColumnHeader();
+
+  @Description("Genotypes Genotypes count column header")
+  @DefaultStringValue("Genotypes")
+  String vcfGenotypesCountColumnHeader();
+
+  @Description("Genotypes Variants count column header")
+  @DefaultStringValue("Variants")
+  String vcfVariantsCountColumnHeader();
+
+  @Description("Genotypes Controls count column header")
+  @DefaultStringValue("Controls")
+  String vcfControlsCountColumnHeader();
 }
