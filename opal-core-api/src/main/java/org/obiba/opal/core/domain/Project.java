@@ -155,15 +155,6 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
     return MagmaEngine.get().hasDatasource(name);
   }
 
-  @Transient
-  public Iterable<ValueSet> getGenotypesMappingValueSets() {
-    if (hasGenotypesMapping()) {
-      return MagmaEngine.get().getDatasource(name).getValueTable(genotypesMapping.getTableName()).getValueSets();
-    }
-
-    return Lists.newArrayList();
-  }
-
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this).add("name", name).add("database", database).toString();

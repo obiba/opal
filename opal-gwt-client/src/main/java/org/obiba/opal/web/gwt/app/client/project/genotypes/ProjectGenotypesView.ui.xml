@@ -37,7 +37,7 @@
               <g:Label>
                 <ui:msg description="Genotypes Participants with Genotypes label">Participants with Genotype</ui:msg>
               </g:Label>
-              <g:Label ui:field="participantsWithGenotypes"/>
+              <g:Label ui:field="participantsWithGenotype"/>
             </o:PropertyPanel>
             <o:PropertyPanel>
               <g:Label>

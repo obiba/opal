@@ -27,6 +27,7 @@ import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfFileUploadRe
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.GenotypesMappingDto;
+import org.obiba.opal.web.model.client.opal.GenotypesSummaryDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.VCFSummaryDto;
 
@@ -59,7 +60,7 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
     super(eventBus, display);
     getView().setUiHandlers(this);
     this.vcfFileUploadModalPresenterModalProvider = vcfFileUploadModalPresenterModalProvider.setContainer(this);
-    this.projectGenotypeEditMappingTableModalPresenterModalProvider = editMappingTableModalPresenterModalProvider.setContainer(this);
+    projectGenotypeEditMappingTableModalPresenterModalProvider = editMappingTableModalPresenterModalProvider.setContainer(this);
     initializeEventListeners();
   }
 
@@ -123,22 +124,39 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   }
 
   public void refresh() {
-    refreshMappingTable();
-    getView().beforeRenderRows();
-    ResourceRequestBuilderFactory.<JsArray<VCFSummaryDto>>newBuilder()
-        .forResource(UriBuilders.PROJECT_VCF_STORE_VCFS.create().build(projectDto.getName()))
-        .withCallback(new ResourceCallback<JsArray<VCFSummaryDto>>() {
-          @Override
-          public void onResource(Response response, JsArray<VCFSummaryDto> summaries) {
-            getView().renderRows(summaries);
-            getView().afterRenderRows();
-          }
-        })
-        .get()
-        .send();
+    getGenotypesSummary();
+    getMappingTable();
+    getVcfTables();
   }
 
-  private void refreshMappingTable() {
+  public void getGenotypesSummary() {
+    ResourceRequestBuilderFactory.<GenotypesSummaryDto>newBuilder()
+      .forResource(UriBuilders.PROJECT_GENOTYPES_SUMMARY.create().build(projectDto.getName()))
+      .withCallback(new ResourceCallback<GenotypesSummaryDto>() {
+        @Override
+        public void onResource(Response response, GenotypesSummaryDto summary) {
+          logger.info("Received Genotypes summary");
+          getView().setGenotypesSummary(summary);
+        }
+      }).get().send();
+  }
+
+  private void getVcfTables() {
+    getView().beforeRenderRows();
+    ResourceRequestBuilderFactory.<JsArray<VCFSummaryDto>>newBuilder()
+      .forResource(UriBuilders.PROJECT_VCF_STORE_VCFS.create().build(projectDto.getName()))
+      .withCallback(new ResourceCallback<JsArray<VCFSummaryDto>>() {
+        @Override
+        public void onResource(Response response, JsArray<VCFSummaryDto> summaries) {
+          getView().renderRows(summaries);
+          getView().afterRenderRows();
+        }
+      })
+      .get()
+      .send();
+  }
+
+  private void getMappingTable() {
     getView().setGenotypesMapping(currentGenotypesMapping());
     Map<String, String> params = Maps.newHashMap();
     params.put(ENTITY_TYPE_PARAM, ENTITY_TYPE);
@@ -216,6 +234,8 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   }
 
   public interface Display extends View, HasUiHandlers<ProjectGenotypesUiHandlers> {
+
+    void setGenotypesSummary(GenotypesSummaryDto dto);
 
     void setGenotypesMapping(GenotypesMappingDto dto);
 

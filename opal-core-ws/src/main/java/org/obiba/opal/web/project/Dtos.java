@@ -13,6 +13,7 @@ import com.google.common.collect.Sets;
 import org.obiba.magma.*;
 import org.obiba.opal.core.domain.GenotypesMapping;
 import org.obiba.opal.core.domain.Project;
+import org.obiba.opal.core.support.genotypes.ProjectGenotypesSummary;
 import org.obiba.opal.web.magma.DatasourceResource;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Projects;
@@ -144,25 +145,12 @@ public class Dtos {
 
   public static Projects.GenotypesSummaryDto asGenotypesSummary(Project project) {
     Projects.GenotypesSummaryDto.Builder builder = Projects.GenotypesSummaryDto.newBuilder();
+    ProjectGenotypesSummary.Stats stats = new ProjectGenotypesSummary(project).calculate();
 
-    long participants = 0;
-    long partWithGenoTypes = 0;
-    long samples = 0;
-    long controlSamples = 0;
-
-    GenotypesMapping gm = project.getGenotypesMapping();
-
-    for (ValueSet v : project.getGenotypesMappingValueSets()) {
-      ValueTable vt = v.getValueTable();
-      VariableEntity entity = v.getVariableEntity();
-      String sampleId = entity.getIdentifier();
-      String participantId = vt.getValue(vt.getVariable(gm.getParticipantIdVariable()), v).toString();
-      String sampleRole = vt.getValue(vt.getVariable(gm.getSampleRoleVariable()), v).toString();
-
-      participants += participantId != null ? 1 : 0;
-      participants += participantId != null ? 1 : 0;
-
-    }
+    builder.setParticipants(stats.getParticipants());
+    builder.setParticipantsWithGenotype(stats.getParticipantsWithGenotypes());
+    builder.setSamples(stats.getSamples());
+    builder.setControlSamples(stats.getControlSamples());
 
     return builder.build();
   }

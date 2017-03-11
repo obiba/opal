@@ -24,7 +24,6 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
@@ -42,6 +41,7 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.model.client.opal.GenotypesMappingDto;
+import org.obiba.opal.web.model.client.opal.GenotypesSummaryDto;
 import org.obiba.opal.web.model.client.opal.VCFSummaryDto;
 
 import java.util.Comparator;
@@ -55,7 +55,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   Label participants;
 
   @UiField
-  Label participantsWithGenotypes;
+  Label participantsWithGenotype;
 
   @UiField
   Label samples;
@@ -110,6 +110,14 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     this.translationMessages = translationMessages;
     addTableColumns();
     initializeFilter();
+  }
+
+  @Override
+  public void setGenotypesSummary(GenotypesSummaryDto dto) {
+    participants.setText(dto.getParticipants()+"");
+    participantsWithGenotype.setText(dto.getParticipantsWithGenotype()+"");
+    samples.setText(dto.getSamples()+"");
+    controlSamples.setText(dto.getControlSamples()+"");
   }
 
   @Override
@@ -282,7 +290,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
       @Override
       public String getValue(VCFSummaryDto vcfSummaryDto) {
-        return "300";
+        return "*300";
       }
     };
 
@@ -290,7 +298,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
       @Override
       public String getValue(VCFSummaryDto vcfSummaryDto) {
-        return "100";
+        return "*100";
       }
     };
 
@@ -298,7 +306,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
       @Override
       public String getValue(VCFSummaryDto vcfSummaryDto) {
-        return "2";
+        return "*2";
       }
     };
   }

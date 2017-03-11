@@ -440,6 +440,13 @@ public enum UriBuilders {
     }
   },
 
+  PROJECT_GENOTYPES_SUMMARY {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "genotypes", "summary");
+    }
+  },
+
   PROJECT_VCF_STORE {
     @Override
     public UriBuilder create() {
