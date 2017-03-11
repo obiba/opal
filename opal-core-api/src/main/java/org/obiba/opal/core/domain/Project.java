@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.core.domain;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -16,14 +17,11 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.Transient;
+import javax.swing.text.html.HTMLDocument;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.Timestamped;
-import org.obiba.magma.Timestamps;
-import org.obiba.magma.Value;
+import org.obiba.magma.*;
 import org.obiba.magma.type.DateTimeType;
 
 import com.google.common.base.MoreObjects;
@@ -155,6 +153,15 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
   @Transient
   public boolean hasDatasource() {
     return MagmaEngine.get().hasDatasource(name);
+  }
+
+  @Transient
+  public Iterable<ValueSet> getGenotypesMappingValueSets() {
+    if (hasGenotypesMapping()) {
+      return MagmaEngine.get().getDatasource(name).getValueTable(genotypesMapping.getTableName()).getValueSets();
+    }
+
+    return Lists.newArrayList();
   }
 
   @Override

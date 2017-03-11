@@ -9,28 +9,26 @@
  */
 package org.obiba.opal.web.project;
 
-import java.util.Set;
-
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.core.UriBuilder;
-
-import org.obiba.magma.Datasource;
-import org.obiba.magma.Timestamped;
-import org.obiba.magma.Timestamps;
-import org.obiba.magma.Value;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.VariableEntity;
+import com.google.common.collect.Sets;
+import org.obiba.magma.*;
 import org.obiba.opal.core.domain.GenotypesMapping;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.web.magma.DatasourceResource;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Projects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Sets;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.core.UriBuilder;
+import java.util.Set;
 
 import static org.obiba.opal.web.model.Projects.ProjectDto;
 
 public class Dtos {
+
+
+  private static final Logger log = LoggerFactory.getLogger(Dtos.class);
 
   private Dtos() {}
 
@@ -142,5 +140,30 @@ public class Dtos {
             .setSampleIdVariable(genotypesMapping.getSampleIdVariable())
             .setSampleRoleVariable(genotypesMapping.getSampleRoleVariable())
             .build();
+  }
+
+  public static Projects.GenotypesSummaryDto asGenotypesSummary(Project project) {
+    Projects.GenotypesSummaryDto.Builder builder = Projects.GenotypesSummaryDto.newBuilder();
+
+    long participants = 0;
+    long partWithGenoTypes = 0;
+    long samples = 0;
+    long controlSamples = 0;
+
+    GenotypesMapping gm = project.getGenotypesMapping();
+
+    for (ValueSet v : project.getGenotypesMappingValueSets()) {
+      ValueTable vt = v.getValueTable();
+      VariableEntity entity = v.getVariableEntity();
+      String sampleId = entity.getIdentifier();
+      String participantId = vt.getValue(vt.getVariable(gm.getParticipantIdVariable()), v).toString();
+      String sampleRole = vt.getValue(vt.getVariable(gm.getSampleRoleVariable()), v).toString();
+
+      participants += participantId != null ? 1 : 0;
+      participants += participantId != null ? 1 : 0;
+
+    }
+
+    return builder.build();
   }
 }

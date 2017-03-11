@@ -142,6 +142,13 @@ public class ProjectResource {
     return resource;
   }
 
+  @GET
+  @Transactional(readOnly = true)
+  @Path("/genotypes/summary")
+  public Projects.GenotypesSummaryDto getGenotypesSummary() {
+    return Dtos.asGenotypesSummary(getProject());
+  }
+
   private Project getProject() {
     return projectService.getProject(name);
   }
