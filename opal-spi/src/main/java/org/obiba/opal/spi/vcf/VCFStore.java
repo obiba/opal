@@ -96,6 +96,15 @@ public interface VCFStore {
   void readVCF(String name, OutputStream out, Collection<String> samples) throws NoSuchElementException, IOException;
 
   /**
+   * Read the VCF statistics stored with the given name. The stream is a plain text file.
+   *
+   * @param name
+   * @param out The stream to write to.
+   * @return
+   */
+  void readVCFStatistics(String name, OutputStream out) throws NoSuchElementException, IOException;
+
+  /**
    * Some metrics about a VCF file.
    */
   interface VCFSummary {
