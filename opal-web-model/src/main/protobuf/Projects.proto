@@ -1,4 +1,5 @@
 import "Magma.proto";
+import "Plugins.proto";
 
 package Projects;
 
