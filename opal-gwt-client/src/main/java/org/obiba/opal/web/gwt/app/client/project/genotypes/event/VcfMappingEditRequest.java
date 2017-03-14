@@ -5,7 +5,7 @@ import com.gwtplatform.dispatch.annotation.Order;
 import org.obiba.opal.web.model.client.opal.VCFSamplesMappingDto;
 
 @GenEvent
-public class GenotypesMappingEditRequest {
+public class VcfMappingEditRequest {
   @Order(0)
-  VCFSamplesMappingDto genotypesMapping;
+  VCFSamplesMappingDto VCFSamplesMapping;
 }

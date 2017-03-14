@@ -123,7 +123,7 @@ public class ProjectGenotypeEditMappingTableModalView extends ModalPopupViewWith
   }
 
   @Override
-  public void setVCFSamplesMappingDto(VCFSamplesMappingDto dto) {
+  public void setVcfSamplesMappingDto(VCFSamplesMappingDto dto) {
     participantIdVariable.setText(dto.getParticipantIdVariable());
     sampleIdVariable.setText(dto.getSampleIdVariable());
     sampleRoleVariable.setText(dto.getSampleRoleVariable());

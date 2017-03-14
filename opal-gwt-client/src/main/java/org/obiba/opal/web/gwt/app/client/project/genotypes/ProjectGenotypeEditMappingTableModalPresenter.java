@@ -16,7 +16,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.project.genotypes.event.GenotypesMappingEditRequestEvent;
+import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfMappingEditRequestEvent;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
@@ -50,22 +50,22 @@ public class ProjectGenotypeEditMappingTableModalPresenter extends ModalPresente
     getView().setAvailableMappingTables(availableMappingTables);
   }
 
-  public void setGenotypesMapping(VCFSamplesMappingDto currentGenotypesMapping) {
+  public void setVCFSamplesMapping(VCFSamplesMappingDto currentGenotypesMapping) {
     projectName = currentGenotypesMapping.getProjectName();
-    getView().setVCFSamplesMappingDto(currentGenotypesMapping);
+    getView().setVcfSamplesMappingDto(currentGenotypesMapping);
   }
 
   @Override
   public void onSaveEdit() {
     getView().clearErrors();
     if(validationHandler.validate()) {
-      VCFSamplesMappingDto genotypeDto = VCFSamplesMappingDto.create();
-      genotypeDto.setParticipantIdVariable(getView().getParticipantIdVariable().getText());
-      genotypeDto.setSampleIdVariable(getView().getSampleIdVariable().getText());
-      genotypeDto.setSampleRoleVariable(getView().getSampleRoleVariable().getText());
-      genotypeDto.setTableName(getView().getMappingTable().getText());
-      genotypeDto.setProjectName(projectName);
-      fireEvent(new GenotypesMappingEditRequestEvent(genotypeDto));
+      VCFSamplesMappingDto dto = VCFSamplesMappingDto.create();
+      dto.setParticipantIdVariable(getView().getParticipantIdVariable().getText());
+      dto.setSampleIdVariable(getView().getSampleIdVariable().getText());
+      dto.setSampleRoleVariable(getView().getSampleRoleVariable().getText());
+      dto.setTableName(getView().getMappingTable().getText());
+      dto.setProjectName(projectName);
+      fireEvent(new VcfMappingEditRequestEvent(dto));
 
       getView().hideDialog();
     }
@@ -117,7 +117,7 @@ public class ProjectGenotypeEditMappingTableModalPresenter extends ModalPresente
 
     void setAvailableMappingTables(JsArray<TableDto> availableMappingTables);
 
-    void setVCFSamplesMappingDto(VCFSamplesMappingDto dto);
+    void setVcfSamplesMappingDto(VCFSamplesMappingDto dto);
 
     void clearErrors();
 

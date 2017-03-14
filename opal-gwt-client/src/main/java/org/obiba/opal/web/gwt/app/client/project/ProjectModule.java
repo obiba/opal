@@ -50,6 +50,8 @@ public class ProjectModule extends AbstractOpalModule {
         ProjectGenotypesView.class);
     bindPresenterWidget(ProjectImportVcfFileModalPresenter.class, ProjectImportVcfFileModalPresenter.Display.class,
         ProjectImportVcfFileModalView.class);
+    bindPresenterWidget(ProjectExportVcfFileModalPresenter.class, ProjectExportVcfFileModalPresenter.Display.class,
+        ProjectExportVcfFileModalView.class);
     bindPresenterWidget(ProjectGenotypeEditMappingTableModalPresenter.class,
         ProjectGenotypeEditMappingTableModalPresenter.Display.class, ProjectGenotypeEditMappingTableModalView.class);
   }

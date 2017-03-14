@@ -12,11 +12,25 @@
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
              xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
              xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+             xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
              ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
              ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
              ui:generateLocales="default">
 
   <g:FlowPanel>
+    <g:FlowPanel addStyleNames="pull-right">
+      <b:Button icon="UPLOAD_ALT" ui:field="importVCF" addStyleNames="small-indent">
+        <ui:msg description="Genotypes Import vcfFile label">Import</ui:msg>
+      </b:Button>
+
+      <b:Button icon="DOWNLOAD_ALT" ui:field="downloadVCF" addStyleNames="small-indent">
+        <ui:msg description="Genotypes Download vcfFile label">Export</ui:msg>
+      </b:Button>
+
+      <b:Button icon="TRASH" addStyleNames="small-indent">
+      </b:Button>
+    </g:FlowPanel>
+
     <g:FlowPanel>
       <b:Row>
         <b:Column size="6" addStyleNames="pull-left">
@@ -59,10 +73,8 @@
             <b:Heading size="4" addStyleNames="inline-block small-top-margin">
               <ui:msg description="Genotypes Mapping Table label">Mapping Table</ui:msg>
             </b:Heading>
-
-            <b:Button ui:field="editMapping" addStyleNames="pull-right">
-              <ui:msg description="Genotypes Edit Mapping Table label">Edit</ui:msg>
-            </b:Button>
+            <b2:IconAnchor ui:field="editMapping" icon="EDIT" addStyleNames="small-indent">
+            </b2:IconAnchor>
           </g:FlowPanel>
 
           <o:PropertiesTable keyStyleNames="span2">
@@ -101,25 +113,50 @@
       </b:Row>
     </g:FlowPanel>
 
-    <b:Button icon="UPLOAD" ui:field="importVCF" addStyleNames="pull-left">
-      <ui:msg description="Genotypes Import vcfFile label">Import VCF Files</ui:msg>
-    </b:Button>
+    <g:FlowPanel addStyleNames="container">
+      <g:FlowPanel addStyleNames="pull-right">
+        <g:FlowPanel addStyleNames="span4">
+          <o:OpalSimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
+        </g:FlowPanel>
 
-    <g:FlowPanel>
-      <b:Button icon="DOWNLOAD" ui:field="downloadVCF" addStyleNames="pull-right">
-        <ui:msg description="Genotypes Download vcfFile label">Download VCF Files</ui:msg>
-      </b:Button>
-
-      <o:OpalSimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right small-indent"/>
-
-      <b:Controls addStyleNames="pull-right">
-        <b:InputAddOn prependIcon="FILTER">
-          <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
-        </b:InputAddOn>
-      </b:Controls>
+        <g:FlowPanel addStyleNames="span4">
+          <b:Controls addStyleNames="pull-right">
+            <b:InputAddOn prependIcon="FILTER">
+              <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
+            </b:InputAddOn>
+          </b:Controls>
+        </g:FlowPanel>
+      </g:FlowPanel>
     </g:FlowPanel>
 
-    <o:Table ui:field="vcfFilesTable" addStyleNames="small-top-margin"/>
+    <g:FlowPanel>
+      <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false" addStyleNames="actions-select">
+
+        <g:FlowPanel addStyleNames="pull-left">
+          <b2:IconAnchor ui:field="deleteLink" icon="TRASH" addStyleNames="inline xsmall-indent">
+            <ui:msg description="Remove category label">Remove</ui:msg>
+          </b2:IconAnchor>
+        </g:FlowPanel>
+
+        <g:FlowPanel addStyleNames="pull-right">
+          <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
+          <b2:IconAnchor ui:field="selectAllAnchor" icon="CHECK" addStyleNames="inline small-indent"/>
+          <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" visible="false"
+                         addStyleNames="inline small-indent">
+            <ui:msg description="Clear label">Clear</ui:msg>
+          </b2:IconAnchor>
+        </g:FlowPanel>
+
+      </b:Alert>
+
+      <b:Alert ui:field="selectItemTipsAlert" close="false" visible="true" addStyleNames="alert-info actions-select">
+        <g:Label>
+          <ui:msg description="Select vcf files tips label">Select VCF files to export or remove.</ui:msg>
+        </g:Label>
+      </b:Alert>
+    </g:FlowPanel>
+
+    <o:Table ui:field="vcfFilesTable"/>
   </g:FlowPanel>
 
 </ui:UiBinder>

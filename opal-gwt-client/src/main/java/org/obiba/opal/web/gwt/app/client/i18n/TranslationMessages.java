@@ -420,6 +420,11 @@ public interface TranslationMessages extends Messages {
   @AlternateMessage({ "one", "1 Category" })
   String nCategoriesLabel(@PluralCount int nb);
 
+  @Description("N VCFs label")
+  @DefaultMessage("{0} VCF files")
+  @AlternateMessage({ "one", "1 VCF file" })
+  String nVCFsLabel(@PluralCount int nb);
+
   @Description("N Attributes label")
   @DefaultMessage("{0} Attributes")
   @AlternateMessage({ "one", "1 Attribute" })
