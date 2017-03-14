@@ -11,7 +11,6 @@
 package org.obiba.opal.web.gwt.app.client.project.genotypes;
 
 import com.github.gwtbootstrap.client.ui.Alert;
-import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.google.gwt.core.client.JsArray;
@@ -88,7 +87,25 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   TextBoxClearable filter;
 
   @UiField
-  Button editMapping;
+  IconAnchor editMapping;
+
+  @UiField
+  Alert selectItemTipsAlert;
+
+  @UiField
+  IconAnchor deleteLink;
+
+  @UiField
+  Alert selectAllItemsAlert;
+
+  @UiField
+  Label selectAllStatus;
+
+  @UiField
+  IconAnchor selectAllAnchor;
+
+  @UiField
+  IconAnchor clearSelectionAnchor;
 
   private final Translations translations;
 
@@ -113,7 +130,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   }
 
   @Override
-  public void setGenotypesSummary(VCFSamplesSummaryDto dto) {
+  public void setVCFSamplesSummary(VCFSamplesSummaryDto dto) {
     participants.setText(dto.getParticipants()+"");
     participantsWithGenotype.setText(dto.getParticipantsWithGenotype()+"");
     samples.setText(dto.getSamples()+"");
@@ -121,12 +138,12 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   }
 
   @Override
-  public void setGenotypesMapping(VCFSamplesMappingDto genotypesMapping) {
-    project.setText(genotypesMapping.getProjectName());
-    table.setText(genotypesMapping.getTableName());
-    participantId.setText(genotypesMapping.getParticipantIdVariable());
-    sampleId.setText(genotypesMapping.getSampleIdVariable());
-    sampleRole.setText(genotypesMapping.getSampleRoleVariable());
+  public void setVCFSamplesMapping(VCFSamplesMappingDto vcfSamplesMapping) {
+    project.setText(vcfSamplesMapping.getProjectName());
+    table.setText(vcfSamplesMapping.getTableName());
+    participantId.setText(vcfSamplesMapping.getParticipantIdVariable());
+    sampleId.setText(vcfSamplesMapping.getSampleIdVariable());
+    sampleRole.setText(vcfSamplesMapping.getSampleRoleVariable());
   }
 
   @Override
@@ -219,17 +236,17 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
     @Override
     public IconAnchor getClearSelection() {
-      return null;
+      return clearSelectionAnchor;
     }
 
     @Override
     public IconAnchor getSelectAll() {
-      return null;
+      return selectAllAnchor;
     }
 
     @Override
     public HasText getSelectAllStatus() {
-      return null;
+      return selectAllStatus;
     }
 
     @Override
@@ -239,17 +256,17 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
     @Override
     public String getNItemLabel(int nb) {
-      return null;
+      return translationMessages.nVCFsLabel(nb);
     }
 
     @Override
     public Alert getSelectActionsAlert() {
-      return null;
+      return selectAllItemsAlert;
     }
 
     @Override
     public Alert getSelectTipsAlert() {
-      return null;
+      return selectItemTipsAlert;
     }
   }
 

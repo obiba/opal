@@ -22,8 +22,8 @@ import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
-import org.obiba.opal.web.gwt.app.client.project.genotypes.event.GenotypesMappingEditRequestEvent;
 import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfFileUploadRequestEvent;
+import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfMappingEditRequestEvent;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
@@ -50,6 +50,8 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   private final ModalProvider<ProjectImportVcfFileModalPresenter> vcfFileUploadModalPresenterModalProvider;
 
+  private final ModalProvider<ProjectExportVcfFileModalPresenter> vcfFileDownloadModalPresenterModalProvider;
+
   private final ModalProvider<ProjectGenotypeEditMappingTableModalPresenter> projectGenotypeEditMappingTableModalPresenterModalProvider;
 
   private JsArray<TableDto> mappingTables = JsArrays.create();
@@ -57,10 +59,12 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   @Inject
   public ProjectGenotypesPresenter(Display display, EventBus eventBus,
                                    ModalProvider<ProjectImportVcfFileModalPresenter> vcfFileUploadModalPresenterModalProvider,
+                                   ModalProvider<ProjectExportVcfFileModalPresenter> vcfFileDownloadModalPresenterModalProvider,
                                    ModalProvider<ProjectGenotypeEditMappingTableModalPresenter> editMappingTableModalPresenterModalProvider) {
     super(eventBus, display);
     getView().setUiHandlers(this);
     this.vcfFileUploadModalPresenterModalProvider = vcfFileUploadModalPresenterModalProvider.setContainer(this);
+    this.vcfFileDownloadModalPresenterModalProvider = vcfFileDownloadModalPresenterModalProvider.setContainer(this);
     projectGenotypeEditMappingTableModalPresenterModalProvider = editMappingTableModalPresenterModalProvider.setContainer(this);
     initializeEventListeners();
   }
@@ -74,10 +78,10 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
       }
     });
 
-    addRegisteredHandler(GenotypesMappingEditRequestEvent.getType(), new GenotypesMappingEditRequestEvent.GenotypesMappingEditRequestHandler() {
+    addRegisteredHandler(VcfMappingEditRequestEvent.getType(), new VcfMappingEditRequestEvent.VcfMappingEditRequestHandler() {
       @Override
-      public void onGenotypesMappingEditRequest(GenotypesMappingEditRequestEvent event) {
-        updateGenotypesMapping(event.getGenotypesMapping());
+      public void onVcfMappingEditRequest(VcfMappingEditRequestEvent event) {
+        updateVCFMapping(event.getVCFSamplesMapping());
       }
     });
   }
@@ -94,6 +98,7 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   @Override
   public void onDownloadVcfFiles() {
+    vcfFileDownloadModalPresenterModalProvider.get();
   }
 
   @Override
@@ -105,7 +110,7 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   public void onEditMappingTable() {
     ProjectGenotypeEditMappingTableModalPresenter presenter = projectGenotypeEditMappingTableModalPresenterModalProvider.create();
     presenter.setMappingTables(mappingTables);
-    presenter.setGenotypesMapping(currentGenotypesMapping());
+    presenter.setVCFSamplesMapping(currentGenotypesMapping());
     projectGenotypeEditMappingTableModalPresenterModalProvider.show();
   }
 
@@ -137,7 +142,7 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
         @Override
         public void onResource(Response response, VCFSamplesSummaryDto summary) {
           logger.info("Received Genotypes summary");
-          getView().setGenotypesSummary(summary);
+          getView().setVCFSamplesSummary(summary);
         }
       }).get().send();
   }
@@ -158,7 +163,7 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   }
 
   private void getMappingTable() {
-    getView().setGenotypesMapping(currentGenotypesMapping());
+    getView().setVCFSamplesMapping(currentGenotypesMapping());
     Map<String, String> params = Maps.newHashMap();
     params.put(ENTITY_TYPE_PARAM, ENTITY_TYPE);
 
@@ -174,15 +179,14 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   }
 
   private VCFSamplesMappingDto currentGenotypesMapping() {
-//    VCFSamplesMappingDto vcfSamplesMappingDto =
-//      projectDto.hasVcfSamplesMapping() ? projectDto.getVcfSamplesMapping() : VCFSamplesMappingDto.create();
-    VCFSamplesMappingDto vcfSamplesMappingDto =  VCFSamplesMappingDto.create();
+    VCFSamplesMappingDto vcfSamplesMappingDto =
+      projectDto.hasVcfSamplesMapping() ? projectDto.getVcfSamplesMapping() : VCFSamplesMappingDto.create();
     vcfSamplesMappingDto.setProjectName(projectDto.getName());
     return vcfSamplesMappingDto;
   }
 
-  private void updateGenotypesMapping(VCFSamplesMappingDto dto) {
-//    projectDto.setVcfSamplesMapping(dto);
+  private void updateVCFMapping(VCFSamplesMappingDto dto) {
+    projectDto.setVcfSamplesMapping(dto);
 
     ResourceRequestBuilderFactory
         .newBuilder()
@@ -238,9 +242,9 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   public interface Display extends View, HasUiHandlers<ProjectGenotypesUiHandlers> {
 
-    void setGenotypesSummary(VCFSamplesSummaryDto dto);
+    void setVCFSamplesSummary(VCFSamplesSummaryDto dto);
 
-    void setGenotypesMapping(VCFSamplesMappingDto dto);
+    void setVCFSamplesMapping(VCFSamplesMappingDto dto);
 
     void beforeRenderRows();
 
