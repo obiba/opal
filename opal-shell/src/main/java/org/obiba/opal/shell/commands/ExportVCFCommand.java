@@ -37,8 +37,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-@CommandUsage(description = "Generate a report based on the specified report template.",
-    syntax = "Syntax: report --project PROJECT --name TEMPLATE")
+@CommandUsage(description = "Export one or more VCF files from a project into a destination folder.",
+    syntax = "Syntax: export-vcf --project PROJECT --destination DESTINATION NAMES")
 public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<ExportVCFCommandOptions> {
 
   private static final Logger log = LoggerFactory.getLogger(ExportVCFCommand.class);

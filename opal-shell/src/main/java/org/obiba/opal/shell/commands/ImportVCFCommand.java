@@ -31,8 +31,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-@CommandUsage(description = "Generate a report based on the specified report template.",
-    syntax = "Syntax: report --project PROJECT --name TEMPLATE")
+@CommandUsage(description = "Import VCF file into a project.",
+    syntax = "Syntax: import-vcf --project PROJECT --name NAME --file FILE")
 public class ImportVCFCommand extends AbstractOpalRuntimeDependentCommand<ImportVCFCommandOptions> {
 
   private static final Logger log = LoggerFactory.getLogger(ImportVCFCommand.class);
