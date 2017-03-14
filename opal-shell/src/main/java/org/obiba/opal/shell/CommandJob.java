@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import com.google.common.base.Strings;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.obiba.opal.shell.commands.Command;
@@ -100,7 +101,8 @@ public class CommandJob implements OpalShell, Runnable {
     Session session = SecurityUtils.getSubject().getSession(false);
     if(session != null) session.touch();
     if (percent == 100) {
-      messages.add(createMessage(String.format("%s %s completed.", message, name)));
+      String strMessage = Strings.isNullOrEmpty(message) ? name + " completed." : message;
+      messages.add(createMessage(strMessage));
     }
     messageProgress = message;
     currentProgress = current;

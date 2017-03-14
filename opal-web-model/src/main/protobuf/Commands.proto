@@ -82,3 +82,17 @@ message ReportCommandOptionsDto {
   required string name = 1;
   required string project = 2;
 }
+
+message ImportVCFCommandOptionsDto {
+  required string name = 1; // VCF file name in the store
+  required string project = 2; // store location
+  required string file = 3; // VCF file location
+}
+
+message ExportVCFCommandOptionsDto {
+  repeated string names = 1; // VCF file names
+  required string project = 2; // store location
+  required string destination = 3; // Destination folder
+  optional string table = 4; // table reference to be used for sample subseting
+  optional bool caseControl = 5 [default = true];
+}
