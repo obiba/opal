@@ -26,13 +26,8 @@ import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.Dtos;
 import org.obiba.opal.shell.commands.Command;
-import org.obiba.opal.shell.commands.options.CopyCommandOptions;
-import org.obiba.opal.shell.commands.options.ImportCommandOptions;
-import org.obiba.opal.shell.commands.options.ReportCommandOptions;
-import org.obiba.opal.shell.web.CopyCommandOptionsDtoImpl;
-import org.obiba.opal.shell.web.ExportCommandOptionsDtoImpl;
-import org.obiba.opal.shell.web.ImportCommandOptionsDtoImpl;
-import org.obiba.opal.shell.web.ReportCommandOptionsDtoImpl;
+import org.obiba.opal.shell.commands.options.*;
+import org.obiba.opal.shell.web.*;
 import org.obiba.opal.web.model.Commands;
 import org.obiba.opal.web.support.InvalidRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +65,10 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
 
     return commandDtoList;
   }
+
+  //
+  // Phenotype data
+  //
 
   @POST
   @Path("/_import")
@@ -126,6 +125,32 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
 
     return launchCommand(commandName, copyCommand);
   }
+
+  //
+  // Genotype data
+  //
+
+  @POST
+  @Path("/_import_vcf")
+  public Response importVCF(Commands.ImportVCFCommandOptionsDto optionsDto) {
+    ImportVCFCommandOptions options = new ImportVCFCommandOptionsDtoImpl(optionsDto);
+    Command<ImportVCFCommandOptions> command = commandRegistry.newCommand("import-vcf");
+    command.setOptions(options);
+    return launchCommand(command);
+  }
+
+  @POST
+  @Path("/_export_vcf")
+  public Response exportVCF(Commands.ExportVCFCommandOptionsDto optionsDto) {
+    ExportVCFCommandOptions options = new ExportVCFCommandOptionsDtoImpl(optionsDto);
+    Command<ExportVCFCommandOptions> command = commandRegistry.newCommand("export-vcf");
+    command.setOptions(options);
+    return launchCommand(command);
+  }
+
+  //
+  // Report
+  //
 
   @POST
   @Path("/_report")

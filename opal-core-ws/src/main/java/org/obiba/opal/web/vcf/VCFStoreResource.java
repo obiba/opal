@@ -49,19 +49,6 @@ public interface VCFStoreResource {
   List<Plugins.VCFSummaryDto> getVCFList();
 
   /**
-   * Add a VCF file at the specified location in Opal file system. If name is not provided, the base name of the file
-   * will be used.
-   *
-   * @param uriInfo
-   * @param vcfPath
-   * @param name Optional VCF file base name
-   * @return
-   */
-  @POST
-  @Path("/vcfs")
-  Response addVCF(@Context UriInfo uriInfo, @QueryParam("file") String vcfPath, @QueryParam("name") String name);
-
-  /**
    * Delete a VCF file. Does not fail if such VCF is not found.
    *
    * @param vcfName
@@ -81,17 +68,4 @@ public interface VCFStoreResource {
   @Path("/vcf/{vcfName}")
   Plugins.VCFSummaryDto getVCF(@PathParam("vcfName") String vcfName);
 
-  /**
-   * Download the (compressed) VCF file, optionally encrypted.
-   *
-   * @param vcfName
-   * @param table Table fully qualified name that provides either a Participant or a Sample list, to be used for subsetting the VCF file.
-   * @param withCaseControls
-   * @param fileKey
-   * @return
-   */
-  @GET
-  @Path("/vcf/{vcfName}/_download")
-  Response downloadVCF(@PathParam("vcfName") String vcfName, @QueryParam("table") String table,
-                       @QueryParam("cc") boolean withCaseControls, @HeaderParam("X-File-Key") String fileKey);
 }
