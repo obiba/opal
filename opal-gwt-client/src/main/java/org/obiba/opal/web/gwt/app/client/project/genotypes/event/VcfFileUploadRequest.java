@@ -5,7 +5,7 @@ import com.gwtplatform.dispatch.annotation.Optional;
 import com.gwtplatform.dispatch.annotation.Order;
 
 @GenEvent
-public class VCFFileUploadRequest {
+public class VcfFileUploadRequest {
     @Order(0)
     String file;
 

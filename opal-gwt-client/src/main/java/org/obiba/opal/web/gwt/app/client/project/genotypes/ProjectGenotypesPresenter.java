@@ -179,14 +179,15 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   }
 
   private VCFSamplesMappingDto currentGenotypesMapping() {
-    VCFSamplesMappingDto vcfSamplesMappingDto =
-      projectDto.hasVcfSamplesMapping() ? projectDto.getVcfSamplesMapping() : VCFSamplesMappingDto.create();
+//    VCFSamplesMappingDto vcfSamplesMappingDto =
+//      projectDto.hasVcfSamplesMapping() ? projectDto.getVcfSamplesMapping() : VCFSamplesMappingDto.create();
+    VCFSamplesMappingDto vcfSamplesMappingDto = VCFSamplesMappingDto.create();
     vcfSamplesMappingDto.setProjectName(projectDto.getName());
     return vcfSamplesMappingDto;
   }
 
   private void updateVCFMapping(VCFSamplesMappingDto dto) {
-    projectDto.setVcfSamplesMapping(dto);
+//    projectDto.setVcfSamplesMapping(dto);
 
     ResourceRequestBuilderFactory
         .newBuilder()

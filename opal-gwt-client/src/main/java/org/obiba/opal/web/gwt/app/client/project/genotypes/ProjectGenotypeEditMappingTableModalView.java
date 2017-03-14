@@ -127,7 +127,7 @@ public class ProjectGenotypeEditMappingTableModalView extends ModalPopupViewWith
     participantIdVariable.setText(dto.getParticipantIdVariable());
     sampleIdVariable.setText(dto.getSampleIdVariable());
     sampleRoleVariable.setText(dto.getSampleRoleVariable());
-    getMappingTable().setText(dto.getTableName());
+    getMappingTable().setText(dto.getTableReference());
   }
 
   @Override
