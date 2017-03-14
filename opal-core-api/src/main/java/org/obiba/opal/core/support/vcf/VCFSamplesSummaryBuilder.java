@@ -8,6 +8,7 @@ import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.obiba.opal.core.domain.VCFSampleRole;
 import org.obiba.opal.core.domain.VCFSamplesMapping;
 import org.obiba.opal.spi.vcf.VCFStore;
 
@@ -53,8 +54,8 @@ public class VCFSamplesSummaryBuilder {
           participants.add(participantId);
           if (allSamples.contains(sampleId)) participantsWithGenotypes.add(participantId);
         }
-        if ("sample".equals(role)) stats.samples++;
-        else if ("control".equals(role)) stats.controlSamples++;
+        if (VCFSampleRole.isSample(role)) stats.samples++;
+        else if (VCFSampleRole.isControl(role)) stats.controlSamples++;
       }
 
       // unique genotype participants count
@@ -79,16 +80,17 @@ public class VCFSamplesSummaryBuilder {
       for (ValueSet v : valueSets) {
         String sampleId = v.getVariableEntity().getIdentifier();
         String participantId = vt.getValue(participantVariable, v).toString();
-        String role = vt.getValue(roleVariable, v).toString();
+        String roleName = vt.getValue(roleVariable, v).toString();
 
         if (allSamples.contains(sampleId)){
           if (Strings.isNullOrEmpty(participantId)) {
-            if ("sample".equals(role)) stats.orphanSamples++;
+            if (VCFSampleRole.isSample(roleName)) stats.orphanSamples++;
           } else {
             participants.add(participantId);
           }
 
-          if ("control".equals(role)) stats.controlSamples++;
+          if (VCFSampleRole.isSample(roleName)) stats.samples++;
+          else if (VCFSampleRole.isControl(roleName)) stats.controlSamples++;
         }
 
       }
@@ -101,29 +103,29 @@ public class VCFSamplesSummaryBuilder {
   }
 
   public static class Stats {
-    long participants = 0L;
-    long participantsWithGenotypes = 0L;
-    long samples = 0L;
-    long controlSamples = 0L;
-    long orphanSamples = 0L;
+    int participants = 0;
+    int participantsWithGenotypes = 0;
+    int samples = 0;
+    int controlSamples = 0;
+    int orphanSamples = 0;
 
-    public long getParticipants() {
+    public int getParticipants() {
       return participants;
     }
 
-    public long getParticipantsWithGenotypes() {
+    public int getParticipantsWithGenotypes() {
       return participantsWithGenotypes;
     }
 
-    public long getSamples() {
+    public int getSamples() {
       return samples;
     }
 
-    public long getControlSamples() {
+    public int getControlSamples() {
       return controlSamples;
     }
 
-    public long getOrphanSamples() {
+    public int getOrphanSamples() {
       return orphanSamples;
     }
   }

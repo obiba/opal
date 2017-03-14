@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.VCFSamplesMappingDto;
 
 import javax.annotation.Nullable;
@@ -50,8 +51,8 @@ public class ProjectGenotypeEditMappingTableModalPresenter extends ModalPresente
     getView().setAvailableMappingTables(availableMappingTables);
   }
 
-  public void setVCFSamplesMapping(VCFSamplesMappingDto currentGenotypesMapping) {
-    projectName = currentGenotypesMapping.getProjectName();
+  public void setVCFSamplesMapping(VCFSamplesMappingDto currentGenotypesMapping, ProjectDto projectDto) {
+    projectName = projectDto.getName();
     getView().setVcfSamplesMappingDto(currentGenotypesMapping);
   }
 

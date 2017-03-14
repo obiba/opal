@@ -20,16 +20,23 @@ message PluginDto {
 message VCFStoreDto {
     required string name = 1;
     repeated string vcf = 2; // VCF file names
-    required int32 samplesCount = 3;
+    required int32 totalSamplesCount = 3;
+    optional int32 samplesCount = 4;
+    optional int32 controlSamplesCount = 5;
+    optional int32 participantsCount = 6;
+    optional int32 participantsWithGenotypeCount = 7;
 }
 
 message VCFSummaryDto {
     required string name = 1; // VCF file name
     required int64 size = 2; // VCF file size
-    required int32 samplesCount = 3;
-    required int32 variantsCount = 4;
-    required int32 genotypesCount = 5;
-    optional VCFSamplesSummaryDto samplesSummary = 6;
+    required int32 totalSamplesCount = 3;
+    required int32 samplesCount = 4;
+    required int32 variantsCount = 5;
+    required int32 genotypesCount = 6;
+    optional int32 participantsCount = 7;
+    optional int32 orphanSamplesCount = 8;
+    optional int32 controlSamplesCount = 9;
 }
 
 message VCFSamplesMappingDto {
@@ -38,12 +45,4 @@ message VCFSamplesMappingDto {
     required string participantIdVariable = 3;
     required string sampleIdVariable = 4;
     required string sampleRoleVariable = 5;
-}
-
-message VCFSamplesSummaryDto {
-    optional int64 participants = 1;
-    optional int64 participantsWithGenotype = 2;
-    optional int64 samples = 3;
-    optional int64 controlSamples = 4;
-    optional int64 orphanSamples = 5;
 }

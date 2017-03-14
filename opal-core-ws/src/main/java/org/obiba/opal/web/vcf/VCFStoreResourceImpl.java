@@ -13,6 +13,7 @@ package org.obiba.opal.web.vcf;
 
 import org.obiba.opal.core.domain.VCFSamplesMapping;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.NoSuchVCFSamplesMappingException;
 import org.obiba.opal.core.service.VCFSamplesMappingService;
 import org.obiba.opal.core.support.vcf.VCFSamplesSummaryBuilder;
 import org.obiba.opal.spi.vcf.VCFStore;
@@ -49,13 +50,19 @@ public class VCFStoreResourceImpl implements VCFStoreResource {
     VCFStoreService service = opalRuntime.getVCFStoreService(serviceName);
     if (!service.hasStore(name)) service.createStore(name);
     store = service.getStore(name);
-    summaryBuilder = new VCFSamplesSummaryBuilder().mappings(vcfSamplesMappingService.getVCFSamplesMapping(name));
+    summaryBuilder = new VCFSamplesSummaryBuilder();
+
+    try {
+      summaryBuilder.mappings(vcfSamplesMappingService.getVCFSamplesMapping(name));
+    } catch (NoSuchVCFSamplesMappingException e) {
+    }
+
     this.name = name;
   }
 
   @Override
   public Plugins.VCFStoreDto get() {
-    return Dtos.asDto(store);
+    return Dtos.asDto(store, summaryBuilder.sampleIds(store.getSampleIds()).buildGeneralSummary());
   }
 
   @Override
@@ -74,11 +81,6 @@ public class VCFStoreResourceImpl implements VCFStoreResource {
     VCFSamplesMapping vcfSamplesMapping = vcfSamplesMappingService.getVCFSamplesMapping(name);
     vcfSamplesMappingService.delete(vcfSamplesMapping.getProjectName());
     return Response.ok().build();
-  }
-
-  @Override
-  public Plugins.VCFSamplesSummaryDto getSummary() {
-    return Dtos.fromDto(summaryBuilder.sampleIds(store.getSampleIds()).buildGeneralSummary());
   }
 
   @Override

@@ -159,6 +159,13 @@ public enum UriBuilders {
     }
   },
 
+  DATASOURCES_TABLES {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasources", "tables");
+    }
+  },
+
   DATASOURCE_TABLES_EXCEL {
     @Override
     public UriBuilder create() {
@@ -440,13 +447,6 @@ public enum UriBuilders {
     }
   },
 
-  PROJECT_GENOTYPES_SUMMARY {
-    @Override
-    public UriBuilder create() {
-      return UriBuilder.create().segment("project", "{}", "vcf-store", "summary");
-    }
-  },
-
   PROJECT_VCF_STORE {
     @Override
     public UriBuilder create() {
@@ -458,6 +458,13 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("project", "{}", "vcf-store", "vcfs");
+    }
+  },
+
+  PROJECT_VCF_STORE_IMPORT {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "commands", "_import_vcf");
     }
   },
 

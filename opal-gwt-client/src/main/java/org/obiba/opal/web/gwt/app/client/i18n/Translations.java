@@ -451,6 +451,7 @@ public interface Translations extends Constants {
       "DatasourceReadFailed", "The datasource cannot be read: {0}.",//
       "CircularVariableDependency", "Circular dependency for variable '{0}'.:<br /><br /><pre>{1}</pre>",//
       "NoSuchProject", "No such project '{0}'.",//
+      "NoSuchVCFSamplesMapping", "No such VCF sample mapping '{0}'.",//
       "NoSuchDatabase", "No such database '{0}'.",//
       "SubjectPrincipalNotFound", "No such subject principal '{0}'.",//
       "SubjectProfileNotFound", "No profile for subject '{0}'.",//
@@ -1239,6 +1240,7 @@ public interface Translations extends Constants {
   @DefaultStringMapValue({ "HOME", "Home", //
       "TABLES", "Tables", //
       "FILES", "Files", //
+      "GENOTYPES", "Genotypes Data", //
       "VISUALISATION", "Data visualization", //
       "REPORTS", "Reports", //
       "TASKS", "Tasks", //

@@ -118,7 +118,7 @@ public class ProjectGenotypeEditMappingTableModalView extends ModalPopupViewWith
     mappingTable.clear();
 
     for (TableDto tableDto : JsArrays.toIterable(availableMappingTables)) {
-      mappingTable.addItem(tableDto.getName(), tableDto.getName());
+      mappingTable.addItem(tableDto.getName(), tableDto.getDatasourceName() + "." + tableDto.getName());
     }
   }
 

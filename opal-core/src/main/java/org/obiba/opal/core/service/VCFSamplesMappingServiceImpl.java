@@ -43,11 +43,11 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService {
   }
 
   @Override
-  public boolean hasVCFSamplesMapping(@NotNull String projectName) {
+  public boolean hasVCFSamplesMapping(@NotNull String samplesMapping) {
     try {
-      getVCFSamplesMapping(projectName);
+      getVCFSamplesMapping(samplesMapping);
       return true;
-    } catch(NoSuchProjectException e) {
+    } catch(NoSuchVCFSamplesMappingException e) {
       return false;
     }
   }

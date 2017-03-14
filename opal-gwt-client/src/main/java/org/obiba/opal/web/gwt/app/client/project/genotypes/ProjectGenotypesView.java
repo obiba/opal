@@ -40,13 +40,17 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.model.client.opal.VCFSamplesMappingDto;
-import org.obiba.opal.web.model.client.opal.VCFSamplesSummaryDto;
+import org.obiba.opal.web.model.client.opal.VCFStoreDto;
 import org.obiba.opal.web.model.client.opal.VCFSummaryDto;
 
 import java.util.Comparator;
+import java.util.logging.Logger;
 
 public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiHandlers>
     implements ProjectGenotypesPresenter.Display {
+
+
+  private static Logger logger = Logger.getLogger("ProjectGenotypesView");
 
   private static final int SORTABLE_COLUMN_VCF_FILE = 1;
 
@@ -130,15 +134,16 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   }
 
   @Override
-  public void setVCFSamplesSummary(VCFSamplesSummaryDto dto) {
-    participants.setText(dto.getParticipants()+"");
-    participantsWithGenotype.setText(dto.getParticipantsWithGenotype()+"");
-    samples.setText(dto.getSamples()+"");
-    controlSamples.setText(dto.getControlSamples()+"");
+  public void setVCFSamplesSummary(VCFStoreDto dto) {
+    participants.setText(dto.getParticipantsCount()+"");
+    participantsWithGenotype.setText(dto.getParticipantsWithGenotypeCount()+"");
+    samples.setText(dto.getSamplesCount()+"");
+    controlSamples.setText(dto.getControlSamplesCount()+"");
   }
 
   @Override
   public void setVCFSamplesMapping(VCFSamplesMappingDto vcfSamplesMapping) {
+    logger.info(vcfSamplesMapping.getProjectName() + " " + vcfSamplesMapping.getTableReference());
     project.setText(vcfSamplesMapping.getProjectName());
     table.setText(vcfSamplesMapping.getTableReference());
     participantId.setText(vcfSamplesMapping.getParticipantIdVariable());
@@ -307,8 +312,8 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
       @Override
       public String getValue(VCFSummaryDto vcfSummaryDto) {
-        return vcfSummaryDto.hasSamplesSummary()
-          ? Double.toString(vcfSummaryDto.getSamplesSummary().getParticipants())
+        return vcfSummaryDto.hasParticipantsCount()
+          ? Integer.toString(vcfSummaryDto.getParticipantsCount())
           : "0";
       }
     };
@@ -317,8 +322,8 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
       @Override
       public String getValue(VCFSummaryDto vcfSummaryDto) {
-        return vcfSummaryDto.hasSamplesSummary()
-          ? Double.toString(vcfSummaryDto.getSamplesSummary().getOrphanSamples())
+        return vcfSummaryDto.hasOrphanSamplesCount()
+          ? Integer.toString(vcfSummaryDto.getOrphanSamplesCount())
           : "0";
       }
     };
@@ -327,8 +332,8 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
       @Override
       public String getValue(VCFSummaryDto vcfSummaryDto) {
-        return vcfSummaryDto.hasSamplesSummary()
-          ? Double.toString(vcfSummaryDto.getSamplesSummary().getControlSamples())
+        return vcfSummaryDto.hasControlSamplesCount()
+          ? Integer.toString(vcfSummaryDto.getControlSamplesCount())
           : "0";
       }
     };

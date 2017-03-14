@@ -38,27 +38,30 @@ public class Dtos {
     return builder.build();
   }
 
-  public static Plugins.VCFStoreDto asDto(VCFStore store) {
-    Plugins.VCFStoreDto.Builder builder = Plugins.VCFStoreDto.newBuilder();
-    builder.setName(store.getName()) //
-        .setSamplesCount(store.getSampleIds().size()) //
-        .addAllVcf(store.getVCFNames());
-    return builder.build();
+  public static Plugins.VCFStoreDto asDto(VCFStore store, VCFSamplesSummaryBuilder.Stats stats) {
+    return Plugins.VCFStoreDto.newBuilder()
+      .setName(store.getName()) //
+      .setTotalSamplesCount(store.getSampleIds().size()) //
+      .setParticipantsCount(stats.getParticipants()) //
+      .setParticipantsWithGenotypeCount(stats.getParticipantsWithGenotypes()) //
+      .setControlSamplesCount(stats.getControlSamples()) //
+      .setSamplesCount(stats.getSamples()) //
+      .addAllVcf(store.getVCFNames())
+      .build();
   }
 
   public static Plugins.VCFSummaryDto asDto(VCFStore.VCFSummary summary, VCFSamplesSummaryBuilder.Stats stats) {
-    Plugins.VCFSummaryDto.Builder builder = Plugins.VCFSummaryDto.newBuilder();
-    builder.setName(summary.getName()) //
-        .setSize(summary.size()) //
-        .setSamplesCount(summary.getSampleIds().size()) //
-        .setGenotypesCount(summary.getGenotypesCount()) //
-        .setVariantsCount(summary.getVariantsCount())
-        .setSamplesSummary(Plugins.VCFSamplesSummaryDto.newBuilder()
-          .setParticipants(stats.getParticipants())
-          .setOrphanSamples(stats.getOrphanSamples())
-          .setControlSamples(stats.getControlSamples())
-        );
-    return builder.build();
+    return Plugins.VCFSummaryDto.newBuilder()
+      .setName(summary.getName()) //
+      .setSize(summary.size()) //
+      .setTotalSamplesCount(summary.getSampleIds().size()) //
+      .setSamplesCount(stats.getSamples()) //
+      .setGenotypesCount(summary.getGenotypesCount()) //
+      .setVariantsCount(summary.getVariantsCount()) //
+      .setParticipantsCount(stats.getParticipants()) //
+      .setOrphanSamplesCount(stats.getOrphanSamples())
+      .setControlSamplesCount(stats.getControlSamples())
+      .build();
   }
 
   public static VCFSamplesMapping fromDto(Plugins.VCFSamplesMappingDto dto) {
@@ -79,15 +82,5 @@ public class Dtos {
       .setSampleIdVariable(sampleMappings.getSampleIdVariable())
       .setSampleRoleVariable(sampleMappings.getSampleRoleVariable())
       .build();
-  }
-
-  public static Plugins.VCFSamplesSummaryDto fromDto(VCFSamplesSummaryBuilder.Stats stats) {
-    Plugins.VCFSamplesSummaryDto.Builder builder = Plugins.VCFSamplesSummaryDto.newBuilder();
-    builder.setParticipants(stats.getParticipants());
-    builder.setParticipantsWithGenotype(stats.getParticipantsWithGenotypes());
-    builder.setSamples(stats.getSamples());
-    builder.setControlSamples(stats.getControlSamples());
-
-    return builder.build();
   }
 }

@@ -24,7 +24,7 @@
         <o:OpalSimplePanel ui:field="vcfFilePanel"/>
       </b:Controls>
       <b:HelpBlock>
-        <ui:msg description="Genotypes Import file content help">The file readable name.</ui:msg>
+        <ui:msg description="Genotypes Import file content help">The VCF file path.</ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 

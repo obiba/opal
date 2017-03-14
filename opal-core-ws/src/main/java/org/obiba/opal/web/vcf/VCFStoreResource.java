@@ -10,13 +10,10 @@
 
 package org.obiba.opal.web.vcf;
 
-import org.obiba.opal.core.support.vcf.VCFSamplesSummaryBuilder;
 import org.obiba.opal.web.model.Plugins;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import java.util.List;
 
 /**
@@ -69,15 +66,6 @@ public interface VCFStoreResource {
   @DELETE
   @Path("/samples")
   Response deleteSamplesMapping();
-
-  /**
-   * Get the {@link org.obiba.opal.spi.vcf.VCFStore.VCFSummary} list.
-   *
-   * @return
-   */
-  @GET
-  @Path("/summary")
-  Plugins.VCFSamplesSummaryDto getSummary();
 
   /**
    * Get the {@link org.obiba.opal.spi.vcf.VCFStore.VCFSummary} list.

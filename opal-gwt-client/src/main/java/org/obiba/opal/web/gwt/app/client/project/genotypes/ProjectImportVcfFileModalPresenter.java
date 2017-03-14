@@ -76,12 +76,10 @@ public class ProjectImportVcfFileModalPresenter extends ModalPresenterWidget<Pro
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      if(validators == null) {
         validators = new LinkedHashSet<>();
         validators.add(new ConditionValidator(vcfFileExtensionCondition(fileSelectionPresenter.getSelectedFile()),
                 "VCFFileRequired",
                 Display.FormField.FILE.name()));
-      }
       return validators;
     }
 
@@ -98,7 +96,6 @@ public class ProjectImportVcfFileModalPresenter extends ModalPresenterWidget<Pro
     protected void showMessage(String id, String message) {
       getView().showError(Display.FormField.valueOf(id), message);
     }
-
   }
 
   public interface Display extends PopupView, HasUiHandlers<ProjectImportVcfFileModalUiHandlers> {
