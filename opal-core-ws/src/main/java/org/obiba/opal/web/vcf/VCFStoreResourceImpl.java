@@ -16,6 +16,7 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.support.vcf.VCFSamplesSummaryBuilder;
 import org.obiba.opal.spi.vcf.VCFStore;
 import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.model.Plugins;
@@ -51,6 +52,7 @@ public class VCFStoreResourceImpl implements VCFStoreResource {
   private final MimetypesFileTypeMap mimeTypes = new MimetypesFileTypeMap();
 
   private VCFStore store;
+  private VCFSamplesSummaryBuilder summaryBuilder;
 
   @Override
   public void setVCFStore(String serviceName, String name) {
@@ -61,13 +63,25 @@ public class VCFStoreResourceImpl implements VCFStoreResource {
   }
 
   @Override
+  public void setVCFSamplesSummaryBuilder(VCFSamplesSummaryBuilder builder) {
+    summaryBuilder = builder.store(store);
+  }
+
+  @Override
   public Plugins.VCFStoreDto get() {
     return Dtos.asDto(store);
   }
 
   @Override
+  public Plugins.VCFSamplesSummaryDto getSummary() {
+    return Dtos.fromDto(summaryBuilder.buildSummary());
+  }
+
+  @Override
   public List<Plugins.VCFSummaryDto> getVCFList() {
-    return store.getVCFNames().stream().map(n -> Dtos.asDto(store.getVCFSummary(n))).collect(Collectors.toList());
+    return store.getVCFNames().stream()
+      .map(n -> Dtos.asDto(store.getVCFSummary(n), summaryBuilder.buildSummary(n)))
+      .collect(Collectors.toList());
   }
 
   @Override
@@ -106,7 +120,7 @@ public class VCFStoreResourceImpl implements VCFStoreResource {
 
   @Override
   public Plugins.VCFSummaryDto getVCF(String vcfName) {
-    return Dtos.asDto(store.getVCFSummary(vcfName));
+    return Dtos.asDto(store.getVCFSummary(vcfName), summaryBuilder.buildSummary(vcfName));
   }
 
   @Override

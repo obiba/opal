@@ -1,4 +1,5 @@
 import "Magma.proto";
+import "Plugins.proto";
 
 package Projects;
 
@@ -16,6 +17,7 @@ message ProjectDto {
   optional string database = 9;
   optional Magma.TimestampsDto timestamps = 10;
   optional string vcfStoreService = 11;
+  optional Plugins.VCFSamplesMappingDto vcfSamplesMapping = 12;
 }
 
 message ProjectFactoryDto {
@@ -25,6 +27,7 @@ message ProjectFactoryDto {
   optional string database = 4;
   repeated string tags = 5;
   optional string vcfStoreService = 6;
+  optional Plugins.VCFSamplesMappingDto vcfSamplesMapping = 7;
 }
 
 message ProjectSummaryDto {

@@ -19,11 +19,7 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.Timestamped;
-import org.obiba.magma.Timestamps;
-import org.obiba.magma.Value;
+import org.obiba.magma.*;
 import org.obiba.magma.type.DateTimeType;
 
 import com.google.common.base.MoreObjects;
@@ -52,6 +48,8 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
   private String database;
 
   private String vcfStoreService;
+
+  private VCFSamplesMapping vcfSamplesMapping;
 
   public Project() {
   }
@@ -160,6 +158,18 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
     return MoreObjects.toStringHelper(this).add("name", name).add("database", database).toString();
   }
 
+  public boolean hasVCFSamplesMapping() {
+    return vcfSamplesMapping != null;
+  }
+
+  public VCFSamplesMapping getVCFSamplesMapping() {
+    return vcfSamplesMapping;
+  }
+
+  public void setVCFSamplesMapping(VCFSamplesMapping vcfSamplesMapping) {
+    this.vcfSamplesMapping = vcfSamplesMapping;
+  }
+
   @Override
   public boolean equals(Object o) {
     if(this == o) return true;
@@ -261,6 +271,11 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
 
     public Builder vcfStoreService(String service) {
       project.setVCFStoreService(service);
+      return this;
+    }
+
+    public Builder vcfSamplesMapping(VCFSamplesMapping value) {
+      project.setVCFSamplesMapping(value);
       return this;
     }
 
