@@ -140,7 +140,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   @Override
   public void setVCFSamplesMapping(VCFSamplesMappingDto vcfSamplesMapping) {
     project.setText(vcfSamplesMapping.getProjectName());
-    table.setText(vcfSamplesMapping.getTableName());
+    table.setText(vcfSamplesMapping.getTableReference());
     participantId.setText(vcfSamplesMapping.getParticipantIdVariable());
     sampleId.setText(vcfSamplesMapping.getSampleIdVariable());
     sampleRole.setText(vcfSamplesMapping.getSampleRoleVariable());
