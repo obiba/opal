@@ -94,4 +94,5 @@ message ExportVCFCommandOptionsDto {
   required string project = 2; // store location
   required string destination = 3; // Destination folder
   optional string table = 4; // table reference to be used for sample subseting
+  optional bool caseControl = 5 [default = true];
 }

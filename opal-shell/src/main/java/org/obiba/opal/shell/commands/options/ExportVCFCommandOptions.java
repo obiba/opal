@@ -35,4 +35,7 @@ public interface ExportVCFCommandOptions extends HelpOption {
   String getTable();
 
   boolean hasTable();
+
+  @Option(shortName = "c", description = "With case control")
+  boolean isCaseControl();
 }

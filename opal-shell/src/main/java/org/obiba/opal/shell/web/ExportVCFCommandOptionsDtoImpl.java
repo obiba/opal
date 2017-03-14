@@ -52,4 +52,9 @@ public class ExportVCFCommandOptionsDtoImpl implements ExportVCFCommandOptions {
   public boolean hasTable() {
     return options.hasTable();
   }
+
+  @Override
+  public boolean isCaseControl() {
+    return options.hasCaseControl() ? options.getCaseControl() : true;
+  }
 }
