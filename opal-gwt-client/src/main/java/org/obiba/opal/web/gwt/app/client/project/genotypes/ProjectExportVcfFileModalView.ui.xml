@@ -28,6 +28,22 @@
       </b:HelpBlock>
     </b:ControlGroup>
 
+    <b:ControlGroup ui:field="participantsFilterGroup">
+      <b:ControlLabel for="participantsFilter">
+        <ui:msg description="Participants Filter label">Participants filter</ui:msg>
+      </b:ControlLabel>
+      <o:Chooser ui:field="participantsFilter" name="participantsFilter"/>
+      <b:HelpBlock>
+        <ui:msg description="Participants Filter help">Select a table to provide the set of participants from wich samples will be included in the VCF file. If no table is selected, no participant filter will be applied.</ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+
+    <b:ControlGroup>
+      <b:CheckBox ui:field="includeCaseControls">
+        <ui:msg description="Participants Filter Include case controls label">Include case controls</ui:msg>
+      </b:CheckBox>
+    </b:ControlGroup>
+
     <b:ModalFooter>
       <b:Button ui:field="exportButton" type="PRIMARY">
         <ui:msg description="Genotypes Import  label">Export</ui:msg>

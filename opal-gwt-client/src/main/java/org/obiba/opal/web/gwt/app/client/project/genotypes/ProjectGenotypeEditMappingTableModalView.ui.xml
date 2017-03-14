@@ -22,7 +22,7 @@
       </b:ControlLabel>
       <o:Chooser ui:field="mappingTable" name="mappingTable"/>
       <b:HelpBlock>
-        <ui:msg description="Database Title help">Genotype's mapping table.</ui:msg>
+        <ui:msg description="Mapping Table help">Genotype's mapping table.</ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 

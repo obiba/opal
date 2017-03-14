@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.project.genotypes;
 
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
@@ -23,6 +24,7 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePanel;
@@ -45,6 +47,15 @@ public class ProjectExportVcfFileModalView extends ModalPopupViewWithUiHandlers<
 
   @UiField
   ControlGroup fileGroup;
+
+  @UiField
+  ControlGroup participantsFilterGroup;
+
+  @UiField
+  Chooser participantsFilter;
+
+  @UiField
+  CheckBox includeCaseControls;
 
   @Inject
   public ProjectExportVcfFileModalView(EventBus eventBus, Binder binder, Translations translations) {
