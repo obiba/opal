@@ -440,6 +440,48 @@ public enum UriBuilders {
     }
   },
 
+  PROJECT_GENOTYPES_SUMMARY {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "genotypes", "summary");
+    }
+  },
+
+  PROJECT_VCF_STORE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "vcf-store");
+    }
+  },
+
+  PROJECT_VCF_STORE_VCFS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "vcf-store", "vcfs");
+    }
+  },
+
+  PROJECT_VCF_STORE_VCF {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "vcf-store", "vcf", "{}");
+    }
+  },
+
+  PROJECT_VCF_STORE_VCF_DOWNLOAD {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "vcf-store", "vcf", "{}", "_download");
+    }
+  },
+
+  PROJECT_VCF_STORE_SAMPLES {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "vcf-store", "samples");
+    }
+  },
+
   SUBJECT_CREDENTIALS {
     @Override
     public UriBuilder create() {
