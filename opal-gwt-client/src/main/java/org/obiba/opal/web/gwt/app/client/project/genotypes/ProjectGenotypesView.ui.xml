@@ -19,7 +19,7 @@
 
   <g:FlowPanel>
     <g:FlowPanel addStyleNames="pull-right">
-      <b:Button icon="UPLOAD_ALT" ui:field="importVCF" addStyleNames="small-indent">
+      <b:Button icon="UPLOAD_ALT" ui:field="importVCF">
         <ui:msg description="Genotypes Import vcfFile label">Import</ui:msg>
       </b:Button>
 
@@ -31,89 +31,89 @@
       </b:Button>
     </g:FlowPanel>
 
-    <g:FlowPanel>
-      <b:Row>
-        <b:Column size="6" addStyleNames="pull-left">
-          <g:FlowPanel>
-            <b:Heading size="4" addStyleNames="inline-block small-top-margin">
-              <ui:msg description="Genotypes Genotypes Summary label">Summary</ui:msg>
-            </b:Heading>
-          </g:FlowPanel>
+    <g:FlowPanel addStyleNames="clearfix"/>
 
-          <o:PropertiesTable keyStyleNames="span2">
-            <o:PropertyPanel>
-              <g:Label>
-                <ui:msg description="Genotypes Participants label">Participants</ui:msg>
-              </g:Label>
-              <g:Label ui:field="participants"/>
-            </o:PropertyPanel>
-            <o:PropertyPanel>
-              <g:Label>
-                <ui:msg description="Genotypes Participants with Genotypes label">Participants with Genotype</ui:msg>
-              </g:Label>
-              <g:Label ui:field="participantsWithGenotype"/>
-            </o:PropertyPanel>
-            <o:PropertyPanel>
-              <g:Label>
-                <ui:msg description="Genotypes Samples label">Samples</ui:msg>
-              </g:Label>
-              <g:Label ui:field="samples"/>
-            </o:PropertyPanel>
-            <o:PropertyPanel>
-              <g:Label>
-                <ui:msg description="Genotypes Control Samples label">Control Samples</ui:msg>
-              </g:Label>
-              <g:Label ui:field="controlSamples"/>
-            </o:PropertyPanel>
-          </o:PropertiesTable>
-        </b:Column>
+    <g:FlowPanel addStyleNames="container-fluid no-padding-left no-padding-right">
+      <g:FlowPanel addStyleNames="no-left-margin pull-left" width="45%">
+        <g:FlowPanel>
+          <b:Heading size="4" addStyleNames="inline-block small-top-margin">
+            <ui:msg description="Genotypes Genotypes Summary label">Summary</ui:msg>
+          </b:Heading>
+        </g:FlowPanel>
 
-        <b:Column size="5" addStyleNames="pull-right">
-          <g:FlowPanel>
-            <b:Heading size="4" addStyleNames="inline-block small-top-margin">
-              <ui:msg description="Genotypes Mapping Table label">Mapping Table</ui:msg>
-            </b:Heading>
-            <b2:IconAnchor ui:field="editMapping" icon="EDIT" addStyleNames="small-indent">
-            </b2:IconAnchor>
-          </g:FlowPanel>
+        <o:PropertiesTable keyStyleNames="span2">
+          <o:PropertyPanel>
+            <g:Label>
+              <ui:msg description="Genotypes Participants label">Participants</ui:msg>
+            </g:Label>
+            <g:Label ui:field="participants"/>
+          </o:PropertyPanel>
+          <o:PropertyPanel>
+            <g:Label>
+              <ui:msg description="Genotypes Participants with Genotypes label">Participants with Genotype</ui:msg>
+            </g:Label>
+            <g:Label ui:field="participantsWithGenotype"/>
+          </o:PropertyPanel>
+          <o:PropertyPanel>
+            <g:Label>
+              <ui:msg description="Genotypes Samples label">Samples</ui:msg>
+            </g:Label>
+            <g:Label ui:field="samples"/>
+          </o:PropertyPanel>
+          <o:PropertyPanel>
+            <g:Label>
+              <ui:msg description="Genotypes Control Samples label">Control Samples</ui:msg>
+            </g:Label>
+            <g:Label ui:field="controlSamples"/>
+          </o:PropertyPanel>
+        </o:PropertiesTable>
+      </g:FlowPanel>
 
-          <o:PropertiesTable keyStyleNames="span2">
-            <o:PropertyPanel>
-              <g:Label>
-                <ui:msg description="Genotypes Project label">Project</ui:msg>
-              </g:Label>
-              <g:Label ui:field="project"/>
-            </o:PropertyPanel>
-            <o:PropertyPanel>
-              <g:Label>
-                <ui:msg description="Genotypes Table label">Table</ui:msg>
-              </g:Label>
-              <g:Label ui:field="table"/>
-            </o:PropertyPanel>
-            <o:PropertyPanel>
-              <g:Label>
-                <ui:msg description="Genotypes Participant ID label">Participant ID</ui:msg>
-              </g:Label>
-              <g:Label ui:field="participantId"/>
-            </o:PropertyPanel>
-            <o:PropertyPanel>
-              <g:Label>
-                <ui:msg description="Genotypes Sample ID label">Sample ID</ui:msg>
-              </g:Label>
-              <g:Label ui:field="sampleId"/>
-            </o:PropertyPanel>
-            <o:PropertyPanel>
-              <g:Label>
-                <ui:msg description="Genotypes Sample Role label">Sample Role</ui:msg>
-              </g:Label>
-              <g:Label ui:field="sampleRole"/>
-            </o:PropertyPanel>
-          </o:PropertiesTable>
-        </b:Column>
-      </b:Row>
+      <g:FlowPanel addStyleNames="no-left-margin pull-right" width="45%">
+        <g:FlowPanel>
+          <b:Heading size="4" addStyleNames="inline-block small-top-margin">
+            <ui:msg description="Genotypes Mapping Table label">Mapping Table</ui:msg>
+          </b:Heading>
+          <b2:IconAnchor ui:field="editMapping" icon="EDIT" addStyleNames="small-indent">
+          </b2:IconAnchor>
+        </g:FlowPanel>
+
+        <o:PropertiesTable keyStyleNames="span2">
+          <o:PropertyPanel>
+            <g:Label>
+              <ui:msg description="Genotypes Project label">Project</ui:msg>
+            </g:Label>
+            <g:Label ui:field="project"/>
+          </o:PropertyPanel>
+          <o:PropertyPanel>
+            <g:Label>
+              <ui:msg description="Genotypes Table label">Table</ui:msg>
+            </g:Label>
+            <g:Label ui:field="table"/>
+          </o:PropertyPanel>
+          <o:PropertyPanel>
+            <g:Label>
+              <ui:msg description="Genotypes Participant ID label">Participant ID</ui:msg>
+            </g:Label>
+            <g:Label ui:field="participantId"/>
+          </o:PropertyPanel>
+          <o:PropertyPanel>
+            <g:Label>
+              <ui:msg description="Genotypes Sample ID label">Sample ID</ui:msg>
+            </g:Label>
+            <g:Label ui:field="sampleId"/>
+          </o:PropertyPanel>
+          <o:PropertyPanel>
+            <g:Label>
+              <ui:msg description="Genotypes Sample Role label">Sample Role</ui:msg>
+            </g:Label>
+            <g:Label ui:field="sampleRole"/>
+          </o:PropertyPanel>
+        </o:PropertiesTable>
+      </g:FlowPanel>
     </g:FlowPanel>
 
-    <g:FlowPanel addStyleNames="container">
+    <g:FlowPanel addStyleNames="container-fluid no-padding-left no-padding-right">
       <g:FlowPanel addStyleNames="pull-right">
         <g:FlowPanel addStyleNames="span4">
           <o:OpalSimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
