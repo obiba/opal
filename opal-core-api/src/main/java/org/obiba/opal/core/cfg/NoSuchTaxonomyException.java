@@ -11,7 +11,7 @@ package org.obiba.opal.core.cfg;
 
 public class NoSuchTaxonomyException extends RuntimeException {
 
-  private static final long serialVersionUID = -6357540199499515674L;
+  private static final long serialVersionUID = -2729149786583030898L;
 
   private final String taxonomyName;
 

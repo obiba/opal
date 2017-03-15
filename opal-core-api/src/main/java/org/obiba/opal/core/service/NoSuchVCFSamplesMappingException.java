@@ -9,25 +9,18 @@
  */
 package org.obiba.opal.core.service;
 
-public class NoSuchReportTemplateException extends RuntimeException {
+public class NoSuchVCFSamplesMappingException extends RuntimeException {
 
-  private static final long serialVersionUID = 4718078183924914536L;
+  private static final long serialVersionUID = -6357540199499515674L;
 
   private final String name;
 
-  private final String project;
-
-  public NoSuchReportTemplateException(String name, String project) {
-    super("No report template exists with name '" + name + "' in project '" + project + "'");
-    this.name = name;
-    this.project = project;
+  public NoSuchVCFSamplesMappingException(String vcfSamplesMappingName) {
+    super("No VCF Samples mapping exists with the specified name '" + vcfSamplesMappingName + "'");
+    name = vcfSamplesMappingName;
   }
 
   public String getName() {
     return name;
-  }
-
-  public String getProject() {
-    return project;
   }
 }

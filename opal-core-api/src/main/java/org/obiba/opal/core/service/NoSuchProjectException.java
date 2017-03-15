@@ -11,8 +11,8 @@ package org.obiba.opal.core.service;
 
 public class NoSuchProjectException extends RuntimeException {
 
-  private static final long serialVersionUID = -6357540199499515674L;
-
+  private static final long serialVersionUID = -3397221631139533468L;
+  
   private final String projectName;
 
   public NoSuchProjectException(String projectName) {

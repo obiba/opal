@@ -11,7 +11,9 @@
 package org.obiba.opal.web.plugins;
 
 import com.google.common.collect.Lists;
+import org.obiba.opal.core.domain.VCFSamplesMapping;
 import org.obiba.opal.core.runtime.Plugin;
+import org.obiba.opal.core.support.vcf.VCFSamplesSummaryBuilder;
 import org.obiba.opal.spi.vcf.VCFStore;
 import org.obiba.opal.web.model.Plugins;
 
@@ -36,22 +38,49 @@ public class Dtos {
     return builder.build();
   }
 
-  public static Plugins.VCFStoreDto asDto(VCFStore store) {
-    Plugins.VCFStoreDto.Builder builder = Plugins.VCFStoreDto.newBuilder();
-    builder.setName(store.getName()) //
-        .setSamplesCount(store.getSampleIds().size()) //
-        .addAllVcf(store.getVCFNames());
-    return builder.build();
+  public static Plugins.VCFStoreDto asDto(VCFStore store, VCFSamplesSummaryBuilder.Stats stats) {
+    return Plugins.VCFStoreDto.newBuilder()
+      .setName(store.getName()) //
+      .setTotalSamplesCount(store.getSampleIds().size()) //
+      .setParticipantsCount(stats.getParticipants()) //
+      .setParticipantsWithGenotypeCount(stats.getParticipantsWithGenotypes()) //
+      .setControlSamplesCount(stats.getControlSamples()) //
+      .setSamplesCount(stats.getSamples()) //
+      .addAllVcf(store.getVCFNames())
+      .build();
   }
 
-  public static Plugins.VCFSummaryDto asDto(VCFStore.VCFSummary summary) {
-    Plugins.VCFSummaryDto.Builder builder = Plugins.VCFSummaryDto.newBuilder();
-    builder.setName(summary.getName()) //
-        .setSize(summary.size()) //
-        .setSamplesCount(summary.getSampleIds().size()) //
-        .setGenotypesCount(summary.getGenotypesCount()) //
-        .setVariantsCount(summary.getVariantsCount());
-    return builder.build();
+  public static Plugins.VCFSummaryDto asDto(VCFStore.VCFSummary summary, VCFSamplesSummaryBuilder.Stats stats) {
+    return Plugins.VCFSummaryDto.newBuilder()
+      .setName(summary.getName()) //
+      .setSize(summary.size()) //
+      .setTotalSamplesCount(summary.getSampleIds().size()) //
+      .setSamplesCount(stats.getSamples()) //
+      .setGenotypesCount(summary.getGenotypesCount()) //
+      .setVariantsCount(summary.getVariantsCount()) //
+      .setParticipantsCount(stats.getParticipants()) //
+      .setOrphanSamplesCount(stats.getOrphanSamples())
+      .setControlSamplesCount(stats.getControlSamples())
+      .build();
   }
 
+  public static VCFSamplesMapping fromDto(Plugins.VCFSamplesMappingDto dto) {
+    return VCFSamplesMapping.newBuilder()
+      .projectName(dto.getProjectName())
+      .tableName(dto.getTableReference())
+      .participantIdVariable(dto.getParticipantIdVariable())
+      .sampleIdVariable(dto.getSampleIdVariable())
+      .sampleRoleVariable(dto.getSampleRoleVariable())
+      .build();
+  }
+
+  public static Plugins.VCFSamplesMappingDto asDto(VCFSamplesMapping sampleMappings) {
+    return Plugins.VCFSamplesMappingDto.newBuilder()
+      .setProjectName(sampleMappings.getProjectName())
+      .setTableReference(sampleMappings.getTableReference())
+      .setParticipantIdVariable(sampleMappings.getParticipantIdVariable())
+      .setSampleIdVariable(sampleMappings.getSampleIdVariable())
+      .setSampleRoleVariable(sampleMappings.getSampleRoleVariable())
+      .build();
+  }
 }
