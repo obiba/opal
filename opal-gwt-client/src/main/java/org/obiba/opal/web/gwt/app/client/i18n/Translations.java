@@ -1786,6 +1786,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Download File")
   String downloadFileModalTitle();
 
+  @Description("Export VCF Modal title")
+  @DefaultStringValue("Export VCFs")
+  String exportVcfModalTitle();
+
   @Description("Rename Modal title")
   @DefaultStringValue("Rename File")
   String renameFileModalTitle();
