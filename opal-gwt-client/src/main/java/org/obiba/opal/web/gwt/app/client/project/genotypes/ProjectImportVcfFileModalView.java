@@ -52,7 +52,7 @@ public class ProjectImportVcfFileModalView extends ModalPopupViewWithUiHandlers<
   public ProjectImportVcfFileModalView(EventBus eventBus, Binder binder, Translations translations) {
     super(eventBus);
     initWidget(binder.createAndBindUi(this));
-    dialog.setTitle(translations.downloadFileModalTitle());
+    dialog.setTitle(translations.importVcfModalTitle());
   }
 
   @Override

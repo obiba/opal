@@ -144,6 +144,14 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Remove Taxonomy")
   String removeTaxonomy();
 
+  @Description("Remove VCF Files label")
+  @DefaultMessage("Remove VCF Files")
+  String removeVCFFile();
+
+  @Description("Remove All Genotypes Data label")
+  @DefaultMessage("Remove All Genotypes Data")
+  String removeAllGenotypesData();
+
   @Description("Remove Vocabulary label")
   @DefaultMessage("Remove Vocabulary")
   String removeVocabulary();
@@ -314,6 +322,18 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage(
       "Please confirm that you want to remove the current taxonomy from configuration (variable attributes will not be affected).")
   String confirmDeleteTaxonomy();
+
+  @Description(
+      "Please confirm that you want to remove the selected VCF files message")
+  @DefaultMessage(
+      "Please confirm that you want to remove the selected VCF files.")
+  String confirmDeleteVCFFile();
+
+  @Description(
+      "Please confirm that you want to remove the mapping table and all imported VCF files message")
+  @DefaultMessage(
+      "Please confirm that you want to remove the mapping table and all imported VCF files.")
+  String confirmRemoveAllGenotypesData();
 
   @Description(
       "Please confirm that you want to remove the current Vocabulary message")

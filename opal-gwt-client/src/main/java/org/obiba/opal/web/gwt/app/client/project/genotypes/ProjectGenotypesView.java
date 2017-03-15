@@ -22,6 +22,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -97,9 +98,6 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   Alert selectItemTipsAlert;
 
   @UiField
-  IconAnchor deleteLink;
-
-  @UiField
   Alert selectAllItemsAlert;
 
   @UiField
@@ -110,6 +108,10 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   @UiField
   IconAnchor clearSelectionAnchor;
+  @UiField
+  FlowPanel mainPanel;
+  @UiField
+  FlowPanel noMappingPanel;
 
   private final Translations translations;
 
@@ -143,6 +145,8 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   @Override
   public void setVCFSamplesMapping(VCFSamplesMappingDto vcfSamplesMapping) {
+    setNoMappingPanelVisibility(false);
+
     logger.info(vcfSamplesMapping.getProjectName() + " " + vcfSamplesMapping.getTableReference());
     project.setText(vcfSamplesMapping.getProjectName());
     table.setText(vcfSamplesMapping.getTableReference());
@@ -151,8 +155,14 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     sampleRole.setText(vcfSamplesMapping.getSampleRoleVariable());
   }
 
+  private void setNoMappingPanelVisibility(boolean value) {
+    noMappingPanel.setVisible(value);
+    mainPanel.setVisible(!noMappingPanel.isVisible());
+  }
+
   @Override
   public void beforeRenderRows() {
+    checkColumn.clearSelection();
     tablePager.setPagerVisible(false);
     vcfFilesTable.showLoadingIndicator(dataProvider);
     initializeFilter();
@@ -163,6 +173,11 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     dataProvider.refresh();
     tablePager.setPagerVisible(vcfFilesTable.getRowCount() > Table.DEFAULT_PAGESIZE);
     vcfFilesTable.hideLoadingIndicator();
+  }
+
+  @Override
+  public void clearSamplesMappingData() {
+    setNoMappingPanelVisibility(true);
   }
 
   @Override
@@ -190,9 +205,19 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     getUiHandlers().onImportVcfFiles();
   }
 
-  @UiHandler("editMapping")
+  @UiHandler({"addMapping","editMapping"})
   public void editMappingClick(ClickEvent event) {
     getUiHandlers().onEditMappingTable();
+  }
+
+  @UiHandler("deleteLink")
+  public void deleteLinkClick(ClickEvent event) {
+    getUiHandlers().onRemoveVcfFile(checkColumn.getSelectedItems());
+  }
+
+  @UiHandler("deleteAll")
+  public void deleteAllClick(ClickEvent event) {
+    getUiHandlers().onRemoveAll();
   }
 
   private void addTableColumns() {
@@ -370,7 +395,8 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
           switch(actionName){
             case REMOVE_ACTION:
-              getUiHandlers().onRemoveVcfFile(object);
+              checkColumn.getFieldUpdater().update(0, object, true);
+              getUiHandlers().onRemoveVcfFile(checkColumn.getSelectedItems());
               break;
             case STATISTICS_ACTION:
               getUiHandlers().onDownloadStatistics(object);
