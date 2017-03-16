@@ -10,6 +10,7 @@
 
 package org.obiba.opal.shell.web;
 
+import com.google.common.base.Strings;
 import org.obiba.opal.shell.commands.options.ExportVCFCommandOptions;
 import org.obiba.opal.web.model.Commands;
 
@@ -45,12 +46,12 @@ public class ExportVCFCommandOptionsDtoImpl implements ExportVCFCommandOptions {
 
   @Override
   public String getTable() {
-    return options.hasTable() ? options.getTable() : "";
+    return hasTable() ? options.getTable() : "";
   }
 
   @Override
   public boolean hasTable() {
-    return options.hasTable();
+    return options.hasTable() && !Strings.isNullOrEmpty(options.getTable());
   }
 
   @Override
