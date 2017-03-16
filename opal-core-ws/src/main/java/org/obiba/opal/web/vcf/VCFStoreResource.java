@@ -38,6 +38,14 @@ public interface VCFStoreResource {
   Plugins.VCFStoreDto get();
 
   /**
+   * Removes the current {@link org.obiba.opal.core.domain.VCFSamplesMapping} along with all VCF files.
+   *
+   * @return
+   */
+  @DELETE
+  Response deleteStore();
+
+  /**
    * Get a specific {@link org.obiba.opal.core.domain.VCFSamplesMapping}.
    *
    * @return
@@ -73,6 +81,16 @@ public interface VCFStoreResource {
   @GET
   @Path("/vcfs")
   List<Plugins.VCFSummaryDto> getVCFList();
+
+  /**
+   * Delete a collection of VCF files. Does not fail if one or all VCF file is not found.
+   *
+   * @param vcfName
+   * @return
+   */
+  @DELETE
+  @Path("/vcfs")
+  Response deleteVCFs(@QueryParam("file") List<String> files);
 
   /**
    * Delete a VCF file. Does not fail if such VCF is not found.

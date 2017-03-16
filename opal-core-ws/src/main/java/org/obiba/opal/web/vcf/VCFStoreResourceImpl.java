@@ -11,6 +11,7 @@
 package org.obiba.opal.web.vcf;
 
 
+import com.google.common.collect.Lists;
 import org.obiba.opal.core.domain.VCFSamplesMapping;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.NoSuchVCFSamplesMappingException;
@@ -66,6 +67,13 @@ public class VCFStoreResourceImpl implements VCFStoreResource {
   }
 
   @Override
+  public Response deleteStore() {
+    removeSamplesMappings();
+    store.getVCFNames().forEach(this::deleteVCF);
+    return Response.noContent().build();
+  }
+
+  @Override
   public Plugins.VCFSamplesMappingDto getSamplesMapping() {
     return Dtos.asDto(vcfSamplesMappingService.getVCFSamplesMapping(name));
   }
@@ -78,9 +86,13 @@ public class VCFStoreResourceImpl implements VCFStoreResource {
 
   @Override
   public Response deleteSamplesMapping() {
+    removeSamplesMappings();
+    return Response.noContent().build();
+  }
+
+  private void removeSamplesMappings() {
     VCFSamplesMapping vcfSamplesMapping = vcfSamplesMappingService.getVCFSamplesMapping(name);
     vcfSamplesMappingService.delete(vcfSamplesMapping.getProjectName());
-    return Response.ok().build();
   }
 
   @Override
@@ -95,12 +107,21 @@ public class VCFStoreResourceImpl implements VCFStoreResource {
 
   @Override
   public Response deleteVCF(String vcfName) {
+    return deleteVCFs(Lists.newArrayList(vcfName));
+  }
+
+  @Override
+  public Response deleteVCFs(List<String> files) {
+    files.forEach(vcfName -> deleteVCFFile(vcfName));
+    return Response.noContent().build();
+  }
+
+  private void deleteVCFFile(String vcfName) {
     try {
       store.deleteVCF(vcfName);
     } catch (Exception e) {
       // ignore
     }
-    return Response.noContent().build();
   }
 
   @Override

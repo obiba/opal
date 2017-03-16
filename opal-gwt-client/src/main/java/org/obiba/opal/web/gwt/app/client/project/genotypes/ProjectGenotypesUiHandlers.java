@@ -13,6 +13,8 @@ package org.obiba.opal.web.gwt.app.client.project.genotypes;
 import com.gwtplatform.mvp.client.UiHandlers;
 import org.obiba.opal.web.model.client.opal.VCFSummaryDto;
 
+import java.util.Collection;
+
 public interface ProjectGenotypesUiHandlers extends UiHandlers {
 
   void onDownloadVcfFiles();
@@ -21,9 +23,11 @@ public interface ProjectGenotypesUiHandlers extends UiHandlers {
 
   void onEditMappingTable();
 
-  void onRemoveVcfFile(VCFSummaryDto vcfSummaryDto);
+  void onRemoveVcfFile(Collection<VCFSummaryDto> vcfSummaryDto);
 
   void onDownloadVcfFile(VCFSummaryDto vcfSummaryDto);
 
   void onDownloadStatistics(VCFSummaryDto vcfSummaryDto);
+
+  void onRemoveAll();
 }

@@ -24,7 +24,7 @@
         <o:OpalSimplePanel ui:field="vcfFilePanel"/>
       </b:Controls>
       <b:HelpBlock>
-        <ui:msg description="Genotypes Import file content help">The VCF file path.</ui:msg>
+        <ui:msg description="Genotypes Import file content help">A VCF file must end with ".vcf" or in compressed form with ".vcf.gz".</ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 
@@ -36,7 +36,7 @@
         <b:TextBox name="encryptPassword" ui:field="name" visibleLength="16"/>
       </b:Controls>
       <b:HelpBlock>
-        <ui:msg description="Genotypes Import file content help">The file readable name.</ui:msg>
+        <ui:msg description="Genotypes Import file content help">An optional name associated with the VCF file.</ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 
