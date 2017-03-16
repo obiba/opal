@@ -65,6 +65,9 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   private JsArray<TableDto> mappingTables = JsArrays.create();
 
   private VCFSamplesMappingDto mappingTable = VCFSamplesMappingDto.create();
+
+  private JsArray<VCFSummaryDto> vcfSummaryDtos = JsArrays.create();
+
   private Runnable actionRequiringConfirmation;
 
   @Inject
@@ -187,11 +190,37 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
     fireEvent(new FileDownloadRequestEvent(downloadUrl));
   }
 
+  @Override
+  public void onFilterUpdate(String filter) {
+    if(Strings.isNullOrEmpty(filter)) {
+      getView().renderRows(vcfSummaryDtos);
+    } else {
+      JsArray<VCFSummaryDto> filtered = JsArrays.create();
+      for(VCFSummaryDto dto : JsArrays.toIterable(vcfSummaryDtos)) {
+        if(vcfMatches(dto, filter)) {
+          filtered.push(dto);
+        }
+      }
+      getView().renderRows(filtered);
+    }
+  }
+
+  private boolean vcfMatches(VCFSummaryDto dto, String filter) {
+    String name = dto.getName().toLowerCase();
+    for(String token : filter.toLowerCase().split(" ")) {
+      if(!Strings.isNullOrEmpty(token)) {
+        if(!name.contains(token))
+          return false;
+      }
+    }
+    return true;
+  }
+
   public void refresh() {
     getVcfStore();
     getMappingTable();
     getMappingTables();
-    getVcfTables();
+    getVcfSummaries();
   }
 
   public void getVcfStore() {
@@ -223,13 +252,14 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
         .send();
   }
 
-  private void getVcfTables() {
+  private void getVcfSummaries() {
     getView().beforeRenderRows();
     ResourceRequestBuilderFactory.<JsArray<VCFSummaryDto>>newBuilder()
       .forResource(UriBuilders.PROJECT_VCF_STORE_VCFS.create().build(projectDto.getName()))
       .withCallback(new ResourceCallback<JsArray<VCFSummaryDto>>() {
         @Override
         public void onResource(Response response, JsArray<VCFSummaryDto> summaries) {
+          vcfSummaryDtos = summaries;
           getView().renderRows(summaries);
           getView().afterRenderRows();
         }
@@ -326,18 +356,11 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
         .send();
   }
 
-  private String getFileBasename(String file) {
-    int pos = file.lastIndexOf(".vcf.gz");
-    if (pos > 0) return file.substring(file.lastIndexOf('/'), pos);
-    return file;
-  }
-
-
   private void uploadVcfFile(String file, String name) {
     ImportVCFCommandOptionsDto importOptions = ImportVCFCommandOptionsDto.create();
     importOptions.setFile(file);
     importOptions.setProject(projectDto.getName());
-    importOptions.setName(Strings.isNullOrEmpty(name) ? getFileBasename(file) : name);
+    if (!Strings.isNullOrEmpty(name)) importOptions.setName(name);
 
     ResourceRequestBuilderFactory
         .newBuilder()

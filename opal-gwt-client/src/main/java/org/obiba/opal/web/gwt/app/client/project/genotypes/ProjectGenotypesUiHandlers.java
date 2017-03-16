@@ -28,4 +28,6 @@ public interface ProjectGenotypesUiHandlers extends UiHandlers {
   void onDownloadStatistics(VCFSummaryDto vcfSummaryDto);
 
   void onRemoveAll();
+
+  void onFilterUpdate(String filter);
 }

@@ -39,29 +39,37 @@ public class Dtos {
   }
 
   public static Plugins.VCFStoreDto asDto(VCFStore store, VCFSamplesSummaryBuilder.Stats stats) {
-    return Plugins.VCFStoreDto.newBuilder()
+    Plugins.VCFStoreDto.Builder builder = Plugins.VCFStoreDto.newBuilder()
       .setName(store.getName()) //
       .setTotalSamplesCount(store.getSampleIds().size()) //
-      .setParticipantsCount(stats.getParticipants()) //
-      .setParticipantsWithGenotypeCount(stats.getParticipantsWithGenotypes()) //
-      .setControlSamplesCount(stats.getControlSamples()) //
-      .setSamplesCount(stats.getSamples()) //
-      .addAllVcf(store.getVCFNames())
-      .build();
+      .addAllVcf(store.getVCFNames()) //
+      .setParticipantsCount(stats.getParticipants()); //
+
+    if (stats.hasSamples()) {
+      builder.setParticipantsWithGenotypeCount(stats.getParticipantsWithGenotypes()) //
+        .setControlSamplesCount(stats.getControlSamples()) //
+        .setSamplesCount(stats.getSamples());
+    }
+
+    return builder.build();
   }
 
   public static Plugins.VCFSummaryDto asDto(VCFStore.VCFSummary summary, VCFSamplesSummaryBuilder.Stats stats) {
-    return Plugins.VCFSummaryDto.newBuilder()
+    Plugins.VCFSummaryDto.Builder builder = Plugins.VCFSummaryDto.newBuilder()
       .setName(summary.getName()) //
       .setSize(summary.size()) //
       .setTotalSamplesCount(summary.getSampleIds().size()) //
-      .setSamplesCount(stats.getSamples()) //
       .setGenotypesCount(summary.getGenotypesCount()) //
-      .setVariantsCount(summary.getVariantsCount()) //
-      .setParticipantsCount(stats.getParticipants()) //
-      .setOrphanSamplesCount(stats.getOrphanSamples())
-      .setControlSamplesCount(stats.getControlSamples())
-      .build();
+      .setVariantsCount(summary.getVariantsCount());
+
+      if (stats.hasSamples()) {
+        builder.setSamplesCount(stats.getSamples()) //
+          .setParticipantsCount(stats.getParticipants()) //
+          .setOrphanSamplesCount(stats.getOrphanSamples())
+          .setControlSamplesCount(stats.getControlSamples());
+      }
+
+      return builder.build();
   }
 
   public static VCFSamplesMapping fromDto(Plugins.VCFSamplesMappingDto dto) {

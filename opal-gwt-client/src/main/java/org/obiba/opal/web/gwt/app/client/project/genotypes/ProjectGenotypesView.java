@@ -11,11 +11,15 @@
 package org.obiba.opal.web.gwt.app.client.project.genotypes;
 
 import com.github.gwtbootstrap.client.ui.Alert;
+import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -89,6 +93,9 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   OpalSimplePager tablePager;
 
   @UiField
+  FlowPanel filterPanel;
+
+  @UiField
   TextBoxClearable filter;
 
   @UiField
@@ -108,10 +115,18 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   @UiField
   IconAnchor clearSelectionAnchor;
+
   @UiField
   FlowPanel mainPanel;
+
   @UiField
   FlowPanel noMappingPanel;
+
+  @UiField
+  Button downloadVCF;
+
+  @UiField
+  Button deleteAll;
 
   private final Translations translations;
 
@@ -148,16 +163,16 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   @Override
   public void setVCFSamplesSummary(VCFStoreDto dto) {
     participants.setText(dto.getParticipantsCount()+"");
-    participantsWithGenotype.setText(dto.getParticipantsWithGenotypeCount()+"");
-    samples.setText(dto.getSamplesCount()+"");
-    controlSamples.setText(dto.getControlSamplesCount()+"");
+    participantsWithGenotype.setText(dto.hasParticipantsWithGenotypeCount() ? dto.getParticipantsWithGenotypeCount()+"" : "-");
+    samples.setText(dto.hasSamplesCount() ? dto.getSamplesCount()+"" : "-");
+    controlSamples.setText(dto.hasControlSamplesCount() ? dto.getControlSamplesCount()+"" : "-");
   }
 
   @Override
   public void setVCFSamplesMapping(VCFSamplesMappingDto vcfSamplesMapping) {
     setNoMappingPanelVisibility(false);
+    deleteAll.setVisible(true);
 
-    logger.info(vcfSamplesMapping.getProjectName() + " " + vcfSamplesMapping.getTableReference());
     project.setText(vcfSamplesMapping.getProjectName());
     table.setText(vcfSamplesMapping.getTableReference());
     participantId.setText(vcfSamplesMapping.getParticipantIdVariable());
@@ -168,10 +183,15 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   private void setNoMappingPanelVisibility(boolean value) {
     noMappingPanel.setVisible(value);
     mainPanel.setVisible(!noMappingPanel.isVisible());
+    deleteAll.setVisible(vcfFilesTable.getRowCount() > 0);
   }
 
   @Override
   public void beforeRenderRows() {
+    filterPanel.setVisible(false);
+    downloadVCF.setVisible(false);
+    deleteAll.setVisible(!Strings.isNullOrEmpty(project.getText()));
+
     checkColumn.clearSelection();
     tablePager.setPagerVisible(false);
     vcfFilesTable.showLoadingIndicator(dataProvider);
@@ -183,6 +203,10 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     dataProvider.refresh();
     tablePager.setPagerVisible(vcfFilesTable.getRowCount() > Table.DEFAULT_PAGESIZE);
     vcfFilesTable.hideLoadingIndicator();
+
+    int rows = vcfFilesTable.getRowCount();
+    filterPanel.setVisible(rows > 1);
+    downloadVCF.setVisible(rows > 0);
   }
 
   @Override
@@ -228,6 +252,11 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   @UiHandler("deleteAll")
   public void deleteAllClick(ClickEvent event) {
     getUiHandlers().onRemoveAll();
+  }
+
+  @UiHandler("filter")
+  public void filterKeyUp(KeyUpEvent event) {
+    getUiHandlers().onFilterUpdate(filter.getText());
   }
 
   private void addTableColumns() {
@@ -331,7 +360,9 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
       @Override
       public String getValue(VCFSummaryDto vcfSummaryDto) {
-        return Integer.toString(vcfSummaryDto.getSamplesCount());
+        return vcfSummaryDto.hasSamplesCount() //
+          ? Integer.toString(vcfSummaryDto.getSamplesCount()) //
+          : "-"; //
       }
     };
 
@@ -349,7 +380,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
       public String getValue(VCFSummaryDto vcfSummaryDto) {
         return vcfSummaryDto.hasParticipantsCount()
           ? Integer.toString(vcfSummaryDto.getParticipantsCount())
-          : "0";
+          : "-";
       }
     };
 
@@ -357,9 +388,9 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
       @Override
       public String getValue(VCFSummaryDto vcfSummaryDto) {
-        return vcfSummaryDto.hasOrphanSamplesCount()
-          ? Integer.toString(vcfSummaryDto.getOrphanSamplesCount())
-          : "0";
+        return Integer.toString(vcfSummaryDto.hasOrphanSamplesCount()
+          ? vcfSummaryDto.getOrphanSamplesCount()
+          : vcfSummaryDto.getTotalSamplesCount());
       }
     };
 
@@ -369,7 +400,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
       public String getValue(VCFSummaryDto vcfSummaryDto) {
         return vcfSummaryDto.hasControlSamplesCount()
           ? Integer.toString(vcfSummaryDto.getControlSamplesCount())
-          : "0";
+          : "-";
       }
     };
   }
@@ -405,8 +436,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
           switch(actionName){
             case REMOVE_ACTION:
-              checkColumn.getFieldUpdater().update(0, object, true);
-              getUiHandlers().onRemoveVcfFile(checkColumn.getSelectedItems());
+              getUiHandlers().onRemoveVcfFile(Lists.newArrayList(object));
               break;
             case STATISTICS_ACTION:
               getUiHandlers().onDownloadStatistics(object);

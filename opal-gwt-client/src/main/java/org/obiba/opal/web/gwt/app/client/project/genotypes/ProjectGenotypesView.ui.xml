@@ -19,6 +19,7 @@
 
   <g:FlowPanel>
 
+    <!-- Empty content -->
     <g:FlowPanel ui:field="noMappingPanel" visible="false">
       <g:FlowPanel addStyleNames="clearfix"/>
       <b:Paragraph>
@@ -30,20 +31,23 @@
       </b:Button>
     </g:FlowPanel>
 
+    <g:FlowPanel addStyleNames="pull-right small-bottom-margin">
+      <g:FlowPanel addStyleNames="clearfix"/>
+
+      <b:Button icon="UPLOAD_ALT" ui:field="importVCF">
+        <ui:msg description="Genotypes Import vcfFile label">Import</ui:msg>
+      </b:Button>
+
+      <b:Button icon="DOWNLOAD_ALT" ui:field="downloadVCF" addStyleNames="small-indent">
+        <ui:msg description="Genotypes Download vcfFile label">Export</ui:msg>
+      </b:Button>
+
+      <b:Button icon="TRASH" visible="false" ui:field="deleteAll" addStyleNames="small-indent">
+      </b:Button>
+    </g:FlowPanel>
+
+    <!-- Empty content -->
     <g:FlowPanel ui:field="mainPanel" visible="true">
-      <g:FlowPanel addStyleNames="pull-right">
-        <b:Button icon="UPLOAD_ALT" ui:field="importVCF">
-          <ui:msg description="Genotypes Import vcfFile label">Import</ui:msg>
-        </b:Button>
-
-        <b:Button icon="DOWNLOAD_ALT" ui:field="downloadVCF" addStyleNames="small-indent">
-          <ui:msg description="Genotypes Download vcfFile label">Export</ui:msg>
-        </b:Button>
-
-        <b:Button icon="TRASH" ui:field="deleteAll" addStyleNames="small-indent">
-        </b:Button>
-      </g:FlowPanel>
-
       <g:FlowPanel addStyleNames="clearfix"/>
 
       <g:FlowPanel addStyleNames="container-fluid no-padding-left no-padding-right">
@@ -125,6 +129,10 @@
           </o:PropertiesTable>
         </g:FlowPanel>
       </g:FlowPanel>
+    </g:FlowPanel>
+
+    <g:FlowPanel>
+      <g:FlowPanel addStyleNames="clearfix"/>
 
       <g:FlowPanel addStyleNames="container-fluid no-padding-left no-padding-right">
         <g:FlowPanel addStyleNames="pull-right">
@@ -132,7 +140,7 @@
             <o:OpalSimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
           </g:FlowPanel>
 
-          <g:FlowPanel addStyleNames="span4">
+          <g:FlowPanel addStyleNames="span4" ui:field="filterPanel" visible="false">
             <b:Controls addStyleNames="pull-right">
               <b:InputAddOn prependIcon="FILTER">
                 <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
