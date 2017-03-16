@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfFileExportRequestEvent;
 import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfFileUploadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfMappingEditRequestEvent;
 import org.obiba.opal.web.gwt.rest.client.*;
@@ -33,6 +34,7 @@ import org.obiba.opal.web.model.client.opal.*;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -106,6 +108,13 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
         updateVCFMapping(event.getVCFSamplesMapping());
       }
     });
+
+    addRegisteredHandler(VcfFileExportRequestEvent.getType(), new VcfFileExportRequestEvent.VcfFileExportRequestHandler() {
+      @Override
+      public void onVcfFileExportRequest(VcfFileExportRequestEvent event) {
+        exportVcfFiles(event.getCommand());
+      }
+    });
   }
 
   @Override
@@ -119,8 +128,12 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   }
 
   @Override
-  public void onDownloadVcfFiles() {
-    vcfFileDownloadModalPresenterModalProvider.get();
+  public void onExportVcfFiles() {
+    ProjectExportVcfFileModalPresenter provider = vcfFileDownloadModalPresenterModalProvider.get();
+    boolean allSelected = getView().getAllVCFs().size() == getView().getSelectedVCFs().size()
+        || getView().getSelectedVCFs().size() == 0;
+
+    provider.setExportVCFs(allSelected ? getView().getAllVCFs() : getView().getSelectedVCFs(), allSelected);
   }
 
   @Override
@@ -165,11 +178,6 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   }
 
   @Override
-  public void onDownloadVcfFile(VCFSummaryDto vcfSummaryDto) {
-
-  }
-
-  @Override
   public void onDownloadStatistics(VCFSummaryDto vcfSummaryDto) {
 
   }
@@ -190,6 +198,24 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
           getView().setVCFSamplesSummary(vcfStoreDto);
         }
       }).get().send();
+  }
+
+  private void exportVcfFiles(ExportVCFCommandOptionsDto commandOptions) {
+    commandOptions.setProject(projectDto.getName());
+    commandOptions.setTable(mappingTable.getTableReference());
+
+    ResourceRequestBuilderFactory
+        .newBuilder()
+        .withResourceBody(ExportVCFCommandOptionsDto.stringify(commandOptions))
+        .forResource(UriBuilders.PROJECT_VCF_STORE_EXPORT.create().build(projectDto.getName()))
+        .post()
+        .withCallback(SC_CREATED, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            refresh();
+          }
+        })
+        .send();
   }
 
   private void getVcfTables() {
@@ -323,6 +349,10 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   }
 
   public interface Display extends View, HasUiHandlers<ProjectGenotypesUiHandlers> {
+
+    List<VCFSummaryDto> getSelectedVCFs();
+
+    List<VCFSummaryDto> getAllVCFs();
 
     void setVCFSamplesSummary(VCFStoreDto dto);
 

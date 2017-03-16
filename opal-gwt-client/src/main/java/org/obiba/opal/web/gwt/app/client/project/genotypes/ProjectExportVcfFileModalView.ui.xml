@@ -16,6 +16,8 @@
 
   <o:Modal ui:field="dialog" closeVisible="true" keyboard="true" animation="false">
 
+    <b:Alert ui:field="exportNVCF" close="false" visible="true" type="INFO"/>
+
     <b:ControlGroup ui:field="fileGroup">
       <b:ControlLabel>
         <ui:msg description="Genotypes Export file directory name label">Destination Folder *</ui:msg>
@@ -23,9 +25,6 @@
       <b:Controls>
         <o:OpalSimplePanel ui:field="vcfFilePanel"/>
       </b:Controls>
-      <b:HelpBlock>
-        <ui:msg description="Genotypes Export file directory content help">The directory readable name.</ui:msg>
-      </b:HelpBlock>
     </b:ControlGroup>
 
     <b:ControlGroup ui:field="participantsFilterGroup">

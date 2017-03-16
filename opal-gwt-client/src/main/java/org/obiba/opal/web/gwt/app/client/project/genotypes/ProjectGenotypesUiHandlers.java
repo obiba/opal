@@ -17,15 +17,13 @@ import java.util.Collection;
 
 public interface ProjectGenotypesUiHandlers extends UiHandlers {
 
-  void onDownloadVcfFiles();
+  void onExportVcfFiles();
 
   void onImportVcfFiles();
 
   void onEditMappingTable();
 
   void onRemoveVcfFile(Collection<VCFSummaryDto> vcfSummaryDto);
-
-  void onDownloadVcfFile(VCFSummaryDto vcfSummaryDto);
 
   void onDownloadStatistics(VCFSummaryDto vcfSummaryDto);
 

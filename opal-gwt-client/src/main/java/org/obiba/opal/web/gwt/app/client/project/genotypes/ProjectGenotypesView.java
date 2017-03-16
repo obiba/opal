@@ -45,11 +45,11 @@ import org.obiba.opal.web.model.client.opal.VCFStoreDto;
 import org.obiba.opal.web.model.client.opal.VCFSummaryDto;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiHandlers>
     implements ProjectGenotypesPresenter.Display {
-
 
   private static Logger logger = Logger.getLogger("ProjectGenotypesView");
 
@@ -136,6 +136,16 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   }
 
   @Override
+  public List<VCFSummaryDto> getSelectedVCFs() {
+    return checkColumn.getSelectedItems();
+  }
+
+  @Override
+  public List<VCFSummaryDto> getAllVCFs() {
+    return dataProvider.getList();
+  }
+
+  @Override
   public void setVCFSamplesSummary(VCFStoreDto dto) {
     participants.setText(dto.getParticipantsCount()+"");
     participantsWithGenotype.setText(dto.getParticipantsWithGenotypeCount()+"");
@@ -197,7 +207,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   @UiHandler("downloadVCF")
   public void downloadVCFClick(ClickEvent event) {
-    getUiHandlers().onDownloadVcfFiles();
+    getUiHandlers().onExportVcfFiles();
   }
 
   @UiHandler("importVCF")

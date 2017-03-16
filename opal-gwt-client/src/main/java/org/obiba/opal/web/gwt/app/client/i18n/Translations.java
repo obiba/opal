@@ -2089,6 +2089,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("All tables are selected for being exported.")
   String exportAllTables();
 
+  @Description("All VCF files are selected for being exported label")
+  @DefaultStringValue("All VCF files are selected for being exported.")
+  String exportAllVCFs();
+
   @Description("All tables are selected for being copied label")
   @DefaultStringValue("All tables are selected for being copied.")
   String copyAllTables();
