@@ -22,6 +22,7 @@ import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
@@ -179,7 +180,11 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   @Override
   public void onDownloadStatistics(VCFSummaryDto vcfSummaryDto) {
+    String downloadUrl = UriBuilders.PROJECT_VCF_STORE_VCF_EXPORT_STATS
+      .create()
+      .build(projectDto.getName(), vcfSummaryDto.getName());
 
+    fireEvent(new FileDownloadRequestEvent(downloadUrl));
   }
 
   public void refresh() {

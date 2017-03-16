@@ -482,6 +482,13 @@ public enum UriBuilders {
     }
   },
 
+  PROJECT_VCF_STORE_VCF_EXPORT_STATS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "vcf-store", "vcf", "{}", "_statistics");
+    }
+  },
+
   PROJECT_VCF_STORE_VCF_DOWNLOAD {
     @Override
     public UriBuilder create() {

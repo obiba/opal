@@ -14,6 +14,7 @@ import org.obiba.opal.web.model.Plugins;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -43,7 +44,7 @@ public interface VCFStoreResource {
    * @return
    */
   @DELETE
-  Response deleteStore();
+  Response delete();
 
   /**
    * Get a specific {@link org.obiba.opal.core.domain.VCFSamplesMapping}.
@@ -72,6 +73,16 @@ public interface VCFStoreResource {
   @DELETE
   @Path("/samples")
   Response deleteSamplesMapping();
+
+  /**
+   * Exports the statistics .
+   *
+   * @return
+   */
+  @GET
+  @Produces(value = "text/plain")
+  @Path("/vcf/{vcfName}/_statistics")
+  Response getStatistics(@PathParam("vcfName") String vcfName);
 
   /**
    * Get the {@link org.obiba.opal.spi.vcf.VCFStore.VCFSummary} list.
