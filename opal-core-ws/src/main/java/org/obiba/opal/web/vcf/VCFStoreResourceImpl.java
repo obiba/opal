@@ -11,6 +11,7 @@
 package org.obiba.opal.web.vcf;
 
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.obiba.opal.core.domain.VCFSamplesMapping;
 import org.obiba.opal.core.runtime.OpalRuntime;
@@ -27,6 +28,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+import java.io.*;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -44,11 +48,12 @@ public class VCFStoreResourceImpl implements VCFStoreResource {
   private VCFStore store;
   private VCFSamplesSummaryBuilder summaryBuilder;
   private String name;
+  private VCFStoreService service;
 
   @Override
   public void setVCFStore(String serviceName, String name) {
     if (!opalRuntime.hasVCFStoreServices()) throw new NoSuchElementException("No VCF store service is available");
-    VCFStoreService service = opalRuntime.getVCFStoreService(serviceName);
+    service = opalRuntime.getVCFStoreService(serviceName);
     if (!service.hasStore(name)) service.createStore(name);
     store = service.getStore(name);
     summaryBuilder = new VCFSamplesSummaryBuilder();
@@ -67,9 +72,9 @@ public class VCFStoreResourceImpl implements VCFStoreResource {
   }
 
   @Override
-  public Response deleteStore() {
+  public Response delete() {
     removeSamplesMappings();
-    store.getVCFNames().forEach(this::deleteVCF);
+    service.deleteStore(name);
     return Response.noContent().build();
   }
 
@@ -88,6 +93,19 @@ public class VCFStoreResourceImpl implements VCFStoreResource {
   public Response deleteSamplesMapping() {
     removeSamplesMappings();
     return Response.noContent().build();
+  }
+
+  @Override
+  public Response getStatistics(String vcfName) {
+    StreamingOutput stream = new StreamingOutput() {
+      @Override
+      public void write(OutputStream os) throws IOException {
+        store.readVCFStatistics(vcfName, os);
+      }
+    };
+
+    return Response.ok(stream)
+      .header("Content-Disposition", "attachment; filename=\"" + vcfName + ".tsv\"").build();
   }
 
   private void removeSamplesMappings() {
