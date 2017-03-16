@@ -9,16 +9,15 @@
  */
 package org.obiba.opal.web.gwt.app.client.project.genotypes;
 
+import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
-import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -57,11 +56,18 @@ public class ProjectExportVcfFileModalView extends ModalPopupViewWithUiHandlers<
   @UiField
   CheckBox includeCaseControls;
 
+  @UiField
+  Alert exportNVCF;
+
   @Inject
   public ProjectExportVcfFileModalView(EventBus eventBus, Binder binder, Translations translations) {
     super(eventBus);
     initWidget(binder.createAndBindUi(this));
-    dialog.setTitle(translations.downloadFileModalTitle());
+    dialog.setTitle(translations.exportVcfModalTitle());
+
+    // hide until solution to filter VCF files' sample ID is founds
+    participantsFilterGroup.setVisible(false);
+    includeCaseControls.setVisible(false);
   }
 
   @Override
@@ -73,13 +79,18 @@ public class ProjectExportVcfFileModalView extends ModalPopupViewWithUiHandlers<
     dialog.hide();
   }
 
+  @Override
+  public void showExportNAlert(String message) {
+    exportNVCF.setText(message);
+  }
+
   @UiHandler("cancelButton")
   public void onCancelButton(ClickEvent event) {
     dialog.hide();
   }
 
   @UiHandler("exportButton")
-  public void importButtonClick(ClickEvent event) {
+  public void exportButtonClick(ClickEvent event) {
     getUiHandlers().onExport();
   }
 
