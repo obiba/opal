@@ -11,13 +11,13 @@
 package org.obiba.opal.web.vcf;
 
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.obiba.opal.core.domain.VCFSamplesMapping;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.NoSuchVCFSamplesMappingException;
 import org.obiba.opal.core.service.VCFSamplesMappingService;
 import org.obiba.opal.core.support.vcf.VCFSamplesSummaryBuilder;
+import org.obiba.opal.spi.ServicePlugin;
 import org.obiba.opal.spi.vcf.VCFStore;
 import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.model.Plugins;
@@ -29,8 +29,6 @@ import org.springframework.stereotype.Component;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-import java.io.*;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -52,15 +50,20 @@ public class VCFStoreResourceImpl implements VCFStoreResource {
 
   @Override
   public void setVCFStore(String serviceName, String name) {
-    if (!opalRuntime.hasVCFStoreServices()) throw new NoSuchElementException("No VCF store service is available");
-    service = opalRuntime.getVCFStoreService(serviceName);
-    if (!service.hasStore(name)) service.createStore(name);
-    store = service.getStore(name);
-    summaryBuilder = new VCFSamplesSummaryBuilder();
+    if (!opalRuntime.hasServicePlugins()) throw new NoSuchElementException("No VCF store service is available");
+    ServicePlugin servicePlugin = opalRuntime.getServicePlugin(serviceName);
+
+    if (opalRuntime.isVCFStorePluginService(servicePlugin)) {
+      service = (VCFStoreService) servicePlugin;
+      if (!service.hasStore(name)) service.createStore(name);
+      store = service.getStore(name);
+      summaryBuilder = new VCFSamplesSummaryBuilder();
+    }
 
     try {
       summaryBuilder.mappings(vcfSamplesMappingService.getVCFSamplesMapping(name));
     } catch (NoSuchVCFSamplesMappingException e) {
+      // ignore
     }
 
     this.name = name;

@@ -19,6 +19,7 @@ import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.shell.commands.options.ImportVCFCommandOptions;
+import org.obiba.opal.spi.ServicePlugin;
 import org.obiba.opal.spi.vcf.VCFStore;
 import org.obiba.opal.spi.vcf.VCFStoreException;
 import org.obiba.opal.spi.vcf.VCFStoreService;
@@ -56,12 +57,14 @@ public class ImportVCFCommand extends AbstractOpalRuntimeDependentCommand<Import
     getShell().printf("Importing VCF file '%s' located at '%s' in project '%s'...", options.getName(), options.getFile(), options.getProject());
     getShell().progress(String.format("Preparing VCF file store for project '%s'", options.getProject()), 0, 3, 0);
     Project project = projectService.getProject(getOptions().getProject());
-    if (!opalRuntime.hasVCFStoreServices()) throw new NoSuchServiceException(VCFStoreService.SERVICE_TYPE);
+    if (!opalRuntime.hasServicePlugins()) throw new NoSuchServiceException(VCFStoreService.SERVICE_TYPE);
     if (!project.hasVCFStoreService()) {
       // for now get the first one. Some day, the service type will be a project admin choice
-      VCFStoreService service = opalRuntime.getVCFStoreServices().iterator().next();
+      ServicePlugin service = opalRuntime.getServicePlugins()
+          .stream().filter(s -> opalRuntime.isVCFStorePluginService(s)).iterator().next();
       project.setVCFStoreService(service.getName());
       projectService.save(project);
+
     }
     setVCFStore(project.getVCFStoreService(), project.getName());
 
@@ -83,8 +86,11 @@ public class ImportVCFCommand extends AbstractOpalRuntimeDependentCommand<Import
   //
 
   private void setVCFStore(String serviceName, String name) {
-    if (!opalRuntime.hasVCFStoreServices()) throw new NoSuchElementException("No VCF store service is available");
-    VCFStoreService service = opalRuntime.getVCFStoreService(serviceName);
+    if (!opalRuntime.hasServicePlugins()) throw new NoSuchElementException("No service plugin is available");
+    ServicePlugin servicePlugin = opalRuntime.getServicePlugin(serviceName);
+    if (!opalRuntime.isVCFStorePluginService(servicePlugin)) throw new NoSuchElementException("No VCF store service is available");
+
+    VCFStoreService service = (VCFStoreService) servicePlugin;
     if (!service.hasStore(name)) service.createStore(name);
     store = service.getStore(name);
   }

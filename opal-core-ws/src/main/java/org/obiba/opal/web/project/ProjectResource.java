@@ -10,7 +10,6 @@
 package org.obiba.opal.web.project;
 
 import java.util.Arrays;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -35,9 +34,9 @@ import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.security.OpalKeyStore;
-import org.obiba.opal.core.service.NoSuchProjectException;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
+import org.obiba.opal.spi.ServicePlugin;
 import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.security.KeyStoreResource;
@@ -110,8 +109,12 @@ public class ProjectResource {
           listener.onDelete(ds);
         }
       }
-      if (project.hasVCFStoreService() && opalRuntime.hasVCFStoreService(project.getVCFStoreService())) {
-        opalRuntime.getVCFStoreService(project.getVCFStoreService()).deleteStore(project.getName());
+      if (project.hasVCFStoreService() && opalRuntime.hasServicePlugin(project.getVCFStoreService())) {
+        ServicePlugin servicePlugin = opalRuntime.getServicePlugin(project.getVCFStoreService());
+        if (opalRuntime.isVCFStorePluginService(servicePlugin)) {
+          ((VCFStoreService) servicePlugin).deleteStore(project.getName());
+        }
+
       }
     } catch(Exception e) {
       // silently ignore project not found and other errors
@@ -130,10 +133,11 @@ public class ProjectResource {
   @Path("/vcf-store")
   public VCFStoreResource getVCFStoreResource() {
     Project project = getProject();
-    if (!opalRuntime.hasVCFStoreServices()) throw new NoSuchServiceException(VCFStoreService.SERVICE_TYPE);
+    if (!opalRuntime.hasServicePlugins()) throw new NoSuchServiceException(VCFStoreService.SERVICE_TYPE);
     if (!project.hasVCFStoreService()) {
       // for now get the first one. Some day, the service type will be a project admin choice
-      VCFStoreService service = opalRuntime.getVCFStoreServices().iterator().next();
+      ServicePlugin service = opalRuntime.getServicePlugins()
+          .stream().filter(s -> opalRuntime.isVCFStorePluginService(s)).iterator().next();
       project.setVCFStoreService(service.getName());
       projectService.save(project);
     }

@@ -25,6 +25,7 @@ import org.obiba.opal.core.tx.TransactionalThread;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
 import org.obiba.opal.fs.security.SecuredOpalFileSystem;
+import org.obiba.opal.spi.ServicePlugin;
 import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.spi.vcf.VCFStoreServiceLoader;
 import org.slf4j.Logger;
@@ -71,7 +72,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   private final Object syncFs = new Object();
 
-  private List<VCFStoreService> vcfStoreServices = Lists.newArrayList();
+  private List<ServicePlugin> servicePlugins = Lists.newArrayList();
 
   @Override
   @PostConstruct
@@ -87,7 +88,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
   @Override
   @PreDestroy
   public void stop() {
-    for (VCFStoreService service : vcfStoreServices) {
+    for (ServicePlugin service : servicePlugins) {
       try {
         if (service.isRunning()) service.stop();
       } catch (RuntimeException e) {
@@ -188,25 +189,30 @@ public class DefaultOpalRuntime implements OpalRuntime {
   }
 
   @Override
-  public boolean hasVCFStoreService(String name) {
-    return vcfStoreServices.stream().filter(s -> name.equals(s.getName())).count() == 1;
+  public boolean hasServicePlugin(String name) {
+    return servicePlugins.stream().filter(s -> name.equals(s.getName())).count() == 1;
   }
 
   @Override
-  public VCFStoreService getVCFStoreService(String name) {
-    Optional<VCFStoreService> service = vcfStoreServices.stream().filter(s -> name.equals(s.getName())).findFirst();
-    if (!service.isPresent()) throw new NoSuchServiceException(VCFStoreService.SERVICE_TYPE);
+  public ServicePlugin getServicePlugin(String name) {
+    Optional<ServicePlugin> service = servicePlugins.stream().filter(s -> name.equals(s.getName())).findFirst();
+    if (!service.isPresent()) throw new NoSuchServiceException(name);
     return service.get();
   }
 
   @Override
-  public boolean hasVCFStoreServices() {
-    return vcfStoreServices.size()>0;
+  public boolean isVCFStorePluginService(ServicePlugin servicePlugin) {
+    return VCFStoreService.class.isAssignableFrom(servicePlugin.getClass());
   }
 
   @Override
-  public Collection<VCFStoreService> getVCFStoreServices() {
-    return vcfStoreServices;
+  public boolean hasServicePlugins() {
+    return servicePlugins.size()>0;
+  }
+
+  @Override
+  public Collection<ServicePlugin> getServicePlugins() {
+    return servicePlugins;
   }
 
   private void initPlugins() {
@@ -290,7 +296,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
             Plugin plugin = pluginsMap.get(service.getName());
             service.configure(plugin.getProperties());
             service.start();
-            vcfStoreServices.add(service);
+            servicePlugins.add(service);
           } catch (Exception e) {
             log.warn("Error initializing/starting plugin service: {}", service.getClass(), e);
           }

@@ -11,16 +11,14 @@
 package org.obiba.opal.web.services;
 
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.core.runtime.Plugin;
 import org.obiba.opal.web.model.Plugins;
 import org.obiba.opal.web.plugins.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
-import java.util.Properties;
 
 @Component
 @Scope("request")
@@ -31,11 +29,21 @@ public class PluginResource {
   private String name;
 
   @Autowired
+  private ApplicationContext applicationContext;
+
+  @Autowired
   private OpalRuntime opalRuntime;
 
   @GET
   public Plugins.PluginDto get() {
     return Dtos.asDto(opalRuntime.getPlugin(name));
+  }
+
+  @Path("/{service}")
+  public ServicePluginResource service(@PathParam("service") String service) {
+    ServicePluginResource resource = applicationContext.getBean(ServicePluginResource.class);
+    resource.setService(service);
+    return resource;
   }
 
 }

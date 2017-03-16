@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.project.edit;
 
 import javax.annotation.Nullable;
 
+import com.google.gwt.core.client.JsArrayString;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.DatasourceDtos;
@@ -20,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.validator.ConstrainedModal;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
+import org.obiba.opal.web.model.client.opal.PluginDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
@@ -41,6 +43,7 @@ public class EditProjectModalView extends ModalPopupViewWithUiHandlers<EditProje
     implements EditProjectModalPresenter.Display {
 
   private static final String DATABASE_NONE = "_none";
+  private static final String VCF_STORE_SERVICE_NONE = "_none";
 
   interface Binder extends UiBinder<Widget, EditProjectModalView> {}
 
@@ -73,6 +76,9 @@ public class EditProjectModalView extends ModalPopupViewWithUiHandlers<EditProje
 
   @UiField
   Button cancelButton;
+
+  @UiField
+  Chooser vcfStoreService;
 
   private final Translations translations;
 
@@ -155,6 +161,29 @@ public class EditProjectModalView extends ModalPopupViewWithUiHandlers<EditProje
   }
 
   @Override
+  public HasText getVcfStoreService() {
+    return new HasText() {
+      @Override
+      public String getText() {
+        String selectedVcfStoreService = vcfStoreService.getSelectedValue();
+        return selectedVcfStoreService == null || VCF_STORE_SERVICE_NONE.equals(selectedVcfStoreService) ? null : selectedVcfStoreService;
+      }
+
+      @Override
+      public void setText(String s) {
+        if(Strings.isNullOrEmpty(s)) return;
+        int count = vcfStoreService.getItemCount();
+        for(int i = 0; i < count; i++) {
+          if(vcfStoreService.getValue(i).equals(s)) {
+            vcfStoreService.setSelectedIndex(i);
+            break;
+          }
+        }
+      }
+    };
+  }
+
+  @Override
   public void setAvailableDatabases(JsArray<DatabaseDto> availableDatabases) {
     database.clear();
     database.addItem(translations.none(), DATABASE_NONE);
@@ -177,6 +206,16 @@ public class EditProjectModalView extends ModalPopupViewWithUiHandlers<EditProje
     modal.setCloseVisible(!busy);
     saveButton.setEnabled(!busy);
     cancelButton.setEnabled(!busy);
+  }
+
+  @Override
+  public void setAvailableVcfStoreServices(JsArray<PluginDto> availableVcfStoreServices) {
+    vcfStoreService.clear();
+    vcfStoreService.addItem(translations.none(), VCF_STORE_SERVICE_NONE);
+
+    for (int i = 0; i < availableVcfStoreServices.length(); i++) {
+      vcfStoreService.addItem(availableVcfStoreServices.get(i).getName());
+    }
   }
 
   @Override

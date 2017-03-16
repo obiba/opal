@@ -48,6 +48,16 @@
     </b:ControlGroup>
 
     <b:ControlGroup>
+      <b:ControlLabel for="vcfStoreService">
+        <ui:msg description="Mapping Table label">VCF Store Service</ui:msg>
+      </b:ControlLabel>
+      <o:Chooser ui:field="vcfStoreService" name="vcfStoreService"/>
+      <b:HelpBlock>
+        <ui:msg description="Mapping Table help">A project's store service name.</ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+
+    <b:ControlGroup>
       <b:ControlLabel for="description">
         <ui:msg description="Description label">Description</ui:msg>
       </b:ControlLabel>
