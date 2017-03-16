@@ -3,14 +3,12 @@ package org.obiba.opal.core.support.vcf;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.core.domain.VCFSampleRole;
 import org.obiba.opal.core.domain.VCFSamplesMapping;
-import org.obiba.opal.spi.vcf.VCFStore;
 
 import java.util.Collection;
 import java.util.Set;
@@ -49,13 +47,16 @@ public class VCFSamplesSummaryBuilder {
         String sampleId = v.getVariableEntity().getIdentifier();
         String participantId = vt.getValue(participantVariable, v).toString();
         String role = vt.getValue(roleVariable, v).toString();
+        boolean sampleFound = allSamples.contains(sampleId);
 
         if (!Strings.isNullOrEmpty(participantId)) {
           participants.add(participantId);
-          if (allSamples.contains(sampleId)) participantsWithGenotypes.add(participantId);
+          if (sampleFound) participantsWithGenotypes.add(participantId);
         }
-        if (VCFSampleRole.isSample(role)) stats.samples++;
-        else if (VCFSampleRole.isControl(role)) stats.controlSamples++;
+        if (sampleFound) {
+          if (VCFSampleRole.isSample(role)) stats.samples++;
+          else if (VCFSampleRole.isControl(role)) stats.controlSamples++;
+        }
       }
 
       // unique genotype participants count
@@ -127,6 +128,10 @@ public class VCFSamplesSummaryBuilder {
 
     public int getOrphanSamples() {
       return orphanSamples;
+    }
+
+    public boolean hasSamples() {
+      return samples + controlSamples > 0;
     }
   }
 }

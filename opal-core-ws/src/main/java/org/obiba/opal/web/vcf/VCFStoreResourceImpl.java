@@ -97,12 +97,7 @@ public class VCFStoreResourceImpl implements VCFStoreResource {
 
   @Override
   public Response getStatistics(String vcfName) {
-    StreamingOutput stream = new StreamingOutput() {
-      @Override
-      public void write(OutputStream os) throws IOException {
-        store.readVCFStatistics(vcfName, os);
-      }
-    };
+    StreamingOutput stream = os -> store.readVCFStatistics(vcfName, os);
 
     return Response.ok(stream)
       .header("Content-Disposition", "attachment; filename=\"" + vcfName + ".tsv\"").build();

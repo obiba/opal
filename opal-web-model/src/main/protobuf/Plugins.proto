@@ -31,9 +31,9 @@ message VCFSummaryDto {
     required string name = 1; // VCF file name
     required int64 size = 2; // VCF file size
     required int32 totalSamplesCount = 3;
-    required int32 samplesCount = 4;
-    required int32 variantsCount = 5;
-    required int32 genotypesCount = 6;
+    required int32 variantsCount = 4;
+    required int32 genotypesCount = 5;
+    optional int32 samplesCount = 6;
     optional int32 participantsCount = 7;
     optional int32 orphanSamplesCount = 8;
     optional int32 controlSamplesCount = 9;
