@@ -65,6 +65,8 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
 
   private final TranslationMessages translationMessages;
 
+  private boolean hasServicePlugins = false;
+
   @Inject
   public ProjectAdministrationPresenter(EventBus eventBus, Display view, PlaceManager placeManager,
       ModalProvider<EditProjectModalPresenter> editProjectModalProvider,
@@ -90,10 +92,12 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     });
   }
 
-  public void setProject(ProjectDto project) {
+  public void setProject(ProjectDto project, boolean hasServicePlugins) {
     this.project = project;
     getView().setProject(project);
     authorize();
+
+    this.hasServicePlugins = hasServicePlugins;
   }
 
   private void authorize() {
@@ -121,10 +125,15 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
         .delete().send();
   }
 
+  public void showVcfServiceNamePanel(boolean show) {
+    getView().toggleVcfServicePluginPanel(show);
+  }
+
   @Override
   public void onEdit() {
     EditProjectModalPresenter presenter = editProjectModalProvider.create();
     presenter.setProjectName(project.getName());
+    presenter.toggleVcfServicePanel(hasServicePlugins);
     editProjectModalProvider.show();
   }
 
@@ -246,6 +255,8 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     void setProject(ProjectDto project);
 
     ProjectDto getProject();
+
+    void toggleVcfServicePluginPanel(boolean show);
 
     HasAuthorization getEditAuthorizer();
 

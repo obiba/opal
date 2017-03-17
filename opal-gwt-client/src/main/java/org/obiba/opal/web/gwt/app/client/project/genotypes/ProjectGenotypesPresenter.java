@@ -132,8 +132,11 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   public void initialize(ProjectDto dto) {
     projectDto = dto;
-    getParticipantTables();
-    refresh();
+    getView().clear(dto.hasVcfStoreService());
+    if (dto.hasVcfStoreService()) {
+      getParticipantTables();
+      refresh();
+    }
   }
 
   @Override
@@ -288,7 +291,6 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
         @Override
         public void onResponseCode(Request request, Response response) {
           mappingTable = VCFSamplesMappingDto.create();
-          getView().clearSamplesMappingData();
         }
       })
       .get().send();
@@ -414,6 +416,6 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
     void afterRenderRows();
 
-    void clearSamplesMappingData();
+    void clear(boolean hasVcfService);
   }
 }

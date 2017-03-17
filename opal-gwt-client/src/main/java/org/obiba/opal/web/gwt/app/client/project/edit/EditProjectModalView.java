@@ -80,6 +80,9 @@ public class EditProjectModalView extends ModalPopupViewWithUiHandlers<EditProje
   @UiField
   Chooser vcfStoreService;
 
+  @UiField
+  ControlGroup vcfStoreServiceGroup;
+
   private final Translations translations;
 
   @Inject
@@ -206,6 +209,11 @@ public class EditProjectModalView extends ModalPopupViewWithUiHandlers<EditProje
     modal.setCloseVisible(!busy);
     saveButton.setEnabled(!busy);
     cancelButton.setEnabled(!busy);
+  }
+
+  @Override
+  public void toggleAvailableVcfStoreServicesPanel(boolean show) {
+    vcfStoreServiceGroup.setVisible(show);
   }
 
   @Override
