@@ -19,35 +19,7 @@
 
   <g:FlowPanel>
 
-    <!-- Empty content -->
-    <g:FlowPanel ui:field="noMappingPanel" visible="false">
-      <g:FlowPanel addStyleNames="clearfix"/>
-      <b:Paragraph>
-        <ui:msg description="Report Templates text">In order to manage genotypes data you must first select a mapping table.
-        </ui:msg>
-      </b:Paragraph>
-      <b:Button icon="PLUS" type="INFO" ui:field="addMapping">
-        <ui:msg description="Add Report Template label">Add Mapping Table</ui:msg>
-      </b:Button>
-    </g:FlowPanel>
-
-    <g:FlowPanel addStyleNames="pull-right small-bottom-margin">
-      <g:FlowPanel addStyleNames="clearfix"/>
-
-      <b:Button icon="UPLOAD_ALT" ui:field="importVCF">
-        <ui:msg description="Genotypes Import vcfFile label">Import</ui:msg>
-      </b:Button>
-
-      <b:Button icon="DOWNLOAD_ALT" ui:field="downloadVCF" addStyleNames="small-indent">
-        <ui:msg description="Genotypes Download vcfFile label">Export</ui:msg>
-      </b:Button>
-
-      <b:Button icon="TRASH" visible="false" ui:field="deleteAll" addStyleNames="small-indent">
-      </b:Button>
-    </g:FlowPanel>
-
-    <!-- Empty content -->
-    <g:FlowPanel ui:field="mainPanel" visible="true">
+    <g:FlowPanel>
       <g:FlowPanel addStyleNames="clearfix"/>
 
       <g:FlowPanel addStyleNames="container-fluid no-padding-left no-padding-right">
@@ -89,9 +61,11 @@
         <g:FlowPanel addStyleNames="no-left-margin pull-right" width="45%">
           <g:FlowPanel>
             <b:Heading size="4" addStyleNames="inline-block small-top-margin">
-              <ui:msg description="Genotypes Mapping Table label">Mapping Table</ui:msg>
+              <ui:msg description="Genotypes Mapping Table label">Samples-Participants Mapping</ui:msg>
             </b:Heading>
             <b2:IconAnchor ui:field="editMapping" icon="EDIT" addStyleNames="small-indent">
+            </b2:IconAnchor>
+            <b2:IconAnchor ui:field="addMapping" icon="PLUS_SIGN_ALT" addStyleNames="small-indent">
             </b2:IconAnchor>
           </g:FlowPanel>
 
@@ -135,17 +109,35 @@
       <g:FlowPanel addStyleNames="clearfix"/>
 
       <g:FlowPanel addStyleNames="container-fluid no-padding-left no-padding-right">
-        <g:FlowPanel addStyleNames="pull-right">
-          <g:FlowPanel addStyleNames="span4">
-            <o:OpalSimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
+          <g:FlowPanel addStyleNames="clearfix"/>
+
+          <g:FlowPanel addStyleNames="small-bottom-margin">
+            <b:Heading size="4" addStyleNames="inline-block small-top-margin">
+              <ui:msg description="Genotypes Mapping Table title label">VCF Files</ui:msg>
+            </b:Heading>
           </g:FlowPanel>
 
-          <g:FlowPanel addStyleNames="span4" ui:field="filterPanel" visible="false">
-            <b:Controls addStyleNames="pull-right">
+          <b:Button icon="UPLOAD_ALT" ui:field="importVCF">
+            <ui:msg description="Genotypes Import vcfFile label">Import</ui:msg>
+          </b:Button>
+
+          <b:Button icon="DOWNLOAD_ALT" ui:field="downloadVCF" addStyleNames="small-indent">
+            <ui:msg description="Genotypes Download vcfFile label">Export</ui:msg>
+          </b:Button>
+
+          <b:Button icon="TRASH" visible="true" ui:field="deleteAll" addStyleNames="small-indent">
+          </b:Button>
+
+        <g:FlowPanel addStyleNames="pull-right">
+          <g:FlowPanel ui:field="filterPanel">
+            <b:Controls>
               <b:InputAddOn prependIcon="FILTER">
                 <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
               </b:InputAddOn>
             </b:Controls>
+          </g:FlowPanel>
+          <g:FlowPanel addStyleNames="span4">
+            <o:OpalSimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
           </g:FlowPanel>
         </g:FlowPanel>
       </g:FlowPanel>

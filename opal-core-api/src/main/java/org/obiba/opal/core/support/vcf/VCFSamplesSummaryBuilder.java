@@ -19,7 +19,7 @@ public class VCFSamplesSummaryBuilder {
   }
 
   private VCFSamplesMapping mappings;
-  private Collection<String> sampleIds;
+  private Set<String> sampleIds;
 
   public VCFSamplesSummaryBuilder mappings(VCFSamplesMapping value) {
     mappings = value;
@@ -27,111 +27,176 @@ public class VCFSamplesSummaryBuilder {
   }
 
   public VCFSamplesSummaryBuilder sampleIds(Collection<String> value) {
-    sampleIds = value;
+    sampleIds = value == null ? Sets.newHashSet() : Sets.newHashSet(value);
     return this;
   }
 
   public Stats buildGeneralSummary() {
-    Stats stats = new Stats();
+    Stats stats = createStats();
 
     if (mappings != null) {
+      int samples = 0;
+      int controlSamples = 0;
       ValueTable vt = MagmaEngineTableResolver.valueOf(mappings.getTableReference()).resolveTable();
       Iterable<ValueSet> valueSets = vt.getValueSets();
       Variable participantVariable = vt.getVariable(mappings.getParticipantIdVariable());
       Variable roleVariable = vt.getVariable(mappings.getSampleRoleVariable());
       Set<String> participants = Sets.newHashSet();
       Set<String> participantsWithGenotypes = Sets.newHashSet();
-      Collection<String> allSamples = sampleIds == null ? Lists.newArrayList() : sampleIds;
 
       for (ValueSet v : valueSets) {
         String sampleId = v.getVariableEntity().getIdentifier();
         String participantId = vt.getValue(participantVariable, v).toString();
         String role = vt.getValue(roleVariable, v).toString();
-        boolean sampleFound = allSamples.contains(sampleId);
+        boolean sampleFound = sampleIds.contains(sampleId);
 
         if (!Strings.isNullOrEmpty(participantId)) {
           participants.add(participantId);
           if (sampleFound) participantsWithGenotypes.add(participantId);
         }
+
         if (sampleFound) {
-          if (VCFSampleRole.isSample(role)) stats.samples++;
-          else if (VCFSampleRole.isControl(role)) stats.controlSamples++;
+          if (VCFSampleRole.isSample(role)) samples++;
+          else if (VCFSampleRole.isControl(role)) controlSamples++;
         }
       }
 
-      // unique genotype participants count
-      stats.participants = participants.size();
-      stats.participantsWithGenotypes = participantsWithGenotypes.size();
+      if (samples + controlSamples > 0) {
+        stats.setSamples(samples);
+        stats.setControlSamples(controlSamples);
+        stats.setParticipantsWithGenotypes(participantsWithGenotypes.size());
+      }
+
+      stats.setParticipants(participants.size());
+    } else if (!sampleIds.isEmpty()){
+      stats.setSamples(sampleIds.size());
     }
+
 
     return stats;
   }
 
   public Stats buildSummary() {
-    Stats stats = new Stats();
+    Stats stats = createStats();
 
     if (mappings != null) {
+      int orphanSamples = 0;
+      int samples = 0;
+      int controlSamples = 0;
+
       ValueTable vt = MagmaEngineTableResolver.valueOf(mappings.getTableReference()).resolveTable();
       Iterable<ValueSet> valueSets = vt.getValueSets();
       Variable participantVariable = vt.getVariable(mappings.getParticipantIdVariable());
       Variable roleVariable = vt.getVariable(mappings.getSampleRoleVariable());
       Set<String> participants = Sets.newHashSet();
-      Collection<String> allSamples = sampleIds == null ? Lists.newArrayList() : sampleIds;
 
       for (ValueSet v : valueSets) {
         String sampleId = v.getVariableEntity().getIdentifier();
         String participantId = vt.getValue(participantVariable, v).toString();
         String roleName = vt.getValue(roleVariable, v).toString();
 
-        if (allSamples.contains(sampleId)){
+        if (sampleIds.contains(sampleId)){
           if (Strings.isNullOrEmpty(participantId)) {
-            if (VCFSampleRole.isSample(roleName)) stats.orphanSamples++;
+            if (VCFSampleRole.isSample(roleName)) orphanSamples++;
           } else {
             participants.add(participantId);
           }
 
-          if (VCFSampleRole.isSample(roleName)) stats.samples++;
-          else if (VCFSampleRole.isControl(roleName)) stats.controlSamples++;
+          if (VCFSampleRole.isSample(roleName)) samples++;
+          else if (VCFSampleRole.isControl(roleName)) controlSamples++;
         }
 
       }
 
-      // unique genotype participants count
-      stats.participants = participants.size();
+      if (samples + controlSamples > 0) {
+        // no samples matched
+        stats.setSamples(samples);
+        stats.setControlSamples(controlSamples);
+        stats.setOrphanSamples(orphanSamples);
+        stats.setParticipants(participants.size());
+      }
     }
 
     return stats;
   }
 
+  private Stats createStats() {
+    Stats stats = new Stats();
+    stats.samplesIdCount = sampleIds.size();
+    return stats;
+  }
+
   public static class Stats {
-    int participants = 0;
-    int participantsWithGenotypes = 0;
-    int samples = 0;
-    int controlSamples = 0;
-    int orphanSamples = 0;
+    int samplesIdCount = 0;
+
+    Integer participants = null;
+    Integer participantsWithGenotypes = null;
+    Integer samples = null;
+    Integer controlSamples = null;
+    Integer orphanSamples = null;
+
+    public int getSamplesIdCount() {
+      return samplesIdCount;
+    }
+
+    public boolean hasParticipants() {
+      return participants != null;
+    }
+
+    public void setParticipants(int value ) {
+      participants = value;
+    }
 
     public int getParticipants() {
       return participants;
+    }
+
+    public boolean hasParticipantsWithGenotypes() {
+      return participantsWithGenotypes != null;
+    }
+
+    public void setParticipantsWithGenotypes(int value) {
+      participantsWithGenotypes = value;
     }
 
     public int getParticipantsWithGenotypes() {
       return participantsWithGenotypes;
     }
 
+    public boolean hasSamples() {
+      return samples != null;
+    }
+
+    public void setSamples(int value) {
+      samples = value;
+    }
+
     public int getSamples() {
       return samples;
+    }
+
+    public boolean hasControlSamples() {
+      return controlSamples != null;
+    }
+
+    public void setControlSamples(int value) {
+      controlSamples = value;
     }
 
     public int getControlSamples() {
       return controlSamples;
     }
 
-    public int getOrphanSamples() {
-      return orphanSamples;
+    public boolean hasOrphanSamples() {
+      return orphanSamples != null;
     }
 
-    public boolean hasSamples() {
-      return samples + controlSamples > 0;
+    public void setOrphanSamples(int value) {
+      orphanSamples = value;
+    }
+
+    public int getOrphanSamples() {
+      return orphanSamples;
     }
   }
 }

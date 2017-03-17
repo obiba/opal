@@ -201,8 +201,8 @@ public interface TranslationMessages extends Messages {
   @AlternateMessage({ "=0", "No tables", "one", "1 table" })
   String tableCount(@PluralCount int count);
 
-  @Description("VCF file count label")
-  @DefaultMessage("{0} VCF files")
+  @Description("Table count label")
+  @DefaultMessage("{0} VCFs")
   @AlternateMessage({ "=0", "No VCF file", "one", "1 VCF file" })
   String vcfFilesCount(@PluralCount int count);
 
