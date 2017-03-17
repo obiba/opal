@@ -46,7 +46,7 @@ public class ContinuousSummaryResourceImpl extends AbstractSummaryResource imple
 
     ContinuousVariableSummary summary;
     if(fullIfCached && variableSummaryService.isSummaryCached(summaryFactory)) {
-      summary = variableSummaryService.getSummary(summaryFactory, false);
+      summary = variableSummaryService.getSummary(summaryFactory, resetCache);
     } else {
       summaryFactory.setLimit(limit);
       summary = variableSummaryService.getSummary(summaryFactory, resetCache);

@@ -42,7 +42,7 @@ public class CategoricalSummaryResourceImpl extends AbstractSummaryResource impl
 
     CategoricalVariableSummary summary;
     if(fullIfCached && variableSummaryService.isSummaryCached(summaryFactory)) {
-      summary = variableSummaryService.getSummary(summaryFactory, false);
+      summary = variableSummaryService.getSummary(summaryFactory, resetCache);
     } else {
       summaryFactory.setLimit(limit);
       summary = variableSummaryService.getSummary(summaryFactory, resetCache);

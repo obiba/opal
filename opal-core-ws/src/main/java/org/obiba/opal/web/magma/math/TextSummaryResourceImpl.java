@@ -38,7 +38,7 @@ public class TextSummaryResourceImpl extends AbstractSummaryResource implements 
 
     TextVariableSummary summary;
     if(fullIfCached && variableSummaryService.isSummaryCached(summaryFactory)) {
-      summary = variableSummaryService.getSummary(summaryFactory, false);
+      summary = variableSummaryService.getSummary(summaryFactory, resetCache);
     } else {
       summaryFactory.setLimit(limit);
       summary = variableSummaryService.getSummary(summaryFactory, resetCache);
