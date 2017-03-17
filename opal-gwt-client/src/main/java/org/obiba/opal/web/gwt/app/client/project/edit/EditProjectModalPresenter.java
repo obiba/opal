@@ -10,11 +10,11 @@
 
 package org.obiba.opal.web.gwt.app.client.project.edit;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 import javax.annotation.Nullable;
 
+import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
@@ -32,6 +32,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
+import org.obiba.opal.web.model.client.opal.PluginDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.ProjectFactoryDto;
 
@@ -84,6 +85,7 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
               project = projectDto;
               getView().setProject(project);
               getView().getDatabase().setText(project.getDatabase());
+              getView().getVcfStoreService().setText(project.getVcfStoreService());
             }
           }).get().send();
     }
@@ -99,7 +101,22 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
           @Override
           public void onResource(Response response, JsArray<DatabaseDto> databases) {
             getView().setAvailableDatabases(databases);
-            if(project != null) getView().getDatabase().setText(project.getDatabase());
+            if(project != null) {
+              getView().getDatabase().setText(project.getDatabase());
+              getView().getVcfStoreService().setText(project.getVcfStoreService());
+            }
+          }
+        }).get().send();
+
+    Map<String, String> pluginsParams = new HashMap<>();
+    pluginsParams.put("type", VCFStoreService.SERVICE_TYPE);
+
+    ResourceRequestBuilderFactory.<JsArray<PluginDto>>newBuilder().forResource(UriBuilders.PLUGINS.create().query(pluginsParams).build())
+        .withCallback(new ResourceCallback<JsArray<PluginDto>>() {
+
+          @Override
+          public void onResource(Response response, JsArray<PluginDto> resource) {
+            getView().setAvailableVcfStoreServices(resource);
           }
         }).get().send();
   }
@@ -156,6 +173,7 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
       }
     }
     dto.setDatabase(getView().getDatabase().getText());
+    dto.setVcfStoreService(getView().getVcfStoreService().getText());
     if(project != null) dto.setArchived(project.getArchived());
     return dto;
   }
@@ -197,6 +215,7 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
     dto.setTitle(Strings.isNullOrEmpty(title) ? dto.getName() : title);
     dto.setDescription(getView().getDescription().getText());
     dto.setDatabase(getView().getDatabase().getText());
+    dto.setVcfStoreService(getView().getVcfStoreService().getText());
     String tags = getView().getTags().getText();
     if(!Strings.isNullOrEmpty(tags)) {
       JsArrayString tagsArray = JavaScriptObject.createArray().cast();
@@ -275,6 +294,8 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
 
     HasText getDatabase();
 
+    HasText getVcfStoreService();
+
     void showError(@Nullable FormField formField, String message);
 
     void hideDialog();
@@ -284,5 +305,7 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
     void setAvailableDatabases(JsArray<DatabaseDto> availableDatabases);
 
     void setBusy(boolean busy);
+
+    void setAvailableVcfStoreServices(JsArray<PluginDto> availableVcfStoreServices);
   }
 }

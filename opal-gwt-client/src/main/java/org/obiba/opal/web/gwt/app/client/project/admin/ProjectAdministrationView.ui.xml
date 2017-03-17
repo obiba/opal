@@ -54,6 +54,12 @@
               </g:Label>
               <g:Label ui:field="tags"/>
             </o:PropertyPanel>
+            <o:PropertyPanel>
+              <g:Label>
+                <ui:msg description="Name label">VCF Store Service</ui:msg>
+              </g:Label>
+              <g:Label ui:field="vcfServiceName"/>
+            </o:PropertyPanel>
           </o:PropertiesTable>
         </b:Column>
       </b:Row>

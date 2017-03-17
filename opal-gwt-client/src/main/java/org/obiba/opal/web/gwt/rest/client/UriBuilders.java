@@ -671,6 +671,14 @@ public enum UriBuilders {
 
   },
 
+  PLUGINS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("plugins");
+
+    }
+  },
+
   IDENTIFIERS_TABLES {
     @Override
     public UriBuilder create() {

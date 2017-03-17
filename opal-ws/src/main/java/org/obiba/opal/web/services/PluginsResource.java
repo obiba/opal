@@ -10,7 +10,11 @@
 
 package org.obiba.opal.web.services;
 
+import com.google.common.base.Strings;
+import org.codehaus.jettison.json.JSONArray;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.spi.ServicePlugin;
+import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.model.Plugins;
 import org.obiba.opal.web.plugins.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +23,9 @@ import org.springframework.stereotype.Component;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,8 +38,20 @@ public class PluginsResource {
   private OpalRuntime opalRuntime;
 
   @GET
-  public List<Plugins.PluginDto> get() {
-    return opalRuntime.getPlugins().stream().map(Dtos::asDto).collect(Collectors.toList());
+  public List<Plugins.PluginDto> get(@QueryParam("type") String type) {
+    return opalRuntime.getPlugins().stream()
+        .map(Dtos::asDto)
+        .filter(p -> Strings.isNullOrEmpty(type) || (type.equals(p.getType()) || testType(type)))
+        .collect(Collectors.toList());
+  }
+
+  private boolean testType(String type) {
+    switch (type) {
+      case VCFStoreService.SERVICE_TYPE:
+        return true;
+    }
+
+    return false;
   }
 
 }

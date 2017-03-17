@@ -10,22 +10,9 @@
 
 package org.obiba.opal.web.system;
 
-import java.lang.management.GarbageCollectorMXBean;
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryUsage;
-import java.lang.management.RuntimeMXBean;
-import java.lang.management.ThreadMXBean;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
-
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import org.obiba.opal.core.cfg.TaxonomyService;
 import org.obiba.opal.core.domain.OpalGeneralConfig;
 import org.obiba.opal.core.domain.database.Database;
@@ -43,9 +30,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
+import java.lang.management.*;
+import java.util.*;
 
 import static org.obiba.opal.web.model.Database.DatabasesStatusDto;
 
@@ -235,4 +225,5 @@ public class SystemResource {
     resource.setKeyStore(systemKeyStoreService.getKeyStore());
     return resource;
   }
+
 }

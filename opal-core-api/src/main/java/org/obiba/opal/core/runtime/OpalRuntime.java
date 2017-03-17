@@ -11,18 +11,11 @@ package org.obiba.opal.core.runtime;
 
 import org.obiba.opal.core.service.SystemService;
 import org.obiba.opal.fs.OpalFileSystem;
-import org.obiba.opal.spi.vcf.VCFStoreService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.obiba.opal.spi.ServicePlugin;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
-import java.io.FileInputStream;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Collection;
-import java.util.Properties;
 import java.util.Set;
 
 public interface OpalRuntime extends SystemService {
@@ -123,33 +116,35 @@ public interface OpalRuntime extends SystemService {
   //
 
   /**
-   * Check if there is any VCF store plugin loaded.
+   * Check if there is any service plugin loaded.
    *
    * @return
    */
-  boolean hasVCFStoreServices();
+  boolean hasServicePlugins();
 
   /**
-   * Get all vcf services.
+   * Get all service plugins.
    *
    * @return
    */
-  Collection<VCFStoreService> getVCFStoreServices();
+  Collection<ServicePlugin> getServicePlugins();
 
   /**
-   * Check that a vcf service exists.
+   * Check that a service service exists.
    *
    * @param name
    * @return
    */
-  boolean hasVCFStoreService(String name);
+  boolean hasServicePlugin(String name);
 
   /**
-   * Get the {@link VCFStoreService} from name.
+   * Get the {@link ServicePlugin} from name.
    *
    * @param name
    * @return
    * @throws java.util.NoSuchElementException
    */
-  VCFStoreService getVCFStoreService(String name);
+  ServicePlugin getServicePlugin(String name);
+
+  boolean isVCFStorePluginService(ServicePlugin servicePlugin);
 }

@@ -80,6 +80,9 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   @UiField
   Panel deletePanel;
 
+  @UiField
+  Label vcfServiceName;
+
   private ProjectDto project;
 
   @Inject
@@ -106,6 +109,8 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
       //noDatabasePanel.clear();
       //noDatabasePanel.add(new Label(translations.noProjectDatabase()));
     }
+
+    vcfServiceName.setText(project.hasVcfStoreService() ? project.getVcfStoreService() : "");
   }
 
   @Override

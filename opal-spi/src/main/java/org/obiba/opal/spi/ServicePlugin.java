@@ -23,6 +23,13 @@ public interface ServicePlugin {
   String getName();
 
   /**
+   * Get the configuration of the service
+   *
+   * @return
+   */
+  Properties getProperties();
+
+  /**
    * Set the configuration of the service.
    *
    * @param properties

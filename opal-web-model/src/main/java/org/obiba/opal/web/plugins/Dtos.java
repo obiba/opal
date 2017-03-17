@@ -14,6 +14,7 @@ import com.google.common.collect.Lists;
 import org.obiba.opal.core.domain.VCFSamplesMapping;
 import org.obiba.opal.core.runtime.Plugin;
 import org.obiba.opal.core.support.vcf.VCFSamplesSummaryBuilder;
+import org.obiba.opal.spi.ServicePlugin;
 import org.obiba.opal.spi.vcf.VCFStore;
 import org.obiba.opal.web.model.Plugins;
 
@@ -26,15 +27,13 @@ public class Dtos {
 
   public static Plugins.PluginDto asDto(Plugin plugin) {
     Plugins.PluginDto.Builder builder = Plugins.PluginDto.newBuilder();
-    Properties properties = plugin.getProperties();
-    properties.entrySet().stream().filter(entry -> !reservedProperties.contains(entry.getKey().toString())).forEach(entry -> {
-      if ("name".equals(entry.getKey())) builder.setName(entry.getValue().toString());
-      else if ("title".equals(entry.getKey())) builder.setTitle(entry.getValue().toString());
-      else if ("description".equals(entry.getKey())) builder.setDescription(entry.getValue().toString());
-      else if ("version".equals(entry.getKey())) builder.setVersion(entry.getValue().toString());
-      else if ("opal.version".equals(entry.getKey())) builder.setOpalVersion(entry.getValue().toString());
-      else builder.addProperties(Plugins.PropertyDto.newBuilder().setKey(entry.getKey().toString()).setValue(entry.getValue().toString()));
-    });
+    setProperties(plugin.getProperties(), builder);
+    return builder.build();
+  }
+
+  public static Plugins.PluginDto asDto(ServicePlugin plugin) {
+    Plugins.PluginDto.Builder builder = Plugins.PluginDto.newBuilder();
+    setProperties(plugin.getProperties(), builder);
     return builder.build();
   }
 
@@ -90,5 +89,17 @@ public class Dtos {
       .setSampleIdVariable(sampleMappings.getSampleIdVariable())
       .setSampleRoleVariable(sampleMappings.getSampleRoleVariable())
       .build();
+  }
+
+  private static void setProperties(Properties properties, Plugins.PluginDto.Builder builder) {
+    properties.entrySet().stream().filter(entry -> !reservedProperties.contains(entry.getKey().toString())).forEach(entry -> {
+      if ("name".equals(entry.getKey())) builder.setName(entry.getValue().toString());
+      else if ("title".equals(entry.getKey())) builder.setTitle(entry.getValue().toString());
+      else if ("description".equals(entry.getKey())) builder.setDescription(entry.getValue().toString());
+      else if ("version".equals(entry.getKey())) builder.setVersion(entry.getValue().toString());
+      else if ("opal.version".equals(entry.getKey())) builder.setOpalVersion(entry.getValue().toString());
+      else if ("type".equals(entry.getKey())) builder.setType(entry.getValue().toString());
+      else builder.addProperties(Plugins.PropertyDto.newBuilder().setKey(entry.getKey().toString()).setValue(entry.getValue().toString()));
+    });
   }
 }
