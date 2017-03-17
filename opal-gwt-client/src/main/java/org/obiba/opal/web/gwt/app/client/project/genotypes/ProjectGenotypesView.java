@@ -193,7 +193,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   @Override
   public void afterRenderRows() {
-    boolean pagerVisible = vcfFilesTable.getRowCount() > 0;
+    boolean pagerVisible = vcfFilesTable.getRowCount() > Table.DEFAULT_PAGESIZE;
     dataProvider.refresh();
     tablePager.setPagerVisible(pagerVisible);
     vcfFilesTable.hideLoadingIndicator();
@@ -264,7 +264,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     dataProvider.addDataDisplay(vcfFilesTable);
     initializeSortableColumns();
     vcfFilesTable.setSelectionModel(new SingleSelectionModel<VCFSummaryDto>());
-    vcfFilesTable.setPageSize(1);
+    vcfFilesTable.setPageSize(Table.DEFAULT_PAGESIZE);
     vcfFilesTable.setEmptyTableWidget(new InlineLabel(translationMessages.vcfFilesCount(0)));
     tablePager.setDisplay(vcfFilesTable);
   }

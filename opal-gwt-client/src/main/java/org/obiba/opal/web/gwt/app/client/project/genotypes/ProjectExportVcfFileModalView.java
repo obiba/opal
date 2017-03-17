@@ -14,6 +14,7 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -23,10 +24,12 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePanel;
+import org.obiba.opal.web.model.client.magma.TableDto;
 
 import javax.annotation.Nullable;
 
@@ -64,10 +67,6 @@ public class ProjectExportVcfFileModalView extends ModalPopupViewWithUiHandlers<
     super(eventBus);
     initWidget(binder.createAndBindUi(this));
     dialog.setTitle(translations.exportVcfModalTitle());
-
-    // hide until solution to filter VCF files' sample ID is founds
-    participantsFilterGroup.setVisible(false);
-    includeCaseControls.setVisible(false);
   }
 
   @Override
@@ -92,6 +91,16 @@ public class ProjectExportVcfFileModalView extends ModalPopupViewWithUiHandlers<
   @UiHandler("exportButton")
   public void exportButtonClick(ClickEvent event) {
     getUiHandlers().onExport();
+  }
+
+  @Override
+  public void setParticipants(JsArray<TableDto> tables) {
+    participantsFilter.clear();
+
+    for (TableDto tableDto : JsArrays.toIterable(tables)) {
+      // place full path in case same table name exists in another datasource
+      participantsFilter.addItem(tableDto.getDatasourceName() + "." + tableDto.getName());
+    }
   }
 
   @Override
