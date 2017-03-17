@@ -40,15 +40,13 @@ public class Dtos {
   public static Plugins.VCFStoreDto asDto(VCFStore store, VCFSamplesSummaryBuilder.Stats stats) {
     Plugins.VCFStoreDto.Builder builder = Plugins.VCFStoreDto.newBuilder()
       .setName(store.getName()) //
-      .setTotalSamplesCount(store.getSampleIds().size()) //
-      .addAllVcf(store.getVCFNames()) //
-      .setParticipantsCount(stats.getParticipants()); //
+      .setTotalSamplesCount(stats.getSamplesIdCount()) //
+      .addAllVcf(store.getVCFNames());
 
-    if (stats.hasSamples()) {
-      builder.setParticipantsWithGenotypeCount(stats.getParticipantsWithGenotypes()) //
-        .setControlSamplesCount(stats.getControlSamples()) //
-        .setSamplesCount(stats.getSamples());
-    }
+    if (stats.hasSamples()) builder.setSamplesCount(stats.getSamples());
+    if (stats.hasControlSamples()) builder.setControlSamplesCount(stats.getControlSamples());
+    if (stats.hasParticipantsWithGenotypes()) builder.setParticipantsWithGenotypeCount(stats.getParticipantsWithGenotypes());
+    if (stats.hasParticipants()) builder.setParticipantsCount(stats.getParticipants());
 
     return builder.build();
   }
@@ -61,14 +59,12 @@ public class Dtos {
       .setGenotypesCount(summary.getGenotypesCount()) //
       .setVariantsCount(summary.getVariantsCount());
 
-      if (stats.hasSamples()) {
-        builder.setSamplesCount(stats.getSamples()) //
-          .setParticipantsCount(stats.getParticipants()) //
-          .setOrphanSamplesCount(stats.getOrphanSamples())
-          .setControlSamplesCount(stats.getControlSamples());
-      }
+    if (stats.hasSamples()) builder.setSamplesCount(stats.getSamples());
+    if (stats.hasControlSamples()) builder.setControlSamplesCount(stats.getControlSamples());
+    if (stats.hasOrphanSamples()) builder.setOrphanSamplesCount(stats.getOrphanSamples());
+    if (stats.hasParticipants()) builder.setParticipantsCount(stats.getParticipants());
 
-      return builder.build();
+    return builder.build();
   }
 
   public static VCFSamplesMapping fromDto(Plugins.VCFSamplesMappingDto dto) {

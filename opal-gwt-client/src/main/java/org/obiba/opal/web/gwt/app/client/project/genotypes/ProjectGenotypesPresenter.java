@@ -327,6 +327,8 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
       .withCallback(new ResponseCodeCallback() {
         @Override
         public void onResponseCode(Request request, Response response) {
+          mappingTable = VCFSamplesMappingDto.create();
+          mappingTables = JsArrays.create();
           logger.info("Deleted ALL");
           refresh();
         }

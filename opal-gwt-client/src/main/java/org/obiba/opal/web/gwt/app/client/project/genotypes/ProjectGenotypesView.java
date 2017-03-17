@@ -14,7 +14,6 @@ import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style;
@@ -117,16 +116,13 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   IconAnchor clearSelectionAnchor;
 
   @UiField
-  FlowPanel mainPanel;
-
-  @UiField
-  FlowPanel noMappingPanel;
-
-  @UiField
   Button downloadVCF;
 
   @UiField
   Button deleteAll;
+
+  @UiField
+  IconAnchor addMapping;
 
   private final Translations translations;
 
@@ -143,11 +139,12 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   @Inject
   public ProjectGenotypesView(Binder uiBinder, Translations translations, TranslationMessages translationMessages) {
-    initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
     this.translationMessages = translationMessages;
+    initWidget(uiBinder.createAndBindUi(this));
     addTableColumns();
     initializeFilter();
+    showEditMapping(false);
   }
 
   @Override
@@ -162,16 +159,15 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   @Override
   public void setVCFSamplesSummary(VCFStoreDto dto) {
-    participants.setText(dto.getParticipantsCount()+"");
-    participantsWithGenotype.setText(dto.hasParticipantsWithGenotypeCount() ? dto.getParticipantsWithGenotypeCount()+"" : "-");
-    samples.setText(dto.hasSamplesCount() ? dto.getSamplesCount()+"" : "-");
-    controlSamples.setText(dto.hasControlSamplesCount() ? dto.getControlSamplesCount()+"" : "-");
+    participants.setText(dto.hasParticipantsCount() ? dto.getParticipantsCount()+"" : "");
+    participantsWithGenotype.setText(dto.hasParticipantsWithGenotypeCount() ? dto.getParticipantsWithGenotypeCount()+"" : "");
+    samples.setText(dto.hasSamplesCount() ? dto.getSamplesCount()+"" : "");
+    controlSamples.setText(dto.hasControlSamplesCount() ? dto.getControlSamplesCount()+"" : "");
   }
 
   @Override
   public void setVCFSamplesMapping(VCFSamplesMappingDto vcfSamplesMapping) {
-    setNoMappingPanelVisibility(false);
-    deleteAll.setVisible(true);
+    showEditMapping(true);
 
     project.setText(vcfSamplesMapping.getProjectName());
     table.setText(vcfSamplesMapping.getTableReference());
@@ -180,17 +176,14 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     sampleRole.setText(vcfSamplesMapping.getSampleRoleVariable());
   }
 
-  private void setNoMappingPanelVisibility(boolean value) {
-    noMappingPanel.setVisible(value);
-    mainPanel.setVisible(!noMappingPanel.isVisible());
-    deleteAll.setVisible(vcfFilesTable.getRowCount() > 0);
+  private void showEditMapping(boolean value) {
+    editMapping.setVisible(value);
+    addMapping.setVisible(!value);
   }
 
   @Override
   public void beforeRenderRows() {
-    filterPanel.setVisible(false);
     downloadVCF.setVisible(false);
-    deleteAll.setVisible(!Strings.isNullOrEmpty(project.getText()));
 
     checkColumn.clearSelection();
     tablePager.setPagerVisible(false);
@@ -200,18 +193,25 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   @Override
   public void afterRenderRows() {
+    boolean pagerVisible = vcfFilesTable.getRowCount() > 0;
     dataProvider.refresh();
-    tablePager.setPagerVisible(vcfFilesTable.getRowCount() > Table.DEFAULT_PAGESIZE);
+    tablePager.setPagerVisible(pagerVisible);
     vcfFilesTable.hideLoadingIndicator();
+    filterPanel.setStyleName(pagerVisible ? "span3" : "pull-right");
+
 
     int rows = vcfFilesTable.getRowCount();
-    filterPanel.setVisible(rows > 1);
     downloadVCF.setVisible(rows > 0);
   }
 
   @Override
   public void clearSamplesMappingData() {
-    setNoMappingPanelVisibility(true);
+    showEditMapping(false);
+    project.setText("");
+    table.setText("");
+    participantId.setText("");
+    sampleId.setText("");
+    sampleRole.setText("");
   }
 
   @Override
@@ -264,7 +264,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     dataProvider.addDataDisplay(vcfFilesTable);
     initializeSortableColumns();
     vcfFilesTable.setSelectionModel(new SingleSelectionModel<VCFSummaryDto>());
-    vcfFilesTable.setPageSize(Table.DEFAULT_PAGESIZE);
+    vcfFilesTable.setPageSize(1);
     vcfFilesTable.setEmptyTableWidget(new InlineLabel(translationMessages.vcfFilesCount(0)));
     tablePager.setDisplay(vcfFilesTable);
   }
@@ -362,7 +362,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
       public String getValue(VCFSummaryDto vcfSummaryDto) {
         return vcfSummaryDto.hasSamplesCount() //
           ? Integer.toString(vcfSummaryDto.getSamplesCount()) //
-          : "-"; //
+          : ""; //
       }
     };
 
@@ -380,7 +380,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
       public String getValue(VCFSummaryDto vcfSummaryDto) {
         return vcfSummaryDto.hasParticipantsCount()
           ? Integer.toString(vcfSummaryDto.getParticipantsCount())
-          : "-";
+          : "";
       }
     };
 
@@ -400,7 +400,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
       public String getValue(VCFSummaryDto vcfSummaryDto) {
         return vcfSummaryDto.hasControlSamplesCount()
           ? Integer.toString(vcfSummaryDto.getControlSamplesCount())
-          : "-";
+          : "";
       }
     };
   }
