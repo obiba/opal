@@ -48,7 +48,9 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   private static final String FILE_PARAM = "file";
 
-  private static final String ENTITY_TYPE = "Sample";
+  private static final String SAMPLE_ENTITY_TYPE = "Sample";
+
+  private static final String PARTICIPANT_ENTITY_TYPE = "Participant";
 
   private static Logger logger = Logger.getLogger("ProjectGenotypesPresenter");
 
@@ -63,6 +65,8 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   private final ModalProvider<ProjectGenotypeEditMappingTableModalPresenter> projectGenotypeEditMappingTableModalPresenterModalProvider;
 
   private JsArray<TableDto> mappingTables = JsArrays.create();
+
+  private JsArray<TableDto> participantTables = JsArrays.create();
 
   private VCFSamplesMappingDto mappingTable = VCFSamplesMappingDto.create();
 
@@ -128,16 +132,18 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   public void initialize(ProjectDto dto) {
     projectDto = dto;
+    getParticipantTables();
     refresh();
   }
 
   @Override
   public void onExportVcfFiles() {
-    ProjectExportVcfFileModalPresenter provider = vcfFileDownloadModalPresenterModalProvider.get();
+    ProjectExportVcfFileModalPresenter modal = vcfFileDownloadModalPresenterModalProvider.get();
     boolean allSelected = getView().getAllVCFs().size() == getView().getSelectedVCFs().size()
         || getView().getSelectedVCFs().size() == 0;
 
-    provider.setExportVCFs(allSelected ? getView().getAllVCFs() : getView().getSelectedVCFs(), allSelected);
+    modal.setParticipantTables(participantTables);
+    modal.setExportVCFs(allSelected ? getView().getAllVCFs() : getView().getSelectedVCFs(), allSelected);
   }
 
   @Override
@@ -290,7 +296,7 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   private void getMappingTables() {
     Map<String, String> params = Maps.newHashMap();
-    params.put(ENTITY_TYPE_PARAM, ENTITY_TYPE);
+    params.put(ENTITY_TYPE_PARAM, SAMPLE_ENTITY_TYPE);
 
     ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder()
         .forResource(UriBuilders.DATASOURCES_TABLES.create().query(params).build())
@@ -299,6 +305,21 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
           public void onResource(Response response, JsArray<TableDto> resource) {
             mappingTables = resource;
             logger.info(mappingTables.length() + " mapping tables");
+          }
+        }).get().send();
+  }
+
+  private void getParticipantTables() {
+    Map<String, String> params = Maps.newHashMap();
+    params.put(ENTITY_TYPE_PARAM, PARTICIPANT_ENTITY_TYPE);
+
+    ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder()
+        .forResource(UriBuilders.DATASOURCES_TABLES.create().query(params).build())
+        .withCallback(new ResourceCallback<JsArray<TableDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<TableDto> resource) {
+            participantTables = resource;
+            logger.info(participantTables.length() + " PARTICIPANT tables");
           }
         }).get().send();
   }

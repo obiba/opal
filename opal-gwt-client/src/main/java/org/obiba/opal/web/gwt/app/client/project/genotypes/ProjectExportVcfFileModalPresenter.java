@@ -11,7 +11,7 @@ package org.obiba.opal.web.gwt.app.client.project.genotypes;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
@@ -26,6 +26,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfFileExportRequestEvent;
 import org.obiba.opal.web.gwt.app.client.validator.*;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.ExportVCFCommandOptionsDto;
 import org.obiba.opal.web.model.client.opal.VCFSummaryDto;
 
@@ -107,6 +108,10 @@ public class ProjectExportVcfFileModalPresenter extends ModalPresenterWidget<Pro
     }
   }
 
+  public void setParticipantTables(JsArray<TableDto> participantTables) {
+    getView().setParticipants(participantTables);
+  }
+
   private class ModalValidationHandler extends ViewValidationHandler {
 
     private Set<FieldValidator> validators;
@@ -144,6 +149,8 @@ public class ProjectExportVcfFileModalPresenter extends ModalPresenterWidget<Pro
       DIRECTORY,
       NAME
     }
+
+    void setParticipants(JsArray<TableDto> tables);
 
     void setFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
 
