@@ -18,25 +18,13 @@
 
     <b:ControlGroup ui:field="fileGroup">
       <b:ControlLabel>
-        <ui:msg description="Genotypes Import file name label">Name</ui:msg>
+        <ui:msg description="Genotypes Import file name label">VCF/BCF File</ui:msg>
       </b:ControlLabel>
       <b:Controls>
         <o:OpalSimplePanel ui:field="vcfFilePanel"/>
       </b:Controls>
       <b:HelpBlock>
-        <ui:msg description="Genotypes Import file content help">A VCF file must end with ".vcf" or in compressed form with ".vcf.gz".</ui:msg>
-      </b:HelpBlock>
-    </b:ControlGroup>
-
-    <b:ControlGroup ui:field="nameGroup">
-      <b:ControlLabel>
-        <ui:msg description="Genotypes Import file name label">Name</ui:msg>
-      </b:ControlLabel>
-      <b:Controls>
-        <b:TextBox name="encryptPassword" ui:field="name" visibleLength="16"/>
-      </b:Controls>
-      <b:HelpBlock>
-        <ui:msg description="Genotypes Import file content help">An optional name associated with the VCF file.</ui:msg>
+        <ui:msg description="Genotypes Import file content help">A VCF/BCF (optionally compressed) file, with suffix .vcf, .vcf.gz, .bcf or .bcf.gz.</ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 

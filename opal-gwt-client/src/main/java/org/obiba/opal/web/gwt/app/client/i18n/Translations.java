@@ -361,7 +361,7 @@ public interface Translations extends Constants {
       "DatasourceNameDisallowedChars", "Datasource names cannot contain colon or period characters.", //
       "ViewNameDisallowedChars", "View names cannot contain colon or period characters.", //
       "CSVFileRequired", "A CSV file is required.", //
-      "VCFFileRequired", "A VCF or a zipped (.gz) file is required.", //
+      "VCFFileRequired", "A VCF/BCF (optionally compressed) file is required.", //
       "XMLFileRequired", "An XML file is required.", //
       "XMLFileSuffixInvalid", "Invalid XML file suffix: .xml is expected.", //
       "ZipFileRequired", "A Zip file is required.", //

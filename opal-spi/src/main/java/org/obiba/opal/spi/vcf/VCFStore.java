@@ -86,6 +86,16 @@ public interface VCFStore {
   void readVCF(String name, OutputStream out) throws NoSuchElementException, IOException;
 
   /**
+   * Read the VCF stored with the given name. The stream is a compressed VCF file.
+   *
+   * @param name
+   * @param format
+   * @param out The stream to write to.
+   * @return
+   */
+  void readVCF(String name, Format format, OutputStream out) throws NoSuchElementException, IOException;
+
+  /**
    * Read the VCF stored with the given name, with a subset applied to the provided samples. The returned stream is a compressed VCF file.
    *
    * @param name
@@ -95,6 +105,19 @@ public interface VCFStore {
    */
   void readVCF(String name, OutputStream out, Collection<String> samples) throws NoSuchElementException, IOException;
 
+
+  /**
+   * Read the VCF stored with the given name, with a subset applied to the provided samples. The returned stream is a compressed VCF file.
+   *
+   * @param name
+   * @param format
+   * @param out The stream to write to.
+   * @param samples The sample IDs.
+   * @return
+   */
+  void readVCF(String name, Format format, OutputStream out, Collection<String> samples) throws NoSuchElementException, IOException;
+
+
   /**
    * Read the VCF statistics stored with the given name. The stream is a plain text file.
    *
@@ -103,6 +126,13 @@ public interface VCFStore {
    * @return
    */
   void readVCFStatistics(String name, OutputStream out) throws NoSuchElementException, IOException;
+
+  /**
+   * VCF file format flavor.
+   */
+  enum Format {
+    VCF, BCF
+  }
 
   /**
    * Some metrics about a VCF file.
@@ -115,6 +145,12 @@ public interface VCFStore {
      * @return
      */
     String getName();
+
+    /**
+     * Get the VCF format flavour: VCF or BCF
+     * @return
+     */
+    Format getFormat();
 
     /**
      * The sample IDs.

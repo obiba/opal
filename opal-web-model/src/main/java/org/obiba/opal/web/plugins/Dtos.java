@@ -54,6 +54,7 @@ public class Dtos {
   public static Plugins.VCFSummaryDto asDto(VCFStore.VCFSummary summary, VCFSamplesSummaryBuilder.Stats stats) {
     Plugins.VCFSummaryDto.Builder builder = Plugins.VCFSummaryDto.newBuilder()
       .setName(summary.getName()) //
+      .setFormat(summary.getFormat().name()) //
       .setSize(summary.size()) //
       .setTotalSamplesCount(summary.getSampleIds().size()) //
       .setGenotypesCount(summary.getGenotypesCount()) //
