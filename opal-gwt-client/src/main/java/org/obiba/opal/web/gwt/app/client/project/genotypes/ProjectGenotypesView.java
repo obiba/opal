@@ -344,7 +344,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
       @Override
       public String getValue(VCFSummaryDto vcfSummaryDto) {
-        return vcfSummaryDto.getName();
+        return vcfSummaryDto.getName() + "." + vcfSummaryDto.getFormat().toLowerCase() + ".gz";
       }
     };
 

@@ -44,8 +44,11 @@ public class VCFStoreResourceImpl implements VCFStoreResource {
   private VCFSamplesMappingService vcfSamplesMappingService;
 
   private VCFStore store;
+
   private VCFSamplesSummaryBuilder summaryBuilder;
+
   private String name;
+
   private VCFStoreService service;
 
   @Override
@@ -101,9 +104,8 @@ public class VCFStoreResourceImpl implements VCFStoreResource {
   @Override
   public Response getStatistics(String vcfName) {
     StreamingOutput stream = os -> store.readVCFStatistics(vcfName, os);
-
     return Response.ok(stream)
-      .header("Content-Disposition", "attachment; filename=\"" + vcfName + ".tsv\"").build();
+      .header("Content-Disposition", "attachment; filename=\"" +  store.getName() + "-" + vcfName + "-statistics.txt\"").build();
   }
 
   private void removeSamplesMappings() {

@@ -9,7 +9,6 @@
  */
 package org.obiba.opal.web.gwt.app.client.project.genotypes;
 
-import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -21,7 +20,6 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfFileUploadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.validator.*;
 
-import javax.annotation.Nullable;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -63,9 +61,7 @@ public class ProjectImportVcfFileModalPresenter extends ModalPresenterWidget<Pro
   public void onImport() {
     getView().clearErrors();
     if(validationHandler.validate()) {
-      fireEvent(new VcfFileUploadRequestEvent.Builder(fileSelectionPresenter.getSelectedFile())
-              .name(getView().getName().getText())
-              .build());
+      fireEvent(new VcfFileUploadRequestEvent.Builder(fileSelectionPresenter.getSelectedFile()).build());
       getView().hideDialog();
     }
   }
@@ -78,8 +74,7 @@ public class ProjectImportVcfFileModalPresenter extends ModalPresenterWidget<Pro
     protected Set<FieldValidator> getValidators() {
         validators = new LinkedHashSet<>();
         validators.add(new ConditionValidator(vcfFileExtensionCondition(fileSelectionPresenter.getSelectedFile()),
-                "VCFFileRequired",
-                Display.FormField.FILE.name()));
+                "VCFFileRequired"));
       return validators;
     }
 
@@ -87,31 +82,25 @@ public class ProjectImportVcfFileModalPresenter extends ModalPresenterWidget<Pro
       return new HasBooleanValue() {
         @Override
         public Boolean getValue() {
-          return selectedFile.toLowerCase().endsWith(".vcf") || selectedFile.toLowerCase().endsWith(".vcf.gz");
+          return selectedFile.toLowerCase().endsWith(".vcf") || selectedFile.toLowerCase().endsWith(".vcf.gz")
+              || selectedFile.toLowerCase().endsWith(".bcf") || selectedFile.toLowerCase().endsWith(".bcf.gz");
         }
       };
     }
 
     @Override
     protected void showMessage(String id, String message) {
-      getView().showError(Display.FormField.valueOf(id), message);
+      getView().showError(message);
     }
   }
 
   public interface Display extends PopupView, HasUiHandlers<ProjectImportVcfFileModalUiHandlers> {
 
-    enum FormField {
-      FILE,
-      NAME
-    }
-
     void setFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
-
-    HasText getName();
 
     void clearErrors();
 
-    void showError(@Nullable FormField formField, String message);
+    void showError(String message);
 
     void hideDialog();
   }

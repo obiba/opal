@@ -115,7 +115,8 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
     int count = 1;
     for (String vcfName : options.getNames()) {
       getShell().progress(String.format("Exporting VCF file: %s", vcfName), count, total, (count*100)/total);
-      String vcfFileName = vcfName + "-" + timestamp + ".vcf.gz";
+      VCFStore.VCFSummary summary = store.getVCFSummary(vcfName);
+      String vcfFileName = vcfName + "-" + timestamp + "." + summary.getFormat().name().toLowerCase() + ".gz";
       File vcfFile = new File(destinationFolder, vcfFileName);
       store.readVCF(vcfName, new FileOutputStream(vcfFile));
       count++;

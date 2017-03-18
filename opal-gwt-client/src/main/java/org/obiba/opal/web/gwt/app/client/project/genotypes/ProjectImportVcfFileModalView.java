@@ -39,12 +39,10 @@ public class ProjectImportVcfFileModalView extends ModalPopupViewWithUiHandlers<
 
   @UiField
   Button cancelButton;
-  @UiField
-  ControlGroup nameGroup;
-  @UiField
-  TextBox name;
+
   @UiField
   OpalSimplePanel vcfFilePanel;
+
   @UiField
   ControlGroup fileGroup;
 
@@ -81,32 +79,12 @@ public class ProjectImportVcfFileModalView extends ModalPopupViewWithUiHandlers<
   }
 
   @Override
-  public HasText getName() {
-    return name;
-  }
-
-  @Override
   public void clearErrors() {
     dialog.clearAlert();
   }
 
   @Override
-  public void showError(@Nullable FormField formField, String message) {
-    ControlGroup group = null;
-    if(formField != null) {
-      switch(formField) {
-        case FILE:
-          group = fileGroup ;
-          break;
-        case NAME:
-          group = nameGroup ;
-          break;
-      }
-    }
-    if(group == null) {
-      dialog.addAlert(message, AlertType.ERROR);
-    } else {
-      dialog.addAlert(message, AlertType.ERROR, group);
-    }
+  public void showError(String message) {
+    dialog.addAlert(message, AlertType.ERROR, fileGroup);
   }
 }
