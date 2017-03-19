@@ -54,7 +54,7 @@ public class ImportVCFCommand extends AbstractOpalRuntimeDependentCommand<Import
   public int execute() {
     Stopwatch stopwatch = Stopwatch.createStarted();
 
-    getShell().printf("Importing VCF file '%s' located at '%s' in project '%s'...", options.getName(), options.getFile(), options.getProject());
+    getShell().printf("Importing VCF/BCF files in project '%s'...", options.getProject());
     getShell().progress(String.format("Preparing VCF file store for project '%s'", options.getProject()), 0, 3, 0);
     Project project = projectService.getProject(getOptions().getProject());
     if (!opalRuntime.hasServicePlugins()) throw new NoSuchServiceException(VCFStoreService.SERVICE_TYPE);
@@ -71,13 +71,13 @@ public class ImportVCFCommand extends AbstractOpalRuntimeDependentCommand<Import
     try {
       importVCF();
     } catch (Exception e) {
-      log.error("Cannot import VCF {} in project {}: {}", options.getName(), options.getProject(), options.getFile(), e);
-      getShell().printf("Cannot import VCF file: %s", e.getMessage());
-      log.info("Import VCF failed in {}", stopwatch.stop());
+      log.error("Cannot import VCF/BCF files in project {}", options.getProject(), e);
+      getShell().printf("Cannot import VCF/BCF file: %s", e.getMessage());
+      log.info("Import VCF/BCF files failed in {}", stopwatch.stop());
       return 1;
     }
 
-    log.info("Import VCF succeeded in {}", stopwatch.stop());
+    log.info("Import VCF/BCF files succeeded in {}", stopwatch.stop());
     return 0;
   }
 
@@ -96,18 +96,21 @@ public class ImportVCFCommand extends AbstractOpalRuntimeDependentCommand<Import
   }
 
   private void importVCF() throws IOException, VCFStoreException {
-    getShell().progress(String.format("Preparing VCF file '%s'", options.getFile()), 1, 3, 10);
-    FileObject fileObject = resolveFileInFileSystem(options.getFile());
-    if (fileObject == null || !fileObject.exists() || fileObject.getType() == FileType.FOLDER)
-      throw new IllegalArgumentException("Not a valid path to VCF file: " + options.getFile());
-    if (!fileObject.isReadable()) throw new IllegalArgumentException("VCF file is not readable: " + options.getFile());
-    File vcfFile = opalRuntime.getFileSystem().getLocalFile(fileObject);
-    String vcfName = options.getName();
-    if (Strings.isNullOrEmpty(vcfName)) vcfName = vcfFile.getName();
-
-    getShell().progress(String.format("Importing VCF file as '%s'", vcfName), 2, 3, 20);
-    store.writeVCF(vcfName, new FileInputStream(vcfFile));
-    getShell().progress(String.format("VCF file import completed."), 3, 3, 100);
+    int total = options.getFiles().size() + 1;
+    int count = 1;
+    for (String vcfFilePath : options.getFiles()) {
+      getShell().printf(String.format("Importing VCF/BCF file: %s", vcfFilePath));
+      getShell().progress(String.format("Importing VCF/BCF file: %s", vcfFilePath), count, total, (count*100)/total);
+      FileObject vcfFileObject = resolveFileInFileSystem(vcfFilePath);
+      if (vcfFileObject == null || !vcfFileObject.exists() || vcfFileObject.getType() == FileType.FOLDER)
+        throw new IllegalArgumentException("Not a valid path to VCF/BCF file: " + vcfFilePath);
+      if (!vcfFileObject.isReadable())
+        throw new IllegalArgumentException("VCF/BCF file is not readable: " + vcfFilePath);
+      File vcfFile = opalRuntime.getFileSystem().getLocalFile(vcfFileObject);
+      store.writeVCF(vcfFile.getName(), new FileInputStream(vcfFile));
+      count++;
+    }
+    getShell().progress(String.format("VCF/BCF file(s) import completed."), total, total, 100);
   }
 
   FileObject resolveFileInFileSystem(String path) throws FileSystemException {
@@ -117,7 +120,7 @@ public class ImportVCFCommand extends AbstractOpalRuntimeDependentCommand<Import
 
   @Override
   public String toString() {
-    return "import-vcf -n '" + getOptions().getName() + "' -p '" + getOptions().getProject() + "' -f '" + options.getFile() + "'";
+    return "import-vcf -p '" + getOptions().getProject() + "' " + String.join(", ", options.getFiles());
   }
 
 }

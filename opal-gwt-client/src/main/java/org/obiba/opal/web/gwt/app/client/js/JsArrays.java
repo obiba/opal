@@ -132,6 +132,12 @@ public class JsArrays {
     return array;
   }
 
+  public static JsArrayString from(String str) {
+    JsArrayString array = (JsArrayString) JsArrayString.createArray();
+    if(str != null) array.push(str);
+    return array;
+  }
+
   /**
    * Creates a {@code List} that is a view of a portion of the supplied array. This method does not copy the supplied
    * array. As such, any modifications made to the array will be reflected in the sub-list. The returned list is

@@ -84,9 +84,8 @@ message ReportCommandOptionsDto {
 }
 
 message ImportVCFCommandOptionsDto {
-  optional string name = 1; // VCF file name in the store
-  required string project = 2; // store location
-  required string file = 3; // VCF file location
+  required string project = 1; // store location
+  repeated string files = 2; // VCF files location
 }
 
 message ExportVCFCommandOptionsDto {

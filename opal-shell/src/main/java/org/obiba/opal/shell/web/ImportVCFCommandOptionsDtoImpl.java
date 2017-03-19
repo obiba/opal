@@ -13,6 +13,8 @@ package org.obiba.opal.shell.web;
 import org.obiba.opal.shell.commands.options.ImportVCFCommandOptions;
 import org.obiba.opal.web.model.Commands;
 
+import java.util.List;
+
 public class ImportVCFCommandOptionsDtoImpl implements ImportVCFCommandOptions {
 
   private final Commands.ImportVCFCommandOptionsDto options;
@@ -27,17 +29,12 @@ public class ImportVCFCommandOptionsDtoImpl implements ImportVCFCommandOptions {
   }
 
   @Override
-  public String getName() {
-    return options.getName();
-  }
-
-  @Override
   public String getProject() {
     return options.getProject();
   }
 
   @Override
-  public String getFile() {
-    return options.getFile();
+  public List<String> getFiles() {
+    return options.getFilesList();
   }
 }

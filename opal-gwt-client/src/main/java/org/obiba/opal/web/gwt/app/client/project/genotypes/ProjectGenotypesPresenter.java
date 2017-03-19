@@ -381,9 +381,8 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   private void uploadVcfFile(String file, String name) {
     ImportVCFCommandOptionsDto importOptions = ImportVCFCommandOptionsDto.create();
-    importOptions.setFile(file);
+    importOptions.setFilesArray(JsArrays.from(file));
     importOptions.setProject(projectDto.getName());
-    if (!Strings.isNullOrEmpty(name)) importOptions.setName(name);
 
     ResourceRequestBuilderFactory
         .newBuilder()

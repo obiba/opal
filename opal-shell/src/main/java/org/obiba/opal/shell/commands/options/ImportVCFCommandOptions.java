@@ -12,6 +12,9 @@ package org.obiba.opal.shell.commands.options;
 
 import uk.co.flamingpenguin.jewel.cli.CommandLineInterface;
 import uk.co.flamingpenguin.jewel.cli.Option;
+import uk.co.flamingpenguin.jewel.cli.Unparsed;
+
+import java.util.List;
 
 /**
  * This interface declares the options that may be used with the import VCF command.
@@ -19,12 +22,9 @@ import uk.co.flamingpenguin.jewel.cli.Option;
 @CommandLineInterface(application = "import-vcf")
 public interface ImportVCFCommandOptions extends HelpOption {
 
-  @Option(shortName = "n", description = "The VCF file name.")
-  String getName();
-
   @Option(shortName = "p", description = "The project associated to the VCF store.")
   String getProject();
 
-  @Option(shortName = "f", description = "The VCF file location.")
-  String getFile();
+  @Unparsed(name = "FILE")
+  List<String> getFiles();
 }

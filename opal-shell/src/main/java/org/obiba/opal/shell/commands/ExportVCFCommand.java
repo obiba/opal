@@ -62,9 +62,9 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
     String names = String.join(", ", options.getNames());
 
     if (options.hasTable())
-      getShell().printf("Exporting VCF files '%s' from project '%s' into '%s', filtered by '%s'...", names, options.getProject(), options.getDestination(), options.getTable());
+      getShell().printf("Exporting VCF/BCF files '%s' from project '%s' into '%s', filtered by '%s'...", names, options.getProject(), options.getDestination(), options.getTable());
     else
-      getShell().printf("Exporting VCF files '%s' from project '%s' into '%s'...", names, options.getProject(), options.getDestination());
+      getShell().printf("Exporting VCF/BCF files '%s' from project '%s' into '%s'...", names, options.getProject(), options.getDestination());
     Project project = projectService.getProject(getOptions().getProject());
     if (!opalRuntime.hasServicePlugins()) throw new NoSuchServiceException(VCFStoreService.SERVICE_TYPE);
     if (!project.hasVCFStoreService()) {
@@ -76,13 +76,13 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
     try {
       exportVCF();
     } catch (Exception e) {
-      log.error("Cannot export VCF files from project {} into {}: {}", options.getProject(), options.getDestination(), names, e);
+      log.error("Cannot export VCF/BCF files from project {} into {}: {}", options.getProject(), options.getDestination(), names, e);
       getShell().printf("Cannot export VCF files: %s", e.getMessage());
-      log.info("Export VCF failed in {}", stopwatch.stop());
+      log.info("Export VCF/BCF failed in {}", stopwatch.stop());
       return 1;
     }
 
-    log.info("Export VCF succeeded in {}", stopwatch.stop());
+    log.info("Export VCF/BCF succeeded in {}", stopwatch.stop());
     return 0;
   }
 
@@ -106,22 +106,26 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
       throw new IllegalArgumentException("Not a valid path to VCF file: " + options.getDestination());
     if (!fileObject.exists()) fileObject.createFolder();
     if (!fileObject.isWriteable()) throw new IllegalArgumentException("Export destination is not writable: " + options.getDestination());
-    File destinationFolder = opalRuntime.getFileSystem().getLocalFile(fileObject);
+    String timestamp = DATE_FORMAT.format(new Date());
+    String destinationFolderName = store.getName() + "-vcf-" + timestamp;
+    File destinationFolder = new File(opalRuntime.getFileSystem().getLocalFile(fileObject), destinationFolderName);
+    destinationFolder.mkdirs();
+    getShell().printf(String.format("Exporting VCF/BCF files in: %s", options.getDestination() + "/" + destinationFolderName));
 
     // TODO samples filtering
-    String timestamp = DATE_FORMAT.format(new Date());
     int total = options.getNames().size() + 1;
-    getShell().progress(String.format("Exporting VCF file(s): %s", String.join(", ", options.getNames())), 0, total, 0);
+    getShell().progress(String.format("Exporting VCF/BCF file(s): %s", String.join(", ", options.getNames())), 0, total, 0);
     int count = 1;
     for (String vcfName : options.getNames()) {
-      getShell().progress(String.format("Exporting VCF file: %s", vcfName), count, total, (count*100)/total);
+      getShell().progress(String.format("Exporting VCF/BCF file: %s", vcfName), count, total, (count*100)/total);
       VCFStore.VCFSummary summary = store.getVCFSummary(vcfName);
-      String vcfFileName = vcfName + "-" + timestamp + "." + summary.getFormat().name().toLowerCase() + ".gz";
+      String vcfFileName = vcfName + "." + summary.getFormat().name().toLowerCase() + ".gz";
+      getShell().printf(String.format("Exporting VCF/BCF file: %s", vcfFileName));
       File vcfFile = new File(destinationFolder, vcfFileName);
       store.readVCF(vcfName, new FileOutputStream(vcfFile));
       count++;
     }
-    getShell().progress(String.format("VCF file(s) export completed."), 3, 3, 100);
+    getShell().progress(String.format("VCF/BCF file(s) export completed."), total, total, 100);
   }
 
   FileObject resolveFileInFileSystem(String path) throws FileSystemException {
