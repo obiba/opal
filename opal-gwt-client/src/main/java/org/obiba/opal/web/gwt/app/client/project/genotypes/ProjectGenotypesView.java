@@ -25,14 +25,12 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -71,16 +69,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   Label controlSamples;
 
   @UiField
-  Label project;
-
-  @UiField
-  Label table;
-
-  @UiField
   Label participantId;
-
-  @UiField
-  Label sampleId;
 
   @UiField
   Label sampleRole;
@@ -123,6 +112,8 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   @UiField
   IconAnchor addMapping;
+  @UiField
+  Anchor tableLink;
 
   private final Translations translations;
 
@@ -168,11 +159,8 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   @Override
   public void setVCFSamplesMapping(VCFSamplesMappingDto vcfSamplesMapping) {
     showEditMapping(true);
-
-    project.setText(vcfSamplesMapping.getProjectName());
-    table.setText(vcfSamplesMapping.getTableReference());
+    tableLink.setText(vcfSamplesMapping.getTableReference());
     participantId.setText(vcfSamplesMapping.getParticipantIdVariable());
-    sampleId.setText(vcfSamplesMapping.getSampleIdVariable());
     sampleRole.setText(vcfSamplesMapping.getSampleRoleVariable());
   }
 
@@ -207,10 +195,8 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   @Override
   public void clearSamplesMappingData() {
     showEditMapping(false);
-    project.setText("");
-    table.setText("");
+    tableLink.setText("");
     participantId.setText("");
-    sampleId.setText("");
     sampleRole.setText("");
   }
 
@@ -257,6 +243,11 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   @UiHandler("filter")
   public void filterKeyUp(KeyUpEvent event) {
     getUiHandlers().onFilterUpdate(filter.getText());
+  }
+
+  @UiHandler("tableLink")
+  public void tableLinkClick(ClickEvent event) {
+    getUiHandlers().onMappingTableNavigateTo();
   }
 
   private void addTableColumns() {
