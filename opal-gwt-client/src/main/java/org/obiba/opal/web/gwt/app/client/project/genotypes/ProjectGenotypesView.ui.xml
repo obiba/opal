@@ -70,36 +70,26 @@
           </g:FlowPanel>
 
           <o:PropertiesTable keyStyleNames="span2">
-            <o:PropertyPanel>
-              <g:Label>
-                <ui:msg description="Genotypes Project label">Project</ui:msg>
-              </g:Label>
-              <g:Label ui:field="project"/>
-            </o:PropertyPanel>
-            <o:PropertyPanel>
+            <g:FlowPanel>
               <g:Label>
                 <ui:msg description="Genotypes Table label">Table</ui:msg>
               </g:Label>
-              <g:Label ui:field="table"/>
-            </o:PropertyPanel>
-            <o:PropertyPanel>
+              <g:FlowPanel>
+                <g:Anchor ui:field="tableLink"></g:Anchor>
+              </g:FlowPanel>
+            </g:FlowPanel>
+            <g:FlowPanel>
               <g:Label>
                 <ui:msg description="Genotypes Participant ID label">Participant ID</ui:msg>
               </g:Label>
               <g:Label ui:field="participantId"/>
-            </o:PropertyPanel>
-            <o:PropertyPanel>
-              <g:Label>
-                <ui:msg description="Genotypes Sample ID label">Sample ID</ui:msg>
-              </g:Label>
-              <g:Label ui:field="sampleId"/>
-            </o:PropertyPanel>
-            <o:PropertyPanel>
+            </g:FlowPanel>
+            <g:FlowPanel>
               <g:Label>
                 <ui:msg description="Genotypes Sample Role label">Sample Role</ui:msg>
               </g:Label>
               <g:Label ui:field="sampleRole"/>
-            </o:PropertyPanel>
+            </g:FlowPanel>
           </o:PropertiesTable>
         </g:FlowPanel>
       </g:FlowPanel>

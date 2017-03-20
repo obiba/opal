@@ -30,4 +30,6 @@ public interface ProjectGenotypesUiHandlers extends UiHandlers {
   void onRemoveAll();
 
   void onFilterUpdate(String filter);
+
+  void onMappingTableNavigateTo();
 }
