@@ -124,6 +124,12 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   @UiField
   IconAnchor addMapping;
 
+  @UiField
+  FlowPanel genotypesContentPanel;
+
+  @UiField
+  FlowPanel noVcfServiceAlertPanel;
+
   private final Translations translations;
 
   private final TranslationMessages translationMessages;
@@ -205,13 +211,24 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   }
 
   @Override
-  public void clearSamplesMappingData() {
+  public void clear(boolean hasVcfService) {
     showEditMapping(false);
+
+    // clear mapping
     project.setText("");
     table.setText("");
     participantId.setText("");
     sampleId.setText("");
     sampleRole.setText("");
+
+    // clear summary
+    participants.setText("");
+    participantsWithGenotype.setText("");
+    samples.setText("");
+    controlSamples.setText("");
+
+    noVcfServiceAlertPanel.setVisible(!hasVcfService);
+    genotypesContentPanel.setVisible(hasVcfService);
   }
 
   @Override

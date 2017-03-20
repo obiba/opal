@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.gwt.app.client.project.view;
 
+import com.github.gwtbootstrap.client.ui.*;
+import com.github.gwtbootstrap.client.ui.Label;
+import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -19,11 +22,6 @@ import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
-import com.github.gwtbootstrap.client.ui.Breadcrumbs;
-import com.github.gwtbootstrap.client.ui.HelpBlock;
-import com.github.gwtbootstrap.client.ui.Label;
-import com.github.gwtbootstrap.client.ui.NavLink;
-import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -96,6 +94,11 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     setTags(project);
     description.setVisible(project.hasDescription());
     description.setText(project.hasDescription() ? project.getDescription() : "");
+  }
+
+  @Override
+  public void toggleGenotypesTab(boolean show) {
+    TabPanelHelper.setTabVisible(tabPanel, ProjectTab.GENOTYPES.ordinal(), show);
   }
 
   private void setTags(ProjectDto project) {

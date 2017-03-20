@@ -10,11 +10,6 @@
 
 package org.obiba.opal.web.gwt.app.client.project.admin;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
-import org.obiba.opal.web.model.client.opal.ProjectDto;
-
 import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -27,6 +22,10 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
+import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdministrationUiHandlers>
     implements ProjectAdministrationPresenter.Display {
@@ -109,8 +108,6 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
       //noDatabasePanel.clear();
       //noDatabasePanel.add(new Label(translations.noProjectDatabase()));
     }
-
-    vcfServiceName.setText(project.hasVcfStoreService() ? project.getVcfStoreService() : "");
   }
 
   @Override
@@ -127,6 +124,11 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   @Override
   public ProjectDto getProject() {
     return project;
+  }
+
+  @Override
+  public void toggleVcfServicePluginPanel(boolean show) {
+    vcfServiceName.setText(show && project.hasVcfStoreService() ? project.getVcfStoreService() : "");
   }
 
   @Override

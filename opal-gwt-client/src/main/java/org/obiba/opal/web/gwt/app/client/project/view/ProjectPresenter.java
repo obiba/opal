@@ -11,6 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.project.view;
 
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -27,6 +28,7 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
+import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.gwt.app.client.bookmark.icon.BookmarkIconPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
@@ -49,9 +51,12 @@ import org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.HasTabPanel;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.opal.PluginDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ProjectPresenter extends Presenter<ProjectPresenter.Display, ProjectPresenter.Proxy>
     implements ProjectUiHandlers, FolderUpdatedEvent.FolderUpdatedHandler {
@@ -69,6 +74,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     }
 
     void setProject(ProjectDto project);
+
+    void toggleGenotypesTab(boolean show);
 
     HasAuthorization getPermissionsAuthorizer();
   }
@@ -144,6 +151,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private BookmarkIconPresenter bookmarkIconPresenter;
 
+  private boolean hasServicePlugins = false;
+
   @Inject
   @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
   public ProjectPresenter(EventBus eventBus, Display display, Proxy proxy, PlaceManager placeManager,
@@ -194,6 +203,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     getView().setTabData(tab.ordinal(), tab == Display.ProjectTab.TABLES ? validatePath(projectName, path) : null);
 
     refresh();
+
+    checkVCFPlugin();
   }
 
   private void authorize() {
@@ -345,7 +356,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       projectAdministrationPresenter = projectAdministrationPresenterProvider.get();
       setInSlot(ADMIN_PANE, projectAdministrationPresenter);
     }
-    projectAdministrationPresenter.setProject(project);
+    projectAdministrationPresenter.setProject(project, hasServicePlugins);
+    projectAdministrationPresenter.showVcfServiceNamePanel(hasServicePlugins);
   }
 
   @Override
@@ -386,5 +398,20 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     }
     updateHistory(null);
     return null;
+  }
+
+  private void checkVCFPlugin() {
+    Map<String, String> pluginsParams = new HashMap<>();
+    pluginsParams.put("type", VCFStoreService.SERVICE_TYPE);
+
+    ResourceRequestBuilderFactory.<JsArray<PluginDto>>newBuilder().forResource(UriBuilders.PLUGINS.create().query(pluginsParams).build())
+        .withCallback(new ResourceCallback<JsArray<PluginDto>>() {
+
+          @Override
+          public void onResource(Response response, JsArray<PluginDto> resource) {
+            hasServicePlugins = resource.length() > 0;
+            getView().toggleGenotypesTab(hasServicePlugins);
+          }
+        }).get().send();
   }
 }
