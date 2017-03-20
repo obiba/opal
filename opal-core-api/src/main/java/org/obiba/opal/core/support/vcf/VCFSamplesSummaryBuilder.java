@@ -89,9 +89,11 @@ public class VCFSamplesSummaryBuilder {
       Variable participantVariable = vt.getVariable(mappings.getParticipantIdVariable());
       Variable roleVariable = vt.getVariable(mappings.getSampleRoleVariable());
       Set<String> participants = Sets.newHashSet();
+      Set<String> mappedSampleIds = Sets.newHashSet();
 
       for (ValueSet v : valueSets) {
         String sampleId = v.getVariableEntity().getIdentifier();
+        mappedSampleIds.add(sampleId);
         String participantId = vt.getValue(participantVariable, v).toString();
         String roleName = vt.getValue(roleVariable, v).toString();
 
@@ -105,14 +107,12 @@ public class VCFSamplesSummaryBuilder {
           if (VCFSampleRole.isSample(roleName)) samples++;
           else if (VCFSampleRole.isControl(roleName)) controlSamples++;
         }
-
       }
 
       if (samples + controlSamples > 0) {
-        // no samples matched
         stats.setSamples(samples);
         stats.setControlSamples(controlSamples);
-        stats.setOrphanSamples(orphanSamples);
+        stats.setOrphanSamples(orphanSamples + Sets.difference(sampleIds, mappedSampleIds).size());
         stats.setParticipants(participants.size());
       }
     }

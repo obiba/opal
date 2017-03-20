@@ -20,15 +20,20 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
+import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfFileExportRequestEvent;
 import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfFileUploadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfMappingEditRequestEvent;
+import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.*;
@@ -53,6 +58,8 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   private static final String PARTICIPANT_ENTITY_TYPE = "Participant";
 
   private static Logger logger = Logger.getLogger("ProjectGenotypesPresenter");
+
+  private final PlaceManager placeManager;
 
   private ProjectDto projectDto;
 
@@ -79,13 +86,15 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
                                    ModalProvider<ProjectImportVcfFileModalPresenter> vcfFileUploadModalPresenterModalProvider,
                                    ModalProvider<ProjectExportVcfFileModalPresenter> vcfFileDownloadModalPresenterModalProvider,
                                    ModalProvider<ProjectGenotypeEditMappingTableModalPresenter> editMappingTableModalPresenterModalProvider,
-                                   TranslationMessages translationMessages) {
+                                   TranslationMessages translationMessages,
+                                   PlaceManager placeManager) {
     super(eventBus, display);
     getView().setUiHandlers(this);
     this.translationMessages = translationMessages;
     this.vcfFileUploadModalPresenterModalProvider = vcfFileUploadModalPresenterModalProvider.setContainer(this);
     this.vcfFileDownloadModalPresenterModalProvider = vcfFileDownloadModalPresenterModalProvider.setContainer(this);
     projectGenotypeEditMappingTableModalPresenterModalProvider = editMappingTableModalPresenterModalProvider.setContainer(this);
+    this.placeManager = placeManager;
     initializeEventListeners();
   }
 
@@ -211,6 +220,19 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
         }
       }
       getView().renderRows(filtered);
+    }
+  }
+
+  @Override
+  public void onMappingTableNavigateTo() {
+    if (mappingTable != null) {
+
+      PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.PROJECT)
+        .with(ParameterTokens.TOKEN_NAME, mappingTable.getProjectName()) //
+        .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString()) //
+        .with(ParameterTokens.TOKEN_PATH, mappingTable.getTableReference());
+
+      placeManager.revealPlace(builder.build());
     }
   }
 
