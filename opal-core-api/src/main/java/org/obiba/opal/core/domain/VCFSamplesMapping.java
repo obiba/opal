@@ -17,9 +17,6 @@ public class VCFSamplesMapping implements HasUniqueProperties {
   private String participantIdVariable;
 
   @NotNull
-  private String sampleIdVariable;
-
-  @NotNull
   private String sampleRoleVariable;
 
   public VCFSamplesMapping() {
@@ -55,14 +52,6 @@ public class VCFSamplesMapping implements HasUniqueProperties {
 
   public void setParticipantIdVariable(String participantIdVariable) {
     this.participantIdVariable = participantIdVariable;
-  }
-
-  public String getSampleIdVariable() {
-    return sampleIdVariable;
-  }
-
-  public void setSampleIdVariable(String sampleIdVariable) {
-    this.sampleIdVariable = sampleIdVariable;
   }
 
   public String getSampleRoleVariable() {
@@ -102,11 +91,6 @@ public class VCFSamplesMapping implements HasUniqueProperties {
 
     public Builder participantIdVariable(String value) {
       vcfSamplesMapping.participantIdVariable = value;
-      return this;
-    }
-
-    public Builder sampleIdVariable(String value) {
-      vcfSamplesMapping.sampleIdVariable = value;
       return this;
     }
 

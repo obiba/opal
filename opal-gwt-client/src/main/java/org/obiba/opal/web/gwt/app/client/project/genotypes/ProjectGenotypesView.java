@@ -25,10 +25,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.Inject;
@@ -71,19 +68,13 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   Label controlSamples;
 
   @UiField
-  Label project;
+  Anchor tableLink;
 
   @UiField
-  Label table;
+  Anchor participantIdLink;
 
   @UiField
-  Label participantId;
-
-  @UiField
-  Label sampleId;
-
-  @UiField
-  Label sampleRole;
+  Anchor sampleRoleLink;
 
   @UiField
   Table<VCFSummaryDto> vcfFilesTable;
@@ -119,10 +110,8 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   Button downloadVCF;
 
   @UiField
-  Button deleteAll;
-
-  @UiField
   IconAnchor addMapping;
+
 
   @UiField
   FlowPanel genotypesContentPanel;
@@ -174,12 +163,9 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   @Override
   public void setVCFSamplesMapping(VCFSamplesMappingDto vcfSamplesMapping) {
     showEditMapping(true);
-
-    project.setText(vcfSamplesMapping.getProjectName());
-    table.setText(vcfSamplesMapping.getTableReference());
-    participantId.setText(vcfSamplesMapping.getParticipantIdVariable());
-    sampleId.setText(vcfSamplesMapping.getSampleIdVariable());
-    sampleRole.setText(vcfSamplesMapping.getSampleRoleVariable());
+    tableLink.setText(vcfSamplesMapping.getTableReference());
+    participantIdLink.setText(vcfSamplesMapping.getParticipantIdVariable());
+    sampleRoleLink.setText(vcfSamplesMapping.getSampleRoleVariable());
   }
 
   private void showEditMapping(boolean value) {
@@ -212,15 +198,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   @Override
   public void clear(boolean hasVcfService) {
-    showEditMapping(false);
-
-    // clear mapping
-    project.setText("");
-    table.setText("");
-    participantId.setText("");
-    sampleId.setText("");
-    sampleRole.setText("");
-
+    clearMappingTable();
     // clear summary
     participants.setText("");
     participantsWithGenotype.setText("");
@@ -229,6 +207,14 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
     noVcfServiceAlertPanel.setVisible(!hasVcfService);
     genotypesContentPanel.setVisible(hasVcfService);
+  }
+
+  @Override
+  public void clearMappingTable() {
+    showEditMapping(false);
+    tableLink.setText("");
+    participantIdLink.setText("");
+    sampleRoleLink.setText("");
   }
 
   @Override
@@ -246,7 +232,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     filter.getClear().setTitle(translations.clearFilter());
   }
 
-  @UiHandler("downloadVCF")
+  @UiHandler({"downloadVCF","exportLink"})
   public void downloadVCFClick(ClickEvent event) {
     getUiHandlers().onExportVcfFiles();
   }
@@ -266,14 +252,24 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     getUiHandlers().onRemoveVcfFile(checkColumn.getSelectedItems());
   }
 
-  @UiHandler("deleteAll")
-  public void deleteAllClick(ClickEvent event) {
-    getUiHandlers().onRemoveAll();
-  }
-
   @UiHandler("filter")
   public void filterKeyUp(KeyUpEvent event) {
     getUiHandlers().onFilterUpdate(filter.getText());
+  }
+
+  @UiHandler("tableLink")
+  public void tableLinkClick(ClickEvent event) {
+    getUiHandlers().onMappingTableNavigateTo();
+  }
+
+  @UiHandler("participantIdLink")
+  public void participantIdLinkClick(ClickEvent event) {
+    getUiHandlers().onMappingTableNavigateToVariable(participantIdLink.getText());
+  }
+
+  @UiHandler("sampleRoleLink")
+  public void sampleRoleLinkClick(ClickEvent event) {
+    getUiHandlers().onMappingTableNavigateToVariable(sampleRoleLink.getText());
   }
 
   private void addTableColumns() {

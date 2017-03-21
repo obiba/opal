@@ -77,41 +77,35 @@
               </b2:IconAnchor>
             </g:FlowPanel>
 
-            <o:PropertiesTable keyStyleNames="span2">
-              <o:PropertyPanel>
-                <g:Label>
-                  <ui:msg description="Genotypes Project label">Project</ui:msg>
-                </g:Label>
-                <g:Label ui:field="project"/>
-              </o:PropertyPanel>
-              <o:PropertyPanel>
-                <g:Label>
-                  <ui:msg description="Genotypes Table label">Table</ui:msg>
-                </g:Label>
-                <g:Label ui:field="table"/>
-              </o:PropertyPanel>
-              <o:PropertyPanel>
-                <g:Label>
-                  <ui:msg description="Genotypes Participant ID label">Participant ID</ui:msg>
-                </g:Label>
-                <g:Label ui:field="participantId"/>
-              </o:PropertyPanel>
-              <o:PropertyPanel>
-                <g:Label>
-                  <ui:msg description="Genotypes Sample ID label">Sample ID</ui:msg>
-                </g:Label>
-                <g:Label ui:field="sampleId"/>
-              </o:PropertyPanel>
-              <o:PropertyPanel>
-                <g:Label>
-                  <ui:msg description="Genotypes Sample Role label">Sample Role</ui:msg>
-                </g:Label>
-                <g:Label ui:field="sampleRole"/>
-              </o:PropertyPanel>
-            </o:PropertiesTable>
-          </g:FlowPanel>
+          <o:PropertiesTable keyStyleNames="span2">
+            <g:FlowPanel>
+              <g:Label>
+                <ui:msg description="Genotypes Table label">Table</ui:msg>
+              </g:Label>
+              <g:FlowPanel>
+                <g:Anchor ui:field="tableLink"></g:Anchor>
+              </g:FlowPanel>
+            </g:FlowPanel>
+            <g:FlowPanel>
+              <g:Label>
+                <ui:msg description="Genotypes Participant ID label">Participant ID</ui:msg>
+              </g:Label>
+              <g:FlowPanel>
+                <g:Anchor ui:field="participantIdLink"></g:Anchor>
+              </g:FlowPanel>
+            </g:FlowPanel>
+            <g:FlowPanel>
+              <g:Label>
+                <ui:msg description="Genotypes Sample Role label">Sample Role</ui:msg>
+              </g:Label>
+              <g:FlowPanel>
+                <g:Anchor ui:field="sampleRoleLink"></g:Anchor>
+              </g:FlowPanel>
+            </g:FlowPanel>
+          </o:PropertiesTable>
         </g:FlowPanel>
       </g:FlowPanel>
+    </g:FlowPanel>
 
       <g:FlowPanel>
         <g:FlowPanel addStyleNames="container-fluid no-padding-left no-padding-right">
@@ -129,9 +123,6 @@
 
               <b:Button icon="DOWNLOAD_ALT" ui:field="downloadVCF" addStyleNames="small-indent">
                 <ui:msg description="Genotypes Download vcfFile label">Export</ui:msg>
-              </b:Button>
-
-              <b:Button icon="TRASH" visible="true" ui:field="deleteAll" addStyleNames="small-indent">
               </b:Button>
             </g:FlowPanel>
 
@@ -154,7 +145,10 @@
 
             <g:FlowPanel addStyleNames="pull-left">
               <b2:IconAnchor ui:field="deleteLink" icon="TRASH" addStyleNames="inline xsmall-indent">
-                <ui:msg description="Remove category label">Remove</ui:msg>
+                <ui:msg description="Genotypes Remove VCF Files label">Remove</ui:msg>
+              </b2:IconAnchor>
+              <b2:IconAnchor ui:field="exportLink" icon="DOWNLOAD_ALT" addStyleNames="inline xsmall-indent">
+                <ui:msg description="Genotypes Export VCF Files label">Export</ui:msg>
               </b2:IconAnchor>
             </g:FlowPanel>
 

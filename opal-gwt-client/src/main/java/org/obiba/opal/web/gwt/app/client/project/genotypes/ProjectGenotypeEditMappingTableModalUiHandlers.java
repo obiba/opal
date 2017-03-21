@@ -15,4 +15,6 @@ import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 public interface ProjectGenotypeEditMappingTableModalUiHandlers extends ModalUiHandlers {
 
   void onSaveEdit();
+
+  void onGetTableVariables(String tableReference);
 }

@@ -20,15 +20,22 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
+import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfFileExportRequestEvent;
 import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfFileUploadRequestEvent;
+import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfMappingDeleteRequestEvent;
 import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfMappingEditRequestEvent;
+import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.*;
@@ -54,6 +61,8 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   private static Logger logger = Logger.getLogger("ProjectGenotypesPresenter");
 
+  private final PlaceManager placeManager;
+
   private ProjectDto projectDto;
 
   private final TranslationMessages translationMessages;
@@ -68,7 +77,7 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   private JsArray<TableDto> participantTables = JsArrays.create();
 
-  private VCFSamplesMappingDto mappingTable = VCFSamplesMappingDto.create();
+  private VCFSamplesMappingDto mappingTable = null;
 
   private JsArray<VCFSummaryDto> vcfSummaryDtos = JsArrays.create();
 
@@ -79,13 +88,15 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
                                    ModalProvider<ProjectImportVcfFileModalPresenter> vcfFileUploadModalPresenterModalProvider,
                                    ModalProvider<ProjectExportVcfFileModalPresenter> vcfFileDownloadModalPresenterModalProvider,
                                    ModalProvider<ProjectGenotypeEditMappingTableModalPresenter> editMappingTableModalPresenterModalProvider,
-                                   TranslationMessages translationMessages) {
+                                   TranslationMessages translationMessages,
+                                   PlaceManager placeManager) {
     super(eventBus, display);
     getView().setUiHandlers(this);
     this.translationMessages = translationMessages;
     this.vcfFileUploadModalPresenterModalProvider = vcfFileUploadModalPresenterModalProvider.setContainer(this);
     this.vcfFileDownloadModalPresenterModalProvider = vcfFileDownloadModalPresenterModalProvider.setContainer(this);
     projectGenotypeEditMappingTableModalPresenterModalProvider = editMappingTableModalPresenterModalProvider.setContainer(this);
+    this.placeManager = placeManager;
     initializeEventListeners();
   }
 
@@ -115,6 +126,14 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
       public void onVcfMappingEditRequest(VcfMappingEditRequestEvent event) {
         updateVCFMapping(event.getVCFSamplesMapping());
       }
+    });
+
+    addRegisteredHandler(VcfMappingDeleteRequestEvent.getType(), new VcfMappingDeleteRequestEvent.VcfMappingDeleteRequestHandler() {
+      @Override
+      public void onVcfMappingDeleteRequest(VcfMappingDeleteRequestEvent event) {
+        removeVCFMapping(event.getProjectName());
+      }
+
     });
 
     addRegisteredHandler(VcfFileExportRequestEvent.getType(), new VcfFileExportRequestEvent.VcfFileExportRequestHandler() {
@@ -162,20 +181,6 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   }
 
   @Override
-  public void onRemoveAll() {
-    actionRequiringConfirmation = new Runnable() {
-      @Override
-      public void run() {
-        removeAll();
-      }
-    };
-
-    fireEvent(ConfirmationRequiredEvent
-      .createWithMessages(actionRequiringConfirmation, translationMessages.removeAllGenotypesData(),
-        translationMessages.confirmRemoveAllGenotypesData()));
-  }
-
-  @Override
   public void onRemoveVcfFile(Collection<VCFSummaryDto> vcfSummaryDto) {
     final Collection<VCFSummaryDto> vcfs = vcfSummaryDto;
     actionRequiringConfirmation = new Runnable() {
@@ -211,6 +216,30 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
         }
       }
       getView().renderRows(filtered);
+    }
+  }
+
+  @Override
+  public void onMappingTableNavigateTo() {
+    if (mappingTable != null) {
+      PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.PROJECT)
+        .with(ParameterTokens.TOKEN_NAME, mappingTable.getProjectName()) //
+        .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString()) //
+        .with(ParameterTokens.TOKEN_PATH, mappingTable.getTableReference());
+
+      placeManager.revealPlace(builder.build());
+    }
+  }
+
+  @Override
+  public void onMappingTableNavigateToVariable(String variable) {
+    if (mappingTable != null) {
+      PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.PROJECT)
+        .with(ParameterTokens.TOKEN_NAME, mappingTable.getProjectName()) //
+        .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString()) //
+        .with(ParameterTokens.TOKEN_PATH, mappingTable.getTableReference()+":"+variable);
+
+      placeManager.revealPlace(builder.build());
     }
   }
 
@@ -254,6 +283,7 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
         .withCallback(SC_CREATED, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
+            fireEvent(NotificationEvent.newBuilder().info("VCFFileExportTask").build());
             refresh();
           }
         })
@@ -289,7 +319,7 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
       .withCallback(SC_NOT_FOUND, new ResponseCodeCallback() {
         @Override
         public void onResponseCode(Request request, Response response) {
-          mappingTable = VCFSamplesMappingDto.create();
+          mappingTable = null;
         }
       })
       .get().send();
@@ -341,21 +371,21 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
         .send();
   }
 
-  private void removeAll() {
+  private void removeVCFMapping(String projectName) {
     ResourceRequestBuilderFactory
-      .newBuilder()
-      .forResource(UriBuilders.PROJECT_VCF_STORE.create().build(projectDto.getName()))
-      .delete()
-      .withCallback(new ResponseCodeCallback() {
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          mappingTable = VCFSamplesMappingDto.create();
-          mappingTables = JsArrays.create();
-          logger.info("Deleted ALL");
-          refresh();
-        }
-      }, SC_NO_CONTENT)
-      .send();
+        .newBuilder()
+        .forResource(UriBuilders.PROJECT_VCF_STORE_SAMPLES.create().build(projectDto.getName()))
+        .delete()
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().clearMappingTable();
+            mappingTable = null;
+            mappingTables = JsArrays.create();
+            refresh();
+          }
+        }, SC_NO_CONTENT)
+        .send();
   }
 
   private void removeVcfFile(Collection<VCFSummaryDto> vcfSummaryDtos) {
@@ -373,7 +403,6 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            logger.info("Deleted file");
             refresh();
           }
         }, SC_NO_CONTENT)
@@ -393,6 +422,7 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
         .withCallback(SC_CREATED, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
+            fireEvent(NotificationEvent.newBuilder().info("VCFFileImportTask").build());
             refresh();
           }
         })
@@ -416,5 +446,7 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
     void afterRenderRows();
 
     void clear(boolean hasVcfService);
+
+    void clearMappingTable();
   }
 }
