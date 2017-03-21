@@ -12,7 +12,9 @@ package org.obiba.opal.core.security;
 
 import com.google.common.collect.Lists;
 import org.obiba.opal.web.model.Opal;
+import org.springframework.stereotype.Component;
 
+@Component
 public class VCFStorePermissionsConverter extends OpalPermissionConverter {
   @Override
   public Iterable<String> convert(String domain, String node, String permission) {
@@ -21,6 +23,11 @@ public class VCFStorePermissionsConverter extends OpalPermissionConverter {
 
   @Override
   protected boolean hasPermission(Opal.AclAction action) {
+    for(Permission perm : Permission.values()) {
+      if(perm.toString().equals(action.toString())) {
+        return true;
+      }
+    }
     return false;
   }
 
@@ -28,26 +35,34 @@ public class VCFStorePermissionsConverter extends OpalPermissionConverter {
     VCF_STORE_VIEW {
       @Override
       public Iterable<String> convert(String node) {
-        String[] args = args(node, "/project/(.+)/vcf-store/vcfs");
-        return Lists.newArrayList(toRest("/project/{0}/vcf-store/vcfs", "GET", args));
+        String[] args = args(node, "/project/(.+)/vcf-store");
+        return Lists.newArrayList(
+            toRest("/project/{0}/vcf-store", "GET:GET", args),
+            toRest("/project/{0}/vcf-store/vcfs", "GET:GET", args),
+            toRest("/project/{0}/vcf-store/samples", "GET:GET", args)
+        );
       }
     },
     VCF_STORE_EDIT {
       @Override
       public Iterable<String> convert(String node) {
-        String[] args = args(node, "/project/(.+)/vcf-store/vcfs");
-        return Lists.newArrayList(toRest("/project/{0}/vcf-store/vcfs", "GET", args),
-          toRest("/project/{0}/commands/_export_vcf", "POST", args));
+        String[] args = args(node, "/project/(.+)/vcf-store");
+        return Lists.newArrayList(
+            toRest("/project/{0}/vcf-store", "GET:GET", args),
+            toRest("/project/{0}/vcf-store/vcfs", "GET:GET", args),
+            toRest("/project/{0}/commands/_export_vcf", "POST", args));
       }
     },
     VCF_STORE_ALL {
       @Override
       public Iterable<String> convert(String node) {
-        String[] args = args(node, "/project/(.+)/vcf-store/vcfs");
-        return Lists.newArrayList(toRest("/project/{0}/vcf-store/vcfs", "GET", args),
-          toRest("/project/{0}/commands/_export_vcf", "POST", args),
-          toRest("/project/{0}/commands/_import_vcf", "POST", args),
-          toRest("/project/{0}/commands/_import_vcf/samples", "PUT:GET/*", args));
+        String[] args = args(node, "/project/(.+)/vcf-store");
+        return Lists.newArrayList(
+            toRest("/project/{0}/vcf-store", "GET:GET/*", args),
+            toRest("/project/{0}/vcf-store/vcfs", "GET/*", args),
+            toRest("/project/{0}/vcf-store/samples", "PUT:GET/*", args),
+            toRest("/project/{0}/commands/_export_vcf", "POST", args),
+            toRest("/project/{0}/commands/_import_vcf", "POST", args));
       }
     };
 

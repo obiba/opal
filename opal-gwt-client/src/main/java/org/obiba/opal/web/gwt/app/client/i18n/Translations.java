@@ -155,6 +155,10 @@ public interface Translations extends Constants {
 
       "PROJECT_ALL", "Administrate", //
 
+      "VCF_STORE_VIEW", "View VCF Store", //
+      "VCF_STORE_EDIT", "Edit VCF Store", //
+      "VCF_STORE_ALL", "Administrate VCF Store", //
+
       "DATASOURCE_ALL", "Administrate", //
       "TABLE_ADD", "Add table", //
 
@@ -194,6 +198,10 @@ public interface Translations extends Constants {
 
       "PROJECT_ADD.help", "Add new projects and therefore can import/export data in the context of the project.", //
       "PROJECT_ALL.help", "Full access to project settings and data.", //
+
+      "VCF_STORE_VIEW.help", "View VCF files and statistics.", //
+      "VCF_STORE_EDIT.help", "Export VCF files and view statistics.", //
+      "VCF_STORE_ALL.help", "Import/Export VCF files, view statistics and set samples-participants mapping table.", //
 
       "DATASOURCE_ALL.help", "Full access to project tables, including individual values.", //
       "TABLE_ADD.help", "Add tables or views.", //

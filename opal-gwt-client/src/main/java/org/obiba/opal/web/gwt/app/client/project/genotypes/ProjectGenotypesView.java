@@ -10,8 +10,9 @@
 
 package org.obiba.opal.web.gwt.app.client.project.genotypes;
 
-import com.github.gwtbootstrap.client.ui.Alert;
+import com.github.gwtbootstrap.client.ui.*;
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.google.common.collect.Lists;
@@ -26,6 +27,7 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.Inject;
@@ -40,6 +42,8 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
 import org.obiba.opal.web.model.client.opal.VCFSamplesMappingDto;
 import org.obiba.opal.web.model.client.opal.VCFStoreDto;
 import org.obiba.opal.web.model.client.opal.VCFSummaryDto;
@@ -54,6 +58,8 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   private static Logger logger = Logger.getLogger("ProjectGenotypesView");
 
   private static final int SORTABLE_COLUMN_VCF_FILE = 1;
+
+  private static final int PERMISSIONS_TAB_INDEX = 1;
 
   @UiField
   Label participants;
@@ -112,12 +118,14 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   @UiField
   IconAnchor addMapping;
 
-
-  @UiField
-  FlowPanel genotypesContentPanel;
-
   @UiField
   FlowPanel noVcfServiceAlertPanel;
+
+  @UiField
+  SimplePanel permissionsPanel;
+
+  @UiField
+  TabPanel tabPanel;
 
   private final Translations translations;
 
@@ -206,7 +214,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     controlSamples.setText("");
 
     noVcfServiceAlertPanel.setVisible(!hasVcfService);
-    genotypesContentPanel.setVisible(hasVcfService);
+    tabPanel.setVisible(hasVcfService);
   }
 
   @Override
@@ -215,6 +223,19 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     tableLink.setText("");
     participantIdLink.setText("");
     sampleRoleLink.setText("");
+  }
+
+  @Override
+  public HasAuthorization getPermissionsAuthorizer() {
+    return new TabPanelAuthorizer(tabPanel, PERMISSIONS_TAB_INDEX);
+  }
+
+  @Override
+  public void setInSlot(Object slot, IsWidget content) {
+    permissionsPanel.clear();
+    if(content != null) {
+      permissionsPanel.add(content.asWidget());
+    }
   }
 
   @Override

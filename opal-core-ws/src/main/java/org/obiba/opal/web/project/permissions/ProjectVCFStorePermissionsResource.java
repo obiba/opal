@@ -42,7 +42,8 @@ public class ProjectVCFStorePermissionsResource extends AbstractPermissionsResou
   /**
    * Get all datasource-level permissions in the project.
    *
-   * @param domain
+   * @param principals
+   * @param permission
    * @param type
    * @return
    */
@@ -85,18 +86,16 @@ public class ProjectVCFStorePermissionsResource extends AbstractPermissionsResou
    *
    * @param type
    * @param principals
-   * @param permission
    * @return
    */
   @DELETE
   public Response deleteVCFStorePermission(@QueryParam("type") @DefaultValue("USER") SubjectAcl.SubjectType type,
-      @QueryParam("principal") List<String> principals,
-      @QueryParam("permission") VCFStorePermissionsConverter.Permission permission) {
+      @QueryParam("principal") List<String> principals) {
 
     // make sure project exists
     projectService.getProject(name);
 
-    setPermission(principals, type, permission.name());
+    deletePermissions(principals, type);
     return Response.ok().build();
   }
 
