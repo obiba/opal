@@ -21,6 +21,7 @@ public enum ResourcePermissionType {
   R(AclAction.R_USE),
   PROJECT(AclAction.PROJECT_ALL),
   DATASOURCE(AclAction.TABLE_ADD, AclAction.DATASOURCE_ALL),
+  VCF_STORE(AclAction.VCF_STORE_VIEW, AclAction.VCF_STORE_EDIT, AclAction.VCF_STORE_ALL),
   TABLE(AclAction.TABLE_READ, AclAction.TABLE_VALUES, AclAction.TABLE_EDIT, AclAction.TABLE_VALUES_EDIT,
       AclAction.TABLE_ALL),
   VARIABLE(AclAction.VARIABLE_READ),

@@ -16,6 +16,7 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
@@ -28,6 +29,10 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
@@ -37,6 +42,8 @@ import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfMappingDelet
 import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfMappingEditRequestEvent;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
 import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.*;
 
@@ -73,6 +80,8 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   private final ModalProvider<ProjectGenotypeEditMappingTableModalPresenter> projectGenotypeEditMappingTableModalPresenterModalProvider;
 
+  private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
+
   private JsArray<TableDto> mappingTables = JsArrays.create();
 
   private JsArray<TableDto> participantTables = JsArrays.create();
@@ -88,6 +97,7 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
                                    ModalProvider<ProjectImportVcfFileModalPresenter> vcfFileUploadModalPresenterModalProvider,
                                    ModalProvider<ProjectExportVcfFileModalPresenter> vcfFileDownloadModalPresenterModalProvider,
                                    ModalProvider<ProjectGenotypeEditMappingTableModalPresenter> editMappingTableModalPresenterModalProvider,
+                                   Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
                                    TranslationMessages translationMessages,
                                    PlaceManager placeManager) {
     super(eventBus, display);
@@ -96,6 +106,7 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
     this.vcfFileUploadModalPresenterModalProvider = vcfFileUploadModalPresenterModalProvider.setContainer(this);
     this.vcfFileDownloadModalPresenterModalProvider = vcfFileDownloadModalPresenterModalProvider.setContainer(this);
     projectGenotypeEditMappingTableModalPresenterModalProvider = editMappingTableModalPresenterModalProvider.setContainer(this);
+    this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.placeManager = placeManager;
     initializeEventListeners();
   }
@@ -156,6 +167,8 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
       getParticipantTables();
       refresh();
     }
+
+    authorize();
   }
 
   @Override
@@ -259,6 +272,16 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
     getMappingTable();
     getMappingTables();
     getVcfSummaries();
+  }
+
+  private void authorize() {
+    if (projectDto.getName() == null) return;
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(
+            UriBuilders.PROJECT_VCF_PERMISSIONS.create().build(projectDto.getName())) //
+        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new ProjectGenotypesPresenter.PermissionsUpdate())) //
+        .post().send();
   }
 
   public void getVcfStore() {
@@ -429,6 +452,28 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
         .send();
   }
 
+  private final class PermissionsUpdate implements HasAuthorization {
+
+    @Override
+    public void beforeAuthorization() {
+
+    }
+
+    @Override
+    public void authorized() {
+      ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
+      resourcePermissionsPresenter.initialize(ResourcePermissionType.VCF_STORE,
+          ResourcePermissionRequestPaths.UriBuilders.PROJECT_VCF_PERMISSIONS_STORE, projectDto.getName());
+
+      setInSlot(TablePresenter.Display.Slots.Permissions, resourcePermissionsPresenter);
+    }
+
+    @Override
+    public void unauthorized() {
+
+    }
+  }
+
   public interface Display extends View, HasUiHandlers<ProjectGenotypesUiHandlers> {
 
     List<VCFSummaryDto> getSelectedVCFs();
@@ -448,5 +493,7 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
     void clear(boolean hasVcfService);
 
     void clearMappingTable();
+
+    HasAuthorization getPermissionsAuthorizer();
   }
 }
