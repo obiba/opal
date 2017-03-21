@@ -83,6 +83,16 @@ public class ProjectExportVcfFileModalView extends ModalPopupViewWithUiHandlers<
     exportNVCF.setText(message);
   }
 
+  @Override
+  public String getParticipantsFilterTable() {
+    return participantsFilter.getSelectedValue();
+  }
+
+  @Override
+  public boolean hasCaseControls() {
+    return includeCaseControls.getValue();
+  }
+
   @UiHandler("cancelButton")
   public void onCancelButton(ClickEvent event) {
     dialog.hide();

@@ -92,6 +92,8 @@ public class ProjectExportVcfFileModalPresenter extends ModalPresenterWidget<Pro
       }
 
       dto.setNamesArray(names);
+      dto.setTable(getView().getParticipantsFilterTable());
+      dto.setCaseControl(getView().hasCaseControls());
       dto.setDestination(fileSelectionPresenter.getSelectedFile());
 
       fireEvent(new VcfFileExportRequestEvent(dto));
@@ -161,6 +163,10 @@ public class ProjectExportVcfFileModalPresenter extends ModalPresenterWidget<Pro
     void hideDialog();
 
     void showExportNAlert(String message);
+
+    String getParticipantsFilterTable();
+
+    boolean hasCaseControls();
   }
 
 }
