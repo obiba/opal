@@ -362,6 +362,7 @@ public interface Translations extends Constants {
       "ViewNameDisallowedChars", "View names cannot contain colon or period characters.", //
       "CSVFileRequired", "A CSV file is required.", //
       "VCFFileRequired", "A VCF/BCF (optionally compressed) file is required.", //
+      "VCFParticipantSampleVariablesIdentical", "Participant ID variable and Sample Role variable cannot have identical names.", //
       "XMLFileRequired", "An XML file is required.", //
       "XMLFileSuffixInvalid", "Invalid XML file suffix: .xml is expected.", //
       "ZipFileRequired", "A Zip file is required.", //
@@ -452,6 +453,8 @@ public interface Translations extends Constants {
       "CircularVariableDependency", "Circular dependency for variable '{0}'.:<br /><br /><pre>{1}</pre>",//
       "NoSuchProject", "No such project '{0}'.",//
       "NoSuchVCFSamplesMapping", "No such VCF sample mapping '{0}'.",//
+      "VCFFileImportTask", "Import task has been launched.  You can follow its progress in the task list.",//
+      "VCFFileExportTask", "Export task has been launched.  You can follow its progress in the task list.",//
       "NoSuchDatabase", "No such database '{0}'.",//
       "SubjectPrincipalNotFound", "No such subject principal '{0}'.",//
       "SubjectProfileNotFound", "No profile for subject '{0}'.",//

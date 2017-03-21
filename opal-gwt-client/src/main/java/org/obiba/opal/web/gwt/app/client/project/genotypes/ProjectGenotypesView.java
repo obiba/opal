@@ -30,7 +30,6 @@ import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -69,10 +68,13 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   Label controlSamples;
 
   @UiField
-  Label participantId;
+  Anchor tableLink;
 
   @UiField
-  Label sampleRole;
+  Anchor participantIdLink;
+
+  @UiField
+  Anchor sampleRoleLink;
 
   @UiField
   Table<VCFSummaryDto> vcfFilesTable;
@@ -108,12 +110,8 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   Button downloadVCF;
 
   @UiField
-  Button deleteAll;
-
-  @UiField
   IconAnchor addMapping;
-  @UiField
-  Anchor tableLink;
+
 
   @UiField
   FlowPanel genotypesContentPanel;
@@ -166,8 +164,8 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   public void setVCFSamplesMapping(VCFSamplesMappingDto vcfSamplesMapping) {
     showEditMapping(true);
     tableLink.setText(vcfSamplesMapping.getTableReference());
-    participantId.setText(vcfSamplesMapping.getParticipantIdVariable());
-    sampleRole.setText(vcfSamplesMapping.getSampleRoleVariable());
+    participantIdLink.setText(vcfSamplesMapping.getParticipantIdVariable());
+    sampleRoleLink.setText(vcfSamplesMapping.getSampleRoleVariable());
   }
 
   private void showEditMapping(boolean value) {
@@ -200,11 +198,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   @Override
   public void clear(boolean hasVcfService) {
-    showEditMapping(false);
-    tableLink.setText("");
-    participantId.setText("");
-    sampleRole.setText("");
-
+    clearMappingTable();
     // clear summary
     participants.setText("");
     participantsWithGenotype.setText("");
@@ -213,6 +207,14 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
     noVcfServiceAlertPanel.setVisible(!hasVcfService);
     genotypesContentPanel.setVisible(hasVcfService);
+  }
+
+  @Override
+  public void clearMappingTable() {
+    showEditMapping(false);
+    tableLink.setText("");
+    participantIdLink.setText("");
+    sampleRoleLink.setText("");
   }
 
   @Override
@@ -230,7 +232,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     filter.getClear().setTitle(translations.clearFilter());
   }
 
-  @UiHandler("downloadVCF")
+  @UiHandler({"downloadVCF","exportLink"})
   public void downloadVCFClick(ClickEvent event) {
     getUiHandlers().onExportVcfFiles();
   }
@@ -250,11 +252,6 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     getUiHandlers().onRemoveVcfFile(checkColumn.getSelectedItems());
   }
 
-  @UiHandler("deleteAll")
-  public void deleteAllClick(ClickEvent event) {
-    getUiHandlers().onRemoveAll();
-  }
-
   @UiHandler("filter")
   public void filterKeyUp(KeyUpEvent event) {
     getUiHandlers().onFilterUpdate(filter.getText());
@@ -263,6 +260,16 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   @UiHandler("tableLink")
   public void tableLinkClick(ClickEvent event) {
     getUiHandlers().onMappingTableNavigateTo();
+  }
+
+  @UiHandler("participantIdLink")
+  public void participantIdLinkClick(ClickEvent event) {
+    getUiHandlers().onMappingTableNavigateToVariable(participantIdLink.getText());
+  }
+
+  @UiHandler("sampleRoleLink")
+  public void sampleRoleLinkClick(ClickEvent event) {
+    getUiHandlers().onMappingTableNavigateToVariable(sampleRoleLink.getText());
   }
 
   private void addTableColumns() {

@@ -27,38 +27,22 @@
     </b:ControlGroup>
 
     <b:ControlGroup ui:field="participantIdVariableGroup">
-      <b:ControlLabel>
-        <ui:msg description="Genotypes Participant ID variable name label">Participant ID Variable</ui:msg>
+      <b:ControlLabel for="participantIds">
+        <ui:msg description="Mapping Table label">Participant ID Variable</ui:msg>
       </b:ControlLabel>
-      <b:Controls>
-        <b:TextBox name="participantIdVariable" ui:field="participantIdVariable" visibleLength="16"/>
-      </b:Controls>
+      <o:Chooser ui:field="participantIds" name="participantIds"/>
       <b:HelpBlock>
         <ui:msg description="Genotypes Participant ID variable name help">The participant ID variable name.</ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 
-    <b:ControlGroup ui:field="sampleIdVariableGroup">
-      <b:ControlLabel>
-        <ui:msg description="Genotypes Sample ID variable name label">Sample ID Variable</ui:msg>
-      </b:ControlLabel>
-      <b:Controls>
-        <b:TextBox name="sampleIdVariable" ui:field="sampleIdVariable" visibleLength="16"/>
-      </b:Controls>
-      <b:HelpBlock>
-        <ui:msg description="Genotypes Sample ID variable name help">The sample ID variable name.</ui:msg>
-      </b:HelpBlock>
-    </b:ControlGroup>
-
     <b:ControlGroup ui:field="sampleRoleVariableGroup">
-      <b:ControlLabel>
-        <ui:msg description="Genotypes Sample Role variable name label">Sample Role Variable</ui:msg>
+      <b:ControlLabel for="sampleRoleIds">
+        <ui:msg description="Mapping Table label">Sample Role Variable</ui:msg>
       </b:ControlLabel>
-      <b:Controls>
-        <b:TextBox name="sampleRoleVariable" ui:field="sampleRoleVariable" visibleLength="16"/>
-      </b:Controls>
+      <o:Chooser ui:field="sampleRoleIds" name="sampleRoleIds"/>
       <b:HelpBlock>
-        <ui:msg description="Genotypes Sample Role variable name help">The sample Role variable name.</ui:msg>
+        <ui:msg description="Genotypes sampleRole ID variable name help">The sample Role variable name.</ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 

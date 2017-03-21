@@ -44,6 +44,5 @@ message VCFSamplesMappingDto {
     required string projectName = 1;
     required string tableReference = 2;
     required string participantIdVariable = 3;
-    required string sampleIdVariable = 4;
-    required string sampleRoleVariable = 5;
+    required string sampleRoleVariable = 4;
 }

@@ -90,13 +90,17 @@
               <g:Label>
                 <ui:msg description="Genotypes Participant ID label">Participant ID</ui:msg>
               </g:Label>
-              <g:Label ui:field="participantId"/>
+              <g:FlowPanel>
+                <g:Anchor ui:field="participantIdLink"></g:Anchor>
+              </g:FlowPanel>
             </g:FlowPanel>
             <g:FlowPanel>
               <g:Label>
                 <ui:msg description="Genotypes Sample Role label">Sample Role</ui:msg>
               </g:Label>
-              <g:Label ui:field="sampleRole"/>
+              <g:FlowPanel>
+                <g:Anchor ui:field="sampleRoleLink"></g:Anchor>
+              </g:FlowPanel>
             </g:FlowPanel>
           </o:PropertiesTable>
         </g:FlowPanel>
@@ -120,9 +124,6 @@
               <b:Button icon="DOWNLOAD_ALT" ui:field="downloadVCF" addStyleNames="small-indent">
                 <ui:msg description="Genotypes Download vcfFile label">Export</ui:msg>
               </b:Button>
-
-              <b:Button icon="TRASH" visible="true" ui:field="deleteAll" addStyleNames="small-indent">
-              </b:Button>
             </g:FlowPanel>
 
             <g:FlowPanel addStyleNames="span4 pull-left no-left-margin">
@@ -144,7 +145,10 @@
 
             <g:FlowPanel addStyleNames="pull-left">
               <b2:IconAnchor ui:field="deleteLink" icon="TRASH" addStyleNames="inline xsmall-indent">
-                <ui:msg description="Remove category label">Remove</ui:msg>
+                <ui:msg description="Genotypes Remove VCF Files label">Remove</ui:msg>
+              </b2:IconAnchor>
+              <b2:IconAnchor ui:field="exportLink" icon="DOWNLOAD_ALT" addStyleNames="inline xsmall-indent">
+                <ui:msg description="Genotypes Export VCF Files label">Export</ui:msg>
               </b2:IconAnchor>
             </g:FlowPanel>
 

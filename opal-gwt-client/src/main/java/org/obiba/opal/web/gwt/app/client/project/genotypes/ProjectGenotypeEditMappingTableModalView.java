@@ -10,10 +10,9 @@
 package org.obiba.opal.web.gwt.app.client.project.genotypes;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
-import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
-import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -28,43 +27,44 @@ import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.opal.VCFSamplesMappingDto;
 
 import javax.annotation.Nullable;
+import java.util.logging.Logger;
 
 public class ProjectGenotypeEditMappingTableModalView extends ModalPopupViewWithUiHandlers<ProjectGenotypeEditMappingTableModalUiHandlers>
         implements ProjectGenotypeEditMappingTableModalPresenter.Display {
 
+  private final Translations translations;
+
+  private VCFSamplesMappingDto initialMappingTable;
+
   interface Binder extends UiBinder<Widget, ProjectGenotypeEditMappingTableModalView> {}
+
+  private static Logger logger = Logger.getLogger("ProjectGenotypeEditMappingTableModalView");
 
   @UiField
   Modal dialog;
 
   @UiField
+  Chooser mappingTable;
+
+  @UiField
+  Chooser participantIds;
+
+  @UiField
+  Chooser sampleRoleIds;
+  @UiField
   ControlGroup participantIdVariableGroup;
-
-  @UiField
-  TextBox participantIdVariable;
-
-  @UiField
-  ControlGroup sampleIdVariableGroup;
-
-  @UiField
-  TextBox sampleIdVariable;
-
   @UiField
   ControlGroup sampleRoleVariableGroup;
-
-  @UiField
-  TextBox sampleRoleVariable;
-
-  @UiField
-  Chooser mappingTable;
 
   @Inject
   public ProjectGenotypeEditMappingTableModalView(EventBus eventBus, Binder binder, Translations translations) {
     super(eventBus);
     initWidget(binder.createAndBindUi(this));
+    this.translations = translations;
     dialog.setTitle(translations.projectGenotypeEditMappingeModalTitle());
   }
 
@@ -78,6 +78,35 @@ public class ProjectGenotypeEditMappingTableModalView extends ModalPopupViewWith
   }
 
   @Override
+  public VCFSamplesMappingDto getInitialMappingTable() {
+    return initialMappingTable;
+  }
+
+  @Override
+  public void setVariables(JsArray<VariableDto> variables) {
+    participantIds.clear();
+    sampleRoleIds.clear();
+
+    participantIds.addItem("");
+    sampleRoleIds.addItem("");
+
+    for (VariableDto variableDto : JsArrays.toIterable(variables)) {
+      // place full path in case same table name exists in another datasource
+      participantIds.addItem(variableDto.getName());
+      sampleRoleIds.addItem(variableDto.getName());
+    }
+
+    String selectedTable = mappingTable.getSelectedValue();
+    if (initialMappingTable != null && initialMappingTable.getTableReference().equals(selectedTable)) {
+      participantIds.setSelectedValue(initialMappingTable.getParticipantIdVariable());
+      sampleRoleIds.setSelectedValue(initialMappingTable.getSampleRoleVariable());
+    } else {
+      participantIds.setItemSelected(0, true);
+      sampleRoleIds.setItemSelected(0, true);
+    }
+  }
+
+  @Override
   public HasText getMappingTable() {
     return new HasText() {
       @Override
@@ -87,35 +116,46 @@ public class ProjectGenotypeEditMappingTableModalView extends ModalPopupViewWith
 
       @Override
       public void setText(String s) {
-        if (Strings.isNullOrEmpty(s)) return;
-        int count = mappingTable.getItemCount();
-        for (int i = 0; i < count; i++) {
-          if (mappingTable.getValue(i).equals(s)) {
-            mappingTable.setSelectedIndex(i);
-          }
-        }
+        mappingTable.setSelectedValue(s);
+      }
+    };
+  }
+
+  @Override
+  public HasText getSampleRoleVariable() {
+    return new HasText() {
+
+      @Override
+      public String getText() {
+        return sampleRoleIds.getSelectedValue();
+      }
+
+      @Override
+      public void setText(String s) {
+        sampleRoleIds.setSelectedValue(s);
       }
     };
   }
 
   @Override
   public HasText getParticipantIdVariable() {
-    return participantIdVariable;
-  }
+    return new HasText() {
+      @Override
+      public String getText() {
+        return participantIds.getSelectedValue();
+      }
 
-  @Override
-  public HasText getSampleIdVariable() {
-    return sampleIdVariable;
-  }
-
-  @Override
-  public HasText getSampleRoleVariable() {
-    return sampleRoleVariable;
+      @Override
+      public void setText(String s) {
+        participantIds.setSelectedValue(s);
+      }
+    };
   }
 
   @Override
   public void setAvailableMappingTables(JsArray<TableDto> availableMappingTables) {
     mappingTable.clear();
+    mappingTable.addItem(translations.none(), "");
 
     for (TableDto tableDto : JsArrays.toIterable(availableMappingTables)) {
       // place full path in case same table name exists in another datasource
@@ -125,10 +165,10 @@ public class ProjectGenotypeEditMappingTableModalView extends ModalPopupViewWith
 
   @Override
   public void setVcfSamplesMappingDto(VCFSamplesMappingDto dto) {
-    participantIdVariable.setText(dto.getParticipantIdVariable());
-    sampleIdVariable.setText(dto.getSampleIdVariable());
-    sampleRoleVariable.setText(dto.getSampleRoleVariable());
+    initialMappingTable = dto;
     getMappingTable().setText(dto.getTableReference());
+    participantIds.setSelectedValue(dto.getParticipantIdVariable());
+    sampleRoleIds.setSelectedValue(dto.getSampleRoleVariable());
   }
 
   @Override
@@ -143,9 +183,6 @@ public class ProjectGenotypeEditMappingTableModalView extends ModalPopupViewWith
       switch (formField) {
         case PARTICIPANT_ID_VARIABLE:
           group = participantIdVariableGroup;
-          break;
-        case SAMPLE_ID_VARIABLE:
-          group = sampleIdVariableGroup;
           break;
         case SAMPLE_ROLE_VARIABLE:
           group = sampleRoleVariableGroup;
@@ -168,5 +205,16 @@ public class ProjectGenotypeEditMappingTableModalView extends ModalPopupViewWith
   @UiHandler("cancelButton")
   public void cancelButtonClick(ClickEvent event) {
     dialog.hide();
+  }
+
+  @UiHandler("mappingTable")
+  public void mappingTableChange(ChangeEvent event) {
+    logger.info("Selected table " + mappingTable.getSelectedValue());
+    if ("".equals(mappingTable.getSelectedValue())) {
+      participantIds.clear();
+      sampleRoleIds.clear();
+    } else {
+      getUiHandlers().onGetTableVariables(mappingTable.getSelectedValue());
+    }
   }
 }

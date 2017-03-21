@@ -73,7 +73,6 @@ public class Dtos {
       .projectName(dto.getProjectName())
       .tableName(dto.getTableReference())
       .participantIdVariable(dto.getParticipantIdVariable())
-      .sampleIdVariable(dto.getSampleIdVariable())
       .sampleRoleVariable(dto.getSampleRoleVariable())
       .build();
   }
@@ -83,7 +82,6 @@ public class Dtos {
       .setProjectName(sampleMappings.getProjectName())
       .setTableReference(sampleMappings.getTableReference())
       .setParticipantIdVariable(sampleMappings.getParticipantIdVariable())
-      .setSampleIdVariable(sampleMappings.getSampleIdVariable())
       .setSampleRoleVariable(sampleMappings.getSampleRoleVariable())
       .build();
   }
