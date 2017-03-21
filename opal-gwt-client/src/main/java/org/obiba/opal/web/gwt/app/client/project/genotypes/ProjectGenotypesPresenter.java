@@ -245,7 +245,6 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   private void exportVcfFiles(ExportVCFCommandOptionsDto commandOptions) {
     commandOptions.setProject(projectDto.getName());
-    commandOptions.setTable(mappingTable.getTableReference());
 
     ResourceRequestBuilderFactory
         .newBuilder()

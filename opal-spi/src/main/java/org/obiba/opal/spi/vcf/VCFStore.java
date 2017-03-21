@@ -10,6 +10,7 @@
 
 package org.obiba.opal.spi.vcf;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -126,6 +127,16 @@ public interface VCFStore {
    * @return
    */
   void readVCFStatistics(String name, OutputStream out) throws NoSuchElementException, IOException;
+
+  /**
+   * Filter the stored VCF with the given name, with a provided comma-separated list of samples. The result is a compressed file placed in the destination file.
+   *
+   * @param vcfName
+   * @param format
+   * @param commaSeparatedSampleIds
+   * @param destination
+   */
+  void filter(String vcfName, Format format, String commaSeparatedSampleIds, File destination) throws NoSuchElementException, IOException;
 
   /**
    * VCF file format flavor.
