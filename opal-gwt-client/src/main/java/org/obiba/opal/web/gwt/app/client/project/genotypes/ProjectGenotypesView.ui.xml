@@ -87,8 +87,6 @@
                     </b:Heading>
                     <b2:IconAnchor ui:field="editMapping" icon="EDIT" addStyleNames="small-indent">
                     </b2:IconAnchor>
-                    <b2:IconAnchor ui:field="addMapping" icon="PLUS_SIGN_ALT" addStyleNames="small-indent">
-                    </b2:IconAnchor>
                   </g:FlowPanel>
 
                   <o:PropertiesTable keyStyleNames="span2">
