@@ -11,6 +11,7 @@ package org.obiba.opal.shell.commands;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -30,10 +31,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @CommandUsage(description = "Export one or more VCF files from a project into a destination folder.",
@@ -116,13 +119,12 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
     destinationFolder.mkdirs();
     getShell().printf(String.format("Exporting VCF/BCF files in: %s", options.getDestination() + File.separator + destinationFolderName));
 
-    // TODO samples filtering
     int total = options.getNames().size() + 1;
     getShell().progress(String.format("Exporting VCF/BCF file(s): %s", String.join(", ", options.getNames())), 0, total, 0);
 
-    String filteredSampleIds = StringUtils.join(
-        vcfSamplesMappingService.getFilteredSampleIds(options.getProject(), options.getTable(), options.isCaseControl()),
-        ",");
+    List<String> filterSampleIds = options.hasTable() ?
+        vcfSamplesMappingService.getFilteredSampleIds(options.getProject(), options.getTable(), options.isCaseControl()) :
+        Lists.newArrayList();
 
     int count = 1;
     for (String vcfName : options.getNames()) {
@@ -131,7 +133,10 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
       String vcfFileName = vcfName + "." + summary.getFormat().name().toLowerCase() + ".gz";
       getShell().printf(String.format("Exporting VCF/BCF file: %s", vcfFileName));
       File vcfFile = new File(destinationFolder, vcfFileName);
-      store.filter(vcfName, summary.getFormat(), filteredSampleIds, vcfFile);
+      if (filterSampleIds.isEmpty())
+        store.readVCF(vcfName, new FileOutputStream(vcfFile));
+      else
+        store.readVCF(vcfName, new FileOutputStream(vcfFile), filterSampleIds);
       count++;
     }
     getShell().progress(String.format("VCF/BCF file(s) export completed."), total, total, 100);

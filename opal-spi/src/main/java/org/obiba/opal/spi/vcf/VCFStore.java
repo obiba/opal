@@ -129,16 +129,6 @@ public interface VCFStore {
   void readVCFStatistics(String name, OutputStream out) throws NoSuchElementException, IOException;
 
   /**
-   * Filter the stored VCF with the given name, with a provided comma-separated list of samples. The result is a compressed file placed in the destination file.
-   *
-   * @param vcfName
-   * @param format
-   * @param commaSeparatedSampleIds
-   * @param destination
-   */
-  void filter(String vcfName, Format format, String commaSeparatedSampleIds, File destination) throws NoSuchElementException, IOException;
-
-  /**
    * VCF file format flavor.
    */
   enum Format {
