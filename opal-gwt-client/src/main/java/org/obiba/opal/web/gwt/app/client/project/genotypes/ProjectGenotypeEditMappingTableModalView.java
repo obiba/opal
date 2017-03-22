@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.project.genotypes;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -31,6 +32,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.opal.VCFSamplesMappingDto;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class ProjectGenotypeEditMappingTableModalView extends ModalPopupViewWithUiHandlers<ProjectGenotypeEditMappingTableModalUiHandlers>
@@ -157,10 +159,18 @@ public class ProjectGenotypeEditMappingTableModalView extends ModalPopupViewWith
     mappingTable.clear();
     mappingTable.addItem(translations.none(), "");
 
+    List<String> groups = Lists.newArrayList();
+
     for (TableDto tableDto : JsArrays.toIterable(availableMappingTables)) {
-      // place full path in case same table name exists in another datasource
-      mappingTable.addItem(tableDto.getDatasourceName() + "." + tableDto.getName());
+      if (groups.indexOf(tableDto.getDatasourceName()) == -1) {
+        groups.add(tableDto.getDatasourceName());
+        mappingTable.addGroup(tableDto.getDatasourceName());
+      }
+
+      mappingTable.addItemToGroup(tableDto.getName(), tableDto.getDatasourceName() + "." + tableDto.getName());
     }
+
+    mappingTable.update();
   }
 
   @Override

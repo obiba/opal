@@ -165,6 +165,7 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
         || getView().getSelectedVCFs().size() == 0;
 
     modal.setParticipantTables(participantTables);
+    modal.showMappingDependantContent(mappingTable != null);
     modal.setExportVCFs(allSelected ? getView().getAllVCFs() : getView().getSelectedVCFs(), allSelected);
   }
 

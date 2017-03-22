@@ -14,11 +14,15 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -32,6 +36,8 @@ import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePanel;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
 import javax.annotation.Nullable;
+import java.util.List;
+import java.util.logging.Logger;
 
 public class ProjectExportVcfFileModalView extends ModalPopupViewWithUiHandlers<ProjectExportVcfFileModalUiHandlers>
         implements ProjectExportVcfFileModalPresenter.Display {
@@ -62,11 +68,19 @@ public class ProjectExportVcfFileModalView extends ModalPopupViewWithUiHandlers<
   @UiField
   Alert exportNVCF;
 
+  @UiField
+  FlowPanel mappingDependant;
+
+  private static final String PARTICIPANT_FILTER_NONE = "_none";
+
+  private Translations translations;
+
   @Inject
   public ProjectExportVcfFileModalView(EventBus eventBus, Binder binder, Translations translations) {
     super(eventBus);
     initWidget(binder.createAndBindUi(this));
     dialog.setTitle(translations.exportVcfModalTitle());
+    this.translations = translations;
   }
 
   @Override
@@ -84,8 +98,31 @@ public class ProjectExportVcfFileModalView extends ModalPopupViewWithUiHandlers<
   }
 
   @Override
-  public String getParticipantsFilterTable() {
-    return participantsFilter.getSelectedValue();
+  public HasText getParticipantsFilterTable() {
+    return new HasText() {
+      @Override
+      public String getText() {
+        String selectedParticipantFilter = participantsFilter.getSelectedValue();
+        return selectedParticipantFilter == null || PARTICIPANT_FILTER_NONE.equals(selectedParticipantFilter) ? null : selectedParticipantFilter;
+      }
+
+      @Override
+      public void setText(String s) {
+        if(Strings.isNullOrEmpty(s)) return;
+        int count = participantsFilter.getItemCount();
+        for(int i = 0; i < count; i++) {
+          if(participantsFilter.getValue(i).equals(s)) {
+            participantsFilter.setSelectedIndex(i);
+            break;
+          }
+        }
+      }
+    };
+  }
+
+  @Override
+  public void showMappingDependant(boolean show) {
+    mappingDependant.setVisible(show);
   }
 
   @Override
@@ -106,11 +143,20 @@ public class ProjectExportVcfFileModalView extends ModalPopupViewWithUiHandlers<
   @Override
   public void setParticipants(JsArray<TableDto> tables) {
     participantsFilter.clear();
+    participantsFilter.addItem(translations.none(), PARTICIPANT_FILTER_NONE);
+
+    List<String> groups = Lists.newArrayList();
 
     for (TableDto tableDto : JsArrays.toIterable(tables)) {
-      // place full path in case same table name exists in another datasource
-      participantsFilter.addItem(tableDto.getDatasourceName() + "." + tableDto.getName());
+      if (groups.indexOf(tableDto.getDatasourceName()) == -1) {
+        groups.add(tableDto.getDatasourceName());
+        participantsFilter.addGroup(tableDto.getDatasourceName());
+      }
+
+      participantsFilter.addItemToGroup(tableDto.getName(), tableDto.getDatasourceName() + "." + tableDto.getName());
     }
+
+    participantsFilter.update();
   }
 
   @Override
