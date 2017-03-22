@@ -454,6 +454,13 @@ public enum UriBuilders {
     }
   },
 
+  PROJECT_VCF_PERMISSIONS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "permissions", "vcf-store");
+    }
+  },
+
   PROJECT_VCF_STORE_VCFS {
     @Override
     public UriBuilder create() {

@@ -126,6 +126,9 @@ enum AclAction {
   TABLE_VALUES_EDIT = 24;
   PROJECT_ADD = 25;
   SYSTEM_ALL = 26;
+  VCF_STORE_VIEW = 27;
+  VCF_STORE_EDIT = 28;
+  VCF_STORE_ALL = 29;
 }
 
 message OpalMap {
