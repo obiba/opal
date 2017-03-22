@@ -127,6 +127,9 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   @UiField
   TabPanel tabPanel;
 
+  @UiField
+  FlowPanel tabPanelContainer;
+
   private final Translations translations;
 
   private final TranslationMessages translationMessages;
@@ -214,7 +217,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     controlSamples.setText("");
 
     noVcfServiceAlertPanel.setVisible(!hasVcfService);
-    tabPanel.setVisible(hasVcfService);
+    tabPanelContainer.setVisible(hasVcfService);
   }
 
   @Override
@@ -291,6 +294,11 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   @UiHandler("sampleRoleLink")
   public void sampleRoleLinkClick(ClickEvent event) {
     getUiHandlers().onMappingTableNavigateToVariable(sampleRoleLink.getText());
+  }
+
+  @UiHandler("refreshButton")
+  public void refreshButtonClick(ClickEvent event) {
+    getUiHandlers().onRefresh();
   }
 
   private void addTableColumns() {

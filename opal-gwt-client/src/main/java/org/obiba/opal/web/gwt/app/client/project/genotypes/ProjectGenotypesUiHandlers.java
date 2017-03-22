@@ -32,4 +32,6 @@ public interface ProjectGenotypesUiHandlers extends UiHandlers {
   void onMappingTableNavigateTo();
 
   void onMappingTableNavigateToVariable(String variable);
+
+  void onRefresh();
 }

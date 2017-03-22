@@ -257,6 +257,11 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
     }
   }
 
+  @Override
+  public void onRefresh() {
+    getVcfSummaries();
+  }
+
   private boolean vcfMatches(VCFSummaryDto dto, String filter) {
     String name = dto.getName().toLowerCase();
     for(String token : filter.toLowerCase().split(" ")) {
