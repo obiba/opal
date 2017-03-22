@@ -13,6 +13,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -92,7 +93,7 @@ public class ProjectExportVcfFileModalPresenter extends ModalPresenterWidget<Pro
       }
 
       dto.setNamesArray(names);
-      dto.setTable(getView().getParticipantsFilterTable());
+      dto.setTable(getView().getParticipantsFilterTable().getText());
       dto.setCaseControl(getView().hasCaseControls());
       dto.setDestination(fileSelectionPresenter.getSelectedFile());
 
@@ -112,6 +113,10 @@ public class ProjectExportVcfFileModalPresenter extends ModalPresenterWidget<Pro
 
   public void setParticipantTables(JsArray<TableDto> participantTables) {
     getView().setParticipants(participantTables);
+  }
+
+  public void showMappingDependantContent(boolean show) {
+    getView().showMappingDependant(show);
   }
 
   private class ModalValidationHandler extends ViewValidationHandler {
@@ -164,7 +169,9 @@ public class ProjectExportVcfFileModalPresenter extends ModalPresenterWidget<Pro
 
     void showExportNAlert(String message);
 
-    String getParticipantsFilterTable();
+    HasText getParticipantsFilterTable();
+
+    void showMappingDependant(boolean show);
 
     boolean hasCaseControls();
   }
