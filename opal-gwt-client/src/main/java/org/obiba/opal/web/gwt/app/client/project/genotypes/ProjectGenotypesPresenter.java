@@ -284,6 +284,26 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
     if (projectDto.getName() == null) return;
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(UriBuilders.PROJECT_VCF_STORE_SAMPLES.create().build(projectDto.getName())) //
+        .authorize(getView().getEditMappingAuthorizer()) //
+        .put().send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(UriBuilders.PROJECT_VCF_STORE_IMPORT.create().build(projectDto.getName())) //
+        .authorize(getView().getImportAuthorizer()) //
+        .put().send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(UriBuilders.PROJECT_VCF_STORE_EXPORT.create().build(projectDto.getName())) //
+        .authorize(getView().getExportAuthorizer()) //
+        .put().send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(UriBuilders.PROJECT_VCF_STORE_VCFS.create().build(projectDto.getName())) //
+        .authorize(getView().getRemoveVCF()) //
+        .put().send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
         .forResource(
             UriBuilders.PROJECT_VCF_PERMISSIONS.create().build(projectDto.getName())) //
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new ProjectGenotypesPresenter.PermissionsUpdate())) //
@@ -501,5 +521,13 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
     void clearMappingTable();
 
     HasAuthorization getPermissionsAuthorizer();
+
+    HasAuthorization getImportAuthorizer();
+
+    HasAuthorization getExportAuthorizer();
+
+    HasAuthorization getEditMappingAuthorizer();
+
+    HasAuthorization getRemoveVCF();
   }
 }
