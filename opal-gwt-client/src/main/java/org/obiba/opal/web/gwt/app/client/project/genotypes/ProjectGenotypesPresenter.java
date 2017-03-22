@@ -162,6 +162,7 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   public void initialize(ProjectDto dto) {
     projectDto = dto;
+
     getView().clear(dto.hasVcfStoreService());
     if (dto.hasVcfStoreService()) {
       getParticipantTables();
@@ -236,8 +237,9 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   @Override
   public void onMappingTableNavigateTo() {
     if (mappingTable != null) {
+      String[] parts = mappingTable.getTableReference().split("\\.");
       PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.PROJECT)
-        .with(ParameterTokens.TOKEN_NAME, mappingTable.getProjectName()) //
+        .with(ParameterTokens.TOKEN_NAME, parts[0]) //
         .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString()) //
         .with(ParameterTokens.TOKEN_PATH, mappingTable.getTableReference());
 
@@ -248,8 +250,9 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   @Override
   public void onMappingTableNavigateToVariable(String variable) {
     if (mappingTable != null) {
+      String[] parts = mappingTable.getTableReference().split("\\.");
       PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.PROJECT)
-        .with(ParameterTokens.TOKEN_NAME, mappingTable.getProjectName()) //
+        .with(ParameterTokens.TOKEN_NAME, parts[0]) //
         .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString()) //
         .with(ParameterTokens.TOKEN_PATH, mappingTable.getTableReference()+":"+variable);
 
@@ -282,6 +285,25 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   private void authorize() {
     if (projectDto.getName() == null) return;
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(UriBuilders.PROJECT_VCF_STORE_SAMPLES.create().build(projectDto.getName())) //
+        .authorize(getView().getEditMappingAuthorizer()) //
+        .put().send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(UriBuilders.PROJECT_VCF_STORE_IMPORT.create().build(projectDto.getName())) //
+        .authorize(getView().getImportAuthorizer()) //
+        .post().send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(UriBuilders.PROJECT_VCF_STORE_EXPORT.create().build(projectDto.getName())) //
+        .authorize(getView().getExportAuthorizer()) //
+        .post().send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(UriBuilders.PROJECT_VCF_STORE_VCFS.create().build(projectDto.getName())) //
+        .authorize(getView().getRemoveVCF()) //
+        .delete().send();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder() //
         .forResource(
@@ -501,5 +523,13 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
     void clearMappingTable();
 
     HasAuthorization getPermissionsAuthorizer();
+
+    HasAuthorization getImportAuthorizer();
+
+    HasAuthorization getExportAuthorizer();
+
+    HasAuthorization getEditMappingAuthorizer();
+
+    HasAuthorization getRemoveVCF();
   }
 }

@@ -15,6 +15,7 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style;
@@ -44,6 +45,7 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.VCFSamplesMappingDto;
 import org.obiba.opal.web.model.client.opal.VCFStoreDto;
 import org.obiba.opal.web.model.client.opal.VCFSummaryDto;
@@ -116,7 +118,10 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   Button downloadVCF;
 
   @UiField
-  IconAnchor addMapping;
+  IconAnchor exportLink;
+
+  @UiField
+  Button importVCF;
 
   @UiField
   FlowPanel noVcfServiceAlertPanel;
@@ -129,6 +134,9 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   @UiField
   FlowPanel tabPanelContainer;
+
+  @UiField
+  IconAnchor deleteLink;
 
   private final Translations translations;
 
@@ -180,14 +188,11 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   }
 
   private void showEditMapping(boolean value) {
-    editMapping.setVisible(value);
-    addMapping.setVisible(!value);
+    editMapping.setIcon(value ? IconType.EDIT : IconType.PLUS_SIGN_ALT);
   }
 
   @Override
   public void beforeRenderRows() {
-    downloadVCF.setVisible(false);
-
     checkColumn.clearSelection();
     tablePager.setPagerVisible(false);
     vcfFilesTable.showLoadingIndicator(dataProvider);
@@ -201,10 +206,6 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     tablePager.setPagerVisible(pagerVisible);
     vcfFilesTable.hideLoadingIndicator();
     filterPanel.setStyleName(pagerVisible ? "span3" : "pull-right");
-
-
-    int rows = vcfFilesTable.getRowCount();
-    downloadVCF.setVisible(rows > 0);
   }
 
   @Override
@@ -231,6 +232,26 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   @Override
   public HasAuthorization getPermissionsAuthorizer() {
     return new TabPanelAuthorizer(tabPanel, PERMISSIONS_TAB_INDEX);
+  }
+
+  @Override
+  public HasAuthorization getImportAuthorizer() {
+    return new WidgetAuthorizer(importVCF);
+  }
+
+  @Override
+  public HasAuthorization getExportAuthorizer() {
+    return new WidgetAuthorizer(downloadVCF, exportLink);
+  }
+
+  @Override
+  public HasAuthorization getEditMappingAuthorizer() {
+    return new WidgetAuthorizer(editMapping);
+  }
+
+  @Override
+  public HasAuthorization getRemoveVCF() {
+    return new WidgetAuthorizer(deleteLink);
   }
 
   @Override
@@ -266,7 +287,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     getUiHandlers().onImportVcfFiles();
   }
 
-  @UiHandler({"addMapping","editMapping"})
+  @UiHandler("editMapping")
   public void editMappingClick(ClickEvent event) {
     getUiHandlers().onEditMappingTable();
   }
@@ -467,9 +488,13 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
           return new String[] { REMOVE_ACTION, STATISTICS_ACTION };
         }
 
+        public String[] someActions() {
+          return new String[] { STATISTICS_ACTION };
+        }
+
         @Override
         public String[] getActions(VCFSummaryDto value) {
-          return allActions();
+          return deleteLink.isVisible() ? allActions() : someActions();
         }
       });
       setActionHandler(new ActionHandler<VCFSummaryDto>() {
