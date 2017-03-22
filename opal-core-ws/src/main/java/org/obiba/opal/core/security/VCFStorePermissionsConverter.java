@@ -37,9 +37,7 @@ public class VCFStorePermissionsConverter extends OpalPermissionConverter {
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/project/(.+)/vcf-store");
         return Lists.newArrayList(
-            toRest("/project/{0}/vcf-store", "GET:GET", args),
-            toRest("/project/{0}/vcf-store/vcfs", "GET:GET", args),
-            toRest("/project/{0}/vcf-store/samples", "GET:GET", args)
+            toRest("/project/{0}/vcf-store", "GET:GET/GET", args)
         );
       }
     },
@@ -48,8 +46,7 @@ public class VCFStorePermissionsConverter extends OpalPermissionConverter {
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/project/(.+)/vcf-store");
         return Lists.newArrayList(
-            toRest("/project/{0}/vcf-store", "GET:GET", args),
-            toRest("/project/{0}/vcf-store/vcfs", "GET:GET", args),
+            toRest("/project/{0}/vcf-store", "GET:GET/GET", args),
             toRest("/project/{0}/commands/_export_vcf", "POST", args));
       }
     },
@@ -58,9 +55,9 @@ public class VCFStorePermissionsConverter extends OpalPermissionConverter {
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/project/(.+)/vcf-store");
         return Lists.newArrayList(
-            toRest("/project/{0}/vcf-store", "GET:GET/*", args),
-            toRest("/project/{0}/vcf-store/vcfs", "GET/*", args),
-            toRest("/project/{0}/vcf-store/samples", "PUT:GET/*", args),
+            toRest("/project/{0}/vcf-store", "GET:GET/GET", args),
+            toRest("/project/{0}/vcf-store/vcfs", "DELETE", args),
+            toRest("/project/{0}/vcf-store/samples", "PUT,DELETE", args),
             toRest("/project/{0}/commands/_export_vcf", "POST", args),
             toRest("/project/{0}/commands/_import_vcf", "POST", args));
       }
