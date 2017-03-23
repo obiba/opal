@@ -101,30 +101,24 @@
                   </g:FlowPanel>
 
                   <o:PropertiesTable keyStyleNames="span2" ui:field="mappingProperties">
-                    <g:FlowPanel>
+                    <o:PropertyPanel>
                       <g:Label>
                         <ui:msg description="Genotypes Table label">Table</ui:msg>
                       </g:Label>
-                      <g:FlowPanel>
-                        <g:Anchor ui:field="tableLink"></g:Anchor>
-                      </g:FlowPanel>
-                    </g:FlowPanel>
-                    <g:FlowPanel>
+                      <g:Anchor ui:field="tableLink"></g:Anchor>
+                    </o:PropertyPanel>
+                    <o:PropertyPanel>
                       <g:Label>
                         <ui:msg description="Genotypes Participant ID label">Participant ID</ui:msg>
                       </g:Label>
-                      <g:FlowPanel>
-                        <g:Anchor ui:field="participantIdLink"></g:Anchor>
-                      </g:FlowPanel>
-                    </g:FlowPanel>
-                    <g:FlowPanel>
+                      <g:Anchor ui:field="participantIdLink"></g:Anchor>
+                    </o:PropertyPanel>
+                    <o:PropertyPanel>
                       <g:Label>
                         <ui:msg description="Genotypes Sample Role label">Sample Role</ui:msg>
                       </g:Label>
-                      <g:FlowPanel>
-                        <g:Anchor ui:field="sampleRoleLink"></g:Anchor>
-                      </g:FlowPanel>
-                    </g:FlowPanel>
+                      <g:Anchor ui:field="sampleRoleLink"></g:Anchor>
+                    </o:PropertyPanel>
                   </o:PropertiesTable>
                 </g:FlowPanel>
               </g:FlowPanel>
