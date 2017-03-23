@@ -309,11 +309,18 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
-              fireEvent(NotificationEvent.newBuilder().error((ClientErrorDto) JsonUtils.unsafeEval(response.getText()))
-                  .build());
-              if(withCounts) updateTables(false);
+              if(response.getStatusCode() == Response.SC_FORBIDDEN) {
+                fireEvent(NotificationEvent.newBuilder().warn("Forbidden").build());
+              } else if (!Strings.isNullOrEmpty(response.getText())) {
+                fireEvent(NotificationEvent.newBuilder().error((ClientErrorDto) JsonUtils.unsafeEval(response.getText()))
+                    .build());
+                if (withCounts) updateTables(false);
+              }
+              tables = JsArrays.create();
+              getView().renderRows(tables);
+              getView().afterRenderRows();
             }
-          }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_NOT_FOUND).send();
+          }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_NOT_FOUND, Response.SC_FORBIDDEN).send();
     }
 
     private void authorize() {

@@ -187,10 +187,10 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   @Override
   public void setVCFSamplesSummary(VCFStoreDto dto) {
-    participants.setText(dto.hasParticipantsCount() ? dto.getParticipantsCount()+"" : "");
-    participantsWithGenotype.setText(dto.hasParticipantsWithGenotypeCount() ? dto.getParticipantsWithGenotypeCount()+"" : "");
-    samples.setText(dto.hasSamplesCount() ? dto.getSamplesCount()+"" : "");
-    controlSamples.setText(dto.hasControlSamplesCount() ? dto.getControlSamplesCount()+"" : "");
+    participants.setText(dto != null && dto.hasParticipantsCount() ? dto.getParticipantsCount()+"" : "");
+    participantsWithGenotype.setText(dto != null && dto.hasParticipantsWithGenotypeCount() ? dto.getParticipantsWithGenotypeCount()+"" : "");
+    samples.setText(dto != null && dto.hasSamplesCount() ? dto.getSamplesCount()+"" : "");
+    controlSamples.setText(dto != null && dto.hasControlSamplesCount() ? dto.getControlSamplesCount()+"" : "");
   }
 
   @Override

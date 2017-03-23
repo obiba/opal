@@ -280,7 +280,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
         onFilesTabSelected(queryPathParam);
         break;
       case GENOTYPES:
-        onGenotypesTabSelected(queryPathParam);
+        onGenotypesTabSelected();
         break;
       case REPORTS:
         onReportsTabSelected();
@@ -318,7 +318,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
         : new FolderRequestEvent(FileDtos.create(path.split("/"))));
   }
 
-  private void onGenotypesTabSelected(String path) {
+  private void onGenotypesTabSelected() {
     if(projectGenotypesPresenter == null) {
       projectGenotypesPresenter = projectGenotypesPresenterProvider.get();
       setInSlot(GENOTYPES_PANE, projectGenotypesPresenter);

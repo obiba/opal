@@ -15,6 +15,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -203,7 +204,14 @@ public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissi
             selectSubject(selection);
           }
 
-        }).send();
+        }).withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if(response.getStatusCode() == Response.SC_FORBIDDEN) {
+              fireEvent(NotificationEvent.newBuilder().warn("Forbidden").build());
+            }
+          }
+        }, Response.SC_FORBIDDEN).send();
   }
 
   @Override

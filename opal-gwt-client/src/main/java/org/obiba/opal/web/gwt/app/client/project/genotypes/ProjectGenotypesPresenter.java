@@ -288,7 +288,7 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   }
 
   private void authorize() {
-    if (projectDto.getName() == null) return;
+    if (projectDto == null) return;
     ResourceAuthorizationRequestBuilderFactory.newBuilder() //
         .forResource(UriBuilders.PROJECT_VCF_STORE_SAMPLES.create().build(projectDto.getName())) //
         .authorize(getView().getEditMappingAuthorizer()) //
@@ -318,13 +318,20 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   public void getVcfStore() {
     ResourceRequestBuilderFactory.<VCFStoreDto>newBuilder()
-      .forResource(UriBuilders.PROJECT_VCF_STORE.create().build(projectDto.getName()))
-      .withCallback(new ResourceCallback<VCFStoreDto>() {
-        @Override
-        public void onResource(Response response, VCFStoreDto vcfStoreDto) {
-          getView().setVCFSamplesSummary(vcfStoreDto);
-        }
-      }).get().send();
+        .forResource(UriBuilders.PROJECT_VCF_STORE.create().build(projectDto.getName()))
+        .withCallback(new ResourceCallback<VCFStoreDto>() {
+          @Override
+          public void onResource(Response response, VCFStoreDto vcfStoreDto) {
+            getView().setVCFSamplesSummary(vcfStoreDto);
+          }
+        })
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().setVCFSamplesSummary(null);
+          }
+        }, Response.SC_FORBIDDEN)
+        .get().send();
   }
 
   private void exportVcfFiles(ExportVCFCommandOptionsDto commandOptions) {
@@ -348,36 +355,47 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   private void getVcfSummaries() {
     getView().beforeRenderRows();
     ResourceRequestBuilderFactory.<JsArray<VCFSummaryDto>>newBuilder()
-      .forResource(UriBuilders.PROJECT_VCF_STORE_VCFS.create().build(projectDto.getName()))
-      .withCallback(new ResourceCallback<JsArray<VCFSummaryDto>>() {
-        @Override
-        public void onResource(Response response, JsArray<VCFSummaryDto> summaries) {
-          vcfSummaryDtos = summaries;
-          getView().renderRows(summaries);
-          getView().afterRenderRows();
-        }
-      })
-      .get()
-      .send();
+        .forResource(UriBuilders.PROJECT_VCF_STORE_VCFS.create().build(projectDto.getName()))
+        .withCallback(new ResourceCallback<JsArray<VCFSummaryDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<VCFSummaryDto> summaries) {
+            vcfSummaryDtos = summaries;
+            getView().renderRows(summaries);
+            getView().afterRenderRows();
+          }
+        })
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if(response.getStatusCode() == Response.SC_FORBIDDEN) {
+              fireEvent(NotificationEvent.newBuilder().warn("Forbidden").build());
+            }
+            vcfSummaryDtos = JsArrays.create();
+            getView().renderRows(vcfSummaryDtos);
+            getView().afterRenderRows();
+          }
+        }, Response.SC_FORBIDDEN)
+        .get()
+        .send();
   }
 
   private void getMappingTable() {
     ResourceRequestBuilderFactory.<VCFSamplesMappingDto>newBuilder()
-      .forResource(UriBuilders.PROJECT_VCF_STORE_SAMPLES.create().build(projectDto.getName()))
-      .withCallback(new ResourceCallback<VCFSamplesMappingDto>() {
-        @Override
-        public void onResource(Response response, VCFSamplesMappingDto vcfSamplesMappingDto) {
-          mappingTable = vcfSamplesMappingDto;
-          getView().setVCFSamplesMapping(vcfSamplesMappingDto);
-        }
-      })
-      .withCallback(SC_NOT_FOUND, new ResponseCodeCallback() {
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          mappingTable = null;
-        }
-      })
-      .get().send();
+        .forResource(UriBuilders.PROJECT_VCF_STORE_SAMPLES.create().build(projectDto.getName()))
+        .withCallback(new ResourceCallback<VCFSamplesMappingDto>() {
+          @Override
+          public void onResource(Response response, VCFSamplesMappingDto vcfSamplesMappingDto) {
+            mappingTable = vcfSamplesMappingDto;
+            getView().setVCFSamplesMapping(vcfSamplesMappingDto);
+          }
+        })
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            mappingTable = null;
+          }
+        }, Response.SC_FORBIDDEN, Response.SC_NOT_FOUND)
+        .get().send();
   }
 
   private void getParticipantTables() {

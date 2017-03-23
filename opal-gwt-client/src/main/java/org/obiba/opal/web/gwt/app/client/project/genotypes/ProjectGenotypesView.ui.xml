@@ -22,7 +22,7 @@
     <g:FlowPanel addStyleNames="clearfix"/>
 
     <g:FlowPanel ui:field="noVcfServiceAlertPanel">
-      <b:Alert>
+      <b:Alert close="false">
         <ui:msg description="No VCF Store Service configured message">No VCF store configured for this project. Please set it in the project's administration page.</ui:msg>
       </b:Alert>
     </g:FlowPanel>
