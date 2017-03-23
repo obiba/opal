@@ -13,6 +13,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
@@ -115,11 +116,15 @@ public class ProjectGenotypeEditMappingTableModalPresenter extends ModalPresente
 
         private Map<String, VariableDto> suggestParticipantSampleVariables(JsArray<VariableDto> variables) {
           Map<String, VariableDto> suggestions = Maps.newHashMap();
+          RegExp participantPattern = RegExp.compile("participant", "i");
+          RegExp rolePattern = RegExp.compile("role", "i");
 
           for (VariableDto variable : JsArrays.toIterable(variables)) {
             JsArray<CategoryDto> categories = variable.getCategoriesArray();
+            String variableName = variable.getName();
 
-            if (variable.hasReferencedEntityType() && "Participant".equals(variable.getReferencedEntityType())) {
+            if (variable.hasReferencedEntityType() && "Participant".equals(variable.getReferencedEntityType())
+                || participantPattern.exec(variableName) != null) {
               // found candidate for Participant ID variable
               suggestions.put(PARTICIPANT_ID_VARIABE_KEY, variable);
             } else if (categories != null && categories.length() > 0) {
@@ -137,6 +142,13 @@ public class ProjectGenotypeEditMappingTableModalPresenter extends ModalPresente
                   break;
                 }
               }
+
+              if (!suggestions.containsKey(SAMPLE_ROLE_VARIABE_KEY) && rolePattern.exec(variableName) != null) {
+                suggestions.put(SAMPLE_ROLE_VARIABE_KEY, variable);
+              }
+
+            } else if (rolePattern.exec(variableName) != null) {
+              suggestions.put(SAMPLE_ROLE_VARIABE_KEY, variable);
             }
 
             if (suggestions.size() == 2) {
