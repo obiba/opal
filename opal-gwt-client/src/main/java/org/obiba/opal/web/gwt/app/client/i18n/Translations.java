@@ -617,7 +617,8 @@ public interface Translations extends Constants {
       "IllegalArgument", "{0}", //
       "Forbidden", "Operation not allowed.", //
       "FileAlreadyExists", "File '{0}' already exists.", //
-      "FolderAlreadyExists", "Folder '{0}' already exists." //
+      "FolderAlreadyExists", "Folder '{0}' already exists.", //
+      "Forbidden", "You are not authorized to access to the content of this page."
   })
   Map<String, String> userMessageMap();
 

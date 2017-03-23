@@ -17,6 +17,7 @@ import org.obiba.opal.spi.ServicePlugin;
 import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.model.Plugins;
 import org.obiba.opal.web.plugins.Dtos;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -38,6 +39,7 @@ public class PluginsResource {
   private OpalRuntime opalRuntime;
 
   @GET
+  @NoAuthorization
   public List<Plugins.PluginDto> get(@QueryParam("type") String type) {
     return opalRuntime.getPlugins().stream()
         .map(Dtos::asDto)
