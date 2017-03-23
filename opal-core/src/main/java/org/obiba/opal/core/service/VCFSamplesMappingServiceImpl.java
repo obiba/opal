@@ -1,7 +1,5 @@
 package org.obiba.opal.core.service;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
@@ -70,27 +68,14 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService {
   }
 
   @Override
-  public List<String> getFilteredSampleIds(@NotNull String projectName, String filteringTable, boolean withControl) {
-    List<String> participantIds = Strings.isNullOrEmpty(filteringTable) ? 
-        Lists.newArrayList() :
-        MagmaEngineTableResolver.valueOf(filteringTable).resolveTable()
-            .getVariableEntities().stream().map(VariableEntity::getIdentifier).collect(Collectors.toList());
+  public List<String> getFilteredSampleIds(@NotNull String projectName, @NotNull String filteringTable, boolean withControl) {
+    ValueTable filteringValueTable = MagmaEngineTableResolver.valueOf(filteringTable).resolveTable();
+    List<String> participantIds = filteringValueTable.getVariableEntities().stream().map(VariableEntity::getIdentifier).collect(Collectors.toList());
 
     Map<String, ParticipantRolePair> sampleParticipantMap = getSampleParticipantMap(projectName);
     return sampleParticipantMap.entrySet()
         .stream()
-        .filter(e -> (e.getValue().getKey() == null && VCFSampleRole.isControl(e.getValue().getValue()) && withControl) ||
-            participantIds.contains(e.getValue().getKey())
-        )
-        .map(Map.Entry::getKey).collect(Collectors.toList());
-  }
-
-  @Override
-  public List<String> getControls(@NotNull String projectName) {
-    Map<String, ParticipantRolePair> sampleParticipantMap = getSampleParticipantMap(projectName);
-    return sampleParticipantMap.entrySet()
-        .stream()
-        .filter(e -> VCFSampleRole.isControl(e.getValue().getValue()))
+        .filter(e -> (e.getValue().getKey() == null && VCFSampleRole.isControl(e.getValue().getValue()) && withControl) || participantIds.contains(e.getValue().getKey()))
         .map(Map.Entry::getKey).collect(Collectors.toList());
   }
 

@@ -122,9 +122,7 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
 
     List<String> filterSampleIds = options.hasTable() ?
         vcfSamplesMappingService.getFilteredSampleIds(options.getProject(), options.getTable(), options.isCaseControl()) :
-        !options.hasTable() && !options.isCaseControl() ?
-            vcfSamplesMappingService.getControls(options.getProject()) :
-            Lists.newArrayList();
+        Lists.newArrayList();
 
     int count = 1;
     for (String vcfName : options.getNames()) {
@@ -133,10 +131,8 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
       String vcfFileName = vcfName + "." + summary.getFormat().name().toLowerCase() + ".gz";
       getShell().printf(String.format("Exporting VCF/BCF file: %s", vcfFileName));
       File vcfFile = new File(destinationFolder, vcfFileName);
-      if (!options.hasTable() && filterSampleIds.isEmpty())
+      if (filterSampleIds.isEmpty())
         store.readVCF(vcfName, new FileOutputStream(vcfFile));
-      else if (!options.hasTable() && !options.isCaseControl())
-        store.readVCF(vcfName, new FileOutputStream(vcfFile), filterSampleIds, false);
       else
         store.readVCF(vcfName, new FileOutputStream(vcfFile), filterSampleIds);
       count++;

@@ -106,17 +106,6 @@ public interface VCFStore {
    */
   void readVCF(String name, OutputStream out, Collection<String> samples) throws NoSuchElementException, IOException;
 
-  /**
-   * Read the VCF stored with the given name, with a subset applied to the provided samples. The returned stream is a compressed VCF file.
-   *
-   * @param name
-   * @param out The stream to write to.
-   * @param samples The sample IDs.
-   * @param includeSamples Whether to include or exclude the sample IDs.
-   * @throws NoSuchElementException
-   * @throws IOException
-   */
-  void readVCF(String name, OutputStream out, Collection<String> samples, boolean includeSamples) throws NoSuchElementException, IOException;
 
   /**
    * Read the VCF stored with the given name, with a subset applied to the provided samples. The returned stream is a compressed VCF file.
@@ -128,19 +117,6 @@ public interface VCFStore {
    * @return
    */
   void readVCF(String name, Format format, OutputStream out, Collection<String> samples) throws NoSuchElementException, IOException;
-
-  /**
-   * Read the VCF stored with the given name, with a subset applied to the provided samples. The returned stream is a compressed VCF file.
-   *
-   * @param vcfName
-   * @param format
-   * @param out The stream to write to.
-   * @param samples The sample IDs.
-   * @param includeSamples Whether to include or exclude the sample IDs.
-   * @throws NoSuchElementException
-   * @throws IOException
-   */
-  void readVCF(String vcfName, Format format, OutputStream out, Collection<String> samples, boolean includeSamples) throws NoSuchElementException, IOException;
 
 
   /**
