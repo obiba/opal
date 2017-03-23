@@ -318,15 +318,20 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   public void getVcfStore() {
     ResourceRequestBuilderFactory.<VCFStoreDto>newBuilder()
-      .forResource(UriBuilders.PROJECT_VCF_STORE.create().build(projectDto.getName()))
-      .withCallback(new ResourceCallback<VCFStoreDto>() {
-        @Override
-        public void onResource(Response response, VCFStoreDto vcfStoreDto) {
-          if (response.getStatusCode() == Response.SC_OK) {
+        .forResource(UriBuilders.PROJECT_VCF_STORE.create().build(projectDto.getName()))
+        .withCallback(new ResourceCallback<VCFStoreDto>() {
+          @Override
+          public void onResource(Response response, VCFStoreDto vcfStoreDto) {
             getView().setVCFSamplesSummary(vcfStoreDto);
           }
-        }
-      }).get().send();
+        })
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().setVCFSamplesSummary(null);
+          }
+        }, Response.SC_FORBIDDEN)
+        .get().send();
   }
 
   private void exportVcfFiles(ExportVCFCommandOptionsDto commandOptions) {
