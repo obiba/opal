@@ -62,8 +62,6 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   private static final String FILE_PARAM = "file";
 
-  private static final String SAMPLE_ENTITY_TYPE = "Sample";
-
   private static final String PARTICIPANT_ENTITY_TYPE = "Participant";
 
   private static Logger logger = Logger.getLogger("ProjectGenotypesPresenter");
@@ -81,8 +79,6 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   private final ModalProvider<ProjectGenotypeEditMappingTableModalPresenter> projectGenotypeEditMappingTableModalPresenterModalProvider;
 
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
-
-  private JsArray<TableDto> mappingTables = JsArrays.create();
 
   private JsArray<TableDto> participantTables = JsArrays.create();
 
@@ -191,8 +187,17 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   @Override
   public void onEditMappingTable() {
     ProjectGenotypeEditMappingTableModalPresenter presenter = projectGenotypeEditMappingTableModalPresenterModalProvider.get();
-    presenter.setMappingTables(mappingTables);
     presenter.setVCFSamplesMapping(mappingTable, projectDto);
+  }
+
+  @Override
+  public void onAddMappingTable() {
+    onEditMappingTable();
+  }
+
+  @Override
+  public void onDeleteMappingTable() {
+    fireEvent(new VcfMappingDeleteRequestEvent(projectDto.getName()));
   }
 
   @Override
@@ -279,7 +284,6 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   public void refresh() {
     getVcfStore();
     getMappingTable();
-    getMappingTables();
     getVcfSummaries();
   }
 
@@ -376,21 +380,6 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
       .get().send();
   }
 
-  private void getMappingTables() {
-    Map<String, String> params = Maps.newHashMap();
-    params.put(ENTITY_TYPE_PARAM, SAMPLE_ENTITY_TYPE);
-
-    ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder()
-        .forResource(UriBuilders.DATASOURCES_TABLES.create().query(params).build())
-        .withCallback(new ResourceCallback<JsArray<TableDto>>() {
-          @Override
-          public void onResource(Response response, JsArray<TableDto> resource) {
-            mappingTables = resource;
-            logger.info(mappingTables.length() + " mapping tables");
-          }
-        }).get().send();
-  }
-
   private void getParticipantTables() {
     Map<String, String> params = Maps.newHashMap();
     params.put(ENTITY_TYPE_PARAM, PARTICIPANT_ENTITY_TYPE);
@@ -425,14 +414,13 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   private void removeVCFMapping(String projectName) {
     ResourceRequestBuilderFactory
         .newBuilder()
-        .forResource(UriBuilders.PROJECT_VCF_STORE_SAMPLES.create().build(projectDto.getName()))
+        .forResource(UriBuilders.PROJECT_VCF_STORE_SAMPLES.create().build(projectName))
         .delete()
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
             getView().clearMappingTable();
             mappingTable = null;
-            mappingTables = JsArrays.create();
             refresh();
           }
         }, SC_NO_CONTENT)
