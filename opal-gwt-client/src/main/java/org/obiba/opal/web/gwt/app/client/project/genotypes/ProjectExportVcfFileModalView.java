@@ -122,6 +122,7 @@ public class ProjectExportVcfFileModalView extends ModalPopupViewWithUiHandlers<
 
   @Override
   public void showMappingDependant(boolean show) {
+    includeCaseControls.setValue(show);
     mappingDependant.setVisible(show);
   }
 
