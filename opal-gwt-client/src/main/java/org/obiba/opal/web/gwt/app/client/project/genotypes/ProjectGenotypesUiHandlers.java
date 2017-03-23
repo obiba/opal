@@ -23,6 +23,10 @@ public interface ProjectGenotypesUiHandlers extends UiHandlers {
 
   void onEditMappingTable();
 
+  void onAddMappingTable();
+
+  void onDeleteMappingTable();
+
   void onRemoveVcfFile(Collection<VCFSummaryDto> vcfSummaryDto);
 
   void onDownloadStatistics(VCFSummaryDto vcfSummaryDto);

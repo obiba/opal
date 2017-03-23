@@ -167,19 +167,22 @@ public class ProjectGenotypeEditMappingTableModalView extends ModalPopupViewWith
   @Override
   public void setAvailableMappingTables(JsArray<TableDto> availableMappingTables) {
     mappingTable.clear();
-    mappingTable.addItem(translations.none(), "");
-
     List<String> groups = Lists.newArrayList();
-
     for (TableDto tableDto : JsArrays.toIterable(availableMappingTables)) {
       if (groups.indexOf(tableDto.getDatasourceName()) == -1) {
         groups.add(tableDto.getDatasourceName());
         mappingTable.addGroup(tableDto.getDatasourceName());
       }
-
       mappingTable.addItemToGroup(tableDto.getName(), tableDto.getDatasourceName() + "." + tableDto.getName());
     }
-
+    if (availableMappingTables.length() > 0) {
+      if (initialMappingTable == null) {
+        mappingTable.setItemSelected(0, true);
+      } else {
+        mappingTable.setSelectedValue(initialMappingTable.getTableReference());
+      }
+      mappingTableChange(null);
+    }
     mappingTable.update();
   }
 
@@ -187,7 +190,8 @@ public class ProjectGenotypeEditMappingTableModalView extends ModalPopupViewWith
   public void setVcfSamplesMappingDto(VCFSamplesMappingDto dto) {
     initialMappingTable = dto;
     if (dto != null) {
-      getMappingTable().setText(dto.getTableReference());
+      mappingTable.setSelectedValue(dto.getTableReference());
+      //getMappingTable().setText(dto.getTableReference());
       participantIds.setSelectedValue(dto.getParticipantIdVariable());
       sampleRoleIds.setSelectedValue(dto.getSampleRoleVariable());
     }

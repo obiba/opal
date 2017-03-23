@@ -37,6 +37,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
+import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
@@ -97,7 +98,16 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   TextBoxClearable filter;
 
   @UiField
+  Button addMapping;
+
+  @UiField
   IconAnchor editMapping;
+
+  @UiField
+  IconAnchor deleteMapping;
+
+  @UiField
+  PropertiesTable mappingProperties;
 
   @UiField
   Alert selectItemTipsAlert;
@@ -148,6 +158,10 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   private ColumnSortEvent.ListHandler<VCFSummaryDto> typeSortHandler;
 
+  private boolean editableMapping;
+
+  private VCFSamplesMappingDto vcfSamplesMapping;
+
   interface Binder extends UiBinder<Widget, ProjectGenotypesView> {
   }
 
@@ -181,14 +195,24 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   @Override
   public void setVCFSamplesMapping(VCFSamplesMappingDto vcfSamplesMapping) {
-    showEditMapping(true);
-    tableLink.setText(vcfSamplesMapping.getTableReference());
-    participantIdLink.setText(vcfSamplesMapping.getParticipantIdVariable());
-    sampleRoleLink.setText(vcfSamplesMapping.getSampleRoleVariable());
+    this.vcfSamplesMapping = vcfSamplesMapping;
+    boolean hasMapping = vcfSamplesMapping != null;
+    showEditMapping(hasMapping);
+    tableLink.setText(hasMapping ? vcfSamplesMapping.getTableReference() : "");
+    participantIdLink.setText(hasMapping ? vcfSamplesMapping.getParticipantIdVariable() : "");
+    sampleRoleLink.setText(hasMapping ? vcfSamplesMapping.getSampleRoleVariable() : "");
   }
 
   private void showEditMapping(boolean value) {
-    editMapping.setIcon(value ? IconType.EDIT : IconType.PLUS_SIGN_ALT);
+    editMapping.setVisible(editableMapping && value);
+    deleteMapping.setVisible(editableMapping && value);
+    mappingProperties.setVisible(value);
+    addMapping.setVisible(editableMapping && !value);
+  }
+
+  private void refreshEditMapping() {
+    boolean hasMapping = vcfSamplesMapping != null;
+    showEditMapping(hasMapping);
   }
 
   @Override
@@ -223,10 +247,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   @Override
   public void clearMappingTable() {
-    showEditMapping(false);
-    tableLink.setText("");
-    participantIdLink.setText("");
-    sampleRoleLink.setText("");
+    setVCFSamplesMapping(null);
   }
 
   @Override
@@ -246,7 +267,24 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   @Override
   public HasAuthorization getEditMappingAuthorizer() {
-    return new WidgetAuthorizer(editMapping);
+    return new HasAuthorization() {
+      @Override
+      public void beforeAuthorization() {
+
+      }
+
+      @Override
+      public void authorized() {
+        editableMapping = true;
+        refreshEditMapping();
+      }
+
+      @Override
+      public void unauthorized() {
+        editableMapping = false;
+        refreshEditMapping();
+      }
+    };
   }
 
   @Override
@@ -287,9 +325,19 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     getUiHandlers().onImportVcfFiles();
   }
 
+  @UiHandler("addMapping")
+  public void addMappingClick(ClickEvent event) {
+    getUiHandlers().onAddMappingTable();
+  }
+
   @UiHandler("editMapping")
   public void editMappingClick(ClickEvent event) {
     getUiHandlers().onEditMappingTable();
+  }
+
+  @UiHandler("deleteMapping")
+  public void deleteMappingClick(ClickEvent event) {
+    getUiHandlers().onDeleteMappingTable();
   }
 
   @UiHandler("deleteLink")

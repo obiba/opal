@@ -54,9 +54,15 @@ public class ProjectGenotypeEditMappingTableModalPresenter extends ModalPresente
 
   private static final String SAMPLE_CATEGORY = "sample";
 
+  private static final String ENTITY_TYPE_PARAM = "entityType";
+
+  private static final String SAMPLE_ENTITY_TYPE = "Sample";
+
   private final ValidationHandler validationHandler;
 
   private String projectName;
+
+  private JsArray<TableDto> mappingTables = JsArrays.create();
 
   @Inject
   public ProjectGenotypeEditMappingTableModalPresenter(Display display, EventBus eventBus) {
@@ -67,10 +73,23 @@ public class ProjectGenotypeEditMappingTableModalPresenter extends ModalPresente
 
   @Override
   protected void onBind() {
+    setMappingTables();
   }
 
-  public void setMappingTables(JsArray<TableDto> availableMappingTables) {
-    getView().setAvailableMappingTables(availableMappingTables);
+  private void setMappingTables() {
+    Map<String, String> params = Maps.newHashMap();
+    params.put(ENTITY_TYPE_PARAM, SAMPLE_ENTITY_TYPE);
+
+    ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder()
+        .forResource(UriBuilders.DATASOURCES_TABLES.create().query(params).build())
+        .withCallback(new ResourceCallback<JsArray<TableDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<TableDto> resource) {
+            mappingTables = resource;
+            getView().setAvailableMappingTables(mappingTables);
+            logger.info(mappingTables.length() + " mapping tables");
+          }
+        }).get().send();
   }
 
   public void setVCFSamplesMapping(VCFSamplesMappingDto currentGenotypesMapping, ProjectDto projectDto) {
@@ -82,20 +101,15 @@ public class ProjectGenotypeEditMappingTableModalPresenter extends ModalPresente
   @Override
   public void onSaveEdit() {
     getView().clearErrors();
-    String mappingTable = getView().getMappingTable().getText();
-
-    if(Strings.isNullOrEmpty(mappingTable)) {
-      if (getView().getInitialMappingTable() != null) fireEvent(new VcfMappingDeleteRequestEvent(projectName));
-      getView().hideDialog();
-    } else if (validationHandler.validate()) {
+    if (validationHandler.validate()) {
       VCFSamplesMappingDto dto = VCFSamplesMappingDto.create();
       dto.setParticipantIdVariable(getView().getParticipantIdVariable().getText());
       dto.setSampleRoleVariable(getView().getSampleRoleVariable().getText());
       dto.setTableReference(getView().getMappingTable().getText());
       dto.setProjectName(projectName);
       fireEvent(new VcfMappingEditRequestEvent(dto));
-      getView().hideDialog();
     }
+    getView().hideDialog();
   }
 
   @Override
