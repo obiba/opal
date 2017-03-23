@@ -13,6 +13,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
@@ -22,7 +23,6 @@ import com.gwtplatform.mvp.client.PopupView;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfMappingDeleteRequestEvent;
 import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfMappingEditRequestEvent;
 import org.obiba.opal.web.gwt.app.client.validator.*;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -122,47 +122,67 @@ public class ProjectGenotypeEditMappingTableModalPresenter extends ModalPresente
       .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
         @Override
         public void onResource(Response response, JsArray<VariableDto> variables) {
-          Map<String, VariableDto> suggestions = suggestParticipantSampleVariables(variables);
+          MappingTableVariablesSuggester suggester = new MappingTableVariablesSuggester();
+          Map<String, VariableDto> suggestions = suggester.suggest(variables);
           getView().setVariables(variables, suggestions.get(PARTICIPANT_ID_VARIABE_KEY),
               suggestions.get(SAMPLE_ROLE_VARIABE_KEY));
         }
 
-        private Map<String, VariableDto> suggestParticipantSampleVariables(JsArray<VariableDto> variables) {
-          Map<String, VariableDto> suggestions = Maps.newHashMap();
+      }).get().send();
+  }
 
-          for (VariableDto variable : JsArrays.toIterable(variables)) {
-            JsArray<CategoryDto> categories = variable.getCategoriesArray();
+  private static class MappingTableVariablesSuggester {
 
-            if (variable.hasReferencedEntityType() && "Participant".equals(variable.getReferencedEntityType())) {
-              // found candidate for Participant ID variable
-              suggestions.put(PARTICIPANT_ID_VARIABE_KEY, variable);
-            } else if (categories != null && categories.length() > 0) {
-              // found candidate for Sample Role variable
-              boolean foundControl = false;
-              boolean foundSample = false;
+    public Map<String, VariableDto> suggest(JsArray<VariableDto> variables) {
+      Map<String, VariableDto> suggestions = Maps.newHashMap();
 
-              for(CategoryDto category : JsArrays.toIterable(categories)) {
-                String categoryName = category.getName();
-                if (CONTROL_CATEGORY.equalsIgnoreCase(categoryName)) foundControl = true;
-                if (SAMPLE_CATEGORY.equalsIgnoreCase(categoryName)) foundSample = true;
-
-                if (foundControl && foundSample) {
-                  suggestions.put(SAMPLE_ROLE_VARIABE_KEY, variable);
-                  break;
-                }
-              }
-            }
-
-            if (suggestions.size() == 2) {
-              return suggestions;
-            }
-          }
-
-          // The mapping variables do not have the apt categories nor the reference entity type
-          return suggestions;
+      for (VariableDto variable : JsArrays.toIterable(variables)) {
+        if (!suggestions.containsKey(PARTICIPANT_ID_VARIABE_KEY)) {
+          suggestParticipant(variable, suggestions);
+        } else if (!suggestions.containsKey(SAMPLE_ROLE_VARIABE_KEY)) {
+          suggestSample(variable, suggestions);
         }
 
-      }).get().send();
+        if (suggestions.containsKey(PARTICIPANT_ID_VARIABE_KEY) && suggestions.containsKey(SAMPLE_ROLE_VARIABE_KEY)) {
+          break;
+        }
+      }
+
+      return suggestions;
+    }
+
+    private void suggestParticipant(VariableDto variable, Map<String, VariableDto> suggestions) {
+      if(variable.hasReferencedEntityType() && "Participant".equals(variable.getReferencedEntityType()) ||
+          RegExp.compile("participant", "i").exec(variable.getName()) != null) {
+        suggestions.put(PARTICIPANT_ID_VARIABE_KEY, variable);
+      }
+    }
+
+    private void suggestSample(VariableDto variable, Map<String, VariableDto> suggestions) {
+      JsArray<CategoryDto> categories = variable.getCategoriesArray();
+
+      if (categories != null && categories.length() > 0) {
+        // found candidate for Sample Role variable
+        boolean foundControl = false;
+        boolean foundSample = false;
+
+        for(CategoryDto category : JsArrays.toIterable(categories)) {
+          String categoryName = category.getName();
+          if(CONTROL_CATEGORY.equalsIgnoreCase(categoryName)) foundControl = true;
+          if(SAMPLE_CATEGORY.equalsIgnoreCase(categoryName)) foundSample = true;
+
+          if(foundControl && foundSample) {
+            suggestions.put(SAMPLE_ROLE_VARIABE_KEY, variable);
+            break;
+          }
+        }
+
+        if(!suggestions.containsKey(SAMPLE_ROLE_VARIABE_KEY) &&
+            RegExp.compile("role", "i").exec(variable.getName()) != null) {
+          suggestions.put(SAMPLE_ROLE_VARIABE_KEY, variable);
+        }
+      }
+    }
   }
 
   private class ModalValidationHandler extends ViewValidationHandler {

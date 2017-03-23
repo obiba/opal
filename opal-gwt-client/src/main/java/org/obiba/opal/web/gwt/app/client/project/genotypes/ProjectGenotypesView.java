@@ -526,7 +526,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   private class GenotypesActionsColumn extends ActionsColumn<VCFSummaryDto> {
 
-    public static final String STATISTICS_ACTION = "Statistics";
+    private static final String STATISTICS_ACTION = "Statistics";
 
     private GenotypesActionsColumn() {
       super(new ActionsProvider<VCFSummaryDto>() {
@@ -536,7 +536,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
           return new String[] { REMOVE_ACTION, STATISTICS_ACTION };
         }
 
-        public String[] someActions() {
+        private String[] someActions() {
           return new String[] { STATISTICS_ACTION };
         }
 
