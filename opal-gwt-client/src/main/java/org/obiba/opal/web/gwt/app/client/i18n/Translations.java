@@ -1251,7 +1251,7 @@ public interface Translations extends Constants {
   @DefaultStringMapValue({ "HOME", "Home", //
       "TABLES", "Tables", //
       "FILES", "Files", //
-      "GENOTYPES", "Genotypes Data", //
+      "GENOTYPES", "Genotypes", //
       "VISUALISATION", "Data visualization", //
       "REPORTS", "Reports", //
       "TASKS", "Tasks", //

@@ -54,12 +54,6 @@
               </g:Label>
               <g:Label ui:field="tags"/>
             </o:PropertyPanel>
-            <o:PropertyPanel>
-              <g:Label>
-                <ui:msg description="Name label">VCF Store Service</ui:msg>
-              </g:Label>
-              <g:Label ui:field="vcfServiceName"/>
-            </o:PropertyPanel>
           </o:PropertiesTable>
         </b:Column>
       </b:Row>
@@ -86,6 +80,30 @@
                   <ui:msg description="Type label">Type</ui:msg>
                 </g:Label>
                 <g:Label ui:field="dbType"/>
+              </o:PropertyPanel>
+            </o:PropertiesTable>
+          </b:Column>
+        </b:Row>
+      </g:FlowPanel>
+
+      <b:Alert type="WARNING" close="false" animation="true" ui:field="noVCFServicePanel">
+        <ui:msg description="No Project VCF Store label">No VCF store is defined for this project. No genotypes can be
+          imported.
+        </ui:msg>
+      </b:Alert>
+      <g:FlowPanel ui:field="vcfServicePanel">
+        <b:Paragraph ui:field="vcfServiceText">
+          <ui:msg description="VCF Store Service title">Project genotypes are stored using the service:
+          </ui:msg>
+        </b:Paragraph>
+        <b:Row>
+          <b:Column size="6">
+            <o:PropertiesTable keyStyleNames="span2">
+              <o:PropertyPanel>
+                <g:Label>
+                  <ui:msg description="Name label">VCF Store</ui:msg>
+                </g:Label>
+                <g:Label ui:field="vcfServiceName"/>
               </o:PropertyPanel>
             </o:PropertiesTable>
           </b:Column>

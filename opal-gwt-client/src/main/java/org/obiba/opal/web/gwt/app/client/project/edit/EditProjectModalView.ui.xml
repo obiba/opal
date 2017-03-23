@@ -49,11 +49,11 @@
 
     <b:ControlGroup ui:field="vcfStoreServiceGroup">
       <b:ControlLabel for="vcfStoreService">
-        <ui:msg description="Mapping Table label">VCF Store Service</ui:msg>
+        <ui:msg description="VCF Store Service label">VCF Store</ui:msg>
       </b:ControlLabel>
       <o:Chooser ui:field="vcfStoreService" name="vcfStoreService"/>
       <b:HelpBlock>
-        <ui:msg description="Mapping Table help">A project's store service name.</ui:msg>
+        <ui:msg description="Mapping Table help">Optional VCF store service name to store genotypes.</ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 

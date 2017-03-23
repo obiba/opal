@@ -23,7 +23,7 @@
 
     <g:FlowPanel ui:field="noVcfServiceAlertPanel">
       <b:Alert>
-        <ui:msg description="No VCF Store Service configured message">No VCF Store Service configured for this project. Configure it, if present, in the project's administration page.</ui:msg>
+        <ui:msg description="No VCF Store Service configured message">No VCF store configured for this project. Please set it in the project's administration page.</ui:msg>
       </b:Alert>
     </g:FlowPanel>
 

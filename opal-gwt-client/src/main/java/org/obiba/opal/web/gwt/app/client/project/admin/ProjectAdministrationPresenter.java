@@ -98,6 +98,7 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     authorize();
 
     this.hasServicePlugins = hasServicePlugins;
+    showVcfServiceNamePanel(hasServicePlugins);
   }
 
   private void authorize() {
@@ -125,7 +126,7 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
         .delete().send();
   }
 
-  public void showVcfServiceNamePanel(boolean show) {
+  private void showVcfServiceNamePanel(boolean show) {
     getView().toggleVcfServicePluginPanel(show);
   }
 

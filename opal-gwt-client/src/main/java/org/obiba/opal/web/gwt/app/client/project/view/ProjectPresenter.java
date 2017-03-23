@@ -357,7 +357,6 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       setInSlot(ADMIN_PANE, projectAdministrationPresenter);
     }
     projectAdministrationPresenter.setProject(project, hasServicePlugins);
-    projectAdministrationPresenter.showVcfServiceNamePanel(hasServicePlugins);
   }
 
   @Override

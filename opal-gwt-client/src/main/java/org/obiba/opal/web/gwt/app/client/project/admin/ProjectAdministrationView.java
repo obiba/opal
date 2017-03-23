@@ -80,6 +80,15 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   Panel deletePanel;
 
   @UiField
+  Panel noVCFServicePanel;
+
+  @UiField
+  Panel vcfServicePanel;
+
+  @UiField
+  Paragraph vcfServiceText;
+
+  @UiField
   Label vcfServiceName;
 
   private ProjectDto project;
@@ -128,7 +137,9 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
 
   @Override
   public void toggleVcfServicePluginPanel(boolean show) {
-    vcfServiceName.setText(show && project.hasVcfStoreService() ? project.getVcfStoreService() : "");
+    noVCFServicePanel.setVisible(show && !project.hasVcfStoreService());
+    vcfServicePanel.setVisible(show && project.hasVcfStoreService());
+    vcfServiceName.setText(project.hasVcfStoreService() ? project.getVcfStoreService() : "");
   }
 
   @Override

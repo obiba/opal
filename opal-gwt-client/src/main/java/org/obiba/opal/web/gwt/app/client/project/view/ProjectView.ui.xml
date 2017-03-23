@@ -36,7 +36,7 @@
         <g:SimplePanel ui:field="filesPanel"/>
       </b:Tab>
       <b:Tab icon="BEAKER">
-        <b:Heading size="3" addStyleNames="no-top-margin span5 no-left-margin">Genotypes Data</b:Heading>
+        <b:Heading size="3" addStyleNames="no-top-margin span5 no-left-margin">Genotypes</b:Heading>
         <g:SimplePanel ui:field="genotypesPanel"/>
       </b:Tab>
       <b:Tab icon="FILE_ALT">
