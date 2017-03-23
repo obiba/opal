@@ -10,6 +10,7 @@
 package org.obiba.opal.web.project;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -111,10 +112,7 @@ public class ProjectResource {
       }
       if (project.hasVCFStoreService() && opalRuntime.hasServicePlugin(project.getVCFStoreService())) {
         ServicePlugin servicePlugin = opalRuntime.getServicePlugin(project.getVCFStoreService());
-        if (opalRuntime.isVCFStorePluginService(servicePlugin)) {
-          ((VCFStoreService) servicePlugin).deleteStore(project.getName());
-        }
-
+        ((VCFStoreService) servicePlugin).deleteStore(project.getName());
       }
     } catch(Exception e) {
       // silently ignore project not found and other errors
@@ -133,13 +131,14 @@ public class ProjectResource {
   @Path("/vcf-store")
   public VCFStoreResource getVCFStoreResource() {
     Project project = getProject();
-    if (!opalRuntime.hasServicePlugins()) throw new NoSuchServiceException(VCFStoreService.SERVICE_TYPE);
+    if (!opalRuntime.hasServicePlugins(VCFStoreService.class)) throw new NoSuchServiceException(VCFStoreService.SERVICE_TYPE);
     if (!project.hasVCFStoreService()) {
-      // for now get the first one. Some day, the service type will be a project admin choice
-      ServicePlugin service = opalRuntime.getServicePlugins()
-          .stream().filter(s -> opalRuntime.isVCFStorePluginService(s)).iterator().next();
-      project.setVCFStoreService(service.getName());
-      projectService.save(project);
+      if (opalRuntime.getServicePlugins(VCFStoreService.class).size() == 1) {
+        // set the unique VCF store service automatically
+        ServicePlugin service = opalRuntime.getServicePlugins(VCFStoreService.class).stream().iterator().next();
+        project.setVCFStoreService(service.getName());
+        projectService.save(project);
+      } else throw new IllegalArgumentException("Project has no VCF store: " + project.getName());
     }
     VCFStoreResource resource = applicationContext.getBean(VCFStoreResource.class);
     resource.setVCFStore(project.getVCFStoreService(), name);

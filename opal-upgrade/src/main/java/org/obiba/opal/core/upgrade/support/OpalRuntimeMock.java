@@ -79,6 +79,16 @@ public class OpalRuntimeMock implements OpalRuntime {
   }
 
   @Override
+  public boolean hasServicePlugins(Class clazz) {
+    return false;
+  }
+
+  @Override
+  public Collection<ServicePlugin> getServicePlugins(Class clazz) {
+    return Lists.newArrayList();
+  }
+
+  @Override
   public boolean hasServicePlugin(String name) {
     return false;
   }
@@ -86,11 +96,6 @@ public class OpalRuntimeMock implements OpalRuntime {
   @Override
   public ServicePlugin getServicePlugin(String name) {
     throw new NoSuchElementException(name);
-  }
-
-  @Override
-  public boolean isVCFStorePluginService(ServicePlugin servicePlugin) {
-    return VCFStoreService.class.isAssignableFrom(servicePlugin.getClass());
   }
 
   @Override

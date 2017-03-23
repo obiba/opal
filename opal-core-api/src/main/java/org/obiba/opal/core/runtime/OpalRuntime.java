@@ -112,7 +112,7 @@ public interface OpalRuntime extends SystemService {
   Plugin getPlugin(String name);
 
   //
-  // VCF Store Service plugins
+  // Service plugins
   //
 
   /**
@@ -130,7 +130,23 @@ public interface OpalRuntime extends SystemService {
   Collection<ServicePlugin> getServicePlugins();
 
   /**
-   * Check that a service service exists.
+   * Check if there is any service plugin of given class.
+   *
+   * @param clazz
+   * @return
+   */
+  boolean hasServicePlugins(Class clazz);
+
+  /**
+   * Get all service plugins of given class.
+   *
+   * @param clazz
+   * @return
+   */
+  Collection<ServicePlugin> getServicePlugins(Class clazz);
+
+  /**
+   * Check that a service plugin exists with provided name.
    *
    * @param name
    * @return
@@ -146,5 +162,4 @@ public interface OpalRuntime extends SystemService {
    */
   ServicePlugin getServicePlugin(String name);
 
-  boolean isVCFStorePluginService(ServicePlugin servicePlugin);
 }

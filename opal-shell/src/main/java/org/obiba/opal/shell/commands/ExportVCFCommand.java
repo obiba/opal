@@ -73,7 +73,7 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
     else
       getShell().printf("Exporting VCF/BCF files '%s' from project '%s' into '%s'...", names, options.getProject(), options.getDestination());
     Project project = projectService.getProject(getOptions().getProject());
-    if (!opalRuntime.hasServicePlugins()) throw new NoSuchServiceException(VCFStoreService.SERVICE_TYPE);
+    if (!opalRuntime.hasServicePlugins(VCFStoreService.class)) throw new NoSuchServiceException(VCFStoreService.SERVICE_TYPE);
     if (!project.hasVCFStoreService()) {
       getShell().printf("The project '%s' has no VCF store", options.getProject());
       return 1;
@@ -98,12 +98,10 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
   //
 
   private void setVCFStore(String serviceName, String name) {
-    if (!opalRuntime.hasServicePlugins()) throw new NoSuchElementException("No service plugin is available");
+    if (!opalRuntime.hasServicePlugins(VCFStoreService.class)) throw new NoSuchServiceException(VCFStoreService.SERVICE_TYPE);
     ServicePlugin servicePlugin = opalRuntime.getServicePlugin(serviceName);
-    if (!opalRuntime.isVCFStorePluginService(servicePlugin)) throw new NoSuchElementException("No VCF store service is available");
-
+    if (!(servicePlugin instanceof VCFStoreService)) throw new NoSuchServiceException(serviceName);
     VCFStoreService service = (VCFStoreService) servicePlugin;
-    if (!service.hasStore(name)) service.createStore(name);
     store = service.getStore(name);
   }
 

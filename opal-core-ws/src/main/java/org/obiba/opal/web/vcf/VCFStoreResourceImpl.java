@@ -53,15 +53,14 @@ public class VCFStoreResourceImpl implements VCFStoreResource {
 
   @Override
   public void setVCFStore(String serviceName, String name) {
-    if (!opalRuntime.hasServicePlugins()) throw new NoSuchElementException("No VCF store service is available");
+    if (!opalRuntime.hasServicePlugin(serviceName)) throw new NoSuchElementException("No VCF store service: " + serviceName);
     ServicePlugin servicePlugin = opalRuntime.getServicePlugin(serviceName);
-
-    if (opalRuntime.isVCFStorePluginService(servicePlugin)) {
+    if (servicePlugin instanceof VCFStoreService) {
       service = (VCFStoreService) servicePlugin;
       if (!service.hasStore(name)) service.createStore(name);
       store = service.getStore(name);
       summaryBuilder = new VCFSamplesSummaryBuilder();
-    }
+    } else  throw new NoSuchElementException("No VCF store service: " + serviceName);
 
     try {
       summaryBuilder.mappings(vcfSamplesMappingService.getVCFSamplesMapping(name));

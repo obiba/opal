@@ -189,6 +189,26 @@ public class DefaultOpalRuntime implements OpalRuntime {
   }
 
   @Override
+  public boolean hasServicePlugins() {
+    return servicePlugins.size()>0;
+  }
+
+  @Override
+  public Collection<ServicePlugin> getServicePlugins() {
+    return servicePlugins;
+  }
+
+  @Override
+  public boolean hasServicePlugins(Class clazz) {
+    return servicePlugins.stream().filter(s -> clazz.isAssignableFrom(s.getClass())).count() > 0;
+  }
+
+  @Override
+  public Collection<ServicePlugin> getServicePlugins(Class clazz) {
+    return servicePlugins.stream().filter(s -> clazz.isAssignableFrom(s.getClass())).collect(Collectors.toList());
+  }
+
+  @Override
   public boolean hasServicePlugin(String name) {
     return servicePlugins.stream().filter(s -> name.equals(s.getName())).count() == 1;
   }
@@ -200,20 +220,9 @@ public class DefaultOpalRuntime implements OpalRuntime {
     return service.get();
   }
 
-  @Override
-  public boolean isVCFStorePluginService(ServicePlugin servicePlugin) {
-    return VCFStoreService.class.isAssignableFrom(servicePlugin.getClass());
-  }
-
-  @Override
-  public boolean hasServicePlugins() {
-    return servicePlugins.size()>0;
-  }
-
-  @Override
-  public Collection<ServicePlugin> getServicePlugins() {
-    return servicePlugins;
-  }
+  //
+  // Private methods
+  //
 
   private void initPlugins() {
     // read it to enhance classpath
