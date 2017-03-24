@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.Header;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 
 import com.github.gwtbootstrap.client.ui.CellTable;
@@ -52,6 +54,29 @@ public class Table<T> extends CellTable<T> {
     setStriped(true);
     setCondensed(true);
     setBordered(true);
+  }
+
+  /**
+   * Remove the column if it exists.
+   *
+   * @param col
+   */
+  @Override
+  public void removeColumn(Column<T, ?> col) {
+    int idx = getColumnIndex(col);
+    if (idx != -1) super.removeColumn(idx);
+  }
+
+  /**
+   * Insert column if it does not already exists.
+   *
+   * @param beforeIndex
+   * @param col
+   * @param header
+   */
+  @Override
+  public void insertColumn(int beforeIndex, Column<T, ?> col, String header) {
+    if (getColumnIndex(col) == -1) super.insertColumn(beforeIndex, col, header);
   }
 
   /**

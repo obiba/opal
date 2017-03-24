@@ -43,9 +43,8 @@ public class Dtos {
       .setTotalSamplesCount(stats.getSamplesIdCount()) //
       .addAllVcf(store.getVCFNames());
 
-    if (stats.hasSamples()) builder.setSamplesCount(stats.getSamples());
+    if (stats.hasIdentifiedSamples()) builder.setIdentifiedSamplesCount(stats.getIdentifiedSamples());
     if (stats.hasControlSamples()) builder.setControlSamplesCount(stats.getControlSamples());
-    if (stats.hasParticipantsWithGenotypes()) builder.setParticipantsWithGenotypeCount(stats.getParticipantsWithGenotypes());
     if (stats.hasParticipants()) builder.setParticipantsCount(stats.getParticipants());
 
     return builder.build();
@@ -60,9 +59,8 @@ public class Dtos {
       .setGenotypesCount(summary.getGenotypesCount()) //
       .setVariantsCount(summary.getVariantsCount());
 
-    if (stats.hasSamples()) builder.setSamplesCount(stats.getSamples());
+    if (stats.hasIdentifiedSamples()) builder.setIdentifiedSamplesCount(stats.getIdentifiedSamples());
     if (stats.hasControlSamples()) builder.setControlSamplesCount(stats.getControlSamples());
-    if (stats.hasOrphanSamples()) builder.setOrphanSamplesCount(stats.getOrphanSamples());
     if (stats.hasParticipants()) builder.setParticipantsCount(stats.getParticipants());
 
     return builder.build();

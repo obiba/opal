@@ -21,10 +21,9 @@ message VCFStoreDto {
     required string name = 1;
     repeated string vcf = 2; // VCF file names
     required int32 totalSamplesCount = 3;
-    optional int32 samplesCount = 4;
+    optional int32 identifiedSamplesCount = 4;
     optional int32 controlSamplesCount = 5;
     optional int32 participantsCount = 6;
-    optional int32 participantsWithGenotypeCount = 7;
 }
 
 message VCFSummaryDto {
@@ -32,12 +31,11 @@ message VCFSummaryDto {
     required string format = 2; // VCF/BCF
     required int64 size = 3; // VCF file size
     required int32 totalSamplesCount = 4;
-    required int32 variantsCount = 5;
-    required int32 genotypesCount = 6;
-    optional int32 samplesCount = 7;
-    optional int32 participantsCount = 8;
-    optional int32 orphanSamplesCount = 9;
-    optional int32 controlSamplesCount = 10;
+    optional int32 identifiedSamplesCount = 5;
+    optional int32 controlSamplesCount = 6;
+    optional int32 participantsCount = 7;
+    required int32 variantsCount = 8;
+    required int32 genotypesCount = 9;
 }
 
 message VCFSamplesMappingDto {

@@ -1332,6 +1332,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Participant")
   String participant();
 
+  @Description("Participants label")
+  @DefaultStringValue("Participants")
+  String participantsLabel();
+
   @Description("Download label")
   @DefaultStringValue("Download")
   String downloadLabel();
@@ -2422,31 +2426,31 @@ public interface Translations extends Constants {
   @DefaultStringValue("Too many repeated errors. Stopping further requests")
   String tooManyRepeatedErrorsLabel();
 
-  @Description("Genotypes VCF file column header")
+  @Description("Genotypes VCF file label")
   @DefaultStringValue("VCF File")
-  String vcfFileColumnHeader();
+  String vcfFileLabel();
 
-  @Description("Genotypes Samples count column header")
-  @DefaultStringValue("Samples")
-  String vcfSamplesCountColumnHeader();
+  @Description("Genotypes Identified Samples count label")
+  @DefaultStringValue("Identified Samples")
+  String vcfIdentifiedSamplesCountLabel();
 
-  @Description("Genotypes Participants count column header")
+  @Description("Genotypes Participants count label")
   @DefaultStringValue("Participants")
-  String vcfParticipantsCountColumnHeader();
+  String vcfParticipantsCountLabel();
 
-  @Description("Genotypes Orphan count column header")
-  @DefaultStringValue("Orphan Samples")
-  String vcfOrphanSamplesCountColumnHeader();
+  @Description("Genotypes Samples count label")
+  @DefaultStringValue("Samples")
+  String vcfSamplesCountLabel();
 
-  @Description("Genotypes Genotypes count column header")
+  @Description("Genotypes Genotypes count label")
   @DefaultStringValue("Genotypes")
-  String vcfGenotypesCountColumnHeader();
+  String vcfGenotypesCountLabel();
 
-  @Description("Genotypes Variants count column header")
+  @Description("Genotypes Variants count label")
   @DefaultStringValue("Variants")
-  String vcfVariantsCountColumnHeader();
+  String vcfVariantsCountLabel();
 
-  @Description("Genotypes Controls count column header")
+  @Description("Genotypes Controls count label")
   @DefaultStringValue("Controls")
-  String vcfControlsCountColumnHeader();
+  String vcfControlsCountLabel();
 }

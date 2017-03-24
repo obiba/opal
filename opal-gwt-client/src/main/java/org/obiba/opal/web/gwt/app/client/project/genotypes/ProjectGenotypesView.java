@@ -16,7 +16,6 @@ import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.google.common.collect.Lists;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -36,10 +35,7 @@ import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
-import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
-import org.obiba.opal.web.gwt.app.client.ui.Table;
-import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
+import org.obiba.opal.web.gwt.app.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
@@ -65,16 +61,10 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   private static final int PERMISSIONS_TAB_INDEX = 1;
 
   @UiField
-  Label participants;
-
-  @UiField
-  Label participantsWithGenotype;
+  PropertiesTable summaryProperties;
 
   @UiField
   Label samples;
-
-  @UiField
-  Label controlSamples;
 
   @UiField
   Anchor tableLink;
@@ -187,20 +177,35 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   @Override
   public void setVCFSamplesSummary(VCFStoreDto dto) {
-    participants.setText(dto != null && dto.hasParticipantsCount() ? dto.getParticipantsCount()+"" : "");
-    participantsWithGenotype.setText(dto != null && dto.hasParticipantsWithGenotypeCount() ? dto.getParticipantsWithGenotypeCount()+"" : "");
-    samples.setText(dto != null && dto.hasSamplesCount() ? dto.getSamplesCount()+"" : "");
-    controlSamples.setText(dto != null && dto.hasControlSamplesCount() ? dto.getControlSamplesCount()+"" : "");
+    samples.setText(dto != null ? dto.getTotalSamplesCount()+"" : "0");
+    while (summaryProperties.getRowCount()>1) {
+      summaryProperties.removeProperty(1);
+    }
+    if (dto != null && (dto.hasParticipantsCount() || dto.hasControlSamplesCount())) {
+        summaryProperties.addProperty(translations.vcfParticipantsCountLabel(),dto.hasParticipantsCount() ? dto.getParticipantsCount()+"" : "");
+        summaryProperties.addProperty(translations.vcfIdentifiedSamplesCountLabel(),dto.hasIdentifiedSamplesCount() ? dto.getIdentifiedSamplesCount()+"" : "");
+        summaryProperties.addProperty(translations.vcfControlsCountLabel(),dto.hasControlSamplesCount() ? dto.getControlSamplesCount()+"" : "");
+    }
   }
 
   @Override
   public void setVCFSamplesMapping(VCFSamplesMappingDto vcfSamplesMapping) {
     this.vcfSamplesMapping = vcfSamplesMapping;
-    boolean hasMapping = vcfSamplesMapping != null;
+    boolean hasMapping = hasMapping();
     showEditMapping(hasMapping);
     tableLink.setText(hasMapping ? vcfSamplesMapping.getTableReference() : "");
     participantIdLink.setText(hasMapping ? vcfSamplesMapping.getParticipantIdVariable() : "");
     sampleRoleLink.setText(hasMapping ? vcfSamplesMapping.getSampleRoleVariable() : "");
+    if (hasMapping) {
+      vcfFilesTable.insertColumn(3, ProjectGenotypesColumns.CONTROLS_COUNT, translations.vcfControlsCountLabel());
+      vcfFilesTable.insertColumn(3, ProjectGenotypesColumns.IDENTIFIED_SAMPLES_COUNT, translations.vcfIdentifiedSamplesCountLabel());
+      vcfFilesTable.insertColumn(3, ProjectGenotypesColumns.PARTICIPANTS_COUNT, translations.vcfParticipantsCountLabel());
+    } else {
+      vcfFilesTable.removeColumn(ProjectGenotypesColumns.PARTICIPANTS_COUNT);
+      vcfFilesTable.removeColumn(ProjectGenotypesColumns.IDENTIFIED_SAMPLES_COUNT);
+      vcfFilesTable.removeColumn(ProjectGenotypesColumns.CONTROLS_COUNT);
+
+    }
   }
 
   private void showEditMapping(boolean hasMapping) {
@@ -211,8 +216,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   }
 
   private void refreshEditMapping() {
-    boolean hasMapping = vcfSamplesMapping != null;
-    showEditMapping(hasMapping);
+    showEditMapping(hasMapping());
   }
 
   @Override
@@ -236,11 +240,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   public void clear(boolean hasVcfService) {
     clearMappingTable();
     // clear summary
-    participants.setText("");
-    participantsWithGenotype.setText("");
     samples.setText("");
-    controlSamples.setText("");
-
     noVcfServiceAlertPanel.setVisible(!hasVcfService);
     tabPanelContainer.setVisible(hasVcfService);
   }
@@ -370,6 +370,10 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     getUiHandlers().onRefresh();
   }
 
+  private boolean hasMapping() {
+    return vcfSamplesMapping != null;
+  }
+
   private void addTableColumns() {
     initializeColumns();
     dataProvider.addDataDisplay(vcfFilesTable);
@@ -384,13 +388,13 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     checkColumn = new CheckboxColumn<VCFSummaryDto>(new ProjectGenotypesCheckStatusDisplay());
     vcfFilesTable.addColumn(checkColumn, checkColumn.getCheckColumnHeader());
     vcfFilesTable.setColumnWidth(checkColumn, 1, Style.Unit.PX);
-    vcfFilesTable.addColumn(ProjectGenotypesColumns.VCF_FILE, translations.vcfFileColumnHeader());
-    vcfFilesTable.addColumn(ProjectGenotypesColumns.PARTICIPANTS_COUNT, translations.vcfParticipantsCountColumnHeader());
-    vcfFilesTable.addColumn(ProjectGenotypesColumns.SAMPLES_COUNT, translations.vcfSamplesCountColumnHeader());
-    vcfFilesTable.addColumn(ProjectGenotypesColumns.ORPHAN_SAMPLES_COUNT, translations.vcfOrphanSamplesCountColumnHeader());
-    vcfFilesTable.addColumn(ProjectGenotypesColumns.CONTROLS_COUNT, translations.vcfControlsCountColumnHeader());
-    vcfFilesTable.addColumn(ProjectGenotypesColumns.VARIANTS_COUNT, translations.vcfVariantsCountColumnHeader());
-    vcfFilesTable.addColumn(ProjectGenotypesColumns.GENOTYPES_COUNT, translations.vcfGenotypesCountColumnHeader());
+    vcfFilesTable.addColumn(ProjectGenotypesColumns.VCF_FILE, translations.vcfFileLabel());
+    vcfFilesTable.addColumn(ProjectGenotypesColumns.SAMPLES_COUNT, translations.vcfSamplesCountLabel());
+    vcfFilesTable.addColumn(ProjectGenotypesColumns.PARTICIPANTS_COUNT, translations.vcfParticipantsCountLabel());
+    vcfFilesTable.addColumn(ProjectGenotypesColumns.IDENTIFIED_SAMPLES_COUNT, translations.vcfIdentifiedSamplesCountLabel());
+    vcfFilesTable.addColumn(ProjectGenotypesColumns.CONTROLS_COUNT, translations.vcfControlsCountLabel());
+    vcfFilesTable.addColumn(ProjectGenotypesColumns.VARIANTS_COUNT, translations.vcfVariantsCountLabel());
+    vcfFilesTable.addColumn(ProjectGenotypesColumns.GENOTYPES_COUNT, translations.vcfGenotypesCountLabel());
     vcfFilesTable.addColumn(new GenotypesActionsColumn(), translations.actionsLabel());
   }
 
@@ -467,12 +471,12 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
       }
     };
 
-    static final Column<VCFSummaryDto, String> SAMPLES_COUNT = new TextColumn<VCFSummaryDto>() {
+    static final Column<VCFSummaryDto, String> IDENTIFIED_SAMPLES_COUNT = new TextColumn<VCFSummaryDto>() {
 
       @Override
       public String getValue(VCFSummaryDto vcfSummaryDto) {
-        return vcfSummaryDto.hasSamplesCount() //
-          ? Integer.toString(vcfSummaryDto.getSamplesCount()) //
+        return vcfSummaryDto.hasIdentifiedSamplesCount() //
+          ? Integer.toString(vcfSummaryDto.getIdentifiedSamplesCount()) //
           : ""; //
       }
     };
@@ -495,13 +499,11 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
       }
     };
 
-    static final Column<VCFSummaryDto, String> ORPHAN_SAMPLES_COUNT = new TextColumn<VCFSummaryDto>() {
+    static final Column<VCFSummaryDto, String> SAMPLES_COUNT = new TextColumn<VCFSummaryDto>() {
 
       @Override
       public String getValue(VCFSummaryDto vcfSummaryDto) {
-        return Integer.toString(vcfSummaryDto.hasOrphanSamplesCount()
-          ? vcfSummaryDto.getOrphanSamplesCount()
-          : vcfSummaryDto.getTotalSamplesCount());
+        return Integer.toString(vcfSummaryDto.getTotalSamplesCount());
       }
     };
 
