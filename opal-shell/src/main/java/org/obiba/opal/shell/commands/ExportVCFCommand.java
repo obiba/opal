@@ -35,6 +35,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -131,9 +132,15 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
       String vcfFileName = vcfName + "." + summary.getFormat().name().toLowerCase() + ".gz";
       getShell().printf(String.format("Exporting VCF/BCF file: %s", vcfFileName));
       File vcfFile = new File(destinationFolder, vcfFileName);
-      if (filterSampleIds.isEmpty())
-        store.readVCF(vcfName, new FileOutputStream(vcfFile));
-      else
+      if (!options.hasTable()) {
+        if (!options.isCaseControl()) {
+          Collection<String> sampleIds = summary.getSampleIds();
+          sampleIds.removeAll(vcfSamplesMappingService.getControls(options.getProject()));
+
+          store.readVCF(vcfName, new FileOutputStream(vcfFile), sampleIds);
+        } else
+          store.readVCF(vcfName, new FileOutputStream(vcfFile));
+      } else
         store.readVCF(vcfName, new FileOutputStream(vcfFile), filterSampleIds);
       count++;
     }
