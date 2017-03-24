@@ -37,7 +37,6 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class ProjectExportVcfFileModalView extends ModalPopupViewWithUiHandlers<ProjectExportVcfFileModalUiHandlers>
         implements ProjectExportVcfFileModalPresenter.Display {
@@ -81,6 +80,7 @@ public class ProjectExportVcfFileModalView extends ModalPopupViewWithUiHandlers<
     initWidget(binder.createAndBindUi(this));
     dialog.setTitle(translations.exportVcfModalTitle());
     this.translations = translations;
+    includeCaseControls.setValue(true); // default value
   }
 
   @Override
