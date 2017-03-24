@@ -1,7 +1,6 @@
 package org.obiba.opal.core.support.vcf;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
@@ -35,43 +34,34 @@ public class VCFSamplesSummaryBuilder {
     Stats stats = createStats();
 
     if (mappings != null) {
-      int samples = 0;
+      int identifiedSamples = 0;
       int controlSamples = 0;
       ValueTable vt = MagmaEngineTableResolver.valueOf(mappings.getTableReference()).resolveTable();
       Iterable<ValueSet> valueSets = vt.getValueSets();
       Variable participantVariable = vt.getVariable(mappings.getParticipantIdVariable());
       Variable roleVariable = vt.getVariable(mappings.getSampleRoleVariable());
       Set<String> participants = Sets.newHashSet();
-      Set<String> participantsWithGenotypes = Sets.newHashSet();
 
       for (ValueSet v : valueSets) {
         String sampleId = v.getVariableEntity().getIdentifier();
         String participantId = vt.getValue(participantVariable, v).toString();
         String role = vt.getValue(roleVariable, v).toString();
-        boolean sampleFound = sampleIds.contains(sampleId);
-
-        if (!Strings.isNullOrEmpty(participantId)) {
-          participants.add(participantId);
-          if (sampleFound) participantsWithGenotypes.add(participantId);
-        }
-
-        if (sampleFound) {
-          if (VCFSampleRole.isSample(role)) samples++;
-          else if (VCFSampleRole.isControl(role)) controlSamples++;
+        // check if the mapped sample is one of the samples observed in the vcf files
+        if (sampleIds.contains(sampleId)) {
+          if (VCFSampleRole.isControl(role)) controlSamples++;
+          if (!Strings.isNullOrEmpty(participantId)) {
+            participants.add(participantId);
+            identifiedSamples++;
+          }
         }
       }
 
-      if (samples + controlSamples > 0) {
-        stats.setSamples(samples);
+      if (identifiedSamples + controlSamples > 0) {
+        stats.setIdentifiedSamples(identifiedSamples);
         stats.setControlSamples(controlSamples);
-        stats.setParticipantsWithGenotypes(participantsWithGenotypes.size());
       }
-
       stats.setParticipants(participants.size());
-    } else if (!sampleIds.isEmpty()){
-      stats.setSamples(sampleIds.size());
     }
-
 
     return stats;
   }
@@ -81,7 +71,7 @@ public class VCFSamplesSummaryBuilder {
 
     if (mappings != null) {
       int orphanSamples = 0;
-      int samples = 0;
+      int identifiedSamples = 0;
       int controlSamples = 0;
 
       ValueTable vt = MagmaEngineTableResolver.valueOf(mappings.getTableReference()).resolveTable();
@@ -96,23 +86,19 @@ public class VCFSamplesSummaryBuilder {
         mappedSampleIds.add(sampleId);
         String participantId = vt.getValue(participantVariable, v).toString();
         String roleName = vt.getValue(roleVariable, v).toString();
-
-        if (sampleIds.contains(sampleId)){
-          if (Strings.isNullOrEmpty(participantId)) {
-            if (VCFSampleRole.isSample(roleName)) orphanSamples++;
-          } else {
+        // check if the mapped sample is one of the samples observed in the vcf file
+        if (sampleIds.contains(sampleId)) {
+          if (VCFSampleRole.isControl(roleName)) controlSamples++;
+          if (!Strings.isNullOrEmpty(participantId)) {
             participants.add(participantId);
+            identifiedSamples++;
           }
-
-          if (VCFSampleRole.isSample(roleName)) samples++;
-          else if (VCFSampleRole.isControl(roleName)) controlSamples++;
         }
       }
 
-      if (samples + controlSamples > 0) {
-        stats.setSamples(samples);
+      if (identifiedSamples + controlSamples > 0) {
+        stats.setIdentifiedSamples(identifiedSamples);
         stats.setControlSamples(controlSamples);
-        stats.setOrphanSamples(orphanSamples + Sets.difference(sampleIds, mappedSampleIds).size());
         stats.setParticipants(participants.size());
       }
     }
@@ -130,10 +116,8 @@ public class VCFSamplesSummaryBuilder {
     int samplesIdCount = 0;
 
     Integer participants = null;
-    Integer participantsWithGenotypes = null;
-    Integer samples = null;
+    Integer identifiedSamples = null;
     Integer controlSamples = null;
-    Integer orphanSamples = null;
 
     public int getSamplesIdCount() {
       return samplesIdCount;
@@ -143,7 +127,7 @@ public class VCFSamplesSummaryBuilder {
       return participants != null;
     }
 
-    public void setParticipants(int value ) {
+    public void setParticipants(int value) {
       participants = value;
     }
 
@@ -151,28 +135,16 @@ public class VCFSamplesSummaryBuilder {
       return participants;
     }
 
-    public boolean hasParticipantsWithGenotypes() {
-      return participantsWithGenotypes != null;
+    public boolean hasIdentifiedSamples() {
+      return identifiedSamples != null;
     }
 
-    public void setParticipantsWithGenotypes(int value) {
-      participantsWithGenotypes = value;
+    public void setIdentifiedSamples(int value) {
+      identifiedSamples = value;
     }
 
-    public int getParticipantsWithGenotypes() {
-      return participantsWithGenotypes;
-    }
-
-    public boolean hasSamples() {
-      return samples != null;
-    }
-
-    public void setSamples(int value) {
-      samples = value;
-    }
-
-    public int getSamples() {
-      return samples;
+    public int getIdentifiedSamples() {
+      return identifiedSamples;
     }
 
     public boolean hasControlSamples() {
@@ -187,16 +159,5 @@ public class VCFSamplesSummaryBuilder {
       return controlSamples;
     }
 
-    public boolean hasOrphanSamples() {
-      return orphanSamples != null;
-    }
-
-    public void setOrphanSamples(int value) {
-      orphanSamples = value;
-    }
-
-    public int getOrphanSamples() {
-      return orphanSamples;
-    }
   }
 }

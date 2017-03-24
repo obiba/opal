@@ -267,6 +267,7 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   @Override
   public void onRefresh() {
+    getVcfStore();
     getVcfSummaries();
   }
 
