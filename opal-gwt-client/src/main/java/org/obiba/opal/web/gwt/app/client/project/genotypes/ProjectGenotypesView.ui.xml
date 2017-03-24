@@ -33,7 +33,7 @@
           <ui:msg description="Genotypes Import vcfFile label">Import</ui:msg>
         </b:Button>
 
-        <b:Button icon="DOWNLOAD_ALT" ui:field="downloadVCF" addStyleNames="small-indent">
+        <b:Button icon="DOWNLOAD_ALT" ui:field="exportVCF" addStyleNames="small-indent">
           <ui:msg description="Genotypes Download vcfFile label">Export</ui:msg>
         </b:Button>
       </g:FlowPanel>

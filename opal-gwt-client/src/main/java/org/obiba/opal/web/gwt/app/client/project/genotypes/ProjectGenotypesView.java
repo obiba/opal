@@ -15,8 +15,8 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
-import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.collect.Lists;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -125,7 +125,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   IconAnchor clearSelectionAnchor;
 
   @UiField
-  Button downloadVCF;
+  Button exportVCF;
 
   @UiField
   IconAnchor exportLink;
@@ -203,11 +203,11 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     sampleRoleLink.setText(hasMapping ? vcfSamplesMapping.getSampleRoleVariable() : "");
   }
 
-  private void showEditMapping(boolean value) {
-    editMapping.setVisible(editableMapping && value);
-    deleteMapping.setVisible(editableMapping && value);
-    mappingProperties.setVisible(value);
-    addMapping.setVisible(editableMapping && !value);
+  private void showEditMapping(boolean hasMapping) {
+    editMapping.setVisible(editableMapping && hasMapping);
+    deleteMapping.setVisible(editableMapping && hasMapping);
+    mappingProperties.setVisible(hasMapping);
+    addMapping.setVisible(editableMapping && !hasMapping);
   }
 
   private void refreshEditMapping() {
@@ -262,7 +262,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
   @Override
   public HasAuthorization getExportAuthorizer() {
-    return new WidgetAuthorizer(downloadVCF, exportLink);
+    return new WidgetAuthorizer(exportVCF, exportLink);
   }
 
   @Override
@@ -315,7 +315,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     filter.getClear().setTitle(translations.clearFilter());
   }
 
-  @UiHandler({"downloadVCF","exportLink"})
+  @UiHandler({"exportVCF","exportLink"})
   public void downloadVCFClick(ClickEvent event) {
     getUiHandlers().onExportVcfFiles();
   }

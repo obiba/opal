@@ -309,7 +309,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
       if(response.getStatusCode() >= Response.SC_BAD_REQUEST) return;
 
       Set<HttpMethod> allowed = getAllowedMethods(response);
-      if(!allowed.isEmpty()) {
+      if(!allowed.isEmpty() && allowed.size()>1) {
         authorizationCache.put(uri, allowed);
       }
     }
