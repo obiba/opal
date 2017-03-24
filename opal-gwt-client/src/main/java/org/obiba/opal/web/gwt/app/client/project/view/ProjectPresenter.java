@@ -65,8 +65,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
     enum ProjectTab {
       TABLES,
-      FILES,
       GENOTYPES,
+      FILES,
       REPORTS,
       TASKS,
       PERMISSIONS,
