@@ -139,11 +139,11 @@
                 <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false" addStyleNames="actions-select">
 
                   <g:FlowPanel addStyleNames="pull-left">
-                    <b2:IconAnchor ui:field="deleteLink" icon="TRASH" addStyleNames="inline xsmall-indent">
-                      <ui:msg description="Genotypes Remove VCF Files label">Remove</ui:msg>
-                    </b2:IconAnchor>
                     <b2:IconAnchor ui:field="exportLink" icon="DOWNLOAD_ALT" addStyleNames="inline xsmall-indent">
                       <ui:msg description="Genotypes Export VCF Files label">Export</ui:msg>
+                    </b2:IconAnchor>
+                    <b2:IconAnchor ui:field="deleteLink" icon="TRASH" addStyleNames="inline xsmall-indent">
+                      <ui:msg description="Genotypes Remove VCF Files label">Remove</ui:msg>
                     </b2:IconAnchor>
                   </g:FlowPanel>
 
