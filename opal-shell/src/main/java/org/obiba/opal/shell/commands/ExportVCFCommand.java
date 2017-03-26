@@ -127,9 +127,12 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
 
     int count = 1;
     for (String vcfName : options.getNames()) {
-      getShell().progress(String.format("Exporting VCF/BCF file: %s", vcfName), count, total, (count*100)/total);
-      VCFStore.VCFSummary summary = store.getVCFSummary(vcfName);
-      String vcfFileName = vcfName + "." + summary.getFormat().name().toLowerCase() + ".gz";
+      String baseVcfName = vcfName;
+      if (vcfName.endsWith(".vcf.gz")) baseVcfName = vcfName.replaceAll("\\.vcf\\.gz$", "");
+      else if (vcfName.endsWith(".bcf.gz")) baseVcfName = vcfName.replaceAll("\\.bcf\\.gz$", "");
+      getShell().progress(String.format("Exporting VCF/BCF file: %s", baseVcfName), count, total, (count*100)/total);
+      VCFStore.VCFSummary summary = store.getVCFSummary(baseVcfName);
+      String vcfFileName = baseVcfName + "." + summary.getFormat().name().toLowerCase() + ".gz";
       getShell().printf(String.format("Exporting VCF/BCF file: %s", vcfFileName));
       File vcfFile = new File(destinationFolder, vcfFileName);
       if (!options.hasTable()) {
@@ -137,11 +140,11 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
           Collection<String> sampleIds = summary.getSampleIds();
           sampleIds.removeAll(vcfSamplesMappingService.getControls(options.getProject()));
 
-          store.readVCF(vcfName, new FileOutputStream(vcfFile), sampleIds);
+          store.readVCF(baseVcfName, new FileOutputStream(vcfFile), sampleIds);
         } else
-          store.readVCF(vcfName, new FileOutputStream(vcfFile));
+          store.readVCF(baseVcfName, new FileOutputStream(vcfFile));
       } else
-        store.readVCF(vcfName, new FileOutputStream(vcfFile), filterSampleIds);
+        store.readVCF(baseVcfName, new FileOutputStream(vcfFile), filterSampleIds);
       count++;
     }
     getShell().progress(String.format("VCF/BCF file(s) export completed."), total, total, 100);

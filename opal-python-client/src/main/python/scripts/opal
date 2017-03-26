@@ -13,11 +13,13 @@ import opal.import_xml
 import opal.import_spss
 import opal.import_limesurvey
 import opal.import_sql
+import opal.import_vcf
 import opal.import_ids
 import opal.import_idsmap
 import opal.export_xml
 import opal.export_csv
 import opal.export_sql
+import opal.export_vcf
 import opal.copy_table
 import opal.delete_table
 import opal.user
@@ -79,6 +81,8 @@ add_subcommand('import-limesurvey', 'Import data from a LimeSurvey database.', o
                opal.import_limesurvey.do_command)
 add_subcommand('import-sql', 'Import data from a SQL database.', opal.import_sql.add_arguments,
                opal.import_sql.do_command)
+add_subcommand('import-vcf', 'Import genotypes data from some VCF/BCF files.', opal.import_vcf.add_arguments,
+               opal.import_vcf.do_command)
 add_subcommand('import-ids', 'Import system identifiers.', opal.import_ids.add_arguments,
                opal.import_ids.do_command)
 add_subcommand('import-ids-map', 'Import identifiers mappings.', opal.import_idsmap.add_arguments,
@@ -89,6 +93,8 @@ add_subcommand('export-csv', 'Export data to a folder of CSV files.', opal.expor
                opal.export_csv.do_command)
 add_subcommand('export-sql', 'Export data to a SQL database.', opal.export_sql.add_arguments,
                opal.export_sql.do_command)
+add_subcommand('export-vcf', 'Export genotypes data to VCF/BCF files.', opal.export_vcf.add_arguments,
+               opal.export_vcf.do_command)
 add_subcommand('copy-table', 'Copy a table into another table.', opal.copy_table.add_arguments, opal.copy_table.do_command)
 add_subcommand('delete-table', 'Delete some tables.', opal.delete_table.add_arguments, opal.delete_table.do_command)
 add_subcommand('user', 'Manage users.', opal.user.add_arguments, opal.user.do_command)
