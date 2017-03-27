@@ -1,5 +1,6 @@
 package org.obiba.opal.core.domain;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import javax.validation.constraints.NotNull;
@@ -36,6 +37,10 @@ public class VCFSamplesMapping implements HasUniqueProperties {
 
   public void setProjectName(String projectName) {
     this.projectName = projectName;
+  }
+
+  public boolean hasTableReference() {
+    return !Strings.isNullOrEmpty(tableReference);
   }
 
   public String getTableReference() {

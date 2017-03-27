@@ -54,7 +54,7 @@
                 </o:PropertyPanel>
               </o:PropertiesTable>
             </b:Column>
-            <b:Column size="6">
+            <b:Column size="6" ui:field="mappingColumn">
               <b:Heading size="4" addStyleNames="inline-block small-top-margin">
                 <ui:msg description="Genotypes Mapping Table label">Sample-Participant Mapping</ui:msg>
               </b:Heading>

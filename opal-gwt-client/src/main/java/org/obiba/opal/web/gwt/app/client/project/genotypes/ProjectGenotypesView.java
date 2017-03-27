@@ -88,6 +88,9 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   TextBoxClearable filter;
 
   @UiField
+  Panel mappingColumn;
+
+  @UiField
   Button addMapping;
 
   @UiField
@@ -213,6 +216,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     deleteMapping.setVisible(editableMapping && hasMapping);
     mappingProperties.setVisible(hasMapping);
     addMapping.setVisible(editableMapping && !hasMapping);
+    mappingColumn.setVisible(editableMapping || hasMapping);
   }
 
   private void refreshEditMapping() {

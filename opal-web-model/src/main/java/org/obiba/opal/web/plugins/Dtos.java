@@ -11,6 +11,9 @@
 package org.obiba.opal.web.plugins;
 
 import com.google.common.collect.Lists;
+import org.obiba.magma.NoSuchDatasourceException;
+import org.obiba.magma.NoSuchValueTableException;
+import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.core.domain.VCFSamplesMapping;
 import org.obiba.opal.core.runtime.Plugin;
 import org.obiba.opal.core.support.vcf.VCFSamplesSummaryBuilder;
@@ -76,12 +79,21 @@ public class Dtos {
   }
 
   public static Plugins.VCFSamplesMappingDto asDto(VCFSamplesMapping sampleMappings) {
-    return Plugins.VCFSamplesMappingDto.newBuilder()
-      .setProjectName(sampleMappings.getProjectName())
-      .setTableReference(sampleMappings.getTableReference())
-      .setParticipantIdVariable(sampleMappings.getParticipantIdVariable())
-      .setSampleRoleVariable(sampleMappings.getSampleRoleVariable())
-      .build();
+    Plugins.VCFSamplesMappingDto.Builder builder = Plugins.VCFSamplesMappingDto.newBuilder()
+      .setProjectName(sampleMappings.getProjectName());
+
+    if (sampleMappings.hasTableReference()) {
+      //try {
+        MagmaEngineTableResolver.valueOf(sampleMappings.getTableReference()).resolveTable();
+        builder.setTableReference(sampleMappings.getTableReference())
+            .setParticipantIdVariable(sampleMappings.getParticipantIdVariable())
+            .setSampleRoleVariable(sampleMappings.getSampleRoleVariable());
+      //} catch (NoSuchValueTableException|NoSuchDatasourceException e) {
+        // ignore
+      //}
+    }
+
+    return builder.build();
   }
 
   private static void setProperties(Properties properties, Plugins.PluginDto.Builder builder) {

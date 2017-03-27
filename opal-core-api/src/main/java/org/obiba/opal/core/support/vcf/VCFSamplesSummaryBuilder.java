@@ -2,9 +2,7 @@ package org.obiba.opal.core.support.vcf;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
-import org.obiba.magma.ValueSet;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.Variable;
+import org.obiba.magma.*;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.core.domain.VCFSampleRole;
 import org.obiba.opal.core.domain.VCFSamplesMapping;
@@ -18,10 +16,19 @@ public class VCFSamplesSummaryBuilder {
   }
 
   private VCFSamplesMapping mappings;
+
+  private ValueTable mappingsTable;
+
   private Set<String> sampleIds;
 
   public VCFSamplesSummaryBuilder mappings(VCFSamplesMapping value) {
     mappings = value;
+    try {
+      mappingsTable = MagmaEngineTableResolver.valueOf(mappings.getTableReference()).resolveTable();
+    } catch (NoSuchValueTableException|NoSuchDatasourceException e) {
+      // ignore: table could be not accessible because of permission or because it was removed
+      // so act like there was none
+    }
     return this;
   }
 
@@ -33,22 +40,21 @@ public class VCFSamplesSummaryBuilder {
   public Stats buildGeneralSummary() {
     Stats stats = createStats();
 
-    if (mappings != null) {
+    if (mappings != null && mappingsTable != null) {
       int identifiedSamples = 0;
       int controlSamples = 0;
-      ValueTable vt = MagmaEngineTableResolver.valueOf(mappings.getTableReference()).resolveTable();
-      Iterable<ValueSet> valueSets = vt.getValueSets();
-      Variable participantVariable = vt.getVariable(mappings.getParticipantIdVariable());
-      Variable roleVariable = vt.getVariable(mappings.getSampleRoleVariable());
+      Iterable<ValueSet> valueSets = mappingsTable.getValueSets();
+      Variable participantVariable = mappingsTable.getVariable(mappings.getParticipantIdVariable());
+      Variable roleVariable = mappingsTable.getVariable(mappings.getSampleRoleVariable());
       Set<String> participants = Sets.newHashSet();
 
       for (ValueSet v : valueSets) {
         String sampleId = v.getVariableEntity().getIdentifier();
-        String participantId = vt.getValue(participantVariable, v).toString();
-        String role = vt.getValue(roleVariable, v).toString();
+        String participantId = mappingsTable.getValue(participantVariable, v).toString();
+        String roleName = mappingsTable.getValue(roleVariable, v).toString();
         // check if the mapped sample is one of the samples observed in the vcf files
         if (sampleIds.contains(sampleId)) {
-          if (VCFSampleRole.isControl(role)) controlSamples++;
+          if (VCFSampleRole.isControl(roleName)) controlSamples++;
           if (!Strings.isNullOrEmpty(participantId)) {
             participants.add(participantId);
             identifiedSamples++;
@@ -69,23 +75,21 @@ public class VCFSamplesSummaryBuilder {
   public Stats buildSummary() {
     Stats stats = createStats();
 
-    if (mappings != null) {
-      int orphanSamples = 0;
+    if (mappings != null && mappingsTable != null) {
       int identifiedSamples = 0;
       int controlSamples = 0;
 
-      ValueTable vt = MagmaEngineTableResolver.valueOf(mappings.getTableReference()).resolveTable();
-      Iterable<ValueSet> valueSets = vt.getValueSets();
-      Variable participantVariable = vt.getVariable(mappings.getParticipantIdVariable());
-      Variable roleVariable = vt.getVariable(mappings.getSampleRoleVariable());
+      Iterable<ValueSet> valueSets = mappingsTable.getValueSets();
+      Variable participantVariable = mappingsTable.getVariable(mappings.getParticipantIdVariable());
+      Variable roleVariable = mappingsTable.getVariable(mappings.getSampleRoleVariable());
       Set<String> participants = Sets.newHashSet();
       Set<String> mappedSampleIds = Sets.newHashSet();
 
       for (ValueSet v : valueSets) {
         String sampleId = v.getVariableEntity().getIdentifier();
         mappedSampleIds.add(sampleId);
-        String participantId = vt.getValue(participantVariable, v).toString();
-        String roleName = vt.getValue(roleVariable, v).toString();
+        String participantId = mappingsTable.getValue(participantVariable, v).toString();
+        String roleName = mappingsTable.getValue(roleVariable, v).toString();
         // check if the mapped sample is one of the samples observed in the vcf file
         if (sampleIds.contains(sampleId)) {
           if (VCFSampleRole.isControl(roleName)) controlSamples++;
