@@ -42,14 +42,14 @@ public class VCFStorePermissionsConverter extends OpalPermissionConverter {
         );
       }
     },
-    VCF_STORE_EDIT {
+    VCF_STORE_VALUES {
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/project/(.+)/vcf-store");
         return Lists.newArrayList(
             toRest("/datasource/{0}", "GET", args), // so that project appears in the projects list
             toRest("/project/{0}/vcf-store", "GET:GET/GET", args),
-            toRest("/project/{0}/commands/_export_vcf", "POST", args));
+            toRest("/project/{0}/commands/_export_vcf", "POST:GET", args));
       }
     },
     VCF_STORE_ALL {
