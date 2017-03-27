@@ -212,18 +212,17 @@ public class EditProjectModalView extends ModalPopupViewWithUiHandlers<EditProje
   }
 
   @Override
-  public void toggleAvailableVcfStoreServicesPanel(boolean show) {
-    vcfStoreServiceGroup.setVisible(show);
-  }
-
-  @Override
   public void setAvailableVcfStoreServices(JsArray<PluginDto> availableVcfStoreServices) {
     vcfStoreService.clear();
     vcfStoreService.addItem(translations.none(), VCF_STORE_SERVICE_NONE);
 
-    for (int i = 0; i < availableVcfStoreServices.length(); i++) {
-      vcfStoreService.addItem(availableVcfStoreServices.get(i).getName());
+    if (availableVcfStoreServices != null) {
+      for (int i = 0; i < availableVcfStoreServices.length(); i++) {
+        vcfStoreService.addItem(availableVcfStoreServices.get(i).getName());
+      }
     }
+
+    vcfStoreServiceGroup.setVisible(availableVcfStoreServices != null && availableVcfStoreServices.length()>0);
   }
 
   @Override

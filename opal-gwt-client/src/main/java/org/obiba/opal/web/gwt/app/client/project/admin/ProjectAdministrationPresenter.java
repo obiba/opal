@@ -134,7 +134,6 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
   public void onEdit() {
     EditProjectModalPresenter presenter = editProjectModalProvider.create();
     presenter.setProjectName(project.getName());
-    presenter.toggleVcfServicePanel(hasServicePlugins);
     editProjectModalProvider.show();
   }
 

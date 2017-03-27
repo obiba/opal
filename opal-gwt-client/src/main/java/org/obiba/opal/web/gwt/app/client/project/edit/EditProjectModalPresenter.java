@@ -91,10 +91,6 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
     }
   }
 
-  public void toggleVcfServicePanel(boolean show) {
-    getView().toggleAvailableVcfStoreServicesPanel(show);
-  }
-
   @Override
   protected void onBind() {
     super.onBind();
@@ -309,8 +305,6 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
     void setAvailableDatabases(JsArray<DatabaseDto> availableDatabases);
 
     void setBusy(boolean busy);
-
-    void toggleAvailableVcfStoreServicesPanel(boolean show);
 
     void setAvailableVcfStoreServices(JsArray<PluginDto> availableVcfStoreServices);
   }
