@@ -134,6 +134,11 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     return new TabPanelAuthorizer(tabPanel, ProjectTab.PERMISSIONS.ordinal());
   }
 
+  @Override
+  public HasAuthorization getGenotypesAuthorizer() {
+    return new TabPanelAuthorizer(tabPanel, ProjectTab.GENOTYPES.ordinal());
+  }
+
   @UiHandler("projects")
   void onProjectsSelection(ClickEvent event) {
     getUiHandlers().onProjectsSelection();

@@ -78,6 +78,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     void toggleGenotypesTab(boolean show);
 
     HasAuthorization getPermissionsAuthorizer();
+
+    HasAuthorization getGenotypesAuthorizer();
   }
 
   @ProxyStandard
@@ -199,16 +201,20 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       if(fileExplorerPresenter != null) fileExplorerPresenter.reset();
       getView().clearTabsData();
     }
-
+    
     getView().setTabData(tab.ordinal(), tab == Display.ProjectTab.TABLES ? validatePath(projectName, path) : null);
-
     refresh();
-
-    checkVCFPlugin();
   }
 
   private void authorize() {
     if(projectName == null) return;
+
+
+    // genotypes tab
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.PROJECT_VCF_STORE.create().build(projectName)).get()//
+        .authorize(getView().getGenotypesAuthorizer())//
+        .send();
 
     // permissions tab
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
@@ -397,20 +403,5 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     }
     updateHistory(null);
     return null;
-  }
-
-  private void checkVCFPlugin() {
-    Map<String, String> pluginsParams = new HashMap<>();
-    pluginsParams.put("type", VCFStoreService.SERVICE_TYPE);
-
-    ResourceRequestBuilderFactory.<JsArray<PluginDto>>newBuilder().forResource(UriBuilders.PLUGINS.create().query(pluginsParams).build())
-        .withCallback(new ResourceCallback<JsArray<PluginDto>>() {
-
-          @Override
-          public void onResource(Response response, JsArray<PluginDto> resource) {
-            hasServicePlugins = resource.length() > 0;
-            getView().toggleGenotypesTab(hasServicePlugins);
-          }
-        }).get().send();
   }
 }
