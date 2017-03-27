@@ -10,11 +10,15 @@
 
 package org.obiba.opal.web.gwt.app.client.project.permissions;
 
-import java.util.Comparator;
-import java.util.List;
-
-import javax.annotation.Nonnull;
-
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
@@ -33,21 +37,14 @@ import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFac
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.Acl;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.Subject;
 
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.HasUiHandlers;
-import com.gwtplatform.mvp.client.PresenterWidget;
-import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
+import javax.annotation.Nonnull;
+import java.util.Comparator;
+import java.util.List;
 
 public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissionsPresenter.Display>
     implements ProjectPermissionsUiHandlers, DeleteAllSubjectPermissionsHandler {
@@ -167,6 +164,12 @@ public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissi
             .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, typeName)
             .build(aclTokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT),
                 aclTokenizer.getToken(AclResourceTokenizer.ResourceTokens.REPORTTEMPLATE));
+      case VCF_STORE:
+        return ResourcePermissionRequestPaths.UriBuilders.PROJECT_VCF_PERMISSIONS_STORE.create()
+            .query(ResourcePermissionRequestPaths.PRINCIPAL_QUERY_PARAM, principal)
+            .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, typeName)
+            .build(aclTokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT));
+
       default:
         return null;
     }
@@ -279,6 +282,10 @@ public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissi
           placeRequest = ProjectPlacesHelper
               .getReportsPlace(tokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT));
           break;
+        case VCF_STORE:
+          placeRequest = ProjectPlacesHelper
+              .getVcfStorePlace(tokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT));
+          break;
       }
 
       assert placeRequest != null;
@@ -326,6 +333,10 @@ public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissi
 
         case REPORT_TEMPLATE:
           name = tokenizer.getToken(AclResourceTokenizer.ResourceTokens.REPORTTEMPLATE);
+          break;
+
+        case VCF_STORE:
+          name = tokenizer.getToken(AclResourceTokenizer.ResourceTokens.VCFSTORE);
           break;
       }
 
