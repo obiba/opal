@@ -2453,4 +2453,12 @@ public interface Translations extends Constants {
   @Description("Genotypes Controls count label")
   @DefaultStringValue("Controls")
   String vcfControlsCountLabel();
+
+  @Description("Genotypes selection items default tip message for export or remove")
+  @DefaultStringValue("Select VCF files to export or remove.")
+  String vcfItemTipsAlertMessageExportOrRemove();
+
+  @Description("Genotypes selection items default tip message for export only")
+  @DefaultStringValue("Select VCF files to export.")
+  String vcfItemTipsAlertMessageExport();
 }
