@@ -141,6 +141,12 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   @UiField
   IconAnchor deleteLink;
 
+  @UiField
+  Label selectItemTipsAlertMessage;
+
+  @UiField
+  FlowPanel selectItemTipsAlertPanel;
+
   private final Translations translations;
 
   private final TranslationMessages translationMessages;
@@ -238,6 +244,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     tablePager.setPagerVisible(pagerVisible);
     vcfFilesTable.hideLoadingIndicator();
     filterPanel.setStyleName(pagerVisible ? "span3" : "pull-right");
+    selectItemTip();
   }
 
   @Override
@@ -372,6 +379,23 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
   @UiHandler("refreshButton")
   public void refreshButtonClick(ClickEvent event) {
     getUiHandlers().onRefresh();
+  }
+
+  private void selectItemTip() {
+    if (exportVCF.isVisible()) {
+      selectItemTipsAlertPanel.setVisible(true);
+
+      if (deleteLink.isVisible())
+        selectItemTipsAlertMessage.setText(translations.vcfItemTipsAlertMessageExportOrRemove());
+      else
+        selectItemTipsAlertMessage.setText(translations.vcfItemTipsAlertMessageExport());
+
+      if (vcfFilesTable.getColumnIndex(checkColumn) == -1)
+        vcfFilesTable.insertColumn(0, checkColumn, checkColumn.getCheckColumnHeader());
+    } else {
+      selectItemTipsAlertPanel.setVisible(false);
+      vcfFilesTable.removeColumn(checkColumn);
+    }
   }
 
   private boolean hasMapping() {
