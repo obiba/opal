@@ -184,7 +184,8 @@ public interface Translations extends Constants {
       "DATASOURCE", "Tables",//
       "TABLE", "Table",//
       "VARIABLE", "Variable",//
-      "REPORT_TEMPLATE", "Report"//
+      "REPORT_TEMPLATE", "Report",//
+      "VCF_STORE", "VCF Store"
   })
   Map<String, String> permissionResourceNodeTypeMap();
 
