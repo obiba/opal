@@ -75,11 +75,11 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
     void setProject(ProjectDto project);
 
-    void toggleGenotypesTab(boolean show);
-
-    HasAuthorization getPermissionsAuthorizer();
+    HasAuthorization getTablesAuthorizer();
 
     HasAuthorization getGenotypesAuthorizer();
+
+    HasAuthorization getPermissionsAuthorizer();
   }
 
   @ProxyStandard
@@ -201,7 +201,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       if(fileExplorerPresenter != null) fileExplorerPresenter.reset();
       getView().clearTabsData();
     }
-    
+
     getView().setTabData(tab.ordinal(), tab == Display.ProjectTab.TABLES ? validatePath(projectName, path) : null);
     refresh();
   }
@@ -209,6 +209,11 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   private void authorize() {
     if(projectName == null) return;
 
+    // tables tab
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.DATASOURCE_TABLES.create().build(projectName)).get()//
+        .authorize(getView().getTablesAuthorizer())//
+        .send();
 
     // genotypes tab
     ResourceAuthorizationRequestBuilderFactory.newBuilder()

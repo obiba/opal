@@ -96,11 +96,6 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     description.setText(project.hasDescription() ? project.getDescription() : "");
   }
 
-  @Override
-  public void toggleGenotypesTab(boolean show) {
-    TabPanelHelper.setTabVisible(tabPanel, ProjectTab.GENOTYPES.ordinal(), show);
-  }
-
   private void setTags(ProjectDto project) {
     tagsPanel.clear();
     JsArrayString tagsArray = JsArrays.toSafeArray(project.getTagsArray());
@@ -130,13 +125,18 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   }
 
   @Override
-  public HasAuthorization getPermissionsAuthorizer() {
-    return new TabPanelAuthorizer(tabPanel, ProjectTab.PERMISSIONS.ordinal());
+  public HasAuthorization getTablesAuthorizer() {
+    return new TabPanelAuthorizer(tabPanel, ProjectTab.TABLES.ordinal());
   }
 
   @Override
   public HasAuthorization getGenotypesAuthorizer() {
     return new TabPanelAuthorizer(tabPanel, ProjectTab.GENOTYPES.ordinal());
+  }
+
+  @Override
+  public HasAuthorization getPermissionsAuthorizer() {
+    return new TabPanelAuthorizer(tabPanel, ProjectTab.PERMISSIONS.ordinal());
   }
 
   @UiHandler("projects")
