@@ -40,134 +40,105 @@
 
       <b:TabPanel tabPosition="above" ui:field="tabPanel">
         <b:Tab heading="VCF" active="true">
-          <g:FlowPanel>
-            <g:FlowPanel>
-              <g:FlowPanel addStyleNames="clearfix"/>
-
-              <g:FlowPanel addStyleNames="container-fluid no-padding-left no-padding-right">
-                <g:FlowPanel addStyleNames="no-left-margin pull-left" width="45%">
-                  <g:FlowPanel>
-                    <b:Heading size="4" addStyleNames="inline-block small-top-margin">
-                      <ui:msg description="Genotypes Genotypes Summary label">Summary</ui:msg>
-                    </b:Heading>
-                  </g:FlowPanel>
-
-                  <o:PropertiesTable keyStyleNames="span2" ui:field="summaryProperties">
-                    <o:PropertyPanel>
-                      <g:Label>
-                        <ui:msg description="Genotypes Samples label">Samples</ui:msg>
-                      </g:Label>
-                      <g:Label ui:field="samples"/>
-                    </o:PropertyPanel>
-                  </o:PropertiesTable>
-                </g:FlowPanel>
-
-                <g:FlowPanel addStyleNames="no-left-margin pull-right" width="45%">
-                  <g:FlowPanel>
-                    <b:Heading size="4" addStyleNames="inline-block small-top-margin">
-                      <ui:msg description="Genotypes Mapping Table label">Sample-Participant Mapping</ui:msg>
-                    </b:Heading>
-                    <b2:IconAnchor ui:field="editMapping" icon="EDIT" addStyleNames="small-indent">
-                    </b2:IconAnchor>
-                    <b2:IconAnchor ui:field="deleteMapping" icon="TRASH" addStyleNames="small-indent">
-                    </b2:IconAnchor>
-                  </g:FlowPanel>
-
-                  <g:FlowPanel>
-                    <b:HelpBlock>
-                      <ui:msg description="Genotypes Mapping Table help">Enhance the description of the genotypes with a table describing the samples: associated participant ID and case-controls identification.</ui:msg>
-                    </b:HelpBlock>
-                    <b:Button type="INFO" icon="PLUS" ui:field="addMapping">
-                      <ui:msg description="Add Sample Mapping label">Add Mapping</ui:msg>
-                    </b:Button>
-                  </g:FlowPanel>
-
-                  <o:PropertiesTable keyStyleNames="span2" ui:field="mappingProperties">
-                    <o:PropertyPanel>
-                      <g:Label>
-                        <ui:msg description="Genotypes Table label">Table</ui:msg>
-                      </g:Label>
-                      <g:Anchor ui:field="tableLink"></g:Anchor>
-                    </o:PropertyPanel>
-                    <o:PropertyPanel>
-                      <g:Label>
-                        <ui:msg description="Genotypes Participant ID label">Participant ID</ui:msg>
-                      </g:Label>
-                      <g:Anchor ui:field="participantIdLink"></g:Anchor>
-                    </o:PropertyPanel>
-                    <o:PropertyPanel>
-                      <g:Label>
-                        <ui:msg description="Genotypes Sample Role label">Sample Role</ui:msg>
-                      </g:Label>
-                      <g:Anchor ui:field="sampleRoleLink"></g:Anchor>
-                    </o:PropertyPanel>
-                  </o:PropertiesTable>
-                </g:FlowPanel>
-              </g:FlowPanel>
-            </g:FlowPanel>
-
-            <g:FlowPanel>
-              <g:FlowPanel addStyleNames="container-fluid no-padding-left no-padding-right">
-                <g:FlowPanel addStyleNames="small-bottom-margin">
-                  <b:Heading size="4" addStyleNames="inline-block small-top-margin">
-                    <ui:msg description="Genotypes Mapping Table title label">VCF Files</ui:msg>
-                  </b:Heading>
-                </g:FlowPanel>
-
-                <g:FlowPanel>
-                  <g:FlowPanel addStyleNames="span4 pull-left no-left-margin">
-                    <b:Button ui:field="refreshButton" icon="REFRESH" addStyleNames="small-indent no-left-margin">
-                      <ui:msg description="Refresh tables list">Refresh</ui:msg>
-                    </b:Button>
-                  </g:FlowPanel>
-
-                  <g:FlowPanel addStyleNames="span4 pull-left no-left-margin">
-                    <o:OpalSimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-left"/>
-                  </g:FlowPanel>
-
-                  <g:FlowPanel addStyleNames="span4 pull-right no-left-margin" ui:field="filterPanel">
-                    <b:Controls>
-                      <b:InputAddOn prependIcon="FILTER" addStyleNames="pull-right">
-                        <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
-                      </b:InputAddOn>
-                    </b:Controls>
-                  </g:FlowPanel>
-                </g:FlowPanel>
-              </g:FlowPanel>
-
-              <g:FlowPanel>
-                <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false" addStyleNames="actions-select">
-
-                  <g:FlowPanel addStyleNames="pull-left">
-                    <b2:IconAnchor ui:field="exportLink" icon="DOWNLOAD_ALT" addStyleNames="inline xsmall-indent">
-                      <ui:msg description="Genotypes Export VCF Files label">Export</ui:msg>
-                    </b2:IconAnchor>
-                    <b2:IconAnchor ui:field="deleteLink" icon="TRASH" addStyleNames="inline xsmall-indent">
-                      <ui:msg description="Genotypes Remove VCF Files label">Remove</ui:msg>
-                    </b2:IconAnchor>
-                  </g:FlowPanel>
-
-                  <g:FlowPanel addStyleNames="pull-right">
-                    <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
-                    <b2:IconAnchor ui:field="selectAllAnchor" icon="CHECK" addStyleNames="inline small-indent"/>
-                    <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" visible="false"
-                                   addStyleNames="inline small-indent">
-                      <ui:msg description="Clear label">Clear</ui:msg>
-                    </b2:IconAnchor>
-                  </g:FlowPanel>
-
-                </b:Alert>
-
-                <b:Alert ui:field="selectItemTipsAlert" close="false" visible="true" addStyleNames="alert-info actions-select">
+          <b:FluidRow>
+            <b:Column size="6">
+              <b:Heading size="4" addStyleNames="small-top-margin">
+                <ui:msg description="Genotypes Genotypes Summary label">Summary</ui:msg>
+              </b:Heading>
+              <o:PropertiesTable keyStyleNames="span2" ui:field="summaryProperties">
+                <o:PropertyPanel>
                   <g:Label>
-                    <ui:msg description="Select vcf files tips label">Select VCF files to export or remove.</ui:msg>
+                    <ui:msg description="Genotypes Samples label">Samples</ui:msg>
                   </g:Label>
-                </b:Alert>
+                  <g:Label ui:field="samples"/>
+                </o:PropertyPanel>
+              </o:PropertiesTable>
+            </b:Column>
+            <b:Column size="6">
+              <b:Heading size="4" addStyleNames="inline-block small-top-margin">
+                <ui:msg description="Genotypes Mapping Table label">Sample-Participant Mapping</ui:msg>
+              </b:Heading>
+              <b2:IconAnchor ui:field="editMapping" icon="EDIT" addStyleNames="small-indent">
+              </b2:IconAnchor>
+              <b2:IconAnchor ui:field="deleteMapping" icon="TRASH" addStyleNames="small-indent">
+              </b2:IconAnchor>
+              <g:FlowPanel>
+                <b:HelpBlock>
+                  <ui:msg description="Genotypes Mapping Table help">Enhance the description of the genotypes with a table describing the samples: associated participant ID and case-controls identification.</ui:msg>
+                </b:HelpBlock>
+                <b:Button type="INFO" icon="PLUS" ui:field="addMapping">
+                  <ui:msg description="Add Sample Mapping label">Add Mapping</ui:msg>
+                </b:Button>
               </g:FlowPanel>
+              <o:PropertiesTable keyStyleNames="span2" ui:field="mappingProperties">
+                <o:PropertyPanel>
+                  <g:Label>
+                    <ui:msg description="Genotypes Table label">Table</ui:msg>
+                  </g:Label>
+                  <g:Anchor ui:field="tableLink"></g:Anchor>
+                </o:PropertyPanel>
+                <o:PropertyPanel>
+                  <g:Label>
+                    <ui:msg description="Genotypes Participant ID label">Participant ID</ui:msg>
+                  </g:Label>
+                  <g:Anchor ui:field="participantIdLink"></g:Anchor>
+                </o:PropertyPanel>
+                <o:PropertyPanel>
+                  <g:Label>
+                    <ui:msg description="Genotypes Sample Role label">Sample Role</ui:msg>
+                  </g:Label>
+                  <g:Anchor ui:field="sampleRoleLink"></g:Anchor>
+                </o:PropertyPanel>
+              </o:PropertiesTable>
+            </b:Column>
+          </b:FluidRow>
 
-              <o:Table ui:field="vcfFilesTable"/>
+          <b:Heading size="4" addStyleNames="inline-block small-top-margin">
+            <ui:msg description="Genotypes Mapping Table title label">VCF Files</ui:msg>
+          </b:Heading>
+
+          <g:FlowPanel addStyleNames="clearfix">
+            <b:Button ui:field="refreshButton" icon="REFRESH" addStyleNames="pull-left">
+              <ui:msg description="Refresh tables list">Refresh</ui:msg>
+            </b:Button>
+            <o:OpalSimplePager ui:field="tablePager" showTotalWhenNoPager="true" location="RIGHT" addStyleNames="pull-right"/>
+            <g:FlowPanel addStyleNames="span4 pull-right no-left-margin" ui:field="filterPanel">
+              <b:Controls>
+                <b:InputAddOn prependIcon="FILTER" addStyleNames="pull-right">
+                  <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
+                </b:InputAddOn>
+              </b:Controls>
             </g:FlowPanel>
           </g:FlowPanel>
+
+          <g:FlowPanel>
+            <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false" addStyleNames="actions-select">
+              <g:FlowPanel addStyleNames="pull-left">
+                <b2:IconAnchor ui:field="exportLink" icon="DOWNLOAD_ALT" addStyleNames="inline xsmall-indent">
+                  <ui:msg description="Genotypes Export VCF Files label">Export</ui:msg>
+                </b2:IconAnchor>
+                <b2:IconAnchor ui:field="deleteLink" icon="TRASH" addStyleNames="inline xsmall-indent">
+                  <ui:msg description="Genotypes Remove VCF Files label">Remove</ui:msg>
+                </b2:IconAnchor>
+              </g:FlowPanel>
+              <g:FlowPanel addStyleNames="pull-right">
+                <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
+                <b2:IconAnchor ui:field="selectAllAnchor" icon="CHECK" addStyleNames="inline small-indent"/>
+                <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" visible="false"
+                               addStyleNames="inline small-indent">
+                  <ui:msg description="Clear label">Clear</ui:msg>
+                </b2:IconAnchor>
+              </g:FlowPanel>
+            </b:Alert>
+            <b:Alert ui:field="selectItemTipsAlert" close="false" visible="true" addStyleNames="alert-info actions-select">
+              <g:Label>
+                <ui:msg description="Select vcf files tips label">Select VCF files to export or remove.</ui:msg>
+              </g:Label>
+            </b:Alert>
+          </g:FlowPanel>
+
+          <o:Table ui:field="vcfFilesTable"/>
+
         </b:Tab>
 
         <b:Tab heading="Permissions">
