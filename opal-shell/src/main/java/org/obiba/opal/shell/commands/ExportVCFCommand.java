@@ -130,10 +130,10 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
       String baseVcfName = vcfName;
       if (vcfName.endsWith(".vcf.gz")) baseVcfName = vcfName.replaceAll("\\.vcf\\.gz$", "");
       else if (vcfName.endsWith(".bcf.gz")) baseVcfName = vcfName.replaceAll("\\.bcf\\.gz$", "");
-      getShell().progress(String.format("Exporting VCF/BCF file: %s", baseVcfName), count, total, (count*100)/total);
+      getShell().progress(String.format("Exporting VCF/BCF file (%s)", baseVcfName), count, total, (count*100)/total);
       VCFStore.VCFSummary summary = store.getVCFSummary(baseVcfName);
       String vcfFileName = baseVcfName + "." + summary.getFormat().name().toLowerCase() + ".gz";
-      getShell().printf(String.format("Exporting VCF/BCF file: %s", vcfFileName));
+      getShell().printf(String.format("Exporting VCF/BCF file (%s)", vcfFileName));
       File vcfFile = new File(destinationFolder, vcfFileName);
       if (!options.hasTable()) {
         if (!options.isCaseControl()) {
