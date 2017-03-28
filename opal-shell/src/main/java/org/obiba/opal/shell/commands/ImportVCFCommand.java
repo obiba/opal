@@ -98,8 +98,8 @@ public class ImportVCFCommand extends AbstractOpalRuntimeDependentCommand<Import
     int total = options.getFiles().size() + 1;
     int count = 1;
     for (String vcfFilePath : options.getFiles()) {
-      getShell().printf(String.format("Importing VCF/BCF file: %s", vcfFilePath));
-      getShell().progress(String.format("Importing VCF/BCF file: %s", vcfFilePath), count, total, (count*100)/total);
+      getShell().printf(String.format("Importing VCF/BCF file (%s)", vcfFilePath));
+      getShell().progress(String.format("Importing VCF/BCF file (%s)", vcfFilePath), count, total, (count*100)/total);
       FileObject vcfFileObject = resolveFileInFileSystem(vcfFilePath);
       if (vcfFileObject == null || !vcfFileObject.exists() || vcfFileObject.getType() == FileType.FOLDER)
         throw new IllegalArgumentException("Not a valid path to VCF/BCF file: " + vcfFilePath);
