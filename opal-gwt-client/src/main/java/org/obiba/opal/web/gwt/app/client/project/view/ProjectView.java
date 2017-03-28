@@ -86,6 +86,11 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   }
 
   @Override
+  public boolean isTabVisible(int index) {
+    return tabPanel.isTabVisible(index);
+  }
+
+  @Override
   public void setProject(ProjectDto project) {
     if(titleCrumbs.getWidgetCount() > 1) {
       titleCrumbs.remove(1);

@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.github.gwtbootstrap.client.ui.TabPanel;
+import com.github.gwtbootstrap.client.ui.base.UnorderedList;
 
 public class OpalTabPanel extends TabPanel {
 
@@ -24,11 +25,20 @@ public class OpalTabPanel extends TabPanel {
     return this;
   }
 
+  public boolean isTabVisible(int index) {
+    return getNavTab(index).isVisible();
+  }
+
   public Object getData(int index) {
     return data.get(index);
   }
 
   public void clearData() {
     data.clear();
+  }
+
+  private com.github.gwtbootstrap.client.ui.base.ListItem getNavTab(int i) {
+    UnorderedList ul = (UnorderedList) getWidget(0);
+    return (com.github.gwtbootstrap.client.ui.base.ListItem) ul.getWidget(i);
   }
 }

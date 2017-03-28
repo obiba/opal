@@ -10,25 +10,8 @@
 
 package org.obiba.opal.web.gwt.app.client.project.view;
 
-import com.google.common.base.Strings;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.HasUiHandlers;
-import com.gwtplatform.mvp.client.Presenter;
-import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.annotations.ContentSlot;
-import com.gwtplatform.mvp.client.annotations.NameToken;
-import com.gwtplatform.mvp.client.annotations.ProxyStandard;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.client.proxy.ProxyPlace;
-import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
-import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
-import org.obiba.opal.spi.vcf.VCFStoreService;
+import java.util.Arrays;
+
 import org.obiba.opal.web.gwt.app.client.bookmark.icon.BookmarkIconPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
@@ -49,14 +32,31 @@ import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 import org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.HasTabPanel;
-import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.opal.PluginDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import com.google.common.base.Strings;
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.ContentSlot;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
+import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 
 public class ProjectPresenter extends Presenter<ProjectPresenter.Display, ProjectPresenter.Proxy>
     implements ProjectUiHandlers, FolderUpdatedEvent.FolderUpdatedHandler {
@@ -72,6 +72,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       PERMISSIONS,
       ADMINISTRATION
     }
+
+    boolean isTabVisible(int index);
 
     void setProject(ProjectDto project);
 
@@ -132,6 +134,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   private String projectName;
 
   private Display.ProjectTab tab = Display.ProjectTab.TABLES;
+
+  private String path;
 
   private ProjectDto project;
 
@@ -195,53 +199,48 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
     projectName = request.getParameter(ParameterTokens.TOKEN_NAME, null);
     tab = validateTab(request.getParameter(ParameterTokens.TOKEN_TAB, null));
-    String path = Strings.nullToEmpty(request.getParameter(ParameterTokens.TOKEN_PATH, null));
+    path = Strings.nullToEmpty(request.getParameter(ParameterTokens.TOKEN_PATH, null));
 
     if(!projectName.equals(oldProject) && path.isEmpty()) {
       if(fileExplorerPresenter != null) fileExplorerPresenter.reset();
       getView().clearTabsData();
     }
 
-    getView().setTabData(tab.ordinal(), tab == Display.ProjectTab.TABLES ? validatePath(projectName, path) : null);
     refresh();
   }
 
   private void authorize() {
     if(projectName == null) return;
 
-    // tables tab
-    ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.DATASOURCE_TABLES.create().build(projectName)).get()//
-        .authorize(getView().getTablesAuthorizer())//
-        .send();
-
-    // genotypes tab
-    ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.PROJECT_VCF_STORE.create().build(projectName)).get()//
-        .authorize(getView().getGenotypesAuthorizer())//
-        .send();
+    new DefaultTabAuthorizer().authorizeTables();
 
     // permissions tab
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.PROJECT_PERMISSIONS_SUBJECTS.create().build(projectName)).get()//
-        .authorize(getView().getPermissionsAuthorizer())//
+        .forResource(UriBuilders.PROJECT_PERMISSIONS_SUBJECTS.create().build(projectName)).get()
+        .authorize(getView().getPermissionsAuthorizer())
         .send();
   }
 
   public void refresh() {
     // TODO handle wrong or missing project name
     if(projectName == null) return;
+
     // reset
-    ResourceRequestBuilderFactory.<ProjectDto>newBuilder() //
-        .forResource(UriBuilders.PROJECT.create().build(projectName)) //
+    ResourceRequestBuilderFactory.<ProjectDto>newBuilder()
+        .forResource(UriBuilders.PROJECT.create().build(projectName))
         .withCallback(new ResourceCallback<ProjectDto>() {
           @Override
           public void onResource(Response response, ProjectDto resource) {
             project = resource;
-            // TODO check project is null
             getView().setProject(project);
-            onTabSelected(tab.ordinal());
-            getView().selectTab(tab.ordinal());
+            authorize();
+
+            if(tab != Display.ProjectTab.TABLES && tab != Display.ProjectTab.GENOTYPES) {
+              // these two tabs will be selected upon their authorization
+              onTabSelected(tab.ordinal());
+              getView().selectTab(tab.ordinal());
+            }
+
             if(bookmarkIconPresenter == null) {
               bookmarkIconPresenter = bookmarkIconPresenterProvider.get();
               bookmarkIconPresenter.addStyleName("small-indent");
@@ -249,7 +248,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
             }
             bookmarkIconPresenter.setBookmarkable(UriBuilders.DATASOURCE.create().build(projectName));
           }
-        })//
+        })
         .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
@@ -257,7 +256,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
             placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.PROJECTS).build());
           }
         }).get().send();
-    authorize();
+
   }
 
   @Override
@@ -272,7 +271,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
     PlaceRequest.Builder builder = PlaceRequestHelper
         .createRequestBuilderWithParams(placeManager.getCurrentPlaceRequest(),
-            Arrays.asList(ParameterTokens.TOKEN_NAME)) //
+            Arrays.asList(ParameterTokens.TOKEN_NAME))
         .with(ParameterTokens.TOKEN_TAB, tab.toString());
     if(!Strings.isNullOrEmpty(queryPathParam)) {
       builder.with(ParameterTokens.TOKEN_PATH, queryPathParam);
@@ -408,5 +407,87 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     }
     updateHistory(null);
     return null;
+  }
+
+  /**
+   * Helper class to show TABLES or GENOTYPES TABs based on authorization results
+   */
+  private class DefaultTabAuthorizer {
+    public void authorizeTables() {
+      ResourceAuthorizationRequestBuilderFactory.newBuilder()
+          .forResource(UriBuilders.DATASOURCE_TABLES.create().build(projectName)).get()
+          .authorize(new HasAuthorization() {
+            HasAuthorization viewAuthorizer = getView().getTablesAuthorizer();
+
+            @Override
+            public void beforeAuthorization() {
+              viewAuthorizer.beforeAuthorization();
+            }
+
+            @Override
+            public void authorized() {
+              viewAuthorizer.authorized();
+              getView().setTabData(tab.ordinal(), tab == Display.ProjectTab.TABLES ? validatePath(projectName, path) : null);
+              onTabSelected(tab.ordinal());
+              getView().selectTab(tab.ordinal());
+              authorizeGenotypes();
+            }
+
+            @Override
+            public void unauthorized() {
+              viewAuthorizer.unauthorized();
+              authorizeGenotypes();
+            }
+          })
+          .send();
+    }
+
+    void authorizeGenotypes() {
+      // tables tab
+      ResourceAuthorizationRequestBuilderFactory.newBuilder()
+          .forResource(UriBuilders.PROJECT_VCF_STORE.create().build(projectName)).get()
+          .authorize(new HasAuthorization() {
+            HasAuthorization viewAuthorizer = getView().getGenotypesAuthorizer();
+
+            @Override
+            public void beforeAuthorization() {
+              viewAuthorizer.beforeAuthorization();
+            }
+
+            @Override
+            public void authorized() {
+              viewAuthorizer.authorized();
+              if (!getView().isTabVisible(Display.ProjectTab.TABLES.ordinal()) &&
+                  tab == Display.ProjectTab.TABLES ||
+                  tab == Display.ProjectTab.GENOTYPES) {
+
+                tab = Display.ProjectTab.GENOTYPES;
+                onTabSelected(tab.ordinal());
+                getView().selectTab(tab.ordinal());
+                getView().setTabData(tab.ordinal(), tab == Display.ProjectTab.GENOTYPES ? validatePath(projectName, path) : null);
+                PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.PROJECT)
+                    .with(ParameterTokens.TOKEN_NAME, projectName)
+                    .with(ParameterTokens.TOKEN_TAB, Display.ProjectTab.GENOTYPES.toString())
+                    .with(ParameterTokens.TOKEN_PATH, path);
+
+                // Prevent recursive placement changes by stopping when new and current places are identical
+                PlaceRequest newPlace = builder.build();
+                PlaceRequest currPlace = placeManager.getCurrentPlaceRequest();
+                if (!currPlace.hasSameNameToken(newPlace) ||
+                    !currPlace.getParameter(ParameterTokens.TOKEN_NAME, "").equals(projectName) ||
+                    !currPlace.getParameter(ParameterTokens.TOKEN_TAB, "").equals(Display.ProjectTab.GENOTYPES.toString())) {
+
+                  placeManager.revealPlace(builder.build());
+                }
+              }
+            }
+
+            @Override
+            public void unauthorized() {
+              viewAuthorizer.unauthorized();
+            }
+          })
+          .send();
+    }
   }
 }
