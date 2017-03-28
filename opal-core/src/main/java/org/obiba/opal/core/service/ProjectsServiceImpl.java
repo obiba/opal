@@ -170,7 +170,10 @@ public class ProjectsServiceImpl implements ProjectService {
     } catch(NoSuchProjectException e) {
       registerDatasource(project);
     }
-    orientDbService.save(project, project);
+
+    synchronized (this) {
+      orientDbService.save(project, project);
+    }
   }
 
   @NotNull
