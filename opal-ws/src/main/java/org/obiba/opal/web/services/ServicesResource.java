@@ -17,7 +17,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.UriBuilder;
 
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
+import org.obiba.opal.spi.ServicePlugin;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -36,6 +38,9 @@ public class ServicesResource {
   @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
   private Set<Service> services;
 
+  @Autowired
+  private OpalRuntime opalRuntime;
+
   @GET
   public List<Opal.ServiceDto> services() {
     List<Opal.ServiceDto> serviceDtos = Lists.newArrayList();
@@ -43,6 +48,14 @@ public class ServicesResource {
     for(Service service : services) {
       Opal.ServiceStatus status = service.isRunning() ? Opal.ServiceStatus.RUNNING : Opal.ServiceStatus.STOPPED;
       URI link = UriBuilder.fromPath("/").path(ServiceResource.class).build(service.getName());
+      Opal.ServiceDto dto = Opal.ServiceDto.newBuilder().setName(service.getName()).setStatus(status)
+          .setLink(link.getPath()).build();
+      serviceDtos.add(dto);
+    }
+
+    for (ServicePlugin service : opalRuntime.getServicePlugins()) {
+      Opal.ServiceStatus status = service.isRunning() ? Opal.ServiceStatus.RUNNING : Opal.ServiceStatus.STOPPED;
+      URI link = UriBuilder.fromPath("/").path(PluginResource.class).segment("service").build(service.getName());
       Opal.ServiceDto dto = Opal.ServiceDto.newBuilder().setName(service.getName()).setStatus(status)
           .setLink(link.getPath()).build();
       serviceDtos.add(dto);

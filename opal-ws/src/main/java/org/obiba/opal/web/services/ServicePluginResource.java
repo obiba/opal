@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
@@ -29,7 +30,7 @@ public class ServicePluginResource {
   public Response get() {
     ServicePlugin plugin = opalRuntime.getServicePlugin(service);
     Opal.ServiceStatus status = plugin.isRunning() ? Opal.ServiceStatus.RUNNING : Opal.ServiceStatus.STOPPED;
-    URI link = UriBuilder.fromPath("/").path(PluginResource.class).build(plugin.getName());
+    URI link = UriBuilder.fromPath("/").path(PluginResource.class).segment("service").build(plugin.getName());
 
     Opal.ServiceDto dto = Opal.ServiceDto.newBuilder().setName(plugin.getName()).setStatus(status)
         .setLink(link.getPath()).build();
