@@ -11,6 +11,7 @@ package org.obiba.opal.core.runtime;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import net.sf.ehcache.CacheManager;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -317,22 +318,34 @@ public class DefaultOpalRuntime implements OpalRuntime {
     folder.createFolder();
   }
 
-  private List<Plugin> listPlugins() {
-    List<Plugin> plugins = Lists.newArrayList();
+  private Collection<Plugin> listPlugins() {
+    Map<String, Plugin> pluginsMap = Maps.newLinkedHashMap();
     // make sure plugins directory exists
     initDirectory(PLUGINS_DIR);
     // read it to enhance classpath
     File pluginsDir = new File(PLUGINS_DIR);
-    if (!pluginsDir.exists() || !pluginsDir.isDirectory() || !pluginsDir.canRead()) return plugins;
+    if (!pluginsDir.exists() || !pluginsDir.isDirectory() || !pluginsDir.canRead()) return pluginsMap.values();
     File[] children = pluginsDir.listFiles();
-    if (children == null) return plugins;
+    if (children == null) return pluginsMap.values();
     for (File child : children) {
       Plugin plugin = new Plugin(child);
-      if (plugin.isValid()) plugins.add(plugin);
+      addPlugin(pluginsMap, plugin);
     }
-    return plugins;
+    return pluginsMap.values();
   }
 
-
+  /**
+   * Add plugin if valid and if most recent version.
+   *
+   * @param pluginsMap
+   * @param plugin
+   */
+  private void addPlugin(Map<String, Plugin> pluginsMap, Plugin plugin) {
+    if (!plugin.isValid()) return;
+    if (!pluginsMap.containsKey(plugin.getName()))
+      pluginsMap.put(plugin.getName(), plugin);
+    else if (plugin.getVersion().compareTo(pluginsMap.get(plugin.getName()).getVersion())>0)
+      pluginsMap.put(plugin.getName(), plugin);
+  }
 
 }

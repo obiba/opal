@@ -10,6 +10,8 @@
 
 package org.obiba.opal.core.runtime;
 
+import com.google.common.base.Strings;
+import org.obiba.runtime.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +59,11 @@ public class Plugin {
     return directory.isDirectory() && directory.canRead()
         && properties.exists() && properties.canRead()
         && lib.exists() && lib.isDirectory() && lib.canRead();
+  }
+
+  public Version getVersion() {
+    String version = getProperties().getProperty("version");
+    return new Version(version);
   }
 
   public Properties getProperties() {
