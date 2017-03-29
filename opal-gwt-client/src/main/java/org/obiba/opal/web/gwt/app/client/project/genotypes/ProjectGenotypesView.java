@@ -508,7 +508,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
       public String getValue(VCFSummaryDto vcfSummaryDto) {
         return vcfSummaryDto.hasIdentifiedSamplesCount() //
           ? Integer.toString(vcfSummaryDto.getIdentifiedSamplesCount()) //
-          : ""; //
+          : "0"; //
       }
     };
 
@@ -526,7 +526,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
       public String getValue(VCFSummaryDto vcfSummaryDto) {
         return vcfSummaryDto.hasParticipantsCount()
           ? Integer.toString(vcfSummaryDto.getParticipantsCount())
-          : "";
+          : "0";
       }
     };
 
@@ -544,7 +544,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
       public String getValue(VCFSummaryDto vcfSummaryDto) {
         return vcfSummaryDto.hasControlSamplesCount()
           ? Integer.toString(vcfSummaryDto.getControlSamplesCount())
-          : "";
+          : "0";
       }
     };
 
