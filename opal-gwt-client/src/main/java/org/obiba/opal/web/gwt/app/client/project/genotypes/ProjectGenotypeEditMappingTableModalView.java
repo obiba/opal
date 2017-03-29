@@ -165,19 +165,23 @@ public class ProjectGenotypeEditMappingTableModalView extends ModalPopupViewWith
   }
 
   @Override
-  public void setAvailableMappingTables(JsArray<TableDto> availableMappingTables) {
+  public void setAvailableMappingTables(JsArray<TableDto> availableMappingTables, String projectName) {
     mappingTable.clear();
     List<String> groups = Lists.newArrayList();
-    for (TableDto tableDto : JsArrays.toIterable(availableMappingTables)) {
+
+    int tentativeIndex = -1;
+    for (int i = 0; i < availableMappingTables.length(); i++) {
+      TableDto tableDto = availableMappingTables.get(i);
       if (groups.indexOf(tableDto.getDatasourceName()) == -1) {
         groups.add(tableDto.getDatasourceName());
         mappingTable.addGroup(tableDto.getDatasourceName());
       }
+      if (projectName.equals(tableDto.getDatasourceName()) && tentativeIndex == -1) tentativeIndex = i;
       mappingTable.addItemToGroup(tableDto.getName(), tableDto.getDatasourceName() + "." + tableDto.getName());
     }
     if (availableMappingTables.length() > 0) {
       if (initialMappingTable == null) {
-        mappingTable.setItemSelected(0, true);
+        mappingTable.setItemSelected(tentativeIndex == -1 ? 0 : tentativeIndex, true);
       } else {
         mappingTable.setSelectedValue(initialMappingTable.getTableReference());
       }
