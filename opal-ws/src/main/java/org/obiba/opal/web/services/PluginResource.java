@@ -39,10 +39,10 @@ public class PluginResource {
     return Dtos.asDto(opalRuntime.getPlugin(name));
   }
 
-  @Path("/{service}")
-  public ServicePluginResource service(@PathParam("service") String service) {
+  @Path("/service")
+  public ServicePluginResource service() {
     ServicePluginResource resource = applicationContext.getBean(ServicePluginResource.class);
-    resource.setService(service);
+    resource.setService(name);
     return resource;
   }
 
