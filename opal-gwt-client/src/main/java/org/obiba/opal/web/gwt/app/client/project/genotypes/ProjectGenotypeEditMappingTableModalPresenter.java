@@ -86,7 +86,7 @@ public class ProjectGenotypeEditMappingTableModalPresenter extends ModalPresente
           @Override
           public void onResource(Response response, JsArray<TableDto> resource) {
             mappingTables = resource;
-            getView().setAvailableMappingTables(mappingTables);
+            getView().setAvailableMappingTables(mappingTables, projectName);
             logger.info(mappingTables.length() + " mapping tables");
           }
         }).get().send();
@@ -236,7 +236,7 @@ public class ProjectGenotypeEditMappingTableModalPresenter extends ModalPresente
 
     HasText getSampleRoleVariable();
 
-    void setAvailableMappingTables(JsArray<TableDto> availableMappingTables);
+    void setAvailableMappingTables(JsArray<TableDto> availableMappingTables, String projectName);
 
     void setVcfSamplesMappingDto(VCFSamplesMappingDto dto);
 
