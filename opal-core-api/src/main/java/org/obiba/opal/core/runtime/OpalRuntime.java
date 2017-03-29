@@ -28,6 +28,8 @@ public interface OpalRuntime extends SystemService {
 
   String PLUGIN_PROPERTIES = "plugin.properties";
 
+  String SITE_PROPERTIES = "site.properties";
+
   String EXTENSIONS_DIR = System.getProperty("OPAL_HOME") + File.separator + "extensions";
 
   String MAGMA_JS_EXTENSION = EXTENSIONS_DIR + File.separator + "magma-js";

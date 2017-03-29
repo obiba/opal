@@ -31,11 +31,14 @@ public class Plugin {
 
   private final File properties;
 
+  private final File siteProperties;
+
   private final File lib;
 
   public Plugin(File directory) {
     this.directory = directory;
     this.properties = new File(directory, OpalRuntime.PLUGIN_PROPERTIES);
+    this.siteProperties = new File(directory, OpalRuntime.SITE_PROPERTIES);
     this.lib = new File(directory, "lib");
   }
 
@@ -60,11 +63,17 @@ public class Plugin {
     Properties prop = getDefaultProperties();
     try (FileInputStream in = new FileInputStream(properties)) {
       prop.load(in);
-      return prop;
     } catch (Exception e) {
       log.warn("Failed reading properties: {}", properties.getAbsolutePath(), e);
-      return prop;
     }
+    if (siteProperties.exists()) {
+      try (FileInputStream in = new FileInputStream(siteProperties)) {
+        prop.load(in);
+      } catch (Exception e) {
+        log.warn("Failed reading site properties: {}", siteProperties.getAbsolutePath(), e);
+      }
+    }
+    return prop;
   }
 
   private Properties getDefaultProperties() {
