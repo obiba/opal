@@ -139,7 +139,10 @@ public class ProjectGenotypeEditMappingTableModalPresenter extends ModalPresente
       for (VariableDto variable : JsArrays.toIterable(variables)) {
         if (!suggestions.containsKey(PARTICIPANT_ID_VARIABE_KEY)) {
           suggestParticipant(variable, suggestions);
-        } else if (!suggestions.containsKey(SAMPLE_ROLE_VARIABE_KEY)) {
+          if (suggestions.containsKey(PARTICIPANT_ID_VARIABE_KEY)) continue;
+        }
+
+        if (!suggestions.containsKey(SAMPLE_ROLE_VARIABE_KEY)) {
           suggestSample(variable, suggestions);
         }
 
@@ -176,11 +179,11 @@ public class ProjectGenotypeEditMappingTableModalPresenter extends ModalPresente
             break;
           }
         }
+      }
 
-        if(!suggestions.containsKey(SAMPLE_ROLE_VARIABE_KEY) &&
-            RegExp.compile("role", "i").exec(variable.getName()) != null) {
-          suggestions.put(SAMPLE_ROLE_VARIABE_KEY, variable);
-        }
+      if(!suggestions.containsKey(SAMPLE_ROLE_VARIABE_KEY) &&
+          RegExp.compile("role", "i").exec(variable.getName()) != null) {
+        suggestions.put(SAMPLE_ROLE_VARIABE_KEY, variable);
       }
     }
   }
