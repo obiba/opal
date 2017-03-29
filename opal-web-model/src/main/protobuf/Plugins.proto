@@ -13,8 +13,12 @@ message PluginDto {
     required string description = 3;
     required string version = 4;
     required string opalVersion = 5;
-    repeated PropertyDto properties = 6;
+    optional PluginCfgDto config = 6;
     optional string type = 7;
+}
+
+message PluginCfgDto {
+    repeated PropertyDto properties = 1;
 }
 
 message VCFStoreDto {

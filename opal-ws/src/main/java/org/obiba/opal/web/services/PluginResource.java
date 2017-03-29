@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
 
 @Component
 @Scope("request")
@@ -44,6 +45,19 @@ public class PluginResource {
     ServicePluginResource resource = applicationContext.getBean(ServicePluginResource.class);
     resource.setService(name);
     return resource;
+  }
+
+  @GET
+  @Path("/cfg")
+  public Plugins.PluginCfgDto getConfig() {
+    return get().getConfig();
+  }
+
+  @PUT
+  @Path("/cfg")
+  public Response saveConfig(Plugins.PluginCfgDto configDto) {
+    // TODO: write plugin properties
+    return Response.status(Response.Status.NOT_IMPLEMENTED).build();
   }
 
 }

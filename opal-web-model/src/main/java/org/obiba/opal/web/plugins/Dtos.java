@@ -97,6 +97,7 @@ public class Dtos {
   }
 
   private static void setProperties(Properties properties, Plugins.PluginDto.Builder builder) {
+    Plugins.PluginCfgDto.Builder cfgBuilder = Plugins.PluginCfgDto.newBuilder();
     properties.entrySet().stream().filter(entry -> !reservedProperties.contains(entry.getKey().toString())).forEach(entry -> {
       if ("name".equals(entry.getKey())) builder.setName(entry.getValue().toString());
       else if ("title".equals(entry.getKey())) builder.setTitle(entry.getValue().toString());
@@ -104,7 +105,8 @@ public class Dtos {
       else if ("version".equals(entry.getKey())) builder.setVersion(entry.getValue().toString());
       else if ("opal.version".equals(entry.getKey())) builder.setOpalVersion(entry.getValue().toString());
       else if ("type".equals(entry.getKey())) builder.setType(entry.getValue().toString());
-      else builder.addProperties(Plugins.PropertyDto.newBuilder().setKey(entry.getKey().toString()).setValue(entry.getValue().toString()));
+      else cfgBuilder.addProperties(Plugins.PropertyDto.newBuilder().setKey(entry.getKey().toString()).setValue(entry.getValue().toString()));
     });
+    builder.setConfig(cfgBuilder);
   }
 }
