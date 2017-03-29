@@ -35,6 +35,7 @@ import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.support.ValueRenderingHelper;
 import org.obiba.opal.web.gwt.app.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
@@ -43,6 +44,7 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
+import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.opal.VCFSamplesMappingDto;
 import org.obiba.opal.web.model.client.opal.VCFStoreDto;
 import org.obiba.opal.web.model.client.opal.VCFSummaryDto;
@@ -423,6 +425,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     vcfFilesTable.addColumn(ProjectGenotypesColumns.CONTROLS_COUNT, translations.vcfControlsCountLabel());
     vcfFilesTable.addColumn(ProjectGenotypesColumns.VARIANTS_COUNT, translations.vcfVariantsCountLabel());
     vcfFilesTable.addColumn(ProjectGenotypesColumns.GENOTYPES_COUNT, translations.vcfGenotypesCountLabel());
+    vcfFilesTable.addColumn(ProjectGenotypesColumns.FILE_SIZE, translations.sizeLabel());
     vcfFilesTable.addColumn(new GenotypesActionsColumn(), translations.actionsLabel());
   }
 
@@ -542,6 +545,14 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
         return vcfSummaryDto.hasControlSamplesCount()
           ? Integer.toString(vcfSummaryDto.getControlSamplesCount())
           : "";
+      }
+    };
+
+    static final Column<VCFSummaryDto, String> FILE_SIZE = new TextColumn<VCFSummaryDto>() {
+
+      @Override
+      public String getValue(VCFSummaryDto object) {
+        return ValueRenderingHelper.getSizeWithUnit(object.getSize());
       }
     };
   }
