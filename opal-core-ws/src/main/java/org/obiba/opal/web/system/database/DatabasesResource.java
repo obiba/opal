@@ -25,6 +25,7 @@ import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.database.MultipleIdentifiersDatabaseException;
 import org.obiba.opal.web.database.Dtos;
 import org.obiba.opal.web.support.InvalidRequestException;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +41,7 @@ public class DatabasesResource {
   private DatabaseRegistry databaseRegistry;
 
   @GET
+  @NoAuthorization
   public List<DatabaseDto> getDatabases(@QueryParam("usage") String usage, @QueryParam("settings")
       @DefaultValue("false") Boolean settings) {
     try {
