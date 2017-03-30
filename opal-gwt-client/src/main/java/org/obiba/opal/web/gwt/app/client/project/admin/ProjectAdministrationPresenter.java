@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.gwt.app.client.project.admin;
 
+import com.google.common.collect.Maps;
+import com.google.gwt.core.client.JsArray;
+import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -23,13 +26,10 @@ import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.project.edit.EditProjectModalPresenter;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.project.keystore.ProjectKeyStorePresenter;
-import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.opal.PluginDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.google.gwt.http.client.Request;
@@ -42,6 +42,8 @@ import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
+
+import java.util.Map;
 
 import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
@@ -64,8 +66,6 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
   private Runnable removeConfirmation;
 
   private final TranslationMessages translationMessages;
-
-  private boolean hasServicePlugins = false;
 
   @Inject
   public ProjectAdministrationPresenter(EventBus eventBus, Display view, PlaceManager placeManager,
@@ -92,13 +92,22 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     });
   }
 
-  public void setProject(ProjectDto project, boolean hasServicePlugins) {
+  public void setProject(ProjectDto project) {
     this.project = project;
     getView().setProject(project);
     authorize();
 
-    this.hasServicePlugins = hasServicePlugins;
-    showVcfServiceNamePanel(hasServicePlugins);
+    Map<String, String> params = Maps.newHashMap();
+    params.put("type", VCFStoreService.SERVICE_TYPE);
+
+    ResourceRequestBuilderFactory.<JsArray<PluginDto>>newBuilder()
+      .forResource(UriBuilders.PLUGINS.create().query(params).build())
+      .withCallback(new ResourceCallback<JsArray<PluginDto>>() {
+        @Override
+        public void onResource(Response response, JsArray<PluginDto> resource) {
+          showVcfServiceNamePanel(resource != null && resource.length() > 0);
+        }
+      }).get().send();
   }
 
   private void authorize() {

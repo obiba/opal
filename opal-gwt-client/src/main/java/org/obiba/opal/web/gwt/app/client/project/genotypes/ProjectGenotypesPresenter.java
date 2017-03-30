@@ -163,9 +163,8 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
     if (dto.hasVcfStoreService()) {
       getParticipantTables();
       refresh();
+      authorize();
     }
-
-    authorize();
   }
 
   @Override
@@ -283,9 +282,8 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   }
 
   public void refresh() {
-    getVcfStore();
+    onRefresh();
     getMappingTable();
-    getVcfSummaries();
   }
 
   private void authorize() {

@@ -11,8 +11,6 @@
 package org.obiba.opal.web.plugins;
 
 import com.google.common.collect.Lists;
-import org.obiba.magma.NoSuchDatasourceException;
-import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.core.domain.VCFSamplesMapping;
 import org.obiba.opal.core.runtime.Plugin;
@@ -30,13 +28,19 @@ public class Dtos {
 
   public static Plugins.PluginDto asDto(Plugin plugin) {
     Plugins.PluginDto.Builder builder = Plugins.PluginDto.newBuilder();
-    setProperties(plugin.getProperties(), builder);
+    setProperties(plugin.getProperties(), builder, false);
+    return builder.build();
+  }
+
+  public static Plugins.PluginDto asDtoForPublic(Plugin plugin) {
+    Plugins.PluginDto.Builder builder = Plugins.PluginDto.newBuilder();
+    setProperties(plugin.getProperties(), builder, true);
     return builder.build();
   }
 
   public static Plugins.PluginDto asDto(ServicePlugin plugin) {
     Plugins.PluginDto.Builder builder = Plugins.PluginDto.newBuilder();
-    setProperties(plugin.getProperties(), builder);
+    setProperties(plugin.getProperties(), builder, false);
     return builder.build();
   }
 
@@ -83,20 +87,16 @@ public class Dtos {
       .setProjectName(sampleMappings.getProjectName());
 
     if (sampleMappings.hasTableReference()) {
-      //try {
-        MagmaEngineTableResolver.valueOf(sampleMappings.getTableReference()).resolveTable();
-        builder.setTableReference(sampleMappings.getTableReference())
-            .setParticipantIdVariable(sampleMappings.getParticipantIdVariable())
-            .setSampleRoleVariable(sampleMappings.getSampleRoleVariable());
-      //} catch (NoSuchValueTableException|NoSuchDatasourceException e) {
-        // ignore
-      //}
+      MagmaEngineTableResolver.valueOf(sampleMappings.getTableReference()).resolveTable();
+      builder.setTableReference(sampleMappings.getTableReference())
+          .setParticipantIdVariable(sampleMappings.getParticipantIdVariable())
+          .setSampleRoleVariable(sampleMappings.getSampleRoleVariable());
     }
 
     return builder.build();
   }
 
-  private static void setProperties(Properties properties, Plugins.PluginDto.Builder builder) {
+  private static void setProperties(Properties properties, Plugins.PluginDto.Builder builder, boolean isPublic) {
     Plugins.PluginCfgDto.Builder cfgBuilder = Plugins.PluginCfgDto.newBuilder();
     properties.entrySet().stream().filter(entry -> !reservedProperties.contains(entry.getKey().toString())).forEach(entry -> {
       if ("name".equals(entry.getKey())) builder.setName(entry.getValue().toString());
@@ -105,7 +105,7 @@ public class Dtos {
       else if ("version".equals(entry.getKey())) builder.setVersion(entry.getValue().toString());
       else if ("opal.version".equals(entry.getKey())) builder.setOpalVersion(entry.getValue().toString());
       else if ("type".equals(entry.getKey())) builder.setType(entry.getValue().toString());
-      else cfgBuilder.addProperties(Plugins.PropertyDto.newBuilder().setKey(entry.getKey().toString()).setValue(entry.getValue().toString()));
+      else if (!isPublic) cfgBuilder.addProperties(Plugins.PropertyDto.newBuilder().setKey(entry.getKey().toString()).setValue(entry.getValue().toString()));
     });
     builder.setConfig(cfgBuilder);
   }

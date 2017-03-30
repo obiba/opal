@@ -58,14 +58,7 @@ public class ImportVCFCommand extends AbstractOpalRuntimeDependentCommand<Import
     getShell().progress(String.format("Preparing VCF file store for project '%s'", options.getProject()), 0, 3, 0);
     Project project = projectService.getProject(options.getProject());
     if (!opalRuntime.hasServicePlugins(VCFStoreService.class)) throw new NoSuchServiceException(VCFStoreService.SERVICE_TYPE);
-    if (!project.hasVCFStoreService()) {
-      if (opalRuntime.getServicePlugins(VCFStoreService.class).size() == 1) {
-        // set the unique VCF store service automatically
-        ServicePlugin service = opalRuntime.getServicePlugins(VCFStoreService.class).stream().iterator().next();
-        project.setVCFStoreService(service.getName());
-        projectService.save(project);
-      } else throw new IllegalArgumentException("Project has no VCF store: " + options.getProject());
-    }
+    if (!project.hasVCFStoreService()) throw new IllegalArgumentException("Project has no VCF store: " + options.getProject());
     setVCFStore(project.getVCFStoreService(), project.getName());
 
     try {
