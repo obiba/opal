@@ -13,8 +13,8 @@ message PluginDto {
     required string description = 3;
     required string version = 4;
     required string opalVersion = 5;
-    optional PluginCfgDto config = 6;
-    optional string type = 7;
+    required string type = 6;
+    optional PluginCfgDto config = 7;
 }
 
 message PluginCfgDto {

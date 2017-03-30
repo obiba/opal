@@ -42,17 +42,8 @@ public class PluginsResource {
   public List<Plugins.PluginDto> get(@QueryParam("type") String type) {
     return opalRuntime.getPlugins().stream()
         .map(Dtos::asDto)
-        .filter(p -> Strings.isNullOrEmpty(type) || (type.equals(p.getType()) || testType(type)))
+        .filter(p -> Strings.isNullOrEmpty(type) || (type.equals(p.getType())))
         .collect(Collectors.toList());
-  }
-
-  private boolean testType(String type) {
-    switch (type) {
-      case VCFStoreService.SERVICE_TYPE:
-        return true;
-    }
-
-    return false;
   }
 
 }
