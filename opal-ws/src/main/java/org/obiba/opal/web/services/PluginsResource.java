@@ -42,7 +42,7 @@ public class PluginsResource {
   @NoAuthorization
   public List<Plugins.PluginDto> get(@QueryParam("type") String type) {
     return opalRuntime.getPlugins().stream()
-        .map(Dtos::asDto)
+        .map(Dtos::asDtoForPublic)
         .filter(p -> Strings.isNullOrEmpty(type) || (type.equals(p.getType())))
         .collect(Collectors.toList());
   }

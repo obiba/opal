@@ -157,8 +157,6 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private BookmarkIconPresenter bookmarkIconPresenter;
 
-  private boolean hasServicePlugins = false;
-
   @Inject
   @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
   public ProjectPresenter(EventBus eventBus, Display display, Proxy proxy, PlaceManager placeManager,
@@ -366,7 +364,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       projectAdministrationPresenter = projectAdministrationPresenterProvider.get();
       setInSlot(ADMIN_PANE, projectAdministrationPresenter);
     }
-    projectAdministrationPresenter.setProject(project, hasServicePlugins);
+    projectAdministrationPresenter.setProject(project);
   }
 
   @Override
