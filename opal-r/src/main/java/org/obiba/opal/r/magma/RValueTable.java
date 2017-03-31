@@ -40,7 +40,6 @@ public class RValueTable extends AbstractValueTable {
     this.symbol = symbol;
     this.idPosition = 0;
     setVariableEntityProvider(new RVariableEntityProvider(this, entityType, idColumn));
-    setEntityBatchSize(1000);
   }
 
   @Override
