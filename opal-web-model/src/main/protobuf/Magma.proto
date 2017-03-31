@@ -77,6 +77,7 @@ message JdbcDatasourceSettingsDto {
   optional bool multipleDatasources = 8;
   optional int32 batchSize = 9;
   optional bool multilines = 10 [default = false];
+  repeated JdbcValueTableSettingsFactoryDto tableSettingsFactories = 11;
 }
 
 message JdbcValueTableSettingsDto {
@@ -87,6 +88,19 @@ message JdbcValueTableSettingsDto {
   optional string createdTimestampColumn = 5;
   optional string updatedTimestampColumn = 6;
   optional string entityIdentifiersWhere = 7;
+  optional string excludedColumns = 8;
+  optional string includedColumns = 9;
+  optional bool multilines = 10 [default = false];
+}
+
+message JdbcValueTableSettingsFactoryDto {
+  required string sqlTable = 1;
+  optional string opalTable = 2;
+  required string entityType = 3;
+  optional string entityIdentifierColumn = 4;
+  optional string createdTimestampColumn = 5;
+  optional string updatedTimestampColumn = 6;
+  required string entityIdentifiersFilterColumn = 7;
   optional string excludedColumns = 8;
   optional string includedColumns = 9;
   optional bool multilines = 10 [default = false];

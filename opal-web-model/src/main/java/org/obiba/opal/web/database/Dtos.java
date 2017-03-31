@@ -16,6 +16,7 @@ import javax.validation.constraints.NotNull;
 import com.google.common.collect.Sets;
 import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
 import org.obiba.magma.datasource.jdbc.JdbcValueTableSettings;
+import org.obiba.magma.datasource.jdbc.JdbcValueTableSettingsFactory;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbSettings;
 import org.obiba.opal.core.domain.database.SqlSettings;
@@ -84,6 +85,10 @@ public class Dtos {
       builder.tableSettings(dto.getTableSettingsList().stream().map(settingsDto ->
         fromDto(settingsDto, dto.getDefaultEntityType(), dto.getDefaultEntityIdColumnName())).collect(Collectors.toSet()));
     }
+    if (dto.getTableSettingsFactoriesCount() > 0) {
+      builder.tableSettingsFactories(dto.getTableSettingsFactoriesList().stream().map(settingsDto ->
+          fromDto(settingsDto, dto.getDefaultEntityType(), dto.getDefaultEntityIdColumnName())).collect(Collectors.toSet()));
+    }
 
     return builder.build();
   }
@@ -97,6 +102,19 @@ public class Dtos {
     if (dto.hasCreatedTimestampColumn()) builder.createdTimestampColumn(dto.getCreatedTimestampColumn());
     if (dto.hasUpdatedTimestampColumn()) builder.updatedTimestampColumn(dto.getUpdatedTimestampColumn());
     if (dto.hasEntityIdentifiersWhere()) builder.entityIdentifiersWhere(dto.getEntityIdentifiersWhere());
+    if (dto.hasExcludedColumns()) builder.excludedColumns(dto.getExcludedColumns());
+    if (dto.hasIncludedColumns()) builder.includedColumns(dto.getIncludedColumns());
+    return builder.build();
+  }
+
+  private static JdbcValueTableSettingsFactory fromDto(@NotNull Magma.JdbcValueTableSettingsFactoryDto dto, String defaultEntityType, String defaultEntityIdColumn ) {
+    JdbcValueTableSettingsFactory.Builder builder = JdbcValueTableSettingsFactory.newSettings(dto.getSqlTable(), dto.getEntityIdentifiersFilterColumn()) //
+        .entityType(dto.hasEntityType() ? dto.getEntityType() : defaultEntityType) //
+        .entityIdentifierColumn(dto.hasEntityIdentifierColumn() ? dto.getEntityIdentifierColumn() : defaultEntityIdColumn)
+        .multilines(dto.getMultilines());
+    if (dto.hasOpalTable()) builder.tableName(dto.getOpalTable());
+    if (dto.hasCreatedTimestampColumn()) builder.createdTimestampColumn(dto.getCreatedTimestampColumn());
+    if (dto.hasUpdatedTimestampColumn()) builder.updatedTimestampColumn(dto.getUpdatedTimestampColumn());
     if (dto.hasExcludedColumns()) builder.excludedColumns(dto.getExcludedColumns());
     if (dto.hasIncludedColumns()) builder.includedColumns(dto.getIncludedColumns());
     return builder.build();
@@ -196,6 +214,7 @@ public class Dtos {
     if(jdbcSettings.hasMappedTables()) jdbcSettings.getMappedTables().forEach(t -> builder.addMappedTables(t));
 
     jdbcSettings.getTableSettings().forEach(settings -> builder.addTableSettings(asDto(settings)));
+    jdbcSettings.getTableSettingsFactories().forEach(settings -> builder.addTableSettingsFactories(asDto(settings)));
 
     return builder;
   }
@@ -212,6 +231,21 @@ public class Dtos {
     if(jdbcSettings.hasExcludedColumns()) builder.setExcludedColumns(jdbcSettings.getExcludedColumns());
     if(jdbcSettings.hasIncludedColumns()) builder.setIncludedColumns(jdbcSettings.getIncludedColumns());
     builder.setMultilines(jdbcSettings.isMultilines());
+    return builder;
+  }
+
+  private static Magma.JdbcValueTableSettingsFactoryDto.Builder asDto(JdbcValueTableSettingsFactory factory) {
+    Magma.JdbcValueTableSettingsFactoryDto.Builder builder = Magma.JdbcValueTableSettingsFactoryDto.newBuilder();
+    builder.setSqlTable(factory.getSqlTableName()) //
+        .setEntityIdentifiersFilterColumn(factory.getEntityIdentifiersFilterColumn()) //
+        .setEntityType(factory.getEntityType()) //
+        .setEntityIdentifierColumn(factory.getEntityIdentifierColumn());
+    if(factory.hasMagmaTableName()) builder.setOpalTable(factory.getMagmaTableName());
+    if(factory.hasCreatedTimestampColumnName()) builder.setCreatedTimestampColumn(factory.getCreatedTimestampColumnName());
+    if(factory.hasUpdatedTimestampColumnName()) builder.setUpdatedTimestampColumn(factory.getUpdatedTimestampColumnName());
+    if(factory.hasExcludedColumns()) builder.setExcludedColumns(factory.getExcludedColumns());
+    if(factory.hasIncludedColumns()) builder.setIncludedColumns(factory.getIncludedColumns());
+    builder.setMultilines(factory.isMultilines());
     return builder;
   }
 
