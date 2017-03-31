@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.project.genotypes;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.common.collect.Lists;
@@ -18,6 +19,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -57,10 +59,21 @@ public class ProjectGenotypeEditMappingTableModalView extends ModalPopupViewWith
 
   @UiField
   Chooser sampleRoleIds;
+
   @UiField
   ControlGroup participantIdVariableGroup;
+
   @UiField
   ControlGroup sampleRoleVariableGroup;
+
+  @UiField
+  FlowPanel tableAvailableUiContent;
+
+  @UiField
+  FlowPanel noTableAvailableAlertContainer;
+
+  @UiField
+  Button saveButton;
 
   @Inject
   public ProjectGenotypeEditMappingTableModalView(EventBus eventBus, Binder binder, Translations translations) {
@@ -68,6 +81,7 @@ public class ProjectGenotypeEditMappingTableModalView extends ModalPopupViewWith
     initWidget(binder.createAndBindUi(this));
     this.translations = translations;
     dialog.setTitle(translations.projectGenotypeEditMappingeModalTitle());
+    toggleContent(false);
   }
 
   @Override
@@ -169,6 +183,8 @@ public class ProjectGenotypeEditMappingTableModalView extends ModalPopupViewWith
     mappingTable.clear();
     List<String> groups = Lists.newArrayList();
 
+    toggleContent(availableMappingTables.length() > 0);
+
     int tentativeIndex = -1;
     for (int i = 0; i < availableMappingTables.length(); i++) {
       TableDto tableDto = availableMappingTables.get(i);
@@ -246,5 +262,11 @@ public class ProjectGenotypeEditMappingTableModalView extends ModalPopupViewWith
     } else {
       getUiHandlers().onGetTableVariables(mappingTable.getSelectedValue());
     }
+  }
+
+  public void toggleContent(boolean showContent) {
+    noTableAvailableAlertContainer.setVisible(!showContent);
+    saveButton.setVisible(showContent);
+    tableAvailableUiContent.setVisible(showContent);
   }
 }
