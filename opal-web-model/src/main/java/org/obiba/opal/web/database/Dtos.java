@@ -115,6 +115,7 @@ public class Dtos {
     if (dto.hasOpalTable()) builder.tableName(dto.getOpalTable());
     if (dto.hasCreatedTimestampColumn()) builder.createdTimestampColumn(dto.getCreatedTimestampColumn());
     if (dto.hasUpdatedTimestampColumn()) builder.updatedTimestampColumn(dto.getUpdatedTimestampColumn());
+    if (dto.hasEntityIdentifiersWhere()) builder.entityIdentifiersWhere(dto.getEntityIdentifiersWhere());
     if (dto.hasExcludedColumns()) builder.excludedColumns(dto.getExcludedColumns());
     if (dto.hasIncludedColumns()) builder.includedColumns(dto.getIncludedColumns());
     return builder.build();

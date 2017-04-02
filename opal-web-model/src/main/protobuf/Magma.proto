@@ -100,10 +100,11 @@ message JdbcValueTableSettingsFactoryDto {
   optional string entityIdentifierColumn = 4;
   optional string createdTimestampColumn = 5;
   optional string updatedTimestampColumn = 6;
-  required string entityIdentifiersFilterColumn = 7;
-  optional string excludedColumns = 8;
-  optional string includedColumns = 9;
-  optional bool multilines = 10 [default = false];
+  optional string entityIdentifiersWhere = 7;
+  required string entityIdentifiersFilterColumn = 8;
+  optional string excludedColumns = 9;
+  optional string includedColumns = 10;
+  optional bool multilines = 11 [default = false];
 }
 
 message HibernateDatasourceFactoryDto {
