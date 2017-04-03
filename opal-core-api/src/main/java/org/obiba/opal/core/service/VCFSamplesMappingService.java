@@ -19,6 +19,8 @@ public interface VCFSamplesMappingService extends SystemService {
 
   void delete(@NotNull String name) throws NoSuchVCFSamplesMappingException;
 
+  void deleteProjectSampleMappings(@NotNull String project);
+
   List<String> getFilteredSampleIds(@NotNull String projectName, @NotNull String filteringTable, boolean withControl);
 
   List<String> getControls(@NotNull String projectName);

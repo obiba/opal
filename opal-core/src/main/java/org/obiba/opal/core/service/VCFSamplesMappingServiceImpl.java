@@ -70,6 +70,15 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService {
   }
 
   @Override
+  public void deleteProjectSampleMappings(@NotNull String project) {
+    Iterable<VCFSamplesMapping> list = orientDbService.list(
+        VCFSamplesMapping.class,
+        "select from " + VCFSamplesMapping.class.getSimpleName() + " where tableReference like ?",
+        project + ".%");
+    list.forEach(s -> delete(s.getProjectName()));
+  }
+
+  @Override
   public List<String> getFilteredSampleIds(@NotNull String projectName, String filteringTable, boolean withControl) {
     List<String> participantIds = Strings.isNullOrEmpty(filteringTable) ?
         Lists.newArrayList() :
