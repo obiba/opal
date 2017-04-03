@@ -101,7 +101,7 @@ message JdbcValueTableSettingsFactoryDto {
   optional string createdTimestampColumn = 5;
   optional string updatedTimestampColumn = 6;
   optional string entityIdentifiersWhere = 7;
-  required string entityIdentifiersFilterColumn = 8;
+  required string tablePartitionColumn = 8;
   optional string excludedColumns = 9;
   optional string includedColumns = 10;
   optional bool multilines = 11 [default = false];

@@ -108,7 +108,7 @@ public class Dtos {
   }
 
   private static JdbcValueTableSettingsFactory fromDto(@NotNull Magma.JdbcValueTableSettingsFactoryDto dto, String defaultEntityType, String defaultEntityIdColumn ) {
-    JdbcValueTableSettingsFactory.Builder builder = JdbcValueTableSettingsFactory.newSettings(dto.getSqlTable(), dto.getEntityIdentifiersFilterColumn()) //
+    JdbcValueTableSettingsFactory.Builder builder = JdbcValueTableSettingsFactory.newSettings(dto.getSqlTable(), dto.getTablePartitionColumn()) //
         .entityType(dto.hasEntityType() ? dto.getEntityType() : defaultEntityType) //
         .entityIdentifierColumn(dto.hasEntityIdentifierColumn() ? dto.getEntityIdentifierColumn() : defaultEntityIdColumn)
         .multilines(dto.getMultilines());
@@ -238,7 +238,7 @@ public class Dtos {
   private static Magma.JdbcValueTableSettingsFactoryDto.Builder asDto(JdbcValueTableSettingsFactory factory) {
     Magma.JdbcValueTableSettingsFactoryDto.Builder builder = Magma.JdbcValueTableSettingsFactoryDto.newBuilder();
     builder.setSqlTable(factory.getSqlTableName()) //
-        .setEntityIdentifiersFilterColumn(factory.getEntityIdentifiersFilterColumn()) //
+        .setTablePartitionColumn(factory.getTablePartitionColumn()) //
         .setEntityType(factory.getEntityType()) //
         .setEntityIdentifierColumn(factory.getEntityIdentifierColumn());
     if(factory.hasMagmaTableName()) builder.setOpalTable(factory.getMagmaTableName());
