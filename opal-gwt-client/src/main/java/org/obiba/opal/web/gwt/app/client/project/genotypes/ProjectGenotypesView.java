@@ -16,10 +16,13 @@ import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.google.common.collect.Lists;
+import com.google.gwt.cell.client.Cell;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -485,12 +488,25 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     }
   }
 
+  private static String abbreviate(String msg, int maxWidth) {
+    return msg.length() > maxWidth ?  msg.substring(0, maxWidth - 3) + "..." : msg;
+  }
+
   private static class ProjectGenotypesColumns {
     static final Column<VCFSummaryDto, String> VCF_FILE = new TextColumn<VCFSummaryDto>() {
 
       @Override
+      public void render(Cell.Context context, VCFSummaryDto vcfSummaryDto, SafeHtmlBuilder sb) {
+        String msg = vcfSummaryDto.getName() + "." + vcfSummaryDto.getFormat().toLowerCase() + ".gz";
+        sb.appendHtmlConstant("<span title=\"" + msg + "\">");
+        sb.appendEscaped(getValue(vcfSummaryDto));
+        sb.appendHtmlConstant("</span>");
+      }
+
+      @Override
       public String getValue(VCFSummaryDto vcfSummaryDto) {
-        return vcfSummaryDto.getName() + "." + vcfSummaryDto.getFormat().toLowerCase() + ".gz";
+        String msg = vcfSummaryDto.getName() + "." + vcfSummaryDto.getFormat().toLowerCase() + ".gz";
+        return abbreviate(msg, 30);
       }
     };
 

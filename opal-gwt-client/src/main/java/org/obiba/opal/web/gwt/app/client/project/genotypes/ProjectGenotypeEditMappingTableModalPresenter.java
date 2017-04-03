@@ -108,8 +108,8 @@ public class ProjectGenotypeEditMappingTableModalPresenter extends ModalPresente
       dto.setTableReference(getView().getMappingTable().getText());
       dto.setProjectName(projectName);
       fireEvent(new VcfMappingEditRequestEvent(dto));
+      getView().hideDialog();
     }
-    getView().hideDialog();
   }
 
   @Override
