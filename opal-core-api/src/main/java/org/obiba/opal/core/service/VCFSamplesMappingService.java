@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface VCFSamplesMappingService extends SystemService {
 
+  String TABLE_ENTITY_TYPE = "Sample";
+
   Iterable<VCFSamplesMapping> getVCFSamplesMappings();
 
   @NotNull

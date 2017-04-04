@@ -42,6 +42,7 @@ import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.security.OpalPermissions;
+import org.obiba.opal.core.service.VCFSamplesMappingService;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
@@ -71,6 +72,9 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
   private ViewManager viewManager;
 
   private Set<ValueTableUpdateListener> tableListeners;
+
+  @Autowired
+  private VCFSamplesMappingService vcfSamplesMappingService;
 
   @Override
   public void setDatasource(Datasource datasource) {
@@ -206,6 +210,9 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
         } else {
           datasource.dropTable(table);
         }
+
+        if (VCFSamplesMappingService.TABLE_ENTITY_TYPE.equals(datasource.getValueTable(table).getEntityType()))
+          vcfSamplesMappingService.deleteProjectSampleMappings(datasource.getName() + "." + table);
       }
     }
 

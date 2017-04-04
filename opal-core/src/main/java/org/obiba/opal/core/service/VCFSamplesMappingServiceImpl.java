@@ -74,7 +74,7 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService {
     Iterable<VCFSamplesMapping> list = orientDbService.list(
         VCFSamplesMapping.class,
         "select from " + VCFSamplesMapping.class.getSimpleName() + " where tableReference like ?",
-        project + ".%");
+        project);
     list.forEach(s -> delete(s.getProjectName()));
   }
 
