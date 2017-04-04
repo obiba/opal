@@ -118,7 +118,7 @@ public class ProjectResource {
         ((VCFStoreService) servicePlugin).deleteStore(project.getName());
       }
 
-      vcfSamplesMappingService.deleteProjectSampleMappings(name);
+      vcfSamplesMappingService.deleteProjectSampleMappings(name + ".%");
     } catch(Exception e) {
       // silently ignore project not found and other errors
     }
