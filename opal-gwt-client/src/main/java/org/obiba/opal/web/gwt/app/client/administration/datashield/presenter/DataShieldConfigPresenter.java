@@ -121,6 +121,7 @@ public class DataShieldConfigPresenter
   @Override
   protected void onBind() {
     addToSlot(PackageSlot, packagePresenter);
+    setInSlot(OptionsSlot, dataShieldROptionsPresenter);
     addToSlot(AggregateEnvironmentSlot, aggregatePresenter);
     addToSlot(AssignEnvironmentSlot, assignPresenter);
   }
@@ -140,8 +141,6 @@ public class DataShieldConfigPresenter
     public void authorized() {
       ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
       resourcePermissionsPresenter.initialize(ResourcePermissionType.DATASHIELD, ResourcePermissionRequestPaths.UriBuilders.SYSTEM_PERMISSIONS_DATASHIELD);
-
-      setInSlot(OptionsSlot, dataShieldROptionsPresenter);
       setInSlot(PermissionSlot, resourcePermissionsPresenter);
     }
   }

@@ -13,13 +13,11 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShiledROptionCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldROptionCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.datashield.DataShieldROptionDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -38,6 +36,8 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
 
   public interface Display extends View, HasUiHandlers<DataShieldROptionsUiHandlers> {
     void initialize(List<DataShieldROptionDto> options);
+
+    HasAuthorization addROptionsAuthorizer();
   }
 
   @Inject
@@ -59,10 +59,10 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
           }
         });
 
-    addHandler(DataShiledROptionCreatedEvent.getType(),
-        new DataShiledROptionCreatedEvent.DataShiledROptionCreatedHandler() {
+    addHandler(DataShieldROptionCreatedEvent.getType(),
+        new DataShieldROptionCreatedEvent.DataShieldROptionCreatedHandler() {
           @Override
-          public void onDataShiledROptionCreated(DataShiledROptionCreatedEvent event) {
+          public void onDataShieldROptionCreated(DataShieldROptionCreatedEvent event) {
             addOrUpdate(event.getOptionDto());
           }
 
@@ -105,6 +105,8 @@ public class DataShieldROptionsPresenter extends PresenterWidget<DataShieldROpti
 
   @Override
   protected void onReveal() {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(UriBuilders.DATASHIELD_ROPTION.create().build()).post()
+        .authorize(getView().addROptionsAuthorizer()).send();
     refresh();
   }
 

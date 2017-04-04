@@ -174,6 +174,7 @@ public class RSessionsView extends ViewWithUiHandlers<RSessionsUiHandlers> imple
   private void addTablePager() {
     table.setPageSize(20);
     pager.setDisplay(table);
+    pager.setVisible(false);
   }
 
   private static class StatusColumn extends Column<RSessionDto, String> {

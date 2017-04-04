@@ -22,10 +22,7 @@ import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionT
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
-import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.ServiceDto;
@@ -103,12 +100,15 @@ public class RAdministrationPresenter
     AclRequest.newResourceAuthorizationRequestBuilder()
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
 
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/r/sessions").post().authorize(getView().getTestAuthorizer())
+        .send();
+
     refreshStatus();
   }
 
   private void refreshStatus() {
     // stop start R service
-    ResourceRequestBuilderFactory.<ServiceDto>newBuilder().forResource("/service/r") //
+    ResourceRequestBuilderFactory.<ServiceDto>newBuilder().forResource(UriBuilders.SERVICE_R.create().build()) //
         .withCallback(new ResourceCallback<ServiceDto>() {
           @Override
           public void onResource(Response response, ServiceDto resource) {
@@ -126,7 +126,7 @@ public class RAdministrationPresenter
   public void start() {
     // Start service
     getView().setServiceStatus(Display.Status.Pending);
-    ResourceRequestBuilderFactory.newBuilder().forResource("/service/r").put().withCallback(new ResponseCodeCallback() {
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R.create().build()).put().withCallback(new ResponseCodeCallback() {
       @Override
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == SC_OK) {
@@ -142,7 +142,7 @@ public class RAdministrationPresenter
   public void stop() {
     // Stop service
     getView().setServiceStatus(Display.Status.Pending);
-    ResourceRequestBuilderFactory.newBuilder().forResource("/service/r").delete()
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SERVICE_R.create().build()).delete()
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
@@ -228,6 +228,8 @@ public class RAdministrationPresenter
     void setServiceStatus(Status status);
 
     HasAuthorization getPermissionsAuthorizer();
+
+    HasAuthorization getTestAuthorizer();
 
   }
 

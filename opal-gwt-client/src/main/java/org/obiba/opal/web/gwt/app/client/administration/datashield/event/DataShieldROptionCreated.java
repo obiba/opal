@@ -16,6 +16,6 @@ import org.obiba.opal.web.model.client.datashield.DataShieldROptionDto;
 import com.gwtplatform.dispatch.annotation.GenEvent;
 
 @GenEvent
-public class DataShiledROptionCreated {
+public class DataShieldROptionCreated {
   DataShieldROptionDto optionDto;
 }

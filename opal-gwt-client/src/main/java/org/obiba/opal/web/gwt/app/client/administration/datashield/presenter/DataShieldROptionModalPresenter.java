@@ -12,7 +12,7 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShiledROptionCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldROptionCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RegExValidator;
@@ -53,7 +53,7 @@ public class DataShieldROptionModalPresenter extends ModalPresenterWidget<DataSh
     DataShieldROptionDto dto = DataShieldROptionDto.create();
     dto.setName(getView().getName().getText());
     dto.setValue(getView().getValue().getText());
-    fireEvent(new DataShiledROptionCreatedEvent(dto));
+    fireEvent(new DataShieldROptionCreatedEvent(dto));
     getView().hideDialog();
   }
 

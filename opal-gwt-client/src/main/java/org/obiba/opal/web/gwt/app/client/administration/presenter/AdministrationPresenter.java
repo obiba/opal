@@ -119,11 +119,11 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
         .authorize(composeAuthorizer(getView().getProfilesAuthorizer())).send();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(ResourcePermissionRequestPaths.UriBuilders.SYSTEM_PERMISSIONS_R.create().build()).get()
+        .forResource(UriBuilders.SERVICE_R.create().build()).get()
         .authorize(composeAuthorizer(getView().getRAuthorizer())).send();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(ResourcePermissionRequestPaths.UriBuilders.SYSTEM_PERMISSIONS_DATASHIELD.create().build()).get()
+        .forResource(UriBuilders.DATASHIELD_PACKAGES.create().build()).get()
         .authorize(composeAuthorizer(getView().getDataShieldAuthorizer())).send();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder()

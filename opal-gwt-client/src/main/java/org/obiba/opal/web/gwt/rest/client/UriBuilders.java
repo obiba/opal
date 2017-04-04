@@ -781,6 +781,22 @@ public enum UriBuilders {
     }
   },
 
+  SERVICE_R {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("service", "r");
+
+    }
+  },
+
+  DATASHIELD_PACKAGES {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datashield", "packages");
+
+    }
+  },
+
   DATASHIELD_ROPTIONS {
     @Override
     public UriBuilder create() {

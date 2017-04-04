@@ -125,6 +125,11 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
   }
 
   @Override
+  public HasAuthorization getTestAuthorizer() {
+    return new WidgetAuthorizer(rTestButton);
+  }
+
+  @Override
   public HasWidgets getBreadcrumbs() {
     return breadcrumbs;
   }

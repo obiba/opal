@@ -28,6 +28,10 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
+import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
+import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
+import static com.google.gwt.http.client.Response.SC_OK;
+
 /**
  *
  */
@@ -84,10 +88,13 @@ public class RSessionsPresenter extends PresenterWidget<RSessionsPresenter.Displ
 
           @Override
           public void onResponseCode(Request request, Response response) {
-            if(response.getStatusCode() == Response.SC_OK) {
+            if(response.getStatusCode() == SC_OK) {
               getEventBus().fireEvent(NotificationEvent.newBuilder().info("rSessionTerminated").build());
             } else {
-              getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+              String errorMessage = response.getText().isEmpty() ? response.getStatusCode() == SC_FORBIDDEN
+                  ? "Forbidden"
+                  : "UnknownError" : response.getText();
+              fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
             }
             onRefresh();
           }
@@ -95,7 +102,7 @@ public class RSessionsPresenter extends PresenterWidget<RSessionsPresenter.Displ
         UriBuilder uriBuilder = UriBuilder.create();
         uriBuilder.segment("service", "r", "session", session.getId());
         ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).delete()
-            .withCallback(Response.SC_OK, callbackHandler).send();
+            .withCallback(callbackHandler, SC_OK, SC_FORBIDDEN, SC_NOT_FOUND).send();
       }
     };
 

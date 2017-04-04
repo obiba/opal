@@ -19,6 +19,8 @@ import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.datashield.DataShieldROptionDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
@@ -49,6 +51,9 @@ public class DataShieldROptionsView extends ViewWithUiHandlers<DataShieldROption
   @UiField
   OpalSimplePager pager;
 
+  @UiField
+  Button addOptionButton;
+
   private final ListDataProvider<DataShieldROptionDto> dataProvider = new ListDataProvider<>();
 
   @Inject
@@ -60,6 +65,11 @@ public class DataShieldROptionsView extends ViewWithUiHandlers<DataShieldROption
   @Override
   public void initialize(List<DataShieldROptionDto> options) {
     populateTable(options);
+  }
+
+  @Override
+  public HasAuthorization addROptionsAuthorizer() {
+    return new WidgetAuthorizer(addOptionButton);
   }
 
   @UiHandler("addOptionButton")
@@ -79,7 +89,7 @@ public class DataShieldROptionsView extends ViewWithUiHandlers<DataShieldROption
     table.addColumn(Columns.NAME, translations.nameLabel());
     table.addColumn(Columns.VALUE, translations.valueLabel());
     table.addColumn(Columns.ACTIONS, translations.actionsLabel());
-    table.setEmptyTableWidget(new Label(translations.noOtionsLabel()));
+    table.setEmptyTableWidget(new Label(translations.noOptionsLabel()));
 
     registerActionsHandlers();
     dataProvider.addDataDisplay(table);

@@ -619,7 +619,7 @@ public interface Translations extends Constants {
       "Forbidden", "Operation not allowed.", //
       "FileAlreadyExists", "File '{0}' already exists.", //
       "FolderAlreadyExists", "Folder '{0}' already exists.", //
-      "Forbidden", "You are not authorized to access to the content of this page."
+      "ForbiddenPage", "You are not authorized to access to the content of this page."
   })
   Map<String, String> userMessageMap();
 
@@ -822,7 +822,7 @@ public interface Translations extends Constants {
 
   @Description("No Options label")
   @DefaultStringValue("No Options")
-  String noOtionsLabel();
+  String noOptionsLabel();
 
   @Description("Summary preview pending on label")
   @DefaultStringValue("Summary preview pending on")

@@ -24,11 +24,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsPackageRColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
@@ -137,10 +133,6 @@ public class DataShieldPackageAdministrationPresenter
     authorizeAddPackageR(getView().getAddPackageAuthorizer());
   }
 
-  private String packagesR() {
-    return UriBuilder.create().segment("datashield", "packages").build();
-  }
-
   private String packageR(String packageR) {
     return UriBuilder.create().segment("datashield", "package", "{package}").build(packageR);
   }
@@ -150,11 +142,11 @@ public class DataShieldPackageAdministrationPresenter
   }
 
   private void authorizePackagesR(HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(packagesR()).get().authorize(authorizer).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(UriBuilders.DATASHIELD_PACKAGES.create().build()).get().authorize(authorizer).send();
   }
 
   private void authorizeAddPackageR(HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(packagesR()).post().authorize(authorizer)
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(UriBuilders.DATASHIELD_PACKAGES.create().build()).post().authorize(authorizer)
         .send();
   }
 
@@ -175,7 +167,7 @@ public class DataShieldPackageAdministrationPresenter
   }
 
   private void updateDataShieldPackages() {
-    ResourceRequestBuilderFactory.<JsArray<RPackageDto>>newBuilder().forResource(packagesR()).get()//
+    ResourceRequestBuilderFactory.<JsArray<RPackageDto>>newBuilder().forResource(UriBuilders.DATASHIELD_PACKAGES.create().build()).get()//
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
