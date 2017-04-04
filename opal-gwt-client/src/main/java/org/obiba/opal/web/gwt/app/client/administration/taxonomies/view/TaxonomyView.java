@@ -29,6 +29,8 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.LocaleTextColumn;
 import org.obiba.opal.web.gwt.datetime.client.FormatType;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.opal.VcsCommitInfoDto;
@@ -128,6 +130,9 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
 
   @UiField
   TextBoxClearable filter;
+
+  @UiField
+  Panel commitInfoPanel;
 
   @UiField
   CellTable<VcsCommitInfoDto> commitInfoTable;
@@ -266,6 +271,11 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
   @Override
   public void setDirty(boolean isDirty) {
     saveChangesAlert.setVisible(isDirty);
+  }
+
+  @Override
+  public HasAuthorization getCommitsAuthorizer() {
+    return new WidgetAuthorizer(commitInfoPanel);
   }
 
   private void renderTaxonomy(TaxonomyDto taxonomy) {

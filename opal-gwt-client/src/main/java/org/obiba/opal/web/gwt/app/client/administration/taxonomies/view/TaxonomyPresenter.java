@@ -30,10 +30,9 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.VcsCommitHistoryModalPr
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.opal.VcsCommitInfoDto;
@@ -283,7 +282,25 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
   }
 
   private void authorize() {
-    // TODO
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.SYSTEM_CONF_TAXONOMY_COMMITS_INFO.create()
+            .build(taxonomy.getName())).get()
+        .authorize(new CompositeAuthorizer(getView().getCommitsAuthorizer(), new HasAuthorization() {
+          @Override
+          public void beforeAuthorization() {
+
+          }
+
+          @Override
+          public void authorized() {
+            retrieveCommitInfos();
+          }
+
+          @Override
+          public void unauthorized() {
+
+          }
+        })).send();
   }
 
   private void refreshTaxonomy(String name) {
@@ -342,7 +359,6 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
       taxonomy = resource;
       getView().setTaxonomy(resource);
       getView().setDirty(false);
-      retrieveCommitInfos();
       authorize();
     }
   }
@@ -361,6 +377,8 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
     void setEditable(boolean editable);
 
     void setDirty(boolean isDirty);
+
+    HasAuthorization getCommitsAuthorizer();
 
     HasActionHandler<VcsCommitInfoDto> getActions();
   }

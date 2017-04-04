@@ -103,13 +103,13 @@
       <o:Table ui:field="table"/>
     </g:FlowPanel>
 
-    <g:FlowPanel addStyleNames="top-margin">
+    <g:FlowPanel ui:field="commitInfoPanel" addStyleNames="top-margin">
       <b:Heading size="4" addStyleNames="inline-block">
         <ui:msg description="History of Changes label">History of Changes</ui:msg>
       </b:Heading>
       <o:OpalSimplePager ui:field="commitInfoTablePager" location="RIGHT" addStyleNames="pull-right"/>
+      <o:Table ui:field="commitInfoTable"/>
     </g:FlowPanel>
-    <o:Table ui:field="commitInfoTable"/>
 
   </g:FlowPanel>
 
