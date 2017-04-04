@@ -10,7 +10,6 @@
 package org.obiba.opal.web.project;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -36,6 +35,7 @@ import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.ProjectService;
+import org.obiba.opal.core.service.VCFSamplesMappingService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
 import org.obiba.opal.spi.ServicePlugin;
 import org.obiba.opal.spi.vcf.VCFStoreService;
@@ -71,6 +71,9 @@ public class ProjectResource {
 
   @Autowired
   private ApplicationContext applicationContext;
+
+  @Autowired
+  private VCFSamplesMappingService vcfSamplesMappingService;
 
   @GET
   @Transactional(readOnly = true)
@@ -114,6 +117,8 @@ public class ProjectResource {
         ServicePlugin servicePlugin = opalRuntime.getServicePlugin(project.getVCFStoreService());
         ((VCFStoreService) servicePlugin).deleteStore(project.getName());
       }
+
+      vcfSamplesMappingService.deleteProjectSampleMappings(name);
     } catch(Exception e) {
       // silently ignore project not found and other errors
     }
