@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ConstantActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
@@ -153,7 +154,22 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
 
   @Override
   public HasAuthorization getAddMethodAuthorizer() {
-    return new WidgetAuthorizer(addMethodButton);
+    return new CompositeAuthorizer(new WidgetAuthorizer(addMethodButton), new HasAuthorization() {
+      @Override
+      public void beforeAuthorization() {
+
+      }
+
+      @Override
+      public void authorized() {
+
+      }
+
+      @Override
+      public void unauthorized() {
+        methodsTable.removeColumn(actionsColumn);
+      }
+    });
   }
 
   @Override

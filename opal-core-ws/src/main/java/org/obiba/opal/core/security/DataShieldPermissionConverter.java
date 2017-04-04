@@ -39,7 +39,11 @@ public class DataShieldPermissionConverter extends OpalPermissionConverter {
     DATASHIELD_ALL {
       @Override
       public Iterable<String> convert(String node) {
-        return Lists.newArrayList(toRest("/datashield", "*:GET/*"),//
+        return Lists.newArrayList(toRest("/datashield/session", "*:GET/*"),//
+            toRest("/datashield/packages", "*:GET/*"),//
+            toRest("/datashield/options", "*:GET/*"),//
+            toRest("/datashield/env/aggregate/methods", "GET:GET"),//
+            toRest("/datashield/env/assign/methods", "GET:GET"),//
             toRest("/service/r", "GET"), //
             toRest("/service/r", "PUT"), //
             toRest("/service/r", "DELETE"), //
