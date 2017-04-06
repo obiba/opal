@@ -9,19 +9,19 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.database.edit.sql;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
-
+import com.google.common.base.Strings;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.HasChangeHandlers;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.TakesValue;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasVisibility;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import org.obiba.opal.web.gwt.app.client.administration.database.edit.AbstractDatabaseModalPresenter;
-import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
-import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.app.client.validator.RequiredValueValidator;
-import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
+import org.obiba.opal.web.gwt.app.client.validator.*;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
@@ -30,19 +30,10 @@ import org.obiba.opal.web.model.client.database.JdbcDriverDto;
 import org.obiba.opal.web.model.client.database.SqlSettingsDto;
 import org.obiba.opal.web.model.client.magma.JdbcDatasourceSettingsDto;
 
-import com.google.common.base.Strings;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.HasChangeHandlers;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.TakesValue;
-import com.google.gwt.user.client.ui.HasEnabled;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.HasVisibility;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import static org.obiba.opal.web.gwt.app.client.administration.database.edit.sql.SqlDatabaseModalPresenter.Display.FormField;
 
@@ -103,15 +94,8 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
     JdbcDatasourceSettingsDto jdbcDatasourceSettings = sqlSettings.getJdbcDatasourceSettings();
     if(SqlSettingsDto.SqlSchema.JDBC.getName().equals(sqlSettings.getSqlSchema().getName()) &&
         jdbcDatasourceSettings != null) {
-      getView().getDefaultEntityType().setText(jdbcDatasourceSettings.getDefaultEntityType());
-      getView().getDefaultEntityIdColumn()
-          .setText(jdbcDatasourceSettings.getDefaultEntityIdColumnName());
-      getView().getDefaultCreatedTimestampColumn()
-          .setText(jdbcDatasourceSettings.getDefaultCreatedTimestampColumnName());
-      getView().getDefaultUpdatedTimestampColumn()
-          .setText(jdbcDatasourceSettings.getDefaultUpdatedTimestampColumnName());
-      getView().getUseMetadataTables().setValue(jdbcDatasourceSettings.getUseMetadataTables());
-      getView().getBatchSize().setValue(jdbcDatasourceSettings.getBatchSize());
+      getView().setJdbcDatasourceSettings(jdbcDatasourceSettings);
+
     } else if(SqlSettingsDto.SqlSchema.LIMESURVEY.getName().equals(sqlSettings.getSqlSchema().getName()) &&
         sqlSettings.getLimesurveyDatasourceSettings() != null) {
       getView().getTablePrefix().setText(sqlSettings.getLimesurveyDatasourceSettings().getTablePrefix());
@@ -128,13 +112,7 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
   @Override
   protected void disableFieldsForDatabaseWithDatasource() {
     super.disableFieldsForDatabaseWithDatasource();
-    getView().getSqlSchemaEnabled().setEnabled(false);
-    getView().getDriverEnabled().setEnabled(false);
-    getView().getTablePrefixEnabled().setEnabled(false);
-    getView().getDefaultEntityTypeEnabled().setEnabled(false);
-    getView().getDefaultCreatedTimestampColumnEnabled().setEnabled(false);
-    getView().getDefaultUpdatedTimestampColumnEnabled().setEnabled(false);
-    getView().getUseMetadataTablesEnabled().setEnabled(false);
+    getView().disableFieldsForDatabaseWithDatasource();
   }
 
   @Override
@@ -174,19 +152,7 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
   }
 
   private JdbcDatasourceSettingsDto getJdbcDatasourceSettingsDto() {
-    JdbcDatasourceSettingsDto jdbcSettings = JdbcDatasourceSettingsDto.create();
-    jdbcSettings.setDefaultEntityType(getView().getDefaultEntityType().getText());
-    jdbcSettings.setDefaultEntityIdColumnName(getView().getDefaultEntityIdColumn().getText());
-    jdbcSettings.setDefaultCreatedTimestampColumnName(getView().getDefaultCreatedTimestampColumn().getText());
-    jdbcSettings.setDefaultUpdatedTimestampColumnName(getView().getDefaultUpdatedTimestampColumn().getText());
-    jdbcSettings.setUseMetadataTables(getView().getUseMetadataTables().getValue());
-    jdbcSettings.setMultipleDatasources(getView().getUsage().getValue() == Usage.STORAGE);
-    // multilines are detected at import/storage and forced at export
-    jdbcSettings.setMultilines(getView().getUsage().getValue() == Usage.EXPORT);
-
-    if(!getView().getBatchSize().getText().isEmpty())
-      jdbcSettings.setBatchSize(getView().getBatchSize().getNumberValue().intValue());
-
+    JdbcDatasourceSettingsDto jdbcSettings = getView().getJdbcDatasourceSettings();
     return jdbcSettings;
   }
 
@@ -227,6 +193,8 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
             new RequiredValueValidator(getView().getSqlSchema(), "SqlSchemaIsRequired", FormField.SQL_SCHEMA.name()));
         validators.add(new RequiredTextValidator(getView().getDriver(), "DriverIsRequired", FormField.DRIVER.name()));
         validators.add(new DefaultEntityTypeValidator());
+        validators.add(new JdbcTableSettingsValidator());
+        validators.add(new JdbcTableSettingsFactoriesValidator());
       }
       return validators;
     }
@@ -249,6 +217,30 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
       }
     }
 
+    private class JdbcTableSettingsValidator extends AbstractFieldValidator {
+
+      private JdbcTableSettingsValidator() {
+        super("JdbcTableSettingsNotValid", FormField.JDBC_TABLE_SETTINGS.name());
+      }
+
+      @Override
+      protected boolean hasError() {
+        return SqlSchema.JDBC == getView().getSqlSchema().getValue() && getView().hasJdbcTableSettingsError();
+      }
+    }
+
+    private class JdbcTableSettingsFactoriesValidator extends AbstractFieldValidator {
+
+      private JdbcTableSettingsFactoriesValidator() {
+        super("JdbcTableSettingsFactoriesNotValid", FormField.JDBC_TABLE_SETTINGS_FACTORIES.name());
+      }
+
+      @Override
+      protected boolean hasError() {
+        return SqlSchema.JDBC == getView().getSqlSchema().getValue() && getView().hasJdbcTableSettingsFactoriesError();
+      }
+    }
+
   }
 
   public interface Display extends AbstractDatabaseModalPresenter.Display {
@@ -261,7 +253,9 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
       PASSWORD,
       USAGE,
       SQL_SCHEMA,
-      DEFAULT_ENTITY_TYPE
+      DEFAULT_ENTITY_TYPE,
+      JDBC_TABLE_SETTINGS,
+      JDBC_TABLE_SETTINGS_FACTORIES
     }
 
     void setAvailableDrivers(JsArray<JdbcDriverDto> availableDrivers);
@@ -272,33 +266,21 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
 
     TakesValue<SqlSchema> getSqlSchema();
 
-    HasEnabled getSqlSchemaEnabled();
-
     HasText getDriver();
-
-    HasEnabled getDriverEnabled();
 
     HasText getTablePrefix();
 
-    HasEnabled getTablePrefixEnabled();
+    void setJdbcDatasourceSettings(JdbcDatasourceSettingsDto jdbcDatasourceSettings);
+
+    JdbcDatasourceSettingsDto getJdbcDatasourceSettings();
+
+    boolean hasJdbcTableSettingsError();
+
+    boolean hasJdbcTableSettingsFactoriesError();
+
+    void disableFieldsForDatabaseWithDatasource();
 
     HasText getDefaultEntityType();
-
-    HasEnabled getDefaultEntityTypeEnabled();
-
-    HasText getDefaultEntityIdColumn();
-
-    HasText getDefaultCreatedTimestampColumn();
-
-    HasEnabled getDefaultCreatedTimestampColumnEnabled();
-
-    HasText getDefaultUpdatedTimestampColumn();
-
-    HasEnabled getDefaultUpdatedTimestampColumnEnabled();
-
-    HasValue<Boolean> getUseMetadataTables();
-
-    HasEnabled getUseMetadataTablesEnabled();
 
     HasChangeHandlers getSqlSchemaChangeHandlers();
 
@@ -309,10 +291,6 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
     HasVisibility getNameGroupVisibility();
 
     HasVisibility getDefaultStorageGroupVisibility();
-
-    HasVisibility getSqlSchemaGroupVisibility();
-
-    NumericTextBox getBatchSize();
   }
 
 }

@@ -9,29 +9,15 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.database.edit.sql;
 
-import javax.annotation.Nullable;
-
-import org.obiba.magma.datasource.jdbc.JdbcDatasource;
-import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
-import org.obiba.magma.datasource.mongodb.MongoDBDatasource;
-import org.obiba.opal.web.gwt.app.client.administration.database.edit.AbstractDatabaseModalPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.database.edit.DatabaseUiHandlers;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
-import org.obiba.opal.web.gwt.app.client.ui.Modal;
-import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
-import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
-import org.obiba.opal.web.gwt.app.client.validator.ConstrainedModal;
-import org.obiba.opal.web.model.client.database.JdbcDriverDto;
-
 import com.github.gwtbootstrap.client.ui.CheckBox;
-import com.github.gwtbootstrap.client.ui.ControlGroup;
+import com.github.gwtbootstrap.client.ui.*;
 import com.github.gwtbootstrap.client.ui.PasswordTextBox;
+import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.github.gwtbootstrap.client.ui.TextArea;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -41,15 +27,30 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.TakesValue;
-import com.google.gwt.user.client.ui.HasEnabled;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.HasVisibility;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
+import org.obiba.opal.web.gwt.app.client.administration.database.edit.AbstractDatabaseModalPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.database.edit.DatabaseUiHandlers;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
+import org.obiba.opal.web.gwt.app.client.validator.ConstrainedModal;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
+import org.obiba.opal.web.model.client.database.JdbcDriverDto;
+import org.obiba.opal.web.model.client.magma.JdbcDatasourceSettingsDto;
+import org.obiba.opal.web.model.client.magma.JdbcValueTableSettingsDto;
+import org.obiba.opal.web.model.client.magma.JdbcValueTableSettingsFactoryDto;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 import static org.obiba.opal.web.gwt.app.client.administration.database.edit.AbstractDatabaseModalPresenter.Mode.CREATE;
 import static org.obiba.opal.web.gwt.app.client.administration.database.edit.AbstractDatabaseModalPresenter.SqlSchema;
@@ -62,6 +63,10 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
     implements SqlDatabaseModalPresenter.Display {
 
   interface Binder extends UiBinder<Widget, SqlDatabaseModalView> {}
+
+  private static final int JDBC_TABLES_TAB_INDEX = 1;
+
+  private static final int JDBC_TABLE_PARTITIONS_TAB_INDEX = 2;
 
   @UiField
   Modal modal;
@@ -127,6 +132,9 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   CollapsiblePanel jdbcOptions;
 
   @UiField
+  TabPanel jdbcOptionsTabPanel;
+
+  @UiField
   CollapsiblePanel advancedOptions;
 
   @UiField
@@ -136,19 +144,25 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   TextBox defaultEntityIdColumn;
 
   @UiField
-  TextBox defaultCreatedTimestampColumn;
-
-  @UiField
   TextBox defaultUpdatedTimestampColumn;
 
   @UiField
   NumericTextBox batchSize;
 
   @UiField
+  ControlGroup useMetadataTablesGroup;
+
+  @UiField
   CheckBox useMetadataTables;
 
   @UiField
   ControlGroup defaultEntityTypeGroup;
+
+  @UiField
+  JdbcTableSettingsEditor jdbcTableSettingsEditor;
+
+  @UiField
+  JdbcTableSettingsFactoriesEditor jdbcTableSettingsFactoriesEditor;
 
   private final Translations translations;
 
@@ -342,16 +356,6 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
     };
   }
 
-  @Override
-  public HasEnabled getSqlSchemaEnabled() {
-    return sqlSchema;
-  }
-
-  @Override
-  public HasVisibility getSqlSchemaGroupVisibility() {
-    return sqlSchemaGroup;
-  }
-
   private void setAvailableUsages() {
     for(Usage usageType : Usage.values()) {
       usage.addItem(usageType.getLabel(), usageType.name());
@@ -445,11 +449,6 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   }
 
   @Override
-  public HasEnabled getDriverEnabled() {
-    return driver;
-  }
-
-  @Override
   public HasText getUsername() {
     return username;
   }
@@ -488,43 +487,81 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   }
 
   @Override
-  public HasEnabled getTablePrefixEnabled() {
-    return tablePrefix;
+  public void setJdbcDatasourceSettings(JdbcDatasourceSettingsDto jdbcDatasourceSettings) {
+    defaultEntityType.setText(jdbcDatasourceSettings.getDefaultEntityType());
+    defaultEntityIdColumn.setText(jdbcDatasourceSettings.getDefaultEntityIdColumnName());
+    defaultUpdatedTimestampColumn.setText(jdbcDatasourceSettings.getDefaultUpdatedTimestampColumnName());
+    useMetadataTables.setValue(jdbcDatasourceSettings.getUseMetadataTables());
+    batchSize.setValue(jdbcDatasourceSettings.getBatchSize());
+    for (JdbcValueTableSettingsDto dto : JsArrays.toIterable(jdbcDatasourceSettings.getTableSettingsArray()))
+      jdbcTableSettingsEditor.addJdbcTableSettings(dto);
+    for (JdbcValueTableSettingsFactoryDto dto : JsArrays.toIterable(jdbcDatasourceSettings.getTableSettingsFactoriesArray()))
+      jdbcTableSettingsFactoriesEditor.addJdbcTableSettingsFactory(dto);
+  }
+
+  @Override
+  public JdbcDatasourceSettingsDto getJdbcDatasourceSettings() {
+    JdbcDatasourceSettingsDto jdbcSettings = JdbcDatasourceSettingsDto.create();
+    jdbcSettings.setDefaultEntityType(defaultEntityType.getText());
+    jdbcSettings.setDefaultEntityIdColumnName(defaultEntityIdColumn.getText());
+    if(getUsageValue() == Usage.STORAGE) jdbcSettings.setDefaultCreatedTimestampColumnName("opal_created");
+    jdbcSettings.setDefaultUpdatedTimestampColumnName(defaultUpdatedTimestampColumn.getText());
+    jdbcSettings.setUseMetadataTables(useMetadataTables.getValue());
+    jdbcSettings.setMultipleDatasources(getUsageValue() == Usage.STORAGE);
+    // multilines are detected at import/storage and forced at export
+    jdbcSettings.setMultilines(getUsageValue() == Usage.EXPORT);
+
+    List<String> mappedTables = Lists.newArrayList();
+    jdbcSettings.setTableSettingsArray(jdbcTableSettingsEditor.getJdbcTableSettings());
+    jdbcSettings.setTableSettingsFactoriesArray(jdbcTableSettingsFactoriesEditor.getJdbcTableSettingsFactories());
+
+    for (JdbcValueTableSettingsDto dto : JsArrays.toIterable(jdbcSettings.getTableSettingsArray()))
+      if (!mappedTables.contains(dto.getSqlTable())) mappedTables.add(dto.getSqlTable());
+    for (JdbcValueTableSettingsFactoryDto dto : JsArrays.toIterable(jdbcSettings.getTableSettingsFactoriesArray()))
+      if (!mappedTables.contains(dto.getSqlTable())) mappedTables.add(dto.getSqlTable());
+
+    if (!mappedTables.isEmpty())
+      jdbcSettings.setMappedTablesArray(JsArrays.fromIterable(mappedTables));
+
+    if(!batchSize.getText().isEmpty())
+      jdbcSettings.setBatchSize(batchSize.getNumberValue().intValue());
+
+    return jdbcSettings;
+  }
+
+  @Override
+  public boolean hasJdbcTableSettingsError() {
+    try {
+      jdbcTableSettingsEditor.getJdbcTableSettings();
+      return false;
+    } catch (Exception e) {
+      return true;
+    }
+  }
+
+  @Override
+  public boolean hasJdbcTableSettingsFactoriesError() {
+    try {
+      jdbcTableSettingsFactoriesEditor.getJdbcTableSettingsFactories();
+      return false;
+    } catch (Exception e) {
+      return true;
+    }
+  }
+
+  @Override
+  public void disableFieldsForDatabaseWithDatasource() {
+    sqlSchema.setEnabled(false);
+    driver.setEnabled(false);
+    tablePrefix.setEnabled(false);
+    defaultEntityType.setEnabled(false);
+    defaultUpdatedTimestampColumn.setEnabled(false);
+    useMetadataTables.setEnabled(false);
   }
 
   @Override
   public HasText getDefaultEntityType() {
     return defaultEntityType;
-  }
-
-  @Override
-  public HasEnabled getDefaultEntityTypeEnabled() {
-    return defaultEntityType;
-  }
-
-  @Override
-  public HasText getDefaultEntityIdColumn() {
-    return defaultEntityIdColumn;
-  }
-
-  @Override
-  public HasText getDefaultCreatedTimestampColumn() {
-    return defaultCreatedTimestampColumn;
-  }
-
-  @Override
-  public HasEnabled getDefaultCreatedTimestampColumnEnabled() {
-    return defaultCreatedTimestampColumn;
-  }
-
-  @Override
-  public HasText getDefaultUpdatedTimestampColumn() {
-    return defaultUpdatedTimestampColumn;
-  }
-
-  @Override
-  public HasEnabled getDefaultUpdatedTimestampColumnEnabled() {
-    return defaultUpdatedTimestampColumn;
   }
 
   @Override
@@ -535,20 +572,6 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   @Override
   public HasVisibility getDefaultStorageGroupVisibility() {
     return defaultStorage;
-  }
-
-  @Override
-  public HasValue<Boolean> getUseMetadataTables() {
-    return useMetadataTables;
-  }
-
-  @Override
-  public HasEnabled getUseMetadataTablesEnabled() {
-    return useMetadataTables;
-  }
-
-  public NumericTextBox getBatchSize() {
-    return batchSize;
   }
 
   @Override
@@ -571,16 +594,23 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
 
   @Override
   public void toggleJdbcOptions(boolean show) {
-    boolean storage = getUsageValue() == Usage.STORAGE;
+    Usage usageValue = getUsageValue();
+    boolean storage = usageValue == Usage.STORAGE;
     defaultEntityType.setValue("Participant");
     // set default jdbc options when usage is storage
     defaultEntityIdColumn.setValue(show && storage ? "opal_id" : "id");
-    defaultCreatedTimestampColumn.setValue(show && storage ? "opal_created" : "created");
-    defaultUpdatedTimestampColumn.setValue(show && storage ? "opal_updated" : "updated");
+    defaultUpdatedTimestampColumn.setValue(show && storage ? "opal_updated" : usageValue == Usage.EXPORT ? "updated" : "");
     useMetadataTables.setValue(show && storage);
+    useMetadataTablesGroup.setVisible(show && usageValue == Usage.EXPORT);
     // do not show jdbc options when usage is storage
     jdbcOptions.setVisible(show && !storage);
     jdbcOptions.setOpen(true);
+    if (show && !storage) {
+      HasAuthorization authorizer = new CompositeAuthorizer(new TabPanelAuthorizer(jdbcOptionsTabPanel, JDBC_TABLES_TAB_INDEX),
+          new TabPanelAuthorizer(jdbcOptionsTabPanel, JDBC_TABLE_PARTITIONS_TAB_INDEX));
+      if (usageValue == Usage.IMPORT) authorizer.authorized();
+      else authorizer.unauthorized();
+    }
   }
 
   private Usage getUsageValue() {

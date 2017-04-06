@@ -9,12 +9,13 @@
   -->
 
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
-    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
-    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+             xmlns:s="urn:import:org.obiba.opal.web.gwt.app.client.administration.database.edit.sql"
+             xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <o:Modal ui:field="modal" closeVisible="true" keyboard="true" animation="false">
+  <o:Modal ui:field="modal" closeVisible="true" keyboard="true" animation="false" minHeight="700" minWidth="500">
     <b:ControlGroup ui:field="nameGroup">
       <b:ControlLabel for="name">
         <ui:msg description="Name label">Name</ui:msg>
@@ -106,59 +107,76 @@
 
     <o:CollapsiblePanel ui:field="jdbcOptions">
 
+      <b:TabPanel tabPosition="above" ui:field="jdbcOptionsTabPanel">
 
-      <b:ControlGroup>
-        <b:ControlLabel for="defaultEntityIdColumn">
-          <ui:msg description="Entity Id column label">Entity Identifier Column</ui:msg>
-          <o:RequiredIcon/>
-        </b:ControlLabel>
-        <b:TextBox ui:field="defaultEntityIdColumn" b:id="defaultEntityIdColumn"/>
-        <b:HelpBlock>
-          <ui:msg description="Entity Id help label">The column name for identifying the entity. Make sure it will not conflict with a variable column name.</ui:msg>
-        </b:HelpBlock>
-      </b:ControlGroup>
+        <b:Tab heading="Defaults" active="true">
 
-      <b:ControlGroup>
-        <b:ControlLabel for="defaultCreatedTimestampColumn">
-          <ui:msg description="Creation timestamp column label">Creation Timestamp Column</ui:msg>
-        </b:ControlLabel>
-        <b:TextBox ui:field="defaultCreatedTimestampColumn" b:id="defaultCreatedTimestampColumn"/>
-        <b:HelpBlock>
-          <ui:msg description="Creation timestamp help label">The column name for entity values insertion date time. Make sure it will not conflict with a variable column name.</ui:msg>
-        </b:HelpBlock>
-      </b:ControlGroup>
+          <b:ControlGroup ui:field="defaultEntityTypeGroup">
+            <b:ControlLabel for="defaultEntityType">
+              <ui:msg description="Default Entity Type label">Default Entity Type</ui:msg>
+              <o:RequiredIcon/>
+            </b:ControlLabel>
+            <b:TextBox ui:field="defaultEntityType" b:id="defaultEntityType"/>
+            <b:HelpBlock>
+              <ui:msg description="Default Entity type help label">Entity type to be used if no variables description tables is available.</ui:msg>
+            </b:HelpBlock>
+          </b:ControlGroup>
 
-      <b:ControlGroup>
-        <b:ControlLabel for="defaultUpdatedTimestampColumn">
-          <ui:msg description="Update timestamp column label">Update Timestamp Column</ui:msg>
-        </b:ControlLabel>
-        <b:TextBox ui:field="defaultUpdatedTimestampColumn" b:id="defaultUpdatedTimestampColumn"/>
-        <b:HelpBlock>
-          <ui:msg description="Update timestamp help label">The column name for entity values last update date time, required for performing incremental imports. Make sure it will not conflict with a variable column name.</ui:msg>
-        </b:HelpBlock>
-      </b:ControlGroup>
+          <b:ControlGroup>
+            <b:ControlLabel for="defaultEntityIdColumn">
+              <ui:msg description="Entity Id column label">Entity Identifier Column</ui:msg>
+              <o:RequiredIcon/>
+            </b:ControlLabel>
+            <b:TextBox ui:field="defaultEntityIdColumn" b:id="defaultEntityIdColumn"/>
+            <b:HelpBlock>
+              <ui:msg description="Entity Id help label">The column name for identifying the entity. Make sure it will not conflict with a variable column name.</ui:msg>
+            </b:HelpBlock>
+          </b:ControlGroup>
 
-      <b:ControlGroup>
-        <b:CheckBox ui:field="useMetadataTables" b:id="useMetadataTables" inline="true">
-          <ui:msg description="With variables description tables label">With variables description tables</ui:msg>
-        </b:CheckBox>
-        <b:HelpBlock>
-          <ui:msg description="With variables help label">If checked, the variables description will be fetched from
-            database.
-          </ui:msg>
-        </b:HelpBlock>
-      </b:ControlGroup>
+          <b:ControlGroup>
+            <b:ControlLabel for="defaultUpdatedTimestampColumn">
+              <ui:msg description="Update timestamp column label">Update Timestamp Column</ui:msg>
+            </b:ControlLabel>
+            <b:TextBox ui:field="defaultUpdatedTimestampColumn" b:id="defaultUpdatedTimestampColumn"/>
+            <b:HelpBlock>
+              <ui:msg description="Update timestamp help label">The column name for entity values last update date time, required for performing incremental imports. Make sure it will not conflict with a variable column name.</ui:msg>
+            </b:HelpBlock>
+          </b:ControlGroup>
 
-      <b:ControlGroup ui:field="defaultEntityTypeGroup">
-        <b:ControlLabel for="defaultEntityType">
-          <ui:msg description="Default Entity Type label">Default Entity Type</ui:msg>
-          <o:RequiredIcon/>
-        </b:ControlLabel>
-        <b:TextBox ui:field="defaultEntityType" b:id="defaultEntityType"/>
-        <b:HelpBlock>
-          <ui:msg description="Default Entity type help label">Entity type to be used if no variables description tables is available.</ui:msg>
-        </b:HelpBlock>
-      </b:ControlGroup>
+          <b:ControlGroup ui:field="useMetadataTablesGroup">
+            <b:CheckBox ui:field="useMetadataTables" b:id="useMetadataTables" inline="true">
+              <ui:msg description="With variables description tables label">With variables description tables</ui:msg>
+            </b:CheckBox>
+            <b:HelpBlock>
+              <ui:msg description="With variables help label">If checked, the variables description will be fetched from
+                database.
+              </ui:msg>
+            </b:HelpBlock>
+          </b:ControlGroup>
+
+        </b:Tab>
+
+        <b:Tab heading="Tables">
+          <b:HelpBlock>
+            <ui:msg description="Jdbc Tables Help">The SQL tables to import can be explicitly defined with specific options.
+            </ui:msg>
+          </b:HelpBlock>
+
+          <s:JdbcTableSettingsEditor ui:field="jdbcTableSettingsEditor"/>
+
+        </b:Tab>
+
+        <b:Tab heading="Table Partitions">
+          <b:HelpBlock>
+            <ui:msg description="Jdbc Table Partitions Help">A SQL table can be partitioned in several tables to import: one for each distinct value observed in the partition column. Specific table options can also be defined.
+            </ui:msg>
+          </b:HelpBlock>
+
+          <s:JdbcTableSettingsFactoriesEditor ui:field="jdbcTableSettingsFactoriesEditor"/>
+
+        </b:Tab>
+
+      </b:TabPanel>
     </o:CollapsiblePanel>
 
     <o:CollapsiblePanel ui:field="advancedOptions">
