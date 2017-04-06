@@ -134,16 +134,6 @@
           </b:ControlGroup>
 
           <b:ControlGroup>
-            <b:ControlLabel for="defaultCreatedTimestampColumn">
-              <ui:msg description="Creation timestamp column label">Creation Timestamp Column</ui:msg>
-            </b:ControlLabel>
-            <b:TextBox ui:field="defaultCreatedTimestampColumn" b:id="defaultCreatedTimestampColumn"/>
-            <b:HelpBlock>
-              <ui:msg description="Creation timestamp help label">The column name for entity values insertion date time. Make sure it will not conflict with a variable column name.</ui:msg>
-            </b:HelpBlock>
-          </b:ControlGroup>
-
-          <b:ControlGroup>
             <b:ControlLabel for="defaultUpdatedTimestampColumn">
               <ui:msg description="Update timestamp column label">Update Timestamp Column</ui:msg>
             </b:ControlLabel>
@@ -153,7 +143,7 @@
             </b:HelpBlock>
           </b:ControlGroup>
 
-          <b:ControlGroup>
+          <b:ControlGroup ui:field="useMetadataTablesGroup">
             <b:CheckBox ui:field="useMetadataTables" b:id="useMetadataTables" inline="true">
               <ui:msg description="With variables description tables label">With variables description tables</ui:msg>
             </b:CheckBox>

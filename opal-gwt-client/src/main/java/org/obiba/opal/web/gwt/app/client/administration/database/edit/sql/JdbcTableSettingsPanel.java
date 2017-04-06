@@ -66,6 +66,7 @@ public class JdbcTableSettingsPanel extends Composite {
     this.groupHandler = groupHandler;
     JdbcValueTableSettingsDto settings = JdbcValueTableSettingsDto.create();
     settings.setSqlTable(sqlTableName);
+    settings.setEntityType("Participant");
     setJdbcTableSettings(settings);
   }
 

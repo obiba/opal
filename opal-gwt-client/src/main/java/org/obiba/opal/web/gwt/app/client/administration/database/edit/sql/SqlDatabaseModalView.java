@@ -144,13 +144,13 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   TextBox defaultEntityIdColumn;
 
   @UiField
-  TextBox defaultCreatedTimestampColumn;
-
-  @UiField
   TextBox defaultUpdatedTimestampColumn;
 
   @UiField
   NumericTextBox batchSize;
+
+  @UiField
+  ControlGroup useMetadataTablesGroup;
 
   @UiField
   CheckBox useMetadataTables;
@@ -490,7 +490,6 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   public void setJdbcDatasourceSettings(JdbcDatasourceSettingsDto jdbcDatasourceSettings) {
     defaultEntityType.setText(jdbcDatasourceSettings.getDefaultEntityType());
     defaultEntityIdColumn.setText(jdbcDatasourceSettings.getDefaultEntityIdColumnName());
-    defaultCreatedTimestampColumn.setText(jdbcDatasourceSettings.getDefaultCreatedTimestampColumnName());
     defaultUpdatedTimestampColumn.setText(jdbcDatasourceSettings.getDefaultUpdatedTimestampColumnName());
     useMetadataTables.setValue(jdbcDatasourceSettings.getUseMetadataTables());
     batchSize.setValue(jdbcDatasourceSettings.getBatchSize());
@@ -505,7 +504,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
     JdbcDatasourceSettingsDto jdbcSettings = JdbcDatasourceSettingsDto.create();
     jdbcSettings.setDefaultEntityType(defaultEntityType.getText());
     jdbcSettings.setDefaultEntityIdColumnName(defaultEntityIdColumn.getText());
-    jdbcSettings.setDefaultCreatedTimestampColumnName(defaultCreatedTimestampColumn.getText());
+    if(getUsageValue() == Usage.STORAGE) jdbcSettings.setDefaultCreatedTimestampColumnName("opal_created");
     jdbcSettings.setDefaultUpdatedTimestampColumnName(defaultUpdatedTimestampColumn.getText());
     jdbcSettings.setUseMetadataTables(useMetadataTables.getValue());
     jdbcSettings.setMultipleDatasources(getUsageValue() == Usage.STORAGE);
@@ -556,7 +555,6 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
     driver.setEnabled(false);
     tablePrefix.setEnabled(false);
     defaultEntityType.setEnabled(false);
-    defaultCreatedTimestampColumn.setEnabled(false);
     defaultUpdatedTimestampColumn.setEnabled(false);
     useMetadataTables.setEnabled(false);
   }
@@ -601,9 +599,9 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
     defaultEntityType.setValue("Participant");
     // set default jdbc options when usage is storage
     defaultEntityIdColumn.setValue(show && storage ? "opal_id" : "id");
-    defaultCreatedTimestampColumn.setValue(show && storage ? "opal_created" : "");
     defaultUpdatedTimestampColumn.setValue(show && storage ? "opal_updated" : usageValue == Usage.EXPORT ? "updated" : "");
     useMetadataTables.setValue(show && storage);
+    useMetadataTablesGroup.setVisible(show && usageValue == Usage.EXPORT);
     // do not show jdbc options when usage is storage
     jdbcOptions.setVisible(show && !storage);
     jdbcOptions.setOpen(true);
