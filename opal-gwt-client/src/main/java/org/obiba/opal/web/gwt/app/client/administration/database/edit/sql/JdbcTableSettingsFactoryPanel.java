@@ -21,7 +21,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
-import org.obiba.opal.web.model.client.magma.JdbcValueTableSettingsDto;
 import org.obiba.opal.web.model.client.magma.JdbcValueTableSettingsFactoryDto;
 
 public class JdbcTableSettingsFactoryPanel extends Composite {
@@ -117,9 +116,12 @@ public class JdbcTableSettingsFactoryPanel extends Composite {
   }
 
   public JdbcValueTableSettingsFactoryDto getJdbcTableSettingsFactory() {
+    this.settings = JdbcValueTableSettingsFactoryDto.create();
+    if (Strings.isNullOrEmpty(sqlTable.getValue())) throw new RuntimeException("SQL table name is required");
     settings.setSqlTable(sqlTable.getValue());
     settings.setOpalTable(opalTable.getValue());
     settings.setEntityType(Strings.isNullOrEmpty(entityType.getValue()) ? "Participant" : entityType.getValue());
+    if (Strings.isNullOrEmpty(tablePartitionColumn.getValue())) throw new RuntimeException("Table partition column is required");
     settings.setTablePartitionColumn(tablePartitionColumn.getValue());
     settings.setEntityIdentifierColumn(entityIdentifierColumn.getValue());
     settings.setUpdatedTimestampColumn(updatedTimestampColumn.getValue());

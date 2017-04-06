@@ -9,19 +9,28 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.database.edit.sql;
 
-import javax.annotation.Nullable;
-
-import com.github.gwtbootstrap.client.ui.*;
 import com.github.gwtbootstrap.client.ui.CheckBox;
+import com.github.gwtbootstrap.client.ui.*;
 import com.github.gwtbootstrap.client.ui.PasswordTextBox;
 import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.github.gwtbootstrap.client.ui.TextArea;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.event.dom.client.*;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.HasChangeHandlers;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
 import org.obiba.opal.web.gwt.app.client.administration.database.edit.AbstractDatabaseModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.edit.DatabaseUiHandlers;
@@ -36,20 +45,11 @@ import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
 import org.obiba.opal.web.model.client.database.JdbcDriverDto;
-
-import com.github.gwtbootstrap.client.ui.constants.AlertType;
-import com.google.common.base.Strings;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.TakesValue;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
 import org.obiba.opal.web.model.client.magma.JdbcDatasourceSettingsDto;
 import org.obiba.opal.web.model.client.magma.JdbcValueTableSettingsDto;
 import org.obiba.opal.web.model.client.magma.JdbcValueTableSettingsFactoryDto;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 import static org.obiba.opal.web.gwt.app.client.administration.database.edit.AbstractDatabaseModalPresenter.Mode.CREATE;
@@ -514,7 +514,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
 
     List<String> mappedTables = Lists.newArrayList();
     jdbcSettings.setTableSettingsArray(jdbcTableSettingsEditor.getJdbcTableSettings());
-    jdbcSettings.setTableSettingsFactoriesArray(jdbcTableSettingsFactoriesEditor.getJdbcTableSettingsFactory());
+    jdbcSettings.setTableSettingsFactoriesArray(jdbcTableSettingsFactoriesEditor.getJdbcTableSettingsFactories());
 
     for (JdbcValueTableSettingsDto dto : JsArrays.toIterable(jdbcSettings.getTableSettingsArray()))
       if (!mappedTables.contains(dto.getSqlTable())) mappedTables.add(dto.getSqlTable());
@@ -528,6 +528,26 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
       jdbcSettings.setBatchSize(batchSize.getNumberValue().intValue());
 
     return jdbcSettings;
+  }
+
+  @Override
+  public boolean hasJdbcTableSettingsError() {
+    try {
+      jdbcTableSettingsEditor.getJdbcTableSettings();
+      return false;
+    } catch (Exception e) {
+      return true;
+    }
+  }
+
+  @Override
+  public boolean hasJdbcTableSettingsFactoriesError() {
+    try {
+      jdbcTableSettingsFactoriesEditor.getJdbcTableSettingsFactories();
+      return false;
+    } catch (Exception e) {
+      return true;
+    }
   }
 
   @Override

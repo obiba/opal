@@ -26,7 +26,6 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.model.client.magma.JdbcValueTableSettingsDto;
 import org.obiba.opal.web.model.client.magma.JdbcValueTableSettingsFactoryDto;
 
 import java.util.List;
@@ -64,7 +63,7 @@ public class JdbcTableSettingsFactoriesEditor extends Composite {
     }
   }
 
-  public JsArray<JdbcValueTableSettingsFactoryDto> getJdbcTableSettingsFactory() {
+  public JsArray<JdbcValueTableSettingsFactoryDto> getJdbcTableSettingsFactories() {
     JsArray<JdbcValueTableSettingsFactoryDto> settingsArray = JsArrays.create();
     for (JdbcTableSettingsFactoryPanel panels : settingsList) settingsArray.push(panels.getJdbcTableSettingsFactory());
     return settingsArray;

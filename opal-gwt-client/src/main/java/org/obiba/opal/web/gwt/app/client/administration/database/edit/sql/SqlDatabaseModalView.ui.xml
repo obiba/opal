@@ -12,7 +12,6 @@
              xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
              xmlns:s="urn:import:org.obiba.opal.web.gwt.app.client.administration.database.edit.sql"
              xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
              ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
              ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
 

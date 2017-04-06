@@ -112,6 +112,8 @@ public class JdbcTableSettingsPanel extends Composite {
   }
 
   public JdbcValueTableSettingsDto getJdbcTableSettings() {
+    this.settings = JdbcValueTableSettingsDto.create();
+    if (Strings.isNullOrEmpty(sqlTable.getValue())) throw new RuntimeException("SQL table name is required");
     settings.setSqlTable(sqlTable.getValue());
     settings.setOpalTable(opalTable.getValue());
     settings.setEntityType(Strings.isNullOrEmpty(entityType.getValue()) ? "Participant" : entityType.getValue());

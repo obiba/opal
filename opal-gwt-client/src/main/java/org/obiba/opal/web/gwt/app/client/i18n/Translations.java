@@ -520,6 +520,8 @@ public interface Translations extends Constants {
       "CertificateIsRequired", "A certificate is required.",//
       "UsageIsRequired", "Database usage is required.",//
       "SqlSchemaIsRequired", "Database SQL schema is required.",//
+      "JdbcTableSettingsNotValid", "Table SQL name is required.", //
+      "JdbcTableSettingsFactoriesNotValid", "Table SQL name and partition column are required.", //
       "OpalURLIsRequired", "Opal address is required.",//
       "RemoteDatasourceIsRequired", "Remote datasource name is required.",//
       "TableSelectionIsRequired", "At least one table must be selected.",//
