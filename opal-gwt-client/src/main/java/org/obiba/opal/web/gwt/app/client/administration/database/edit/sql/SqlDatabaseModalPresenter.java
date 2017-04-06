@@ -103,15 +103,8 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
     JdbcDatasourceSettingsDto jdbcDatasourceSettings = sqlSettings.getJdbcDatasourceSettings();
     if(SqlSettingsDto.SqlSchema.JDBC.getName().equals(sqlSettings.getSqlSchema().getName()) &&
         jdbcDatasourceSettings != null) {
-      getView().getDefaultEntityType().setText(jdbcDatasourceSettings.getDefaultEntityType());
-      getView().getDefaultEntityIdColumn()
-          .setText(jdbcDatasourceSettings.getDefaultEntityIdColumnName());
-      getView().getDefaultCreatedTimestampColumn()
-          .setText(jdbcDatasourceSettings.getDefaultCreatedTimestampColumnName());
-      getView().getDefaultUpdatedTimestampColumn()
-          .setText(jdbcDatasourceSettings.getDefaultUpdatedTimestampColumnName());
-      getView().getUseMetadataTables().setValue(jdbcDatasourceSettings.getUseMetadataTables());
-      getView().getBatchSize().setValue(jdbcDatasourceSettings.getBatchSize());
+      getView().setJdbcDatasourceSettings(jdbcDatasourceSettings);
+
     } else if(SqlSettingsDto.SqlSchema.LIMESURVEY.getName().equals(sqlSettings.getSqlSchema().getName()) &&
         sqlSettings.getLimesurveyDatasourceSettings() != null) {
       getView().getTablePrefix().setText(sqlSettings.getLimesurveyDatasourceSettings().getTablePrefix());
@@ -128,13 +121,7 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
   @Override
   protected void disableFieldsForDatabaseWithDatasource() {
     super.disableFieldsForDatabaseWithDatasource();
-    getView().getSqlSchemaEnabled().setEnabled(false);
-    getView().getDriverEnabled().setEnabled(false);
-    getView().getTablePrefixEnabled().setEnabled(false);
-    getView().getDefaultEntityTypeEnabled().setEnabled(false);
-    getView().getDefaultCreatedTimestampColumnEnabled().setEnabled(false);
-    getView().getDefaultUpdatedTimestampColumnEnabled().setEnabled(false);
-    getView().getUseMetadataTablesEnabled().setEnabled(false);
+    getView().disableFieldsForDatabaseWithDatasource();
   }
 
   @Override
@@ -174,19 +161,7 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
   }
 
   private JdbcDatasourceSettingsDto getJdbcDatasourceSettingsDto() {
-    JdbcDatasourceSettingsDto jdbcSettings = JdbcDatasourceSettingsDto.create();
-    jdbcSettings.setDefaultEntityType(getView().getDefaultEntityType().getText());
-    jdbcSettings.setDefaultEntityIdColumnName(getView().getDefaultEntityIdColumn().getText());
-    jdbcSettings.setDefaultCreatedTimestampColumnName(getView().getDefaultCreatedTimestampColumn().getText());
-    jdbcSettings.setDefaultUpdatedTimestampColumnName(getView().getDefaultUpdatedTimestampColumn().getText());
-    jdbcSettings.setUseMetadataTables(getView().getUseMetadataTables().getValue());
-    jdbcSettings.setMultipleDatasources(getView().getUsage().getValue() == Usage.STORAGE);
-    // multilines are detected at import/storage and forced at export
-    jdbcSettings.setMultilines(getView().getUsage().getValue() == Usage.EXPORT);
-
-    if(!getView().getBatchSize().getText().isEmpty())
-      jdbcSettings.setBatchSize(getView().getBatchSize().getNumberValue().intValue());
-
+    JdbcDatasourceSettingsDto jdbcSettings = getView().getJdbcDatasourceSettings();
     return jdbcSettings;
   }
 
@@ -253,6 +228,7 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
 
   public interface Display extends AbstractDatabaseModalPresenter.Display {
 
+
     enum FormField {
       NAME,
       DRIVER,
@@ -272,33 +248,17 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
 
     TakesValue<SqlSchema> getSqlSchema();
 
-    HasEnabled getSqlSchemaEnabled();
-
     HasText getDriver();
-
-    HasEnabled getDriverEnabled();
 
     HasText getTablePrefix();
 
-    HasEnabled getTablePrefixEnabled();
+    void setJdbcDatasourceSettings(JdbcDatasourceSettingsDto jdbcDatasourceSettings);
+
+    JdbcDatasourceSettingsDto getJdbcDatasourceSettings();
+
+    void disableFieldsForDatabaseWithDatasource();
 
     HasText getDefaultEntityType();
-
-    HasEnabled getDefaultEntityTypeEnabled();
-
-    HasText getDefaultEntityIdColumn();
-
-    HasText getDefaultCreatedTimestampColumn();
-
-    HasEnabled getDefaultCreatedTimestampColumnEnabled();
-
-    HasText getDefaultUpdatedTimestampColumn();
-
-    HasEnabled getDefaultUpdatedTimestampColumnEnabled();
-
-    HasValue<Boolean> getUseMetadataTables();
-
-    HasEnabled getUseMetadataTablesEnabled();
 
     HasChangeHandlers getSqlSchemaChangeHandlers();
 
@@ -309,10 +269,6 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
     HasVisibility getNameGroupVisibility();
 
     HasVisibility getDefaultStorageGroupVisibility();
-
-    HasVisibility getSqlSchemaGroupVisibility();
-
-    NumericTextBox getBatchSize();
   }
 
 }

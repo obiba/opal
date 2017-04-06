@@ -109,10 +109,10 @@ public class Dtos {
 
   private static JdbcValueTableSettingsFactory fromDto(@NotNull Magma.JdbcValueTableSettingsFactoryDto dto, String defaultEntityType, String defaultEntityIdColumn ) {
     JdbcValueTableSettingsFactory.Builder builder = JdbcValueTableSettingsFactory.newSettings(dto.getSqlTable(), dto.getTablePartitionColumn()) //
+        .tableName(dto.getOpalTable()) //
         .entityType(dto.hasEntityType() ? dto.getEntityType() : defaultEntityType) //
         .entityIdentifierColumn(dto.hasEntityIdentifierColumn() ? dto.getEntityIdentifierColumn() : defaultEntityIdColumn)
         .multilines(dto.getMultilines());
-    if (dto.hasOpalTable()) builder.tableName(dto.getOpalTable());
     if (dto.hasCreatedTimestampColumn()) builder.createdTimestampColumn(dto.getCreatedTimestampColumn());
     if (dto.hasUpdatedTimestampColumn()) builder.updatedTimestampColumn(dto.getUpdatedTimestampColumn());
     if (dto.hasEntityIdentifiersWhere()) builder.entityIdentifiersWhere(dto.getEntityIdentifiersWhere());
