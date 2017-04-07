@@ -230,13 +230,6 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
 
   private void sortByName(List<Magma.TableDto> tables) {
     // sort alphabetically
-    Collections.sort(tables, new Comparator<Magma.TableDto>() {
-
-      @Override
-      public int compare(TableDto t1, TableDto t2) {
-        return t1.getName().compareTo(t2.getName());
-      }
-
-    });
+    Collections.sort(tables, Comparator.comparing(TableDto::getName));
   }
 }

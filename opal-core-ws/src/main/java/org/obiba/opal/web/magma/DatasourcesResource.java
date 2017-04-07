@@ -59,6 +59,8 @@ public class DatasourcesResource {
     for(Datasource datasource : MagmaEngine.get().getDatasources()) {
       tables.addAll(getDatasourceTablesResource(datasource).getTables(false, entityType));
     }
+
+    Collections.sort(tables, Comparator.comparing(Magma.TableDto::getLink));
     return tables;
   }
 
@@ -77,14 +79,7 @@ public class DatasourcesResource {
 
   private void sortByName(List<Magma.DatasourceDto> datasources) {
     // sort alphabetically
-    Collections.sort(datasources, new Comparator<Magma.DatasourceDto>() {
-
-      @Override
-      public int compare(DatasourceDto d1, DatasourceDto d2) {
-        return d1.getName().compareTo(d2.getName());
-      }
-
-    });
+    Collections.sort(datasources, Comparator.comparing(DatasourceDto::getName));
   }
 
 }
