@@ -58,13 +58,7 @@ public class FileSystemResource {
     // Get the children for the current folder (list of files & folders).
     List<FileObject> children = Arrays.asList(parentFolder.getChildren());
 
-    Collections.sort(children, new Comparator<FileObject>() {
-
-      @Override
-      public int compare(FileObject arg0, FileObject arg1) {
-        return arg0.getName().compareTo(arg1.getName());
-      }
-    });
+    Collections.sort(children, Comparator.comparing(FileObject::getName));
 
     // Loop through all children.
     for(FileObject child : children) {

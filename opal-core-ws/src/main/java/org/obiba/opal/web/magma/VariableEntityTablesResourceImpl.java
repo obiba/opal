@@ -9,11 +9,7 @@
  */
 package org.obiba.opal.web.magma;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.ws.rs.GET;
 
@@ -87,7 +83,11 @@ public class VariableEntityTablesResourceImpl implements AbstractTablesResource,
         .withLimit(limit) //
         .find(new VariableEntityTablesQuery(variableEntity), results);
 
-    return results.getValue();
+    List<Magma.TableDto> tables = results.getValue();
+
+    Collections.sort(tables, Comparator.comparing(Magma.TableDto::getLink));
+
+    return tables;
   }
 
   public static class VariableEntityTablesQuery extends AbstractFinderQuery {
