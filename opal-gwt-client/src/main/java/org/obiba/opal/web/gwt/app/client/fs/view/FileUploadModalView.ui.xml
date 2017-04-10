@@ -24,7 +24,6 @@
         </b:ControlLabel>
         <b:Controls>
           <b2:InlineLabel ui:field="remoteFolderName" addStyleNames="help-block"/>
-          <g:Image ui:field="uploadingText" visible="false" url="image/in-progress.gif"/>
         </b:Controls>
       </b:ControlGroup>
       <b:ControlGroup>
@@ -34,6 +33,13 @@
           </b:Form>
         </b:Controls>
       </b:ControlGroup>
+    </g:FlowPanel>
+
+    <g:FlowPanel ui:field="uploadProgressPanel">
+      <g:Label>
+        <ui:msg description="File upload progress label">Please wait while file is being uploaded...</ui:msg>
+      </g:Label>
+      <g:Image ui:field="uploadingImage" visible="false" url="image/in-progress.gif"/>
     </g:FlowPanel>
 
     <b:ModalFooter>

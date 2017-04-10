@@ -55,7 +55,7 @@ public class FileUploadModalView extends ModalPopupViewWithUiHandlers<FileUpload
   Panel inputFieldPanel;
 
   @UiField
-  Image uploadingText;
+  Panel uploadProgressPanel;
 
   @Inject
   public FileUploadModalView(EventBus eventBus, Binder uiBinder, Translations translations) {
@@ -108,7 +108,8 @@ public class FileUploadModalView extends ModalPopupViewWithUiHandlers<FileUpload
     inputFieldPanel.setVisible(!isUploading);
     cancelButton.setEnabled(!isUploading);
     uploadButton.setEnabled(!isUploading);
-    uploadingText.setVisible(isUploading);
+    uploadProgressPanel.setVisible(isUploading);
+    dialog.setBusy(isUploading);
   }
 
 }
