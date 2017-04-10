@@ -2,9 +2,7 @@ package org.obiba.opal.core.service;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import org.obiba.magma.ValueSet;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.VariableEntity;
+import org.obiba.magma.*;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.core.domain.VCFSampleRole;
 import org.obiba.opal.core.domain.VCFSamplesMapping;
@@ -20,7 +18,7 @@ import java.util.stream.Collectors;
 
 
 @Component
-public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService {
+public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService, ValueTableUpdateListener {
 
   @Autowired
   private OrientDbService orientDbService;
@@ -122,6 +120,21 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService {
         valueTable.getValue(valueTable.getVariable(participantVariableColumn), valueSet).toString(),
         valueTable.getValue(valueTable.getVariable(roleVariableColumn), valueSet).toString()
     );
+  }
+
+  @Override
+  public void onRename(@NotNull ValueTable vt, String newName) {
+    // should we rename the sample mappings?
+  }
+
+  @Override
+  public void onRename(@NotNull ValueTable vt, Variable v, String newName) {
+    // should we rename the sample mapping variables?
+  }
+
+  @Override
+  public void onDelete(@NotNull ValueTable vt) {
+    if (TABLE_ENTITY_TYPE.equals(vt.getEntityType())) deleteProjectSampleMappings(vt.getDatasource().getName() + "." + vt.getName());
   }
 
   private class ParticipantRolePair implements Map.Entry<String, String> {

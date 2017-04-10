@@ -73,9 +73,6 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
 
   private Set<ValueTableUpdateListener> tableListeners;
 
-  @Autowired
-  private VCFSamplesMappingService vcfSamplesMappingService;
-
   @Override
   public void setDatasource(Datasource datasource) {
     this.datasource = datasource;
@@ -205,14 +202,12 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
           }
         }
 
-        if(datasource.getValueTable(table).isView()) {
+        ValueTable toDrop = datasource.getValueTable(table);
+        if(toDrop.isView()) {
           viewManager.removeView(datasource.getName(), table);
         } else {
           datasource.dropTable(table);
         }
-
-        if (VCFSamplesMappingService.TABLE_ENTITY_TYPE.equals(datasource.getValueTable(table).getEntityType()))
-          vcfSamplesMappingService.deleteProjectSampleMappings(datasource.getName() + "." + table);
       }
     }
 
