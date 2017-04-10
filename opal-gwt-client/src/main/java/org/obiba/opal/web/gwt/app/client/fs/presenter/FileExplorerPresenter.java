@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
@@ -372,6 +373,7 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
 
           @Override
           public void onResponseCode(Request request, Response response) {
+            fireEvent(ConfirmationTerminatedEvent.create());
             if(response.getStatusCode() == Response.SC_OK) {
               getEventBus().fireEvent(new FileDeletedEvent(file));
             } else {

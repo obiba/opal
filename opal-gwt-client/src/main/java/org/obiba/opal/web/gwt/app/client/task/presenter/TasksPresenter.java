@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.task.presenter;
 
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
@@ -144,6 +145,7 @@ public class TasksPresenter extends PresenterWidget<TasksPresenter.Display> {
 
           @Override
           public void onResponseCode(Request request, Response response) {
+            fireEvent(ConfirmationTerminatedEvent.create());
             if(response.getStatusCode() == 200) {
               getEventBus().fireEvent(NotificationEvent.newBuilder().info("jobCancelled").build());
             } else {
@@ -173,6 +175,7 @@ public class TasksPresenter extends PresenterWidget<TasksPresenter.Display> {
 
           @Override
           public void onResponseCode(Request request, Response response) {
+            fireEvent(ConfirmationTerminatedEvent.create());
             updateTable();
           }
         };

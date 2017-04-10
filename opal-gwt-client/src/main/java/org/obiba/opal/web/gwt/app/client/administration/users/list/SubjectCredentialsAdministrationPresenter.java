@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.administration.users.SubjectCredentials
 import org.obiba.opal.web.gwt.app.client.administration.users.edit.SubjectCredentialsPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
@@ -263,8 +264,8 @@ public class SubjectCredentialsAdministrationPresenter extends
           .withCallback(Response.SC_OK, new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
-              getEventBus().fireEvent(
-                  isSubjectCredentials ? new SubjectCredentialsRefreshedEvent() : new GroupsRefreshedEvent());
+              fireEvent(ConfirmationTerminatedEvent.create());
+              fireEvent(isSubjectCredentials ? new SubjectCredentialsRefreshedEvent() : new GroupsRefreshedEvent());
             }
           }).delete().send();
     }

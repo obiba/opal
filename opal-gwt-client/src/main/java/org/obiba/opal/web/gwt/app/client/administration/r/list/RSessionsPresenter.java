@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.administration.r.list;
 
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -88,6 +89,7 @@ public class RSessionsPresenter extends PresenterWidget<RSessionsPresenter.Displ
 
           @Override
           public void onResponseCode(Request request, Response response) {
+            fireEvent(ConfirmationTerminatedEvent.create());
             if(response.getStatusCode() == SC_OK) {
               getEventBus().fireEvent(NotificationEvent.newBuilder().info("rSessionTerminated").build());
             } else {

@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.presenter;
 
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 
 import com.google.gwt.core.client.GWT;
@@ -47,6 +48,12 @@ public class ConfirmationPresenter extends PresenterWidget<ConfirmationPresenter
   protected void onBind() {
     super.onBind();
     registerHandler(getEventBus().addHandler(ConfirmationRequiredEvent.getType(), new ConfirmationRequiredHandler()));
+    registerHandler(getEventBus().addHandler(ConfirmationTerminatedEvent.getType(), new ConfirmationTerminatedEvent.Handler() {
+      @Override
+      public void onConfirmation(ConfirmationTerminatedEvent event) {
+        getView().hideDialog();
+      }
+    }));
   }
 
   @Override
@@ -61,7 +68,7 @@ public class ConfirmationPresenter extends PresenterWidget<ConfirmationPresenter
   @Override
   public void onYes() {
     getEventBus().fireEvent(new ConfirmationEvent(confirmationRequiredSource, true));
-    getView().hideDialog();
+    getView().disableDialog();
   }
 
   @Override
@@ -83,6 +90,8 @@ public class ConfirmationPresenter extends PresenterWidget<ConfirmationPresenter
     void showDialog();
 
     void hideDialog();
+
+    void disableDialog();
   }
 
   class ConfirmationRequiredHandler implements ConfirmationRequiredEvent.Handler {

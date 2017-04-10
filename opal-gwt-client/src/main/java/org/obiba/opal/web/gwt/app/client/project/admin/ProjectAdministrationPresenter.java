@@ -15,6 +15,7 @@ import com.google.gwt.core.client.JsArray;
 import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
@@ -188,6 +189,7 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
 
         @Override
         public void onResponseCode(Request request, Response response) {
+          fireEvent(ConfirmationTerminatedEvent.create());
           if(response.getStatusCode() == SC_OK) {
             PlaceRequest projectsRequest = new PlaceRequest.Builder().nameToken(Places.PROJECTS).build();
             placeManager.revealPlace(projectsRequest);

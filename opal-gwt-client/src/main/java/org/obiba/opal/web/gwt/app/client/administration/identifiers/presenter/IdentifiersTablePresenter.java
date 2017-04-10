@@ -13,6 +13,7 @@ package org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.event.IdentifiersTableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
@@ -212,21 +213,7 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
   private class RemoveIdentifiersTableRunnable implements Runnable {
     @Override
     public void run() {
-      ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
-
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          if(response.getStatusCode() == SC_OK) {
-            fireEvent(new IdentifiersTableSelectionEvent.Builder().dto(table).build());
-          } else {
-            String errorMessage = response.getText().isEmpty() ? response.getStatusCode() == SC_FORBIDDEN
-                ? "Forbidden"
-                : "UnknownError" : response.getText();
-            fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
-          }
-        }
-      };
-
+      ResponseCodeCallback callbackHandler = new RemoveResponseCodeCallback();
       String uri = UriBuilders.IDENTIFIERS_TABLE.create().build(table.getName());
       ResourceRequestBuilderFactory.newBuilder().forResource(uri).delete().withCallback(SC_OK, callbackHandler)
           .withCallback(SC_FORBIDDEN, callbackHandler).withCallback(SC_INTERNAL_SERVER_ERROR, callbackHandler)
@@ -245,27 +232,29 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
 
     @Override
     public void run() {
-      ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
-
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          if(response.getStatusCode() == SC_OK) {
-            fireEvent(new IdentifiersTableSelectionEvent.Builder().dto(table).build());
-          } else {
-            String errorMessage = response.getText().isEmpty() ? response.getStatusCode() == SC_FORBIDDEN
-                ? "Forbidden"
-                : "UnknownError" : response.getText();
-            fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
-          }
-        }
-      };
-
+      ResponseCodeCallback callbackHandler = new RemoveResponseCodeCallback();
       String uri = UriBuilders.IDENTIFIERS_TABLE_VARIABLE.create().build(table.getName(), variable.getName());
       ResourceRequestBuilderFactory.newBuilder().forResource(uri).delete().withCallback(SC_OK, callbackHandler)
           .withCallback(SC_FORBIDDEN, callbackHandler).withCallback(SC_INTERNAL_SERVER_ERROR, callbackHandler)
           .withCallback(SC_NOT_FOUND, callbackHandler).send();
     }
 
+  }
+
+  private class RemoveResponseCodeCallback implements ResponseCodeCallback {
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      fireEvent(ConfirmationTerminatedEvent.create());
+      if(response.getStatusCode() == SC_OK) {
+        fireEvent(new IdentifiersTableSelectionEvent.Builder().dto(table).build());
+      } else {
+        String errorMessage = response.getText().isEmpty() ? response.getStatusCode() == SC_FORBIDDEN
+            ? "Forbidden"
+            : "UnknownError" : response.getText();
+        fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
+      }
+    }
   }
 
   public interface Display extends View, HasUiHandlers<IdentifiersTableUiHandlers> {

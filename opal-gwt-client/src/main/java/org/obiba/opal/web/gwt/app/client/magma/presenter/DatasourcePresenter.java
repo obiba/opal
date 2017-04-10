@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
@@ -421,6 +422,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
+              fireEvent(ConfirmationTerminatedEvent.create());
               if(response.getStatusCode() == SC_OK) {
                 nb_deleted += BATCH_SIZE;
 

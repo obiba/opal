@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
@@ -263,6 +264,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
                   .withCallback(SC_OK, new ResponseCodeCallback() {
                     @Override
                     public void onResponseCode(Request request, Response response) {
+                      fireEvent(ConfirmationTerminatedEvent.create());
                       refreshProducedReports(reportTemplate);
                     }
                   }) //
@@ -299,6 +301,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
   private class RemoveReportTemplateResponseCallBack implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
+      fireEvent(ConfirmationTerminatedEvent.create());
       fireEvent(new ReportTemplateDeletedEvent(reportTemplate));
     }
   }
@@ -313,6 +316,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
     @Override
     public void onResponseCode(Request request, Response response) {
+      fireEvent(ConfirmationTerminatedEvent.create());
       fireEvent(NotificationEvent.newBuilder().error("ReportTemplateCannotBeFound").args(templateName).build());
     }
   }

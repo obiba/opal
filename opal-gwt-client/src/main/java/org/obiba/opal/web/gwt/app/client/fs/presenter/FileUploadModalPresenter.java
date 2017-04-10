@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileUploadedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
@@ -138,6 +139,7 @@ public class FileUploadModalPresenter extends ModalPresenterWidget<FileUploadMod
 
   private void submitFile() {
     getView().submit(urlBuilder.buildAbsoluteUrl("/files" + currentFolder.getPath()));
+    fireEvent(ConfirmationTerminatedEvent.create());
   }
 
   public interface Display extends PopupView, HasUiHandlers<FileUploadModalUiHandlers> {

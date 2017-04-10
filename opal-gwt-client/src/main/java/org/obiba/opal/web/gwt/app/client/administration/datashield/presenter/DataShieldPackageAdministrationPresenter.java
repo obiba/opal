@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShi
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageRemovedEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -295,6 +296,7 @@ public class DataShieldPackageAdministrationPresenter
 
         @Override
         public void onResponseCode(Request request, Response response) {
+          fireEvent(ConfirmationTerminatedEvent.create());
           if(response.getStatusCode() == Response.SC_OK) {
             updateDataShieldPackages();
             getEventBus().fireEvent(new DataShieldPackageRemovedEvent(dto));
@@ -326,10 +328,11 @@ public class DataShieldPackageAdministrationPresenter
 
             @Override
             public void onResource(Response response, DataShieldPackageMethodsDto resource) {
+              fireEvent(ConfirmationTerminatedEvent.create());
               if(response.getStatusCode() == Response.SC_OK) {
-                getEventBus().fireEvent(new DataShieldMethodUpdatedEvent());
+                fireEvent(new DataShieldMethodUpdatedEvent());
               } else {
-                getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+                fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
               }
             }
           }).send();

@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShi
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageRemovedEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -224,6 +225,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
 
       @Override
       public void onResponseCode(Request request, Response response) {
+        fireEvent(ConfirmationTerminatedEvent.create());
         if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_NOT_FOUND) {
           updateDataShieldMethods();
         } else {

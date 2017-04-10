@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.administration.taxonomies.term.edit.Ter
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.edit.VocabularyEditModalPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -152,6 +153,7 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
             .withCallback(SC_OK, new ResponseCodeCallback() {
               @Override
               public void onResponseCode(Request request, Response response) {
+                fireEvent(ConfirmationTerminatedEvent.create());
                 fireEvent(new VocabularyUpdatedEvent(taxonomy.getName(), vocabulary.getName()));
               }
             }) //
@@ -176,6 +178,7 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
             .withCallback(SC_OK, new ResponseCodeCallback() {
               @Override
               public void onResponseCode(Request request, Response response) {
+                fireEvent(ConfirmationTerminatedEvent.create());
                 fireEvent(new VocabularyDeletedEvent(taxonomy.getName(), vocabulary.getName()));
               }
             }) //
@@ -369,6 +372,7 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
 
     @Override
     public void onResponseCode(Request request, Response response) {
+      fireEvent(ConfirmationTerminatedEvent.create());
       fireEvent(NotificationEvent.newBuilder().error("VocabularyNotFound").args(taxonomy, vocabulary).build());
     }
   }
@@ -389,6 +393,7 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
 
     @Override
     public void onResponseCode(Request request, Response response) {
+      fireEvent(ConfirmationTerminatedEvent.create());
       fireEvent(NotificationEvent.newBuilder().error("TermNotFound").args(taxonomy, vocabulary, term).build());
     }
   }

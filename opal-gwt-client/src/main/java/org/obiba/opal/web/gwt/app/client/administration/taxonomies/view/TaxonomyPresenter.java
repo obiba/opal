@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.Vocabul
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.edit.VocabularyEditModalPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
@@ -132,6 +133,7 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
             .withCallback(SC_OK, new ResponseCodeCallback() {
               @Override
               public void onResponseCode(Request request, Response response) {
+                fireEvent(ConfirmationTerminatedEvent.create());
                 fireEvent(new TaxonomyDeletedEvent(taxonomy));
               }
             }) //
@@ -323,6 +325,7 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
 
     @Override
     public void onResponseCode(Request request, Response response) {
+      fireEvent(ConfirmationTerminatedEvent.create());
       fireEvent(NotificationEvent.newBuilder().error("TaxonomyNotFound").args(taxonomyName).build());
     }
   }

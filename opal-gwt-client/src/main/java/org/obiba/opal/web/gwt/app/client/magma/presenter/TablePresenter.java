@@ -17,6 +17,7 @@ import java.util.Set;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
@@ -933,33 +934,24 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     }
 
     private void removeView() {
-
-      ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
-
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          if(response.getStatusCode() == SC_OK) {
-            gotoDatasource();
-          } else {
-            String errorMessage = response.getText().isEmpty() ? response.getStatusCode() == SC_FORBIDDEN
-                ? "Forbidden"
-                : "UnknownError" : response.getText();
-            fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
-          }
-        }
-      };
-
+      ResponseCodeCallback callbackHandler = newResponseCodeCallback();
       ResourceRequestBuilderFactory.newBuilder().forResource(table.getViewLink()).delete()
           .withCallback(SC_OK, callbackHandler).withCallback(SC_FORBIDDEN, callbackHandler)
           .withCallback(SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(SC_NOT_FOUND, callbackHandler).send();
     }
 
     private void removeTable() {
-
-      ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+      ResponseCodeCallback callbackHandler = newResponseCodeCallback();
+      ResourceRequestBuilderFactory.newBuilder().forResource(table.getLink()).delete()
+          .withCallback(SC_OK, callbackHandler).withCallback(SC_FORBIDDEN, callbackHandler)
+          .withCallback(SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(SC_NOT_FOUND, callbackHandler).send();
+    }
+    private ResponseCodeCallback newResponseCodeCallback() {
+      return new ResponseCodeCallback() {
 
         @Override
         public void onResponseCode(Request request, Response response) {
+          fireEvent(ConfirmationTerminatedEvent.create());
           if(response.getStatusCode() == SC_OK) {
             gotoDatasource();
           } else {
@@ -970,10 +962,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
           }
         }
       };
-
-      ResourceRequestBuilderFactory.newBuilder().forResource(table.getLink()).delete()
-          .withCallback(SC_OK, callbackHandler).withCallback(SC_FORBIDDEN, callbackHandler)
-          .withCallback(SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(SC_NOT_FOUND, callbackHandler).send();
     }
 
   }
@@ -1011,6 +999,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
+              fireEvent(ConfirmationTerminatedEvent.create());
               if(response.getStatusCode() == SC_OK) {
                 nb_deleted += BATCH_SIZE;
 

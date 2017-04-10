@@ -13,7 +13,6 @@ import org.obiba.opal.web.gwt.app.client.presenter.ConfirmationPresenter.Display
 import org.obiba.opal.web.gwt.app.client.presenter.ConfirmationUiHandlers;
 
 import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.Modal;
 import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -22,6 +21,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
 
 /**
  *
@@ -64,12 +64,22 @@ public class ConfirmationView extends ViewWithUiHandlers<ConfirmationUiHandlers>
 
   @Override
   public void showDialog() {
+    noButton.setEnabled(true);
+    yesButton.setEnabled(true);
+    dialogBox.setBusy(false);
     dialogBox.show();
   }
 
   @Override
   public void hideDialog() {
     dialogBox.hide();
+  }
+
+  @Override
+  public void disableDialog() {
+    noButton.setEnabled(false);
+    yesButton.setEnabled(false);
+    dialogBox.setBusy(true);
   }
 
   @Override

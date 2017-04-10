@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -581,22 +582,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     }
 
     private void removeDerivedVariable() {
-
-      ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
-
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          if(response.getStatusCode() == SC_OK) {
-            gotoTable();
-          } else {
-            String errorMessage = response.getText().isEmpty() ? response.getStatusCode() == SC_FORBIDDEN
-                ? "Forbidden"
-                : "UnknownError" : response.getText();
-            fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
-          }
-        }
-      };
-
+      ResponseCodeCallback callbackHandler = newResponseCodeCallback();
       ResourceRequestBuilderFactory.newBuilder() //
           .forResource(UriBuilders.DATASOURCE_VIEW_VARIABLE.create()
               .build(table.getDatasourceName(), table.getName(), variable.getName())) //
@@ -605,11 +591,20 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     }
 
     private void removeVariable() {
+      ResponseCodeCallback callbackHandler = newResponseCodeCallback();
+      ResourceRequestBuilderFactory.newBuilder() //
+          .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
+              .build(table.getDatasourceName(), table.getName(), variable.getName())) //
+          .withCallback(callbackHandler, SC_OK, SC_FORBIDDEN, SC_INTERNAL_SERVER_ERROR, SC_NOT_FOUND) //
+          .delete().send();
+    }
 
-      ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+    private ResponseCodeCallback newResponseCodeCallback() {
+      return new ResponseCodeCallback() {
 
         @Override
         public void onResponseCode(Request request, Response response) {
+          fireEvent(ConfirmationTerminatedEvent.create());
           if(response.getStatusCode() == SC_OK) {
             gotoTable();
           } else {
@@ -620,12 +615,6 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
           }
         }
       };
-
-      ResourceRequestBuilderFactory.newBuilder() //
-          .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
-              .build(table.getDatasourceName(), table.getName(), variable.getName())) //
-          .withCallback(callbackHandler, SC_OK, SC_FORBIDDEN, SC_INTERNAL_SERVER_ERROR, SC_NOT_FOUND) //
-          .delete().send();
     }
 
   }
