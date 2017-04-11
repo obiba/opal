@@ -144,6 +144,10 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Remove Taxonomy")
   String removeTaxonomy();
 
+  @Description("Remove VCF Store Mapping Table label")
+  @DefaultMessage("Remove Sample-Participant Mapping")
+  String removeVCFStoreMappingTable();
+
   @Description("Remove VCF Files label")
   @DefaultMessage("Remove VCF Files")
   String removeVCFFile();
@@ -328,6 +332,12 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage(
       "Please confirm that you want to remove the selected VCF files.")
   String confirmDeleteVCFFile();
+
+  @Description(
+      "Please confirm that you want to remove the Sample-Participant mapping message")
+  @DefaultMessage(
+      "Please confirm that you want to remove this sample-participant mapping. Note that the corresponding project''s table won''t be deleted.")
+  String confirmDeleteVCFStoreMappingTable();
 
   @Description(
       "Please confirm that you want to remove the mapping table and all imported VCF files message")

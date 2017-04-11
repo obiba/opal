@@ -621,7 +621,9 @@ public interface Translations extends Constants {
       "Forbidden", "Operation not allowed.", //
       "FileAlreadyExists", "File '{0}' already exists.", //
       "FolderAlreadyExists", "Folder '{0}' already exists.", //
-      "ForbiddenPage", "You are not authorized to access to the content of this page."
+      "ForbiddenPage", "You are not authorized to access to the content of this page.",
+      "ParticipantIdVariableIsRequired", "Participant ID variable name is required.",
+      "SampleRoleVariableIsRequired", "Sample Role variable name is required."
   })
   Map<String, String> userMessageMap();
 
