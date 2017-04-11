@@ -13,11 +13,13 @@ import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
+import com.github.gwtbootstrap.client.ui.base.TextNode;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.i18n.client.HasDirection;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -62,6 +64,12 @@ public class ProjectExportVcfFileModalView extends ModalPopupViewWithUiHandlers<
   Chooser participantsFilter;
 
   @UiField
+  ControlGroup participantsIdentifiersGroup;
+
+  @UiField
+  Chooser participantsIdentifiersMapping;
+
+  @UiField
   CheckBox includeCaseControls;
 
   @UiField
@@ -99,6 +107,7 @@ public class ProjectExportVcfFileModalView extends ModalPopupViewWithUiHandlers<
 
   @Override
   public HasText getParticipantsFilterTable() {
+
     return new HasText() {
       @Override
       public String getText() {
@@ -116,6 +125,21 @@ public class ProjectExportVcfFileModalView extends ModalPopupViewWithUiHandlers<
             break;
           }
         }
+      }
+    };
+  }
+
+  @Override
+  public HasText getParticipantIdentifiersMapping() {
+    return new HasText() {
+      @Override
+      public String getText() {
+        String participantIdentifierMappingTableName = participantsIdentifiersMapping.getSelectedValue();
+        return participantIdentifierMappingTableName == null || PARTICIPANT_FILTER_NONE.equals(participantIdentifierMappingTableName) ? null : participantIdentifierMappingTableName;
+      }
+
+      @Override
+      public void setText(String text) {
       }
     };
   }
@@ -157,6 +181,26 @@ public class ProjectExportVcfFileModalView extends ModalPopupViewWithUiHandlers<
     }
 
     participantsFilter.update();
+  }
+
+  @Override
+  public void setParticipantIdentifiersMappingList(List<String> participantIdentifiersMappingList) {
+
+    participantsIdentifiersMapping.clear();
+
+    if (participantIdentifiersMappingList.size() == 0) {
+      participantsIdentifiersGroup.setVisible(false);
+      participantsIdentifiersMapping.addItem(translations.none(), PARTICIPANT_FILTER_NONE);
+    } else if (participantIdentifiersMappingList.size() == 1) {
+      participantsIdentifiersGroup.setVisible(false);
+      participantsIdentifiersMapping.addItem(participantIdentifiersMappingList.get(0));
+      participantsIdentifiersMapping.setSelectedValue(participantIdentifiersMappingList.get(0));
+    } else {
+      participantsIdentifiersGroup.setVisible(true);
+      for (String participantIdentifiersMapping : participantIdentifiersMappingList) {
+        participantsIdentifiersMapping.addItem(participantIdentifiersMapping);
+      }
+    }
   }
 
   @Override

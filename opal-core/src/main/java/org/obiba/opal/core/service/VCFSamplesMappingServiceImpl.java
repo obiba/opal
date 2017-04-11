@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -101,6 +103,19 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService {
         .stream()
         .filter(e -> VCFSampleRole.isControl(e.getValue().getValue()))
         .map(Map.Entry::getKey).collect(Collectors.toList());
+  }
+
+  @Override
+  public Map<String, String> findParticipantIdBySampleId(@NotNull String projectName, @NotNull Collection<String> samplesIds) {
+    Map<String, ParticipantRolePair> sampleParticipantAndRoleMap = getSampleParticipantMap(projectName);
+    final Map<String, String> sampleParticipantMap = new HashMap<>();
+
+    sampleParticipantAndRoleMap.forEach((sampleId, participantRolePair) -> {
+      if (samplesIds.contains(sampleId))
+        sampleParticipantMap.put(sampleId, participantRolePair.getKey());
+    });
+
+    return sampleParticipantMap;
   }
 
   private Map<String, ParticipantRolePair> getSampleParticipantMap(@NotNull String projectName) {

@@ -38,4 +38,7 @@ public interface ExportVCFCommandOptions extends HelpOption {
 
   @Option(shortName = "c", description = "With case control")
   boolean isCaseControl();
+
+  @Option(shortName = "m", description = "With participant identifier mapping")
+  String getParticipantIdentifiersMapping();
 }
