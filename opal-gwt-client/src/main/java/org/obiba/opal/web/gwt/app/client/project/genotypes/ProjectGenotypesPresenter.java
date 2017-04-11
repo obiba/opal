@@ -197,7 +197,16 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   @Override
   public void onDeleteMappingTable() {
-    fireEvent(new VcfMappingDeleteRequestEvent(projectDto.getName()));
+    actionRequiringConfirmation = new Runnable() {
+      @Override
+      public void run() {
+        fireEvent(new VcfMappingDeleteRequestEvent(projectDto.getName()));
+      }
+    };
+
+    fireEvent(ConfirmationRequiredEvent
+        .createWithMessages(actionRequiringConfirmation, translationMessages.removeVCFStoreMappingTable(),
+            translationMessages.confirmDeleteVCFStoreMappingTable()));
   }
 
   @Override
@@ -437,6 +446,7 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
+            fireEvent(ConfirmationTerminatedEvent.create());
             getView().clearMappingTable();
             mappingTable = null;
             refresh();
