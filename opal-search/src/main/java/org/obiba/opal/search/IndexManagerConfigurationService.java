@@ -74,11 +74,16 @@ public class IndexManagerConfigurationService implements ValueTableUpdateListene
 
   @Override
   public void onRename(@Nonnull ValueTable vt, Variable v, String newName) {
-    onDelete(vt);
+    // does not affect scheduling
   }
 
   @Override
   public void onDelete(@NotNull ValueTable vt) {
     remove(vt);
+  }
+
+  @Override
+  public void onDelete(@NotNull ValueTable vt, Variable v) {
+    // does not affect scheduling
   }
 }

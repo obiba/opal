@@ -137,6 +137,11 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService, V
     if (TABLE_ENTITY_TYPE.equals(vt.getEntityType())) deleteProjectSampleMappings(vt.getDatasource().getName() + "." + vt.getName());
   }
 
+  @Override
+  public void onDelete(@NotNull ValueTable vt, Variable v) {
+    // TODO
+  }
+
   private class ParticipantRolePair implements Map.Entry<String, String> {
 
     private String participant;

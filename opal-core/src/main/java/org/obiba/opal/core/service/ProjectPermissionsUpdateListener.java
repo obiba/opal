@@ -77,6 +77,14 @@ public class ProjectPermissionsUpdateListener implements DatasourceUpdateListene
     subjectAclService.deleteNodePermissions(getNode(vt));
   }
 
+  @Override
+  public void onDelete(@NotNull ValueTable vt, Variable v) {
+    Iterable<SubjectAclService.Permissions> perms = subjectAclService
+        .getNodeHierarchyPermissions("opal", getNode(vt, v), null);
+    // remove all permissions related to the variable
+    subjectAclService.deleteNodePermissions(getNode(vt, v));
+  }
+
   private String getNode(ValueTable vt) {
     return "/datasource/" + vt.getDatasource().getName() +
         (vt.isView() ? "/view/" + vt.getName() : "/table/" + vt.getName());

@@ -167,6 +167,11 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
     getIndex(vt).delete();
   }
 
+  @Override
+  public void onDelete(@NotNull ValueTable vt, Variable v) {
+    onDelete(vt);
+  }
+
   protected abstract class EsIndexer implements IndexSynchronization {
 
     @NotNull
