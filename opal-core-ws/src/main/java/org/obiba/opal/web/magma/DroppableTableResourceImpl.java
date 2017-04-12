@@ -14,6 +14,7 @@ import java.util.Collection;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.core.Response;
 
+import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTableUpdateListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -36,12 +37,16 @@ public class DroppableTableResourceImpl extends TableResourceImpl implements Dro
   @Override
   @DELETE
   public Response drop() {
-    if(tableListeners != null && !tableListeners.isEmpty()) {
-      for(ValueTableUpdateListener listener : tableListeners) {
-        listener.onDelete(getValueTable());
+    try {
+      if (tableListeners != null && !tableListeners.isEmpty()) {
+        for (ValueTableUpdateListener listener : tableListeners) {
+          listener.onDelete(getValueTable());
+        }
       }
+      getDatasource().dropTable(getValueTable().getName());
+    } catch (NoSuchValueTableException e) {
+      // ignore
     }
-    getDatasource().dropTable(getValueTable().getName());
     return Response.ok().build();
   }
 }
