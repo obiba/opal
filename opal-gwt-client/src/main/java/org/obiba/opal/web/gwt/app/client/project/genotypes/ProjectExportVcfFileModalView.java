@@ -26,6 +26,7 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.watopi.chosen.client.event.ChosenChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -79,6 +80,8 @@ public class ProjectExportVcfFileModalView extends ModalPopupViewWithUiHandlers<
   private static final String PARTICIPANT_FILTER_NONE = "_none";
 
   private Translations translations;
+
+  private List<String> participantIdentifiersMappingList;
 
   @Inject
   public ProjectExportVcfFileModalView(EventBus eventBus, Binder binder, Translations translations) {
@@ -179,10 +182,23 @@ public class ProjectExportVcfFileModalView extends ModalPopupViewWithUiHandlers<
     }
 
     participantsFilter.update();
+
+    participantsFilter.addChosenChangeHandler(new ChosenChangeEvent.ChosenChangeHandler() {
+      @Override
+      public void onChange(ChosenChangeEvent event) {
+        updateParticipantsIdentifiersGroupVisibility();
+      }
+    });
   }
 
   @Override
   public void setParticipantIdentifiersMappingList(List<String> participantIdentifiersMappingList) {
+
+    this.participantIdentifiersMappingList=participantIdentifiersMappingList;
+    updateParticipantsIdentifiersGroupVisibility();
+  }
+
+  private void updateParticipantsIdentifiersGroupVisibility() {
 
     participantsIdentifiersMapping.clear();
 
