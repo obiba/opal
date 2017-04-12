@@ -15,6 +15,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
+import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.Variable;
 import org.obiba.opal.core.domain.Project;
@@ -41,10 +42,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @CommandUsage(description = "Export one or more VCF files from a project into a destination folder.",
@@ -64,7 +65,14 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
   @Autowired
   private VCFSamplesMappingService vcfSamplesMappingService;
 
+  @Autowired
+  private IdentifiersTableService identifiersTableService;
+
   private VCFStore store;
+
+  private Iterable<ValueSet> participantsMappingTable;
+
+  private Map<String, ValueSet> mapParticipantInternalIdWithParticipantMappingValueSet;
 
   //
   // AbstractOpalRuntimeDependentCommand Methods
@@ -129,18 +137,18 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
     getShell().progress(String.format("Exporting VCF/BCF file(s): %s", String.join(", ", options.getNames())), 0, total, 0);
 
     List<String> filterSampleIds = options.hasTable() ?
-        vcfSamplesMappingService.getFilteredSampleIds(options.getProject(), options.getTable(), options.isCaseControl()) :
-        Lists.newArrayList();
+            vcfSamplesMappingService.getFilteredSampleIds(options.getProject(), options.getTable(), options.isCaseControl()) :
+            Lists.newArrayList();
 
     int count = 1;
     for (String vcfName : options.getNames()) {
       String baseVcfName = vcfName;
       if (vcfName.endsWith(".vcf.gz")) baseVcfName = vcfName.replaceAll("\\.vcf\\.gz$", "");
       else if (vcfName.endsWith(".bcf.gz")) baseVcfName = vcfName.replaceAll("\\.bcf\\.gz$", "");
-      getShell().progress(String.format("Exporting VCF/BCF file (%s)", baseVcfName), count, total, (count*100)/total);
+      getShell().progress(String.format("Exporting VCF/BCF file (%s)", baseVcfName), count, total, (count * 100) / total);
       VCFStore.VCFSummary summary = store.getVCFSummary(baseVcfName);
       String vcfFileName = baseVcfName + "." + summary.getFormat().name().toLowerCase() + ".gz";
-      String csvFileName = baseVcfName + ".csv";
+      String csvFileName = baseVcfName + "-samples.csv";
       getShell().printf(String.format("Exporting VCF/BCF file (%s)", vcfFileName));
       File vcfFile = new File(destinationFolder, vcfFileName);
       File csvFile = new File(destinationFolder, csvFileName);
@@ -173,54 +181,59 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
     if (StringUtils.isEmpty(options.getParticipantIdentifiersMapping()))
       return;
 
-    Map<String, String> mapSampleIdParticipantId = vcfSamplesMappingService.findParticipantIdBySampleId(options.getProject(), sampleIds);
+    Map<String, VCFSamplesMappingService.ParticipantRolePair> mapSampleIdParticipantId = vcfSamplesMappingService.findParticipantIdBySampleId(options.getProject(), sampleIds);
 
     try (FileWriter fileWriter = new FileWriter(csvFile)) {
-      for (Map.Entry<String, String> mapSampleIdParticipantIdEntry : mapSampleIdParticipantId.entrySet()) {
+      for (Map.Entry<String, VCFSamplesMappingService.ParticipantRolePair> mapSampleIdParticipantIdEntry : mapSampleIdParticipantId.entrySet()) {
 
         String sampleId = mapSampleIdParticipantIdEntry.getKey();
-        String internalParticipantId = mapSampleIdParticipantIdEntry.getValue();
+        String role = mapSampleIdParticipantIdEntry.getValue().getRole();
+        String internalParticipantId = mapSampleIdParticipantIdEntry.getValue().getParticipantId();
         String externalParticipantId = findExternalParticipantIdFromInternalParticipantId(internalParticipantId);
-        fileWriter.write(String.format("\"%s\",\"%s\"\n", escapeCsvField(sampleId), escapeCsvField(externalParticipantId)));
+        fileWriter.write(String.format("\"%s\",\"%s\",\"%s\"\n", escapeCsvField(sampleId), escapeCsvField(externalParticipantId), escapeCsvField(role)));
       }
     }
   }
 
   private String escapeCsvField(String csvField) {
-    return csvField.replaceAll("\"", "\\\"");
+    return csvField != null ? csvField.replaceAll("\"", "\\\"") : "";
   }
 
   private String findExternalParticipantIdFromInternalParticipantId(String internalParticipantId) {
 
-    Iterable<ValueSet> participantsMappingTable = identifiersTableService.getIdentifiersTable("Participant").getValueSets();
-
-    Optional<ValueSet> participantValueSet = StreamSupport.stream(participantsMappingTable.spliterator(), false)
-            .filter((valueSet) -> valueSet.getVariableEntity().getIdentifier().equals(internalParticipantId))
-            .findFirst();
-
+    Optional<ValueSet> participantValueSet = Optional.ofNullable(mapParticipantInternalIdWithParticipantMappingValueSet().get(internalParticipantId));
     if (!participantValueSet.isPresent())
       return "";
 
-    Optional<Variable> participantExternalIdVariable = StreamSupport.stream(participantValueSet.get().getValueTable().getVariables().spliterator(), false)
+    Optional<Variable> participantExternalIdVariable = StreamSupport.stream(participantValueSet.get().getValueTable().getVariables().spliterator(), true)
             .filter((s) -> s.getName().equals(options.getParticipantIdentifiersMapping()))
             .findFirst();
-
     if (!participantExternalIdVariable.isPresent())
       return "";
 
-    return participantsMappingTable.iterator().next().getValueTable().getValue(
+    Value value = getParticipantsMappingTable().iterator().next().getValueTable().getValue(
             participantExternalIdVariable.get(),
-            participantValueSet.get())
-            .getValue().toString();
-
-//    return participantsMappingTable.iterator().next().getValueTable().getValue(
-//            participantExternalIdVariable.get(),
-//            participantValueSet.get().getValueTable().getValueSet(
-//                    participantValueSet.get().getVariableEntity())).getValue().toString();
+            participantValueSet.get());
+    return value.isNull() || value.getValue() == null ? "" : value.getValue().toString();
   }
 
-  @Autowired
-  private IdentifiersTableService identifiersTableService;
+  private synchronized Map<String, ValueSet> mapParticipantInternalIdWithParticipantMappingValueSet() {
+
+    if (mapParticipantInternalIdWithParticipantMappingValueSet == null) {
+      mapParticipantInternalIdWithParticipantMappingValueSet = new HashMap<>();
+
+      getParticipantsMappingTable().forEach(valueSet ->
+              mapParticipantInternalIdWithParticipantMappingValueSet.put(valueSet.getVariableEntity().getIdentifier(), valueSet));
+    }
+
+    return mapParticipantInternalIdWithParticipantMappingValueSet;
+  }
+
+  private synchronized Iterable<ValueSet> getParticipantsMappingTable() {
+    if (participantsMappingTable == null)
+      participantsMappingTable = identifiersTableService.getIdentifiersTable("Participant").getValueSets();
+    return participantsMappingTable;
+  }
 
   FileObject resolveFileInFileSystem(String path) throws FileSystemException {
     if (Strings.isNullOrEmpty(path)) return null;
@@ -231,5 +244,4 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
   public String toString() {
     return "export-vcf -p '" + getOptions().getProject() + "' -d '" + options.getDestination() + "' " + String.join(", ", options.getNames());
   }
-
 }

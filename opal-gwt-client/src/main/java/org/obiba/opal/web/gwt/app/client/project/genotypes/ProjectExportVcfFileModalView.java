@@ -13,13 +13,11 @@ import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
-import com.github.gwtbootstrap.client.ui.base.TextNode;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.i18n.client.HasDirection;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -188,7 +186,7 @@ public class ProjectExportVcfFileModalView extends ModalPopupViewWithUiHandlers<
 
     participantsIdentifiersMapping.clear();
 
-    if (participantIdentifiersMappingList.size() == 0) {
+    if (participantsFilter.getSelectedValue().equals(PARTICIPANT_FILTER_NONE) || participantIdentifiersMappingList.size() == 0) {
       participantsIdentifiersGroup.setVisible(false);
       participantsIdentifiersMapping.addItem(translations.none(), PARTICIPANT_FILTER_NONE);
     } else if (participantIdentifiersMappingList.size() == 1) {

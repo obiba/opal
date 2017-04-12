@@ -29,5 +29,24 @@ public interface VCFSamplesMappingService extends SystemService {
 
   List<String> getControls(@NotNull String projectName);
 
-  Map<String, String> findParticipantIdBySampleId(@NotNull String projectName, @NotNull Collection<String> samplesIds);
+  Map<String, ParticipantRolePair> findParticipantIdBySampleId(@NotNull String projectName, @NotNull Collection<String> samplesIds);
+
+  class ParticipantRolePair {
+
+    private String participant;
+    private String role;
+
+    ParticipantRolePair(String participant, String role) {
+      this.participant = participant;
+      this.role = role;
+    }
+
+    public String getParticipantId() {
+      return participant;
+    }
+
+    public String getRole() {
+      return role;
+    }
+  }
 }

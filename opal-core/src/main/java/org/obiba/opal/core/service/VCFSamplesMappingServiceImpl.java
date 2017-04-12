@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
 @Component
 public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService {
 
@@ -90,8 +89,8 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService {
     Map<String, ParticipantRolePair> sampleParticipantMap = getSampleParticipantMap(projectName);
     return sampleParticipantMap.entrySet()
         .stream()
-        .filter(e -> (e.getValue().getKey() == null && VCFSampleRole.isControl(e.getValue().getValue()) && withControl) ||
-            participantIds.contains(e.getValue().getKey())
+        .filter(e -> (e.getValue().getParticipantId() == null && VCFSampleRole.isControl(e.getValue().getRole()) && withControl) ||
+            participantIds.contains(e.getValue().getParticipantId())
         )
         .map(Map.Entry::getKey).collect(Collectors.toList());
   }
@@ -101,18 +100,18 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService {
     Map<String, ParticipantRolePair> sampleParticipantMap = getSampleParticipantMap(projectName);
     return sampleParticipantMap.entrySet()
         .stream()
-        .filter(e -> VCFSampleRole.isControl(e.getValue().getValue()))
+        .filter(e -> VCFSampleRole.isControl(e.getValue().getRole()))
         .map(Map.Entry::getKey).collect(Collectors.toList());
   }
 
   @Override
-  public Map<String, String> findParticipantIdBySampleId(@NotNull String projectName, @NotNull Collection<String> samplesIds) {
+  public Map<String, ParticipantRolePair> findParticipantIdBySampleId(@NotNull String projectName, @NotNull Collection<String> samplesIds) {
     Map<String, ParticipantRolePair> sampleParticipantAndRoleMap = getSampleParticipantMap(projectName);
-    final Map<String, String> sampleParticipantMap = new HashMap<>();
+    final Map<String, ParticipantRolePair> sampleParticipantMap = new HashMap<>();
 
-    sampleParticipantAndRoleMap.forEach((sampleId, participantRolePair) -> {
-      if (samplesIds.contains(sampleId))
-        sampleParticipantMap.put(sampleId, participantRolePair.getKey());
+    samplesIds.forEach(sampleId -> {
+      ParticipantRolePair participantRolePair = sampleParticipantAndRoleMap.get(sampleId);
+      sampleParticipantMap.put(sampleId, participantRolePair != null ? participantRolePair : new ParticipantRolePair("", ""));
     });
 
     return sampleParticipantMap;
@@ -137,33 +136,5 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService {
         valueTable.getValue(valueTable.getVariable(participantVariableColumn), valueSet).toString(),
         valueTable.getValue(valueTable.getVariable(roleVariableColumn), valueSet).toString()
     );
-  }
-
-  private class ParticipantRolePair implements Map.Entry<String, String> {
-
-    private String participant;
-    private String role;
-
-    ParticipantRolePair(String participant, String role) {
-      this.participant = participant;
-      this.role = role;
-    }
-
-    @Override
-    public String getKey() {
-      return participant;
-    }
-
-    @Override
-    public String getValue() {
-      return role;
-    }
-
-    @Override
-    public String setValue(String value) {
-      String oldValue = role;
-      role = value;
-      return oldValue;
-    }
   }
 }
