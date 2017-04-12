@@ -167,6 +167,17 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
     getUiHandlers().onEdit();
   }
 
+  @UiHandler("editPropertiesDb")
+  void onEditPropertiesDb(ClickEvent event) {
+    getUiHandlers().onEdit();
+  }
+
+  @UiHandler("editPropertiesVcf")
+  void onEditPropertiesVcf(ClickEvent event) {
+    getUiHandlers().onEdit();
+  }
+
+
   @UiHandler("deleteProject")
   void onDeleteProject(ClickEvent event) {
     getUiHandlers().onDelete();

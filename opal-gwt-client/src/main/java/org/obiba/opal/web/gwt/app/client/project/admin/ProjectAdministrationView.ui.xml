@@ -9,13 +9,13 @@
   -->
 
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-    xmlns:g="urn:import:com.google.gwt.user.client.ui"
-    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
-    xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
-    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
-    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
-    ui:generateLocales="default">
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+             xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+             ui:generateLocales="default">
 
   <g:FlowPanel>
     <g:FlowPanel>
@@ -26,90 +26,96 @@
       </b2:IconAnchor>
     </g:FlowPanel>
 
-    <g:FlowPanel>
-      <b:Row>
-        <b:Column size="6">
-          <o:PropertiesTable ui:field="propertiesTable" keyStyleNames="span2">
+    <b:FluidRow>
+      <b:Column size="6">
+        <o:PropertiesTable ui:field="propertiesTable" keyStyleNames="span2">
+          <o:PropertyPanel>
+            <g:Label>
+              <ui:msg description="Name label">Name</ui:msg>
+            </g:Label>
+            <g:Label ui:field="name"/>
+          </o:PropertyPanel>
+          <o:PropertyPanel>
+            <g:Label>
+              <ui:msg description="Title label">Title</ui:msg>
+            </g:Label>
+            <g:Label ui:field="title"/>
+          </o:PropertyPanel>
+          <o:PropertyPanel>
+            <g:Label>
+              <ui:msg description="Description label">Description</ui:msg>
+            </g:Label>
+            <g:Label ui:field="description"/>
+          </o:PropertyPanel>
+          <o:PropertyPanel>
+            <g:Label>
+              <ui:msg description="Tags label">Tags</ui:msg>
+            </g:Label>
+            <g:Label ui:field="tags"/>
+          </o:PropertyPanel>
+        </o:PropertiesTable>
+      </b:Column>
+    </b:FluidRow>
+
+    <b:FluidRow>
+      <b:Column size="6">
+        <b:Alert type="WARNING" close="false" animation="true" ui:field="noDatabasePanel">
+          <ui:msg description="No Project Database label">No database is defined for this project. No data can be
+            imported. Only views can be added.
+          </ui:msg>
+          <g:FlowPanel addStyleNames="pull-right">
+            <g:Anchor ui:field="editPropertiesDb">
+              <ui:msg description="Edit Project Database label">Edit properties</ui:msg>
+            </g:Anchor>
+          </g:FlowPanel>
+        </b:Alert>
+        <g:FlowPanel ui:field="databasePanel">
+          <b:Paragraph ui:field="databaseText">
+          </b:Paragraph>
+          <o:PropertiesTable keyStyleNames="span2">
             <o:PropertyPanel>
               <g:Label>
                 <ui:msg description="Name label">Name</ui:msg>
               </g:Label>
-              <g:Label ui:field="name"/>
+              <g:Label ui:field="dbName"/>
             </o:PropertyPanel>
             <o:PropertyPanel>
               <g:Label>
-                <ui:msg description="Title label">Title</ui:msg>
+                <ui:msg description="Type label">Type</ui:msg>
               </g:Label>
-              <g:Label ui:field="title"/>
-            </o:PropertyPanel>
-            <o:PropertyPanel>
-              <g:Label>
-                <ui:msg description="Description label">Description</ui:msg>
-              </g:Label>
-              <g:Label ui:field="description"/>
-            </o:PropertyPanel>
-            <o:PropertyPanel>
-              <g:Label>
-                <ui:msg description="Tags label">Tags</ui:msg>
-              </g:Label>
-              <g:Label ui:field="tags"/>
+              <g:Label ui:field="dbType"/>
             </o:PropertyPanel>
           </o:PropertiesTable>
-        </b:Column>
-      </b:Row>
+        </g:FlowPanel>
+      </b:Column>
 
-      <b:Alert type="WARNING" close="false" animation="true" ui:field="noDatabasePanel">
-        <ui:msg description="No Project Database label">No database is defined for this project. No data can be
-          imported. Only views can be added.
-        </ui:msg>
-      </b:Alert>
-      <g:FlowPanel ui:field="databasePanel">
-        <b:Paragraph ui:field="databaseText">
-        </b:Paragraph>
-        <b:Row>
-          <b:Column size="6">
-            <o:PropertiesTable keyStyleNames="span2">
-              <o:PropertyPanel>
-                <g:Label>
-                  <ui:msg description="Name label">Name</ui:msg>
-                </g:Label>
-                <g:Label ui:field="dbName"/>
-              </o:PropertyPanel>
-              <o:PropertyPanel>
-                <g:Label>
-                  <ui:msg description="Type label">Type</ui:msg>
-                </g:Label>
-                <g:Label ui:field="dbType"/>
-              </o:PropertyPanel>
-            </o:PropertiesTable>
-          </b:Column>
-        </b:Row>
-      </g:FlowPanel>
-
-      <b:Alert type="WARNING" close="false" animation="true" ui:field="noVCFServicePanel">
-        <ui:msg description="No Project VCF Store label">No VCF store is defined for this project. No genotypes can be
-          imported.
-        </ui:msg>
-      </b:Alert>
-      <g:FlowPanel ui:field="vcfServicePanel">
-        <b:Paragraph ui:field="vcfServiceText">
-          <ui:msg description="VCF Store Service title">Project genotypes are stored using the service:
+      <b:Column size="6">
+        <b:Alert type="WARNING" close="false" animation="true" ui:field="noVCFServicePanel">
+          <ui:msg description="No Project VCF Store label">No VCF store is defined for this project. No genotypes can be
+            imported.
           </ui:msg>
-        </b:Paragraph>
-        <b:Row>
-          <b:Column size="6">
-            <o:PropertiesTable keyStyleNames="span2">
-              <o:PropertyPanel>
-                <g:Label>
-                  <ui:msg description="Name label">VCF Store</ui:msg>
-                </g:Label>
-                <g:Label ui:field="vcfServiceName"/>
-              </o:PropertyPanel>
-            </o:PropertiesTable>
-          </b:Column>
-        </b:Row>
-      </g:FlowPanel>
-    </g:FlowPanel>
+          <g:FlowPanel addStyleNames="pull-right">
+            <g:Anchor ui:field="editPropertiesVcf">
+              <ui:msg description="Edit Project VCF Store label">Edit properties</ui:msg>
+            </g:Anchor>
+          </g:FlowPanel>
+        </b:Alert>
+        <g:FlowPanel ui:field="vcfServicePanel">
+          <b:Paragraph ui:field="vcfServiceText">
+            <ui:msg description="VCF Store Service title">Project genotypes are stored using the service:
+            </ui:msg>
+          </b:Paragraph>
+          <o:PropertiesTable keyStyleNames="span2">
+            <o:PropertyPanel>
+              <g:Label>
+                <ui:msg description="Name label">VCF Store</ui:msg>
+              </g:Label>
+              <g:Label ui:field="vcfServiceName"/>
+            </o:PropertyPanel>
+          </o:PropertiesTable>
+        </g:FlowPanel>
+      </b:Column>
+    </b:FluidRow>
 
     <g:FlowPanel ui:field="keyStorePanel">
       <b:Heading size="4">
@@ -131,7 +137,8 @@
       </b:Heading>
       <b:Paragraph>
         <ui:msg description="Archive Project text">Archiving a project makes its data inaccessible. Project tables,
-          views, files, reports and keystore will remain untouched. These data will be reinstated when a project with the same
+          views, files, reports and keystore will remain untouched. These data will be reinstated when a project with
+          the same
           name is added. Note that project description and permissions will be deleted permanently.
         </ui:msg>
       </b:Paragraph>
