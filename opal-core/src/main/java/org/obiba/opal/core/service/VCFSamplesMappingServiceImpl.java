@@ -1,7 +1,6 @@
 package org.obiba.opal.core.service;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.obiba.magma.*;
 import org.obiba.magma.support.MagmaEngineTableResolver;
@@ -13,6 +12,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -87,8 +88,8 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService, V
     Map<String, ParticipantRolePair> sampleParticipantMap = getSampleParticipantMap(projectName);
     return sampleParticipantMap.entrySet()
         .stream()
-        .filter(e -> (e.getValue().getKey() == null && VCFSampleRole.isControl(e.getValue().getValue()) && withControl) ||
-            participantIds.contains(e.getValue().getKey())
+        .filter(e -> (e.getValue().getParticipantId() == null && VCFSampleRole.isControl(e.getValue().getRole()) && withControl) ||
+            participantIds.contains(e.getValue().getParticipantId())
         )
         .map(Map.Entry::getKey).collect(Collectors.toList());
   }
@@ -98,8 +99,21 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService, V
     Map<String, ParticipantRolePair> sampleParticipantMap = getSampleParticipantMap(projectName);
     return sampleParticipantMap.entrySet()
         .stream()
-        .filter(e -> VCFSampleRole.isControl(e.getValue().getValue()))
+        .filter(e -> VCFSampleRole.isControl(e.getValue().getRole()))
         .map(Map.Entry::getKey).collect(Collectors.toList());
+  }
+
+  @Override
+  public Map<String, ParticipantRolePair> findParticipantIdBySampleId(@NotNull String projectName, @NotNull Collection<String> samplesIds) {
+    Map<String, ParticipantRolePair> sampleParticipantAndRoleMap = getSampleParticipantMap(projectName);
+    final Map<String, ParticipantRolePair> sampleParticipantMap = new HashMap<>();
+
+    samplesIds.forEach(sampleId -> {
+      ParticipantRolePair participantRolePair = sampleParticipantAndRoleMap.get(sampleId);
+      sampleParticipantMap.put(sampleId, participantRolePair != null ? participantRolePair : new ParticipantRolePair("", ""));
+    });
+
+    return sampleParticipantMap;
   }
 
   private Map<String, ParticipantRolePair> getSampleParticipantMap(@NotNull String projectName) {
@@ -199,33 +213,5 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService, V
     return Optional.ofNullable(vcfSamplesMapping.getTableReference().equals(tableReference)
         ? vcfSamplesMapping
         : null);
-  }
-
-  private class ParticipantRolePair implements Map.Entry<String, String> {
-
-    private String participant;
-    private String role;
-
-    ParticipantRolePair(String participant, String role) {
-      this.participant = participant;
-      this.role = role;
-    }
-
-    @Override
-    public String getKey() {
-      return participant;
-    }
-
-    @Override
-    public String getValue() {
-      return role;
-    }
-
-    @Override
-    public String setValue(String value) {
-      String oldValue = role;
-      role = value;
-      return oldValue;
-    }
   }
 }

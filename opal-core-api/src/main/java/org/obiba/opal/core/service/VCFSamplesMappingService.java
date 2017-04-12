@@ -4,7 +4,9 @@ import org.obiba.opal.core.domain.VCFSamplesMapping;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public interface VCFSamplesMappingService extends SystemService {
 
@@ -26,4 +28,25 @@ public interface VCFSamplesMappingService extends SystemService {
   List<String> getFilteredSampleIds(@NotNull String projectName, @NotNull String filteringTable, boolean withControl);
 
   List<String> getControls(@NotNull String projectName);
+
+  Map<String, ParticipantRolePair> findParticipantIdBySampleId(@NotNull String projectName, @NotNull Collection<String> samplesIds);
+
+  class ParticipantRolePair {
+
+    private String participant;
+    private String role;
+
+    ParticipantRolePair(String participant, String role) {
+      this.participant = participant;
+      this.role = role;
+    }
+
+    public String getParticipantId() {
+      return participant;
+    }
+
+    public String getRole() {
+      return role;
+    }
+  }
 }

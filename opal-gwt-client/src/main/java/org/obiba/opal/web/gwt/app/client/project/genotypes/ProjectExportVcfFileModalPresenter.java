@@ -94,6 +94,7 @@ public class ProjectExportVcfFileModalPresenter extends ModalPresenterWidget<Pro
 
       dto.setNamesArray(names);
       dto.setTable(getView().getParticipantsFilterTable().getText());
+      dto.setParticipantIdentifiersMapping(getView().getParticipantIdentifiersMapping().getText());
       dto.setCaseControl(getView().hasCaseControls());
       dto.setDestination(fileSelectionPresenter.getSelectedFile());
 
@@ -113,6 +114,10 @@ public class ProjectExportVcfFileModalPresenter extends ModalPresenterWidget<Pro
 
   public void setParticipantTables(JsArray<TableDto> participantTables) {
     getView().setParticipants(participantTables);
+  }
+
+  public void setParticipantIdentifiersMappingList(List<String> participantIdentifiersMappingList) {
+    getView().setParticipantIdentifiersMappingList(participantIdentifiersMappingList);
   }
 
   public void showMappingDependantContent(boolean show) {
@@ -159,6 +164,8 @@ public class ProjectExportVcfFileModalPresenter extends ModalPresenterWidget<Pro
 
     void setParticipants(JsArray<TableDto> tables);
 
+    void setParticipantIdentifiersMappingList(List<String> tables);
+
     void setFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
 
     void clearErrors();
@@ -170,6 +177,8 @@ public class ProjectExportVcfFileModalPresenter extends ModalPresenterWidget<Pro
     void showExportNAlert(String message);
 
     HasText getParticipantsFilterTable();
+
+    HasText getParticipantIdentifiersMapping();
 
     void showMappingDependant(boolean show);
 

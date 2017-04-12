@@ -58,4 +58,9 @@ public class ExportVCFCommandOptionsDtoImpl implements ExportVCFCommandOptions {
   public boolean isCaseControl() {
     return options.hasCaseControl() ? options.getCaseControl() : true;
   }
+
+  @Override
+  public String getParticipantIdentifiersMapping() {
+    return options.getParticipantIdentifiersMapping();
+  }
 }
