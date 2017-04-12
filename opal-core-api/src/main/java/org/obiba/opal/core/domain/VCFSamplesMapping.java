@@ -31,6 +31,10 @@ public class VCFSamplesMapping implements HasUniqueProperties {
     return new Builder();
   }
 
+  public static Builder newBuilder(VCFSamplesMapping vcfSamplesMapping) {
+    return new Builder(vcfSamplesMapping);
+  }
+
   public String getProjectName() {
     return projectName;
   }
@@ -82,6 +86,14 @@ public class VCFSamplesMapping implements HasUniqueProperties {
 
     private Builder() {
       vcfSamplesMapping = new VCFSamplesMapping();
+    }
+
+    public Builder(VCFSamplesMapping samplesMapping) {
+      vcfSamplesMapping = new VCFSamplesMapping();
+      vcfSamplesMapping.projectName = samplesMapping.projectName;
+      vcfSamplesMapping.tableReference = samplesMapping.tableReference;
+      vcfSamplesMapping.participantIdVariable = samplesMapping.participantIdVariable;
+      vcfSamplesMapping.sampleRoleVariable = samplesMapping.sampleRoleVariable;
     }
 
     public Builder projectName(String value) {
