@@ -125,8 +125,12 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
 
   @Override
   public void onProjectSelection(ProjectDto project) {
+    goToProject(project.getName());
+  }
+
+  private void goToProject(String name) {
     PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.PROJECT)
-        .with(ParameterTokens.TOKEN_NAME, project.getName())
+        .with(ParameterTokens.TOKEN_NAME, name)
         .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString()).build();
     placeManager.revealPlace(request);
   }
@@ -202,7 +206,7 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
 
     @Override
     public void onProjectCreated(ProjectCreatedEvent event) {
-      refresh();
+      goToProject(event.getName());
     }
 
     @Override

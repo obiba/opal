@@ -188,6 +188,7 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
   }
 
   private void createProject() {
+
     ResourceRequestBuilderFactory.<ProjectFactoryDto>newBuilder() //
         .forResource("/projects")  //
         .withResourceBody(ProjectFactoryDto.stringify(getProjectFactoryDto())) //
@@ -195,7 +196,7 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
           @Override
           public void onResponseCode(Request request, Response response) {
             getView().hideDialog();
-            fireEvent(new ProjectCreatedEvent.Builder().build());
+            fireEvent(new ProjectCreatedEvent(getView().getName().getText()));
           }
         }) //
         .withCallback(SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget()) {
