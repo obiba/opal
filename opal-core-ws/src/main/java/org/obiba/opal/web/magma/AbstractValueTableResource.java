@@ -91,7 +91,7 @@ abstract class AbstractValueTableResource {
   }
 
   protected List<Variable> orderVariables(List<Variable> variables) {
-    Collections.sort(variables, (o1, o2) -> o1.getIndex() - o2.getIndex());
+    Collections.sort(variables, Comparator.comparingInt(Variable::getIndex));
     return variables;
   }
 
