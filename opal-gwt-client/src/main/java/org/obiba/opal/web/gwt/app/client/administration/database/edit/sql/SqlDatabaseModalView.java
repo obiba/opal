@@ -493,10 +493,8 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
     defaultUpdatedTimestampColumn.setText(jdbcDatasourceSettings.getDefaultUpdatedTimestampColumnName());
     useMetadataTables.setValue(jdbcDatasourceSettings.getUseMetadataTables());
     batchSize.setValue(jdbcDatasourceSettings.getBatchSize());
-    for (JdbcValueTableSettingsDto dto : JsArrays.toIterable(jdbcDatasourceSettings.getTableSettingsArray()))
-      jdbcTableSettingsEditor.addJdbcTableSettings(dto);
-    for (JdbcValueTableSettingsFactoryDto dto : JsArrays.toIterable(jdbcDatasourceSettings.getTableSettingsFactoriesArray()))
-      jdbcTableSettingsFactoriesEditor.addJdbcTableSettingsFactory(dto);
+    jdbcTableSettingsEditor.addJdbcTableSettings(JsArrays.toList(jdbcDatasourceSettings.getTableSettingsArray()));
+    jdbcTableSettingsFactoriesEditor.addJdbcTableSettingsFactory(JsArrays.toList(jdbcDatasourceSettings.getTableSettingsFactoriesArray()));
   }
 
   @Override

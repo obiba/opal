@@ -28,6 +28,8 @@ import com.google.gwt.user.client.ui.Widget;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.model.client.magma.JdbcValueTableSettingsFactoryDto;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class JdbcTableSettingsFactoriesEditor extends Composite {
@@ -67,6 +69,22 @@ public class JdbcTableSettingsFactoriesEditor extends Composite {
     JsArray<JdbcValueTableSettingsFactoryDto> settingsArray = JsArrays.create();
     for (JdbcTableSettingsFactoryPanel panels : settingsList) settingsArray.push(panels.getJdbcTableSettingsFactory());
     return settingsArray;
+  }
+
+  public void addJdbcTableSettingsFactory(List<JdbcValueTableSettingsFactoryDto> settings) {
+    if (settings == null) return;
+    Collections.sort(settings, new Comparator<JdbcValueTableSettingsFactoryDto>() {
+      @Override
+      public int compare(JdbcValueTableSettingsFactoryDto o1, JdbcValueTableSettingsFactoryDto o2) {
+        return fullName(o1).compareTo(fullName(o2));
+      }
+
+      private String fullName(JdbcValueTableSettingsFactoryDto dto)  {
+        return dto.getSqlTable() + "(" + dto.getTablePartitionColumn() + ") - " + dto.getOpalTable();
+      }
+
+    });
+    for (JdbcValueTableSettingsFactoryDto dto : settings) addJdbcTableSettingsFactory(dto);
   }
 
   public void addJdbcTableSettingsFactory(JdbcValueTableSettingsFactoryDto settings) {

@@ -28,6 +28,8 @@ import com.google.gwt.user.client.ui.Widget;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.model.client.magma.JdbcValueTableSettingsDto;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class JdbcTableSettingsEditor extends Composite {
@@ -67,6 +69,20 @@ public class JdbcTableSettingsEditor extends Composite {
     JsArray<JdbcValueTableSettingsDto> settingsArray = JsArrays.create();
     for (JdbcTableSettingsPanel panels : settingsList) settingsArray.push(panels.getJdbcTableSettings());
     return settingsArray;
+  }
+
+  public void addJdbcTableSettings(List<JdbcValueTableSettingsDto> settings) {
+    if (settings == null) return;
+    Collections.sort(settings, new Comparator<JdbcValueTableSettingsDto>() {
+      @Override
+      public int compare(JdbcValueTableSettingsDto o1, JdbcValueTableSettingsDto o2) {
+        return fullName(o1).compareTo(fullName(o2));
+      }
+      private String fullName(JdbcValueTableSettingsDto dto)  {
+        return dto.getSqlTable() + " - " + dto.getOpalTable();
+      }
+    });
+    for (JdbcValueTableSettingsDto dto : settings) addJdbcTableSettings(dto);
   }
 
   public void addJdbcTableSettings(JdbcValueTableSettingsDto settings) {
