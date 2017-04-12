@@ -1,6 +1,7 @@
 package org.obiba.opal.core.service;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.obiba.magma.*;
 import org.obiba.magma.support.MagmaEngineTableResolver;
@@ -14,8 +15,8 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
-
 
 @Component
 public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService, ValueTableUpdateListener {
@@ -124,22 +125,80 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService, V
 
   @Override
   public void onRename(@NotNull ValueTable vt, String newName) {
-    // should we rename the sample mappings?
+    getMatchingMappingTables(vt).ifPresent(list -> {
+      String newTableReference = String.format("%s.%s", vt.getDatasource().getName(), newName);
+      list.forEach(s -> {
+        VCFSamplesMapping n = VCFSamplesMapping.newBuilder(s).tableName(newTableReference).build();
+        orientDbService.save(n, n);
+      });
+    });
   }
 
   @Override
-  public void onRename(@NotNull ValueTable vt, Variable v, String newName) {
-    // should we rename the sample mapping variables?
+  public void onRename(@NotNull ValueTable vt, Variable variable, String newName) {
+    getMatchingMappingTables(vt).ifPresent(list -> {
+      String variableName = variable.getName();
+      list.forEach(s -> {
+        VCFSamplesMapping.Builder b = VCFSamplesMapping.newBuilder(s);
+        if (s.getParticipantIdVariable().equals(variableName)) {
+          b.participantIdVariable(newName);
+        } else if (s.getSampleRoleVariable().equals(variableName)) {
+          b.sampleRoleVariable(newName);
+        }
+
+        VCFSamplesMapping n = b.build();
+        orientDbService.save(n, n);
+      });
+    });
   }
 
   @Override
   public void onDelete(@NotNull ValueTable vt) {
-    if (TABLE_ENTITY_TYPE.equals(vt.getEntityType())) deleteProjectSampleMappings(vt.getDatasource().getName() + "." + vt.getName());
+    if (TABLE_ENTITY_TYPE.equals(vt.getEntityType())) {
+      deleteProjectSampleMappings(vt.getDatasource().getName() + "." + vt.getName());
+    }
   }
 
   @Override
   public void onDelete(@NotNull ValueTable vt, Variable v) {
-    // TODO
+    getMatchingMappingTables(vt).ifPresent(list -> {
+      String variableName = v.getName();
+      list.forEach(s -> {
+        if (s.getParticipantIdVariable().equals(variableName) || s.getSampleRoleVariable().equals(variableName)) {
+          delete(s.getProjectName());
+        }
+      });
+    });
+  }
+
+  /**
+   * Return the mappings from all projects matching this table
+   *
+   * @param vt
+   * @return
+   */
+  private Optional<Iterable<VCFSamplesMapping>> getMatchingMappingTables(ValueTable vt) {
+    Optional<Iterable<VCFSamplesMapping>> list = Optional.empty();
+    if (TABLE_ENTITY_TYPE.equals(vt.getEntityType())) {
+      String tableReference = String.format("%s.%s", vt.getDatasource().getName(), vt.getName());
+      list = Optional.ofNullable(orientDbService.list(VCFSamplesMapping.class,
+          "select from " + VCFSamplesMapping.class.getSimpleName() + " where tableReference like ?",
+          tableReference));
+    }
+
+    return list;
+  }
+
+  private Optional<VCFSamplesMapping> getVCFSamplesMappingBuilder(ValueTable valueTable) {
+    String projectName = valueTable.getDatasource().getName();
+    if (!hasVCFSamplesMapping(projectName)) return Optional.ofNullable(null);
+
+    String tableReference = String.format("%s.%s", projectName, valueTable.getName());
+    VCFSamplesMapping vcfSamplesMapping = getVCFSamplesMapping(projectName);
+
+    return Optional.ofNullable(vcfSamplesMapping.getTableReference().equals(tableReference)
+        ? vcfSamplesMapping
+        : null);
   }
 
   private class ParticipantRolePair implements Map.Entry<String, String> {
