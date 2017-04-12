@@ -15,6 +15,7 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.Response;
 
+import org.obiba.magma.ValueTableUpdateListener;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
@@ -102,6 +103,11 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
         Variable variable = variableSource.getVariable();
         String name = variable.getName();
         if(variables.contains(name)) {
+          if (tableListeners != null && !tableListeners.isEmpty()) {
+            for (ValueTableUpdateListener listener : tableListeners) {
+              listener.onDelete(getValueTable(), variable);
+            }
+          }
           operationContext.deleteVariable(view, variable);
           names.add(name);
           variableWriter.removeVariable(variable);

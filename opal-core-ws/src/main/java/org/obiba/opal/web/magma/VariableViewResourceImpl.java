@@ -107,6 +107,11 @@ public class VariableViewResourceImpl extends VariableResourceImpl implements Va
       for(VariableValueSource v : view.getListClause().getVariableValueSources()) {
         Variable variable = v.getVariable();
         if(variable.getName().equals(getName())) {
+          if (tableListeners != null && !tableListeners.isEmpty()) {
+            for (ValueTableUpdateListener listener : tableListeners) {
+              listener.onDelete(getValueTable(), variable);
+            }
+          }
           variableWriter.removeVariable(variable);
           VariableOperationContext operationContext = new VariableOperationContext();
           operationContext.deleteVariable(view, variable);

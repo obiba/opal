@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.magma;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.ws.rs.core.PathSegment;
@@ -17,6 +18,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.obiba.magma.ValueTableUpdateListener;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
@@ -31,6 +33,7 @@ import org.obiba.opal.web.magma.math.TextSummaryResource;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.support.InvalidRequestException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -96,6 +99,12 @@ public class VariableResourceImpl extends AbstractValueTableResource implements 
 
     // The variable must exist
     Variable v = getValueTable().getVariable(name);
+
+    if (tableListeners != null && !tableListeners.isEmpty()) {
+      for (ValueTableUpdateListener listener : tableListeners) {
+        listener.onDelete(getValueTable(), v);
+      }
+    }
 
     try(ValueTableWriter tableWriter = getValueTable().getDatasource()
         .createWriter(getValueTable().getName(), getValueTable().getEntityType());

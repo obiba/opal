@@ -11,6 +11,7 @@ package org.obiba.opal.web.magma;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -20,11 +21,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.obiba.magma.Datasource;
-import org.obiba.magma.MagmaRuntimeException;
-import org.obiba.magma.ValueTableWriter;
+import org.obiba.magma.*;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
-import org.obiba.magma.Variable;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
@@ -33,6 +31,7 @@ import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableDto.Builder;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.support.InvalidRequestException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -68,13 +67,8 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
 
     Iterable<Variable> variables = filterVariables(script, offset, limit);
     Iterable<VariableDto> entity = Iterables
-        .transform(variables, Functions.compose(new Function<VariableDto.Builder, VariableDto>() {
-
-          @Override
-          public VariableDto apply(Builder input) {
-            return input.setLink(uriBuilder.build(input.getName()).toString()).build();
-          }
-        }, Dtos.asDtoFunc(tableLinkBuilder.build())));
+        .transform(variables, Functions.compose(input -> input.setLink(uriBuilder.build(input.getName()).toString()).build(),
+            Dtos.asDtoFunc(tableLinkBuilder.build())));
 
     return entity;
   }
@@ -152,6 +146,11 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
       for(String name : variables) {
         // The variable must exist
         Variable v = getValueTable().getVariable(name);
+        if (tableListeners != null && !tableListeners.isEmpty()) {
+          for (ValueTableUpdateListener listener : tableListeners) {
+            listener.onDelete(getValueTable(), v);
+          }
+        }
         variableWriter.removeVariable(v);
       }
       return Response.ok().build();
