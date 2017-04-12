@@ -181,6 +181,8 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
     if (StringUtils.isEmpty(options.getParticipantIdentifiersMapping()))
       return;
 
+    getShell().printf(String.format("Exporting csv mapping file (%s)", csvFile));
+
     Map<String, VCFSamplesMappingService.ParticipantRolePair> mapSampleIdParticipantId = vcfSamplesMappingService.findParticipantIdBySampleId(options.getProject(), sampleIds);
 
     try (FileWriter fileWriter = new FileWriter(csvFile)) {
