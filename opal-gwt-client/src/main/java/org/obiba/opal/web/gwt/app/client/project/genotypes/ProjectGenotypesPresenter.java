@@ -46,8 +46,11 @@ import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.opal.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -82,6 +85,8 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
   private JsArray<TableDto> participantTables = JsArrays.create();
+
+  private List<String> participantIdentifiersMappingList = new ArrayList<>();
 
   private VCFSamplesMappingDto mappingTable = null;
 
@@ -163,9 +168,28 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
     getView().clear(dto.hasVcfStoreService());
     if (dto.hasVcfStoreService()) {
       getParticipantTables();
+      initializeParticipantIdentifierMappingList();
       refresh();
       authorize();
     }
+  }
+
+  private void initializeParticipantIdentifierMappingList() {
+    String uri = UriBuilders.IDENTIFIERS_TABLE_VARIABLES.create().build("keys");
+    ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder() //
+            .forResource(uri) //
+            .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
+              @Override
+              public void onResource(Response response, JsArray<VariableDto> resource) {
+                participantIdentifiersMappingList.clear();
+                JsArray<VariableDto> variableDtoJsArray = JsArrays.toSafeArray(resource);
+                Iterable<VariableDto> variableDtos = JsArrays.toIterable(variableDtoJsArray);
+                for (VariableDto variableDto : variableDtos) {
+                  participantIdentifiersMappingList.add(variableDto.getName());
+                }
+              }
+            }) //
+            .get().send();
   }
 
   @Override
@@ -175,6 +199,7 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
         || getView().getSelectedVCFs().size() == 0;
 
     modal.setParticipantTables(participantTables);
+    modal.setParticipantIdentifiersMappingList(participantIdentifiersMappingList);
     modal.showMappingDependantContent(mappingTable != null);
     modal.setExportVCFs(allSelected ? getView().getAllVCFs() : getView().getSelectedVCFs(), allSelected);
   }

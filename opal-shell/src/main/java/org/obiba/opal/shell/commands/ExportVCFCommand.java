@@ -12,13 +12,16 @@ package org.obiba.opal.shell.commands;
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
+import org.obiba.magma.Value;
+import org.obiba.magma.ValueSet;
+import org.obiba.magma.Variable;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.VCFSamplesMappingService;
 import org.obiba.opal.shell.commands.options.ExportVCFCommandOptions;
@@ -29,16 +32,21 @@ import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 @CommandUsage(description = "Export one or more VCF files from a project into a destination folder.",
     syntax = "Syntax: export-vcf --project PROJECT --destination DESTINATION NAMES")
@@ -57,7 +65,14 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
   @Autowired
   private VCFSamplesMappingService vcfSamplesMappingService;
 
+  @Autowired
+  private IdentifiersTableService identifiersTableService;
+
   private VCFStore store;
+
+  private Iterable<ValueSet> participantsMappingTable;
+
+  private Map<String, ValueSet> mapParticipantInternalIdWithParticipantMappingValueSet;
 
   //
   // AbstractOpalRuntimeDependentCommand Methods
@@ -122,36 +137,104 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
     getShell().progress(String.format("Exporting VCF/BCF file(s): %s", String.join(", ", options.getNames())), 0, total, 0);
 
     List<String> filterSampleIds = options.hasTable() ?
-        vcfSamplesMappingService.getFilteredSampleIds(options.getProject(), options.getTable(), options.isCaseControl()) :
-        Lists.newArrayList();
+            vcfSamplesMappingService.getFilteredSampleIds(options.getProject(), options.getTable(), options.isCaseControl()) :
+            Lists.newArrayList();
 
     int count = 1;
     for (String vcfName : options.getNames()) {
       String baseVcfName = vcfName;
       if (vcfName.endsWith(".vcf.gz")) baseVcfName = vcfName.replaceAll("\\.vcf\\.gz$", "");
       else if (vcfName.endsWith(".bcf.gz")) baseVcfName = vcfName.replaceAll("\\.bcf\\.gz$", "");
-      getShell().progress(String.format("Exporting VCF/BCF file (%s)", baseVcfName), count, total, (count*100)/total);
+      getShell().progress(String.format("Exporting VCF/BCF file (%s)", baseVcfName), count, total, (count * 100) / total);
       VCFStore.VCFSummary summary = store.getVCFSummary(baseVcfName);
       String vcfFileName = baseVcfName + "." + summary.getFormat().name().toLowerCase() + ".gz";
+      String csvFileName = baseVcfName + "-samples.csv";
       getShell().printf(String.format("Exporting VCF/BCF file (%s)", vcfFileName));
       File vcfFile = new File(destinationFolder, vcfFileName);
+      File csvFile = new File(destinationFolder, csvFileName);
       if (!options.hasTable()) {
         if (!options.isCaseControl()) {
           Collection<String> sampleIds = summary.getSampleIds();
           sampleIds.removeAll(vcfSamplesMappingService.getControls(options.getProject()));
 
           store.readVCF(baseVcfName, new FileOutputStream(vcfFile), sampleIds);
-        } else
+          exportCsvFileMappingSampleIdAndParticipantId(csvFile, sampleIds);
+        } else {
           store.readVCF(baseVcfName, new FileOutputStream(vcfFile));
+          exportCsvFileMappingSampleIdAndParticipantId(csvFile, summary.getSampleIds());
+        }
       } else {
         Collection<String> sampleIds = summary.getSampleIds();
         sampleIds.retainAll(filterSampleIds);
-        if (sampleIds.size() > 0)
+        if (sampleIds.size() > 0) {
           store.readVCF(baseVcfName, new FileOutputStream(vcfFile), filterSampleIds);
+          exportCsvFileMappingSampleIdAndParticipantId(csvFile, sampleIds);
+        }
       }
       count++;
     }
     getShell().progress(String.format("VCF/BCF file(s) export completed."), total, total, 100);
+  }
+
+  private void exportCsvFileMappingSampleIdAndParticipantId(File csvFile, Collection<String> sampleIds) throws IOException {
+
+    if (StringUtils.isEmpty(options.getParticipantIdentifiersMapping()))
+      return;
+
+    getShell().printf(String.format("Exporting csv mapping file (%s)", csvFile));
+
+    Map<String, VCFSamplesMappingService.ParticipantRolePair> mapSampleIdParticipantId = vcfSamplesMappingService.findParticipantIdBySampleId(options.getProject(), sampleIds);
+
+    try (FileWriter fileWriter = new FileWriter(csvFile)) {
+      for (Map.Entry<String, VCFSamplesMappingService.ParticipantRolePair> mapSampleIdParticipantIdEntry : mapSampleIdParticipantId.entrySet()) {
+
+        String sampleId = mapSampleIdParticipantIdEntry.getKey();
+        String role = mapSampleIdParticipantIdEntry.getValue().getRole();
+        String internalParticipantId = mapSampleIdParticipantIdEntry.getValue().getParticipantId();
+        String externalParticipantId = findExternalParticipantIdFromInternalParticipantId(internalParticipantId);
+        fileWriter.write(String.format("\"%s\",\"%s\",\"%s\"\n", escapeCsvField(sampleId), escapeCsvField(externalParticipantId), escapeCsvField(role)));
+      }
+    }
+  }
+
+  private String escapeCsvField(String csvField) {
+    return csvField != null ? csvField.replaceAll("\"", "\\\"") : "";
+  }
+
+  private String findExternalParticipantIdFromInternalParticipantId(String internalParticipantId) {
+
+    Optional<ValueSet> participantValueSet = Optional.ofNullable(mapParticipantInternalIdWithParticipantMappingValueSet().get(internalParticipantId));
+    if (!participantValueSet.isPresent())
+      return "";
+
+    Optional<Variable> participantExternalIdVariable = StreamSupport.stream(participantValueSet.get().getValueTable().getVariables().spliterator(), true)
+            .filter((s) -> s.getName().equals(options.getParticipantIdentifiersMapping()))
+            .findFirst();
+    if (!participantExternalIdVariable.isPresent())
+      return "";
+
+    Value value = getParticipantsMappingTable().iterator().next().getValueTable().getValue(
+            participantExternalIdVariable.get(),
+            participantValueSet.get());
+    return value.isNull() || value.getValue() == null ? "" : value.getValue().toString();
+  }
+
+  private synchronized Map<String, ValueSet> mapParticipantInternalIdWithParticipantMappingValueSet() {
+
+    if (mapParticipantInternalIdWithParticipantMappingValueSet == null) {
+      mapParticipantInternalIdWithParticipantMappingValueSet = new HashMap<>();
+
+      getParticipantsMappingTable().forEach(valueSet ->
+              mapParticipantInternalIdWithParticipantMappingValueSet.put(valueSet.getVariableEntity().getIdentifier(), valueSet));
+    }
+
+    return mapParticipantInternalIdWithParticipantMappingValueSet;
+  }
+
+  private synchronized Iterable<ValueSet> getParticipantsMappingTable() {
+    if (participantsMappingTable == null)
+      participantsMappingTable = identifiersTableService.getIdentifiersTable("Participant").getValueSets();
+    return participantsMappingTable;
   }
 
   FileObject resolveFileInFileSystem(String path) throws FileSystemException {
@@ -163,5 +246,4 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
   public String toString() {
     return "export-vcf -p '" + getOptions().getProject() + "' -d '" + options.getDestination() + "' " + String.join(", ", options.getNames());
   }
-
 }

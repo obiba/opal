@@ -43,6 +43,17 @@
           <ui:msg description="Participants Filter Include case controls label">Include case controls</ui:msg>
         </b:CheckBox>
       </b:ControlGroup>
+
+      <b:ControlGroup ui:field="participantsIdentifiersGroup" visible="false">
+        <b:ControlLabel for="participantsIdentifiers">
+          <ui:msg description="Participants Filter label">Participants filter</ui:msg>
+        </b:ControlLabel>
+        <o:Chooser ui:field="participantsIdentifiersMapping" name="participantsIdentifiersMapping"/>
+        <b:HelpBlock>
+          <ui:msg description="Participants Filter help">Select a mapping of participant identifiers to be used when exporting sample participant ID correspondence.</ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
+
     </g:FlowPanel>
 
     <b:ModalFooter>
