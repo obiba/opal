@@ -63,4 +63,9 @@ public class ExportVCFCommandOptionsDtoImpl implements ExportVCFCommandOptions {
   public String getParticipantIdentifiersMapping() {
     return options.getParticipantIdentifiersMapping();
   }
+
+  @Override
+  public boolean hasParticipantIdentifiersMapping() {
+    return options.hasParticipantIdentifiersMapping() && !Strings.isNullOrEmpty(options.getParticipantIdentifiersMapping());
+  }
 }
