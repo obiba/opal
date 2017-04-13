@@ -193,28 +193,18 @@ public class ProjectExportVcfFileModalView extends ModalPopupViewWithUiHandlers<
 
   @Override
   public void setParticipantIdentifiersMappingList(List<String> participantIdentifiersMappingList) {
-
     this.participantIdentifiersMappingList=participantIdentifiersMappingList;
     updateParticipantsIdentifiersGroupVisibility();
   }
 
   private void updateParticipantsIdentifiersGroupVisibility() {
-
     participantsIdentifiersMapping.clear();
-
-    if (participantsFilter.getSelectedValue().equals(PARTICIPANT_FILTER_NONE) || participantIdentifiersMappingList.size() == 0) {
-      participantsIdentifiersGroup.setVisible(false);
-      participantsIdentifiersMapping.addItem(translations.none(), PARTICIPANT_FILTER_NONE);
-    } else if (participantIdentifiersMappingList.size() == 1) {
-      participantsIdentifiersGroup.setVisible(false);
-      participantsIdentifiersMapping.addItem(participantIdentifiersMappingList.get(0));
-      participantsIdentifiersMapping.setSelectedValue(participantIdentifiersMappingList.get(0));
-    } else {
-      participantsIdentifiersGroup.setVisible(true);
-      for (String participantIdentifiersMapping : participantIdentifiersMappingList) {
-        participantsIdentifiersMapping.addItem(participantIdentifiersMapping);
-      }
+    participantsIdentifiersMapping.addItem(translations.none(), PARTICIPANT_FILTER_NONE);
+    for (String participantIdentifiersMapping : participantIdentifiersMappingList) {
+      participantsIdentifiersMapping.addItem(participantIdentifiersMapping);
     }
+    participantsIdentifiersGroup.setVisible(participantIdentifiersMappingList.size()>0);
+    participantsIdentifiersMapping.setEnabled(!participantsFilter.getSelectedValue().equals(PARTICIPANT_FILTER_NONE) && participantIdentifiersMappingList.size()>0);
   }
 
   @Override
