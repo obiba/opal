@@ -41,4 +41,6 @@ public interface ExportVCFCommandOptions extends HelpOption {
 
   @Option(shortName = "m", description = "With participant identifier mapping")
   String getParticipantIdentifiersMapping();
+
+  boolean hasParticipantIdentifiersMapping();
 }

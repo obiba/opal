@@ -14,7 +14,7 @@
              ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
              ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <o:Modal ui:field="dialog" closeVisible="true" keyboard="true" animation="false">
+  <o:Modal ui:field="dialog" closeVisible="true" keyboard="true" animation="false" minHeight="550">
 
     <b:Alert ui:field="exportNVCF" close="false" visible="true" type="INFO"/>
 
@@ -30,7 +30,7 @@
     <g:FlowPanel ui:field="mappingDependant">
       <b:ControlGroup ui:field="participantsFilterGroup">
         <b:ControlLabel for="participantsFilter">
-          <ui:msg description="Participants Filter label">Participants filter</ui:msg>
+          <ui:msg description="Participants Filter label">Participants Filter</ui:msg>
         </b:ControlLabel>
         <o:Chooser ui:field="participantsFilter" name="participantsFilter"/>
         <b:HelpBlock>
@@ -38,20 +38,20 @@
         </b:HelpBlock>
       </b:ControlGroup>
 
-      <b:ControlGroup>
-        <b:CheckBox ui:field="includeCaseControls">
-          <ui:msg description="Participants Filter Include case controls label">Include case controls</ui:msg>
-        </b:CheckBox>
-      </b:ControlGroup>
-
       <b:ControlGroup ui:field="participantsIdentifiersGroup" visible="false">
         <b:ControlLabel for="participantsIdentifiers">
-          <ui:msg description="Participants Filter label">Participants filter</ui:msg>
+          <ui:msg description="Participants Identifiers Mapping label">Participants Identifiers Mapping</ui:msg>
         </b:ControlLabel>
         <o:Chooser ui:field="participantsIdentifiersMapping" name="participantsIdentifiersMapping"/>
         <b:HelpBlock>
           <ui:msg description="Participants Filter help">Select a mapping of participant identifiers to be used when exporting sample participant ID correspondence.</ui:msg>
         </b:HelpBlock>
+      </b:ControlGroup>
+
+      <b:ControlGroup>
+        <b:CheckBox ui:field="includeCaseControls">
+          <ui:msg description="Participants Filter Include case controls label">Include case controls</ui:msg>
+        </b:CheckBox>
       </b:ControlGroup>
 
     </g:FlowPanel>
