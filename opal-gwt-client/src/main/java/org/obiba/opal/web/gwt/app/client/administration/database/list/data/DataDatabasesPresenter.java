@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.administration.database.list.DatabaseAd
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -175,6 +176,7 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
 
             @Override
             public void onResponseCode(Request request, Response response) {
+              fireEvent(new ConfirmationTerminatedEvent());
               refresh();
               getEventBus().fireEvent(new DatabaseDeletedEvent(dto));
             }
