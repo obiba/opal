@@ -14,7 +14,7 @@ import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface ProjectUiHandlers extends UiHandlers {
 
-  void onProjectsSelection();
+  void onProjectsSelection(String tag);
 
   void onTabSelected(int index);
 }

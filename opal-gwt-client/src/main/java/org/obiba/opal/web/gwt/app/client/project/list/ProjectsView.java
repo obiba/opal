@@ -93,14 +93,10 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
   private int selectedTagTab = 0;
 
-//  private final Provider<BookmarkIconPresenter> bookmarkIconPresenterProvider;
-
   @Inject
-  public ProjectsView(Binder uiBinder, PlaceManager placeManager, Translations translations/*,
-      Provider<BookmarkIconPresenter> bookmarkIconPresenterProvider*/) {
+  public ProjectsView(Binder uiBinder, PlaceManager placeManager, Translations translations) {
     this.placeManager = placeManager;
     this.translations = translations;
-//    this.bookmarkIconPresenterProvider = bookmarkIconPresenterProvider;
     initWidget(uiBinder.createAndBindUi(this));
     initTabs();
     initProjectsTable();
@@ -114,8 +110,20 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   }
 
   @Override
-  public void setTags(List<String> tags) {
-    renderTagTabs(tags);
+  public void setTags(List<String> tags, String selectedTag) {
+    this.tags = tags;
+    tabs.clear();
+    tabs.add(new SimplePanel(), new Anchor(translations.allProjectsLabel()));
+    selectedTagTab = 0;
+    if (!tags.isEmpty()) {
+      int i = 0;
+      for (String tag : tags) {
+        if (tag.equals(selectedTag)) selectedTagTab = i + 1;
+        tabs.add(new SimplePanel(), new Anchor(tag));
+        i++;
+      }
+    }
+    tabs.selectTab(selectedTagTab, false);
   }
 
   @Override
@@ -146,7 +154,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
   @UiHandler("filter")
   void onFilterUpdate(KeyUpEvent event) {
-    getUiHandlers().onProjectsFilterUpdate(filter.getText());
+    getUiHandlers().onProjectsFilterUpdate(getSelectedTag(), filter.getText());
   }
 
   private void initTabs() {
@@ -154,7 +162,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
       @Override
       public void onSelection(SelectionEvent<Integer> event) {
         selectedTagTab = event.getSelectedItem();
-        getUiHandlers().onProjectsFilterUpdate(filter.getText());
+        getUiHandlers().onProjectsFilterUpdate(getSelectedTag(), filter.getText());
       }
     });
   }
@@ -175,20 +183,6 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     projectsTable.getColumnSortList().push(projectsTable.getColumn(SORTABLE_COLUMN_LAST_UPDATED));
     projectsTable.getColumnSortList().push(projectsTable.getColumn(SORTABLE_COLUMN_NAME));
     projectsTable.addColumnSortHandler(typeSortHandler);
-  }
-
-  private void renderTagTabs(List<String> tags) {
-    this.tags = tags;
-    tabs.clear();
-    tabs.add(new SimplePanel(), new Anchor(translations.allProjectsLabel()));
-    //tabs.setVisible(!tags.isEmpty());
-    if (!tags.isEmpty()) {
-      for (String tag : tags) {
-        tabs.add(new SimplePanel(), new Anchor(tag));
-      }
-    }
-    selectedTagTab = 0;
-    tabs.selectTab(selectedTagTab, false);
   }
 
   private void renderProjectsTable(List<ProjectDto> projects) {

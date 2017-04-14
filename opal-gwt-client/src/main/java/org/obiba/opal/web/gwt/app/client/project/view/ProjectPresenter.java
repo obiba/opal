@@ -258,8 +258,10 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   }
 
   @Override
-  public void onProjectsSelection() {
-    placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.PROJECTS).build());
+  public void onProjectsSelection(String tag) {
+    PlaceRequest.Builder place = new PlaceRequest.Builder().nameToken(Places.PROJECTS);
+    if (tag != null) place = place.with(ParameterTokens.TOKEN_TAG, tag);
+    placeManager.revealPlace(place.build());
   }
 
   @Override

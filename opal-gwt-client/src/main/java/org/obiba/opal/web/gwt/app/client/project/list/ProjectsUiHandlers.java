@@ -22,5 +22,5 @@ public interface ProjectsUiHandlers extends UiHandlers {
 
   void showAddProject();
 
-  void onProjectsFilterUpdate(String filter);
+  void onProjectsFilterUpdate(String tag, String filter);
 }

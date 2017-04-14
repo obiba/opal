@@ -13,6 +13,7 @@ package org.obiba.opal.web.gwt.app.client.project.view;
 import com.github.gwtbootstrap.client.ui.*;
 import com.github.gwtbootstrap.client.ui.Label;
 import com.github.gwtbootstrap.client.ui.TabPanel;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -106,9 +107,15 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     JsArrayString tagsArray = JsArrays.toSafeArray(project.getTagsArray());
     tagsPanel.setVisible(tagsArray.length() > 0);
     if(tagsArray.length() > 0) {
-      for(String tag : JsArrays.toIterable(tagsArray)) {
-        Label tagLabel = new Label(tag);
-        tagLabel.addStyleName("small-indent");
+      for(final String tag : JsArrays.toIterable(tagsArray)) {
+        Anchor tagLabel = new Anchor(tag);
+        tagLabel.addClickHandler(new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            getUiHandlers().onProjectsSelection(tag);
+          }
+        });
+        tagLabel.addStyleName("small-indent label");
         tagsPanel.add(tagLabel);
       }
     }
@@ -146,7 +153,7 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
 
   @UiHandler("projects")
   void onProjectsSelection(ClickEvent event) {
-    getUiHandlers().onProjectsSelection();
+    getUiHandlers().onProjectsSelection(null);
   }
 
   @UiHandler("tabPanel")

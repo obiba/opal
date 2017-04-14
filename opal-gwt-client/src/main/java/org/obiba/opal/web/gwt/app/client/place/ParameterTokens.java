@@ -18,4 +18,6 @@ public class ParameterTokens {
   public static final String TOKEN_TAB = "tab";
 
   public static final String TOKEN_PATH = "path";
+
+  public static final String TOKEN_TAG = "tag";
 }

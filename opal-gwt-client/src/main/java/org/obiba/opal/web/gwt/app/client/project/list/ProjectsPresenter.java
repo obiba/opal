@@ -11,6 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.project.list;
 
 import com.google.common.collect.Lists;
+import com.google.gwt.core.client.GWT;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
@@ -61,6 +62,8 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
 
   private String projectsFilter;
 
+  private String selectedTag;
+
   private final Translations translations;
 
   private final ModalProvider<EditProjectModalPresenter> addProjectModalProvider;
@@ -92,6 +95,11 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
     refresh();
   }
 
+  @Override
+  public void prepareFromRequest(PlaceRequest request) {
+    selectedTag = request.getParameter(ParameterTokens.TOKEN_TAG, null);
+  }
+
   private void authorize() {
     // add project
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
@@ -115,8 +123,8 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
               }
             }
             Collections.sort(tags);
-            getView().setTags(tags);
-            onProjectsFilterUpdate(projectsFilter);
+            getView().setTags(tags, selectedTag);
+            onProjectsFilterUpdate(selectedTag, projectsFilter);
           }
         }) //
         .get().send();
@@ -156,7 +164,7 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
   }
 
   @Override
-  public void onProjectsFilterUpdate(String filter) {
+  public void onProjectsFilterUpdate(String tag, String filter) {
     projectsFilter = filter;
     if(Strings.isNullOrEmpty(filter)) {
       getView().setProjects(projects);
@@ -169,6 +177,9 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
       }
       getView().setProjects(filtered);
     }
+    PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.PROJECTS);
+    if (!Strings.isNullOrEmpty(tag)) builder.with(ParameterTokens.TOKEN_TAG, tag);
+    placeManager.updateHistory(builder.build(), true);
   }
 
   /**
@@ -192,7 +203,7 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
 
     void beforeRenderProjects();
 
-    void setTags(List<String> tags);
+    void setTags(List<String> tags, String selectedTag);
 
     void setProjects(JsArray<ProjectDto> projects);
 
