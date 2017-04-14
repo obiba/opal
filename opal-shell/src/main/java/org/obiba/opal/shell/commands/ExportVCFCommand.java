@@ -169,7 +169,7 @@ public class ExportVCFCommand extends AbstractOpalRuntimeDependentCommand<Export
     getShell().printf(String.format("Exporting VCF/BCF file (%s)", vcfFile.getName()));
     if (sampleIds == null)
       store.readVCF(baseVcfName, new FileOutputStream(vcfFile));
-    if (!sampleIds.isEmpty())
+    else if (!sampleIds.isEmpty())
       store.readVCF(baseVcfName, new FileOutputStream(vcfFile), sampleIds);
   }
 
