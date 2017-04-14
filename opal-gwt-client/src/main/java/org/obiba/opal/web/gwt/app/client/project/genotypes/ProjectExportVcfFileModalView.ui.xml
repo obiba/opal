@@ -14,7 +14,7 @@
              ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
              ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <o:Modal ui:field="dialog" closeVisible="true" keyboard="true" animation="false" minHeight="550">
+  <o:Modal ui:field="dialog" closeVisible="true" keyboard="true" animation="false">
 
     <b:Alert ui:field="exportNVCF" close="false" visible="true" type="INFO"/>
 
