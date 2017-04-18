@@ -45,12 +45,11 @@ import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.opal.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -63,6 +62,8 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
     implements ProjectGenotypesUiHandlers {
 
   private static final String ENTITY_TYPE_PARAM = "entityType";
+
+  private static final String MAPPINGS_ENTITY_TYPE_PARAM = "type";
 
   private static final String FILE_PARAM = "file";
 
@@ -175,21 +176,23 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
   }
 
   private void initializeParticipantIdentifierMappingList() {
-    String uri = UriBuilders.IDENTIFIERS_TABLE_VARIABLES.create().build("keys");
-    ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder() //
-            .forResource(uri) //
-            .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
-              @Override
-              public void onResource(Response response, JsArray<VariableDto> resource) {
-                participantIdentifiersMappingList.clear();
-                JsArray<VariableDto> variableDtoJsArray = JsArrays.toSafeArray(resource);
-                Iterable<VariableDto> variableDtos = JsArrays.toIterable(variableDtoJsArray);
-                for (VariableDto variableDto : variableDtos) {
-                  participantIdentifiersMappingList.add(variableDto.getName());
-                }
-              }
-            }) //
-            .get().send();
+    Map<String, String> params = Maps.newHashMap();
+    params.put(MAPPINGS_ENTITY_TYPE_PARAM, PARTICIPANT_ENTITY_TYPE);
+
+    String uri = UriBuilders.IDENTIFIERS_MAPPINGS.create().query(params).build();
+    ResourceRequestBuilderFactory.<JsArray<IdentifiersMappingDto>>newBuilder()
+        .forResource(uri)
+        .withCallback(new ResourceCallback<JsArray<IdentifiersMappingDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<IdentifiersMappingDto> resource) {
+            JsArray<IdentifiersMappingDto> identifiersMappings = JsArrays.toSafeArray(resource);
+            participantIdentifiersMappingList.clear();
+            for(IdentifiersMappingDto identifiersMappingDto : JsArrays.toIterable(identifiersMappings)) {
+              participantIdentifiersMappingList.add(identifiersMappingDto.getName());
+            }
+          }
+        })
+        .get().send();
   }
 
   @Override
