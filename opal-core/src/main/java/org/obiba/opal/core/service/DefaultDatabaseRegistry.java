@@ -119,7 +119,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
   @Override
   public Iterable<Database> list() {
     return orientDbService
-        .list(Database.class, "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ?", false);
+        .list(Database.class, "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ? order by name", false);
   }
 
   @Override
@@ -128,20 +128,20 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
       return list();
     }
     return orientDbService.list(Database.class,
-        "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ? and usage = ?", false, usage.toString());
+        "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ? and usage = ? order by name", false, usage.toString());
   }
 
   @Override
   public Iterable<Database> listSqlDatabases() {
     return orientDbService.list(Database.class,
-        "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ? and sqlSettings is not null",
+        "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ? and sqlSettings is not null order by name",
         false);
   }
 
   @Override
   public Iterable<Database> listMongoDatabases() {
     return orientDbService.list(Database.class, "select from " + Database.class.getSimpleName() +
-        " where usedForIdentifiers = ? and mongoDbSettings is not null", false);
+        " where usedForIdentifiers = ? and mongoDbSettings is not null order by name", false);
   }
 
   @Override
