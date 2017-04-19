@@ -686,6 +686,13 @@ public enum UriBuilders {
     }
   },
 
+  IDENTIFIERS_MAPPINGS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("identifiers", "mappings");
+    }
+  },
+
   IDENTIFIERS_TABLES {
     @Override
     public UriBuilder create() {
