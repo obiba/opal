@@ -340,7 +340,7 @@ public enum VectorType {
       contents.add(new REXPString("factor"));
       names.add("levels");
       contents.add(new REXPString(levels));
-    } else if (variable.hasCategories()) {
+    } else if (variable.hasCategories() && !variable.areAllCategoriesMissing()) {
       names.add("class");
       contents.add(new REXPString("labelled"));
       names.add("labels");
