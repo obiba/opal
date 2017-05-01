@@ -39,7 +39,7 @@ message VCFSummaryDto {
     optional int32 controlSamplesCount = 6;
     optional int32 participantsCount = 7;
     required int32 variantsCount = 8;
-    required int32 genotypesCount = 9;
+    required int64 genotypesCount = 9;
 }
 
 message VCFSamplesMappingDto {

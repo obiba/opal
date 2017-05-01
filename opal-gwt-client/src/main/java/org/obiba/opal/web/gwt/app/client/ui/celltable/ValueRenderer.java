@@ -37,7 +37,7 @@ public enum ValueRenderer {
       if(!value.hasLink() || value.getLink().isEmpty()) return "";
       String label = translations.downloadLabel();
       if(value.hasLength()) {
-        label += " [" + ValueRenderingHelper.getSizeWithUnit(value.getLength()) + "]";
+        label += " [" + ValueRenderingHelper.getSizeInBytes(value.getLength()) + "]";
       }
 
       return label;

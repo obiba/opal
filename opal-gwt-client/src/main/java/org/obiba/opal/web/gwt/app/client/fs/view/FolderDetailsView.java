@@ -154,7 +154,7 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
       @Override
       public String getValue(FileDto object) {
         return object.getType().isFileType(FileDto.FileType.FILE) ? ValueRenderingHelper
-            .getSizeWithUnit(object.getSize()) : "";
+            .getSizeInBytes(object.getSize()) : "";
       }
 
     }, translations.sizeLabel());

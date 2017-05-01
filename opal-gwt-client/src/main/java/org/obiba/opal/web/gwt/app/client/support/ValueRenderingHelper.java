@@ -18,29 +18,43 @@ public class ValueRenderingHelper {
 
   private static final long GB = MB * KB;
 
+  private static final long K = 1000l;
+
+  private static final long M = K * K;
+
+  private static final long G = M * K;
+
   private ValueRenderingHelper() {
   }
 
-  public static String getSizeWithUnit(double size) {
-    if(size < KB) {
-      return (long) size + " B";
+  public static String getSizeInBytes(double size) {
+    return getSizeWithUnit(size, KB, MB, GB, "B");
+  }
+
+  public static String getSize(double size) {
+    return getSizeWithUnit(size, K, M, G, "");
+  }
+
+  private static String getSizeWithUnit(double size, long k, long m, long g, String unit) {
+    if(size < k) {
+      return (long) size + " " + unit;
     }
-    if(size < MB) {
-      double sizeInKB = size / KB;
-      long iPart = (long) sizeInKB;
-      long fPart = Math.round((sizeInKB - iPart) * 10);
-      return iPart + "." + fPart + " KB";
+    if(size < m) {
+      double sizeInK = size / k;
+      long iPart = (long) sizeInK;
+      long fPart = Math.round((sizeInK - iPart) * 10);
+      return iPart + "." + fPart + " K" + unit;
     }
-    if(size < GB) {
-      double sizeInMB = size / MB;
-      long iPart = (long) sizeInMB;
-      long fPart = Math.round((sizeInMB - iPart) * 10);
-      return iPart + "." + fPart + " MB";
+    if(size < g) {
+      double sizeInM = size / m;
+      long iPart = (long) sizeInM;
+      long fPart = Math.round((sizeInM - iPart) * 10);
+      return iPart + "." + fPart + " M" + unit;
     }
-    double sizeInGB = size / GB;
-    long iPart = (long) sizeInGB;
-    long fPart = Math.round((sizeInGB - iPart) * 10);
-    return iPart + "." + fPart + " GB";
+    double sizeInG = size / g;
+    long iPart = (long) sizeInG;
+    long fPart = Math.round((sizeInG - iPart) * 10);
+    return iPart + "." + fPart + " G" + unit;
   }
 
 }

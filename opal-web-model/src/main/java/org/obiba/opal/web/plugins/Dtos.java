@@ -63,7 +63,7 @@ public class Dtos {
       .setFormat(summary.getFormat().name()) //
       .setSize(summary.size()) //
       .setTotalSamplesCount(summary.getSampleIds().size()) //
-      .setGenotypesCount(summary.getGenotypesCount()) //
+      .setGenotypesCount((long)summary.getVariantsCount() * summary.getSampleIds().size()) //
       .setVariantsCount(summary.getVariantsCount());
 
     if (stats.hasIdentifiedSamples()) builder.setIdentifiedSamplesCount(stats.getIdentifiedSamples());

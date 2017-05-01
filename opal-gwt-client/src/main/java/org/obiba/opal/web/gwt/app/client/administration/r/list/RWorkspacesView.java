@@ -127,7 +127,7 @@ public class RWorkspacesView extends ViewWithUiHandlers<RWorkspacesUiHandlers> i
       @Override
       public String getValue(RWorkspaceDto object) {
         return ValueRenderingHelper
-            .getSizeWithUnit(object.getSize());
+            .getSizeInBytes(object.getSize());
       }
     }, translations.sizeLabel());
 

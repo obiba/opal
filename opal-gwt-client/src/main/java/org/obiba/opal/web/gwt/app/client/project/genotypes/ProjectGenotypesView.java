@@ -514,7 +514,7 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
 
       @Override
       public String getValue(VCFSummaryDto vcfSummaryDto) {
-        return Integer.toString(vcfSummaryDto.getGenotypesCount());
+        return ValueRenderingHelper.getSize(vcfSummaryDto.getGenotypesCount());
       }
     };
 
@@ -567,8 +567,8 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     static final Column<VCFSummaryDto, String> FILE_SIZE = new TextColumn<VCFSummaryDto>() {
 
       @Override
-      public String getValue(VCFSummaryDto object) {
-        return ValueRenderingHelper.getSizeWithUnit(object.getSize());
+      public String getValue(VCFSummaryDto vcfSummaryDto) {
+        return ValueRenderingHelper.getSizeInBytes(vcfSummaryDto.getSize());
       }
     };
   }
