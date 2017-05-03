@@ -23,6 +23,8 @@ public final class Places {
 
   public static final String PROJECTS = "!projects";
 
+  public static final String SEARCH = "!search";
+
   public static final String PROJECT = "!project";
 
   public static final String IDENTIFIERS = "!identifiers";
@@ -45,7 +47,7 @@ public final class Places {
 
   public static final String DATABASES = "!databases";
 
-  public static final String INDEX = "!search";
+  public static final String INDEX = "!index";
 
   public static final String DATASHIELD = "!datashield";
 

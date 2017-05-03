@@ -74,6 +74,9 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
   NavLink projectsItem;
 
   @UiField
+  NavLink searchItem;
+
+  @UiField
   Panel notification;
 
   @UiField
@@ -116,6 +119,7 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
 
     dashboardItem.setHref("#" + Places.DASHBOARD);
     projectsItem.setHref("#" + Places.PROJECTS);
+    searchItem.setHref("#" + Places.SEARCH);
     administrationItem.setHref("#" + Places.ADMINISTRATION);
     profileItem.setHref("#" + Places.PROFILE);
 

@@ -25,6 +25,9 @@
         <b:NavLink ui:field="projectsItem">
           <ui:msg description="Projects label">Projects</ui:msg>
         </b:NavLink>
+        <b:NavLink ui:field="searchItem" visible="false">
+          <ui:msg description="Search label">Search</ui:msg>
+        </b:NavLink>
       </b:Nav>
 
       <b:Nav alignment="RIGHT">
