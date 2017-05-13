@@ -20,21 +20,7 @@ import javax.validation.constraints.NotNull;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.util.EntityUtils;
-import org.obiba.magma.AbstractVariableValueSource;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.Initialisable;
-import org.obiba.magma.NoSuchValueSetException;
-import org.obiba.magma.NoSuchVariableException;
-import org.obiba.magma.Timestamps;
-import org.obiba.magma.Value;
-import org.obiba.magma.ValueSet;
-import org.obiba.magma.ValueSource;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueType;
-import org.obiba.magma.Variable;
-import org.obiba.magma.VariableEntity;
-import org.obiba.magma.VectorSource;
-import org.obiba.magma.VectorSourceNotSupportedException;
+import org.obiba.magma.*;
 import org.obiba.magma.support.AbstractValueTable;
 import org.obiba.magma.support.ValueSetBean;
 import org.obiba.magma.support.VariableEntityBean;
@@ -71,6 +57,8 @@ public class RestValueTable extends AbstractValueTable {
 
   private boolean valueSetsTimestampsSupported = true;
 
+  private boolean variablesInitialised = false;
+
   RestValueTable(Datasource datasource, TableDto dto) {
     super(datasource, dto.getName());
     tableDto = dto;
@@ -85,16 +73,36 @@ public class RestValueTable extends AbstractValueTable {
 
   @Override
   public void initialise() {
-    super.initialise();
     FederatedVariableEntityProvider provider = new FederatedVariableEntityProvider();
     provider.initialise();
     setVariableEntityProvider(provider);
+  }
 
+  private void initialiseVariables() {
     Iterable<VariableDto> variables = getOpalClient()
         .getResources(VariableDto.class, newReference("variables"), VariableDto.newBuilder());
     for(final VariableDto dto : variables) {
       addVariableValueSource(new RestVariableValueSource(dto));
     }
+    variablesInitialised = true;
+  }
+
+  @Override
+  public boolean hasVariable(String variableName) {
+    if (!variablesInitialised) initialiseVariables();
+    return super.hasVariable(variableName);
+  }
+
+  @Override
+  public VariableValueSource getVariableValueSource(String variableName) throws NoSuchVariableException {
+    if (!variablesInitialised) initialiseVariables();
+    return super.getVariableValueSource(variableName);
+  }
+
+  @Override
+  protected Set<VariableValueSource> getSources() {
+    if (!variablesInitialised) initialiseVariables();
+    return super.getSources();
   }
 
   @Override
