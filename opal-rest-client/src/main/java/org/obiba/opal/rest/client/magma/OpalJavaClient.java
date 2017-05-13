@@ -239,9 +239,9 @@ public class OpalJavaClient {
     String rootPath = root.getPath();
     if(!rootPath.endsWith("/")) {
       try {
-        return new UriBuilder(
-            new URI(root.getScheme(), root.getHost() + ":" + root.getPort(), rootPath + "/", root.getQuery(),
-                root.getFragment()));
+        String authority = root.getHost();
+        if (root.getPort()>0) authority = authority + ":" + root.getPort();
+        return new UriBuilder(new URI(root.getScheme(), authority, rootPath + "/", root.getQuery(), root.getFragment()));
       } catch(URISyntaxException e) {
         throw new RuntimeException(e);
       }
