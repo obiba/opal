@@ -23,14 +23,12 @@ import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.spi.search.ValueTableIndex;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.EsResultConverter;
-import org.obiba.opal.web.search.support.IndexManagerHelper;
 import org.obiba.opal.web.search.support.QueryTermConverter;
 import org.obiba.opal.web.search.support.SearchQueryExecutor;
+import org.obiba.opal.web.search.support.ValueTableIndexManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
 
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.HashMap;
@@ -49,33 +47,29 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
 
   private final int termsFacetSizeLimit;
 
-  public EsSearchQueryExecutor(@NotNull ElasticSearchProvider esProvider, int termsFacetSizeLimit) {
-    Assert.notNull(esProvider, "Elastic Search provider is null!");
+  private final ValueTableIndexManager valueTableIndexManager;
+
+  public EsSearchQueryExecutor(ElasticSearchProvider esProvider, ValueTableIndexManager valueTableIndexManager, int termsFacetSizeLimit) {
     this.esProvider = esProvider;
+    this.valueTableIndexManager = valueTableIndexManager;
     this.termsFacetSizeLimit = termsFacetSizeLimit;
   }
 
   /**
    * Executes an elastic search query.
    *
-   * @param indexManagerHelper
    * @param dtoQueries
    * @return
    * @throws JSONException
    */
   @Override
-  public Search.QueryResultDto execute(@NotNull IndexManagerHelper indexManagerHelper,
-      @NotNull Search.QueryTermsDto dtoQueries) throws JSONException {
-
-    Assert.notNull(indexManagerHelper, "Index Manager Helper is null!");
-    Assert.notNull(dtoQueries, "Query dto request is null!");
-
+  public Search.QueryResultDto execute(Search.QueryTermsDto dtoQueries) throws JSONException {
     final CountDownLatch latch = new CountDownLatch(1);
     final AtomicReference<Response> ref = new AtomicReference<>();
 
-    String body = build(dtoQueries, indexManagerHelper);
+    String body = build(dtoQueries, valueTableIndexManager);
 
-    RestRequest request = new EsRestRequest(indexManagerHelper.getValueTableIndex(), body, "_search");
+    RestRequest request = new EsRestRequest(valueTableIndexManager.getValueTableValuesIndex(), body, "_search");
     esProvider.getRest().dispatchRequest(request,
         new RestChannel(request, true) {
 
@@ -115,22 +109,16 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
   /**
    * Executes a single elastic search query.
    *
-   * @param indexManagerHelper
    * @param dtoQuery
    * @return
    * @throws JSONException
    */
   @Override
-  public Search.QueryResultDto execute(@NotNull IndexManagerHelper indexManagerHelper,
-      @NotNull Search.QueryTermDto dtoQuery) throws JSONException {
-
-    Assert.notNull(indexManagerHelper, "Index Manager Helper is null!");
-    Assert.notNull(dtoQuery, "Query dto request is null!");
-
+  public Search.QueryResultDto execute(Search.QueryTermDto dtoQuery) throws JSONException {
     // wrap in a QueryTermsDto for API uniformity
     Search.QueryTermsDto dtoQueries = Search.QueryTermsDto.newBuilder().addQueries(dtoQuery).build();
 
-    return execute(indexManagerHelper, dtoQueries);
+    return execute(dtoQueries);
   }
 
   private Response convert(RestResponse response) throws IOException {
@@ -144,8 +132,8 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
     return Response.status(response.status().getStatus()).entity(entity).type(response.contentType()).build();
   }
 
-  private String build(Search.QueryTermsDto dtoQueries, IndexManagerHelper indexManagerHelper) throws JSONException {
-    QueryTermConverter converter = new QueryTermConverter(indexManagerHelper, termsFacetSizeLimit);
+  private String build(Search.QueryTermsDto dtoQueries, ValueTableIndexManager valueTableIndexManager) throws JSONException {
+    QueryTermConverter converter = new QueryTermConverter(valueTableIndexManager, termsFacetSizeLimit);
     JSONObject queryJSON = converter.convert(dtoQueries);
 
     return queryJSON.toString();

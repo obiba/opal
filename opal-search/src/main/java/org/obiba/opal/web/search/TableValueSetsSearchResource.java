@@ -68,7 +68,7 @@ public class TableValueSetsSearchResource extends AbstractSearchUtility {
       @QueryParam("select") String select) throws JSONException {
 
     if(!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-    if(!valuesIndexManager.hasIndex(getValueTable())) return Response.status(Response.Status.NOT_FOUND).build();
+    if(!opalSearchService.getValuesIndexManager().hasIndex(getValueTable())) return Response.status(Response.Status.NOT_FOUND).build();
 
     JSONObject jsonResponse = executeQuery(buildQuerySearch(query, offset, limit, null, null, null, null).build());
 
@@ -110,7 +110,7 @@ public class TableValueSetsSearchResource extends AbstractSearchUtility {
 
   @Override
   protected String getSearchPath() {
-    return valuesIndexManager.getIndex(getValueTable()).getRequestPath();
+    return opalSearchService.getValuesIndexManager().getIndex(getValueTable()).getRequestPath();
   }
 
   //
@@ -118,8 +118,8 @@ public class TableValueSetsSearchResource extends AbstractSearchUtility {
   //
 
   private boolean canQueryEsIndex() {
-    return searchServiceAvailable() && valuesIndexManager.isReady() &&
-        valuesIndexManager.isIndexUpToDate(getValueTable());
+    return searchServiceAvailable() && opalSearchService.getValuesIndexManager().isReady() &&
+        opalSearchService.getValuesIndexManager().isIndexUpToDate(getValueTable());
   }
 
   private ValueTable getValueTable() {

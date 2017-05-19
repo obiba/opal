@@ -12,10 +12,7 @@ package org.obiba.opal.search;
 import com.google.common.base.Strings;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.obiba.opal.search.es.support.EsQueryExecutor;
 import org.obiba.opal.search.service.OpalSearchService;
-import org.obiba.opal.spi.search.ValuesIndexManager;
-import org.obiba.opal.spi.search.VariablesIndexManager;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.EsResultConverter;
 import org.obiba.opal.web.search.support.QuerySearchJsonBuilder;
@@ -37,12 +34,6 @@ public abstract class AbstractSearchUtility {
   @Autowired
   protected OpalSearchService opalSearchService;
 
-  @Autowired
-  protected ValuesIndexManager valuesIndexManager;
-
-  @Autowired
-  protected VariablesIndexManager variablesIndexManager;
-
   abstract protected String getSearchPath();
 
   protected Search.QueryResultDto convertResponse(JSONObject jsonResponse) throws JSONException {
@@ -63,8 +54,7 @@ public abstract class AbstractSearchUtility {
   }
 
   protected JSONObject executeQuery(JSONObject jsonQuery) throws JSONException {
-    EsQueryExecutor queryExecutor = new EsQueryExecutor(opalSearchService).setSearchPath(getSearchPath());
-    return queryExecutor.executePost(jsonQuery);
+    return opalSearchService.executeQuery(jsonQuery, getSearchPath());
   }
 
   protected boolean searchServiceAvailable() {

@@ -40,7 +40,7 @@ public class ValueTableIndexResource extends IndexResource {
   @GET
   @OPTIONS
   public Response getTableStatus() {
-    if(!valuesIndexManager.isReady()) {
+    if(!opalSearchService.getValuesIndexManager().isReady()) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
     }
 
@@ -62,7 +62,7 @@ public class ValueTableIndexResource extends IndexResource {
       dtoBuilder.setTableLastUpdate(valueTable.getTimestamps().getLastUpdate().toString());
     }
 
-    Timestamps indexTimestamps = valuesIndexManager.getIndex(valueTable).getTimestamps();
+    Timestamps indexTimestamps = opalSearchService.getValuesIndexManager().getIndex(valueTable).getTimestamps();
     if(!indexTimestamps.getCreated().isNull()) {
       dtoBuilder.setIndexCreated(indexTimestamps.getCreated().toString());
     }
@@ -82,8 +82,8 @@ public class ValueTableIndexResource extends IndexResource {
     ValueTable valueTable = getValueTable(datasource, table);
     if(!isInProgress(datasource, table)) {
       // synchronize variable index and values index
-      synchroManager.synchronizeIndex(variablesIndexManager, valueTable, 0);
-      synchroManager.synchronizeIndex(valuesIndexManager, valueTable, 0);
+      synchroManager.synchronizeIndex(opalSearchService.getVariablesIndexManager(), valueTable, 0);
+      synchroManager.synchronizeIndex(opalSearchService.getValuesIndexManager(), valueTable, 0);
     }
     return Response.ok().build();
   }

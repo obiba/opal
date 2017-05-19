@@ -82,6 +82,6 @@ public class SearchQueryWhereClause extends AbstractSearchUtility implements Que
 
   @Override
   protected String getSearchPath() {
-    return valuesIndexManager.getIndex(valueTable).getRequestPath();
+    return opalSearchService.getValuesIndexManager().getIndex(valueTable).getRequestPath();
   }
 }

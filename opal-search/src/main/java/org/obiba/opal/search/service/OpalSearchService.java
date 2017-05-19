@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.search.service;
 
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.node.Node;
@@ -23,8 +25,15 @@ import org.obiba.opal.search.IndexSynchronizationManager;
 import org.obiba.opal.search.es.ElasticSearchConfiguration;
 import org.obiba.opal.search.es.ElasticSearchConfigurationService;
 import org.obiba.opal.search.es.ElasticSearchProvider;
+import org.obiba.opal.search.es.support.EsQueryExecutor;
+import org.obiba.opal.search.es.support.EsSearchQueryExecutor;
 import org.obiba.opal.spi.search.SearchService;
+import org.obiba.opal.spi.search.ValuesIndexManager;
+import org.obiba.opal.spi.search.VariablesIndexManager;
+import org.obiba.opal.web.search.support.SearchQueryExecutor;
+import org.obiba.opal.web.search.support.ValueTableIndexManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -39,6 +48,9 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
 
   public static final String PATH_WORK = "${OPAL_HOME}/work/elasticsearch/work";
 
+  @Value("${org.obiba.opal.web.search.termsFacetSizeLimit}")
+  private int termsFacetSizeLimit;
+
   @Autowired
   private ElasticSearchConfigurationService configService;
 
@@ -47,6 +59,12 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
 
   @Autowired
   private OpalRuntime opalRuntime;
+
+  @Autowired
+  protected ValuesIndexManager valuesIndexManager;
+
+  @Autowired
+  protected VariablesIndexManager variablesIndexManager;
 
   private Node esNode;
 
@@ -102,6 +120,28 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
   @Override
   public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
     return configService.getConfig();
+  }
+
+  //
+  // Search methods
+  //
+
+  public VariablesIndexManager getVariablesIndexManager() {
+    return variablesIndexManager;
+  }
+
+  public ValuesIndexManager getValuesIndexManager() {
+    return valuesIndexManager;
+  }
+
+  public JSONObject executeQuery(JSONObject jsonQuery, String searchPath) throws JSONException {
+    EsQueryExecutor queryExecutor = new EsQueryExecutor(this).setSearchPath(searchPath);
+    return queryExecutor.executePost(jsonQuery);
+  }
+
+  public SearchQueryExecutor createQueryExecutor(String datasource, String table) {
+    ValueTableIndexManager valueTableIndexManager = new ValueTableIndexManager(getValuesIndexManager(), datasource, table);
+    return new EsSearchQueryExecutor(this, valueTableIndexManager, termsFacetSizeLimit);
   }
 
   //

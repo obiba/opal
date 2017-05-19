@@ -43,7 +43,7 @@ public class SearchServiceResource extends IndexResource {
     List<Opal.TableIndexStatusDto> tableStatusDtos = Lists.newArrayList();
 
     // ES is available
-    if(!valuesIndexManager.isReady() || opalSearchService.isEnabled()) return tableStatusDtos;
+    if(!opalSearchService.getValuesIndexManager().isReady() || opalSearchService.isEnabled()) return tableStatusDtos;
 
     for(Datasource datasource : MagmaEngine.get().getDatasources()) {
       for(ValueTable valueTable : datasource.getValueTables()) {
@@ -58,14 +58,14 @@ public class SearchServiceResource extends IndexResource {
   @PUT
   @Path("/cfg/enabled")
   public Response enableIndexing() {
-    valuesIndexManager.setEnabled(true);
+    opalSearchService.getValuesIndexManager().setEnabled(true);
     return Response.ok().build();
   }
 
   @GET
   @Path("/cfg/enabled")
   public Response isEnableIndexing() {
-    return valuesIndexManager.isEnabled()
+    return opalSearchService.getValuesIndexManager().isEnabled()
         ? Response.ok().build()
         : Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
   }
@@ -73,7 +73,7 @@ public class SearchServiceResource extends IndexResource {
   @DELETE
   @Path("/cfg/enabled")
   public Response disableIndexing() {
-    valuesIndexManager.setEnabled(false);
+    opalSearchService.getValuesIndexManager().setEnabled(false);
     return Response.ok().build();
   }
 
@@ -113,13 +113,13 @@ public class SearchServiceResource extends IndexResource {
       tableStatusDto = tableStatusDto.toBuilder().setTableLastUpdate(timestamps.getLastUpdate().toString()).build();
     }
 
-    if(!valuesIndexManager.getIndex(valueTable).getTimestamps().getCreated().isNull()) {
+    if(!opalSearchService.getValuesIndexManager().getIndex(valueTable).getTimestamps().getCreated().isNull()) {
       tableStatusDto = tableStatusDto.toBuilder()
-          .setIndexCreated(valuesIndexManager.getIndex(valueTable).getTimestamps().getCreated().toString()).build();
+          .setIndexCreated(opalSearchService.getValuesIndexManager().getIndex(valueTable).getTimestamps().getCreated().toString()).build();
     }
-    if(!valuesIndexManager.getIndex(valueTable).getTimestamps().getLastUpdate().isNull()) {
+    if(!opalSearchService.getValuesIndexManager().getIndex(valueTable).getTimestamps().getLastUpdate().isNull()) {
       tableStatusDto = tableStatusDto.toBuilder()
-          .setIndexLastUpdate(valuesIndexManager.getIndex(valueTable).getTimestamps().getLastUpdate().toString())
+          .setIndexLastUpdate(opalSearchService.getValuesIndexManager().getIndex(valueTable).getTimestamps().getLastUpdate().toString())
           .build();
     }
 

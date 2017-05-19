@@ -9,23 +9,20 @@
  */
 package org.obiba.opal.web.search;
 
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Response;
-
 import org.codehaus.jettison.json.JSONException;
 import org.obiba.opal.search.service.OpalSearchService;
-import org.obiba.opal.spi.search.ValuesIndexManager;
 import org.obiba.opal.web.model.Search;
-import org.obiba.opal.web.search.support.IndexManagerHelper;
-import org.obiba.opal.web.search.support.SearchQueryExecutorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
 
 /**
  * Elastic Search API resource that provides a secure mechanism of performing queries on the indexes without exposing
@@ -40,12 +37,6 @@ public class ValueTableFacetsResource {
 
   @Autowired
   protected OpalSearchService opalSearchService;
-
-  @Autowired
-  private ValuesIndexManager indexManager;
-
-  @Autowired
-  private SearchQueryExecutorFactory searchQueryFactory;
 
   @PathParam("ds")
   private String datasource;
@@ -62,9 +53,7 @@ public class ValueTableFacetsResource {
     }
 
     try {
-      IndexManagerHelper indexManagerHelper = new IndexManagerHelper(indexManager).setDatasource(datasource)
-          .setTable(table);
-      Search.QueryResultDto dtoResult = searchQueryFactory.create().execute(indexManagerHelper, dtoQueries);
+      Search.QueryResultDto dtoResult = opalSearchService.createQueryExecutor(datasource, table).execute(dtoQueries);
       return Response.ok().entity(dtoResult).build();
     } catch(UnsupportedOperationException e) {
       return Response.status(Response.Status.BAD_REQUEST).build();

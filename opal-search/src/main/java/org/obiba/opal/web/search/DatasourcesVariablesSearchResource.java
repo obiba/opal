@@ -64,7 +64,7 @@ public class DatasourcesVariablesSearchResource extends AbstractSearchUtility {
 
   @Override
   protected String getSearchPath() {
-    return variablesIndexManager.getName();
+    return opalSearchService.getVariablesIndexManager().getName();
   }
 
   @Override
@@ -82,7 +82,7 @@ public class DatasourcesVariablesSearchResource extends AbstractSearchUtility {
 
     for(Datasource datasource : MagmaEngine.get().getDatasources()) {
       for(ValueTable valueTable : datasource.getValueTables()) {
-        types.add(variablesIndexManager.getIndex(valueTable).getIndexName());
+        types.add(opalSearchService.getVariablesIndexManager().getIndex(valueTable).getIndexName());
       }
     }
 

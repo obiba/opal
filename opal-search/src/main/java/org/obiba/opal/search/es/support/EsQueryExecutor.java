@@ -44,10 +44,6 @@ public class EsQueryExecutor {
     return this;
   }
 
-  public JSONObject executeGet(JSONObject jsonBody) throws JSONException {
-    return execute(jsonBody, RestRequest.Method.GET);
-  }
-
   public JSONObject executePost(JSONObject jsonBody) throws JSONException {
     return execute(jsonBody, RestRequest.Method.POST);
   }

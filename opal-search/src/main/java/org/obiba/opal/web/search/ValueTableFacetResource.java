@@ -9,24 +9,21 @@
  */
 package org.obiba.opal.web.search;
 
+import org.codehaus.jettison.json.JSONException;
+import org.obiba.opal.search.service.OpalSearchService;
+import org.obiba.opal.web.model.Search;
+import org.obiba.opal.web.search.support.QueryTermDtoBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import javax.annotation.Nullable;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-
-import org.codehaus.jettison.json.JSONException;
-import org.obiba.opal.search.service.OpalSearchService;
-import org.obiba.opal.spi.search.ValuesIndexManager;
-import org.obiba.opal.web.model.Search;
-import org.obiba.opal.web.search.support.IndexManagerHelper;
-import org.obiba.opal.web.search.support.QueryTermDtoBuilder;
-import org.obiba.opal.web.search.support.SearchQueryExecutorFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Elastic Search API resource that provides a secure mechanism of performing queries on the indexes without exposing
@@ -39,12 +36,6 @@ public class ValueTableFacetResource {
 
   @Autowired
   protected OpalSearchService opalSearchService;
-
-  @Autowired
-  private ValuesIndexManager indexManager;
-
-  @Autowired
-  private SearchQueryExecutorFactory searchQueryFactory;
 
   @PathParam("ds")
   private String datasource;
@@ -71,11 +62,8 @@ public class ValueTableFacetResource {
     Search.QueryResultDto dtoResult;
 
     try {
-      IndexManagerHelper indexManagerHelper = new IndexManagerHelper(indexManager).setDatasource(datasource)
-          .setTable(table);
       QueryTermDtoBuilder dtoBuilder = new QueryTermDtoBuilder("0").variableTermDto(variable, type);
-
-      dtoResult = searchQueryFactory.create().execute(indexManagerHelper, dtoBuilder.build());
+      dtoResult = opalSearchService.createQueryExecutor(datasource, table).execute(dtoBuilder.build());
 
     } catch(UnsupportedOperationException|JSONException e) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();

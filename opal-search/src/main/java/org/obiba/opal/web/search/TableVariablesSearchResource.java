@@ -57,7 +57,7 @@ public class TableVariablesSearchResource extends AbstractSearchUtility {
 
     try {
       if(!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-      if(!variablesIndexManager.hasIndex(getValueTable())) return Response.status(Response.Status.NOT_FOUND).build();
+      if(!opalSearchService.getVariablesIndexManager().hasIndex(getValueTable())) return Response.status(Response.Status.NOT_FOUND).build();
       QuerySearchJsonBuilder jsonBuiler = buildQuerySearch(query, offset, limit, fields, facets, sortField, sortDir);
       JSONObject jsonResponse = executeQuery(jsonBuiler.build());
       Search.QueryResultDto dtoResponse = convertResponse(jsonResponse, addVariableDto);
@@ -73,7 +73,7 @@ public class TableVariablesSearchResource extends AbstractSearchUtility {
 
   @Override
   protected String getSearchPath() {
-    return variablesIndexManager.getIndex(getValueTable()).getRequestPath();
+    return opalSearchService.getVariablesIndexManager().getIndex(getValueTable()).getRequestPath();
   }
 
   protected Search.QueryResultDto convertResponse(JSONObject jsonResponse, boolean addVariableDto)
@@ -84,8 +84,8 @@ public class TableVariablesSearchResource extends AbstractSearchUtility {
   }
 
   private boolean canQueryEsIndex() {
-    return searchServiceAvailable() && variablesIndexManager.isReady() &&
-        variablesIndexManager.isIndexUpToDate(getValueTable());
+    return searchServiceAvailable() && opalSearchService.getVariablesIndexManager().isReady() &&
+        opalSearchService.getVariablesIndexManager().isIndexUpToDate(getValueTable());
   }
 
   private ValueTable getValueTable() {
