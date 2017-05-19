@@ -15,8 +15,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.codehaus.jettison.json.JSONException;
-import org.obiba.opal.search.ValuesIndexManager;
-import org.obiba.opal.search.es.ElasticSearchProvider;
+import org.obiba.opal.search.service.OpalSearchService;
+import org.obiba.opal.spi.search.ValuesIndexManager;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.IndexManagerHelper;
 import org.obiba.opal.web.search.support.SearchQueryExecutorFactory;
@@ -39,7 +39,7 @@ public class ValueTableFacetsResource {
   private static final Logger log = LoggerFactory.getLogger(ValueTableFacetsResource.class);
 
   @Autowired
-  protected ElasticSearchProvider esProvider;
+  protected OpalSearchService opalSearchService;
 
   @Autowired
   private ValuesIndexManager indexManager;
@@ -57,7 +57,7 @@ public class ValueTableFacetsResource {
   @Path("/_search")
   @Transactional(readOnly = true)
   public Response search(Search.QueryTermsDto dtoQueries) {
-    if(!esProvider.isEnabled()) {
+    if(!opalSearchService.isEnabled()) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
     }
 

@@ -13,8 +13,8 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.opal.core.domain.VariableNature;
-import org.obiba.opal.search.ValueTableValuesIndex;
-import org.obiba.opal.search.ValuesIndexManager;
+import org.obiba.opal.spi.search.ValueTableValuesIndex;
+import org.obiba.opal.spi.search.ValuesIndexManager;
 
 /**
  * Helper class that wraps an IndexManager and provides some utility methods listed below

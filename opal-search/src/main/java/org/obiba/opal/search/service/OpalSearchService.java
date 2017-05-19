@@ -17,11 +17,13 @@ import org.elasticsearch.node.internal.InternalNode;
 import org.elasticsearch.rest.RestController;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.search.IndexSynchronizationManager;
 import org.obiba.opal.search.es.ElasticSearchConfiguration;
 import org.obiba.opal.search.es.ElasticSearchConfigurationService;
 import org.obiba.opal.search.es.ElasticSearchProvider;
+import org.obiba.opal.spi.search.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -43,22 +45,26 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
   @Autowired
   private ApplicationContext applicationContext;
 
+  @Autowired
+  private OpalRuntime opalRuntime;
+
   private Node esNode;
 
   private Client client;
 
   @Override
   public boolean isEnabled() {
-    return configService.getConfig().isEnabled();
+    return configService.getConfig().isEnabled() && hasSearchServicePlugin();
   }
 
   @Override
   public boolean isRunning() {
-    return esNode != null;
+    return esNode != null && hasSearchServicePlugin() && getSearchServicePlugin().isRunning();
   }
 
   @Override
   public void start() {
+    if (hasSearchServicePlugin() && !getSearchServicePlugin().isRunning()) getSearchServicePlugin().start();
     ElasticSearchConfiguration esConfig = configService.getConfig();
     if(!isRunning() && esConfig.isEnabled()) {
       esNode = NodeBuilder.nodeBuilder() //
@@ -77,16 +83,6 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
   }
 
   @Override
-  public Client getClient() {
-    return client;
-  }
-
-  @Override
-  public RestController getRest() {
-    return ((InternalNode) esNode).injector().getInstance(RestController.class);
-  }
-
-  @Override
   public void stop() {
     if(isRunning()) {
       // use applicationContext.getBean() to avoid unresolvable circular reference
@@ -95,6 +91,7 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
       esNode = null;
       client = null;
     }
+    if (hasSearchServicePlugin() && getSearchServicePlugin().isRunning()) getSearchServicePlugin().stop();
   }
 
   @Override
@@ -106,4 +103,27 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
   public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
     return configService.getConfig();
   }
+
+  //
+  // Private methods
+  //
+
+  private SearchService getSearchServicePlugin() {
+    return (SearchService) opalRuntime.getServicePlugin(SearchService.class);
+  }
+
+  private boolean hasSearchServicePlugin() {
+    return opalRuntime.hasServicePlugins(SearchService.class);
+  }
+
+  @Override
+  public Client getClient() {
+    return client;
+  }
+
+  @Override
+  public RestController getRest() {
+    return ((InternalNode) esNode).injector().getInstance(RestController.class);
+  }
+
 }

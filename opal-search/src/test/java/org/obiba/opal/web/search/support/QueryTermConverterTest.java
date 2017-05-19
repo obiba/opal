@@ -28,8 +28,8 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.type.DecimalType;
 import org.obiba.magma.type.PointType;
 import org.obiba.magma.type.TextType;
-import org.obiba.opal.search.ValueTableValuesIndex;
-import org.obiba.opal.search.ValuesIndexManager;
+import org.obiba.opal.spi.search.ValueTableValuesIndex;
+import org.obiba.opal.spi.search.ValuesIndexManager;
 import org.obiba.opal.web.model.Search;
 
 import static org.easymock.EasyMock.createMock;

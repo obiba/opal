@@ -9,12 +9,11 @@
  */
 package org.obiba.opal.search.es.mapping;
 
-import java.io.IOException;
-
-import javax.validation.constraints.NotNull;
-
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.obiba.magma.Attribute;
+
+import javax.validation.constraints.NotNull;
+import java.io.IOException;
 
 public class AttributeMapping {
 

@@ -7,9 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.search;
-
-import javax.validation.constraints.NotNull;
+package org.obiba.opal.spi.search;
 
 import org.obiba.magma.Attribute;
 
@@ -24,6 +22,5 @@ public interface ValueTableVariablesIndex extends ValueTableIndex {
    * @param attribute Attribute
    * @return
    */
-  @NotNull
-  String getFieldName(@NotNull Attribute attribute);
+  String getFieldName(Attribute attribute);
 }

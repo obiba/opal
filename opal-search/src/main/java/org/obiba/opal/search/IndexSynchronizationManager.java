@@ -9,31 +9,29 @@
  */
 package org.obiba.opal.search;
 
-import java.util.Calendar;
-import java.util.Set;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.NoSuchDatasourceException;
-import org.obiba.magma.NoSuchValueTableException;
-import org.obiba.magma.Value;
-import org.obiba.magma.ValueTable;
+import org.obiba.magma.*;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.core.security.BackgroundJobServiceAuthToken;
 import org.obiba.opal.core.tx.TransactionalThreadFactory;
 import org.obiba.opal.search.service.OpalSearchService;
+import org.obiba.opal.spi.search.IndexManager;
+import org.obiba.opal.spi.search.IndexSynchronization;
+import org.obiba.opal.spi.search.ValueTableIndex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Calendar;
+import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Manages {@code IndexSynchronization} tasks. This class will monitor the state of all indices periodically. When an

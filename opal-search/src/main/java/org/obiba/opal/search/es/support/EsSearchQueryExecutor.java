@@ -7,16 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.search.support;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicReference;
-
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.core.Response;
+package org.obiba.opal.search.es.support;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -26,13 +17,26 @@ import org.elasticsearch.common.collect.ImmutableMap;
 import org.elasticsearch.common.lease.Releasable;
 import org.elasticsearch.http.HttpRequest;
 import org.elasticsearch.rest.RestChannel;
+import org.elasticsearch.rest.RestRequest;
 import org.elasticsearch.rest.RestResponse;
-import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.es.ElasticSearchProvider;
+import org.obiba.opal.spi.search.ValueTableIndex;
 import org.obiba.opal.web.model.Search;
+import org.obiba.opal.web.search.support.EsResultConverter;
+import org.obiba.opal.web.search.support.IndexManagerHelper;
+import org.obiba.opal.web.search.support.QueryTermConverter;
+import org.obiba.opal.web.search.support.SearchQueryExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
+
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * This class is responsible for executing an elastic search. The input and output of this class are DTO format.
@@ -71,7 +75,7 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
 
     String body = build(dtoQueries, indexManagerHelper);
 
-    EsRestRequest request = new EsRestRequest(indexManagerHelper.getValueTableIndex(), body, "_search");
+    RestRequest request = new EsRestRequest(indexManagerHelper.getValueTableIndex(), body, "_search");
     esProvider.getRest().dispatchRequest(request,
         new RestChannel(request, true) {
 

@@ -12,12 +12,13 @@ package org.obiba.opal.web.search;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.search.IndexManagerConfigurationService;
-import org.obiba.opal.search.IndexSynchronization;
+import org.obiba.opal.search.service.OpalSearchService;
+import org.obiba.opal.spi.search.IndexSynchronization;
 import org.obiba.opal.search.IndexSynchronizationManager;
 import org.obiba.opal.search.Schedule;
-import org.obiba.opal.search.ValueTableValuesIndex;
-import org.obiba.opal.search.ValuesIndexManager;
-import org.obiba.opal.search.VariablesIndexManager;
+import org.obiba.opal.spi.search.ValueTableValuesIndex;
+import org.obiba.opal.spi.search.ValuesIndexManager;
+import org.obiba.opal.spi.search.VariablesIndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.web.model.Opal;
 import org.slf4j.Logger;
@@ -38,7 +39,7 @@ public abstract class IndexResource {
   protected IndexManagerConfigurationService configService;
 
   @Autowired
-  protected ElasticSearchProvider esProvider;
+  protected OpalSearchService opalSearchService;
 
   @Autowired
   protected IndexSynchronizationManager synchroManager;

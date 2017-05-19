@@ -9,7 +9,8 @@
  */
 package org.obiba.opal.web.search.support;
 
-import org.obiba.opal.search.es.ElasticSearchProvider;
+import org.obiba.opal.search.es.support.EsSearchQueryExecutor;
+import org.obiba.opal.search.service.OpalSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -24,10 +25,10 @@ public class EsSearchQueryExecutorFactory implements SearchQueryExecutorFactory 
   private int termsFacetSizeLimit;
 
   @Autowired
-  private ElasticSearchProvider esProvider;
+  private OpalSearchService opalSearchService;
 
   @Override
   public SearchQueryExecutor create() {
-    return new EsSearchQueryExecutor(esProvider, termsFacetSizeLimit);
+    return new EsSearchQueryExecutor(opalSearchService, termsFacetSizeLimit);
   }
 }

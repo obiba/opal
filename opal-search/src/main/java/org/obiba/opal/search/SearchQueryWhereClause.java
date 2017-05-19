@@ -10,8 +10,7 @@
 
 package org.obiba.opal.search;
 
-import java.util.Collection;
-
+import com.google.common.collect.Lists;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.obiba.magma.Initialisable;
@@ -27,7 +26,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Lists;
+import java.util.Collection;
 
 /**
  * {@link org.obiba.magma.views.WhereClause} that apply a where filter by issuing a query on a table index.

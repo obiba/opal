@@ -9,13 +9,14 @@
  */
 package org.obiba.opal.search;
 
+import org.obiba.magma.ValueTable;
+import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.spi.search.ValueTableIndex;
+import org.obiba.opal.web.model.Opal;
+
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.obiba.magma.ValueTable;
-import org.obiba.opal.core.cfg.OpalConfigurationExtension;
-import org.obiba.opal.web.model.Opal;
 
 public class IndexManagerConfiguration implements OpalConfigurationExtension {
 

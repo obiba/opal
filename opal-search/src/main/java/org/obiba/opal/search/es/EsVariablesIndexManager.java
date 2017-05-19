@@ -9,33 +9,26 @@
  */
 package org.obiba.opal.search.es;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentFactory;
+import org.obiba.magma.*;
+import org.obiba.opal.core.domain.VariableNature;
+import org.obiba.opal.search.es.mapping.AttributeMapping;
+import org.obiba.opal.search.es.mapping.ValueTableVariablesMapping;
+import org.obiba.opal.spi.search.IndexSynchronization;
+import org.obiba.opal.spi.search.ValueTableIndex;
+import org.obiba.opal.spi.search.ValueTableVariablesIndex;
+import org.obiba.opal.spi.search.VariablesIndexManager;
+import org.springframework.stereotype.Component;
+
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import javax.validation.constraints.NotNull;
-
-import org.elasticsearch.action.bulk.BulkRequestBuilder;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
-import org.obiba.magma.Attribute;
-import org.obiba.magma.AttributeAware;
-import org.obiba.magma.Category;
-import org.obiba.magma.Value;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.Variable;
-import org.obiba.opal.core.domain.VariableNature;
-import org.obiba.opal.search.IndexSynchronization;
-import org.obiba.opal.search.ValueTableIndex;
-import org.obiba.opal.search.ValueTableVariablesIndex;
-import org.obiba.opal.search.VariablesIndexManager;
-import org.obiba.opal.search.es.mapping.AttributeMapping;
-import org.obiba.opal.search.es.mapping.ValueTableVariablesMapping;
-import org.springframework.stereotype.Component;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 @Component
 public class EsVariablesIndexManager extends EsIndexManager implements VariablesIndexManager {
