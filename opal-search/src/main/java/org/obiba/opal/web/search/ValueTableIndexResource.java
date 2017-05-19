@@ -175,40 +175,6 @@ public class ValueTableIndexResource extends IndexResource {
     return Response.ok(map.build()).build();
   }
 
-  @GET
-  @POST
-  @Path("_search")
-  public Response search(@Context HttpServletRequest servletRequest, String body) {
-    final CountDownLatch latch = new CountDownLatch(1);
-    final AtomicReference<Response> ref = new AtomicReference<>();
-
-    JaxRsRestRequest request = new JaxRsRestRequest(getValueTableIndex(datasource, table), servletRequest, body, "_search");
-    esProvider.getRest()
-        .dispatchRequest(request,
-            new RestChannel(request, true) {
-
-              @Override
-              public void sendResponse(RestResponse response) {
-                try {
-                  ref.set(convert(response));
-                } catch(IOException e) {
-                  // Not gonna happen
-                } finally {
-                  latch.countDown();
-                }
-              }
-
-            });
-
-    try {
-      latch.await();
-      Response r = ref.get();
-      return r != null ? r : Response.serverError().build();
-    } catch(InterruptedException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   private Response convert(RestResponse response) throws IOException {
     byte[] entity;
     if(response.content() instanceof Releasable) {
