@@ -51,10 +51,6 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
 
   private static final Logger log = LoggerFactory.getLogger(EsIndexManager.class);
 
-  public static final String DEFAULT_OPAL_INDEX_NAME = "opal";
-
-  public static final String DEFAULT_CLUSTER_NAME = "opal";
-
   protected static final int ES_BATCH_SIZE = 100;
 
   @Autowired

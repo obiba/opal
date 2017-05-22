@@ -72,18 +72,19 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
 
   @Override
   public boolean isEnabled() {
-    return configService.getConfig().isEnabled() && hasSearchServicePlugin();
+    return configService.getConfig().isEnabled();
   }
 
   @Override
   public boolean isRunning() {
-    return esNode != null && hasSearchServicePlugin() && getSearchServicePlugin().isRunning();
+    return esNode != null || hasSearchServicePlugin() && getSearchServicePlugin().isRunning();
   }
 
   @Override
   public void start() {
-    if (hasSearchServicePlugin() && !getSearchServicePlugin().isRunning()) getSearchServicePlugin().start();
     ElasticSearchConfiguration esConfig = configService.getConfig();
+    if (esConfig.isEnabled() && hasSearchServicePlugin() && !getSearchServicePlugin().isRunning()) getSearchServicePlugin().start();
+
     if(!isRunning() && esConfig.isEnabled()) {
       esNode = NodeBuilder.nodeBuilder() //
           .client(!esConfig.isDataNode()) //

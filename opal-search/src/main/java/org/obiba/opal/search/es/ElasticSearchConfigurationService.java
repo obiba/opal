@@ -11,6 +11,7 @@ package org.obiba.opal.search.es;
 
 import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.search.es.ElasticSearchConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
