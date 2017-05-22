@@ -22,18 +22,18 @@ import org.springframework.util.Assert;
  */
 public class QueryTermConverter {
 
-  private final IndexManagerHelper indexManagerHelper;
+  private final ValueTableIndexManager valueTableIndexManager;
 
   private final int termsFacetSize;
 
   /**
-   * @param indexManagerHelper - IndexManagerHelper provides certain variable information required for conversion
+   * @param valueTableIndexManager - ValueTableIndexManager provides certain variable information required for conversion
    * @param termsFacetSize - used to limit the 'terms' facet results
    */
-  public QueryTermConverter(IndexManagerHelper indexManagerHelper, int termsFacetSize) {
-    Assert.notNull(indexManagerHelper, "Index Manager Helper is null!");
+  public QueryTermConverter(ValueTableIndexManager valueTableIndexManager, int termsFacetSize) {
+    Assert.notNull(valueTableIndexManager, "Index Manager Helper is null!");
 
-    this.indexManagerHelper = indexManagerHelper;
+    this.valueTableIndexManager = valueTableIndexManager;
     this.termsFacetSize = termsFacetSize;
   }
 
@@ -150,13 +150,13 @@ public class QueryTermConverter {
         jsonAggregation.put("terms", jsonField);
         break;
       case STATS:
-        if(indexManagerHelper.getVariableNature(variable) != VariableNature.CONTINUOUS)
+        if(valueTableIndexManager.getVariableNature(variable) != VariableNature.CONTINUOUS)
           throw new IllegalArgumentException(
               "Statistics aggregation is only applicable to numeric continuous variables");
         jsonAggregation.put("extended_stats", jsonField);
         break;
       case PERCENTILES:
-        if(indexManagerHelper.getVariableNature(variable) != VariableNature.CONTINUOUS)
+        if(valueTableIndexManager.getVariableNature(variable) != VariableNature.CONTINUOUS)
           throw new IllegalArgumentException(
               "Percentiles aggregation is only applicable to numeric continuous variables");
         jsonAggregation.put("percentiles", jsonField);
@@ -178,7 +178,7 @@ public class QueryTermConverter {
     JSONObject jsonField = new JSONObject();
     jsonField.put("field", variableFieldName(variable));
 
-    switch(indexManagerHelper.getVariableNature(variable)) {
+    switch(valueTableIndexManager.getVariableNature(variable)) {
 
       case CONTINUOUS:
         jsonAggregation.put("extended_stats", jsonField);
@@ -261,7 +261,7 @@ public class QueryTermConverter {
   }
 
   private String variableFieldName(String variable) {
-    return indexManagerHelper.getIndexFieldName(variable);
+    return valueTableIndexManager.getIndexFieldName(variable);
   }
 
 }

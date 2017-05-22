@@ -89,6 +89,11 @@ public class OpalRuntimeMock implements OpalRuntime {
   }
 
   @Override
+  public ServicePlugin getServicePlugin(Class clazz) {
+    throw new NoSuchElementException(clazz.getName());
+  }
+
+  @Override
   public boolean hasServicePlugin(String name) {
     return false;
   }

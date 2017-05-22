@@ -9,15 +9,7 @@
  */
 package org.obiba.opal.search.es;
 
-import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Map;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
-
+import com.google.common.collect.Maps;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
@@ -31,19 +23,15 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.indices.IndexMissingException;
 import org.elasticsearch.indices.TypeMissingException;
-import org.obiba.magma.Timestamps;
-import org.obiba.magma.Value;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueTableUpdateListener;
-import org.obiba.magma.Variable;
+import org.obiba.magma.*;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.Timestampeds;
 import org.obiba.magma.type.DateTimeType;
-import org.obiba.opal.search.IndexManager;
 import org.obiba.opal.search.IndexManagerConfigurationService;
-import org.obiba.opal.search.IndexSynchronization;
-import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.service.OpalSearchService;
+import org.obiba.opal.spi.search.IndexManager;
+import org.obiba.opal.spi.search.IndexSynchronization;
+import org.obiba.opal.spi.search.ValueTableIndex;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.VersionProvider;
 import org.slf4j.Logger;
@@ -51,15 +39,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
-import com.google.common.collect.Maps;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Map;
 
 abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener {
 
   private static final Logger log = LoggerFactory.getLogger(EsIndexManager.class);
-
-  public static final String DEFAULT_OPAL_INDEX_NAME = "opal";
-
-  public static final String DEFAULT_CLUSTER_NAME = "opal";
 
   protected static final int ES_BATCH_SIZE = 100;
 

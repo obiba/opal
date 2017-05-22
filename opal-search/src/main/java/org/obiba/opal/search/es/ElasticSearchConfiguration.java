@@ -13,6 +13,10 @@ import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 
 public class ElasticSearchConfiguration implements OpalConfigurationExtension {
 
+  private static final String DEFAULT_OPAL_INDEX_NAME = "opal";
+
+  private static final String DEFAULT_CLUSTER_NAME = "opal";
+
   private Boolean enabled;
 
   private String clusterName;
@@ -32,11 +36,11 @@ public class ElasticSearchConfiguration implements OpalConfigurationExtension {
   }
 
   public String getClusterName() {
-    return clusterName == null ? EsIndexManager.DEFAULT_CLUSTER_NAME : clusterName;
+    return clusterName == null ? DEFAULT_CLUSTER_NAME : clusterName;
   }
 
   public String getIndexName() {
-    return indexName == null ? EsIndexManager.DEFAULT_OPAL_INDEX_NAME : indexName;
+    return indexName == null ? DEFAULT_OPAL_INDEX_NAME : indexName;
   }
 
   public boolean isDataNode() {

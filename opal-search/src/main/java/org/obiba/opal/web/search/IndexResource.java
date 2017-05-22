@@ -12,13 +12,11 @@ package org.obiba.opal.web.search;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.search.IndexManagerConfigurationService;
-import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.IndexSynchronizationManager;
 import org.obiba.opal.search.Schedule;
-import org.obiba.opal.search.ValueTableValuesIndex;
-import org.obiba.opal.search.ValuesIndexManager;
-import org.obiba.opal.search.VariablesIndexManager;
-import org.obiba.opal.search.es.ElasticSearchProvider;
+import org.obiba.opal.search.service.OpalSearchService;
+import org.obiba.opal.spi.search.IndexSynchronization;
+import org.obiba.opal.spi.search.ValueTableValuesIndex;
 import org.obiba.opal.web.model.Opal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,16 +27,10 @@ public abstract class IndexResource {
   private static final Logger log = LoggerFactory.getLogger(IndexResource.class);
 
   @Autowired
-  protected ValuesIndexManager valuesIndexManager;
-
-  @Autowired
-  protected VariablesIndexManager variablesIndexManager;
-
-  @Autowired
   protected IndexManagerConfigurationService configService;
 
   @Autowired
-  protected ElasticSearchProvider esProvider;
+  protected OpalSearchService opalSearchService;
 
   @Autowired
   protected IndexSynchronizationManager synchroManager;
@@ -75,7 +67,7 @@ public abstract class IndexResource {
       return synchroManager.getCurrentTask().getProgress();
     }
 
-    return synchroManager.isAlreadyQueued(valuesIndexManager, getValueTableIndex(datasource, table)) ? 0f : null;
+    return synchroManager.isAlreadyQueued(opalSearchService.getValuesIndexManager(), getValueTableIndex(datasource, table)) ? 0f : null;
   }
 
   protected boolean isInProgress(String datasource, String table) {
@@ -83,7 +75,7 @@ public abstract class IndexResource {
   }
 
   protected ValueTableValuesIndex getValueTableIndex(String datasource, String table) {
-    return valuesIndexManager.getIndex(getValueTable(datasource, table));
+    return opalSearchService.getValuesIndexManager().getIndex(getValueTable(datasource, table));
   }
 
   protected Opal.TableIndexationStatus getTableIndexationStatus(String datasource, String table) {
@@ -92,13 +84,13 @@ public abstract class IndexResource {
 
     // Set Indexation status
     boolean upToDate = getValueTableIndex(datasource, table).isUpToDate();
-    if(valuesIndexManager.isReady() && !upToDate && !inProgress) {
+    if(opalSearchService.getValuesIndexManager().isReady() && !upToDate && !inProgress) {
       return Opal.TableIndexationStatus.OUTDATED;
     }
-    if(valuesIndexManager.isReady() && inProgress) {
+    if(opalSearchService.getValuesIndexManager().isReady() && inProgress) {
       return Opal.TableIndexationStatus.IN_PROGRESS;
     }
-    if(valuesIndexManager.isReady() && upToDate) {
+    if(opalSearchService.getValuesIndexManager().isReady() && upToDate) {
       return Opal.TableIndexationStatus.UPTODATE;
     }
     return Opal.TableIndexationStatus.NOT_INDEXED;

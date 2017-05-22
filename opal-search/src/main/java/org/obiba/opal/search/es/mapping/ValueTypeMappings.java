@@ -9,27 +9,15 @@
  */
 package org.obiba.opal.search.es.mapping;
 
-import java.io.IOException;
-import java.util.Map;
+import com.google.common.collect.ImmutableMap;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.obiba.magma.ValueType;
+import org.obiba.magma.type.*;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.obiba.magma.ValueType;
-import org.obiba.magma.type.BinaryType;
-import org.obiba.magma.type.BooleanType;
-import org.obiba.magma.type.DateTimeType;
-import org.obiba.magma.type.DateType;
-import org.obiba.magma.type.DecimalType;
-import org.obiba.magma.type.IntegerType;
-import org.obiba.magma.type.LineStringType;
-import org.obiba.magma.type.LocaleType;
-import org.obiba.magma.type.PointType;
-import org.obiba.magma.type.PolygonType;
-import org.obiba.magma.type.TextType;
-
-import com.google.common.collect.ImmutableMap;
+import java.io.IOException;
+import java.util.Map;
 
 public class ValueTypeMappings {
 

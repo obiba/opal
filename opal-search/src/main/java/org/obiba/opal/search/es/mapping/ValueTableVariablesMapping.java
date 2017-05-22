@@ -9,11 +9,6 @@
  */
 package org.obiba.opal.search.es.mapping;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.obiba.magma.Attribute;
@@ -23,6 +18,11 @@ import org.obiba.magma.type.BooleanType;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.magma.type.TextType;
 import org.obiba.runtime.Version;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ValueTableVariablesMapping {
 

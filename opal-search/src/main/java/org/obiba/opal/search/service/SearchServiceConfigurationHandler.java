@@ -10,9 +10,6 @@
 
 package org.obiba.opal.search.service;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.obiba.core.util.FileUtil;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.search.es.ElasticSearchConfiguration;
@@ -24,6 +21,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.io.File;
+import java.io.IOException;
 
 @Component
 public class SearchServiceConfigurationHandler implements ServiceConfigurationHandler {

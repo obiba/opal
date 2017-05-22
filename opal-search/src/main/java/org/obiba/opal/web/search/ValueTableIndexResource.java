@@ -9,43 +9,21 @@
  */
 package org.obiba.opal.web.search;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicReference;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.OPTIONS;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-
-import org.elasticsearch.common.bytes.BytesArray;
-import org.elasticsearch.common.bytes.BytesReference;
-import org.elasticsearch.common.collect.Maps;
-import org.elasticsearch.common.lease.Releasable;
-import org.elasticsearch.http.HttpRequest;
-import org.elasticsearch.rest.RestChannel;
-import org.elasticsearch.rest.RestResponse;
-import org.elasticsearch.rest.support.RestUtils;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
-import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.Schedule;
-import org.obiba.opal.search.ValueTableIndex;
-import org.obiba.opal.search.ValueTableValuesIndex;
+import org.obiba.opal.spi.search.IndexSynchronization;
+import org.obiba.opal.spi.search.ValueTableValuesIndex;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.OpalMap;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 
 @Component
 @Transactional(readOnly = true)
@@ -62,7 +40,7 @@ public class ValueTableIndexResource extends IndexResource {
   @GET
   @OPTIONS
   public Response getTableStatus() {
-    if(!valuesIndexManager.isReady()) {
+    if(!opalSearchService.getValuesIndexManager().isReady()) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
     }
 
@@ -84,7 +62,7 @@ public class ValueTableIndexResource extends IndexResource {
       dtoBuilder.setTableLastUpdate(valueTable.getTimestamps().getLastUpdate().toString());
     }
 
-    Timestamps indexTimestamps = valuesIndexManager.getIndex(valueTable).getTimestamps();
+    Timestamps indexTimestamps = opalSearchService.getValuesIndexManager().getIndex(valueTable).getTimestamps();
     if(!indexTimestamps.getCreated().isNull()) {
       dtoBuilder.setIndexCreated(indexTimestamps.getCreated().toString());
     }
@@ -97,22 +75,22 @@ public class ValueTableIndexResource extends IndexResource {
 
   @PUT
   public Response updateIndex() {
-    if(!esProvider.isEnabled()) {
+    if(!opalSearchService.isEnabled()) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
     }
 
     ValueTable valueTable = getValueTable(datasource, table);
     if(!isInProgress(datasource, table)) {
       // synchronize variable index and values index
-      synchroManager.synchronizeIndex(variablesIndexManager, valueTable, 0);
-      synchroManager.synchronizeIndex(valuesIndexManager, valueTable, 0);
+      synchroManager.synchronizeIndex(opalSearchService.getVariablesIndexManager(), valueTable, 0);
+      synchroManager.synchronizeIndex(opalSearchService.getValuesIndexManager(), valueTable, 0);
     }
     return Response.ok().build();
   }
 
   @DELETE
   public Response deleteIndex() {
-    if(!esProvider.isEnabled()) {
+    if(!opalSearchService.isEnabled()) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
     }
 
@@ -175,107 +153,4 @@ public class ValueTableIndexResource extends IndexResource {
     return Response.ok(map.build()).build();
   }
 
-  private Response convert(RestResponse response) throws IOException {
-    byte[] entity;
-    if(response.content() instanceof Releasable) {
-      entity = new byte[response.content().length()];
-      System.arraycopy(response.content().toBytes(), 0, entity, 0, response.content().length());
-    } else {
-      entity = response.content().toBytes();
-    }
-    return Response.status(response.status().getStatus()).entity(entity).type(response.contentType()).build();
-  }
-
-  private static class JaxRsRestRequest extends HttpRequest {
-
-    private final String body;
-
-    private final HttpServletRequest servletRequest;
-
-    private final Map<String, String> params;
-
-    private final String rawPath;
-
-    private final String esUri;
-
-    private final Map<String, String> headers;
-
-    JaxRsRestRequest(ValueTableIndex tableIndex, HttpServletRequest servletRequest, String body, String path) {
-      this.body = body;
-      this.servletRequest = servletRequest;
-      params = Maps.newHashMap();
-      headers = Maps.newHashMap();
-      rawPath = tableIndex.getRequestPath() + "/" + path;
-
-      // Reconstruct the uri
-      String queryString = servletRequest.getQueryString();
-      esUri = rawPath + (queryString == null ? "" : '?' + queryString);
-
-      RestUtils.decodeQueryString(queryString == null ? "" : queryString, 0, params);
-
-      // headers
-      String cType = servletRequest.getHeader("Content-Type");
-      if(cType == null) {
-        cType = "application/json";
-      }
-      headers.put("Content-Type", cType);
-    }
-
-    @Override
-    public Method method() {
-      return Method.valueOf(servletRequest.getMethod().toUpperCase());
-    }
-
-    @Override
-    public String uri() {
-      return esUri;
-    }
-
-    @Override
-    public String rawPath() {
-      int pathEndPos = esUri.indexOf('?');
-      return pathEndPos < 0 ? esUri : esUri.substring(0, pathEndPos);
-    }
-
-    @Override
-    public boolean hasContent() {
-      return body != null && !body.isEmpty();
-    }
-
-    @Override
-    public String header(String name) {
-      return headers.get(name);
-    }
-
-    @Override
-    public Iterable<Map.Entry<String, String>> headers() {
-      return headers.entrySet();
-    }
-
-    @Override
-    public boolean hasParam(String key) {
-      return params.containsKey(key);
-    }
-
-    @Override
-    public String param(String key) {
-      return params.get(key);
-    }
-
-    @Override
-    public Map<String, String> params() {
-      return params;
-    }
-
-    @Override
-    public String param(String key, String defaultValue) {
-      return hasParam(key) ? param(key) : defaultValue;
-    }
-
-    @Override
-    public BytesReference content() {
-      return new BytesArray(body);
-    }
-
-  }
 }

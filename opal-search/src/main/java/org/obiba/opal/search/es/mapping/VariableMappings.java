@@ -9,13 +9,12 @@
  */
 package org.obiba.opal.search.es.mapping;
 
-import java.io.IOException;
-
+import com.google.common.collect.ImmutableList;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.obiba.magma.Variable;
 import org.obiba.magma.type.TextType;
 
-import com.google.common.collect.ImmutableList;
+import java.io.IOException;
 
 public class VariableMappings {
 

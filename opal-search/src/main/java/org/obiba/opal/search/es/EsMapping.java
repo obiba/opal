@@ -9,13 +9,13 @@
  */
 package org.obiba.opal.search.es;
 
-import java.io.IOException;
-import java.util.Map;
-
 import org.elasticsearch.common.collect.Maps;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.json.JsonXContent;
+
+import java.io.IOException;
+import java.util.Map;
 
 class EsMapping {
 

@@ -13,32 +13,24 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.opal.core.domain.VariableNature;
-import org.obiba.opal.search.ValueTableValuesIndex;
-import org.obiba.opal.search.ValuesIndexManager;
+import org.obiba.opal.spi.search.ValueTableValuesIndex;
+import org.obiba.opal.spi.search.ValuesIndexManager;
 
 /**
  * Helper class that wraps an IndexManager and provides some utility methods listed below
  */
-public class IndexManagerHelper {
+public class ValueTableIndexManager {
 
-  private final ValuesIndexManager indexManager;
+  private final ValuesIndexManager valuesIndexManager;
 
-  private String datasource;
+  private final String datasource;
 
-  private String table;
+  private final String table;
 
-  public IndexManagerHelper(ValuesIndexManager indexManager) {
-    this.indexManager = indexManager;
-  }
-
-  public IndexManagerHelper setDatasource(@SuppressWarnings("ParameterHidesMemberVariable") String datasource) {
+  public ValueTableIndexManager(ValuesIndexManager valuesIndexManager, String datasource, String table) {
+    this.valuesIndexManager = valuesIndexManager;
     this.datasource = datasource;
-    return this;
-  }
-
-  public IndexManagerHelper setTable(@SuppressWarnings("ParameterHidesMemberVariable") String table) {
     this.table = table;
-    return this;
   }
 
   public VariableNature getVariableNature(String variableName) {
@@ -47,16 +39,12 @@ public class IndexManagerHelper {
     return VariableNature.getNature(var);
   }
 
-  public String getIndexName() {
-    return getValueTableIndex().getIndexName();
-  }
-
   public String getIndexFieldName(String variable) {
-    return getValueTableIndex().getFieldName(variable);
+    return getValueTableValuesIndex().getFieldName(variable);
   }
 
-  public ValueTableValuesIndex getValueTableIndex() {
-    return indexManager.getIndex(getValueTable());
+  public ValueTableValuesIndex getValueTableValuesIndex() {
+    return valuesIndexManager.getIndex(getValueTable());
   }
 
   private ValueTable getValueTable() {

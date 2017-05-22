@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.search.service;
 
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.node.Node;
@@ -17,12 +19,21 @@ import org.elasticsearch.node.internal.InternalNode;
 import org.elasticsearch.rest.RestController;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.search.IndexSynchronizationManager;
 import org.obiba.opal.search.es.ElasticSearchConfiguration;
 import org.obiba.opal.search.es.ElasticSearchConfigurationService;
 import org.obiba.opal.search.es.ElasticSearchProvider;
+import org.obiba.opal.search.es.support.EsQueryExecutor;
+import org.obiba.opal.search.es.support.EsSearchQueryExecutor;
+import org.obiba.opal.spi.search.SearchService;
+import org.obiba.opal.spi.search.ValuesIndexManager;
+import org.obiba.opal.spi.search.VariablesIndexManager;
+import org.obiba.opal.web.search.support.SearchQueryExecutor;
+import org.obiba.opal.web.search.support.ValueTableIndexManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -37,11 +48,23 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
 
   public static final String PATH_WORK = "${OPAL_HOME}/work/elasticsearch/work";
 
+  @Value("${org.obiba.opal.web.search.termsFacetSizeLimit}")
+  private int termsFacetSizeLimit;
+
   @Autowired
   private ElasticSearchConfigurationService configService;
 
   @Autowired
   private ApplicationContext applicationContext;
+
+  @Autowired
+  private OpalRuntime opalRuntime;
+
+  @Autowired
+  protected ValuesIndexManager valuesIndexManager;
+
+  @Autowired
+  protected VariablesIndexManager variablesIndexManager;
 
   private Node esNode;
 
@@ -54,12 +77,14 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
 
   @Override
   public boolean isRunning() {
-    return esNode != null;
+    return esNode != null || hasSearchServicePlugin() && getSearchServicePlugin().isRunning();
   }
 
   @Override
   public void start() {
     ElasticSearchConfiguration esConfig = configService.getConfig();
+    if (esConfig.isEnabled() && hasSearchServicePlugin() && !getSearchServicePlugin().isRunning()) getSearchServicePlugin().start();
+
     if(!isRunning() && esConfig.isEnabled()) {
       esNode = NodeBuilder.nodeBuilder() //
           .client(!esConfig.isDataNode()) //
@@ -77,16 +102,6 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
   }
 
   @Override
-  public Client getClient() {
-    return client;
-  }
-
-  @Override
-  public RestController getRest() {
-    return ((InternalNode) esNode).injector().getInstance(RestController.class);
-  }
-
-  @Override
   public void stop() {
     if(isRunning()) {
       // use applicationContext.getBean() to avoid unresolvable circular reference
@@ -95,6 +110,7 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
       esNode = null;
       client = null;
     }
+    if (hasSearchServicePlugin() && getSearchServicePlugin().isRunning()) getSearchServicePlugin().stop();
   }
 
   @Override
@@ -106,4 +122,49 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
   public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
     return configService.getConfig();
   }
+
+  //
+  // Search methods
+  //
+
+  public VariablesIndexManager getVariablesIndexManager() {
+    return variablesIndexManager;
+  }
+
+  public ValuesIndexManager getValuesIndexManager() {
+    return valuesIndexManager;
+  }
+
+  public JSONObject executeQuery(JSONObject jsonQuery, String searchPath) throws JSONException {
+    EsQueryExecutor queryExecutor = new EsQueryExecutor(this).setSearchPath(searchPath);
+    return queryExecutor.executePost(jsonQuery);
+  }
+
+  public SearchQueryExecutor createQueryExecutor(String datasource, String table) {
+    ValueTableIndexManager valueTableIndexManager = new ValueTableIndexManager(getValuesIndexManager(), datasource, table);
+    return new EsSearchQueryExecutor(this, valueTableIndexManager, termsFacetSizeLimit);
+  }
+
+  //
+  // Private methods
+  //
+
+  private SearchService getSearchServicePlugin() {
+    return (SearchService) opalRuntime.getServicePlugin(SearchService.class);
+  }
+
+  private boolean hasSearchServicePlugin() {
+    return opalRuntime.hasServicePlugins(SearchService.class);
+  }
+
+  @Override
+  public Client getClient() {
+    return client;
+  }
+
+  @Override
+  public RestController getRest() {
+    return ((InternalNode) esNode).injector().getInstance(RestController.class);
+  }
+
 }

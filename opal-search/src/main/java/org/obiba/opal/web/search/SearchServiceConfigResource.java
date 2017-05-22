@@ -14,7 +14,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
-import org.elasticsearch.common.settings.SettingsException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.web.model.Opal;
@@ -35,7 +34,7 @@ public class SearchServiceConfigResource {
   private ServiceConfigurationHandlerRegistry configHandler;
 
   @PUT
-  public Response startEnable() throws SettingsException {
+  public Response startEnable() {
 
     Service service = opalRuntime.getService("search");
 

@@ -27,6 +27,7 @@ import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
 import org.obiba.opal.fs.security.SecuredOpalFileSystem;
 import org.obiba.opal.spi.ServicePlugin;
+import org.obiba.opal.spi.search.SearchServiceLoader;
 import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.spi.vcf.VCFStoreServiceLoader;
 import org.slf4j.Logger;
@@ -78,12 +79,12 @@ public class DefaultOpalRuntime implements OpalRuntime {
   @Override
   @PostConstruct
   public void start() {
-    initPlugins();
     initExtensions();
-    initMagmaEngine();
-    initServices();
+    initPlugins();
     initFileSystem();
+    initMagmaEngine();
     initServicePlugins();
+    initServices();
   }
 
   @Override
@@ -210,6 +211,11 @@ public class DefaultOpalRuntime implements OpalRuntime {
   }
 
   @Override
+  public ServicePlugin getServicePlugin(Class clazz) {
+    return getServicePlugins(clazz).iterator().next();
+  }
+
+  @Override
   public boolean hasServicePlugin(String name) {
     return servicePlugins.stream().filter(s -> name.equals(s.getName())).count() == 1;
   }
@@ -301,16 +307,21 @@ public class DefaultOpalRuntime implements OpalRuntime {
     Map<String, Plugin> pluginsMap = listPlugins().stream().collect(Collectors.toMap(Plugin::getName, Function.identity()));
     VCFStoreServiceLoader.get().getServices().stream()
         .filter(service -> pluginsMap.containsKey(service.getName()))
-        .forEach(service -> {
-          try {
-            Plugin plugin = pluginsMap.get(service.getName());
-            service.configure(plugin.getProperties());
-            service.start();
-            servicePlugins.add(service);
-          } catch (Exception e) {
-            log.warn("Error initializing/starting plugin service: {}", service.getClass(), e);
-          }
-        });
+        .forEach(service -> registerServicePlugin(pluginsMap, service));
+    SearchServiceLoader.get().getServices().stream()
+        .filter(service -> pluginsMap.containsKey(service.getName()))
+        .forEach(service -> registerServicePlugin(pluginsMap, service));
+  }
+
+  private void registerServicePlugin(Map<String, Plugin> pluginsMap, ServicePlugin service) {
+    try {
+      Plugin plugin = pluginsMap.get(service.getName());
+      service.configure(plugin.getProperties());
+      service.start();
+      servicePlugins.add(service);
+    } catch (Exception e) {
+      log.warn("Error initializing/starting plugin service: {}", service.getClass(), e);
+    }
   }
 
   private void ensureFolder(String path) throws FileSystemException {

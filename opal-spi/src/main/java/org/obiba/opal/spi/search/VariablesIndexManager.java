@@ -7,9 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.search;
-
-import javax.validation.constraints.NotNull;
+package org.obiba.opal.spi.search;
 
 import org.obiba.magma.ValueTable;
 
@@ -24,8 +22,7 @@ public interface VariablesIndexManager extends IndexManager {
    * @param valueTable
    * @return
    */
-  @NotNull
   @Override
-  ValueTableVariablesIndex getIndex(@NotNull ValueTable valueTable);
+  ValueTableVariablesIndex getIndex(ValueTable valueTable);
 
 }

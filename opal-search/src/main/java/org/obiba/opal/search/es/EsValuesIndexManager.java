@@ -9,15 +9,10 @@
  */
 package org.obiba.opal.search.es;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ThreadFactory;
-
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
-
+import com.google.common.base.Predicate;
+import com.google.common.base.Stopwatch;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -32,21 +27,24 @@ import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.DateType;
 import org.obiba.opal.core.domain.VariableNature;
 import org.obiba.opal.core.service.VariableSummaryService;
-import org.obiba.opal.search.IndexSynchronization;
-import org.obiba.opal.search.ValueTableIndex;
-import org.obiba.opal.search.ValueTableValuesIndex;
-import org.obiba.opal.search.ValuesIndexManager;
 import org.obiba.opal.search.es.mapping.ValueTableMapping;
+import org.obiba.opal.spi.search.IndexSynchronization;
+import org.obiba.opal.spi.search.ValueTableIndex;
+import org.obiba.opal.spi.search.ValueTableValuesIndex;
+import org.obiba.opal.spi.search.ValuesIndexManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Stopwatch;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ThreadFactory;
 
 @Component
 @Transactional(readOnly = true)

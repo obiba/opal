@@ -7,13 +7,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.search;
-
-import java.util.Calendar;
-
-import javax.validation.constraints.NotNull;
+package org.obiba.opal.spi.search;
 
 import org.obiba.magma.Timestamped;
+
+import java.util.Calendar;
 
 /**
  * An index of a {@code ValueTable}
@@ -26,7 +24,6 @@ public interface ValueTableIndex extends Timestamped {
    * @return
    */
   // TODO: this should be hidden in the implementation. Probably we should expose some sort of Request/Response api?
-  @NotNull
   String getRequestPath();
 
   /**
@@ -34,7 +31,6 @@ public interface ValueTableIndex extends Timestamped {
    *
    * @return
    */
-  @NotNull
   String getIndexName();
 
   /**
@@ -62,6 +58,5 @@ public interface ValueTableIndex extends Timestamped {
    *
    * @return the current date
    */
-  @NotNull
   Calendar now();
 }

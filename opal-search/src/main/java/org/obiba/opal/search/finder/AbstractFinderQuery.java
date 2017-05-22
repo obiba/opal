@@ -9,10 +9,10 @@
  */
 package org.obiba.opal.search.finder;
 
+import org.obiba.magma.ValueTable;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.obiba.magma.ValueTable;
 
 /**
  *

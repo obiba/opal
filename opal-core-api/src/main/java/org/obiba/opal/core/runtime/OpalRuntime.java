@@ -148,6 +148,14 @@ public interface OpalRuntime extends SystemService {
   Collection<ServicePlugin> getServicePlugins(Class clazz);
 
   /**
+   * Get service plugin of given class as a singleton.
+   *
+   * @param clazz
+   * @return
+   */
+  ServicePlugin getServicePlugin(Class clazz);
+
+  /**
    * Check that a service plugin exists with provided name.
    *
    * @param name

@@ -9,9 +9,6 @@
  */
 package org.obiba.opal.search;
 
-import javax.annotation.Nonnull;
-import javax.validation.constraints.NotNull;
-
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableUpdateListener;
 import org.obiba.magma.Variable;
@@ -19,6 +16,9 @@ import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 @Component
 public class IndexManagerConfigurationService implements ValueTableUpdateListener {

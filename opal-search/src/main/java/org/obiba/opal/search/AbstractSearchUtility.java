@@ -9,22 +9,18 @@
  */
 package org.obiba.opal.search;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
+import com.google.common.base.Strings;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.elasticsearch.rest.RestRequest;
-import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.model.Search;
-import org.obiba.opal.web.search.support.EsQueryExecutor;
 import org.obiba.opal.web.search.support.EsResultConverter;
 import org.obiba.opal.web.search.support.QuerySearchJsonBuilder;
 import org.obiba.opal.web.ws.SortDir;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.google.common.base.Strings;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Base class for searching in variable or value indices.
@@ -37,15 +33,6 @@ public abstract class AbstractSearchUtility {
 
   @Autowired
   protected OpalSearchService opalSearchService;
-
-  @Autowired
-  protected ElasticSearchProvider esProvider;
-
-  @Autowired
-  protected ValuesIndexManager valuesIndexManager;
-
-  @Autowired
-  protected VariablesIndexManager variablesIndexManager;
 
   abstract protected String getSearchPath();
 
@@ -67,8 +54,7 @@ public abstract class AbstractSearchUtility {
   }
 
   protected JSONObject executeQuery(JSONObject jsonQuery) throws JSONException {
-    EsQueryExecutor queryExecutor = new EsQueryExecutor(esProvider).setSearchPath(getSearchPath());
-    return queryExecutor.execute(jsonQuery, RestRequest.Method.POST);
+    return opalSearchService.executeQuery(jsonQuery, getSearchPath());
   }
 
   protected boolean searchServiceAvailable() {

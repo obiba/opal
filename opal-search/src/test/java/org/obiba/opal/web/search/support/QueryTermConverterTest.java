@@ -28,8 +28,8 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.type.DecimalType;
 import org.obiba.magma.type.PointType;
 import org.obiba.magma.type.TextType;
-import org.obiba.opal.search.ValueTableValuesIndex;
-import org.obiba.opal.search.ValuesIndexManager;
+import org.obiba.opal.spi.search.ValueTableValuesIndex;
+import org.obiba.opal.spi.search.ValuesIndexManager;
 import org.obiba.opal.web.model.Search;
 
 import static org.easymock.EasyMock.createMock;
@@ -54,10 +54,10 @@ public class QueryTermConverterTest {
   public void test_convert_ValidCategoricalQueryJson() throws Exception {
 
     String variableName = "LAST_MEAL_WHEN";
-    IndexManagerHelper indexManagerHelper = createIndexManagerHelper("opal-data", "CIPreliminaryQuestionnaire",
+    ValueTableIndexManager valueTableIndexManager = createIndexManagerHelper("opal-data", "CIPreliminaryQuestionnaire",
         "opal-data-cipreliminaryquestionnaire", variableName, createCategoricalVariable(variableName));
 
-    QueryTermConverter converter = new QueryTermConverter(indexManagerHelper, 10);
+    QueryTermConverter converter = new QueryTermConverter(valueTableIndexManager, 10);
     Search.QueryTermsDto dtoQuery = createSimpleQueryDto(variableName);
 
     JSONObject jsonExpected = new JSONObject("{\"query\":{\"match_all\":{} }, \"size\":0, " + //
@@ -71,10 +71,10 @@ public class QueryTermConverterTest {
   @Test
   public void test_convert_ValidStatisticalQueryJson() throws Exception {
     String variableName = "RES_FIRST_HEIGHT";
-    IndexManagerHelper indexManagerHelper = createIndexManagerHelper("opal-data", "StandingHeight",
+    ValueTableIndexManager valueTableIndexManager = createIndexManagerHelper("opal-data", "StandingHeight",
         "opal-data-standingheight", variableName, createContinuousVariable(variableName));
 
-    QueryTermConverter converter = new QueryTermConverter(indexManagerHelper, 10);
+    QueryTermConverter converter = new QueryTermConverter(valueTableIndexManager, 10);
     Search.QueryTermsDto dtoQuery = createSimpleQueryDto(variableName);
 
     JSONObject jsonExpected = new JSONObject("{\"query\":{\"match_all\":{} }, \"size\":0, " + //
@@ -89,10 +89,10 @@ public class QueryTermConverterTest {
   @Test
   public void test_non_categorical_continuous_conversion_limit_one_thousand() throws JSONException {
     String variableName = "NON_CATEGORICAL_CONTINUOUS";
-    IndexManagerHelper indexManagerHelper = createIndexManagerHelper("opal-data", "StandingHeight",
+    ValueTableIndexManager valueTableIndexManager = createIndexManagerHelper("opal-data", "StandingHeight",
         "opal-data-StandingHeight", variableName, createNonCategoricalContinuousVariable(variableName));
 
-    QueryTermConverter converter = new QueryTermConverter(indexManagerHelper, 1000);
+    QueryTermConverter converter = new QueryTermConverter(valueTableIndexManager, 1000);
     Search.QueryTermsDto dtoQuery = createSimpleQueryDto(variableName);
 
     JSONObject jsonExpected = new JSONObject("{\"query\":{\"match_all\":{} }, \"size\":0, " + //
@@ -114,12 +114,12 @@ public class QueryTermConverterTest {
     return Search.QueryTermsDto.newBuilder().addQueries(dtoBuilder.build()).build();
   }
 
-  private IndexManagerHelper createIndexManagerHelper(String datasource, String table, String indexName,
-      String variableName, Variable variable) {
+  private ValueTableIndexManager createIndexManagerHelper(String datasource, String table, String indexName,
+                                                          String variableName, Variable variable) {
 
     ValuesIndexManager indexManager = setupMockObjects(datasource, table, indexName, variableName, variable);
 
-    return new IndexManagerHelper(indexManager).setDatasource(datasource).setTable(table);
+    return new ValueTableIndexManager(indexManager, datasource, table);
   }
 
   private ValuesIndexManager setupMockObjects(String dsName, String table, String indexName, String variableName,

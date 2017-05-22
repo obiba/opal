@@ -16,6 +16,12 @@ import java.util.Properties;
  * Base pluggable service interface.
  */
 public interface ServicePlugin {
+  
+  public static final String DATA_DIR_PROPERTY = "data.dir";
+
+  public static final String WORK_DIR_PROPERTY = "work.dir";
+
+  public static final String INSTALL_DIR_PROPERTY = "install.dir";
 
   /**
    * Service plugin unique name.

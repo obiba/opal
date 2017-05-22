@@ -7,14 +7,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.search.support;
+package org.obiba.opal.search.es.support;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicReference;
-
+import com.google.common.base.Strings;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.elasticsearch.common.bytes.BytesArray;
@@ -28,7 +23,11 @@ import org.elasticsearch.rest.RestResponse;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.springframework.util.Assert;
 
-import com.google.common.base.Strings;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class EsQueryExecutor {
 
@@ -45,11 +44,11 @@ public class EsQueryExecutor {
     return this;
   }
 
-  public JSONObject execute(JSONObject jsonBody) throws JSONException {
-    return execute(jsonBody, RestRequest.Method.GET);
+  public JSONObject executePost(JSONObject jsonBody) throws JSONException {
+    return execute(jsonBody, RestRequest.Method.POST);
   }
 
-  public JSONObject execute(JSONObject jsonBody, RestRequest.Method httpMethod) throws JSONException {
+  private JSONObject execute(JSONObject jsonBody, RestRequest.Method httpMethod) throws JSONException {
     return executeQuery(jsonBody, new EsRestRequest(jsonBody.toString(), searchPath).setHttpMethod(httpMethod));
   }
 

@@ -9,15 +9,15 @@
  */
 package org.obiba.opal.search.es.mapping;
 
-import java.io.IOException;
-import java.util.Date;
-
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.runtime.Version;
+
+import java.io.IOException;
+import java.util.Date;
 
 public class ValueTableMapping {
 
