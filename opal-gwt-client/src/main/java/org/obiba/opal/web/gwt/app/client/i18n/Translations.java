@@ -1711,6 +1711,18 @@ public interface Translations extends Constants {
   @DefaultStringValue("Projects")
   String pageProjectsTitle();
 
+  @Description("Page Search title")
+  @DefaultStringValue("Search")
+  String pageSearchTitle();
+
+  @Description("Page Search Variables title")
+  @DefaultStringValue("Variables")
+  String pageSearchVariablesTitle();
+
+  @Description("Page Search Entities title")
+  @DefaultStringValue("Entities")
+  String pageSearchEntitiesTitle();
+
   @Description("Page General Configuration title")
   @DefaultStringValue("General Configuration")
   String pageGeneralConfigurationTitle();

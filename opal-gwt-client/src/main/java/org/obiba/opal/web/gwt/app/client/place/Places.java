@@ -25,6 +25,10 @@ public final class Places {
 
   public static final String SEARCH = "!search";
 
+  public static final String SEARCH_VARIABLES = "!variables";
+
+  public static final String SEARCH_ENTITIES = "!entities";
+
   public static final String PROJECT = "!project";
 
   public static final String IDENTIFIERS = "!identifiers";
@@ -34,8 +38,6 @@ public final class Places {
   public static final String REPORT_TEMPLATES = "!reports";
 
   public static final String TASKS = "!tasks";
-
-  public static final String ADMIN = "!adminpage";
 
   public static final String ADMINISTRATION = "!admin";
 
@@ -58,10 +60,6 @@ public final class Places {
   public static final String SERVER = "!server";
 
   public static final String TAXONOMIES = "!taxonomies";
-
-  public static final String VOCABULARY = "!vocabulary";
-
-  public static final String VOCABULARY_EDIT = "!vocabulary.edit";
 
   private Places() {}
 
