@@ -20,4 +20,10 @@ public class ParameterTokens {
   public static final String TOKEN_PATH = "path";
 
   public static final String TOKEN_TAG = "tag";
+
+  public static final String TOKEN_TYPE = "type";
+
+  public static final String TOKEN_ID = "id";
+
+  public static final String TOKEN_TABLE = "table";
 }

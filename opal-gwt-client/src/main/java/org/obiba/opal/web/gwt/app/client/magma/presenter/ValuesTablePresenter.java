@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.ValuesQueryEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.search.entities.SearchEntityEvent;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtoNature;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
@@ -87,7 +88,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private final ModalProvider<ValueSequencePopupPresenter> valueSequencePopupProvider;
 
-  private final ModalProvider<EntityModalPresenter> entityModalProvider;
 
   private OpalMap opalMap;
 
@@ -95,13 +95,11 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   @Inject
   public ValuesTablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
-      ModalProvider<ValueSequencePopupPresenter> valueSequencePopupProvider,
-      ModalProvider<EntityModalPresenter> entityModalProvider, Translations translations) {
+      ModalProvider<ValueSequencePopupPresenter> valueSequencePopupProvider, Translations translations) {
     super(eventBus, display);
     this.placeManager = placeManager;
     this.translations = translations;
     this.valueSequencePopupProvider = valueSequencePopupProvider.setContainer(this);
-    this.entityModalProvider = entityModalProvider.setContainer(this);
 
     getView().setUiHandlers(this);
   }
@@ -146,7 +144,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   /**
    * When showing values from the VariablePresenter, we don't have to set/reset the filter
    *
-   * @param select
    */
   public void updateValuesDisplay() {
     updateValuesDisplay("");
@@ -362,7 +359,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
           }).withCallback(Response.SC_OK, new ResponseCodeCallback() {
         @Override
         public void onResponseCode(Request request, Response response) {
-          fetcher.requestEntityDialog(originalTable.getEntityType(), identifier);
+          fetcher.requestEntitySearch(originalTable.getEntityType(), identifier);
         }
       }).send();
     }
@@ -461,9 +458,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
 
     @Override
-    public void requestEntityDialog(String entityType, String entityId) {
-      EntityModalPresenter entityModalPresenter = entityModalProvider.get();
-      entityModalPresenter.initialize(originalTable, entityType, entityId, getView().getFilterText());
+    public void requestEntitySearch(String entityType, String entityId) {
+      fireEvent(new SearchEntityEvent(entityType, entityId, originalTable.getDatasourceName() + "." + originalTable.getName()));
     }
 
     @Override
@@ -595,7 +591,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     void requestValueSequence(VariableDto variable, String entityIdentifier);
 
-    void requestEntityDialog(String entityType, String entityId);
+    void requestEntitySearch(String entityType, String entityId);
 
     void updateVariables(String select);
   }

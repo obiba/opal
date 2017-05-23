@@ -647,6 +647,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("No Categories")
   String noCategoriesLabel();
 
+  @Description("No Values label")
+  @DefaultStringValue("No Values")
+  String noValuesLabel();
+
   @Description("Attributes label")
   @DefaultStringValue("Attributes")
   String attributesLabel();

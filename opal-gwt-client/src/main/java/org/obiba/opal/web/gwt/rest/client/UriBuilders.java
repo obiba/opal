@@ -138,6 +138,13 @@ public enum UriBuilders {
     }
   },
 
+  DATASOURCES_ENTITY_TYPES {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasources", "entity-types");
+    }
+  },
+
   DATASOURCE {
     @Override
     public UriBuilder create() {
@@ -212,6 +219,13 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("datasource", "{}", "table", "{}", "variable", "{}");
+    }
+  },
+
+  DATASOURCE_TABLE_VALUESET {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasource", "{}", "table", "{}", "valueSet", "{}");
     }
   },
 

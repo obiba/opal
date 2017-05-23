@@ -12,11 +12,13 @@ package org.obiba.opal.web.gwt.app.client.magma.presenter;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.gwt.core.client.GWT;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.search.entities.SearchEntityEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -40,8 +42,6 @@ import com.gwtplatform.mvp.client.PopupView;
 public class ValueSequencePopupPresenter extends ModalPresenterWidget<ValueSequencePopupPresenter.Display>
     implements ValueSequencePopupUiHandlers {
 
-  private final ModalProvider<EntityModalPresenter> entityModalProvider;
-
   private TableDto table;
 
   private VariableDto variable;
@@ -51,14 +51,11 @@ public class ValueSequencePopupPresenter extends ModalPresenterWidget<ValueSeque
   /**
    * @param eventBus
    * @param view
-   * @param proxy
    */
   @Inject
-  public ValueSequencePopupPresenter(EventBus eventBus, Display view,
-      ModalProvider<EntityModalPresenter> entityModalProvider) {
+  public ValueSequencePopupPresenter(EventBus eventBus, Display view) {
     super(eventBus, view);
     getView().setUiHandlers(this);
-    this.entityModalProvider = entityModalProvider.setContainer(this);
   }
 
   @Override
@@ -136,21 +133,21 @@ public class ValueSequencePopupPresenter extends ModalPresenterWidget<ValueSeque
 
     @Override
     public void requestBinaryValue(VariableDto variable, String entityIdentifier, int index) {
-      getEventBus().fireEvent(new FileDownloadRequestEvent(
+      fireEvent(new FileDownloadRequestEvent(
           table.getLink() + "/valueSet/" + entityIdentifier + "/variable/" + variable.getName() + "/value?pos=" +
               index));
     }
 
     @Override
     public void requestGeoValue(VariableDto variable, String entityIdentifier, ValueSetsDto.ValueDto value, int index) {
-      getEventBus().fireEvent(new GeoValueDisplayEvent(variable, entityIdentifier, value, index));
+      fireEvent(new GeoValueDisplayEvent(variable, entityIdentifier, value, index));
     }
 
     @Override
     public void requestEntityID(VariableDto variable, String entityIdentifier, ValueSetsDto.ValueDto value, int index) {
       String entityId = value.getValuesArray().get(index).getValue();
-      EntityModalPresenter entityModalPresenter = entityModalProvider.get();
-      entityModalPresenter.initialize(null, variable.getReferencedEntityType(), entityId, "");
+      fireEvent(new SearchEntityEvent(variable.getReferencedEntityType(), entityId, null));
+      getView().hide();
     }
   }
 

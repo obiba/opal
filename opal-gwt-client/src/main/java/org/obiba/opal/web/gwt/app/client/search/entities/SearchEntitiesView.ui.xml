@@ -11,6 +11,8 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+    xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.search.entities"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -25,6 +27,34 @@
         Search an entity by providing its type and its identifier.
       </ui:msg>
     </b:Paragraph>
-    
+
+    <g:FlowPanel ui:field="entityPanel">
+      <b:Well addStyleNames="form-search">
+        <b:DropdownButton ui:field="typeDropdown"/>
+        <b:TextBox ui:field="entityId" placeholder="entity identifier..." addStyleNames="small-indent"/>
+        <b:Button ui:field="searchButton" addStyleNames="btn btn-primary small-indent">
+          <ui:msg description="Search Button label">Search</ui:msg>
+        </b:Button>
+      </b:Well>
+
+      <g:FlowPanel ui:field="entityResultPanel" visible="false">
+        <g:FlowPanel>
+          <g:FlowPanel addStyleNames="pull-left">
+            <o:TableChooser ui:field="tableChooser" isMultipleSelect="false"/>
+          </g:FlowPanel>
+          <o:OpalSimplePager ui:field="valueSetPager" showTotalWhenNoPager="true" location="RIGHT" addStyleNames="pull-right"/>
+          <!--<b:Controls addStyleNames="pull-right small-top-margin">
+            <b:InputAddOn prependIcon="FILTER">
+              <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
+            </b:InputAddOn>
+          </b:Controls>-->
+        </g:FlowPanel>
+        <o2:ValueSetTable ui:field="valueSetTable" width="100%" addStyleNames="pull-left"/>
+      </g:FlowPanel>
+
+    </g:FlowPanel>
+
+
+
   </g:FlowPanel>
 </ui:UiBinder>

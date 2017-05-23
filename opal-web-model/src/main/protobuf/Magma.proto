@@ -285,6 +285,11 @@ message VariableEntityDto {
   optional string entityType = 2;
 }
 
+message VariableEntitySummaryDto {
+  required string entityType = 1;
+  required int32 tableCount = 2;
+}
+
 message TimestampsDto {
   optional string created = 1;
   optional string lastUpdate = 2;
