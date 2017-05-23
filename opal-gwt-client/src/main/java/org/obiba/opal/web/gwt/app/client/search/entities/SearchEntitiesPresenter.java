@@ -113,12 +113,14 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
     selectedTable = request.getParameter(ParameterTokens.TOKEN_TABLE, null);
     tableVariables.clear();
     tables = null;
-    getView().clearResults();
-    //GWT.log("prepareFromRequest=" + selectedType + ":" + selectedId + ":" + selectedTable);
+    getView().clearResults(true);
+    GWT.log("prepareFromRequest=" + selectedType + ":" + selectedId + ":" + selectedTable);
     if (!Strings.isNullOrEmpty(selectedId)) {
       getView().setEntityType(selectedType);
       getView().setEntityId(selectedId);
       if (!Strings.isNullOrEmpty(selectedId)) searchSelected();
+    } else {
+      getView().reset();
     }
   }
 
@@ -128,7 +130,7 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
     selectedId = entityId;
     selectedTable = null;
     //GWT.log("onSearch=" + selectedType + ":" + selectedId + ":" + selectedTable);
-    getView().clearResults();
+    getView().clearResults(true);
     searchSelected();
   }
 
@@ -194,6 +196,7 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
             tables = JsArrays.toSafeArray(resource);
             if (tables.length() == 0) {
               selectedTable = null;
+              getView().clearResults(false);
               fireEvent(NotificationEvent.newBuilder().warn("NoSuchEntity").args(selectedId, selectedType).build());
             } else {
               getView().showTables(tables);
@@ -276,7 +279,9 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
 
     void setEntityId(String selectedId);
 
-    void clearResults();
+    void clearResults(boolean searchProgress);
+
+    void reset();
 
     void showTables(JsArray<TableDto> tables);
 

@@ -10,14 +10,10 @@
 
 package org.obiba.opal.web.gwt.app.client.search.entities;
 
-import com.github.gwtbootstrap.client.ui.Breadcrumbs;
-import com.github.gwtbootstrap.client.ui.DropdownButton;
-import com.github.gwtbootstrap.client.ui.NavLink;
-import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.*;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -28,6 +24,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.HasWidgets;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
@@ -40,6 +37,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TableChooser;
+import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -72,7 +70,19 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   Panel entityResultPanel;
 
   @UiField
+  Heading entityTitle;
+
+  @UiField
+  Image refreshPending;
+
+  @UiField
   TableChooser tableChooser;
+
+  @UiField
+  TextBoxClearable filter;
+
+  @UiField
+  Controls filterControls;
 
   @UiField
   ValueSetTable valueSetTable;
@@ -80,7 +90,9 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   @UiField
   OpalSimplePager valueSetPager;
 
-  ListDataProvider<VariableValueRow> valueSetProvider = new ListDataProvider<VariableValueRow>();
+  private List<VariableValueRow> variableValueRows;
+
+  private ListDataProvider<VariableValueRow> valueSetProvider = new ListDataProvider<VariableValueRow>();
 
   @Inject
   public SearchEntitiesView(SearchEntitiesView.Binder uiBinder, Translations translations, PlaceManager placeManager) {
@@ -88,6 +100,7 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
     this.translations = translations;
     this.placeManager = placeManager;
     initValueSetTable();
+    filter.getTextBox().setPlaceholder(translations.filterVariables());
   }
 
   @Override
@@ -97,7 +110,8 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
 
   @UiHandler("searchButton")
   public void onSearch(ClickEvent event) {
-    if (!entityId.getValue().isEmpty()) getUiHandlers().onSearch(typeDropdown.getText().trim(), entityId.getValue());
+    if (entityId.getValue().isEmpty()) reset();
+    else getUiHandlers().onSearch(typeDropdown.getText().trim(), entityId.getValue());
   }
 
   @UiHandler("entityId")
@@ -107,7 +121,21 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
 
   @UiHandler("tableChooser")
   public void onTableSelection(ChosenChangeEvent event) {
+    setValueSetsVisible(false);
+    filter.setText("");
     getUiHandlers().onTableChange(tableChooser.getSelectedValue());
+  }
+
+  @UiHandler("filter")
+  void onFilterUpdate(KeyUpEvent event) {
+    if (variableValueRows == null) return;
+    if (Strings.isNullOrEmpty(filter.getText().trim())) showVariableValueRows(variableValueRows);
+
+    List<VariableValueRow> rows = Lists.newArrayList();
+    for (VariableValueRow row : variableValueRows) {
+      if (variableMatches(row.getVariableDto(), filter.getText().trim())) rows.add(row);
+    }
+    showVariableValueRows(rows);
   }
 
   @Override
@@ -144,13 +172,22 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   @Override
   public void setEntityId(String selectedId) {
     entityId.setValue(selectedId);
-    if (Strings.isNullOrEmpty(selectedId)) clearResults();
+    if (Strings.isNullOrEmpty(selectedId)) clearResults(false);
   }
 
   @Override
-  public void clearResults() {
+  public void clearResults(boolean searchProgress) {
     tableChooser.clear();
+    filter.setText("");
     entityResultPanel.setVisible(false);
+    setValueSetsVisible(false);
+    refreshPending.setVisible(searchProgress);
+  }
+
+  @Override
+  public void reset() {
+    clearResults(false);
+    entityId.setText("");
   }
 
   @Override
@@ -164,7 +201,33 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   @Override
   public void showValueSet(String datasource, String table, JsArray<VariableDto> variables, ValueSetsDto valueSets) {
     //GWT.log("showValueSet");
-    List<VariableValueRow> rows = Lists.newArrayList();
+    setVariableValueRows(datasource, table, variables, valueSets);
+    showVariableValueRows(variableValueRows);
+    tableChooser.setSelectedValue(datasource + "." + table);
+  }
+
+  public boolean variableMatches(VariableDto variable, String filter) {
+    String name = variable.getName().toLowerCase();
+    for(String token : filter.toLowerCase().split(" ")) {
+      if(!Strings.isNullOrEmpty(token)) {
+        if(!name.contains(token)) return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Build the complete variable value variableValueRows.
+   *
+   * @param datasource
+   * @param table
+   * @param variables
+   * @param valueSets
+   * @return
+   */
+  private void setVariableValueRows(String datasource, String table, JsArray<VariableDto> variables, ValueSetsDto valueSets) {
+    variableValueRows = Lists.newArrayList();
+    entityTitle.setText(valueSets.getEntityType() + " " + valueSets.getValueSetsArray().get(0).getIdentifier());
     JsArray<ValueSetsDto.ValueDto> values = valueSets.getValueSetsArray().get(0).getValuesArray();
     JsArrayString variableNames = valueSets.getVariablesArray();
     Map<String, VariableDto> variablesMap = Maps.newHashMap();
@@ -173,13 +236,23 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
     }
     for (int i=0; i<variableNames.length(); i++) {
       String varName = variableNames.get(i);
-      rows.add(new VariableValueRow(datasource, table, varName, values.get(i), variablesMap.get(varName)));
+      variableValueRows.add(new VariableValueRow(datasource, table, varName, values.get(i), variablesMap.get(varName)));
     }
+  }
+
+  private void showVariableValueRows(List<VariableValueRow> rows) {
     valueSetProvider.setList(rows);
     valueSetPager.firstPage();
     valueSetPager.setPagerVisible(valueSetProvider.getList().size() > Table.DEFAULT_PAGESIZE);
     valueSetProvider.refresh();
-    tableChooser.setSelectedValue(datasource + "." + table);
+    setValueSetsVisible(true);
+  }
+
+  private void setValueSetsVisible(boolean visible) {
+    refreshPending.setVisible(!visible);
+    valueSetTable.setVisible(visible);
+    valueSetPager.setVisible(visible);
+    filterControls.setVisible(visible);
   }
 
   private void initValueSetTable() {

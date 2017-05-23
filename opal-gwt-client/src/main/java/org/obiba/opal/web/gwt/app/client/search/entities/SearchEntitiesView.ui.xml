@@ -31,26 +31,30 @@
     <g:FlowPanel ui:field="entityPanel">
       <b:Well addStyleNames="form-search">
         <b:DropdownButton ui:field="typeDropdown"/>
-        <b:TextBox ui:field="entityId" placeholder="entity identifier..." addStyleNames="small-indent"/>
+        <b:TextBox ui:field="entityId" placeholder="Entity identifier..." addStyleNames="small-indent"/>
         <b:Button ui:field="searchButton" addStyleNames="btn btn-primary small-indent">
           <ui:msg description="Search Button label">Search</ui:msg>
         </b:Button>
       </b:Well>
 
       <g:FlowPanel ui:field="entityResultPanel" visible="false">
+        <b:Heading size="4" ui:field="entityTitle" addStyleNames="top-margin">
+
+        </b:Heading>
         <g:FlowPanel>
           <g:FlowPanel addStyleNames="pull-left">
             <o:TableChooser ui:field="tableChooser" isMultipleSelect="false"/>
           </g:FlowPanel>
-          <o:OpalSimplePager ui:field="valueSetPager" showTotalWhenNoPager="true" location="RIGHT" addStyleNames="pull-right"/>
-          <!--<b:Controls addStyleNames="pull-right small-top-margin">
+          <o:OpalSimplePager ui:field="valueSetPager" showTotalWhenNoPager="true" location="RIGHT" addStyleNames="pull-right small-indent"/>
+          <b:Controls addStyleNames="pull-right" ui:field="filterControls">
             <b:InputAddOn prependIcon="FILTER">
               <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
             </b:InputAddOn>
-          </b:Controls>-->
+          </b:Controls>
         </g:FlowPanel>
         <o2:ValueSetTable ui:field="valueSetTable" width="100%" addStyleNames="pull-left"/>
       </g:FlowPanel>
+      <g:Image ui:field="refreshPending" url="image/loading.gif" addStyleNames="small-indent"/>
 
     </g:FlowPanel>
 
