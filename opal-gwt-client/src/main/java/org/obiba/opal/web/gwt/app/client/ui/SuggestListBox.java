@@ -119,6 +119,10 @@ public class SuggestListBox extends FocusPanel {
     return closeables.getItemTexts();
   }
 
+  public void setDisplayItemCount(int limit) {
+    aheadBox.setDisplayItemCount(limit);
+  }
+
   private void rebuildSuggestBox() {
     if(textBox != null) {
       // do this because not able to clear suggest box text
@@ -128,6 +132,7 @@ public class SuggestListBox extends FocusPanel {
     textBox = new TextBox();
     aheadBox = new Typeahead(oracle);
     aheadBox.add(textBox);
+    aheadBox.setDisplayItemCount(11);
 
     // Set matchercallback to always return true so TypeHead does not filter values furthermore
     aheadBox.setMatcherCallback(new Typeahead.MatcherCallback() {
@@ -164,8 +169,7 @@ public class SuggestListBox extends FocusPanel {
       }
 
       public void onEnterSelection() {
-        VariableSuggestOracle.VariableSuggestion selectedSuggestion = ((VariableSuggestOracle) oracle)
-            .getSelectedSuggestion();
+        SuggestOracle.Suggestion selectedSuggestion = ((VariableSuggestOracle) oracle).getSelectedSuggestion();
         if(selectedSuggestion != null) {
           updaterCallback.onSelection(selectedSuggestion);
         }

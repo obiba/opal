@@ -320,6 +320,13 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     placeManager.revealPlace(builder.build());
   }
 
+  @Override
+  public void onSearch(VariableSuggestOracle.AdvancedSearchSuggestion suggestion) {
+    PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.SEARCH_VARIABLES)
+        .with(ParameterTokens.TOKEN_QUERY, suggestion.getReplacementString());
+    placeManager.revealPlace(builder.build());
+  }
+
   public interface Display extends View, HasUiHandlers<ApplicationUiHandlers> {
 
     void setDownloadInfo(String Url, String password);

@@ -35,6 +35,11 @@ public class TableVariableSuggestOracle extends VariableSuggestOracle {
   }
 
   @Override
+  protected boolean addAdvancedSearchSuggestion() {
+    return false;
+  }
+
+  @Override
   protected VariableSuggestion convertToFormattedSuggestions(String query, Map<String, String> attributes) {
     SafeHtmlBuilder accum = new SafeHtmlBuilder();
 
