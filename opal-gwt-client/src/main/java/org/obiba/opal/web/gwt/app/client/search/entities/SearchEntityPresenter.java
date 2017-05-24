@@ -195,7 +195,7 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
             if (tables.length() == 0) {
               selectedTable = null;
               getView().clearResults(false);
-              fireEvent(NotificationEvent.newBuilder().warn("NoSuchEntity").args(selectedId, selectedType).build());
+              notifyNoSuchEntity();
             } else {
               getView().showTables(tables);
               if (Strings.isNullOrEmpty(selectedTable))
@@ -223,6 +223,7 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
           @Override
           public void onResponseCode(Request request, Response response) {
             getView().clearResults(false);
+            notifyNoSuchEntity();
           }
         }, Response.SC_FORBIDDEN, Response.SC_NOT_FOUND)
         .withCallback(new ResourceCallback<ValueSetsDto>() {
@@ -249,6 +250,13 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
           }
         })
         .get().send();
+  }
+
+  private void notifyNoSuchEntity() {
+    if (Strings.isNullOrEmpty(selectedTable))
+      fireEvent(NotificationEvent.newBuilder().warn("NoSuchEntity").args(selectedId, selectedType).build());
+    else
+      fireEvent(NotificationEvent.newBuilder().warn("NoSuchEntityInTable").args(selectedId, selectedType, selectedTable).build());
   }
 
   private String[] splitTableReference(String tableReference) {
