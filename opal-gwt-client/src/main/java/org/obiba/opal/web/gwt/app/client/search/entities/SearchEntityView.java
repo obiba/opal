@@ -46,9 +46,9 @@ import org.obiba.opal.web.model.client.magma.VariableEntitySummaryDto;
 import java.util.List;
 import java.util.Map;
 
-public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandlers> implements SearchEntitiesPresenter.Display {
+public class SearchEntityView extends ViewWithUiHandlers<SearchEntityUiHandlers> implements SearchEntityPresenter.Display {
 
-  interface Binder extends UiBinder<Widget, SearchEntitiesView> {}
+  interface Binder extends UiBinder<Widget, SearchEntityView> {}
 
   private final Translations translations;
 
@@ -95,7 +95,7 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   private ListDataProvider<VariableValueRow> valueSetProvider = new ListDataProvider<VariableValueRow>();
 
   @Inject
-  public SearchEntitiesView(SearchEntitiesView.Binder uiBinder, Translations translations, PlaceManager placeManager) {
+  public SearchEntityView(SearchEntityView.Binder uiBinder, Translations translations, PlaceManager placeManager) {
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
     this.placeManager = placeManager;

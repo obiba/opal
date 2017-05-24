@@ -14,6 +14,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -40,10 +41,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -53,8 +51,8 @@ import java.util.List;
 import java.util.Map;
 
 
-public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.Display, SearchEntitiesPresenter.Proxy>
-    implements HasPageTitle, SearchEntitiesUiHandlers {
+public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Display, SearchEntityPresenter.Proxy>
+    implements HasPageTitle, SearchEntityUiHandlers {
 
   private final ModalProvider<ValueSequencePopupPresenter> valueSequencePopupProvider;
 
@@ -75,9 +73,9 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
   private Map<String, JsArray<VariableDto>> tableVariables = Maps.newHashMap();
 
   @Inject
-  public SearchEntitiesPresenter(EventBus eventBus, Display display, Proxy proxy,
-                                 ModalProvider<ValueSequencePopupPresenter> valueSequencePopupProvider, Translations translations,
-                                 DefaultBreadcrumbsBuilder breadcrumbsHelper, PlaceManager placeManager) {
+  public SearchEntityPresenter(EventBus eventBus, Display display, Proxy proxy,
+                               ModalProvider<ValueSequencePopupPresenter> valueSequencePopupProvider, Translations translations,
+                               DefaultBreadcrumbsBuilder breadcrumbsHelper, PlaceManager placeManager) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     this.valueSequencePopupProvider = valueSequencePopupProvider.setContainer(this);
     this.translations = translations;
@@ -89,7 +87,7 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
   @Override
   @TitleFunction
   public String getTitle() {
-    return translations.pageSearchEntitiesTitle();
+    return translations.pageSearchEntityTitle();
   }
 
   @Override
@@ -221,6 +219,12 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
     String valueSetUri = UriBuilders.DATASOURCE_TABLE_VALUESET.create().build(datasource, table, selectedId);
     ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder()
         .forResource(valueSetUri).get()
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().clearResults(false);
+          }
+        }, Response.SC_FORBIDDEN, Response.SC_NOT_FOUND)
         .withCallback(new ResourceCallback<ValueSetsDto>() {
           @Override
           public void onResource(Response response, ValueSetsDto resource) {
@@ -267,11 +271,11 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
   }
 
   @ProxyStandard
-  @NameToken(Places.SEARCH_ENTITIES)
-  public interface Proxy extends ProxyPlace<SearchEntitiesPresenter> {
+  @NameToken(Places.SEARCH_ENTITY)
+  public interface Proxy extends ProxyPlace<SearchEntityPresenter> {
   }
 
-  public interface Display extends View, HasBreadcrumbs, HasUiHandlers<SearchEntitiesUiHandlers> {
+  public interface Display extends View, HasBreadcrumbs, HasUiHandlers<SearchEntityUiHandlers> {
 
     void setEntityTypes(List<VariableEntitySummaryDto> entityTypes, String selectedType);
 

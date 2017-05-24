@@ -56,7 +56,7 @@ public class SearchPresenter extends Presenter<SearchPresenter.Display, SearchPr
   private void setHistoryTokens(TokenFormatter tokenFormatter) {
     PlaceRequest searchPlace = createRequest(Places.SEARCH);
     getView().setVariablesHistoryToken(getHistoryToken(tokenFormatter, searchPlace, Places.SEARCH_VARIABLES));
-    getView().setEntitiesHistoryToken(getHistoryToken(tokenFormatter, searchPlace, Places.SEARCH_ENTITIES));
+    getView().setEntityHistoryToken(getHistoryToken(tokenFormatter, searchPlace, Places.SEARCH_ENTITY));
   }
 
   private String getHistoryToken(TokenFormatter tokenFormatter, PlaceRequest placeRequest, String place) {
@@ -67,6 +67,6 @@ public class SearchPresenter extends Presenter<SearchPresenter.Display, SearchPr
 
     void setVariablesHistoryToken(String historyToken);
 
-    void setEntitiesHistoryToken(String historyToken);
+    void setEntityHistoryToken(String historyToken);
   }
 }

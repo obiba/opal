@@ -14,7 +14,7 @@ import com.gwtplatform.mvp.client.UiHandlers;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
-public interface SearchEntitiesUiHandlers extends UiHandlers {
+public interface SearchEntityUiHandlers extends UiHandlers {
 
   void onSearch(String entityType, String entityId);
 

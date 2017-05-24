@@ -42,16 +42,16 @@
                 </g:FlowPanel>
               </g:FlowPanel>
 
-              <g:FlowPanel ui:field="searchEntitiesAuthorizable">
-                <o:OpalNavLink ui:field="searchEntitiesPlace" icon="COG">
-                  <ui:msg description="Search Entities title">
-                    Search Entities
+              <g:FlowPanel ui:field="searchEntityAuthorizable">
+                <o:OpalNavLink ui:field="searchEntityPlace" icon="COG">
+                  <ui:msg description="Search Entity title">
+                    Search Entity
                   </ui:msg>
                 </o:OpalNavLink>
                 <g:FlowPanel>
                   <g:Label styleName="help-block">
-                    <ui:msg description="Search Entities help">
-                      Search for entities by identifier and variable value criteria
+                    <ui:msg description="Search Entity help">
+                      Search for entity by identifier
                     </ui:msg>
                   </g:Label>
                 </g:FlowPanel>

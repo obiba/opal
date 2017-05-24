@@ -25,7 +25,7 @@ public class SearchView extends ViewImpl implements SearchPresenter.Display {
   OpalNavLink searchVariablesPlace;
 
   @UiField
-  OpalNavLink searchEntitiesPlace;
+  OpalNavLink searchEntityPlace;
 
   @Inject
   public SearchView(SearchView.Binder uiBinder) {
@@ -38,8 +38,8 @@ public class SearchView extends ViewImpl implements SearchPresenter.Display {
   }
 
   @Override
-  public void setEntitiesHistoryToken(String historyToken) {
-    searchEntitiesPlace.setHistoryToken(historyToken);
+  public void setEntityHistoryToken(String historyToken) {
+    searchEntityPlace.setHistoryToken(historyToken);
   }
 
 }

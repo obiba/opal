@@ -27,7 +27,7 @@ public final class Places {
 
   public static final String SEARCH_VARIABLES = "!variables";
 
-  public static final String SEARCH_ENTITIES = "!entities";
+  public static final String SEARCH_ENTITY = "!entity";
 
   public static final String PROJECT = "!project";
 
