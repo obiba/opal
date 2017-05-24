@@ -74,7 +74,7 @@
                       <filter token="project.name" value="${project.name}" />
                       <filter token="project.version" value="${project.version}" />
                       <filter token="project.description" value="${project.description}" />
-                      <filter token="project.download.url" value="http://download.obiba.org/opal/${opal.deploy.dir}/${python.package.name}" />
+                      <filter token="project.download.url" value="http://download.obiba.org/opal/${obiba.deploy.dir}/${python.package.name}" />
                     </filterset>
                 </copy>
                 <exec dir="${python.dist.path}/opal-python" executable="python" failonerror="true">
@@ -234,7 +234,7 @@
                   <target>
                     <property name="deb.package.name" value="${project.name}_${project.version}-b${buildNumber}_all.deb" />
                     <!-- Deploy deb file in deb repo -->
-                    <copy todir="${obiba.deb.dir}/${opal.deploy.dir}" file="target/${deb.package.name}" />
+                    <copy todir="${obiba.deb.dir}/${obiba.deploy.dir}" file="target/${deb.package.name}" />
                   </target>
                 </configuration>
               </execution>
@@ -249,7 +249,7 @@
                     <property name="python.dist.path" value="${basedir}/target" />
                     <property name="python.package.name" value="${project.name}-${project.version}.tar.gz" />
                     <!-- Deploy Python package file in download repo -->
-                    <copy todir="${obiba.download.dir}/opal/${opal.deploy.dir}" file="target/${python.package.name}" />
+                    <copy todir="${obiba.download.dir}/opal/${obiba.deploy.dir}" file="target/${python.package.name}" />
                   </target>
                 </configuration>
               </execution>
@@ -262,7 +262,7 @@
                 <configuration>
                   <target>
                     <!-- Deploy rpm file in rpm repo -->
-                    <copy todir="${obiba.rpm.dir}/${opal.deploy.dir}">
+                    <copy todir="${obiba.rpm.dir}/${obiba.deploy.dir}">
                       <fileset dir="target/rpm/opal-python-client/RPMS/noarch" />
                     </copy>
                   </target>

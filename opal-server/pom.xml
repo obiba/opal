@@ -399,7 +399,7 @@
                   <target>
                     <property name="deb.version" value="${project.version}-b${buildNumber}" />
                     <!-- Deploy deb file in deb repo -->
-                    <copy todir="${obiba.deb.dir}/${opal.deploy.dir}" file="target/opal_${deb.version}_all.deb" />
+                    <copy todir="${obiba.deb.dir}/${obiba.deploy.dir}" file="target/opal_${deb.version}_all.deb" />
                   </target>
                 </configuration>
               </execution>
@@ -412,7 +412,7 @@
                 <configuration>
                   <target>
                     <!-- Deploy Opal package file in download repo -->
-                    <copy todir="${obiba.download.dir}/opal/${opal.deploy.dir}" file="target/opal-server-${project.version}-dist.zip" />
+                    <copy todir="${obiba.download.dir}/opal/${obiba.deploy.dir}" file="target/opal-server-${project.version}-dist.zip" />
                   </target>
                 </configuration>
               </execution>
@@ -425,7 +425,7 @@
                 <configuration>
                   <target>
                     <!-- Deploy rpm file in rpm repo -->
-                    <copy todir="${obiba.rpm.dir}/${opal.deploy.dir}">
+                    <copy todir="${obiba.rpm.dir}/${obiba.deploy.dir}">
                         <fileset dir="target/rpm/opal-server/RPMS/noarch" />
                     </copy>
                   </target>
