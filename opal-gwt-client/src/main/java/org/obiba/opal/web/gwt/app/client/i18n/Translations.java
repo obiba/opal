@@ -474,6 +474,7 @@ public interface Translations extends Constants {
       "NoSuchVariableInTable", "No such variable '{0}' in table '{1}'.",//
       "NoSuchValueTable", "No such table '{0}'.",//
       "NoSuchEntity", "No such entity '{0}' of type '{1}'.",//
+      "NoSuchEntityInTable", "No such entity '{0}' of type '{1}' in table '{2}'.",//
       "NoSuchValueTableInDatasource", "No such table '{0}' in datasource '{1}'.",//
       "NoSuchReportTemplate", "No such report template '{0}' in project '{1}'.",//
       "InvalidVariableScript", "Invalid variable script:<br /><br /><pre>{0}</pre>",//
@@ -646,6 +647,10 @@ public interface Translations extends Constants {
   @Description("No Categories label")
   @DefaultStringValue("No Categories")
   String noCategoriesLabel();
+
+  @Description("No Values label")
+  @DefaultStringValue("No Values")
+  String noValuesLabel();
 
   @Description("Attributes label")
   @DefaultStringValue("Attributes")
@@ -1710,6 +1715,18 @@ public interface Translations extends Constants {
   @Description("Page Projects title")
   @DefaultStringValue("Projects")
   String pageProjectsTitle();
+
+  @Description("Page Search title")
+  @DefaultStringValue("Search")
+  String pageSearchTitle();
+
+  @Description("Page Search Variables title")
+  @DefaultStringValue("Variables")
+  String pageSearchVariablesTitle();
+
+  @Description("Page Search Entity title")
+  @DefaultStringValue("Entity")
+  String pageSearchEntityTitle();
 
   @Description("Page General Configuration title")
   @DefaultStringValue("General Configuration")

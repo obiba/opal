@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.presenter;
 
+import com.google.common.base.Strings;
 import org.obiba.opal.web.gwt.app.client.administration.configuration.event.GeneralConfigSavedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.ModalClosedEvent;
@@ -29,6 +30,7 @@ import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectHiddenEvent;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
+import org.obiba.opal.web.gwt.app.client.search.event.SearchEntityEvent;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.ui.VariableSearchListItem;
 import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
@@ -184,6 +186,17 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       @Override
       public void onProjectHidden(ProjectHiddenEvent event) {
         getView().clearSearch();
+      }
+    });
+
+    addRegisteredHandler(SearchEntityEvent.getType(), new SearchEntityEvent.SearchEntityHandler() {
+      @Override
+      public void onSearchEntity(SearchEntityEvent event) {
+        PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.SEARCH_ENTITY)
+            .with(ParameterTokens.TOKEN_TYPE, event.getEntityType()) //
+            .with(ParameterTokens.TOKEN_ID, event.getEntityId());
+        if (!Strings.isNullOrEmpty(event.getTableReference())) builder.with(ParameterTokens.TOKEN_TABLE, event.getTableReference());
+        placeManager.revealPlace(builder.build());
       }
     });
 

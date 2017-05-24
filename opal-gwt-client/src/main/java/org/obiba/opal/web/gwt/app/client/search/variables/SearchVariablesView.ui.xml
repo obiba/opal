@@ -21,30 +21,10 @@
     </g:FlowPanel>
 
     <b:Paragraph>
-      <ui:msg description="Identifiers Administration help">
-        Identifiers mappings are defined per entity type. Mapping identifiers consist of associating, for a given entity,
-        its identifier in the system to its identifiers in the data being imported or exported.
+      <ui:msg description="Search Variables help">
+        Search variables using controlled vocabularies and full-text search.
       </ui:msg>
     </b:Paragraph>
-
-    <b:FluidRow>
-      <b:Column size="3">
-        <b:NavList ui:field="selector">
-          <b:NavHeader>
-            <ui:msg description="Entity Types label">Entity Types</ui:msg>
-          </b:NavHeader>
-        </b:NavList>
-        <b:ButtonGroup addStyleNames="top-margin">
-          <b:Button type="INFO" icon="PLUS" ui:field="addIdTable">
-            <ui:msg description="Add Identifiers Table label">Add Identifiers Table</ui:msg>
-          </b:Button>
-        </b:ButtonGroup>
-      </b:Column>
-      <b:Column size="9">
-        <g:FlowPanel ui:field="body"/>
-      </b:Column>
-    </b:FluidRow>
-
-
+    
   </g:FlowPanel>
 </ui:UiBinder>

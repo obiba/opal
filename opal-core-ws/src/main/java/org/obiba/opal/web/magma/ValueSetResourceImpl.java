@@ -69,6 +69,7 @@ public class ValueSetResourceImpl extends AbstractValueTableResource implements 
 
   @Override
   public Response getValueSet(UriInfo uriInfo, String select, Boolean filterBinary) {
+    if (!getValueTable().hasValueSet(entity)) return Response.status(Status.NOT_FOUND).build();
     if(vvs == null) {
       ValueSetsDto vs = getValueSetDto(uriInfo, filterVariables(select, 0, null), filterBinary);
       return TimestampedResponses.ok(getValueTable(), vs).build();

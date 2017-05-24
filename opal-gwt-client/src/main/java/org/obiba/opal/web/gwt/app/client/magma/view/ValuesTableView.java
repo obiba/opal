@@ -808,7 +808,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
     @Override
     public void onEntitySelection(String entityType, String entityId) {
-      fetcher.requestEntityDialog(entityType, entityId);
+      fetcher.requestEntitySearch(entityType, entityId);
     }
   }
 
