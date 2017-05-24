@@ -85,6 +85,12 @@ public class SearchEntityView extends ViewWithUiHandlers<SearchEntityUiHandlers>
   Controls filterControls;
 
   @UiField
+  CheckBox showEmpties;
+
+  @UiField
+  Controls emptiesControls;
+
+  @UiField
   ValueSetTable valueSetTable;
 
   @UiField
@@ -123,20 +129,22 @@ public class SearchEntityView extends ViewWithUiHandlers<SearchEntityUiHandlers>
   public void onTableSelection(ChosenChangeEvent event) {
     setValueSetsVisible(false);
     filter.setText("");
+    showEmpties.setValue(true, false);
     getUiHandlers().onTableChange(tableChooser.getSelectedValue());
   }
 
   @UiHandler("filter")
-  void onFilterUpdate(KeyUpEvent event) {
+  public void onFilterUpdate(KeyUpEvent event) {
     if (variableValueRows == null) return;
-    if (Strings.isNullOrEmpty(filter.getText().trim())) showVariableValueRows(variableValueRows);
-
-    List<VariableValueRow> rows = Lists.newArrayList();
-    for (VariableValueRow row : variableValueRows) {
-      if (variableMatches(row.getVariableDto(), filter.getText().trim())) rows.add(row);
-    }
-    showVariableValueRows(rows);
+    showVariableValueRows(filterVariableValueRows(variableValueRows));
   }
+
+  @UiHandler("showEmpties")
+  public void onShowEmptiesUpdate(ClickEvent event) {
+    if (variableValueRows == null) return;
+    showVariableValueRows(filterVariableValueRows(variableValueRows));
+  }
+
 
   @Override
   public void setEntityTypes(List<VariableEntitySummaryDto> entityTypes, String selectedType) {
@@ -179,6 +187,7 @@ public class SearchEntityView extends ViewWithUiHandlers<SearchEntityUiHandlers>
   public void clearResults(boolean searchProgress) {
     tableChooser.clear();
     filter.setText("");
+    showEmpties.setValue(true, false);
     entityResultPanel.setVisible(false);
     setValueSetsVisible(false);
     refreshPending.setVisible(searchProgress);
@@ -253,6 +262,7 @@ public class SearchEntityView extends ViewWithUiHandlers<SearchEntityUiHandlers>
     valueSetTable.setVisible(visible);
     valueSetPager.setVisible(visible);
     filterControls.setVisible(visible);
+    emptiesControls.setVisible(visible);
   }
 
   private void initValueSetTable() {
@@ -275,5 +285,19 @@ public class SearchEntityView extends ViewWithUiHandlers<SearchEntityUiHandlers>
     });
     valueSetPager.setDisplay(valueSetTable);
     valueSetProvider.addDataDisplay(valueSetTable);
+  }
+  
+  private List<VariableValueRow> filterVariableValueRows(List<VariableValueRow> originalRows) {
+    List<VariableValueRow> rows = Lists.newArrayList();
+    String filterText = filter.getText().trim();
+    boolean hasFilter = !Strings.isNullOrEmpty(filterText);
+    boolean withEmpties = showEmpties.getValue();
+    for (VariableValueRow row : originalRows) {
+      boolean isIn = true;
+      if (!withEmpties && row.hasEmptyValue()) isIn = false;
+      if (hasFilter && !variableMatches(row.getVariableDto(), filterText)) isIn = false;
+      if (isIn) rows.add(row);
+    }
+    return rows;
   }
 }

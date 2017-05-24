@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.search.entities;
 
+import com.google.common.base.Strings;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
@@ -55,6 +56,13 @@ public class VariableValueRow {
 
   public VariableDto getVariableDto() {
     return variableDto;
+  }
+
+  public boolean hasEmptyValue() {
+    if (variableDto.getIsRepeatable())
+      return valueDto.getValuesArray() == null || valueDto.getValuesArray().length() == 0;
+    else
+      return !valueDto.hasValue() || Strings.isNullOrEmpty(valueDto.getValue());
   }
 
 }

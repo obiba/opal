@@ -42,14 +42,19 @@
 
         </b:Heading>
         <g:FlowPanel>
-          <g:FlowPanel addStyleNames="pull-left">
+          <g:FlowPanel addStyleNames="pull-left small-top-margin">
             <o:TableChooser ui:field="tableChooser" isMultipleSelect="false"/>
           </g:FlowPanel>
           <o:OpalSimplePager ui:field="valueSetPager" showTotalWhenNoPager="true" location="RIGHT" addStyleNames="pull-right small-indent"/>
-          <b:Controls addStyleNames="pull-right" ui:field="filterControls">
+          <b:Controls addStyleNames="pull-right small-indent" ui:field="filterControls">
             <b:InputAddOn prependIcon="FILTER">
               <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
             </b:InputAddOn>
+          </b:Controls>
+          <b:Controls addStyleNames="pull-right" ui:field="emptiesControls">
+            <b:CheckBox ui:field="showEmpties" value="true">
+              <ui:msg description="Show empty values label">Show empty values</ui:msg>
+            </b:CheckBox>
           </b:Controls>
         </g:FlowPanel>
         <o2:ValueSetTable ui:field="valueSetTable" width="100%" addStyleNames="pull-left"/>
