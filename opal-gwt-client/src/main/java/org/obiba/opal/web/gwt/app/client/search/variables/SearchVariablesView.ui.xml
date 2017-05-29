@@ -9,13 +9,13 @@
   -->
 
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-    xmlns:g="urn:import:com.google.gwt.user.client.ui"
-    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
-    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
-    xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.search.variables"
-    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
-    ui:generateLocales="default">
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+             xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.search.variables"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+             ui:generateLocales="default">
 
   <g:FlowPanel>
     <g:FlowPanel addStyleNames="section-header xlarge-bottom-margin">
@@ -29,7 +29,9 @@
     </b:Paragraph>
 
     <b:Well addStyleNames="form-search">
-      <b:TextBox ui:field="queryInput"/>
+      <b:Typeahead ui:field="queryTypeahead">
+        <b:TextBox ui:field="queryInput" addStyleNames="input-xxlarge"/>
+      </b:Typeahead>
       <b:Button ui:field="searchButton" addStyleNames="btn btn-primary small-indent">
         <ui:msg description="Search Button label">Search</ui:msg>
       </b:Button>
@@ -37,7 +39,8 @@
 
     <g:FlowPanel>
       <g:FlowPanel>
-        <o:OpalSimplePager ui:field="variableItemPager" showTotalWhenNoPager="true" location="RIGHT" addStyleNames="pull-right small-indent"/>
+        <o:OpalSimplePager ui:field="variableItemPager" showTotalWhenNoPager="true" location="RIGHT"
+                           addStyleNames="pull-right small-indent"/>
         <o2:VariableItemTable ui:field="variableItemTable" width="100%" addStyleNames="small-top-margin pull-left"/>
       </g:FlowPanel>
       <g:Image ui:field="refreshPending" url="image/loading.gif"/>

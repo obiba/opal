@@ -10,7 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.search.variables;
 
-import com.github.gwtbootstrap.client.ui.Breadcrumbs;
+import com.github.gwtbootstrap.client.ui.*;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -19,9 +19,8 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.HasWidgets;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
@@ -32,8 +31,13 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.model.client.opal.TaxonomyDto;
+import org.obiba.opal.web.model.client.opal.TermDto;
+import org.obiba.opal.web.model.client.opal.VocabularyDto;
 import org.obiba.opal.web.model.client.search.ItemResultDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
+
+import java.util.List;
 
 public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHandlers> implements SearchVariablesPresenter.Display {
 
@@ -45,6 +49,9 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
   @UiField
   Breadcrumbs breadcrumbs;
+
+  @UiField(provided = true)
+  Typeahead queryTypeahead;
 
   @UiField
   TextBox queryInput;
@@ -62,6 +69,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
   @Inject
   public SearchVariablesView(SearchVariablesView.Binder uiBinder, Translations translations, PlaceManager placeManager) {
+    this.queryTypeahead = new Typeahead(new VariableFieldSuggestOracle());
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
     this.placeManager = placeManager;
@@ -81,6 +89,11 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   @UiHandler("queryInput")
   public void onQueryTyped(KeyUpEvent event) {
     if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) onSearch(null);
+  }
+
+  @Override
+  public void setTaxonomies(List<TaxonomyDto> taxonomies) {
+    ((VariableFieldSuggestOracle) queryTypeahead.getSuggestOracle()).setTaxonomies(taxonomies);
   }
 
   @Override
@@ -127,6 +140,29 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
       Range range = display.getVisibleRange();
       setVariablesVisible(false);
       getUiHandlers().onSearchRange(queryInput.getText(), range.getStart(), range.getLength());
+    }
+  }
+
+  private class TaxonomyTermSuggestOracle extends MultiWordSuggestOracle {
+
+    private List<TaxonomyDto> taxonomies;
+
+    public void setTaxonomies(List<TaxonomyDto> taxonomies) {
+      this.taxonomies = taxonomies;
+      clear();
+      for (TaxonomyDto taxonomy : taxonomies) {
+        for (VocabularyDto vocabulary : JsArrays.toIterable(taxonomy.getVocabulariesArray())) {
+          for (TermDto term : JsArrays.toIterable(vocabulary.getTermsArray())) {
+            add(taxonomy.getName() + "-" + vocabulary.getName() + ":" + term.getName());
+          }
+        }
+      }
+    }
+
+    @Override
+    public void requestSuggestions(Request request, Callback callback) {
+      GWT.log(request.getQuery());
+      super.requestSuggestions(request, callback);
     }
   }
 }
