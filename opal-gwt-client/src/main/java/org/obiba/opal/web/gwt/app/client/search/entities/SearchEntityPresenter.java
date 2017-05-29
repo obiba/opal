@@ -12,7 +12,6 @@ package org.obiba.opal.web.gwt.app.client.search.entities;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -40,6 +39,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
+import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -112,11 +112,11 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
     tableVariables.clear();
     tables = null;
     getView().clearResults(true);
-    GWT.log("prepareFromRequest=" + selectedType + ":" + selectedId + ":" + selectedTable);
+    //GWT.log("prepareFromRequest=" + selectedType + ":" + selectedId + ":" + selectedTable);
     if (!Strings.isNullOrEmpty(selectedId)) {
       getView().setEntityType(selectedType);
       getView().setEntityId(selectedId);
-      if (!Strings.isNullOrEmpty(selectedId)) searchSelected();
+      searchSelected();
     } else {
       getView().reset();
     }
@@ -212,9 +212,9 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
    */
   private void loadSelectedTable() {
     //GWT.log("loadSelectedTable=" + selectedType + ":" + selectedId + ":" + selectedTable);
-    String[] parts = splitTableReference(selectedTable);
-    final String datasource = parts[0];
-    final String table = parts[1];
+    MagmaPath.Parser parser = parseTableReference(selectedTable);
+    final String datasource = parser.getDatasource();
+    final String table = parser.getTable();
 
     String valueSetUri = UriBuilders.DATASOURCE_TABLE_VALUESET.create().build(datasource, table, selectedId);
     ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder()
@@ -259,16 +259,13 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
       fireEvent(NotificationEvent.newBuilder().warn("NoSuchEntityInTable").args(selectedId, selectedType, selectedTable).build());
   }
 
-  private String[] splitTableReference(String tableReference) {
-    int sep = tableReference.indexOf('.');
-    String datasource = tableReference.substring(0, sep);
-    String table = tableReference.substring(sep + 1);
-    return new String[] {datasource, table};
+  private MagmaPath.Parser parseTableReference(String tableReference) {
+    return MagmaPath.Parser.parse(tableReference);
   }
 
   private String tableReferenceAsLink(String tableReference) {
-    String[] parts = splitTableReference(tableReference);
-    return "/datasource/" + parts[0] + "/table/" + parts[1];
+    MagmaPath.Parser parser = parseTableReference(tableReference);
+    return "/datasource/" + parser.getDatasource() + "/table/" + parser.getTable();
   }
 
   private TableDto tableReferenceAsDto(String tableReference) {

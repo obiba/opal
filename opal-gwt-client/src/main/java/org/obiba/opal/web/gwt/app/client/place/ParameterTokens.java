@@ -13,6 +13,12 @@ package org.obiba.opal.web.gwt.app.client.place;
 public class ParameterTokens {
   public static final String TOKEN_QUERY = "q";
 
+  public static final String TOKEN_OFFSET = "o";
+
+  public static final String TOKEN_LIMIT = "lm";
+
+  public static final String TOKEN_LOCALE = "lc";
+
   public static final String TOKEN_NAME = "name";
 
   public static final String TOKEN_TAB = "tab";

@@ -14,4 +14,7 @@ import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface SearchVariablesUiHandlers extends UiHandlers {
 
+  void onSearch(String query);
+
+  void onSearchRange(String query, int offset, int limit);
 }
