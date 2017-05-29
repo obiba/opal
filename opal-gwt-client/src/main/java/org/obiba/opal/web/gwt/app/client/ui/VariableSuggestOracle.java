@@ -10,11 +10,15 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.user.client.rpc.IsSerializable;
+import com.google.gwt.user.client.ui.SuggestOracle;
+import com.google.web.bindery.event.shared.EventBus;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -24,24 +28,24 @@ import org.obiba.opal.web.model.client.opal.EntryDto;
 import org.obiba.opal.web.model.client.search.ItemFieldsDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
-import com.google.common.base.Joiner;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.user.client.rpc.IsSerializable;
-import com.google.gwt.user.client.ui.SuggestOracle;
-import com.google.web.bindery.event.shared.EventBus;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class VariableSuggestOracle extends SuggestOracle {
 
   private static final int LABEL_MAX_SIZE = 75;
 
-  private List<VariableSuggestion> suggestions;
+  private List<Suggestion> suggestions;
+
+  public interface Identifiable {
+    String getId();
+  }
 
   /**
-   * Suggestion class for {@link MultiWordSuggestOracle}.
+   * Suggestion class for {@link com.google.gwt.user.client.ui.SuggestOracle.Suggestion}.
    */
-  public static class VariableSuggestion implements Suggestion, IsSerializable {
+  public static class VariableSuggestion implements Suggestion, Identifiable, IsSerializable {
     private String id;
 
     private String displayString;
@@ -67,11 +71,10 @@ public class VariableSuggestOracle extends SuggestOracle {
      * @param replacementString the string to enter into the SuggestBox's text
      * box if the suggestion is chosen
      * @param displayString the display string
-     * @param table1
-     * @param variable1
+     * @param table
+     * @param variable
      */
-    public VariableSuggestion(String replacementString, String displayString, String datasource, String table,
-        String variable) {
+    public VariableSuggestion(String replacementString, String displayString, String datasource, String table, String variable) {
       this.replacementString = replacementString;
       this.displayString = displayString;
       this.datasource = datasource;
@@ -102,8 +105,78 @@ public class VariableSuggestOracle extends SuggestOracle {
       return datasource;
     }
 
+    @Override
     public String getId() {
       return id;
+    }
+  }
+
+  public static class AdvancedSearchSuggestion implements Suggestion, Identifiable, IsSerializable {
+
+    private int totalHits;
+
+    private int showingCount;
+
+    private String query;
+
+    private String datasource;
+
+    private String table;
+
+    /**
+     * Constructor used by RPC.
+     */
+    @SuppressWarnings("UnusedDeclaration")
+    public AdvancedSearchSuggestion() {
+    }
+
+    public AdvancedSearchSuggestion(String query, int totalHits, int showingCount, String datasource, String table) {
+      this.query = query;
+      this.totalHits = totalHits;
+      this.showingCount = showingCount;
+      this.datasource = datasource;
+      this.table = table;
+    }
+
+    @Override
+    public String getDisplayString() {
+      SafeHtmlBuilder accum = new SafeHtmlBuilder();
+
+      accum.appendHtmlConstant("<span class='advanced-search-suggest-box' id='" + getId() + "' style='font-size:smaller'>");
+      accum.appendEscaped("Showing " + showingCount + "/" + totalHits);
+      accum.appendHtmlConstant("</span>");
+      accum.appendHtmlConstant("<span class='label label-info small-indent'>");
+      accum.appendEscaped("Advanced search");
+      accum.appendHtmlConstant("</span>");
+
+
+      return accum.toSafeHtml().asString();
+    }
+
+    @Override
+    public String getReplacementString() {
+      return query;
+    }
+
+    public int getTotalHits() {
+      return totalHits;
+    }
+
+    public int getShowingCount() {
+      return showingCount;
+    }
+
+    public String getDatasource() {
+      return datasource;
+    }
+
+    public String getTable() {
+      return table;
+    }
+
+    @Override
+    public String getId() {
+      return "_advanced";
     }
   }
 
@@ -126,7 +199,7 @@ public class VariableSuggestOracle extends SuggestOracle {
    * bar".
    * </p>
    *
-   * @param whitespaceChars the characters to treat as word separators
+   * @param eventBus
    */
   public VariableSuggestOracle(EventBus eventBus) {
     this.eventBus = eventBus;
@@ -183,7 +256,7 @@ public class VariableSuggestOracle extends SuggestOracle {
             if(response.getStatusCode() == com.google.gwt.http.client.Response.SC_OK) {
               QueryResultDto resultDto = JsonUtils.unsafeEval(response.getText());
 
-              suggestions = new ArrayList<VariableSuggestion>();
+              suggestions = Lists.newArrayList();
               if(resultDto.getHitsArray() != null && resultDto.getHitsArray().length() > 0) {
                 for(int i = 0; i < resultDto.getHitsArray().length(); i++) {
                   ItemFieldsDto itemDto = (ItemFieldsDto) resultDto.getHitsArray().get(i)
@@ -202,6 +275,8 @@ public class VariableSuggestOracle extends SuggestOracle {
 
                   suggestions.add(convertToFormattedSuggestions(query, attributes));
                 }
+                if (addAdvancedSearchSuggestion())
+                  suggestions.add(new AdvancedSearchSuggestion(query, resultDto.getTotalHits(), resultDto.getHitsArray().length(), datasource, table));
               }
 
               // Convert candidates to suggestions.
@@ -219,6 +294,10 @@ public class VariableSuggestOracle extends SuggestOracle {
           }
         }).send();
 
+  }
+
+  protected boolean addAdvancedSearchSuggestion() {
+    return true;
   }
 
   protected VariableSuggestion convertToFormattedSuggestions(String query, Map<String, String> attributes) {
@@ -264,15 +343,15 @@ public class VariableSuggestOracle extends SuggestOracle {
     return new VariableSuggestion(replacementString, displayString, datasource, table, variable);
   }
 
-  public VariableSuggestion getSelectedSuggestion() {
+  public SuggestOracle.Suggestion getSelectedSuggestion() {
     String activeItem = findActiveItem();
-    if(activeItem != null) {
-      for(VariableSuggestion suggestion : suggestions) {
-        if(activeItem.equals(suggestion.getId())) {
-          return suggestion;
-        }
-      }
-    }
+    if(activeItem != null)
+      for(Suggestion suggestion : suggestions)
+        if (activeItem.equals(((Identifiable)suggestion).getId())) return suggestion;
+    activeItem = findAdvancedSearchItemActive();
+    if(activeItem != null)
+      for(Suggestion suggestion : suggestions)
+        if (activeItem.equals(((Identifiable)suggestion).getId())) return suggestion;
     return null;
   }
 
@@ -283,6 +362,10 @@ public class VariableSuggestOracle extends SuggestOracle {
    */
   private static native String findActiveItem() /*-{
     return $wnd.jQuery('li.active').find('.variable-search-suggest-box').attr('id');
+  }-*/;
+
+  private static native String findAdvancedSearchItemActive() /*-{
+    return $wnd.jQuery('li.active').find('.advanced-search-suggest-box').attr('id');
   }-*/;
 
 }

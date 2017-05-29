@@ -20,6 +20,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import com.google.common.base.Strings;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
@@ -45,14 +46,15 @@ public class DatasourcesVariablesSearchResource extends AbstractSearchUtility {
   @Path("_search")
   @Transactional(readOnly = true)
   public Response search(@QueryParam("query") String query, @QueryParam("offset") @DefaultValue("0") int offset,
-      @QueryParam("limit") @DefaultValue("10") int limit,
+      @QueryParam("limit") @DefaultValue("10") int limit, @QueryParam("sort") String sort, @QueryParam("order") String order,
       @SuppressWarnings("TypeMayBeWeakened") @QueryParam("field") List<String> fields,
       @SuppressWarnings("TypeMayBeWeakened") @QueryParam("facet") List<String> facets) {
 
     try {
       if(!searchServiceAvailable()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-      QuerySearchJsonBuilder jsonBuilder = //
-          buildQuerySearch(query, offset, limit, fields, facets, DEFAULT_SORT_FIELD, SortDir.DESC.toString());
+      String sortField = Strings.isNullOrEmpty(sort) ? DEFAULT_SORT_FIELD : sort;
+      String sortOrder = Strings.isNullOrEmpty(order) ? Strings.isNullOrEmpty(sort) ? SortDir.DESC.toString() : SortDir.ASC.toString() : order;
+      QuerySearchJsonBuilder jsonBuilder = buildQuerySearch(query, offset, limit, fields, facets, sortField, sortOrder);
 
       Search.QueryResultDto dtoResponse = convertResponse(executeQuery(jsonBuilder.build()));
       return Response.ok().entity(dtoResponse).build();

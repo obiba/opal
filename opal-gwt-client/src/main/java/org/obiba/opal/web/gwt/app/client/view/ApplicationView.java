@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.view;
 
+import com.google.gwt.core.client.GWT;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
@@ -148,7 +149,10 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
         // Reset suggestBox text to user input text
         String originalQuery = oracle.getOriginalQuery();
         // Forward selection event
-        getUiHandlers().onSelection((VariableSuggestOracle.VariableSuggestion) selectedSuggestion);
+        if (((VariableSuggestOracle.Identifiable) selectedSuggestion).getId().equals("_advanced")) {
+          getUiHandlers().onSearch((VariableSuggestOracle.AdvancedSearchSuggestion) selectedSuggestion);
+        } else
+          getUiHandlers().onSelection((VariableSuggestOracle.VariableSuggestion) selectedSuggestion);
         return originalQuery;
       }
     });

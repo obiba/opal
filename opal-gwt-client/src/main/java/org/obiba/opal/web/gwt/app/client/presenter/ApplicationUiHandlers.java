@@ -22,4 +22,6 @@ public interface ApplicationUiHandlers extends UiHandlers {
 
   void onSelection(VariableSuggestOracle.VariableSuggestion suggestion);
 
+  void onSearch(VariableSuggestOracle.AdvancedSearchSuggestion suggestion);
+
 }
