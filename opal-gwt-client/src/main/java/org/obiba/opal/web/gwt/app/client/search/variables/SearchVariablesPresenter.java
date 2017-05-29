@@ -114,6 +114,7 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
         .query("query", query)//
         .query("offset", "" + offset)//
         .query("limit", "" + limit)//
+        .query("sort", "name")//
         .query("field", "name", "field", "datasource", "field", "table", "field", "label", "field", "label-" + locale);
 
     // Get candidates from search words.
