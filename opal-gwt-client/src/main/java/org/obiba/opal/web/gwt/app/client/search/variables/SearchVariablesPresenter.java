@@ -37,6 +37,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
@@ -79,6 +80,7 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
   protected void onReveal() {
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
     renderTaxonomies();
+    renderTables();
   }
 
   @Override
@@ -128,9 +130,17 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
+            getView().clearResults();
+            fireEvent(NotificationEvent.newBuilder().warn("MalformedSearchQuery").build());
+          }
+        }, Response.SC_BAD_REQUEST)//
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().clearResults();
             fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
           }
-        }, Response.SC_BAD_REQUEST, Response.SC_SERVICE_UNAVAILABLE)//
+        }, Response.SC_SERVICE_UNAVAILABLE)//
         .withCallback(new ResourceCallback<QueryResultDto>() {
           @Override
           public void onResource(Response response, QueryResultDto resource) {
@@ -154,6 +164,17 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
         }).send();
   }
 
+  private void renderTables() {
+    ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder()
+        .forResource(UriBuilders.DATASOURCES_TABLES.create().build())
+        .withCallback(new ResourceCallback<JsArray<TableDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<TableDto> resource) {
+            getView().setTables(JsArrays.toList(resource));
+          }
+        }).get().send();
+  }
+
   private void updateHistory() {
     PlaceRequest.Builder builder = PlaceRequestHelper.createRequestBuilder(placeManager.getCurrentPlaceRequest())
         .with(ParameterTokens.TOKEN_QUERY, query)
@@ -171,12 +192,15 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
 
     void setTaxonomies(List<TaxonomyDto> taxonomies);
 
+    void setTables(List<TableDto> tables);
+
     void setQuery(String query);
 
     void showResults(QueryResultDto results, int offset, int limit);
 
-    void reset();
+    void clearResults();
 
+    void reset();
   }
 
 }

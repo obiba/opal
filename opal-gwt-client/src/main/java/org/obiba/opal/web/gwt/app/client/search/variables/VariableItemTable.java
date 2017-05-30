@@ -94,6 +94,11 @@ public class VariableItemTable extends Table<ItemResultDto> {
       MagmaPath.Parser parser = MagmaPath.Parser.parse(item.getIdentifier());
       return parser.getDatasource() + "." + parser.getTable();
     }
+
+    @Override
+    public String getIcon(ItemResultDto value) {
+      return "icon-table";
+    }
   }
 
   private static class VariableLinkCell extends PlaceRequestCell<ItemResultDto> {

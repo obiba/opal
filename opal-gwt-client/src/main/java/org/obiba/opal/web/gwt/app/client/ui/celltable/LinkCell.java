@@ -50,11 +50,25 @@ public abstract class LinkCell<C> extends AbstractCell<C> {
     return value == null ? "" : value.toString();
   }
 
+  /**
+   * Get the icon representing the value.
+   * @param value Icon class name, can be null or empty
+   * @return
+   */
+  public String getIcon(C value) {
+    return "";
+  }
+
   @Override
   public void render(Context context, C value, SafeHtmlBuilder sb) {
     String link = getLink(value);
+    String iconClass = getIcon(value);
+    if (iconClass == null) iconClass = "";
+    if (!iconClass.isEmpty()) iconClass = "<i class='" + iconClass + "'></i> ";
     if(isEnabled() && !Strings.isNullOrEmpty(link)) {
-      sb.append(SafeHtmlUtils.fromSafeConstant("<a href=\"" + link + "\">")).appendHtmlConstant(getText(value))
+      sb.append(SafeHtmlUtils.fromSafeConstant("<a href='" + link + "'>"))
+          .append(SafeHtmlUtils.fromSafeConstant(iconClass))
+          .appendHtmlConstant(getText(value))
           .append(SafeHtmlUtils.fromSafeConstant("</a>"));
     } else {
       sb.append(SafeHtmlUtils.fromSafeConstant(getText(value)));

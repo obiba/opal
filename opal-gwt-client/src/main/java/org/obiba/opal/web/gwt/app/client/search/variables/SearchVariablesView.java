@@ -31,6 +31,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.opal.TermDto;
 import org.obiba.opal.web.model.client.opal.VocabularyDto;
@@ -69,7 +70,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
   @Inject
   public SearchVariablesView(SearchVariablesView.Binder uiBinder, Translations translations, PlaceManager placeManager) {
-    this.queryTypeahead = new Typeahead(new VariableFieldSuggestOracle());
+    initQueryTypeahead();
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
     this.placeManager = placeManager;
@@ -97,6 +98,11 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   }
 
   @Override
+  public void setTables(List<TableDto> tables) {
+    ((VariableFieldSuggestOracle) queryTypeahead.getSuggestOracle()).setTables(tables);
+  }
+
+  @Override
   public void setQuery(String query) {
     queryInput.setText(query);
     setVariablesVisible(false);
@@ -112,10 +118,27 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   }
 
   @Override
-  public void reset() {
+  public void clearResults() {
     setVariablesVisible(false);
     refreshPending.setVisible(false);
+  }
+
+  @Override
+  public void reset() {
+    clearResults();
     queryInput.setText("");
+  }
+
+  private void initQueryTypeahead() {
+    queryTypeahead = new Typeahead(new VariableFieldSuggestOracle());
+    queryTypeahead.setUpdaterCallback(new Typeahead.UpdaterCallback() {
+      @Override
+      public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {
+        return selectedSuggestion.getReplacementString();
+      }
+    });
+    queryTypeahead.setDisplayItemCount(15);
+    queryTypeahead.setMinLength(2);
   }
 
   private void initVariableItemTable() {
@@ -143,26 +166,4 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     }
   }
 
-  private class TaxonomyTermSuggestOracle extends MultiWordSuggestOracle {
-
-    private List<TaxonomyDto> taxonomies;
-
-    public void setTaxonomies(List<TaxonomyDto> taxonomies) {
-      this.taxonomies = taxonomies;
-      clear();
-      for (TaxonomyDto taxonomy : taxonomies) {
-        for (VocabularyDto vocabulary : JsArrays.toIterable(taxonomy.getVocabulariesArray())) {
-          for (TermDto term : JsArrays.toIterable(vocabulary.getTermsArray())) {
-            add(taxonomy.getName() + "-" + vocabulary.getName() + ":" + term.getName());
-          }
-        }
-      }
-    }
-
-    @Override
-    public void requestSuggestions(Request request, Callback callback) {
-      GWT.log(request.getQuery());
-      super.requestSuggestions(request, callback);
-    }
-  }
 }
