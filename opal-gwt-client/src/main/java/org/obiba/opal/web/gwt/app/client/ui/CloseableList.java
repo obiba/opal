@@ -36,22 +36,8 @@ public class CloseableList extends UList {
     addStyleName("closeables");
   }
 
-  public boolean addItem(String text, VariableSearchListItem.ItemType type) {
-    return addItem(text, true, type);
-  }
-
   public boolean addItem(String text) {
     return addItem(text, true);
-  }
-
-  public boolean addItem(String text, boolean validate, VariableSearchListItem.ItemType type) {
-    if(Strings.isNullOrEmpty(text)) return false;
-
-    if(validate && itemValidator != null && !itemValidator.validate(text)) return false;
-
-    addItemInternal(text, type);
-
-    return true;
   }
 
   public boolean addItem(String text, boolean validate) {
@@ -59,38 +45,12 @@ public class CloseableList extends UList {
 
     if(validate && itemValidator != null && !itemValidator.validate(text)) return false;
 
-    addItemInternal(text);
+    addItem(text, new ListItem());
 
     return true;
   }
 
-  private void addItemInternal(String text, VariableSearchListItem.ItemType type) {
-    final VariableSearchListItem item = new VariableSearchListItem(type);
-    item.setItemTitle(text);
-
-    InlineLabel label = new InlineLabel(text);
-    label.addStyleName("label");
-    item.add(label);
-    IconAnchor close = new IconAnchor();
-    close.setIcon(IconType.REMOVE);
-
-    close.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        removeItem(item);
-      }
-    });
-    item.add(close);
-
-    clearLastItemFocus();
-
-    add(item);
-  }
-
-  private void addItemInternal(String text) {
-    final ListItem item = new ListItem();
-
+  public void addItem(String text, final ListItem item) {
     InlineLabel label = new InlineLabel(text);
     label.addStyleName("label");
     item.add(label);
