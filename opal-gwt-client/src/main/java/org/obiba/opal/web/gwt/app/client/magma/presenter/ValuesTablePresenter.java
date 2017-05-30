@@ -650,7 +650,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     private void addDefaultFilter(VariableDto resource, String indexedFieldName) {
       DefaultCriterionDropdown criterion = new DefaultCriterionDropdown(resource, indexedFieldName) {
         @Override
-        public void doFilterValueSets() {
+        public void doFilter() {
           applyAllValueSetsFilter();
         }
       };
@@ -662,7 +662,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       // DataTime filter
       DateTimeCriterionDropdown criterion = new DateTimeCriterionDropdown(resource, indexedFieldName) {
         @Override
-        public void doFilterValueSets() {
+        public void doFilter() {
           applyAllValueSetsFilter();
         }
       };
@@ -698,7 +698,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       // Categorical variable
       CategoricalCriterionDropdown criterion = new CategoricalCriterionDropdown(variableDto, fieldName, resource) {
         @Override
-        public void doFilterValueSets() {
+        public void doFilter() {
           applyAllValueSetsFilter();
         }
       };
@@ -710,7 +710,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       // Numerical variable
       NumericalCriterionDropdown criterion = new NumericalCriterionDropdown(variableDto, fieldName, resource) {
         @Override
-        public void doFilterValueSets() {
+        public void doFilter() {
           applyAllValueSetsFilter();
         }
       };
@@ -744,7 +744,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         if(!getView().hasCriteria()) {
           IdentifiersCriterionDropdown criterion = new IdentifiersCriterionDropdown() {
             @Override
-            public void doFilterValueSets() {
+            public void doFilter() {
               applyAllValueSetsFilter();
             }
           };

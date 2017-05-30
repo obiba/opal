@@ -2147,6 +2147,7 @@ public interface Translations extends Constants {
   @Description("Criterion Filters Labels")
   @DefaultStringMapValue({//
       "all", "All",//
+      "any", "Any",//
       "empty", "Empty",//
       "not_empty", "Not empty",//
       "min", "Min",//
@@ -2155,6 +2156,7 @@ public interface Translations extends Constants {
       "select_operator", "Select an operator...",//
       "in", "In", //
       "not_in", "Not in",//
+      "none", "None",//
       "select", "Select",//
       "range", "Range", //
       "values", "Values", //

@@ -29,7 +29,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
 
-public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
+public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDropdown {
 
   private Chooser categories;
 
@@ -148,7 +148,7 @@ public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
     @Override
     public void onChange(ChosenChangeEvent chosenChangeEvent) {
       setFilterText();
-      doFilterValueSets();
+      doFilter();
     }
   }
 

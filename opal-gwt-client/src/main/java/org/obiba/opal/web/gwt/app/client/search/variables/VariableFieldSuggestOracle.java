@@ -67,16 +67,20 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
   public void requestSuggestions(Request request, Callback callback) {
     int limit = request.getLimit();
     String query = normalizeSearch(request.getQuery());
-    List<CandidateSuggestion> candidates = Lists.newArrayList();
+    List<VariableFieldSuggestion> candidates = Lists.newArrayList();
     for (TermSuggestion suggestion : termSuggestions) {
-      if (suggestion.isCandidate(query)) candidates.add(suggestion);
-    }
-    for (PropertySuggestion suggestion : propertySuggestions) {
       if (suggestion.isCandidate(query)) candidates.add(suggestion);
     }
     for (MagmaSuggestion suggestion : tablesSuggestions) {
       if (suggestion.isCandidate(query)) candidates.add(suggestion);
     }
+    for (PropertySuggestion suggestion : propertySuggestions) {
+      if (suggestion.isCandidate(query)) candidates.add(suggestion);
+    }
+    //GWT.log("=========");
+    //for (Suggestion sugg : candidates) {
+    //  GWT.log(sugg.getReplacementString());
+    //}
     Response response = new Response(candidates);
     response.setMoreSuggestionsCount(Math.max(0, candidates.size() - limit));
     callback.onSuggestionsReady(request, response);
@@ -103,15 +107,15 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     String nSearch = search.trim();
     int idx = nSearch.lastIndexOf(' ');
     if (idx > 0) nSearch = nSearch.substring(idx + 1);
-    GWT.log(search + " => " + nSearch);
+    //GWT.log(search + " => " + nSearch);
     return nSearch.trim();
   }
 
-  private interface CandidateSuggestion extends Suggestion {
+  public interface VariableFieldSuggestion extends Suggestion {
     boolean isCandidate(String query);
   }
 
-  private class PropertySuggestion implements CandidateSuggestion {
+  public class PropertySuggestion implements VariableFieldSuggestion {
 
     private final String property;
 
@@ -132,7 +136,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
       SafeHtmlBuilder accum = new SafeHtmlBuilder();
       String name = value.isEmpty() ? property : value;
-      accum.appendHtmlConstant("<div>");
+      accum.appendHtmlConstant("<div id='" + getReplacementString() + "'>");
       accum.appendHtmlConstant("  <i class='icon-list'></i>");
       accum.appendHtmlConstant("  <strong>");
       accum.appendEscaped(name);
@@ -164,7 +168,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     }
   }
 
-  private class MagmaSuggestion implements CandidateSuggestion {
+  public class MagmaSuggestion implements VariableFieldSuggestion {
 
     private final String datasource;
 
@@ -184,7 +188,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     public String getDisplayString() {
       SafeHtmlBuilder accum = new SafeHtmlBuilder();
       String name = table == null ? datasource : table.getName();
-      accum.appendHtmlConstant("<div>");
+      accum.appendHtmlConstant("<div id='" + getReplacementString() + "'>");
       if (table != null) accum.appendHtmlConstant("  <i class='icon-table'></i>");
       else accum.appendHtmlConstant("  <i class='icon-folder-close'></i>");
       accum.appendHtmlConstant("  <strong>");
@@ -216,7 +220,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     }
   }
 
-  private class TermSuggestion implements CandidateSuggestion {
+  public class TermSuggestion implements VariableFieldSuggestion {
 
     private final TaxonomyDto taxonomy;
 
@@ -234,7 +238,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     public String getDisplayString() {
       SafeHtmlBuilder accum = new SafeHtmlBuilder();
       String name = term.getName();
-      accum.appendHtmlConstant("<div>");
+      accum.appendHtmlConstant("<div id='" + getReplacementString() + "'>");
       accum.appendHtmlConstant("  <i class='icon-tag'></i>");
       accum.appendHtmlConstant("  <strong>");
       accum.appendEscaped(name);
@@ -257,7 +261,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     public boolean isCandidate(String query) {
       boolean rval = getReplacementString().toLowerCase().contains(query.toLowerCase());
       // TODO look in title, description, keywords
-      if (rval) GWT.log(getReplacementString() + " isCandidate " + query);
+      //if (rval) GWT.log(getReplacementString() + " isCandidate " + query);
       return rval;
     }
   }

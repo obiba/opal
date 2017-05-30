@@ -26,7 +26,7 @@
       <b:Well>
         <b:ControlGroup ui:field="searchIdentifierGroup" visible="false">
           <b:InputAddOn prependIcon="SEARCH">
-            <b:TextBox ui:field="searchBox" placeholder="search for an identifier..."/>
+            <b:TextBox ui:field="searchBox" placeholder="Search for an identifier..."/>
           </b:InputAddOn>
         </b:ControlGroup>
 

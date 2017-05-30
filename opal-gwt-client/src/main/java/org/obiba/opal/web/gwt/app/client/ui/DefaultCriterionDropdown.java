@@ -21,7 +21,7 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.ui.Widget;
 
-public abstract class DefaultCriterionDropdown extends CriterionDropdown {
+public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown {
 
   private TextBox matches;
 
@@ -142,7 +142,7 @@ public abstract class DefaultCriterionDropdown extends CriterionDropdown {
 
   private void updateMatchCriteriaFilter() {
     setFilterText();
-    doFilterValueSets();
+    doFilter();
   }
 
   private void setFilterText() {

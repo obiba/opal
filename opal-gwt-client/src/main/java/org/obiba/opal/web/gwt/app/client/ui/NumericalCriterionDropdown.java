@@ -27,7 +27,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
 
-public abstract class NumericalCriterionDropdown extends CriterionDropdown {
+public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdown {
 
   private Chooser rangeValueChooser;
 
@@ -199,7 +199,7 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
 
   private void updateRangeValuesCriterionFilter() {
     setFilterText();
-    doFilterValueSets();
+    doFilter();
   }
 
   private void setFilterText() {

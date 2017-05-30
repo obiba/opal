@@ -28,9 +28,10 @@
       </ui:msg>
     </b:Paragraph>
 
-    <b:Well addStyleNames="form-search">
+    <b:Well>
+      <o:CriteriaPanel ui:field="queryPanel" addStyleNames="inline-block"></o:CriteriaPanel>
       <b:Typeahead ui:field="queryTypeahead">
-        <b:TextBox ui:field="queryInput" addStyleNames="input-xxlarge"/>
+        <b:TextBox ui:field="queryInput" addStyleNames="top-margin"/>
       </b:Typeahead>
       <b:Button ui:field="searchButton" addStyleNames="btn btn-primary small-indent">
         <ui:msg description="Search Button label">Search</ui:msg>

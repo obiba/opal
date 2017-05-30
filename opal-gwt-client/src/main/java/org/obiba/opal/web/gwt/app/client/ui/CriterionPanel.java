@@ -54,7 +54,7 @@ public class CriterionPanel extends FlowPanel {
         @Override
         public void onClick(ClickEvent event) {
           removeFromParent();
-          criterion.doFilterValueSets();
+          criterion.doFilter();
         }
       });
       w.addAppendWidget(remove);

@@ -10,31 +10,27 @@
 
 package org.obiba.opal.web.gwt.app.client.search.variables;
 
-import com.github.gwtbootstrap.client.ui.*;
+import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.*;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.*;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.ui.CriteriaPanel;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
-import org.obiba.opal.web.model.client.opal.TermDto;
-import org.obiba.opal.web.model.client.opal.VocabularyDto;
 import org.obiba.opal.web.model.client.search.ItemResultDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
@@ -44,12 +40,13 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
   interface Binder extends UiBinder<Widget, SearchVariablesView> {}
 
-  private final Translations translations;
-
   private final PlaceManager placeManager;
 
   @UiField
   Breadcrumbs breadcrumbs;
+
+  @UiField
+  CriteriaPanel queryPanel;
 
   @UiField(provided = true)
   Typeahead queryTypeahead;
@@ -69,10 +66,9 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   private VariableItemProvider variableItemProvider;
 
   @Inject
-  public SearchVariablesView(SearchVariablesView.Binder uiBinder, Translations translations, PlaceManager placeManager) {
+  public SearchVariablesView(SearchVariablesView.Binder uiBinder, PlaceManager placeManager) {
     initQueryTypeahead();
     initWidget(uiBinder.createAndBindUi(this));
-    this.translations = translations;
     this.placeManager = placeManager;
   }
   
@@ -84,12 +80,12 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   @UiHandler("searchButton")
   public void onSearch(ClickEvent event) {
     setVariablesVisible(false);
-    getUiHandlers().onSearch(queryInput.getText());
+    getUiHandlers().onSearch(getQuery());
   }
 
   @UiHandler("queryInput")
   public void onQueryTyped(KeyUpEvent event) {
-    if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) onSearch(null);
+    if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER || getQuery().isEmpty()) onSearch(null);
   }
 
   @Override
@@ -129,12 +125,36 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     queryInput.setText("");
   }
 
+  //
+  // Private methods
+  //
+
+  private String getQuery() {
+    String queryDropdowns = queryPanel.getQueryString();
+    if ("*".equals(queryDropdowns)) queryDropdowns = "";
+    return (queryDropdowns  + " " + queryInput.getText()).trim();
+  }
+
   private void initQueryTypeahead() {
     queryTypeahead = new Typeahead(new VariableFieldSuggestOracle());
     queryTypeahead.setUpdaterCallback(new Typeahead.UpdaterCallback() {
       @Override
       public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {
-        return selectedSuggestion.getReplacementString();
+        VariableFieldDropdown dd = new VariableFieldDropdown((VariableFieldSuggestOracle.VariableFieldSuggestion) selectedSuggestion) {
+          @Override
+          public void doFilter() {
+            onSearch(null);
+          }
+        };
+        dd.addChangeHandler(new ChangeHandler() {
+          @Override
+          public void onChange(ChangeEvent event) {
+            onSearch(null);
+          }
+        });
+        queryPanel.addCriterion(dd, true, false);
+        return "";
+        //return selectedSuggestion.getReplacementString();
       }
     });
     queryTypeahead.setDisplayItemCount(15);
@@ -162,7 +182,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     protected void onRangeChanged(HasData<ItemResultDto> display) {
       Range range = display.getVisibleRange();
       setVariablesVisible(false);
-      getUiHandlers().onSearchRange(queryInput.getText(), range.getStart(), range.getLength());
+      getUiHandlers().onSearchRange(getQuery(), range.getStart(), range.getLength());
     }
   }
 
