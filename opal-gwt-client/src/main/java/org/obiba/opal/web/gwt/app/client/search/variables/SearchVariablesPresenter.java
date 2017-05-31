@@ -11,8 +11,10 @@
 package org.obiba.opal.web.gwt.app.client.search.variables;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -38,6 +40,7 @@ import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.opal.GeneralConf;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
@@ -58,7 +61,7 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
 
   private int limit = 50;
 
-  private String locale = "en";
+  private List<String> locales = Lists.newArrayList();
 
   @Inject
   public SearchVariablesPresenter(EventBus eventBus, Display display, Proxy proxy, Translations translations,
@@ -81,6 +84,7 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
     renderTaxonomies();
     renderTables();
+    initializeLocales();
   }
 
   @Override
@@ -88,11 +92,9 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
     query = request.getParameter(ParameterTokens.TOKEN_QUERY, null);
     offset = Integer.parseInt(request.getParameter(ParameterTokens.TOKEN_OFFSET, "0"));
     limit = Integer.parseInt(request.getParameter(ParameterTokens.TOKEN_LIMIT, "50"));
-    locale = request.getParameter(ParameterTokens.TOKEN_LOCALE, "en");
     getView().setQuery(query);
     if (!Strings.isNullOrEmpty(query)) query();
     else getView().reset();
-
   }
 
   @Override
@@ -123,7 +125,11 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
         .query("offset", "" + offset)//
         .query("limit", "" + limit)//
         .query("sort", "name")//
-        .query("field", "name", "field", "datasource", "field", "table", "field", "label", "field", "label-" + locale);
+        .query("field", "name", "field", "datasource", "field", "table", "field", "label");
+
+    for (String locale : locales) {
+      ub.query("field", "label-" + locale);
+    }
 
     // Get candidates from search words.
     ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
@@ -175,12 +181,25 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
         }).get().send();
   }
 
+  private void initializeLocales() {
+    ResourceRequestBuilderFactory.<GeneralConf>newBuilder()
+        .forResource(UriBuilders.SYSTEM_CONF_GENERAL.create().build())
+        .withCallback(new ResourceCallback<GeneralConf>() {
+          @Override
+          public void onResource(Response response, GeneralConf resource) {
+            locales.clear();
+            for(int i = 0; i < resource.getLanguagesArray().length(); i++) {
+              locales.add(resource.getLanguages(i));
+            }
+          }
+        }).get().send();
+  }
+
   private void updateHistory() {
     PlaceRequest.Builder builder = PlaceRequestHelper.createRequestBuilder(placeManager.getCurrentPlaceRequest())
         .with(ParameterTokens.TOKEN_QUERY, query)
         .with(ParameterTokens.TOKEN_OFFSET, "" + offset)
-        .with(ParameterTokens.TOKEN_LIMIT, "" + limit)
-        .with(ParameterTokens.TOKEN_LOCALE, locale);
+        .with(ParameterTokens.TOKEN_LIMIT, "" + limit);
     placeManager.updateHistory(builder.build(), true);
   }
 
