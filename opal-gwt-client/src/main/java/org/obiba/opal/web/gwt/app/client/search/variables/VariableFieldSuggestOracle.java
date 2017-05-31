@@ -11,8 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.search.variables;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.gwt.core.client.GWT;
+import com.google.common.collect.Sets;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -21,9 +20,8 @@ import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.opal.TermDto;
 import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class VariableFieldSuggestOracle extends SuggestOracle {
@@ -52,18 +50,13 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
   public void setTables(List<TableDto> tables) {
     tablesSuggestions.clear();
-    Map<String, List<TableDto>> datasourceTables = Maps.newHashMap();
+    Set<String> datasourceNames = Sets.newHashSet();
     for (TableDto table : tables) {
-      if (!datasourceTables.containsKey(table.getDatasourceName())) datasourceTables.put(table.getDatasourceName(), new ArrayList<TableDto>());
-      datasourceTables.get(table.getDatasourceName()).add(table);
+      tablesSuggestions.add(new MagmaSuggestion(table, tables));
+      datasourceNames.add(table.getDatasourceName());
     }
-    for (String datasource : datasourceTables.keySet()) {
-      for (TableDto table : datasourceTables.get(datasource)) {
-        tablesSuggestions.add(new MagmaSuggestion(table, datasourceTables.get(datasource)));
-      }
-    }
-    for (String name : datasourceTables.keySet()) {
-      tablesSuggestions.add(new MagmaSuggestion(name, datasourceTables.keySet()));
+    for (String name : datasourceNames) {
+      tablesSuggestions.add(new MagmaSuggestion(name, datasourceNames));
     }
   }
 
@@ -209,13 +202,13 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     private final List<String> categories = Lists.newArrayList();
 
-    private MagmaSuggestion(TableDto table, List<TableDto> tables) {
+    private MagmaSuggestion(TableDto table, Collection<TableDto> tables) {
       this.datasource = table.getDatasourceName();
       this.table = table;
       for (TableDto tableDto : tables) categories.add(tableDto.getName());
     }
 
-    private MagmaSuggestion(String datasource, Set<String> datasources) {
+    private MagmaSuggestion(String datasource, Collection<String> datasources) {
       this.datasource = datasource;
       this.table = null;
       categories.addAll(datasources);
@@ -258,7 +251,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     }
 
     private String escape(String value) {
-      return value.contains(" ") ? "\"" + value + "\"" : value;
+      return value.replaceAll(" ", "+");
     }
   }
 

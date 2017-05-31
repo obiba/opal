@@ -966,6 +966,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Next >")
   String nextLabel();
 
+  @Description("Basic label")
+  @DefaultStringValue("Basic")
+  String basicLabel();
+
+  @Description("Advanced label")
+  @DefaultStringValue("Advanced")
+  String advancedLabel();
+
   @Description("Previous label")
   @DefaultStringValue("< Previous")
   String previousLabel();

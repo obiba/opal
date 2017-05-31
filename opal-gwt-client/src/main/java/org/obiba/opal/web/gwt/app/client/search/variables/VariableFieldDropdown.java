@@ -14,6 +14,7 @@ import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.*;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -102,7 +103,8 @@ public class VariableFieldDropdown extends CriterionDropdown {
         // select the appropriate checkbox
         for (int i = 0; i<specificControls.getWidgetCount(); i++) {
           CheckBox checkbox = (CheckBox) specificControls.getWidget(i);
-          checkbox.setValue(checkbox.getText().equals(value));
+          GWT.log(normalizeKeyword(checkbox.getText()) + " == " + value);
+          checkbox.setValue(normalizeKeyword(checkbox.getText()).equals(value));
         }
       } else {
         matches.setText(value);
@@ -189,12 +191,16 @@ public class VariableFieldDropdown extends CriterionDropdown {
     for (int i = 0; i<specificControls.getWidgetCount(); i++) {
       CheckBox checkbox = (CheckBox) specificControls.getWidget(i);
       if (checkbox.getValue()) {
-        if (Strings.isNullOrEmpty(rval)) rval = checkbox.getText();
-        else rval = rval + " OR " + checkbox.getText();
+        if (Strings.isNullOrEmpty(rval)) rval = normalizeKeyword(checkbox.getText());
+        else rval = rval + " OR " + normalizeKeyword(checkbox.getText());
       }
     }
     if (Strings.isNullOrEmpty(rval)) return null;
     return (isNot() ? "NOT " : "") + fieldName + ":" + (rval.contains(" OR ") ? "(" + rval + ")" : rval);
+  }
+
+  private String normalizeKeyword(String keyword) {
+    return keyword.replaceAll(" ","+");
   }
 
   /**

@@ -31,11 +31,13 @@
     <b:Well>
       <o:CriteriaPanel ui:field="queryPanel" addStyleNames="inline-block"></o:CriteriaPanel>
       <b:Typeahead ui:field="queryTypeahead">
-        <b:TextBox ui:field="queryInput" addStyleNames="top-margin"/>
+        <b:TextBox ui:field="queryInput" placeholder="Text or more criteria..." addStyleNames="top-margin"/>
       </b:Typeahead>
+      <b:TextArea ui:field="queryArea" visibleLines="5" width="100%" visible="false"></b:TextArea>
       <b:Button ui:field="searchButton" addStyleNames="btn btn-primary small-indent">
         <ui:msg description="Search Button label">Search</ui:msg>
       </b:Button>
+      <o:ToggleAnchor ui:field="queryMode" addStyleNames="btn-small"/>
     </b:Well>
 
     <g:FlowPanel>
