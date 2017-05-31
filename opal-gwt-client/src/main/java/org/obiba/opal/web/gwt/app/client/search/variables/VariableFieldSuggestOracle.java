@@ -89,6 +89,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
   }
 
   private void initPropertySuggestions() {
+    propertySuggestions.add(new PropertySuggestion("name"));
     propertySuggestions.add(new PropertySuggestion("entityType"));
     initPropertySuggestions("valueType", new String[]{"integer", "decimal", "text", "boolean", "date", "datetime"});
     initPropertySuggestions("repeatable", new String[]{"true", "false"});
