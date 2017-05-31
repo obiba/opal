@@ -21,7 +21,7 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.ui.Widget;
 
-public abstract class DefaultCriterionDropdown extends CriterionDropdown {
+public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown {
 
   private TextBox matches;
 
@@ -35,7 +35,7 @@ public abstract class DefaultCriterionDropdown extends CriterionDropdown {
   }
 
   @Override
-  public Widget getSpecificControls() {
+  public Widget createSpecificControls() {
 
     valuesLabel = new ControlLabel();
     values = new TextBox();
@@ -69,19 +69,19 @@ public abstract class DefaultCriterionDropdown extends CriterionDropdown {
 
     private void updateRadioButtons() {
         // Update radio controls
-        RadioButton like = getRadioButton(translations.criterionFiltersMap().get("like"), null);
+        RadioButton like = createRadioButton(translations.criterionFiltersMap().get("like"), null);
         like.addClickHandler(new OperatorClickHandler());
         radioControls.add(like);
 
-        RadioButton not_like = getRadioButton(translations.criterionFiltersMap().get("not_like"), null);
+        RadioButton not_like = createRadioButton(translations.criterionFiltersMap().get("not_like"), null);
         not_like.addClickHandler(new OperatorClickHandler());
         radioControls.add(not_like);
 
-        RadioButton in = getRadioButton(translations.criterionFiltersMap().get("in"), null);
+        RadioButton in = createRadioButton(translations.criterionFiltersMap().get("in"), null);
         in.addClickHandler(new OperatorClickHandler());
         radioControls.add(in);
 
-        RadioButton not_in = getRadioButton(translations.criterionFiltersMap().get("not_in"), null);
+        RadioButton not_in = createRadioButton(translations.criterionFiltersMap().get("not_in"), null);
         not_in.addClickHandler(new OperatorClickHandler());
         radioControls.add(not_in);
     }
@@ -142,7 +142,7 @@ public abstract class DefaultCriterionDropdown extends CriterionDropdown {
 
   private void updateMatchCriteriaFilter() {
     setFilterText();
-    doFilterValueSets();
+    doFilter();
   }
 
   private void setFilterText() {

@@ -547,6 +547,7 @@ public interface Translations extends Constants {
       "CopyVariableIncompatibleEntityType", "Incompatible entity types: {0} / {1}.",//
       "DeleteVariableSelectAtLeastOne", "Select at least one variable to remove.",//
       "SearchServiceUnavailable", "Search operation failed. Please make sure the service is started.",//
+      "MalformedSearchQuery", "Malformed search query.",//
       "UserStatusChangedOk", "User {0} has been successfully {1}.",//
       "UserUpdatedOk", "User {0} has been successfully updated.",//
       "UserCreatedOk", "User {0} has been successfully added.",//
@@ -964,6 +965,14 @@ public interface Translations extends Constants {
   @Description("Next label")
   @DefaultStringValue("Next >")
   String nextLabel();
+
+  @Description("Basic label")
+  @DefaultStringValue("Basic")
+  String basicLabel();
+
+  @Description("Advanced label")
+  @DefaultStringValue("Advanced")
+  String advancedLabel();
 
   @Description("Previous label")
   @DefaultStringValue("< Previous")
@@ -2146,6 +2155,7 @@ public interface Translations extends Constants {
   @Description("Criterion Filters Labels")
   @DefaultStringMapValue({//
       "all", "All",//
+      "any", "Any",//
       "empty", "Empty",//
       "not_empty", "Not empty",//
       "min", "Min",//
@@ -2154,6 +2164,7 @@ public interface Translations extends Constants {
       "select_operator", "Select an operator...",//
       "in", "In", //
       "not_in", "Not in",//
+      "none", "None",//
       "select", "Select",//
       "range", "Range", //
       "values", "Values", //

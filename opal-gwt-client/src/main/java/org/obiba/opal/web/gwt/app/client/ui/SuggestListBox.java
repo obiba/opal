@@ -190,12 +190,12 @@ public class SuggestListBox extends FocusPanel {
     closeables.clear();
   }
 
-  public boolean addItem(String text, VariableSearchListItem.ItemType type) {
-    return closeables.addItem(text, false, type);
-  }
-
   public boolean addItem(String text) {
     return closeables.addItem(text, false);
+  }
+
+  public void addItem(String text, ListItem item) {
+    closeables.addItem(text, item);
   }
 
   @SuppressWarnings("UnusedDeclaration")

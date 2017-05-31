@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.search.variables;
 
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -27,6 +28,7 @@ import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
@@ -35,7 +37,11 @@ import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
+
+import java.util.List;
 
 public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter.Display, SearchVariablesPresenter.Proxy>
     implements HasPageTitle, SearchVariablesUiHandlers {
@@ -73,6 +79,8 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
   @Override
   protected void onReveal() {
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
+    renderTaxonomies();
+    renderTables();
   }
 
   @Override
@@ -122,9 +130,17 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
+            getView().clearResults();
+            fireEvent(NotificationEvent.newBuilder().warn("MalformedSearchQuery").build());
+          }
+        }, Response.SC_BAD_REQUEST)//
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().clearResults();
             fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
           }
-        }, Response.SC_BAD_REQUEST, Response.SC_SERVICE_UNAVAILABLE)//
+        }, Response.SC_SERVICE_UNAVAILABLE)//
         .withCallback(new ResourceCallback<QueryResultDto>() {
           @Override
           public void onResource(Response response, QueryResultDto resource) {
@@ -135,6 +151,28 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
           }
         })//
         .send();
+  }
+
+  private void renderTaxonomies() {
+    ResourceRequestBuilderFactory.<JsArray<TaxonomyDto>>newBuilder()
+        .forResource(UriBuilders.SYSTEM_CONF_TAXONOMIES.create().build()).get()
+        .withCallback(new ResourceCallback<JsArray<TaxonomyDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<TaxonomyDto> resource) {
+            getView().setTaxonomies(JsArrays.toList(resource));
+          }
+        }).send();
+  }
+
+  private void renderTables() {
+    ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder()
+        .forResource(UriBuilders.DATASOURCES_TABLES.create().build())
+        .withCallback(new ResourceCallback<JsArray<TableDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<TableDto> resource) {
+            getView().setTables(JsArrays.toList(resource));
+          }
+        }).get().send();
   }
 
   private void updateHistory() {
@@ -152,9 +190,15 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
 
   public interface Display extends View, HasBreadcrumbs, HasUiHandlers<SearchVariablesUiHandlers> {
 
+    void setTaxonomies(List<TaxonomyDto> taxonomies);
+
+    void setTables(List<TableDto> tables);
+
     void setQuery(String query);
 
     void showResults(QueryResultDto results, int offset, int limit);
+
+    void clearResults();
 
     void reset();
   }

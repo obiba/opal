@@ -29,7 +29,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
 
-public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
+public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDropdown {
 
   private Chooser categories;
 
@@ -38,13 +38,13 @@ public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
   }
 
   @Override
-  public Widget getSpecificControls() {
+  public Widget createSpecificControls() {
     // Update radio controls
-    RadioButton in = getRadioButton(translations.criterionFiltersMap().get("in"), null);
+    RadioButton in = createRadioButton(translations.criterionFiltersMap().get("in"), null);
     in.addClickHandler(new OperatorClickHandler());
     radioControls.add(in);
 
-    RadioButton not_in = getRadioButton(translations.criterionFiltersMap().get("not_in"), null);
+    RadioButton not_in = createRadioButton(translations.criterionFiltersMap().get("not_in"), null);
     not_in.addClickHandler(new OperatorClickHandler());
     radioControls.add(not_in);
 
@@ -148,7 +148,7 @@ public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
     @Override
     public void onChange(ChosenChangeEvent chosenChangeEvent) {
       setFilterText();
-      doFilterValueSets();
+      doFilter();
     }
   }
 

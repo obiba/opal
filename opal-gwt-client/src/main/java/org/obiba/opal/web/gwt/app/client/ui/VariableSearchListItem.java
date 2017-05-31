@@ -19,8 +19,9 @@ public class VariableSearchListItem extends ListItem {
 
   private ItemType type;
 
-  public VariableSearchListItem(ItemType type) {
+  public VariableSearchListItem(ItemType type, String title) {
     this.type = type;
+    setItemTitle(title);
   }
 
   public void setType(ItemType type) {
@@ -31,7 +32,7 @@ public class VariableSearchListItem extends ListItem {
     return type;
   }
 
-  public void setItemTitle(String title) {
+  private void setItemTitle(String title) {
     if(type == ItemType.DATASOURCE) {
       setTitle("datasource:" + title);
     } else {

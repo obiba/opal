@@ -9,13 +9,13 @@
   -->
 
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-    xmlns:g="urn:import:com.google.gwt.user.client.ui"
-    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
-    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
-    xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.search.variables"
-    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
-    ui:generateLocales="default">
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+             xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.search.variables"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+             ui:generateLocales="default">
 
   <g:FlowPanel>
     <g:FlowPanel addStyleNames="section-header xlarge-bottom-margin">
@@ -28,16 +28,22 @@
       </ui:msg>
     </b:Paragraph>
 
-    <b:Well addStyleNames="form-search">
-      <b:TextBox ui:field="queryInput"/>
+    <b:Well>
+      <o:CriteriaPanel ui:field="queryPanel" addStyleNames="inline-block"></o:CriteriaPanel>
+      <b:Typeahead ui:field="queryTypeahead">
+        <b:TextBox ui:field="queryInput" placeholder="Text or more criteria..." addStyleNames="top-margin"/>
+      </b:Typeahead>
+      <b:TextArea ui:field="queryArea" visibleLines="5" width="100%" visible="false"></b:TextArea>
       <b:Button ui:field="searchButton" addStyleNames="btn btn-primary small-indent">
         <ui:msg description="Search Button label">Search</ui:msg>
       </b:Button>
+      <o:ToggleAnchor ui:field="queryMode" addStyleNames="btn-small"/>
     </b:Well>
 
     <g:FlowPanel>
       <g:FlowPanel>
-        <o:OpalSimplePager ui:field="variableItemPager" showTotalWhenNoPager="true" location="RIGHT" addStyleNames="pull-right small-indent"/>
+        <o:OpalSimplePager ui:field="variableItemPager" showTotalWhenNoPager="true" location="RIGHT"
+                           addStyleNames="pull-right small-indent"/>
         <o2:VariableItemTable ui:field="variableItemTable" width="100%" addStyleNames="small-top-margin pull-left"/>
       </g:FlowPanel>
       <g:Image ui:field="refreshPending" url="image/loading.gif"/>

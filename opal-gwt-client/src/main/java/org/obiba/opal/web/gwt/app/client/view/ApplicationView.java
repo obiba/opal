@@ -217,7 +217,7 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
     if(VariableSearchListItem.ItemType.TABLE == type) {
       oracle.setTable(qText);
     }
-    search.addItem(qText, type);
+    search.addItem(qText, new VariableSearchListItem(type, qText));
   }
 
   private String quoteIfContainsSpace(String s) {

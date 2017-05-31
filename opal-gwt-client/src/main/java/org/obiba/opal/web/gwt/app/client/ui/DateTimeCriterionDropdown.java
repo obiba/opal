@@ -29,7 +29,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
 
-public abstract class DateTimeCriterionDropdown extends CriterionDropdown {
+public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdown {
 
   private Chooser rangeValueChooser;
 
@@ -50,7 +50,7 @@ public abstract class DateTimeCriterionDropdown extends CriterionDropdown {
   }
 
   @Override
-  public Widget getSpecificControls() {
+  public Widget createSpecificControls() {
     updateRadioButtons();
 
     ListItem specificControls = new ListItem();
@@ -75,11 +75,11 @@ public abstract class DateTimeCriterionDropdown extends CriterionDropdown {
 
   private void updateRadioButtons() {
     // Update radio controls
-    RadioButton in = getRadioButton(translations.criterionFiltersMap().get("in"), null);
+    RadioButton in = createRadioButton(translations.criterionFiltersMap().get("in"), null);
     in.addClickHandler(new OperatorClickHandler());
     radioControls.add(in);
 
-    RadioButton not_in = getRadioButton(translations.criterionFiltersMap().get("not_in"), null);
+    RadioButton not_in = createRadioButton(translations.criterionFiltersMap().get("not_in"), null);
     not_in.addClickHandler(new OperatorClickHandler());
     radioControls.add(not_in);
   }
@@ -96,7 +96,7 @@ public abstract class DateTimeCriterionDropdown extends CriterionDropdown {
       @Override
       public void onValueChange(ValueChangeEvent<Date> event) {
         setFilterText();
-        doFilterValueSets();
+        doFilter();
       }
     });
 
@@ -199,7 +199,7 @@ public abstract class DateTimeCriterionDropdown extends CriterionDropdown {
     public void onChange(ChosenChangeEvent chosenChangeEvent) {
       updateRangeValuesFields();
       setFilterText();
-      doFilterValueSets();
+      doFilter();
     }
   }
 

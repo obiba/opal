@@ -50,7 +50,6 @@ public class SearchEntityView extends ViewWithUiHandlers<SearchEntityUiHandlers>
 
   interface Binder extends UiBinder<Widget, SearchEntityView> {}
 
-  private final Translations translations;
 
   private final PlaceManager placeManager;
 
@@ -103,7 +102,6 @@ public class SearchEntityView extends ViewWithUiHandlers<SearchEntityUiHandlers>
   @Inject
   public SearchEntityView(SearchEntityView.Binder uiBinder, Translations translations, PlaceManager placeManager) {
     initWidget(uiBinder.createAndBindUi(this));
-    this.translations = translations;
     this.placeManager = placeManager;
     initValueSetTable();
     filter.getTextBox().setPlaceholder(translations.filterVariables());

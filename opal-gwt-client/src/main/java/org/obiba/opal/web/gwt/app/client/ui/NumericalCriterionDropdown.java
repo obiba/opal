@@ -27,7 +27,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
 
-public abstract class NumericalCriterionDropdown extends CriterionDropdown {
+public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdown {
 
   private Chooser rangeValueChooser;
 
@@ -48,7 +48,7 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
   }
 
   @Override
-  public Widget getSpecificControls() {
+  public Widget createSpecificControls() {
     updateRadioButtons();
 
     rangeValueChooser = new Chooser();
@@ -74,11 +74,11 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
 
   private void updateRadioButtons() {
     // Update radio controls
-    RadioButton in = getRadioButton(translations.criterionFiltersMap().get("in"), null);
+    RadioButton in = createRadioButton(translations.criterionFiltersMap().get("in"), null);
     in.addClickHandler(new OperatorClickHandler());
     radioControls.add(in);
 
-    RadioButton not_in = getRadioButton(translations.criterionFiltersMap().get("not_in"), null);
+    RadioButton not_in = createRadioButton(translations.criterionFiltersMap().get("not_in"), null);
     not_in.addClickHandler(new OperatorClickHandler());
     radioControls.add(not_in);
   }
@@ -199,7 +199,7 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
 
   private void updateRangeValuesCriterionFilter() {
     setFilterText();
-    doFilterValueSets();
+    doFilter();
   }
 
   private void setFilterText() {
