@@ -113,6 +113,11 @@ public class ValueSetTable extends Table<VariableValueRow> {
     public String getText(VariableValueRow row) {
       return row.getDatasource() + "." + row.getTable();
     }
+
+    @Override
+    public String getIcon(VariableValueRow value) {
+      return "icon-table";
+    }
   }
 
 

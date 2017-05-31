@@ -17,8 +17,6 @@ public class ParameterTokens {
 
   public static final String TOKEN_LIMIT = "lm";
 
-  public static final String TOKEN_LOCALE = "lc";
-
   public static final String TOKEN_NAME = "name";
 
   public static final String TOKEN_TAB = "tab";
