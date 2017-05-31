@@ -30,7 +30,7 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
     queryResult = termDto;
     updateCriterionFilter(translations.criterionFiltersMap().get("all"));
     addRadioButtons(getNoEmptyCount());
-    Widget specificControls = getSpecificControls();
+    Widget specificControls = createSpecificControls();
     if(specificControls != null) {
       add(specificControls);
     }
@@ -57,14 +57,14 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
 
   private void addRadioButtons(int noEmpty) {
     // All, Empty, Not Empty radio buttons
-    RadioButton radioAll = getRadioButtonResetSpecific(translations.criterionFiltersMap().get("all"),
+    RadioButton radioAll = createRadioButtonResetSpecific(translations.criterionFiltersMap().get("all"),
         queryResult == null ? null : queryResult.getTotalHits());
     radioAll.setValue(true);
     radioControls.add(radioAll);
 
-    radioControls.add(getRadioButtonResetSpecific(translations.criterionFiltersMap().get("empty"),
+    radioControls.add(createRadioButtonResetSpecific(translations.criterionFiltersMap().get("empty"),
         queryResult == null ? null : queryResult.getTotalHits() - noEmpty));
-    radioControls.add(getRadioButtonResetSpecific(translations.criterionFiltersMap().get("not_empty"),
+    radioControls.add(createRadioButtonResetSpecific(translations.criterionFiltersMap().get("not_empty"),
         queryResult == null ? null : noEmpty));
     add(radioControls);
   }

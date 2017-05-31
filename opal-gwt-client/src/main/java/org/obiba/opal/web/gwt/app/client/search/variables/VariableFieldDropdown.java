@@ -13,63 +13,44 @@ package org.obiba.opal.web.gwt.app.client.search.variables;
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.TextBox;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.common.base.Strings;
+import com.google.gwt.event.dom.client.*;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import org.obiba.opal.web.gwt.app.client.ui.CriterionDropdown;
 import org.obiba.opal.web.gwt.app.client.ui.ListItem;
 
+import java.util.List;
+
 public class VariableFieldDropdown extends CriterionDropdown {
+
+  private ListItem divider;
+
+  private ListItem specificControls;
 
   private TextBox matches;
 
+  private List<String> categories;
+
   public VariableFieldDropdown(VariableFieldSuggestOracle.VariableFieldSuggestion suggestion) {
     super(suggestion.getReplacementString());
-    setText(extractValue(suggestion.getReplacementString()));
+    this.categories = suggestion.getCategories();
     initialize(suggestion.getReplacementString());
   }
 
-  public VariableFieldDropdown(String field) {
-    super(field);
-    setText(extractValue(field));
-    initialize(field);
-  }
-
   @Override
-  protected Widget getSpecificControls() {
-    ListItem specificControls = new ListItem();
-    specificControls.addStyleName("controls");
-    matches = new TextBox();
-    matches.addStyleName("bordered");
-    matches.setPlaceholder(translations.criterionFiltersMap().get("custom_match_query"));
-    matches.addKeyUpHandler(new KeyUpHandler() {
-      @Override
-      public void onKeyUp(KeyUpEvent event) {
-        //updateMatchCriteriaFilter();
-      }
-    });
-    matches.setVisible(false);
-
-    specificControls.add(matches);
-    return specificControls;
+  protected Widget createSpecificControls() {
+    return hasCategories() ?  createCategoriesControls() : createMatchQueryControls();
   }
 
   protected String getSpecificQueryString() {
-    if (matches.getText().isEmpty()) return null;
-    // In
-    if(getCheckBox(2).getValue()) return fieldName + ":" + matches.getText();
-    // Not in
-    if(getCheckBox(3).getValue()) return "NOT " + fieldName + ":" + matches.getText();
-
-    return null;
+    return hasCategories() ? getCategoriesQueryString() : getMatchQueryString();
   }
 
   @Override
   protected void resetSpecificControls() {
-    matches.setVisible(false);
-    matches.setText("");
+    specificControls.setVisible(false);
+    divider.setVisible(false);
   }
 
   @Override
@@ -80,53 +61,170 @@ public class VariableFieldDropdown extends CriterionDropdown {
   @Override
   public String getQueryString() {
     // Any
-    if(getCheckBox(0).getValue()) return "_exists_:" + fieldName;
+    if(getRadioControl(0).getValue()) return "_exists_:" + fieldName;
     // None
-    if(getCheckBox(1).getValue()) return "NOT _exists_:" + fieldName;
+    if(getRadioControl(1).getValue()) return "NOT _exists_:" + fieldName;
     return getSpecificQueryString();
   }
 
   @Override
   protected void updateCriterionFilter(String filter) {
-    super.updateCriterionFilter(filter + " " + matches.getText());
+    if (getRadioControl(0).getValue() || getRadioControl(1).getValue())
+      super.updateCriterionFilter(filter);
+    else {
+      String text = hasCategories() ? getCategoriesQueryText() : matches.getText();
+      if (Strings.isNullOrEmpty(text)) super.updateCriterionFilter("");
+      else if (text.length()>30) setText(filter + " " + text.substring(0, 30) + "...");
+      else setText(filter + " " + text);
+    }
+    setTitle(getQueryString());
+  }
+
+  //
+  // Private methods
+  //
+
+  private boolean hasCategories() {
+    return !categories.isEmpty();
   }
 
   private void initialize(String fieldQuery) {
-    //updateCriterionFilter(translations.criterionFiltersMap().get("all"));
-    addRadioButtons(fieldQuery);
-    Widget specificControls = getSpecificControls();
-    if(specificControls != null) {
-      add(specificControls);
+    initializeHeader(fieldQuery);
+    initializeRadioControls(fieldQuery);
+    Widget controls = createSpecificControls();
+    if(controls != null) {
+      divider = new ListItem();
+      divider.addStyleName("divider");
+      add(divider);
+      add(controls);
+      String value = extractValue(fieldQuery);
+      if (hasCategories()) {
+        // select the appropriate checkbox
+        for (int i = 0; i<specificControls.getWidgetCount(); i++) {
+          CheckBox checkbox = (CheckBox) specificControls.getWidget(i);
+          checkbox.setValue(checkbox.getText().equals(value));
+        }
+      } else {
+        matches.setText(value);
+      }
     }
-    matches.setText(extractValue(fieldQuery));
-    matches.setVisible(!matches.getText().isEmpty());
+    updateCriterionFilter(getRadioControl(0).getValue() ? translations.criterionFiltersMap().get("any")
+        : translations.criterionFiltersMap().get("in"));
   }
 
-  private void addRadioButtons(String fieldQuery) {
+  private void initializeHeader(String fieldQuery) {
+    ListItem header = new ListItem();
+    header.addStyleName("controls");
+    header.add(new Label(fieldName));
+    add(header);
+    ListItem headerDivider = new ListItem();
+    headerDivider.addStyleName("divider");
+    add(headerDivider);
+  }
+
+  private void initializeRadioControls(String fieldQuery) {
     String value = extractValue(fieldQuery);
-    radioControls.add(getRadioButtonResetSpecific(translations.criterionFiltersMap().get("any"), null));
-    radioControls.add(getRadioButtonResetSpecific(translations.criterionFiltersMap().get("none"), null));
-    RadioButton in = getRadioButton(translations.criterionFiltersMap().get("in"), null);
+    radioControls.add(createRadioButtonResetSpecific(translations.criterionFiltersMap().get("any"), null));
+    radioControls.add(createRadioButtonResetSpecific(translations.criterionFiltersMap().get("none"), null));
+    RadioButton in = createRadioButton(translations.criterionFiltersMap().get("in"), null);
     in.addClickHandler(new OperatorClickHandler());
     radioControls.add(in);
 
-    RadioButton not_in = getRadioButton(translations.criterionFiltersMap().get("not_in"), null);
+    RadioButton not_in = createRadioButton(translations.criterionFiltersMap().get("not_in"), null);
     not_in.addClickHandler(new OperatorClickHandler());
     radioControls.add(not_in);
-    if (value.isEmpty()) getCheckBox(0).setValue(true);
+    if (value.isEmpty()) getRadioControl(0).setValue(true);
     else in.setValue(true);
     add(radioControls);
   }
 
-  private CheckBox getCheckBox(int index) {
-    return (CheckBox) radioControls.getWidget(index);
+  private RadioButton getRadioControl(int index) {
+    return (RadioButton) radioControls.getWidget(index);
+  }
+
+  private Widget createMatchQueryControls() {
+    specificControls = new ListItem();
+    specificControls.addStyleName("controls");
+    matches = new TextBox();
+    matches.addStyleName("bordered");
+    matches.setPlaceholder(translations.criterionFiltersMap().get("custom_match_query"));
+    matches.addKeyUpHandler(new KeyUpHandler() {
+      @Override
+      public void onKeyUp(KeyUpEvent event) {
+        //updateMatchCriteriaFilter();
+        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+          updateCriterionFilter(translations.criterionFiltersMap().get(isNot() ? "not_in" : "in"));
+          doFilter();
+        }
+      }
+    });
+    specificControls.add(matches);
+    return specificControls;
+  }
+
+  private Widget createCategoriesControls() {
+    specificControls = new ListItem();
+    specificControls.addStyleName("controls");
+    for (String category : categories) {
+      CheckBox checkBox = new CheckBox(category);
+      checkBox.addClickHandler(new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          updateCriterionFilter(translations.criterionFiltersMap().get(isNot() ? "not_in" : "in"));
+          doFilter();
+        }
+      });
+      specificControls.add(checkBox);
+    }
+    return specificControls;
+  }
+
+  private String getMatchQueryString() {
+    if (matches.getText().isEmpty()) return null;
+    return (isNot() ? "NOT " : "") + fieldName + ":" + matches.getText();
+  }
+
+  private String getCategoriesQueryString() {
+    String rval = null;
+    for (int i = 0; i<specificControls.getWidgetCount(); i++) {
+      CheckBox checkbox = (CheckBox) specificControls.getWidget(i);
+      if (checkbox.getValue()) {
+        if (Strings.isNullOrEmpty(rval)) rval = checkbox.getText();
+        else rval = rval + " OR " + checkbox.getText();
+      }
+    }
+    if (Strings.isNullOrEmpty(rval)) return null;
+    return (isNot() ? "NOT " : "") + fieldName + ":" + (rval.contains(" OR ") ? "(" + rval + ")" : rval);
+  }
+
+  /**
+   * For humans.
+   *
+   * @return
+   */
+  private String getCategoriesQueryText() {
+    String rval = "";
+    for (int i = 0; i<specificControls.getWidgetCount(); i++) {
+      CheckBox checkbox = (CheckBox) specificControls.getWidget(i);
+      if (checkbox.getValue()) {
+        if (Strings.isNullOrEmpty(rval)) rval = checkbox.getText();
+        else rval = rval + "," + checkbox.getText();
+      }
+    }
+    return rval;
+  }
+
+  private boolean isNot() {
+    // Not in
+    return getRadioControl(3).getValue();
   }
 
   private class OperatorClickHandler implements ClickHandler {
 
     @Override
     public void onClick(ClickEvent event) {
-      matches.setVisible(true);
+      specificControls.setVisible(true);
+      divider.setVisible(true);
     }
   }
 }

@@ -40,7 +40,7 @@ public abstract class CriterionDropdown extends DropdownButton {
     radioControls.addStyleName("controls");
   }
 
-  protected abstract Widget getSpecificControls();
+  protected abstract Widget createSpecificControls();
 
   protected abstract void resetSpecificControls();
 
@@ -63,7 +63,7 @@ public abstract class CriterionDropdown extends DropdownButton {
     return null;
   }
 
-  protected RadioButton getRadioButton(final String label, Integer count) {
+  protected RadioButton createRadioButton(final String label, Integer count) {
     SafeHtmlBuilder builder = new SafeHtmlBuilder().appendEscaped(label);
 
     if(count != null) {
@@ -83,8 +83,8 @@ public abstract class CriterionDropdown extends DropdownButton {
     return radio;
   }
 
-  protected RadioButton getRadioButtonResetSpecific(String label, Integer count) {
-    RadioButton radio = getRadioButton(label, count);
+  protected RadioButton createRadioButtonResetSpecific(String label, Integer count) {
+    RadioButton radio = createRadioButton(label, count);
     radio.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {

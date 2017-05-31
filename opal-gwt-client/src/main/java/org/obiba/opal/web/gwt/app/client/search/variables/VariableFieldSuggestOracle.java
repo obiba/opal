@@ -11,6 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.search.variables;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.SuggestOracle;
@@ -20,7 +21,10 @@ import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.opal.TermDto;
 import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class VariableFieldSuggestOracle extends SuggestOracle {
 
@@ -48,13 +52,18 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
   public void setTables(List<TableDto> tables) {
     tablesSuggestions.clear();
-    List<String> datasourceNames = Lists.newArrayList();
+    Map<String, List<TableDto>> datasourceTables = Maps.newHashMap();
     for (TableDto table : tables) {
-      tablesSuggestions.add(new MagmaSuggestion(table));
-      if (!datasourceNames.contains(table.getDatasourceName())) datasourceNames.add(table.getDatasourceName());
+      if (!datasourceTables.containsKey(table.getDatasourceName())) datasourceTables.put(table.getDatasourceName(), new ArrayList<TableDto>());
+      datasourceTables.get(table.getDatasourceName()).add(table);
     }
-    for (String name : datasourceNames) {
-      tablesSuggestions.add(new MagmaSuggestion(name));
+    for (String datasource : datasourceTables.keySet()) {
+      for (TableDto table : datasourceTables.get(datasource)) {
+        tablesSuggestions.add(new MagmaSuggestion(table, datasourceTables.get(datasource)));
+      }
+    }
+    for (String name : datasourceTables.keySet()) {
+      tablesSuggestions.add(new MagmaSuggestion(name, datasourceTables.keySet()));
     }
   }
 
@@ -88,19 +97,20 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
   private void initPropertySuggestions() {
     propertySuggestions.add(new PropertySuggestion("entityType"));
-    for (String value : new String[]{"integer", "decimal", "text", "boolean", "date", "datetime"}) {
-      propertySuggestions.add(new PropertySuggestion("valueType", value));
-    }
-    for (String value : new String[]{"true", "false"}) {
-      propertySuggestions.add(new PropertySuggestion("repeatable", value));
-    }
-    for (String value : new String[]{"CATEGORICAL", "CONTINUOUS", "TEMPORAL", "GEO", "BINARY", "UNDETERMINED"}) {
-      propertySuggestions.add(new PropertySuggestion("nature", value));
-    }
+    initPropertySuggestions("valueType", new String[]{"integer", "decimal", "text", "boolean", "date", "datetime"});
+    initPropertySuggestions("repeatable", new String[]{"true", "false"});
+    initPropertySuggestions("nature", new String[]{"CATEGORICAL", "CONTINUOUS", "TEMPORAL", "GEO", "BINARY", "UNDETERMINED"});
     propertySuggestions.add(new PropertySuggestion("occurrenceGroup"));
     propertySuggestions.add(new PropertySuggestion("referencedEntityType"));
     propertySuggestions.add(new PropertySuggestion("mimeType"));
     propertySuggestions.add(new PropertySuggestion("unit"));
+    propertySuggestions.add(new PropertySuggestion("script"));
+  }
+
+  private void initPropertySuggestions(String property, String[] values) {
+    for (String value : values) {
+      propertySuggestions.add(new PropertySuggestion(property, value, values));
+    }
   }
 
   private String normalizeSearch(String search) {
@@ -112,7 +122,22 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
   }
 
   public interface VariableFieldSuggestion extends Suggestion {
+
+    /**
+     * Possible values of the field, if any.
+     *
+     * @return
+     */
+    List<String> getCategories();
+
+    /**
+     * Field statement contains the queried word.
+     *
+     * @param query
+     * @return
+     */
     boolean isCandidate(String query);
+
   }
 
   public class PropertySuggestion implements VariableFieldSuggestion {
@@ -121,14 +146,17 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     private final String value;
 
+    private final List<String> categories = Lists.newArrayList();
+
     private PropertySuggestion(String property) {
       this.property = property;
       this.value = "";
     }
 
-    private PropertySuggestion(String property, String value) {
+    private PropertySuggestion(String property, String value, String[] values) {
       this.property = property;
       this.value = value == null ? "" : value;
+      for (String val : values) this.categories.add(val);
     }
 
     @Override
@@ -166,6 +194,11 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
       if (value.isEmpty()) return "*";
       return value.contains(" ") ? "\"" + value + "\"" : value;
     }
+
+    @Override
+    public List<String> getCategories() {
+      return categories;
+    }
   }
 
   public class MagmaSuggestion implements VariableFieldSuggestion {
@@ -174,14 +207,18 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     private final TableDto table;
 
-    private MagmaSuggestion(TableDto table) {
+    private final List<String> categories = Lists.newArrayList();
+
+    private MagmaSuggestion(TableDto table, List<TableDto> tables) {
       this.datasource = table.getDatasourceName();
       this.table = table;
+      for (TableDto tableDto : tables) categories.add(tableDto.getName());
     }
 
-    private MagmaSuggestion(String datasource) {
+    private MagmaSuggestion(String datasource, Set<String> datasources) {
       this.datasource = datasource;
       this.table = null;
+      categories.addAll(datasources);
     }
 
     @Override
@@ -213,6 +250,11 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     @Override
     public boolean isCandidate(String query) {
       return getReplacementString().toLowerCase().contains(query.toLowerCase());
+    }
+
+    @Override
+    public List<String> getCategories() {
+      return categories;
     }
 
     private String escape(String value) {
@@ -263,6 +305,15 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
       // TODO look in title, description, keywords
       //if (rval) GWT.log(getReplacementString() + " isCandidate " + query);
       return rval;
+    }
+
+    @Override
+    public List<String> getCategories() {
+      List<String> categories = Lists.newArrayList();
+      for (TermDto termDto : JsArrays.toIterable(vocabulary.getTermsArray())) {
+        categories.add(termDto.getName());
+      }
+      return categories;
     }
   }
 }

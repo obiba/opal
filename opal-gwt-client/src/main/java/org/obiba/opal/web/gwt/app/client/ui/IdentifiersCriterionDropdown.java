@@ -31,7 +31,7 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
   }
 
   @Override
-  public Widget getSpecificControls() {
+  public Widget createSpecificControls() {
     setupRadioControls();
 
     ListItem specificControls = new ListItem();
@@ -59,11 +59,11 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
     radioControls.remove(1);
 
     // Update radio controls
-    RadioButton like = getRadioButton(translations.criterionFiltersMap().get("like"), null);
+    RadioButton like = createRadioButton(translations.criterionFiltersMap().get("like"), null);
     like.addClickHandler(new OperatorClickHandler());
     radioControls.add(like);
 
-    RadioButton not_like = getRadioButton(translations.criterionFiltersMap().get("not_like"), null);
+    RadioButton not_like = createRadioButton(translations.criterionFiltersMap().get("not_like"), null);
     not_like.addClickHandler(new OperatorClickHandler());
     radioControls.add(not_like);
   }

@@ -50,7 +50,7 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
   }
 
   @Override
-  public Widget getSpecificControls() {
+  public Widget createSpecificControls() {
     updateRadioButtons();
 
     ListItem specificControls = new ListItem();
@@ -75,11 +75,11 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
 
   private void updateRadioButtons() {
     // Update radio controls
-    RadioButton in = getRadioButton(translations.criterionFiltersMap().get("in"), null);
+    RadioButton in = createRadioButton(translations.criterionFiltersMap().get("in"), null);
     in.addClickHandler(new OperatorClickHandler());
     radioControls.add(in);
 
-    RadioButton not_in = getRadioButton(translations.criterionFiltersMap().get("not_in"), null);
+    RadioButton not_in = createRadioButton(translations.criterionFiltersMap().get("not_in"), null);
     not_in.addClickHandler(new OperatorClickHandler());
     radioControls.add(not_in);
   }
