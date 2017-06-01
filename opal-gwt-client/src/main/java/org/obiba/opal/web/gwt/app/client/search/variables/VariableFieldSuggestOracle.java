@@ -21,6 +21,7 @@ import org.obiba.opal.web.model.client.opal.TermDto;
 import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -118,6 +119,13 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
   public interface VariableFieldSuggestion extends Suggestion {
 
     /**
+     * Field name.
+     *
+     * @return
+     */
+    String getField();
+
+    /**
      * Possible values of the field, if any.
      *
      * @return
@@ -176,7 +184,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     @Override
     public String getReplacementString() {
-      return property + ":" + escape(value);
+      return getField() + ":" + escape(value);
     }
 
     @Override
@@ -187,6 +195,11 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     private String escape(String value) {
       if (value.isEmpty()) return "*";
       return value.contains(" ") ? "\"" + value + "\"" : value;
+    }
+
+    @Override
+    public String getField() {
+      return property;
     }
 
     @Override
@@ -206,7 +219,9 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     private MagmaSuggestion(TableDto table, Collection<TableDto> tables) {
       this.datasource = table.getDatasourceName();
       this.table = table;
-      for (TableDto tableDto : tables) categories.add(tableDto.getName());
+      for (TableDto tableDto : tables)
+        if (!categories.contains(tableDto.getName())) categories.add(tableDto.getName());
+      Collections.sort(categories);
     }
 
     private MagmaSuggestion(String datasource, Collection<String> datasources) {
@@ -238,12 +253,17 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     @Override
     public String getReplacementString() {
-      return table == null ? "datasource:" + escape(datasource) : "table:" + escape(table.getName());
+      return getField() + ":" + (table == null ? datasource : escape(table.getName()));
     }
 
     @Override
     public boolean isCandidate(String query) {
       return getReplacementString().toLowerCase().contains(query.toLowerCase());
+    }
+
+    @Override
+    public String getField() {
+      return table == null ? "datasource" : "table";
     }
 
     @Override
@@ -290,7 +310,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     @Override
     public String getReplacementString() {
-      return taxonomy.getName() + "-" + vocabulary.getName() + ":" + term.getName();
+      return getField() + ":" + term.getName();
     }
 
     @Override
@@ -299,6 +319,11 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
       // TODO look in title, description, keywords
       //if (rval) GWT.log(getReplacementString() + " isCandidate " + query);
       return rval;
+    }
+
+    @Override
+    public String getField() {
+      return taxonomy.getName() + "-" + vocabulary.getName();
     }
 
     @Override

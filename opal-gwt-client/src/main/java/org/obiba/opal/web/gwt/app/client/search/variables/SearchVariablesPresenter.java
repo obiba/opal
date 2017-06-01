@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.search.variables;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -42,9 +43,11 @@ import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.GeneralConf;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
+import org.obiba.opal.web.model.client.search.FacetResultDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import java.util.List;
+import java.util.Map;
 
 public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter.Display, SearchVariablesPresenter.Proxy>
     implements HasPageTitle, SearchVariablesUiHandlers {
@@ -115,6 +118,11 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
     }
   }
 
+  @Override
+  public void onFacet(String field, int size, FacetHandler handler) {
+    facet(field, size, handler);
+  }
+
   //
   // Private methods
   //
@@ -125,10 +133,11 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
         .query("offset", "" + offset)//
         .query("limit", "" + limit)//
         .query("sort", "name")//
-        .query("field", "name", "field", "datasource", "field", "table", "field", "label");
+        .query("field", "name", "field", "datasource", "field", "table", "field", "label", "field", "label-en");
 
     for (String locale : locales) {
-      ub.query("field", "label-" + locale);
+      if (!"en".equals(locale))
+        ub.query("field", "label-" + locale);
     }
 
     // Get candidates from search words.
@@ -153,6 +162,39 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
             if (response.getStatusCode() == Response.SC_OK) {
               getView().showResults(resource, offset, limit);
               updateHistory();
+            }
+          }
+        })//
+        .send();
+  }
+
+  private void facet(String field, int size, final FacetHandler handler) {
+    UriBuilder ub = UriBuilders.DATASOURCES_VARIABLES_SEARCH.create()//
+        .query("query", "*")//
+        .query("offset", "0")//
+        .query("limit", "0")//
+        .query("facet", field + ":" + size);
+
+    ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().clearResults();
+            fireEvent(NotificationEvent.newBuilder().warn("MalformedSearchQuery").build());
+          }
+        }, Response.SC_BAD_REQUEST)//
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().clearResults();
+            fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
+          }
+        }, Response.SC_SERVICE_UNAVAILABLE)//
+        .withCallback(new ResourceCallback<QueryResultDto>() {
+          @Override
+          public void onResource(Response response, QueryResultDto resource) {
+            if (response.getStatusCode() == Response.SC_OK) {
+              handler.onResult(resource.getFacetsArray().get(0));
             }
           }
         })//

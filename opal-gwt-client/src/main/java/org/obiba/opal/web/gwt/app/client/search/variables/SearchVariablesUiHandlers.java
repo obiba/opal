@@ -11,10 +11,19 @@
 package org.obiba.opal.web.gwt.app.client.search.variables;
 
 import com.gwtplatform.mvp.client.UiHandlers;
+import org.obiba.opal.web.model.client.search.FacetResultDto;
 
 public interface SearchVariablesUiHandlers extends UiHandlers {
 
   void onSearch(String query);
 
   void onSearchRange(String query, int offset, int limit);
+
+  void onFacet(String field, int size, FacetHandler handler);
+
+  interface FacetHandler {
+
+    void onResult(FacetResultDto facet);
+
+  }
 }

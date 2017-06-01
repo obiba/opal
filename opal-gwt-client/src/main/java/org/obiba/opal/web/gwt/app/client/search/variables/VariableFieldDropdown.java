@@ -14,14 +14,19 @@ import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.*;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.CriterionDropdown;
 import org.obiba.opal.web.gwt.app.client.ui.ListItem;
+import org.obiba.opal.web.model.client.search.FacetResultDto;
 
 import java.util.List;
+import java.util.Map;
 
 public class VariableFieldDropdown extends CriterionDropdown {
 
@@ -33,9 +38,15 @@ public class VariableFieldDropdown extends CriterionDropdown {
 
   private List<String> categories;
 
-  public VariableFieldDropdown(VariableFieldSuggestOracle.VariableFieldSuggestion suggestion) {
+  Map<String, Integer> categoryFrequencies = Maps.newHashMap();
+
+  public VariableFieldDropdown(VariableFieldSuggestOracle.VariableFieldSuggestion suggestion, FacetResultDto facet) {
     super(suggestion.getReplacementString());
     this.categories = suggestion.getCategories();
+    if (facet != null) {
+      for (FacetResultDto.TermFrequencyResultDto termCount : JsArrays.toIterable(facet.getFrequenciesArray()))
+        categoryFrequencies.put(termCount.getTerm(), termCount.getCount());
+    }
     initialize(suggestion.getReplacementString());
   }
 
@@ -103,8 +114,7 @@ public class VariableFieldDropdown extends CriterionDropdown {
         // select the appropriate checkbox
         for (int i = 0; i<specificControls.getWidgetCount(); i++) {
           CheckBox checkbox = (CheckBox) specificControls.getWidget(i);
-          GWT.log(normalizeKeyword(checkbox.getText()) + " == " + value);
-          checkbox.setValue(normalizeKeyword(checkbox.getText()).equals(value));
+          checkbox.setValue(normalizeKeyword(checkbox.getName()).equals(value));
         }
       } else {
         matches.setText(value);
@@ -126,6 +136,7 @@ public class VariableFieldDropdown extends CriterionDropdown {
 
   private void initializeRadioControls(String fieldQuery) {
     String value = extractValue(fieldQuery);
+    GWT.log("initializeRadioControls.value=" + value);
     radioControls.add(createRadioButtonResetSpecific(translations.criterionFiltersMap().get("any"), null));
     radioControls.add(createRadioButtonResetSpecific(translations.criterionFiltersMap().get("none"), null));
     RadioButton in = createRadioButton(translations.criterionFiltersMap().get("in"), null);
@@ -135,7 +146,7 @@ public class VariableFieldDropdown extends CriterionDropdown {
     RadioButton not_in = createRadioButton(translations.criterionFiltersMap().get("not_in"), null);
     not_in.addClickHandler(new OperatorClickHandler());
     radioControls.add(not_in);
-    if (value.isEmpty()) getRadioControl(0).setValue(true);
+    if (value.isEmpty() || "*".equals(value)) getRadioControl(0).setValue(true);
     else in.setValue(true);
     add(radioControls);
   }
@@ -168,7 +179,14 @@ public class VariableFieldDropdown extends CriterionDropdown {
     specificControls = new ListItem();
     specificControls.addStyleName("controls");
     for (String category : categories) {
-      CheckBox checkBox = new CheckBox(category);
+      SafeHtmlBuilder builder = new SafeHtmlBuilder().appendEscaped(category);
+      if (categoryFrequencies.containsKey(category.toLowerCase())) { // facet term is lower case...
+        builder.appendHtmlConstant("<span style=\"font-size:x-small\"> (")
+            .append(categoryFrequencies.get(category.toLowerCase())).appendEscaped(")")
+            .appendHtmlConstant("</span>");
+      }
+      CheckBox checkBox = new CheckBox(builder.toSafeHtml());
+      checkBox.setName(category);
       checkBox.addClickHandler(new ClickHandler() {
         @Override
         public void onClick(ClickEvent event) {
@@ -191,8 +209,8 @@ public class VariableFieldDropdown extends CriterionDropdown {
     for (int i = 0; i<specificControls.getWidgetCount(); i++) {
       CheckBox checkbox = (CheckBox) specificControls.getWidget(i);
       if (checkbox.getValue()) {
-        if (Strings.isNullOrEmpty(rval)) rval = normalizeKeyword(checkbox.getText());
-        else rval = rval + " OR " + normalizeKeyword(checkbox.getText());
+        if (Strings.isNullOrEmpty(rval)) rval = normalizeKeyword(checkbox.getName());
+        else rval = rval + " OR " + normalizeKeyword(checkbox.getName());
       }
     }
     if (Strings.isNullOrEmpty(rval)) return null;
@@ -213,8 +231,8 @@ public class VariableFieldDropdown extends CriterionDropdown {
     for (int i = 0; i<specificControls.getWidgetCount(); i++) {
       CheckBox checkbox = (CheckBox) specificControls.getWidget(i);
       if (checkbox.getValue()) {
-        if (Strings.isNullOrEmpty(rval)) rval = checkbox.getText();
-        else rval = rval + "," + checkbox.getText();
+        if (Strings.isNullOrEmpty(rval)) rval = checkbox.getName();
+        else rval = rval + "," + checkbox.getName();
       }
     }
     return rval;

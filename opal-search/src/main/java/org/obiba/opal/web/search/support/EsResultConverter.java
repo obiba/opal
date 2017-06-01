@@ -64,6 +64,11 @@ public class EsResultConverter {
       dtoResultsBuilder.addAllFacets(aggsConverter.convert(json.getJSONObject("aggregations")));
     }
 
+    if(json.has("facets")) {
+      AggregationsConverter aggsConverter = new AggregationsConverter();
+      dtoResultsBuilder.addAllFacets(aggsConverter.convert(json.getJSONObject("facets")));
+    }
+
     return dtoResultsBuilder.build();
   }
 
@@ -116,6 +121,10 @@ public class EsResultConverter {
 
       if(jsonAggregation.has("values")) {
         convertValues(jsonAggregation.getJSONObject("values"), dtoResultBuilder);
+      }
+
+      if(jsonAggregation.has("terms")) {
+        convertTerms(jsonAggregation.getJSONArray("terms"), dtoResultBuilder);
       }
     }
 
@@ -176,6 +185,17 @@ public class EsResultConverter {
       }
     }
 
+    private void convertTerms(JSONArray terms, Search.FacetResultDto.Builder dtoResultBuilder)
+        throws JSONException {
+
+      for (int i=0; i<terms.length(); i++) {
+        JSONObject termCount = terms.getJSONObject(i);
+        Search.FacetResultDto.TermFrequencyResultDto dtoValue = Search.FacetResultDto.TermFrequencyResultDto
+            .newBuilder().setTerm(termCount.getString("term")).setCount(termCount.getInt("count")).build();
+
+        dtoResultBuilder.addFrequencies(dtoValue);
+      }
+    }
 
     private void convertStats(JSONObject jsonStatistical, Search.FacetResultDto.Builder dtoResultBuilder)
         throws JSONException {
@@ -237,7 +257,14 @@ public class EsResultConverter {
         Opal.EntryDto.Builder entryBuilder = Opal.EntryDto.newBuilder();
         String key = iterator.next();
         entryBuilder.setKey(key);
-        entryBuilder.setValue(jsonFields.getString(key));
+        if (jsonFields.get(key) instanceof JSONArray) {
+          JSONArray array = (JSONArray)jsonFields.get(key);
+          for (int i=0; i<array.length(); i++) {
+            entryBuilder.addValues(array.getString(i));
+          }
+        }
+        else
+          entryBuilder.setValue(jsonFields.getString(key));
         dtoItemFieldsBuilder.addFields(entryBuilder.build());
       }
 

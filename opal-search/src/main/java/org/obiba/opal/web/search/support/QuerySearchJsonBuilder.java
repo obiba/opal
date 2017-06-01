@@ -34,7 +34,6 @@ public class QuerySearchJsonBuilder {
     defaultQueryFields.add("name.analyzed");
     defaultQueryFields.add("label*");
     defaultQueryFields.add("description*");
-    defaultQueryFields.add("maelstrom*");
   }
 
   //
@@ -151,7 +150,18 @@ public class QuerySearchJsonBuilder {
   private JSONObject buildFacetsJson() throws JSONException {
     JSONObject jsonFacets = new JSONObject();
     for (String facet : facets) {
-      jsonFacets.accumulate(facet, new JSONObject().put("terms", new JSONObject().put("field", facet)));
+      String field = facet;
+      int size = 10;
+      int idx = facet.lastIndexOf(":");
+      if (idx>0) {
+        field = facet.substring(0, idx);
+        try {
+          size = Integer.parseInt(facet.substring(idx+1));
+        } catch (NumberFormatException e) {
+          // ignore
+        }
+      }
+      jsonFacets.accumulate(facet, new JSONObject().put("terms", new JSONObject().put("field", field).put("size", size)));
     }
 
     return jsonFacets;

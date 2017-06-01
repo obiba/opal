@@ -15,7 +15,6 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.TextArea;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.*;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -36,6 +35,7 @@ import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.ToggleAnchor;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
+import org.obiba.opal.web.model.client.search.FacetResultDto;
 import org.obiba.opal.web.model.client.search.ItemResultDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
@@ -131,6 +131,11 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER || getQuery().isEmpty()) onSearch(null);
   }
 
+  @UiHandler("queryArea")
+  public void onAdvancedQueryTyped(KeyUpEvent event) {
+    if ((event.getNativeKeyCode() == KeyCodes.KEY_ENTER && event.isControlKeyDown()) || getQuery().isEmpty()) onSearch(null);
+  }
+
   @Override
   public void setTaxonomies(List<TaxonomyDto> taxonomies) {
     ((VariableFieldSuggestOracle) queryTypeahead.getSuggestOracle()).setTaxonomies(taxonomies);
@@ -198,25 +203,47 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     queryTypeahead.setUpdaterCallback(new Typeahead.UpdaterCallback() {
       @Override
       public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {
-        VariableFieldDropdown dd = new VariableFieldDropdown((VariableFieldSuggestOracle.VariableFieldSuggestion) selectedSuggestion) {
-          @Override
-          public void doFilter() {
-            onSearch(null);
-          }
-        };
-        dd.addChangeHandler(new ChangeHandler() {
-          @Override
-          public void onChange(ChangeEvent event) {
-            onSearch(null);
-          }
-        });
-        queryPanel.addCriterion(dd, true, false);
+        VariableFieldSuggestOracle.VariableFieldSuggestion fieldSuggestion = (VariableFieldSuggestOracle.VariableFieldSuggestion) selectedSuggestion;
+        //if (!fieldSuggestion.getCategories().isEmpty()) {
+        //  getUiHandlers().onFacet(fieldSuggestion.getField(), fieldSuggestion.getCategories().size(), new VariableFieldFacetHandler(fieldSuggestion));
+        //} else
+        addCriterion(fieldSuggestion, null);
         return "";
-        //return selectedSuggestion.getReplacementString();
       }
+
     });
     queryTypeahead.setDisplayItemCount(15);
     queryTypeahead.setMinLength(2);
+  }
+
+  private class VariableFieldFacetHandler implements SearchVariablesUiHandlers.FacetHandler {
+
+    private final VariableFieldSuggestOracle.VariableFieldSuggestion fieldSuggestion;
+
+    private VariableFieldFacetHandler(VariableFieldSuggestOracle.VariableFieldSuggestion fieldSuggestion) {
+      this.fieldSuggestion = fieldSuggestion;
+    }
+
+    @Override
+    public void onResult(FacetResultDto facet) {
+      addCriterion(fieldSuggestion, facet);
+    }
+  }
+
+  private void addCriterion(VariableFieldSuggestOracle.VariableFieldSuggestion fieldSuggestion, FacetResultDto facet) {
+    VariableFieldDropdown dd = new VariableFieldDropdown(fieldSuggestion, facet) {
+      @Override
+      public void doFilter() {
+        onSearch(null);
+      }
+    };
+    dd.addChangeHandler(new ChangeHandler() {
+      @Override
+      public void onChange(ChangeEvent event) {
+        onSearch(null);
+      }
+    });
+    queryPanel.addCriterion(dd, true, false);
   }
 
   private void initVariableItemTable() {
