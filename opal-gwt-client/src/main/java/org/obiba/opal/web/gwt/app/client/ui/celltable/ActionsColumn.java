@@ -18,6 +18,8 @@ public class ActionsColumn<T> extends Column<T, T> implements HasActionHandler<T
 
   public static final String EDIT_ACTION = "Edit";
 
+  public static final String SEARCH_ACTION = "Search";
+
   public ActionsColumn(ActionHandler<T> handler) {
     this(EDIT_ACTION, REMOVE_ACTION);
     setActionHandler(handler);

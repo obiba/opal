@@ -155,12 +155,14 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
       public List<TermDto> get() {
         return Strings.isNullOrEmpty(filter.getText()) ? dataProvider.getList() : Lists.<TermDto>newArrayList();
       }
-    }, ActionsColumn.EDIT_ACTION,
-        ActionsColumn.REMOVE_ACTION);
+    }, ActionsColumn.EDIT_ACTION, ActionsColumn.REMOVE_ACTION, ActionsColumn.SEARCH_ACTION);
     actions.setActionHandler(new ActionHandler<TermDto>() {
       @Override
       public void doAction(TermDto object, String actionName) {
         switch(actionName) {
+          case ActionsColumn.SEARCH_ACTION:
+            getUiHandlers().onSearchVariables(object.getName());
+            break;
           case ActionsColumn.EDIT_ACTION:
             getUiHandlers().onEditTerm(object);
             break;
@@ -203,6 +205,11 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
   @Override
   public void setDirty(boolean isDirty) {
     saveChangesAlert.setVisible(isDirty);
+  }
+
+  @UiHandler("searchVariables")
+  void onSearchVariables(ClickEvent event) {
+    getUiHandlers().onSearchVariables(null);
   }
 
   @UiHandler("remove")

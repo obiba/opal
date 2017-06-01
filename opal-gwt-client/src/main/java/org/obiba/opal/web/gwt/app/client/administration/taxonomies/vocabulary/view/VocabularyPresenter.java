@@ -14,6 +14,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomySelectedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularyDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularyUpdatedEvent;
@@ -26,7 +28,10 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
+import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -52,7 +57,7 @@ import static org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabu
 
 public class VocabularyPresenter extends PresenterWidget<Display> implements VocabularyUiHandlers {
 
-  private final Translations translations;
+  private final PlaceManager placeManager;
 
   private final TranslationMessages translationMessages;
 
@@ -66,14 +71,12 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
 
   private VocabularyDto vocabulary;
 
-  private boolean editable;
-
   @Inject
-  public VocabularyPresenter(Display display, EventBus eventBus, Translations translations,
+  public VocabularyPresenter(Display display, EventBus eventBus, PlaceManager placeManager,
       TranslationMessages translationMessages, ModalProvider<VocabularyEditModalPresenter> vocabularyEditModalProvider,
       ModalProvider<TermEditModalPresenter> termEditModalProvider) {
     super(eventBus, display);
-    this.translations = translations;
+    this.placeManager = placeManager;
     this.translationMessages = translationMessages;
     this.vocabularyEditModalProvider = vocabularyEditModalProvider.setContainer(this);
     this.termEditModalProvider = termEditModalProvider.setContainer(this);
@@ -87,7 +90,6 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
   }
 
   public void setEditable(boolean editable) {
-    this.editable = editable;
     getView().setEditable(editable);
   }
 
@@ -165,6 +167,19 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
     fireEvent(ConfirmationRequiredEvent
         .createWithMessages(actionRequiringConfirmation, translationMessages.removeTerm(),
             translationMessages.confirmDeleteTerm()));
+  }
+
+  @Override
+  public void onSearchVariables(String term) {
+    String query = taxonomy.getName() + "-" + vocabulary.getName();
+    if (Strings.isNullOrEmpty(term))
+      query = "_exists_:" + query;
+    else
+      query = query + ":" + term;
+    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.SEARCH_VARIABLES) //
+        .with(ParameterTokens.TOKEN_QUERY, query)  //
+        .build();
+    placeManager.revealPlace(request, false);
   }
 
   @Override

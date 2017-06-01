@@ -141,6 +141,7 @@ public interface Translations extends Constants {
       "Generate identifiers", "Generate identifiers",//
       "MoveUp", "Move up",//
       "MoveDown", "Move down",//
+      "Search", "Search",//
       "Download identifiers", "Download identifiers",//
       "Unregister", "Unregister", //
       "Terminate", "Terminate", //

@@ -16,6 +16,8 @@ import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface VocabularyUiHandlers extends UiHandlers {
 
+  void onSearchVariables(String term);
+
   void onDelete();
 
   void onPrevious();

@@ -30,6 +30,11 @@
       <b:Heading size="3" ui:field="vocabularyName" addStyleNames="no-top-margin small-indent pull-left"/>
       <g:FlowPanel addStyleNames="pull-right">
         <b:ButtonGroup>
+          <b:Button icon="SEARCH" ui:field="searchVariables">
+            <ui:msg description="Variables label">Variables</ui:msg>
+          </b:Button>
+        </b:ButtonGroup>
+        <b:ButtonGroup>
           <b:Button icon="TRASH" ui:field="remove">
           </b:Button>
         </b:ButtonGroup>
