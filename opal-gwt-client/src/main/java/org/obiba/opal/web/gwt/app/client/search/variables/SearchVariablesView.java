@@ -103,13 +103,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
       private void advancedVisible(boolean visible) {
         if (visible) queryArea.setText(getQuery());
-        queryPanel.setVisible(!visible);
-        queryInput.setVisible(!visible);
-        queryArea.setVisible(visible);
-        if (visible)
-          searchButton.removeStyleName("small-indent");
-        else
-          searchButton.addStyleName("small-indent");
+        showAdvancedQuery(visible);
         onSearch(null);
       }
     });
@@ -148,19 +142,24 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
   @Override
   public void setQuery(String query) {
-    if (Strings.isNullOrEmpty(query)) {
+    if (Strings.isNullOrEmpty(query) || query.equals(getBasicQuery())) {
       queryMode.setOn(true, false);
-      queryPanel.setVisible(true);
-      queryInput.setVisible(true);
-      queryArea.setVisible(false);
-
+      showAdvancedQuery(false);
     } else {
       queryMode.setOn(false, false);
-      queryPanel.setVisible(false);
-      queryInput.setVisible(false);
-      queryArea.setVisible(true);
+      showAdvancedQuery(true);
       queryArea.setText(query);
     }
+  }
+
+  private void showAdvancedQuery(boolean visible) {
+    queryPanel.setVisible(!visible);
+    queryInput.setVisible(!visible);
+    queryArea.setVisible(visible);
+    if (visible)
+      searchButton.removeStyleName("small-indent");
+    else
+      searchButton.addStyleName("small-indent");
   }
 
   @Override
@@ -192,10 +191,18 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   //
 
   private String getQuery() {
-    if (queryArea.isVisible()) return queryArea.getText();
+    if (queryArea.isVisible()) return getAdvancedQuery();
+    return getBasicQuery();
+  }
+
+  private String getBasicQuery() {
     String queryDropdowns = queryPanel.getQueryString();
     if ("*".equals(queryDropdowns)) queryDropdowns = "";
     return (queryDropdowns  + " " + queryInput.getText()).trim();
+  }
+
+  private String getAdvancedQuery() {
+    return queryArea.getText();
   }
 
   private void initQueryTypeahead() {

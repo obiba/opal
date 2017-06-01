@@ -122,6 +122,7 @@ public class VariableFieldDropdown extends CriterionDropdown {
     }
     updateCriterionFilter(getRadioControl(0).getValue() ? translations.criterionFiltersMap().get("any")
         : translations.criterionFiltersMap().get("in"));
+    if (getRadioControl(0).getValue() || getRadioControl(1).getValue()) resetSpecificControls();
   }
 
   private void initializeHeader(String fieldQuery) {
