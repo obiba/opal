@@ -13,6 +13,7 @@ package org.obiba.opal.web.gwt.app.client.search.variables;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -114,11 +115,12 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
   }
 
   private String normalizeSearch(String search) {
-    String nSearch = search.trim();
-    int idx = nSearch.lastIndexOf(' ');
-    if (idx > 0) nSearch = nSearch.substring(idx + 1);
+    //String nSearch = search.trim();
+    //int idx = nSearch.lastIndexOf(' ');
+    //if (idx > 0) nSearch = nSearch.substring(idx + 1);
     //GWT.log(search + " => " + nSearch);
-    return nSearch.trim();
+    //return nSearch.trim();
+    return search.trim();
   }
 
   public interface VariableFieldSuggestion extends Suggestion {
@@ -199,7 +201,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     private String escape(String value) {
       if (value.isEmpty()) return "*";
-      return value.contains(" ") ? "\"" + value + "\"" : value;
+      return value.replaceAll(" ", "+");
     }
 
     @Override
@@ -219,6 +221,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     @Override
     public boolean isCandidate(String query) {
+      //GWT.log("'" + getReplacementString().toLowerCase() + "' '" + escape(query.toLowerCase()) + "'");
       return getReplacementString().toLowerCase().contains(query.toLowerCase());
     }
 
@@ -255,7 +258,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     @Override
     public String getReplacementString() {
-      return getField() + ":" + datasource;
+      return getField() + ":" + escape(datasource);
     }
 
     @Override
@@ -299,7 +302,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     @Override
     public String getReplacementString() {
-      return getField() + ":" + table;
+      return getField() + ":" + escape(table);
     }
 
     @Override
@@ -348,10 +351,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     @Override
     public boolean isCandidate(String query) {
-      boolean rval = getReplacementString().toLowerCase().contains(query.toLowerCase());
-      // TODO look in title, description, keywords
-      //if (rval) GWT.log(getReplacementString() + " isCandidate " + query);
-      return rval;
+      return getReplacementString().toLowerCase().contains(query.toLowerCase());
     }
 
     @Override
