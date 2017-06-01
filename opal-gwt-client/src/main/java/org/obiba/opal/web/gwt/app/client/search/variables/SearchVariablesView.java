@@ -122,7 +122,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
   @UiHandler("queryInput")
   public void onQueryTyped(KeyUpEvent event) {
-    if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER || getQuery().isEmpty()) onSearch(null);
+    if ((event.getNativeKeyCode() == KeyCodes.KEY_ENTER && event.isControlKeyDown()) || getQuery().isEmpty()) onSearch(null);
   }
 
   @UiHandler("queryArea")
@@ -150,16 +150,6 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
       showAdvancedQuery(true);
       queryArea.setText(query);
     }
-  }
-
-  private void showAdvancedQuery(boolean visible) {
-    queryPanel.setVisible(!visible);
-    queryInput.setVisible(!visible);
-    queryArea.setVisible(visible);
-    if (visible)
-      searchButton.removeStyleName("small-indent");
-    else
-      searchButton.addStyleName("small-indent");
   }
 
   @Override
@@ -203,6 +193,16 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
   private String getAdvancedQuery() {
     return queryArea.getText();
+  }
+
+  private void showAdvancedQuery(boolean visible) {
+    queryPanel.setVisible(!visible);
+    queryInput.setVisible(!visible);
+    queryArea.setVisible(visible);
+    if (visible)
+      searchButton.removeStyleName("small-indent");
+    else
+      searchButton.addStyleName("small-indent");
   }
 
   private void initQueryTypeahead() {
@@ -251,6 +251,8 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
       }
     });
     queryPanel.addCriterion(dd, true, false);
+    queryInput.setText("");
+    onSearch(null);
   }
 
   private void initVariableItemTable() {
