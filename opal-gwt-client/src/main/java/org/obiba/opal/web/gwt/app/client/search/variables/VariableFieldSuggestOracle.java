@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.search.variables;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -31,7 +32,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
   private final List<PropertySuggestion> propertySuggestions = Lists.newArrayList();
 
-  private final List<MagmaSuggestion> tablesSuggestions = Lists.newArrayList();
+  private final List<MagmaSuggestion> magmaSuggestions = Lists.newArrayList();
 
 
   public VariableFieldSuggestOracle() {
@@ -50,14 +51,18 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
   }
 
   public void setTables(List<TableDto> tables) {
-    tablesSuggestions.clear();
+    magmaSuggestions.clear();
     Set<String> datasourceNames = Sets.newHashSet();
+    Set<String> tableNames = Sets.newHashSet();
     for (TableDto table : tables) {
-      tablesSuggestions.add(new MagmaSuggestion(table, tables));
       datasourceNames.add(table.getDatasourceName());
+      tableNames.add(table.getName());
+    }
+    for (String name : tableNames) {
+      magmaSuggestions.add(new TableSuggestion(name, tables));
     }
     for (String name : datasourceNames) {
-      tablesSuggestions.add(new MagmaSuggestion(name, datasourceNames));
+      magmaSuggestions.add(new DatasourceSuggestion(name, datasourceNames));
     }
   }
 
@@ -74,7 +79,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     for (TermSuggestion suggestion : termSuggestions) {
       if (suggestion.isCandidate(query)) candidates.add(suggestion);
     }
-    for (MagmaSuggestion suggestion : tablesSuggestions) {
+    for (MagmaSuggestion suggestion : magmaSuggestions) {
       if (suggestion.isCandidate(query)) candidates.add(suggestion);
     }
     for (PropertySuggestion suggestion : propertySuggestions) {
@@ -208,53 +213,9 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     }
   }
 
-  public class MagmaSuggestion implements VariableFieldSuggestion {
+  public abstract class MagmaSuggestion implements VariableFieldSuggestion {
 
-    private final String datasource;
-
-    private final TableDto table;
-
-    private final List<String> categories = Lists.newArrayList();
-
-    private MagmaSuggestion(TableDto table, Collection<TableDto> tables) {
-      this.datasource = table.getDatasourceName();
-      this.table = table;
-      for (TableDto tableDto : tables)
-        if (!categories.contains(tableDto.getName())) categories.add(tableDto.getName());
-      Collections.sort(categories);
-    }
-
-    private MagmaSuggestion(String datasource, Collection<String> datasources) {
-      this.datasource = datasource;
-      this.table = null;
-      categories.addAll(datasources);
-    }
-
-    @Override
-    public String getDisplayString() {
-      SafeHtmlBuilder accum = new SafeHtmlBuilder();
-      String name = table == null ? datasource : table.getName();
-      accum.appendHtmlConstant("<div id='" + getReplacementString() + "'>");
-      if (table != null) accum.appendHtmlConstant("  <i class='icon-table'></i>");
-      else accum.appendHtmlConstant("  <i class='icon-folder-close'></i>");
-      accum.appendHtmlConstant("  <strong>");
-      accum.appendEscaped(name);
-      accum.appendHtmlConstant("  </strong>");
-      accum.appendHtmlConstant("</div>");
-      if (table != null) {
-        accum.appendHtmlConstant("<div>");
-        accum.appendHtmlConstant("  <small>");
-        accum.appendEscaped(datasource);
-        accum.appendHtmlConstant("  </small>");
-        accum.appendHtmlConstant("</div>");
-      }
-      return accum.toSafeHtml().asString();
-    }
-
-    @Override
-    public String getReplacementString() {
-      return getField() + ":" + (table == null ? datasource : escape(table.getName()));
-    }
+    protected final List<String> categories = Lists.newArrayList();
 
     @Override
     public boolean isCandidate(String query) {
@@ -262,18 +223,90 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     }
 
     @Override
-    public String getField() {
-      return table == null ? "datasource" : "table";
-    }
-
-    @Override
     public List<String> getCategories() {
       return categories;
     }
 
-    private String escape(String value) {
+    protected String escape(String value) {
       return value.replaceAll(" ", "+");
     }
+  }
+
+  public class DatasourceSuggestion extends MagmaSuggestion implements VariableFieldSuggestion {
+
+    private final String datasource;
+
+    private DatasourceSuggestion(String datasource, Collection<String> datasources) {
+      this.datasource = datasource;
+      categories.addAll(datasources);
+    }
+
+    @Override
+    public String getDisplayString() {
+      SafeHtmlBuilder accum = new SafeHtmlBuilder();
+      accum.appendHtmlConstant("<div id='" + getReplacementString() + "'>");
+      accum.appendHtmlConstant("  <i class='icon-folder-close'></i>");
+      accum.appendHtmlConstant("  <strong>");
+      accum.appendEscaped(datasource);
+      accum.appendHtmlConstant("  </strong>");
+      accum.appendHtmlConstant("</div>");
+      return accum.toSafeHtml().asString();
+    }
+
+    @Override
+    public String getReplacementString() {
+      return getField() + ":" + datasource;
+    }
+
+    @Override
+    public String getField() {
+      return "datasource";
+    }
+
+  }
+
+  public class TableSuggestion extends MagmaSuggestion implements VariableFieldSuggestion {
+
+    private final List<String> datasources = Lists.newArrayList();
+
+    private final String table;
+
+    private TableSuggestion(String table, Collection<TableDto> allTables) {
+      this.table = table;
+      for (TableDto tableDto : allTables) {
+        if (tableDto.getName().equals(table)) datasources.add(tableDto.getDatasourceName());
+        if (!categories.contains(tableDto.getName())) categories.add(tableDto.getName());
+      }
+      Collections.sort(categories);
+    }
+
+    @Override
+    public String getDisplayString() {
+      SafeHtmlBuilder accum = new SafeHtmlBuilder();
+      accum.appendHtmlConstant("<div id='" + getReplacementString() + "'>");
+      accum.appendHtmlConstant("  <i class='icon-table'></i>");
+      accum.appendHtmlConstant("  <strong>");
+      accum.appendEscaped(table);
+      accum.appendHtmlConstant("  </strong>");
+      accum.appendHtmlConstant("</div>");
+      accum.appendHtmlConstant("<div>");
+      accum.appendHtmlConstant("  <small>");
+      accum.appendEscaped(Joiner.on(", ").join(datasources));
+      accum.appendHtmlConstant("  </small>");
+      accum.appendHtmlConstant("</div>");
+      return accum.toSafeHtml().asString();
+    }
+
+    @Override
+    public String getReplacementString() {
+      return getField() + ":" + table;
+    }
+
+    @Override
+    public String getField() {
+      return "table";
+    }
+
   }
 
   public class TermSuggestion implements VariableFieldSuggestion {
