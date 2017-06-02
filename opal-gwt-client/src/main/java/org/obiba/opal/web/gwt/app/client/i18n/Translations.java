@@ -694,6 +694,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Occurrence Group")
   String occurrenceGroupLabel();
 
+  @Description("Nature label")
+  @DefaultStringValue("Nature")
+  String natureLabel();
+
   @Description("File Selector title")
   @DefaultStringValue("File Selector")
   String fileSelectorTitle();

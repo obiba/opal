@@ -14,12 +14,12 @@ import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.*;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.CriterionDropdown;
 import org.obiba.opal.web.gwt.app.client.ui.ListItem;
@@ -30,33 +30,38 @@ import java.util.Map;
 
 public class VariableFieldDropdown extends CriterionDropdown {
 
+  private VariableFieldSuggestOracle.FieldItem fieldItem;
+
   private ListItem divider;
 
   private ListItem specificControls;
 
   private TextBox matches;
 
-  private List<String> categories;
+  private List<VariableFieldSuggestOracle.FieldItem> fieldTerms;
 
-  Map<String, Integer> categoryFrequencies = Maps.newHashMap();
+  private Map<String, Integer> fieldTermFrequencies = Maps.newHashMap();
+
+  private List<CheckBox> fieldTermChecks = Lists.newArrayList();
 
   public VariableFieldDropdown(VariableFieldSuggestOracle.VariableFieldSuggestion suggestion, FacetResultDto facet) {
-    super(suggestion.getReplacementString());
-    this.categories = suggestion.getCategories();
+    super(suggestion.getField().getName());
+    this.fieldItem = suggestion.getField();
+    this.fieldTerms = suggestion.getFieldTerms();
     if (facet != null) {
       for (FacetResultDto.TermFrequencyResultDto termCount : JsArrays.toIterable(facet.getFrequenciesArray()))
-        categoryFrequencies.put(termCount.getTerm(), termCount.getCount());
+        fieldTermFrequencies.put(termCount.getTerm(), termCount.getCount());
     }
     initialize(suggestion.getReplacementString());
   }
 
   @Override
   protected Widget createSpecificControls() {
-    return hasCategories() ?  createCategoriesControls() : createMatchQueryControls();
+    return hasFieldTerms() ?  createFieldTermsControls() : createMatchQueryControls();
   }
 
   protected String getSpecificQueryString() {
-    return hasCategories() ? getCategoriesQueryString() : getMatchQueryString();
+    return hasFieldTerms() ? getFieldTermsQueryString() : getMatchQueryString();
   }
 
   @Override
@@ -82,9 +87,9 @@ public class VariableFieldDropdown extends CriterionDropdown {
   @Override
   protected void updateCriterionFilter(String filter) {
     if (getRadioControl(0).getValue() || getRadioControl(1).getValue())
-      super.updateCriterionFilter(filter);
+      setText(filter.isEmpty() ? fieldItem.getTitle() : fieldItem.getTitle() + ": " + filter);
     else {
-      String text = hasCategories() ? getCategoriesQueryText() : matches.getText();
+      String text = hasFieldTerms() ? getFieldTermsQueryText() : matches.getText();
       if (Strings.isNullOrEmpty(text)) super.updateCriterionFilter("");
       else if (text.length()>30) setText(filter + " " + text.substring(0, 30) + "...");
       else setText(filter + " " + text);
@@ -96,12 +101,12 @@ public class VariableFieldDropdown extends CriterionDropdown {
   // Private methods
   //
 
-  private boolean hasCategories() {
-    return !categories.isEmpty();
+  private boolean hasFieldTerms() {
+    return !fieldTerms.isEmpty();
   }
 
   private void initialize(String fieldQuery) {
-    initializeHeader(fieldQuery);
+    initializeHeader();
     initializeRadioControls(fieldQuery);
     Widget controls = createSpecificControls();
     if(controls != null) {
@@ -110,10 +115,9 @@ public class VariableFieldDropdown extends CriterionDropdown {
       add(divider);
       add(controls);
       String value = extractValue(fieldQuery);
-      if (hasCategories()) {
+      if (hasFieldTerms()) {
         // select the appropriate checkbox
-        for (int i = 0; i<specificControls.getWidgetCount(); i++) {
-          CheckBox checkbox = (CheckBox) specificControls.getWidget(i);
+        for (CheckBox checkbox : fieldTermChecks) {
           checkbox.setValue(normalizeKeyword(checkbox.getName()).equals(value));
         }
       } else {
@@ -125,10 +129,12 @@ public class VariableFieldDropdown extends CriterionDropdown {
     if (getRadioControl(0).getValue() || getRadioControl(1).getValue()) resetSpecificControls();
   }
 
-  private void initializeHeader(String fieldQuery) {
+  private void initializeHeader() {
     ListItem header = new ListItem();
     header.addStyleName("controls");
-    header.add(new Label(fieldName));
+    Label label = new Label(fieldItem.getTitle());
+    label.setTitle(fieldItem.getDescription());
+    header.add(label);
     add(header);
     ListItem headerDivider = new ListItem();
     headerDivider.addStyleName("divider");
@@ -176,18 +182,30 @@ public class VariableFieldDropdown extends CriterionDropdown {
     return specificControls;
   }
 
-  private Widget createCategoriesControls() {
+  private Widget createFieldTermsControls() {
     specificControls = new ListItem();
     specificControls.addStyleName("controls");
-    for (String category : categories) {
-      SafeHtmlBuilder builder = new SafeHtmlBuilder().appendEscaped(category);
-      if (categoryFrequencies.containsKey(category.toLowerCase())) { // facet term is lower case...
+    ComplexPanel checksPanel;
+    if (fieldTerms.size()>10) {
+      ScrollPanel scrollPanel = new ScrollPanel();
+      scrollPanel.setHeight("200px");
+      specificControls.add(scrollPanel);
+      checksPanel = new FlowPanel();
+      scrollPanel.add(checksPanel);
+    } else {
+      checksPanel = specificControls;
+    }
+    fieldTermChecks.clear();
+    for (VariableFieldSuggestOracle.FieldItem fieldTerm : fieldTerms) {
+      SafeHtmlBuilder builder = new SafeHtmlBuilder().appendEscaped(fieldTerm.getTitle());
+      if (fieldTermFrequencies.containsKey(fieldTerm.getName().toLowerCase())) { // facet term is lower case...
         builder.appendHtmlConstant("<span style=\"font-size:x-small\"> (")
-            .append(categoryFrequencies.get(category.toLowerCase())).appendEscaped(")")
+            .append(fieldTermFrequencies.get(fieldTerm.getName().toLowerCase())).appendEscaped(")")
             .appendHtmlConstant("</span>");
       }
       CheckBox checkBox = new CheckBox(builder.toSafeHtml());
-      checkBox.setName(category);
+      checkBox.setName(fieldTerm.getName());
+      checkBox.setTitle(fieldTerm.getDescription());
       checkBox.addClickHandler(new ClickHandler() {
         @Override
         public void onClick(ClickEvent event) {
@@ -195,7 +213,8 @@ public class VariableFieldDropdown extends CriterionDropdown {
           doFilter();
         }
       });
-      specificControls.add(checkBox);
+      checksPanel.add(checkBox);
+      fieldTermChecks.add(checkBox);
     }
     return specificControls;
   }
@@ -205,10 +224,9 @@ public class VariableFieldDropdown extends CriterionDropdown {
     return (isNot() ? "NOT " : "") + fieldName + ":" + matches.getText();
   }
 
-  private String getCategoriesQueryString() {
+  private String getFieldTermsQueryString() {
     String rval = null;
-    for (int i = 0; i<specificControls.getWidgetCount(); i++) {
-      CheckBox checkbox = (CheckBox) specificControls.getWidget(i);
+    for (CheckBox checkbox : fieldTermChecks) {
       if (checkbox.getValue()) {
         if (Strings.isNullOrEmpty(rval)) rval = normalizeKeyword(checkbox.getName());
         else rval = rval + " OR " + normalizeKeyword(checkbox.getName());
@@ -227,16 +245,23 @@ public class VariableFieldDropdown extends CriterionDropdown {
    *
    * @return
    */
-  private String getCategoriesQueryText() {
-    String rval = "";
-    for (int i = 0; i<specificControls.getWidgetCount(); i++) {
-      CheckBox checkbox = (CheckBox) specificControls.getWidget(i);
+  private String getFieldTermsQueryText() {
+    String text = "";
+    for (CheckBox checkbox : fieldTermChecks) {
       if (checkbox.getValue()) {
-        if (Strings.isNullOrEmpty(rval)) rval = checkbox.getName();
-        else rval = rval + "," + checkbox.getName();
+        String title = getFieldTermTitle(checkbox.getName());
+        if (Strings.isNullOrEmpty(text)) text = title;
+        else text = text + "," + title;
       }
     }
-    return rval;
+    return text;
+  }
+
+  private String getFieldTermTitle(String name) {
+    for (VariableFieldSuggestOracle.FieldItem item : fieldTerms) {
+      if (item.getName().equals(name)) return item.getTitle();
+    }
+    return name;
   }
 
   private boolean isNot() {

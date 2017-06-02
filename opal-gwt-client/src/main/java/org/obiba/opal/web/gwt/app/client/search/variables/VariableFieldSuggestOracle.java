@@ -11,23 +11,29 @@
 package org.obiba.opal.web.gwt.app.client.search.variables;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.SuggestOracle;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.support.AttributeHelper;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.opal.TermDto;
 import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class VariableFieldSuggestOracle extends SuggestOracle {
+
+  private final Translations translations = GWT.create(Translations.class);
+
+  private final String currentLocale;
 
   private final List<TermSuggestion> termSuggestions = Lists.newArrayList();
 
@@ -35,8 +41,8 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
   private final List<MagmaSuggestion> magmaSuggestions = Lists.newArrayList();
 
-
   public VariableFieldSuggestOracle() {
+    this.currentLocale = AttributeHelper.getCurrentLanguage();
     initPropertySuggestions();
   }
 
@@ -86,41 +92,67 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     for (PropertySuggestion suggestion : propertySuggestions) {
       if (suggestion.isCandidate(query)) candidates.add(suggestion);
     }
-    //GWT.log("=========");
-    //for (Suggestion sugg : candidates) {
-    //  GWT.log(sugg.getReplacementString());
-    //}
     Response response = new Response(candidates);
     response.setMoreSuggestionsCount(Math.max(0, candidates.size() - limit));
     callback.onSuggestionsReady(request, response);
   }
 
   private void initPropertySuggestions() {
-    propertySuggestions.add(new PropertySuggestion("name"));
-    propertySuggestions.add(new PropertySuggestion("entityType"));
-    initPropertySuggestions("valueType", new String[]{"integer", "decimal", "text", "boolean", "date", "datetime"});
-    initPropertySuggestions("repeatable", new String[]{"true", "false"});
-    initPropertySuggestions("nature", new String[]{"CATEGORICAL", "CONTINUOUS", "TEMPORAL", "GEO", "BINARY", "UNDETERMINED"});
-    propertySuggestions.add(new PropertySuggestion("occurrenceGroup"));
-    propertySuggestions.add(new PropertySuggestion("referencedEntityType"));
-    propertySuggestions.add(new PropertySuggestion("mimeType"));
-    propertySuggestions.add(new PropertySuggestion("unit"));
-    propertySuggestions.add(new PropertySuggestion("script"));
+    propertySuggestions.add(new PropertySuggestion(translations.nameLabel(), "name"));
+    propertySuggestions.add(new PropertySuggestion(translations.entityTypeLabel(), "entityType"));
+    initPropertySuggestions(translations.valueTypeLabel(), "valueType", new String[]{"integer", "decimal", "text", "boolean", "date", "datetime"});
+    initPropertySuggestions(translations.repeatableLabel(), "repeatable", new String[]{"true", "false"});
+    initPropertySuggestions(translations.natureLabel(), "nature", new String[]{"CATEGORICAL", "CONTINUOUS", "TEMPORAL", "GEO", "BINARY", "UNDETERMINED"});
+    propertySuggestions.add(new PropertySuggestion(translations.occurrenceGroupLabel(), "occurrenceGroup"));
+    propertySuggestions.add(new PropertySuggestion(translations.referencedEntityTypeLabel(), "referencedEntityType"));
+    propertySuggestions.add(new PropertySuggestion(translations. mimeTypeLabel(), "mimeType"));
+    propertySuggestions.add(new PropertySuggestion(translations.unitLabel(),"unit"));
+    propertySuggestions.add(new PropertySuggestion(translations.scriptLabel(), "script"));
   }
 
-  private void initPropertySuggestions(String property, String[] values) {
+  private void initPropertySuggestions(String title, String property, String[] values) {
     for (String value : values) {
-      propertySuggestions.add(new PropertySuggestion(property, value, values));
+      propertySuggestions.add(new PropertySuggestion(title, property, value, values));
     }
   }
 
   private String normalizeSearch(String search) {
-    //String nSearch = search.trim();
-    //int idx = nSearch.lastIndexOf(' ');
-    //if (idx > 0) nSearch = nSearch.substring(idx + 1);
-    //GWT.log(search + " => " + nSearch);
-    //return nSearch.trim();
     return search.trim();
+  }
+
+  public class FieldItem {
+
+    private final String name;
+
+    private final String title;
+
+    private final String description;
+
+    public FieldItem(String name) {
+      this(name, "", "");
+    }
+
+    public FieldItem(String name, String title) {
+      this(name, title, "");
+    }
+
+    public FieldItem(String name, String title, String description) {
+      this.name = name;
+      this.title = title;
+      this.description = description;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public String getTitle() {
+      return Strings.isNullOrEmpty(title) ? name : title;
+    }
+
+    public String getDescription() {
+      return description;
+    }
   }
 
   public interface VariableFieldSuggestion extends Suggestion {
@@ -130,14 +162,14 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
      *
      * @return
      */
-    String getField();
+    FieldItem getField();
 
     /**
      * Possible values of the field, if any.
      *
      * @return
      */
-    List<String> getCategories();
+    List<FieldItem> getFieldTerms();
 
     /**
      * Field statement contains the queried word.
@@ -151,21 +183,25 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
   public class PropertySuggestion implements VariableFieldSuggestion {
 
+    private final String title;
+
     private final String property;
 
     private final String value;
 
-    private final List<String> categories = Lists.newArrayList();
+    private final List<FieldItem> fieldTerms = Lists.newArrayList();
 
-    private PropertySuggestion(String property) {
+    private PropertySuggestion(String title, String property) {
+      this.title = title;
       this.property = property;
       this.value = "";
     }
 
-    private PropertySuggestion(String property, String value, String[] values) {
+    private PropertySuggestion(String title, String property, String value, String[] values) {
+      this.title = title;
       this.property = property;
       this.value = value == null ? "" : value;
-      for (String val : values) this.categories.add(val);
+      for (String val : values) this.fieldTerms.add(new FieldItem(val));
     }
 
     @Override
@@ -191,7 +227,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     @Override
     public String getReplacementString() {
-      return getField() + ":" + escape(value);
+      return getField().getName() + ":" + escape(value);
     }
 
     @Override
@@ -205,19 +241,19 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     }
 
     @Override
-    public String getField() {
-      return property;
+    public FieldItem getField() {
+      return new FieldItem(property, title);
     }
 
     @Override
-    public List<String> getCategories() {
-      return categories;
+    public List<FieldItem> getFieldTerms() {
+      return fieldTerms;
     }
   }
 
   public abstract class MagmaSuggestion implements VariableFieldSuggestion {
 
-    protected final List<String> categories = Lists.newArrayList();
+    protected final List<FieldItem> fieldTerms = Lists.newArrayList();
 
     @Override
     public boolean isCandidate(String query) {
@@ -226,8 +262,8 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     }
 
     @Override
-    public List<String> getCategories() {
-      return categories;
+    public List<FieldItem> getFieldTerms() {
+      return fieldTerms;
     }
 
     protected String escape(String value) {
@@ -241,7 +277,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     private DatasourceSuggestion(String datasource, Collection<String> datasources) {
       this.datasource = datasource;
-      categories.addAll(datasources);
+      for (String ds : datasources) fieldTerms.add(new FieldItem(ds));
     }
 
     @Override
@@ -258,14 +294,13 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     @Override
     public String getReplacementString() {
-      return getField() + ":" + escape(datasource);
+      return getField().getName() + ":" + escape(datasource);
     }
 
     @Override
-    public String getField() {
-      return "datasource";
+    public FieldItem getField() {
+      return new FieldItem("datasource", translations.projectLabel());
     }
-
   }
 
   public class TableSuggestion extends MagmaSuggestion implements VariableFieldSuggestion {
@@ -278,9 +313,14 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
       this.table = table;
       for (TableDto tableDto : allTables) {
         if (tableDto.getName().equals(table)) datasources.add(tableDto.getDatasourceName());
-        if (!categories.contains(tableDto.getName())) categories.add(tableDto.getName());
+        if (!fieldTerms.contains(tableDto.getName())) fieldTerms.add(new FieldItem(tableDto.getName()));
       }
-      Collections.sort(categories);
+      Collections.sort(fieldTerms, new Comparator<FieldItem>() {
+        @Override
+        public int compare(FieldItem o1, FieldItem o2) {
+          return o1.getName().compareTo(o2.getName());
+        }
+      });
     }
 
     @Override
@@ -302,14 +342,13 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     @Override
     public String getReplacementString() {
-      return getField() + ":" + escape(table);
+      return getField().getName() + ":" + escape(table);
     }
 
     @Override
-    public String getField() {
-      return "table";
+    public FieldItem getField() {
+      return new FieldItem("table", translations.tableLabel());
     }
-
   }
 
   public class TermSuggestion implements VariableFieldSuggestion {
@@ -329,7 +368,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     @Override
     public String getDisplayString() {
       SafeHtmlBuilder accum = new SafeHtmlBuilder();
-      String name = term.getName();
+      String name = getLocaleText(term.getTitleArray());
       accum.appendHtmlConstant("<div id='" + getReplacementString() + "'>");
       accum.appendHtmlConstant("  <i class='icon-tag'></i>");
       accum.appendHtmlConstant("  <strong>");
@@ -338,7 +377,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
       accum.appendHtmlConstant("</div>");
       accum.appendHtmlConstant("<div>");
       accum.appendHtmlConstant("  <small>");
-      accum.appendEscaped(taxonomy.getName() + " - " + vocabulary.getName());
+      accum.appendEscaped(getLocaleText(taxonomy.getTitleArray()) + " - " + getLocaleText(vocabulary.getTitleArray()));
       accum.appendHtmlConstant("  </small>");
       accum.appendHtmlConstant("</div>");
       return accum.toSafeHtml().asString();
@@ -346,26 +385,42 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     @Override
     public String getReplacementString() {
-      return getField() + ":" + term.getName();
+      return getField().getName() + ":" + term.getName();
     }
 
     @Override
     public boolean isCandidate(String query) {
-      return getReplacementString().toLowerCase().contains(query.toLowerCase());
+      String nQuery = query.toLowerCase();
+      return getReplacementString().toLowerCase().contains(nQuery)
+       || getLocaleText(term.getTitleArray()).toLowerCase().contains(nQuery)
+       || getLocaleText(term.getDescriptionArray()).toLowerCase().contains(nQuery);
     }
 
     @Override
-    public String getField() {
-      return taxonomy.getName() + "-" + vocabulary.getName();
+    public FieldItem getField() {
+      return new FieldItem(taxonomy.getName() + "-" + vocabulary.getName(),
+          getLocaleText(vocabulary.getTitleArray()), getLocaleText(vocabulary.getDescriptionArray()));
     }
 
     @Override
-    public List<String> getCategories() {
-      List<String> categories = Lists.newArrayList();
+    public List<FieldItem> getFieldTerms() {
+      List<FieldItem> fieldTerms = Lists.newArrayList();
       for (TermDto termDto : JsArrays.toIterable(vocabulary.getTermsArray())) {
-        categories.add(termDto.getName());
+        fieldTerms.add(new FieldItem(termDto.getName(), getLocaleText(termDto.getTitleArray()),
+            getLocaleText(termDto.getDescriptionArray())));
       }
-      return categories;
+      return fieldTerms;
+    }
+
+    private String getLocaleText(JsArray<LocaleTextDto> texts) {
+      for (LocaleTextDto text : JsArrays.toIterable(texts)) {
+        if (currentLocale.equals(text.getLocale())) return text.getText();
+      }
+      // fallback in english
+      for (LocaleTextDto text : JsArrays.toIterable(texts)) {
+        if ("en".equals(text.getLocale())) return text.getText();
+      }
+      return "";
     }
   }
 }
