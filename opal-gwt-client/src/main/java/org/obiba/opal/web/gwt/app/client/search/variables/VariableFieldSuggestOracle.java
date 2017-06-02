@@ -369,7 +369,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     public String getDisplayString() {
       SafeHtmlBuilder accum = new SafeHtmlBuilder();
       String name = getLocaleText(term.getTitleArray());
-      accum.appendHtmlConstant("<div id='" + getReplacementString() + "'>");
+      accum.appendHtmlConstant("<div id='" + getReplacementString() + "' title=\"" + getLocaleText(term.getDescriptionArray()).replaceAll("\"","'") + "\">");
       accum.appendHtmlConstant("  <i class='icon-tag'></i>");
       accum.appendHtmlConstant("  <strong>");
       accum.appendEscaped(name);
