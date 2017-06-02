@@ -26,6 +26,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
 import org.obiba.opal.web.model.client.opal.EntryDto;
 import org.obiba.opal.web.model.client.search.ItemFieldsDto;
@@ -37,7 +38,7 @@ public class VariableItemTable extends Table<ItemResultDto> {
     initColumns(null);
   }
 
-  public void setPlaceManager(PlaceManager placeManager) {
+  public void initialize(PlaceManager placeManager) {
     while (getColumnCount()>0) {
       removeColumn(0);
     }
@@ -48,6 +49,7 @@ public class VariableItemTable extends Table<ItemResultDto> {
     setPageSize(Table.DEFAULT_PAGESIZE);
     setEmptyTableWidget(new InlineLabel(translations.noVariablesLabel()));
 
+    //addCheckColumn();
 
     if (placeManager != null) {
       addColumn(new VariableItemColumn(new ProjectTableLinkCell(placeManager)), translations.tableLabel());
@@ -63,7 +65,12 @@ public class VariableItemTable extends Table<ItemResultDto> {
     }
 
     addColumn(new ItemFieldColumn("label"), translations.labelLabel());
+  }
 
+  private void addCheckColumn(CheckboxColumn.Display<ItemResultDto> checkboxDisplay) {
+    CheckboxColumn<ItemResultDto> checkColumn = new CheckboxColumn<>(checkboxDisplay);
+    addColumn(checkColumn, checkColumn.getCheckColumnHeader());
+    setColumnWidth(checkColumn, 1, com.google.gwt.dom.client.Style.Unit.PX);
   }
 
   private static class VariableItemColumn extends Column<ItemResultDto, ItemResultDto> {

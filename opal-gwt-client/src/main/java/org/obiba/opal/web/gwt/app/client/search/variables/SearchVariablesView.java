@@ -211,8 +211,8 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
       @Override
       public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {
         VariableFieldSuggestOracle.VariableFieldSuggestion fieldSuggestion = (VariableFieldSuggestOracle.VariableFieldSuggestion) selectedSuggestion;
-        //if (!fieldSuggestion.getCategories().isEmpty()) {
-        //  getUiHandlers().onFacet(fieldSuggestion.getField(), fieldSuggestion.getCategories().size(), new VariableFieldFacetHandler(fieldSuggestion));
+        //if (!fieldSuggestion.getFieldTerms().isEmpty()) {
+        //  getUiHandlers().onFacet(fieldSuggestion.getField(), fieldSuggestion.getFieldTerms().size(), new VariableFieldFacetHandler(fieldSuggestion));
         //} else
         addCriterion(fieldSuggestion, null);
         return "";
@@ -258,7 +258,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   private void initVariableItemTable() {
     if (variableItemProvider == null) {
       variableItemProvider = new VariableItemProvider();
-      variableItemTable.setPlaceManager(placeManager);
+      variableItemTable.initialize(placeManager);
       variableItemPager.setDisplay(variableItemTable);
       variableItemProvider.addDataDisplay(variableItemTable);
     }
