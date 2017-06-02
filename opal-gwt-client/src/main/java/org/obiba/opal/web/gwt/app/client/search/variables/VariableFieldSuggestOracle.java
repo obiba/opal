@@ -138,8 +138,8 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     public FieldItem(String name, String title, String description) {
       this.name = name;
-      this.title = title;
-      this.description = description;
+      this.title = Strings.isNullOrEmpty(title) ? name : title;
+      this.description = this.title.equals(description) ? "" : description;
     }
 
     public String getName() {
@@ -147,7 +147,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     }
 
     public String getTitle() {
-      return Strings.isNullOrEmpty(title) ? name : title;
+      return title;
     }
 
     public String getDescription() {
@@ -284,7 +284,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     public String getDisplayString() {
       SafeHtmlBuilder accum = new SafeHtmlBuilder();
       accum.appendHtmlConstant("<div id='" + getReplacementString() + "'>");
-      accum.appendHtmlConstant("  <i class='icon-folder-close'></i>");
+      accum.appendHtmlConstant("  <i class='icon-briefcase'></i>");
       accum.appendHtmlConstant("  <strong>");
       accum.appendEscaped(datasource);
       accum.appendHtmlConstant("  </strong>");
@@ -392,8 +392,9 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     public boolean isCandidate(String query) {
       String nQuery = query.toLowerCase();
       return getReplacementString().toLowerCase().contains(nQuery)
-       || getLocaleText(term.getTitleArray()).toLowerCase().contains(nQuery)
-       || getLocaleText(term.getDescriptionArray()).toLowerCase().contains(nQuery);
+          || getLocaleText(term.getTitleArray()).toLowerCase().contains(nQuery)
+          || getLocaleText(term.getDescriptionArray()).toLowerCase().contains(nQuery)
+          || getLocaleText(term.getKeywordsArray()).toLowerCase().contains(nQuery);
     }
 
     @Override

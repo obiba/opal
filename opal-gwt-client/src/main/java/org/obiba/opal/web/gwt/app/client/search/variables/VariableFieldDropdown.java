@@ -11,12 +11,13 @@
 package org.obiba.opal.web.gwt.app.client.search.variables;
 
 import com.github.gwtbootstrap.client.ui.CheckBox;
+import com.github.gwtbootstrap.client.ui.Icon;
 import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.*;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.*;
@@ -132,9 +133,14 @@ public class VariableFieldDropdown extends CriterionDropdown {
   private void initializeHeader() {
     ListItem header = new ListItem();
     header.addStyleName("controls");
-    Label label = new Label(fieldItem.getTitle());
-    label.setTitle(fieldItem.getDescription());
+    header.setTitle(fieldItem.getDescription());
+    Label label = new InlineLabel(fieldItem.getTitle());
     header.add(label);
+    if (!header.getTitle().isEmpty()) {
+      Icon info = new Icon(IconType.QUESTION_SIGN);
+      info.addStyleName("small-indent");
+      header.add(info);
+    }
     add(header);
     ListItem headerDivider = new ListItem();
     headerDivider.addStyleName("divider");
@@ -143,7 +149,6 @@ public class VariableFieldDropdown extends CriterionDropdown {
 
   private void initializeRadioControls(String fieldQuery) {
     String value = extractValue(fieldQuery);
-    GWT.log("initializeRadioControls.value=" + value);
     radioControls.add(createRadioButtonResetSpecific(translations.criterionFiltersMap().get("any"), null));
     radioControls.add(createRadioButtonResetSpecific(translations.criterionFiltersMap().get("none"), null));
     RadioButton in = createRadioButton(translations.criterionFiltersMap().get("in"), null);
@@ -203,9 +208,9 @@ public class VariableFieldDropdown extends CriterionDropdown {
             .append(fieldTermFrequencies.get(fieldTerm.getName().toLowerCase())).appendEscaped(")")
             .appendHtmlConstant("</span>");
       }
+      FlowPanel checkPanel = new FlowPanel();
       CheckBox checkBox = new CheckBox(builder.toSafeHtml());
       checkBox.setName(fieldTerm.getName());
-      checkBox.setTitle(fieldTerm.getDescription());
       checkBox.addClickHandler(new ClickHandler() {
         @Override
         public void onClick(ClickEvent event) {
@@ -213,7 +218,15 @@ public class VariableFieldDropdown extends CriterionDropdown {
           doFilter();
         }
       });
-      checksPanel.add(checkBox);
+      checkBox.addStyleName("inline-block");
+      checkPanel.setTitle(fieldTerm.getDescription());
+      checkPanel.add(checkBox);
+      if (!checkPanel.getTitle().isEmpty()) {
+        Icon info = new Icon(IconType.QUESTION_SIGN);
+        info.addStyleName("small-indent");
+        checkPanel.add(info);
+      }
+      checksPanel.add(checkPanel);
       fieldTermChecks.add(checkBox);
     }
     return specificControls;
