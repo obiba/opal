@@ -234,8 +234,8 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
     }
 
     @Override
-    public ListDataProvider<JsArray<AttributeDto>> getDataProvider() {
-      return provider;
+    public List<JsArray<AttributeDto>> getDataList() {
+      return provider.getList();
     }
 
     @Override

@@ -776,8 +776,8 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     }
 
     @Override
-    public ListDataProvider<VariableDto> getDataProvider() {
-      return dataProvider;
+    public List<VariableDto> getDataList() {
+      return dataProvider.getList();
     }
 
     @Override

@@ -137,7 +137,7 @@ public class VariableFieldDropdown extends CriterionDropdown {
     Label label = new InlineLabel(fieldItem.getTitle());
     header.add(label);
     if (!header.getTitle().isEmpty()) {
-      Icon info = new Icon(IconType.QUESTION_SIGN);
+      Icon info = new Icon(IconType.INFO_SIGN);
       info.addStyleName("small-indent");
       header.add(info);
     }
@@ -222,7 +222,7 @@ public class VariableFieldDropdown extends CriterionDropdown {
       checkPanel.setTitle(fieldTerm.getDescription());
       checkPanel.add(checkBox);
       if (!checkPanel.getTitle().isEmpty()) {
-        Icon info = new Icon(IconType.QUESTION_SIGN);
+        Icon info = new Icon(IconType.INFO_SIGN);
         info.addStyleName("small-indent");
         checkPanel.add(info);
       }

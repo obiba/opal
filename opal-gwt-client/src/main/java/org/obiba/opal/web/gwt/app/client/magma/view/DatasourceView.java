@@ -440,8 +440,8 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     }
 
     @Override
-    public ListDataProvider<TableDto> getDataProvider() {
-      return dataProvider;
+    public List<TableDto> getDataList() {
+      return dataProvider.getList();
     }
 
     @Override
