@@ -58,8 +58,8 @@ public class VariableItemTable extends Table<ItemResultDto> {
     //addCheckColumn(new ItemResultCheckDisplay(this));
 
     if (placeManager != null) {
-      addColumn(new VariableItemColumn(new ProjectTableLinkCell(placeManager)), translations.tableLabel());
       addColumn(new VariableItemColumn(new VariableLinkCell(placeManager)), translations.variableLabel());
+      addColumn(new VariableItemColumn(new ProjectTableLinkCell(placeManager)), translations.tableLabel());
     } else {
       addColumn(new TextColumn<ItemResultDto>() {
         @Override
@@ -68,6 +68,13 @@ public class VariableItemTable extends Table<ItemResultDto> {
           return parser.getVariable();
         }
       }, translations.variableLabel());
+      addColumn(new TextColumn<ItemResultDto>() {
+        @Override
+        public String getValue(ItemResultDto item) {
+          MagmaPath.Parser parser = MagmaPath.Parser.parse(item.getIdentifier());
+          return parser.getDatasource() + "." + parser.getTable();
+        }
+      }, translations.tableLabel());
     }
 
     addColumn(new ItemFieldColumn("label"), translations.labelLabel());

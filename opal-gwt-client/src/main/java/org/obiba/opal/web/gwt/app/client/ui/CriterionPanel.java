@@ -65,6 +65,7 @@ public class CriterionPanel extends FlowPanel {
 
     addStyleName("xsmall-right-indent");
     addStyleName("inline-block");
+    addStyleName("small-top-margin");
   }
 
   public String getQueryString() {
