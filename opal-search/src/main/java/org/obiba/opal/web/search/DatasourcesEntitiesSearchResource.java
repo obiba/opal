@@ -54,11 +54,20 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
   @Path("_search")
   public Response search(@QueryParam("query") List<String> queries,
                          @QueryParam("type") @DefaultValue("Participant") String entityType, @QueryParam("offset") @DefaultValue("0") int offset,
-                         @QueryParam("limit") @DefaultValue("10") int limit) throws JSONException {
+                         @QueryParam("limit") @DefaultValue("10") int limit, @QueryParam("partials") @DefaultValue("false") boolean withPartials) throws JSONException {
     if(!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
     this.entityType = entityType;
 
     List<ChildQueryParser> childQueries = extractChildQueries(queries);
+    List<Search.EntitiesResultDto> partialResults = Lists.newArrayList();
+    if (withPartials) {
+      for (ChildQueryParser childQuery : childQueries) {
+        QuerySearchJsonBuilder builder = buildHasChildQuerySearch(0, 0);
+        builder.childQuery(childQuery.asChildQuery());
+        JSONObject jsonResponse = executeQuery(builder.build());
+        partialResults.add(getResultDtoBuilder(jsonResponse, childQuery.getQuery()).build());
+      }
+    }
 
     // global query
     QuerySearchJsonBuilder builder = buildHasChildQuerySearch(offset, limit);
@@ -71,6 +80,7 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
     }
 
     Search.EntitiesResultDto.Builder dtoResponseBuilder = getResultDtoBuilder(jsonResponse, Joiner.on(" AND ").join(queries));
+    dtoResponseBuilder.addAllPartialResults(partialResults);
     return Response.ok().entity(dtoResponseBuilder.build()).build();
   }
 
@@ -79,7 +89,7 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
   @Path("_count")
   public Response count(@QueryParam("query") List<String> queries,
                          @QueryParam("type") @DefaultValue("Participant") String entityType) throws JSONException {
-    return search(queries, entityType, 0, 0);
+    return search(queries, entityType, 0, 0, true);
   }
 
   @Override

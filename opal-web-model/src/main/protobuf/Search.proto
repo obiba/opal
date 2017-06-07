@@ -153,4 +153,5 @@ message EntitiesResultDto {
   required int32 totalHits = 2;
   required string query = 3;
   repeated ItemResultDto hits = 4;
+  repeated EntitiesResultDto partialResults = 5;
 }
