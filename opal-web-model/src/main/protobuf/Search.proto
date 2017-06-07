@@ -147,3 +147,10 @@ message ValueSetsResultDto {
   required int32 totalHits = 1;
   optional Magma.ValueSetsDto valueSets = 2;
 }
+
+message EntitiesResultDto {
+  required string entityType = 1;
+  required int32 totalHits = 2;
+  required string query = 3;
+  repeated ItemResultDto hits = 4;
+}

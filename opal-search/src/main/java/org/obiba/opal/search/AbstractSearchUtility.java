@@ -46,9 +46,9 @@ public abstract class AbstractSearchUtility {
     Collection<String> safeFields = fields == null ? new ArrayList<String>() : fields;
     addDefaultFields(safeFields);
     QuerySearchJsonBuilder jsonBuilder = new QuerySearchJsonBuilder();
-    jsonBuilder.setQuery(query).setFields(safeFields).setFacets(facets).setFrom(offset).setSize(limit) //
-        .setSortField(Strings.isNullOrEmpty(sortField) ? DEFAULT_SORT_FIELD : sortField) //
-        .setSortDir(Strings.isNullOrEmpty(sortDir) ? SortDir.DESC.toString() : sortDir);
+    jsonBuilder.query(query).fields(safeFields).facets(facets).from(offset).size(limit) //
+        .sortField(Strings.isNullOrEmpty(sortField) ? DEFAULT_SORT_FIELD : sortField) //
+        .sortDir(Strings.isNullOrEmpty(sortDir) ? SortDir.DESC.toString() : sortDir);
 
     return jsonBuilder;
   }

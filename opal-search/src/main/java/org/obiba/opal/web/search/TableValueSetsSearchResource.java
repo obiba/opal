@@ -16,7 +16,6 @@ import java.util.List;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
@@ -24,7 +23,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import com.google.common.collect.Sets;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -33,6 +31,7 @@ import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.search.AbstractSearchUtility;
 import org.obiba.opal.search.SearchQueryException;
+import org.obiba.opal.spi.search.ValuesIndexManager;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.VariableEntityValueSetDtoFunction;
@@ -59,10 +58,9 @@ public class TableValueSetsSearchResource extends AbstractSearchUtility {
   @PathParam("table")
   private String table;
 
-  @SuppressWarnings("PMD.ExcessiveParameterList")
   @GET
-  @POST
   @Transactional(readOnly = true)
+  @SuppressWarnings("PMD.ExcessiveParameterList")
   public Response search(@Context UriInfo uriInfo, @QueryParam("query") String query,
       @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("10") int limit,
       @QueryParam("select") String select) throws JSONException {
@@ -70,21 +68,22 @@ public class TableValueSetsSearchResource extends AbstractSearchUtility {
     if(!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
     if(!opalSearchService.getValuesIndexManager().hasIndex(getValueTable())) return Response.status(Response.Status.NOT_FOUND).build();
 
-    JSONObject jsonResponse = executeQuery(buildQuerySearch(query, offset, limit, null, null, null, null).build());
+    JSONObject jsonResponse = executeQuery(buildQuerySearch(query, offset, limit,
+        Lists.newArrayList("identifier"), null, null, null).build());
 
     if(!jsonResponse.isNull("error")) {
       throw new SearchQueryException(jsonResponse.get("error").toString());
     }
 
-    Search.ValueSetsResultDto.Builder dtoResponseBuilder = getvalueSetsDtoBuilder(uriInfo, select, jsonResponse);
+    Search.ValueSetsResultDto.Builder dtoResponseBuilder = getValueSetsDtoBuilder(uriInfo, select, jsonResponse);
 
     // filter entities
     return Response.ok().entity(dtoResponseBuilder.build()).build();
 
   }
 
-  private Search.ValueSetsResultDto.Builder getvalueSetsDtoBuilder(UriInfo uriInfo, String select,
-      JSONObject jsonResponse) throws JSONException {
+  private Search.ValueSetsResultDto.Builder getValueSetsDtoBuilder(UriInfo uriInfo, String select,
+                                                                   JSONObject jsonResponse) throws JSONException {
     Search.ValueSetsResultDto.Builder dtoResponseBuilder = Search.ValueSetsResultDto.newBuilder();
     JSONObject jsonHits = jsonResponse.getJSONObject("hits");
 
@@ -95,7 +94,8 @@ public class TableValueSetsSearchResource extends AbstractSearchUtility {
     JSONArray hits = jsonHits.getJSONArray("hits");
     for(int i = 0; i < hits.length(); i++) {
       JSONObject jsonHit = hits.getJSONObject(i);
-      entities.add(new VariableEntityBean(entityType, jsonHit.getString("_id")));
+      JSONObject fields = jsonHit.getJSONObject("fields").getJSONArray("partial").getJSONObject(0);
+      entities.add(new VariableEntityBean(entityType, fields.getString("identifier")));
     }
 
     String path = uriInfo.getPath();
@@ -110,7 +110,8 @@ public class TableValueSetsSearchResource extends AbstractSearchUtility {
 
   @Override
   protected String getSearchPath() {
-    return opalSearchService.getValuesIndexManager().getIndex(getValueTable()).getRequestPath();
+    ValuesIndexManager manager = opalSearchService.getValuesIndexManager();
+    return manager.getName() + "/" + manager.getIndex(getValueTable()).getIndexType();
   }
 
   //

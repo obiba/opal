@@ -153,10 +153,10 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
       this(tableIndex, body, path, new HashMap<String, String>());
     }
 
-    EsRestRequest(ValueTableIndex tableIndex, String body, String path, Map<String, String> params) {
+    private EsRestRequest(ValueTableIndex tableIndex, String body, String path, Map<String, String> params) {
       this.body = body;
       this.params = params;
-      esUri = tableIndex.getRequestPath() + "/" + path;
+      esUri = tableIndex.getIndexName() + "/" + path;
     }
 
     @Override

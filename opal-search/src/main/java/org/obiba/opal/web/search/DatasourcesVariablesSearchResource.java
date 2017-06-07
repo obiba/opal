@@ -15,7 +15,6 @@ import java.util.List;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
@@ -42,7 +41,6 @@ public class DatasourcesVariablesSearchResource extends AbstractSearchUtility {
   private static final Logger log = LoggerFactory.getLogger(DatasourcesVariablesSearchResource.class);
 
   @GET
-  @POST
   @Path("_search")
   @Transactional(readOnly = true)
   public Response search(@QueryParam("query") String query, @QueryParam("offset") @DefaultValue("0") int offset,
@@ -72,23 +70,21 @@ public class DatasourcesVariablesSearchResource extends AbstractSearchUtility {
   @Override
   protected QuerySearchJsonBuilder buildQuerySearch(String query, int offset, int limit, Collection<String> fields,
       Collection<String> facets, String sortField, String sortDir) {
-    return super.buildQuerySearch(query, offset, limit, fields, facets, sortField, sortDir).setFilterTypes(getFilterTypes());
+    return super.buildQuerySearch(query, offset, limit, fields, facets, sortField, sortDir).filterReferences(getTableReferencesFilter());
   }
 
   //
   // Private members
   //
 
-  private Collection<String> getFilterTypes() {
-    Collection<String> types = new ArrayList<>();
-
+  private Collection<String> getTableReferencesFilter() {
+    Collection<String> references = new ArrayList<>();
     for(Datasource datasource : MagmaEngine.get().getDatasources()) {
       for(ValueTable valueTable : datasource.getValueTables()) {
-        types.add(opalSearchService.getVariablesIndexManager().getIndex(valueTable).getIndexName());
+        references.add(valueTable.getTableReference());
       }
     }
-
-    return types;
+    return references;
   }
 
 }

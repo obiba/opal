@@ -131,13 +131,20 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
 
         try {
           XContentBuilder builder = XContentFactory.jsonBuilder().startObject();
+          builder.field("identifier.analyzed", identifier); // analyzed copy of _id
+          builder.field("identifier", identifier);
+          builder.field("datasource", valueTable.getDatasource().getName());
+          builder.field("table", valueTable.getName());
+          builder.field("reference", valueTable.getTableReference());
+          builder.field("entityType", valueTable.getEntityType());
+
           for(int i = 0; i < variables.length; i++) {
             indexValue(builder, variables[i], values[i], identifier);
           }
           builder.endObject();
 
           IndexRequestBuilder requestBuilder = opalSearchService.getClient()
-              .prepareIndex(getName(), index.getIndexName(), identifier).setParent(identifier).setSource(builder);
+              .prepareIndex(getName(), index.getIndexType(), index.getIndexType() + "-" + identifier).setParent(identifier).setSource(builder);
           bulkRequest.add(requestBuilder);
           done++;
 
@@ -150,8 +157,6 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
       }
 
       private void indexValue(XContentBuilder xcb, Variable variable, Value value, String identifier) throws IOException {
-        xcb.field("_id.analyzed", identifier); // analyzed copy of _id
-
         String fieldName = index.getFieldName(variable.getName());
 
         if(value.isSequence() && !value.isNull()) {
@@ -229,12 +234,12 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
 
     @Override
     public String getFieldName(String variable) {
-      return (getIndexName() + "-" + variable).replace(' ','+');
+      return (getIndexType() + FIELD_SEP + variable).replace(' ','+');
     }
 
     @Override
     protected XContentBuilder getMapping() {
-      return new ValueTableMapping().createMapping(runtimeVersionProvider.getVersion(), getIndexName(), resolveTable());
+      return new ValueTableMapping().createMapping(runtimeVersionProvider.getVersion(), getIndexType(), resolveTable());
     }
 
     @Override

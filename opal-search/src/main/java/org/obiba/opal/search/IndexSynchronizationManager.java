@@ -180,10 +180,10 @@ public class IndexSynchronizationManager {
     private void submitTask(IndexManager indexManager, ValueTable table) {
       ValueTableIndex index = indexManager.getIndex(table);
       if(currentTask != null && currentTask.getIndexManager().getName().equals(indexManager.getName()) &&
-          currentTask.getValueTableIndex().getIndexName().equals(index.getIndexName())) return;
+          currentTask.getValueTableIndex().getIndexType().equals(index.getIndexType())) return;
 
       if(!isAlreadyQueued(indexManager, index)) {
-        log.trace("Queueing for indexing {} in {}", index.getIndexName(), indexManager.getName());
+        log.trace("Queueing for indexing {} in {}", index.getIndexType(), indexManager.getName());
         indexSyncQueue.offer(indexManager.createSyncTask(table, index));
       }
     }
@@ -196,7 +196,7 @@ public class IndexSynchronizationManager {
 
   public boolean isAlreadyQueued(IndexManager indexManager, ValueTableIndex index) {
     for(IndexSynchronization s : indexSyncQueue) {
-      if(s.getValueTableIndex().getIndexName().equals(index.getIndexName()) &&
+      if(s.getValueTableIndex().getIndexType().equals(index.getIndexType()) &&
           s.getIndexManager().getName().equals(indexManager.getName())) {
         log.trace("Indexation is already queued...");
         return true;
@@ -224,7 +224,7 @@ public class IndexSynchronizationManager {
     private void consume(IndexSynchronization sync) {
       currentTask = sync;
       try {
-        log.trace("Prepare indexing {} in {}", sync.getValueTableIndex().getIndexName(),
+        log.trace("Prepare indexing {} in {}", sync.getValueTableIndex().getIndexType(),
             sync.getIndexManager().getName());
         // check if still indexable: indexation config could have changed
         if(sync.getIndexManager().isReady()) {

@@ -26,6 +26,7 @@ import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueSetException;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.search.AbstractSearchUtility;
+import org.obiba.opal.spi.search.ValuesIndexManager;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.EsResultConverter;
 import org.obiba.opal.web.search.support.ItemResultDtoStrategy;
@@ -46,7 +47,6 @@ public class TableVariablesSearchResource extends AbstractSearchUtility {
   private String table;
 
   @GET
-  @POST
   @Transactional(readOnly = true)
   @SuppressWarnings("PMD.ExcessiveParameterList")
   public Response search(@QueryParam("query") String query, @QueryParam("offset") @DefaultValue("0") int offset,
@@ -62,9 +62,7 @@ public class TableVariablesSearchResource extends AbstractSearchUtility {
       JSONObject jsonResponse = executeQuery(jsonBuiler.build());
       Search.QueryResultDto dtoResponse = convertResponse(jsonResponse, addVariableDto);
       return Response.ok().entity(dtoResponse).build();
-    } catch(NoSuchValueSetException e) {
-      return Response.status(Response.Status.NOT_FOUND).build();
-    } catch(NoSuchDatasourceException e) {
+    } catch(NoSuchValueSetException | NoSuchDatasourceException e) {
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch(Exception e) {
       return Response.status(Response.Status.BAD_REQUEST).build();
@@ -73,10 +71,10 @@ public class TableVariablesSearchResource extends AbstractSearchUtility {
 
   @Override
   protected String getSearchPath() {
-    return opalSearchService.getVariablesIndexManager().getIndex(getValueTable()).getRequestPath();
+    ValuesIndexManager manager = opalSearchService.getValuesIndexManager();
+    return manager.getName() + "/" + manager.getIndex(getValueTable()).getIndexType();
   }
-
-  protected Search.QueryResultDto convertResponse(JSONObject jsonResponse, boolean addVariableDto)
+  private Search.QueryResultDto convertResponse(JSONObject jsonResponse, boolean addVariableDto)
       throws JSONException {
     EsResultConverter converter = new EsResultConverter();
     if(addVariableDto) converter.setStrategy(new ItemResultDtoStrategy(getValueTable()));

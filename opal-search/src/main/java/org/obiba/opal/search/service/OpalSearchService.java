@@ -30,6 +30,7 @@ import org.obiba.opal.search.es.support.EsSearchQueryExecutor;
 import org.obiba.opal.spi.search.SearchService;
 import org.obiba.opal.spi.search.ValuesIndexManager;
 import org.obiba.opal.spi.search.VariablesIndexManager;
+import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.SearchQueryExecutor;
 import org.obiba.opal.web.search.support.ValueTableIndexManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -140,14 +141,22 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
     return queryExecutor.executePost(jsonQuery);
   }
 
-  public SearchQueryExecutor createQueryExecutor(String datasource, String table) {
-    ValueTableIndexManager valueTableIndexManager = new ValueTableIndexManager(getValuesIndexManager(), datasource, table);
-    return new EsSearchQueryExecutor(this, valueTableIndexManager, termsFacetSizeLimit);
+  public Search.QueryResultDto executeQuery(String datasource, String table, Search.QueryTermDto queryDto) throws JSONException {
+    return createQueryExecutor(datasource, table).execute(queryDto);
+  }
+
+  public Search.QueryResultDto executeQuery(String datasource, String table, Search.QueryTermsDto queryDto) throws JSONException {
+    return createQueryExecutor(datasource, table).execute(queryDto);
   }
 
   //
   // Private methods
   //
+
+  private SearchQueryExecutor createQueryExecutor(String datasource, String table) {
+    ValueTableIndexManager valueTableIndexManager = new ValueTableIndexManager(getValuesIndexManager(), datasource, table);
+    return new EsSearchQueryExecutor(this, valueTableIndexManager, termsFacetSizeLimit);
+  }
 
   private SearchService getSearchServicePlugin() {
     return (SearchService) opalRuntime.getServicePlugin(SearchService.class);

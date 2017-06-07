@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableList;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.obiba.magma.Variable;
 import org.obiba.magma.type.TextType;
+import org.obiba.opal.spi.search.ValuesIndexManager;
 
 import java.io.IOException;
 
@@ -22,12 +23,11 @@ public class VariableMappings {
 
   private final ValueTypeMappings valueTypeMappings = new ValueTypeMappings();
 
-  private final Iterable<VariableMapping> mappings = ImmutableList
-      .<VariableMapping>of(new Categorical()/* , new Store() */);
+  private final Iterable<VariableMapping> mappings = ImmutableList.of(new Categorical());
 
   public XContentBuilder map(String tableName, Variable variable, XContentBuilder builder) {
     try {
-      builder.startObject(tableName + "-" + variable.getName());
+      builder.startObject(tableName + ValuesIndexManager.FIELD_SEP + variable.getName());
 
       valueTypeMappings.forType(variable.getValueType()).map(builder);
 
@@ -38,14 +38,6 @@ public class VariableMappings {
       return builder.endObject();
     } catch(IOException e) {
       throw new RuntimeException(e);
-    }
-  }
-
-  private static class Store implements VariableMapping {
-
-    @Override
-    public void map(Variable variable, XContentBuilder builder) throws IOException {
-      builder.field("store", "yes");
     }
   }
 

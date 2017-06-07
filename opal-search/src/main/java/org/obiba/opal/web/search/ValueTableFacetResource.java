@@ -63,7 +63,7 @@ public class ValueTableFacetResource {
 
     try {
       QueryTermDtoBuilder dtoBuilder = new QueryTermDtoBuilder("0").variableTermDto(variable, type);
-      dtoResult = opalSearchService.createQueryExecutor(datasource, table).execute(dtoBuilder.build());
+      dtoResult = opalSearchService.executeQuery(datasource, table, dtoBuilder.build());
 
     } catch(UnsupportedOperationException|JSONException e) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();

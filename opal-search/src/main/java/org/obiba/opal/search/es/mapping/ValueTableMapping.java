@@ -23,23 +23,27 @@ public class ValueTableMapping {
 
   private final VariableMappings variableMappings = new VariableMappings();
 
-  public XContentBuilder createMapping(Version opalVersion, String indexName, ValueTable valueTable) {
+  public XContentBuilder createMapping(Version opalVersion, String indexType, ValueTable valueTable) {
     try {
-      XContentBuilder mapping = XContentFactory.jsonBuilder().startObject().startObject(indexName);
+      XContentBuilder mapping = XContentFactory.jsonBuilder().startObject().startObject(indexType);
       mapping.startObject("_all").field("enabled", false).endObject();
       mapping.startObject("_parent").field("type", valueTable.getEntityType()).endObject();
 
       mapping.startObject("properties");
 
-      mapping.startObject("_id.analyzed") //
+      mapping.startObject("identifier.analyzed") //
           .field("type", "string") //
           .field("index", "analyzed") //
           .field("index_analyzer", "opal_index_analyzer") //
           .field("search_analyzer", "opal_search_analyzer");
       mapping.endObject();
 
+      mapNotAnalyzedString("datasource", mapping);
+      mapNotAnalyzedString("table", mapping);
+      mapNotAnalyzedString("reference", mapping);
+
       for(Variable variable : valueTable.getVariables()) {
-        variableMappings.map(indexName, variable, mapping);
+        variableMappings.map(indexType, variable, mapping);
       }
 
       mapping.endObject();// properties
@@ -58,18 +62,10 @@ public class ValueTableMapping {
     }
   }
 
-
-  public XContentBuilder updateTimestamps(String name) {
-    try {
-      XContentBuilder mapping = XContentFactory.jsonBuilder().startObject().startObject(name);
-
-      mapping.startObject("_meta").field("_updated", DateTimeType.get().valueOf(new Date()).toString()).endObject();
-
-      mapping.endObject() // type
-          .endObject(); // mapping
-      return mapping;
-    } catch(IOException e) {
-      throw new RuntimeException(e);
-    }
+  private void mapNotAnalyzedString(String field, XContentBuilder mapping) throws IOException {
+    mapping.startObject(field);
+    mapping.field("type", "string");
+    mapping.field("index", "not_analyzed");
+    mapping.endObject();
   }
 }

@@ -27,7 +27,7 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
   private HelpBlock matchesHelp;
 
   public IdentifiersCriterionDropdown() {
-    super(null, "_id", null);
+    super(null, "identifier", null);
   }
 
   @Override

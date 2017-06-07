@@ -42,7 +42,6 @@ public class QueryTermDtoBuilder {
    * @return
    */
   public QueryTermDtoBuilder variableTermDto(@NotNull String variable, @Nullable String type) {
-    log.info("* Variable {}", variable);
     Search.VariableTermDto.Builder variableDto = Search.VariableTermDto.newBuilder();
     variableDto.setVariable(variable);
     if(type != null) {

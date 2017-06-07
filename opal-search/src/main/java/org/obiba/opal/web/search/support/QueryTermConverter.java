@@ -47,7 +47,7 @@ public class QueryTermConverter {
   public JSONObject convert(Search.QueryTermsDto dtoQueries) throws JSONException {
     Assert.notNull(dtoQueries, "Query term DTO is null!");
 
-    JSONObject jsonQuery = new JSONObject("{\"query\":{\"match_all\":{}}, \"size\":0}");
+    JSONObject jsonQuery = new JSONObject("{\"query\":{\"query_string\":{\"query\":\"" + valueTableIndexManager.getQuery() + "\"}}, \"size\":0}");
     JSONObject jsonAggregations = new JSONObject();
 
     for(Search.QueryTermDto dtoQuery : dtoQueries.getQueriesList()) {

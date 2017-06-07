@@ -89,7 +89,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
   public boolean hasIndex(@NotNull ValueTable valueTable) {
     ClusterStateResponse resp = opalSearchService.getClient().admin().cluster().prepareState().execute().actionGet();
     ImmutableOpenMap<String, MappingMetaData> mappings = resp.getState().metaData().index(getName()).mappings();
-    return mappings.containsKey(getIndex(valueTable).getIndexName());
+    return mappings.containsKey(getIndex(valueTable).getIndexType());
 
   }
 
@@ -254,7 +254,6 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
 
     /**
      * @param vt
-     * @param prefixName used to avoid same type name. (Must be unique in ES (even though in different ES indices))
      */
     EsValueTableIndex(@NotNull ValueTable vt) {
       name = indexName(vt);
@@ -263,14 +262,14 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
 
     @NotNull
     @Override
-    public String getIndexName() {
+    public String getIndexType() {
       return name;
     }
 
     @NotNull
     @Override
-    public String getRequestPath() {
-      return getName() + "/" + getIndexName();
+    public String getIndexName() {
+      return getName();
     }
 
     @Override
@@ -296,30 +295,18 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
         EsMapping mapping = readMapping();
         //noinspection ConstantConditions
         mapping.meta().setString("_updated", DateTimeType.get().valueOf(new Date()).toString());
-        opalSearchService.getClient().admin().indices().preparePutMapping(getName()).setType(getIndexName())
+        opalSearchService.getClient().admin().indices().preparePutMapping(getName()).setType(getIndexType())
             .setSource(mapping.toXContent()).execute().actionGet();
       } catch(IOException e) {
         throw new RuntimeException(e);
       }
     }
 
-    protected BulkRequestBuilder sendAndCheck(BulkRequestBuilder bulkRequest) {
-      if(bulkRequest.numberOfActions() > 0) {
-        BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-        if(bulkResponse.hasFailures()) {
-          // process failures by iterating through each bulk response item
-          throw new RuntimeException(bulkResponse.buildFailureMessage());
-        }
-        return opalSearchService.getClient().prepareBulk();
-      }
-      return bulkRequest;
-    }
-
     @Override
     public void delete() {
       if(opalSearchService.isEnabled() && opalSearchService.isRunning()) {
         try {
-          opalSearchService.getClient().admin().indices().prepareDeleteMapping(getName()).setType(getIndexName())
+          opalSearchService.getClient().admin().indices().prepareDeleteMapping(getName()).setType(getIndexType())
               .execute().actionGet();
         } catch(TypeMissingException | IndexMissingException ignored) {
         } finally {
@@ -331,7 +318,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
     protected void createMapping() {
       if(mappingCreated) return;
       getIndexMetaData(); // create index if it does not exist yet
-      opalSearchService.getClient().admin().indices().preparePutMapping(getName()).setType(getIndexName())
+      opalSearchService.getClient().admin().indices().preparePutMapping(getName()).setType(getIndexType())
           .setSource(getMapping()).execute().actionGet();
       mappingCreated = true;
     }
@@ -368,13 +355,11 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
       };
     }
 
-    boolean isForTable(@NotNull ValueTable valueTable) {
-      return valueTableReference.equals(valueTable.getTableReference());
-    }
-
     @NotNull
     private String indexName(@NotNull ValueTable table) {
-      return table.getTableReference().replace(' ', '_').replace('.', '-');
+      String datasourceName = table.getDatasource().getName().replace(' ', '+').replace('.', '-');
+      String tableName = table.getName().replace(' ', '_').replace('.', '-');
+      return datasourceName + "__" + tableName;
     }
 
     @NotNull
@@ -384,18 +369,18 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
           IndexMetaData indexMetaData = getIndexMetaData();
 
           if(indexMetaData != null) {
-            MappingMetaData metaData = indexMetaData.mapping(getIndexName());
+            MappingMetaData metaData = indexMetaData.mapping(getIndexType());
             if(metaData != null) {
               byte[] mappingSource = metaData.source().uncompressed();
-              return new EsMapping(getIndexName(), mappingSource);
+              return new EsMapping(getIndexType(), mappingSource);
             }
           }
 
           mappingCreated = false;
-          return new EsMapping(getIndexName());
+          return new EsMapping(getIndexType());
         } catch(IndexMissingException e) {
           mappingCreated = false;
-          return new EsMapping(getIndexName());
+          return new EsMapping(getIndexType());
         }
       } catch(IOException e) {
         throw new RuntimeException(e);
@@ -425,13 +410,13 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
 
     @Override
     public int hashCode() {
-      return getIndexName().hashCode();
+      return getIndexType().hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
       return obj != null && (obj == this ||
-          obj instanceof EsValueTableIndex && ((ValueTableIndex) obj).getIndexName().equals(getIndexName()));
+          obj instanceof EsValueTableIndex && ((ValueTableIndex) obj).getIndexType().equals(getIndexType()));
     }
 
   }

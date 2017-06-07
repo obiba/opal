@@ -16,6 +16,8 @@ import org.obiba.magma.ValueTable;
  */
 public interface ValuesIndexManager extends IndexManager {
 
+  String FIELD_SEP = "__";
+
   /**
    * Get {@code ValueTable} values index.
    *
