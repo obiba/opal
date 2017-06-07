@@ -18,7 +18,6 @@ import org.codehaus.jettison.json.JSONObject;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.Variable;
 import org.obiba.opal.search.AbstractSearchUtility;
 import org.obiba.opal.search.SearchQueryException;
 import org.obiba.opal.spi.search.ValuesIndexManager;
@@ -32,13 +31,9 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.orientechnologies.orient.core.index.OIndexDefinitionFactory.extractFieldName;
 
 @Component
 @Scope("request")
@@ -60,7 +55,7 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
 
     List<ChildQueryParser> childQueries = extractChildQueries(queries);
     List<Search.EntitiesResultDto> partialResults = Lists.newArrayList();
-    if (withPartials) {
+    if (withPartials && childQueries.size()>1) {
       for (ChildQueryParser childQuery : childQueries) {
         QuerySearchJsonBuilder builder = buildHasChildQuerySearch(0, 0);
         builder.childQuery(childQuery.asChildQuery());
