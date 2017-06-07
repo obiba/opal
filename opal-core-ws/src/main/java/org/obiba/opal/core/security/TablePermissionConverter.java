@@ -70,6 +70,8 @@ public class TablePermissionConverter extends OpalPermissionConverter {
         String[] args = isView ? args(node, "/datasource/(.+)/view/(.+)") : args(node, "/datasource/(.+)/table/(.+)");
 
         List<String> perms = Lists.newArrayList(toRest("/datasource/{0}/table/{1}", "GET:GET", args),//
+            toRest("/datasource/{0}/table/{1}/index", "GET", args), //
+            toRest("/datasource/{0}/table/{1}/index/_schema", "GET", args),//
             toRest("/datasource/{0}/table/{1}/variable", "GET:GET/GET", args),//
             toRest("/datasource/{0}/table/{1}/variables", "GET:GET/GET", args),//
             toRest("/datasource/{0}/table/{1}/facet", "GET:GET/GET", args),//
@@ -117,6 +119,8 @@ public class TablePermissionConverter extends OpalPermissionConverter {
 
         if(isView) {
           perms = Lists.newArrayList(toRest("/datasource/{0}/view/{1}", "PUT:GET", args),//
+              toRest("/datasource/{0}/table/{1}/index", "GET", args), //
+              toRest("/datasource/{0}/table/{1}/index/_schema", "GET", args),//
               toRest("/datasource/{0}/view/{1}/variables", "POST:GET/*", args),//
               toRest("/datasource/{0}/view/{1}/variables", "DELETE:GET/*", args),//
               toRest("/datasource/{0}/view/{1}/from/variable/_transient/summary", "GET:GET", args),//

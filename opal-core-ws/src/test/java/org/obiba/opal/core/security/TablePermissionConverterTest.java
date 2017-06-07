@@ -72,6 +72,8 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
         "rest:/files/projects/patate:POST:GET/*",//
         "rest:/files/projects/patate:PUT:GET/*", //
         "rest:/datasource/patate/table/pwel:GET:GET", //
+        "rest:/datasource/patate/table/pwel/index:GET", //
+        "rest:/datasource/patate/table/pwel/index/_schema:GET", //
         "rest:/datasource/patate/table/pwel/variable:GET:GET/GET", //
         "rest:/datasource/patate/table/pwel/variables:GET:GET/GET", //
         "rest:/datasource/patate/table/pwel/facet:GET:GET/GET",//
@@ -97,6 +99,8 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
         "rest:/project/patate:GET:GET", //
         "rest:/project/patate/summary:GET:GET", //
         "rest:/datasource/patate/table/pwel:GET:GET", //
+        "rest:/datasource/patate/table/pwel/index:GET", //
+        "rest:/datasource/patate/table/pwel/index/_schema:GET", //
         "rest:/datasource/patate/table/pwel/variable:GET:GET/GET", //
         "rest:/datasource/patate/table/pwel/variables:GET:GET/GET", //
         "rest:/datasource/patate/table/pwel/facet:GET:GET/GET", //
@@ -113,6 +117,8 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
         "rest:/files/projects/patate:POST:GET/*", //
         "rest:/files/projects/patate:PUT:GET/*", //
         "rest:/datasource/patate/table/pwel:GET:GET", //
+        "rest:/datasource/patate/table/pwel/index:GET", //
+        "rest:/datasource/patate/table/pwel/index/_schema:GET", //
         "rest:/datasource/patate/table/pwel/variable:GET:GET/GET", //
         "rest:/datasource/patate/table/pwel/variables:GET:GET/GET", //
         "rest:/datasource/patate/table/pwel/facet:GET:GET/GET", //
@@ -126,6 +132,8 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
   public void testTableReadOnView() {
     testConversion("/datasource/patate/view/pwel", TablePermissionConverter.Permission.TABLE_READ, //
         "rest:/datasource/patate/table/pwel:GET:GET", //
+        "rest:/datasource/patate/table/pwel/index:GET", //
+        "rest:/datasource/patate/table/pwel/index/_schema:GET", //
         "rest:/datasource/patate/table/pwel/variable:GET:GET/GET", //
         "rest:/datasource/patate/table/pwel/variables:GET:GET/GET", //
         "rest:/datasource/patate/table/pwel/facet:GET:GET/GET",//
@@ -152,6 +160,8 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
         "rest:/project/patate:GET:GET", //
         "rest:/project/patate/summary:GET:GET", //
         "rest:/datasource/patate/table/pwel:GET:GET", //
+        "rest:/datasource/patate/table/pwel/index:GET", //
+        "rest:/datasource/patate/table/pwel/index/_schema:GET", //
         "rest:/datasource/patate/table/pwel/variable:GET:GET/GET", //
         "rest:/datasource/patate/table/pwel/variables:GET:GET/GET", //
         "rest:/datasource/patate/table/pwel/facet:GET:GET/GET", //
