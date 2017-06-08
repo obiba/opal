@@ -33,9 +33,18 @@ import org.obiba.opal.web.ws.security.AuthorizeResource;
 
 public interface DatasourceTablesResource {
 
+
+  /**
+   * Get the tables of the datasource.
+   *
+   * @param counts Set the count of entities and of variables (default is true).
+   * @param entityType Filter the tables with provided entity type (default is no filter).
+   * @param indexedOnly Filter the tables which values have been indexed, index is up to data and search is enabled.
+   * @return
+   */
   @GET
   List<Magma.TableDto> getTables(@Context Request request, @QueryParam("counts") @DefaultValue("false") boolean counts,
-      @Nullable @QueryParam("entityType") String entityType);
+      @Nullable @QueryParam("entityType") String entityType, @QueryParam("indexed") @DefaultValue("false") boolean indexedOnly);
 
   @GET
   @Path("/excel")
@@ -52,5 +61,5 @@ public interface DatasourceTablesResource {
 
   void setDatasource(Datasource datasource);
 
-  List<Magma.TableDto> getTables(boolean counts, String entityType);
+  List<Magma.TableDto> getTables(boolean counts, String entityType, boolean indexed);
 }

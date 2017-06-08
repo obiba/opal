@@ -69,7 +69,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     DatasourceTablesResource resource = new DatasourceTablesResourceImpl();
     resource.setDatasource(MagmaEngine.get().getDatasource(DATASOURCE2));
 
-    List<Magma.TableDto> dtos = resource.getTables(true, null);
+    List<Magma.TableDto> dtos = resource.getTables(true, null, false);
     // alphabetical order
     assertThat(dtos).hasSize(2);
     assertThat(dtos.get(0).getName()).isEqualTo("Impedance418");
