@@ -527,6 +527,11 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     getUiHandlers().onDownloadView();
   }
 
+  @UiHandler("searchVariables")
+  void onSearchVariables(ClickEvent event) {
+    getUiHandlers().onSearchVariables();
+  }
+
   @UiHandler("remove")
   void onRemove(ClickEvent event) {
     getUiHandlers().onRemove();

@@ -213,6 +213,11 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     checkColumn.clearSelection();
   }
 
+  @UiHandler("searchVariables")
+  void onSearchVariables(ClickEvent event) {
+    getUiHandlers().onSearchVariables();
+  }
+
   @UiHandler("exportSelectionAnchor")
   void onExportSelection(ClickEvent event) {
     getUiHandlers().onExportData();

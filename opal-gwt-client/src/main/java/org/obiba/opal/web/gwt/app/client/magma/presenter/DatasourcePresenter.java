@@ -31,6 +31,7 @@ import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissio
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.search.event.SearchDatasourceVariablesEvent;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -224,6 +225,11 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
   @Override
   public void onRefresh() {
     initDatasource();
+  }
+
+  @Override
+  public void onSearchVariables() {
+    fireEvent(new SearchDatasourceVariablesEvent(datasourceName));
   }
 
   @Override

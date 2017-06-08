@@ -30,7 +30,10 @@ import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectHiddenEvent;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
+import org.obiba.opal.web.gwt.app.client.search.event.SearchDatasourceVariablesEvent;
 import org.obiba.opal.web.gwt.app.client.search.event.SearchEntityEvent;
+import org.obiba.opal.web.gwt.app.client.search.event.SearchTableVariablesEvent;
+import org.obiba.opal.web.gwt.app.client.search.event.SearchTaxonomyVariablesEvent;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.ui.VariableSearchListItem;
 import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
@@ -200,6 +203,31 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       }
     });
 
+    addRegisteredHandler(SearchDatasourceVariablesEvent.getType(), new SearchDatasourceVariablesEvent.SearchDatasourceVariablesHandler() {
+      @Override
+      public void onSearchDatasourceVariables(SearchDatasourceVariablesEvent event) {
+        revealSearchVariables("datasource:" + event.getDatasource().replaceAll(" ", "+"));
+      }
+    });
+
+    addRegisteredHandler(SearchTableVariablesEvent.getType(), new SearchTableVariablesEvent.SearchTableVariablesHandler() {
+      @Override
+      public void onSearchTableVariables(SearchTableVariablesEvent event) {
+        revealSearchVariables("datasource:" + event.getDatasource().replaceAll(" ", "+") + " AND table:" + event.getTable().replaceAll(" ", "+"));
+      }
+    });
+
+    addRegisteredHandler(SearchTaxonomyVariablesEvent.getType(), new SearchTaxonomyVariablesEvent.SearchTaxonomyVariablesHandler() {
+      @Override
+      public void onSearchTaxonomyVariables(SearchTaxonomyVariablesEvent event) {
+        String field = event.getTaxonomy() + "-" + event.getVocabulary();
+        if (Strings.isNullOrEmpty(event.getTerm()))
+          revealSearchVariables("_exists_:" + field);
+        else
+          revealSearchVariables(field + ":" + event.getTerm());
+      }
+    });
+
     addRegisteredHandler(GeneralConfigSavedEvent.getType(), new GeneralConfigSavedEvent.GeneralConfigSavedHandler() {
       @Override
       public void onGeneralConfigSaved(GeneralConfigSavedEvent event) {
@@ -209,6 +237,14 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
     registerUserMessageEventHandler();
     registerModalEvents();
+  }
+
+  private void revealSearchVariables(String query) {
+    PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.SEARCH_VARIABLES)
+        .with(ParameterTokens.TOKEN_QUERY, query)
+        .with(ParameterTokens.TOKEN_OFFSET, "0")
+        .with(ParameterTokens.TOKEN_LIMIT, "50");
+    placeManager.revealPlace(builder.build());
   }
 
   @Override
