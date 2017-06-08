@@ -34,10 +34,7 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.search.entity.SearchEntityPresenter;
-import org.obiba.opal.web.gwt.app.client.search.entity.SearchEntityUiHandlers;
-import org.obiba.opal.web.gwt.app.client.search.entity.ValueSetTable;
-import org.obiba.opal.web.gwt.app.client.search.entity.VariableValueRow;
+import org.obiba.opal.web.gwt.app.client.search.entity.*;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TableChooser;
@@ -64,7 +61,7 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   Panel entityPanel;
 
   @UiField
-  DropdownButton typeDropdown;
+  EntityTypeDropdown typeDropdown;
 
   @UiField
   TextBox queryInput;
@@ -96,38 +93,18 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   @UiHandler("searchButton")
   public void onSearch(ClickEvent event) {
     if (queryInput.getValue().isEmpty()) reset();
-    else getUiHandlers().onSearch(typeDropdown.getText().trim(), queryInput.getValue());
+    else getUiHandlers().onSearch(typeDropdown.getSelection(), queryInput.getValue());
   }
 
   @Override
   public void setEntityTypes(List<VariableEntitySummaryDto> entityTypes, String selectedType) {
-    typeDropdown.clear();
-    String selectedEntityType = Strings.isNullOrEmpty(selectedType) ? "Participant" : selectedType;
-    boolean hasSelectedEntityType = false;
-    boolean hasParticipantType = false;
-    for (VariableEntitySummaryDto typeSummary : entityTypes) {
-      final NavLink item = new NavLink(typeSummary.getEntityType());
-      item.addClickHandler(new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent event) {
-         typeDropdown.setText(item.getText());
-        }
-      });
-      typeDropdown.add(item);
-      if (selectedEntityType.equals(typeSummary.getEntityType())) hasSelectedEntityType = true;
-      if ("Participant".equals(typeSummary.getEntityType())) hasParticipantType = true;
-    }
-    if (hasSelectedEntityType) typeDropdown.setText(selectedEntityType);
-    else if (!entityTypes.isEmpty()) {
-      if (hasParticipantType) typeDropdown.setText("Participant");
-      else typeDropdown.setText(entityTypes.get(0).getEntityType());
-    }
+    typeDropdown.setEntityTypes(entityTypes, selectedType);
     entityPanel.setVisible(!entityTypes.isEmpty());
   }
 
   @Override
   public void setEntityType(String selectedType) {
-    typeDropdown.setText(Strings.isNullOrEmpty(selectedType) ? "Participant" : selectedType);
+    typeDropdown.setSelection(selectedType);
   }
 
   @Override

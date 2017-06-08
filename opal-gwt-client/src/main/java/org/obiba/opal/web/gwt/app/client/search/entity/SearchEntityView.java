@@ -60,7 +60,7 @@ public class SearchEntityView extends ViewWithUiHandlers<SearchEntityUiHandlers>
   Panel entityPanel;
 
   @UiField
-  DropdownButton typeDropdown;
+  EntityTypeDropdown typeDropdown;
 
   @UiField
   TextBox entityId;
@@ -115,7 +115,7 @@ public class SearchEntityView extends ViewWithUiHandlers<SearchEntityUiHandlers>
   @UiHandler("searchButton")
   public void onSearch(ClickEvent event) {
     if (entityId.getValue().isEmpty()) reset();
-    else getUiHandlers().onSearch(typeDropdown.getText().trim(), entityId.getValue());
+    else getUiHandlers().onSearch(typeDropdown.getSelection(), entityId.getValue());
   }
 
   @UiHandler("entityId")
@@ -146,33 +146,13 @@ public class SearchEntityView extends ViewWithUiHandlers<SearchEntityUiHandlers>
 
   @Override
   public void setEntityTypes(List<VariableEntitySummaryDto> entityTypes, String selectedType) {
-    typeDropdown.clear();
-    String selectedEntityType = Strings.isNullOrEmpty(selectedType) ? "Participant" : selectedType;
-    boolean hasSelectedEntityType = false;
-    boolean hasParticipantType = false;
-    for (VariableEntitySummaryDto typeSummary : entityTypes) {
-      final NavLink item = new NavLink(typeSummary.getEntityType());
-      item.addClickHandler(new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent event) {
-         typeDropdown.setText(item.getText());
-        }
-      });
-      typeDropdown.add(item);
-      if (selectedEntityType.equals(typeSummary.getEntityType())) hasSelectedEntityType = true;
-      if ("Participant".equals(typeSummary.getEntityType())) hasParticipantType = true;
-    }
-    if (hasSelectedEntityType) typeDropdown.setText(selectedEntityType);
-    else if (!entityTypes.isEmpty()) {
-      if (hasParticipantType) typeDropdown.setText("Participant");
-      else typeDropdown.setText(entityTypes.get(0).getEntityType());
-    }
+    typeDropdown.setEntityTypes(entityTypes, selectedType);
     entityPanel.setVisible(!entityTypes.isEmpty());
   }
 
   @Override
   public void setEntityType(String selectedType) {
-    typeDropdown.setText(Strings.isNullOrEmpty(selectedType) ? "Participant" : selectedType);
+    typeDropdown.setSelection(selectedType);
   }
 
   @Override
