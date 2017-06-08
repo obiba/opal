@@ -26,8 +26,8 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
 
   private HelpBlock matchesHelp;
 
-  public IdentifiersCriterionDropdown() {
-    super(null, "identifier", null);
+  public IdentifiersCriterionDropdown(String datasource, String table) {
+    super(datasource, table,null, "identifier", null);
   }
 
   @Override

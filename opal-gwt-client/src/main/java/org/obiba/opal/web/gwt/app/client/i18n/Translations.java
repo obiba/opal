@@ -290,6 +290,18 @@ public interface Translations extends Constants {
   @DefaultStringValue("Variable")
   String variableLabel();
 
+  @Description("Query label")
+  @DefaultStringValue("Query")
+  String queryLabel();
+
+  @Description("Count label")
+  @DefaultStringValue("Count")
+  String countLabel();
+
+  @Description("All label")
+  @DefaultStringValue("All")
+  String allLabel();
+
   @Description("Unit label")
   @DefaultStringValue("Unit")
   String unitLabel();

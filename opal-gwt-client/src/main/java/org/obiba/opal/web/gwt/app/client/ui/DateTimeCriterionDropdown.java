@@ -45,8 +45,8 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
 
   private DateBoxAppended date;
 
-  public DateTimeCriterionDropdown(VariableDto variableDto, String fieldName) {
-    super(variableDto, fieldName, null);
+  public DateTimeCriterionDropdown(String datasource, String table, VariableDto variableDto, String fieldName) {
+    super(datasource, table, variableDto, fieldName, null);
   }
 
   @Override

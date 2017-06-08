@@ -173,6 +173,13 @@ public enum UriBuilders {
     }
   },
 
+  DATASOURCES_ENTITIES_COUNT {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasources", "entities", "_count");
+    }
+  },
+
   DATASOURCE_TABLES_EXCEL {
     @Override
     public UriBuilder create() {

@@ -30,8 +30,8 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
   private ControlLabel valuesLabel;
   private TextBox values;
 
-  public DefaultCriterionDropdown(VariableDto variableDto, String fieldName) {
-    super(variableDto, fieldName, null);
+  public DefaultCriterionDropdown(String datasource, String table, VariableDto variableDto, String fieldName) {
+    super(datasource, table, variableDto, fieldName, null);
   }
 
   @Override

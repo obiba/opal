@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.search.event.SearchEntityEvent;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
+import org.obiba.opal.web.gwt.app.client.support.JsOpalMap;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtoNature;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.ui.CategoricalCriterionDropdown;
@@ -88,8 +89,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private final ModalProvider<ValueSequencePopupPresenter> valueSequencePopupProvider;
 
-
-  private OpalMap opalMap;
+  private JsOpalMap variableFieldMap;
 
   private String currentVariablesFilterSelect = "";
 
@@ -626,10 +626,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     public void onResource(Response response, VariableDto resource) {
       // Fetch facets
       if(response.getStatusCode() == Response.SC_OK) {
-
-        List<String> keys = JsArrays.toList(opalMap.getKeysArray());
-        String indexedFieldName = opalMap.getValues(keys.indexOf(resource.getName()));
-
+        String indexedFieldName = variableFieldMap.getValue(resource.getName());
         VariableDtoNature nature = getNature(resource);
         if(nature == CONTINUOUS || nature == CATEGORICAL) {
           // Filter for Categorical variable OR Numerical variable
@@ -648,7 +645,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
 
     private void addDefaultFilter(VariableDto resource, String indexedFieldName) {
-      DefaultCriterionDropdown criterion = new DefaultCriterionDropdown(resource, indexedFieldName) {
+      DefaultCriterionDropdown criterion = new DefaultCriterionDropdown(originalTable.getDatasourceName(), originalTable.getName(), resource, indexedFieldName) {
         @Override
         public void doFilter() {
           applyAllValueSetsFilter();
@@ -660,7 +657,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     private void addDateFilter(VariableDto resource, String indexedFieldName) {
       // DataTime filter
-      DateTimeCriterionDropdown criterion = new DateTimeCriterionDropdown(resource, indexedFieldName) {
+      DateTimeCriterionDropdown criterion = new DateTimeCriterionDropdown(originalTable.getDatasourceName(), originalTable.getName(), resource, indexedFieldName) {
         @Override
         public void doFilter() {
           applyAllValueSetsFilter();
@@ -696,7 +693,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     private void addCategoricalFilter(QueryResultDto resource) {
       // Categorical variable
-      CategoricalCriterionDropdown criterion = new CategoricalCriterionDropdown(variableDto, fieldName, resource) {
+      CategoricalCriterionDropdown criterion = new CategoricalCriterionDropdown(originalTable.getDatasourceName(), originalTable.getName(), variableDto, fieldName, resource) {
         @Override
         public void doFilter() {
           applyAllValueSetsFilter();
@@ -708,7 +705,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     private void addNumericalFilter(QueryResultDto resource) {
       // Numerical variable
-      NumericalCriterionDropdown criterion = new NumericalCriterionDropdown(variableDto, fieldName, resource) {
+      NumericalCriterionDropdown criterion = new NumericalCriterionDropdown(originalTable.getDatasourceName(), originalTable.getName(), variableDto, fieldName, resource) {
         @Override
         public void doFilter() {
           applyAllValueSetsFilter();
@@ -742,7 +739,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
         // Show identifier default filter if not already added
         if(!getView().hasCriteria()) {
-          IdentifiersCriterionDropdown criterion = new IdentifiersCriterionDropdown() {
+          IdentifiersCriterionDropdown criterion = new IdentifiersCriterionDropdown(originalTable.getDatasourceName(), originalTable.getName()) {
             @Override
             public void doFilter() {
               applyAllValueSetsFilter();
@@ -760,7 +757,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
               @Override
               public void onResource(Response response, OpalMap resource) {
                 if(response.getStatusCode() == Response.SC_OK) {
-                  opalMap = resource;
+                  variableFieldMap = new JsOpalMap(resource);
                 }
               }
             }).get().send();

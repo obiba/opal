@@ -15,7 +15,7 @@
              xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.search.entity"
              ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
              ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
-             ui:generateLocales="default" xmlns:entitiy="urn:import:org.obiba.opal.web.gwt.app.client.search.entitiy">
+             ui:generateLocales="default">
 
   <g:FlowPanel>
     <g:FlowPanel addStyleNames="section-header xlarge-bottom-margin">
@@ -29,16 +29,22 @@
     </b:Paragraph>
 
     <g:FlowPanel ui:field="entityPanel">
-      <b:Well addStyleNames="form-search">
+      <b:Well>
         <o2:EntityTypeDropdown ui:field="typeDropdown" size="SMALL"/>
-        <b:TextBox ui:field="queryInput" placeholder="More variable criteria..." addStyleNames="small-indent"/>
+        <o:CriteriaPanel ui:field="criteriaPanel" addStyleNames="inline-block small-indent"></o:CriteriaPanel>
+        <b:Typeahead ui:field="variableTypeahead">
+          <b:TextBox placeholder="More variable criteria..." addStyleNames="top-margin"/>
+        </b:Typeahead>
         <b:Button ui:field="searchButton" addStyleNames="btn btn-primary small-indent">
           <ui:msg description="Search Button label">Search</ui:msg>
         </b:Button>
       </b:Well>
 
       <g:FlowPanel ui:field="entityResultPanel" visible="false">
-        <b:Heading size="4" ui:field="entityTitle" addStyleNames="top-margin"></b:Heading>
+        <b:Heading size="4" ui:field="entityTitle" addStyleNames="top-margin">
+          <ui:msg description="Counts label">Counts</ui:msg>
+        </b:Heading>
+        <g:FlowPanel ui:field="resultsPanel"/>
       </g:FlowPanel>
       <g:Image ui:field="refreshPending" url="image/loading.gif" addStyleNames="small-indent"/>
 

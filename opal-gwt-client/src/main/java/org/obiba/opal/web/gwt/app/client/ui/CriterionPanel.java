@@ -75,5 +75,9 @@ public class CriterionPanel extends FlowPanel {
   public String getQueryText() {
     return criterion.getText();
   }
+
+  public CriterionDropdown getCriterion() {
+    return criterion;
+  }
 }
 
