@@ -9,9 +9,7 @@
  */
 package org.obiba.opal.search.es;
 
-import com.google.common.base.Predicate;
 import com.google.common.base.Stopwatch;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.index.IndexRequestBuilder;
@@ -45,6 +43,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadFactory;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Component
 @Transactional(readOnly = true)
@@ -133,6 +133,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
           XContentBuilder builder = XContentFactory.jsonBuilder().startObject();
           builder.field("identifier.analyzed", identifier); // analyzed copy of _id
           builder.field("identifier", identifier);
+          builder.field("project", valueTable.getDatasource().getName());
           builder.field("datasource", valueTable.getDatasource().getName());
           builder.field("table", valueTable.getName());
           builder.field("reference", valueTable.getTableReference());
@@ -245,15 +246,9 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
     @Override
     public Iterable<Variable> getVariables() {
       // Do not index binary values, do not even extract the binary values
-      // TODO Could be configurable at table level?
-      return Iterables.filter(resolveTable().getVariables(), new Predicate<Variable>() {
-
-        @Override
-        public boolean apply(Variable input) {
-          return !input.getValueType().isGeo() && !input.getValueType().equals(BinaryType.get());
-        }
-
-      });
+      return StreamSupport.stream(resolveTable().getVariables().spliterator(), false)
+          .filter(variable -> !variable.getValueType().isGeo() && !BinaryType.get().equals(variable.getValueType()))
+          .collect(Collectors.toList());
     }
 
   }

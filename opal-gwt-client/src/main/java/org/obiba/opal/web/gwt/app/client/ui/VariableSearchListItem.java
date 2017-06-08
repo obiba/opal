@@ -34,7 +34,7 @@ public class VariableSearchListItem extends ListItem {
 
   private void setItemTitle(String title) {
     if(type == ItemType.DATASOURCE) {
-      setTitle("datasource:" + title);
+      setTitle("project:" + title);
     } else {
       setTitle("table:" + title);
     }

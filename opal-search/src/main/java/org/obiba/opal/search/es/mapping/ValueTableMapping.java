@@ -38,6 +38,7 @@ public class ValueTableMapping {
           .field("search_analyzer", "opal_search_analyzer");
       mapping.endObject();
 
+      mapNotAnalyzedString("project", mapping);
       mapNotAnalyzedString("datasource", mapping);
       mapNotAnalyzedString("table", mapping);
       mapNotAnalyzedString("reference", mapping);

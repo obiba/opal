@@ -233,7 +233,7 @@ public class VariableSuggestOracle extends SuggestOracle {
     originalQuery = request.getQuery();
 
     if(datasource != null) {
-      prefix = "datasource:" + datasource + " ";
+      prefix = "project:" + datasource + " ";
     }
     if(table != null) {
       prefix += "table:" + table + " ";

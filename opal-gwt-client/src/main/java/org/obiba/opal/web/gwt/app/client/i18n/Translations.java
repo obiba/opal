@@ -356,19 +356,19 @@ public interface Translations extends Constants {
       "TableSelectionRequired", "You must select at least one table.", //
       "TableEntityTypesDoNotMatch", "The selected tables must all have the same entity type.", //
       "VariableDefinitionMethodRequired", "You must indicate how the view's variables are to be defined.", //
-      "DatasourceNameRequired", "You must provide a name for the datasource.", //
-      "DatasourceAlreadyExistsWithThisName", "A datasource already exists with this name.", //
+      "DatasourceNameRequired", "You must provide a name for the project.", //
+      "DatasourceAlreadyExistsWithThisName", "A project already exists with this name.", //
       "ExcelFileRequired", "An Excel file is required.", "ExcelFileSuffixInvalid", //
       "Invalid Excel file suffix: .xls or .xlsx are expected.", //
       "ViewMustBeAttachedToExistingOrNewDatasource",
-      "The view must be attached to either an existing datasource or a new one.", //
-      "DuplicateDatasourceName", "The datasource name is already in use. Please choose another.", //
+      "The view must be attached to either an existing project or a new one.", //
+      "DuplicateDatasourceName", "The project name is already in use. Please choose another.", //
       "UnknownError", "An unknown error has occurred.", //
       "InternalError", "An internal error has occurred. Please contact technical support.", //
       "UnhandledException",
       "An internal error has occurred. Please contact technical support and provide the following system error:<br /><br /><pre>{0}</pre>",
       //
-      "DatasourceNameDisallowedChars", "Datasource names cannot contain colon or period characters.", //
+      "DatasourceNameDisallowedChars", "Project names cannot contain colon or period characters.", //
       "ViewNameDisallowedChars", "View names cannot contain colon or period characters.", //
       "CSVFileRequired", "A CSV file is required.", //
       "VCFFileRequired", "A VCF/BCF (optionally compressed) file is required.", //
@@ -529,7 +529,7 @@ public interface Translations extends Constants {
       "TableSelectionIsRequired", "At least one table must be selected.",//
       "IdentifiersImportationCompleted", "Identifiers importation completed.",//
       "IdentifiersImportationFailed", "Identifiers importation failed: {0}.",//
-      "DataWriteNotAuthorized", "You are not allowed to write in datasource: {0}.",//
+      "DataWriteNotAuthorized", "You are not allowed to write in project: {0}.",//
       "AccessDeniedToTableValues", "You are not allowed to view the values of table: {0}.",//
       "NoTablesForEntityIdType", "Failed to retrieve tables for entity {0} and type {1}.",//
       "NoVariablesFound", "Failed to retrieve the list of variables",//

@@ -206,14 +206,14 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     addRegisteredHandler(SearchDatasourceVariablesEvent.getType(), new SearchDatasourceVariablesEvent.SearchDatasourceVariablesHandler() {
       @Override
       public void onSearchDatasourceVariables(SearchDatasourceVariablesEvent event) {
-        revealSearchVariables("datasource:" + event.getDatasource().replaceAll(" ", "+"));
+        revealSearchVariables("project:" + event.getDatasource().replaceAll(" ", "+"));
       }
     });
 
     addRegisteredHandler(SearchTableVariablesEvent.getType(), new SearchTableVariablesEvent.SearchTableVariablesHandler() {
       @Override
       public void onSearchTableVariables(SearchTableVariablesEvent event) {
-        revealSearchVariables("datasource:" + event.getDatasource().replaceAll(" ", "+") + " AND table:" + event.getTable().replaceAll(" ", "+"));
+        revealSearchVariables("project:" + event.getDatasource().replaceAll(" ", "+") + " AND table:" + event.getTable().replaceAll(" ", "+"));
       }
     });
 
