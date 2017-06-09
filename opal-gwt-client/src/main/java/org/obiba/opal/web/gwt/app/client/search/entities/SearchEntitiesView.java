@@ -81,9 +81,18 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
 
   @Inject
   public SearchEntitiesView(EventBus eventBus, SearchEntitiesView.Binder uiBinder, Translations translations, PlaceManager placeManager) {
-    this.oracle = new IndexedVariableSuggestOracle(eventBus);
+    initVariableTypeahead(eventBus);
+    initWidget(uiBinder.createAndBindUi(this));
+    this.translations = translations;
+    this.placeManager = placeManager;
+  }
+
+  private void initVariableTypeahead(EventBus eventBus) {
+    oracle = new IndexedVariableSuggestOracle(eventBus);
+    oracle.setLimit(15);
     variableTypeahead = new Typeahead(oracle);
     variableTypeahead.setMinLength(2);
+    variableTypeahead.setDisplayItemCount(15);
     variableTypeahead.setUpdaterCallback(new Typeahead.UpdaterCallback() {
       @Override
       public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {
@@ -92,9 +101,6 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
         return "";
       }
     });
-    initWidget(uiBinder.createAndBindUi(this));
-    this.translations = translations;
-    this.placeManager = placeManager;
   }
 
   @Override
@@ -105,7 +111,10 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   @UiHandler("searchButton")
   public void onSearch(ClickEvent event) {
     List<String> queries = criteriaPanel.getQueryStrings();
-    if (queries.isEmpty()) return;
+    if (queries.isEmpty()) {
+      reset();
+      return;
+    }
     getUiHandlers().onSearch(typeDropdown.getSelection(), queries);
   }
 
@@ -176,7 +185,7 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
 
   @Override
   public void addCategoricalVariableFilter(final String datasource, final String table, final VariableDto variable, String fieldName, QueryResultDto facet) {
-    criteriaPanel.addCriterion(new CategoricalCriterionDropdown(datasource, table, variable, fieldName, facet) {
+    addVariableFilter(new CategoricalCriterionDropdown(datasource, table, variable, fieldName, facet) {
       @Override
       public void doFilter() {
         onSearch(null);
@@ -186,7 +195,7 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
 
   @Override
   public void addNumericalVariableFilter(final String datasource, final String table, final VariableDto variable, String fieldName, QueryResultDto facet) {
-    criteriaPanel.addCriterion(new NumericalCriterionDropdown(datasource, table, variable, fieldName, facet) {
+    addVariableFilter(new NumericalCriterionDropdown(datasource, table, variable, fieldName, facet) {
       @Override
       public void doFilter() {
         onSearch(null);
@@ -196,7 +205,7 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
 
   @Override
   public void addDateVariableFilter(final String datasource, final String table, final VariableDto variable, String fieldName) {
-    criteriaPanel.addCriterion(new DateTimeCriterionDropdown(datasource, table, variable, fieldName) {
+    addVariableFilter(new DateTimeCriterionDropdown(datasource, table, variable, fieldName) {
       @Override
       public void doFilter() {
         onSearch(null);
@@ -206,12 +215,17 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
 
   @Override
   public void addDefaultVariableFilter(final String datasource, final String table, final VariableDto variable, String fieldName) {
-    criteriaPanel.addCriterion(new DefaultCriterionDropdown(datasource, table, variable, fieldName) {
+    addVariableFilter(new DefaultCriterionDropdown(datasource, table, variable, fieldName) {
       @Override
       public void doFilter() {
         onSearch(null);
       }
     });
+  }
+
+  private void addVariableFilter(CriterionDropdown criterion) {
+    criteriaPanel.addCriterion(criterion);
+    onSearch(null);
   }
 
   private void prepareResultsTable() {
@@ -229,7 +243,7 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
     resultsTable.getFlexCellFormatter().setColSpan(row, 0, 1);
     resultsTable.setWidget(row, 1, createVariableLink(criterion.getDatasource(), criterion.getTable(), criterion.getVariable()));
     Label query = new Label(criterion.getText());
-    query.setTitle(criterion.getText());
+    query.setTitle(criterion.getQueryString());
     resultsTable.setWidget(row, 2, query);
     resultsTable.setText(row, 3, count + "");
   }

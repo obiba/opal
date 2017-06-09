@@ -165,9 +165,9 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
     }
 
     private String extractField() {
-      if (query.startsWith("_exists_:")) return query.substring(9);
-      else if (query.startsWith("NOT _exists_:")) return query.substring(13);
-      return query.substring(0, query.indexOf(":"));
+      String nQuery = query.startsWith("NOT ") ? query.substring(4) : query;
+      if (nQuery.startsWith("_exists_:")) return nQuery.substring(9);
+      return nQuery.substring(0, nQuery.indexOf(":"));
     }
   }
 }

@@ -76,8 +76,8 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
   private void initializeHeader() {
     ListItem header = new ListItem();
     header.addStyleName("controls");
-    header.setTitle(getVariableLabel());
-    Label label = new InlineLabel(variable.getName());
+    header.setTitle(getHeaderTitle());
+    Label label = new InlineLabel(getHeaderText());
     header.add(label);
     if (!header.getTitle().isEmpty()) {
       Icon info = new Icon(IconType.INFO_SIGN);
@@ -90,7 +90,16 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
     add(headerDivider);
   }
 
+  protected String getHeaderText() {
+    return variable.getName();
+  }
+
+  protected String getHeaderTitle() {
+    return getVariableLabel();
+  }
+
   private String getVariableLabel() {
+    if (variable == null) return "";
     List<AttributeDto> labels = Lists.newArrayList();
     for (AttributeDto attribute : JsArrays.toList(variable.getAttributesArray())) {
       if (attribute.getName().equals("label")) labels.add(attribute);

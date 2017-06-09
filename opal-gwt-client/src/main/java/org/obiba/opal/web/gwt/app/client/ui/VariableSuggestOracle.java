@@ -36,6 +36,8 @@ public class VariableSuggestOracle extends SuggestOracle {
 
   private static final int LABEL_MAX_SIZE = 75;
 
+  private int limit = 20;
+
   private List<Suggestion> suggestions;
 
   public interface Identifiable {
@@ -223,6 +225,10 @@ public class VariableSuggestOracle extends SuggestOracle {
     this.table = table;
   }
 
+  public void setLimit(int limit) {
+    this.limit = limit;
+  }
+
   public String getOriginalQuery() {
     return originalQuery;
   }
@@ -235,6 +241,8 @@ public class VariableSuggestOracle extends SuggestOracle {
 
     UriBuilder ub = UriBuilder.create().segment("datasources", "variables", "_search")//
         .query("query", query)//
+        .query("limit", limit + "")//
+        .query("order", "name")//
         .query("field", "name", "field", "datasource", "field", "table", "field", "label", "field", "label-en");
 
     // Get candidates from search words.

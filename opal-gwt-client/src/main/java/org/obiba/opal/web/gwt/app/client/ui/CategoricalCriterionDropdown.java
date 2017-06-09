@@ -10,11 +10,17 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
+import com.github.gwtbootstrap.client.ui.CheckBox;
+import com.github.gwtbootstrap.client.ui.Icon;
+import com.github.gwtbootstrap.client.ui.RadioButton;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.user.client.ui.*;
+import com.watopi.chosen.client.event.ChosenChangeEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
@@ -22,18 +28,13 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.FacetResultDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
-import com.github.gwtbootstrap.client.ui.CheckBox;
-import com.github.gwtbootstrap.client.ui.RadioButton;
-import com.google.common.base.Joiner;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
-import com.watopi.chosen.client.event.ChosenChangeEvent;
+import java.util.List;
 
 public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDropdown {
 
-  private Chooser categories;
+  private ListItem specificControls;
+
+  private List<CheckBox> categoryChecks;
 
   public CategoricalCriterionDropdown(String datasource, String table, VariableDto variableDto, String fieldName, QueryResultDto termDto) {
     super(datasource, table, variableDto, fieldName, termDto);
@@ -50,81 +51,38 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
     not_in.addClickHandler(new OperatorClickHandler());
     radioControls.add(not_in);
 
-    categories = new Chooser(true);
-    ListItem specificControls = new ListItem();
+    specificControls = new ListItem();
     specificControls.addStyleName("controls");
-    specificControls.add(getCategoriesChooserPanel());
+    ComplexPanel checksPanel;
+    if (variable.getCategoriesArray() != null && variable.getCategoriesArray().length()>10) {
+      ScrollPanel scrollPanel = new ScrollPanel();
+      scrollPanel.setHeight("200px");
+      specificControls.add(scrollPanel);
+      checksPanel = new FlowPanel();
+      scrollPanel.add(checksPanel);
+    } else {
+      checksPanel = specificControls;
+    }
+    categoryChecks = Lists.newArrayList();
+    if (variable.getValueType().equals("boolean")) {
+      appendCategoryCheck(checksPanel, "T", translations.trueLabel(), "", getCategoryFrequency("T"));
+      appendCategoryCheck(checksPanel, "F", translations.falseLabel(), "", getCategoryFrequency("F"));
+    }
+    else
+      for (CategoryDto cat : JsArrays.toIterable(variable.getCategoriesArray()))
+        appendCategoryCheck(checksPanel, cat);
+
+    specificControls.setVisible(false);
 
     return specificControls;
   }
 
-  private SimplePanel getCategoriesChooserPanel() {
-    SimplePanel categoriesPanel = new SimplePanel();
-    if (variable.getValueType().equals("boolean")) {
-      categories.addItem(getCategoryItem("T", "true"), "T");
-      categories.addItem(getCategoryItem("F", "false"), "F");
-    } else {
-      for(CategoryDto cat : JsArrays.toIterable(variable.getCategoriesArray())) {
-        categories.addItem(getCategoryItem(cat), cat.getName());
-      }
-    }
-
-    categories.addChosenChangeHandler(new UpdateFilterChosenHandler());
-    categories.setVisible(false);
-
-    categoriesPanel.add(categories);
-    return categoriesPanel;
-  }
 
   @Override
   public void resetSpecificControls() {
-    categories.setVisible(false);
+    specificControls.setVisible(false);
     divider.setVisible(false);
-  }
-
-  private String getCategoryItem(String catName, String catLabel) {
-    // Get the frequency of this category
-    int count = 0;
-    for(FacetResultDto.TermFrequencyResultDto result : JsArrays
-        .toIterable(queryResult.getFacetsArray().get(0).getFrequenciesArray())) {
-      if(result.getTerm().equals(catName)) {
-        count = result.getCount();
-        break;
-      }
-    }
-
-    StringBuilder labelBuilder = new StringBuilder(catName);
-    String freqLabel = count > 0 ? " (" + count + ")" : "";
-    // OPAL-2693 max label length: truncate cat label if necessary
-    int maxLength = 20 - labelBuilder.length() - freqLabel.length();
-
-    if(catLabel.isEmpty()) return labelBuilder.append(freqLabel).toString();
-    if(maxLength <= 0) return labelBuilder.append(freqLabel).toString();
-
-    if(catLabel.length() > maxLength) {
-      labelBuilder.append(": ").append(catLabel.substring(0, maxLength)).append("...");
-    } else {
-      labelBuilder.append(": ").append(catLabel);
-    }
-    return labelBuilder.append(freqLabel).toString();
-  }
-
-  private String getCategoryItem(CategoryDto cat) {
-    return getCategoryItem(cat.getName(), getCategoryLabel(cat));
-  }
-
-  private String getCategoryLabel(CategoryDto cat) {
-    StringBuilder label = new StringBuilder();
-    for(AttributeDto attr : JsArrays.toIterable(cat.getAttributesArray())) {
-      if(!attr.hasNamespace() && attr.getName().equals("label")) {
-        if(label.length() > 0) label.append(" ");
-        if(attr.hasLocale()) {
-          label.append("[").append(attr.getLocale()).append("] ");
-        }
-        label.append(attr.getValue());
-      }
-    }
-    return label.toString();
+    doFilter();
   }
 
   @Override
@@ -138,13 +96,15 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
     }
 
     // in
-    if(((CheckBox) radioControls.getWidget(3)).getValue() && !selected.isEmpty()) {
+    if(((CheckBox) radioControls.getWidget(3)).getValue()) {
+      if (selected.isEmpty()) return "NOT " + fieldName + ":*";
       if (selected.size() == 1) return fieldName + ":" + selected.get(0);
       return fieldName + ":(\"" + Joiner.on("\" OR \"").join(selected) + "\")";
     }
 
     // not in
-    if(((CheckBox) radioControls.getWidget(4)).getValue() && !selected.isEmpty()) {
+    if(((CheckBox) radioControls.getWidget(4)).getValue()) {
+      if (selected.isEmpty()) return fieldName + ":*";
       if (selected.size() == 1) return "NOT " + fieldName + ":" + selected.get(0);
       return "NOT " + fieldName + ":(\"" + Joiner.on("\" OR \"").join(selected) + "\")";
     }
@@ -152,45 +112,96 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
     return null;
   }
 
-  private class UpdateFilterChosenHandler implements ChosenChangeEvent.ChosenChangeHandler {
-    @Override
-    public void onChange(ChosenChangeEvent chosenChangeEvent) {
-      setFilterText();
-      doFilter();
-    }
-  }
-
   private void setFilterText() {
     List<String> selected = getSelectedCategories();
 
-    if(selected.isEmpty()) {
-      setText(variable.getName());
-    } else if(((CheckBox) radioControls.getWidget(3)).getValue()) {
-      setText(variable.getName() + ": " + translations.criterionFiltersMap().get("in") + " (" +
+    if(((CheckBox) radioControls.getWidget(3)).getValue()) {
+      if(selected.isEmpty()) setText(variable.getName()+ ": " + translations.criterionFiltersMap().get("none"));
+      else setText(variable.getName() + ": " + translations.criterionFiltersMap().get("in") + " (" +
           Joiner.on(",").join(selected) + ")");
     } else {
-      setText(variable.getName() + ": " + translations.criterionFiltersMap().get("not_in") + " (" +
+      if(selected.isEmpty()) setText(variable.getName()+ ": " + translations.criterionFiltersMap().get("all"));
+      else setText(variable.getName() + ": " + translations.criterionFiltersMap().get("not_in") + " (" +
           Joiner.on(",").join(selected) + ")");
     }
   }
 
   private List<String> getSelectedCategories() {
     List<String> selectedCategories = Lists.newArrayList();
-    for(int i = 0; i < categories.getItemCount(); i++) {
-      if(categories.isItemSelected(i)) {
-        selectedCategories.add(categories.getValue(i));
-      }
+    for(CheckBox check : categoryChecks) {
+      if(check.getValue()) selectedCategories.add(check.getName());
     }
     return selectedCategories;
+  }
+
+  private void appendCategoryCheck(ComplexPanel checksPanel, CategoryDto cat) {
+    appendCategoryCheck(checksPanel, cat.getName(), cat.getName(), getCategoryLabel(cat), getCategoryFrequency(cat));
+  }
+
+  private void appendCategoryCheck(ComplexPanel checksPanel, String name, String title, String label, int count) {
+    SafeHtmlBuilder builder = new SafeHtmlBuilder().appendEscaped(title);
+    builder.appendHtmlConstant("<span style=\"font-size:x-small\"> (")
+        .append(count).appendEscaped(")")
+        .appendHtmlConstant("</span>");
+    FlowPanel checkPanel = new FlowPanel();
+    CheckBox checkBox = new CheckBox(builder.toSafeHtml());
+    checkBox.setName(name);
+    checkBox.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        setFilterText();
+        doFilter();
+      }
+    });
+    checkBox.addStyleName("inline-block");
+    checkPanel.setTitle(label);
+    checkPanel.add(checkBox);
+    if (!checkPanel.getTitle().isEmpty()) {
+      Icon info = new Icon(IconType.INFO_SIGN);
+      info.addStyleName("small-indent");
+      checkPanel.add(info);
+    }
+    checksPanel.add(checkPanel);
+    categoryChecks.add(checkBox);
+  }
+
+  private int getCategoryFrequency(CategoryDto cat) {
+    return getCategoryFrequency(cat.getName());
+  }
+
+  private int getCategoryFrequency(String name) {
+    int count = 0;
+    for(FacetResultDto.TermFrequencyResultDto result : JsArrays.toIterable(queryResult.getFacetsArray().get(0).getFrequenciesArray())) {
+      if(result.getTerm().equals(name)) {
+        count = result.getCount();
+        break;
+      }
+    }
+    return count;
+  }
+
+  private String getCategoryLabel(CategoryDto cat) {
+    StringBuilder label = new StringBuilder();
+    for(AttributeDto attr : JsArrays.toIterable(cat.getAttributesArray())) {
+      if(!attr.hasNamespace() && attr.getName().equals("label")) {
+        if(label.length() > 0) label.append(" ");
+        if(attr.hasLocale()) {
+          label.append("(").append(attr.getLocale()).append(") ");
+        }
+        label.append(attr.getValue());
+      }
+    }
+    return label.toString();
   }
 
   private class OperatorClickHandler implements ClickHandler {
 
     @Override
     public void onClick(ClickEvent event) {
-      categories.setVisible(true);
+      specificControls.setVisible(true);
       divider.setVisible(true);
       setFilterText();
+      doFilter();
     }
   }
 }

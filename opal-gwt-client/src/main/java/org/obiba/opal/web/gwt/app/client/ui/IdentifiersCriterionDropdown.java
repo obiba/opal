@@ -54,6 +54,16 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
     return specificControls;
   }
 
+  @Override
+  protected String getHeaderText() {
+    return "ID";
+  }
+
+  @Override
+  protected String getHeaderTitle() {
+    return "";
+  }
+
   private void setupRadioControls() {// Remove empty/not empty radio
     radioControls.remove(1);
     radioControls.remove(1);
