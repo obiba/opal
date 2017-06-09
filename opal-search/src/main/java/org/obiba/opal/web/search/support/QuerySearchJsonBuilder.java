@@ -11,9 +11,11 @@ package org.obiba.opal.web.search.support;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import com.google.common.collect.Lists;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -48,13 +50,17 @@ public class QuerySearchJsonBuilder {
 
   private Collection<String> facets;
 
-  private Collection<String> filterTypes;
+  private Collection<String> filterReferences;
 
   private String query;
+
+  private List<ChildQuery> childQueries = Lists.newArrayList();
 
   private String sortField;
 
   private String sortDir;
+
+  private boolean withDefaultQueryFields = true;
 
   //
   // Public methods
@@ -63,56 +69,76 @@ public class QuerySearchJsonBuilder {
   public QuerySearchJsonBuilder() {
   }
 
-  public QuerySearchJsonBuilder setFrom(int value) {
+  public QuerySearchJsonBuilder from(int value) {
     from = value;
     return this;
   }
 
-  public QuerySearchJsonBuilder setSize(int value) {
+  public QuerySearchJsonBuilder size(int value) {
     size = value;
     return this;
   }
 
-  public QuerySearchJsonBuilder setFields(@NotNull Collection<String> value) {
+  public QuerySearchJsonBuilder fields(@NotNull Collection<String> value) {
     fields = value;
     return this;
   }
 
-  public QuerySearchJsonBuilder setFacets(@NotNull Collection<String> value) {
+  public QuerySearchJsonBuilder facets(@NotNull Collection<String> value) {
     facets = value;
     return this;
   }
 
-  public QuerySearchJsonBuilder setSortField(@NotNull String value) {
+  public QuerySearchJsonBuilder sortField(@NotNull String value) {
     sortField = value;
     return this;
   }
 
-  public QuerySearchJsonBuilder setSortDir(@NotNull String value) {
+  public QuerySearchJsonBuilder sortDir(@NotNull String value) {
     sortDir = value.toLowerCase(); // elastic search accepts only lower case
     return this;
   }
 
-  public QuerySearchJsonBuilder setQuery(@NotNull String value) {
-    if(Strings.isNullOrEmpty(value)) {
-      throw new IllegalArgumentException();
-    }
-
+  public QuerySearchJsonBuilder query(@NotNull String value) {
+    if(Strings.isNullOrEmpty(value)) throw new IllegalArgumentException();
     query = value;
     return this;
   }
 
-  public QuerySearchJsonBuilder setFilterTypes(@NotNull Collection<String> value) {
-    filterTypes = value;
+  public QuerySearchJsonBuilder childQuery(@NotNull String type, @NotNull String value) {
+    return childQuery(new ChildQuery(type, value));
+  }
+
+  public QuerySearchJsonBuilder childQueries(List<ChildQuery> queries) {
+    if (queries == null) return this;
+    childQueries.addAll(queries);
+    return this;
+  }
+
+  public QuerySearchJsonBuilder childQuery(ChildQuery child) {
+    childQueries.add(child);
+    return this;
+  }
+
+  public QuerySearchJsonBuilder noDefaultFields() {
+    withDefaultQueryFields = false;
+    return this;
+  }
+
+  public QuerySearchJsonBuilder filterReferences(@NotNull Collection<String> value) {
+    filterReferences = value;
     return this;
   }
 
   public JSONObject build() throws JSONException {
     JSONObject jsonQuery = new JSONObject();
-    jsonQuery.accumulate("query", new JSONObject().put("query_string", buildQueryStringJson()));
+    if (childQueries.isEmpty())
+      jsonQuery.put("query", buildQueryString(query, withDefaultQueryFields));
+    else
+      jsonQuery.put("query", buildHasChildQueries());
     jsonQuery.put("sort", buildSortJson());
     if(fields != null && !fields.isEmpty()) jsonQuery.put("partial_fields", buildFields());
-    if(filterTypes != null && !filterTypes.isEmpty()) jsonQuery.put("filter", buildFilter());
+    if(filterReferences != null && !filterReferences.isEmpty()) jsonQuery.put("filter", buildFilter());
     jsonQuery.put("from", from);
     jsonQuery.put("size", size);
     if (hasFacets()) jsonQuery.put("facets", buildFacetsJson());
@@ -124,13 +150,25 @@ public class QuerySearchJsonBuilder {
   // Private members
   //
 
-  private JSONObject buildQueryStringJson() throws JSONException {
+  private JSONObject buildQueryString(String query, boolean defaultFields) throws JSONException {
     JSONObject json = new JSONObject();
-    if(!hasFacets() && !"*".equals(query)) json.put("fields", new JSONArray(defaultQueryFields));
+    if(defaultFields && !hasFacets() && !"*".equals(query)) json.put("fields", new JSONArray(defaultQueryFields));
     json.put("query", query);
     json.put("default_operator", DEFAULT_QUERY_OPERATOR);
+    return new JSONObject().put("query_string", json);
+  }
 
-    return json;
+  private JSONObject buildHasChildQueries() throws JSONException {
+    JSONObject json = new JSONObject();
+    for (ChildQuery child : childQueries) json.accumulate("must", buildHasChildQuery(child));
+    return new JSONObject().put("bool", json);
+  }
+
+  private JSONObject buildHasChildQuery(ChildQuery child) throws JSONException {
+    JSONObject json = new JSONObject();
+    json.put("type", child.type);
+    json.put("query", buildQueryString(child.query, false));
+    return new JSONObject().put("has_child", json);
   }
 
   private JSONObject buildSortJson() throws JSONException {
@@ -142,8 +180,7 @@ public class QuerySearchJsonBuilder {
   }
 
   private JSONObject buildFilter() throws JSONException {
-    return new JSONObject().put("bool", new JSONObject()
-        .put("must", new JSONObject().put("terms", new JSONObject().put("_type", new JSONArray(filterTypes)))));
+    return new JSONObject().put("terms", new JSONObject().put("reference", new JSONArray(filterReferences)));
   }
 
 
@@ -175,4 +212,13 @@ public class QuerySearchJsonBuilder {
     return facets != null && !facets.isEmpty();
   }
 
+  public static class ChildQuery {
+    private final String type;
+    private final String query;
+
+    public ChildQuery(String type, String query) {
+      this.type = type;
+      this.query = query;
+    }
+  }
 }

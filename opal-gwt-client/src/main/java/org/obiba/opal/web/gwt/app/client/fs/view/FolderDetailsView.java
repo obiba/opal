@@ -263,8 +263,8 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
     }
 
     @Override
-    public ListDataProvider<FileDto> getDataProvider() {
-      return dataProvider;
+    public List<FileDto> getDataList() {
+      return dataProvider.getList();
     }
 
     @Override

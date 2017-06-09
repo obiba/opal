@@ -182,7 +182,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     // populate Typeahead
     oracle = new TableVariableSuggestOracle(eventBus);
     variableTypeahead = new Typeahead(oracle);
-    variableTypeahead.setMinLength(1);
+    variableTypeahead.setMinLength(2);
     variableTypeahead.setUpdaterCallback(new Typeahead.UpdaterCallback() {
       @Override
       public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {

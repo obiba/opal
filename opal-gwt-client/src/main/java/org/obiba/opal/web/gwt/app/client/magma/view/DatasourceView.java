@@ -213,6 +213,11 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     checkColumn.clearSelection();
   }
 
+  @UiHandler("searchVariables")
+  void onSearchVariables(ClickEvent event) {
+    getUiHandlers().onSearchVariables();
+  }
+
   @UiHandler("exportSelectionAnchor")
   void onExportSelection(ClickEvent event) {
     getUiHandlers().onExportData();
@@ -440,8 +445,8 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     }
 
     @Override
-    public ListDataProvider<TableDto> getDataProvider() {
-      return dataProvider;
+    public List<TableDto> getDataList() {
+      return dataProvider.getList();
     }
 
     @Override

@@ -24,14 +24,14 @@ public interface ValueTableIndex extends Timestamped {
    * @return
    */
   // TODO: this should be hidden in the implementation. Probably we should expose some sort of Request/Response api?
-  String getRequestPath();
+  String getIndexName();
 
   /**
-   * Name of the index (which might not be exactly the table reference).
+   * Type in the index (which might not be exactly the table reference).
    *
    * @return
    */
-  String getIndexName();
+  String getIndexType();
 
   /**
    * Returns true if the the lastUpdate timestamp of this index is more recent than that of its corresponding

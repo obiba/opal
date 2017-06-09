@@ -10,7 +10,10 @@
 
 package org.obiba.opal.web.gwt.app.client.search.variables;
 
+import com.github.gwtbootstrap.client.ui.Alert;
+import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -19,6 +22,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.text.shared.SafeHtmlRenderer;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
@@ -31,6 +35,8 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
 import org.obiba.opal.web.model.client.opal.EntryDto;
 import org.obiba.opal.web.model.client.search.ItemFieldsDto;
 import org.obiba.opal.web.model.client.search.ItemResultDto;
+
+import java.util.List;
 
 public class VariableItemTable extends Table<ItemResultDto> {
 
@@ -49,11 +55,11 @@ public class VariableItemTable extends Table<ItemResultDto> {
     setPageSize(Table.DEFAULT_PAGESIZE);
     setEmptyTableWidget(new InlineLabel(translations.noVariablesLabel()));
 
-    //addCheckColumn();
+    //addCheckColumn(new ItemResultCheckDisplay(this));
 
     if (placeManager != null) {
-      addColumn(new VariableItemColumn(new ProjectTableLinkCell(placeManager)), translations.tableLabel());
       addColumn(new VariableItemColumn(new VariableLinkCell(placeManager)), translations.variableLabel());
+      addColumn(new VariableItemColumn(new ProjectTableLinkCell(placeManager)), translations.tableLabel());
     } else {
       addColumn(new TextColumn<ItemResultDto>() {
         @Override
@@ -62,6 +68,13 @@ public class VariableItemTable extends Table<ItemResultDto> {
           return parser.getVariable();
         }
       }, translations.variableLabel());
+      addColumn(new TextColumn<ItemResultDto>() {
+        @Override
+        public String getValue(ItemResultDto item) {
+          MagmaPath.Parser parser = MagmaPath.Parser.parse(item.getIdentifier());
+          return parser.getDatasource() + "." + parser.getTable();
+        }
+      }, translations.tableLabel());
     }
 
     addColumn(new ItemFieldColumn("label"), translations.labelLabel());
@@ -171,6 +184,60 @@ public class VariableItemTable extends Table<ItemResultDto> {
         }
       }
       return fieldsHtml.toString();
+    }
+  }
+
+  private static class ItemResultCheckDisplay implements CheckboxColumn.Display<ItemResultDto> {
+
+    private final VariableItemTable table;
+
+    private ItemResultCheckDisplay(VariableItemTable table) {
+      this.table = table;
+    }
+
+    @Override
+    public Table<ItemResultDto> getTable() {
+      return table;
+    }
+
+    @Override
+    public Object getItemKey(ItemResultDto item) {
+      return item.getIdentifier();
+    }
+
+    @Override
+    public IconAnchor getClearSelection() {
+      return null;
+    }
+
+    @Override
+    public IconAnchor getSelectAll() {
+      return null;
+    }
+
+    @Override
+    public HasText getSelectAllStatus() {
+      return null;
+    }
+
+    @Override
+    public List<ItemResultDto> getDataList() {
+      return Lists.newArrayList();
+    }
+
+    @Override
+    public String getNItemLabel(int nb) {
+      return null;
+    }
+
+    @Override
+    public Alert getSelectActionsAlert() {
+      return null;
+    }
+
+    @Override
+    public Alert getSelectTipsAlert() {
+      return null;
     }
   }
 }

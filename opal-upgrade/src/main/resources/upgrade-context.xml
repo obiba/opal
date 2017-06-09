@@ -140,6 +140,11 @@
           <property name="appliesTo" value="2.3.0"/>
         </bean>
 
+        <!-- 2.10.0 / clear ES indexes -->
+        <bean parent="clearElasticSearchWorkspace">
+          <property name="appliesTo" value="2.10.0"/>
+        </bean>
+
       </list>
     </property>
 
@@ -154,6 +159,11 @@
       abstract="true">
     <property name="description" value="Clear Elastic Search indexes."/>
     <property name="indexPath" value="${OPAL_HOME}/data"/>
+  </bean>
+
+  <bean id="clearElasticSearchWorkspace" class="org.obiba.opal.core.upgrade.ClearElasticSearchIndexes"
+        abstract="true">
+    <property name="description" value="Clear Elastic Search workspace."/>
   </bean>
 
 </beans>

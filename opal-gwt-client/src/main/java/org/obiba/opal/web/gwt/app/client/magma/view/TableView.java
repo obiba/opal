@@ -527,6 +527,11 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     getUiHandlers().onDownloadView();
   }
 
+  @UiHandler("searchVariables")
+  void onSearchVariables(ClickEvent event) {
+    getUiHandlers().onSearchVariables();
+  }
+
   @UiHandler("remove")
   void onRemove(ClickEvent event) {
     getUiHandlers().onRemove();
@@ -776,8 +781,8 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     }
 
     @Override
-    public ListDataProvider<VariableDto> getDataProvider() {
-      return dataProvider;
+    public List<VariableDto> getDataList() {
+      return dataProvider.getList();
     }
 
     @Override

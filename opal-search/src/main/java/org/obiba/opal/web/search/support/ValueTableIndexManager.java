@@ -33,6 +33,10 @@ public class ValueTableIndexManager {
     this.table = table;
   }
 
+  public String getQuery() {
+    return "datasource:" + datasource.replaceAll(" ", "+") + " AND table:" + table.replaceAll(" ", "+");
+  }
+
   public VariableNature getVariableNature(String variableName) {
     Variable var = getValueTable().getVariable(variableName);
 

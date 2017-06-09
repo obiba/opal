@@ -52,7 +52,7 @@ public interface TableResource {
   VariablesResource getVariables();
 
   /**
-   * Get the entities, optionally filtered by a script.
+   * Get the entities.
    */
   @GET
   @Path("/entities")

@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. 
  */
 
-package org.obiba.opal.web.gwt.app.client.search.entities;
+package org.obiba.opal.web.gwt.app.client.search.entity;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
@@ -49,7 +49,6 @@ import org.obiba.opal.web.model.client.magma.VariableEntitySummaryDto;
 
 import java.util.List;
 import java.util.Map;
-
 
 public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Display, SearchEntityPresenter.Proxy>
     implements HasPageTitle, SearchEntityUiHandlers {

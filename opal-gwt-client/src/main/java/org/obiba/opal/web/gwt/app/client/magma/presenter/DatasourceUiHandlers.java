@@ -37,4 +37,6 @@ public interface DatasourceUiHandlers extends UiHandlers {
   void onDeleteTables(List<TableDto> tables);
 
   void onTablesFilterUpdate(String filter);
+
+  void onSearchVariables();
 }

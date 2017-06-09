@@ -12,7 +12,9 @@ package org.obiba.opal.web.gwt.app.client.ui;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
+import com.google.common.collect.Lists;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
@@ -33,8 +35,8 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
 
   private Chooser categories;
 
-  public CategoricalCriterionDropdown(VariableDto variableDto, String fieldName, QueryResultDto termDto) {
-    super(variableDto, fieldName, termDto);
+  public CategoricalCriterionDropdown(String datasource, String table, VariableDto variableDto, String fieldName, QueryResultDto termDto) {
+    super(datasource, table, variableDto, fieldName, termDto);
   }
 
   @Override
@@ -77,6 +79,7 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
   @Override
   public void resetSpecificControls() {
     categories.setVisible(false);
+    divider.setVisible(false);
   }
 
   private String getCategoryItem(String catName, String catLabel) {
@@ -129,15 +132,20 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
     String emptyNotEmpty = super.getQueryString();
     if(emptyNotEmpty != null) return emptyNotEmpty;
 
-    Collection<String> selected = getSelectedCategories();
+    List<String> selected = Lists.newArrayList();
+    for (String sel : getSelectedCategories()) {
+      selected.add(sel.replaceAll(" ", "+"));
+    }
 
     // in
     if(((CheckBox) radioControls.getWidget(3)).getValue() && !selected.isEmpty()) {
+      if (selected.size() == 1) return fieldName + ":" + selected.get(0);
       return fieldName + ":(\"" + Joiner.on("\" OR \"").join(selected) + "\")";
     }
 
     // not in
     if(((CheckBox) radioControls.getWidget(4)).getValue() && !selected.isEmpty()) {
+      if (selected.size() == 1) return "NOT " + fieldName + ":" + selected.get(0);
       return "NOT " + fieldName + ":(\"" + Joiner.on("\" OR \"").join(selected) + "\")";
     }
 
@@ -153,21 +161,21 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
   }
 
   private void setFilterText() {
-    Collection<String> selected = getSelectedCategories();
+    List<String> selected = getSelectedCategories();
 
     if(selected.isEmpty()) {
       setText(variable.getName());
     } else if(((CheckBox) radioControls.getWidget(3)).getValue()) {
       setText(variable.getName() + ": " + translations.criterionFiltersMap().get("in") + " (" +
-          Joiner.on(", ").join(selected) + ")");
+          Joiner.on(",").join(selected) + ")");
     } else {
       setText(variable.getName() + ": " + translations.criterionFiltersMap().get("not_in") + " (" +
-          Joiner.on(", ").join(selected) + ")");
+          Joiner.on(",").join(selected) + ")");
     }
   }
 
-  private Collection<String> getSelectedCategories() {
-    Collection<String> selectedCategories = new ArrayList<String>();
+  private List<String> getSelectedCategories() {
+    List<String> selectedCategories = Lists.newArrayList();
     for(int i = 0; i < categories.getItemCount(); i++) {
       if(categories.isItemSelected(i)) {
         selectedCategories.add(categories.getValue(i));
@@ -181,6 +189,7 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
     @Override
     public void onClick(ClickEvent event) {
       categories.setVisible(true);
+      divider.setVisible(true);
       setFilterText();
     }
   }

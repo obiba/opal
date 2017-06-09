@@ -12,9 +12,11 @@ package org.obiba.opal.web.gwt.app.client.ui;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.gwt.user.client.ui.FlowPanel;
 
 /**
@@ -28,12 +30,7 @@ public class CriteriaPanel extends FlowPanel {
    * @return
    */
   public boolean hasCriteria() {
-    for(int i = 0; i < getWidgetCount(); i++) {
-      if(getWidget(i) instanceof CriterionPanel) {
-        return true;
-      }
-    }
-    return false;
+    return !getQueryStrings().isEmpty();
   }
 
   public void addCriterion(CriterionDropdown criterion) {
@@ -50,15 +47,24 @@ public class CriteriaPanel extends FlowPanel {
    * @return
    */
   public String getQueryString() {
-    Collection<String> filters = new ArrayList<String>();
+    Collection<String> filters = getQueryStrings();
+    return filters.isEmpty() ? "*" : Joiner.on(" AND ").join(filters);
+  }
+
+  /**
+   * Get each of the criterion query string in their order of appearance.
+   *
+   * @return
+   */
+  public List<String> getQueryStrings() {
+    List<String> filters = Lists.newArrayList();
     for(int i = 0; i < getWidgetCount(); i++) {
       if(getWidget(i) instanceof CriterionPanel) {
         String queryString = ((CriterionPanel) getWidget(i)).getQueryString();
         if(!Strings.isNullOrEmpty(queryString)) filters.add(queryString);
       }
     }
-
-    return filters.isEmpty() ? "*" : Joiner.on(" AND ").join(filters);
+    return filters;
   }
 
   /**
@@ -67,14 +73,38 @@ public class CriteriaPanel extends FlowPanel {
    * @return
    */
   public String getQueryText() {
-    Collection<String> filters = new ArrayList<String>();
+    List<String> texts = getQueryTexts();
+    return texts.isEmpty() ? "*" : Joiner.on(" AND ").join(texts);
+  }
+
+  /**
+   * Get each of the criterion query human readable string in their order of appearance.
+   *
+   * @return
+   */
+  public List<String> getQueryTexts() {
+    List<String> texts = Lists.newArrayList();
     for(int i = 0; i < getWidgetCount(); i++) {
       if(getWidget(i) instanceof CriterionPanel) {
         String queryString = ((CriterionPanel) getWidget(i)).getQueryText();
-        if(!Strings.isNullOrEmpty(queryString)) filters.add(queryString);
+        if(!Strings.isNullOrEmpty(queryString)) texts.add(queryString);
       }
     }
+    return texts;
+  }
 
-    return filters.isEmpty() ? "*" : Joiner.on(" AND ").join(filters);
+  /**
+   * Get criterion dropdowns in their order of appearance.
+   *
+   * @return
+   */
+  public List<CriterionDropdown> getCriterions() {
+    List<CriterionDropdown> widgets = Lists.newArrayList();
+    for(int i = 0; i < getWidgetCount(); i++) {
+      if (getWidget(i) instanceof CriterionPanel) {
+        widgets.add(((CriterionPanel) getWidget(i)).getCriterion());
+      }
+    }
+    return widgets;
   }
 }

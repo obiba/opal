@@ -20,6 +20,7 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.magma.QueryWhereClause;
+import org.obiba.opal.spi.search.ValuesIndexManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -46,13 +47,14 @@ public class SearchQueryWhereClause extends AbstractSearchUtility implements Que
   @Override
   public void initialise() {
     try {
-      JSONObject jsonResponse = executeQuery(buildQuerySearch(query, 0, Integer.MAX_VALUE, null, null, null, null).build());
+      JSONObject jsonResponse = executeQuery(buildQuerySearch(query, 0, Integer.MAX_VALUE, Lists.newArrayList("identifier"), null, null, null).build());
       if(jsonResponse.isNull("error")) {
         JSONObject jsonHits = jsonResponse.getJSONObject("hits");
         JSONArray hits = jsonHits.getJSONArray("hits");
         for(int i = 0; i < hits.length(); i++) {
           JSONObject jsonHit = hits.getJSONObject(i);
-          entities.add(new VariableEntityBean(valueTable.getEntityType(), jsonHit.getString("_id")));
+          JSONObject fields = jsonHit.getJSONObject("fields").getJSONArray("partial").getJSONObject(0);
+          entities.add(new VariableEntityBean(valueTable.getEntityType(), fields.getString("identifier")));
         }
       }
     } catch(Exception e) {
@@ -82,6 +84,7 @@ public class SearchQueryWhereClause extends AbstractSearchUtility implements Que
 
   @Override
   protected String getSearchPath() {
-    return opalSearchService.getValuesIndexManager().getIndex(valueTable).getRequestPath();
+    ValuesIndexManager manager = opalSearchService.getValuesIndexManager();
+    return manager.getName() + "/" + manager.getIndex(valueTable).getIndexType();
   }
 }

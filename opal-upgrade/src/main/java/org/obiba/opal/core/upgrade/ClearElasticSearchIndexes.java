@@ -26,14 +26,20 @@ public class ClearElasticSearchIndexes extends AbstractUpgradeStep {
 
   private static final Logger log = LoggerFactory.getLogger(ClearElasticSearchIndexes.class);
 
-  @Value("${OPAL_HOME}/work/elastic-search")
+  @Value("${OPAL_HOME}/work/elasticsearch")
   private String indexPath;
 
   @Override
   public void execute(Version currentVersion) {
+    removeEsWorkDir(indexPath);
+  }
+
+  private void removeEsWorkDir(String indexPath) {
+    File esWork = new File(indexPath);
+    if (!esWork.exists()) return;
     log.info("Clear Elastic Search indexes: {}", indexPath);
     try {
-      if(!FileUtil.delete(new File(indexPath))) {
+      if(!FileUtil.delete(esWork)) {
         log.warn("Cannot find Elastic Search indexes: {}", indexPath);
       }
     } catch(IOException e) {

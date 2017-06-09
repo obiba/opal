@@ -39,8 +39,10 @@ public class ValueTableVariablesMapping {
 
       mapping.startObject("properties");
 
+      mapString("project", mapping);
       mapString("datasource", mapping);
       mapString("table", mapping);
+      mapNotAnalyzedString("reference", mapping);
       mapAnalyzedString("name", mapping);
       mapAnalyzedString("label", mapping);
       mapAnalyzedString("label-en", mapping);
@@ -104,6 +106,13 @@ public class ValueTableVariablesMapping {
   private void mapString(String field, XContentBuilder mapping) throws IOException {
     mapping.startObject(field);
     valueTypeMappings.forType(TextType.get()).map(mapping);
+    mapping.endObject();
+  }
+
+  private void mapNotAnalyzedString(String field, XContentBuilder mapping) throws IOException {
+    mapping.startObject(field);
+    mapping.field("type", "string");
+    mapping.field("index", "not_analyzed");
     mapping.endObject();
   }
 

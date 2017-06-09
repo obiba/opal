@@ -44,6 +44,7 @@ import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionR
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.search.event.SearchTableVariablesEvent;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -497,6 +498,11 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     String downloadUrl = UriBuilders.DATASOURCE_VIEW.create().build(table.getDatasourceName(), table.getName()) +
         "/xml";
     fireEvent(new FileDownloadRequestEvent(downloadUrl));
+  }
+
+  @Override
+  public void onSearchVariables() {
+    fireEvent(new SearchTableVariablesEvent(table.getDatasourceName(), table.getName()));
   }
 
   @Override

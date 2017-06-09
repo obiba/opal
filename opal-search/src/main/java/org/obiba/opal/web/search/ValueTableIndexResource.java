@@ -145,7 +145,6 @@ public class ValueTableIndexResource extends IndexResource {
   public Response search() {
     ValueTableValuesIndex index = getValueTableIndex(datasource, table);
     OpalMap.Builder map = OpalMap.newBuilder();
-
     for(Variable variable : index.getVariables()) {
       map.addKeys(variable.getName());
       map.addValues(index.getFieldName(variable.getName()));

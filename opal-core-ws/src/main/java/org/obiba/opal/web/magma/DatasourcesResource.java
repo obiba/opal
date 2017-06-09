@@ -14,6 +14,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -56,10 +57,10 @@ public class DatasourcesResource {
 
   @GET
   @Path("/tables")
-  public List<Magma.TableDto> getTables(@Nullable @QueryParam("entityType") String entityType) {
+  public List<Magma.TableDto> getTables(@Nullable @QueryParam("entityType") String entityType, @QueryParam("indexed") @DefaultValue("false") boolean indexed) {
     List<Magma.TableDto> tables = Lists.newArrayList();
     for(Datasource datasource : MagmaEngine.get().getDatasources()) {
-      tables.addAll(getDatasourceTablesResource(datasource).getTables(false, entityType));
+      tables.addAll(getDatasourceTablesResource(datasource).getTables(false, entityType, indexed));
     }
 
     Collections.sort(tables, Comparator.comparing(Magma.TableDto::getLink));

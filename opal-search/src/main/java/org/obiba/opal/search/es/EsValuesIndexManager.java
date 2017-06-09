@@ -9,9 +9,7 @@
  */
 package org.obiba.opal.search.es;
 
-import com.google.common.base.Predicate;
 import com.google.common.base.Stopwatch;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.index.IndexRequestBuilder;
@@ -45,6 +43,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadFactory;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Component
 @Transactional(readOnly = true)
@@ -131,13 +131,21 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
 
         try {
           XContentBuilder builder = XContentFactory.jsonBuilder().startObject();
+          builder.field("identifier.analyzed", identifier); // analyzed copy of _id
+          builder.field("identifier", identifier);
+          builder.field("project", valueTable.getDatasource().getName());
+          builder.field("datasource", valueTable.getDatasource().getName());
+          builder.field("table", valueTable.getName());
+          builder.field("reference", valueTable.getTableReference());
+          builder.field("entityType", valueTable.getEntityType());
+
           for(int i = 0; i < variables.length; i++) {
             indexValue(builder, variables[i], values[i], identifier);
           }
           builder.endObject();
 
           IndexRequestBuilder requestBuilder = opalSearchService.getClient()
-              .prepareIndex(getName(), index.getIndexName(), identifier).setParent(identifier).setSource(builder);
+              .prepareIndex(getName(), index.getIndexType(), index.getIndexType() + "-" + identifier).setParent(identifier).setSource(builder);
           bulkRequest.add(requestBuilder);
           done++;
 
@@ -150,8 +158,6 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
       }
 
       private void indexValue(XContentBuilder xcb, Variable variable, Value value, String identifier) throws IOException {
-        xcb.field("_id.analyzed", identifier); // analyzed copy of _id
-
         String fieldName = index.getFieldName(variable.getName());
 
         if(value.isSequence() && !value.isNull()) {
@@ -229,26 +235,20 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
 
     @Override
     public String getFieldName(String variable) {
-      return (getIndexName() + "-" + variable).replace(' ','+');
+      return (getIndexType() + FIELD_SEP + variable).replace(' ','+');
     }
 
     @Override
     protected XContentBuilder getMapping() {
-      return new ValueTableMapping().createMapping(runtimeVersionProvider.getVersion(), getIndexName(), resolveTable());
+      return new ValueTableMapping().createMapping(runtimeVersionProvider.getVersion(), getIndexType(), resolveTable());
     }
 
     @Override
     public Iterable<Variable> getVariables() {
       // Do not index binary values, do not even extract the binary values
-      // TODO Could be configurable at table level?
-      return Iterables.filter(resolveTable().getVariables(), new Predicate<Variable>() {
-
-        @Override
-        public boolean apply(Variable input) {
-          return !input.getValueType().isGeo() && !input.getValueType().equals(BinaryType.get());
-        }
-
-      });
+      return StreamSupport.stream(resolveTable().getVariables().spliterator(), false)
+          .filter(variable -> !variable.getValueType().isGeo() && !BinaryType.get().equals(variable.getValueType()))
+          .collect(Collectors.toList());
     }
 
   }

@@ -40,6 +40,11 @@ public enum VariableDtoNature {
   GEO,
 
   /**
+   * A bnary variable.
+   */
+  BINARY,
+
+  /**
    * None of the above. Variables with {@code LocaleType} will be of this nature.
    */
   UNDETERMINED;
@@ -62,7 +67,9 @@ public enum VariableDtoNature {
         "point".equals(variable.getValueType())) {
       return GEO;
     }
-
+    if("binary".equals(variable.getValueType())) {
+      return BINARY;
+    }
     return UNDETERMINED;
   }
 

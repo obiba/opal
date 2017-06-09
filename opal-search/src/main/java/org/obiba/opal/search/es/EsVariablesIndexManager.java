@@ -93,8 +93,10 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
       String fullName = valueTable.getDatasource().getName() + "." + valueTable.getName() + ":" + variable.getName();
       try {
         XContentBuilder xcb = XContentFactory.jsonBuilder().startObject();
+        xcb.field("project", valueTable.getDatasource().getName());
         xcb.field("datasource", valueTable.getDatasource().getName());
         xcb.field("table", valueTable.getName());
+        xcb.field("reference", valueTable.getTableReference());
         xcb.field("fullName", fullName);
         indexVariableParameters(variable, xcb);
 
@@ -106,7 +108,7 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
           indexVariableCategories(variable, xcb);
         }
 
-        bulkRequest.add(opalSearchService.getClient().prepareIndex(getName(), index.getIndexName(), fullName)
+        bulkRequest.add(opalSearchService.getClient().prepareIndex(getName(), index.getIndexType(), fullName)
             .setSource(xcb.endObject()));
         if(bulkRequest.numberOfActions() >= ES_BATCH_SIZE) {
           return sendAndCheck(bulkRequest);
@@ -170,7 +172,7 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
     @Override
     protected XContentBuilder getMapping() {
       return new ValueTableVariablesMapping()
-          .createMapping(runtimeVersionProvider.getVersion(), getIndexName(), resolveTable());
+          .createMapping(runtimeVersionProvider.getVersion(), getIndexType(), resolveTable());
     }
 
     @NotNull

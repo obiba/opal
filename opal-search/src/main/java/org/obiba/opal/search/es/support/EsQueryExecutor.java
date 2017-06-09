@@ -21,6 +21,8 @@ import org.elasticsearch.rest.RestChannel;
 import org.elasticsearch.rest.RestRequest;
 import org.elasticsearch.rest.RestResponse;
 import org.obiba.opal.search.es.ElasticSearchProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import java.io.IOException;
@@ -30,6 +32,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class EsQueryExecutor {
+
+  private static final Logger log = LoggerFactory.getLogger(EsQueryExecutor.class);
 
   private final ElasticSearchProvider elasticSearchProvider;
 
@@ -57,7 +61,7 @@ public class EsQueryExecutor {
   //
 
   private JSONObject executeQuery(JSONObject jsonBody, RestRequest esRestRequest) throws JSONException {
-
+    if (log.isDebugEnabled()) log.debug("Request: " + searchPath + " => " + jsonBody.toString(2));
     Assert.notNull(jsonBody, "Query json body is null!");
 
     final CountDownLatch latch = new CountDownLatch(1);
@@ -84,7 +88,9 @@ public class EsQueryExecutor {
       latch.await();
       byte[] content = ref.get();
 
-      return new JSONObject(new String(content));
+      JSONObject response = new JSONObject(new String(content));
+      if (log.isDebugEnabled()) log.debug("Response: " + response.toString(2));
+      return response;
 
     } catch(InterruptedException e) {
       throw new RuntimeException(e);

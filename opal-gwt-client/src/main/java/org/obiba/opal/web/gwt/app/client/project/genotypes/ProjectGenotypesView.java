@@ -468,8 +468,8 @@ public class ProjectGenotypesView extends ViewWithUiHandlers<ProjectGenotypesUiH
     }
 
     @Override
-    public ListDataProvider<VCFSummaryDto> getDataProvider() {
-      return dataProvider;
+    public List<VCFSummaryDto> getDataList() {
+      return dataProvider.getList();
     }
 
     @Override

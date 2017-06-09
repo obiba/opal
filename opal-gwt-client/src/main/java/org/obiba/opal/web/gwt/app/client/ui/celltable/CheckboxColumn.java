@@ -132,7 +132,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     display.getClearSelection().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        for(T tc : display.getDataProvider().getList()) {
+        for(T tc : display.getDataList()) {
           selectionModel.setSelected(tc, false);
         }
         display.getTable().redraw();
@@ -148,7 +148,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     display.getSelectAll().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        for(T tc : display.getDataProvider().getList()) {
+        for(T tc : display.getDataList()) {
           selectionModel.setSelected(tc, true);
         }
 
@@ -172,7 +172,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
    */
   public List<T> getSelectedItems() {
     List<T> list = new LinkedList<T>();
-    for(T tc : display.getDataProvider().getList()) {
+    for(T tc : display.getDataList()) {
       if(selectionModel.isSelected(tc)) {
         list.add(tc);
       }
@@ -190,7 +190,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     Header<Boolean> checkHeader = new Header<Boolean>(new CheckboxCell(true, true) {
       @Override
       public void render(Context context, Boolean value, SafeHtmlBuilder sb) {
-        if(display.getDataProvider().getList().isEmpty()) {
+        if(display.getDataList().isEmpty()) {
           sb.append(SafeHtmlUtils.fromSafeConstant("<input type=\"checkbox\" tabindex=\"-1\" disabled=\"disabled\"/>"));
         } else {
           super.render(context, value, sb);
@@ -202,7 +202,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
       @Override
       public Boolean getValue() {
         updateStatusAlert();
-        if(display.getDataProvider().getList().isEmpty()) {
+        if(display.getDataList().isEmpty()) {
           return false;
         }
 
@@ -221,7 +221,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
       @Override
       public void update(Boolean value) {
 
-        if(display.getDataProvider().getList().isEmpty()) return;
+        if(display.getDataList().isEmpty()) return;
 
         for(T tc : display.getTable().getVisibleItems()) {
           selectionModel.setSelected(tc, value);
@@ -243,7 +243,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
       return;
 
     int selectedSize = selectionModel.getSelectedSet().size();
-    int count = display.getDataProvider().getList().size();
+    int count = display.getDataList().size();
     boolean allSelected = selectedSize == count;
 
     if(display.getSelectActionsAlert() != null && selectedSize == 0) {
@@ -285,7 +285,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     display.getSelectAll().setVisible(true);
 
     args.clear();
-    args.add(display.getNItemLabel(display.getDataProvider().getList().size()));
+    args.add(display.getNItemLabel(display.getDataList().size()));
     display.getSelectAll().setText(TranslationsUtils.replaceArguments(translations.selectAllNItems(), args));
     display.getClearSelection().setVisible(true);
   }
@@ -293,7 +293,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
   private void doAction() {
     // Count the number of selected items on the current page.
     int nbSelected = selectionModel.getSelectedSet().size();
-    int count = display.getDataProvider().getList().size();
+    int count = display.getDataList().size();
 
     if(display.getSelectActionsAlert() != null) {
       display.getSelectActionsAlert().setVisible(nbSelected > 0);
@@ -343,7 +343,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     /**
      * @return The table data provider
      */
-    ListDataProvider<T> getDataProvider();
+    List<T> getDataList();
 
     /**
      * @return The type name of item

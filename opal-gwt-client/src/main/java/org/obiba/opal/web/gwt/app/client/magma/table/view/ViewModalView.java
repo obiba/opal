@@ -396,8 +396,8 @@ public class ViewModalView extends ModalPopupViewWithUiHandlers<ViewModalUiHandl
     }
 
     @Override
-    public ListDataProvider<TableDto> getDataProvider() {
-      return dataProvider;
+    public List<TableDto> getDataList() {
+      return dataProvider.getList();
     }
 
     @Override

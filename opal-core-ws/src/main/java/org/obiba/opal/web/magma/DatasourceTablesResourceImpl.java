@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 import javax.ws.rs.DELETE;
@@ -42,7 +42,7 @@ import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.security.OpalPermissions;
-import org.obiba.opal.core.service.VCFSamplesMappingService;
+import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
@@ -73,6 +73,9 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
 
   private Set<ValueTableUpdateListener> tableListeners;
 
+  @Autowired
+  protected OpalSearchService opalSearchService;
+
   @Override
   public void setDatasource(Datasource datasource) {
     this.datasource = datasource;
@@ -88,43 +91,38 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
     this.viewManager = viewManager;
   }
 
-  /**
-   * Get the tables of the datasource.
-   *
-   * @param counts Set the count of entities and of variables (default is true).
-   * @param entityType Filter the tables with provided entity type (default is no filter).
-   * @return
-   */
   @Override
-  public List<TableDto> getTables(Request request, boolean counts, @Nullable String entityType) {
-    return getTables(counts, entityType);
+  public List<TableDto> getTables(Request request, boolean counts, @Nullable String entityType, boolean indexedOnly) {
+    return getTables(counts, entityType, indexedOnly);
   }
 
   @Override
-  public List<TableDto> getTables(boolean counts, String entityType) {
+  public List<TableDto> getTables(boolean counts, String entityType, boolean indexedOnly) {
     List<Magma.TableDto> tables = Lists.newArrayList();
     UriBuilder tableLink = UriBuilder.fromPath("/").path(DatasourceResource.class)
         .path(DatasourceResource.class, "getTable");
     UriBuilder viewLink = UriBuilder.fromPath("/").path(DatasourceResource.class)
         .path(DatasourceResource.class, "getView");
-    for(ValueTable valueTable : datasource.getValueTables()) {
-      if(entityType == null || valueTable.getEntityType().equals(entityType)) {
-        TableDto.Builder builder;
-        try {
-          builder = Dtos.asDto(valueTable, counts);
-        } catch(Exception e) {
-          if (counts) {
-            log.warn("Error when evaluating table variables/values counts: " + valueTable.getName(), e);
-            builder = Dtos.asDto(valueTable, true, false);
-          }
-          else throw e;
+    List<ValueTable> filteredTables = datasource.getValueTables().stream()
+        .filter(vt -> entityType == null || vt.getEntityType().equals(entityType))
+        .filter(vt -> !indexedOnly || hasUpToDateIndex(vt))
+        .collect(Collectors.toList());
+    for(ValueTable valueTable : filteredTables) {
+      TableDto.Builder builder;
+      try {
+        builder = Dtos.asDto(valueTable, counts);
+      } catch(Exception e) {
+        if (counts) {
+          log.warn("Error when evaluating table variables/values counts: " + valueTable.getName(), e);
+          builder = Dtos.asDto(valueTable, true, false);
         }
-        builder.setLink(tableLink.build(datasource.getName(), valueTable.getName()).toString());
-        if(valueTable.isView()) {
-          builder.setViewLink(viewLink.build(datasource.getName(), valueTable.getName()).toString());
-        }
-        tables.add(builder.build());
+        else throw e;
       }
+      builder.setLink(tableLink.build(datasource.getName(), valueTable.getName()).toString());
+      if(valueTable.isView()) {
+        builder.setViewLink(viewLink.build(datasource.getName(), valueTable.getName()).toString());
+      }
+      tables.add(builder.build());
     }
     sortByName(tables);
 
@@ -167,12 +165,7 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
   public Response createTable(final TableDto table) {
     if(MagmaEngine.get().hasExtension(MagmaSecurityExtension.class)) {
       return MagmaEngine.get().getExtension(MagmaSecurityExtension.class).getAuthorizer()
-          .silentSudo(new Callable<Response>() {
-            @Override
-            public Response call() throws Exception {
-              return createTableInternal(table);
-            }
-          });
+          .silentSudo(() -> createTableInternal(table));
     }
 
     return createTableInternal(table);
@@ -226,5 +219,11 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
   private void sortByName(List<Magma.TableDto> tables) {
     // sort alphabetically
     Collections.sort(tables, Comparator.comparing(TableDto::getName));
+  }
+
+  private boolean hasUpToDateIndex(ValueTable table) {
+    return opalSearchService.isRunning() && opalSearchService.isEnabled()
+        && opalSearchService.getValuesIndexManager().hasIndex(table)
+        && opalSearchService.getValuesIndexManager().getIndex(table).isUpToDate();
   }
 }

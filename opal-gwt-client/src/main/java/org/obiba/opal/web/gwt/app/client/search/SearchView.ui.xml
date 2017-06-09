@@ -57,6 +57,21 @@
                 </g:FlowPanel>
               </g:FlowPanel>
 
+              <g:FlowPanel ui:field="searchEntitiesAuthorizable">
+                <o:OpalNavLink ui:field="searchEntitiesPlace" icon="COG">
+                  <ui:msg description="Search Entities title">
+                    Search Entities
+                  </ui:msg>
+                </o:OpalNavLink>
+                <g:FlowPanel>
+                  <g:Label styleName="help-block">
+                    <ui:msg description="Search Entities help">
+                      Count entities matching variable criteria across tables
+                    </ui:msg>
+                  </g:Label>
+                </g:FlowPanel>
+              </g:FlowPanel>
+
             </b:NavList>
         </b:Column>
       </b:FluidRow>

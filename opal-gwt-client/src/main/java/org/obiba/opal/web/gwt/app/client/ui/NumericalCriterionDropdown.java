@@ -43,8 +43,8 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
 
   private TextBox values;
 
-  public NumericalCriterionDropdown(VariableDto variableDto, String fieldName, QueryResultDto termDto) {
-    super(variableDto, fieldName, termDto);
+  public NumericalCriterionDropdown(String datasource, String table, VariableDto variableDto, String fieldName, QueryResultDto termDto) {
+    super(datasource, table, variableDto, fieldName, termDto);
   }
 
   @Override

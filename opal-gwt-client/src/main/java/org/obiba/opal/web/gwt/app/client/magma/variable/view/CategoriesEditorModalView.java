@@ -402,8 +402,8 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     }
 
     @Override
-    public ListDataProvider<CategoryDto> getDataProvider() {
-      return dataProvider;
+    public List<CategoryDto> getDataList() {
+      return dataProvider.getList();
     }
 
     @Override

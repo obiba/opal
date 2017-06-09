@@ -10,12 +10,15 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.view;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
+import com.google.common.base.Strings;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomySelectedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularyDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularyUpdatedEvent;
@@ -26,12 +29,9 @@ import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
-import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
-import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
+import org.obiba.opal.web.gwt.app.client.search.event.SearchTaxonomyVariablesEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -41,23 +41,15 @@ import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.opal.TermDto;
 import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
-import com.google.common.base.Strings;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.HasUiHandlers;
-import com.gwtplatform.mvp.client.PresenterWidget;
-import com.gwtplatform.mvp.client.View;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 import static com.google.gwt.http.client.Response.SC_OK;
 import static org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.view.VocabularyPresenter.Display;
 
 public class VocabularyPresenter extends PresenterWidget<Display> implements VocabularyUiHandlers {
-
-  private final PlaceManager placeManager;
 
   private final TranslationMessages translationMessages;
 
@@ -72,11 +64,10 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
   private VocabularyDto vocabulary;
 
   @Inject
-  public VocabularyPresenter(Display display, EventBus eventBus, PlaceManager placeManager,
+  public VocabularyPresenter(Display display, EventBus eventBus,
       TranslationMessages translationMessages, ModalProvider<VocabularyEditModalPresenter> vocabularyEditModalProvider,
       ModalProvider<TermEditModalPresenter> termEditModalProvider) {
     super(eventBus, display);
-    this.placeManager = placeManager;
     this.translationMessages = translationMessages;
     this.vocabularyEditModalProvider = vocabularyEditModalProvider.setContainer(this);
     this.termEditModalProvider = termEditModalProvider.setContainer(this);
@@ -171,15 +162,7 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
 
   @Override
   public void onSearchVariables(String term) {
-    String query = taxonomy.getName() + "-" + vocabulary.getName();
-    if (Strings.isNullOrEmpty(term))
-      query = "_exists_:" + query;
-    else
-      query = query + ":" + term;
-    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.SEARCH_VARIABLES) //
-        .with(ParameterTokens.TOKEN_QUERY, query)  //
-        .build();
-    placeManager.revealPlace(request, false);
+    fireEvent(new SearchTaxonomyVariablesEvent(taxonomy.getName(), vocabulary.getName(), term));
   }
 
   @Override

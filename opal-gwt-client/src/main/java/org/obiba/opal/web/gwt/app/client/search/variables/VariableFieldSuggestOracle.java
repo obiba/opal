@@ -299,7 +299,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     @Override
     public FieldItem getField() {
-      return new FieldItem("datasource", translations.projectLabel());
+      return new FieldItem("project", translations.projectLabel());
     }
   }
 

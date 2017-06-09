@@ -65,6 +65,7 @@ public class CriterionPanel extends FlowPanel {
 
     addStyleName("xsmall-right-indent");
     addStyleName("inline-block");
+    addStyleName("small-top-margin");
   }
 
   public String getQueryString() {
@@ -73,6 +74,10 @@ public class CriterionPanel extends FlowPanel {
 
   public String getQueryText() {
     return criterion.getText();
+  }
+
+  public CriterionDropdown getCriterion() {
+    return criterion;
   }
 }
 

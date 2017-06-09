@@ -320,8 +320,8 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     }
 
     @Override
-    public ListDataProvider<TableIndexStatusDto> getDataProvider() {
-      return dataProvider;
+    public List<TableIndexStatusDto> getDataList() {
+      return dataProvider.getList();
     }
 
     @Override
