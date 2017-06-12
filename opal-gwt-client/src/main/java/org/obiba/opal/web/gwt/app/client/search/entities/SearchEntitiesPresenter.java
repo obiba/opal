@@ -104,14 +104,11 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
   public void prepareFromRequest(PlaceRequest request) {
     selectedType = request.getParameter(ParameterTokens.TOKEN_TYPE, "Participant");
     String jQueries = request.getParameter(ParameterTokens.TOKEN_QUERY, "");
-    tableVariables.clear();
-    entityTypes = null;
-    indexedTables = null;
     queries = null;
     if (!jQueries.isEmpty()) {
       queries = Splitter.on(QUERY_SEP).splitToList(jQueries);
       getView().clearResults(true);
-      searchSelected();
+      searchProvidedQueryIfReady();
     }
     else getView().reset();
   }
@@ -174,6 +171,7 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
   }
 
   private void renderEntityTypes() {
+    if (entityTypes != null) return;
     ResourceRequestBuilderFactory.<JsArray<VariableEntitySummaryDto>>newBuilder()
         .forResource(UriBuilders.DATASOURCES_ENTITY_TYPES.create().build()).get()
         .withCallback(new ResourceCallback<JsArray<VariableEntitySummaryDto>>() {
@@ -190,6 +188,7 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
    * Fetch the tables which values have been indexed.
    */
   private void renderTables() {
+    if (indexedTables != null) return;
     getView().searchEnabled(false);
     ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder()
         .forResource(UriBuilders.DATASOURCES_TABLES.create().query("indexed", "true").query("entityType", selectedType).build())
