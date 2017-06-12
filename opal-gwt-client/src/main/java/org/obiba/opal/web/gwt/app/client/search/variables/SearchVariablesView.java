@@ -228,6 +228,12 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     });
     queryTypeahead.setDisplayItemCount(15);
     queryTypeahead.setMinLength(2);
+    queryTypeahead.setMatcherCallback(new Typeahead.MatcherCallback() {
+      @Override
+      public boolean compareQueryToItem(String query, String item) {
+        return true;
+      }
+    });
   }
 
   private class VariableFieldFacetHandler implements SearchVariablesUiHandlers.FacetHandler {

@@ -109,6 +109,12 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
         return "";
       }
     });
+    variableTypeahead.setMatcherCallback(new Typeahead.MatcherCallback() {
+      @Override
+      public boolean compareQueryToItem(String query, String item) {
+        return true;
+      }
+    });
   }
 
   @Override

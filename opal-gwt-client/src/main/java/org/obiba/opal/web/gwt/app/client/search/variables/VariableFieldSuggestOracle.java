@@ -11,6 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.search.variables;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -95,6 +96,32 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     Response response = new Response(candidates);
     response.setMoreSuggestionsCount(Math.max(0, candidates.size() - limit));
     callback.onSuggestionsReady(request, response);
+  }
+
+  /**
+   * Query string is split in multiple words, all matches is expected, minus prefix inverse the condition.
+   *
+   * @param ref
+   * @param query
+   * @return
+   */
+  private static boolean isCandidate(String ref, String query) {
+    String rep = ref.toLowerCase();
+    for (String token : Splitter.on(" ").splitToList(query)) {
+      String nQuery = token.trim().toLowerCase();
+      boolean not = false;
+      if (nQuery.startsWith("-")) {
+        not = true;
+        nQuery = nQuery.substring(1);
+      }
+      if (!nQuery.isEmpty()) {
+        if (not) {
+          if (rep.contains(nQuery)) return false;
+        }
+        else if (!rep.contains(nQuery)) return false;
+      }
+    }
+    return true;
   }
 
   private void initPropertySuggestions() {
@@ -232,7 +259,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     @Override
     public boolean isCandidate(String query) {
-      return getReplacementString().toLowerCase().contains(query.toLowerCase());
+      return VariableFieldSuggestOracle.isCandidate(getReplacementString(), query);
     }
 
     private String escape(String value) {
@@ -257,8 +284,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     @Override
     public boolean isCandidate(String query) {
-      //GWT.log("'" + getReplacementString().toLowerCase() + "' '" + escape(query.toLowerCase()) + "'");
-      return getReplacementString().toLowerCase().contains(query.toLowerCase());
+      return VariableFieldSuggestOracle.isCandidate(getReplacementString(), query);
     }
 
     @Override
@@ -359,6 +385,8 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     private final TermDto term;
 
+    private String stringToMatch;
+
     private TermSuggestion(TaxonomyDto taxonomy, VocabularyDto vocabulary, TermDto term) {
       this.taxonomy = taxonomy;
       this.vocabulary = vocabulary;
@@ -390,11 +418,12 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     @Override
     public boolean isCandidate(String query) {
-      String nQuery = query.toLowerCase();
-      return getReplacementString().toLowerCase().contains(nQuery)
-          || getLocaleText(term.getTitleArray()).toLowerCase().contains(nQuery)
-          || getLocaleText(term.getDescriptionArray()).toLowerCase().contains(nQuery)
-          || getLocaleText(term.getKeywordsArray()).toLowerCase().contains(nQuery);
+      if (Strings.isNullOrEmpty(stringToMatch)) {
+        stringToMatch = Joiner.on(" ").join(Lists.newArrayList(getReplacementString(),
+            getLocaleText(term.getTitleArray()), getLocaleText(term.getDescriptionArray()),
+            getLocaleText(term.getKeywordsArray()), getLocaleText(vocabulary.getTitleArray()), getLocaleText(taxonomy.getTitleArray())));
+      }
+      return VariableFieldSuggestOracle.isCandidate(stringToMatch, query);
     }
 
     @Override
@@ -424,4 +453,6 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
       return "";
     }
   }
+
+
 }
