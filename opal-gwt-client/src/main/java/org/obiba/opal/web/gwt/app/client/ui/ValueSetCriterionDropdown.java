@@ -134,7 +134,7 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
         if(queryResult.getFacetsArray().get(0).hasStatistics()) {
           // Statistics facet
           nb += queryResult.getFacetsArray().get(0).getStatistics().getCount();
-        } else {
+        } else if (queryResult.getFacetsArray().get(0).getFrequenciesArray() != null) {
           // Categories frequency facet
           for(int i = 0; i < queryResult.getFacetsArray().get(0).getFrequenciesArray().length(); i++) {
             nb += queryResult.getFacetsArray().get(0).getFrequenciesArray().get(i).getCount();

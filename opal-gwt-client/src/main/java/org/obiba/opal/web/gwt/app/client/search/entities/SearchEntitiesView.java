@@ -167,7 +167,6 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
     List<String> queries = criteriaPanel.getQueryStrings();
     List<CriterionDropdown> criterions = criteriaPanel.getCriterions();
     if (criterions.isEmpty()) {
-      // TODO queries were provided, criterions are to be added accordingly
       refreshPending.setVisible(false);
       return;
     }
