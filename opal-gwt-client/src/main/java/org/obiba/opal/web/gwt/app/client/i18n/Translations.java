@@ -2183,6 +2183,7 @@ public interface Translations extends Constants {
       "min", "Min",//
       "max", "Max", //
       "values", "Values", //
+      "matches", "Matches", //
       "select_operator", "Select an operator...",//
       "in", "In", //
       "not_in", "Not in",//

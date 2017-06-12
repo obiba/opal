@@ -15,6 +15,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -40,10 +41,7 @@ import org.obiba.opal.web.gwt.app.client.support.JsOpalMap;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtoNature;
 import org.obiba.opal.web.gwt.app.client.ui.ValueSetVariableCriterion;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableEntitySummaryDto;
@@ -109,13 +107,13 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
     tableVariables.clear();
     entityTypes = null;
     indexedTables = null;
+    queries = null;
     if (!jQueries.isEmpty()) {
       queries = Splitter.on(QUERY_SEP).splitToList(jQueries);
       getView().clearResults(true);
       searchSelected();
-    } else {
-      getView().reset();
     }
+    else getView().reset();
   }
 
   @Override
@@ -159,6 +157,13 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
     for (String query : queries) builder.query("query", query);
     ResourceRequestBuilderFactory.<EntitiesResultDto>newBuilder()
         .forResource(builder.build())
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            // ignore
+            getView().clearResults(false);
+          }
+        }, Response.SC_BAD_REQUEST)
         .withCallback(new ResourceCallback<EntitiesResultDto>() {
           @Override
           public void onResource(Response response, EntitiesResultDto resource) {

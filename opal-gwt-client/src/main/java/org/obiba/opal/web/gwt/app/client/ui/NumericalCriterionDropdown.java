@@ -179,14 +179,6 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
     return panel;
   }
 
-  private ControlGroup createControlGroup(ControlLabel label, TextBox textBox) {
-    ControlGroup c = new ControlGroup();
-    c.addStyleName("inline-block");
-    c.add(label);
-    c.add(textBox);
-    return c;
-  }
-
   private FlowPanel getRangeValuesChooserPanel() {
     FlowPanel panel = new FlowPanel();
 

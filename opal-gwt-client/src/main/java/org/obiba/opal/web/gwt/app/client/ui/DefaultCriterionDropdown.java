@@ -10,23 +10,24 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
-import com.github.gwtbootstrap.client.ui.*;
+import com.github.gwtbootstrap.client.ui.CheckBox;
+import com.github.gwtbootstrap.client.ui.ControlLabel;
+import com.github.gwtbootstrap.client.ui.RadioButton;
+import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.common.base.Joiner;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown {
 
-  private TextBox matches;
+  private Panel valuesPanel;
 
-  private HelpBlock matchesHelp;
-
-  private ControlLabel valuesLabel;
   private TextBox values;
 
   public DefaultCriterionDropdown(String datasource, String table, VariableDto variableDto, String fieldName) {
@@ -35,38 +36,29 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
 
   public DefaultCriterionDropdown(ValueSetVariableCriterion criterion) {
     this(criterion.getDatasourceName(), criterion.getTableName(), criterion.getVariable(), criterion.getField());
+    initialize(criterion);
   }
 
   @Override
   public Widget createSpecificControls() {
-
-    valuesLabel = new ControlLabel();
-    values = new TextBox();
-    values.addStyleName("bordered");
-
-    initValuesControls();
-    updateRadioButtons();
-
     ListItem specificControls = new ListItem();
-    matches = new TextBox();
-    matches.addStyleName("bordered");
-    matchesHelp = new HelpBlock(translations.criterionFiltersMap().get("wildcards_help"));
     specificControls.addStyleName("controls");
 
-    matches.setPlaceholder(translations.criterionFiltersMap().get("custom_match_query"));
-    matches.addKeyUpHandler(new KeyUpHandler() {
+    valuesPanel = new FlowPanel();
+    ControlLabel valuesLabel = new ControlLabel(translations.criterionFiltersMap().get("values"));
+    values = new TextBox();
+    values.setText("*");
+    values.addStyleName("bordered");
+    values.addKeyUpHandler(new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent event) {
         updateMatchCriteriaFilter();
       }
     });
-    matches.setVisible(false);
-    matchesHelp.setVisible(false);
+    valuesPanel.add(createControlGroup(valuesLabel, values));
+    updateRadioButtons();
 
-    specificControls.add(getValuesPanel());
-
-    specificControls.add(matches);
-    specificControls.add(matchesHelp);
+    specificControls.add(valuesPanel);
 
     updateControls();
     return specificControls;
@@ -74,14 +66,6 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
 
   private void updateRadioButtons() {
     // Update radio controls
-    RadioButton like = createRadioButton(translations.criterionFiltersMap().get("like"), null);
-    like.addClickHandler(new OperatorClickHandler());
-    radioControls.add(like);
-
-    RadioButton not_like = createRadioButton(translations.criterionFiltersMap().get("not_like"), null);
-    not_like.addClickHandler(new OperatorClickHandler());
-    radioControls.add(not_like);
-
     RadioButton in = createRadioButton(translations.criterionFiltersMap().get("in"), null);
     in.addClickHandler(new OperatorClickHandler());
     radioControls.add(in);
@@ -93,25 +77,17 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
 
   @Override
   public void resetSpecificControls() {
-    matches.setVisible(false);
-    matchesHelp.setVisible(false);
-    valuesLabel.setVisible(false);
-    values.setVisible(false);
-    if (divider != null) divider.setVisible(false);
+    valuesPanel.setVisible(false);
+    if (divider != null) {
+      divider.setVisible(false);
+      doFilter();
+    }
   }
 
   @Override
   public String getQueryString() {
     String emptyNotEmpty = super.getQueryString();
     if (emptyNotEmpty != null) return emptyNotEmpty;
-
-    if (isLikeSelected() && !matches.getText().isEmpty()) {
-      return fieldName + ":" + matches.getText();
-    }
-
-    if (isNotLikeSelected() && !matches.getText().isEmpty()) {
-      return "NOT " + fieldName + ":" + matches.getText();
-    }
 
     if (!values.getText().isEmpty()) {
       String[] vals = values.getText().trim().split(",");
@@ -126,42 +102,59 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
     return null;
   }
 
-  private boolean isLikeSelected() {
-    return isCheckSelected(3);
+  private void initialize(ValueSetVariableCriterion criterion) {
+    if ("*".equals(criterion.getValue())) {
+      if (criterion.isNot()) {
+        ((CheckBox) radioControls.getWidget(3)).setValue(true);
+        valuesPanel.setVisible(false);
+        divider.setVisible(true);
+      }
+    } else if (criterion.hasValue()) {
+      ((CheckBox) radioControls.getWidget(criterion.isNot() ? 4 : 3)).setValue(true);
+      boolean isIn = criterion.getValue().startsWith("(") && criterion.getValue().endsWith(")");
+      if (isIn)
+        values.setText(criterion.getValue().substring(1, criterion.getValue().length() - 1));
+      else
+        values.setText(criterion.getValue());
+      valuesPanel.setVisible(true);
+      divider.setVisible(true);
+    } else if (criterion.isExists())
+      ((CheckBox) radioControls.getWidget(criterion.isNot() ? 1 : 2)).setValue(true);
   }
 
-  private boolean isNotLikeSelected() {
-    return isCheckSelected(4);
+  private boolean isValuesSelected() {
+    return isInSelected() || isNotInSelected();
   }
 
   private boolean isInSelected() {
-    return isCheckSelected(5);
+    return isCheckSelected(3);
   }
 
   private boolean isNotInSelected() {
-    return isCheckSelected(6);
+    return isCheckSelected(4);
   }
 
   private boolean isCheckSelected(int idx) {
+    //GWT.log("isCheckSelected(" + idx + ")=" + ((CheckBox) radioControls.getWidget(idx)).getValue());
     return ((CheckBox) radioControls.getWidget(idx)).getValue();
   }
 
   private void updateMatchCriteriaFilter() {
-    setFilterText();
-    doFilter();
+    if (isValuesSelected()) {
+      if (!values.getValue().isEmpty()) {
+        setFilterText();
+        doFilter();
+      }
+    } else {
+      setFilterText();
+      doFilter();
+    }
   }
 
   private void setFilterText() {
-
     String op = null;
     String value = null;
-    if (isLikeSelected()) {
-      op = translations.criterionFiltersMap().get("like");
-      value = matches.getText();
-    } else if (isNotLikeSelected()) {
-      op = translations.criterionFiltersMap().get("not_like");
-      value = matches.getText();
-    } else if (isInSelected()) {
+    if (isInSelected()) {
       op = translations.criterionFiltersMap().get("in");
       value = "(" + values.getText() + ")";
     } else if (isNotInSelected()) {
@@ -176,41 +169,10 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
     }
   }
 
-  private void initValuesControls() {
-    valuesLabel = new ControlLabel(translations.criterionFiltersMap().get("values"));
-    values.addKeyUpHandler(new KeyUpHandler() {
-      @Override
-      public void onKeyUp(KeyUpEvent event) {
-        updateMatchCriteriaFilter();
-      }
-    });
-  }
-
-  private Widget getValuesPanel() {
-    FlowPanel panel = new FlowPanel();
-
-    panel.add(createControlGroup(valuesLabel, values));
-
-    return panel;
-  }
-
-  private ControlGroup createControlGroup(ControlLabel label, TextBox textBox) {
-    ControlGroup c = new ControlGroup();
-    c.addStyleName("inline-block");
-    c.add(label);
-    c.add(textBox);
-    return c;
-  }
-
   private void updateControls() {
-    boolean likeBased = isLikeSelected() || isNotLikeSelected();
-    boolean inBased = isInSelected() || isNotInSelected();
-    matches.setVisible(likeBased);
-    matchesHelp.setVisible(likeBased);
-    valuesLabel.setVisible(inBased);
-    values.setVisible(inBased);
-    if (divider != null) divider.setVisible(inBased || likeBased);
-    setFilterText();
+    valuesPanel.setVisible(isValuesSelected());
+    if (divider != null) divider.setVisible(isValuesSelected());
+    updateMatchCriteriaFilter();
   }
 
   private class OperatorClickHandler implements ClickHandler {

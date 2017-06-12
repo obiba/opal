@@ -11,7 +11,10 @@
 package org.obiba.opal.web.gwt.app.client.ui;
 
 import java.util.Date;
+import java.util.List;
 
+import com.google.common.base.Splitter;
+import com.google.gwt.core.client.GWT;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.github.gwtbootstrap.client.ui.CheckBox;
@@ -34,15 +37,15 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
 
   private Chooser rangeValueChooser;
 
-  private ControlLabel fromLabel;
+  private ControlGroup fromGroup;
 
   private DateBoxAppended from;
 
-  private ControlLabel toLabel;
+  private ControlGroup toGroup;
 
   private DateBoxAppended to;
 
-  private ControlLabel dateLabel;
+  private ControlGroup dateGroup;
 
   private DateBoxAppended date;
 
@@ -52,6 +55,7 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
 
   public DateTimeCriterionDropdown(ValueSetVariableCriterion criterion) {
     this(criterion.getDatasourceName(), criterion.getTableName(), criterion.getVariable(), criterion.getField());
+    initialize(criterion);
   }
 
   @Override
@@ -61,13 +65,8 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
     ListItem specificControls = new ListItem();
     rangeValueChooser = new Chooser();
 
-    fromLabel = new ControlLabel(translations.criterionFiltersMap().get("from"));
     from = createDateBoxAppended();
-
-    toLabel = new ControlLabel(translations.criterionFiltersMap().get("to"));
     to = createDateBoxAppended();
-
-    dateLabel = new ControlLabel(translations.criterionFiltersMap().get("date"));
     date = createDateBoxAppended();
 
     specificControls.addStyleName("controls");
@@ -76,6 +75,63 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
 
     resetSpecificControls();
     return specificControls;
+  }
+
+  private void initialize(ValueSetVariableCriterion criterion) {
+    if ("*".equals(criterion.getValue())) {
+      if (criterion.isNot()) {
+        ((CheckBox) radioControls.getWidget(3)).setValue(true);
+        updateRangeValuesFields();
+        divider.setVisible(true);
+      }
+    }
+    else if (criterion.hasValue()) {
+      selectRangeOrValues(criterion.getValue());
+      ((CheckBox)radioControls.getWidget(criterion.isNot() ? 4 : 3)).setValue(true);
+      updateRangeValuesFields();
+      divider.setVisible(true);
+    }
+    else if (criterion.isExists())
+      ((CheckBox)radioControls.getWidget(criterion.isNot() ? 1 : 2)).setValue(true);
+    setFilterText();
+    doFilter();
+  }
+
+  private void selectRangeOrValues(String valueString) {
+    if (valueString.startsWith("[") && valueString.endsWith("]")) {
+      rangeValueChooser.setSelectedIndex(0);
+      String nValues = valueString.substring(1, valueString.length() - 1);
+      List<String> minMax = Splitter.on(" TO ").splitToList(nValues);
+      Date minDate = null;
+      Date maxDate = null;
+      if (!"*".equals(minMax.get(0))) minDate = getDate(minMax.get(0));
+      if (!"*".equals(minMax.get(1))) maxDate = getDate(minMax.get(1));
+
+      if (minDate != null) from.setValue(minDate);
+      if (maxDate != null) to.setValue(maxDate);
+    }
+    else if (valueString.startsWith("(") && valueString.endsWith(")")) {
+      rangeValueChooser.setSelectedIndex(1);
+      String nValues = valueString.substring(1, valueString.length() - 1);
+      List<String> minMax = Splitter.on(" AND ").splitToList(nValues);
+      Date minDate = null;
+      Date maxDate = null;
+      if (!"*".equals(minMax.get(0))) minDate = getDate(minMax.get(0));
+      if (!"*".equals(minMax.get(1))) maxDate = getDate(minMax.get(1));
+      if (minDate != null && maxDate != null) date.setValue(minDate);
+    }
+  }
+
+  public Date getDate(String dateString) {
+    String nDate = dateString.replaceAll("<=", "").replaceAll(">=", "");
+    Date result = null;
+    try {
+      DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat("yyyy-MM-dd");
+      result = dateTimeFormat.parse(nDate);
+    } catch (Exception e) {
+      // ignore
+    }
+    return result;
   }
 
   private void updateRadioButtons() {
@@ -111,25 +167,29 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
   private Widget getRangeValuePanel() {
     FlowPanel panel = new FlowPanel();
 
-    ControlGroup c = new ControlGroup();
-    c.addStyleName("inline-block");
-    c.add(fromLabel);
-    c.add(from);
+    ControlLabel fromLabel = new ControlLabel(translations.criterionFiltersMap().get("from"));
+    ControlLabel toLabel = new ControlLabel(translations.criterionFiltersMap().get("to"));
+    ControlLabel dateLabel = new ControlLabel(translations.criterionFiltersMap().get("date"));
 
-    ControlGroup c2 = new ControlGroup();
-    c2.addStyleName("inline-block");
-    c2.addStyleName("large-dual-indent");
-    c2.add(toLabel);
-    c2.add(to);
+    fromGroup = new ControlGroup();
+    fromGroup.addStyleName("inline-block");
+    fromGroup.add(fromLabel);
+    fromGroup.add(from);
 
-    ControlGroup c3 = new ControlGroup();
-    c3.addStyleName("inline-block");
-    c3.add(dateLabel);
-    c3.add(date);
+    toGroup = new ControlGroup();
+    toGroup.addStyleName("inline-block");
+    toGroup.addStyleName("large-dual-indent");
+    toGroup.add(toLabel);
+    toGroup.add(to);
 
-    panel.add(c);
-    panel.add(c2);
-    panel.add(c3);
+    dateGroup = new ControlGroup();
+    dateGroup.addStyleName("inline-block");
+    dateGroup.add(dateLabel);
+    dateGroup.add(date);
+
+    panel.add(fromGroup);
+    panel.add(toGroup);
+    panel.add(dateGroup);
 
     return panel;
   }
@@ -147,12 +207,13 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
   @Override
   public void resetSpecificControls() {
     rangeValueChooser.setVisible(false);
-    from.setVisible(false);
-    fromLabel.setVisible(false);
-    to.setVisible(false);
-    toLabel.setVisible(false);
-    dateLabel.setVisible(false);
-    date.setVisible(false);
+    fromGroup.setVisible(false);
+    toGroup.setVisible(false);
+    dateGroup.setVisible(false);
+    if (divider != null) {
+      divider.setVisible(false);
+      doFilter();
+    }
   }
 
   @Override
@@ -187,14 +248,14 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
         ? translations.criterionFiltersMap().get("in")
         : translations.criterionFiltersMap().get("not_in");
 
-    filter += " " + rangeValueChooser.getItemText(rangeValueChooser.getSelectedIndex()).toLowerCase();
+    //filter += " " + rangeValueChooser.getItemText(rangeValueChooser.getSelectedIndex()).toLowerCase();
 
     DateTimeFormat df = DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_MEDIUM);
     filter += rangeValueChooser.isItemSelected(0)
         ? " [" + (from.getValue() == null ? "*" : df.format(from.getValue())) + " " +
         translations.criterionFiltersMap().get("to") + " " +
         (to.getValue() == null ? "*" : df.format(to.getValue())) + "]"
-        : "(" + (date.getValue() == null ? "" : df.format(date.getValue())) + ")";
+        : " (" + (date.getValue() == null ? "" : df.format(date.getValue())) + ")";
 
     setText(filter);
   }
@@ -210,12 +271,10 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
 
   private void updateRangeValuesFields() {
     boolean rangeSelected = rangeValueChooser.isItemSelected(0);
-    fromLabel.setVisible(rangeSelected);
-    from.setVisible(rangeSelected);
-    toLabel.setVisible(rangeSelected);
-    to.setVisible(rangeSelected);
-    dateLabel.setVisible(!rangeSelected);
-    date.setVisible(!rangeSelected);
+    rangeValueChooser.setVisible(true);
+    fromGroup.setVisible(rangeSelected);
+    toGroup.setVisible(rangeSelected);
+    dateGroup.setVisible(!rangeSelected);
   }
 
   private class OperatorClickHandler implements ClickHandler {
@@ -225,6 +284,7 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
       rangeValueChooser.setVisible(true);
       updateRangeValuesFields();
       setFilterText();
+      doFilter();
     }
   }
 

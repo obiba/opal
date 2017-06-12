@@ -10,8 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
-import com.github.gwtbootstrap.client.ui.Icon;
-import com.github.gwtbootstrap.client.ui.RadioButton;
+import com.github.gwtbootstrap.client.ui.*;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.collect.Lists;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -104,6 +103,14 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
 
   protected String getHeaderTitle() {
     return getVariableLabel();
+  }
+
+  protected ControlGroup createControlGroup(ControlLabel label, TextBox textBox) {
+    ControlGroup c = new ControlGroup();
+    c.addStyleName("inline-block");
+    c.add(label);
+    c.add(textBox);
+    return c;
   }
 
   private String getVariableLabel() {
