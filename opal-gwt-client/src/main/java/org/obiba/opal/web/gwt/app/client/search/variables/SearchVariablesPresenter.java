@@ -120,6 +120,16 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
   }
 
   @Override
+  public void onClear() {
+    query = null;
+    PlaceRequest.Builder builder = PlaceRequestHelper.createRequestBuilder(placeManager.getCurrentPlaceRequest())
+        .without(ParameterTokens.TOKEN_QUERY)
+        .without(ParameterTokens.TOKEN_OFFSET)
+        .without(ParameterTokens.TOKEN_LIMIT);
+    placeManager.updateHistory(builder.build(), true);
+  }
+
+  @Override
   public void onFacet(String field, int size, FacetHandler handler) {
     facet(field, size, handler);
   }

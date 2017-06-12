@@ -10,7 +10,9 @@
 
 package org.obiba.opal.web.gwt.app.client.search.entities;
 
-import com.google.common.base.Strings;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
@@ -25,6 +27,7 @@ import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
@@ -36,6 +39,7 @@ import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.support.JsOpalMap;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtoNature;
+import org.obiba.opal.web.gwt.app.client.ui.ValueSetVariableCriterion;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
@@ -55,6 +59,8 @@ import static org.obiba.opal.web.gwt.app.client.support.VariableDtoNature.*;
 public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.Display, SearchEntitiesPresenter.Proxy>
     implements HasPageTitle, SearchEntitiesUiHandlers {
 
+  public static final String QUERY_SEP = "#";
+
   private final Translations translations;
 
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
@@ -64,6 +70,8 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
   private String selectedType;
 
   private List<String> queries;
+
+  private List<VariableEntitySummaryDto> entityTypes;
 
   private List<TableDto> indexedTables;
 
@@ -97,27 +105,41 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
   @Override
   public void prepareFromRequest(PlaceRequest request) {
     selectedType = request.getParameter(ParameterTokens.TOKEN_TYPE, "Participant");
-    //query = request.getParameter(ParameterTokens.TOKEN_QUERY, null);
+    String jQueries = request.getParameter(ParameterTokens.TOKEN_QUERY, "");
     tableVariables.clear();
+    entityTypes = null;
     indexedTables = null;
-    getView().reset();
+    if (!jQueries.isEmpty()) {
+      queries = Splitter.on(QUERY_SEP).splitToList(jQueries);
+      getView().clearResults(true);
+      searchSelected();
+    } else {
+      getView().reset();
+    }
+  }
+
+  @Override
+  public void onClear() {
+    queries.clear();
+    updateHistory();
   }
 
   @Override
   public void onSearch(String entityType, List<String> queries) {
     selectedType = entityType;
     this.queries = queries;
-    //GWT.log("onSearch=" + selectedType + ":" + query + ":" + query);
-    getView().clearResults(true);
-    searchSelected();
+    if (queries.isEmpty()) updateHistory();
+    else {
+      getView().clearResults(true);
+      searchSelected();
+    }
   }
 
   @Override
   public void onVariableFilter(final String datasource, final String table, final String variable) {
-// Fetch variable and show its filter
     ResourceRequestBuilderFactory.<VariableDto>newBuilder().forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
         .build(datasource, table, variable))
-        .withCallback(new VariableFieldProcessor(datasource, table)).get().send();
+        .withCallback(new VariableFilterProcessor(datasource, table)).get().send();
   }
 
   //
@@ -127,6 +149,8 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
   private void updateHistory() {
     PlaceRequest.Builder builder = PlaceRequestHelper.createRequestBuilder(placeManager.getCurrentPlaceRequest())
         .with(ParameterTokens.TOKEN_TYPE, selectedType);
+    if (queries.isEmpty()) builder.without(ParameterTokens.TOKEN_QUERY);
+    else builder.with(ParameterTokens.TOKEN_QUERY, Joiner.on(QUERY_SEP).join(queries));
     placeManager.updateHistory(builder.build(), true);
   }
 
@@ -150,7 +174,9 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
         .withCallback(new ResourceCallback<JsArray<VariableEntitySummaryDto>>() {
           @Override
           public void onResource(Response response, JsArray<VariableEntitySummaryDto> resource) {
-            getView().setEntityTypes(JsArrays.toList(resource), selectedType);
+            entityTypes = JsArrays.toList(resource);
+            getView().setEntityTypes(entityTypes, selectedType);
+            searchProvidedQueryIfReady();
           }
         }).send();
   }
@@ -159,15 +185,47 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
    * Fetch the tables which values have been indexed.
    */
   private void renderTables() {
+    getView().searchEnabled(false);
     ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder()
         .forResource(UriBuilders.DATASOURCES_TABLES.create().query("indexed", "true").query("entityType", selectedType).build())
         .withCallback(new ResourceCallback<JsArray<TableDto>>() {
           @Override
           public void onResource(Response response, JsArray<TableDto> resource) {
             indexedTables = JsArrays.toList(resource);
-            getView().setIndexedTables(indexedTables);
+            if (indexedTables.isEmpty()) {
+              getView().searchEnabled(false);
+              fireEvent(NotificationEvent.newBuilder().error("NoTableIndexed").build());
+            } else {
+              getView().searchEnabled(true);
+              getView().setIndexedTables(indexedTables);
+              searchProvidedQueryIfReady();
+            }
           }
         }).get().send();
+  }
+
+  private void searchProvidedQueryIfReady() {
+    getView().reset();
+    // any provided query
+    if (queries == null || queries.isEmpty()) return;
+    // view init is completed
+    if (indexedTables == null || entityTypes == null) return;
+    List<String> validQueries = Lists.newArrayList();
+    for (String query : queries) {
+      ValueSetVariableCriterion parser = new ValueSetVariableCriterion(query);
+      if (parser.isValid()) {
+        validQueries.add(query);
+        renderVariableFilter(parser);
+      }
+    }
+    queries = validQueries;
+    searchSelected();
+  }
+
+  private void renderVariableFilter(final ValueSetVariableCriterion filter) {
+    ResourceRequestBuilderFactory.<VariableDto>newBuilder().forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
+        .build(filter.getDatasourceName(), filter.getTableName(), filter.getVariableName()))
+        .withCallback(new VariableFilterProcessor(filter)).get().send();
   }
 
   private String asTableReference(String datasource, String table) {
@@ -193,71 +251,89 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
 
     void reset();
 
-    void addCategoricalVariableFilter(String datasource, String table, VariableDto variable, String fieldName, QueryResultDto facet);
+    void addCategoricalCriterion(ValueSetVariableCriterion filter, QueryResultDto facet);
 
-    void addNumericalVariableFilter(String datasource, String table, VariableDto variable, String fieldName, QueryResultDto facet);
+    void addNumericalCriterion(ValueSetVariableCriterion filter, QueryResultDto facet);
 
-    void addDateVariableFilter(String datasource, String table, VariableDto variable, String fieldName);
+    void addDateCriterion(ValueSetVariableCriterion filter);
 
-    void addDefaultVariableFilter(String datasource, String table, VariableDto variable, String fieldName);
+    void addDefaultCriterion(ValueSetVariableCriterion filter);
 
     void showResults(EntitiesResultDto results);
+
+    void searchEnabled(boolean enabled);
   }
 
-  private class VariableFieldProcessor implements ResourceCallback<VariableDto> {
+  private class VariableFilterProcessor implements ResourceCallback<VariableDto> {
     private final String datasource;
     private final String table;
+    private ValueSetVariableCriterion criterion;
 
-    public VariableFieldProcessor(String datasource, String table) {
+    public VariableFilterProcessor(String datasource, String table) {
       this.datasource = datasource;
       this.table = table;
     }
 
+    public VariableFilterProcessor(ValueSetVariableCriterion criterion) {
+      this.datasource = criterion.getDatasourceName();
+      this.table = criterion.getTableName();
+      this.criterion = criterion;
+    }
+
     @Override
     public void onResource(Response response, VariableDto resource) {
-      if (tableIndexSchemas.containsKey(asTableReference(datasource, table)))
-        addVariableCriterion(datasource, table, resource);
+      if (criterion != null) {
+        criterion.setVariable(resource);
+        addVariableCriterion();
+      }
+      else if (tableIndexSchemas.containsKey(asTableReference(datasource, table)))
+        addVariableCriterion(resource);
       else
-        addIndexSchemaAndVariableCriterion(datasource, table, resource);
+        addIndexSchemaAndVariableCriterion(resource);
     }
-  }
 
-  private void addIndexSchemaAndVariableCriterion(final String datasource, final String table, final VariableDto variableDto) {
-    // Fetch variable-field mapping for ES queries
-    ResourceRequestBuilderFactory.<OpalMap>newBuilder().forResource(
-        UriBuilders.DATASOURCE_TABLE_INDEX_SCHEMA.create()
-            .build(datasource, table))
-        .withCallback(new ResourceCallback<OpalMap>() {
-          @Override
-          public void onResource(Response response, OpalMap resource) {
-            if(response.getStatusCode() == Response.SC_OK) {
-              tableIndexSchemas.put(asTableReference(datasource, table), new JsOpalMap(resource));
-              addVariableCriterion(datasource, table, variableDto);
-            }
-          }
-        }).get().send();
-  }
-
-  private void addVariableCriterion(final String datasource, final String table, final VariableDto variable) {
-    final String fieldName = tableIndexSchemas.get(asTableReference(datasource, table)).getValue(variable.getName());
-    final VariableDtoNature nature = getNature(variable);
-    if(nature == CONTINUOUS || nature == CATEGORICAL) {
-      // Filter for Categorical variable OR Numerical variable
-      ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(
-          UriBuilders.DATASOURCE_TABLE_FACET_VARIABLE_SEARCH.create()
-              .build(datasource, table, variable.getName()))
-          .withCallback(new ResourceCallback<QueryResultDto>() {
+    private void addIndexSchemaAndVariableCriterion(final VariableDto variableDto) {
+      // Fetch variable-field mapping for ES queries
+      ResourceRequestBuilderFactory.<OpalMap>newBuilder().forResource(
+          UriBuilders.DATASOURCE_TABLE_INDEX_SCHEMA.create()
+              .build(datasource, table))
+          .withCallback(new ResourceCallback<OpalMap>() {
             @Override
-            public void onResource(Response response, QueryResultDto resource) {
-              if(nature == CONTINUOUS)
-                getView().addNumericalVariableFilter(datasource, table, variable, fieldName, resource);
-              else
-                getView().addCategoricalVariableFilter(datasource, table, variable, fieldName, resource);
+            public void onResource(Response response, OpalMap resource) {
+              if (response.getStatusCode() == Response.SC_OK) {
+                tableIndexSchemas.put(asTableReference(datasource, table), new JsOpalMap(resource));
+                addVariableCriterion(variableDto);
+              }
             }
           }).get().send();
     }
-    else if(nature == TEMPORAL) getView().addDateVariableFilter(datasource, table, variable, fieldName);
-    else getView().addDefaultVariableFilter(datasource, table, variable, fieldName);
+
+    private void addVariableCriterion(VariableDto variable) {
+      this.criterion = new ValueSetVariableCriterion(datasource, table, variable,
+          tableIndexSchemas.get(asTableReference(datasource, table)).getValue(variable.getName()));
+      addVariableCriterion();
+    }
+
+    private void addVariableCriterion() {
+      final VariableDtoNature nature = criterion.getNature();
+      if (nature == CONTINUOUS || nature == CATEGORICAL) {
+        // Filter for Categorical variable OR Numerical variable
+        ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(
+            UriBuilders.DATASOURCE_TABLE_FACET_VARIABLE_SEARCH.create()
+                .build(datasource, table, criterion.getVariableName()))
+            .withCallback(new ResourceCallback<QueryResultDto>() {
+              @Override
+              public void onResource(Response response, QueryResultDto resource) {
+                if (nature == CONTINUOUS)
+                  getView().addNumericalCriterion(criterion, resource);
+                else
+                  getView().addCategoricalCriterion(criterion, resource);
+              }
+            }).get().send();
+      }
+      else if (nature == TEMPORAL) getView().addDateCriterion(criterion);
+      else getView().addDefaultCriterion(criterion);
+    }
   }
 
 }

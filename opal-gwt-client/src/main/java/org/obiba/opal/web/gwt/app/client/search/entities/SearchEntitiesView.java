@@ -11,6 +11,8 @@
 package org.obiba.opal.web.gwt.app.client.search.entities;
 
 import com.github.gwtbootstrap.client.ui.*;
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Strings;
@@ -59,6 +61,12 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
 
   @UiField(provided = true)
   Typeahead variableTypeahead;
+
+  @UiField
+  TextBox variableInput;
+
+  @UiField
+  Button searchButton;
 
   @UiField
   Panel entityResultPanel;
@@ -110,17 +118,26 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
 
   @UiHandler("searchButton")
   public void onSearch(ClickEvent event) {
+    if (!searchButton.isEnabled()) return;
     List<String> queries = criteriaPanel.getQueryStrings();
-    if (queries.isEmpty()) {
-      reset();
-      return;
-    }
+    if (queries.isEmpty()) reset();
     getUiHandlers().onSearch(typeDropdown.getSelection(), queries);
+  }
+
+  @UiHandler("clearButton")
+  public void onClear(ClickEvent event) {
+    reset();
+    getUiHandlers().onClear();
   }
 
   @Override
   public void setIndexedTables(List<TableDto> tables) {
     oracle.setIndexedTables(tables);
+  }
+
+  @Override
+  public void searchEnabled(boolean enabled) {
+    searchButton.setEnabled(enabled);
   }
 
   @Override
@@ -141,9 +158,14 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
 
   @Override
   public void showResults(EntitiesResultDto results) {
-    prepareResultsTable();
     List<String> queries = criteriaPanel.getQueryStrings();
     List<CriterionDropdown> criterions = criteriaPanel.getCriterions();
+    if (criterions.isEmpty()) {
+      // TODO queries were provided, criterions are to be added accordingly
+      refreshPending.setVisible(false);
+      return;
+    }
+    prepareResultsTable();
     int row = 1;
     for (EntitiesResultDto result : JsArrays.toIterable(results.getPartialResultsArray())) {
       int idx = queries.indexOf(result.getQuery());
@@ -181,11 +203,12 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   public void reset() {
     clearResults(false);
     criteriaPanel.clear();
+    variableInput.setText("");
   }
 
   @Override
-  public void addCategoricalVariableFilter(final String datasource, final String table, final VariableDto variable, String fieldName, QueryResultDto facet) {
-    addVariableFilter(new CategoricalCriterionDropdown(datasource, table, variable, fieldName, facet) {
+  public void addCategoricalCriterion(ValueSetVariableCriterion filter, QueryResultDto facet) {
+    addVariableFilter(new CategoricalCriterionDropdown(filter, facet) {
       @Override
       public void doFilter() {
         onSearch(null);
@@ -194,8 +217,8 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   }
 
   @Override
-  public void addNumericalVariableFilter(final String datasource, final String table, final VariableDto variable, String fieldName, QueryResultDto facet) {
-    addVariableFilter(new NumericalCriterionDropdown(datasource, table, variable, fieldName, facet) {
+  public void addNumericalCriterion(ValueSetVariableCriterion filter, QueryResultDto facet) {
+    addVariableFilter(new NumericalCriterionDropdown(filter, facet) {
       @Override
       public void doFilter() {
         onSearch(null);
@@ -204,8 +227,8 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   }
 
   @Override
-  public void addDateVariableFilter(final String datasource, final String table, final VariableDto variable, String fieldName) {
-    addVariableFilter(new DateTimeCriterionDropdown(datasource, table, variable, fieldName) {
+  public void addDateCriterion(ValueSetVariableCriterion filter) {
+    addVariableFilter(new DateTimeCriterionDropdown(filter) {
       @Override
       public void doFilter() {
         onSearch(null);
@@ -214,8 +237,8 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   }
 
   @Override
-  public void addDefaultVariableFilter(final String datasource, final String table, final VariableDto variable, String fieldName) {
-    addVariableFilter(new DefaultCriterionDropdown(datasource, table, variable, fieldName) {
+  public void addDefaultCriterion(ValueSetVariableCriterion filter) {
+    addVariableFilter(new DefaultCriterionDropdown(filter) {
       @Override
       public void doFilter() {
         onSearch(null);

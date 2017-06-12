@@ -37,6 +37,9 @@
       <b:Button ui:field="searchButton" addStyleNames="btn btn-primary small-indent">
         <ui:msg description="Search Button label">Search</ui:msg>
       </b:Button>
+      <b:Button ui:field="clearButton" addStyleNames="btn small-indent">
+        <ui:msg description="Clear Button label">Clear</ui:msg>
+      </b:Button>
       <o:ToggleAnchor ui:field="queryMode" addStyleNames="btn-small"/>
     </b:Well>
 

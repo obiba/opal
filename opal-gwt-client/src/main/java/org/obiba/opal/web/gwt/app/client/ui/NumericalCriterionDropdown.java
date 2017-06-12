@@ -10,6 +10,8 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
@@ -26,6 +28,8 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
+
+import java.util.List;
 
 public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdown {
 
@@ -47,6 +51,11 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
     super(datasource, table, variableDto, fieldName, termDto);
   }
 
+  public NumericalCriterionDropdown(ValueSetVariableCriterion criterion, QueryResultDto termDto) {
+    this(criterion.getDatasourceName(), criterion.getTableName(), criterion.getVariable(), criterion.getField(), termDto);
+    initialize(criterion);
+  }
+
   @Override
   public Widget createSpecificControls() {
     updateRadioButtons();
@@ -55,9 +64,11 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
     min = new TextBox();
     min.addStyleName("bordered");
     max = new TextBox();
-    max.addStyleName("bordered");
+    max.addStyleName("bordered small-indent");
     valuesLabel = new ControlLabel();
     values = new TextBox();
+    values.setText("*");
+    values.addStyleName("bordered");
 
     initMinMaxControls();
     initValuesControls();
@@ -70,6 +81,40 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
 
     resetSpecificControls();
     return specificControls;
+  }
+
+  private void initialize(ValueSetVariableCriterion criterion) {
+    if ("*".equals(criterion.getValue())) {
+      if (criterion.isNot()) {
+        ((CheckBox) radioControls.getWidget(3)).setValue(true);
+        updateRangeValuesFields();
+        divider.setVisible(true);
+      }
+    }
+    else if (criterion.hasValue()) {
+      selectRangeOrValues(criterion.getValue());
+      ((CheckBox)radioControls.getWidget(criterion.isNot() ? 4 : 3)).setValue(true);
+      updateRangeValuesFields();
+      divider.setVisible(true);
+    }
+    else if (criterion.isExists())
+      ((CheckBox)radioControls.getWidget(criterion.isNot() ? 1 : 2)).setValue(true);
+    setFilterText();
+    doFilter();
+  }
+
+  private void selectRangeOrValues(String valueString) {
+    if (valueString.startsWith("[") && valueString.endsWith("]")) {
+      rangeValueChooser.setSelectedIndex(0);
+      String nValues = valueString.substring(1, valueString.length() - 1);
+      List<String> minMax = Splitter.on(" TO ").splitToList(nValues);
+      if (!"*".equals(minMax.get(0))) min.setText(minMax.get(0));
+      if (!"*".equals(minMax.get(1))) max.setText(minMax.get(1));
+    }
+    else if (valueString.startsWith("(") && valueString.endsWith(")")) {
+      rangeValueChooser.setSelectedIndex(1);
+      values.setText(valueString.substring(1, valueString.length() - 1));
+    }
   }
 
   private void updateRadioButtons() {
@@ -88,6 +133,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
     values.addKeyUpHandler(new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent event) {
+        if (values.getText().isEmpty()) return;
         updateRangeValuesCriterionFilter();
       }
     });
@@ -104,6 +150,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
     });
 
     maxLabel = new ControlLabel(translations.criterionFiltersMap().get("max"));
+    maxLabel.addStyleName("small-indent");
     maxLabel.setFor(max.getId());
     max.addKeyUpHandler(new KeyUpHandler() {
       @Override
@@ -126,7 +173,6 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
 
     panel.add(createControlGroup(minLabel, min));
     ControlGroup maxGroup = createControlGroup(maxLabel, max);
-    maxGroup.addStyleName("small-indent");
     panel.add(maxGroup);
     panel.add(createControlGroup(valuesLabel, values));
 
@@ -162,6 +208,10 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
     max.setVisible(false);
     valuesLabel.setVisible(false);
     values.setVisible(false);
+    if (divider != null) {
+      divider.setVisible(false);
+      doFilter();
+    }
   }
 
   @Override
@@ -208,11 +258,11 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
         ? translations.criterionFiltersMap().get("in")
         : translations.criterionFiltersMap().get("not_in");
 
-    filter += " " + rangeValueChooser.getItemText(rangeValueChooser.getSelectedIndex()).toLowerCase();
+    //filter += " " + rangeValueChooser.getItemText(rangeValueChooser.getSelectedIndex()).toLowerCase();
 
     filter += rangeValueChooser.isItemSelected(0) ? " [" + (min.getText().isEmpty() ? "*" : min.getText()) + " " +
         translations.criterionFiltersMap().get("to") + " " +
-        (max.getText().isEmpty() ? "*" : max.getText()) + "]" : "(" + values.getText() + ")";
+        (max.getText().isEmpty() ? "*" : max.getText()) + "]" : " (" + values.getText() + ")";
 
     setText(filter);
   }
@@ -227,6 +277,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
 
   private void updateRangeValuesFields() {
     boolean rangeSelected = rangeValueChooser.isItemSelected(0);
+    rangeValueChooser.setVisible(true);
     minLabel.setVisible(rangeSelected);
     min.setVisible(rangeSelected);
     maxLabel.setVisible(rangeSelected);
@@ -239,9 +290,11 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
 
     @Override
     public void onClick(ClickEvent event) {
+      divider.setVisible(true);
       rangeValueChooser.setVisible(true);
       updateRangeValuesFields();
       setFilterText();
+      doFilter();
     }
   }
 }

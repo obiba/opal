@@ -40,7 +40,7 @@ public class IndexedVariableSuggestOracle extends VariableSuggestOracle {
   protected String getQueryPrefix() {
     String prefix = "NOT nature:(BINARY OR GEO) "; // because these types of values are not indexed
     if (tableReferences.isEmpty()) return prefix;
-    prefix = prefix + " AND reference:(" + Joiner.on(" OR ").join(tableReferences) + ")";
+    prefix = prefix + "AND reference:(" + Joiner.on(" OR ").join(tableReferences) + ") ";
     return prefix;
   }
 

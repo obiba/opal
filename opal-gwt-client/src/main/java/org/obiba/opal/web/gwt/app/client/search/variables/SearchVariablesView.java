@@ -120,6 +120,13 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     getUiHandlers().onSearch(getQuery());
   }
 
+  @UiHandler("clearButton")
+  public void onClear(ClickEvent event) {
+    reset();
+    showAdvancedQuery(false);
+    getUiHandlers().onClear();
+  }
+
   @UiHandler("queryInput")
   public void onQueryTyped(KeyUpEvent event) {
     if ((event.getNativeKeyCode() == KeyCodes.KEY_ENTER && event.isControlKeyDown()) || getQuery().isEmpty()) onSearch(null);

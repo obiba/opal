@@ -14,6 +14,7 @@ import com.github.gwtbootstrap.client.ui.Icon;
 import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.collect.Lists;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -77,13 +78,20 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
     ListItem header = new ListItem();
     header.addStyleName("controls");
     header.setTitle(getHeaderTitle());
+    FlowPanel namePanel = new FlowPanel();
+    header.add(namePanel);
     Label label = new InlineLabel(getHeaderText());
-    header.add(label);
+    namePanel.add(label);
     if (!header.getTitle().isEmpty()) {
       Icon info = new Icon(IconType.INFO_SIGN);
       info.addStyleName("small-indent");
-      header.add(info);
+      namePanel.add(info);
     }
+    FlowPanel tablePanel = new FlowPanel();
+    header.add(tablePanel);
+    Label tableLabel = new Label(datasource + " - " + table);
+    tableLabel.addStyleName("italic");
+    tablePanel.add(tableLabel);
     add(header);
     ListItem headerDivider = new ListItem();
     headerDivider.addStyleName("divider");

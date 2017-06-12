@@ -28,6 +28,7 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
+import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdown {
 
@@ -47,6 +48,10 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
 
   public DateTimeCriterionDropdown(String datasource, String table, VariableDto variableDto, String fieldName) {
     super(datasource, table, variableDto, fieldName, null);
+  }
+
+  public DateTimeCriterionDropdown(ValueSetVariableCriterion criterion) {
+    this(criterion.getDatasourceName(), criterion.getTableName(), criterion.getVariable(), criterion.getField());
   }
 
   @Override

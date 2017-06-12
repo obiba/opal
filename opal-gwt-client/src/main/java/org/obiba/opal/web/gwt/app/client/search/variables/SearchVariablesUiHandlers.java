@@ -19,6 +19,8 @@ public interface SearchVariablesUiHandlers extends UiHandlers {
 
   void onSearchRange(String query, int offset, int limit);
 
+  void onClear();
+
   void onFacet(String field, int size, FacetHandler handler);
 
   interface FacetHandler {
