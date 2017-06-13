@@ -40,6 +40,7 @@ import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.support.JsOpalMap;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtoNature;
+import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.ValueSetVariableCriterion;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -116,13 +117,13 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
   }
 
   @Override
-  public void onSearch(String entityType, List<String> queries) {
+  public void onSearch(String entityType, List<String> queries, int offset, int limit) {
     selectedType = entityType;
     this.queries = queries;
     if (queries.isEmpty()) updateHistory();
     else {
       getView().clearResults(true);
-      searchSelected();
+      searchSelected(offset, limit);
     }
   }
 
@@ -146,7 +147,16 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
   }
 
   private void searchSelected() {
-    UriBuilder builder = UriBuilders.DATASOURCES_ENTITIES_COUNT.create().query("type", selectedType);
+    searchSelected(0, Table.DEFAULT_PAGESIZE);
+  }
+
+  private void searchSelected(final int offset, final int limit) {
+    UriBuilder builder = UriBuilders.DATASOURCES_ENTITIES_SEARCH.create()
+        .query("type", selectedType)
+        .query("format", "rql")
+        .query("counts", "true")
+        .query("offset", "" + offset)
+        .query("limit", "" + limit);
     for (String query : queries) builder.query("query", query);
     ResourceRequestBuilderFactory.<EntitiesResultDto>newBuilder()
         .forResource(builder.build())
@@ -160,7 +170,7 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
         .withCallback(new ResourceCallback<EntitiesResultDto>() {
           @Override
           public void onResource(Response response, EntitiesResultDto resource) {
-            getView().showResults(resource);
+            getView().showResults(resource, offset, limit);
             updateHistory();
           }
         }).get().send();
@@ -255,7 +265,7 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
 
     void addDefaultCriterion(ValueSetVariableCriterion filter);
 
-    void showResults(EntitiesResultDto results);
+    void showResults(EntitiesResultDto results, int offset, int limit);
 
     void searchEnabled(boolean enabled);
   }
