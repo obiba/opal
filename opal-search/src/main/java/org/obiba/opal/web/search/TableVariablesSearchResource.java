@@ -27,6 +27,7 @@ import org.obiba.magma.NoSuchValueSetException;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.search.AbstractSearchUtility;
 import org.obiba.opal.spi.search.ValuesIndexManager;
+import org.obiba.opal.spi.search.VariablesIndexManager;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.EsResultConverter;
 import org.obiba.opal.web.search.support.ItemResultDtoStrategy;
@@ -71,7 +72,7 @@ public class TableVariablesSearchResource extends AbstractSearchUtility {
 
   @Override
   protected String getSearchPath() {
-    ValuesIndexManager manager = opalSearchService.getValuesIndexManager();
+    VariablesIndexManager manager = opalSearchService.getVariablesIndexManager();
     return manager.getName() + "/" + manager.getIndex(getValueTable()).getIndexType();
   }
   private Search.QueryResultDto convertResponse(JSONObject jsonResponse, boolean addVariableDto)

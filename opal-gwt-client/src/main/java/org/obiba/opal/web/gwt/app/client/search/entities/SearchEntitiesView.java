@@ -16,6 +16,9 @@ import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -24,6 +27,9 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.view.client.AsyncDataProvider;
+import com.google.gwt.view.client.HasData;
+import com.google.gwt.view.client.Range;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
@@ -38,6 +44,7 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableEntitySummaryDto;
 import org.obiba.opal.web.model.client.search.EntitiesResultDto;
+import org.obiba.opal.web.model.client.search.ItemResultDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import java.util.List;
@@ -69,13 +76,19 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   Button searchButton;
 
   @UiField
-  Panel entityResultPanel;
+  Panel countsResultPanel;
 
   @UiField
-  Heading entityTitle;
+  FlowPanel countsPanel;
 
   @UiField
-  FlowPanel resultsPanel;
+  Panel entitiesResultPanel;
+
+  @UiField
+  OpalSimplePager entityItemPager;
+
+  @UiField
+  EntityItemTable entityItemTable;
 
   @UiField
   Image refreshPending;
@@ -87,12 +100,21 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
 
   private IndexedVariableSuggestOracle oracle;
 
+  private EntityItemProvider entityItemProvider;
+
   @Inject
   public SearchEntitiesView(EventBus eventBus, SearchEntitiesView.Binder uiBinder, Translations translations, PlaceManager placeManager) {
     initVariableTypeahead(eventBus);
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
     this.placeManager = placeManager;
+    typeDropdown.addChangeHandler(new ChangeHandler() {
+      @Override
+      public void onChange(ChangeEvent event) {
+        getUiHandlers().onEntityType(typeDropdown.getSelection());
+        reset();
+      }
+    });
   }
 
   private void initVariableTypeahead(EventBus eventBus) {
@@ -124,10 +146,7 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
 
   @UiHandler("searchButton")
   public void onSearch(ClickEvent event) {
-    if (!searchButton.isEnabled()) return;
-    List<String> queries = criteriaPanel.getQueryStrings();
-    if (queries.isEmpty()) reset();
-    getUiHandlers().onSearch(typeDropdown.getSelection(), queries);
+    onSearch(0, Table.DEFAULT_PAGESIZE);
   }
 
   @UiHandler("clearButton")
@@ -163,44 +182,17 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   }
 
   @Override
-  public void showResults(EntitiesResultDto results) {
-    List<String> queries = criteriaPanel.getQueryStrings();
-    List<CriterionDropdown> criterions = criteriaPanel.getCriterions();
-    if (criterions.isEmpty()) {
-      refreshPending.setVisible(false);
-      return;
-    }
-    prepareResultsTable();
-    int row = 1;
-    for (EntitiesResultDto result : JsArrays.toIterable(results.getPartialResultsArray())) {
-      int idx = queries.indexOf(result.getQuery());
-      ValueSetCriterionDropdown criterion = (ValueSetCriterionDropdown) criterions.get(idx);
-      setResultsRow(row, criterion, result.getTotalHits());
-      row++;
-    }
-    Label query = new Label(criteriaPanel.getQueryText());
-    query.setTitle(results.getQuery());
-    if (queries.size() == 1) {
-      ValueSetCriterionDropdown criterion = (ValueSetCriterionDropdown) criterions.get(0);
-      setResultsRow(row, criterion, results.getTotalHits());
-    } else {
-      Label all = new Label(translations.allLabel());
-      all.addStyleName("property-key");
-      resultsTable.setWidget(row, 0, all);
-      resultsTable.getFlexCellFormatter().setColSpan(row, 0, 2);
-      resultsTable.setWidget(row, 1, query);
-      Label total = new Label(results.getTotalHits() + "");
-      total.addStyleName("property-key");
-      resultsTable.setWidget(row, 2, total);
-    }
-    entityResultPanel.setVisible(true);
+  public void showResults(EntitiesResultDto results, int offset, int limit) {
+    showCountsResults(results);
+    showIdentifiersResults(results, offset, limit);
     refreshPending.setVisible(false);
   }
 
   @Override
   public void clearResults(boolean searchProgress) {
-    entityResultPanel.setVisible(false);
-    resultsPanel.clear();
+    countsResultPanel.setVisible(false);
+    countsPanel.clear();
+    entitiesResultPanel.setVisible(false);
     refreshPending.setVisible(searchProgress);
   }
 
@@ -256,22 +248,75 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
     onSearch(null);
   }
 
+  private void onSearch(int offset, int limit) {
+    if (!searchButton.isEnabled()) return;
+    List<String> queries = criteriaPanel.getRQLQueryStrings();
+    if (queries.isEmpty()) reset();
+    getUiHandlers().onSearch(typeDropdown.getSelection(), queries, offset, limit);
+  }
+
+  private void showIdentifiersResults(EntitiesResultDto results, int offset, int limit) {
+    List<ItemResultDto> identifiers = JsArrays.toList(results.getHitsArray());
+    if (limit == 0 || identifiers.isEmpty()) {
+      entitiesResultPanel.setVisible(false);
+      return;
+    }
+    initEntityItemTable();
+    entityItemProvider.updateRowData(offset, identifiers);
+    entityItemProvider.updateRowCount(results.getTotalHits(), true);
+    entityItemPager.setPagerVisible(results.getTotalHits() > Table.DEFAULT_PAGESIZE);
+    entitiesResultPanel.setVisible(true);
+  }
+
+  private void showCountsResults(EntitiesResultDto results) {
+    List<String> queries = criteriaPanel.getRQLQueryStrings();
+    List<CriterionDropdown> criterions = criteriaPanel.getCriterions();
+    if (criterions.isEmpty()) {
+      refreshPending.setVisible(false);
+      return;
+    }
+    prepareResultsTable();
+    int row = 1;
+    for (EntitiesResultDto result : JsArrays.toIterable(results.getPartialResultsArray())) {
+      int idx = queries.indexOf(result.getQuery());
+      ValueSetCriterionDropdown criterion = (ValueSetCriterionDropdown) criterions.get(idx);
+      setCountResultRow(row, criterion, result.getTotalHits());
+      row++;
+    }
+    Label query = new Label(criteriaPanel.getQueryText());
+    query.setTitle(results.getQuery());
+    if (queries.size() == 1) {
+      ValueSetCriterionDropdown criterion = (ValueSetCriterionDropdown) criterions.get(0);
+      setCountResultRow(row, criterion, results.getTotalHits());
+    } else {
+      Label all = new Label(translations.allLabel());
+      all.addStyleName("property-key");
+      resultsTable.setWidget(row, 0, all);
+      resultsTable.getFlexCellFormatter().setColSpan(row, 0, 2);
+      resultsTable.setWidget(row, 1, query);
+      Label total = new Label(results.getTotalHits() + "");
+      total.addStyleName("property-key");
+      resultsTable.setWidget(row, 2, total);
+    }
+    countsResultPanel.setVisible(true);
+  }
+
   private void prepareResultsTable() {
-    resultsPanel.clear();
+    countsPanel.clear();
     resultsTable = new DefaultFlexTable();
-    resultsPanel.add(resultsTable);
+    countsPanel.add(resultsTable);
     resultsTable.setHeader(0, translations.tableLabel());
     resultsTable.setHeader(1, translations.variableLabel());
     resultsTable.setHeader(2, translations.queryLabel());
     resultsTable.setHeader(3, translations.countLabel());
   }
 
-  private void setResultsRow(int row, ValueSetCriterionDropdown criterion, int count) {
+  private void setCountResultRow(int row, ValueSetCriterionDropdown criterion, int count) {
     resultsTable.setWidget(row, 0, createTableLink(criterion.getDatasource(), criterion.getTable()));
     resultsTable.getFlexCellFormatter().setColSpan(row, 0, 1);
     resultsTable.setWidget(row, 1, createVariableLink(criterion.getDatasource(), criterion.getTable(), criterion.getVariable()));
     Label query = new Label(criterion.getText());
-    query.setTitle(criterion.getQueryString());
+    query.setTitle(criterion.getRQLQueryString());
     resultsTable.setWidget(row, 2, query);
     resultsTable.setText(row, 3, count + "");
   }
@@ -300,5 +345,32 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
       }
     });
     return link;
+  }
+
+  private void initEntityItemTable() {
+    if (entityItemProvider == null || !typeDropdown.getSelection().equals(entityItemProvider.entityType)) {
+      entityItemProvider = new EntityItemProvider(typeDropdown.getSelection());
+      entityItemTable.initialize(placeManager, typeDropdown.getSelection());
+      entityItemPager.setDisplay(entityItemTable);
+      entityItemProvider.addDataDisplay(entityItemTable);
+    }
+  }
+
+  private class EntityItemProvider extends AsyncDataProvider<ItemResultDto> {
+
+    private final String entityType;
+
+    private EntityItemProvider(String entityType) {
+      this.entityType = entityType;
+    }
+
+    @Override
+    protected void onRangeChanged(HasData<ItemResultDto> display) {
+
+      Range range = display.getVisibleRange();
+      entitiesResultPanel.setVisible(false);
+      refreshPending.setVisible(true);
+      onSearch(range.getStart(), range.getLength());
+    }
   }
 }

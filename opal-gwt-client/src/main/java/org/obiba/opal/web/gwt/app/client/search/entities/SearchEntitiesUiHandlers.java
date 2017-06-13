@@ -18,9 +18,11 @@ import java.util.List;
 
 public interface SearchEntitiesUiHandlers extends UiHandlers {
 
-  void onSearch(String entityType, List<String> query);
+  void onSearch(String entityType, List<String> query, int offset, int limit);
 
   void onVariableFilter(String datasource, String table, String variable);
 
   void onClear();
+
+  void onEntityType(String selection);
 }

@@ -21,7 +21,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.*;
-import com.watopi.chosen.client.event.ChosenChangeEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
@@ -118,8 +117,34 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
     return null;
   }
 
+  @Override
+  public String getRQLQueryString() {
+    String emptyNotEmpty = super.getRQLQueryString();
+    if(emptyNotEmpty != null) return emptyNotEmpty;
+
+    List<String> selected = Lists.newArrayList();
+    for (String sel : getSelectedCategories()) {
+      selected.add(sel.replaceAll(" ", "+"));
+    }
+
+    String rqlField = getRQLField();
+    // in
+    if(((CheckBox) radioControls.getWidget(3)).getValue()) {
+      if (selected.isEmpty()) return "not(in(" + rqlField + ",*))";
+      return "in(" + rqlField + ",(" + Joiner.on(",").join(selected) + "))";
+    }
+
+    // not in
+    if(((CheckBox) radioControls.getWidget(4)).getValue()) {
+      if (selected.isEmpty()) return "in(" + rqlField + ",*)";
+      return "not(in(" + rqlField + ",(" + Joiner.on(",").join(selected) + ")))";
+    }
+
+    return null;
+  }
+
   private void initialize(ValueSetVariableCriterion criterion) {
-    if ("*".equals(criterion.getValue())) {
+    if (criterion.hasWildcardValue()) {
       if (criterion.isNot()) {
         ((CheckBox) radioControls.getWidget(3)).setValue(true);
         specificControls.setVisible(true);
@@ -127,7 +152,7 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
       }
     }
     else if (criterion.hasValue()) {
-      for (String value : parseValues(criterion.getValue())) {
+      for (String value : criterion.getValues()) {
         selectCategory(value);
       }
       ((CheckBox)radioControls.getWidget(criterion.isNot() ? 4 : 3)).setValue(true);
@@ -149,29 +174,16 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
     }
   }
 
-  private List<String> parseValues(String valueString) {
-    List<String> values = Lists.newArrayList();
-    String nValues = valueString.trim();
-    if (nValues.startsWith("(") && nValues.endsWith(")")) {
-      nValues = nValues.substring(1, nValues.length() - 1);
-      for (String value : Splitter.on(" OR ").splitToList(nValues)) {
-        values.add(value.replaceAll("\"", ""));
-      }
-    }
-    else values.add(nValues);
-    return values;
-  }
-
   private void setFilterText() {
     List<String> selected = getSelectedCategories();
 
     if(((CheckBox) radioControls.getWidget(3)).getValue()) {
-      if(selected.isEmpty()) setText(variable.getName()+ ": " + translations.criterionFiltersMap().get("none"));
-      else setText(variable.getName() + ": " + translations.criterionFiltersMap().get("in") + " (" +
+      if(selected.isEmpty()) setText(variable.getName()+ " " + translations.criterionFiltersMap().get("none").toLowerCase());
+      else setText(variable.getName() + " " + translations.criterionFiltersMap().get("in").toLowerCase() + " (" +
           Joiner.on(",").join(selected) + ")");
     } else {
-      if(selected.isEmpty()) setText(variable.getName()+ ": " + translations.criterionFiltersMap().get("all"));
-      else setText(variable.getName() + ": " + translations.criterionFiltersMap().get("not_in") + " (" +
+      if(selected.isEmpty()) setText(variable.getName()+ " " + translations.criterionFiltersMap().get("all").toLowerCase());
+      else setText(variable.getName() + " " + translations.criterionFiltersMap().get("not_in").toLowerCase() + " (" +
           Joiner.on(",").join(selected) + ")");
     }
   }

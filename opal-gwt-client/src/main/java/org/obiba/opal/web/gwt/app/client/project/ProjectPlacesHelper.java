@@ -65,6 +65,13 @@ public class ProjectPlacesHelper {
         .build();
   }
 
+  public static PlaceRequest getEntityPlace(String entityType, String identifier) {
+    return new PlaceRequest.Builder().nameToken(Places.SEARCH_ENTITY) //
+        .with(ParameterTokens.TOKEN_TYPE, entityType) //
+        .with(ParameterTokens.TOKEN_ID, identifier) //
+        .build();
+  }
+
   public static PlaceRequest getReportsPlace(String project) {
     return new PlaceRequest.Builder().nameToken(Places.PROJECT) //
         .with(ParameterTokens.TOKEN_NAME, project) //

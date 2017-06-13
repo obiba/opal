@@ -102,8 +102,26 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
     return null;
   }
 
+  @Override
+  public String getRQLQueryString() {
+    String emptyNotEmpty = super.getRQLQueryString();
+    if (emptyNotEmpty != null) return emptyNotEmpty;
+
+    if (!values.getText().isEmpty()) {
+      String[] vals = values.getText().trim().split("\\s+");
+      String valuesQuery = "in(" + getRQLField() + ",(" + Joiner.on(",").join(vals) + "))";
+      if (isInSelected()) {
+        return valuesQuery;
+      } else if (isNotInSelected()) {
+        return "not(" + valuesQuery + ")";
+      }
+    }
+
+    return null;
+  }
+
   private void initialize(ValueSetVariableCriterion criterion) {
-    if ("*".equals(criterion.getValue())) {
+    if (criterion.hasWildcardValue()) {
       if (criterion.isNot()) {
         ((CheckBox) radioControls.getWidget(3)).setValue(true);
         valuesPanel.setVisible(false);
@@ -111,15 +129,13 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
       }
     } else if (criterion.hasValue()) {
       ((CheckBox) radioControls.getWidget(criterion.isNot() ? 4 : 3)).setValue(true);
-      boolean isIn = criterion.getValue().startsWith("(") && criterion.getValue().endsWith(")");
-      if (isIn)
-        values.setText(criterion.getValue().substring(1, criterion.getValue().length() - 1));
-      else
-        values.setText(criterion.getValue());
+      values.setText(criterion.getValueString());
       valuesPanel.setVisible(true);
       divider.setVisible(true);
     } else if (criterion.isExists())
       ((CheckBox) radioControls.getWidget(criterion.isNot() ? 1 : 2)).setValue(true);
+    setFilterText();
+    doFilter();
   }
 
   private boolean isValuesSelected() {
@@ -135,8 +151,7 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
   }
 
   private boolean isCheckSelected(int idx) {
-    //GWT.log("isCheckSelected(" + idx + ")=" + ((CheckBox) radioControls.getWidget(idx)).getValue());
-    return ((CheckBox) radioControls.getWidget(idx)).getValue();
+    return getRadionButtonValue(idx);
   }
 
   private void updateMatchCriteriaFilter() {
@@ -152,20 +167,28 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
   }
 
   private void setFilterText() {
-    String op = null;
-    String value = null;
-    if (isInSelected()) {
-      op = translations.criterionFiltersMap().get("in");
-      value = "(" + values.getText() + ")";
-    } else if (isNotInSelected()) {
-      op = translations.criterionFiltersMap().get("not_in");
-      value = "(" + values.getText() + ")";
-    }
+    if (isCheckSelected(0))
+      updateCriterionFilter(translations.criterionFiltersMap().get("all").toLowerCase());
+    else if (isCheckSelected(1))
+      updateCriterionFilter(translations.criterionFiltersMap().get("empty").toLowerCase());
+    else if (isCheckSelected(2))
+      updateCriterionFilter(translations.criterionFiltersMap().get("not_empty").toLowerCase());
+    else {
+      String op = null;
+      String value = null;
+      if (isInSelected()) {
+        op = translations.criterionFiltersMap().get("in").toLowerCase();
+        value = "(" + values.getText() + ")";
+      } else if (isNotInSelected()) {
+        op = translations.criterionFiltersMap().get("not_in").toLowerCase();
+        value = "(" + values.getText() + ")";
+      }
 
-    if (op == null) {
-      updateCriterionFilter("");
-    } else {
-      updateCriterionFilter(op + " " + value);
+      if (op == null) {
+        updateCriterionFilter("");
+      } else {
+        updateCriterionFilter(op + " " + value);
+      }
     }
   }
 

@@ -92,7 +92,6 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
   @Override
   protected void onReveal() {
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
-    //GWT.log("onReveal=" + selectedType + ":" + selectedId + ":" + selectedTable);
     ResourceRequestBuilderFactory.<JsArray<VariableEntitySummaryDto>>newBuilder()
         .forResource(UriBuilders.DATASOURCES_ENTITY_TYPES.create().build()).get()
         .withCallback(new ResourceCallback<JsArray<VariableEntitySummaryDto>>() {
@@ -111,7 +110,6 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
     tableVariables.clear();
     tables = null;
     getView().clearResults(true);
-    //GWT.log("prepareFromRequest=" + selectedType + ":" + selectedId + ":" + selectedTable);
     if (!Strings.isNullOrEmpty(selectedId)) {
       getView().setEntityType(selectedType);
       getView().setEntityId(selectedId);
@@ -126,7 +124,6 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
     selectedType = entityType;
     selectedId = entityId;
     selectedTable = null;
-    //GWT.log("onSearch=" + selectedType + ":" + selectedId + ":" + selectedTable);
     getView().clearResults(true);
     searchSelected();
   }
@@ -134,7 +131,7 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
   @Override
   public void onTableChange(String tableReference) {
     selectedTable = tableReference;
-    loadSelectedTable();
+    loadTable(selectedTable);
     updateHistory();
   }
 
@@ -176,7 +173,6 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
   }
 
   private void searchSelected() {
-    //GWT.log("searchSelected=" + selectedType + ":" + selectedId + ":" + selectedTable);
     loadTables();
   }
 
@@ -184,7 +180,6 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
    * Load the tables where the entity appears.
    */
   private void loadTables() {
-    //GWT.log("loadTables=" + selectedType + ":" + selectedId + ":" + selectedTable);
     UriBuilder uriBuilder = UriBuilder.create().segment("entity", selectedId, "type", selectedType, "tables");
     ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(uriBuilder.build()).get()
         .withCallback(new ResourceCallback<JsArray<TableDto>>() {
@@ -197,9 +192,10 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
               notifyNoSuchEntity();
             } else {
               getView().showTables(tables);
+              String tableRef = selectedTable;
               if (Strings.isNullOrEmpty(selectedTable))
-                selectedTable = tables.get(0).getDatasourceName() + "." + tables.get(0).getName();
-              loadSelectedTable();
+                tableRef = tables.get(0).getDatasourceName() + "." + tables.get(0).getName();
+              loadTable(tableRef);
             }
             updateHistory();
           }
@@ -209,9 +205,8 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
   /**
    * Load value set of the entity for the selected table. Load also the variables if necessary.
    */
-  private void loadSelectedTable() {
-    //GWT.log("loadSelectedTable=" + selectedType + ":" + selectedId + ":" + selectedTable);
-    MagmaPath.Parser parser = parseTableReference(selectedTable);
+  private void loadTable(final String tableRef) {
+    MagmaPath.Parser parser = parseTableReference(tableRef);
     final String datasource = parser.getDatasource();
     final String table = parser.getTable();
 
@@ -228,22 +223,21 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
         .withCallback(new ResourceCallback<ValueSetsDto>() {
           @Override
           public void onResource(Response response, ValueSetsDto resource) {
-            if (tableVariables.containsKey(selectedTable))
-              getView().showValueSet(datasource, table, tableVariables.get(selectedTable), resource);
+            if (tableVariables.containsKey(tableRef))
+              getView().showValueSet(datasource, table, tableVariables.get(tableRef), resource);
             else
              loadSelectedTableVariables(datasource, table, resource);
           }
 
           private void loadSelectedTableVariables(final String datasource, final String table, final ValueSetsDto valueSets) {
             String variablesUri = UriBuilders.DATASOURCE_TABLE_VARIABLES.create().build(datasource, table);
-            //GWT.log(variablesUri);
             ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder() //
                 .forResource(variablesUri) //
                 .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
                   @Override
                   public void onResource(Response response, JsArray<VariableDto> resource) {
-                    tableVariables.put(selectedTable, JsArrays.toSafeArray(resource));
-                    getView().showValueSet(datasource, table, tableVariables.get(selectedTable), valueSets);
+                    tableVariables.put(tableRef, JsArrays.toSafeArray(resource));
+                    getView().showValueSet(datasource, table, tableVariables.get(tableRef), valueSets);
                   }
                 }).get().send();
           }

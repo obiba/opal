@@ -53,6 +53,14 @@
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>net.jazdw</groupId>
+      <artifactId>rql-parser</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
   </dependencies>
 
 </project>

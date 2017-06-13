@@ -40,6 +40,7 @@ import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.support.JsOpalMap;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtoNature;
+import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.ValueSetVariableCriterion;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -72,10 +73,6 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
   private List<VariableEntitySummaryDto> entityTypes;
 
   private List<TableDto> indexedTables;
-
-  private final Map<String, JsArray<VariableDto>> tableVariables = Maps.newHashMap();
-
-  private final Map<String, JsOpalMap> tableIndexSchemas = Maps.newHashMap();
 
   @Inject
   public SearchEntitiesPresenter(EventBus eventBus, Display display, Proxy proxy, Translations translations,
@@ -120,13 +117,21 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
   }
 
   @Override
-  public void onSearch(String entityType, List<String> queries) {
+  public void onEntityType(String selection) {
+    selectedType = selection;
+    queries = null;
+    indexedTables = null;
+    renderTables();
+  }
+
+  @Override
+  public void onSearch(String entityType, List<String> queries, int offset, int limit) {
     selectedType = entityType;
     this.queries = queries;
     if (queries.isEmpty()) updateHistory();
     else {
       getView().clearResults(true);
-      searchSelected();
+      searchSelected(offset, limit);
     }
   }
 
@@ -150,7 +155,16 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
   }
 
   private void searchSelected() {
-    UriBuilder builder = UriBuilders.DATASOURCES_ENTITIES_COUNT.create().query("type", selectedType);
+    searchSelected(0, Table.DEFAULT_PAGESIZE);
+  }
+
+  private void searchSelected(final int offset, final int limit) {
+    UriBuilder builder = UriBuilders.DATASOURCES_ENTITIES_SEARCH.create()
+        .query("type", selectedType)
+        .query("format", "rql")
+        .query("counts", "true")
+        .query("offset", "" + offset)
+        .query("limit", "" + limit);
     for (String query : queries) builder.query("query", query);
     ResourceRequestBuilderFactory.<EntitiesResultDto>newBuilder()
         .forResource(builder.build())
@@ -164,7 +178,7 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
         .withCallback(new ResourceCallback<EntitiesResultDto>() {
           @Override
           public void onResource(Response response, EntitiesResultDto resource) {
-            getView().showResults(resource);
+            getView().showResults(resource, offset, limit);
             updateHistory();
           }
         }).get().send();
@@ -232,10 +246,6 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
         .withCallback(new VariableFilterProcessor(filter)).get().send();
   }
 
-  private String asTableReference(String datasource, String table) {
-    return datasource + "." + table;
-  }
-
   @ProxyStandard
   @NameToken(Places.SEARCH_ENTITIES)
   public interface Proxy extends ProxyPlace<SearchEntitiesPresenter> {
@@ -263,7 +273,7 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
 
     void addDefaultCriterion(ValueSetVariableCriterion filter);
 
-    void showResults(EntitiesResultDto results);
+    void showResults(EntitiesResultDto results, int offset, int limit);
 
     void searchEnabled(boolean enabled);
   }
@@ -290,31 +300,11 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
         criterion.setVariable(resource);
         addVariableCriterion();
       }
-      else if (tableIndexSchemas.containsKey(asTableReference(datasource, table)))
-        addVariableCriterion(resource);
-      else
-        addIndexSchemaAndVariableCriterion(resource);
-    }
-
-    private void addIndexSchemaAndVariableCriterion(final VariableDto variableDto) {
-      // Fetch variable-field mapping for ES queries
-      ResourceRequestBuilderFactory.<OpalMap>newBuilder().forResource(
-          UriBuilders.DATASOURCE_TABLE_INDEX_SCHEMA.create()
-              .build(datasource, table))
-          .withCallback(new ResourceCallback<OpalMap>() {
-            @Override
-            public void onResource(Response response, OpalMap resource) {
-              if (response.getStatusCode() == Response.SC_OK) {
-                tableIndexSchemas.put(asTableReference(datasource, table), new JsOpalMap(resource));
-                addVariableCriterion(variableDto);
-              }
-            }
-          }).get().send();
+      else addVariableCriterion(resource);
     }
 
     private void addVariableCriterion(VariableDto variable) {
-      this.criterion = new ValueSetVariableCriterion(datasource, table, variable,
-          tableIndexSchemas.get(asTableReference(datasource, table)).getValue(variable.getName()));
+      this.criterion = new ValueSetVariableCriterion(datasource, table, variable);
       addVariableCriterion();
     }
 

@@ -15,14 +15,15 @@ import com.google.common.collect.Lists;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.ValueTable;
 import org.obiba.opal.search.AbstractSearchUtility;
 import org.obiba.opal.search.SearchQueryException;
-import org.obiba.opal.spi.search.ValuesIndexManager;
 import org.obiba.opal.web.model.Search;
+import org.obiba.opal.web.search.support.ESValueSetVariableCriterionParser;
 import org.obiba.opal.web.search.support.QuerySearchJsonBuilder;
+import org.obiba.opal.web.search.support.RQLValueSetVariableCriterionParser;
+import org.obiba.opal.web.search.support.ValueSetVariableCriterionParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +41,7 @@ import java.util.stream.Collectors;
 @Path("/datasources/entities")
 public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
 
-//  private static final Logger log = LoggerFactory.getLogger(DatasourcesEntitiesSearchResource.class);
+  private static final Logger log = LoggerFactory.getLogger(DatasourcesEntitiesSearchResource.class);
 
   private String entityType;
 
@@ -48,29 +49,31 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
   @Transactional(readOnly = true)
   @Path("_search")
   public Response search(@QueryParam("query") List<String> queries,
-                         @QueryParam("type") @DefaultValue("Participant") String entityType, @QueryParam("offset") @DefaultValue("0") int offset,
-                         @QueryParam("limit") @DefaultValue("10") int limit, @QueryParam("partials") @DefaultValue("false") boolean withPartials) throws JSONException {
-    if(!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+                         @QueryParam("type") @DefaultValue("Participant") String entityType,
+                         @QueryParam("offset") @DefaultValue("0") int offset,
+                         @QueryParam("limit") @DefaultValue("10") int limit,
+                         @QueryParam("counts") @DefaultValue("false") boolean withCounts,
+                         @QueryParam("format") @DefaultValue("rql") String format) throws JSONException {
+    if (!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
     this.entityType = entityType;
 
-    List<ChildQueryParser> childQueries = extractChildQueries(queries);
+    List<ValueSetVariableCriterionParser> childQueries = extractChildQueries(queries, format);
     List<Search.EntitiesResultDto> partialResults = Lists.newArrayList();
-    if (withPartials && childQueries.size()>1) {
-      for (ChildQueryParser childQuery : childQueries) {
+    if (withCounts && childQueries.size() > 1) {
+      for (ValueSetVariableCriterionParser childQuery : childQueries) {
         QuerySearchJsonBuilder builder = buildHasChildQuerySearch(0, 0);
         builder.childQuery(childQuery.asChildQuery());
         JSONObject jsonResponse = executeQuery(builder.build());
-        partialResults.add(getResultDtoBuilder(jsonResponse, childQuery.getQuery()).build());
+        partialResults.add(getResultDtoBuilder(jsonResponse, childQuery.getOriginalQuery()).build());
       }
     }
 
     // global query
     QuerySearchJsonBuilder builder = buildHasChildQuerySearch(offset, limit);
-    builder.childQueries(childQueries.stream().map(ChildQueryParser::asChildQuery).collect(Collectors.toList()));
-    childQueries.forEach(child -> builder.childQuery(child.asChildQuery()));
+    builder.childQueries(childQueries.stream().map(ValueSetVariableCriterionParser::asChildQuery).collect(Collectors.toList()));
     JSONObject jsonResponse = executeQuery(builder.build());
 
-    if(!jsonResponse.isNull("error")) {
+    if (!jsonResponse.isNull("error")) {
       throw new SearchQueryException(jsonResponse.get("error").toString());
     }
 
@@ -83,8 +86,9 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
   @Transactional(readOnly = true)
   @Path("_count")
   public Response count(@QueryParam("query") List<String> queries,
-                         @QueryParam("type") @DefaultValue("Participant") String entityType) throws JSONException {
-    return search(queries, entityType, 0, 0, true);
+                        @QueryParam("type") @DefaultValue("Participant") String entityType,
+                        @QueryParam("format") @DefaultValue("rql") String format) throws JSONException {
+    return search(queries, entityType, 0, 0, true, format);
   }
 
   @Override
@@ -96,10 +100,12 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
   // Private methods
   //
 
-  private List<ChildQueryParser> extractChildQueries(List<String> queries) {
-    return queries.stream().map(q -> new ChildQueryParser(q)).collect(Collectors.toList());
+  private List<ValueSetVariableCriterionParser> extractChildQueries(List<String> queries, String format) {
+    if ("rql".equals(format))
+      return queries.stream().map(q -> new RQLValueSetVariableCriterionParser(opalSearchService.getValuesIndexManager(), q)).collect(Collectors.toList());
+    else
+      return queries.stream().map(q -> new ESValueSetVariableCriterionParser(opalSearchService.getValuesIndexManager(), q)).collect(Collectors.toList());
   }
-
 
   private QuerySearchJsonBuilder buildHasChildQuerySearch(int offset, int limit) {
     QuerySearchJsonBuilder jsonBuilder = new QuerySearchJsonBuilder();
@@ -110,18 +116,23 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
   private Search.EntitiesResultDto.Builder getResultDtoBuilder(JSONObject jsonResponse, String query) throws JSONException {
     Search.EntitiesResultDto.Builder builder = Search.EntitiesResultDto.newBuilder();
     builder.setEntityType(entityType);
-    JSONObject jsonHits = jsonResponse.getJSONObject("hits");
-    builder.setTotalHits(jsonHits.getInt("total"));
-    builder.setQuery(query);
+    if (jsonResponse.has("hits")) {
+      JSONObject jsonHits = jsonResponse.getJSONObject("hits");
+      builder.setTotalHits(jsonHits.getInt("total"));
+      builder.setQuery(query);
 
-    JSONArray hits = jsonHits.getJSONArray("hits");
-    if (hits.length()>0) {
-      for(int i = 0; i < hits.length(); i++) {
-        Search.ItemResultDto.Builder dtoItemResultBuilder = Search.ItemResultDto.newBuilder();
-        JSONObject jsonHit = hits.getJSONObject(i);
-        dtoItemResultBuilder.setIdentifier(jsonHit.getString("_id"));
-        builder.addHits(dtoItemResultBuilder);
+      JSONArray hits = jsonHits.getJSONArray("hits");
+      if (hits.length() > 0) {
+        for (int i = 0; i < hits.length(); i++) {
+          Search.ItemResultDto.Builder dtoItemResultBuilder = Search.ItemResultDto.newBuilder();
+          JSONObject jsonHit = hits.getJSONObject(i);
+          dtoItemResultBuilder.setIdentifier(jsonHit.getString("_id"));
+          builder.addHits(dtoItemResultBuilder);
+        }
       }
+    } else {
+      builder.setTotalHits(0);
+      builder.setQuery(query);
     }
     return builder;
   }
@@ -130,44 +141,4 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
     return searchServiceAvailable() && opalSearchService.getValuesIndexManager().isReady();
   }
 
-  private class ChildQueryParser {
-
-    private final String query;
-
-    private final String field;
-
-    private final ValueTable table;
-
-    private ChildQueryParser(String query) {
-      this.query = query;
-      this.field = extractField();
-      String[] tokens = field.split(ValuesIndexManager.FIELD_SEP);
-      // verify variable access (exists and allowed)
-      Datasource ds = MagmaEngine.get().getDatasource(tokens[0]);
-      this.table = ds.getValueTable(tokens[1]);
-      this.table.getVariable(tokens[2]);
-    }
-
-    public ValueTable getValueTable() {
-      return table;
-    }
-
-    public String getField() {
-      return field;
-    }
-
-    public String getQuery() {
-      return query;
-    }
-
-    public QuerySearchJsonBuilder.ChildQuery asChildQuery() {
-      return new QuerySearchJsonBuilder.ChildQuery(opalSearchService.getValuesIndexManager().getIndex(table).getIndexType(), query);
-    }
-
-    private String extractField() {
-      String nQuery = query.startsWith("NOT ") ? query.substring(4) : query;
-      if (nQuery.startsWith("_exists_:")) return nQuery.substring(9);
-      return nQuery.substring(0, nQuery.indexOf(":"));
-    }
-  }
 }

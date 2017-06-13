@@ -13,6 +13,7 @@
              xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
              xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
              xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.search.entity"
+             xmlns:o3="urn:import:org.obiba.opal.web.gwt.app.client.search.entities"
              ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
              ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
              ui:generateLocales="default">
@@ -43,11 +44,19 @@
         </b:Button>
       </b:Well>
 
-      <g:FlowPanel ui:field="entityResultPanel" visible="false">
-        <b:Heading size="4" ui:field="entityTitle" addStyleNames="top-margin">
+      <g:FlowPanel ui:field="countsResultPanel" visible="false">
+        <b:Heading size="4" addStyleNames="top-margin">
           <ui:msg description="Counts label">Counts</ui:msg>
         </b:Heading>
-        <g:FlowPanel ui:field="resultsPanel"/>
+        <g:FlowPanel ui:field="countsPanel"/>
+      </g:FlowPanel>
+      <g:FlowPanel ui:field="entitiesResultPanel" visible="false">
+        <b:Heading size="4" addStyleNames="top-margin pull-left">
+          <ui:msg description="Identifiers label">Identifiers</ui:msg>
+        </b:Heading>
+        <o:OpalSimplePager ui:field="entityItemPager" showTotalWhenNoPager="true" location="RIGHT"
+                           addStyleNames="pull-right small-indent"/>
+        <o3:EntityItemTable ui:field="entityItemTable" width="100%" addStyleNames="small-top-margin"/>
       </g:FlowPanel>
       <g:Image ui:field="refreshPending" url="image/loading.gif" addStyleNames="small-indent"/>
 
