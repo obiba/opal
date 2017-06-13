@@ -38,7 +38,7 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
 
   protected ListItem divider;
 
-  ValueSetCriterionDropdown(String datasource, String table, VariableDto variableDto, @Nonnull String fieldName, @Nullable QueryResultDto termDto) {
+  ValueSetCriterionDropdown(String datasource, String table, VariableDto variableDto, String fieldName, @Nullable QueryResultDto termDto) {
     super(fieldName);
     this.datasource = datasource;
     this.table = table;
@@ -105,6 +105,12 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
     return getVariableLabel();
   }
 
+  @Override
+  protected String getRQLField() {
+    return datasource + "." + table + ":" + variable.getName();
+  }
+
+
   protected ControlGroup createControlGroup(ControlLabel label, TextBox textBox) {
     ControlGroup c = new ControlGroup();
     c.addStyleName("inline-block");
@@ -160,7 +166,7 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
   }
 
   protected void updateCriterionFilter(String filter) {
-    setText(filter.isEmpty() ? variable.getName() : variable.getName() + ": " + filter);
+    setText(filter.isEmpty() ? variable.getName() : variable.getName() + " " + filter);
   }
 
 }

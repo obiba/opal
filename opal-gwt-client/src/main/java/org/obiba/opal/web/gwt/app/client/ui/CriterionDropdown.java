@@ -47,20 +47,45 @@ public abstract class CriterionDropdown extends DropdownButton {
   public abstract void doFilter();
 
   public String getQueryString() {
-    if(((CheckBox) radioControls.getWidget(0)).getValue()) {
+    if(getRadionButtonValue(0)) {
       // All: No filter is necessary
       return fieldName + ":*";
     }
-    if(((CheckBox) radioControls.getWidget(1)).getValue()) {
+    if(getRadionButtonValue(1)) {
       // Not empty
       return "NOT _exists_:" + fieldName;
     }
-    if(((CheckBox) radioControls.getWidget(2)).getValue()) {
+    if(getRadionButtonValue(2)) {
       // Empty
       return "_exists_:" + fieldName;
     }
 
     return null;
+  }
+
+  public String getRQLQueryString() {
+    if(((CheckBox) radioControls.getWidget(0)).getValue()) {
+      // All: No filter is necessary
+      return "in(" + getRQLField() + ",*)";
+    }
+    if(((CheckBox) radioControls.getWidget(1)).getValue()) {
+      // Not empty
+      return "not(exists(" + getRQLField() + "))";
+    }
+    if(((CheckBox) radioControls.getWidget(2)).getValue()) {
+      // Empty
+      return "exists(" + getRQLField() + ")";
+    }
+
+    return null;
+  }
+
+  protected String getRQLField() {
+    return fieldName;
+  }
+
+  protected boolean getRadionButtonValue(int idx) {
+    return ((CheckBox) radioControls.getWidget(idx)).getValue();
   }
 
   protected RadioButton createRadioButton(final String label, Integer count) {
@@ -76,7 +101,7 @@ public abstract class CriterionDropdown extends DropdownButton {
     radio.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        updateCriterionFilter(label);
+        updateCriterionFilter(label.toLowerCase());
       }
     });
 

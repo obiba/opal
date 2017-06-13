@@ -125,7 +125,7 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   @UiHandler("searchButton")
   public void onSearch(ClickEvent event) {
     if (!searchButton.isEnabled()) return;
-    List<String> queries = criteriaPanel.getQueryStrings();
+    List<String> queries = criteriaPanel.getRQLQueryStrings();
     if (queries.isEmpty()) reset();
     getUiHandlers().onSearch(typeDropdown.getSelection(), queries);
   }
@@ -164,7 +164,7 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
 
   @Override
   public void showResults(EntitiesResultDto results) {
-    List<String> queries = criteriaPanel.getQueryStrings();
+    List<String> queries = criteriaPanel.getRQLQueryStrings();
     List<CriterionDropdown> criterions = criteriaPanel.getCriterions();
     if (criterions.isEmpty()) {
       refreshPending.setVisible(false);
@@ -271,7 +271,7 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
     resultsTable.getFlexCellFormatter().setColSpan(row, 0, 1);
     resultsTable.setWidget(row, 1, createVariableLink(criterion.getDatasource(), criterion.getTable(), criterion.getVariable()));
     Label query = new Label(criterion.getText());
-    query.setTitle(criterion.getQueryString());
+    query.setTitle(criterion.getRQLQueryString());
     resultsTable.setWidget(row, 2, query);
     resultsTable.setText(row, 3, count + "");
   }

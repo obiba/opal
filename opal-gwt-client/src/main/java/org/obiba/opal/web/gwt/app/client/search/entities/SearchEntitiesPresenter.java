@@ -73,10 +73,6 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
 
   private List<TableDto> indexedTables;
 
-  private final Map<String, JsArray<VariableDto>> tableVariables = Maps.newHashMap();
-
-  private final Map<String, JsOpalMap> tableIndexSchemas = Maps.newHashMap();
-
   @Inject
   public SearchEntitiesPresenter(EventBus eventBus, Display display, Proxy proxy, Translations translations,
                                  DefaultBreadcrumbsBuilder breadcrumbsHelper, PlaceManager placeManager) {
@@ -232,10 +228,6 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
         .withCallback(new VariableFilterProcessor(filter)).get().send();
   }
 
-  private String asTableReference(String datasource, String table) {
-    return datasource + "." + table;
-  }
-
   @ProxyStandard
   @NameToken(Places.SEARCH_ENTITIES)
   public interface Proxy extends ProxyPlace<SearchEntitiesPresenter> {
@@ -290,31 +282,11 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
         criterion.setVariable(resource);
         addVariableCriterion();
       }
-      else if (tableIndexSchemas.containsKey(asTableReference(datasource, table)))
-        addVariableCriterion(resource);
-      else
-        addIndexSchemaAndVariableCriterion(resource);
-    }
-
-    private void addIndexSchemaAndVariableCriterion(final VariableDto variableDto) {
-      // Fetch variable-field mapping for ES queries
-      ResourceRequestBuilderFactory.<OpalMap>newBuilder().forResource(
-          UriBuilders.DATASOURCE_TABLE_INDEX_SCHEMA.create()
-              .build(datasource, table))
-          .withCallback(new ResourceCallback<OpalMap>() {
-            @Override
-            public void onResource(Response response, OpalMap resource) {
-              if (response.getStatusCode() == Response.SC_OK) {
-                tableIndexSchemas.put(asTableReference(datasource, table), new JsOpalMap(resource));
-                addVariableCriterion(variableDto);
-              }
-            }
-          }).get().send();
+      else addVariableCriterion(resource);
     }
 
     private void addVariableCriterion(VariableDto variable) {
-      this.criterion = new ValueSetVariableCriterion(datasource, table, variable,
-          tableIndexSchemas.get(asTableReference(datasource, table)).getValue(variable.getName()));
+      this.criterion = new ValueSetVariableCriterion(datasource, table, variable);
       addVariableCriterion();
     }
 

@@ -67,6 +67,17 @@ public class CriteriaPanel extends FlowPanel {
     return filters;
   }
 
+  public List<String> getRQLQueryStrings() {
+    List<String> filters = Lists.newArrayList();
+    for(int i = 0; i < getWidgetCount(); i++) {
+      if(getWidget(i) instanceof CriterionPanel) {
+        String queryString = ((CriterionPanel) getWidget(i)).getRQLQueryString();
+        if(!Strings.isNullOrEmpty(queryString)) filters.add(queryString);
+      }
+    }
+    return filters;
+  }
+
   /**
    * Get human readable query string.
    *

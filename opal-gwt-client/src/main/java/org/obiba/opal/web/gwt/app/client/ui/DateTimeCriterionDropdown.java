@@ -10,19 +10,13 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
-import java.util.Date;
-import java.util.List;
-
-import com.google.common.base.Splitter;
-import com.google.gwt.core.client.GWT;
-import org.obiba.opal.web.model.client.magma.VariableDto;
-
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.ControlLabel;
 import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.github.gwtbootstrap.datepicker.client.ui.DateBoxAppended;
+import com.google.common.base.Splitter;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -31,7 +25,10 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
-import org.obiba.opal.web.model.client.search.QueryResultDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
+
+import java.util.Date;
+import java.util.List;
 
 public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdown {
 
@@ -78,52 +75,47 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
   }
 
   private void initialize(ValueSetVariableCriterion criterion) {
-    if ("*".equals(criterion.getValue())) {
+    if (criterion.hasWildcardValue()) {
       if (criterion.isNot()) {
         ((CheckBox) radioControls.getWidget(3)).setValue(true);
         updateRangeValuesFields();
         divider.setVisible(true);
       }
-    }
-    else if (criterion.hasValue()) {
-      selectRangeOrValues(criterion.getValue());
-      ((CheckBox)radioControls.getWidget(criterion.isNot() ? 4 : 3)).setValue(true);
+    } else if (criterion.hasValue()) {
+      if (criterion.isRange()) selectRange(criterion.getValues());
+      else selectValues(criterion.getValueString());
+      ((CheckBox) radioControls.getWidget(criterion.isNot() ? 4 : 3)).setValue(true);
       updateRangeValuesFields();
       divider.setVisible(true);
-    }
-    else if (criterion.isExists())
-      ((CheckBox)radioControls.getWidget(criterion.isNot() ? 1 : 2)).setValue(true);
+    } else if (criterion.isExists())
+      ((CheckBox) radioControls.getWidget(criterion.isNot() ? 1 : 2)).setValue(true);
     setFilterText();
     doFilter();
   }
 
-  private void selectRangeOrValues(String valueString) {
-    if (valueString.startsWith("[") && valueString.endsWith("]")) {
-      rangeValueChooser.setSelectedIndex(0);
-      String nValues = valueString.substring(1, valueString.length() - 1);
-      List<String> minMax = Splitter.on(" TO ").splitToList(nValues);
-      Date minDate = null;
-      Date maxDate = null;
-      if (!"*".equals(minMax.get(0))) minDate = getDate(minMax.get(0));
-      if (!"*".equals(minMax.get(1))) maxDate = getDate(minMax.get(1));
-
-      if (minDate != null) from.setValue(minDate);
-      if (maxDate != null) to.setValue(maxDate);
-    }
-    else if (valueString.startsWith("(") && valueString.endsWith(")")) {
-      rangeValueChooser.setSelectedIndex(1);
-      String nValues = valueString.substring(1, valueString.length() - 1);
-      List<String> minMax = Splitter.on(" AND ").splitToList(nValues);
-      Date minDate = null;
-      Date maxDate = null;
-      if (!"*".equals(minMax.get(0))) minDate = getDate(minMax.get(0));
-      if (!"*".equals(minMax.get(1))) maxDate = getDate(minMax.get(1));
-      if (minDate != null && maxDate != null) date.setValue(minDate);
-    }
+  private void selectRange(List<String> values) {
+    rangeValueChooser.setSelectedIndex(0);
+    Date minDate = null;
+    Date maxDate = null;
+    if (!values.isEmpty() && !"*".equals(values.get(0))) minDate = getDate(values.get(0));
+    if (values.size() > 1 && !"*".equals(values.get(1))) maxDate = getDate(values.get(1));
+    if (minDate != null) from.setValue(minDate);
+    if (maxDate != null) to.setValue(maxDate);
   }
 
-  public Date getDate(String dateString) {
-    String nDate = dateString.replaceAll("<=", "").replaceAll(">=", "");
+  private void selectValues(String valueString) {
+    rangeValueChooser.setSelectedIndex(1);
+    String nValues = valueString.substring(1, valueString.length() - 1);
+    List<String> minMax = Splitter.on(" AND ").splitToList(nValues);
+    Date minDate = null;
+    Date maxDate = null;
+    if (!"*".equals(minMax.get(0))) minDate = getDate(minMax.get(0));
+    if (!"*".equals(minMax.get(1))) maxDate = getDate(minMax.get(1));
+    if (minDate != null && maxDate != null) date.setValue(minDate);
+  }
+
+  private Date getDate(String dateString) {
+    String nDate = dateString.trim();
     Date result = null;
     try {
       DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat("yyyy-MM-dd");
@@ -219,15 +211,15 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
   @Override
   public String getQueryString() {
     String emptyNotEmpty = super.getQueryString();
-    if(emptyNotEmpty != null) return emptyNotEmpty;
+    if (emptyNotEmpty != null) return emptyNotEmpty;
 
     DateTimeFormat df = DateTimeFormat.getFormat("yyyy-MM-dd");
-    if(rangeValueChooser.isItemSelected(0)) {
+    if (rangeValueChooser.isItemSelected(0)) {
       // RANGE
       String rangeQuery = fieldName + ":[" + (from.getValue() == null ? "*" : df.format(from.getValue())) + " TO " +
           (to.getValue() == null ? "*" : df.format(to.getValue())) + "]";
 
-      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
+      if (((CheckBox) radioControls.getWidget(4)).getValue()) {
         return "NOT " + rangeQuery;
       }
       return rangeQuery;
@@ -235,20 +227,42 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
 
     // VALUES
     String valuesQuery = fieldName + ":(>=" + df.format(date.getValue()) + " AND <=" + df.format(date.getValue()) + ")";
-    if(((CheckBox) radioControls.getWidget(4)).getValue()) {
+    if (((CheckBox) radioControls.getWidget(4)).getValue()) {
       return "NOT " + valuesQuery;
     }
     return valuesQuery;
+  }
 
+  @Override
+  public String getRQLQueryString() {
+    String emptyNotEmpty = super.getRQLQueryString();
+    if (emptyNotEmpty != null) return emptyNotEmpty;
+
+    DateTimeFormat df = DateTimeFormat.getFormat("yyyy-MM-dd");
+    if (rangeValueChooser.isItemSelected(0)) {
+      // RANGE
+      String rangeQuery = "range(" + getRQLField() + ",(" + (from.getValue() == null ? "*" : df.format(from.getValue())) + "," +
+          (to.getValue() == null ? "*" : df.format(to.getValue())) + "))";
+
+      if (((CheckBox) radioControls.getWidget(4)).getValue()) {
+        return "not(" + rangeQuery + ")";
+      }
+      return rangeQuery;
+    }
+
+    // VALUES
+    String valuesQuery = "in(" + getRQLField() + ",(" + df.format(date.getValue()) + "))";
+    if (((CheckBox) radioControls.getWidget(4)).getValue()) {
+      return "not(" + valuesQuery + ")";
+    }
+    return valuesQuery;
   }
 
   private void setFilterText() {
-    String filter = variable.getName() + ": ";
+    String filter = variable.getName() + " ";
     filter += ((CheckBox) radioControls.getWidget(3)).getValue()
-        ? translations.criterionFiltersMap().get("in")
-        : translations.criterionFiltersMap().get("not_in");
-
-    //filter += " " + rangeValueChooser.getItemText(rangeValueChooser.getSelectedIndex()).toLowerCase();
+        ? translations.criterionFiltersMap().get("in").toLowerCase()
+        : translations.criterionFiltersMap().get("not_in").toLowerCase();
 
     DateTimeFormat df = DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_MEDIUM);
     filter += rangeValueChooser.isItemSelected(0)

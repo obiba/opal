@@ -84,7 +84,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
   }
 
   private void initialize(ValueSetVariableCriterion criterion) {
-    if ("*".equals(criterion.getValue())) {
+    if (criterion.hasWildcardValue()) {
       if (criterion.isNot()) {
         ((CheckBox) radioControls.getWidget(3)).setValue(true);
         updateRangeValuesFields();
@@ -92,7 +92,8 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
       }
     }
     else if (criterion.hasValue()) {
-      selectRangeOrValues(criterion.getValue());
+      if (criterion.isRange()) selectRange(criterion.getValues());
+      else selectValues(criterion.getValueString());
       ((CheckBox)radioControls.getWidget(criterion.isNot() ? 4 : 3)).setValue(true);
       updateRangeValuesFields();
       divider.setVisible(true);
@@ -103,18 +104,15 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
     doFilter();
   }
 
-  private void selectRangeOrValues(String valueString) {
-    if (valueString.startsWith("[") && valueString.endsWith("]")) {
-      rangeValueChooser.setSelectedIndex(0);
-      String nValues = valueString.substring(1, valueString.length() - 1);
-      List<String> minMax = Splitter.on(" TO ").splitToList(nValues);
-      if (!"*".equals(minMax.get(0))) min.setText(minMax.get(0));
-      if (!"*".equals(minMax.get(1))) max.setText(minMax.get(1));
-    }
-    else if (valueString.startsWith("(") && valueString.endsWith(")")) {
-      rangeValueChooser.setSelectedIndex(1);
-      values.setText(valueString.substring(1, valueString.length() - 1));
-    }
+  private void selectRange(List<String> values) {
+    rangeValueChooser.setSelectedIndex(0);
+    if (!values.isEmpty() && !"*".equals(values.get(0))) min.setText(values.get(0));
+    if (values.size()>1 && !"*".equals(values.get(1))) max.setText(values.get(1));
+  }
+
+  private void selectValues(String valueString) {
+    rangeValueChooser.setSelectedIndex(1);
+    values.setText(valueString);
   }
 
   private void updateRadioButtons() {
@@ -239,21 +237,56 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
     return "";
   }
 
+  @Override
+  public String getRQLQueryString() {
+    String emptyNotEmpty = super.getRQLQueryString();
+    if(emptyNotEmpty != null) return emptyNotEmpty;
+
+    String rqlField = getRQLField();
+    // RANGE
+    if(rangeValueChooser.isItemSelected(0)) {
+      String rangeQuery = "range(" + rqlField + ",(" + (min.getText().isEmpty() ? "*" : min.getText()) + "," +
+          (max.getText().isEmpty() ? "*" : max.getText()) + "))";
+
+      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
+        return "not(" + rangeQuery + ")";
+      }
+
+      return rangeQuery;
+    }
+
+    // VALUES
+    if(rangeValueChooser.isItemSelected(1) && !values.getText().isEmpty()) {
+      // Parse numbers
+      List<String> numbers = Lists.newArrayList();
+      for (String nb : values.getText().trim().split("\\s+")) {
+        if (!nb.trim().isEmpty()) numbers.add(nb);
+      }
+      String valuesQuery = "in(" + rqlField + ",(" + Joiner.on(",").join(numbers) + "))";
+
+      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
+        return "not(" + valuesQuery + ")";
+      }
+
+      return valuesQuery;
+    }
+
+    return "";
+  }
+
   private void updateRangeValuesCriterionFilter() {
     setFilterText();
     doFilter();
   }
 
   private void setFilterText() {
-    String filter = variable.getName() + ": ";
+    String filter = variable.getName() + " ";
     filter += ((CheckBox) radioControls.getWidget(3)).getValue()
-        ? translations.criterionFiltersMap().get("in")
-        : translations.criterionFiltersMap().get("not_in");
-
-    //filter += " " + rangeValueChooser.getItemText(rangeValueChooser.getSelectedIndex()).toLowerCase();
+        ? translations.criterionFiltersMap().get("in").toLowerCase()
+        : translations.criterionFiltersMap().get("not_in").toLowerCase();
 
     filter += rangeValueChooser.isItemSelected(0) ? " [" + (min.getText().isEmpty() ? "*" : min.getText()) + " " +
-        translations.criterionFiltersMap().get("to") + " " +
+        translations.criterionFiltersMap().get("to").toLowerCase() + " " +
         (max.getText().isEmpty() ? "*" : max.getText()) + "]" : " (" + values.getText() + ")";
 
     setText(filter);

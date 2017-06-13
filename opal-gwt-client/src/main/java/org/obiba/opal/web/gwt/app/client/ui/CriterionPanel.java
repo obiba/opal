@@ -72,6 +72,10 @@ public class CriterionPanel extends FlowPanel {
     return criterion.getQueryString();
   }
 
+  public String getRQLQueryString() {
+    return criterion.getRQLQueryString();
+  }
+
   public String getQueryText() {
     return criterion.getText();
   }
