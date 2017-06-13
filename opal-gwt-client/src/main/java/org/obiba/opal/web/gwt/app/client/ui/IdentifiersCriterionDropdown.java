@@ -82,6 +82,7 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
   public void resetSpecificControls() {
     matches.setVisible(false);
     matchesHelp.setVisible(false);
+    if (divider != null) divider.setVisible(false);
   }
 
   @Override
@@ -134,6 +135,7 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
     public void onClick(ClickEvent event) {
       matches.setVisible(true);
       matchesHelp.setVisible(true);
+      divider.setVisible(true);
       setFilterText();
     }
   }

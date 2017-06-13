@@ -21,4 +21,6 @@ public interface SearchEntitiesUiHandlers extends UiHandlers {
   void onSearch(String entityType, List<String> query);
 
   void onVariableFilter(String datasource, String table, String variable);
+
+  void onClear();
 }

@@ -47,16 +47,21 @@ public class EsResultConverter {
    */
   public Search.QueryResultDto convert(JSONObject json) throws JSONException {
     Assert.notNull(json, "Result JSON is null!");
+    Search.QueryResultDto.Builder dtoResultsBuilder = Search.QueryResultDto.newBuilder();
 
-    JSONObject jsonHits = json.getJSONObject("hits");
-    JSONArray hits = jsonHits.getJSONArray("hits");
-    Search.QueryResultDto.Builder dtoResultsBuilder = Search.QueryResultDto.newBuilder()
-        .setTotalHits(jsonHits.getInt("total"));
+    if (json.has("hits")) {
+      JSONObject jsonHits = json.getJSONObject("hits");
+      JSONArray hits = jsonHits.getJSONArray("hits");
+      dtoResultsBuilder.setTotalHits(jsonHits.getInt("total"));
 
-    if(hits.length() > 0) {
-      HitsConverter hitsConverter = new HitsConverter();
-      hitsConverter.setStrategy(itemResultStrategy);
-      dtoResultsBuilder.addAllHits(hitsConverter.convert(jsonHits.getJSONArray("hits")));
+      if(hits.length() > 0) {
+        HitsConverter hitsConverter = new HitsConverter();
+        hitsConverter.setStrategy(itemResultStrategy);
+        dtoResultsBuilder.addAllHits(hitsConverter.convert(jsonHits.getJSONArray("hits")));
+      }
+    }
+    else {
+      dtoResultsBuilder.setTotalHits(0);
     }
 
     if(json.has("aggregations")) {

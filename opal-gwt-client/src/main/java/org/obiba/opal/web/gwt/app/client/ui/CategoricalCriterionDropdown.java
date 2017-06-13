@@ -15,6 +15,7 @@ import com.github.gwtbootstrap.client.ui.Icon;
 import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -38,6 +39,11 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
 
   public CategoricalCriterionDropdown(String datasource, String table, VariableDto variableDto, String fieldName, QueryResultDto termDto) {
     super(datasource, table, variableDto, fieldName, termDto);
+  }
+
+  public CategoricalCriterionDropdown(ValueSetVariableCriterion criterion, QueryResultDto termDto) {
+    this(criterion.getDatasourceName(), criterion.getTableName(), criterion.getVariable(), criterion.getField(), termDto);
+    initialize(criterion);
   }
 
   @Override
@@ -110,6 +116,50 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
     }
 
     return null;
+  }
+
+  private void initialize(ValueSetVariableCriterion criterion) {
+    if ("*".equals(criterion.getValue())) {
+      if (criterion.isNot()) {
+        ((CheckBox) radioControls.getWidget(3)).setValue(true);
+        specificControls.setVisible(true);
+        divider.setVisible(true);
+      }
+    }
+    else if (criterion.hasValue()) {
+      for (String value : parseValues(criterion.getValue())) {
+        selectCategory(value);
+      }
+      ((CheckBox)radioControls.getWidget(criterion.isNot() ? 4 : 3)).setValue(true);
+      specificControls.setVisible(true);
+      divider.setVisible(true);
+    }
+    else if (criterion.isExists())
+      ((CheckBox)radioControls.getWidget(criterion.isNot() ? 1 : 2)).setValue(true);
+    setFilterText();
+    doFilter();
+  }
+
+  private void selectCategory(String value) {
+    for (CheckBox checkBox : categoryChecks) {
+      if (checkBox.getName().equals(value)) {
+        checkBox.setValue(true);
+        break;
+      }
+    }
+  }
+
+  private List<String> parseValues(String valueString) {
+    List<String> values = Lists.newArrayList();
+    String nValues = valueString.trim();
+    if (nValues.startsWith("(") && nValues.endsWith(")")) {
+      nValues = nValues.substring(1, nValues.length() - 1);
+      for (String value : Splitter.on(" OR ").splitToList(nValues)) {
+        values.add(value.replaceAll("\"", ""));
+      }
+    }
+    else values.add(nValues);
+    return values;
   }
 
   private void setFilterText() {

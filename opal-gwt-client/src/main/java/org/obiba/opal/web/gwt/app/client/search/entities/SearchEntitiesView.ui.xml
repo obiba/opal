@@ -33,10 +33,13 @@
         <o2:EntityTypeDropdown ui:field="typeDropdown" size="SMALL"/>
         <o:CriteriaPanel ui:field="criteriaPanel" addStyleNames="inline-block small-indent"></o:CriteriaPanel>
         <b:Typeahead ui:field="variableTypeahead">
-          <b:TextBox placeholder="More variable criteria..." addStyleNames="top-margin"/>
+          <b:TextBox ui:field="variableInput" placeholder="More variable criteria..." addStyleNames="top-margin"/>
         </b:Typeahead>
         <b:Button ui:field="searchButton" addStyleNames="btn btn-primary small-indent">
           <ui:msg description="Search Button label">Search</ui:msg>
+        </b:Button>
+        <b:Button ui:field="clearButton" addStyleNames="btn small-indent">
+          <ui:msg description="Clear Button label">Clear</ui:msg>
         </b:Button>
       </b:Well>
 
