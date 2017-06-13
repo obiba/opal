@@ -117,6 +117,14 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
   }
 
   @Override
+  public void onEntityType(String selection) {
+    selectedType = selection;
+    queries = null;
+    indexedTables = null;
+    renderTables();
+  }
+
+  @Override
   public void onSearch(String entityType, List<String> queries, int offset, int limit) {
     selectedType = entityType;
     this.queries = queries;
