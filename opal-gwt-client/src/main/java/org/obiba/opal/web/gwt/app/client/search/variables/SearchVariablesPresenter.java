@@ -108,7 +108,6 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
 
   @Override
   public void onSearchRange(String query, int offset, int limit) {
-    //GWT.log("onSearchRange?q=" + query + "&o=" + offset + "&lm=" + limit);
     this.query = query;
     this.offset = offset;
     this.limit = limit;

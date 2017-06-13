@@ -179,7 +179,6 @@ public class SearchEntityView extends ViewWithUiHandlers<SearchEntityUiHandlers>
 
   @Override
   public void showTables(JsArray<TableDto> tables) {
-    //GWT.log("showTables");
     tableChooser.clear();
     tableChooser.addTableSelections(tables);
     entityResultPanel.setVisible(tables != null && tables.length()>0);
@@ -187,7 +186,6 @@ public class SearchEntityView extends ViewWithUiHandlers<SearchEntityUiHandlers>
 
   @Override
   public void showValueSet(String datasource, String table, JsArray<VariableDto> variables, ValueSetsDto valueSets) {
-    //GWT.log("showValueSet");
     setVariableValueRows(datasource, table, variables, valueSets);
     showVariableValueRows(variableValueRows);
     tableChooser.setSelectedValue(datasource + "." + table);

@@ -92,7 +92,6 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
   @Override
   protected void onReveal() {
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
-    //GWT.log("onReveal=" + selectedType + ":" + selectedId + ":" + selectedTable);
     ResourceRequestBuilderFactory.<JsArray<VariableEntitySummaryDto>>newBuilder()
         .forResource(UriBuilders.DATASOURCES_ENTITY_TYPES.create().build()).get()
         .withCallback(new ResourceCallback<JsArray<VariableEntitySummaryDto>>() {
@@ -111,7 +110,6 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
     tableVariables.clear();
     tables = null;
     getView().clearResults(true);
-    //GWT.log("prepareFromRequest=" + selectedType + ":" + selectedId + ":" + selectedTable);
     if (!Strings.isNullOrEmpty(selectedId)) {
       getView().setEntityType(selectedType);
       getView().setEntityId(selectedId);
@@ -126,7 +124,6 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
     selectedType = entityType;
     selectedId = entityId;
     selectedTable = null;
-    //GWT.log("onSearch=" + selectedType + ":" + selectedId + ":" + selectedTable);
     getView().clearResults(true);
     searchSelected();
   }
@@ -176,7 +173,6 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
   }
 
   private void searchSelected() {
-    //GWT.log("searchSelected=" + selectedType + ":" + selectedId + ":" + selectedTable);
     loadTables();
   }
 
@@ -184,7 +180,6 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
    * Load the tables where the entity appears.
    */
   private void loadTables() {
-    //GWT.log("loadTables=" + selectedType + ":" + selectedId + ":" + selectedTable);
     UriBuilder uriBuilder = UriBuilder.create().segment("entity", selectedId, "type", selectedType, "tables");
     ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(uriBuilder.build()).get()
         .withCallback(new ResourceCallback<JsArray<TableDto>>() {
@@ -210,7 +205,6 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
    * Load value set of the entity for the selected table. Load also the variables if necessary.
    */
   private void loadSelectedTable() {
-    //GWT.log("loadSelectedTable=" + selectedType + ":" + selectedId + ":" + selectedTable);
     MagmaPath.Parser parser = parseTableReference(selectedTable);
     final String datasource = parser.getDatasource();
     final String table = parser.getTable();
@@ -236,7 +230,6 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
 
           private void loadSelectedTableVariables(final String datasource, final String table, final ValueSetsDto valueSets) {
             String variablesUri = UriBuilders.DATASOURCE_TABLE_VARIABLES.create().build(datasource, table);
-            //GWT.log(variablesUri);
             ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder() //
                 .forResource(variablesUri) //
                 .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
