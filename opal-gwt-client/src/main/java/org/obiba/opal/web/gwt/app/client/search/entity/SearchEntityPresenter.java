@@ -131,7 +131,7 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
   @Override
   public void onTableChange(String tableReference) {
     selectedTable = tableReference;
-    loadSelectedTable();
+    loadTable(selectedTable);
     updateHistory();
   }
 
@@ -192,9 +192,10 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
               notifyNoSuchEntity();
             } else {
               getView().showTables(tables);
+              String tableRef = selectedTable;
               if (Strings.isNullOrEmpty(selectedTable))
-                selectedTable = tables.get(0).getDatasourceName() + "." + tables.get(0).getName();
-              loadSelectedTable();
+                tableRef = tables.get(0).getDatasourceName() + "." + tables.get(0).getName();
+              loadTable(tableRef);
             }
             updateHistory();
           }
@@ -204,8 +205,8 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
   /**
    * Load value set of the entity for the selected table. Load also the variables if necessary.
    */
-  private void loadSelectedTable() {
-    MagmaPath.Parser parser = parseTableReference(selectedTable);
+  private void loadTable(final String tableRef) {
+    MagmaPath.Parser parser = parseTableReference(tableRef);
     final String datasource = parser.getDatasource();
     final String table = parser.getTable();
 
@@ -222,8 +223,8 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
         .withCallback(new ResourceCallback<ValueSetsDto>() {
           @Override
           public void onResource(Response response, ValueSetsDto resource) {
-            if (tableVariables.containsKey(selectedTable))
-              getView().showValueSet(datasource, table, tableVariables.get(selectedTable), resource);
+            if (tableVariables.containsKey(tableRef))
+              getView().showValueSet(datasource, table, tableVariables.get(tableRef), resource);
             else
              loadSelectedTableVariables(datasource, table, resource);
           }
@@ -235,8 +236,8 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
                 .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
                   @Override
                   public void onResource(Response response, JsArray<VariableDto> resource) {
-                    tableVariables.put(selectedTable, JsArrays.toSafeArray(resource));
-                    getView().showValueSet(datasource, table, tableVariables.get(selectedTable), valueSets);
+                    tableVariables.put(tableRef, JsArrays.toSafeArray(resource));
+                    getView().showValueSet(datasource, table, tableVariables.get(tableRef), valueSets);
                   }
                 }).get().send();
           }
