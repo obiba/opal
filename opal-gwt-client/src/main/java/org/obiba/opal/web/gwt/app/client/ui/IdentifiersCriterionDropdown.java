@@ -24,8 +24,6 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
 
   private TextBox matches;
 
-  private HelpBlock matchesHelp;
-
   public IdentifiersCriterionDropdown(String datasource, String table) {
     super(datasource, table,null, "identifier", null);
   }
@@ -36,10 +34,7 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
 
     ListItem specificControls = new ListItem();
     matches = new TextBox();
-    matchesHelp = new HelpBlock(translations.criterionFiltersMap().get("wildcards_help"));
     specificControls.addStyleName("controls");
-
-    matches.setPlaceholder(translations.criterionFiltersMap().get("custom_match_query"));
     matches.addKeyUpHandler(new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent event) {
@@ -47,10 +42,8 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
       }
     });
     matches.setVisible(false);
-    matchesHelp.setVisible(false);
 
     specificControls.add(matches);
-    specificControls.add(matchesHelp);
     return specificControls;
   }
 
@@ -81,20 +74,17 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
   @Override
   public void resetSpecificControls() {
     matches.setVisible(false);
-    matchesHelp.setVisible(false);
     if (divider != null) divider.setVisible(false);
   }
 
   @Override
   public String getQueryString() {
-    String emptyNotEmpty;
-
     if(((CheckBox) radioControls.getWidget(0)).getValue()) {
-      emptyNotEmpty = super.getQueryString();
+      String emptyNotEmpty = super.getQueryString();
       if(emptyNotEmpty != null) return emptyNotEmpty;
     }
 
-    String query = "(" + fieldName + ":" + matches.getText() + " OR " + fieldName + ".analyzed:" + matches.getText() + ")";
+    String query = "(" + fieldName + ":(" + matches.getText() + ") OR " + fieldName + ".analyzed:(" + matches.getText() + "))";
 
     if(((CheckBox) radioControls.getWidget(1)).getValue() && !matches.getText().isEmpty()) {
       return query;
@@ -107,8 +97,25 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
     return null;
   }
 
+  @Override
+  public String getRQLQueryString() {
+    if (getRadionButtonValue(0)) {
+      String emptyNotEmpty = super.getRQLQueryString();
+      if (emptyNotEmpty != null) return emptyNotEmpty;
+    }
+    String query = "like(" + getRQLField() + ",(" + matches.getText() + "))";
+    if (getRadionButtonValue(1)) return query;
+    if (getRadionButtonValue(2)) return "not(" + query + ")";
+    return null;
+  }
+
+  @Override
+  protected String getRQLField() {
+    return fieldName;
+  }
+
   protected void updateCriterionFilter(String filter) {
-    setText(filter.isEmpty() ? "ID" : "ID: " + filter);
+    setText(filter.isEmpty() ? "ID" : "ID " + filter);
   }
 
   private void updateMatchCriteriaFilter() {
@@ -122,10 +129,10 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
     } else {
 
       String prefix = ((CheckBox) radioControls.getWidget(1)).getValue()
-          ? translations.criterionFiltersMap().get("like") + " "
-          : translations.criterionFiltersMap().get("not_like") + " ";
+          ? translations.criterionFiltersMap().get("like").toLowerCase() + " ("
+          : translations.criterionFiltersMap().get("not_like").toLowerCase() + " (";
 
-      updateCriterionFilter(prefix + matches.getText());
+      updateCriterionFilter(prefix + matches.getText() + ")");
     }
   }
 
@@ -134,7 +141,6 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
     @Override
     public void onClick(ClickEvent event) {
       matches.setVisible(true);
-      matchesHelp.setVisible(true);
       divider.setVisible(true);
       setFilterText();
     }
