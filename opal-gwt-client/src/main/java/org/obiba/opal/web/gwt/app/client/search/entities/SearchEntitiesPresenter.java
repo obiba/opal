@@ -12,8 +12,8 @@ package org.obiba.opal.web.gwt.app.client.search.entities;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -37,21 +37,19 @@ import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
-import org.obiba.opal.web.gwt.app.client.support.JsOpalMap;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtoNature;
+import org.obiba.opal.web.gwt.app.client.ui.RQLIdentifierCriterionParser;
+import org.obiba.opal.web.gwt.app.client.ui.RQLValueSetVariableCriterionParser;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
-import org.obiba.opal.web.gwt.app.client.ui.ValueSetVariableCriterion;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableEntitySummaryDto;
-import org.obiba.opal.web.model.client.opal.OpalMap;
 import org.obiba.opal.web.model.client.search.EntitiesResultDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.obiba.opal.web.gwt.app.client.support.VariableDtoNature.*;
 
@@ -67,6 +65,8 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
   private final PlaceManager placeManager;
 
   private String selectedType;
+
+  private String idQuery;
 
   private List<String> queries;
 
@@ -100,14 +100,14 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
   @Override
   public void prepareFromRequest(PlaceRequest request) {
     selectedType = request.getParameter(ParameterTokens.TOKEN_TYPE, "Participant");
+    idQuery = request.getParameter(ParameterTokens.TOKEN_ID, "");
     String jQueries = request.getParameter(ParameterTokens.TOKEN_QUERY, "");
     queries = null;
     if (!jQueries.isEmpty()) {
       queries = Splitter.on(QUERY_SEP).splitToList(jQueries);
       getView().clearResults(true);
       searchProvidedQueryIfReady();
-    }
-    else getView().reset();
+    } else getView().reset();
   }
 
   @Override
@@ -125,8 +125,9 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
   }
 
   @Override
-  public void onSearch(String entityType, List<String> queries, int offset, int limit) {
+  public void onSearch(String entityType, String idQuery, List<String> queries, int offset, int limit) {
     selectedType = entityType;
+    this.idQuery = idQuery;
     this.queries = queries;
     if (queries.isEmpty()) updateHistory();
     else {
@@ -136,10 +137,10 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
   }
 
   @Override
-  public void onVariableFilter(final String datasource, final String table, final String variable) {
+  public void onVariableCriterion(final String datasource, final String table, final String variable) {
     ResourceRequestBuilderFactory.<VariableDto>newBuilder().forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
         .build(datasource, table, variable))
-        .withCallback(new VariableFilterProcessor(datasource, table)).get().send();
+        .withCallback(new VariableCriterionProcessor(datasource, table)).get().send();
   }
 
   //
@@ -149,9 +150,19 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
   private void updateHistory() {
     PlaceRequest.Builder builder = PlaceRequestHelper.createRequestBuilder(placeManager.getCurrentPlaceRequest())
         .with(ParameterTokens.TOKEN_TYPE, selectedType);
-    if (queries.isEmpty()) builder.without(ParameterTokens.TOKEN_QUERY);
-    else builder.with(ParameterTokens.TOKEN_QUERY, Joiner.on(QUERY_SEP).join(queries));
+    if (queries.isEmpty()) {
+      builder.without(ParameterTokens.TOKEN_ID);
+      builder.without(ParameterTokens.TOKEN_QUERY);
+    } else {
+      builder.with(ParameterTokens.TOKEN_ID, idQuery);
+      builder.with(ParameterTokens.TOKEN_QUERY, Joiner.on(QUERY_SEP).join(queries));
+    }
     placeManager.updateHistory(builder.build(), true);
+  }
+
+  private List<String> getVariableQueries() {
+    if (queries == null || queries.isEmpty()) return Lists.newArrayList();
+    else return queries.subList(1, queries.size());
   }
 
   private void searchSelected() {
@@ -165,6 +176,7 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
         .query("counts", "true")
         .query("offset", "" + offset)
         .query("limit", "" + limit);
+    if (!Strings.isNullOrEmpty(idQuery)) builder.query("id", idQuery);
     for (String query : queries) builder.query("query", query);
     ResourceRequestBuilderFactory.<EntitiesResultDto>newBuilder()
         .forResource(builder.build())
@@ -229,21 +241,35 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
     // view init is completed
     if (indexedTables == null || entityTypes == null) return;
     List<String> validQueries = Lists.newArrayList();
+    List<RQLValueSetVariableCriterionParser> criterions = Lists.newArrayList();
     for (String query : queries) {
-      ValueSetVariableCriterion parser = new ValueSetVariableCriterion(query);
-      if (parser.isValid()) {
+      RQLValueSetVariableCriterionParser criterion = new RQLValueSetVariableCriterionParser(query);
+      if (criterion.isValid()) {
         validQueries.add(query);
-        renderVariableFilter(parser);
+        criterions.add(criterion);
+
       }
     }
     queries = validQueries;
-    searchSelected();
+    // cascading rendering
+    renderVariableCriterion(criterions, 0);
   }
 
-  private void renderVariableFilter(final ValueSetVariableCriterion filter) {
-    ResourceRequestBuilderFactory.<VariableDto>newBuilder().forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
-        .build(filter.getDatasourceName(), filter.getTableName(), filter.getVariableName()))
-        .withCallback(new VariableFilterProcessor(filter)).get().send();
+  /**
+   * Render a list of criterions in a cascading way.
+   *
+   * @param criterions
+   * @param idx
+   */
+  private void renderVariableCriterion(final List<RQLValueSetVariableCriterionParser> criterions, final int idx) {
+    if (idx < criterions.size()) {
+      final RQLValueSetVariableCriterionParser criterion = criterions.get(idx);
+      ResourceRequestBuilderFactory.<VariableDto>newBuilder().forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
+          .build(criterion.getDatasourceName(), criterion.getTableName(), criterion.getVariableName()))
+          .withCallback(new VariableCriterionProcessor(criterions, idx)).get().send();
+    } else {
+      searchSelected();
+    }
   }
 
   @ProxyStandard
@@ -265,33 +291,42 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
 
     void reset();
 
-    void addCategoricalCriterion(ValueSetVariableCriterion filter, QueryResultDto facet);
+    void addCategoricalCriterion(RQLIdentifierCriterionParser idCriterion, RQLValueSetVariableCriterionParser criterion, QueryResultDto facet);
 
-    void addNumericalCriterion(ValueSetVariableCriterion filter, QueryResultDto facet);
+    void addNumericalCriterion(RQLIdentifierCriterionParser idCriterion, RQLValueSetVariableCriterionParser criterion, QueryResultDto facet);
 
-    void addDateCriterion(ValueSetVariableCriterion filter);
+    void addDateCriterion(RQLIdentifierCriterionParser idCriterion, RQLValueSetVariableCriterionParser criterion);
 
-    void addDefaultCriterion(ValueSetVariableCriterion filter);
+    void addDefaultCriterion(RQLIdentifierCriterionParser idCriterion, RQLValueSetVariableCriterionParser criterion);
 
     void showResults(EntitiesResultDto results, int offset, int limit);
 
     void searchEnabled(boolean enabled);
+
+    void triggerSearch();
   }
 
-  private class VariableFilterProcessor implements ResourceCallback<VariableDto> {
+  private class VariableCriterionProcessor implements ResourceCallback<VariableDto> {
     private final String datasource;
     private final String table;
-    private ValueSetVariableCriterion criterion;
+    private RQLValueSetVariableCriterionParser criterion;
+    private final List<RQLValueSetVariableCriterionParser> criterions;
+    private final int currentIdx;
 
-    public VariableFilterProcessor(String datasource, String table) {
+    public VariableCriterionProcessor(String datasource, String table) {
+      this.criterion = null;
+      this.criterions = null;
+      this.currentIdx = -1;
       this.datasource = datasource;
       this.table = table;
     }
 
-    public VariableFilterProcessor(ValueSetVariableCriterion criterion) {
+    public VariableCriterionProcessor(List<RQLValueSetVariableCriterionParser> criterions, int idx) {
+      this.criterion = criterions.get(idx);
+      this.criterions = criterions;
+      this.currentIdx = idx;
       this.datasource = criterion.getDatasourceName();
       this.table = criterion.getTableName();
-      this.criterion = criterion;
     }
 
     @Override
@@ -299,17 +334,17 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
       if (criterion != null) {
         criterion.setVariable(resource);
         addVariableCriterion();
-      }
-      else addVariableCriterion(resource);
+      } else addVariableCriterion(resource);
     }
 
     private void addVariableCriterion(VariableDto variable) {
-      this.criterion = new ValueSetVariableCriterion(datasource, table, variable);
+      this.criterion = new RQLValueSetVariableCriterionParser(datasource, table, variable);
       addVariableCriterion();
     }
 
     private void addVariableCriterion() {
       final VariableDtoNature nature = criterion.getNature();
+      final RQLIdentifierCriterionParser idCriterion = new RQLIdentifierCriterionParser(idQuery);
       if (nature == CONTINUOUS || nature == CATEGORICAL) {
         // Filter for Categorical variable OR Numerical variable
         ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(
@@ -319,14 +354,25 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
               @Override
               public void onResource(Response response, QueryResultDto resource) {
                 if (nature == CONTINUOUS)
-                  getView().addNumericalCriterion(criterion, resource);
+                  getView().addNumericalCriterion(idCriterion, criterion, resource);
                 else
-                  getView().addCategoricalCriterion(criterion, resource);
+                  getView().addCategoricalCriterion(idCriterion, criterion, resource);
+                renderNextVariableCriterionOrSearch();
               }
             }).get().send();
+      } else {
+        if (nature == TEMPORAL)
+          getView().addDateCriterion(idCriterion, criterion);
+        else
+          getView().addDefaultCriterion(idCriterion, criterion);
+        renderNextVariableCriterionOrSearch();
       }
-      else if (nature == TEMPORAL) getView().addDateCriterion(criterion);
-      else getView().addDefaultCriterion(criterion);
+    }
+
+    private void renderNextVariableCriterionOrSearch() {
+      if (criterions == null) getView().triggerSearch();
+      else if (currentIdx < criterions.size() - 1) renderVariableCriterion(criterions, currentIdx + 1);
+      else searchSelected();
     }
   }
 

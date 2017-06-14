@@ -10,7 +10,6 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
-import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
@@ -51,7 +50,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
     super(datasource, table, variableDto, fieldName, termDto);
   }
 
-  public NumericalCriterionDropdown(ValueSetVariableCriterion criterion, QueryResultDto termDto) {
+  public NumericalCriterionDropdown(RQLValueSetVariableCriterionParser criterion, QueryResultDto termDto) {
     this(criterion.getDatasourceName(), criterion.getTableName(), criterion.getVariable(), criterion.getField(), termDto);
     initialize(criterion);
   }
@@ -83,7 +82,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
     return specificControls;
   }
 
-  private void initialize(ValueSetVariableCriterion criterion) {
+  private void initialize(RQLValueSetVariableCriterionParser criterion) {
     if (criterion.hasWildcardValue()) {
       if (criterion.isNot()) {
         ((CheckBox) radioControls.getWidget(3)).setValue(true);
@@ -101,7 +100,6 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
     else if (criterion.isExists())
       ((CheckBox)radioControls.getWidget(criterion.isNot() ? 1 : 2)).setValue(true);
     setFilterText();
-    doFilter();
   }
 
   private void selectRange(List<String> values) {

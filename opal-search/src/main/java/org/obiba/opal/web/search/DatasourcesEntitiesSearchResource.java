@@ -11,6 +11,7 @@
 package org.obiba.opal.web.search;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -18,8 +19,8 @@ import org.codehaus.jettison.json.JSONObject;
 import org.obiba.opal.search.AbstractSearchUtility;
 import org.obiba.opal.search.SearchQueryException;
 import org.obiba.opal.web.model.Search;
-import org.obiba.opal.web.search.support.ESValueSetVariableCriterionParser;
 import org.obiba.opal.web.search.support.QuerySearchJsonBuilder;
+import org.obiba.opal.web.search.support.RQLIdentifierCriterionParser;
 import org.obiba.opal.web.search.support.RQLValueSetVariableCriterionParser;
 import org.obiba.opal.web.search.support.ValueSetVariableCriterionParser;
 import org.slf4j.Logger;
@@ -49,20 +50,21 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
   @Transactional(readOnly = true)
   @Path("_search")
   public Response search(@QueryParam("query") List<String> queries,
+                         @QueryParam("id") String idQuery,
                          @QueryParam("type") @DefaultValue("Participant") String entityType,
                          @QueryParam("offset") @DefaultValue("0") int offset,
                          @QueryParam("limit") @DefaultValue("10") int limit,
-                         @QueryParam("counts") @DefaultValue("false") boolean withCounts,
-                         @QueryParam("format") @DefaultValue("rql") String format) throws JSONException {
+                         @QueryParam("counts") @DefaultValue("false") boolean withCounts) throws JSONException {
     if (!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
     this.entityType = entityType;
 
-    List<ValueSetVariableCriterionParser> childQueries = extractChildQueries(queries, format);
+    final RQLIdentifierCriterionParser idCriterion = Strings.isNullOrEmpty(idQuery) ? null : new RQLIdentifierCriterionParser(idQuery);
+    List<ValueSetVariableCriterionParser> childQueries = extractChildQueries(queries);
     List<Search.EntitiesResultDto> partialResults = Lists.newArrayList();
     if (withCounts && childQueries.size() > 1) {
       for (ValueSetVariableCriterionParser childQuery : childQueries) {
         QuerySearchJsonBuilder builder = buildHasChildQuerySearch(0, 0);
-        builder.childQuery(childQuery.asChildQuery());
+        builder.childQuery(childQuery.asChildQuery(idCriterion == null ? null : idCriterion.getQuery()));
         JSONObject jsonResponse = executeQuery(builder.build());
         partialResults.add(getResultDtoBuilder(jsonResponse, childQuery.getOriginalQuery()).build());
       }
@@ -70,7 +72,7 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
 
     // global query
     QuerySearchJsonBuilder builder = buildHasChildQuerySearch(offset, limit);
-    builder.childQueries(childQueries.stream().map(ValueSetVariableCriterionParser::asChildQuery).collect(Collectors.toList()));
+    builder.childQueries(childQueries.stream().map(p -> p.asChildQuery(idCriterion == null ? null : idCriterion.getQuery())).collect(Collectors.toList()));
     JSONObject jsonResponse = executeQuery(builder.build());
 
     if (!jsonResponse.isNull("error")) {
@@ -86,9 +88,9 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
   @Transactional(readOnly = true)
   @Path("_count")
   public Response count(@QueryParam("query") List<String> queries,
-                        @QueryParam("type") @DefaultValue("Participant") String entityType,
-                        @QueryParam("format") @DefaultValue("rql") String format) throws JSONException {
-    return search(queries, entityType, 0, 0, true, format);
+                        @QueryParam("id") String idQuery,
+                        @QueryParam("type") @DefaultValue("Participant") String entityType) throws JSONException {
+    return search(queries, idQuery, entityType, 0, 0, true);
   }
 
   @Override
@@ -100,11 +102,8 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
   // Private methods
   //
 
-  private List<ValueSetVariableCriterionParser> extractChildQueries(List<String> queries, String format) {
-    if ("rql".equals(format))
-      return queries.stream().map(q -> new RQLValueSetVariableCriterionParser(opalSearchService.getValuesIndexManager(), q)).collect(Collectors.toList());
-    else
-      return queries.stream().map(q -> new ESValueSetVariableCriterionParser(opalSearchService.getValuesIndexManager(), q)).collect(Collectors.toList());
+  private List<ValueSetVariableCriterionParser> extractChildQueries(List<String> queries) {
+    return queries.stream().map(q -> new RQLValueSetVariableCriterionParser(opalSearchService.getValuesIndexManager(), q)).collect(Collectors.toList());
   }
 
   private QuerySearchJsonBuilder buildHasChildQuerySearch(int offset, int limit) {

@@ -15,7 +15,6 @@ import com.github.gwtbootstrap.client.ui.Icon;
 import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -40,7 +39,7 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
     super(datasource, table, variableDto, fieldName, termDto);
   }
 
-  public CategoricalCriterionDropdown(ValueSetVariableCriterion criterion, QueryResultDto termDto) {
+  public CategoricalCriterionDropdown(RQLValueSetVariableCriterionParser criterion, QueryResultDto termDto) {
     this(criterion.getDatasourceName(), criterion.getTableName(), criterion.getVariable(), criterion.getField(), termDto);
     initialize(criterion);
   }
@@ -143,7 +142,7 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
     return null;
   }
 
-  private void initialize(ValueSetVariableCriterion criterion) {
+  private void initialize(RQLValueSetVariableCriterionParser criterion) {
     if (criterion.hasWildcardValue()) {
       if (criterion.isNot()) {
         ((CheckBox) radioControls.getWidget(3)).setValue(true);
@@ -162,7 +161,6 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
     else if (criterion.isExists())
       ((CheckBox)radioControls.getWidget(criterion.isNot() ? 1 : 2)).setValue(true);
     setFilterText();
-    doFilter();
   }
 
   private void selectCategory(String value) {

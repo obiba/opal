@@ -26,7 +26,6 @@ import java.util.Map;
 
 public class ValueTableVariablesMapping {
 
-  private static final String ANALYZED_FIELD_POSTFIX = ".analyzed";
 
   private final ValueTypeMappings valueTypeMappings = new ValueTypeMappings();
 
@@ -42,10 +41,10 @@ public class ValueTableVariablesMapping {
       mapString("project", mapping);
       mapString("datasource", mapping);
       mapString("table", mapping);
-      mapNotAnalyzedString("reference", mapping);
-      mapAnalyzedString("name", mapping);
-      mapAnalyzedString("label", mapping);
-      mapAnalyzedString("label-en", mapping);
+      MappingHelper.mapNotAnalyzedString("reference", mapping);
+      MappingHelper.mapAnalyzedString("name", mapping);
+      MappingHelper.mapAnalyzedString("label", mapping);
+      MappingHelper.mapAnalyzedString("label-en", mapping);
       mapString("fullName", mapping);
       mapString("entityType", mapping);
       mapString("valueType", mapping);
@@ -109,35 +108,5 @@ public class ValueTableVariablesMapping {
     mapping.endObject();
   }
 
-  private void mapNotAnalyzedString(String field, XContentBuilder mapping) throws IOException {
-    mapping.startObject(field);
-    mapping.field("type", "string");
-    mapping.field("index", "not_analyzed");
-    mapping.endObject();
-  }
 
-  private void mapAnalyzedString(String field, XContentBuilder mapping) throws IOException {
-    mapping.startObject(field);
-    mapping.field("fields", mapFields(field));
-    mapping.field("type", "multi_field");
-    mapping.endObject();
-  }
-
-  private Map<String, Map<String, String>> mapFields(String field) {
-    Map<String, String> analyzed = new HashMap<>();
-    analyzed.put("type", "string");
-    analyzed.put("index", "analyzed");
-    analyzed.put("index_analyzer", "opal_index_analyzer");
-    analyzed.put("search_analyzer", "opal_search_analyzer");
-
-    Map<String, String> notAnalyzed = new HashMap<>();
-    notAnalyzed.put("type", "string");
-    notAnalyzed.put("index", "not_analyzed");
-
-    Map<String, Map<String, String>> fields = new HashMap<>();
-    fields.put(field + ANALYZED_FIELD_POSTFIX, analyzed);
-    fields.put(field, notAnalyzed);
-
-    return fields;
-  }
 }

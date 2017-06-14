@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.ui;
 
 import com.github.gwtbootstrap.client.ui.*;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
@@ -61,7 +62,7 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
 
   private void initialize() {
     initializeHeader();
-    updateCriterionFilter(translations.criterionFiltersMap().get("all"));
+    updateCriterionFilter(translations.criterionFiltersMap().get("all").toLowerCase());
     initializeRadioControls(getNoEmptyCount());
     Widget specificControls = createSpecificControls();
     if(specificControls != null) {
@@ -86,11 +87,14 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
       info.addStyleName("small-indent");
       namePanel.add(info);
     }
-    FlowPanel tablePanel = new FlowPanel();
-    header.add(tablePanel);
-    Label tableLabel = new Label(datasource + " - " + table);
-    tableLabel.addStyleName("italic");
-    tablePanel.add(tableLabel);
+    String subtitle = getHeaderSubTitle();
+    if (!Strings.isNullOrEmpty(subtitle)) {
+      FlowPanel tablePanel = new FlowPanel();
+      Label tableLabel = new Label(subtitle);
+      tableLabel.addStyleName("italic");
+      tablePanel.add(tableLabel);
+      header.add(tablePanel);
+    }
     add(header);
     ListItem headerDivider = new ListItem();
     headerDivider.addStyleName("divider");
@@ -103,6 +107,13 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
 
   protected String getHeaderTitle() {
     return getVariableLabel();
+  }
+
+  protected String getHeaderSubTitle() {
+    if (!Strings.isNullOrEmpty(datasource) && !Strings.isNullOrEmpty(table)) {
+      return datasource + " - " + table;
+    }
+    return "";
   }
 
   @Override

@@ -17,7 +17,6 @@ import com.google.gwt.user.client.ui.InlineLabel;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
-import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
 import org.obiba.opal.web.model.client.search.ItemResultDto;
@@ -79,7 +78,7 @@ public class EntityItemTable extends Table<ItemResultDto> {
 
     @Override
     public PlaceRequest getPlaceRequest(ItemResultDto item) {
-      return ProjectPlacesHelper.getEntityPlace(entityType, item.getIdentifier());
+      return ProjectPlacesHelper.getSearchEntityPlace(entityType, item.getIdentifier());
     }
 
     @Override

@@ -10,11 +10,14 @@
 
 package org.obiba.opal.web.gwt.app.client.project;
 
+import com.google.common.base.Joiner;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
 
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
+
+import java.util.List;
 
 @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
 public class ProjectPlacesHelper {
@@ -65,10 +68,18 @@ public class ProjectPlacesHelper {
         .build();
   }
 
-  public static PlaceRequest getEntityPlace(String entityType, String identifier) {
+  public static PlaceRequest getSearchEntityPlace(String entityType, String identifier) {
     return new PlaceRequest.Builder().nameToken(Places.SEARCH_ENTITY) //
         .with(ParameterTokens.TOKEN_TYPE, entityType) //
         .with(ParameterTokens.TOKEN_ID, identifier) //
+        .build();
+  }
+
+  public static PlaceRequest getSearchEntitiesPlace(String entityType, String identifierQuery, List<String> queries) {
+    return new PlaceRequest.Builder().nameToken(Places.SEARCH_ENTITIES) //
+        .with(ParameterTokens.TOKEN_TYPE, entityType) //
+        .with(ParameterTokens.TOKEN_ID, identifierQuery) //
+        .with(ParameterTokens.TOKEN_QUERY, Joiner.on("#").join(queries)) //
         .build();
   }
 

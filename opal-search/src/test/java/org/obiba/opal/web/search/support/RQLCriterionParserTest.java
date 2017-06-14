@@ -52,6 +52,19 @@ public class RQLCriterionParserTest {
     assertThat(parser.getQuery()).isEqualTo("field:(\"1\")");
   }
 
+
+  @Test
+  public void test_in_single_categorical_wildcard() {
+    String rql = "in(field,*)";
+    RQLCriterionParser parser = new RQLCriterionParser(rql) {
+      @Override
+      protected VariableNature getNature() {
+        return VariableNature.CATEGORICAL;
+      }
+    };
+    assertThat(parser.getQuery()).isEqualTo("field:(*)");
+  }
+
   @Test
   public void test_in_single_spaced() {
     String rql = "in(field,1 2)";
@@ -97,6 +110,18 @@ public class RQLCriterionParserTest {
       }
     };
     assertThat(parser.getQuery()).isEqualTo("field:(\"1\" OR \"2\")");
+  }
+
+  @Test
+  public void test_in_multiple_categorical_wildcard() {
+    String rql = "in(field,(1*,2))";
+    RQLCriterionParser parser = new RQLCriterionParser(rql) {
+      @Override
+      protected VariableNature getNature() {
+        return VariableNature.CATEGORICAL;
+      }
+    };
+    assertThat(parser.getQuery()).isEqualTo("field:(1* OR \"2\")");
   }
 
   @Test

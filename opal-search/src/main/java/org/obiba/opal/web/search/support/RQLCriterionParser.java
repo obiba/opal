@@ -99,7 +99,7 @@ public class RQLCriterionParser {
     boolean toQuote = getNature().equals(VariableNature.CATEGORICAL);
     List<String> nArgs = args.stream().map(arg -> {
       String nArg = arg instanceof DateTime ? DATE_FORMAT.format(((DateTime) arg).toDate()) : arg.toString();
-      if (toQuote) return "\"" + nArg + "\"";
+      if (toQuote) return quote(nArg);
       else return normalizeString(nArg);
     }).collect(Collectors.toList());
 
@@ -118,11 +118,16 @@ public class RQLCriterionParser {
       return parseOr(values);
     }
     if (value instanceof DateTime) return parseSingleDate(value);
-    return getNature().equals(VariableNature.CATEGORICAL) ? "\"" + value + "\"" : normalizeString(value.toString());
+    return getNature().equals(VariableNature.CATEGORICAL) ? quote(value) : normalizeString(value.toString());
   }
 
   private String normalizeString(String str) {
     return str.replaceAll(" ","+");
+  }
+
+  private String quote(Object value) {
+    String valueStr = value.toString();
+    return valueStr.contains("*") ? normalizeString(valueStr) : "\"" + valueStr + "\"";
   }
 
   private String parseRange(Object value) {

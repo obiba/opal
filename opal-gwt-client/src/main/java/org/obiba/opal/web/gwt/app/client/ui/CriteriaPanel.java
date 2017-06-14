@@ -10,7 +10,6 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 

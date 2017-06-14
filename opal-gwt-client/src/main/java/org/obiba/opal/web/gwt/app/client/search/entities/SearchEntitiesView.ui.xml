@@ -32,7 +32,8 @@
     <g:FlowPanel ui:field="entityPanel">
       <b:Well>
         <o2:EntityTypeDropdown ui:field="typeDropdown" size="SMALL"/>
-        <o:CriteriaPanel ui:field="criteriaPanel" addStyleNames="inline-block small-indent"></o:CriteriaPanel>
+        <g:SimplePanel ui:field="idPanel" addStyleNames="inline-block"></g:SimplePanel>
+        <o:CriteriaPanel ui:field="criteriaPanel" addStyleNames="inline-block"></o:CriteriaPanel>
         <b:Typeahead ui:field="variableTypeahead">
           <b:TextBox ui:field="variableInput" placeholder="More variable criteria..." addStyleNames="top-margin"/>
         </b:Typeahead>

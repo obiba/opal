@@ -31,15 +31,21 @@
         </b:ControlGroup>
 
         <b:ControlGroup ui:field="valuesFilterGroup" visible="false">
-          <b:ControlLabel>
-            <ui:msg description="Values Filter label">Values Filter</ui:msg>
-          </b:ControlLabel>
-          <b:Controls>
+          <g:FlowPanel>
             <o:CriteriaPanel ui:field="filters" addStyleNames="inline-block"/>
             <b:Typeahead ui:field="variableTypeahead">
-              <b:TextBox placeholder="More variable criteria..."/>
+              <b:TextBox placeholder="More variable criteria..." addStyleNames="top-margin"/>
             </b:Typeahead>
-          </b:Controls>
+            <b:Button ui:field="searchButton" addStyleNames="btn btn-primary small-indent">
+              <ui:msg description="Search Button label">Search</ui:msg>
+            </b:Button>
+            <b:Button ui:field="clearButton" addStyleNames="btn small-indent">
+              <ui:msg description="Clear Button label">Clear</ui:msg>
+            </b:Button>
+            <g:Anchor ui:field="searchEntities" addStyleNames="btn-small">
+              <ui:msg description="Search Entities Button label">Search entities</ui:msg>
+            </g:Anchor>
+          </g:FlowPanel>
           <b:HelpBlock>
             <ui:msg description="Values Filter help">Select some variables and apply value filter on each of them. Export or Copy the resulting data set.
             </ui:msg>

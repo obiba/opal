@@ -12,7 +12,13 @@ package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
 import com.gwtplatform.mvp.client.UiHandlers;
 
+import java.util.List;
+
 public interface ValuesTableUiHandlers extends UiHandlers {
 
   void onVariableFilter(String variableName);
+
+  void onSearch();
+
+  void onSearchEntities(String idQuery, List<String> queries);
 }

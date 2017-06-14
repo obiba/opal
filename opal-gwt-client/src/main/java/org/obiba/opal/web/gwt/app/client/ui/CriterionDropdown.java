@@ -64,15 +64,15 @@ public abstract class CriterionDropdown extends DropdownButton {
   }
 
   public String getRQLQueryString() {
-    if(((CheckBox) radioControls.getWidget(0)).getValue()) {
+    if(getRadionButtonValue(0)) {
       // All: No filter is necessary
       return "in(" + getRQLField() + ",*)";
     }
-    if(((CheckBox) radioControls.getWidget(1)).getValue()) {
+    if(getRadionButtonValue(1)) {
       // Not empty
       return "not(exists(" + getRQLField() + "))";
     }
-    if(((CheckBox) radioControls.getWidget(2)).getValue()) {
+    if(getRadionButtonValue(2)) {
       // Empty
       return "exists(" + getRQLField() + ")";
     }

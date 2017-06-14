@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.search.support;
 
+import com.google.common.base.Strings;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueType;
@@ -36,9 +37,10 @@ public class RQLValueSetVariableCriterionParser extends RQLCriterionParser imple
   }
 
   @Override
-  public QuerySearchJsonBuilder.ChildQuery asChildQuery() {
-    getQuery(); // make sure ES query is built
-    return new QuerySearchJsonBuilder.ChildQuery(valuesIndexManager.getIndex(table).getIndexType(), getQuery());
+  public QuerySearchJsonBuilder.ChildQuery asChildQuery(String idQuery) {
+    String query = getQuery(); // make sure ES query is built
+    if (!Strings.isNullOrEmpty(idQuery)) query = idQuery + " AND " + query;
+    return new QuerySearchJsonBuilder.ChildQuery(valuesIndexManager.getIndex(table).getIndexType(), query);
   }
 
   @Override

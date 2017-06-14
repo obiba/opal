@@ -12,6 +12,9 @@ package org.obiba.opal.web.gwt.app.client.magma.view;
 import java.util.AbstractList;
 import java.util.List;
 
+import com.google.gwt.event.dom.client.*;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
@@ -51,11 +54,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -68,14 +66,6 @@ import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.InlineLabel;
-import com.google.gwt.user.client.ui.MenuBar;
-import com.google.gwt.user.client.ui.MenuItem;
-import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.SuggestOracle;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.AbstractDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
@@ -143,6 +133,9 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
   @UiField(provided = true)
   Typeahead variableTypeahead;
+
+  @UiField
+  Anchor searchEntities;
 
   @UiField
   ControlGroup searchIdentifierGroup;
@@ -222,6 +215,26 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     };
 
     addPanel.setText(translations.displayOptionsLabel());
+  }
+
+  @UiHandler("searchButton")
+  public void onSearch(ClickEvent event) {
+    getUiHandlers().onSearch();
+  }
+
+  @UiHandler("clearButton")
+  public void onClear(ClickEvent event) {
+    while (filters.getCriterions().size()>1) {
+      filters.remove(1);
+    }
+    getUiHandlers().onSearch();
+  }
+
+  @UiHandler("searchEntities")
+  public void onSearchEntities(ClickEvent event) {
+    List<String> queries = filters.getRQLQueryStrings();
+    if (queries.size() == 1) return;
+    getUiHandlers().onSearchEntities(queries.get(0), queries.subList(1, queries.size()));
   }
 
   @Override
@@ -515,6 +528,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
   @Override
   public void populateValues(int offset, ValueSetsDto resource) {
+    searchEntities.setVisible(filters.getQueryStrings().size()>1);
     if(dataProvider != null) {
       dataProvider.populateValues(offset, resource);
     }

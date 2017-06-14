@@ -16,7 +16,6 @@ import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -94,7 +93,12 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   Image refreshPending;
 
   @UiField
+  SimplePanel idPanel;
+
+  @UiField
   CriteriaPanel criteriaPanel;
+
+  private CriterionPanel idCriterionPanel;
 
   private DefaultFlexTable resultsTable;
 
@@ -117,6 +121,18 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
     });
   }
 
+  private void initIdCriterionPanel(RQLIdentifierCriterionParser idFilter) {
+    if (idCriterionPanel != null) return;
+    idPanel.clear();
+    this.idCriterionPanel = new CriterionPanel(new IdentifiersCriterionDropdown(idFilter) {
+      @Override
+      public void doFilter() {
+        onSearch(null);
+      }
+    }, false, false);
+    idPanel.add(idCriterionPanel);
+  }
+
   private void initVariableTypeahead(EventBus eventBus) {
     oracle = new IndexedVariableSuggestOracle(eventBus);
     oracle.setLimit(15);
@@ -127,7 +143,7 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
       @Override
       public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {
         VariableSuggestOracle.VariableSuggestion variableSuggestion = (VariableSuggestOracle.VariableSuggestion) selectedSuggestion;
-        getUiHandlers().onVariableFilter(variableSuggestion.getDatasource(), variableSuggestion.getTable(), variableSuggestion.getVariable());
+        getUiHandlers().onVariableCriterion(variableSuggestion.getDatasource(), variableSuggestion.getTable(), variableSuggestion.getVariable());
         return "";
       }
     });
@@ -166,6 +182,11 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   }
 
   @Override
+  public void triggerSearch() {
+    onSearch(null);
+  }
+
+  @Override
   public void setEntityTypes(List<VariableEntitySummaryDto> entityTypes, String selectedType) {
     typeDropdown.setEntityTypes(entityTypes, selectedType);
     entityPanel.setVisible(!entityTypes.isEmpty());
@@ -200,12 +221,14 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   public void reset() {
     clearResults(false);
     criteriaPanel.clear();
+    idPanel.clear();
+    idCriterionPanel = null;
     variableInput.setText("");
   }
 
   @Override
-  public void addCategoricalCriterion(ValueSetVariableCriterion filter, QueryResultDto facet) {
-    addVariableFilter(new CategoricalCriterionDropdown(filter, facet) {
+  public void addCategoricalCriterion(RQLIdentifierCriterionParser idFilter, RQLValueSetVariableCriterionParser filter, QueryResultDto facet) {
+    addVariableFilter(idFilter, new CategoricalCriterionDropdown(filter, facet) {
       @Override
       public void doFilter() {
         onSearch(null);
@@ -214,8 +237,8 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   }
 
   @Override
-  public void addNumericalCriterion(ValueSetVariableCriterion filter, QueryResultDto facet) {
-    addVariableFilter(new NumericalCriterionDropdown(filter, facet) {
+  public void addNumericalCriterion(RQLIdentifierCriterionParser idFilter, RQLValueSetVariableCriterionParser filter, QueryResultDto facet) {
+    addVariableFilter(idFilter, new NumericalCriterionDropdown(filter, facet) {
       @Override
       public void doFilter() {
         onSearch(null);
@@ -224,8 +247,8 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   }
 
   @Override
-  public void addDateCriterion(ValueSetVariableCriterion filter) {
-    addVariableFilter(new DateTimeCriterionDropdown(filter) {
+  public void addDateCriterion(RQLIdentifierCriterionParser idFilter, RQLValueSetVariableCriterionParser filter) {
+    addVariableFilter(idFilter, new DateTimeCriterionDropdown(filter) {
       @Override
       public void doFilter() {
         onSearch(null);
@@ -234,8 +257,8 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   }
 
   @Override
-  public void addDefaultCriterion(ValueSetVariableCriterion filter) {
-    addVariableFilter(new DefaultCriterionDropdown(filter) {
+  public void addDefaultCriterion(RQLIdentifierCriterionParser idFilter, RQLValueSetVariableCriterionParser filter) {
+    addVariableFilter(idFilter, new DefaultCriterionDropdown(filter) {
       @Override
       public void doFilter() {
         onSearch(null);
@@ -243,19 +266,25 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
     });
   }
 
-  private void addVariableFilter(CriterionDropdown criterion) {
+  private void addVariableFilter(RQLIdentifierCriterionParser idFilter, CriterionDropdown criterion) {
+    initIdCriterionPanel(idFilter);
     criteriaPanel.addCriterion(criterion);
-    onSearch(null);
+    //onSearch(null);
   }
 
   private void onSearch(int offset, int limit) {
     if (!searchButton.isEnabled()) return;
     List<String> queries = criteriaPanel.getRQLQueryStrings();
     if (queries.isEmpty()) reset();
-    getUiHandlers().onSearch(typeDropdown.getSelection(), queries, offset, limit);
+    String idQuery = idCriterionPanel == null ? "" : idCriterionPanel.getRQLQueryString();
+    getUiHandlers().onSearch(typeDropdown.getSelection(), idQuery, queries, offset, limit);
   }
 
   private void showIdentifiersResults(EntitiesResultDto results, int offset, int limit) {
+    if (getValueSetCriterions().isEmpty()) {
+      refreshPending.setVisible(false);
+      return;
+    }
     List<ItemResultDto> identifiers = JsArrays.toList(results.getHitsArray());
     if (limit == 0 || identifiers.isEmpty()) {
       entitiesResultPanel.setVisible(false);
@@ -269,8 +298,8 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   }
 
   private void showCountsResults(EntitiesResultDto results) {
-    List<String> queries = criteriaPanel.getRQLQueryStrings();
-    List<CriterionDropdown> criterions = criteriaPanel.getCriterions();
+    List<String> queries = getValueSetRQLQueryStrings();
+    List<CriterionDropdown> criterions = getValueSetCriterions();
     if (criterions.isEmpty()) {
       refreshPending.setVisible(false);
       return;
@@ -283,8 +312,6 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
       setCountResultRow(row, criterion, result.getTotalHits());
       row++;
     }
-    Label query = new Label(criteriaPanel.getQueryText());
-    query.setTitle(results.getQuery());
     if (queries.size() == 1) {
       ValueSetCriterionDropdown criterion = (ValueSetCriterionDropdown) criterions.get(0);
       setCountResultRow(row, criterion, results.getTotalHits());
@@ -293,12 +320,22 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
       all.addStyleName("property-key");
       resultsTable.setWidget(row, 0, all);
       resultsTable.getFlexCellFormatter().setColSpan(row, 0, 2);
+      Label query = new Label(idCriterionPanel.getQueryText() + " AND " + criteriaPanel.getQueryText());
+      query.setTitle(idCriterionPanel.getRQLQueryString() + " AND " + results.getQuery());
       resultsTable.setWidget(row, 1, query);
       Label total = new Label(results.getTotalHits() + "");
       total.addStyleName("property-key");
       resultsTable.setWidget(row, 2, total);
     }
     countsResultPanel.setVisible(true);
+  }
+
+  private List<String> getValueSetRQLQueryStrings() {
+    return criteriaPanel.getRQLQueryStrings();
+  }
+
+  private List<CriterionDropdown> getValueSetCriterions() {
+    return criteriaPanel.getCriterions();
   }
 
   private void prepareResultsTable() {
@@ -315,8 +352,8 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
     resultsTable.setWidget(row, 0, createTableLink(criterion.getDatasource(), criterion.getTable()));
     resultsTable.getFlexCellFormatter().setColSpan(row, 0, 1);
     resultsTable.setWidget(row, 1, createVariableLink(criterion.getDatasource(), criterion.getTable(), criterion.getVariable()));
-    Label query = new Label(criterion.getText());
-    query.setTitle(criterion.getRQLQueryString());
+    Label query = new Label(idCriterionPanel.getQueryText() + " AND " + criterion.getText());
+    query.setTitle(idCriterionPanel.getRQLQueryString() + " AND " + criterion.getRQLQueryString());
     resultsTable.setWidget(row, 2, query);
     resultsTable.setText(row, 3, count + "");
   }

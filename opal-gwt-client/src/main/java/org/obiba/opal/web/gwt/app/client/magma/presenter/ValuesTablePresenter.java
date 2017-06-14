@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.magma.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -22,10 +23,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.ValuesQueryEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.search.event.SearchEntityEvent;
-import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
-import org.obiba.opal.web.gwt.app.client.support.JsOpalMap;
-import org.obiba.opal.web.gwt.app.client.support.VariableDtoNature;
-import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
+import org.obiba.opal.web.gwt.app.client.support.*;
 import org.obiba.opal.web.gwt.app.client.ui.CategoricalCriterionDropdown;
 import org.obiba.opal.web.gwt.app.client.ui.CriterionDropdown;
 import org.obiba.opal.web.gwt.app.client.ui.DateTimeCriterionDropdown;
@@ -221,6 +219,17 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     ResourceRequestBuilderFactory.<VariableDto>newBuilder().forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
         .build(originalTable.getDatasourceName(), originalTable.getName(), variableName))
         .withCallback(new VariableFilterResourceCallback(variableName)).get().send();
+  }
+
+  @Override
+  public void onSearch() {
+    applyAllValueSetsFilter();
+  }
+
+  @Override
+  public void onSearchEntities(String idQuery, List<String> queries) {
+    PlaceRequest request = ProjectPlacesHelper.getSearchEntitiesPlace(originalTable.getEntityType(), idQuery, queries);
+    placeManager.revealPlace(request);
   }
 
   private void applyAllValueSetsFilter() {

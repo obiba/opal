@@ -20,7 +20,7 @@ public interface ValueSetVariableCriterionParser {
    *
    * @return
    */
-  QuerySearchJsonBuilder.ChildQuery asChildQuery();
+  QuerySearchJsonBuilder.ChildQuery asChildQuery(String idQuery);
 
   /**
    * Get the query that was parsed.

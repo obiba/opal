@@ -31,17 +31,11 @@ public class ValueTableMapping {
 
       mapping.startObject("properties");
 
-      mapping.startObject("identifier.analyzed") //
-          .field("type", "string") //
-          .field("index", "analyzed") //
-          .field("index_analyzer", "opal_index_analyzer") //
-          .field("search_analyzer", "opal_search_analyzer");
-      mapping.endObject();
-
-      mapNotAnalyzedString("project", mapping);
-      mapNotAnalyzedString("datasource", mapping);
-      mapNotAnalyzedString("table", mapping);
-      mapNotAnalyzedString("reference", mapping);
+      MappingHelper.mapAnalyzedString("identifier", mapping);
+      MappingHelper.mapNotAnalyzedString("project", mapping);
+      MappingHelper.mapNotAnalyzedString("datasource", mapping);
+      MappingHelper.mapNotAnalyzedString("table", mapping);
+      MappingHelper.mapNotAnalyzedString("reference", mapping);
 
       for(Variable variable : valueTable.getVariables()) {
         variableMappings.map(indexType, variable, mapping);
@@ -63,10 +57,4 @@ public class ValueTableMapping {
     }
   }
 
-  private void mapNotAnalyzedString(String field, XContentBuilder mapping) throws IOException {
-    mapping.startObject(field);
-    mapping.field("type", "string");
-    mapping.field("index", "not_analyzed");
-    mapping.endObject();
-  }
 }

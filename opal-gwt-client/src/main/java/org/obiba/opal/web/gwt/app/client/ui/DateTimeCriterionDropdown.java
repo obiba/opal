@@ -50,7 +50,7 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
     super(datasource, table, variableDto, fieldName, null);
   }
 
-  public DateTimeCriterionDropdown(ValueSetVariableCriterion criterion) {
+  public DateTimeCriterionDropdown(RQLValueSetVariableCriterionParser criterion) {
     this(criterion.getDatasourceName(), criterion.getTableName(), criterion.getVariable(), criterion.getField());
     initialize(criterion);
   }
@@ -74,7 +74,7 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
     return specificControls;
   }
 
-  private void initialize(ValueSetVariableCriterion criterion) {
+  private void initialize(RQLValueSetVariableCriterionParser criterion) {
     if (criterion.hasWildcardValue()) {
       if (criterion.isNot()) {
         ((CheckBox) radioControls.getWidget(3)).setValue(true);
@@ -90,7 +90,6 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
     } else if (criterion.isExists())
       ((CheckBox) radioControls.getWidget(criterion.isNot() ? 1 : 2)).setValue(true);
     setFilterText();
-    doFilter();
   }
 
   private void selectRange(List<String> values) {

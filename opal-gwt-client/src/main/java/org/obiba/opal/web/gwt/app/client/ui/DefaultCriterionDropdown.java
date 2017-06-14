@@ -34,7 +34,7 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
     super(datasource, table, variableDto, fieldName, null);
   }
 
-  public DefaultCriterionDropdown(ValueSetVariableCriterion criterion) {
+  public DefaultCriterionDropdown(RQLValueSetVariableCriterionParser criterion) {
     this(criterion.getDatasourceName(), criterion.getTableName(), criterion.getVariable(), criterion.getField());
     initialize(criterion);
   }
@@ -120,7 +120,7 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
     return null;
   }
 
-  private void initialize(ValueSetVariableCriterion criterion) {
+  private void initialize(RQLValueSetVariableCriterionParser criterion) {
     if (criterion.hasWildcardValue()) {
       if (criterion.isNot()) {
         ((CheckBox) radioControls.getWidget(3)).setValue(true);
@@ -135,7 +135,6 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
     } else if (criterion.isExists())
       ((CheckBox) radioControls.getWidget(criterion.isNot() ? 1 : 2)).setValue(true);
     setFilterText();
-    doFilter();
   }
 
   private boolean isValuesSelected() {

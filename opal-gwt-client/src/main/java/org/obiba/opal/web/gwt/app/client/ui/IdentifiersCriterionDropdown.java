@@ -11,7 +11,6 @@
 package org.obiba.opal.web.gwt.app.client.ui;
 
 import com.github.gwtbootstrap.client.ui.CheckBox;
-import com.github.gwtbootstrap.client.ui.HelpBlock;
 import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -24,8 +23,30 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
 
   private TextBox matches;
 
+
+  public IdentifiersCriterionDropdown(RQLIdentifierCriterionParser criterion) {
+    this(null, null);
+    initialize(criterion);
+  }
+
   public IdentifiersCriterionDropdown(String datasource, String table) {
     super(datasource, table,null, "identifier", null);
+  }
+
+  private void initialize(RQLIdentifierCriterionParser criterion) {
+    if (criterion.isValid() && criterion.isLike()) {
+      ((CheckBox) radioControls.getWidget(criterion.isNot() ? 2 : 1)).setValue(true);
+      ((CheckBox) radioControls.getWidget(0)).setValue(false);
+      matches.setText(criterion.getValueString());
+      matches.setVisible(true);
+      divider.setVisible(true);
+    }
+    else {
+      ((CheckBox) radioControls.getWidget(0)).setValue(true);
+      matches.setVisible(false);
+      divider.setVisible(false);
+    }
+    setFilterText();
   }
 
   @Override
@@ -34,6 +55,8 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
 
     ListItem specificControls = new ListItem();
     matches = new TextBox();
+    matches.setText("*");
+    matches.addStyleName("bordered");
     specificControls.addStyleName("controls");
     matches.addKeyUpHandler(new KeyUpHandler() {
       @Override
@@ -57,6 +80,11 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
     return "";
   }
 
+  @Override
+  protected String getHeaderSubTitle() {
+    return translations.criterionFiltersMap().get("entity_identifier");
+  }
+
   private void setupRadioControls() {// Remove empty/not empty radio
     radioControls.remove(1);
     radioControls.remove(1);
@@ -75,6 +103,7 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
   public void resetSpecificControls() {
     matches.setVisible(false);
     if (divider != null) divider.setVisible(false);
+    doFilter();
   }
 
   @Override
@@ -124,14 +153,12 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
   }
 
   private void setFilterText() {
-    if(matches.getText().isEmpty()) {
-      updateCriterionFilter("");
+    if(getRadionButtonValue(0)) {
+      updateCriterionFilter(translations.criterionFiltersMap().get("all").toLowerCase());
     } else {
-
-      String prefix = ((CheckBox) radioControls.getWidget(1)).getValue()
+      String prefix = getRadionButtonValue(1)
           ? translations.criterionFiltersMap().get("like").toLowerCase() + " ("
           : translations.criterionFiltersMap().get("not_like").toLowerCase() + " (";
-
       updateCriterionFilter(prefix + matches.getText() + ")");
     }
   }
@@ -143,6 +170,7 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
       matches.setVisible(true);
       divider.setVisible(true);
       setFilterText();
+      doFilter();
     }
   }
 }
