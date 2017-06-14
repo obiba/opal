@@ -10,7 +10,10 @@
 
 package org.obiba.opal.web.search.support;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.magma.type.DateType;
@@ -19,6 +22,16 @@ import org.obiba.opal.core.domain.VariableNature;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 public class RQLCriterionParserTest {
+  
+  @Before
+  public void setUp() throws Exception {
+    new MagmaEngine();
+  }
+
+  @After
+  public void tearDown() {
+    MagmaEngine.get().shutdown();
+  }
 
   @Test
   public void test_in_single() {
