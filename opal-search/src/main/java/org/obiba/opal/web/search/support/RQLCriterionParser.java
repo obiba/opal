@@ -32,7 +32,12 @@ public class RQLCriterionParser {
   private final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
   /**
-   * RQL query.
+   * RQL query object.
+   */
+  private ASTNode queryNode;
+
+  /**
+   * RQL query string.
    */
   private final String rqlQuery;
 
@@ -45,15 +50,48 @@ public class RQLCriterionParser {
     this.rqlQuery = rqlQuery;
   }
 
+  public RQLCriterionParser(ASTNode queryNode) {
+    this.queryNode = queryNode;
+    this.rqlQuery = toString(queryNode);
+  }
+
   public String getOriginalQuery() {
     return rqlQuery;
   }
 
   public String getQuery() {
     if (Strings.isNullOrEmpty(query)) {
-      this.query = parseNode(new RQLParser().parse(rqlQuery));
+      this.query = queryNode == null ? parseNode(RQLParserFactory.newParser().parse(rqlQuery))
+            : parseNode(queryNode);
     }
     return query;
+  }
+
+  private String toString(ASTNode node) {
+    StringBuilder builder = new StringBuilder(node.getName()).append("(");
+    for (int i=0; i<node.getArgumentsSize(); i++) {
+      if (i>0) builder.append(",");
+      append(builder, node.getArgument(i));
+    }
+    builder.append(")");
+    return builder.toString();
+  }
+
+  private void append(StringBuilder builder, Object arg) {
+    if (arg instanceof ASTNode) builder.append(toString((ASTNode)arg));
+    else if (arg instanceof Collection) {
+      builder.append("(");
+      Collection<?> values = (Collection) arg;
+      int i=0;
+      for (Object value : values) {
+        if (i>0) builder.append(",");
+        append(builder, value);
+        i++;
+      }
+      builder.append(")");
+    }
+    else if (arg instanceof DateTime) builder.append(normalizeDate((DateTime)arg));
+    else builder.append(arg);
   }
 
   private String parseNode(ASTNode node) {
@@ -98,7 +136,7 @@ public class RQLCriterionParser {
     String nOn = on;
     boolean toQuote = getNature().equals(VariableNature.CATEGORICAL);
     List<String> nArgs = args.stream().map(arg -> {
-      String nArg = arg instanceof DateTime ? DATE_FORMAT.format(((DateTime) arg).toDate()) : arg.toString();
+      String nArg = arg instanceof DateTime ? normalizeDate((DateTime) arg) : arg.toString();
       if (toQuote) return quote(nArg);
       else return normalizeString(nArg);
     }).collect(Collectors.toList());
@@ -123,6 +161,10 @@ public class RQLCriterionParser {
 
   private String normalizeString(String str) {
     return str.replaceAll(" ","+");
+  }
+
+  private String normalizeDate(DateTime date) {
+    return DATE_FORMAT.format(date.toDate());
   }
 
   private String quote(Object value) {

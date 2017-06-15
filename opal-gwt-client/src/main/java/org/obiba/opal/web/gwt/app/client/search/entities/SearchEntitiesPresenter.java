@@ -177,7 +177,9 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
         .query("offset", "" + offset)
         .query("limit", "" + limit);
     if (!Strings.isNullOrEmpty(idQuery)) builder.query("id", idQuery);
-    for (String query : queries) builder.query("query", query);
+    String query = Joiner.on(",").join(queries);
+    if (queries.size()>1) query = "and(" + query + ")";
+    builder.query("query", query);
     ResourceRequestBuilderFactory.<EntitiesResultDto>newBuilder()
         .forResource(builder.build())
         .withCallback(new ResponseCodeCallback() {

@@ -11,6 +11,7 @@
 package org.obiba.opal.web.search.support;
 
 import com.google.common.base.Strings;
+import net.jazdw.rql.parser.ASTNode;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueType;
@@ -33,6 +34,11 @@ public class RQLValueSetVariableCriterionParser extends RQLCriterionParser imple
 
   public RQLValueSetVariableCriterionParser(ValuesIndexManager valuesIndexManager, String rqlQuery) {
     super(rqlQuery);
+    this.valuesIndexManager = valuesIndexManager;
+  }
+
+  public RQLValueSetVariableCriterionParser(ValuesIndexManager valuesIndexManager, ASTNode rqlNode) {
+    super(rqlNode);
     this.valuesIndexManager = valuesIndexManager;
   }
 

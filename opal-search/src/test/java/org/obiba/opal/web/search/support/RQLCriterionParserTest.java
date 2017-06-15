@@ -10,6 +10,8 @@
 
 package org.obiba.opal.web.search.support;
 
+import net.jazdw.rql.parser.ASTNode;
+import net.jazdw.rql.parser.RQLParser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -306,5 +308,27 @@ public class RQLCriterionParserTest {
     String rql = "like(field,(1,2*))";
     RQLCriterionParser parser = new RQLCriterionParser(rql);
     assertThat(parser.getQuery()).isEqualTo("(field:(1 OR 2*) OR field.analyzed:(1 OR 2*))");
+  }
+
+  @Test
+  public void test_query_node() {
+    test_query_node_tostring("in(field1,1)");
+    test_query_node_tostring("in(field1,(1,2))");
+    test_query_node_tostring("in(field1,(1 OR 2))");
+    test_query_node_tostring("not(in(field1,(1,2)))");
+    test_query_node_tostring("exists(field2)");
+    test_query_node_tostring("not(exists(field2))");
+    test_query_node_tostring("range(field3,(100,200))");
+    test_query_node_tostring("not(range(field3,(100,200)))");
+    test_query_node_tostring("range(field2,(2009-04-12,*))");
+    test_query_node_tostring("in(field2,2009-04-12)");
+    test_query_node_tostring("in(field2,(2009-04-12))");
+  }
+
+  private void test_query_node_tostring(String rql) {
+    ASTNode node = new RQLParser().parse(rql);
+    RQLCriterionParser parser = new RQLCriterionParser(node);
+    assertThat(parser.getOriginalQuery()).isEqualTo(rql);
+
   }
 }
