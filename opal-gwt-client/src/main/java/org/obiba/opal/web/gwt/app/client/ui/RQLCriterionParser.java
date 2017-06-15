@@ -10,11 +10,16 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.gwt.core.client.JsArrayString;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtoNature;
+import org.obiba.opal.web.gwt.rql.client.RQLParser;
+import org.obiba.opal.web.gwt.rql.client.RQLQuery;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import java.util.List;
@@ -26,6 +31,7 @@ public class RQLCriterionParser {
 
   protected String fieldName;
   private String value;
+  private JsArrayString values;
   private boolean not;
   private boolean exists;
   private boolean like;
@@ -67,7 +73,7 @@ public class RQLCriterionParser {
   }
 
   public boolean hasValue() {
-    return !Strings.isNullOrEmpty(value);
+    return !Strings.isNullOrEmpty(value) || values != null;
   }
 
   public String getValue() {
@@ -76,20 +82,14 @@ public class RQLCriterionParser {
 
   public String getValueString() {
     if (!hasValue()) return "";
-    if (value.startsWith("(") && value.endsWith(")")) return value.substring(1, value.length() - 1);
-    return value;
+    if (!Strings.isNullOrEmpty(value)) return value;
+    return Joiner.on(",").join(JsArrays.toIterable(values));
   }
 
   public List<String> getValues() {
-    List<String> values = Lists.newArrayList();
-    if (!hasValue()) return values;
-    String nValue = value;
-    if (value.startsWith("(") && value.endsWith(")"))
-      nValue = value.substring(1, value.length() - 1);
-    for (String val : Splitter.on(",").splitToList(nValue)) {
-      values.add(val.trim());
-    }
-    return values;
+    if (!hasValue()) return Lists.newArrayList();
+    if (!Strings.isNullOrEmpty(value)) return Lists.newArrayList(value);
+    return JsArrays.toList(values);
   }
 
   public boolean isValid() {
@@ -98,43 +98,30 @@ public class RQLCriterionParser {
 
   private void parseRQLQuery(String query) {
     if (Strings.isNullOrEmpty(query)) return;
-    String nQuery = query.trim();
-    if (nQuery.startsWith("not(") && nQuery.endsWith(")")) {
-      not = true;
-      nQuery = nQuery.substring(4, nQuery.length() - 1);
+    RQLQuery node = RQLParser.parse(query).getRQLQuery(0);
+    not = "not".equals(node.getName());
+    if (not) {
+      node = node.getRQLQuery(0);
     }
-    if (nQuery.startsWith("exists(") && nQuery.endsWith(")")) {
-      exists = true;
-      nQuery = nQuery.substring(7, nQuery.length() - 1);
-      parseField(nQuery);
+    exists = "exists".equals(node.getName());
+    if (exists) {
+      parseField(node.getString(0));
       return;
     }
+    like = "like".equals(node.getName());
+    range = "range".equals(node.getName());
+    in = range || "in".equals(node.getName());
 
-    if (nQuery.startsWith("like(") && nQuery.endsWith(")")) {
-      like = true;
-      nQuery = nQuery.substring(5, nQuery.length() - 1);
+    parseField(node.getString(0));
+    if (node.getArgumentsSize()<2) return;
+    if (node.isArray(1)) {
+      values = node.getArray(1);
     }
-    if (nQuery.startsWith("in(") && nQuery.endsWith(")")) {
-      in = true;
-      nQuery = nQuery.substring(3, nQuery.length() - 1);
-    }
-    if (nQuery.startsWith("range(") && nQuery.endsWith(")")) {
-      in = true;
-      range = true;
-      nQuery = nQuery.substring(6, nQuery.length() - 1);
-    }
-    // at this point we should have "field,values"
-    int idx = nQuery.indexOf(',');
-    parseField(nQuery.substring(0, idx));
-    parseValue(nQuery.substring(idx + 1));
+    else value = node.getString(1);
   }
 
   protected void parseField(String field) {
     this.fieldName = field.trim();
-  }
-
-  private void parseValue(String valueString) {
-    this.value = valueString;
   }
 
 }
