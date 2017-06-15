@@ -269,7 +269,7 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   private void addVariableFilter(RQLIdentifierCriterionParser idFilter, CriterionDropdown criterion) {
     initIdCriterionPanel(idFilter);
     criteriaPanel.addCriterion(criterion);
-    //onSearch(null);
+    //onSearchValueSets(null);
   }
 
   private void onSearch(int offset, int limit) {

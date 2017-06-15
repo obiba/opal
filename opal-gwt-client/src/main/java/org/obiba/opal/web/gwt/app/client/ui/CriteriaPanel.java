@@ -66,6 +66,21 @@ public class CriteriaPanel extends FlowPanel {
     return filters;
   }
 
+  /**
+   * Get the RQL string representation of the query.
+   *
+   * @return
+   */
+  public String getRQLQueryString() {
+    Collection<String> filters = getRQLQueryStrings();
+    return filters.isEmpty() ? "*" : Joiner.on(",").join(filters);
+  }
+
+  /**
+   * Get each of the criterion RQL query string in their order of appearance.
+   *
+   * @return
+   */
   public List<String> getRQLQueryStrings() {
     List<String> filters = Lists.newArrayList();
     for(int i = 0; i < getWidgetCount(); i++) {
