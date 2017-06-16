@@ -12,10 +12,11 @@ package org.obiba.opal.web.gwt.app.client.presenter;
 import com.google.common.base.Strings;
 import org.obiba.opal.web.gwt.app.client.administration.configuration.event.GeneralConfigSavedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
-import org.obiba.opal.web.gwt.app.client.event.ModalClosedEvent;
-import org.obiba.opal.web.gwt.app.client.event.ModalShownEvent;
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
+import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariableEvent;
+import org.obiba.opal.web.gwt.app.client.cart.event.CartCountsUpdate;
+import org.obiba.opal.web.gwt.app.client.cart.event.CartCountsUpdateEvent;
+import org.obiba.opal.web.gwt.app.client.cart.service.CartService;
+import org.obiba.opal.web.gwt.app.client.event.*;
 import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequestEvent;
@@ -95,6 +96,8 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   private final PlaceManager placeManager;
 
+  private final CartService cartService;
+
   private int activeModals = 0;
 
   @Inject
@@ -104,7 +107,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       UnhandledResponseNotificationPresenter unhandledResponseNotificationPresenter,
       ModalProvider<FileSelectorPresenter> fileSelectorProvider,
       ModalProvider<ValueMapPopupPresenter> valueMapPopupProvider, RequestUrlBuilder urlBuilder,
-      PlaceManager placeManager) {
+      PlaceManager placeManager, CartService cartService) {
     super(eventBus, display, proxy);
     this.credentials = credentials;
     this.messageDialog = messageDialog;
@@ -113,7 +116,9 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     this.valueMapPopupProvider = valueMapPopupProvider.setContainer(this);
     this.urlBuilder = urlBuilder;
     this.placeManager = placeManager;
+    this.cartService = cartService;
     getView().setUiHandlers(this);
+    getView().setCartCounts(cartService.getVariablesCount());
   }
 
   @Override
@@ -123,6 +128,12 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   @Override
   protected void onBind() {
+    addRegisteredHandler(SessionCreatedEvent.getType(), new SessionCreatedEvent.Handler() {
+      @Override
+      public void onSessionCreated(SessionCreatedEvent event) {
+        cartService.clear();
+      }
+    });
     addRegisteredHandler(FileSelectionRequestEvent.getType(), new FileSelectionRequestEvent.Handler() {
       @Override
       public void onFileSelectionRequired(FileSelectionRequestEvent event) {
@@ -189,6 +200,21 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       @Override
       public void onProjectHidden(ProjectHiddenEvent event) {
         getView().clearSearch();
+      }
+    });
+
+    addRegisteredHandler(CartAddVariableEvent.getType(), new CartAddVariableEvent.CartAddVariableHandler() {
+      @Override
+      public void onCartAddVariable(CartAddVariableEvent event) {
+        cartService.addVariable(event.getDatasource(), event.getTable(), event.getVariable());
+        getView().setCartCounts(cartService.getVariablesCount());
+      }
+    });
+
+    addRegisteredHandler(CartCountsUpdateEvent.getType(), new CartCountsUpdateEvent.CartCountsUpdateHandler() {
+      @Override
+      public void onCartCountsUpdate(CartCountsUpdateEvent event) {
+        getView().setCartCounts(event.getVariablesCount());
       }
     });
 
@@ -335,6 +361,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   @Override
   public void onQuit() {
+    cartService.clear();
     fireEvent(new SessionEndedEvent());
   }
 
@@ -372,6 +399,8 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     void setUsername(String username);
 
     void setVersion(String version);
+
+    void setCartCounts(int count);
 
     void addSearchItem(String text, VariableSearchListItem.ItemType type);
 

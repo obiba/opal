@@ -78,6 +78,8 @@
   <extend-configuration-property name="gin.ginjector.modules"
       value="org.obiba.opal.web.gwt.app.client.search.SearchModule"/>
   <extend-configuration-property name="gin.ginjector.modules"
+      value="org.obiba.opal.web.gwt.app.client.cart.CartModule"/>
+  <extend-configuration-property name="gin.ginjector.modules"
       value="org.obiba.opal.web.gwt.app.client.magma.derive.DeriveModule"/>
 
   <!-- Client-side REST framework -->

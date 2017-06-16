@@ -34,6 +34,8 @@ public interface TableUiHandlers extends UiHandlers {
 
   void onAddVariablesToView(List<VariableDto> variables);
 
+  void onAddVariablesToCart(List<VariableDto> variables);
+
   void onEdit();
 
   void onEditWhere();

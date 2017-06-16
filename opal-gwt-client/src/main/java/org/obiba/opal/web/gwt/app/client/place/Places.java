@@ -23,6 +23,8 @@ public final class Places {
 
   public static final String PROJECTS = "!projects";
 
+  public static final String CART = "!cart";
+
   public static final String SEARCH = "!search";
 
   public static final String SEARCH_VARIABLES = "!variables";

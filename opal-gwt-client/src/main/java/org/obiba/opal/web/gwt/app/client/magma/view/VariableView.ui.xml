@@ -20,18 +20,8 @@
 
   <g:FlowPanel>
 
-    <g:FlowPanel>
-      <b:ButtonGroup addStyleNames="pull-right">
-        <b:Button icon="CHEVRON_UP" ui:field="previous">
-        </b:Button>
-        <b:Button icon="CHEVRON_DOWN" ui:field="next">
-        </b:Button>
-      </b:ButtonGroup>
-      <b:ButtonGroup addStyleNames="pull-right">
-        <b:Button icon="TRASH" ui:field="remove">
-        </b:Button>
-      </b:ButtonGroup>
-      <b:DropdownButton text="Derive" icon="COG" ui:field="deriveBtn" addStyleNames="pull-right">
+    <g:FlowPanel addStyleNames="pull-right">
+      <b:DropdownButton text="Derive" icon="COG" ui:field="deriveBtn">
         <b:NavLink ui:field="addToView">
           <ui:msg description="Add variable to view label">Add variable to view...</ui:msg>
         </b:NavLink>
@@ -45,6 +35,20 @@
           <ui:msg description="Custom derivation label">Custom derivation...</ui:msg>
         </b:NavLink>
       </b:DropdownButton>
+      <b:ButtonGroup>
+        <b:Button icon="SHOPPING_CART" ui:field="addToCart">
+        </b:Button>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:Button icon="TRASH" ui:field="remove">
+        </b:Button>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:Button icon="CHEVRON_UP" ui:field="previous">
+        </b:Button>
+        <b:Button icon="CHEVRON_DOWN" ui:field="next">
+        </b:Button>
+      </b:ButtonGroup>
     </g:FlowPanel>
 
     <b:TabPanel tabPosition="above" ui:field="tabPanel">

@@ -31,6 +31,9 @@
       </b:Nav>
 
       <b:Nav alignment="RIGHT">
+        <b:NavWidget ui:field="cartItem" icon="SHOPPING_CART" iconSize="TWO_TIMES" addStyleNames="pull-left nav-icon">
+          <b:Badge ui:field="cartCounts" type="INFO">0</b:Badge>
+        </b:NavWidget>
         <o:SuggestListBox ui:field="search" addStyleNames="pull-left navbar-search"/>
         <b:NavLink ui:field="administrationItem">
           <ui:msg description="Administration label">Administration</ui:msg>
