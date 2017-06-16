@@ -11,6 +11,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
              xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+             xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
              xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
              xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.search.variables"
              ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
@@ -30,8 +31,9 @@
 
     <b:Well>
       <o:CriteriaPanel ui:field="queryPanel" addStyleNames="inline-block"></o:CriteriaPanel>
+      <b:TextBox ui:field="containsInput" placeholder="Contains text..." addStyleNames="top-margin"></b:TextBox>
       <b:Typeahead ui:field="queryTypeahead">
-        <b:TextBox ui:field="queryInput" placeholder="Text or more criteria..." addStyleNames="top-margin"/>
+        <b:TextBox ui:field="queryInput" placeholder="More criteria..." addStyleNames="top-margin small-indent"/>
       </b:Typeahead>
       <b:TextArea ui:field="queryArea" visibleLines="5" width="100%" visible="false"></b:TextArea>
       <b:Button ui:field="searchButton" addStyleNames="btn btn-primary small-indent">
@@ -44,10 +46,39 @@
     </b:Well>
 
     <g:FlowPanel>
-      <g:FlowPanel>
+      <g:FlowPanel addStyleNames="small-bottom-margin clearfix">
         <o:OpalSimplePager ui:field="variableItemPager" showTotalWhenNoPager="true" location="RIGHT"
                            addStyleNames="pull-right small-indent"/>
-        <o2:VariableItemTable ui:field="variableItemTable" width="100%" addStyleNames="small-top-margin pull-left"/>
+      </g:FlowPanel>
+      <g:FlowPanel ui:field="variableItemTablePanel">
+        <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false" addStyleNames="actions-select">
+
+          <g:FlowPanel addStyleNames="pull-left" width="60%">
+            <b2:IconAnchor ui:field="addToCart" icon="SHOPPING_CART"
+                           addStyleNames="inline">
+              <ui:msg description="Add to cart label">Add to cart</ui:msg>
+            </b2:IconAnchor>
+          </g:FlowPanel>
+
+          <g:FlowPanel addStyleNames="pull-right">
+            <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
+            <b2:IconAnchor ui:field="selectAllAnchor" icon="CHECK" addStyleNames="inline small-indent"/>
+            <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" visible="false"
+                           addStyleNames="inline small-indent">
+              <ui:msg description="Clear label">Clear</ui:msg>
+            </b2:IconAnchor>
+          </g:FlowPanel>
+
+        </b:Alert>
+        <b:Alert ui:field="selectItemTipsAlert" close="false" visible="true"
+                 addStyleNames="alert-info actions-select">
+          <g:Label>
+            <ui:msg description="Select found variables tips label">Select variables to add to cart for further
+              processing.
+            </ui:msg>
+          </g:Label>
+        </b:Alert>
+        <o2:VariableItemTable ui:field="variableItemTable" width="100%" addStyleNames="pull-left"/>
       </g:FlowPanel>
       <g:Image ui:field="refreshPending" url="image/loading.gif"/>
     </g:FlowPanel>

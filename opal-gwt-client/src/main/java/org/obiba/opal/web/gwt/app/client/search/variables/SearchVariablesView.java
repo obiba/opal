@@ -14,6 +14,7 @@ import com.github.gwtbootstrap.client.ui.*;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.TextArea;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.*;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -21,12 +22,14 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.CriteriaPanel;
@@ -45,7 +48,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
   interface Binder extends UiBinder<Widget, SearchVariablesView> {}
 
-  private final Translations translations;
+  private final TranslationMessages translationMessages;
 
   private final PlaceManager placeManager;
 
@@ -57,6 +60,9 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
   @UiField(provided = true)
   Typeahead queryTypeahead;
+
+  @UiField
+  TextBox containsInput;
 
   @UiField
   TextBox queryInput;
@@ -74,6 +80,24 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   Image refreshPending;
 
   @UiField
+  Panel variableItemTablePanel;
+
+  @UiField
+  Alert selectItemTipsAlert;
+
+  @UiField
+  Alert selectAllItemsAlert;
+
+  @UiField
+  Label selectAllStatus;
+
+  @UiField
+  IconAnchor selectAllAnchor;
+
+  @UiField
+  IconAnchor clearSelectionAnchor;
+
+  @UiField
   VariableItemTable variableItemTable;
 
   @UiField
@@ -82,8 +106,8 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   private VariableItemProvider variableItemProvider;
 
   @Inject
-  public SearchVariablesView(SearchVariablesView.Binder uiBinder, Translations translations, PlaceManager placeManager) {
-    this.translations = translations;
+  public SearchVariablesView(SearchVariablesView.Binder uiBinder, Translations translations, TranslationMessages translationMessages, PlaceManager placeManager) {
+    this.translationMessages = translationMessages;
     initQueryTypeahead();
     initWidget(uiBinder.createAndBindUi(this));
     this.placeManager = placeManager;
@@ -127,9 +151,9 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     getUiHandlers().onClear();
   }
 
-  @UiHandler("queryInput")
-  public void onQueryTyped(KeyUpEvent event) {
-    if ((event.getNativeKeyCode() == KeyCodes.KEY_ENTER && event.isControlKeyDown()) || getQuery().isEmpty()) onSearch(null);
+  @UiHandler("containsInput")
+  public void onContainsTyped(KeyUpEvent event) {
+    if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER || getQuery().isEmpty()) onSearch(null);
   }
 
   @UiHandler("queryArea")
@@ -137,7 +161,12 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     if ((event.getNativeKeyCode() == KeyCodes.KEY_ENTER && event.isControlKeyDown()) || getQuery().isEmpty()) onSearch(null);
   }
 
-  @Override
+  @UiHandler("addToCart")
+  public void onAddToCart(ClickEvent event) {
+    getUiHandlers().onAddToCart(variableItemTable.getSelectedItems());
+  }
+
+    @Override
   public void setTaxonomies(List<TaxonomyDto> taxonomies) {
     ((VariableFieldSuggestOracle) queryTypeahead.getSuggestOracle()).setTaxonomies(taxonomies);
   }
@@ -178,6 +207,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   public void reset() {
     clearResults();
     queryPanel.clear();
+    containsInput.setText("");
     queryInput.setText("");
     queryArea.setText("");
     queryMode.setOn(true);
@@ -195,7 +225,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   private String getBasicQuery() {
     String queryDropdowns = queryPanel.getQueryString();
     if ("*".equals(queryDropdowns)) queryDropdowns = "";
-    return (queryDropdowns  + " " + queryInput.getText()).trim();
+    return (queryDropdowns  + " " + containsInput.getText()).trim();
   }
 
   private String getAdvancedQuery() {
@@ -204,6 +234,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
   private void showAdvancedQuery(boolean visible) {
     queryPanel.setVisible(!visible);
+    containsInput.setVisible(!visible);
     queryInput.setVisible(!visible);
     queryArea.setVisible(visible);
     if (visible)
@@ -271,7 +302,37 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   private void initVariableItemTable() {
     if (variableItemProvider == null) {
       variableItemProvider = new VariableItemProvider();
-      variableItemTable.initialize(placeManager);
+      variableItemTable.initialize(placeManager, new VariableItemTable.ItemResultCheckDisplay() {
+        @Override
+        public IconAnchor getClearSelection() {
+          return clearSelectionAnchor;
+        }
+
+        @Override
+        public IconAnchor getSelectAll() {
+          return selectAllAnchor;
+        }
+
+        @Override
+        public HasText getSelectAllStatus() {
+          return selectAllStatus;
+        }
+
+        @Override
+        public String getNItemLabel(int nb) {
+          return translationMessages.nVariablesLabel(nb);
+        }
+
+        @Override
+        public Alert getSelectActionsAlert() {
+          return selectAllItemsAlert;
+        }
+
+        @Override
+        public Alert getSelectTipsAlert() {
+          return selectItemTipsAlert;
+        }
+      });
       variableItemPager.setDisplay(variableItemTable);
       variableItemProvider.addDataDisplay(variableItemTable);
     }
@@ -279,7 +340,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
   private void setVariablesVisible(boolean visible) {
     refreshPending.setVisible(!visible);
-    variableItemTable.setVisible(visible);
+    variableItemTablePanel.setVisible(visible);
     variableItemPager.setVisible(visible);
   }
 

@@ -29,6 +29,7 @@ import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
+import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariableEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -39,12 +40,17 @@ import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
 import org.obiba.opal.web.gwt.app.client.search.event.*;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
+import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.opal.EntryDto;
 import org.obiba.opal.web.model.client.opal.GeneralConf;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.search.FacetResultDto;
+import org.obiba.opal.web.model.client.search.ItemFieldsDto;
+import org.obiba.opal.web.model.client.search.ItemResultDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import java.util.List;
@@ -133,6 +139,23 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
     facet(field, size, handler);
   }
 
+  @Override
+  public void onAddToCart(List<ItemResultDto> selectedItems) {
+    if(selectedItems.isEmpty()) return;
+    for (ItemResultDto item : selectedItems) {
+      MagmaPath.Parser parser = MagmaPath.Parser.parse(item.getIdentifier());
+      String entityType = "Participant";
+      ItemFieldsDto fields = (ItemFieldsDto) item.getExtension("Search.ItemFieldsDto.item");
+      for (EntryDto entry : JsArrays.toIterable(fields.getFieldsArray())) {
+        if ("entityType".equals(entry.getKey())) {
+          entityType = entry.getValue();
+          break;
+        }
+      }
+      fireEvent(new CartAddVariableEvent(entityType, parser.getDatasource(), parser.getTable(), parser.getVariable()));
+    }
+  }
+
   //
   // Private methods
   //
@@ -143,7 +166,7 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
         .query("offset", "" + offset)//
         .query("limit", "" + limit)//
         .query("sort", "name")//
-        .query("field", "name", "field", "datasource", "field", "table", "field", "label", "field", "label-en");
+        .query("field", "name", "field", "datasource", "field", "table", "field", "label", "field", "label-en", "field", "entityType");
 
     for (String locale : locales) {
       if (!"en".equals(locale))
