@@ -435,7 +435,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   @Override
   public void onAddToCart() {
-    fireEvent(new CartAddVariableEvent(table.getDatasourceName(), table.getName(), variable.getName()));
+    fireEvent(new CartAddVariableEvent(table.getEntityType(), table.getDatasourceName(), table.getName(), variable.getName()));
   }
 
   @Override

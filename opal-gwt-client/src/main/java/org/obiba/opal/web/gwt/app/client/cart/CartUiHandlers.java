@@ -11,6 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.cart;
 
 import com.gwtplatform.mvp.client.UiHandlers;
+import org.obiba.opal.web.gwt.app.client.cart.service.CartVariableItem;
 
 import java.util.List;
 
@@ -19,5 +20,5 @@ public interface CartUiHandlers extends UiHandlers {
 
   void onRemoveVariable(String variableFullName);
 
-  void onSearchEntities(List<String> selectedVariables);
+  void onSearchEntities(List<CartVariableItem> selectedVariables);
 }

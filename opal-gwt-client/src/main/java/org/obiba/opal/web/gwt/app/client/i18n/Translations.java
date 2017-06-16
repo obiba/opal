@@ -562,6 +562,7 @@ public interface Translations extends Constants {
       "SearchServiceUnavailable", "Search operation failed. Please make sure the service is started.",//
       "NoTableIndexed", "No table values have been indexed or search service unavailable.",//
       "MalformedSearchQuery", "Malformed search query.",//
+      "CannotMixVariableEntityTypes", "Variables with different entity types cannot be mixed.", //
       "UserStatusChangedOk", "User {0} has been successfully {1}.",//
       "UserUpdatedOk", "User {0} has been successfully updated.",//
       "UserCreatedOk", "User {0} has been successfully added.",//

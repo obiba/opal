@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.cart;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -23,6 +24,8 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import org.obiba.opal.web.gwt.app.client.cart.event.CartCountsUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.cart.service.CartService;
+import org.obiba.opal.web.gwt.app.client.cart.service.CartVariableItem;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
@@ -72,14 +75,21 @@ public class CartPresenter extends Presenter<CartPresenter.Display, CartPresente
   }
 
   @Override
-  public void onSearchEntities(List<String> selectedVariables) {
+  public void onSearchEntities(List<CartVariableItem> selectedVariables) {
     if (selectedVariables.isEmpty()) return;
     List<String> queries = Lists.newArrayList();
-    for (String var : selectedVariables) {
-      queries.add("in(" + var + ",*)");
+    String entityType = "";
+    boolean entityTypeError = false;
+    for (CartVariableItem var : selectedVariables) {
+      queries.add("in(" + var.getIdentifier() + ",*)");
+      if (Strings.isNullOrEmpty(entityType)) entityType = var.getEntityType();
+      else if (!entityType.equals(var.getEntityType())) {
+        entityTypeError = true;
+        break;
+      }
     }
-    // TODO identify entity type...
-    placeManager.revealPlace(ProjectPlacesHelper.getSearchEntitiesPlace("Participant", queries));
+    if (entityTypeError) fireEvent(NotificationEvent.newBuilder().warn("CannotMixVariableEntityTypes").build());
+    else placeManager.revealPlace(ProjectPlacesHelper.getSearchEntitiesPlace(entityType, queries));
   }
 
   private void updateView() {
@@ -94,7 +104,7 @@ public class CartPresenter extends Presenter<CartPresenter.Display, CartPresente
 
   public interface Display extends View, HasUiHandlers<CartUiHandlers> {
 
-    void showVariables(List<String> variables);
+    void showVariables(List<CartVariableItem> variables);
 
   }
 }

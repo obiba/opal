@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.cart.service;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.storage.client.Storage;
 import com.google.gwt.storage.client.StorageMap;
@@ -21,13 +22,12 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import java.util.List;
+import java.util.Map;
 
 @Singleton
 public class CartService {
 
-  private static final String VARIABLE_PREFIX = "variable-";
-
-  private final List<String> variables = Lists.newArrayList();
+  private final Map<String, CartVariableItem> variables = Maps.newHashMap();
 
   private Storage stockStore = null;
 
@@ -36,16 +36,16 @@ public class CartService {
     GWT.log("Local storage is supported: " + (stockStore != null));
   }
 
-  public void addVariable(String datasource, String table, String variable) {
-    addVariable(getVariableFullName(datasource, table, variable));
+  public void addVariable(String entityType, String datasource, String table, String variable) {
+    addVariable(entityType, getVariableFullName(datasource, table, variable));
   }
 
-  public void addVariable(String variableFullName) {
+  public void addVariable(String entityType, String variableFullName) {
     if (Strings.isNullOrEmpty(variableFullName)) return;
-    if (!isStoreSupported()) addVariableInMemory(variableFullName);
-    else if (!hasVariableInStore(variableFullName)){
-      stockStore.setItem(VARIABLE_PREFIX + stockStore.getLength(), variableFullName);
-    }
+    if (isStoreSupported())
+      stockStore.setItem(variableFullName, entityType);
+    else if (!hasVariableInStore(variableFullName))
+      addVariableInMemory(entityType, variableFullName);
   }
 
   public void removeVariable(String datasource, String table, String variable) {
@@ -72,18 +72,18 @@ public class CartService {
         : hasVariableInStore(variableFullName);
   }
 
-  public List<String> getVariables() {
-    return !isStoreSupported() ? variables : getVariablesInStore();
+  public List<CartVariableItem> getVariables() {
+    return isStoreSupported() ? getVariablesInStore() : Lists.newArrayList(variables.values());
   }
 
   public void clear() {
-    if (!isStoreSupported()) variables.clear();
-    else stockStore.clear();
+    if (isStoreSupported()) stockStore.clear();
+    else variables.clear();
   }
 
   public void clearVariables() {
-    if (!isStoreSupported()) variables.clear();
-    else clearVariablesInStore();
+    // only variables in the store for now
+    clear();
   }
   
   private boolean isStoreSupported() {
@@ -103,42 +103,38 @@ public class CartService {
     return stockMap.containsValue(variableFullName);
   }
 
-  private List<String> getVariablesInStore() {
-    List<String> vars = Lists.newArrayList();
+  private List<CartVariableItem> getVariablesInStore() {
+    List<CartVariableItem> vars = Lists.newArrayList();
     for (int i=0; i<stockStore.getLength(); i++) {
-      vars.add(stockStore.getItem(stockStore.key(i)));
+      String key = stockStore.key(i);
+      vars.add(new CartVariableItem(key, stockStore.getItem(key)));
+    }
+    return vars;
+  }
+
+  private List<CartVariableItem> getVariablesInStore(String entityType) {
+    List<CartVariableItem> vars = Lists.newArrayList();
+    for (int i=0; i<stockStore.getLength(); i++) {
+      String key = stockStore.key(i);
+      String type = stockStore.getItem(key);
+      if (type.equals(entityType)) vars.add(new CartVariableItem(key, type));
     }
     return vars;
   }
 
   private void removeVariableInStore(String variableFullName) {
-    StorageMap stockMap = new StorageMap(stockStore);
-    if (stockMap.containsValue(variableFullName)) {
-      for (int i=stockStore.getLength()-1; i>=0; i--) {
-        String key = stockStore.key(i);
-        if (key.startsWith(VARIABLE_PREFIX)) {
-          if (variableFullName.equals(stockStore.getItem(key))) stockStore.removeItem(key);
-        }
-      }
-    }
-  }
-
-  private void clearVariablesInStore() {
-    for (int i=stockStore.getLength()-1; i>=0; i--) {
-      String key = stockStore.key(i);
-      if (key.startsWith(VARIABLE_PREFIX)) stockStore.removeItem(key);
-    }
+    stockStore.removeItem(variableFullName);
   }
 
   //
   // In memory
   //
 
-  private void addVariableInMemory(String variableFullName) {
-    if (!variables.contains(variableFullName)) variables.add(variableFullName);
+  private void addVariableInMemory(String entityType, String variableFullName) {
+    if (!variables.containsKey(variableFullName)) variables.put(variableFullName, new CartVariableItem(variableFullName, entityType));
   }
 
   private boolean hasVariableInMemory(String variableFullName) {
-    return variables.contains(variableFullName);
+    return variables.containsKey(variableFullName);
   }
 }

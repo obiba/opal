@@ -11,7 +11,6 @@
 package org.obiba.opal.web.gwt.app.client.cart;
 
 import com.github.gwtbootstrap.client.ui.Alert;
-import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.common.collect.Lists;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -25,9 +24,9 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.ViewImpl;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import org.obiba.opal.web.gwt.app.client.cart.service.CartVariableItem;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
@@ -39,7 +38,8 @@ import java.util.List;
 
 public class CartView extends ViewWithUiHandlers<CartUiHandlers> implements CartPresenter.Display {
 
-  interface Binder extends UiBinder<Widget, CartView> {}
+  interface Binder extends UiBinder<Widget, CartView> {
+  }
 
   @UiField
   Alert noVariablesAlert;
@@ -75,9 +75,9 @@ public class CartView extends ViewWithUiHandlers<CartUiHandlers> implements Cart
 
   private final TranslationMessages translationMessages;
 
-  private ListDataProvider<String> variableCartProvider;
+  private ListDataProvider<CartVariableItem> variableCartProvider;
 
-  private List<String> originalVariables;
+  private List<CartVariableItem> originalVariables;
 
   @Inject
   public CartView(CartView.Binder uiBinder, Translations translations, PlaceManager placeManager, TranslationMessages translationMessages) {
@@ -104,7 +104,7 @@ public class CartView extends ViewWithUiHandlers<CartUiHandlers> implements Cart
 
 
   @Override
-  public void showVariables(List<String> variables) {
+  public void showVariables(List<CartVariableItem> variables) {
     initCartVariableTable();
     originalVariables = variables;
     variableCartPanel.setVisible(!originalVariables.isEmpty());
@@ -112,68 +112,68 @@ public class CartView extends ViewWithUiHandlers<CartUiHandlers> implements Cart
     renderVariables(originalVariables);
   }
 
-  private void renderVariables(List<String> variables) {
+  private void renderVariables(List<CartVariableItem> variables) {
     variableCartProvider.setList(variables);
     variableCartProvider.refresh();
-    variableCartPager.setPagerVisible(variables.size()> Table.DEFAULT_PAGESIZE);
+    variableCartPager.setPagerVisible(variables.size() > Table.DEFAULT_PAGESIZE);
   }
 
-  private List<String> filterVariables(String filterText) {
-    List<String> variables = Lists.newArrayList();
+  private List<CartVariableItem> filterVariables(String filterText) {
+    List<CartVariableItem> variables = Lists.newArrayList();
     if (originalVariables == null || originalVariables.isEmpty()) return variables;
-    for (String var : originalVariables) {
+    for (CartVariableItem var : originalVariables) {
       // TODO multi-tokens with negation (like 'cancer -lung')
-      if (var.toLowerCase().contains(filterText.toLowerCase())) variables.add(var);
+      if (var.getIdentifier().toLowerCase().contains(filterText.toLowerCase())) variables.add(var);
     }
     return variables;
   }
 
   private void initCartVariableTable() {
     if (variableCartProvider == null) {
-       variableCartProvider = new ListDataProvider<String>();
-       variableCartTable.initialize(placeManager, new CartVariableTable.CartVariableCheckDisplay() {
-         @Override
-         public IconAnchor getClearSelection() {
-           return clearSelectionAnchor;
-         }
+      variableCartProvider = new ListDataProvider<CartVariableItem>();
+      variableCartTable.initialize(placeManager, new CartVariableTable.CartVariableCheckDisplay() {
+        @Override
+        public IconAnchor getClearSelection() {
+          return clearSelectionAnchor;
+        }
 
-         @Override
-         public IconAnchor getSelectAll() {
-           return selectAllAnchor;
-         }
+        @Override
+        public IconAnchor getSelectAll() {
+          return selectAllAnchor;
+        }
 
-         @Override
-         public HasText getSelectAllStatus() {
-           return selectAllStatus;
-         }
+        @Override
+        public HasText getSelectAllStatus() {
+          return selectAllStatus;
+        }
 
-         @Override
-         public List<String> getDataList() {
-           return variableCartProvider.getList();
-         }
+        @Override
+        public List<CartVariableItem> getDataList() {
+          return variableCartProvider.getList();
+        }
 
-         @Override
-         public String getNItemLabel(int nb) {
-           return translationMessages.nVariablesLabel(nb);
-         }
+        @Override
+        public String getNItemLabel(int nb) {
+          return translationMessages.nVariablesLabel(nb);
+        }
 
-         @Override
-         public Alert getSelectActionsAlert() {
-           return selectAllItemsAlert;
-         }
+        @Override
+        public Alert getSelectActionsAlert() {
+          return selectAllItemsAlert;
+        }
 
-         @Override
-         public Alert getSelectTipsAlert() {
-           return selectItemTipsAlert;
-         }
-       }, new ActionHandler<String>() {
-         @Override
-         public void doAction(String item, String actionName) {
-           getUiHandlers().onRemoveVariable(item);
-         }
-       });
-       variableCartPager.setDisplay(variableCartTable);
-       variableCartProvider.addDataDisplay(variableCartTable);
+        @Override
+        public Alert getSelectTipsAlert() {
+          return selectItemTipsAlert;
+        }
+      }, new ActionHandler<CartVariableItem>() {
+        @Override
+        public void doAction(CartVariableItem item, String actionName) {
+          getUiHandlers().onRemoveVariable(item.getIdentifier());
+        }
+      });
+      variableCartPager.setDisplay(variableCartTable);
+      variableCartProvider.addDataDisplay(variableCartTable);
     }
   }
 }

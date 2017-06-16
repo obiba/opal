@@ -531,7 +531,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   public void onAddVariablesToCart(List<VariableDto> variables) {
     if(variables.isEmpty()) return;
     for (VariableDto variable : variables) {
-      fireEvent(new CartAddVariableEvent(table.getDatasourceName(), table.getName(), variable.getName()));
+      fireEvent(new CartAddVariableEvent(table.getEntityType(), table.getDatasourceName(), table.getName(), variable.getName()));
     }
   }
 

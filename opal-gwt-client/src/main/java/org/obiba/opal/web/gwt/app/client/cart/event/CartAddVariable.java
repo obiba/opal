@@ -15,6 +15,8 @@ import com.gwtplatform.dispatch.annotation.GenEvent;
 @GenEvent
 public class CartAddVariable {
 
+  String entityType;
+
   String datasource;
 
   String table;

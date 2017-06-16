@@ -206,7 +206,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     addRegisteredHandler(CartAddVariableEvent.getType(), new CartAddVariableEvent.CartAddVariableHandler() {
       @Override
       public void onCartAddVariable(CartAddVariableEvent event) {
-        cartService.addVariable(event.getDatasource(), event.getTable(), event.getVariable());
+        cartService.addVariable(event.getEntityType(), event.getDatasource(), event.getTable(), event.getVariable());
         getView().setCartCounts(cartService.getVariablesCount());
       }
     });
