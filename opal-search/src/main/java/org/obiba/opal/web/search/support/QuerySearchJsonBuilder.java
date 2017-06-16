@@ -56,6 +56,8 @@ public class QuerySearchJsonBuilder {
 
   private List<ChildQuery> childQueries = Lists.newArrayList();
 
+  private String childQueryOperator = "must";
+
   private String sortField;
 
   private String sortDir;
@@ -160,7 +162,7 @@ public class QuerySearchJsonBuilder {
 
   private JSONObject buildHasChildQueries() throws JSONException {
     JSONObject json = new JSONObject();
-    for (ChildQuery child : childQueries) json.accumulate("must", buildHasChildQuery(child));
+    for (ChildQuery child : childQueries) json.accumulate(childQueryOperator, buildHasChildQuery(child));
     return new JSONObject().put("bool", json);
   }
 
@@ -210,6 +212,13 @@ public class QuerySearchJsonBuilder {
 
   private boolean hasFacets() {
     return facets != null && !facets.isEmpty();
+  }
+
+  public void childQueryOperator(String name) {
+    if (Strings.isNullOrEmpty(name) || !"or".equals(name.toLowerCase()))
+      childQueryOperator = "must";
+    else
+      childQueryOperator = "should";
   }
 
   public static class ChildQuery {

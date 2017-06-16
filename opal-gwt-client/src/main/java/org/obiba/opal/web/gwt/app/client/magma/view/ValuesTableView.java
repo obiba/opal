@@ -18,18 +18,9 @@ import com.google.gwt.user.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter.DataFetcher;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter.EntitySelectionHandler;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTableUiHandlers;
-import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
-import org.obiba.opal.web.gwt.app.client.ui.CriteriaPanel;
-import org.obiba.opal.web.gwt.app.client.ui.CriterionDropdown;
-import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
-import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
-import org.obiba.opal.web.gwt.app.client.ui.Table;
-import org.obiba.opal.web.gwt.app.client.ui.TableVariableSuggestOracle;
-import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
-import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
+import org.obiba.opal.web.gwt.app.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.IconActionCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.IconActionCell.Delegate;
@@ -72,6 +63,7 @@ import com.google.gwt.view.client.Range;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 @SuppressWarnings("OverlyCoupledClass")
 public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> implements ValuesTablePresenter.Display {
@@ -91,9 +83,6 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
   @UiField
   CollapsiblePanel addPanel;
-
-  @UiField
-  ControlGroup valuesFilterGroup;
 
   @UiField
   OpalSimplePager pager;
@@ -129,16 +118,13 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   NumericTextBox visibleColumns;
 
   @UiField
-  CriteriaPanel filters;
+  CriteriaPanel criteriaPanel;
 
   @UiField(provided = true)
   Typeahead variableTypeahead;
 
   @UiField
   Anchor searchEntities;
-
-  @UiField
-  ControlGroup searchIdentifierGroup;
 
   private ValueSetsDataProvider dataProvider;
 
@@ -149,8 +135,6 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   private List<String> listValueSetVariable;
 
   private TableDto table;
-
-  private DataFetcher fetcher;
 
   private VariableValueSelectionHandler variableValueSelectionHandler;
 
@@ -200,6 +184,12 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
     filter.getTextBox().addKeyUpHandler(new FilterOnEnterSubmitKeyUpHandler());
     filter.getClear().setTitle(translations.clearFilter());
+    filter.getClear().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        getUiHandlers().updateVariables(filter.getText());
+      }
+    });
 
     visibleListVariable = new AbstractList<VariableDto>() {
 
@@ -219,20 +209,21 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
   @UiHandler("searchButton")
   public void onSearch(ClickEvent event) {
-    getUiHandlers().onSearch();
+    onSearch( 0, getPageSize());
   }
+
 
   @UiHandler("clearButton")
   public void onClear(ClickEvent event) {
-    while (filters.getCriterions().size()>1) {
-      filters.remove(1);
+    while (criteriaPanel.getCriterions().size()>1) {
+      criteriaPanel.remove(1);
     }
-    getUiHandlers().onSearch();
+    onSearch(null);
   }
 
   @UiHandler("searchEntities")
   public void onSearchEntities(ClickEvent event) {
-    List<String> queries = filters.getRQLQueryStrings();
+    List<String> queries = criteriaPanel.getRQLQueryStrings();
     if (queries.size() == 1) return;
     getUiHandlers().onSearchEntities(queries.get(0), queries.subList(1, queries.size()));
   }
@@ -282,6 +273,14 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
     oracle.setTable("\"" + table.getName() + "\"");
     oracle.setDatasource("\"" + table.getDatasourceName() + "\"");
+    // ID criterion
+    criteriaPanel.clear();
+    criteriaPanel.addCriterion(new IdentifiersCriterionDropdown(table.getDatasourceName(), table.getName()) {
+      @Override
+      public void doFilter() {
+        onSearch(null);
+      }
+    }, false, false);
   }
 
   @Override
@@ -295,11 +294,6 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   }
 
   @Override
-  public void setValueSetsFetcher(DataFetcher provider) {
-    fetcher = provider;
-  }
-
-  @Override
   public void setViewMode(ValuesTablePresenter.ViewMode mode) {
     viewMode = mode;
     searchPanel.setVisible(viewMode == ValuesTablePresenter.ViewMode.DETAILED_MODE);
@@ -310,15 +304,19 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     }
   }
 
-  public void setRefreshing(boolean refresh) {
-    refreshPending.setVisible(refresh);
-  }
-
   //
   // Private methods
   //
 
-  public int getMaxVisibleColumns() {
+  private void onSearch(int offset, int limit) {
+    getUiHandlers().onSearchValueSets(criteriaPanel.getRQLQueryStrings(), offset, limit);
+  }
+
+  private void setRefreshing(boolean refresh) {
+    refreshPending.setVisible(refresh);
+  }
+
+  private int getMaxVisibleColumns() {
     return maxVisibleColumns;
   }
 
@@ -509,7 +507,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     if(text != null && !text.isEmpty()) {
       filter.setText(text);
 
-      fetcher.updateVariables(text);
+      getUiHandlers().updateVariables(text);
       if(!text.isEmpty()) {
         addPanel.setOpen(true);
       }
@@ -528,45 +526,72 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
   @Override
   public void populateValues(int offset, ValueSetsDto resource) {
-    searchEntities.setVisible(filters.getQueryStrings().size()>1);
+    searchEntities.setVisible(criteriaPanel.getQueryStrings().size()>1);
     if(dataProvider != null) {
       dataProvider.populateValues(offset, resource);
     }
   }
 
   @Override
-  public void clearCriteria() {
-    filters.clear();
+  public void addCategoricalCriterion(RQLValueSetVariableCriterionParser criterion, QueryResultDto facet) {
+    addVariableFilter(new CategoricalCriterionDropdown(criterion, facet) {
+      @Override
+      public void doFilter() {
+        onSearch(null);
+      }
+    });
   }
 
   @Override
-  public boolean hasCriteria() {
-    return filters.hasCriteria();
+  public void addNumericalCriterion(RQLValueSetVariableCriterionParser criterion, QueryResultDto facet) {
+    addVariableFilter(new NumericalCriterionDropdown(criterion, facet) {
+      @Override
+      public void doFilter() {
+        onSearch(null);
+      }
+    });
   }
 
   @Override
-  public void addVariableFilter(CriterionDropdown criterion) {
-    filters.addCriterion(criterion);
+  public void addDateCriterion(RQLValueSetVariableCriterionParser criterion) {
+    addVariableFilter(new DateTimeCriterionDropdown(criterion) {
+      @Override
+      public void doFilter() {
+        onSearch(null);
+      }
+    });
   }
 
   @Override
-  public void addVariableFilter(CriterionDropdown criterion, boolean removeable, boolean opened) {
-    filters.addCriterion(criterion, removeable, opened);
+  public void addDefaultCriterion(RQLValueSetVariableCriterionParser criterion) {
+    addVariableFilter(new DefaultCriterionDropdown(criterion) {
+      @Override
+      public void doFilter() {
+        onSearch(null);
+      }
+    });
+  }
+
+  private void addVariableFilter(ValueSetCriterionDropdown criterion) {
+    if (criteriaPanel.getCriterions().isEmpty()) {
+      criteriaPanel.addCriterion(new IdentifiersCriterionDropdown(criterion.getDatasource(), criterion.getTable()) {
+        @Override
+        public void doFilter() {
+          onSearch(null);
+        }
+      });
+    }
+    criteriaPanel.addCriterion(criterion);
   }
 
   @Override
   public String getQueryString() {
-    return filters.getQueryString();
+    return criteriaPanel.getRQLQueryString();
   }
 
   @Override
-  public String getQueryText() {
-    return filters.getQueryText();
-  }
-
-  @Override
-  public ControlGroup getValuesFilterGroup() {
-    return valuesFilterGroup;
+  public void setSearchAvailable(boolean available) {
+    searchPanel.setVisible(available);
   }
 
   @Override
@@ -577,11 +602,6 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   @Override
   public void setRowCount(int totalHits) {
     valuesTable.setRowCount(totalHits);
-  }
-
-  @Override
-  public ControlGroup getSearchIdentifierGroup() {
-    return searchIdentifierGroup;
   }
 
   //
@@ -672,7 +692,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
     private void refreshRows() {
       setRefreshing(true);
-      fetcher.request(visibleListVariable, pager.getPageStart(), pager.getPageSize());
+      getUiHandlers().onRequestValueSets(visibleListVariable, pager.getPageStart(), pager.getPageSize());
     }
 
     protected abstract MenuBar createMenuBar();
@@ -752,8 +772,6 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   private final class ValueSetsDataProvider extends AbstractDataProvider<ValueSetsDto.ValueSetDto>
       implements ValuesTablePresenter.ValueSetsProvider {
 
-    Range range;
-
     boolean exactMatch = false;
 
     private ValueSetsDataProvider(boolean exactMatch) {
@@ -762,26 +780,16 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
     @Override
     protected void onRangeChanged(HasData<ValueSetDto> display) {
-      // Get the new range.
-      if(range == null || display.getVisibleRange().getStart() != range.getStart()) {
-        range = display.getVisibleRange();
-
-        // Range has changed
-
-        // query the valueSets
-        int start = range.getStart();
-
-        if(start > table.getValueSetCount()) return;
-
-        if(filter.getTextBox().getText().isEmpty()) {
-          setRefreshing(true);
-          fetcher.request(visibleListVariable, start, pager.getPageSize());
-        } else {
-          setRefreshing(true);
-          fetcher.request(filter.getTextBox().getText(), start, pager.getPageSize(), exactMatch);
-        }
-      }
+      Range range = display.getVisibleRange();
+      setRefreshing(true);
+      if (searchPanel.isVisible())
+        onSearch(range.getStart(), range.getLength());
+      else if(filter.getText().isEmpty())
+        getUiHandlers().onRequestValueSets(visibleListVariable, range.getStart(), range.getLength());
+      else
+        getUiHandlers().onRequestValueSets(filter.getText(), range.getStart(), range.getLength(), exactMatch);
     }
+
 
     @Override
     public void populateValues(int offset, ValueSetsDto valueSets) {
@@ -797,13 +805,13 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   private final class VariableValueSelectionHandler implements ValueSelectionHandler {
     @Override
     public void onBinaryValueSelection(VariableDto variable, int row, int column, ValueSetDto valueSet) {
-      fetcher.requestBinaryValue(variable, valueSet.getIdentifier());
+      getUiHandlers().requestBinaryValue(variable, valueSet.getIdentifier());
     }
 
     @Override
     public void onGeoValueSelection(VariableDto variable, int row, int column, ValueSetDto valueSet,
         ValueSetsDto.ValueDto value) {
-      fetcher.requestGeoValue(variable, valueSet.getIdentifier(), value);
+      getUiHandlers().requestGeoValue(variable, valueSet.getIdentifier(), value);
     }
 
     @Override
@@ -814,7 +822,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
     @Override
     public void onValueSequenceSelection(VariableDto variable, int row, int column, ValueSetDto valueSet) {
-      fetcher.requestValueSequence(variable, valueSet.getIdentifier());
+      getUiHandlers().requestValueSequence(variable, valueSet.getIdentifier());
     }
   }
 
@@ -822,7 +830,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
     @Override
     public void onEntitySelection(String entityType, String entityId) {
-      fetcher.requestEntitySearch(entityType, entityId);
+      getUiHandlers().requestEntitySearch(entityType, entityId);
     }
   }
 
@@ -847,7 +855,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
           lastFilter = filter.getTextBox().getText();
           maxVisibleColumns = columns;
           setRefreshing(true);
-          fetcher.updateVariables(filter.getTextBox().getText());
+          getUiHandlers().updateVariables(filter.getTextBox().getText());
         } else if(valuesTable.getPageSize() != page) {
           // page size only has changed
           setRefreshing(true);
@@ -879,12 +887,12 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
           maxVisibleColumns = columns;
           setRefreshing(true);
           valuesTable.setPageSize(page);
-          fetcher.updateVariables(filter.getTextBox().getText());
+          getUiHandlers().updateVariables(filter.getTextBox().getText());
         } else if(valuesTable.getPageSize() != page) {
           // page size only has changed
           setRefreshing(true);
           valuesTable.setPageSize(page);
-          fetcher.updateVariables(filter.getTextBox().getText());
+          getUiHandlers().updateVariables(filter.getTextBox().getText());
         }
         setRefreshing(false);
         // else nothing to refresh

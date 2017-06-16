@@ -14,6 +14,8 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -43,6 +45,8 @@ import org.obiba.opal.web.gwt.app.client.ui.RQLIdentifierCriterionParser;
 import org.obiba.opal.web.gwt.app.client.ui.RQLValueSetVariableCriterionParser;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.gwt.rql.client.RQLParser;
+import org.obiba.opal.web.gwt.rql.client.RQLQuery;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableEntitySummaryDto;
@@ -56,7 +60,7 @@ import static org.obiba.opal.web.gwt.app.client.support.VariableDtoNature.*;
 public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.Display, SearchEntitiesPresenter.Proxy>
     implements HasPageTitle, SearchEntitiesUiHandlers {
 
-  public static final String QUERY_SEP = "#";
+  public static final String QUERY_SEP = ",";
 
   private final Translations translations;
 
@@ -104,7 +108,12 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
     String jQueries = request.getParameter(ParameterTokens.TOKEN_QUERY, "");
     queries = null;
     if (!jQueries.isEmpty()) {
-      queries = Splitter.on(QUERY_SEP).splitToList(jQueries);
+      RQLQuery root = RQLParser.parse(jQueries);
+      queries = Lists.newArrayList();
+      for (int i=0; i<root.getArgumentsSize(); i++) {
+        RQLQuery q = root.getRQLQuery(i);
+        queries.add(q.asString());
+      }
       getView().clearResults(true);
       searchProvidedQueryIfReady();
     } else getView().reset();
@@ -177,7 +186,9 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
         .query("offset", "" + offset)
         .query("limit", "" + limit);
     if (!Strings.isNullOrEmpty(idQuery)) builder.query("id", idQuery);
-    for (String query : queries) builder.query("query", query);
+    String query = Joiner.on(",").join(queries);
+    if (queries.size()>1) query = "and(" + query + ")";
+    builder.query("query", query);
     ResourceRequestBuilderFactory.<EntitiesResultDto>newBuilder()
         .forResource(builder.build())
         .withCallback(new ResponseCodeCallback() {

@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
 
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
+import org.obiba.opal.web.gwt.app.client.search.entities.SearchEntitiesPresenter;
 
 import java.util.List;
 
@@ -79,7 +80,7 @@ public class ProjectPlacesHelper {
     return new PlaceRequest.Builder().nameToken(Places.SEARCH_ENTITIES) //
         .with(ParameterTokens.TOKEN_TYPE, entityType) //
         .with(ParameterTokens.TOKEN_ID, identifierQuery) //
-        .with(ParameterTokens.TOKEN_QUERY, Joiner.on("#").join(queries)) //
+        .with(ParameterTokens.TOKEN_QUERY, Joiner.on(SearchEntitiesPresenter.QUERY_SEP).join(queries)) //
         .build();
   }
 

@@ -105,6 +105,9 @@
   <!-- Opal Markdown Module -->
   <inherits name='org.obiba.opal.web.gwt.markdown.Markdown'/>
 
+  <!-- Opal RQL Module -->
+  <inherits name='org.obiba.opal.web.gwt.rql.RQL'/>
+
   <!-- Ace editor -->
   <inherits name='org.obiba.opal.web.gwt.ace.Ace'/>
 

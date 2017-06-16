@@ -13,6 +13,7 @@ package org.obiba.opal.web.search;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -23,6 +24,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import net.jazdw.rql.parser.ASTNode;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -34,6 +36,9 @@ import org.obiba.opal.search.SearchQueryException;
 import org.obiba.opal.spi.search.ValuesIndexManager;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Search;
+import org.obiba.opal.web.search.support.RQLCriterionParser;
+import org.obiba.opal.web.search.support.RQLParserFactory;
+import org.obiba.opal.web.search.support.RQLValueSetVariableCriterionParser;
 import org.obiba.opal.web.search.support.VariableEntityValueSetDtoFunction;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -61,14 +66,28 @@ public class TableValueSetsSearchResource extends AbstractSearchUtility {
   @GET
   @Transactional(readOnly = true)
   @SuppressWarnings("PMD.ExcessiveParameterList")
-  public Response search(@Context UriInfo uriInfo, @QueryParam("query") String query,
+  public Response search(@Context UriInfo uriInfo, @QueryParam("ql") @DefaultValue("rql") String queryLanguage, @QueryParam("query") String query,
       @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("10") int limit,
       @QueryParam("select") String select) throws JSONException {
+
+    String esQuery = query;
+
+    if (!"es".equals(queryLanguage)) {
+      ASTNode queryNode = RQLParserFactory.newParser().parse(query);
+      if ("and".equals(queryNode.getName()) || "or".equals(queryNode.getName()) || "".equals(queryNode.getName())) {
+        esQuery = queryNode.getArguments().stream()
+            .map(qn -> new RQLValueSetVariableCriterionParser(opalSearchService.getValuesIndexManager(), (ASTNode)qn ).getQuery())
+            .collect(Collectors.joining("or".equals(queryNode.getName()) ? " OR " : " AND "));
+      }
+      else { // single query
+        esQuery = new RQLValueSetVariableCriterionParser(opalSearchService.getValuesIndexManager(), queryNode).getQuery();
+      }
+    }
 
     if(!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
     if(!opalSearchService.getValuesIndexManager().hasIndex(getValueTable())) return Response.status(Response.Status.NOT_FOUND).build();
 
-    JSONObject jsonResponse = executeQuery(buildQuerySearch(query, offset, limit,
+    JSONObject jsonResponse = executeQuery(buildQuerySearch(esQuery, offset, limit,
         Lists.newArrayList("identifier"), null, null, null).build());
 
     if(!jsonResponse.isNull("error")) {

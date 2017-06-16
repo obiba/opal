@@ -22,17 +22,11 @@
     </g:InlineLabel>
     <g:PopupPanel ui:field="navigationPopup" autoHideEnabled="true" styleName="gwt-MenuBarPopup"/>
 
-    <g:FlowPanel ui:field="searchPanel">
+    <g:FlowPanel ui:field="searchPanel" visible="false">
       <b:Well>
-        <b:ControlGroup ui:field="searchIdentifierGroup" visible="false">
-          <b:InputAddOn prependIcon="SEARCH">
-            <b:TextBox ui:field="searchBox" placeholder="Search for an identifier..."/>
-          </b:InputAddOn>
-        </b:ControlGroup>
-
-        <b:ControlGroup ui:field="valuesFilterGroup" visible="false">
+        <b:ControlGroup>
           <g:FlowPanel>
-            <o:CriteriaPanel ui:field="filters" addStyleNames="inline-block"/>
+            <o:CriteriaPanel ui:field="criteriaPanel" addStyleNames="inline-block"/>
             <b:Typeahead ui:field="variableTypeahead">
               <b:TextBox placeholder="More variable criteria..." addStyleNames="top-margin"/>
             </b:Typeahead>
@@ -98,8 +92,10 @@
           </b:Column>
         </b:Row>
       </o:CollapsiblePanel>
-
-      <o:OpalSimplePager ui:field="pager" showTotalWhenNoPager="true" location="RIGHT" addStyleNames="pull-right"/>
+      <o:OpalSimplePager ui:field="pager" showTotalWhenNoPager="true" location="RIGHT" addStyleNames="small-indent pull-right"/>
+      <b:InputAddOn prependIcon="SEARCH" addStyleNames="pull-right">
+        <b:TextBox ui:field="searchBox" placeholder="Search for an identifier..."/>
+      </b:InputAddOn>
     </g:FlowPanel>
 
     <o:Table ui:field="valuesTable" addStyleNames="small-top-margin"/>
