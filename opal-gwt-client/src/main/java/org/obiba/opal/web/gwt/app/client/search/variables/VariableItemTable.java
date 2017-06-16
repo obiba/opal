@@ -10,10 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.search.variables;
 
-import com.github.gwtbootstrap.client.ui.Alert;
-import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -22,7 +19,6 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.text.shared.SafeHtmlRenderer;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
@@ -40,22 +36,30 @@ import java.util.List;
 
 public class VariableItemTable extends Table<ItemResultDto> {
 
+  private CheckboxColumn<ItemResultDto> checkColumn;
+
   public VariableItemTable() {
-    initColumns(null);
   }
 
-  public void initialize(PlaceManager placeManager) {
-    while (getColumnCount()>0) {
+  public void initialize(PlaceManager placeManager, ItemResultCheckDisplay checkDisplay) {
+    while (getColumnCount() > 0) {
       removeColumn(0);
     }
-    initColumns(placeManager);
+    initColumns(placeManager, checkDisplay);
   }
 
-  private void initColumns(PlaceManager placeManager) {
+  public List<ItemResultDto> getSelectedItems() {
+    return checkColumn.getSelectedItems();
+  }
+
+  private void initColumns(PlaceManager placeManager, ItemResultCheckDisplay checkDisplay) {
     setPageSize(Table.DEFAULT_PAGESIZE);
     setEmptyTableWidget(new InlineLabel(translations.noVariablesLabel()));
 
-    //addCheckColumn(new ItemResultCheckDisplay(this));
+    if (checkDisplay != null) {
+      checkDisplay.setTable(this);
+      addCheckColumn(checkDisplay);
+    }
 
     if (placeManager != null) {
       addColumn(new VariableItemColumn(new VariableLinkCell(placeManager)), translations.variableLabel());
@@ -78,10 +82,11 @@ public class VariableItemTable extends Table<ItemResultDto> {
     }
 
     addColumn(new ItemFieldColumn("label"), translations.labelLabel());
+    addColumn(new ItemFieldColumn("entityType"), translations.entityTypeLabel());
   }
 
   private void addCheckColumn(CheckboxColumn.Display<ItemResultDto> checkboxDisplay) {
-    CheckboxColumn<ItemResultDto> checkColumn = new CheckboxColumn<>(checkboxDisplay);
+    checkColumn = new CheckboxColumn<>(checkboxDisplay);
     addColumn(checkColumn, checkColumn.getCheckColumnHeader());
     setColumnWidth(checkColumn, 1, com.google.gwt.dom.client.Style.Unit.PX);
   }
@@ -187,11 +192,14 @@ public class VariableItemTable extends Table<ItemResultDto> {
     }
   }
 
-  private static class ItemResultCheckDisplay implements CheckboxColumn.Display<ItemResultDto> {
+  public static abstract class ItemResultCheckDisplay implements CheckboxColumn.Display<ItemResultDto> {
 
-    private final VariableItemTable table;
+    private VariableItemTable table;
 
-    private ItemResultCheckDisplay(VariableItemTable table) {
+    public ItemResultCheckDisplay() {
+    }
+
+    public void setTable(VariableItemTable table) {
       this.table = table;
     }
 
@@ -206,38 +214,8 @@ public class VariableItemTable extends Table<ItemResultDto> {
     }
 
     @Override
-    public IconAnchor getClearSelection() {
-      return null;
-    }
-
-    @Override
-    public IconAnchor getSelectAll() {
-      return null;
-    }
-
-    @Override
-    public HasText getSelectAllStatus() {
-      return null;
-    }
-
-    @Override
     public List<ItemResultDto> getDataList() {
-      return Lists.newArrayList();
-    }
-
-    @Override
-    public String getNItemLabel(int nb) {
-      return null;
-    }
-
-    @Override
-    public Alert getSelectActionsAlert() {
-      return null;
-    }
-
-    @Override
-    public Alert getSelectTipsAlert() {
-      return null;
+      return table.getVisibleItems();
     }
   }
 }

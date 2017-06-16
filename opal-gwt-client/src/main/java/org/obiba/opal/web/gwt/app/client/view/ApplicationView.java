@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.view;
 
+import com.github.gwtbootstrap.client.ui.*;
 import com.google.gwt.core.client.GWT;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.place.Places;
@@ -22,14 +23,6 @@ import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 
-import com.github.gwtbootstrap.client.ui.Brand;
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.Dropdown;
-import com.github.gwtbootstrap.client.ui.FluidContainer;
-import com.github.gwtbootstrap.client.ui.NavLink;
-import com.github.gwtbootstrap.client.ui.TextBox;
-import com.github.gwtbootstrap.client.ui.Tooltip;
-import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Strings;
 import com.google.gwt.dom.client.Document;
@@ -75,7 +68,13 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
   NavLink projectsItem;
 
   @UiField
+  Badge cartCounts;
+
+  @UiField
   NavLink searchItem;
+
+  @UiField
+  NavWidget cartItem;
 
   @UiField
   Panel notification;
@@ -121,13 +120,20 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
     dashboardItem.setHref("#" + Places.DASHBOARD);
     projectsItem.setHref("#" + Places.PROJECTS);
     searchItem.setHref("#" + Places.SEARCH);
+    cartItem.setHref("#" + Places.CART);
     administrationItem.setHref("#" + Places.ADMINISTRATION);
     profileItem.setHref("#" + Places.PROFILE);
 
     resizeTooltip.setText(translations.switchScreenDisplay());
 
+    initCart();
     initSearchWidget();
     initDownloadWidgets();
+  }
+
+  private void initCart() {
+    cartCounts.setText(String.valueOf(0));
+    cartCounts.setVisible(false);
   }
 
   private void initSearchWidget() {
@@ -206,6 +212,12 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
   @Override
   public void setVersion(String version) {
     this.version.setText(version);
+  }
+
+  @Override
+  public void setCartCounts(int count) {
+    cartCounts.setText(String.valueOf(count));
+    cartCounts.setVisible(true);
   }
 
   @Override

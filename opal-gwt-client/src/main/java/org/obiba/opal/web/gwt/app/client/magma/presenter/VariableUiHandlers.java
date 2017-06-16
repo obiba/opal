@@ -45,4 +45,6 @@ public interface VariableUiHandlers extends NamespacedAttributesTableUiHandlers 
   void onAddAttribute();
 
   void onAddTaxonomy();
+
+  void onAddToCart();
 }

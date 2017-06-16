@@ -340,6 +340,12 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     getUiHandlers().onRemove();
   }
 
+  @UiHandler("addToCart")
+  void onAddToCart(ClickEvent event) {
+    getUiHandlers().onAddToCart();
+  }
+
+
   //
   // VariablePresenter.Display Methods
   //

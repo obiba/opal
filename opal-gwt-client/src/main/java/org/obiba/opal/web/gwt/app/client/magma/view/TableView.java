@@ -572,6 +572,12 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     getUiHandlers().onAddVariablesToView(checkColumn.getSelectedItems());
   }
 
+  @UiHandler("cartVariables")
+  void onAddVariablesToCart(ClickEvent event) {
+    getUiHandlers().onAddVariablesToCart(checkColumn.getSelectedItems());
+  }
+
+
   @UiHandler("deleteVariables")
   void onDeleteVariables(ClickEvent event) {
     getUiHandlers().onDeleteVariables(checkColumn.getSelectedItems());

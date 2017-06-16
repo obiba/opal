@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariableEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
@@ -430,6 +431,11 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     VariableTaxonomyModalPresenter presenter = taxonomyModalProvider.get();
     presenter.setDialogMode(Mode.CREATE);
     presenter.initialize(table, variable);
+  }
+
+  @Override
+  public void onAddToCart() {
+    fireEvent(new CartAddVariableEvent(table.getEntityType(), table.getDatasourceName(), table.getName(), variable.getName()));
   }
 
   @Override

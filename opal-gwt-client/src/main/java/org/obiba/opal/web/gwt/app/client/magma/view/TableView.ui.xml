@@ -123,10 +123,15 @@
         <g:FlowPanel>
           <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false" addStyleNames="actions-select">
 
-            <g:FlowPanel addStyleNames="pull-left">
+            <g:FlowPanel addStyleNames="pull-left" width="60%">
               <b2:IconAnchor ui:field="copyVariables" icon="PLUS_SIGN"
                   addStyleNames="inline">
-                <ui:msg description="Add variables to view label">Add variables to view</ui:msg>
+                <ui:msg description="Add variables to view label">Add to view</ui:msg>
+              </b2:IconAnchor>
+
+              <b2:IconAnchor ui:field="cartVariables" icon="SHOPPING_CART"
+                             addStyleNames="inline">
+                <ui:msg description="Add variables to cart label">Add to cart</ui:msg>
               </b2:IconAnchor>
 
               <b:Dropdown icon="TAG" ui:field="applyAttributeButton"
@@ -167,7 +172,7 @@
           </b:Alert>
           <b:Alert ui:field="selectItemTipsAlert" close="false" visible="true" addStyleNames="alert-info actions-select">
             <g:Label>
-              <ui:msg description="Select variables tips label">Select variables to add to view, manage attributes or remove.</ui:msg>
+              <ui:msg description="Select variables tips label">Select variables to add to view or cart, manage attributes or remove.</ui:msg>
             </g:Label>
           </b:Alert>
           <o:Table ui:field="table" addStyleNames="pull-left"/>

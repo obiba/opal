@@ -182,7 +182,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
             if(credentials.hasCredentials()) {
               getView().clear();
               credentials.setUsername(username);
-              getEventBus().fireEvent(new SessionCreatedEvent(response.getHeader("Location")));
+              fireEvent(new SessionCreatedEvent(response.getHeader("Location")));
             } else {
               getView().setBusy(false);
               getView().showErrorMessageAndClearPassword();

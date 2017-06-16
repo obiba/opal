@@ -12,6 +12,9 @@ package org.obiba.opal.web.gwt.app.client.search.variables;
 
 import com.gwtplatform.mvp.client.UiHandlers;
 import org.obiba.opal.web.model.client.search.FacetResultDto;
+import org.obiba.opal.web.model.client.search.ItemResultDto;
+
+import java.util.List;
 
 public interface SearchVariablesUiHandlers extends UiHandlers {
 
@@ -22,6 +25,8 @@ public interface SearchVariablesUiHandlers extends UiHandlers {
   void onClear();
 
   void onFacet(String field, int size, FacetHandler handler);
+
+  void onAddToCart(List<ItemResultDto> selectedItems);
 
   interface FacetHandler {
 
