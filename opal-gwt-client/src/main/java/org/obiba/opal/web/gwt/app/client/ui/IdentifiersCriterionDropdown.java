@@ -128,13 +128,13 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
 
   @Override
   public String getRQLQueryString() {
-    if (getRadionButtonValue(0)) {
+    if (getRadioButtonValue(0)) {
       String emptyNotEmpty = super.getRQLQueryString();
       if (emptyNotEmpty != null) return emptyNotEmpty;
     }
     String query = "like(" + getRQLField() + ",(" + matches.getText() + "))";
-    if (getRadionButtonValue(1)) return query;
-    if (getRadionButtonValue(2)) return "not(" + query + ")";
+    if (getRadioButtonValue(1)) return query;
+    if (getRadioButtonValue(2)) return "not(" + query + ")";
     return null;
   }
 
@@ -153,14 +153,15 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
   }
 
   private void setFilterText() {
-    if(getRadionButtonValue(0)) {
-      updateCriterionFilter(translations.criterionFiltersMap().get("all").toLowerCase());
-    } else {
-      String prefix = getRadionButtonValue(1)
-          ? translations.criterionFiltersMap().get("like").toLowerCase() + " ("
-          : translations.criterionFiltersMap().get("not_like").toLowerCase() + " (";
+    if(getRadioButtonValue(1)) {
+      String prefix = translations.criterionFiltersMap().get("like").toLowerCase() + " (";
+      updateCriterionFilter(prefix + matches.getText() + ")");
+    } else if (getRadioButtonValue(2)) {
+      String prefix = translations.criterionFiltersMap().get("not_like").toLowerCase() + " (";
       updateCriterionFilter(prefix + matches.getText() + ")");
     }
+    else
+      updateCriterionFilter(translations.criterionFiltersMap().get("all").toLowerCase());
   }
 
   private class OperatorClickHandler implements ClickHandler {

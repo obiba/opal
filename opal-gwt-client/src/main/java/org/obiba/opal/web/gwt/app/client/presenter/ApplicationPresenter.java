@@ -128,12 +128,6 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   @Override
   protected void onBind() {
-    addRegisteredHandler(SessionCreatedEvent.getType(), new SessionCreatedEvent.Handler() {
-      @Override
-      public void onSessionCreated(SessionCreatedEvent event) {
-        cartService.clear();
-      }
-    });
     addRegisteredHandler(FileSelectionRequestEvent.getType(), new FileSelectionRequestEvent.Handler() {
       @Override
       public void onFileSelectionRequired(FileSelectionRequestEvent event) {

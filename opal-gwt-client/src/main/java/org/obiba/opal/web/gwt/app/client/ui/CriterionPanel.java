@@ -83,5 +83,9 @@ public class CriterionPanel extends FlowPanel {
   public CriterionDropdown getCriterion() {
     return criterion;
   }
+
+  public boolean isAll() {
+    return criterion.isAll();
+  }
 }
 

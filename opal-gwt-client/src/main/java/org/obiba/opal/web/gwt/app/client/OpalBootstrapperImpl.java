@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client;
 
+import org.obiba.opal.web.gwt.app.client.cart.service.CartService;
 import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
@@ -57,6 +58,9 @@ public class OpalBootstrapperImpl implements Bootstrapper {
 
   @Inject
   ConfirmationPresenter confirmationPresenter;
+
+  @Inject
+  CartService cartService;
 
   @Inject
   public OpalBootstrapperImpl(PlaceManager placeManager) {
@@ -127,6 +131,7 @@ public class OpalBootstrapperImpl implements Bootstrapper {
     eventBus.addHandler(SessionCreatedEvent.getType(), new SessionCreatedEvent.Handler() {
       @Override
       public void onSessionCreated(SessionCreatedEvent event) {
+        cartService.clear();
         revealCurrentPlace();
       }
     });

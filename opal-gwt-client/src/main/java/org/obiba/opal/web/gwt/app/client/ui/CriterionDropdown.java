@@ -47,44 +47,48 @@ public abstract class CriterionDropdown extends DropdownButton {
   public abstract void doFilter();
 
   public String getQueryString() {
-    if(getRadionButtonValue(0)) {
-      // All: No filter is necessary
-      return fieldName + ":*";
-    }
-    if(getRadionButtonValue(1)) {
+    if(getRadioButtonValue(1)) {
       // Not empty
       return "NOT _exists_:" + fieldName;
     }
-    if(getRadionButtonValue(2)) {
+    if(getRadioButtonValue(2)) {
       // Empty
       return "_exists_:" + fieldName;
+    }
+    if(getRadioButtonValue(0)) {
+      // All: No filter is necessary
+      return fieldName + ":*";
     }
 
     return null;
   }
 
   public String getRQLQueryString() {
-    if(getRadionButtonValue(0)) {
-      // All: No filter is necessary
-      return "in(" + getRQLField() + ",*)";
-    }
-    if(getRadionButtonValue(1)) {
+    if(getRadioButtonValue(1)) {
       // Not empty
       return "not(exists(" + getRQLField() + "))";
     }
-    if(getRadionButtonValue(2)) {
+    if(getRadioButtonValue(2)) {
       // Empty
       return "exists(" + getRQLField() + ")";
     }
+    if(getRadioButtonValue(0)) {
+      // All: No filter is necessary
+      return "in(" + getRQLField() + ",*)";
+    }
 
     return null;
+  }
+
+  public boolean isAll() {
+    return getRadioButtonValue(0);
   }
 
   protected String getRQLField() {
     return fieldName;
   }
 
-  protected boolean getRadionButtonValue(int idx) {
+  protected boolean getRadioButtonValue(int idx) {
     return ((CheckBox) radioControls.getWidget(idx)).getValue();
   }
 

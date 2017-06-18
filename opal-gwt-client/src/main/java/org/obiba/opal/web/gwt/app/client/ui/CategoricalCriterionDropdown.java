@@ -173,17 +173,37 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
   }
 
   private void setFilterText() {
-    List<String> selected = getSelectedCategories();
-
-    if(((CheckBox) radioControls.getWidget(3)).getValue()) {
-      if(selected.isEmpty()) setText(variable.getName()+ " " + translations.criterionFiltersMap().get("none").toLowerCase());
-      else setText(variable.getName() + " " + translations.criterionFiltersMap().get("in").toLowerCase() + " (" +
-          Joiner.on(",").join(selected) + ")");
-    } else {
-      if(selected.isEmpty()) setText(variable.getName()+ " " + translations.criterionFiltersMap().get("all").toLowerCase());
-      else setText(variable.getName() + " " + translations.criterionFiltersMap().get("not_in").toLowerCase() + " (" +
-          Joiner.on(",").join(selected) + ")");
+    String filter = variable.getName() + " ";
+    if (getRadioButtonValue(1)) {
+      setText(filter + translations.criterionFiltersMap().get("empty").toLowerCase());
+      return;
     }
+    if (getRadioButtonValue(2)) {
+      setText(filter + translations.criterionFiltersMap().get("not_empty").toLowerCase());
+      return;
+    }
+
+    List<String> selected = getSelectedCategories();
+    if(getRadioButtonValue(3)) {
+      if(selected.isEmpty()) setText(filter + translations.criterionFiltersMap().get("none").toLowerCase());
+      else setText(filter + translations.criterionFiltersMap().get("in").toLowerCase() + " (" +
+          Joiner.on(",").join(selected) + ")");
+      return;
+    }
+
+    if (getRadioButtonValue(4)) {
+      if(selected.isEmpty()) setText(filter + translations.criterionFiltersMap().get("all").toLowerCase());
+      else setText(filter + translations.criterionFiltersMap().get("not_in").toLowerCase() + " (" +
+          Joiner.on(",").join(selected) + ")");
+      return;
+    }
+
+    if (getRadioButtonValue(0)) {
+      setText(filter + translations.criterionFiltersMap().get("all").toLowerCase());
+      return;
+    }
+
+    setText(filter);
   }
 
   private List<String> getSelectedCategories() {

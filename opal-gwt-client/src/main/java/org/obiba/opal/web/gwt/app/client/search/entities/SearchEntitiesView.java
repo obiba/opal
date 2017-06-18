@@ -16,6 +16,7 @@ import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -320,14 +321,24 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
       all.addStyleName("property-key");
       resultsTable.setWidget(row, 0, all);
       resultsTable.getFlexCellFormatter().setColSpan(row, 0, 2);
-      Label query = new Label(idCriterionPanel.getQueryText() + " AND " + criteriaPanel.getQueryText());
-      query.setTitle(idCriterionPanel.getRQLQueryString() + " AND " + results.getQuery());
+      Label query = new Label(getIDCriterionPrefix() + criteriaPanel.getQueryText());
+      query.setTitle(getIDCriterionRQLPrefix() + results.getQuery());
       resultsTable.setWidget(row, 1, query);
       Label total = new Label(results.getTotalHits() + "");
       total.addStyleName("property-key");
       resultsTable.setWidget(row, 2, total);
     }
     countsResultPanel.setVisible(true);
+  }
+
+  private String getIDCriterionRQLPrefix() {
+    GWT.log("isAll=" + idCriterionPanel.isAll());
+    return idCriterionPanel.isAll() ? "" : idCriterionPanel.getRQLQueryString() + " AND ";
+  }
+
+  private String getIDCriterionPrefix() {
+    GWT.log("isAll=" + idCriterionPanel.isAll());
+    return idCriterionPanel.isAll() ? "" : idCriterionPanel.getQueryText() + " AND " ;
   }
 
   private List<String> getValueSetRQLQueryStrings() {
@@ -352,8 +363,8 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
     resultsTable.setWidget(row, 0, createTableLink(criterion.getDatasource(), criterion.getTable()));
     resultsTable.getFlexCellFormatter().setColSpan(row, 0, 1);
     resultsTable.setWidget(row, 1, createVariableLink(criterion.getDatasource(), criterion.getTable(), criterion.getVariable()));
-    Label query = new Label(idCriterionPanel.getQueryText() + " AND " + criterion.getText());
-    query.setTitle(idCriterionPanel.getRQLQueryString() + " AND " + criterion.getRQLQueryString());
+    Label query = new Label(getIDCriterionPrefix() + criterion.getText());
+    query.setTitle(getIDCriterionRQLPrefix() + criterion.getRQLQueryString());
     resultsTable.setWidget(row, 2, query);
     resultsTable.setText(row, 3, count + "");
   }

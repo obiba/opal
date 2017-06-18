@@ -259,18 +259,29 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
 
   private void setFilterText() {
     String filter = variable.getName() + " ";
-    filter += ((CheckBox) radioControls.getWidget(3)).getValue()
-        ? translations.criterionFiltersMap().get("in").toLowerCase()
-        : translations.criterionFiltersMap().get("not_in").toLowerCase();
+    if (getRadioButtonValue(1))
+      setText(filter + translations.criterionFiltersMap().get("empty").toLowerCase());
+    else if (getRadioButtonValue(2))
+      setText(filter + translations.criterionFiltersMap().get("not_empty").toLowerCase());
+    else if (getRadioButtonValue(3)) {
+      filter += translations.criterionFiltersMap().get("in").toLowerCase();
+      setText(filter + getRangeOrValueFilterText());
+    }
+    else if (getRadioButtonValue(4)) {
+      filter += translations.criterionFiltersMap().get("not_in").toLowerCase();
+      setText(filter + getRangeOrValueFilterText());
+    }
+    else
+      setText(filter + translations.criterionFiltersMap().get("all").toLowerCase());
+  }
 
+  private String getRangeOrValueFilterText() {
     DateTimeFormat df = DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_MEDIUM);
-    filter += rangeValueChooser.isItemSelected(0)
+    return rangeValueChooser.isItemSelected(0)
         ? " [" + (from.getValue() == null ? "*" : df.format(from.getValue())) + " " +
         translations.criterionFiltersMap().get("to") + " " +
         (to.getValue() == null ? "*" : df.format(to.getValue())) + "]"
         : " (" + (date.getValue() == null ? "" : df.format(date.getValue())) + ")";
-
-    setText(filter);
   }
 
   private class UpdateFilterChosenHandler implements ChosenChangeEvent.ChosenChangeHandler {

@@ -150,7 +150,7 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
   }
 
   private boolean isCheckSelected(int idx) {
-    return getRadionButtonValue(idx);
+    return getRadioButtonValue(idx);
   }
 
   private void updateMatchCriteriaFilter() {
@@ -166,13 +166,11 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
   }
 
   private void setFilterText() {
-    if (isCheckSelected(0))
-      updateCriterionFilter(translations.criterionFiltersMap().get("all").toLowerCase());
-    else if (isCheckSelected(1))
+    if (isCheckSelected(1))
       updateCriterionFilter(translations.criterionFiltersMap().get("empty").toLowerCase());
     else if (isCheckSelected(2))
       updateCriterionFilter(translations.criterionFiltersMap().get("not_empty").toLowerCase());
-    else {
+    else if (isInSelected() || isNotInSelected()){
       String op = null;
       String value = null;
       if (isInSelected()) {
@@ -189,6 +187,8 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
         updateCriterionFilter(op + " " + value);
       }
     }
+    else
+    updateCriterionFilter(translations.criterionFiltersMap().get("all").toLowerCase());
   }
 
   private void updateControls() {

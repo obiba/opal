@@ -279,15 +279,26 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
 
   private void setFilterText() {
     String filter = variable.getName() + " ";
-    filter += ((CheckBox) radioControls.getWidget(3)).getValue()
-        ? translations.criterionFiltersMap().get("in").toLowerCase()
-        : translations.criterionFiltersMap().get("not_in").toLowerCase();
+    if (getRadioButtonValue(1))
+      setText(filter + translations.criterionFiltersMap().get("empty").toLowerCase());
+    else if (getRadioButtonValue(2))
+      setText(filter + translations.criterionFiltersMap().get("not_empty").toLowerCase());
+    else if (getRadioButtonValue(3)) {
+      filter += translations.criterionFiltersMap().get("in").toLowerCase();
+      setText(filter + getRangeOrValueFilterText());
+    }
+    else if (getRadioButtonValue(4)) {
+      filter += translations.criterionFiltersMap().get("not_in").toLowerCase();
+      setText(filter + getRangeOrValueFilterText());
+    }
+    else
+      setText(filter + translations.criterionFiltersMap().get("all").toLowerCase());
+  }
 
-    filter += rangeValueChooser.isItemSelected(0) ? " [" + (min.getText().isEmpty() ? "*" : min.getText()) + " " +
+  private String getRangeOrValueFilterText() {
+    return rangeValueChooser.isItemSelected(0) ? " [" + (min.getText().isEmpty() ? "*" : min.getText()) + " " +
         translations.criterionFiltersMap().get("to").toLowerCase() + " " +
         (max.getText().isEmpty() ? "*" : max.getText()) + "]" : " (" + values.getText() + ")";
-
-    setText(filter);
   }
 
   private class UpdateFilterChosenHandler implements ChosenChangeEvent.ChosenChangeHandler {
