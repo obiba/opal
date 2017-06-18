@@ -191,6 +191,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   @Override
   public void showResults(QueryResultDto results, int offset, int limit) {
     initVariableItemTable();
+    variableItemTable.clearSelectedItems();
     variableItemProvider.updateRowData(offset, JsArrays.toList(results.getHitsArray()));
     variableItemProvider.updateRowCount(results.getTotalHits(), true);
     variableItemPager.setPagerVisible(results.getTotalHits() > Table.DEFAULT_PAGESIZE);

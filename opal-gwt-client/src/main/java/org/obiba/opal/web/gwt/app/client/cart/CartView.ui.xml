@@ -31,60 +31,58 @@
       </ui:msg>
     </b:Paragraph>
 
-    <b:Alert ui:field="noVariablesAlert" type="INFO" close="false" visible="false">
-      <ui:msg description="No Variable Cart message">No variables in the cart.</ui:msg>
-    </b:Alert>
+    <b:Heading size="4" addStyleNames="top-margin">
+      <ui:msg description="Variables label">Variables</ui:msg>
+    </b:Heading>
+    <g:FlowPanel>
 
-    <g:FlowPanel ui:field="variableCartPanel" visible="false">
-      <b:Heading size="4" addStyleNames="top-margin">
-        <ui:msg description="Variables label">Variables</ui:msg>
-      </b:Heading>
+      <g:FlowPanel addStyleNames="small-bottom-margin clearfix">
+        <b:Button ui:field="searchEntitiesAll" type="INFO" icon="SEARCH" addStyleNames="btn">
+          <ui:msg description="Search Entities Button label">Entities</ui:msg>
+        </b:Button>
+        <b:Button ui:field="clearVariables" addStyleNames="btn small-indent">
+          <ui:msg description="Clear Button label">Clear</ui:msg>
+        </b:Button>
+        <o:OpalSimplePager ui:field="variableCartPager" showTotalWhenNoPager="true" location="RIGHT"
+                           addStyleNames="pull-right small-indent"/>
+        <b:Controls addStyleNames="pull-right small-indent" ui:field="filterControls">
+          <b:InputAddOn prependIcon="FILTER">
+            <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
+          </b:InputAddOn>
+        </b:Controls>
+      </g:FlowPanel>
+
       <g:FlowPanel>
+        <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false" addStyleNames="actions-select">
 
-        <g:FlowPanel addStyleNames="small-bottom-margin clearfix">
-          <b:Button ui:field="clearVariables" addStyleNames="btn">
-            <ui:msg description="Clear Button label">Clear</ui:msg>
-          </b:Button>
-          <o:OpalSimplePager ui:field="variableCartPager" showTotalWhenNoPager="true" location="RIGHT"
-                             addStyleNames="pull-right small-indent"/>
-          <b:Controls addStyleNames="pull-right small-indent" ui:field="filterControls">
-            <b:InputAddOn prependIcon="FILTER">
-              <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
-            </b:InputAddOn>
-          </b:Controls>
-        </g:FlowPanel>
+          <g:FlowPanel addStyleNames="pull-left" width="60%">
+            <b2:IconAnchor ui:field="searchEntities" icon="SEARCH"
+                           addStyleNames="inline">
+              <ui:msg description="Search entities label">Search entities</ui:msg>
+            </b2:IconAnchor>
+          </g:FlowPanel>
 
-        <g:FlowPanel>
-          <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false" addStyleNames="actions-select">
+          <g:FlowPanel addStyleNames="pull-right">
+            <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
+            <b2:IconAnchor ui:field="selectAllAnchor" icon="CHECK" addStyleNames="inline small-indent"/>
+            <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" visible="false"
+                           addStyleNames="inline small-indent">
+              <ui:msg description="Clear label">Clear</ui:msg>
+            </b2:IconAnchor>
+          </g:FlowPanel>
 
-            <g:FlowPanel addStyleNames="pull-left" width="60%">
-              <b2:IconAnchor ui:field="searchEntities" icon="SEARCH"
-                             addStyleNames="inline">
-                <ui:msg description="Search entities label">Search entities</ui:msg>
-              </b2:IconAnchor>
-            </g:FlowPanel>
-
-            <g:FlowPanel addStyleNames="pull-right">
-              <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
-              <b2:IconAnchor ui:field="selectAllAnchor" icon="CHECK" addStyleNames="inline small-indent"/>
-              <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" visible="false"
-                             addStyleNames="inline small-indent">
-                <ui:msg description="Clear label">Clear</ui:msg>
-              </b2:IconAnchor>
-            </g:FlowPanel>
-
-          </b:Alert>
-          <b:Alert ui:field="selectItemTipsAlert" close="false" visible="true"
-                   addStyleNames="alert-info actions-select">
-            <g:Label>
-              <ui:msg description="Select variables tips label">Select variables to add to view, manage attributes or
-                remove.
-              </ui:msg>
-            </g:Label>
-          </b:Alert>
-          <o2:CartVariableTable ui:field="variableCartTable" width="100%" addStyleNames="pull-left"/>
-        </g:FlowPanel>
+        </b:Alert>
+        <b:Alert ui:field="selectItemTipsAlert" close="false" visible="true"
+                 addStyleNames="alert-info actions-select">
+          <g:Label>
+            <ui:msg description="Select variables tips label">Select variables to add to view, manage attributes or
+              remove.
+            </ui:msg>
+          </g:Label>
+        </b:Alert>
+        <o2:CartVariableTable ui:field="variableCartTable" width="100%" addStyleNames="pull-left"/>
       </g:FlowPanel>
     </g:FlowPanel>
   </g:FlowPanel>
+
 </ui:UiBinder>

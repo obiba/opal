@@ -52,6 +52,10 @@ public class VariableItemTable extends Table<ItemResultDto> {
     return checkColumn.getSelectedItems();
   }
 
+  public void clearSelectedItems() {
+    checkColumn.clearSelection();
+  }
+
   private void initColumns(PlaceManager placeManager, ItemResultCheckDisplay checkDisplay) {
     setPageSize(Table.DEFAULT_PAGESIZE);
     setEmptyTableWidget(new InlineLabel(translations.noVariablesLabel()));

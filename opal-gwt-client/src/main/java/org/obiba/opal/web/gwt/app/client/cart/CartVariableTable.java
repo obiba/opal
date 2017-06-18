@@ -18,7 +18,6 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import org.obiba.opal.web.gwt.app.client.cart.service.CartVariableItem;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
-import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
@@ -88,6 +87,10 @@ public class CartVariableTable extends Table<CartVariableItem> {
 
   public List<CartVariableItem> getSelectedItems() {
     return checkColumn.getSelectedItems();
+  }
+
+  public void clearSelectedItems() {
+    checkColumn.clearSelection();
   }
 
   private static class VariableItemColumn extends Column<CartVariableItem, CartVariableItem> {

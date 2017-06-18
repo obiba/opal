@@ -42,12 +42,6 @@ public class CartView extends ViewWithUiHandlers<CartUiHandlers> implements Cart
   }
 
   @UiField
-  Alert noVariablesAlert;
-
-  @UiField
-  Panel variableCartPanel;
-
-  @UiField
   TextBoxClearable filter;
 
   @UiField
@@ -97,22 +91,25 @@ public class CartView extends ViewWithUiHandlers<CartUiHandlers> implements Cart
     renderVariables(filterVariables(filter.getText()));
   }
 
+  @UiHandler("searchEntitiesAll")
+  public void onSearchEntitiesAll(ClickEvent event) {
+    getUiHandlers().onSearchEntities(variableCartProvider.getList());
+  }
+
   @UiHandler("searchEntities")
   public void onSearchEntities(ClickEvent event) {
     getUiHandlers().onSearchEntities(variableCartTable.getSelectedItems());
   }
 
-
   @Override
   public void showVariables(List<CartVariableItem> variables) {
     initCartVariableTable();
     originalVariables = variables;
-    variableCartPanel.setVisible(!originalVariables.isEmpty());
-    noVariablesAlert.setVisible(originalVariables.isEmpty());
     renderVariables(originalVariables);
   }
 
   private void renderVariables(List<CartVariableItem> variables) {
+    variableCartTable.clearSelectedItems();
     variableCartProvider.setList(variables);
     variableCartProvider.refresh();
     variableCartPager.setPagerVisible(variables.size() > Table.DEFAULT_PAGESIZE);
