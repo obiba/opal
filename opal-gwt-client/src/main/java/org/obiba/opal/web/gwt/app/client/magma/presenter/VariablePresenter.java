@@ -385,7 +385,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     List<VariableDto> variables = new ArrayList<>();
     variables.add(variable);
     VariablesToViewPresenter variablesToViewPresenter = variablesToViewProvider.get();
-    variablesToViewPresenter.initialize(table, variables);
+    variablesToViewPresenter.show(table, variables);
   }
 
   @Override

@@ -62,8 +62,13 @@ public class ViewDtoBuilder {
     return this;
   }
 
-  public ViewDtoBuilder fromTables(JsArrayString tableFullNames) {
+  public ViewDtoBuilder fromTableReferences(JsArrayString tableFullNames) {
     viewDto.setFromArray(tableFullNames);
+    return this;
+  }
+
+  public ViewDtoBuilder fromTableReferences(List<String> tableFullNames) {
+    fromTableReferences(JsArrays.fromIterable(tableFullNames));
     return this;
   }
 

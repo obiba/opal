@@ -523,7 +523,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       fireEvent(NotificationEvent.newBuilder().error("CopyVariableSelectAtLeastOne").build());
     } else {
       VariablesToViewPresenter variablesToViewPresenter = variablesToViewProvider.get();
-      variablesToViewPresenter.initialize(table, variableDtos);
+      variablesToViewPresenter.show(table, variableDtos);
     }
   }
 

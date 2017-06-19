@@ -21,4 +21,6 @@ public interface CartUiHandlers extends UiHandlers {
   void onRemoveVariable(String variableFullName);
 
   void onSearchEntities(List<CartVariableItem> selectedVariables);
+
+  void onAddToView(List<CartVariableItem> selectedVariables);
 }

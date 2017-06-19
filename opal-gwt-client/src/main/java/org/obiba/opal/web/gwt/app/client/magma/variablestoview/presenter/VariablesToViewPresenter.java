@@ -9,46 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.derive.helper.CategoricalVariableDerivationHelper;
-import org.obiba.opal.web.gwt.app.client.magma.derive.helper.VariableDuplicationHelper;
-import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
-import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
-import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
-import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsVariableCopyColumn;
-import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
-import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
-import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.model.client.magma.DatasourceDto;
-import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.magma.VariableListViewDto;
-import org.obiba.opal.web.model.client.magma.ViewDto;
-
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -61,6 +22,25 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.derive.helper.CategoricalVariableDerivationHelper;
+import org.obiba.opal.web.gwt.app.client.magma.derive.helper.VariableDuplicationHelper;
+import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
+import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
+import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
+import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
+import org.obiba.opal.web.gwt.app.client.validator.*;
+import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.model.client.magma.*;
+
+import javax.annotation.Nullable;
+import java.util.*;
 
 import static org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter.Display.FormField;
 
@@ -71,7 +51,7 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
 
   private final PlaceManager placeManager;
 
-  private TableDto table;
+  private List<String> tableReferences;
 
   private List<VariableDto> variables = new LinkedList<VariableDto>();
 
@@ -91,7 +71,7 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
     getView().clearErrors();
 
     variableCopyValidationHandler = new VariableCopyValidationHandler();
-    if(variableCopyValidationHandler.validate()) {
+    if (variableCopyValidationHandler.validate()) {
       createOrUpdateViewWithVariables();
     }
   }
@@ -112,16 +92,16 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
     boolean renameCategories = getView().isRenameCategoriesSelected();
     JsArray<VariableDto> derivedVariables = JsArrays.create();
 
-    for(VariableDto variable : variables) {
-      if(perOccurrence && variable.getIsRepeatable()) {
-        for (int i=0; i<max; i++) {
+    for (VariableDto variable : variables) {
+      if (perOccurrence && variable.getIsRepeatable()) {
+        for (int i = 0; i < max; i++) {
           if (renameCategories) {
             derivedVariables.push(getDerivedVariable(variable, i));
           } else {
             derivedVariables.push(new VariableDuplicationHelper(variable, i).getDerivedVariable());
           }
         }
-      } else if(renameCategories) {
+      } else if (renameCategories) {
         // Keep new name if changed
         derivedVariables.push(getDerivedVariable(variable));
       } else {
@@ -130,33 +110,67 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
 
     }
 
-    getView().renderRows(variables, derivedVariables, false);
+    getView().renderVariables(variables, derivedVariables, false);
   }
 
-  public void initialize(TableDto table, List<VariableDto> variables) {
-    this.table = table;
+  public void show(TableDto table, List<VariableDto> variables) {
+    this.tableReferences = Lists.newArrayList(table.getDatasourceName() + "." + table.getName());
     this.variables = variables;
 
     refreshDatasources();
 
     // Prepare the array of variableDto
     JsArray<VariableDto> derivedVariables = JsArrays.create();
-    for(VariableDto variable : variables) {
+    for (VariableDto variable : variables) {
       derivedVariables.push(new VariableDuplicationHelper(variable).getDerivedVariable());
     }
 
-    getView().renderRows(variables, derivedVariables, true);
+    getView().renderVariables(variables, derivedVariables, true);
     getView().showDialog();
   }
 
+  public void show(List<String> variableFullNames) {
+    tableReferences = Lists.newArrayList();
+    final int expectedCount = variableFullNames.size();
+    final JsArray<VariableDto> derivedVariables = JsArrays.create();
+    final List<String> notFoundVariables = Lists.newArrayList();
+    // build a unique list of table references
+    for (final String varFullName : variableFullNames) {
+      MagmaPath.Parser parser = MagmaPath.Parser.parse(varFullName);
+      String tableRef = parser.getTableReference();
+      if (!tableReferences.contains(tableRef)) tableReferences.add(tableRef);
+      if (tableReferences.size() == 1) refreshDatasources();
+      ResourceRequestBuilderFactory.<VariableDto>newBuilder() //
+          .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
+              .build(parser.getDatasource(), parser.getTable(), parser.getVariable())) //
+          .get() //
+          .withCallback(new ResourceCallback<VariableDto>() {
+            @Override
+            public void onResource(Response response, VariableDto resource) {
+              variables.add(resource);
+              derivedVariables.push(new VariableDuplicationHelper(resource).getDerivedVariable());
+              if ((derivedVariables.length() + notFoundVariables.size()) == expectedCount) {
+                getView().renderVariables(variables, derivedVariables, true);
+                getView().showDialog();
+              }
+            }
+          }).withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              notFoundVariables.add(varFullName);
+            }
+          }, Response.SC_NOT_FOUND, Response.SC_FORBIDDEN).send();
+    }
+  }
+
   private void createOrUpdateViewWithVariables() {
-    ViewDto view = ViewDtoBuilder.newBuilder().setName(getView().getViewName().getText()).fromTables(table)
+    ViewDto view = ViewDtoBuilder.newBuilder().setName(getView().getViewName().getText()).fromTableReferences(tableReferences)
         .defaultVariableListView().build();
     VariableListViewDto derivedVariables = (VariableListViewDto) view
         .getExtension(VariableListViewDto.ViewDtoExtensions.view);
 
     JsArray<VariableDto> variablesDto = JsArrays.create();
-    for(VariableDto v : getView().getVariables(true)) {
+    for (VariableDto v : getView().getVariables(true)) {
       // Push with the right name if it was changed
       variablesDto.push(v);
     }
@@ -179,7 +193,7 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
   }
 
   private VariableDto getDerivedVariable(VariableDto variable, int valueAt) {
-    if(VariableDtos.hasCategories(variable) && ("text".equals(variable.getValueType()) ||
+    if (VariableDtos.hasCategories(variable) && ("text".equals(variable.getValueType()) ||
         "integer".equals(variable.getValueType()) && !VariableDtos.allCategoriesMissing(variable))) {
       CategoricalVariableDerivationHelper derivationHelper = new CategoricalVariableDerivationHelper(variable, valueAt);
       derivationHelper.initializeValueMapEntries();
@@ -224,9 +238,9 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
       updateFromTables(viewDto);
 
       JsArray<VariableDto> existingVariables = JsArrays.toSafeArray(derivedVariables.getVariablesArray());
-      for(int i = 0; i < variables.length(); i++) {
+      for (int i = 0; i < variables.length(); i++) {
         int index = getVariableIndex(existingVariables, variables.get(i).getName());
-        if(index == -1) {
+        if (index == -1) {
           existingVariables.push(variables.get(i));
         } else {
           existingVariables.set(index, variables.get(i));
@@ -247,23 +261,23 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
     private void updateFromTables(ViewDto viewDto) {
       // Update from tables
       JsArrayString fromTables = viewDto.getFromArray();
-      String newFrom = table.getDatasourceName() + "." + table.getName();
-      GWT.log("" + newFrom);
-      boolean addTable = true;
-      for(int i = 0; i < fromTables.length(); i++) {
-        if(fromTables.get(i).equals(newFrom)) {
-          addTable = false;
-          break;
+      for (String tableRef : tableReferences) {
+        boolean addTable = true;
+        for (int i = 0; i < fromTables.length(); i++) {
+          if (fromTables.get(i).equals(tableRef)) {
+            addTable = false;
+            break;
+          }
         }
-      }
-      if(addTable) {
-        fromTables.push(newFrom);
+        if (addTable) {
+          fromTables.push(tableRef);
+        }
       }
     }
 
     private int getVariableIndex(JsArray<VariableDto> vars, String name) {
-      for(int i = 0; i < vars.length(); i++) {
-        if(vars.get(i).getName().equals(name)) {
+      for (int i = 0; i < vars.length(); i++) {
+        if (vars.get(i).getName().equals(name)) {
           return i;
         }
       }
@@ -301,12 +315,12 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
           @Override
           public void onResource(Response response, JsArray<DatasourceDto> resource) {
             datasources = JsArrays.toSafeArray(resource);
-            for(int i = 0; i < datasources.length(); i++) {
+            for (int i = 0; i < datasources.length(); i++) {
               DatasourceDto d = datasources.get(i);
               d.setViewArray(JsArrays.toSafeArray(d.getViewArray()));
             }
-
-            getView().setDatasources(datasources, table.getDatasourceName());
+            // pre select the first datasource
+            getView().setDatasources(datasources, MagmaPath.Parser.parse(tableReferences.get(0)).getDatasource());
           }
         }).send();
   }
@@ -325,7 +339,7 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
 
     void setDatasources(JsArray<DatasourceDto> datasources, String name);
 
-    void renderRows(List<VariableDto> originalVariables, JsArray<VariableDto> rows, boolean clearNames);
+    void renderVariables(List<VariableDto> originalVariables, JsArray<VariableDto> rows, boolean clearNames);
 
     HasText getViewName();
 
@@ -350,7 +364,7 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      if(validators == null) {
+      if (validators == null) {
         validators = new LinkedHashSet<FieldValidator>();
 
         validators.add(new RequiredTextValidator(getView().getViewName(), "ViewNameRequired", FormField.NAME.name()));
@@ -360,7 +374,7 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
 
         List<VariableDto> list = getView().getVariables(true);
         String variableGroupName = list.size() == 1 ? FormField.VARIABLE.name() : FormField.VARIABLES.name();
-        for(VariableDto v : list) {
+        for (VariableDto v : list) {
           validators.add(new ConditionValidator(variableNameEmptyCondition(v.getName()), "CopyVariableNameRequired",
               variableGroupName));
 
@@ -381,7 +395,11 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
       return new HasBooleanValue() {
         @Override
         public Boolean getValue() {
-          return !(datasourceName + "." + viewName).equals(table.getDatasourceName() + "." + table.getName());
+          String selfRef = datasourceName + "." + viewName;
+          for (String tableRef : tableReferences) {
+            if (selfRef.equals(tableRef)) return false;
+          }
+          return true;
         }
       };
     }
@@ -423,8 +441,8 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
     protected boolean hasError() {
       Collection<String> names = new HashSet<String>();
 
-      for(VariableDto var : variables) {
-        if(!names.add(var.getName())) {
+      for (VariableDto var : variables) {
+        if (!names.add(var.getName())) {
           List<String> args = new ArrayList<String>();
           args.add(var.getName());
           setArgs(args);

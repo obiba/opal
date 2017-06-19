@@ -196,8 +196,17 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
           public void onResponseCode(Request request, Response response) {
             // ignore
             getView().clearResults(false);
+            fireEvent(NotificationEvent.newBuilder().warn("MalformedSearchQuery").build());
           }
         }, Response.SC_BAD_REQUEST)
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            // ignore
+            getView().clearResults(false);
+            fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
+          }
+        }, Response.SC_SERVICE_UNAVAILABLE)
         .withCallback(new ResourceCallback<EntitiesResultDto>() {
           @Override
           public void onResource(Response response, EntitiesResultDto resource) {

@@ -230,7 +230,7 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
   }
 
   @Override
-  public void renderRows(List<VariableDto> originalVariables, JsArray<VariableDto> rows, boolean clearNames) {
+  public void renderVariables(List<VariableDto> originalVariables, JsArray<VariableDto> rows, boolean clearNames) {
     // Set all variable names to their original name
     if(clearNames) {
       for(VariableDto v : originalVariables) {

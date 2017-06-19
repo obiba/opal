@@ -27,9 +27,11 @@ import org.obiba.opal.web.gwt.app.client.cart.service.CartService;
 import org.obiba.opal.web.gwt.app.client.cart.service.CartVariableItem;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 
 import java.util.List;
@@ -42,12 +44,16 @@ public class CartPresenter extends Presenter<CartPresenter.Display, CartPresente
 
   private final PlaceManager placeManager;
 
+  private final ModalProvider<VariablesToViewPresenter> variablesToViewProvider;
+
   @Inject
-  public CartPresenter(EventBus eventBus, Display view, Proxy proxy, Translations translations, CartService cartService, PlaceManager placeManager) {
+  public CartPresenter(EventBus eventBus, Display view, Proxy proxy, Translations translations, CartService cartService,
+                       PlaceManager placeManager, ModalProvider<VariablesToViewPresenter> variablesToViewProvider) {
     super(eventBus, view, proxy, ApplicationPresenter.WORKBENCH);
     this.translations = translations;
     this.cartService = cartService;
     this.placeManager = placeManager;
+    this.variablesToViewProvider = variablesToViewProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -90,6 +96,27 @@ public class CartPresenter extends Presenter<CartPresenter.Display, CartPresente
     }
     if (entityTypeError) fireEvent(NotificationEvent.newBuilder().warn("CannotMixVariableEntityTypes").build());
     else placeManager.revealPlace(ProjectPlacesHelper.getSearchEntitiesPlace(entityType, queries));
+  }
+
+  @Override
+  public void onAddToView(List<CartVariableItem> selectedVariables) {
+    if (selectedVariables.isEmpty()) return;
+    List<String> variableFullNames = Lists.newArrayList();
+    String entityType = "";
+    boolean entityTypeError = false;
+    for (CartVariableItem var : selectedVariables) {
+      variableFullNames.add(var.getIdentifier());
+      if (Strings.isNullOrEmpty(entityType)) entityType = var.getEntityType();
+      else if (!entityType.equals(var.getEntityType())) {
+        entityTypeError = true;
+        break;
+      }
+    }
+    if (entityTypeError) fireEvent(NotificationEvent.newBuilder().warn("CannotMixVariableEntityTypes").build());
+    else {
+      VariablesToViewPresenter variablesToViewPresenter = variablesToViewProvider.get();
+      variablesToViewPresenter.show(variableFullNames);
+    }
   }
 
   private void updateView() {

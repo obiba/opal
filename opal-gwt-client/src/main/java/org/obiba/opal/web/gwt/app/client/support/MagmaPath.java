@@ -95,6 +95,9 @@ public class MagmaPath {
       return variableName;
     }
 
+    public String getTableReference() {
+      return datasourceName + "." + tableName;
+    }
   }
 
 }

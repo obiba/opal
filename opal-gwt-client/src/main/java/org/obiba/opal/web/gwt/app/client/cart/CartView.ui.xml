@@ -37,7 +37,10 @@
     <g:FlowPanel>
 
       <g:FlowPanel addStyleNames="small-bottom-margin clearfix">
-        <b:Button ui:field="searchEntitiesAll" type="INFO" icon="SEARCH" addStyleNames="btn">
+        <b:Button ui:field="addToViewAll" type="INFO" icon="PLUS" addStyleNames="btn">
+          <ui:msg description="Add to View Button label">View</ui:msg>
+        </b:Button>
+        <b:Button ui:field="searchEntitiesAll" type="INFO" icon="SEARCH" addStyleNames="btn small-indent">
           <ui:msg description="Search Entities Button label">Entities</ui:msg>
         </b:Button>
         <b:Button ui:field="clearVariables" addStyleNames="btn small-indent">
@@ -56,8 +59,12 @@
         <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false" addStyleNames="actions-select">
 
           <g:FlowPanel addStyleNames="pull-left" width="60%">
-            <b2:IconAnchor ui:field="searchEntities" icon="SEARCH"
+            <b2:IconAnchor ui:field="addToView" icon="PLUS_SIGN"
                            addStyleNames="inline">
+              <ui:msg description="Add to view label">Add to view</ui:msg>
+            </b2:IconAnchor>
+            <b2:IconAnchor ui:field="searchEntities" icon="SEARCH"
+                           addStyleNames="inline small-indent">
               <ui:msg description="Search entities label">Search entities</ui:msg>
             </b2:IconAnchor>
           </g:FlowPanel>
@@ -75,8 +82,7 @@
         <b:Alert ui:field="selectItemTipsAlert" close="false" visible="true"
                  addStyleNames="alert-info actions-select">
           <g:Label>
-            <ui:msg description="Select variables tips label">Select variables to add to view, manage attributes or
-              remove.
+            <ui:msg description="Select cart variables tips label">Select variables to add to view or to use as entities search criteria.
             </ui:msg>
           </g:Label>
         </b:Alert>
