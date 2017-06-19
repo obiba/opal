@@ -47,7 +47,7 @@
 
     <g:FlowPanel>
       <g:FlowPanel addStyleNames="small-bottom-margin clearfix">
-        <o:OpalSimplePager ui:field="variableItemPager" showTotalWhenNoPager="true" location="RIGHT"
+        <o:OpalSimplePager ui:field="variableItemPager" location="RIGHT"
                            addStyleNames="pull-right small-indent"/>
       </g:FlowPanel>
       <g:FlowPanel ui:field="variableItemTablePanel">

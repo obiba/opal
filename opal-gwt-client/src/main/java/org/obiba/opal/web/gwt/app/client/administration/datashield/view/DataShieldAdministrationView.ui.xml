@@ -94,7 +94,12 @@
       <b:Button ui:field="addMethodButton" icon="PLUS" type="INFO">
         <ui:msg description="Add DataSHIELD method label">Add Method</ui:msg>
       </b:Button>
-      <o:OpalSimplePager ui:field="methodsTablePager" location="RIGHT" addStyleNames="pull-right small-bottom-margin"/>
+      <o:OpalSimplePager ui:field="methodsTablePager" location="RIGHT" addStyleNames="pull-right small-indent small-bottom-margin"/>
+      <b:Controls addStyleNames="pull-right small-indent" ui:field="filterControls">
+        <b:InputAddOn prependIcon="FILTER">
+          <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
+        </b:InputAddOn>
+      </b:Controls>
     </g:FlowPanel>
     <o:Table ui:field="methodsTable" visible="false"/>
 

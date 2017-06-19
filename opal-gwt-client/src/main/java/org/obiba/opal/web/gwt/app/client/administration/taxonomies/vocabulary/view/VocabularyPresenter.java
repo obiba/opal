@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.taxonomies.vocabulary.view;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
@@ -32,6 +33,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.search.event.SearchTaxonomyVariablesEvent;
+import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -227,11 +229,10 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
     if(Strings.isNullOrEmpty(filter)) {
       getView().renderTerms(vocabulary.getTermsArray());
     } else {
+      List<String> tokens = FilterHelper.tokenize(filter);
       JsArray<TermDto> filtered = JsArrays.create();
       for(TermDto term : JsArrays.toIterable(vocabulary.getTermsArray())) {
-        if(termMatches(term, filter)) {
-          filtered.push(term);
-        }
+        if(termMatches(term, tokens)) filtered.push(term);
       }
       getView().renderTerms(filtered);
     }
@@ -315,16 +316,12 @@ public class VocabularyPresenter extends PresenterWidget<Display> implements Voc
     });
   }
 
-  private boolean termMatches(TermDto term, String filter) {
-    String name = term.getName().toLowerCase();
-    for(String token : filter.toLowerCase().split(" ")) {
-      if(!Strings.isNullOrEmpty(token)) {
-        if(!name.contains(token) && !textsContains(term.getTitleArray(), token) &&
-            !textsContains(term.getDescriptionArray(), token) && !textsContains(term.getKeywordsArray(), token))
-          return false;
-      }
-    }
-    return true;
+  private boolean termMatches(TermDto term, List<String> tokens) {
+    String toText = Joiner.on(" ").join(term.getName(),
+        Joiner.on(" ").join(JsArrays.toIterable(term.getTitleArray())),
+        Joiner.on(" ").join(JsArrays.toIterable(term.getDescriptionArray())),
+        Joiner.on(" ").join(JsArrays.toIterable(term.getKeywordsArray())));
+    return FilterHelper.matches(toText, tokens);
   }
 
   private boolean textsContains(JsArray<LocaleTextDto> texts, String token) {

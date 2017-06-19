@@ -22,6 +22,7 @@ import com.google.gwt.user.client.ui.SuggestOracle;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.AttributeHelper;
+import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
@@ -106,22 +107,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
    * @return
    */
   private static boolean isCandidate(String ref, String query) {
-    String rep = ref.toLowerCase();
-    for (String token : Splitter.on(" ").splitToList(query)) {
-      String nQuery = token.trim().toLowerCase();
-      boolean not = false;
-      if (nQuery.startsWith("-")) {
-        not = true;
-        nQuery = nQuery.substring(1);
-      }
-      if (!nQuery.isEmpty()) {
-        if (not) {
-          if (rep.contains(nQuery)) return false;
-        }
-        else if (!rep.contains(nQuery)) return false;
-      }
-    }
-    return true;
+    return FilterHelper.matches(ref, FilterHelper.tokenize(query));
   }
 
   private void initPropertySuggestions() {

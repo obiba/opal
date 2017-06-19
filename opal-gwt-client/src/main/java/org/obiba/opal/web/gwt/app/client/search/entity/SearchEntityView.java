@@ -34,6 +34,7 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TableChooser;
@@ -265,13 +266,13 @@ public class SearchEntityView extends ViewWithUiHandlers<SearchEntityUiHandlers>
   
   private List<VariableValueRow> filterVariableValueRows(List<VariableValueRow> originalRows) {
     List<VariableValueRow> rows = Lists.newArrayList();
-    String filterText = filter.getText().trim();
-    boolean hasFilter = !Strings.isNullOrEmpty(filterText);
+    List<String> tokens = FilterHelper.tokenize(filter.getText());
+    boolean hasFilter = !tokens.isEmpty();
     boolean withEmpties = showEmpties.getValue();
     for (VariableValueRow row : originalRows) {
       boolean isIn = true;
       if (!withEmpties && row.hasEmptyValue()) isIn = false;
-      if (hasFilter && !variableMatches(row.getVariableDto(), filterText)) isIn = false;
+      if (hasFilter && !FilterHelper.matches(row.getVariableDto().getName(), tokens)) isIn = false;
       if (isIn) rows.add(row);
     }
     return rows;

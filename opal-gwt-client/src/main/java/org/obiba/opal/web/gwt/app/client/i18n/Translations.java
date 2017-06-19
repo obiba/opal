@@ -1692,6 +1692,10 @@ public interface Translations extends Constants {
   @Constants.DefaultStringValue("Filter terms...")
   String filterTerms();
 
+  @Description("Filter DataShield Methods label")
+  @Constants.DefaultStringValue("Filter methods and packages...")
+  String filterDataShieldMethods();
+
   @Description("Clear filter label")
   @DefaultStringValue("Clear filter")
   String clearFilter();

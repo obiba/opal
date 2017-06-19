@@ -71,7 +71,12 @@
         </b:ButtonGroup>
       </g:FlowPanel>
 
-      <o:OpalSimplePager ui:field="indexTablePager" location="RIGHT" addStyleNames="pull-right"/>
+      <o:OpalSimplePager ui:field="indexTablePager" location="RIGHT" addStyleNames="small-indent pull-right"/>
+      <b:Controls addStyleNames="pull-right small-indent" ui:field="filterControls">
+        <b:InputAddOn prependIcon="FILTER">
+          <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
+        </b:InputAddOn>
+      </b:Controls>
     </g:FlowPanel>
 
     <g:FlowPanel ui:field="indexPanel">
@@ -95,6 +100,13 @@
             <ui:msg description="Clear label">Clear</ui:msg>
           </b2:IconAnchor>
         </g:FlowPanel>
+      </b:Alert>
+      <b:Alert ui:field="selectItemTipsAlert" close="false" visible="true"
+               addStyleNames="alert-info actions-select">
+        <g:Label>
+          <ui:msg description="Select variables tips label">Select tables to manage their index.
+          </ui:msg>
+        </g:Label>
       </b:Alert>
       <o:Table ui:field="indexTable"/>
     </g:FlowPanel>

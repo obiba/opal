@@ -15,6 +15,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.google.common.base.Joiner;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.edit.TaxonomyEditModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyUpdatedEvent;
@@ -29,6 +30,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VcsCommitHistoryModalPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.*;
@@ -172,11 +174,10 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
     if(Strings.isNullOrEmpty(filter)) {
       getView().setVocabularies(taxonomy.getVocabulariesArray());
     } else {
+      List<String> tokens = FilterHelper.tokenize(filter);
       JsArray<VocabularyDto> filtered = JsArrays.create();
       for(VocabularyDto vocabulary : JsArrays.toIterable(taxonomy.getVocabulariesArray())) {
-        if(vocabularyMatches(vocabulary, filter)) {
-          filtered.push(vocabulary);
-        }
+        if(vocabularyMatches(vocabulary, tokens)) filtered.push(vocabulary);
       }
       getView().setVocabularies(filtered);
     }
@@ -246,22 +247,11 @@ public class TaxonomyPresenter extends PresenterWidget<TaxonomyPresenter.Display
         .put().send();
   }
 
-  private boolean vocabularyMatches(VocabularyDto vocabulary, String filter) {
-    String name = vocabulary.getName().toLowerCase();
-    for(String token : filter.toLowerCase().split(" ")) {
-      if(!Strings.isNullOrEmpty(token)) {
-        if(!name.contains(token) && !textsContains(vocabulary.getTitleArray(), token) &&
-            !textsContains(vocabulary.getDescriptionArray(), token)) return false;
-      }
-    }
-    return true;
-  }
-
-  private boolean textsContains(JsArray<LocaleTextDto> texts, String token) {
-    for(LocaleTextDto text : JsArrays.toIterable(texts)) {
-      if(text.getText().contains(token)) return true;
-    }
-    return false;
+  private boolean vocabularyMatches(VocabularyDto vocabulary, List<String> tokens) {
+    String toText = Joiner.on(" ").join(vocabulary.getName(),
+        Joiner.on(" ").join(JsArrays.toIterable(vocabulary.getTitleArray())),
+        Joiner.on(" ").join(JsArrays.toIterable(vocabulary.getDescriptionArray())));
+    return FilterHelper.matches(toText, tokens);
   }
 
   //

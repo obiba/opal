@@ -29,6 +29,7 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import org.obiba.opal.web.gwt.app.client.cart.service.CartVariableItem;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
@@ -118,9 +119,9 @@ public class CartView extends ViewWithUiHandlers<CartUiHandlers> implements Cart
   private List<CartVariableItem> filterVariables(String filterText) {
     List<CartVariableItem> variables = Lists.newArrayList();
     if (originalVariables == null || originalVariables.isEmpty()) return variables;
+    List<String> tokens = FilterHelper.tokenize(filterText);
     for (CartVariableItem var : originalVariables) {
-      // TODO multi-tokens with negation (like 'cancer -lung')
-      if (var.getIdentifier().toLowerCase().contains(filterText.toLowerCase())) variables.add(var);
+      if (FilterHelper.matches(var.getIdentifier(), tokens)) variables.add(var);
     }
     return variables;
   }

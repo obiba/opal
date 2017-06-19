@@ -9,68 +9,51 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.index.view;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdministrationUiHandlers;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
-import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
-import org.obiba.opal.web.gwt.app.client.ui.Table;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsIndexColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.StatusImageCell;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueRenderer;
-import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
-
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasWidgets;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.HasData;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
+import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdministrationUiHandlers;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
+import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
+import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.*;
+import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 
-import static org.obiba.opal.web.model.client.opal.ScheduleType.DAILY;
-import static org.obiba.opal.web.model.client.opal.ScheduleType.HOURLY;
-import static org.obiba.opal.web.model.client.opal.ScheduleType.MINUTES_15;
-import static org.obiba.opal.web.model.client.opal.ScheduleType.MINUTES_30;
-import static org.obiba.opal.web.model.client.opal.ScheduleType.MINUTES_5;
-import static org.obiba.opal.web.model.client.opal.ScheduleType.NOT_SCHEDULED;
-import static org.obiba.opal.web.model.client.opal.ScheduleType.WEEKLY;
-import static org.obiba.opal.web.model.client.opal.TableIndexationStatus.IN_PROGRESS;
-import static org.obiba.opal.web.model.client.opal.TableIndexationStatus.OUTDATED;
-import static org.obiba.opal.web.model.client.opal.TableIndexationStatus.UPTODATE;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.obiba.opal.web.model.client.opal.ScheduleType.*;
+import static org.obiba.opal.web.model.client.opal.TableIndexationStatus.*;
 
 public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrationUiHandlers>
     implements IndexAdministrationPresenter.Display {
 
   private final TranslationMessages translationMessages;
 
-  interface Binder extends UiBinder<Widget, IndexAdministrationView> {}
+  interface Binder extends UiBinder<Widget, IndexAdministrationView> {
+  }
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -87,10 +70,16 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
   Button refreshIndicesButton;
 
   @UiField
+  TextBoxClearable filter;
+
+  @UiField
   OpalSimplePager indexTablePager;
 
   @UiField
   Panel indexPanel;
+
+  @UiField
+  Alert selectItemTipsAlert;
 
   @UiField
   Alert selectAllAlert;
@@ -129,19 +118,20 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
   private boolean enabled;
 
+  private List<TableIndexStatusDto> originalIndices;
+
   @Inject
   public IndexAdministrationView(Binder uiBinder, PlaceManager placeManager, TranslationMessages translationMessages) {
     this.placeManager = placeManager;
     this.translationMessages = translationMessages;
     initWidget(uiBinder.createAndBindUi(this));
-
+    filter.getTextBox().setPlaceholder(translations.filterTables());
     indexTablePager.setDisplay(indexTable);
-
     checkboxColumn = new CheckboxColumn<TableIndexStatusDto>(new TableIndexStatusDtoDisplay());
     ActionsIndexColumn<TableIndexStatusDto> actionsColumn = new ActionsIndexColumn<TableIndexStatusDto>(
         new ActionsProvider<TableIndexStatusDto>() {
 
-          private final String[] all = new String[] { REMOVE_ACTION, INDEX_ACTION };
+          private final String[] all = new String[]{REMOVE_ACTION, INDEX_ACTION};
 
           @Override
           public String[] allActions() {
@@ -171,9 +161,9 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     actionsColumn.setActionHandler(new ActionHandler<TableIndexStatusDto>() {
       @Override
       public void doAction(TableIndexStatusDto statusDto, String actionName) {
-        if(actionName.trim().equalsIgnoreCase(REMOVE_ACTION)) {
+        if (actionName.trim().equalsIgnoreCase(REMOVE_ACTION)) {
           getUiHandlers().delete(Arrays.asList(statusDto));
-        } else if(actionName.trim().equalsIgnoreCase(INDEX_ACTION)) {
+        } else if (actionName.trim().equalsIgnoreCase(INDEX_ACTION)) {
           getUiHandlers().indexNow(Arrays.asList(statusDto));
         }
       }
@@ -182,19 +172,35 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
   @UiHandler("startStopButton")
   public void onStartStop(ClickEvent event) {
-    if(status == Status.Startable) getUiHandlers().start();
+    if (status == Status.Startable) getUiHandlers().start();
     else getUiHandlers().stop();
   }
 
   @UiHandler("enableButton")
   public void onSuspendResume(ClickEvent event) {
-    if(enabled) getUiHandlers().suspend();
+    if (enabled) getUiHandlers().suspend();
     else getUiHandlers().resume();
   }
 
   @UiHandler("refreshIndicesButton")
   public void onRefresh(ClickEvent event) {
     getUiHandlers().refresh();
+  }
+
+  @UiHandler("filter")
+  public void onFilterUpdate(KeyUpEvent event) {
+    renderTableIndices(filterTableIndices(filter.getText()));
+  }
+
+  private List<TableIndexStatusDto> filterTableIndices(String text) {
+    List<TableIndexStatusDto> indices = Lists.newArrayList();
+    if (originalIndices == null) return indices;
+    List<String> tokens = FilterHelper.tokenize(text);
+    for (TableIndexStatusDto index : originalIndices) {
+      String indexText = Joiner.on(" ").join(index.getDatasource(), index.getTable(), index.getStatus().getName());
+      if (FilterHelper.matches(indexText, tokens)) indices.add(index);
+    }
+    return indices;
   }
 
   @UiHandler("configureButton")
@@ -218,17 +224,15 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
   }
 
   @Override
-  public void renderRows(JsArray<TableIndexStatusDto> rows) {
-    dataProvider.setList(JsArrays.toList(rows));
-    indexTablePager.firstPage();
-    dataProvider.refresh();
-    indexTablePager.setPagerVisible(dataProvider.getList().size() > indexTablePager.getPageSize());
+  public void showTableIndices(List<TableIndexStatusDto> indices) {
+    originalIndices = indices;
+    renderTableIndices(indices);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public void clear() {
-    renderRows((JsArray<TableIndexStatusDto>) JavaScriptObject.createArray());
+    showTableIndices(null);
     checkboxColumn.clearSelection();
     selectAllAlert.setVisible(false);
   }
@@ -236,7 +240,7 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
   @Override
   public void setServiceStatus(Status status) {
     this.status = status;
-    switch(status) {
+    switch (status) {
       case Startable:
         startStopButton.setText(translations.startLabel());
         enableStart(true);
@@ -263,15 +267,6 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     refreshIndicesButton.setVisible(enabled);
   }
 
-  private void enableStart(boolean enable) {
-    startStopButton.setEnabled(enable);
-    configureButton.setEnabled(enable);
-  }
-
-  private void enableActions(boolean enable) {
-    refreshIndicesButton.setEnabled(enable);
-  }
-
   @Override
   public List<TableIndexStatusDto> getSelectedIndices() {
     return checkboxColumn.getSelectedItems();
@@ -283,13 +278,25 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
   }
 
   @Override
-  public HasData<TableIndexStatusDto> getIndexTable() {
-    return indexTable;
-  }
-
-  @Override
   public HasWidgets getBreadcrumbs() {
     return breadcrumbs;
+  }
+
+  private void enableStart(boolean enable) {
+    startStopButton.setEnabled(enable);
+    configureButton.setEnabled(enable);
+  }
+
+  private void enableActions(boolean enable) {
+    refreshIndicesButton.setEnabled(enable);
+  }
+
+  private void renderTableIndices(List<TableIndexStatusDto> indices) {
+    checkboxColumn.clearSelection();
+    dataProvider.setList(indices);
+    indexTablePager.firstPage();
+    dataProvider.refresh();
+    indexTablePager.setPagerVisible(dataProvider.getList().size() > Table.DEFAULT_PAGESIZE);
   }
 
   private class TableIndexStatusDtoDisplay implements CheckboxColumn.Display<TableIndexStatusDto> {
@@ -336,7 +343,7 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
     @Override
     public Alert getSelectTipsAlert() {
-      return null;
+      return selectItemTipsAlert;
     }
   }
 
@@ -398,29 +405,29 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
     @Override
     public String getValue(TableIndexStatusDto object) {
-      if(object.getSchedule().getType().getName().equals(NOT_SCHEDULED.getName())) {
+      if (object.getSchedule().getType().getName().equals(NOT_SCHEDULED.getName())) {
         return translations.manuallyLabel();
       }
-      if(object.getSchedule().getType().getName().equals(MINUTES_5.getName())) {
+      if (object.getSchedule().getType().getName().equals(MINUTES_5.getName())) {
         return translations.minutes5Label();
       }
-      if(object.getSchedule().getType().getName().equals(MINUTES_15.getName())) {
+      if (object.getSchedule().getType().getName().equals(MINUTES_15.getName())) {
         return translations.minutes15Label();
       }
-      if(object.getSchedule().getType().getName().equals(MINUTES_30.getName())) {
+      if (object.getSchedule().getType().getName().equals(MINUTES_30.getName())) {
         return translations.minutes30Label();
       }
       String minutes = object.getSchedule().getMinutes() < 10
           ? "0" + object.getSchedule().getMinutes()
           : String.valueOf(object.getSchedule().getMinutes());
-      if(object.getSchedule().getType().getName().equals(HOURLY.getName())) {
+      if (object.getSchedule().getType().getName().equals(HOURLY.getName())) {
         return translations.hourlyAtLabel().replace("{0}", minutes);
       }
-      if(object.getSchedule().getType().getName().equals(DAILY.getName())) {
+      if (object.getSchedule().getType().getName().equals(DAILY.getName())) {
         return translations.dailyAtLabel().replace("{0}", Integer.toString(object.getSchedule().getHours()))
             .replace("{1}", minutes);
       }
-      if(object.getSchedule().getType().getName().equals(WEEKLY.getName())) {
+      if (object.getSchedule().getType().getName().equals(WEEKLY.getName())) {
         return translations.weeklyAtLabel()
             .replace("{0}", translations.timeMap().get(object.getSchedule().getDay().getName()))
             .replace("{1}", Integer.toString(object.getSchedule().getHours())).replace("{2}", minutes);
@@ -432,25 +439,27 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
   private static class StatusColumn extends Column<TableIndexStatusDto, String> {
 
-    private StatusColumn() {super(new StatusImageCell());}
+    private StatusColumn() {
+      super(new StatusImageCell());
+    }
 
     @Override
     public String getValue(TableIndexStatusDto dto) {
       // In progress
-      if(dto.getStatus().getName().equals(IN_PROGRESS.getName())) {
+      if (dto.getStatus().getName().equals(IN_PROGRESS.getName())) {
         return translations.indexInProgress() + ":" + (int) (dto.getProgress() * 100) + "%";
       }
       // Up to date
-      if(dto.getStatus().getName().equals(UPTODATE.getName())) {
+      if (dto.getStatus().getName().equals(UPTODATE.getName())) {
         return translations.indexUpToDate() + ":" + StatusImageCell.BULLET_GREEN;
       }
       // Out dated but scheduled
-      if(dto.getStatus().getName().equals(OUTDATED.getName()) &&
+      if (dto.getStatus().getName().equals(OUTDATED.getName()) &&
           !dto.getSchedule().getType().isScheduleType(NOT_SCHEDULED)) {
         return translations.indexOutdatedScheduled() + ":" + StatusImageCell.BULLET_ORANGE;
       }
       // Out dated but not scheduled
-      if(dto.getStatus().getName().equals(OUTDATED.getName()) &&
+      if (dto.getStatus().getName().equals(OUTDATED.getName()) &&
           dto.getSchedule().getType().isScheduleType(NOT_SCHEDULED)) {
         return translations.indexOutdatedNotScheduled() + ":" + StatusImageCell.BULLET_RED;
       }

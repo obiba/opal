@@ -9,11 +9,18 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.view.client.ListDataProvider;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
+import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
+import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ConstantActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
@@ -38,6 +45,8 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewImpl;
 
+import java.util.List;
+
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOVE_ACTION;
 
@@ -46,7 +55,7 @@ import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOV
  */
 public class DataShieldAdministrationView extends ViewImpl implements DataShieldAdministrationPresenter.Display {
 
-  private static final int PAGE_SIZE = 10;
+  private static final int PAGE_SIZE = 20;
 
   interface Binder extends UiBinder<Widget, DataShieldAdministrationView> {}
 
@@ -70,17 +79,28 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
   @UiField
   FlowPanel assignMethods;
 
-  private final JsArrayDataProvider<DataShieldMethodDto> methodsDataProvider
-      = new JsArrayDataProvider<DataShieldMethodDto>();
+  @UiField
+  TextBoxClearable filter;
+
+  private final ListDataProvider<DataShieldMethodDto> methodsDataProvider = new ListDataProvider<DataShieldMethodDto>();
 
   private ActionsColumn<DataShieldMethodDto> actionsColumn;
+
+  private List<DataShieldMethodDto> originalMethods;
 
   @Inject
   public DataShieldAdministrationView(Binder uiBinder, Translations translations) {
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
     initMethodsTable();
+    filter.getTextBox().setPlaceholder(translations.filterDataShieldMethods());
   }
+
+  @UiHandler("filter")
+  public void onFilterUpdate(KeyUpEvent event) {
+    renderMethods(filterMethods(filter.getText()));
+  }
+
 
   @Override
   public HandlerRegistration addMethodHandler(ClickHandler handler) {
@@ -88,9 +108,26 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
   }
 
   @Override
-  public void renderDataShieldMethodsRows(JsArray<DataShieldMethodDto> rows) {
-    methodsDataProvider.setArray(rows);
+  public void showDataShieldMethods(List<DataShieldMethodDto> rows) {
+    originalMethods = rows;
+    renderMethods(rows);
+  }
 
+  private List<DataShieldMethodDto> filterMethods(String query) {
+    List<DataShieldMethodDto> methods = Lists.newArrayList();
+    if (originalMethods == null || originalMethods.isEmpty()) return methods;
+    List<String> tokens = FilterHelper.tokenize(query);
+    for (DataShieldMethodDto method : originalMethods) {
+      RFunctionDataShieldMethodDto dto = (RFunctionDataShieldMethodDto) method
+          .getExtension(RFunctionDataShieldMethodDto.DataShieldMethodDtoExtensions.method);
+      String packageName = dto == null ? "" : dto.getRPackage();
+      if (FilterHelper.matches(Joiner.on(" ").join(method.getName(), packageName), tokens)) methods.add(method);
+    }
+    return methods;
+  }
+
+  private void renderMethods(List<DataShieldMethodDto> rows) {
+    methodsDataProvider.setList(rows);
     int size = methodsDataProvider.getList().size();
     methodsTablePager.firstPage();
     methodsTable.setVisible(size > 0);

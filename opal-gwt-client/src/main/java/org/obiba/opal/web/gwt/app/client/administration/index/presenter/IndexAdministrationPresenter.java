@@ -9,13 +9,26 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.index.presenter;
 
-import java.util.List;
-
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.Timer;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyEvent;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.annotations.TitleFunction;
+import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import org.obiba.opal.web.gwt.app.client.administration.index.event.TableIndicesRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableIndexStatusRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
@@ -32,22 +45,7 @@ import org.obiba.opal.web.model.client.opal.ServiceStatus;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.Timer;
-import com.google.gwt.view.client.HasData;
-import com.google.gwt.view.client.Range;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.HasUiHandlers;
-import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.annotations.NameToken;
-import com.gwtplatform.mvp.client.annotations.ProxyEvent;
-import com.gwtplatform.mvp.client.annotations.ProxyStandard;
-import com.gwtplatform.mvp.client.annotations.TitleFunction;
-import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import java.util.List;
 
 public class IndexAdministrationPresenter
     extends ItemAdministrationPresenter<IndexAdministrationPresenter.Display, IndexAdministrationPresenter.Proxy>
@@ -55,7 +53,8 @@ public class IndexAdministrationPresenter
 
   @ProxyStandard
   @NameToken(Places.INDEX)
-  public interface Proxy extends ProxyPlace<IndexAdministrationPresenter> {}
+  public interface Proxy extends ProxyPlace<IndexAdministrationPresenter> {
+  }
 
   private static final int DELAY_MILLIS = 1500;
 
@@ -79,13 +78,11 @@ public class IndexAdministrationPresenter
 
     void unselectIndex(TableIndexStatusDto object);
 
-    void renderRows(JsArray<TableIndexStatusDto> rows);
+    void showTableIndices(List<TableIndexStatusDto> rows);
 
     void clear();
 
     List<TableIndexStatusDto> getSelectedIndices();
-
-    HasData<TableIndexStatusDto> getIndexTable();
   }
 
   private final ModalProvider<IndexPresenter> indexModalProvider;
@@ -96,9 +93,9 @@ public class IndexAdministrationPresenter
 
   @Inject
   public IndexAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
-      ModalProvider<IndexPresenter> indexModalProvider,
-      ModalProvider<IndexConfigurationPresenter> indexConfigurationProvider,
-      DefaultBreadcrumbsBuilder breadcrumbsHelper) {
+                                      ModalProvider<IndexPresenter> indexModalProvider,
+                                      ModalProvider<IndexConfigurationPresenter> indexConfigurationProvider,
+                                      DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     this.indexModalProvider = indexModalProvider.setContainer(this);
     this.indexConfigurationProvider = indexConfigurationProvider.setContainer(this);
@@ -126,7 +123,7 @@ public class IndexAdministrationPresenter
         .withCallback(new ResourceCallback<ServiceDto>() {
           @Override
           public void onResource(Response response, ServiceDto resource) {
-            if(response.getStatusCode() == Response.SC_OK) {
+            if (response.getStatusCode() == Response.SC_OK) {
               getView().setServiceStatus(resource.getStatus().isServiceStatus(ServiceStatus.RUNNING)
                   ? Display.Status.Stoppable
                   : Display.Status.Startable);
@@ -143,8 +140,6 @@ public class IndexAdministrationPresenter
           }
         }, Response.SC_OK, Response.SC_SERVICE_UNAVAILABLE, Response.SC_UNAUTHORIZED)//
         .get().send();
-
-    getView().getIndexTable().setVisibleRange(0, 10);
     refresh();
   }
 
@@ -192,7 +187,7 @@ public class IndexAdministrationPresenter
             getView().setServiceStatus(Display.Status.Startable);
 
             ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-            if(error.getStatus() != null) {
+            if (error.getStatus() != null) {
               fireEvent(NotificationEvent.newBuilder()
                   .error(TranslationsUtils.replaceArguments(translations.searchSettingsError(), error.getStatus()))
                   .build());
@@ -290,7 +285,7 @@ public class IndexAdministrationPresenter
 
   @Override
   public void delete(List<TableIndexStatusDto> statusDtos) {
-    for(TableIndexStatusDto statusDto : statusDtos) {
+    for (TableIndexStatusDto statusDto : statusDtos) {
       ResponseCodeCallback callback = new ResponseCodeCallback() {
 
         @Override
@@ -316,7 +311,7 @@ public class IndexAdministrationPresenter
 
   @Override
   public void indexNow(List<TableIndexStatusDto> statusDtos) {
-    for(TableIndexStatusDto statusDto : statusDtos) {
+    for (TableIndexStatusDto statusDto : statusDtos) {
       ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder() //
           .forResource(Resources.index(statusDto.getDatasource(), statusDto.getTable())) //
           .accept("application/json") //
@@ -341,26 +336,23 @@ public class IndexAdministrationPresenter
     // Fetch all indices
     ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
         .forResource(Resources.indices())//
-        .withCallback(new TableIndexStatusResourceCallback(getView().getIndexTable().getVisibleRange(), clearIndices))//
+        .withCallback(new TableIndexStatusResourceCallback(clearIndices))//
         .withCallback(Response.SC_SERVICE_UNAVAILABLE, ResponseCodeCallback.NO_OP) //
         .get().send();
   }
 
   private class TableIndexStatusResourceCallback implements ResourceCallback<JsArray<TableIndexStatusDto>> {
-    private final Range r;
 
     private final boolean clearIndices;
 
-    private TableIndexStatusResourceCallback(Range r, boolean clearIndices) {
-      this.r = r;
+    private TableIndexStatusResourceCallback(boolean clearIndices) {
       this.clearIndices = clearIndices;
     }
 
     @Override
     public void onResource(Response response, JsArray<TableIndexStatusDto> resource) {
-      getView().renderRows(resource);
-      getView().getIndexTable().setVisibleRangeAndClearData(r, true);
-      if(clearIndices) getView().getSelectedIndices().clear();
+      getView().showTableIndices(JsArrays.toList(resource));
+      if (clearIndices) getView().getSelectedIndices().clear();
     }
   }
 
@@ -379,7 +371,7 @@ public class IndexAdministrationPresenter
           .withCallback(new ResourceCallback<JsArray<TableIndexStatusDto>>() {
             @Override
             public void onResource(Response response, JsArray<TableIndexStatusDto> resource) {
-              getView().renderRows(resource);
+              getView().showTableIndices(JsArrays.toList(resource));
             }
           }) //
           .withCallback(Response.SC_SERVICE_UNAVAILABLE, ResponseCodeCallback.NO_OP) //

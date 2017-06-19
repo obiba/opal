@@ -92,7 +92,7 @@
           </b:Column>
         </b:Row>
       </o:CollapsiblePanel>
-      <o:OpalSimplePager ui:field="pager" showTotalWhenNoPager="true" location="RIGHT" addStyleNames="small-indent pull-right"/>
+      <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="small-indent pull-right"/>
       <b:InputAddOn prependIcon="SEARCH" addStyleNames="pull-right">
         <b:TextBox ui:field="searchBox" placeholder="Search for an identifier..."/>
       </b:InputAddOn>

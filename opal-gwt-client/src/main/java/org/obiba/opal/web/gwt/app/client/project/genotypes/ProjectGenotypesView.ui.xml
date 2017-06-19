@@ -101,7 +101,7 @@
             <b:Button ui:field="refreshButton" icon="REFRESH" addStyleNames="pull-left">
               <ui:msg description="Refresh tables list">Refresh</ui:msg>
             </b:Button>
-            <o:OpalSimplePager ui:field="tablePager" showTotalWhenNoPager="true" location="RIGHT" addStyleNames="pull-right"/>
+            <o:OpalSimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
             <g:FlowPanel addStyleNames="span4 pull-right no-left-margin" ui:field="filterPanel">
               <b:Controls>
                 <b:InputAddOn prependIcon="FILTER" addStyleNames="pull-right">

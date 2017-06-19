@@ -43,7 +43,7 @@
           <g:FlowPanel addStyleNames="pull-left small-top-margin">
             <o:TableChooser ui:field="tableChooser" isMultipleSelect="false"/>
           </g:FlowPanel>
-          <o:OpalSimplePager ui:field="valueSetPager" showTotalWhenNoPager="true" location="RIGHT"
+          <o:OpalSimplePager ui:field="valueSetPager" location="RIGHT"
                              addStyleNames="pull-right small-indent"/>
           <b:Controls addStyleNames="pull-right small-indent" ui:field="filterControls">
             <b:InputAddOn prependIcon="FILTER">

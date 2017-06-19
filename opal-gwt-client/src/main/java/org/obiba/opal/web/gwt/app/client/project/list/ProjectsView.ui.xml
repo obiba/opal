@@ -33,7 +33,7 @@
     </o:NavTabsPanel>
 
     <g:FlowPanel addStyleNames="small-bottom-margin">
-      <o:OpalSimplePager ui:field="tablePager" showTotalWhenNoPager="true" location="RIGHT"
+      <o:OpalSimplePager ui:field="tablePager" location="RIGHT"
           addStyleNames="pull-right small-top-margin small-indent"/>
       <b:Controls addStyleNames="pull-right small-top-margin">
         <b:InputAddOn prependIcon="FILTER">

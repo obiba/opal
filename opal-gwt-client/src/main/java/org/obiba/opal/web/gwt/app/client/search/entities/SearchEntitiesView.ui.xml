@@ -55,7 +55,7 @@
         <b:Heading size="4" addStyleNames="top-margin pull-left">
           <ui:msg description="Identifiers label">Identifiers</ui:msg>
         </b:Heading>
-        <o:OpalSimplePager ui:field="entityItemPager" showTotalWhenNoPager="true" location="RIGHT"
+        <o:OpalSimplePager ui:field="entityItemPager" location="RIGHT"
                            addStyleNames="pull-right small-indent"/>
         <o3:EntityItemTable ui:field="entityItemTable" width="100%" addStyleNames="small-top-margin"/>
       </g:FlowPanel>

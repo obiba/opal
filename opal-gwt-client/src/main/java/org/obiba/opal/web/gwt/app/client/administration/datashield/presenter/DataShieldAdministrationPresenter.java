@@ -46,6 +46,8 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
+import java.util.List;
+
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOVE_ACTION;
 
@@ -178,7 +180,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
 
           @Override
           public void onResource(Response response, JsArray<DataShieldMethodDto> resource) {
-            getView().renderDataShieldMethodsRows(JsArrays.toSafeArray(resource));
+            getView().showDataShieldMethods(JsArrays.toList(resource));
           }
         }).send();
   }
@@ -280,7 +282,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
 
   public interface Display extends View {
 
-    void renderDataShieldMethodsRows(JsArray<DataShieldMethodDto> rows);
+    void showDataShieldMethods(List<DataShieldMethodDto> rows);
 
     HasActionHandler<DataShieldMethodDto> getDataShieldMethodActionsColumn();
 

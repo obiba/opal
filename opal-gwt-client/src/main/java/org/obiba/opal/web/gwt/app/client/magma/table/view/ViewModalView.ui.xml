@@ -49,7 +49,7 @@
           <b:Button icon="PLUS" type="SUCCESS" ui:field="addButton" addStyleNames="small-indent">
             <ui:msg description="Add label">Add</ui:msg>
           </b:Button>
-          <o:OpalSimplePager ui:field="pager" showTotalWhenNoPager="true" location="RIGHT" addStyleNames="pull-right"/>
+          <o:OpalSimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
         </b:Controls>
       </b:ControlGroup>
     </g:FlowPanel>

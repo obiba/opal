@@ -31,7 +31,7 @@ public class OpalSimplePager extends SimplePager {
   private final Panel panel;
   private final Collection<Widget> pagerWidgets = new ArrayList<>();
 
-  private boolean showTotalWhenNoPager = false;
+  private boolean showTotalWhenNoPager = true;
 
   @UiConstructor
   public OpalSimplePager(TextLocation location) {

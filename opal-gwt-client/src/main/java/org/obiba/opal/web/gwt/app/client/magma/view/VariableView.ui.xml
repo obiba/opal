@@ -134,7 +134,7 @@
           <b:Button type="INFO" icon="EDIT" ui:field="editCategories" addStyleNames="pull-left">
             <ui:msg description="Edit Categories label">Edit Categories</ui:msg>
           </b:Button>
-          <o:OpalSimplePager ui:field="categoryTablePager" showTotalWhenNoPager="true" location="RIGHT" addStyleNames="pull-right"/>
+          <o:OpalSimplePager ui:field="categoryTablePager" location="RIGHT" addStyleNames="pull-right"/>
           <o2:CategoriesTable ui:field="categoryTable" addStyleNames="pull-left small-top-margin"/>
         </g:FlowPanel>
 
