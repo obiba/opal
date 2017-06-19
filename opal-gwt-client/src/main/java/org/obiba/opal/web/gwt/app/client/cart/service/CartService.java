@@ -27,6 +27,8 @@ import java.util.Map;
 @Singleton
 public class CartService {
 
+  private static final String VARIABLES_PREFIX = "/variables/";
+
   private final Map<String, CartVariableItem> variables = Maps.newHashMap();
 
   private Storage stockStore = null;
@@ -43,8 +45,8 @@ public class CartService {
   public void addVariable(String entityType, String variableFullName) {
     if (Strings.isNullOrEmpty(variableFullName)) return;
     if (isStoreSupported())
-      stockStore.setItem(variableFullName, entityType);
-    else if (!hasVariableInStore(variableFullName))
+      stockStore.setItem(VARIABLES_PREFIX + variableFullName, entityType);
+    else
       addVariableInMemory(entityType, variableFullName);
   }
 
@@ -100,14 +102,15 @@ public class CartService {
 
   private boolean hasVariableInStore(String variableFullName) {
     StorageMap stockMap = new StorageMap(stockStore);
-    return stockMap.containsValue(variableFullName);
+    return stockMap.containsValue(VARIABLES_PREFIX + variableFullName);
   }
 
   private List<CartVariableItem> getVariablesInStore() {
     List<CartVariableItem> vars = Lists.newArrayList();
     for (int i=0; i<stockStore.getLength(); i++) {
       String key = stockStore.key(i);
-      vars.add(new CartVariableItem(key, stockStore.getItem(key)));
+      if (key.startsWith(VARIABLES_PREFIX))
+        vars.add(new CartVariableItem(key.replace(VARIABLES_PREFIX,""), stockStore.getItem(key)));
     }
     return vars;
   }
@@ -116,14 +119,16 @@ public class CartService {
     List<CartVariableItem> vars = Lists.newArrayList();
     for (int i=0; i<stockStore.getLength(); i++) {
       String key = stockStore.key(i);
-      String type = stockStore.getItem(key);
-      if (type.equals(entityType)) vars.add(new CartVariableItem(key, type));
+      if (key.startsWith(VARIABLES_PREFIX)) {
+        String type = stockStore.getItem(key);
+        if (type.equals(entityType)) vars.add(new CartVariableItem(key.replace(VARIABLES_PREFIX, ""), type));
+      }
     }
     return vars;
   }
 
   private void removeVariableInStore(String variableFullName) {
-    stockStore.removeItem(variableFullName);
+    stockStore.removeItem(VARIABLES_PREFIX + variableFullName);
   }
 
   //
@@ -131,7 +136,7 @@ public class CartService {
   //
 
   private void addVariableInMemory(String entityType, String variableFullName) {
-    if (!variables.containsKey(variableFullName)) variables.put(variableFullName, new CartVariableItem(variableFullName, entityType));
+    variables.put(variableFullName, new CartVariableItem(variableFullName, entityType));
   }
 
   private boolean hasVariableInMemory(String variableFullName) {
