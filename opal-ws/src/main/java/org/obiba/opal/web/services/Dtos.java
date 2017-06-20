@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.plugins;
+package org.obiba.opal.web.services;
 
 import com.google.common.collect.Lists;
 import org.obiba.magma.support.MagmaEngineTableResolver;

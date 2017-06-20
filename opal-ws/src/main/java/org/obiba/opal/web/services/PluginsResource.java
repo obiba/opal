@@ -11,12 +11,8 @@
 package org.obiba.opal.web.services;
 
 import com.google.common.base.Strings;
-import org.codehaus.jettison.json.JSONArray;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.spi.ServicePlugin;
-import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.model.Plugins;
-import org.obiba.opal.web.plugins.Dtos;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -25,8 +21,6 @@ import org.springframework.stereotype.Component;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
