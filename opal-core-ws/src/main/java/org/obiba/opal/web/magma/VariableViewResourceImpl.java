@@ -62,40 +62,7 @@ public class VariableViewResourceImpl extends VariableResourceImpl implements Va
 
   @Override
   public Response createOrUpdateVariable(VariableDto variableDto, @Nullable String comment) {
-    // The variable must exist
-    ValueTable table = getValueTable();
-    Variable variable = table.getVariable(getName());
-
-    if(!variable.getEntityType().equals(variableDto.getEntityType())) {
-      return Response.status(Response.Status.BAD_REQUEST).build();
-    }
-
-    View view = getValueTableAsView();
-    VariableOperationContext operationContext = new VariableOperationContext();
-
-    try(ValueTableWriter.VariableWriter variableWriter = view.getListClause().createWriter()) {
-
-      // Rename existing variable
-      if(!variableDto.getName().equals(variable.getName())) {
-        operationContext.deleteVariable(view, variable);
-        renameVariable(variable, variableDto.getName(), table, variableWriter);
-      }
-      Variable updatedVariable = Dtos.fromDto(variableDto);
-      operationContext.addVariable(view, updatedVariable);
-      variableWriter.writeVariable(updatedVariable);
-      viewManager.addView(getDatasource().getName(), view, comment, operationContext);
-    }
-    return Response.ok().build();
-  }
-
-  private void renameVariable(Variable variable, String newName, ValueTable table,
-      ValueTableWriter.VariableWriter variableWriter) {
-    if(tableListeners != null && !tableListeners.isEmpty()) {
-      for(ValueTableUpdateListener listener : tableListeners) {
-        listener.onRename(table, variable, newName);
-      }
-    }
-    variableWriter.removeVariable(variable);
+    return createOrUpdateVariable(Dtos.fromDto(variableDto), comment);
   }
 
   @Override
@@ -122,6 +89,63 @@ public class VariableViewResourceImpl extends VariableResourceImpl implements Va
     }
 
     return Response.ok().build();
+  }
+
+  @Override
+  public Response updateVariableAttribute(String name, String namespace, String locale, String value) {
+    // The variable must exist
+    ValueTable table = getValueTable();
+    Variable variable = table.getVariable(getName());
+    return createOrUpdateVariable(updateVariableAttribute(variable, name, namespace, locale, value), "Update attribute");
+  }
+
+  @Override
+  public Response deleteVariableAttribute(String name, String namespace, String locale) {
+    // The variable must exist
+    ValueTable table = getValueTable();
+    if (!table.hasVariable(getName())) return Response.ok().build();
+    Variable variable = table.getVariable(getName());
+    Variable updatedVariable = deleteVariableAttribute(variable, name, namespace, locale);
+    return updatedVariable == null ? Response.ok().build() : createOrUpdateVariable(updatedVariable, "Delete attribute");
+  }
+
+  //
+  // Private methods
+  //
+
+  private Response createOrUpdateVariable(Variable updatedVariable, @Nullable String comment) {
+    // The variable must exist
+    ValueTable table = getValueTable();
+    Variable variable = table.getVariable(getName());
+
+    if(!variable.getEntityType().equals(updatedVariable.getEntityType())) {
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+
+    View view = getValueTableAsView();
+    VariableOperationContext operationContext = new VariableOperationContext();
+
+    try(ValueTableWriter.VariableWriter variableWriter = view.getListClause().createWriter()) {
+
+      // Rename existing variable
+      if(!updatedVariable.getName().equals(variable.getName())) {
+        operationContext.deleteVariable(view, variable);
+        renameVariable(variable, updatedVariable.getName(), table, variableWriter);
+      }
+      operationContext.addVariable(view, updatedVariable);
+      variableWriter.writeVariable(updatedVariable);
+      viewManager.addView(getDatasource().getName(), view, comment, operationContext);
+    }
+    return Response.ok().build();
+  }
+
+  private void renameVariable(Variable variable, String newName, ValueTable table, ValueTableWriter.VariableWriter variableWriter) {
+    if(tableListeners != null && !tableListeners.isEmpty()) {
+      for(ValueTableUpdateListener listener : tableListeners) {
+        listener.onRename(table, variable, newName);
+      }
+    }
+    variableWriter.removeVariable(variable);
   }
 
   private View getValueTableAsView() {

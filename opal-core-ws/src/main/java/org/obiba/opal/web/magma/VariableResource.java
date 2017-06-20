@@ -10,11 +10,7 @@
 
 package org.obiba.opal.web.magma;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -42,6 +38,14 @@ public interface VariableResource {
 
   @DELETE
   Response deleteVariable();
+
+  @PUT
+  @Path("/attribute/{name}")
+  Response updateVariableAttribute(@PathParam("name") String name, @QueryParam("namespace") String namespace, @QueryParam("locale") String locale, @QueryParam("value") String value);
+
+  @DELETE
+  @Path("/attribute/{name}")
+  Response deleteVariableAttribute(@PathParam("name") String name, @QueryParam("namespace") String namespace, @QueryParam("locale") String locale);
 
   @Path("/summary")
   @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)

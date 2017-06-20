@@ -263,6 +263,16 @@ message AttributeDto {
   optional string namespace = 4;
 }
 
+message VariableAttributeDto {
+  optional string datasource = 1;
+  optional string table = 2;
+  required string variable = 3;
+  required string name = 4;
+  optional string namespace = 5;
+  optional string locale = 6;
+  optional string value = 7; // if missing: update is a deletion
+}
+
 message ValueSetsDto {
   message ValueSetDto {
     required string identifier = 1;

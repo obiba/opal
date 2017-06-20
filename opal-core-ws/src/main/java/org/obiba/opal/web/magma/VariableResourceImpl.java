@@ -18,10 +18,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.obiba.magma.ValueTableUpdateListener;
-import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.Variable;
-import org.obiba.magma.VariableValueSource;
+import com.google.common.base.Strings;
+import org.obiba.magma.*;
 import org.obiba.opal.core.domain.VariableNature;
 import org.obiba.opal.web.magma.math.BinarySummaryResource;
 import org.obiba.opal.web.magma.math.CategoricalSummaryResource;
@@ -72,25 +70,7 @@ public class VariableResourceImpl extends AbstractValueTableResource implements 
 
   @Override
   public Response updateVariable(VariableDto dto) {
-    if(getValueTable().isView()) throw new InvalidRequestException("Derived variable must be updated by the view");
-
-    // The variable must exist
-    Variable variable = getValueTable().getVariable(name);
-
-    if(!variable.getEntityType().equals(dto.getEntityType())) {
-      throw new InvalidRequestException("Variable entity type must be the same as the one of the table");
-    }
-
-    if(!variable.getName().equals(dto.getName())) {
-      throw new InvalidRequestException("Variable cannot be renamed");
-    }
-
-    try(ValueTableWriter tableWriter = getValueTable().getDatasource()
-        .createWriter(getValueTable().getName(), getValueTable().getEntityType());
-        ValueTableWriter.VariableWriter variableWriter = tableWriter.writeVariables()) {
-      variableWriter.writeVariable(Dtos.fromDto(dto));
-      return Response.ok().build();
-    }
+    return updateVariable(Dtos.fromDto(dto));
   }
 
   @Override
@@ -115,6 +95,19 @@ public class VariableResourceImpl extends AbstractValueTableResource implements 
   }
 
   @Override
+  public Response updateVariableAttribute(String name, String namespace, String locale, String value) {
+    Variable v = getValueTable().getVariable(this.name);
+    return updateVariable(updateVariableAttribute(v, name, namespace, locale, value));
+  }
+
+  @Override
+  public Response deleteVariableAttribute(String name, String namespace, String locale) {
+    Variable v = getValueTable().getVariable(this.name);
+    Variable updatedVariable = deleteVariableAttribute(v, name, namespace, locale);
+    return updatedVariable == null ? Response.ok().build() : updateVariable(updatedVariable);
+  }
+
+  @Override
   public SummaryResource getSummary(Request request, String natureStr) {
     Variable variable = variableValueSource.getVariable();
     VariableNature nature = natureStr == null
@@ -131,6 +124,77 @@ public class VariableResourceImpl extends AbstractValueTableResource implements 
     resource.setVariableValueSource(variableValueSource);
     return resource;
 
+  }
+
+  //
+  // Private methods
+  //
+
+  protected Variable updateVariableAttribute(Variable originalVariable, String name, String namespace, String locale, String value) {
+    VariableBean.Builder builder = VariableBean.Builder.sameAs(originalVariable);
+    builder.clearAttributes();
+    Attribute.Builder attrBuilder = Attribute.Builder.newAttribute(name).withValue(value);
+    if (!Strings.isNullOrEmpty(namespace)) attrBuilder.withNamespace(namespace);
+    if (!Strings.isNullOrEmpty(locale)) attrBuilder.withLocale(locale);
+    boolean found = false;
+    for (Attribute attr : originalVariable.getAttributes()) {
+      if (foundAttribute(attr, name, namespace, locale)) {
+        found = true;
+        builder.addAttribute(attrBuilder.build());
+      }
+      else
+        builder.addAttribute(attr);
+    }
+    if (!found) builder.addAttribute(attrBuilder.build());
+    return builder.build();
+  }
+
+  protected Variable deleteVariableAttribute(Variable originalVariable, String name, String namespace, String locale) {
+    VariableBean.Builder builder = VariableBean.Builder.sameAs(originalVariable);
+    builder.clearAttributes();
+    boolean found = false;
+    for (Attribute attr : originalVariable.getAttributes()) {
+      if (!foundAttribute(attr, name, namespace, locale))
+        builder.addAttribute(attr);
+      else
+        found = true;
+    }
+    return found ? builder.build() : null;
+  }
+
+  private boolean foundAttribute(Attribute attr, String name, String namespace, String locale) {
+    if (!attr.getName().equals(name)) return false;
+    if (!sameValue(attr.hasNamespace() ? attr.getNamespace() : "", namespace)) return false;
+    if (!sameValue(attr.isLocalised() ? attr.getLocale().getLanguage() : "", locale)) return false;
+    return true;
+  }
+
+  private boolean sameValue(String value1, String value2) {
+    String nValue1 = Strings.isNullOrEmpty(value1) ? "" : value1;
+    String nValue2 = Strings.isNullOrEmpty(value2) ? "" : value2;
+    return nValue1.equals(nValue2);
+  }
+
+  private Response updateVariable(Variable updatedVariable) {
+    if(getValueTable().isView()) throw new InvalidRequestException("Derived variable must be updated by the view");
+
+    // The variable must exist
+    Variable variable = getValueTable().getVariable(name);
+
+    if(!variable.getEntityType().equals(updatedVariable.getEntityType())) {
+      throw new InvalidRequestException("Variable entity type must be the same as the one of the table");
+    }
+
+    if(!variable.getName().equals(updatedVariable.getName())) {
+      throw new InvalidRequestException("Variable cannot be renamed");
+    }
+
+    try(ValueTableWriter tableWriter = getValueTable().getDatasource()
+        .createWriter(getValueTable().getName(), getValueTable().getEntityType());
+        ValueTableWriter.VariableWriter variableWriter = tableWriter.writeVariables()) {
+      variableWriter.writeVariable(updatedVariable);
+      return Response.ok().build();
+    }
   }
 
   private SummaryResource getSummaryResourceClass(VariableNature nature) {
