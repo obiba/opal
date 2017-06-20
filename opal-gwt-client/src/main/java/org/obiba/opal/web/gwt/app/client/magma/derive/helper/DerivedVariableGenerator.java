@@ -37,6 +37,8 @@ import static org.obiba.opal.web.gwt.app.client.js.JsArrays.toIterable;
  */
 public abstract class DerivedVariableGenerator {
 
+  protected final String originalTableReference;
+
   protected final VariableDto originalVariable;
 
   protected final List<ValueMapEntry> valueMapEntries;
@@ -56,9 +58,18 @@ public abstract class DerivedVariableGenerator {
   }
 
   public DerivedVariableGenerator(VariableDto originalVariable, List<ValueMapEntry> valueMapEntries, int valueAt) {
+    this(null, originalVariable, valueMapEntries, valueAt);
+  }
+
+  public DerivedVariableGenerator(String originalTableReference, VariableDto originalVariable, List<ValueMapEntry> valueMapEntries, int valueAt) {
+    this.originalTableReference = originalTableReference;
     this.originalVariable = originalVariable;
     this.valueMapEntries = valueMapEntries;
     this.valueAt = valueAt;
+  }
+
+  protected String getOriginalVariableName() {
+    return Strings.isNullOrEmpty(originalTableReference) ? originalVariable.getName() : originalTableReference + ":" + originalVariable.getName();
   }
 
   @SuppressWarnings("unchecked")

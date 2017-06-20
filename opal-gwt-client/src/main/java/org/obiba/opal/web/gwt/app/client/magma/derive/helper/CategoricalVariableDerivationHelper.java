@@ -62,25 +62,29 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
   private int valueAt = -1;
 
   public CategoricalVariableDerivationHelper(VariableDto originalVariable) {
-    this(originalVariable, null, null, true, -1);
+    this(null, originalVariable, null, null, true, -1);
   }
 
   public CategoricalVariableDerivationHelper(VariableDto originalVariable, int valueAt) {
-    this(originalVariable, null, null, true, valueAt);
+    this(null, originalVariable, null, null, true, valueAt);
+  }
+
+  public CategoricalVariableDerivationHelper(String originalTableReference, VariableDto originalVariable, int valueAt) {
+    this(originalTableReference, originalVariable, null, null, true, valueAt);
   }
 
   public CategoricalVariableDerivationHelper(VariableDto originalVariable, boolean recodeCategoriesName) {
-    this(originalVariable, null, null, recodeCategoriesName, -1);
+    this(null, originalVariable, null, null, recodeCategoriesName, -1);
   }
 
   public CategoricalVariableDerivationHelper(VariableDto originalVariable, @Nullable VariableDto destination,
       @Nullable SummaryStatisticsDto summaryStatisticsDto) {
-    this(originalVariable, destination, summaryStatisticsDto, true, -1);
+    this(null, originalVariable, destination, summaryStatisticsDto, true, -1);
   }
 
-  private CategoricalVariableDerivationHelper(VariableDto originalVariable, @Nullable VariableDto destination,
+  private CategoricalVariableDerivationHelper(String originalTableReference, VariableDto originalVariable, @Nullable VariableDto destination,
                                               @Nullable SummaryStatisticsDto summaryStatisticsDto, boolean recodeCategoriesName, int valueAt) {
-    super(originalVariable, destination);
+    super(originalTableReference, originalVariable, destination);
     this.recodeCategoriesName = recodeCategoriesName;
     this.valueAt = valueAt;
     //noinspection RedundantCast
@@ -241,7 +245,7 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   @Override
   protected DerivedVariableGenerator getDerivedVariableGenerator() {
-    return new DerivedCategoricalVariableGenerator(originalVariable, valueMapEntries, valueAt);
+    return new DerivedCategoricalVariableGenerator(originalTableReference, originalVariable, valueMapEntries, valueAt);
   }
 
   private boolean estimateIsMissing(CategoryDto cat) {
@@ -258,8 +262,8 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
   public static class DerivedCategoricalVariableGenerator extends DerivedVariableGenerator {
 
-    public DerivedCategoricalVariableGenerator(VariableDto originalVariable, List<ValueMapEntry> valueMapEntries, int valueAt) {
-      super(originalVariable, valueMapEntries, valueAt);
+    public DerivedCategoricalVariableGenerator(String originalTableReference, VariableDto originalVariable, List<ValueMapEntry> valueMapEntries, int valueAt) {
+      super(originalTableReference, originalVariable, valueMapEntries, valueAt);
     }
 
     public DerivedCategoricalVariableGenerator(VariableDto originalVariable, List<ValueMapEntry> valueMapEntries) {
@@ -268,8 +272,8 @@ public class CategoricalVariableDerivationHelper extends DerivationHelper {
 
     @Override
     protected void generateScript() {
-      scriptBuilder.append("$('").append(originalVariable.getName()).append("')");
-      if (getValueAt()>=0) {
+      scriptBuilder.append("$('").append(getOriginalVariableName()).append("')");
+      if (getValueAt()>=0 && Strings.isNullOrEmpty(originalTableReference)) {
         scriptBuilder.append(".valueAt(").append(getValueAt()).append(")");
       }
       scriptBuilder.append(".map({");

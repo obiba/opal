@@ -15,6 +15,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -60,8 +61,6 @@ import com.watopi.chosen.client.event.ChosenChangeEvent;
  */
 public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesToViewUiHandlers>
     implements VariablesToViewPresenter.Display {
-
-  private static final int SCRIPT_MAX_LENGTH = 150;
 
   private static final int OCCURRENCE_COUNT_DEFAULT = 5;
 
@@ -134,10 +133,6 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
 
   private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
 
-  private final TextInputCell cell = new TextInputCell();
-
-  private ActionsVariableCopyColumn<VariableDto> actionsColumn;
-
   private final static int PAGE_SIZE = 10;
 
   @Inject
@@ -181,39 +176,7 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
   }
 
   private void addTableColumns() {
-
-    EditableColumn<VariableDto> editColumn = new EditableColumn<VariableDto>(cell) {
-      @Override
-      public String getValue(VariableDto object) {
-        return object.getName();
-      }
-    };
-
-    table.addColumn(editColumn, translations.nameLabel());
-    table.addColumn(new TextColumn<VariableDto>() {
-      @Override
-      public String getValue(VariableDto object) {
-        return getTruncatedScript(object);
-      }
-
-      private String getTruncatedScript(VariableDto object) {
-        String script = "";
-        for(int i = 0; i < JsArrays.toSafeArray(object.getAttributesArray()).length(); i++) {
-          if("script".equals(object.getAttributesArray().get(i).getName())) {
-            script = object.getAttributesArray().get(i).getValue();
-            if(script.length() > SCRIPT_MAX_LENGTH) {
-              script = script.substring(0, Math.min(script.length(), SCRIPT_MAX_LENGTH)) + " ...";
-            }
-            break;
-          }
-        }
-        return script;
-      }
-    }, translations.scriptLabel());
-
-    actionsColumn = new ActionsVariableCopyColumn<VariableDto>(
-        new ConstantActionsProvider<VariableDto>(ActionsVariableCopyColumn.REMOVE_ACTION));
-    actionsColumn.setActionHandler(new ActionHandler<VariableDto>() {
+    table.initialize(new ActionHandler<VariableDto>() {
       @Override
       public void doAction(VariableDto object, String actionName) {
         if(actionName.equals(ActionsVariableCopyColumn.REMOVE_ACTION)) {
@@ -221,8 +184,6 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
         }
       }
     });
-    table.addColumn(actionsColumn, translations.actionsLabel());
-
     table.setPageSize(PAGE_SIZE);
     table.setEmptyTableWidget(noVariables);
     pager.setDisplay(table);
@@ -230,21 +191,19 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
   }
 
   @Override
-  public void renderVariables(List<VariableDto> originalVariables, JsArray<VariableDto> rows, boolean clearNames) {
+  public void renderVariables(List<VariableDto> originalVariables, List<VariableDto> rows, boolean clearNames) {
     // Set all variable names to their original name
     if(clearNames) {
       for(VariableDto v : originalVariables) {
-        cell.clearViewData(v.getName());
+        table.clearViewData(v.getName());
       }
     }
 
-    dataProvider.setList(JsArrays.toList(rows));
-
+    dataProvider.setList(rows);
     pager.setPagerVisible(dataProvider.getList().size() > PAGE_SIZE);
     if(dataProvider.getList().size() > 1) {
       singleVariablePanel.setVisible(false);
       multipleVariablePanel.setVisible(true);
-
       dataProvider.refresh();
       table.redraw();
     } else {
@@ -264,16 +223,16 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
     // Show renameCategories categories to number only if there is at least one variable with categories
     boolean isRenameEnabled = false;
     boolean hasRepeatable = false;
+    List<String> variableUniqueNames = Lists.newArrayList();
     for(VariableDto originalVariable : originalVariables) {
       if(VariableDtos.hasCategories(originalVariable) && ("text".equals(originalVariable.getValueType()) ||
           "integer".equals(originalVariable.getValueType()) && !VariableDtos.allCategoriesMissing(originalVariable))) {
         isRenameEnabled = true;
       }
-      if (originalVariable.getIsRepeatable()) {
-        hasRepeatable = true;
-      }
+      if (originalVariable.getIsRepeatable()) hasRepeatable = true;
+      if (!variableUniqueNames.contains(originalVariable.getName())) variableUniqueNames.add(originalVariable.getName());
     }
-    perOccurrencePanel.setVisible(hasRepeatable);
+    perOccurrencePanel.setVisible(hasRepeatable || originalVariables.size()>variableUniqueNames.size());
     renameWithNumberPanel.setVisible(isRenameEnabled);
   }
 
@@ -386,7 +345,7 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
       // make effective the name changes
       for(VariableDto v : dataProvider.getList()) {
         if(withNewNames) {
-          TextInputCell.ViewData vi = cell.getViewData(v.getName());
+          TextInputCell.ViewData vi = table.getViewData(v.getName());
 
           if(vi != null) {
             v.setName(vi.getCurrentValue());

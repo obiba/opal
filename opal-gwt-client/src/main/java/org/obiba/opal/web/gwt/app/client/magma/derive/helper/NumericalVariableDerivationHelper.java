@@ -34,7 +34,7 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
   private Map<ValueMapEntry, Range<N>> entryRangeMap;
 
   public NumericalVariableDerivationHelper(VariableDto originalVariable, VariableDto destination) {
-    super(originalVariable, destination);
+    super(null, originalVariable, destination);
     initializeValueMapEntries();
   }
 

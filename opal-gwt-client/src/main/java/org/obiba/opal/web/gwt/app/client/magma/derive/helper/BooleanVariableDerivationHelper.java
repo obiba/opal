@@ -21,7 +21,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 public class BooleanVariableDerivationHelper extends DerivationHelper {
 
   public BooleanVariableDerivationHelper(VariableDto originalVariable, VariableDto destination) {
-    super(originalVariable, destination);
+    super(null, originalVariable, destination);
     initializeValueMapEntries();
   }
 

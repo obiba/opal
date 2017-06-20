@@ -15,6 +15,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.google.common.base.Strings;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -39,11 +40,14 @@ public abstract class DerivationHelper {
 
   protected List<ValueMapEntry> valueMapEntries;
 
+  protected String originalTableReference;
+
   protected final VariableDto originalVariable;
 
   private final VariableDto destination;
 
-  public DerivationHelper(VariableDto originalVariable, @Nullable VariableDto destination) {
+  public DerivationHelper(String originalTableReference, VariableDto originalVariable, @Nullable VariableDto destination) {
+    this.originalTableReference = originalTableReference;
     this.originalVariable = originalVariable;
     this.destination = destination;
   }
@@ -130,6 +134,10 @@ public abstract class DerivationHelper {
 
   public VariableDto getOriginalVariable() {
     return originalVariable;
+  }
+
+  public String getOriginalVariableName() {
+    return Strings.isNullOrEmpty(originalTableReference) ? originalVariable.getName() : originalTableReference + ":" + originalVariable.getName();
   }
 
   public List<String> getMapStepWarnings() {

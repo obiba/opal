@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -53,11 +54,11 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
 
   private List<String> tableReferences;
 
+  private Map<String, List<String>> variableTableReferences;
+
   private List<VariableDto> variables = new LinkedList<VariableDto>();
 
-  private VariableCopyValidationHandler variableCopyValidationHandler;
-
-  JsArray<DatasourceDto> datasources;
+  private JsArray<DatasourceDto> datasources;
 
   @Inject
   public VariablesToViewPresenter(Display display, EventBus eventBus, PlaceManager placeManager) {
@@ -70,7 +71,7 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
   public void saveVariable() {
     getView().clearErrors();
 
-    variableCopyValidationHandler = new VariableCopyValidationHandler();
+    VariableCopyValidationHandler variableCopyValidationHandler = new VariableCopyValidationHandler();
     if (variableCopyValidationHandler.validate()) {
       createOrUpdateViewWithVariables();
     }
@@ -90,39 +91,90 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
     boolean perOccurrence = getView().isPerOccurrence();
     int max = getView().getPerOccurrenceCount();
     boolean renameCategories = getView().isRenameCategoriesSelected();
-    JsArray<VariableDto> derivedVariables = JsArrays.create();
-
+    List<VariableDto> derivedVariables = Lists.newArrayList();
     for (VariableDto variable : variables) {
-      if (perOccurrence && variable.getIsRepeatable()) {
-        for (int i = 0; i < max; i++) {
-          if (renameCategories) {
-            derivedVariables.push(getDerivedVariable(variable, i));
-          } else {
-            derivedVariables.push(new VariableDuplicationHelper(variable, i).getDerivedVariable());
-          }
-        }
+      // whether the context provides variables with same name from different tables
+      boolean namedOccurrences = variableTableReferences.get(variable.getName()).size()>1;
+      if (perOccurrence && (variable.getIsRepeatable() || namedOccurrences)) {
+        if (namedOccurrences) splitNamedOccurrencesVariable(variable, derivedVariables, renameCategories);
+        else splitRepeatableVariable(variable, derivedVariables, max, renameCategories);
       } else if (renameCategories) {
         // Keep new name if changed
-        derivedVariables.push(getDerivedVariable(variable));
+        VariableDto derived = getDerivedVariable(variable);
+        derived.setIsRepeatable(namedOccurrences);
+        appendDerivedVariable(derivedVariables, derived);
       } else {
-        derivedVariables.push(new VariableDuplicationHelper(variable).getDerivedVariable());
+        VariableDto derived = new VariableDuplicationHelper(variable).getDerivedVariable();
+        derived.setIsRepeatable(namedOccurrences);
+        appendDerivedVariable(derivedVariables, derived);
       }
-
     }
 
     getView().renderVariables(variables, derivedVariables, false);
   }
 
+  /**
+   * Original variable is repeatable and can be split by occurrence index (with a maximum count).
+   *
+   * @param variable
+   * @param derivedVariables
+   * @param max
+   * @param renameCategories
+   */
+  private void splitRepeatableVariable(VariableDto variable, List<VariableDto> derivedVariables, int max, boolean renameCategories) {
+    for (int i = 0; i < max; i++) {
+      if (renameCategories)
+        appendDerivedVariable(derivedVariables, getDerivedVariable(null, variable, i));
+      else
+        appendDerivedVariable(derivedVariables, new VariableDuplicationHelper(variable, i).getDerivedVariable());
+    }
+  }
+
+  /**
+   * Several original variables have the same name, and then can be derived distinctly.
+   *
+   * @param variable
+   * @param derivedVariables
+   * @param renameCategories
+   */
+  private void splitNamedOccurrencesVariable(VariableDto variable, List<VariableDto> derivedVariables, boolean renameCategories) {
+    int valueAt = 0;
+    for (String ref : variableTableReferences.get(variable.getName())) {
+      if (renameCategories)
+        appendDerivedVariable(derivedVariables, getDerivedVariable(ref, variable, valueAt));
+      else
+        appendDerivedVariable(derivedVariables, new VariableDuplicationHelper(ref, variable, valueAt).getDerivedVariable());
+      valueAt++;
+    }
+  }
+
+  /**
+   * Append a derived variable to a list, making sure variable names are unique.
+   *
+   * @param derivedVariables
+   * @param derived
+   */
+  private void appendDerivedVariable(List<VariableDto> derivedVariables, VariableDto derived) {
+    // make sure the derived variables name are unique
+    for (VariableDto var : derivedVariables) {
+      if (var.getName().equals(derived.getName())) return;
+    }
+    derivedVariables.add(derived);
+  }
+
   public void show(TableDto table, List<VariableDto> variables) {
     this.tableReferences = Lists.newArrayList(table.getDatasourceName() + "." + table.getName());
+    this.variableTableReferences = Maps.newHashMap();
     this.variables = variables;
 
     refreshDatasources();
 
     // Prepare the array of variableDto
-    JsArray<VariableDto> derivedVariables = JsArrays.create();
+    List<VariableDto> derivedVariables = Lists.newArrayList();
     for (VariableDto variable : variables) {
-      derivedVariables.push(new VariableDuplicationHelper(variable).getDerivedVariable());
+      List<String> refs = Lists.newArrayList(table.getDatasourceName() + "." + table.getName());
+      variableTableReferences.put(variable.getName(), refs);
+      derivedVariables.add(new VariableDuplicationHelper(variable).getDerivedVariable());
     }
 
     getView().renderVariables(variables, derivedVariables, true);
@@ -130,16 +182,19 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
   }
 
   public void show(List<String> variableFullNames) {
-    tableReferences = Lists.newArrayList();
+    this.tableReferences = Lists.newArrayList();
+    this.variableTableReferences = Maps.newHashMap();
     final int expectedCount = variableFullNames.size();
-    final JsArray<VariableDto> derivedVariables = JsArrays.create();
+    final Map<String, VariableDto> derivedVariablesByName = Maps.newHashMap();
     final List<String> notFoundVariables = Lists.newArrayList();
-    // build a unique list of table references
     for (final String varFullName : variableFullNames) {
-      MagmaPath.Parser parser = MagmaPath.Parser.parse(varFullName);
+      final MagmaPath.Parser parser = MagmaPath.Parser.parse(varFullName);
+      // build a unique list of table references
       String tableRef = parser.getTableReference();
       if (!tableReferences.contains(tableRef)) tableReferences.add(tableRef);
       if (tableReferences.size() == 1) refreshDatasources();
+      // build a unique list of derived variables
+      // when several original variables have the same name, the unique derived + repeatable variable is added
       ResourceRequestBuilderFactory.<VariableDto>newBuilder() //
           .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
               .build(parser.getDatasource(), parser.getTable(), parser.getVariable())) //
@@ -147,12 +202,31 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
           .withCallback(new ResourceCallback<VariableDto>() {
             @Override
             public void onResource(Response response, VariableDto resource) {
-              variables.add(resource);
-              derivedVariables.push(new VariableDuplicationHelper(resource).getDerivedVariable());
-              if ((derivedVariables.length() + notFoundVariables.size()) == expectedCount) {
-                getView().renderVariables(variables, derivedVariables, true);
-                getView().showDialog();
+              appendVariable(resource);
+              if ((variables.size() + notFoundVariables.size()) == expectedCount) {
+                renderVariables();
               }
+            }
+
+            private void appendVariable(VariableDto resource) {
+              variables.add(resource);
+              if (variableTableReferences.containsKey(parser.getVariable()))
+                variableTableReferences.get(parser.getVariable()).add(parser.getDatasource() + "." + parser.getTable());
+              else{
+                List<String> refs = Lists.newArrayList(parser.getDatasource() + "." + parser.getTable());
+                variableTableReferences.put(parser.getVariable(), refs);
+              }
+              if (derivedVariablesByName.containsKey(resource.getName())) derivedVariablesByName.get(resource.getName()).setIsRepeatable(true);
+              else {
+                VariableDto derived = new VariableDuplicationHelper(resource).getDerivedVariable();
+                derived.setIndex(derivedVariablesByName.size());
+                derivedVariablesByName.put(resource.getName(), derived);
+              }
+            }
+
+            private void renderVariables() {
+              getView().renderVariables(variables, Lists.newArrayList(derivedVariablesByName.values()), true);
+              getView().showDialog();
             }
           }).withCallback(new ResponseCodeCallback() {
             @Override
@@ -189,17 +263,17 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
 
 
   private VariableDto getDerivedVariable(VariableDto variable) {
-    return getDerivedVariable(variable, -1);
+    return getDerivedVariable(null, variable, -1);
   }
 
-  private VariableDto getDerivedVariable(VariableDto variable, int valueAt) {
+  private VariableDto getDerivedVariable(String tableRef, VariableDto variable, int valueAt) {
     if (VariableDtos.hasCategories(variable) && ("text".equals(variable.getValueType()) ||
         "integer".equals(variable.getValueType()) && !VariableDtos.allCategoriesMissing(variable))) {
-      CategoricalVariableDerivationHelper derivationHelper = new CategoricalVariableDerivationHelper(variable, valueAt);
+      CategoricalVariableDerivationHelper derivationHelper = new CategoricalVariableDerivationHelper(tableRef, variable, valueAt);
       derivationHelper.initializeValueMapEntries();
       return derivationHelper.getDerivedVariable();
     }
-    return new VariableDuplicationHelper(variable, valueAt).getDerivedVariable();
+    return new VariableDuplicationHelper(tableRef, variable, valueAt).getDerivedVariable();
   }
 
   private class CreateViewCallBack implements ResponseCodeCallback {
@@ -339,7 +413,7 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
 
     void setDatasources(JsArray<DatasourceDto> datasources, String name);
 
-    void renderVariables(List<VariableDto> originalVariables, JsArray<VariableDto> rows, boolean clearNames);
+    void renderVariables(List<VariableDto> originalVariables, List<VariableDto> rows, boolean clearNames);
 
     HasText getViewName();
 

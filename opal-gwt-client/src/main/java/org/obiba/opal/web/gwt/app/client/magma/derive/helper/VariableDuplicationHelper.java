@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.derive.helper;
 
+import com.google.common.base.Strings;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
@@ -17,16 +18,24 @@ public class VariableDuplicationHelper extends DerivationHelper {
   private int valueAt = -1;
 
   public VariableDuplicationHelper(VariableDto originalVariable) {
-    this(originalVariable, null);
+    this(null, originalVariable, null);
   }
 
   public VariableDuplicationHelper(VariableDto originalVariable, int valueAt) {
-    this(originalVariable, null);
+    this(null, originalVariable, valueAt);
+  }
+
+  public VariableDuplicationHelper(String originalTableReference, VariableDto originalVariable, int valueAt) {
+    this(originalTableReference, originalVariable, null);
     this.valueAt = valueAt;
   }
 
   public VariableDuplicationHelper(VariableDto originalVariable, VariableDto destination) {
-    super(originalVariable, destination);
+    this(null, originalVariable, destination);
+  }
+
+  public VariableDuplicationHelper(String originalTableReference, VariableDto originalVariable, VariableDto destination) {
+    super(originalTableReference, originalVariable, destination);
   }
 
   @Override
@@ -37,9 +46,9 @@ public class VariableDuplicationHelper extends DerivationHelper {
   @Override
   public VariableDto getDerivedVariable() {
     VariableDto derived = DerivedVariableGenerator.copyVariable(originalVariable, true, originalVariable.getLink());
-    String script = "$('" + originalVariable.getName() + "')";
+    String script = "$('" + getOriginalVariableName() + "')";
     if (valueAt>=0) {
-      script = script + ".valueAt(" + valueAt + ")";
+      if (Strings.isNullOrEmpty(originalTableReference)) script = script + ".valueAt(" + valueAt + ")";
       derived.setName(derived.getName() + "_" + (valueAt + 1));
       derived.setIsRepeatable(false);
     }

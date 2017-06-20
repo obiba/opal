@@ -34,7 +34,7 @@ public class TemporalVariableDerivationHelper extends DerivationHelper {
 
   public TemporalVariableDerivationHelper(VariableDto originalVariable, VariableDto destination, String groupMethod,
       Date fromDate, Date toDate) {
-    super(originalVariable, destination);
+    super(null, originalVariable, destination);
     this.groupMethod = GroupMethod.valueOf(groupMethod);
     this.fromDate = new Date(fromDate.getTime());
     this.toDate = new Date(toDate.getTime());
