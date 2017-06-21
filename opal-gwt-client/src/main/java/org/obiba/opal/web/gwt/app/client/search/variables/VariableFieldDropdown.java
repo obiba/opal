@@ -58,17 +58,20 @@ public class VariableFieldDropdown extends CriterionDropdown {
   }
 
   public void initialize(RQLQuery rqlQuery) {
+    specificControls.setVisible(false);
+    divider.setVisible(false);
     if (rqlQuery == null) return;
+    getRadioControl(2).setValue(false);
     String filter;
     if ("exists".equals(rqlQuery.getName())) {
       getRadioControl(0).setValue(true);
-      filter = translations.criterionFiltersMap().get("any");
+      filter = translations.criterionFiltersMap().get("any").toLowerCase();
     }
     else if ("not".equals(rqlQuery.getName())) {
       RQLQuery subQuery = rqlQuery.getRQLQuery(0);
       if ("exists".equals(subQuery.getName())) {
         getRadioControl(1).setValue(true);
-        filter = translations.criterionFiltersMap().get("none");
+        filter = translations.criterionFiltersMap().get("none").toLowerCase();
       } else {
         getRadioControl(3).setValue(true);
         filter = translations.criterionFiltersMap().get("not_in");
