@@ -16,7 +16,6 @@ import com.github.gwtbootstrap.client.ui.TextArea;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.*;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -49,7 +48,8 @@ import java.util.List;
 
 public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHandlers> implements SearchVariablesPresenter.Display {
 
-  interface Binder extends UiBinder<Widget, SearchVariablesView> {}
+  interface Binder extends UiBinder<Widget, SearchVariablesView> {
+  }
 
   private final TranslationMessages translationMessages;
 
@@ -137,7 +137,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
       }
     });
   }
-  
+
   @Override
   public HasWidgets getBreadcrumbs() {
     return breadcrumbs;
@@ -163,7 +163,8 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
   @UiHandler("queryArea")
   public void onAdvancedQueryTyped(KeyUpEvent event) {
-    if ((event.getNativeKeyCode() == KeyCodes.KEY_ENTER && event.isControlKeyDown()) || getQuery().isEmpty()) onSearch(null);
+    if ((event.getNativeKeyCode() == KeyCodes.KEY_ENTER && event.isControlKeyDown()) || getQuery().isEmpty())
+      onSearch(null);
   }
 
   @UiHandler("addToCart")
@@ -171,7 +172,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     getUiHandlers().onAddToCart(variableItemTable.getSelectedItems());
   }
 
-    @Override
+  @Override
   public void setTaxonomies(List<TaxonomyDto> taxonomies) {
     ((VariableFieldSuggestOracle) queryTypeahead.getSuggestOracle()).setTaxonomies(taxonomies);
   }
@@ -195,27 +196,28 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
   @Override
   public void setRQLQuery(String rqlQuery) {
-    if (!Strings.isNullOrEmpty(rqlQuery)) {
-      queryMode.setOn(true, false);
-      showAdvancedQuery(false);
-      RQLQuery root = RQLParser.parse(rqlQuery);
-      for (int i=0; i<root.getArgumentsSize(); i++) {
-        RQLQuery query = root.getRQLQuery(i);
-        if (!query.getName().equals("contains")) {
-          String fieldName;
-          if ("not".equals(query.getName())) {
-            fieldName = query.getRQLQuery(0).getString(0);
-          }
-          else
-            fieldName = query.getString(0);
-          VariableFieldSuggestOracle.VariableFieldSuggestion suggestion = oracle.findSuggestion(fieldName);
-          addCriterion(suggestion, query,null);
-        } else {
-          containsInput.setText(query.getString(0));
-        }
+    if (Strings.isNullOrEmpty(rqlQuery)) return;
+    clearResults();
+    queryPanel.clear();
+    //containsInput.setText("");
+    queryMode.setOn(true, false);
+    showAdvancedQuery(false);
+    RQLQuery root = RQLParser.parse(rqlQuery);
+    for (int i = 0; i < root.getArgumentsSize(); i++) {
+      RQLQuery query = root.getRQLQuery(i);
+      if (!query.getName().equals("contains")) {
+        String fieldName;
+        if ("not".equals(query.getName())) {
+          fieldName = query.getRQLQuery(0).getString(0);
+        } else
+          fieldName = query.getString(0);
+        VariableFieldSuggestOracle.VariableFieldSuggestion suggestion = oracle.findSuggestion(fieldName);
+        addCriterion(suggestion, query, null);
+      } else {
+        containsInput.setText(query.getString(0));
       }
-      //oracle.findSuggestion();
     }
+    onSearch(null);
   }
 
   @Override
@@ -260,7 +262,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   private String getBasicQuery() {
     String queries = queryPanel.getQueryString();
     if ("*".equals(queries)) queries = "";
-    return (queries  + " " + containsInput.getText()).trim();
+    return (queries + " " + containsInput.getText()).trim();
   }
 
   private String getBasicRQLQuery() {
@@ -296,7 +298,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
         //if (!fieldSuggestion.getFieldTerms().isEmpty()) {
         //  getUiHandlers().onFacet(fieldSuggestion.getField(), fieldSuggestion.getFieldTerms().size(), new VariableFieldFacetHandler(fieldSuggestion));
         //} else
-        addCriterion(fieldSuggestion, null,null);
+        addCriterion(fieldSuggestion, null, null);
         return "";
       }
 
@@ -341,7 +343,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     dd.initialize(rqlQuery);
     queryPanel.addCriterion(dd, true, true);
     queryInput.setText("");
-    onSearch(null);
+    if (rqlQuery == null) onSearch(null);
   }
 
   private void initVariableItemTable() {

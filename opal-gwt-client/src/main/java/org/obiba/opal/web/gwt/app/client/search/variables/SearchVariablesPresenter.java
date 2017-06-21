@@ -12,10 +12,7 @@ package org.obiba.opal.web.gwt.app.client.search.variables;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -38,23 +35,19 @@ import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
-import org.obiba.opal.web.gwt.app.client.search.event.*;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.opal.EntryDto;
 import org.obiba.opal.web.model.client.opal.GeneralConf;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
-import org.obiba.opal.web.model.client.search.FacetResultDto;
 import org.obiba.opal.web.model.client.search.ItemFieldsDto;
 import org.obiba.opal.web.model.client.search.ItemResultDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import java.util.List;
-import java.util.Map;
 
 public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter.Display, SearchVariablesPresenter.Proxy>
     implements HasPageTitle, SearchVariablesUiHandlers {
@@ -110,8 +103,7 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
     else if (viewInitialized && hasRQLQuery()) {
       getView().reset();
       searchProvidedRQLQueryIfReady();
-    }
-    else getView().reset();
+    } else getView().reset();
   }
 
   @Override
@@ -151,7 +143,7 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
 
   @Override
   public void onAddToCart(List<ItemResultDto> selectedItems) {
-    if(selectedItems.isEmpty()) return;
+    if (selectedItems.isEmpty()) return;
     for (ItemResultDto item : selectedItems) {
       MagmaPath.Parser parser = MagmaPath.Parser.parse(item.getIdentifier());
       String entityType = "Participant";
@@ -256,14 +248,14 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
    * Cascade locales, taxonomies and tables init.
    */
   private void initializeView() {
-    viewInitialized = false;
+    if (viewInitialized) return;
     ResourceRequestBuilderFactory.<GeneralConf>newBuilder()
         .forResource(UriBuilders.SYSTEM_CONF_GENERAL.create().build())
         .withCallback(new ResourceCallback<GeneralConf>() {
           @Override
           public void onResource(Response response, GeneralConf resource) {
             locales.clear();
-            for(int i = 0; i < resource.getLanguagesArray().length(); i++) {
+            for (int i = 0; i < resource.getLanguagesArray().length(); i++) {
               locales.add(resource.getLanguages(i));
             }
             // cascade taxonomies and tables rendering
@@ -308,8 +300,7 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
     if (Strings.isNullOrEmpty(rqlQuery)) {
       builder.with(ParameterTokens.TOKEN_QUERY, query);
       builder.without(ParameterTokens.TOKEN_RQL_QUERY);
-    }
-    else {
+    } else {
       builder.with(ParameterTokens.TOKEN_RQL_QUERY, rqlQuery);
       builder.without(ParameterTokens.TOKEN_QUERY);
     }
@@ -318,7 +309,8 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
 
   @ProxyStandard
   @NameToken(Places.SEARCH_VARIABLES)
-  public interface Proxy extends ProxyPlace<SearchVariablesPresenter> {}
+  public interface Proxy extends ProxyPlace<SearchVariablesPresenter> {
+  }
 
   public interface Display extends View, HasBreadcrumbs, HasUiHandlers<SearchVariablesUiHandlers> {
 
