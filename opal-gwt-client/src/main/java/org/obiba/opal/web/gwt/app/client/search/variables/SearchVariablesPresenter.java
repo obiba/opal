@@ -67,11 +67,15 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
 
   private String query;
 
+  private String rqlQuery;
+
   private int offset = 0;
 
   private int limit = 50;
 
   private List<String> locales = Lists.newArrayList();
+
+  private boolean viewInitialized;
 
   @Inject
   public SearchVariablesPresenter(EventBus eventBus, Display display, Proxy proxy, Translations translations,
@@ -92,32 +96,36 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
   @Override
   protected void onReveal() {
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
-    renderTaxonomies();
-    renderTables();
-    initializeLocales();
+    initializeView();
   }
 
   @Override
   public void prepareFromRequest(PlaceRequest request) {
     query = request.getParameter(ParameterTokens.TOKEN_QUERY, null);
+    rqlQuery = request.getParameter(ParameterTokens.TOKEN_RQL_QUERY, null);
     offset = Integer.parseInt(request.getParameter(ParameterTokens.TOKEN_OFFSET, "0"));
     limit = Integer.parseInt(request.getParameter(ParameterTokens.TOKEN_LIMIT, "50"));
     getView().setQuery(query);
-    if (!Strings.isNullOrEmpty(query)) query();
+    if (hasQuery()) query();
+    else if (viewInitialized && hasRQLQuery()) {
+      getView().reset();
+      searchProvidedRQLQueryIfReady();
+    }
     else getView().reset();
   }
 
   @Override
-  public void onSearch(String query) {
-    onSearchRange(query, 0, 50);
+  public void onSearch(String query, String rqlQuery) {
+    onSearchRange(query, rqlQuery, 0, 50);
   }
 
   @Override
-  public void onSearchRange(String query, int offset, int limit) {
+  public void onSearchRange(String query, String rqlQuery, int offset, int limit) {
     this.query = query;
+    this.rqlQuery = rqlQuery;
     this.offset = offset;
     this.limit = limit;
-    if (!Strings.isNullOrEmpty(query)) query();
+    if (hasQuery()) query();
     else {
       getView().reset();
       updateHistory();
@@ -127,8 +135,10 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
   @Override
   public void onClear() {
     query = null;
+    rqlQuery = null;
     PlaceRequest.Builder builder = PlaceRequestHelper.createRequestBuilder(placeManager.getCurrentPlaceRequest())
         .without(ParameterTokens.TOKEN_QUERY)
+        .without(ParameterTokens.TOKEN_RQL_QUERY)
         .without(ParameterTokens.TOKEN_OFFSET)
         .without(ParameterTokens.TOKEN_LIMIT);
     placeManager.updateHistory(builder.build(), true);
@@ -159,6 +169,14 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
   //
   // Private methods
   //
+
+  private boolean hasQuery() {
+    return !Strings.isNullOrEmpty(query);
+  }
+
+  private boolean hasRQLQuery() {
+    return !Strings.isNullOrEmpty(rqlQuery);
+  }
 
   private void query() {
     UriBuilder ub = UriBuilders.DATASOURCES_VARIABLES_SEARCH.create()//
@@ -234,6 +252,26 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
         .send();
   }
 
+  /**
+   * Cascade locales, taxonomies and tables init.
+   */
+  private void initializeView() {
+    viewInitialized = false;
+    ResourceRequestBuilderFactory.<GeneralConf>newBuilder()
+        .forResource(UriBuilders.SYSTEM_CONF_GENERAL.create().build())
+        .withCallback(new ResourceCallback<GeneralConf>() {
+          @Override
+          public void onResource(Response response, GeneralConf resource) {
+            locales.clear();
+            for(int i = 0; i < resource.getLanguagesArray().length(); i++) {
+              locales.add(resource.getLanguages(i));
+            }
+            // cascade taxonomies and tables rendering
+            renderTaxonomies();
+          }
+        }).get().send();
+  }
+
   private void renderTaxonomies() {
     ResourceRequestBuilderFactory.<JsArray<TaxonomyDto>>newBuilder()
         .forResource(UriBuilders.SYSTEM_CONF_TAXONOMIES.create().build()).get()
@@ -241,6 +279,7 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
           @Override
           public void onResource(Response response, JsArray<TaxonomyDto> resource) {
             getView().setTaxonomies(JsArrays.toList(resource));
+            renderTables();
           }
         }).send();
   }
@@ -252,29 +291,28 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
           @Override
           public void onResource(Response response, JsArray<TableDto> resource) {
             getView().setTables(JsArrays.toList(resource));
+            viewInitialized = true;
+            searchProvidedRQLQueryIfReady();
           }
         }).get().send();
   }
 
-  private void initializeLocales() {
-    ResourceRequestBuilderFactory.<GeneralConf>newBuilder()
-        .forResource(UriBuilders.SYSTEM_CONF_GENERAL.create().build())
-        .withCallback(new ResourceCallback<GeneralConf>() {
-          @Override
-          public void onResource(Response response, GeneralConf resource) {
-            locales.clear();
-            for(int i = 0; i < resource.getLanguagesArray().length(); i++) {
-              locales.add(resource.getLanguages(i));
-            }
-          }
-        }).get().send();
+  private void searchProvidedRQLQueryIfReady() {
+    if (viewInitialized && hasRQLQuery()) getView().setRQLQuery(rqlQuery);
   }
 
   private void updateHistory() {
     PlaceRequest.Builder builder = PlaceRequestHelper.createRequestBuilder(placeManager.getCurrentPlaceRequest())
-        .with(ParameterTokens.TOKEN_QUERY, query)
         .with(ParameterTokens.TOKEN_OFFSET, "" + offset)
         .with(ParameterTokens.TOKEN_LIMIT, "" + limit);
+    if (Strings.isNullOrEmpty(rqlQuery)) {
+      builder.with(ParameterTokens.TOKEN_QUERY, query);
+      builder.without(ParameterTokens.TOKEN_RQL_QUERY);
+    }
+    else {
+      builder.with(ParameterTokens.TOKEN_RQL_QUERY, rqlQuery);
+      builder.without(ParameterTokens.TOKEN_QUERY);
+    }
     placeManager.updateHistory(builder.build(), true);
   }
 
@@ -289,6 +327,8 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
     void setTables(List<TableDto> tables);
 
     void setQuery(String query);
+
+    void setRQLQuery(String rqlQuery);
 
     void showResults(QueryResultDto results, int offset, int limit);
 

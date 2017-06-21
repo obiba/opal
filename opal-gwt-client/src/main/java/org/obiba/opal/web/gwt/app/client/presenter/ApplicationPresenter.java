@@ -226,14 +226,14 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     addRegisteredHandler(SearchDatasourceVariablesEvent.getType(), new SearchDatasourceVariablesEvent.SearchDatasourceVariablesHandler() {
       @Override
       public void onSearchDatasourceVariables(SearchDatasourceVariablesEvent event) {
-        revealSearchVariables("project:" + event.getDatasource().replaceAll(" ", "+"));
+        revealSearchVariables("in(project,(" + event.getDatasource().replaceAll(" ", "+") + "))");
       }
     });
 
     addRegisteredHandler(SearchTableVariablesEvent.getType(), new SearchTableVariablesEvent.SearchTableVariablesHandler() {
       @Override
       public void onSearchTableVariables(SearchTableVariablesEvent event) {
-        revealSearchVariables("project:" + event.getDatasource().replaceAll(" ", "+") + " AND table:" + event.getTable().replaceAll(" ", "+"));
+        revealSearchVariables("in(project,(" + event.getDatasource().replaceAll(" ", "+") + ")),in(table,(" + event.getTable().replaceAll(" ", "+") + "))");
       }
     });
 
@@ -242,9 +242,9 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       public void onSearchTaxonomyVariables(SearchTaxonomyVariablesEvent event) {
         String field = event.getTaxonomy() + "-" + event.getVocabulary();
         if (Strings.isNullOrEmpty(event.getTerm()))
-          revealSearchVariables("_exists_:" + field);
+          revealSearchVariables("exists(" + field + ")");
         else
-          revealSearchVariables(field + ":" + event.getTerm());
+          revealSearchVariables("in(" + field + ",(" + event.getTerm() + "))");
       }
     });
 
@@ -259,9 +259,9 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     registerModalEvents();
   }
 
-  private void revealSearchVariables(String query) {
+  private void revealSearchVariables(String rqlQuery) {
     PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.SEARCH_VARIABLES)
-        .with(ParameterTokens.TOKEN_QUERY, query)
+        .with(ParameterTokens.TOKEN_RQL_QUERY, rqlQuery)
         .with(ParameterTokens.TOKEN_OFFSET, "0")
         .with(ParameterTokens.TOKEN_LIMIT, "50");
     placeManager.revealPlace(builder.build());

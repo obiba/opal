@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.AttributeHelper;
 import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
+import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
@@ -99,6 +100,23 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     callback.onSuggestionsReady(request, response);
   }
 
+  public VariableFieldSuggestion findSuggestion(String fieldName) {
+    for (TermSuggestion suggestion : termSuggestions) {
+      if (suggestion.getField().getName().equals(fieldName)) return suggestion;
+    }
+    for (MagmaSuggestion suggestion : magmaSuggestions) {
+      if (suggestion.getField().getName().equals(fieldName)) return suggestion;
+    }
+    for (PropertySuggestion suggestion : propertySuggestions) {
+      if (suggestion.getField().getName().equals(fieldName)) return suggestion;
+    }
+    return null;
+  }
+
+  //
+  // Private methods
+  //
+
   /**
    * Query string is split in multiple words, all matches is expected, minus prefix inverse the condition.
    *
@@ -167,6 +185,10 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
       return description;
     }
   }
+
+  //
+  // Suggestion classes
+  //
 
   public interface VariableFieldSuggestion extends Suggestion {
 
@@ -323,9 +345,13 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     private TableSuggestion(String table, Collection<TableDto> allTables) {
       this.table = table;
+      List<String> tableNames = Lists.newArrayList();
       for (TableDto tableDto : allTables) {
         if (tableDto.getName().equals(table)) datasources.add(tableDto.getDatasourceName());
-        if (!fieldTerms.contains(tableDto.getName())) fieldTerms.add(new FieldItem(tableDto.getName()));
+        if (!tableNames.contains(tableDto.getName())) {
+          fieldTerms.add(new FieldItem(tableDto.getName()));
+          tableNames.add(tableDto.getName());
+        }
       }
       Collections.sort(fieldTerms, new Comparator<FieldItem>() {
         @Override
@@ -439,6 +465,4 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
       return "";
     }
   }
-
-
 }

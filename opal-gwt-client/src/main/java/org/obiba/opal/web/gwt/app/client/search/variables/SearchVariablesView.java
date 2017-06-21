@@ -16,6 +16,7 @@ import com.github.gwtbootstrap.client.ui.TextArea;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.*;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -36,6 +37,8 @@ import org.obiba.opal.web.gwt.app.client.ui.CriteriaPanel;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.ToggleAnchor;
+import org.obiba.opal.web.gwt.rql.client.RQLParser;
+import org.obiba.opal.web.gwt.rql.client.RQLQuery;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.search.FacetResultDto;
@@ -105,6 +108,8 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
   private VariableItemProvider variableItemProvider;
 
+  private VariableFieldSuggestOracle oracle;
+
   @Inject
   public SearchVariablesView(SearchVariablesView.Binder uiBinder, Translations translations, TranslationMessages translationMessages, PlaceManager placeManager) {
     this.translationMessages = translationMessages;
@@ -141,7 +146,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   @UiHandler("searchButton")
   public void onSearch(ClickEvent event) {
     setVariablesVisible(false);
-    getUiHandlers().onSearch(getQuery());
+    getUiHandlers().onSearch(getQuery(), getRQLQuery());
   }
 
   @UiHandler("clearButton")
@@ -189,6 +194,31 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   }
 
   @Override
+  public void setRQLQuery(String rqlQuery) {
+    if (!Strings.isNullOrEmpty(rqlQuery)) {
+      queryMode.setOn(true, false);
+      showAdvancedQuery(false);
+      RQLQuery root = RQLParser.parse(rqlQuery);
+      for (int i=0; i<root.getArgumentsSize(); i++) {
+        RQLQuery query = root.getRQLQuery(i);
+        if (!query.getName().equals("contains")) {
+          String fieldName;
+          if ("not".equals(query.getName())) {
+            fieldName = query.getRQLQuery(0).getString(0);
+          }
+          else
+            fieldName = query.getString(0);
+          VariableFieldSuggestOracle.VariableFieldSuggestion suggestion = oracle.findSuggestion(fieldName);
+          addCriterion(suggestion, query,null);
+        } else {
+          containsInput.setText(query.getString(0));
+        }
+      }
+      //oracle.findSuggestion();
+    }
+  }
+
+  @Override
   public void showResults(QueryResultDto results, int offset, int limit) {
     initVariableItemTable();
     variableItemTable.clearSelectedItems();
@@ -223,10 +253,22 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     return getBasicQuery();
   }
 
+  private String getRQLQuery() {
+    return queryArea.isVisible() ? null : getBasicRQLQuery();
+  }
+
   private String getBasicQuery() {
-    String queryDropdowns = queryPanel.getQueryString();
-    if ("*".equals(queryDropdowns)) queryDropdowns = "";
-    return (queryDropdowns  + " " + containsInput.getText()).trim();
+    String queries = queryPanel.getQueryString();
+    if ("*".equals(queries)) queries = "";
+    return (queries  + " " + containsInput.getText()).trim();
+  }
+
+  private String getBasicRQLQuery() {
+    String queries = queryPanel.getRQLQueryString();
+    if ("*".equals(queries)) queries = "";
+    String contains = containsInput.getText().trim();
+    if (!Strings.isNullOrEmpty(contains)) contains = "contains(" + contains + ")";
+    return Strings.isNullOrEmpty(queries) ? contains : queries + (Strings.isNullOrEmpty(contains) ? "" : "," + contains);
   }
 
   private String getAdvancedQuery() {
@@ -245,7 +287,8 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   }
 
   private void initQueryTypeahead() {
-    queryTypeahead = new Typeahead(new VariableFieldSuggestOracle());
+    oracle = new VariableFieldSuggestOracle();
+    queryTypeahead = new Typeahead(oracle);
     queryTypeahead.setUpdaterCallback(new Typeahead.UpdaterCallback() {
       @Override
       public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {
@@ -253,7 +296,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
         //if (!fieldSuggestion.getFieldTerms().isEmpty()) {
         //  getUiHandlers().onFacet(fieldSuggestion.getField(), fieldSuggestion.getFieldTerms().size(), new VariableFieldFacetHandler(fieldSuggestion));
         //} else
-        addCriterion(fieldSuggestion, null);
+        addCriterion(fieldSuggestion, null,null);
         return "";
       }
 
@@ -278,11 +321,11 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
     @Override
     public void onResult(FacetResultDto facet) {
-      addCriterion(fieldSuggestion, facet);
+      addCriterion(fieldSuggestion, null, facet);
     }
   }
 
-  private void addCriterion(VariableFieldSuggestOracle.VariableFieldSuggestion fieldSuggestion, FacetResultDto facet) {
+  private void addCriterion(VariableFieldSuggestOracle.VariableFieldSuggestion fieldSuggestion, RQLQuery rqlQuery, FacetResultDto facet) {
     VariableFieldDropdown dd = new VariableFieldDropdown(fieldSuggestion, facet) {
       @Override
       public void doFilter() {
@@ -295,7 +338,8 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
         onSearch(null);
       }
     });
-    queryPanel.addCriterion(dd, true, false);
+    dd.initialize(rqlQuery);
+    queryPanel.addCriterion(dd, true, true);
     queryInput.setText("");
     onSearch(null);
   }
@@ -351,7 +395,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     protected void onRangeChanged(HasData<ItemResultDto> display) {
       Range range = display.getVisibleRange();
       setVariablesVisible(false);
-      getUiHandlers().onSearchRange(getQuery(), range.getStart(), range.getLength());
+      getUiHandlers().onSearchRange(getQuery(), getRQLQuery(), range.getStart(), range.getLength());
     }
   }
 

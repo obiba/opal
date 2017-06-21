@@ -24,6 +24,7 @@ import com.google.gwt.user.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.CriterionDropdown;
 import org.obiba.opal.web.gwt.app.client.ui.ListItem;
+import org.obiba.opal.web.gwt.rql.client.RQLQuery;
 import org.obiba.opal.web.model.client.search.FacetResultDto;
 
 import java.util.List;
@@ -56,6 +57,50 @@ public class VariableFieldDropdown extends CriterionDropdown {
     initialize(suggestion.getReplacementString());
   }
 
+  public void initialize(RQLQuery rqlQuery) {
+    if (rqlQuery == null) return;
+    String filter;
+    if ("exists".equals(rqlQuery.getName())) {
+      getRadioControl(0).setValue(true);
+      filter = translations.criterionFiltersMap().get("any");
+    }
+    else if ("not".equals(rqlQuery.getName())) {
+      RQLQuery subQuery = rqlQuery.getRQLQuery(0);
+      if ("exists".equals(subQuery.getName())) {
+        getRadioControl(1).setValue(true);
+        filter = translations.criterionFiltersMap().get("none");
+      } else {
+        getRadioControl(3).setValue(true);
+        filter = translations.criterionFiltersMap().get("not_in");
+        applySelection(subQuery);
+      }
+    }
+    else {
+      getRadioControl(2).setValue(true);
+      filter = translations.criterionFiltersMap().get("in");
+      applySelection(rqlQuery);
+    }
+    updateCriterionFilter(filter);
+  }
+
+  private void applySelection(RQLQuery rqlQuery) {
+    if (hasFieldTerms()) {
+      List<String> selections;
+      if (rqlQuery.isArray(1))
+        selections = JsArrays.toList(rqlQuery.getArray(1));
+      else
+        selections = Lists.newArrayList(rqlQuery.getString(1));
+      for (CheckBox check : fieldTermChecks) {
+        check.setValue(selections.contains(check.getName()));
+      }
+    } else {
+      String selection = rqlQuery.isArray(1) ? rqlQuery.getArray(1).get(0) : rqlQuery.getString(1);
+      matches.setText(selection);
+    }
+    specificControls.setVisible(true);
+    divider.setVisible(true);
+  }
+
   @Override
   protected Widget createSpecificControls() {
     return hasFieldTerms() ?  createFieldTermsControls() : createMatchQueryControls();
@@ -63,6 +108,10 @@ public class VariableFieldDropdown extends CriterionDropdown {
 
   protected String getSpecificQueryString() {
     return hasFieldTerms() ? getFieldTermsQueryString() : getMatchQueryString();
+  }
+
+  protected String getSpecificRQLQueryString() {
+    return hasFieldTerms() ? getFieldTermsRQLQueryString() : getMatchRQLQueryString();
   }
 
   @Override
@@ -83,6 +132,15 @@ public class VariableFieldDropdown extends CriterionDropdown {
     // None
     if(getRadioControl(1).getValue()) return "NOT _exists_:" + fieldName;
     return getSpecificQueryString();
+  }
+
+  @Override
+  public String getRQLQueryString() {
+    // Any
+    if(getRadioControl(0).getValue()) return "exists(" + getRQLField() + ")";
+    // None
+    if(getRadioControl(1).getValue()) return "not(exists(" + getRQLField() + "))";
+    return getSpecificRQLQueryString();
   }
 
   @Override
@@ -237,6 +295,12 @@ public class VariableFieldDropdown extends CriterionDropdown {
     return (isNot() ? "NOT " : "") + fieldName + ":" + matches.getText();
   }
 
+  private String getMatchRQLQueryString() {
+    if (matches.getText().isEmpty()) return null;
+    String q = "in(" + getRQLField() + ",(" + matches.getText() + "))";
+    return isNot() ? "not(" + q + ")" : q;
+  }
+
   private String getFieldTermsQueryString() {
     String rval = null;
     for (CheckBox checkbox : fieldTermChecks) {
@@ -247,6 +311,19 @@ public class VariableFieldDropdown extends CriterionDropdown {
     }
     if (Strings.isNullOrEmpty(rval)) return null;
     return (isNot() ? "NOT " : "") + fieldName + ":" + (rval.contains(" OR ") ? "(" + rval + ")" : rval);
+  }
+
+  private String getFieldTermsRQLQueryString() {
+    String rval = null;
+    for (CheckBox checkbox : fieldTermChecks) {
+      if (checkbox.getValue()) {
+        if (Strings.isNullOrEmpty(rval)) rval = normalizeKeyword(checkbox.getName());
+        else rval = rval + "," + normalizeKeyword(checkbox.getName());
+      }
+    }
+    if (Strings.isNullOrEmpty(rval)) return null;
+    String q = "in(" + getRQLField() + ",(" + rval + "))";
+    return isNot() ? "not(" + q + ")" : q;
   }
 
   private String normalizeKeyword(String keyword) {
