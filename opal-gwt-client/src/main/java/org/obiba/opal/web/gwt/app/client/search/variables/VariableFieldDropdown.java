@@ -73,17 +73,21 @@ public class VariableFieldDropdown extends CriterionDropdown {
         getRadioControl(1).setValue(true);
         filter = translations.criterionFiltersMap().get("none").toLowerCase();
       } else {
-        getRadioControl(3).setValue(true);
+        getRadioControl(isFieldTermWildCard(subQuery) ? 2 : 3).setValue(true);
         filter = translations.criterionFiltersMap().get("not_in");
         applySelection(subQuery);
       }
     }
     else {
-      getRadioControl(2).setValue(true);
+      getRadioControl(isFieldTermWildCard(rqlQuery) ? 3 : 2).setValue(true);
       filter = translations.criterionFiltersMap().get("in");
       applySelection(rqlQuery);
     }
     updateCriterionFilter(filter);
+  }
+
+  private boolean isFieldTermWildCard(RQLQuery rqlQuery) {
+    return hasFieldTerms() && !rqlQuery.isArray(1) && "*".equals(rqlQuery.getString(1));
   }
 
   private void applySelection(RQLQuery rqlQuery) {
@@ -312,7 +316,7 @@ public class VariableFieldDropdown extends CriterionDropdown {
         else rval = rval + " OR " + normalizeKeyword(checkbox.getName());
       }
     }
-    if (Strings.isNullOrEmpty(rval)) return null;
+    if (Strings.isNullOrEmpty(rval)) return (isNot() ? "" : "NOT ") + fieldName + ":*";
     return (isNot() ? "NOT " : "") + fieldName + ":" + (rval.contains(" OR ") ? "(" + rval + ")" : rval);
   }
 
@@ -324,7 +328,10 @@ public class VariableFieldDropdown extends CriterionDropdown {
         else rval = rval + "," + normalizeKeyword(checkbox.getName());
       }
     }
-    if (Strings.isNullOrEmpty(rval)) return null;
+    if (Strings.isNullOrEmpty(rval)) {
+      String q = "in(" + getRQLField() + ",*)";
+      return isNot() ? q : "not(" + q + ")";
+    }
     String q = "in(" + getRQLField() + ",(" + rval + "))";
     return isNot() ? "not(" + q + ")" : q;
   }
@@ -347,6 +354,7 @@ public class VariableFieldDropdown extends CriterionDropdown {
         else text = text + "," + title;
       }
     }
+    if (Strings.isNullOrEmpty(text)) return translations.criterionFiltersMap().get(isNot() ? "any" : "none").toLowerCase();
     return text;
   }
 
