@@ -58,9 +58,9 @@ public class VariableFieldDropdown extends CriterionDropdown {
   }
 
   public void initialize(RQLQuery rqlQuery) {
+    if (rqlQuery == null) return;
     specificControls.setVisible(false);
     divider.setVisible(false);
-    if (rqlQuery == null) return;
     getRadioControl(2).setValue(false);
     String filter;
     if ("exists".equals(rqlQuery.getName())) {
