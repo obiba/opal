@@ -29,11 +29,19 @@
               <ui:msg description="Actions label">Actions</ui:msg>
             </b:NavHeader>
 
-            <g:FlowPanel ui:field="datasources" addStyleNames="top-margin">
-              <b2:IconAnchor icon="TABLE" ui:field="exploreVariablesLink"/>
+            <g:FlowPanel ui:field="projects" addStyleNames="top-margin">
+              <b2:IconAnchor icon="TABLE" ui:field="exploreProjectsLink"/>
               <g:Label addStyleNames="help-block">
                 <ui:msg description="Explore variables link description">Browse tables and variables, create views,
                   import/export data and dictionaries.
+                </ui:msg>
+              </g:Label>
+            </g:FlowPanel>
+
+            <g:FlowPanel ui:field="search" addStyleNames="top-margin">
+              <b2:IconAnchor icon="SEARCH" ui:field="searchLink"/>
+              <g:Label addStyleNames="help-block">
+                <ui:msg description="Search link description">Search for variables, a specific entity or entities matching some variable criteria.
                 </ui:msg>
               </g:Label>
             </g:FlowPanel>

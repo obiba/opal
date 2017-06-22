@@ -11,11 +11,8 @@
 package org.obiba.opal.web.gwt.app.client.search.entities;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -110,7 +107,7 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
     if (!jQueries.isEmpty()) {
       RQLQuery root = RQLParser.parse(jQueries);
       queries = Lists.newArrayList();
-      for (int i=0; i<root.getArgumentsSize(); i++) {
+      for (int i = 0; i < root.getArgumentsSize(); i++) {
         RQLQuery q = root.getRQLQuery(i);
         queries.add(q.asString());
       }
@@ -187,16 +184,16 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
         .query("limit", "" + limit);
     if (!Strings.isNullOrEmpty(idQuery)) builder.query("id", idQuery);
     String query = Joiner.on(",").join(queries);
-    if (queries.size()>1) query = "and(" + query + ")";
+    if (queries.size() > 1) query = "and(" + query + ")";
     builder.query("query", query);
     ResourceRequestBuilderFactory.<EntitiesResultDto>newBuilder()
         .forResource(builder.build())
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            // ignore
+            // not supposed to happen
             getView().clearResults(false);
-            fireEvent(NotificationEvent.newBuilder().warn("MalformedSearchQuery").build());
+            fireEvent(NotificationEvent.newBuilder().error("MalformedSearchQuery").build());
           }
         }, Response.SC_BAD_REQUEST)
         .withCallback(new ResponseCodeCallback() {
@@ -261,19 +258,32 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
     // view init is completed
     if (indexedTables == null || entityTypes == null) return;
     List<String> validQueries = Lists.newArrayList();
+    List<String> invalidTableReferences = Lists.newArrayList();
     List<RQLValueSetVariableCriterionParser> criterions = Lists.newArrayList();
     for (String query : queries) {
       RQLValueSetVariableCriterionParser criterion = new RQLValueSetVariableCriterionParser(query);
       if (criterion.isValid()) {
-        validQueries.add(query);
-        criterions.add(criterion);
-
+        boolean found = false;
+        for (TableDto table : indexedTables) {
+          if (table.getDatasourceName().equals(criterion.getDatasourceName()) && table.getName().equals(criterion.getTableName())) {
+            found = true;
+            break;
+          }
+        }
+        if (found) {
+          validQueries.add(query);
+          criterions.add(criterion);
+        } else if (!invalidTableReferences.contains(criterion.getTableReference()))
+          invalidTableReferences.add(criterion.getTableReference());
       }
     }
     queries = validQueries;
+    if (invalidTableReferences.size() > 0)
+      fireEvent(NotificationEvent.newBuilder().error("NotIndexedTable").args(Joiner.on(", ").join(invalidTableReferences)).build());
     // cascading rendering
-    renderVariableCriterion(criterions, 0);
+    if (criterions.size() > 0) renderVariableCriterion(criterions, 0);
   }
+
 
   /**
    * Render a list of criterions in a cascading way.

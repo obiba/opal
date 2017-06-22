@@ -53,6 +53,10 @@ public class RQLValueSetVariableCriterionParser extends RQLCriterionParser {
     return tableName;
   }
 
+  public String getTableReference() {
+    return datasourceName + "." + tableName;
+  }
+
   public String getVariableName() {
     return variableName;
   }

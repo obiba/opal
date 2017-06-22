@@ -196,11 +196,8 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
   @Override
   public void setRQLQuery(String rqlQuery) {
+    reset();
     if (Strings.isNullOrEmpty(rqlQuery)) return;
-    clearResults();
-    queryPanel.clear();
-    //containsInput.setText("");
-    queryMode.setOn(true, false);
     showAdvancedQuery(false);
     RQLQuery root = RQLParser.parse(rqlQuery);
     for (int i = 0; i < root.getArgumentsSize(); i++) {

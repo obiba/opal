@@ -20,7 +20,6 @@ import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
@@ -34,7 +33,10 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   PageHeader pageTitle;
 
   @UiField
-  IconAnchor exploreVariablesLink;
+  IconAnchor exploreProjectsLink;
+
+  @UiField
+  IconAnchor searchLink;
 
   @UiField
   IconAnchor exploreFilesLink;
@@ -49,7 +51,7 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   IconAnchor identifiersLink;
 
   @UiField
-  Panel datasources;
+  Panel projects;
 
   @UiField
   Panel identifiers;
@@ -69,14 +71,16 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   @Inject
   public DashboardView(Binder uiBinder, Translations translations) {
     initWidget(uiBinder.createAndBindUi(this));
-    getDatasourcesLink().setHref("#" + Places.PROJECTS);
-    getIdentifiersLink().setHref("#" + Places.ADMINISTRATION + "/" + Places.IDENTIFIERS);
-    getReportsLink().setHref("#" + Places.ADMINISTRATION + "/" + Places.REPORT_TEMPLATES);
-    getFilesLink().setHref("#" + Places.ADMINISTRATION + "/" + Places.FILES);
+    exploreProjectsLink.setHref("#" + Places.PROJECTS);
+    searchLink.setHref("#" + Places.SEARCH);
+    identifiersLink.setHref("#" + Places.ADMINISTRATION + "/" + Places.IDENTIFIERS);
+    reportsLink.setHref("#" + Places.ADMINISTRATION + "/" + Places.REPORT_TEMPLATES);
+    exploreFilesLink.setHref("#" + Places.ADMINISTRATION + "/" + Places.FILES);
     tasksLink.setHref("#" + Places.ADMINISTRATION + "/" + Places.TASKS);
     pageTitle.setText(translations.pageDashboardTitle());
 
-    exploreVariablesLink.setText(translations.exploreVariables());
+    exploreProjectsLink.setText(translations.exploreVariables());
+    searchLink.setText(translations.pageSearchTitle());
     exploreFilesLink.setText(translations.manageFiles());
     tasksLink.setText(translations.tasks());
     reportsLink.setText(translations.runReports());
@@ -97,22 +101,6 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
       bookmarks.clear();
       bookmarks.add(content);
     }
-  }
-
-  public IconAnchor getDatasourcesLink() {
-    return exploreVariablesLink;
-  }
-
-  public IconAnchor getFilesLink() {
-    return exploreFilesLink;
-  }
-
-  public IconAnchor getReportsLink() {
-    return reportsLink;
-  }
-
-  public IconAnchor getIdentifiersLink() {
-    return identifiersLink;
   }
 
   @Override
