@@ -10,6 +10,7 @@
 package org.obiba.opal.spi.search;
 
 import org.obiba.magma.Timestamped;
+import org.obiba.runtime.Version;
 
 import java.util.Calendar;
 
@@ -40,13 +41,6 @@ public interface ValueTableIndex extends Timestamped {
    * @return true when this index is up to date, false otherwise
    */
   boolean isUpToDate();
-
-  /**
-   * Returns true if the index was created using a Opal with an older version.
-   *
-   * @return
-   */
-  boolean requiresUpgrade();
 
   /**
    * Delete the index.

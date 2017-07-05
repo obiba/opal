@@ -7,12 +7,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.search.support;
+package org.obiba.opal.search.support;
 
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
-import org.obiba.opal.core.domain.VariableNature;
+import org.obiba.magma.support.VariableNature;
 import org.obiba.opal.spi.search.ValueTableValuesIndex;
 import org.obiba.opal.spi.search.ValuesIndexManager;
 

@@ -22,10 +22,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.elasticsearch</groupId>
-      <artifactId>elasticsearch</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.obiba.opal</groupId>
       <artifactId>opal-core-api</artifactId>
     </dependency>
@@ -52,6 +48,10 @@
     <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jettison</groupId>
+      <artifactId>jettison</artifactId>
     </dependency>
     <dependency>
       <groupId>net.jazdw</groupId>

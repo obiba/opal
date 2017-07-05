@@ -10,9 +10,40 @@
 
 package org.obiba.opal.spi.search;
 
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.obiba.opal.spi.ServicePlugin;
+import org.obiba.opal.web.model.Search;
+
+import java.util.concurrent.ThreadFactory;
 
 public interface SearchService extends ServicePlugin {
 
+  //
+  // Configuration methods
+  //
 
+  void configure(SearchSettings settings, VariableSummaryHandler variableSummaryHandler, ThreadFactory threadFactory);
+
+  SearchSettings getConfig();
+
+  boolean isEnabled();
+
+  //
+  // Index methods
+  //
+
+  VariablesIndexManager getVariablesIndexManager();
+
+  ValuesIndexManager getValuesIndexManager();
+
+  //
+  // Search methods
+  //
+
+  JSONObject executeQuery(JSONObject jsonQuery, String searchPath) throws JSONException;
+
+  Search.QueryResultDto executeQuery(String datasource, String table, Search.QueryTermDto queryDto) throws JSONException;
+
+  Search.QueryResultDto executeQuery(String datasource, String table, Search.QueryTermsDto queryDto) throws JSONException;
 }

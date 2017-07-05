@@ -9,52 +9,26 @@
  */
 package org.obiba.opal.web.magma;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
-
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.apache.commons.math3.stat.descriptive.rank.Median;
-import org.obiba.magma.Attribute;
-import org.obiba.magma.Category;
-import org.obiba.magma.Coordinate;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.Timestamped;
-import org.obiba.magma.Timestamps;
-import org.obiba.magma.Value;
-import org.obiba.magma.ValueSet;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueType;
-import org.obiba.magma.Variable;
-import org.obiba.magma.VariableEntity;
-import org.obiba.magma.math.stat.IntervalFrequency;
-import org.obiba.magma.math.summary.BinaryVariableSummary;
-import org.obiba.magma.math.summary.CategoricalVariableSummary;
-import org.obiba.magma.math.summary.ContinuousVariableSummary;
-import org.obiba.magma.math.summary.DefaultVariableSummary;
-import org.obiba.magma.math.summary.GeoVariableSummary;
-import org.obiba.magma.math.summary.TextVariableSummary;
-import org.obiba.magma.type.BinaryType;
-import org.obiba.opal.web.model.Magma;
-import org.obiba.opal.web.model.Magma.AttributeDto;
-import org.obiba.opal.web.model.Magma.CategoryDto;
-import org.obiba.opal.web.model.Magma.DatasourceDto;
-import org.obiba.opal.web.model.Magma.LinkDto;
-import org.obiba.opal.web.model.Magma.TableDto;
-import org.obiba.opal.web.model.Magma.ValueSetsDto;
-import org.obiba.opal.web.model.Magma.VariableDto;
-import org.obiba.opal.web.model.Magma.VariableEntityDto;
-import org.obiba.opal.web.model.Math;
-import org.obiba.opal.web.model.Opal.LocaleDto;
-
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.descriptive.rank.Median;
+import org.obiba.magma.*;
+import org.obiba.magma.math.stat.IntervalFrequency;
+import org.obiba.magma.math.summary.*;
+import org.obiba.magma.type.BinaryType;
+import org.obiba.opal.web.model.Magma;
+import org.obiba.opal.web.model.Magma.*;
+import org.obiba.opal.web.model.Math;
+import org.obiba.opal.web.model.Opal.LocaleDto;
+
+import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Utilities for manipulating Magma Dto instances
@@ -262,13 +236,7 @@ public final class Dtos {
         return type.nullSequence();
       }
       return type.sequenceOf(ImmutableList
-          .copyOf(Iterables.transform(valueDto.getValuesList(), new Function<ValueSetsDto.ValueDto, Value>() {
-
-            @Override
-            public Value apply(ValueSetsDto.ValueDto input) {
-              return fromDto(input, type, false);
-            }
-          })));
+          .copyOf(Iterables.transform(valueDto.getValuesList(), input -> fromDto(input, type, false))));
     } else {
       if(valueDto.hasValue()) {
         return type.valueOf(valueDto.getValue());
@@ -278,16 +246,16 @@ public final class Dtos {
 
   }
 
-  public static ValueSetsDto.ValueDto.Builder asDto(@NotNull Value value) {
+  public static ValueSetsDto.ValueDto.Builder asDto(Value value) {
     return asDto(null, value);
   }
 
-  public static ValueSetsDto.ValueDto.Builder asDto(@Nullable String link, @NotNull Value value) {
+  public static ValueSetsDto.ValueDto.Builder asDto(@Nullable String link, Value value) {
     return asDto(link, value, false);
   }
 
   @SuppressWarnings("ConstantConditions")
-  public static ValueSetsDto.ValueDto.Builder asDto(@Nullable String link, @NotNull Value value, boolean filterBinary) {
+  public static ValueSetsDto.ValueDto.Builder asDto(@Nullable String link, Value value, boolean filterBinary) {
     Function<Object, String> toString = filterBinary ? FilteredToStringFunction.INSTANCE : Functions.toStringFunction();
 
     ValueSetsDto.ValueDto.Builder valueDto = ValueSetsDto.ValueDto.newBuilder();

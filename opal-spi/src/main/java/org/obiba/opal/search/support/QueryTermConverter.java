@@ -7,15 +7,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.search.support;
+package org.obiba.opal.search.support;
 
 import java.util.List;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.obiba.opal.core.domain.VariableNature;
+import org.obiba.magma.support.VariableNature;
+import org.obiba.opal.search.support.ValueTableIndexManager;
 import org.obiba.opal.web.model.Search;
-import org.springframework.util.Assert;
 
 /**
  * Converts a DTO query to an elastic search JSON query
@@ -31,8 +31,6 @@ public class QueryTermConverter {
    * @param termsFacetSize - used to limit the 'terms' facet results
    */
   public QueryTermConverter(ValueTableIndexManager valueTableIndexManager, int termsFacetSize) {
-    Assert.notNull(valueTableIndexManager, "Index Manager Helper is null!");
-
     this.valueTableIndexManager = valueTableIndexManager;
     this.termsFacetSize = termsFacetSize;
   }
@@ -45,8 +43,6 @@ public class QueryTermConverter {
    * @throws JSONException
    */
   public JSONObject convert(Search.QueryTermsDto dtoQueries) throws JSONException {
-    Assert.notNull(dtoQueries, "Query term DTO is null!");
-
     JSONObject jsonQuery = new JSONObject("{\"query\":{\"query_string\":{\"query\":\"" + valueTableIndexManager.getQuery() + "\"}}, \"size\":0}");
     JSONObject jsonAggregations = new JSONObject();
 

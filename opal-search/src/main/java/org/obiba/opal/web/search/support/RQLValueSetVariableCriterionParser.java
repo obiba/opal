@@ -12,13 +12,10 @@ package org.obiba.opal.web.search.support;
 
 import com.google.common.base.Strings;
 import net.jazdw.rql.parser.ASTNode;
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueType;
-import org.obiba.magma.Variable;
+import org.obiba.magma.*;
 import org.obiba.magma.support.MagmaEngineVariableResolver;
+import org.obiba.magma.support.VariableNature;
 import org.obiba.magma.type.TextType;
-import org.obiba.opal.core.domain.VariableNature;
 import org.obiba.opal.spi.search.ValuesIndexManager;
 
 /**

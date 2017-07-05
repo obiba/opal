@@ -13,7 +13,6 @@ import java.util.Collection;
 
 import javax.annotation.Nullable;
 
-import org.obiba.magma.datasource.mongodb.MongoDBDatasource;
 import org.obiba.opal.web.gwt.app.client.administration.database.edit.AbstractDatabaseModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.edit.DatabaseUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -54,6 +53,8 @@ import static org.obiba.opal.web.gwt.app.client.administration.database.edit.Abs
  */
 public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseUiHandlers>
     implements MongoDatabaseModalPresenter.Display {
+
+  private static final int MAX_BATCH_SIZE = 1000;
 
   private static final int DEFAULT_BATCH_SIZE = 100;
 
@@ -123,7 +124,7 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
     constrainedModal.registerWidget("url", translations.urlLabel(), urlGroup);
     constrainedModal.registerWidget("usage", translations.usageLabel(), usageGroup);
 
-    batchSize.setMax(MongoDBDatasource.MAX_BATCH_SIZE);
+    batchSize.setMax(MAX_BATCH_SIZE);
     batchSize.setMin(1);
     batchSize.setValue(DEFAULT_BATCH_SIZE);
   }

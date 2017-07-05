@@ -42,22 +42,12 @@ public interface IndexManager {
 
   boolean isEnabled();
 
-  void setEnabled(boolean enabled);
-
   /**
    * Check if any indexation tasks can be started.
    *
    * @return
    */
   boolean isReady();
-
-  /**
-   * Check if a value table is to be indexed.
-   *
-   * @param valueTable
-   * @return
-   */
-  boolean isIndexable(ValueTable valueTable);
 
   /**
    * Returns true of value table is indexed and index is up to date, ie ready to be queried.

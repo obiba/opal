@@ -21,6 +21,7 @@ import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.spi.search.IndexManager;
 import org.obiba.opal.spi.search.IndexSynchronization;
 import org.obiba.opal.spi.search.ValueTableIndex;
+import org.obiba.runtime.upgrade.VersionProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.NotNull;
 import java.util.Calendar;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
@@ -47,14 +49,13 @@ public class IndexSynchronizationManager {
   private static final int GRACE_PERIOD = 300;
 
   @Autowired
-  @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-  private Set<IndexManager> indexManagers;
-
-  @Autowired
   private OpalSearchService opalSearchService;
 
   @Autowired
   private TransactionalThreadFactory transactionalThreadFactory;
+
+  @Autowired
+  private IndexManagerConfigurationService indexConfig;
 
   private final SyncProducer syncProducer = new SyncProducer();
 
@@ -127,9 +128,10 @@ public class IndexSynchronizationManager {
         for(Datasource ds : MagmaEngine.get().getDatasources()) {
           for(ValueTable table : ds.getValueTables()) {
             log.debug("Check index for table: {}.{}", ds.getName(), table.getName());
-            for(IndexManager indexManager : indexManagers) {
-              checkIndexable(indexManager, table);
-            }
+            IndexManager indexManager = opalSearchService.getVariablesIndexManager();
+            checkIndexable(indexManager, table, indexManager.isReady() && !indexManager.getIndex(table).isUpToDate());
+            indexManager = opalSearchService.getValuesIndexManager();
+            checkIndexable(indexManager, table, indexManager.isReady() && indexConfig.getConfig().isReadyForIndexing(table, indexManager.getIndex(table)));
           }
         }
       } catch(Exception ignored) {
@@ -137,11 +139,11 @@ public class IndexSynchronizationManager {
       }
     }
 
-    private void checkIndexable(IndexManager indexManager, ValueTable table) {
-      if(indexManager.isReady() && indexManager.isIndexable(table)) {
+    private void checkIndexable(IndexManager indexManager, ValueTable table, boolean indexable) {
+      if(indexable) {
         ValueTableIndex index = indexManager.getIndex(table);
         // Check that the index is older than the ValueTable
-        if(index.requiresUpgrade() || !index.isUpToDate()) {
+        if(!index.isUpToDate()) {
           index(indexManager, table, GRACE_PERIOD);
         }
       }

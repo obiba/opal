@@ -26,8 +26,12 @@
       <artifactId>magma-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.obiba.opal</groupId>
-      <artifactId>opal-core-api</artifactId>
+      <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-math</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.gwt</groupId>

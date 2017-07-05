@@ -14,8 +14,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.obiba.magma.*;
+import org.obiba.magma.support.VariableNature;
 import org.obiba.magma.type.*;
-import org.obiba.opal.core.domain.VariableNature;
 import org.obiba.opal.r.MagmaRRuntimeException;
 import org.rosuda.REngine.*;
 

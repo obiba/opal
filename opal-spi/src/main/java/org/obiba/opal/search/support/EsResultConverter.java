@@ -7,20 +7,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.search.support;
+package org.obiba.opal.search.support;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-
+import com.google.common.collect.Iterators;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Search;
-import org.springframework.util.Assert;
 
-import com.google.common.collect.Iterators;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * Utility class used to convert an elastic search JSON query to a DTO query.
@@ -46,7 +44,6 @@ public class EsResultConverter {
    * @throws JSONException
    */
   public Search.QueryResultDto convert(JSONObject json) throws JSONException {
-    Assert.notNull(json, "Result JSON is null!");
     Search.QueryResultDto.Builder dtoResultsBuilder = Search.QueryResultDto.newBuilder();
 
     if (json.has("hits")) {

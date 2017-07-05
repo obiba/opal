@@ -14,6 +14,7 @@ import java.util.List;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Test;
+import org.obiba.opal.search.support.EsResultConverter;
 import org.obiba.opal.web.model.Search;
 
 import static org.fest.assertions.api.Assertions.assertThat;
