@@ -9,13 +9,12 @@
  */
 package org.obiba.opal.search.support;
 
-import java.util.List;
-
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.obiba.magma.support.VariableNature;
-import org.obiba.opal.search.support.ValueTableIndexManager;
 import org.obiba.opal.web.model.Search;
+
+import java.util.List;
 
 /**
  * Converts a DTO query to an elastic search JSON query
