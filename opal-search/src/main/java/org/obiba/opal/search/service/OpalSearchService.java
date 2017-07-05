@@ -19,7 +19,6 @@ import org.obiba.opal.search.es.ElasticSearchConfigurationService;
 import org.obiba.opal.spi.search.*;
 import org.obiba.opal.web.model.Search;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ThreadFactory;
@@ -28,9 +27,6 @@ import java.util.concurrent.ThreadFactory;
 public class OpalSearchService implements Service {
 
   static final String SERVICE_NAME = "search";
-
-  @Value("${org.obiba.opal.web.search.termsFacetSizeLimit}")
-  private int termsFacetSizeLimit;
 
   @Autowired
   private ElasticSearchConfigurationService configService;
