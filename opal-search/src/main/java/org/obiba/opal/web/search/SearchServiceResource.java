@@ -49,7 +49,8 @@ public class SearchServiceResource extends IndexResource {
     List<Opal.TableIndexStatusDto> tableStatusDtos = Lists.newArrayList();
 
     // ES is available
-    if(!opalSearchService.getValuesIndexManager().isReady() || !opalSearchService.isEnabled()) return tableStatusDtos;
+    if(!opalSearchService.isRunning() || !opalSearchService.getValuesIndexManager().isReady() || !opalSearchService.isEnabled())
+      return tableStatusDtos;
 
     for(Datasource datasource : MagmaEngine.get().getDatasources()) {
       for(ValueTable valueTable : datasource.getValueTables()) {
@@ -71,7 +72,7 @@ public class SearchServiceResource extends IndexResource {
   @GET
   @Path("/cfg/enabled")
   public Response isEnableIndexing() {
-    return opalSearchService.getValuesIndexManager().isEnabled()
+    return opalSearchService.isRunning() && opalSearchService.getValuesIndexManager().isEnabled()
         ? Response.ok().build()
         : Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
   }

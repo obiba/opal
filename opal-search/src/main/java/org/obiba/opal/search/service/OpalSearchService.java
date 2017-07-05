@@ -18,6 +18,8 @@ import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.search.es.ElasticSearchConfigurationService;
 import org.obiba.opal.spi.search.*;
 import org.obiba.opal.web.model.Search;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +27,8 @@ import java.util.concurrent.ThreadFactory;
 
 @Component
 public class OpalSearchService implements Service {
+
+  private static final Logger log = LoggerFactory.getLogger(OpalSearchService.class);
 
   static final String SERVICE_NAME = "search";
 
@@ -51,12 +55,16 @@ public class OpalSearchService implements Service {
 
   @Override
   public void start() {
+    if (isRunning()) return;
     SearchSettings esConfig = configService.getConfig();
-    if (esConfig.isEnabled() && !isRunning()) {
-      SearchService service = getSearchServicePlugin();
-      service.configure(esConfig, variableSummaryHandler, threadFactory);
-      service.start();
+    if (!esConfig.isEnabled()) return;
+    if (!hasSearchServicePlugin()) {
+      log.warn("No Search Service plugin found.");
+      return;
     }
+    SearchService service = getSearchServicePlugin();
+    service.configure(esConfig, variableSummaryHandler, threadFactory);
+    service.start();
   }
 
   @Override
@@ -79,32 +87,28 @@ public class OpalSearchService implements Service {
   //
 
   public VariablesIndexManager getVariablesIndexManager() {
+    if (!isRunning()) return null;
     return getSearchServicePlugin().getVariablesIndexManager();
   }
 
   public ValuesIndexManager getValuesIndexManager() {
+    if (!isRunning()) return null;
     return getSearchServicePlugin().getValuesIndexManager();
   }
 
   public JSONObject executeQuery(JSONObject jsonQuery, String searchPath) throws JSONException {
-    if (hasSearchServicePlugin() && getSearchServicePlugin().isRunning()) {
-      return getSearchServicePlugin().executeQuery(jsonQuery, searchPath);
-    }
-    return null;
+    if (!isRunning()) return null;
+    return getSearchServicePlugin().executeQuery(jsonQuery, searchPath);
   }
 
   public Search.QueryResultDto executeQuery(String datasource, String table, Search.QueryTermDto queryDto) throws JSONException {
-    if (hasSearchServicePlugin() && getSearchServicePlugin().isRunning()) {
-      return getSearchServicePlugin().executeQuery(datasource, table, queryDto);
-    }
-    return null;
+    if (!isRunning()) return null;
+    return getSearchServicePlugin().executeQuery(datasource, table, queryDto);
   }
 
   public Search.QueryResultDto executeQuery(String datasource, String table, Search.QueryTermsDto queryDto) throws JSONException {
-    if (hasSearchServicePlugin() && getSearchServicePlugin().isRunning()) {
-      return getSearchServicePlugin().executeQuery(datasource, table, queryDto);
-    }
-    return null;
+    if (!isRunning()) return null;
+    return getSearchServicePlugin().executeQuery(datasource, table, queryDto);
   }
 
   //
