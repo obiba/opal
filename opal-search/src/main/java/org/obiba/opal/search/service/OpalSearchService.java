@@ -11,6 +11,9 @@ package org.obiba.opal.search.service;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableUpdateListener;
+import org.obiba.magma.Variable;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.OpalRuntime;
@@ -23,10 +26,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
 import java.util.concurrent.ThreadFactory;
 
 @Component
-public class OpalSearchService implements Service {
+public class OpalSearchService implements Service, ValueTableUpdateListener {
 
   private static final Logger log = LoggerFactory.getLogger(OpalSearchService.class);
 
@@ -123,4 +127,26 @@ public class OpalSearchService implements Service {
     return opalRuntime.hasServicePlugins(SearchService.class);
   }
 
+  @Override
+  public void onRename(@NotNull ValueTable vt, String newName) {
+    onDelete(vt);
+  }
+
+  @Override
+  public void onRename(ValueTable vt, Variable v, String newName) {
+    onDelete(vt);
+  }
+
+  @Override
+  public void onDelete(@NotNull ValueTable vt) {
+    if (!isRunning()) return;
+    // Delete index
+    getValuesIndexManager().getIndex(vt).delete();
+    getVariablesIndexManager().getIndex(vt).delete();
+  }
+
+  @Override
+  public void onDelete(@NotNull ValueTable vt, Variable v) {
+    onDelete(vt);
+  }
 }
