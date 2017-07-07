@@ -135,18 +135,13 @@ public class IndexSynchronizationManager {
           }
         }
       } catch(Exception ignored) {
-        log.debug("Error while checking indexable", ignored);
+        log.warn("Error while checking indexable", ignored);
       }
     }
 
     private void checkIndexable(IndexManager indexManager, ValueTable table, boolean indexable) {
-      if(indexable) {
-        ValueTableIndex index = indexManager.getIndex(table);
-        // Check that the index is older than the ValueTable
-        if(!index.isUpToDate()) {
-          index(indexManager, table, GRACE_PERIOD);
-        }
-      }
+      if(!indexable) return;
+      index(indexManager, table, GRACE_PERIOD);
     }
 
     private void index(IndexManager indexManager, ValueTable table, int seconds) {

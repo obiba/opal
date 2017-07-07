@@ -139,7 +139,7 @@ public class QuerySearchJsonBuilder {
     else
       jsonQuery.put("query", buildHasChildQueries());
     jsonQuery.put("sort", buildSortJson());
-    if(fields != null && !fields.isEmpty()) jsonQuery.put("partial_fields", buildFields());
+    if(fields != null && !fields.isEmpty()) jsonQuery.put("_source", buildFields());
     if(filterReferences != null && !filterReferences.isEmpty()) jsonQuery.put("filter", buildFilter());
     jsonQuery.put("from", from);
     jsonQuery.put("size", size);
@@ -207,7 +207,7 @@ public class QuerySearchJsonBuilder {
   }
 
   private JSONObject buildFields() throws JSONException {
-    return new JSONObject().put("partial", new JSONObject().put("include", new JSONArray(fields)));
+    return new JSONObject().put("includes", new JSONArray(fields));
   }
 
   private boolean hasFacets() {

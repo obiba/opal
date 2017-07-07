@@ -237,9 +237,12 @@ public class EsResultConverter {
         Search.ItemResultDto.Builder dtoItemResultBuilder = Search.ItemResultDto.newBuilder();
         JSONObject jsonHit = jsonHits.getJSONObject(i);
         dtoItemResultBuilder.setIdentifier(jsonHit.getString("_id"));
-        JSONObject fields = jsonHit.getJSONObject("fields").getJSONArray("partial").getJSONObject(0);
-
-        if(fields.length() > 0) convertFields(dtoItemResultBuilder, fields);
+        if (jsonHit.has("fields")) {
+          JSONObject fields = jsonHit.getJSONObject("fields").getJSONArray("partial").getJSONObject(0);
+          if (fields.length() > 0) convertFields(dtoItemResultBuilder, fields);
+        } else if (jsonHit.has("_source")) {
+          convertFields(dtoItemResultBuilder, jsonHit.getJSONObject("_source"));
+        }
         if(itemResultStrategy != null) itemResultStrategy.process(dtoItemResultBuilder);
 
         itemsDtoList.add(dtoItemResultBuilder.build());
@@ -248,12 +251,9 @@ public class EsResultConverter {
       return itemsDtoList;
     }
 
-    @SuppressWarnings("unchecked")
     private void convertFields(Search.ItemResultDto.Builder dtoItemResultBuilder, JSONObject jsonFields)
         throws JSONException {
-
       Search.ItemFieldsDto.Builder dtoItemFieldsBuilder = Search.ItemFieldsDto.newBuilder();
-
       for(Iterator<String> iterator = jsonFields.keys(); iterator.hasNext(); ) {
 
         Opal.EntryDto.Builder entryBuilder = Opal.EntryDto.newBuilder();
@@ -269,7 +269,6 @@ public class EsResultConverter {
           entryBuilder.setValue(jsonFields.getString(key));
         dtoItemFieldsBuilder.addFields(entryBuilder.build());
       }
-
       dtoItemResultBuilder.setExtension(Search.ItemFieldsDto.item, dtoItemFieldsBuilder.build());
     }
   }
