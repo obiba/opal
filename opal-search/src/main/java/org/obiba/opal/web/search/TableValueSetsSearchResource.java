@@ -113,8 +113,9 @@ public class TableValueSetsSearchResource extends AbstractSearchUtility {
     JSONArray hits = jsonHits.getJSONArray("hits");
     for(int i = 0; i < hits.length(); i++) {
       JSONObject jsonHit = hits.getJSONObject(i);
-      JSONObject fields = jsonHit.getJSONObject("fields").getJSONArray("partial").getJSONObject(0);
-      entities.add(new VariableEntityBean(entityType, fields.getString("identifier")));
+      if (jsonHit.has("_source")) {
+        entities.add(new VariableEntityBean(entityType, jsonHit.getJSONObject("_source").getString("identifier")));
+      }
     }
 
     String path = uriInfo.getPath();

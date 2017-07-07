@@ -55,6 +55,7 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
                          @QueryParam("limit") @DefaultValue("10") int limit,
                          @QueryParam("counts") @DefaultValue("false") boolean withCounts) throws JSONException {
     if (!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+    if (Strings.isNullOrEmpty(query)) return Response.status(Response.Status.BAD_REQUEST).build();
     this.entityType = entityType;
 
     final RQLIdentifierCriterionParser idCriterion = Strings.isNullOrEmpty(idQuery) ? null : new RQLIdentifierCriterionParser(idQuery);

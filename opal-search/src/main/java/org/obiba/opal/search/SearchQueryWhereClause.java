@@ -53,8 +53,9 @@ public class SearchQueryWhereClause extends AbstractSearchUtility implements Que
         JSONArray hits = jsonHits.getJSONArray("hits");
         for(int i = 0; i < hits.length(); i++) {
           JSONObject jsonHit = hits.getJSONObject(i);
-          JSONObject fields = jsonHit.getJSONObject("fields").getJSONArray("partial").getJSONObject(0);
-          entities.add(new VariableEntityBean(valueTable.getEntityType(), fields.getString("identifier")));
+          if (jsonHit.has("_source")) {
+            entities.add(new VariableEntityBean(valueTable.getEntityType(), jsonHit.getJSONObject("_source").getString("identifier")));
+          }
         }
       }
     } catch(Exception e) {
