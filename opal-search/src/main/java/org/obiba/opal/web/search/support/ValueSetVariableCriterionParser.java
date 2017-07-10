@@ -10,6 +10,8 @@
 
 package org.obiba.opal.web.search.support;
 
+import org.obiba.opal.spi.search.QuerySettings;
+
 /**
  * Criterion for filtering values based on a variable field.
  */
@@ -20,7 +22,7 @@ public interface ValueSetVariableCriterionParser {
    *
    * @return
    */
-  QuerySearchJsonBuilder.ChildQuery asChildQuery(String idQuery);
+  QuerySettings.ChildQuery asChildQuery(String idQuery);
 
   /**
    * Get the query that was parsed.

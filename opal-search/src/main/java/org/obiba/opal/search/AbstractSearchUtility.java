@@ -10,16 +10,12 @@
 package org.obiba.opal.search;
 
 import com.google.common.base.Strings;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
+import com.google.common.collect.Lists;
 import org.obiba.opal.search.service.OpalSearchService;
-import org.obiba.opal.web.model.Search;
-import org.obiba.opal.search.support.EsResultConverter;
-import org.obiba.opal.web.search.support.QuerySearchJsonBuilder;
+import org.obiba.opal.spi.search.QuerySettings;
 import org.obiba.opal.web.ws.SortDir;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -36,25 +32,17 @@ public abstract class AbstractSearchUtility {
 
   abstract protected String getSearchPath();
 
-  protected Search.QueryResultDto convertResponse(JSONObject jsonResponse) throws JSONException {
-    return new EsResultConverter().convert(jsonResponse);
-  }
+  protected QuerySettings buildQuerySearch(String query, int offset, int limit, Collection<String> fields,
+                                           Collection<String> facets, String sortField, String sortDir) {
 
-  protected QuerySearchJsonBuilder buildQuerySearch(String query, int offset, int limit, Collection<String> fields,
-      Collection<String> facets, String sortField, String sortDir) {
-
-    Collection<String> safeFields = fields == null ? new ArrayList<String>() : fields;
+    Collection<String> safeFields = fields == null ? Lists.newArrayList() : fields;
     addDefaultFields(safeFields);
-    QuerySearchJsonBuilder jsonBuilder = new QuerySearchJsonBuilder();
-    jsonBuilder.query(query).fields(safeFields).facets(facets).from(offset).size(limit) //
+    QuerySettings querySettings = QuerySettings.newSettings(query)
+        .fields(safeFields).facets(facets).from(offset).size(limit) //
         .sortField(Strings.isNullOrEmpty(sortField) ? DEFAULT_SORT_FIELD : sortField) //
         .sortDir(Strings.isNullOrEmpty(sortDir) ? SortDir.DESC.toString() : sortDir);
 
-    return jsonBuilder;
-  }
-
-  protected JSONObject executeQuery(JSONObject jsonQuery) throws JSONException {
-    return opalSearchService.executeQuery(jsonQuery, getSearchPath());
+    return querySettings;
   }
 
   protected boolean searchServiceAvailable() {
@@ -62,7 +50,7 @@ public abstract class AbstractSearchUtility {
   }
 
   protected void addDefaultFields(Collection<String> fields) {
-    if(!fields.contains(INDEX_FIELD)) fields.add(INDEX_FIELD);
+    if (!fields.contains(INDEX_FIELD)) fields.add(INDEX_FIELD);
   }
 }
 

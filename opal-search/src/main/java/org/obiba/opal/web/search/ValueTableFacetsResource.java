@@ -9,8 +9,8 @@
  */
 package org.obiba.opal.web.search;
 
-import org.codehaus.jettison.json.JSONException;
 import org.obiba.opal.search.service.OpalSearchService;
+import org.obiba.opal.spi.search.SearchException;
 import org.obiba.opal.web.model.Search;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,19 +47,16 @@ public class ValueTableFacetsResource {
   @POST
   @Path("/_search")
   @Transactional(readOnly = true)
-  public Response search(Search.QueryTermsDto dtoQueries) {
-    if(!opalSearchService.isEnabled()) {
+  public Response search(Search.QueryTermsDto dtoQueries) throws SearchException {
+    if (!opalSearchService.isEnabled()) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
     }
 
     try {
       Search.QueryResultDto dtoResult = opalSearchService.executeQuery(datasource, table, dtoQueries);
       return Response.ok().entity(dtoResult).build();
-    } catch(UnsupportedOperationException e) {
+    } catch (UnsupportedOperationException e) {
       return Response.status(Response.Status.BAD_REQUEST).build();
-    } catch(JSONException e) {
-      log.error("Error when extracting facet from {}.{}", datasource, table, e);
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }
 }

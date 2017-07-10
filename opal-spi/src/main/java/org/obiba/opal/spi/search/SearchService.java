@@ -10,8 +10,7 @@
 
 package org.obiba.opal.spi.search;
 
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
+import org.obiba.opal.spi.search.support.ItemResultDtoStrategy;
 import org.obiba.opal.spi.ServicePlugin;
 import org.obiba.opal.web.model.Search;
 
@@ -41,9 +40,29 @@ public interface SearchService extends ServicePlugin {
   // Search methods
   //
 
-  JSONObject executeQuery(JSONObject jsonQuery, String searchPath) throws JSONException;
+  void executeIdentifiersQuery(QuerySettings querySettings, String searchPath, HitsQueryCallback<String> callback) throws SearchException;
 
-  Search.QueryResultDto executeQuery(String datasource, String table, Search.QueryTermDto queryDto) throws JSONException;
+  Search.EntitiesResultDto.Builder executeEntitiesQuery(QuerySettings querySettings, String searchPath, String entityType, String query) throws SearchException;
 
-  Search.QueryResultDto executeQuery(String datasource, String table, Search.QueryTermsDto queryDto) throws JSONException;
+  Search.QueryResultDto executeQuery(QuerySettings querySettings, String searchPath, ItemResultDtoStrategy strategy) throws SearchException;
+
+  Search.QueryResultDto executeQuery(String datasource, String table, Search.QueryTermDto queryDto) throws SearchException;
+
+  Search.QueryResultDto executeQuery(String datasource, String table, Search.QueryTermsDto queryDto) throws SearchException;
+
+  //
+  // Search callbacks
+  //
+
+  interface HitsQueryCallback<T> {
+
+    boolean hasTotal();
+
+    int getTotal();
+
+    void onTotal(int total);
+
+    void onIdentifier(T id);
+
+  }
 }

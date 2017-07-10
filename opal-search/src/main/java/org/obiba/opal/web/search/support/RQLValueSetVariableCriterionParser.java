@@ -16,6 +16,7 @@ import org.obiba.magma.*;
 import org.obiba.magma.support.MagmaEngineVariableResolver;
 import org.obiba.magma.support.VariableNature;
 import org.obiba.magma.type.TextType;
+import org.obiba.opal.spi.search.QuerySettings;
 import org.obiba.opal.spi.search.ValuesIndexManager;
 
 /**
@@ -40,10 +41,10 @@ public class RQLValueSetVariableCriterionParser extends RQLCriterionParser imple
   }
 
   @Override
-  public QuerySearchJsonBuilder.ChildQuery asChildQuery(String idQuery) {
+  public QuerySettings.ChildQuery asChildQuery(String idQuery) {
     String query = getQuery(); // make sure ES query is built
     if (!Strings.isNullOrEmpty(idQuery)) query = idQuery + " AND " + query;
-    return new QuerySearchJsonBuilder.ChildQuery(valuesIndexManager.getIndex(table).getIndexType(), query);
+    return new QuerySettings.ChildQuery(valuesIndexManager.getIndex(table).getIndexType(), query);
   }
 
   @Override

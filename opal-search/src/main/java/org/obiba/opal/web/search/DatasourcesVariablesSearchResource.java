@@ -24,8 +24,8 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.search.AbstractSearchUtility;
+import org.obiba.opal.spi.search.QuerySettings;
 import org.obiba.opal.web.model.Search;
-import org.obiba.opal.web.search.support.QuerySearchJsonBuilder;
 import org.obiba.opal.web.ws.SortDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,9 +52,8 @@ public class DatasourcesVariablesSearchResource extends AbstractSearchUtility {
       if(!searchServiceAvailable()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
       String sortField = Strings.isNullOrEmpty(sort) ? DEFAULT_SORT_FIELD : sort;
       String sortOrder = Strings.isNullOrEmpty(order) ? Strings.isNullOrEmpty(sort) ? SortDir.DESC.toString() : SortDir.ASC.toString() : order;
-      QuerySearchJsonBuilder jsonBuilder = buildQuerySearch(query, offset, limit, fields, facets, sortField, sortOrder);
-
-      Search.QueryResultDto dtoResponse = convertResponse(executeQuery(jsonBuilder.build()));
+      Search.QueryResultDto dtoResponse = opalSearchService.executeQuery(buildQuerySearch(query, offset, limit, fields, facets, sortField, sortOrder),
+          getSearchPath(), null);
       return Response.ok().entity(dtoResponse).build();
     } catch(Exception e) {
       log.error("Unable to perform variables search", e);
@@ -68,8 +67,8 @@ public class DatasourcesVariablesSearchResource extends AbstractSearchUtility {
   }
 
   @Override
-  protected QuerySearchJsonBuilder buildQuerySearch(String query, int offset, int limit, Collection<String> fields,
-      Collection<String> facets, String sortField, String sortDir) {
+  protected QuerySettings buildQuerySearch(String query, int offset, int limit, Collection<String> fields,
+                                           Collection<String> facets, String sortField, String sortDir) {
     return super.buildQuerySearch(query, offset, limit, fields, facets, sortField, sortDir).filterReferences(getTableReferencesFilter());
   }
 

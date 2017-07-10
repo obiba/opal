@@ -47,17 +47,9 @@ public class SearchQueryWhereClause extends AbstractSearchUtility implements Que
   @Override
   public void initialise() {
     try {
-      JSONObject jsonResponse = executeQuery(buildQuerySearch(query, 0, Integer.MAX_VALUE, Lists.newArrayList("identifier"), null, null, null).build());
-      if(jsonResponse.isNull("error")) {
-        JSONObject jsonHits = jsonResponse.getJSONObject("hits");
-        JSONArray hits = jsonHits.getJSONArray("hits");
-        for(int i = 0; i < hits.length(); i++) {
-          JSONObject jsonHit = hits.getJSONObject(i);
-          if (jsonHit.has("_source")) {
-            entities.add(new VariableEntityBean(valueTable.getEntityType(), jsonHit.getJSONObject("_source").getString("identifier")));
-          }
-        }
-      }
+      opalSearchService.executeAllIdentifiersQuery(
+          buildQuerySearch(query, 0, Integer.MAX_VALUE, Lists.newArrayList("identifier"), null, null, null),
+          getSearchPath()).forEach(id -> entities.add(new VariableEntityBean(valueTable.getEntityType(), id)));
     } catch(Exception e) {
       log.error("Failed querying: {}", query, e);
     }

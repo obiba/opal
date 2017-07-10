@@ -9,8 +9,8 @@
  */
 package org.obiba.opal.search.service;
 
+import com.google.common.collect.Lists;
 import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableUpdateListener;
 import org.obiba.magma.Variable;
@@ -19,6 +19,7 @@ import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.search.es.ElasticSearchConfigurationService;
+import org.obiba.opal.spi.search.support.ItemResultDtoStrategy;
 import org.obiba.opal.spi.search.*;
 import org.obiba.opal.web.model.Search;
 import org.slf4j.Logger;
@@ -27,6 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ThreadFactory;
 
 @Component
@@ -100,19 +103,74 @@ public class OpalSearchService implements Service, ValueTableUpdateListener {
     return getSearchServicePlugin().getValuesIndexManager();
   }
 
-  public JSONObject executeQuery(JSONObject jsonQuery, String searchPath) throws JSONException {
-    if (!isRunning()) return null;
-    return getSearchServicePlugin().executeQuery(jsonQuery, searchPath);
+  public Collection<String> executeAllIdentifiersQuery(QuerySettings querySettings, String searchPath) throws SearchException {
+    if (!isRunning()) return Lists.newArrayList();
+    IdentifiersQueryCallback callback = new IdentifiersQueryCallback();
+    int from = 0;
+    final int size = 1000;
+    while (!callback.hasTotal() && callback.getIdentifiers().size() < callback.getTotal()) {
+      querySettings.from(from);
+      querySettings.from(from + size);
+      getSearchServicePlugin().executeIdentifiersQuery(querySettings, searchPath, callback);
+      from = from + size;
+    }
+    return callback.getIdentifiers();
   }
 
-  public Search.QueryResultDto executeQuery(String datasource, String table, Search.QueryTermDto queryDto) throws JSONException {
+  public void executeIdentifiersQuery(QuerySettings querySettings, String searchPath, IdentifiersQueryCallback callback) throws SearchException {
+    if (!isRunning()) return;
+    getSearchServicePlugin().executeIdentifiersQuery(querySettings, searchPath, callback);
+  }
+
+  public Search.EntitiesResultDto.Builder executeEntitiesQuery(QuerySettings querySettings, String searchPath, String entityType, String query) throws SearchException {
+    if (!isRunning()) return null;
+    return getSearchServicePlugin().executeEntitiesQuery(querySettings, searchPath, entityType, query);
+  }
+
+  public Search.QueryResultDto executeQuery(QuerySettings querySettings, String searchPath, ItemResultDtoStrategy strategy) throws SearchException {
+    if (!isRunning()) return null;
+    return getSearchServicePlugin().executeQuery(querySettings, searchPath, strategy);
+  }
+
+  public Search.QueryResultDto executeQuery(String datasource, String table, Search.QueryTermDto queryDto) throws SearchException {
     if (!isRunning()) return null;
     return getSearchServicePlugin().executeQuery(datasource, table, queryDto);
   }
 
-  public Search.QueryResultDto executeQuery(String datasource, String table, Search.QueryTermsDto queryDto) throws JSONException {
+  public Search.QueryResultDto executeQuery(String datasource, String table, Search.QueryTermsDto queryDto) throws SearchException {
     if (!isRunning()) return null;
     return getSearchServicePlugin().executeQuery(datasource, table, queryDto);
+  }
+
+  public static class IdentifiersQueryCallback implements SearchService.HitsQueryCallback<String> {
+
+    private int total = -1;
+
+    private List<String> identifiers = Lists.newArrayList();
+
+    @Override
+    public boolean hasTotal() {
+      return total > -1;
+    }
+
+    @Override
+    public int getTotal() {
+      return total;
+    }
+
+    @Override
+    public void onTotal(int total) {
+      this.total = total;
+    }
+
+    @Override
+    public void onIdentifier(String id) {
+      identifiers.add(id);
+    }
+
+    public List<String> getIdentifiers() {
+      return identifiers;
+    }
   }
 
   //
