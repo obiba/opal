@@ -9,8 +9,8 @@
  */
 package org.obiba.opal.web.search;
 
-import org.codehaus.jettison.json.JSONException;
 import org.obiba.opal.search.service.OpalSearchService;
+import org.obiba.opal.spi.search.SearchException;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.QueryTermDtoBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,18 +54,16 @@ public class ValueTableFacetResource {
   @GET
   @Path("/variable/{variable}/_search")
   @Transactional(readOnly = true)
-  public Response search(@PathParam("variable") String variable, @Nullable @QueryParam("type") String type) {
-    if(!opalSearchService.isEnabled()) {
+  public Response search(@PathParam("variable") String variable, @Nullable @QueryParam("type") String type) throws SearchException {
+    if (!opalSearchService.isEnabled()) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
     }
 
     Search.QueryResultDto dtoResult;
-
     try {
       QueryTermDtoBuilder dtoBuilder = new QueryTermDtoBuilder("0").variableTermDto(variable, type);
       dtoResult = opalSearchService.executeQuery(datasource, table, dtoBuilder.build());
-
-    } catch(UnsupportedOperationException|JSONException e) {
+    } catch (UnsupportedOperationException e) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
     }
 

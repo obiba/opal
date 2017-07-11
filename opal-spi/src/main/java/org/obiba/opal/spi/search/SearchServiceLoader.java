@@ -11,12 +11,11 @@
 package org.obiba.opal.spi.search;
 
 import org.obiba.opal.spi.ServicePluginLoader;
-import org.obiba.opal.spi.vcf.VCFStoreService;
 
 import java.util.ServiceLoader;
 
 /**
- * {@link VCFStoreService} loader.
+ * {@link SearchService} loader.
  */
 public class SearchServiceLoader extends ServicePluginLoader<SearchService> {
 

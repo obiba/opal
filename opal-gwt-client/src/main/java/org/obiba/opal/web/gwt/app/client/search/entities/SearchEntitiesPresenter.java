@@ -176,6 +176,8 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
   }
 
   private void searchSelected(final int offset, final int limit) {
+    String query = Joiner.on(",").join(queries);
+    if (Strings.isNullOrEmpty(query)) return;
     UriBuilder builder = UriBuilders.DATASOURCES_ENTITIES_SEARCH.create()
         .query("type", selectedType)
         .query("format", "rql")
@@ -183,7 +185,6 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
         .query("offset", "" + offset)
         .query("limit", "" + limit);
     if (!Strings.isNullOrEmpty(idQuery)) builder.query("id", idQuery);
-    String query = Joiner.on(",").join(queries);
     if (queries.size() > 1) query = "and(" + query + ")";
     builder.query("query", query);
     ResourceRequestBuilderFactory.<EntitiesResultDto>newBuilder()

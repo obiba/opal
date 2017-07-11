@@ -11,22 +11,14 @@ package org.obiba.opal.core.service;
 
 import javax.validation.constraints.NotNull;
 
-import org.obiba.magma.Value;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.Variable;
 import org.obiba.magma.math.summary.VariableSummary;
 import org.obiba.magma.math.summary.VariableSummaryFactory;
+import org.obiba.opal.spi.search.VariableSummaryHandler;
 
 /**
  *
  */
-public interface VariableSummaryService {
-
-  void stackVariable(@NotNull ValueTable valueTable, @NotNull Variable variable, @NotNull Value value);
-
-  void computeSummaries(@NotNull ValueTable valueTable);
-
-  void clearComputingSummaries(@NotNull ValueTable valueTable);
+public interface VariableSummaryService extends VariableSummaryHandler {
 
   @NotNull
   <TVariableSummary extends VariableSummary, //

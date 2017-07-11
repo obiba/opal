@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -25,7 +26,9 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.ValueTable;
+import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.web.model.Opal;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,13 +40,17 @@ import com.google.common.collect.Lists;
 @Path("/service/search/indices")
 public class SearchServiceResource extends IndexResource {
 
+  @Autowired
+  private IndexManagerConfigurationService indexManagerConfigurationService;
+
   @GET
   @Transactional(readOnly = true)
   public List<Opal.TableIndexStatusDto> getIndices() {
     List<Opal.TableIndexStatusDto> tableStatusDtos = Lists.newArrayList();
 
     // ES is available
-    if(!opalSearchService.getValuesIndexManager().isReady() || !opalSearchService.isEnabled()) return tableStatusDtos;
+    if(!opalSearchService.isRunning() || !opalSearchService.getValuesIndexManager().isReady() || !opalSearchService.isEnabled())
+      return tableStatusDtos;
 
     for(Datasource datasource : MagmaEngine.get().getDatasources()) {
       for(ValueTable valueTable : datasource.getValueTables()) {
@@ -58,14 +65,14 @@ public class SearchServiceResource extends IndexResource {
   @PUT
   @Path("/cfg/enabled")
   public Response enableIndexing() {
-    opalSearchService.getValuesIndexManager().setEnabled(true);
+    indexManagerConfigurationService.setEnabled(true);
     return Response.ok().build();
   }
 
   @GET
   @Path("/cfg/enabled")
   public Response isEnableIndexing() {
-    return opalSearchService.getValuesIndexManager().isEnabled()
+    return opalSearchService.isRunning() && opalSearchService.getValuesIndexManager().isEnabled()
         ? Response.ok().build()
         : Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
   }
@@ -73,7 +80,7 @@ public class SearchServiceResource extends IndexResource {
   @DELETE
   @Path("/cfg/enabled")
   public Response disableIndexing() {
-    opalSearchService.getValuesIndexManager().setEnabled(false);
+    indexManagerConfigurationService.setEnabled(false);
     return Response.ok().build();
   }
 

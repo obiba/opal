@@ -14,10 +14,10 @@ import java.util.*;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.project.admin.ProjectAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
@@ -109,7 +109,7 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
         }).get().send();
 
     Map<String, String> pluginsParams = new HashMap<>();
-    pluginsParams.put("type", VCFStoreService.SERVICE_TYPE);
+    pluginsParams.put("type", ProjectAdministrationPresenter.VCF_STORE_SERVICE_TYPE);
 
     ResourceRequestBuilderFactory.<JsArray<PluginDto>>newBuilder().forResource(UriBuilders.PLUGINS.create().query(pluginsParams).build())
         .withCallback(new ResourceCallback<JsArray<PluginDto>>() {

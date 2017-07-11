@@ -9,32 +9,21 @@
  */
 package org.obiba.opal.web.search;
 
-import java.util.List;
-
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
-
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueSetException;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.search.AbstractSearchUtility;
-import org.obiba.opal.spi.search.ValuesIndexManager;
 import org.obiba.opal.spi.search.VariablesIndexManager;
+import org.obiba.opal.spi.search.support.ItemResultDtoStrategy;
 import org.obiba.opal.web.model.Search;
-import org.obiba.opal.web.search.support.EsResultConverter;
-import org.obiba.opal.web.search.support.ItemResultDtoStrategy;
-import org.obiba.opal.web.search.support.QuerySearchJsonBuilder;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import java.util.List;
 
 @Component
 @Scope("request")
@@ -51,21 +40,22 @@ public class TableVariablesSearchResource extends AbstractSearchUtility {
   @Transactional(readOnly = true)
   @SuppressWarnings("PMD.ExcessiveParameterList")
   public Response search(@QueryParam("query") String query, @QueryParam("offset") @DefaultValue("0") int offset,
-      @QueryParam("limit") @DefaultValue("10") int limit,
-      @QueryParam("variable") @DefaultValue("false") boolean addVariableDto, @QueryParam("field") List<String> fields,
-      @QueryParam("facet") List<String> facets, @QueryParam("sortField") String sortField,
-      @QueryParam("sortDir") String sortDir) {
+                         @QueryParam("limit") @DefaultValue("10") int limit,
+                         @QueryParam("variable") @DefaultValue("false") boolean addVariableDto, @QueryParam("field") List<String> fields,
+                         @QueryParam("facet") List<String> facets, @QueryParam("sortField") String sortField,
+                         @QueryParam("sortDir") String sortDir) {
 
     try {
-      if(!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-      if(!opalSearchService.getVariablesIndexManager().hasIndex(getValueTable())) return Response.status(Response.Status.NOT_FOUND).build();
-      QuerySearchJsonBuilder jsonBuiler = buildQuerySearch(query, offset, limit, fields, facets, sortField, sortDir);
-      JSONObject jsonResponse = executeQuery(jsonBuiler.build());
-      Search.QueryResultDto dtoResponse = convertResponse(jsonResponse, addVariableDto);
+      if (!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+      if (!opalSearchService.getVariablesIndexManager().hasIndex(getValueTable()))
+        return Response.status(Response.Status.NOT_FOUND).build();
+      Search.QueryResultDto dtoResponse = opalSearchService.executeQuery(buildQuerySearch(query, offset, limit, fields, facets, sortField, sortDir),
+          getSearchPath(),
+          addVariableDto ? new ItemResultDtoStrategy(getValueTable()) : null);
       return Response.ok().entity(dtoResponse).build();
-    } catch(NoSuchValueSetException | NoSuchDatasourceException e) {
+    } catch (NoSuchValueSetException | NoSuchDatasourceException e) {
       return Response.status(Response.Status.NOT_FOUND).build();
-    } catch(Exception e) {
+    } catch (Exception e) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
   }
@@ -74,12 +64,6 @@ public class TableVariablesSearchResource extends AbstractSearchUtility {
   protected String getSearchPath() {
     VariablesIndexManager manager = opalSearchService.getVariablesIndexManager();
     return manager.getName() + "/" + manager.getIndex(getValueTable()).getIndexType();
-  }
-  private Search.QueryResultDto convertResponse(JSONObject jsonResponse, boolean addVariableDto)
-      throws JSONException {
-    EsResultConverter converter = new EsResultConverter();
-    if(addVariableDto) converter.setStrategy(new ItemResultDtoStrategy(getValueTable()));
-    return converter.convert(jsonResponse);
   }
 
   private boolean canQueryEsIndex() {

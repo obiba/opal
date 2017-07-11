@@ -12,13 +12,11 @@ package org.obiba.opal.web.search.support;
 
 import com.google.common.base.Strings;
 import net.jazdw.rql.parser.ASTNode;
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueType;
-import org.obiba.magma.Variable;
+import org.obiba.magma.*;
 import org.obiba.magma.support.MagmaEngineVariableResolver;
+import org.obiba.magma.support.VariableNature;
 import org.obiba.magma.type.TextType;
-import org.obiba.opal.core.domain.VariableNature;
+import org.obiba.opal.spi.search.QuerySettings;
 import org.obiba.opal.spi.search.ValuesIndexManager;
 
 /**
@@ -31,22 +29,18 @@ public class RQLValueSetVariableCriterionParser extends RQLCriterionParser imple
   private ValueTable table;
 
   private Variable variable;
-
-  public RQLValueSetVariableCriterionParser(ValuesIndexManager valuesIndexManager, String rqlQuery) {
-    super(rqlQuery);
-    this.valuesIndexManager = valuesIndexManager;
-  }
-
+  
   public RQLValueSetVariableCriterionParser(ValuesIndexManager valuesIndexManager, ASTNode rqlNode) {
     super(rqlNode);
     this.valuesIndexManager = valuesIndexManager;
   }
 
   @Override
-  public QuerySearchJsonBuilder.ChildQuery asChildQuery(String idQuery) {
+  public QuerySettings.ChildQuery asChildQuery(String idQuery) {
     String query = getQuery(); // make sure ES query is built
     if (!Strings.isNullOrEmpty(idQuery)) query = idQuery + " AND " + query;
-    return new QuerySearchJsonBuilder.ChildQuery(valuesIndexManager.getIndex(table).getIndexType(), query);
+    query = "reference:\"" + table.getTableReference() + "\" AND " + query;
+    return new QuerySettings.ChildQuery(valuesIndexManager.getIndex(table).getIndexType(), query);
   }
 
   @Override

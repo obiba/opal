@@ -10,8 +10,6 @@
 package org.obiba.opal.core.runtime;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import net.sf.ehcache.CacheManager;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -27,9 +25,6 @@ import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
 import org.obiba.opal.fs.security.SecuredOpalFileSystem;
 import org.obiba.opal.spi.ServicePlugin;
-import org.obiba.opal.spi.search.SearchServiceLoader;
-import org.obiba.opal.spi.vcf.VCFStoreService;
-import org.obiba.opal.spi.vcf.VCFStoreServiceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +38,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.validation.constraints.NotNull;
 import java.io.File;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.Set;
 
 /**
  *
@@ -70,11 +64,13 @@ public class DefaultOpalRuntime implements OpalRuntime {
   @Autowired
   private CacheManager cacheManager;
 
+  @Autowired
+  private PluginsManager pluginsManager;
+
   private OpalFileSystem opalFileSystem;
 
   private final Object syncFs = new Object();
 
-  private List<ServicePlugin> servicePlugins = Lists.newArrayList();
 
   @Override
   @PostConstruct
@@ -90,7 +86,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
   @Override
   @PreDestroy
   public void stop() {
-    for (ServicePlugin service : servicePlugins) {
+    for (ServicePlugin service : pluginsManager.getServicePlugins()) {
       try {
         if (service.isRunning()) service.stop();
       } catch (RuntimeException e) {
@@ -170,44 +166,42 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   @Override
   public boolean hasPlugins() {
-    return listPlugins().size()>0;
+    return pluginsManager.hasPlugins();
   }
 
   @Override
   public Collection<Plugin> getPlugins() {
-    return listPlugins();
+    return pluginsManager.getPlugins();
   }
 
   @Override
   public boolean hasPlugin(String name) {
-    return listPlugins().stream().anyMatch(p -> p.getName().equals(name));
+    return pluginsManager.hasPlugin(name);
   }
 
   @Override
   public Plugin getPlugin(String name) {
-    Optional<Plugin> plugin = listPlugins().stream().filter(p -> p.getName().equals(name)).findFirst();
-    if (!plugin.isPresent()) throw new NoSuchElementException("No such plugin with name: " + name);
-    return plugin.get();
+    return pluginsManager.getPlugin(name);
   }
 
   @Override
   public boolean hasServicePlugins() {
-    return servicePlugins.size()>0;
+    return pluginsManager.getServicePlugins().size()>0;
   }
 
   @Override
   public Collection<ServicePlugin> getServicePlugins() {
-    return servicePlugins;
+    return pluginsManager.getServicePlugins();
   }
 
   @Override
   public boolean hasServicePlugins(Class clazz) {
-    return servicePlugins.stream().filter(s -> clazz.isAssignableFrom(s.getClass())).count() > 0;
+    return pluginsManager.hasServicePlugins(clazz);
   }
 
   @Override
   public Collection<ServicePlugin> getServicePlugins(Class clazz) {
-    return servicePlugins.stream().filter(s -> clazz.isAssignableFrom(s.getClass())).collect(Collectors.toList());
+    return pluginsManager.getServicePlugins(clazz);
   }
 
   @Override
@@ -217,14 +211,12 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   @Override
   public boolean hasServicePlugin(String name) {
-    return servicePlugins.stream().filter(s -> name.equals(s.getName())).count() == 1;
+    return pluginsManager.getServicePlugins().stream().filter(s -> name.equals(s.getName())).count() == 1;
   }
 
   @Override
   public ServicePlugin getServicePlugin(String name) {
-    Optional<ServicePlugin> service = servicePlugins.stream().filter(s -> name.equals(s.getName())).findFirst();
-    if (!service.isPresent()) throw new NoSuchServiceException(name);
-    return service.get();
+    return pluginsManager.getServicePlugin(name);
   }
 
   //
@@ -232,8 +224,14 @@ public class DefaultOpalRuntime implements OpalRuntime {
   //
 
   private void initPlugins() {
+    // make sure plugins directory exists
+    initDirectory(PLUGINS_DIR);
     // read it to enhance classpath
-    listPlugins().forEach(Plugin::init);
+    pluginsManager.initPlugins();
+  }
+
+  private void initServicePlugins() {
+    pluginsManager.initServicePlugins();
   }
 
   private void initExtensions() {
@@ -251,19 +249,16 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   private void initMagmaEngine() {
     try {
-      Runnable magmaEngineInit = new Runnable() {
-        @Override
-        public void run() {
-          // This needs to be added BEFORE otherwise bad things happen. That really sucks.
-          MagmaEngine.get().addDecorator(viewManager);
-          MagmaEngineFactory magmaEngineFactory = opalConfigurationService.getOpalConfiguration()
-              .getMagmaEngineFactory();
+      Runnable magmaEngineInit = () -> {
+        // This needs to be added BEFORE otherwise bad things happen. That really sucks.
+        MagmaEngine.get().addDecorator(viewManager);
+        MagmaEngineFactory magmaEngineFactory = opalConfigurationService.getOpalConfiguration()
+            .getMagmaEngineFactory();
 
-          for (MagmaEngineExtension extension : magmaEngineFactory.extensions()) {
-            MagmaEngine.get().extend(extension);
-          }
-          MagmaEngine.get().extend(new MagmaCacheExtension(new EhCacheCacheManager(cacheManager)));
+        for (MagmaEngineExtension extension : magmaEngineFactory.extensions()) {
+          MagmaEngine.get().extend(extension);
         }
+        MagmaEngine.get().extend(new MagmaCacheExtension(new EhCacheCacheManager(cacheManager)));
       };
       new TransactionalThread(transactionTemplate, magmaEngineInit).start();
     } catch (RuntimeException e) {
@@ -303,60 +298,9 @@ public class DefaultOpalRuntime implements OpalRuntime {
     }
   }
 
-  private void initServicePlugins() {
-    Map<String, Plugin> pluginsMap = listPlugins().stream().collect(Collectors.toMap(Plugin::getName, Function.identity()));
-    VCFStoreServiceLoader.get().getServices().stream()
-        .filter(service -> pluginsMap.containsKey(service.getName()))
-        .forEach(service -> registerServicePlugin(pluginsMap, service));
-    SearchServiceLoader.get().getServices().stream()
-        .filter(service -> pluginsMap.containsKey(service.getName()))
-        .forEach(service -> registerServicePlugin(pluginsMap, service));
-  }
-
-  private void registerServicePlugin(Map<String, Plugin> pluginsMap, ServicePlugin service) {
-    try {
-      Plugin plugin = pluginsMap.get(service.getName());
-      service.configure(plugin.getProperties());
-      service.start();
-      servicePlugins.add(service);
-    } catch (Exception e) {
-      log.warn("Error initializing/starting plugin service: {}", service.getClass(), e);
-    }
-  }
-
   private void ensureFolder(String path) throws FileSystemException {
     FileObject folder = getFileSystem().getRoot().resolveFile(path);
     folder.createFolder();
-  }
-
-  private Collection<Plugin> listPlugins() {
-    Map<String, Plugin> pluginsMap = Maps.newLinkedHashMap();
-    // make sure plugins directory exists
-    initDirectory(PLUGINS_DIR);
-    // read it to enhance classpath
-    File pluginsDir = new File(PLUGINS_DIR);
-    if (!pluginsDir.exists() || !pluginsDir.isDirectory() || !pluginsDir.canRead()) return pluginsMap.values();
-    File[] children = pluginsDir.listFiles();
-    if (children == null) return pluginsMap.values();
-    for (File child : children) {
-      Plugin plugin = new Plugin(child);
-      addPlugin(pluginsMap, plugin);
-    }
-    return pluginsMap.values();
-  }
-
-  /**
-   * Add plugin if valid and if most recent version.
-   *
-   * @param pluginsMap
-   * @param plugin
-   */
-  private void addPlugin(Map<String, Plugin> pluginsMap, Plugin plugin) {
-    if (!plugin.isValid()) return;
-    if (!pluginsMap.containsKey(plugin.getName()))
-      pluginsMap.put(plugin.getName(), plugin);
-    else if (plugin.getVersion().compareTo(pluginsMap.get(plugin.getName()).getVersion())>0)
-      pluginsMap.put(plugin.getName(), plugin);
   }
 
 }

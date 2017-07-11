@@ -18,7 +18,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-public class IndexManagerConfiguration implements OpalConfigurationExtension {
+public class IndexManagerConfiguration implements ValueTableIndexManagerConfiguration, OpalConfigurationExtension {
 
   private final Map<String, Schedule> indexConfigurations;
 
@@ -32,28 +32,34 @@ public class IndexManagerConfiguration implements OpalConfigurationExtension {
    * Get from the Index manager configuration whether a given value table is ready for indexing by comparing
    * the last update of the table with the last update of the index (and a grace period).
    */
+  @Override
   public boolean isReadyForIndexing(ValueTable vt, ValueTableIndex index) {
     Schedule schedule = getSchedule(vt);
     return schedule.getType() != Opal.ScheduleType.NOT_SCHEDULED && !index.isUpToDate() &&
         shouldUpdate(schedule, index.now());
   }
 
+  @Override
   public boolean isEnabled() {
     return enabled;
   }
 
+  @Override
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;
   }
 
+  @Override
   public void updateSchedule(ValueTable vt, Schedule schedule) {
     indexConfigurations.put(getFullyQualifiedName(vt), schedule);
   }
 
+  @Override
   public void removeSchedule(ValueTable vt) {
     indexConfigurations.remove(getFullyQualifiedName(vt));
   }
 
+  @Override
   public Schedule getSchedule(ValueTable vt) {
     Schedule schedule = indexConfigurations.get(getFullyQualifiedName(vt));
 

@@ -9,108 +9,73 @@
  */
 package org.obiba.opal.search.service;
 
+import com.google.common.collect.Lists;
 import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.common.settings.ImmutableSettings;
-import org.elasticsearch.node.Node;
-import org.elasticsearch.node.NodeBuilder;
-import org.elasticsearch.node.internal.InternalNode;
-import org.elasticsearch.rest.RestController;
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableUpdateListener;
+import org.obiba.magma.Variable;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
-import org.obiba.opal.search.IndexSynchronizationManager;
-import org.obiba.opal.search.es.ElasticSearchConfiguration;
 import org.obiba.opal.search.es.ElasticSearchConfigurationService;
-import org.obiba.opal.search.es.ElasticSearchProvider;
-import org.obiba.opal.search.es.support.EsQueryExecutor;
-import org.obiba.opal.search.es.support.EsSearchQueryExecutor;
-import org.obiba.opal.spi.search.SearchService;
-import org.obiba.opal.spi.search.ValuesIndexManager;
-import org.obiba.opal.spi.search.VariablesIndexManager;
+import org.obiba.opal.spi.search.support.ItemResultDtoStrategy;
+import org.obiba.opal.spi.search.*;
 import org.obiba.opal.web.model.Search;
-import org.obiba.opal.web.search.support.SearchQueryExecutor;
-import org.obiba.opal.web.search.support.ValueTableIndexManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.ThreadFactory;
+
 @Component
-public class OpalSearchService implements Service, ElasticSearchProvider {
+public class OpalSearchService implements Service, ValueTableUpdateListener {
 
-  public static final String SERVICE_NAME = "search";
+  private static final Logger log = LoggerFactory.getLogger(OpalSearchService.class);
 
-  private static final String DEFAULT_SETTINGS_RESOURCE = "org/obiba/opal/search/service/default-settings.yml";
-
-  public static final String PATH_DATA = "${OPAL_HOME}/work/elasticsearch/data";
-
-  public static final String PATH_WORK = "${OPAL_HOME}/work/elasticsearch/work";
-
-  @Value("${org.obiba.opal.web.search.termsFacetSizeLimit}")
-  private int termsFacetSizeLimit;
+  static final String SERVICE_NAME = "search";
 
   @Autowired
   private ElasticSearchConfigurationService configService;
 
   @Autowired
-  private ApplicationContext applicationContext;
-
-  @Autowired
   private OpalRuntime opalRuntime;
 
   @Autowired
-  protected ValuesIndexManager valuesIndexManager;
+  private VariableSummaryHandler variableSummaryHandler;
 
   @Autowired
-  protected VariablesIndexManager variablesIndexManager;
+  private ThreadFactory threadFactory;
 
-  private Node esNode;
-
-  private Client client;
-
-  @Override
   public boolean isEnabled() {
     return configService.getConfig().isEnabled();
   }
 
   @Override
   public boolean isRunning() {
-    return esNode != null || hasSearchServicePlugin() && getSearchServicePlugin().isRunning();
+    return hasSearchServicePlugin() && getSearchServicePlugin().isRunning();
   }
 
   @Override
   public void start() {
-    ElasticSearchConfiguration esConfig = configService.getConfig();
-    if (esConfig.isEnabled() && hasSearchServicePlugin() && !getSearchServicePlugin().isRunning()) getSearchServicePlugin().start();
-
-    if(!isRunning() && esConfig.isEnabled()) {
-      esNode = NodeBuilder.nodeBuilder() //
-          .client(!esConfig.isDataNode()) //
-          .settings(ImmutableSettings.settingsBuilder() //
-              .classLoader(OpalSearchService.class.getClassLoader()) //
-              .loadFromClasspath(DEFAULT_SETTINGS_RESOURCE) //
-              .put("path.data", PATH_DATA.replace("${OPAL_HOME}", System.getProperty("OPAL_HOME"))) //
-              .put("path.work", PATH_WORK.replace("${OPAL_HOME}", System.getProperty("OPAL_HOME"))) //
-              .loadFromSource(esConfig.getEsSettings()) //
-          ) //
-          .clusterName(esConfig.getClusterName()) //
-          .node();
-      client = esNode.client();
+    if (isRunning()) return;
+    SearchSettings esConfig = configService.getConfig();
+    if (!esConfig.isEnabled()) return;
+    if (!hasSearchServicePlugin()) {
+      log.warn("No Search Service plugin found.");
+      return;
     }
+    SearchService service = getSearchServicePlugin();
+    service.configure(esConfig, variableSummaryHandler, threadFactory);
+    service.start();
   }
 
   @Override
   public void stop() {
-    if(isRunning()) {
-      // use applicationContext.getBean() to avoid unresolvable circular reference
-      applicationContext.getBean(IndexSynchronizationManager.class).terminateConsumerThread(); // stop indexer thread
-      esNode.close();
-      esNode = null;
-      client = null;
-    }
     if (hasSearchServicePlugin() && getSearchServicePlugin().isRunning()) getSearchServicePlugin().stop();
   }
 
@@ -129,34 +94,86 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
   //
 
   public VariablesIndexManager getVariablesIndexManager() {
-    return variablesIndexManager;
+    if (!isRunning()) return null;
+    return getSearchServicePlugin().getVariablesIndexManager();
   }
 
   public ValuesIndexManager getValuesIndexManager() {
-    return valuesIndexManager;
+    if (!isRunning()) return null;
+    return getSearchServicePlugin().getValuesIndexManager();
   }
 
-  public JSONObject executeQuery(JSONObject jsonQuery, String searchPath) throws JSONException {
-    EsQueryExecutor queryExecutor = new EsQueryExecutor(this).setSearchPath(searchPath);
-    return queryExecutor.executePost(jsonQuery);
+  public Collection<String> executeAllIdentifiersQuery(QuerySettings querySettings, String searchPath) throws SearchException {
+    if (!isRunning()) return Lists.newArrayList();
+    IdentifiersQueryCallback callback = new IdentifiersQueryCallback();
+    int from = 0;
+    final int size = 1000;
+    while (!callback.hasTotal() || callback.getIdentifiers().size() < callback.getTotal()) {
+      querySettings.from(from);
+      querySettings.size(from + size);
+      getSearchServicePlugin().executeIdentifiersQuery(querySettings, searchPath, callback);
+      from = from + size;
+    }
+    return callback.getIdentifiers();
   }
 
-  public Search.QueryResultDto executeQuery(String datasource, String table, Search.QueryTermDto queryDto) throws JSONException {
-    return createQueryExecutor(datasource, table).execute(queryDto);
+  public void executeIdentifiersQuery(QuerySettings querySettings, String searchPath, IdentifiersQueryCallback callback) throws SearchException {
+    if (!isRunning()) return;
+    getSearchServicePlugin().executeIdentifiersQuery(querySettings, searchPath, callback);
   }
 
-  public Search.QueryResultDto executeQuery(String datasource, String table, Search.QueryTermsDto queryDto) throws JSONException {
-    return createQueryExecutor(datasource, table).execute(queryDto);
+  public Search.EntitiesResultDto.Builder executeEntitiesQuery(QuerySettings querySettings, String searchPath, String entityType, String query) throws SearchException {
+    if (!isRunning()) return null;
+    return getSearchServicePlugin().executeEntitiesQuery(querySettings, searchPath, entityType, query);
+  }
+
+  public Search.QueryResultDto executeQuery(QuerySettings querySettings, String searchPath, ItemResultDtoStrategy strategy) throws SearchException {
+    if (!isRunning()) return null;
+    return getSearchServicePlugin().executeQuery(querySettings, searchPath, strategy);
+  }
+
+  public Search.QueryResultDto executeQuery(String datasource, String table, Search.QueryTermDto queryDto) throws SearchException {
+    if (!isRunning()) return null;
+    return getSearchServicePlugin().executeQuery(datasource, table, queryDto);
+  }
+
+  public Search.QueryResultDto executeQuery(String datasource, String table, Search.QueryTermsDto queryDto) throws SearchException {
+    if (!isRunning()) return null;
+    return getSearchServicePlugin().executeQuery(datasource, table, queryDto);
+  }
+
+  public static class IdentifiersQueryCallback implements SearchService.HitsQueryCallback<String> {
+
+    private int total = -1;
+
+    private List<String> identifiers = Lists.newArrayList();
+
+    @Override
+    public void onTotal(int total) {
+      this.total = total;
+    }
+
+    @Override
+    public void onIdentifier(String id) {
+      identifiers.add(id);
+    }
+
+    public boolean hasTotal() {
+      return total > -1;
+    }
+
+    public int getTotal() {
+      return total;
+    }
+    
+    public List<String> getIdentifiers() {
+      return identifiers;
+    }
   }
 
   //
   // Private methods
   //
-
-  private SearchQueryExecutor createQueryExecutor(String datasource, String table) {
-    ValueTableIndexManager valueTableIndexManager = new ValueTableIndexManager(getValuesIndexManager(), datasource, table);
-    return new EsSearchQueryExecutor(this, valueTableIndexManager, termsFacetSizeLimit);
-  }
 
   private SearchService getSearchServicePlugin() {
     return (SearchService) opalRuntime.getServicePlugin(SearchService.class);
@@ -167,13 +184,25 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
   }
 
   @Override
-  public Client getClient() {
-    return client;
+  public void onRename(@NotNull ValueTable vt, String newName) {
+    onDelete(vt);
   }
 
   @Override
-  public RestController getRest() {
-    return ((InternalNode) esNode).injector().getInstance(RestController.class);
+  public void onRename(ValueTable vt, Variable v, String newName) {
+    onDelete(vt);
   }
 
+  @Override
+  public void onDelete(@NotNull ValueTable vt) {
+    if (!isRunning()) return;
+    // Delete index
+    getValuesIndexManager().getIndex(vt).delete();
+    getVariablesIndexManager().getIndex(vt).delete();
+  }
+
+  @Override
+  public void onDelete(@NotNull ValueTable vt, Variable v) {
+    onDelete(vt);
+  }
 }

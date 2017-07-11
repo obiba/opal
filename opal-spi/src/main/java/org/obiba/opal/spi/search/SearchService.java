@@ -10,9 +10,55 @@
 
 package org.obiba.opal.spi.search;
 
+import org.obiba.opal.spi.search.support.ItemResultDtoStrategy;
 import org.obiba.opal.spi.ServicePlugin;
+import org.obiba.opal.web.model.Search;
+
+import java.util.concurrent.ThreadFactory;
 
 public interface SearchService extends ServicePlugin {
 
+  //
+  // Configuration methods
+  //
 
+  void configure(SearchSettings settings, VariableSummaryHandler variableSummaryHandler, ThreadFactory threadFactory);
+
+  SearchSettings getConfig();
+
+  boolean isEnabled();
+
+  //
+  // Index methods
+  //
+
+  VariablesIndexManager getVariablesIndexManager();
+
+  ValuesIndexManager getValuesIndexManager();
+
+  //
+  // Search methods
+  //
+
+  void executeIdentifiersQuery(QuerySettings querySettings, String searchPath, HitsQueryCallback<String> callback) throws SearchException;
+
+  Search.EntitiesResultDto.Builder executeEntitiesQuery(QuerySettings querySettings, String searchPath, String entityType, String query) throws SearchException;
+
+  Search.QueryResultDto executeQuery(QuerySettings querySettings, String searchPath, ItemResultDtoStrategy strategy) throws SearchException;
+
+  Search.QueryResultDto executeQuery(String datasource, String table, Search.QueryTermDto queryDto) throws SearchException;
+
+  Search.QueryResultDto executeQuery(String datasource, String table, Search.QueryTermsDto queryDto) throws SearchException;
+
+  //
+  // Search callbacks
+  //
+
+  interface HitsQueryCallback<T> {
+
+    void onTotal(int total);
+
+    void onIdentifier(T id);
+
+  }
 }

@@ -7,9 +7,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.search.support;
+package org.obiba.opal.spi.search;
 
-import org.codehaus.jettison.json.JSONException;
 import org.obiba.opal.web.model.Search;
 
 /**
@@ -22,18 +21,17 @@ public interface SearchQueryExecutor {
    *
    * @param dtoQueries
    * @return
-   * @throws JSONException
+   * @throws SearchException
    */
-  Search.QueryResultDto execute(Search.QueryTermsDto dtoQueries)
-      throws JSONException;
+  Search.QueryResultDto execute(Search.QueryTermsDto dtoQueries) throws SearchException;
 
   /**
    * Execute a query term search query.
    *
    * @param dtoQuery
    * @return
-   * @throws JSONException
+   * @throws SearchException
    */
-  Search.QueryResultDto execute(Search.QueryTermDto dtoQuery)
-      throws JSONException;
+  Search.QueryResultDto execute(Search.QueryTermDto dtoQuery) throws SearchException;
+
 }

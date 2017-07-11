@@ -7,15 +7,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.search.es.mapping;
 
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.obiba.magma.Variable;
+package org.obiba.opal.spi.search;
 
-import java.io.IOException;
+public class SearchException extends Exception {
 
-public interface VariableMapping {
-
-  void map(Variable variable, XContentBuilder builder) throws IOException;
+  public SearchException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
 }

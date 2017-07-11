@@ -10,33 +10,23 @@
 
 package org.obiba.opal.web.search;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import net.jazdw.rql.parser.ASTNode;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
-import org.obiba.magma.*;
+import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
+import org.obiba.magma.VariableEntity;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.search.AbstractSearchUtility;
-import org.obiba.opal.search.SearchQueryException;
+import org.obiba.opal.search.service.OpalSearchService;
+import org.obiba.opal.spi.search.SearchException;
 import org.obiba.opal.spi.search.ValuesIndexManager;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Search;
-import org.obiba.opal.web.search.support.RQLCriterionParser;
 import org.obiba.opal.web.search.support.RQLParserFactory;
 import org.obiba.opal.web.search.support.RQLValueSetVariableCriterionParser;
 import org.obiba.opal.web.search.support.VariableEntityValueSetDtoFunction;
@@ -45,10 +35,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @Scope("request")
@@ -67,56 +61,32 @@ public class TableValueSetsSearchResource extends AbstractSearchUtility {
   @Transactional(readOnly = true)
   @SuppressWarnings("PMD.ExcessiveParameterList")
   public Response search(@Context UriInfo uriInfo, @QueryParam("ql") @DefaultValue("rql") String queryLanguage, @QueryParam("query") String query,
-      @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("10") int limit,
-      @QueryParam("select") String select) throws JSONException {
+                         @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("10") int limit,
+                         @QueryParam("select") String select) throws SearchException {
 
     String esQuery = query;
 
-    if (!"es".equals(queryLanguage)) {
-      ASTNode queryNode = RQLParserFactory.newParser().parse(query);
-      if ("and".equals(queryNode.getName()) || "or".equals(queryNode.getName()) || "".equals(queryNode.getName())) {
-        esQuery = queryNode.getArguments().stream()
-            .map(qn -> new RQLValueSetVariableCriterionParser(opalSearchService.getValuesIndexManager(), (ASTNode)qn ).getQuery())
-            .collect(Collectors.joining("or".equals(queryNode.getName()) ? " OR " : " AND "));
-      }
-      else { // single query
-        esQuery = new RQLValueSetVariableCriterionParser(opalSearchService.getValuesIndexManager(), queryNode).getQuery();
-      }
-    }
+    if (!"es".equals(queryLanguage))
+      esQuery = RQLParserFactory.parse(query, opalSearchService.getValuesIndexManager());
 
-    if(!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-    if(!opalSearchService.getValuesIndexManager().hasIndex(getValueTable())) return Response.status(Response.Status.NOT_FOUND).build();
+    if (!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+    if (!opalSearchService.getValuesIndexManager().hasIndex(getValueTable()))
+      return Response.status(Response.Status.NOT_FOUND).build();
 
-    JSONObject jsonResponse = executeQuery(buildQuerySearch(esQuery, offset, limit,
-        Lists.newArrayList("identifier"), null, null, null).build());
-
-    if(!jsonResponse.isNull("error")) {
-      throw new SearchQueryException(jsonResponse.get("error").toString());
-    }
-
-    Search.ValueSetsResultDto.Builder dtoResponseBuilder = getValueSetsDtoBuilder(uriInfo, select, jsonResponse);
-
-    // filter entities
+    esQuery = "reference:\"" + getValueTable().getTableReference() + "\" AND " + esQuery;
+    OpalSearchService.IdentifiersQueryCallback callback = new OpalSearchService.IdentifiersQueryCallback();
+    opalSearchService.executeIdentifiersQuery(buildQuerySearch(esQuery, offset, limit,
+        Lists.newArrayList("identifier"), null, null, null), getSearchPath(), callback);
+    Search.ValueSetsResultDto.Builder dtoResponseBuilder = getValueSetsDtoBuilder(uriInfo, select, callback.getTotal(), callback.getIdentifiers());
     return Response.ok().entity(dtoResponseBuilder.build()).build();
-
   }
 
   private Search.ValueSetsResultDto.Builder getValueSetsDtoBuilder(UriInfo uriInfo, String select,
-                                                                   JSONObject jsonResponse) throws JSONException {
+                                                                   int totalIds, List<String> ids) throws SearchException {
     Search.ValueSetsResultDto.Builder dtoResponseBuilder = Search.ValueSetsResultDto.newBuilder();
-    JSONObject jsonHits = jsonResponse.getJSONObject("hits");
-
-    dtoResponseBuilder.setTotalHits(jsonHits.getInt("total"));
-    Collection<VariableEntity> entities = new ArrayList<>();
+    dtoResponseBuilder.setTotalHits(totalIds);
     String entityType = getValueTable().getEntityType();
-
-    JSONArray hits = jsonHits.getJSONArray("hits");
-    for(int i = 0; i < hits.length(); i++) {
-      JSONObject jsonHit = hits.getJSONObject(i);
-      JSONObject fields = jsonHit.getJSONObject("fields").getJSONArray("partial").getJSONObject(0);
-      entities.add(new VariableEntityBean(entityType, fields.getString("identifier")));
-    }
-
+    Collection<VariableEntity> entities = ids.stream().map(id -> new VariableEntityBean(entityType, id)).collect(Collectors.toList());
     String path = uriInfo.getPath();
     path = path.substring(0, path.indexOf("/_search"));
     dtoResponseBuilder.setValueSets(getValueSetsDto(path, select, entities));
@@ -147,7 +117,7 @@ public class TableValueSetsSearchResource extends AbstractSearchUtility {
   }
 
   private Magma.ValueSetsDto getValueSetsDto(String uriInfoPath, String select,
-      Iterable<VariableEntity> variableEntities) {
+                                             Iterable<VariableEntity> variableEntities) {
     Iterable<Variable> variables = filterVariables(select);
 
     Magma.ValueSetsDto.Builder builder = Magma.ValueSetsDto.newBuilder().setEntityType(getValueTable().getEntityType());
@@ -165,7 +135,7 @@ public class TableValueSetsSearchResource extends AbstractSearchUtility {
     Iterable<Magma.ValueSetsDto.ValueSetDto> transform = Iterables.transform(getValueTable().getValueSets(variableEntities),
         new VariableEntityValueSetDtoFunction(getValueTable(), variables, uriInfoPath, true));
 
-    for(Magma.ValueSetsDto.ValueSetDto valueSetDto : transform) {
+    for (Magma.ValueSetsDto.ValueSetDto valueSetDto : transform) {
       valueSetDtoBuilder.add(valueSetDto);
     }
 
@@ -177,15 +147,15 @@ public class TableValueSetsSearchResource extends AbstractSearchUtility {
   protected Iterable<Variable> filterVariables(String script) {
     List<Variable> filteredVariables;
 
-    if(StringUtils.isEmpty(script)) {
+    if (StringUtils.isEmpty(script)) {
       filteredVariables = Lists.newArrayList(getValueTable().getVariables());
     } else {
       JavascriptClause jsClause = new JavascriptClause(script);
       jsClause.initialise();
 
       filteredVariables = new ArrayList<>();
-      for(Variable variable : getValueTable().getVariables()) {
-        if(jsClause.select(variable)) {
+      for (Variable variable : getValueTable().getVariables()) {
+        if (jsClause.select(variable)) {
           filteredVariables.add(variable);
         }
       }

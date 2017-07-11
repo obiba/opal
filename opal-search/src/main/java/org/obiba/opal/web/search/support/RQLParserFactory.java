@@ -11,12 +11,36 @@
 package org.obiba.opal.web.search.support;
 
 
+import net.jazdw.rql.parser.ASTNode;
 import net.jazdw.rql.parser.RQLParser;
+import org.obiba.opal.spi.search.ValuesIndexManager;
+
+import java.util.stream.Collectors;
 
 public class RQLParserFactory {
 
   public static RQLParser newParser() {
     return new RQLParser();
+  }
+
+  /**
+   * Converts a RQL query to a ES query.
+   *
+   * @param rqlQuery
+   * @param valuesIndexManager
+   * @return
+   */
+  public static String parse(String rqlQuery, ValuesIndexManager valuesIndexManager) {
+    String esQuery;
+    ASTNode queryNode = newParser().parse(rqlQuery);
+    if ("and".equals(queryNode.getName()) || "or".equals(queryNode.getName()) || "".equals(queryNode.getName())) {
+      esQuery = queryNode.getArguments().stream()
+          .map(qn -> new RQLValueSetVariableCriterionParser(valuesIndexManager, (ASTNode) qn).getQuery())
+          .collect(Collectors.joining("or".equals(queryNode.getName()) ? " OR " : " AND "));
+    } else { // single query
+      esQuery = new RQLValueSetVariableCriterionParser(valuesIndexManager, queryNode).getQuery();
+    }
+    return esQuery;
   }
 
 }

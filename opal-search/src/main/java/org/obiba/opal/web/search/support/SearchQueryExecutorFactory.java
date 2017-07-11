@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.web.search.support;
 
+import org.obiba.opal.spi.search.SearchQueryExecutor;
+
 /**
  * Creates a @{SearchQueryExecutor}.
  */

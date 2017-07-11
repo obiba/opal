@@ -12,7 +12,6 @@ package org.obiba.opal.web.gwt.app.client.project.admin;
 
 import com.google.common.collect.Maps;
 import com.google.gwt.core.client.JsArray;
-import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
@@ -53,6 +52,8 @@ import static com.google.gwt.http.client.Response.SC_OK;
 
 public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdministrationPresenter.Display>
     implements ProjectAdministrationUiHandlers {
+
+  public static final String VCF_STORE_SERVICE_TYPE = "vcf-store";
 
   private final PlaceManager placeManager;
 
@@ -99,7 +100,7 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     authorize();
 
     Map<String, String> params = Maps.newHashMap();
-    params.put("type", VCFStoreService.SERVICE_TYPE);
+    params.put("type", VCF_STORE_SERVICE_TYPE);
 
     ResourceRequestBuilderFactory.<JsArray<PluginDto>>newBuilder()
       .forResource(UriBuilders.PLUGINS.create().query(params).build())

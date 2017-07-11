@@ -10,7 +10,6 @@
 
 package org.obiba.opal.core.runtime;
 
-import com.google.common.base.Strings;
 import org.obiba.runtime.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +28,10 @@ public class Plugin {
 
   private static final Logger log = LoggerFactory.getLogger(Plugin.class);
 
+  public static  final String PLUGIN_PROPERTIES = "plugin.properties";
+
+  public static  final String SITE_PROPERTIES = "site.properties";
+
   private final File directory;
 
   private final File properties;
@@ -39,8 +42,8 @@ public class Plugin {
 
   public Plugin(File directory) {
     this.directory = directory;
-    this.properties = new File(directory, OpalRuntime.PLUGIN_PROPERTIES);
-    this.siteProperties = new File(directory, OpalRuntime.SITE_PROPERTIES);
+    this.properties = new File(directory, PLUGIN_PROPERTIES);
+    this.siteProperties = new File(directory, SITE_PROPERTIES);
     this.lib = new File(directory, "lib");
   }
 
@@ -50,9 +53,13 @@ public class Plugin {
       prop.load(in);
       return prop.getProperty("name", directory.getName());
     } catch (Exception e) {
-      log.warn("Failed reading properties: {}", properties.getAbsolutePath(), e);
+      log.warn("Failed reading plugin name property: {}", properties.getAbsolutePath(), e);
       return directory.getName();
     }
+  }
+
+  public String getType() {
+    return getProperties().getProperty("type", "");
   }
 
   public boolean isValid() {
@@ -62,7 +69,7 @@ public class Plugin {
   }
 
   public Version getVersion() {
-    String version = getProperties().getProperty("version");
+    String version = getProperties().getProperty("version", "0.0.0");
     return new Version(version);
   }
 

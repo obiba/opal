@@ -7,12 +7,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.search.es.mapping;
 
-import org.elasticsearch.common.xcontent.XContentBuilder;
+package org.obiba.opal.spi.search;
 
-public interface ValueTypeMapping {
+public interface SearchSettings {
 
-  XContentBuilder map(XContentBuilder builder);
+  String getClusterName();
 
+  String getIndexName();
+
+  boolean isDataNode();
+
+  String getEsSettings();
+
+  boolean isEnabled();
+
+  Integer getShards();
+
+  Integer getReplicas();
 }

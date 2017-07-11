@@ -17,9 +17,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueType;
+import org.obiba.magma.support.VariableNature;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.magma.type.DateType;
-import org.obiba.opal.core.domain.VariableNature;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 

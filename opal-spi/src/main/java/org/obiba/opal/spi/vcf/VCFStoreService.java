@@ -20,7 +20,7 @@ import java.util.NoSuchElementException;
  */
 public interface VCFStoreService extends ServicePlugin {
 
-  public static final String SERVICE_TYPE = "vcf-store";
+  String SERVICE_TYPE = "vcf-store";
 
   /**
    * Get the registered store names.

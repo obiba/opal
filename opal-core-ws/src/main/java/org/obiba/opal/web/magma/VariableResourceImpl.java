@@ -9,7 +9,6 @@
  */
 package org.obiba.opal.web.magma;
 
-import java.util.Collection;
 import java.util.List;
 
 import javax.ws.rs.core.PathSegment;
@@ -20,7 +19,7 @@ import javax.ws.rs.core.UriInfo;
 
 import com.google.common.base.Strings;
 import org.obiba.magma.*;
-import org.obiba.opal.core.domain.VariableNature;
+import org.obiba.magma.support.VariableNature;
 import org.obiba.opal.web.magma.math.BinarySummaryResource;
 import org.obiba.opal.web.magma.math.CategoricalSummaryResource;
 import org.obiba.opal.web.magma.math.ContinuousSummaryResource;
@@ -31,7 +30,6 @@ import org.obiba.opal.web.magma.math.TextSummaryResource;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.support.InvalidRequestException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

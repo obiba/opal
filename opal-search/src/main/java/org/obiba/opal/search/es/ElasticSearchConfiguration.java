@@ -9,9 +9,11 @@
  */
 package org.obiba.opal.search.es;
 
+import com.google.common.base.Strings;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.spi.search.SearchSettings;
 
-public class ElasticSearchConfiguration implements OpalConfigurationExtension {
+public class ElasticSearchConfiguration implements OpalConfigurationExtension, SearchSettings {
 
   private static final String DEFAULT_OPAL_INDEX_NAME = "opal";
 
@@ -31,30 +33,37 @@ public class ElasticSearchConfiguration implements OpalConfigurationExtension {
 
   private String esSettings;
 
+  @Override
   public boolean isEnabled() {
     return enabled == null ? true : enabled;
   }
 
+  @Override
   public String getClusterName() {
     return clusterName == null ? DEFAULT_CLUSTER_NAME : clusterName;
   }
 
+  @Override
   public String getIndexName() {
-    return indexName == null ? DEFAULT_OPAL_INDEX_NAME : indexName;
+    return Strings.isNullOrEmpty(indexName) ? DEFAULT_OPAL_INDEX_NAME : indexName;
   }
 
+  @Override
   public boolean isDataNode() {
     return dataNode == null ? true : dataNode;
   }
 
+  @Override
   public String getEsSettings() {
     return esSettings == null ? "" : esSettings;
   }
 
+  @Override
   public Integer getShards() {
     return shards == null ? 5 : shards;
   }
 
+  @Override
   public Integer getReplicas() {
     return replicas == null ? 1 : replicas;
   }

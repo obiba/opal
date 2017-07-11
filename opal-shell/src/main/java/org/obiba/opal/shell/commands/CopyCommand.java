@@ -105,6 +105,8 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
   private String destinationDatasourceName;
 
+  private Set<ValueTable> valueTables;
+
   public CopyCommand() {
     fileDatasourceFactory = new MultipleFileCsvDatasourceFactory();
     fileDatasourceFactory.setNext(new SingleFileCsvDatasourceFactory()) //
@@ -265,6 +267,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   private Set<ValueTable> getValueTables() {
+    if (valueTables != null) return valueTables;
     Map<String, ValueTable> tablesByName = Maps.newHashMap();
 
     if(options.isSource()) {
@@ -284,7 +287,8 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     applyQueryOption(tablesByName);
     applyNameOption(tablesByName);
 
-    return ImmutableSet.copyOf(tablesByName.values());
+    valueTables = ImmutableSet.copyOf(tablesByName.values());
+    return valueTables;
   }
 
   private void applyNameOption(Map<String, ValueTable> tablesByName) {

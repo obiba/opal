@@ -81,6 +81,18 @@
     </dependency>
 
     <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-core-api</artifactId>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.jayway.jsonpath</groupId>
+          <artifactId>json-path</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
       <groupId>com.github.gwtbootstrap</groupId>
       <artifactId>gwt-bootstrap</artifactId>
     </dependency>

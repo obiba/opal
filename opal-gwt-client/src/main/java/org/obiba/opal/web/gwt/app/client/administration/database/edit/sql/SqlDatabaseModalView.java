@@ -31,7 +31,6 @@ import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
-import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
 import org.obiba.opal.web.gwt.app.client.administration.database.edit.AbstractDatabaseModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.edit.DatabaseUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -67,6 +66,10 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   private static final int JDBC_TABLES_TAB_INDEX = 1;
 
   private static final int JDBC_TABLE_PARTITIONS_TAB_INDEX = 2;
+
+  private static final int MAX_BATCH_SIZE = 1000;
+
+  private static final int DEFAULT_BATCH_SIZE = 100;
 
   @UiField
   Modal modal;
@@ -172,8 +175,6 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
 
   private JsArray<JdbcDriverDto> availableDrivers;
 
-  private final int DEFAULT_BATCH_SIZE = 100;
-
   @Inject
   public SqlDatabaseModalView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
@@ -217,7 +218,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
       }
     });
 
-    batchSize.setMax(JdbcDatasourceSettings.MAX_BATCH_SIZE);
+    batchSize.setMax(MAX_BATCH_SIZE);
     batchSize.setMin(1);
     batchSize.setValue(DEFAULT_BATCH_SIZE);
   }
