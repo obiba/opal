@@ -66,16 +66,8 @@ public class TableValueSetsSearchResource extends AbstractSearchUtility {
 
     String esQuery = query;
 
-    if (!"es".equals(queryLanguage)) {
-      ASTNode queryNode = RQLParserFactory.newParser().parse(query);
-      if ("and".equals(queryNode.getName()) || "or".equals(queryNode.getName()) || "".equals(queryNode.getName())) {
-        esQuery = queryNode.getArguments().stream()
-            .map(qn -> new RQLValueSetVariableCriterionParser(opalSearchService.getValuesIndexManager(), (ASTNode) qn).getQuery())
-            .collect(Collectors.joining("or".equals(queryNode.getName()) ? " OR " : " AND "));
-      } else { // single query
-        esQuery = new RQLValueSetVariableCriterionParser(opalSearchService.getValuesIndexManager(), queryNode).getQuery();
-      }
-    }
+    if (!"es".equals(queryLanguage))
+      esQuery = RQLParserFactory.parse(query, opalSearchService.getValuesIndexManager());
 
     if (!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
     if (!opalSearchService.getValuesIndexManager().hasIndex(getValueTable()))

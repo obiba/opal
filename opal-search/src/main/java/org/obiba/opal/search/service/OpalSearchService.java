@@ -108,9 +108,9 @@ public class OpalSearchService implements Service, ValueTableUpdateListener {
     IdentifiersQueryCallback callback = new IdentifiersQueryCallback();
     int from = 0;
     final int size = 1000;
-    while (!callback.hasTotal() && callback.getIdentifiers().size() < callback.getTotal()) {
+    while (!callback.hasTotal() || callback.getIdentifiers().size() < callback.getTotal()) {
       querySettings.from(from);
-      querySettings.from(from + size);
+      querySettings.size(from + size);
       getSearchServicePlugin().executeIdentifiersQuery(querySettings, searchPath, callback);
       from = from + size;
     }
@@ -149,16 +149,6 @@ public class OpalSearchService implements Service, ValueTableUpdateListener {
     private List<String> identifiers = Lists.newArrayList();
 
     @Override
-    public boolean hasTotal() {
-      return total > -1;
-    }
-
-    @Override
-    public int getTotal() {
-      return total;
-    }
-
-    @Override
     public void onTotal(int total) {
       this.total = total;
     }
@@ -168,6 +158,14 @@ public class OpalSearchService implements Service, ValueTableUpdateListener {
       identifiers.add(id);
     }
 
+    public boolean hasTotal() {
+      return total > -1;
+    }
+
+    public int getTotal() {
+      return total;
+    }
+    
     public List<String> getIdentifiers() {
       return identifiers;
     }

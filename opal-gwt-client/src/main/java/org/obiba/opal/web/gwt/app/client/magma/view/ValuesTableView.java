@@ -17,6 +17,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.event.ValuesQueryEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter.EntitySelectionHandler;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTableUiHandlers;
@@ -126,6 +127,8 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   @UiField
   Anchor searchEntities;
 
+  private final EventBus eventBus;
+
   private ValueSetsDataProvider dataProvider;
 
   private List<VariableDto> listVariable;
@@ -156,6 +159,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
   @Inject
   public ValuesTableView(EventBus eventBus) {
+    this.eventBus = eventBus;
     // populate Typeahead
     oracle = new TableVariableSuggestOracle(eventBus);
     variableTypeahead = new Typeahead(oracle);
@@ -309,6 +313,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   //
 
   private void onSearch(int offset, int limit) {
+    eventBus.fireEvent(new ValuesQueryEvent(criteriaPanel.getRQLQueryString(), criteriaPanel.getQueryText()));
     getUiHandlers().onSearchValueSets(criteriaPanel.getRQLQueryStrings(), offset, limit);
   }
 

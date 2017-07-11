@@ -21,6 +21,7 @@ import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.magma.QueryWhereClause;
 import org.obiba.opal.spi.search.ValuesIndexManager;
+import org.obiba.opal.web.search.support.RQLParserFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -46,9 +47,12 @@ public class SearchQueryWhereClause extends AbstractSearchUtility implements Que
 
   @Override
   public void initialise() {
+    if (!entities.isEmpty()) return;
     try {
+      String esQuery = RQLParserFactory.parse(query, opalSearchService.getValuesIndexManager());
+      String safeQuery = "reference:\"" + valueTable.getTableReference() + "\" AND " + esQuery;
       opalSearchService.executeAllIdentifiersQuery(
-          buildQuerySearch(query, 0, Integer.MAX_VALUE, Lists.newArrayList("identifier"), null, null, null),
+          buildQuerySearch(safeQuery, 0, Integer.MAX_VALUE, Lists.newArrayList("identifier"), null, null, null),
           getSearchPath()).forEach(id -> entities.add(new VariableEntityBean(valueTable.getEntityType(), id)));
     } catch(Exception e) {
       log.error("Failed querying: {}", query, e);
@@ -63,6 +67,7 @@ public class SearchQueryWhereClause extends AbstractSearchUtility implements Que
   @Override
   public void setQuery(String query) {
     this.query = query;
+    entities.clear();
   }
 
   @Override

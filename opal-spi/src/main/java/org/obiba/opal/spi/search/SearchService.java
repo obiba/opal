@@ -56,10 +56,6 @@ public interface SearchService extends ServicePlugin {
 
   interface HitsQueryCallback<T> {
 
-    boolean hasTotal();
-
-    int getTotal();
-
     void onTotal(int total);
 
     void onIdentifier(T id);
