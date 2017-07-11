@@ -81,6 +81,7 @@ public class TableValueSetsSearchResource extends AbstractSearchUtility {
     if (!opalSearchService.getValuesIndexManager().hasIndex(getValueTable()))
       return Response.status(Response.Status.NOT_FOUND).build();
 
+    esQuery = "reference:\"" + getValueTable().getTableReference() + "\" AND " + esQuery;
     OpalSearchService.IdentifiersQueryCallback callback = new OpalSearchService.IdentifiersQueryCallback();
     opalSearchService.executeIdentifiersQuery(buildQuerySearch(esQuery, offset, limit,
         Lists.newArrayList("identifier"), null, null, null), getSearchPath(), callback);

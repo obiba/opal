@@ -29,12 +29,7 @@ public class RQLValueSetVariableCriterionParser extends RQLCriterionParser imple
   private ValueTable table;
 
   private Variable variable;
-
-  public RQLValueSetVariableCriterionParser(ValuesIndexManager valuesIndexManager, String rqlQuery) {
-    super(rqlQuery);
-    this.valuesIndexManager = valuesIndexManager;
-  }
-
+  
   public RQLValueSetVariableCriterionParser(ValuesIndexManager valuesIndexManager, ASTNode rqlNode) {
     super(rqlNode);
     this.valuesIndexManager = valuesIndexManager;
@@ -44,6 +39,7 @@ public class RQLValueSetVariableCriterionParser extends RQLCriterionParser imple
   public QuerySettings.ChildQuery asChildQuery(String idQuery) {
     String query = getQuery(); // make sure ES query is built
     if (!Strings.isNullOrEmpty(idQuery)) query = idQuery + " AND " + query;
+    query = "reference:\"" + table.getTableReference() + "\" AND " + query;
     return new QuerySettings.ChildQuery(valuesIndexManager.getIndex(table).getIndexType(), query);
   }
 
