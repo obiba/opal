@@ -24,6 +24,10 @@
       <ui:msg description="Cart label">Cart</ui:msg>
     </b:PageHeader>
 
+    <b:Heading size="4" addStyleNames="top-margin">
+      <ui:msg description="Variables label">Variables</ui:msg>
+    </b:Heading>
+
     <b:Paragraph>
       <ui:msg description="Cart help">
         The cart is a place where to store temporarily variables of interest before processing them: search entities,
@@ -31,11 +35,7 @@
       </ui:msg>
     </b:Paragraph>
 
-    <b:Heading size="4" addStyleNames="top-margin">
-      <ui:msg description="Variables label">Variables</ui:msg>
-    </b:Heading>
     <g:FlowPanel>
-
       <g:FlowPanel addStyleNames="small-bottom-margin clearfix">
         <b:Button ui:field="addToViewAll" type="INFO" icon="PLUS" addStyleNames="btn">
           <ui:msg description="Add to View Button label">View</ui:msg>

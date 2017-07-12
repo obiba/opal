@@ -1718,7 +1718,7 @@ public interface Translations extends Constants {
   String pageDataShieldTitle();
 
   @Description("Page Search Index title")
-  @DefaultStringValue("Index")
+  @DefaultStringValue("Search")
   String pageSearchIndexTitle();
 
   @Description("Page R Admin title")

@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.administration.index.view;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.Controls;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -68,6 +69,9 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
   @UiField
   Button refreshIndicesButton;
+
+  @UiField
+  Controls filterControls;
 
   @UiField
   TextBoxClearable filter;
@@ -264,6 +268,7 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     enableButton.setText(enabled ? translations.suspendLabel() : translations.resumeLabel());
     indexPanel.setVisible(enabled);
     indexTablePager.setVisible(enabled);
+    filterControls.setVisible(enabled);
     refreshIndicesButton.setVisible(enabled);
   }
 
