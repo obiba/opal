@@ -13,18 +13,26 @@ package org.obiba.opal.core.runtime;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.obiba.core.util.FileUtil;
 import org.obiba.opal.spi.ServicePlugin;
 import org.obiba.opal.spi.search.SearchServiceLoader;
 import org.obiba.opal.spi.vcf.VCFStoreServiceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -35,6 +43,13 @@ import java.util.zip.ZipFile;
 class PluginsManager {
 
   private static final Logger log = LoggerFactory.getLogger(PluginsManager.class);
+
+  private static final String PLUGINS_REPO_FILE = "plugins.json";
+
+  @Value("${org.obiba.opal.plugin.repos}")
+  private List<String> repos;
+
+  private List<PluginDescription> pluginDescriptions = Lists.newArrayList();
 
   private List<ServicePlugin> servicePlugins = Lists.newArrayList();
 
@@ -53,7 +68,33 @@ class PluginsManager {
   }
 
   void initPlugins() {
+    initPluginDescriptions();
     getPlugins().forEach(Plugin::init);
+  }
+
+  /**
+   * Fetch the plugin descriptions from the configured repositories.
+   *
+   */
+  void initPluginDescriptions() {
+    if (repos != null) {
+      pluginDescriptions.clear();
+      for (String repo : repos) {
+        String location = repo + (repo.endsWith("/") ? "" : "/") + PLUGINS_REPO_FILE;
+        try (InputStream input = new URL(location).openStream()) {
+          JSONObject pluginsObject = new JSONObject(new String(FileCopyUtils.copyToByteArray(input), StandardCharsets.UTF_8));
+          if (pluginsObject.has("plugins")) {
+            JSONArray pluginsArray = pluginsObject.getJSONArray("plugins");
+            for (int i=0; i<pluginsArray.length(); i++) {
+              JSONObject pluginObject = pluginsArray.getJSONObject(i);
+              pluginDescriptions.add(new PluginDescription(pluginObject, repo));
+            }
+          }
+        } catch (Exception e) {
+          log.warn("Could not retrieve plugins list from {}: {}: {}", repo, e.getClass().getName(), e.getMessage());
+        }
+      }
+    }
   }
 
   /**
