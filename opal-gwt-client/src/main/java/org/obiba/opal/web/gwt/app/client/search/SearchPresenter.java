@@ -49,19 +49,23 @@ public class SearchPresenter extends Presenter<SearchPresenter.Display, SearchPr
     return translations.pageSearchTitle();
   }
 
-  private PlaceRequest createRequest(String nameToken) {
-    return new PlaceRequest.Builder().nameToken(nameToken).build();
+  private PlaceRequest.Builder createRequest(String nameToken) {
+    return new PlaceRequest.Builder().nameToken(nameToken);
   }
 
   private void setHistoryTokens(TokenFormatter tokenFormatter) {
-    PlaceRequest searchPlace = createRequest(Places.SEARCH);
-    getView().setVariablesHistoryToken(getHistoryToken(tokenFormatter, searchPlace, Places.SEARCH_VARIABLES));
-    getView().setEntitiesHistoryToken(getHistoryToken(tokenFormatter, searchPlace, Places.SEARCH_ENTITIES));
-    getView().setEntityHistoryToken(getHistoryToken(tokenFormatter, searchPlace, Places.SEARCH_ENTITY));
+    PlaceRequest searchPlace = createRequest(Places.SEARCH).build();
+    getView().setVariablesHistoryToken(getHistoryToken(tokenFormatter, searchPlace, createRequest(Places.SEARCH_VARIABLES)
+        .with("rq", "exists(project),exists(table)")
+        .with("o","0")
+        .with("lm", "50")
+        .build()));
+    getView().setEntitiesHistoryToken(getHistoryToken(tokenFormatter, searchPlace, createRequest(Places.SEARCH_ENTITIES).build()));
+    getView().setEntityHistoryToken(getHistoryToken(tokenFormatter, searchPlace, createRequest(Places.SEARCH_ENTITY).build()));
   }
 
-  private String getHistoryToken(TokenFormatter tokenFormatter, PlaceRequest placeRequest, String place) {
-    return tokenFormatter.toHistoryToken(Arrays.asList(placeRequest, createRequest(place)));
+  private String getHistoryToken(TokenFormatter tokenFormatter, PlaceRequest parentPlaceRequest, PlaceRequest placeRequest) {
+    return tokenFormatter.toHistoryToken(Arrays.asList(parentPlaceRequest, placeRequest));
   }
 
   public interface Display extends View {
