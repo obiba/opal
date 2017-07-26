@@ -14,6 +14,8 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.obiba.runtime.Version;
 
+import java.util.Objects;
+
 /**
  * Plugin description as returned by a plugin repository.
  */
@@ -80,5 +82,22 @@ public class PluginDescription {
 
   public String getFileLocation() {
     return repo + "/" + file;
+  }
+  
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    PluginDescription that = (PluginDescription) o;
+    return Objects.equals(type, that.type) && Objects.equals(name, that.name) && Objects.equals(version, that.version);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(file);
   }
 }

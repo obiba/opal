@@ -12,6 +12,7 @@ package org.obiba.opal.core.runtime;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -49,7 +50,7 @@ class PluginsManager {
   @Value("${org.obiba.opal.plugin.repos}")
   private List<String> repos;
 
-  private List<PluginDescription> pluginDescriptions = Lists.newArrayList();
+  private Set<PluginDescription> pluginDescriptions = Sets.newLinkedHashSet();
 
   private List<ServicePlugin> servicePlugins = Lists.newArrayList();
 
@@ -87,7 +88,8 @@ class PluginsManager {
             JSONArray pluginsArray = pluginsObject.getJSONArray("plugins");
             for (int i=0; i<pluginsArray.length(); i++) {
               JSONObject pluginObject = pluginsArray.getJSONObject(i);
-              pluginDescriptions.add(new PluginDescription(pluginObject, repo));
+              PluginDescription desc = new PluginDescription(pluginObject, repo);
+              pluginDescriptions.add(desc);
             }
           }
         } catch (Exception e) {
