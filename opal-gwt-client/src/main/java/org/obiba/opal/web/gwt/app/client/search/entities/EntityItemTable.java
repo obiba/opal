@@ -14,12 +14,17 @@ import com.google.gwt.cell.client.Cell;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.InlineLabel;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
+import com.gwtplatform.mvp.shared.proxy.TokenFormatter;
+import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.PlacesRequestCell;
 import org.obiba.opal.web.model.client.search.ItemResultDto;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class EntityItemTable extends Table<ItemResultDto> {
 
@@ -27,19 +32,19 @@ public class EntityItemTable extends Table<ItemResultDto> {
     initColumns(null, "Participant");
   }
 
-  public void initialize(PlaceManager placeManager, String entityType) {
+  public void initialize(TokenFormatter tokenFormatter, String entityType) {
     while (getColumnCount()>0) {
       removeColumn(0);
     }
-    initColumns(placeManager, entityType);
+    initColumns(tokenFormatter, entityType);
   }
 
-  private void initColumns(PlaceManager placeManager, final String entityType) {
+  private void initColumns(TokenFormatter tokenFormatter, final String entityType) {
     setPageSize(Table.DEFAULT_PAGESIZE);
     setEmptyTableWidget(new InlineLabel(translations.noVariablesLabel()));
 
-    if (placeManager != null) {
-      addColumn(new EntityItemColumn(new EntityLinkCell(placeManager, entityType)), "ID");
+    if (tokenFormatter != null) {
+      addColumn(new EntityItemColumn(new EntityLinkCell(tokenFormatter, entityType)), "ID");
     } else {
       addColumn(new TextColumn<ItemResultDto>() {
         @Override
@@ -67,18 +72,19 @@ public class EntityItemTable extends Table<ItemResultDto> {
     }
   }
 
-  private static class EntityLinkCell extends PlaceRequestCell<ItemResultDto> {
+  private static class EntityLinkCell extends PlacesRequestCell<ItemResultDto> {
 
     private final String entityType;
 
-    private EntityLinkCell(PlaceManager placeManager, String entityType) {
-      super(placeManager);
+    private EntityLinkCell(TokenFormatter tokenFormatter, String entityType) {
+      super(tokenFormatter);
       this.entityType = entityType;
     }
 
     @Override
-    public PlaceRequest getPlaceRequest(ItemResultDto item) {
-      return ProjectPlacesHelper.getSearchEntityPlace(entityType, item.getIdentifier());
+    public List<PlaceRequest> getPlaceRequest(ItemResultDto item) {
+      return Arrays.asList(PlaceRequestHelper.createRequestBuilder(Places.SEARCH).build(),
+          ProjectPlacesHelper.getSearchEntityPlace(entityType, item.getIdentifier()));
     }
 
     @Override

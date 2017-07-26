@@ -35,6 +35,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
+import com.gwtplatform.mvp.shared.proxy.TokenFormatter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
@@ -56,6 +57,8 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   private final Translations translations;
 
   private final PlaceManager placeManager;
+
+  private final TokenFormatter tokenFormatter;
 
   @UiField
   Breadcrumbs breadcrumbs;
@@ -108,11 +111,13 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   private EntityItemProvider entityItemProvider;
 
   @Inject
-  public SearchEntitiesView(EventBus eventBus, SearchEntitiesView.Binder uiBinder, Translations translations, PlaceManager placeManager) {
+  public SearchEntitiesView(EventBus eventBus, SearchEntitiesView.Binder uiBinder, Translations translations,
+                            PlaceManager placeManager, TokenFormatter tokenFormatter) {
     initVariableTypeahead(eventBus);
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
     this.placeManager = placeManager;
+    this.tokenFormatter = tokenFormatter;
     typeDropdown.addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent event) {
@@ -398,7 +403,7 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   private void initEntityItemTable() {
     if (entityItemProvider == null || !typeDropdown.getSelection().equals(entityItemProvider.entityType)) {
       entityItemProvider = new EntityItemProvider(typeDropdown.getSelection());
-      entityItemTable.initialize(placeManager, typeDropdown.getSelection());
+      entityItemTable.initialize(tokenFormatter, typeDropdown.getSelection());
       entityItemPager.setDisplay(entityItemTable);
       entityItemProvider.addDataDisplay(entityItemTable);
     }

@@ -36,6 +36,7 @@ import org.obiba.opal.web.gwt.app.client.search.event.SearchEntityEvent;
 import org.obiba.opal.web.gwt.app.client.search.event.SearchTableVariablesEvent;
 import org.obiba.opal.web.gwt.app.client.search.event.SearchTaxonomyVariablesEvent;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
+import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 import org.obiba.opal.web.gwt.app.client.ui.VariableSearchListItem;
 import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
@@ -64,6 +65,8 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 import com.gwtplatform.mvp.client.proxy.RevealRootContentEvent;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
+
+import java.util.Arrays;
 
 /**
  *
@@ -219,7 +222,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
             .with(ParameterTokens.TOKEN_TYPE, event.getEntityType()) //
             .with(ParameterTokens.TOKEN_ID, event.getEntityId());
         if (!Strings.isNullOrEmpty(event.getTableReference())) builder.with(ParameterTokens.TOKEN_TABLE, event.getTableReference());
-        placeManager.revealPlace(builder.build());
+        placeManager.revealPlaceHierarchy(Arrays.asList(PlaceRequestHelper.createRequestBuilder(Places.SEARCH).build(), builder.build()));
       }
     });
 
@@ -264,16 +267,14 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
         .with(ParameterTokens.TOKEN_RQL_QUERY, rqlQuery)
         .with(ParameterTokens.TOKEN_OFFSET, "0")
         .with(ParameterTokens.TOKEN_LIMIT, "50");
-    placeManager.revealPlace(builder.build());
+    placeManager.revealPlaceHierarchy(Arrays.asList(PlaceRequestHelper.createRequestBuilder(Places.SEARCH).build(), builder.build()));
   }
 
   @Override
   protected void onReveal() {
     getView().setUsername(credentials.getUsername());
     getView().setVersion(ResourceRequestBuilderFactory.newBuilder().getVersion());
-
     refreshApplicationName();
-
     authorize();
   }
 

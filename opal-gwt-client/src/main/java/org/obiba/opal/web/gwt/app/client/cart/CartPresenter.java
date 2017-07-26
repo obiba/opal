@@ -33,7 +33,9 @@ import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class CartPresenter extends Presenter<CartPresenter.Display, CartPresenter.Proxy> implements HasPageTitle, CartUiHandlers {
@@ -95,7 +97,9 @@ public class CartPresenter extends Presenter<CartPresenter.Display, CartPresente
       }
     }
     if (entityTypeError) fireEvent(NotificationEvent.newBuilder().warn("CannotMixVariableEntityTypes").build());
-    else placeManager.revealPlace(ProjectPlacesHelper.getSearchEntitiesPlace(entityType, queries));
+    else placeManager.revealPlaceHierarchy(Arrays.asList(
+        PlaceRequestHelper.createRequestBuilder(Places.SEARCH).build(),
+        ProjectPlacesHelper.getSearchEntitiesPlace(entityType, queries)));
   }
 
   @Override

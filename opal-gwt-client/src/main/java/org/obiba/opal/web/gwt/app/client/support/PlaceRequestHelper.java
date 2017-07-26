@@ -21,6 +21,10 @@ public class PlaceRequestHelper {
   private PlaceRequestHelper() {
   }
 
+  public static PlaceRequest.Builder createRequestBuilder(String nameToken) {
+    return new PlaceRequest.Builder().nameToken(nameToken);
+  }
+
   public static PlaceRequest.Builder createRequestBuilder(PlaceRequest request) {
     PlaceRequest.Builder builder = createRequestBuilderWithNameToken(request);
 
@@ -43,7 +47,7 @@ public class PlaceRequestHelper {
     return builder;
   }
 
-  public static PlaceRequest.Builder createRequestBuilderWithNameToken(PlaceRequest request) {
+  private static PlaceRequest.Builder createRequestBuilderWithNameToken(PlaceRequest request) {
     return new PlaceRequest.Builder().nameToken(request.getNameToken());
   }
 }

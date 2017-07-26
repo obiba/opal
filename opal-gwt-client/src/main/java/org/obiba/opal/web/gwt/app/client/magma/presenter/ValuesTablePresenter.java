@@ -28,10 +28,12 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
+import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.search.event.SearchEntityEvent;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
+import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtoNature;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.ui.RQLValueSetVariableCriterionParser;
@@ -48,6 +50,7 @@ import org.obiba.opal.web.model.client.search.VariableItemDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.google.gwt.http.client.Response.*;
@@ -196,7 +199,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   @Override
   public void onSearchEntities(String idQuery, List<String> queries) {
     PlaceRequest request = ProjectPlacesHelper.getSearchEntitiesPlace(originalTable.getEntityType(), idQuery, queries);
-    placeManager.revealPlace(request);
+    placeManager.revealPlaceHierarchy(Arrays.asList(PlaceRequestHelper.createRequestBuilder(Places.SEARCH).build(), request));
   }
 
   private void fetchIndexStatus() {
