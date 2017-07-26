@@ -1784,6 +1784,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Taxonomies")
   String pageTaxonomiesTitle();
 
+  @Description("Quick Search Variables title")
+  @DefaultStringValue("Search variables...")
+  String quickSearchVariablesTitle();
+
   @Description("Import Github Taxonomy")
   @DefaultStringValue("Import Github Taxonomy")
   String importGitTaxonomy();

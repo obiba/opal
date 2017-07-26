@@ -21,6 +21,7 @@ import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import com.gwtplatform.mvp.shared.proxy.TokenFormatter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
@@ -56,9 +57,9 @@ public class SearchPresenter extends Presenter<SearchPresenter.Display, SearchPr
   private void setHistoryTokens(TokenFormatter tokenFormatter) {
     PlaceRequest searchPlace = createRequest(Places.SEARCH).build();
     getView().setVariablesHistoryToken(getHistoryToken(tokenFormatter, searchPlace, createRequest(Places.SEARCH_VARIABLES)
-        .with("rq", "exists(project),exists(table)")
-        .with("o","0")
-        .with("lm", "50")
+        .with(ParameterTokens.TOKEN_RQL_QUERY, "exists(project),exists(table)")
+        .with(ParameterTokens.TOKEN_OFFSET,"0")
+        .with(ParameterTokens.TOKEN_LIMIT, "50")
         .build()));
     getView().setEntitiesHistoryToken(getHistoryToken(tokenFormatter, searchPlace, createRequest(Places.SEARCH_ENTITIES).build()));
     getView().setEntityHistoryToken(getHistoryToken(tokenFormatter, searchPlace, createRequest(Places.SEARCH_ENTITY).build()));

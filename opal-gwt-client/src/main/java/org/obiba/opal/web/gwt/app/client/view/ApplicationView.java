@@ -114,7 +114,9 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
   @Inject
   public ApplicationView(EventBus eventBus, Binder uiBinder, Translations translations) {
     oracle = new VariableSuggestOracle(eventBus);
+    oracle.setLimit(10);
     search = new SuggestListBox(oracle);
+    search.getTextBox().setPlaceholder(translations.quickSearchVariablesTitle());
     initWidget(uiBinder.createAndBindUi(this));
 
     dashboardItem.setHref("#" + Places.DASHBOARD);

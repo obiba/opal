@@ -199,7 +199,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     reset();
     if (Strings.isNullOrEmpty(rqlQuery)) return;
     showAdvancedQuery(false);
-    RQLQuery root = RQLParser.parse(rqlQuery);
+    RQLQuery root = RQLParser.parse(rqlQuery.replaceAll(" ","+"));
     for (int i = 0; i < root.getArgumentsSize(); i++) {
       RQLQuery query = root.getRQLQuery(i);
       if (!query.getName().equals("contains")) {
@@ -211,7 +211,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
         VariableFieldSuggestOracle.VariableFieldSuggestion suggestion = oracle.findSuggestion(fieldName);
         addCriterion(suggestion, query, null);
       } else {
-        containsInput.setText(query.getString(0));
+        containsInput.setText(query.getString(0).replaceAll("\\+", " "));
       }
     }
     onSearch(null);

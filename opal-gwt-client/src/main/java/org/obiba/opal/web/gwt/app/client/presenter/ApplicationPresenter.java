@@ -395,7 +395,9 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   @Override
   public void onSearch(VariableSuggestOracle.AdvancedSearchSuggestion suggestion) {
     PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.SEARCH_VARIABLES)
-        .with(ParameterTokens.TOKEN_QUERY, suggestion.getReplacementString());
+        .with(ParameterTokens.TOKEN_RQL_QUERY, "contains(" + suggestion.getReplacementString() + ")")
+        .with(ParameterTokens.TOKEN_OFFSET, "0")
+        .with(ParameterTokens.TOKEN_LIMIT, "50");
     placeManager.revealPlace(builder.build());
   }
 
