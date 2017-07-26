@@ -14,8 +14,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
 import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariableEvent;
+import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariablesEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
@@ -530,9 +532,10 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @Override
   public void onAddVariablesToCart(List<VariableDto> variables) {
     if(variables.isEmpty()) return;
-    for (VariableDto variable : variables) {
-      fireEvent(new CartAddVariableEvent(table.getEntityType(), table.getDatasourceName(), table.getName(), variable.getName()));
-    }
+    List<String> names = Lists.newArrayList();
+    for (VariableDto variable : variables)
+      names.add(variable.getName());
+    fireEvent(new CartAddVariablesEvent(table.getEntityType(), table.getDatasourceName(), table.getName(), names));
   }
 
   @Override

@@ -641,7 +641,10 @@ public interface Translations extends Constants {
       "FolderAlreadyExists", "Folder '{0}' already exists.", //
       "ForbiddenPage", "You are not authorized to access to the content of this page.",
       "ParticipantIdVariableIsRequired", "Participant ID variable name is required.",
-      "SampleRoleVariableIsRequired", "Sample Role variable name is required."
+      "SampleRoleVariableIsRequired", "Sample Role variable name is required.",
+      "NoVariableAddedToCart", "No variable added to the cart.",
+      "VariableAddedToCart", "1 variable added to the cart.",
+      "VariablesAddedToCart", "{0} variables added to the cart."
   })
   Map<String, String> userMessageMap();
 

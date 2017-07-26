@@ -10,13 +10,31 @@
 package org.obiba.opal.web.gwt.app.client.presenter;
 
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
+import com.gwtplatform.mvp.client.Presenter;
+import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.ContentSlot;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
+import com.gwtplatform.mvp.client.proxy.RevealRootContentEvent;
+import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import org.obiba.opal.web.gwt.app.client.administration.configuration.event.GeneralConfigSavedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariableEvent;
-import org.obiba.opal.web.gwt.app.client.cart.event.CartCountsUpdate;
+import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariablesEvent;
 import org.obiba.opal.web.gwt.app.client.cart.event.CartCountsUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.cart.service.CartService;
-import org.obiba.opal.web.gwt.app.client.event.*;
+import org.obiba.opal.web.gwt.app.client.event.ModalClosedEvent;
+import org.obiba.opal.web.gwt.app.client.event.ModalShownEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequestEvent;
@@ -39,32 +57,11 @@ import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 import org.obiba.opal.web.gwt.app.client.ui.VariableSearchListItem;
 import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
-import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
-import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
-
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.HasUiHandlers;
-import com.gwtplatform.mvp.client.Presenter;
-import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.annotations.ContentSlot;
-import com.gwtplatform.mvp.client.annotations.ProxyStandard;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
-import com.gwtplatform.mvp.client.proxy.RevealRootContentEvent;
-import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 
 import java.util.Arrays;
 
@@ -203,8 +200,18 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     addRegisteredHandler(CartAddVariableEvent.getType(), new CartAddVariableEvent.CartAddVariableHandler() {
       @Override
       public void onCartAddVariable(CartAddVariableEvent event) {
+        int originalCount = cartService.getVariablesCount();
         cartService.addVariable(event.getEntityType(), event.getDatasource(), event.getTable(), event.getVariable());
-        getView().setCartCounts(cartService.getVariablesCount());
+        updateCartVariablesCount(originalCount, cartService.getVariablesCount());
+      }
+    });
+
+    addRegisteredHandler(CartAddVariablesEvent.getType(), new CartAddVariablesEvent.CartAddVariablesHandler() {
+      @Override
+      public void onCartAddVariables(CartAddVariablesEvent event) {
+        int originalCount = cartService.getVariablesCount();
+        cartService.addVariables(event.getEntityType(), event.getDatasource(), event.getTable(), event.getVariables());
+        updateCartVariablesCount(originalCount, cartService.getVariablesCount());
       }
     });
 
@@ -260,6 +267,13 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
     registerUserMessageEventHandler();
     registerModalEvents();
+  }
+
+  private void updateCartVariablesCount(int originalCount, int newCount) {
+    getView().setCartCounts(newCount);
+    int diffCount = newCount - originalCount;
+    String msg = diffCount == 0 ? "NoVariableAddedToCart" : (diffCount == 1 ? "VariableAddedToCart" : "VariablesAddedToCart");
+    fireEvent(NotificationEvent.newBuilder().info(msg).args("" + diffCount).build());
   }
 
   private void revealSearchVariables(String rqlQuery) {
