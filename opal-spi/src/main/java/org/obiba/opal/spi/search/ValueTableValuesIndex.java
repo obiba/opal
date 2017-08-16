@@ -19,10 +19,18 @@ public interface ValueTableValuesIndex extends ValueTableIndex {
   /**
    * Name of the field for the given variable.
    *
-   * @param variable Variable name
+   * @param variable
    * @return
    */
-  String getFieldName(String variable);
+  String getFieldName(Variable variable);
+
+  /**
+   * Name of the field for the given variable name.
+   *
+   * @param variableName
+   * @return
+   */
+  String getFieldName(String variableName);
 
   /**
    * Get the variables being indexed.
