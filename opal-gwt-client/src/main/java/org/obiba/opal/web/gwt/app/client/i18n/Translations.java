@@ -644,7 +644,7 @@ public interface Translations extends Constants {
       "SampleRoleVariableIsRequired", "Sample Role variable name is required.",
       "NoVariableAddedToCart", "No variable added to the cart.",
       "VariableAddedToCart", "1 variable added to the cart.",
-      "VariablesAddedToCart", "{0} variables added to the cart."
+      "VariablesAddedToCart", "{0} {1} variables added to the cart."
   })
   Map<String, String> userMessageMap();
 

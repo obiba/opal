@@ -38,9 +38,9 @@ public class CartService {
     GWT.log("Local storage is supported: " + (stockStore != null));
   }
 
-  public void addVariables(String entityType, String datasource, String table, List<String> variables) {
+  public void addVariables(String entityType, List<String> variables) {
     for (String variable : variables)
-      addVariable(entityType, getVariableFullName(datasource, table, variable));
+      addVariable(entityType, variable);
   }
 
   public void addVariable(String entityType, String datasource, String table, String variable) {

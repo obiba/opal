@@ -19,10 +19,7 @@ public class CartAddVariables {
 
   String entityType;
 
-  String datasource;
-
-  String table;
-
+  // variable full names
   List<String> variables;
 
 }

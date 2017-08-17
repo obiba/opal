@@ -202,7 +202,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       public void onCartAddVariable(CartAddVariableEvent event) {
         int originalCount = cartService.getVariablesCount();
         cartService.addVariable(event.getEntityType(), event.getDatasource(), event.getTable(), event.getVariable());
-        updateCartVariablesCount(originalCount, cartService.getVariablesCount());
+        updateCartVariablesCount(originalCount, event.getEntityType(), cartService.getVariablesCount());
       }
     });
 
@@ -210,8 +210,8 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       @Override
       public void onCartAddVariables(CartAddVariablesEvent event) {
         int originalCount = cartService.getVariablesCount();
-        cartService.addVariables(event.getEntityType(), event.getDatasource(), event.getTable(), event.getVariables());
-        updateCartVariablesCount(originalCount, cartService.getVariablesCount());
+        cartService.addVariables(event.getEntityType(), event.getVariables());
+        updateCartVariablesCount(originalCount, event.getEntityType(), cartService.getVariablesCount());
       }
     });
 
@@ -269,11 +269,11 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     registerModalEvents();
   }
 
-  private void updateCartVariablesCount(int originalCount, int newCount) {
+  private void updateCartVariablesCount(int originalCount, String entityType, int newCount) {
     getView().setCartCounts(newCount);
     int diffCount = newCount - originalCount;
     String msg = diffCount == 0 ? "NoVariableAddedToCart" : (diffCount == 1 ? "VariableAddedToCart" : "VariablesAddedToCart");
-    fireEvent(NotificationEvent.newBuilder().info(msg).args("" + diffCount).build());
+    fireEvent(NotificationEvent.newBuilder().info(msg).args("" + diffCount, entityType).build());
   }
 
   private void revealSearchVariables(String rqlQuery) {

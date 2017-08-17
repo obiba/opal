@@ -48,6 +48,7 @@ import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionT
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.search.event.SearchTableVariablesEvent;
+import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -534,8 +535,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     if(variables.isEmpty()) return;
     List<String> names = Lists.newArrayList();
     for (VariableDto variable : variables)
-      names.add(variable.getName());
-    fireEvent(new CartAddVariablesEvent(table.getEntityType(), table.getDatasourceName(), table.getName(), names));
+      names.add(MagmaPath.Builder.datasource(table.getDatasourceName()).table(table.getName()).variable(variable.getName()).build());
+    fireEvent(new CartAddVariablesEvent(table.getEntityType(), names));
   }
 
   @Override

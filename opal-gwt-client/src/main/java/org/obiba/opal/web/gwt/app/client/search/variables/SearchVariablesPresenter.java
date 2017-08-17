@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.search.variables;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -27,6 +28,7 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariableEvent;
+import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariablesEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -47,7 +49,9 @@ import org.obiba.opal.web.model.client.search.ItemFieldsDto;
 import org.obiba.opal.web.model.client.search.ItemResultDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter.Display, SearchVariablesPresenter.Proxy>
     implements HasPageTitle, SearchVariablesUiHandlers {
@@ -144,18 +148,23 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
   @Override
   public void onAddToCart(List<ItemResultDto> selectedItems) {
     if (selectedItems.isEmpty()) return;
+    Map<String, List<String>> namesByType = Maps.newHashMap();
     for (ItemResultDto item : selectedItems) {
       MagmaPath.Parser parser = MagmaPath.Parser.parse(item.getIdentifier());
-      String entityType = "Participant";
       ItemFieldsDto fields = (ItemFieldsDto) item.getExtension("Search.ItemFieldsDto.item");
+      String entityType = "Participant";
       for (EntryDto entry : JsArrays.toIterable(fields.getFieldsArray())) {
         if ("entityType".equals(entry.getKey())) {
           entityType = entry.getValue();
           break;
         }
       }
-      fireEvent(new CartAddVariableEvent(entityType, parser.getDatasource(), parser.getTable(), parser.getVariable()));
+      if (!namesByType.containsKey(entityType))
+        namesByType.put(entityType, new ArrayList<String>());
+      namesByType.get(entityType).add(MagmaPath.Builder.datasource(parser.getDatasource()).table(parser.getTable()).variable(parser.getVariable()).build());
     }
+    for (String type : namesByType.keySet())
+      fireEvent(new CartAddVariablesEvent(type, namesByType.get(type)));
   }
 
   //
