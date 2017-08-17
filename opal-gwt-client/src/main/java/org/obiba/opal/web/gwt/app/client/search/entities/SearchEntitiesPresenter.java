@@ -104,6 +104,7 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
     idQuery = request.getParameter(ParameterTokens.TOKEN_ID, "");
     String jQueries = request.getParameter(ParameterTokens.TOKEN_QUERY, "");
     queries = null;
+    indexedTables = null;
     if (!jQueries.isEmpty()) {
       RQLQuery root = RQLParser.parse(jQueries);
       queries = Lists.newArrayList();
@@ -232,7 +233,7 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
    * Fetch the tables which values have been indexed.
    */
   private void renderTables() {
-    if (indexedTables != null) return;
+    indexedTables = null;
     getView().searchEnabled(false);
     ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder()
         .forResource(UriBuilders.DATASOURCES_TABLES.create().query("indexed", "true").query("entityType", selectedType).build())
