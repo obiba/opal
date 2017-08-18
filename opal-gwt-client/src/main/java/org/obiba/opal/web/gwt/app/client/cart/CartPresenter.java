@@ -85,6 +85,14 @@ public class CartPresenter extends Presenter<CartPresenter.Display, CartPresente
   }
 
   @Override
+  public void onRemoveVariables(List<CartVariableItem> selectedVariables) {
+    for (CartVariableItem var : selectedVariables) {
+      cartService.removeVariable(var.getIdentifier());
+    }
+    updateView();
+  }
+
+  @Override
   public void onSearchEntities(List<CartVariableItem> selectedVariables) {
     if (selectedVariables.isEmpty()) return;
     List<String> queries = Lists.newArrayList();

@@ -107,6 +107,11 @@ public class CartView extends ViewWithUiHandlers<CartUiHandlers> implements Cart
     getUiHandlers().onSearchEntities(variableCartTable.getSelectedItems());
   }
 
+  @UiHandler("removeFromCart")
+  public void onRemoveFromCart(ClickEvent event) {
+    getUiHandlers().onRemoveVariables(variableCartTable.getSelectedItems());
+  }
+
   @UiHandler("addToView")
   public void onAddToView(ClickEvent event) {
     getUiHandlers().onAddToView(variableCartTable.getSelectedItems());

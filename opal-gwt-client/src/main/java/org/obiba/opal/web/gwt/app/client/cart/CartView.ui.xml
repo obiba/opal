@@ -67,6 +67,10 @@
                            addStyleNames="inline small-indent">
               <ui:msg description="Search entities label">Search entities</ui:msg>
             </b2:IconAnchor>
+            <b2:IconAnchor ui:field="removeFromCart" icon="SHOPPING_CART"
+                           addStyleNames="inline small-indent">
+              <ui:msg description="Remove from cart label">Remove from cart</ui:msg>
+            </b2:IconAnchor>
           </g:FlowPanel>
 
           <g:FlowPanel addStyleNames="pull-right">
