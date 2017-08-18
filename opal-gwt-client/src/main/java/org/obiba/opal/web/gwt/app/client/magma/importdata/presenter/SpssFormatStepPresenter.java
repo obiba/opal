@@ -15,6 +15,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
@@ -133,7 +134,7 @@ public class SpssFormatStepPresenter extends PresenterWidget<SpssFormatStepPrese
 
       ConditionValidator localeValidator = new ConditionValidator(localeCondition(getView().getLocale()),
           "InvalidLocaleName", Display.FormField.LOCALE.name());
-      localeValidator.setArgs(Arrays.asList(getView().getLocale()));
+      localeValidator.setArgs(Lists.newArrayList(getView().getLocale()));
       validators.add(localeValidator);
 
       return validators;

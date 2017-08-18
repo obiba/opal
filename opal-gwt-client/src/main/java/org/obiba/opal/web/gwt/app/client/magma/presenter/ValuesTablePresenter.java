@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
@@ -199,7 +200,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   @Override
   public void onSearchEntities(String idQuery, List<String> queries) {
     PlaceRequest request = ProjectPlacesHelper.getSearchEntitiesPlace(originalTable.getEntityType(), idQuery, queries);
-    placeManager.revealPlaceHierarchy(Arrays.asList(PlaceRequestHelper.createRequestBuilder(Places.SEARCH).build(), request));
+    placeManager.revealPlaceHierarchy(Lists.newArrayList(PlaceRequestHelper.createRequestBuilder(Places.SEARCH).build(), request));
   }
 
   private void fetchIndexStatus() {

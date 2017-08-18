@@ -16,6 +16,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
 import org.obiba.opal.web.gwt.app.client.administration.database.edit.AbstractDatabaseModalPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -47,7 +48,7 @@ public class MongoDatabaseModalPresenter extends AbstractDatabaseModalPresenter<
   protected void onBind() {
     super.onBind();
 
-    getView().setAvailableUsages(Arrays.asList(Usage.STORAGE));
+    getView().setAvailableUsages(Lists.newArrayList(Usage.STORAGE));
     getView().getUsageChangeHandlers().addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent event) {

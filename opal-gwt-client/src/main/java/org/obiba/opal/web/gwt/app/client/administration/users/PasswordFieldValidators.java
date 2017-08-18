@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
@@ -49,7 +50,7 @@ public class PasswordFieldValidators {
     validators.add(new RequiredTextValidator(password, "PasswordIsRequired", passwordForm));
     ConditionValidator minLength = new ConditionValidator(minLengthCondition(password), "PasswordLengthMin",
         passwordForm);
-    minLength.setArgs(Arrays.asList(String.valueOf(MIN_PASSWORD_LENGTH)));
+    minLength.setArgs(Lists.newArrayList(String.valueOf(MIN_PASSWORD_LENGTH)));
     validators.add(minLength);
     validators.add(
         new ConditionValidator(passwordsMatchCondition(password, confirmation), "PasswordsMustMatch", passwordForm));

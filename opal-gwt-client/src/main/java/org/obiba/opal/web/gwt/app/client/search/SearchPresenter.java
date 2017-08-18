@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.search;
 
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
@@ -66,7 +67,7 @@ public class SearchPresenter extends Presenter<SearchPresenter.Display, SearchPr
   }
 
   private String getHistoryToken(TokenFormatter tokenFormatter, PlaceRequest parentPlaceRequest, PlaceRequest placeRequest) {
-    return tokenFormatter.toHistoryToken(Arrays.asList(parentPlaceRequest, placeRequest));
+    return tokenFormatter.toHistoryToken(Lists.newArrayList(parentPlaceRequest, placeRequest));
   }
 
   public interface Display extends View {

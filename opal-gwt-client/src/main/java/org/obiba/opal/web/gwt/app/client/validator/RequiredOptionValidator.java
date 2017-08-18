@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import com.google.gwt.user.client.TakesValue;
 
 /**
@@ -64,7 +65,7 @@ public class RequiredOptionValidator extends AbstractFieldValidator {
 
   public static Set<TakesValue<Boolean>> asSet(TakesValue<Boolean>... options) {
     Set<TakesValue<Boolean>> optionSet = new HashSet<TakesValue<Boolean>>();
-    optionSet.addAll(Arrays.asList(options));
+    optionSet.addAll(Lists.newArrayList(options));
     return optionSet;
   }
 }

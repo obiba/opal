@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.administration.presenter;
 
 import java.util.Arrays;
 
+import com.google.common.collect.Lists;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.place.Places;
@@ -184,7 +185,7 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
   }
 
   private String getHistoryToken(TokenFormatter tokenFormatter, PlaceRequest adminPlace, String place) {
-    return tokenFormatter.toHistoryToken(Arrays.asList(adminPlace, createRequest(place)));
+    return tokenFormatter.toHistoryToken(Lists.newArrayList(adminPlace, createRequest(place)));
   }
 
   private PlaceRequest createRequest(String nameToken) {

@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.presenter;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.http.client.Request;
@@ -229,7 +230,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
             .with(ParameterTokens.TOKEN_TYPE, event.getEntityType()) //
             .with(ParameterTokens.TOKEN_ID, event.getEntityId());
         if (!Strings.isNullOrEmpty(event.getTableReference())) builder.with(ParameterTokens.TOKEN_TABLE, event.getTableReference());
-        placeManager.revealPlaceHierarchy(Arrays.asList(PlaceRequestHelper.createRequestBuilder(Places.SEARCH).build(), builder.build()));
+        placeManager.revealPlaceHierarchy(Lists.newArrayList(PlaceRequestHelper.createRequestBuilder(Places.SEARCH).build(), builder.build()));
       }
     });
 
@@ -281,7 +282,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
         .with(ParameterTokens.TOKEN_RQL_QUERY, rqlQuery)
         .with(ParameterTokens.TOKEN_OFFSET, "0")
         .with(ParameterTokens.TOKEN_LIMIT, "50");
-    placeManager.revealPlaceHierarchy(Arrays.asList(PlaceRequestHelper.createRequestBuilder(Places.SEARCH).build(), builder.build()));
+    placeManager.revealPlaceHierarchy(Lists.newArrayList(PlaceRequestHelper.createRequestBuilder(Places.SEARCH).build(), builder.build()));
   }
 
   @Override

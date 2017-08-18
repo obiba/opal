@@ -94,6 +94,9 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   EntityItemTable entityItemTable;
 
   @UiField
+  Image resetPending;
+
+  @UiField
   Image refreshPending;
 
   @UiField
@@ -184,7 +187,14 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
 
   @Override
   public void searchEnabled(boolean enabled) {
+    resetPending.setVisible(!enabled);
     searchButton.setEnabled(enabled);
+  }
+
+  @Override
+  public void searchUnavailable() {
+    resetPending.setVisible(false);
+    searchButton.setEnabled(false);
   }
 
   @Override

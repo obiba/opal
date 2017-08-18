@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -91,7 +92,7 @@ public class ValueSequencePopupPresenter extends ModalPresenterWidget<ValueSeque
     @Override
     public void request(String filter) {
       if(filter == null || filter.isEmpty()) {
-        requestValueSet(Arrays.asList(variable), filter);
+        requestValueSet(Lists.newArrayList(variable), filter);
       } else {
         requestVariablesAndValueSet(filter);
       }

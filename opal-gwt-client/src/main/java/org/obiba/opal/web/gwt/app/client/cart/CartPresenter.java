@@ -22,6 +22,7 @@ import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import org.obiba.opal.web.gwt.app.client.cart.event.CartCountsUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.cart.service.CartService;
 import org.obiba.opal.web.gwt.app.client.cart.service.CartVariableItem;
@@ -35,6 +36,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -97,7 +99,7 @@ public class CartPresenter extends Presenter<CartPresenter.Display, CartPresente
       }
     }
     if (entityTypeError) fireEvent(NotificationEvent.newBuilder().warn("CannotMixVariableEntityTypes").build());
-    else placeManager.revealPlaceHierarchy(Arrays.asList(
+    else placeManager.revealPlaceHierarchy(Lists.newArrayList(
         PlaceRequestHelper.createRequestBuilder(Places.SEARCH).build(),
         ProjectPlacesHelper.getSearchEntitiesPlace(entityType, queries)));
   }

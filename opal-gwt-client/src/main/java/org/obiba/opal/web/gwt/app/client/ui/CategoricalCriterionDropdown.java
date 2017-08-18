@@ -68,9 +68,9 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
       checksPanel = specificControls;
     }
     categoryChecks = Lists.newArrayList();
-    if (variable.getValueType().equals("boolean")) {
-      appendCategoryCheck(checksPanel, "T", translations.trueLabel(), "", getCategoryFrequency("T"));
-      appendCategoryCheck(checksPanel, "F", translations.falseLabel(), "", getCategoryFrequency("F"));
+    if (isBooleanVariable()) {
+      appendCategoryCheck(checksPanel, "T", translations.trueLabel(), "", getCategoryFrequency("1"));
+      appendCategoryCheck(checksPanel, "F", translations.falseLabel(), "", getCategoryFrequency("0"));
     }
     else
       for (CategoryDto cat : JsArrays.toIterable(variable.getCategoriesArray()))
@@ -272,6 +272,10 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
       }
     }
     return label.toString();
+  }
+
+  private boolean isBooleanVariable() {
+    return variable.getValueType().equals("boolean");
   }
 
   private class OperatorClickHandler implements ClickHandler {

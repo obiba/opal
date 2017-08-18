@@ -17,6 +17,7 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
+import com.google.common.collect.Lists;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
@@ -61,7 +62,7 @@ public class AddResourcePermissionModalPresenter
     getView().clearErrors();
     if(new ViewValidatorHandler().validate()) {
       if(updateHandler != null) {
-        updateHandler.update(Arrays.asList(getView().getPrincipal().getText()), currentSubjectType, getView().getPermission());
+        updateHandler.update(Lists.newArrayList(getView().getPrincipal().getText()), currentSubjectType, getView().getPermission());
       }
       getView().close();
     }
@@ -99,7 +100,7 @@ public class AddResourcePermissionModalPresenter
       type = Subject.SubjectType.USER.getName().equals(typeName) ? Subject.SubjectType.USER : Subject.SubjectType.GROUP;
       setErrorMessageKey(
           Subject.SubjectType.USER.isSubjectType(type) ? "DuplicateAclSubjectUser" : "DuplicateAclSubjectGroup");
-      setArgs(Arrays.asList(principal));
+      setArgs(Lists.newArrayList(principal));
     }
 
     @Override

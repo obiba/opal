@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.search.entities;
 
+import com.google.common.collect.Lists;
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
@@ -83,7 +84,7 @@ public class EntityItemTable extends Table<ItemResultDto> {
 
     @Override
     public List<PlaceRequest> getPlaceRequest(ItemResultDto item) {
-      return Arrays.asList(PlaceRequestHelper.createRequestBuilder(Places.SEARCH).build(),
+      return Lists.newArrayList(PlaceRequestHelper.createRequestBuilder(Places.SEARCH).build(),
           ProjectPlacesHelper.getSearchEntityPlace(entityType, item.getIdentifier()));
     }
 

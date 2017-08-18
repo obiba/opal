@@ -14,6 +14,7 @@ import java.util.Arrays;
 
 import javax.annotation.Nonnull;
 
+import com.google.common.collect.Lists;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.model.client.opal.Acl;
@@ -47,7 +48,7 @@ public class UpdateResourcePermissionModalPresenter
   @Override
   public void save() {
     if(updateHandler != null) {
-      updateHandler.update(Arrays.asList(acl.getSubject().getPrincipal()), acl.getSubject().getType(),
+      updateHandler.update(Lists.newArrayList(acl.getSubject().getPrincipal()), acl.getSubject().getType(),
           getView().getPermission());
     }
     getView().close();

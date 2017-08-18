@@ -17,6 +17,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
@@ -271,7 +272,7 @@ public class CsvFormatStepPresenter extends PresenterWidget<CsvFormatStepPresent
       String charset = getView().getCharsetText().getText();
       CharacterSetEncodingValidator charsetValidator = new CharacterSetEncodingValidator(charset,
           "InvalidCharacterSetName", CsvOptionsDisplay.CsvFormField.CHARSET.name());
-      charsetValidator.setArgs(Arrays.asList(charset));
+      charsetValidator.setArgs(Lists.newArrayList(charset));
       validators.add(charsetValidator);
     }
 

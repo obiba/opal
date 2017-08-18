@@ -16,6 +16,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
 import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FilesDownloadRequestEvent;
@@ -110,7 +111,7 @@ public class EncryptDownloadModalPresenter extends ModalPresenterWidget<EncryptD
           validators.add(new RequiredTextValidator(password, "PasswordIsRequired", passwordForm));
           ConditionValidator minLength =
               new ConditionValidator(minLengthCondition(password), "PasswordLengthMin", passwordForm);
-          minLength.setArgs(Arrays.asList(String.valueOf(MIN_PASSWORD_LENGTH)));
+          minLength.setArgs(Lists.newArrayList(String.valueOf(MIN_PASSWORD_LENGTH)));
           validators.add(minLength);
         }
       }

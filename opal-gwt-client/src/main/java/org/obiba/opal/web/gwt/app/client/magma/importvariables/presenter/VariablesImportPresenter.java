@@ -18,6 +18,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
@@ -327,7 +328,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
       String localeName = getView().getLocale();
       LocaleValidator localeValidator = new LocaleValidator(localeName, "InvalidLocaleName",
           Display.FormField.LOCALE.name());
-      localeValidator.setArgs(Arrays.asList(localeName));
+      localeValidator.setArgs(Lists.newArrayList(localeName));
 
       return localeValidator;
     }
@@ -336,7 +337,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
       String encoding = getView().getCharsetText().getText();
       CharacterSetEncodingValidator encodingValidator = new CharacterSetEncodingValidator(encoding,
           "InvalidCharacterSetName", Display.FormField.CHARSET.name());
-      encodingValidator.setArgs(Arrays.asList(encoding));
+      encodingValidator.setArgs(Lists.newArrayList(encoding));
 
       return encodingValidator;
     }

@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.magma.importdata.presenter;
 
 import com.github.gwtbootstrap.client.ui.base.HasType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
+import com.google.common.collect.Lists;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -161,7 +162,7 @@ public class RHavenStepPresenter extends PresenterWidget<RHavenStepPresenter.Dis
 
       ConditionValidator localeValidator = new ConditionValidator(localeCondition(getView().getLocale()),
           "InvalidLocaleName", Display.FormField.LOCALE.name());
-      localeValidator.setArgs(Arrays.asList(getView().getLocale()));
+      localeValidator.setArgs(Lists.newArrayList(getView().getLocale()));
       validators.add(localeValidator);
 
       return validators;

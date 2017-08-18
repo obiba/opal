@@ -28,10 +28,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.event.TableIndexStatusRefreshEvent;
-import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.magma.event.ValuesQueryEvent;
-import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.*;
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewModalPresenter;
@@ -853,6 +850,9 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
             getView().initContingencyTable(JsArrays.toSafeArray(resource));
           }
         }).send();
+        fireEvent(new TableIndexUpdatedEvent(table, true));
+      } else {
+        fireEvent(new TableIndexUpdatedEvent(table, false));
       }
     }
   }

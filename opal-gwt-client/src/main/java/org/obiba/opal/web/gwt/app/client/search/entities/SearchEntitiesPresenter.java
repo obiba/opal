@@ -30,6 +30,7 @@ import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.event.TableIndexUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
@@ -92,6 +93,30 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
   }
 
   @Override
+  protected void onBind() {
+    addRegisteredHandler(TableIndexUpdatedEvent.getType(), new TableIndexUpdatedEvent.Handler() {
+      @Override
+      public void onRefresh(TableIndexUpdatedEvent event) {
+        if (indexedTables == null) return;
+        // update the list of indexed tables following an indexing event
+        int found = -1;
+        for (int i=0; i<indexedTables.size(); i++) {
+          TableDto idxTable = indexedTables.get(i);
+          if (idxTable.getLink().equals(event.getTable().getLink())) {
+            found = i;
+            break;
+          }
+        }
+        if (event.isIndexed() && found == -1)
+          indexedTables.add(event.getTable());
+        else if (!event.isIndexed() && found>-1)
+          indexedTables.remove(found);
+        if (indexedTables != null && indexedTables.size() == 0) indexedTables = null;
+      }
+    });
+  }
+
+  @Override
   protected void onReveal() {
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
     renderEntityTypes();
@@ -104,7 +129,6 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
     idQuery = request.getParameter(ParameterTokens.TOKEN_ID, "");
     String jQueries = request.getParameter(ParameterTokens.TOKEN_QUERY, "");
     queries = null;
-    indexedTables = null;
     if (!jQueries.isEmpty()) {
       RQLQuery root = RQLParser.parse(jQueries);
       queries = Lists.newArrayList();
@@ -233,16 +257,16 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
    * Fetch the tables which values have been indexed.
    */
   private void renderTables() {
-    indexedTables = null;
+    if (indexedTables != null) return;
     getView().searchEnabled(false);
     ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder()
         .forResource(UriBuilders.DATASOURCES_TABLES.create().query("indexed", "true").query("entityType", selectedType).build())
         .withCallback(new ResourceCallback<JsArray<TableDto>>() {
           @Override
           public void onResource(Response response, JsArray<TableDto> resource) {
-            indexedTables = JsArrays.toList(resource);
+            indexedTables = Lists.newArrayList(JsArrays.toIterable(resource));
             if (indexedTables.isEmpty()) {
-              getView().searchEnabled(false);
+              getView().searchUnavailable();
               fireEvent(NotificationEvent.newBuilder().error("NoTableIndexed").build());
             } else {
               getView().searchEnabled(true);
@@ -334,6 +358,8 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
     void showResults(EntitiesResultDto results, int offset, int limit);
 
     void searchEnabled(boolean enabled);
+
+    void searchUnavailable();
 
     void triggerSearch();
   }

@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
@@ -102,7 +103,7 @@ public class AddVariablesModalPresenter extends ModalPresenterWidget<AddVariable
     ViewDtoBuilder builder = ViewDtoBuilder.newBuilder();
     String fileName = fileSelectionPresenter.getSelectedFile();
     builder.setName(tableDto.getName() + "-variables-source");
-    builder.fromTables(Arrays.asList(tableDto));
+    builder.fromTables(Lists.newArrayList(tableDto));
     FileViewDto fileView = FileViewDto.create();
     fileView.setFilename(fileName);
     fileView.setType(getFileType(fileName));

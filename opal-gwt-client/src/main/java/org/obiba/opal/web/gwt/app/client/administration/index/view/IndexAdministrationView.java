@@ -166,9 +166,9 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
       @Override
       public void doAction(TableIndexStatusDto statusDto, String actionName) {
         if (actionName.trim().equalsIgnoreCase(REMOVE_ACTION)) {
-          getUiHandlers().delete(Arrays.asList(statusDto));
+          getUiHandlers().delete(Lists.newArrayList(statusDto));
         } else if (actionName.trim().equalsIgnoreCase(INDEX_ACTION)) {
-          getUiHandlers().indexNow(Arrays.asList(statusDto));
+          getUiHandlers().indexNow(Lists.newArrayList(statusDto));
         }
       }
     });

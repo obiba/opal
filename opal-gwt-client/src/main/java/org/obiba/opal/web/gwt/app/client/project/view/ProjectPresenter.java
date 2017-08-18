@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.project.view;
 
 import java.util.Arrays;
 
+import com.google.common.collect.Lists;
 import org.obiba.opal.web.gwt.app.client.bookmark.icon.BookmarkIconPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
@@ -271,7 +272,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
     PlaceRequest.Builder builder = PlaceRequestHelper
         .createRequestBuilderWithParams(placeManager.getCurrentPlaceRequest(),
-            Arrays.asList(ParameterTokens.TOKEN_NAME))
+            Lists.newArrayList(ParameterTokens.TOKEN_NAME))
         .with(ParameterTokens.TOKEN_TAB, tab.toString());
     if(!Strings.isNullOrEmpty(queryPathParam)) {
       builder.with(ParameterTokens.TOKEN_PATH, queryPathParam);
@@ -378,7 +379,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   private void updateHistory(String queryPathParam) {
     PlaceRequest.Builder builder = PlaceRequestHelper
         .createRequestBuilderWithParams(placeManager.getCurrentPlaceRequest(),
-            Arrays.asList(ParameterTokens.TOKEN_NAME, ParameterTokens.TOKEN_TAB));
+            Lists.newArrayList(ParameterTokens.TOKEN_NAME, ParameterTokens.TOKEN_TAB));
 
     if(!Strings.isNullOrEmpty(queryPathParam)) {
       builder.with(ParameterTokens.TOKEN_PATH, queryPathParam).build();
