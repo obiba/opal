@@ -15,13 +15,11 @@ import java.util.Comparator;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import com.google.common.base.Strings;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.Timestamps;
@@ -60,6 +58,17 @@ public class SearchServiceResource extends IndexResource {
     sortByName(tableStatusDtos);
 
     return tableStatusDtos;
+  }
+
+  @DELETE
+  public Response dropIndices(@QueryParam("type") String type) {
+    if (opalSearchService.isRunning()) {
+      if (Strings.isNullOrEmpty(type) || "values".equals(type.toLowerCase()))
+        opalSearchService.getValuesIndexManager().drop();
+      if (Strings.isNullOrEmpty(type) || "variables".equals(type.toLowerCase()))
+        opalSearchService.getVariablesIndexManager().drop();
+    }
+    return Response.noContent().build();
   }
 
   @PUT

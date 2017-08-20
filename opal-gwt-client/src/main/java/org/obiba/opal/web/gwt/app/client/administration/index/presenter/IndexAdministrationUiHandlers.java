@@ -27,6 +27,8 @@ public interface IndexAdministrationUiHandlers extends UiHandlers {
 
   void refresh();
 
+  void remove();
+
   void configure();
 
   void delete(List<TableIndexStatusDto> statusDtos);

@@ -279,6 +279,20 @@ public class IndexAdministrationPresenter
   }
 
   @Override
+  public void remove() {
+    ResourceRequestBuilderFactory.newBuilder()//
+        .forResource(Resources.valuesIndices())//
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            refresh();
+          }
+        }, Response.SC_NO_CONTENT)//
+        .withCallback(Response.SC_SERVICE_UNAVAILABLE, ResponseCodeCallback.NO_OP) //
+        .delete().send();
+  }
+
+  @Override
   public void configure() {
     indexConfigurationProvider.get();
   }

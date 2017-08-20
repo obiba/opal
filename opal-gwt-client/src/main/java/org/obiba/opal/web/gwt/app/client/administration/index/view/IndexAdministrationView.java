@@ -191,6 +191,11 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     getUiHandlers().refresh();
   }
 
+  @UiHandler("removeIndicesButton")
+  public void onRemove(ClickEvent event) {
+    getUiHandlers().remove();
+  }
+
   @UiHandler("filter")
   public void onFilterUpdate(KeyUpEvent event) {
     renderTableIndices(filterTableIndices(filter.getText()));

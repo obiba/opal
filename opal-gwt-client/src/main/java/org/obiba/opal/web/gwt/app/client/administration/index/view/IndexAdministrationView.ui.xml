@@ -69,6 +69,10 @@
             <ui:msg description="Refresh indices label">Refresh</ui:msg>
           </b:Button>
         </b:ButtonGroup>
+        <b:ButtonGroup>
+          <b:Button icon="TRASH" ui:field="removeIndicesButton">
+          </b:Button>
+        </b:ButtonGroup>
       </g:FlowPanel>
 
       <o:OpalSimplePager ui:field="indexTablePager" location="RIGHT" addStyleNames="small-indent pull-right"/>

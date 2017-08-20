@@ -40,6 +40,11 @@ public interface IndexManager {
    */
   IndexSynchronization createSyncTask(ValueTable valueTable, ValueTableIndex index);
 
+  /**
+   * Check if this index manager is enabled.
+   *
+   * @return
+   */
   boolean isEnabled();
 
   /**
@@ -48,6 +53,12 @@ public interface IndexManager {
    * @return
    */
   boolean isReady();
+
+  /**
+   * Drop the index for all the tables.
+   *
+   */
+  void drop();
 
   /**
    * Returns true of value table is indexed and index is up to date, ie ready to be queried.
