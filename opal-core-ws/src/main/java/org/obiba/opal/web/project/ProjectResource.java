@@ -13,13 +13,7 @@ import java.util.Arrays;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -137,7 +131,7 @@ public class ProjectResource {
   public VCFStoreResource getVCFStoreResource() {
     Project project = getProject();
     if (!opalRuntime.hasServicePlugins(VCFStoreService.class)) throw new NoSuchServiceException(VCFStoreService.SERVICE_TYPE);
-    if (!project.hasVCFStoreService()) throw new IllegalArgumentException("Project has no VCF store: " + project.getName());
+    if (!project.hasVCFStoreService()) throw new NotFoundException("Project has no VCF store: " + project.getName());
     VCFStoreResource resource = applicationContext.getBean(VCFStoreResource.class);
     resource.setVCFStore(project.getVCFStoreService(), name);
     return resource;
