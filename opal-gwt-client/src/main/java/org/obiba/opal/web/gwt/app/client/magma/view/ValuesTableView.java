@@ -258,6 +258,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
   @Override
   public void setTable(TableDto table) {
+    if (!table.hasValueSetCount()) return;
     valuesTable.setEmptyTableWidget(noValues);
     this.table = table;
     valuesTable.setRowCount(table.getValueSetCount());

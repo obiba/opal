@@ -97,16 +97,19 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   public void setTable(final TableDto table) {
-    originalTable = table;
-    getView().clearTable();
-    getView().setTable(table);
-    getView().setVariableLabelFieldUpdater(new ValueUpdater<String>() {
-      @Override
-      public void update(String value) {
-        placeManager
-            .revealPlace(ProjectPlacesHelper.getVariablePlace(table.getDatasourceName(), table.getName(), value));
-      }
-    });
+    if (originalTable == null || !originalTable.getLink().equals(table.getLink())) {
+      originalTable = table;
+      getView().clearTable();
+      getView().setTable(table);
+      getView().setVariableLabelFieldUpdater(new ValueUpdater<String>() {
+        @Override
+        public void update(String value) {
+          placeManager
+              .revealPlace(ProjectPlacesHelper.getVariablePlace(table.getDatasourceName(), table.getName(), value));
+        }
+      });
+    } else if (table.hasValueSetCount())
+      getView().setTable(table);
   }
 
   /**

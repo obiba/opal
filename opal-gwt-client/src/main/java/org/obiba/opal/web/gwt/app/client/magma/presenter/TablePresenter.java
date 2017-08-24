@@ -334,7 +334,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
             // then get the summary
             updateDisplay(datasourceName, tableName, true);
           } else {
-            table = resource;
+            updateDisplay(resource);
             String variableCount = resource.hasVariableCount() ? resource.getVariableCount() + "" : "-";
             String valueSetCount = resource.hasValueSetCount() ? resource.getValueSetCount() + "" : "-";
             getView().setTableSummary(variableCount, valueSetCount);
@@ -360,30 +360,29 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   }
 
   private void updateDisplay(TableDto tableDto) {
-    getView().clear(table == null || !table.getLink().equals(tableDto.getLink()));
-
-    table = tableDto;
-
-    getView().setTable(tableDto);
-
-    if(tableIsView()) {
-      showViewProperties(table);
-    } else {
-      getView().setFromTables(null, null);
-      getView().setWhereScript(null);
+    //getView().clear(table == null || !table.getLink().equals(tableDto.getLink()));
+    if (table == null || !table.getLink().equals(tableDto.getLink())) {
+      table = tableDto;
+      getView().setTable(tableDto);
+      if(tableIsView()) {
+        showViewProperties(table);
+      } else {
+        getView().setFromTables(null, null);
+        getView().setWhereScript(null);
+      }
+      variableFilter = "";
+      valuesFilter = null;
+      valuesFilterText = "";
+      updateVariables();
+      updateTableIndexStatus();
+      authorize();
     }
+    else table = tableDto;
 
     if(getView().isValuesTabSelected()) {
       valuesTablePresenter.setTable(tableDto);
       valuesTablePresenter.updateValuesDisplay("");
     }
-
-    variableFilter = "";
-    valuesFilter = null;
-    valuesFilterText = "";
-    updateVariables();
-    updateTableIndexStatus();
-    authorize();
   }
 
   private void showViewProperties(TableDto tableDto) {
