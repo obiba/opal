@@ -107,6 +107,7 @@ message Acls {
 
 enum AclAction {
   DATASOURCE_ALL = 0;
+  DATASOURCE_VIEW = 7;
   TABLE_ADD = 1;
   TABLE_ALL = 3;
   TABLE_READ = 4;

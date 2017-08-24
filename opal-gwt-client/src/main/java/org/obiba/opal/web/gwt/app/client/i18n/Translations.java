@@ -162,6 +162,7 @@ public interface Translations extends Constants {
 
       "DATASOURCE_ALL", "Administrate", //
       "TABLE_ADD", "Add table", //
+      "DATASOURCE_VIEW", "View dictionary and values of all tables", //
 
       "TABLE_ALL", "Administrate", //
       "TABLE_READ", "View dictionary and summary", //
@@ -207,6 +208,7 @@ public interface Translations extends Constants {
 
       "DATASOURCE_ALL.help", "Full access to project tables, including individual values.", //
       "TABLE_ADD.help", "Add tables or views.", //
+      "DATASOURCE_VIEW.help", "Read access to project tables, including individual values.", //
 
       "TABLE_ALL.help", "Full access to the table, including edition of the dictionary and individual values.", //
       "TABLE_READ.help", "View dictionary and summaries (no access to individual values).", //

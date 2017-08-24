@@ -7,6 +7,7 @@ import opal.core
 import opal.perm
 
 PERMISSIONS = {
+    'view-value': 'DATASOURCE_VIEW',
     'add-table': 'TABLE_ADD',
     'administrate': 'DATASOURCE_ALL'
 }

@@ -70,6 +70,20 @@ public class DatasourcePermissionConverter extends OpalPermissionConverter {
             toRest("/files/projects/{0}", "POST:GET/*", args), //
             toRest("/files/projects/{0}", "PUT:GET/*", args));
       }
+    },
+    DATASOURCE_VIEW {
+      @Override
+      public Iterable<String> convert(String node) {
+        String[] args = args(node, "/datasource/(.+)");
+        return Lists.newArrayList(toRest("/datasource/{0}", "GET:GET/GET", args), //
+            toRest("/project/{0}/commands/_export", "POST:GET", args),//
+            toRest("/project/{0}/commands/_copy", "POST:GET", args),//
+            toRest("/project/{0}/report-templates", "GET:GET", args),//
+            toRest("/project/{0}/report-templates", "POST:GET", args),//
+            toRest("/project/{0}", "GET:GET", args),//
+            toRest("/project/{0}/summary", "GET:GET", args));
+      }
+
     };
 
     public abstract Iterable<String> convert(String node);

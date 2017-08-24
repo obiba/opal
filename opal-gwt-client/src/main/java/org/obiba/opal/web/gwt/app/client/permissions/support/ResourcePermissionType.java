@@ -20,7 +20,7 @@ public enum ResourcePermissionType {
   DATASHIELD(AclAction.DATASHIELD_USE, AclAction.DATASHIELD_ALL),
   R(AclAction.R_USE),
   PROJECT(AclAction.PROJECT_ALL),
-  DATASOURCE(AclAction.TABLE_ADD, AclAction.DATASOURCE_ALL),
+  DATASOURCE(AclAction.DATASOURCE_VIEW, AclAction.TABLE_ADD, AclAction.DATASOURCE_ALL),
   VCF_STORE(AclAction.VCF_STORE_VIEW, AclAction.VCF_STORE_VALUES, AclAction.VCF_STORE_ALL),
   TABLE(AclAction.TABLE_READ, AclAction.TABLE_VALUES, AclAction.TABLE_EDIT, AclAction.TABLE_VALUES_EDIT,
       AclAction.TABLE_ALL),
