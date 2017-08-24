@@ -407,13 +407,13 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
       addPanel.setVisible(false);
     }
 
-    if(dataProvider != null) {
-      dataProvider.removeDataDisplay(valuesTable);
-      dataProvider = null;
+    //valuesTable.setPageSize(pageSize.getNumberValue().intValue());
+    if (dataProvider == null) {
+      dataProvider = new ValueSetsDataProvider();
+      pager.setDisplay(valuesTable);
+      dataProvider.addDataDisplay(valuesTable);
     }
-    valuesTable.setPageSize(pageSize.getNumberValue().intValue());
-    dataProvider = new ValueSetsDataProvider(isExactMatch);
-    dataProvider.addDataDisplay(valuesTable);
+    dataProvider.setExactMatch(isExactMatch);
     pager.setPagerVisible(valuesTable.getRowCount() > pager.getPageSize());
   }
 
@@ -604,11 +604,6 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     return page;
   }
 
-  @Override
-  public void setRowCount(int totalHits) {
-    valuesTable.setRowCount(totalHits);
-  }
-
   //
   // Inner classes
   //
@@ -770,7 +765,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
       for(int i = 0; i < steps; i++) {
         valuesTable.removeColumn(valuesTable.getColumnCount() - 2);
         int idx = --firstVisibleIndex;
-        valuesTable.insertColumn(2, createColumn(getVariableAt(idx)), getColumnLabel(idx));
+        valuesTable.insertColumn(2, createColumn(getVariableAt(idx)), getColumnHeader(idx));
       }
       valuesTable.redrawHeaders();
     }
@@ -782,7 +777,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
     boolean exactMatch = false;
 
-    private ValueSetsDataProvider(boolean exactMatch) {
+    public void setExactMatch(boolean exactMatch) {
       this.exactMatch = exactMatch;
     }
 

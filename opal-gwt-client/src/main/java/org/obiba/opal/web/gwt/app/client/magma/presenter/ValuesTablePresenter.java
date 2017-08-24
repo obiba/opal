@@ -165,7 +165,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   @Override
-  public void onSearchValueSets(List<VariableDto> variables, List<String> query, final int offset, final int limit) {
+  public void onSearchValueSets(final List<VariableDto> variables, List<String> query, final int offset, final int limit) {
     setCurrentVariablesFilterSelect(variables);
     ResourceRequestBuilderFactory.<ValueSetsResultDto>newBuilder()
         .forResource(UriBuilders.DATASOURCE_TABLE_VALUESETS_SEARCH.create()//
@@ -179,7 +179,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
           public void onResource(Response response, ValueSetsResultDto resource) {
             // TODO make one call only
             getView().populateValues(offset, resource.getValueSets());
-            getView().setRowCount(resource.getTotalHits());
           }
         })//
         .withCallback(new ResponseCodeCallback() {
@@ -195,6 +194,12 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
             }
           }
         }, Response.SC_BAD_REQUEST)//
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            onRequestValueSets(variables, offset, limit);
+          }
+        }, Response.SC_SERVICE_UNAVAILABLE)
         .get().send();
   }
 
@@ -510,8 +515,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     void setSearchAvailable(boolean available);
 
     int getPageSize();
-
-    void setRowCount(int totalHits);
 
   }
 
