@@ -49,7 +49,8 @@ public class TableVariablesSearchResource extends AbstractSearchUtility {
       if (!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
       if (!opalSearchService.getVariablesIndexManager().hasIndex(getValueTable()))
         return Response.status(Response.Status.NOT_FOUND).build();
-      Search.QueryResultDto dtoResponse = opalSearchService.executeQuery(buildQuerySearch(query, offset, limit, fields, facets, sortField, sortDir),
+      String esQuery = "reference:\"" + getValueTable().getTableReference() + "\" AND " + query;
+      Search.QueryResultDto dtoResponse = opalSearchService.executeQuery(buildQuerySearch(esQuery, offset, limit, fields, facets, sortField, sortDir),
           getSearchPath(),
           addVariableDto ? new ItemResultDtoStrategy(getValueTable()) : null);
       return Response.ok().entity(dtoResponse).build();
