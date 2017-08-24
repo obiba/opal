@@ -165,7 +165,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   @Override
-  public void onSearchValueSets(List<String> query, final int offset, final int limit) {
+  public void onSearchValueSets(List<VariableDto> variables, List<String> query, final int offset, final int limit) {
+    setCurrentVariablesFilterSelect(variables);
     ResourceRequestBuilderFactory.<ValueSetsResultDto>newBuilder()
         .forResource(UriBuilders.DATASOURCE_TABLE_VALUESETS_SEARCH.create()//
             .query("query", Joiner.on(",").join(query))//
@@ -317,22 +318,26 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     StringBuilder link = getLinkBuilder(offset, limit);
     if (originalTable.getVariableCount() > variables.size()) {
       link.append("&select=");
-      StringBuilder script = new StringBuilder("name().lowerCase().matches(/");
-      if (variables.isEmpty()) {
-        script.append("^$");
-      } else {
-        for (int i = 0; i < variables.size(); i++) {
-          if (i > 0) script.append("|");
-          script.append("^").append(escape(variables.get(i).getName().toLowerCase())).append("$");
-        }
-      }
-      script.append("/)");
-      currentVariablesFilterSelect = script.toString();
+      setCurrentVariablesFilterSelect(variables);
       link.append(currentVariablesFilterSelect);
     } else {
       currentVariablesFilterSelect = ""; //we need to clear currentVariablesFilterSelect, as it will be used later on
     }
     doRequest(offset, link.toString());
+  }
+
+  private void setCurrentVariablesFilterSelect(List<VariableDto> variables) {
+    StringBuilder script = new StringBuilder("name().lowerCase().matches(/");
+    if (variables.isEmpty()) {
+      script.append("^$");
+    } else {
+      for (int i = 0; i < variables.size(); i++) {
+        if (i > 0) script.append("|");
+        script.append("^").append(escape(variables.get(i).getName().toLowerCase())).append("$");
+      }
+    }
+    script.append("/)");
+    currentVariablesFilterSelect = script.toString();
   }
 
   @Override

@@ -20,7 +20,7 @@ public interface ValuesTableUiHandlers extends UiHandlers {
 
   void onVariableFilter(String variableName);
 
-  void onSearchValueSets(List<String> query, int offset, int limit);
+  void onSearchValueSets(List<VariableDto> variables, List<String> query, int offset, int limit);
 
   void onSearchEntities(String idQuery, List<String> queries);
 

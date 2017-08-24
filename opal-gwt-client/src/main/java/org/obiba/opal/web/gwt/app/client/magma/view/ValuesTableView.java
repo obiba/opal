@@ -314,7 +314,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
   private void onSearch(int offset, int limit) {
     eventBus.fireEvent(new ValuesQueryEvent(criteriaPanel.getRQLQueryString(), criteriaPanel.getQueryText()));
-    getUiHandlers().onSearchValueSets(criteriaPanel.getRQLQueryStrings(), offset, limit);
+    getUiHandlers().onSearchValueSets(visibleListVariable, criteriaPanel.getRQLQueryStrings(), offset, limit);
   }
 
   private void setRefreshing(boolean refresh) {
@@ -697,7 +697,10 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
     private void refreshRows() {
       setRefreshing(true);
-      getUiHandlers().onRequestValueSets(visibleListVariable, pager.getPageStart(), pager.getPageSize());
+      if (searchPanel.isVisible())
+        onSearch(pager.getPageStart(), pager.getPageSize());
+      else
+        getUiHandlers().onRequestValueSets(visibleListVariable, pager.getPageStart(), pager.getPageSize());
     }
 
     protected abstract MenuBar createMenuBar();
@@ -787,12 +790,13 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     protected void onRangeChanged(HasData<ValueSetDto> display) {
       Range range = display.getVisibleRange();
       setRefreshing(true);
+      String filterText = filter.getText();
       if (searchPanel.isVisible())
         onSearch(range.getStart(), range.getLength());
-      else if(filter.getText().isEmpty())
+      else if(filterText.isEmpty())
         getUiHandlers().onRequestValueSets(visibleListVariable, range.getStart(), range.getLength());
       else
-        getUiHandlers().onRequestValueSets(filter.getText(), range.getStart(), range.getLength(), exactMatch);
+        getUiHandlers().onRequestValueSets(filterText, range.getStart(), range.getLength(), exactMatch);
     }
 
 
