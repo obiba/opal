@@ -34,6 +34,8 @@ public interface ValueTableIndex extends Timestamped {
    */
   String getIndexType();
 
+  String getValueTableReference();
+
   /**
    * Returns true if the the lastUpdate timestamp of this index is more recent than that of its corresponding
    * {@code ValueTable}
