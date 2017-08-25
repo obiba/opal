@@ -33,7 +33,7 @@ public class PluginPackage {
                        @JsonProperty("description") String description,
                        @JsonProperty("version") String version,
                        @JsonProperty("opalVersion") String opalVersion,
-                       @JsonProperty("fileName") String fileName) {
+                       @JsonProperty("file") String fileName) {
     this.name = name;
     this.type = type;
     this.title = title;
@@ -71,7 +71,15 @@ public class PluginPackage {
     return fileName;
   }
 
+  public boolean isSameAs(String name, String type) {
+    return this.name.equals(name) && this.type.equals(type);
+  }
+
   public boolean isSameAs(String name, String type, Version version) {
     return this.name.equals(name) && this.type.equals(type) && this.version.equals(version);
+  }
+
+  public boolean isNewerThan(String name, String type, Version version) {
+    return this.name.equals(name) && this.type.equals(type) && this.version.compareTo(version)>0;
   }
 }

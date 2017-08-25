@@ -68,15 +68,19 @@ public class PluginsServiceImpl implements PluginsService {
 
   @Override
   public List<PluginPackage> getUpdatablePlugins() {
-    return Lists.newArrayList();
+    Collection<Plugin> registeredPlugins = opalRuntime.getPlugins();
+    // exclude already installed plugin packages whatever the version is
+    return getPluginRepository().getPlugins().stream()
+        .filter(pp -> registeredPlugins.stream().anyMatch(rp -> pp.isNewerThan(rp.getName(), rp.getType(), rp.getVersion())))
+        .collect(Collectors.toList());
   }
 
   @Override
   public List<PluginPackage> getAvailablePlugins() {
     Collection<Plugin> registeredPlugins = opalRuntime.getPlugins();
-    // exclude already installed plugin packages
+    // exclude already installed plugin packages whatever the version is
     return getPluginRepository().getPlugins().stream()
-        .filter(pp -> registeredPlugins.stream().noneMatch(rp -> pp.isSameAs(rp.getName(), rp.getType(), rp.getVersion())))
+        .filter(pp -> registeredPlugins.stream().noneMatch(rp -> pp.isSameAs(rp.getName(), rp.getType())))
         .collect(Collectors.toList());
   }
 

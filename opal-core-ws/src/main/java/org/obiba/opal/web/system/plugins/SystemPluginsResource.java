@@ -37,6 +37,13 @@ public class SystemPluginsResource {
   }
 
   @GET
+  @Path("/_updates")
+  public List<Plugins.PluginPackageDto> getUpdatablePlugins() {
+    return pluginsService.getUpdatablePlugins().stream()
+        .map(this::asDto).collect(Collectors.toList());
+  }
+
+  @GET
   @Path("/_available")
   public List<Plugins.PluginPackageDto> getAvailablePlugins() {
     return pluginsService.getAvailablePlugins().stream()
