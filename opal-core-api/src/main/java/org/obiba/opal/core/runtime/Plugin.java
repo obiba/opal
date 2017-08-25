@@ -73,6 +73,19 @@ public class Plugin {
     return new Version(version);
   }
 
+  public String getTitle() {
+    return getProperties().getProperty("title", "");
+  }
+
+  public String getDescription() {
+    return getProperties().getProperty("description", "");
+  }
+
+  public Version getOpalVersion() {
+    String version = getProperties().getProperty("opal.version", "0.0.0");
+    return new Version(version);
+  }
+
   public Properties getProperties() {
     Properties prop = getDefaultProperties();
     try (FileInputStream in = new FileInputStream(properties)) {

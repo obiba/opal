@@ -15,7 +15,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.obiba.core.util.FileUtil;
 import org.obiba.opal.spi.ServicePlugin;
@@ -31,7 +30,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -47,15 +45,15 @@ class PluginsManager {
 
   private static final String PLUGINS_REPO_FILE = "plugins.json";
 
-  @Value("${org.obiba.opal.plugin.repos}")
-  private List<String> repos;
+  @Value("${org.obiba.opal.plugins.site}")
+  private String repo;
 
   private Set<PluginDescription> pluginDescriptions = Sets.newLinkedHashSet();
 
   private List<ServicePlugin> servicePlugins = Lists.newArrayList();
 
   boolean hasPlugins() {
-    return getPlugins().size()>0;
+    return getPlugins().size() > 0;
   }
 
   boolean hasPlugin(String name) {
@@ -75,27 +73,22 @@ class PluginsManager {
 
   /**
    * Fetch the plugin descriptions from the configured repositories.
-   *
    */
   void initPluginDescriptions() {
-    if (repos != null) {
-      pluginDescriptions.clear();
-      for (String repo : repos) {
-        String location = repo + (repo.endsWith("/") ? "" : "/") + PLUGINS_REPO_FILE;
-        try (InputStream input = new URL(location).openStream()) {
-          JSONObject pluginsObject = new JSONObject(new String(FileCopyUtils.copyToByteArray(input), StandardCharsets.UTF_8));
-          if (pluginsObject.has("plugins")) {
-            JSONArray pluginsArray = pluginsObject.getJSONArray("plugins");
-            for (int i=0; i<pluginsArray.length(); i++) {
-              JSONObject pluginObject = pluginsArray.getJSONObject(i);
-              PluginDescription desc = new PluginDescription(pluginObject, repo);
-              pluginDescriptions.add(desc);
-            }
-          }
-        } catch (Exception e) {
-          log.warn("Could not retrieve plugins list from {}: {}: {}", repo, e.getClass().getName(), e.getMessage());
+    pluginDescriptions.clear();
+    String location = repo + (repo.endsWith("/") ? "" : "/") + PLUGINS_REPO_FILE;
+    try (InputStream input = new URL(location).openStream()) {
+      JSONObject pluginsObject = new JSONObject(new String(FileCopyUtils.copyToByteArray(input), StandardCharsets.UTF_8));
+      if (pluginsObject.has("plugins")) {
+        JSONArray pluginsArray = pluginsObject.getJSONArray("plugins");
+        for (int i = 0; i < pluginsArray.length(); i++) {
+          JSONObject pluginObject = pluginsArray.getJSONObject(i);
+          PluginDescription desc = new PluginDescription(pluginObject, repo);
+          pluginDescriptions.add(desc);
         }
       }
+    } catch (Exception e) {
+      log.warn("Could not retrieve plugins list from {}: {}: {}", repo, e.getClass().getName(), e.getMessage());
     }
   }
 
@@ -300,7 +293,7 @@ class PluginsManager {
     if (!plugin.isValid()) return;
     if (!pluginsMap.containsKey(plugin.getName()))
       pluginsMap.put(plugin.getName(), plugin);
-    else if (plugin.getVersion().compareTo(pluginsMap.get(plugin.getName()).getVersion())>0)
+    else if (plugin.getVersion().compareTo(pluginsMap.get(plugin.getName()).getVersion()) > 0)
       pluginsMap.put(plugin.getName(), plugin);
   }
 
