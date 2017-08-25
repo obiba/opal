@@ -60,6 +60,8 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
 
   public static final String QUERY_SEP = ",";
 
+  private static final int CRITERIA_LIMIT = 20;
+
   private final Translations translations;
 
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
@@ -157,6 +159,10 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
 
   @Override
   public void onSearch(String entityType, String idQuery, List<String> queries, int offset, int limit) {
+    if (queries != null && queries.size() > CRITERIA_LIMIT) {
+      fireEvent(NotificationEvent.newBuilder().warn("CriteriaLimitReached").args("" + CRITERIA_LIMIT).build());
+      return;
+    }
     selectedType = entityType;
     this.idQuery = idQuery;
     this.queries = queries;
@@ -169,6 +175,10 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
 
   @Override
   public void onVariableCriterion(final String datasource, final String table, final String variable) {
+    if (queries != null && queries.size() > CRITERIA_LIMIT) {
+      fireEvent(NotificationEvent.newBuilder().warn("CriteriaLimitReached").args("" + CRITERIA_LIMIT).build());
+      return;
+    }
     ResourceRequestBuilderFactory.<VariableDto>newBuilder().forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
         .build(datasource, table, variable))
         .withCallback(new VariableCriterionProcessor(datasource, table)).get().send();
@@ -189,11 +199,6 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
       builder.with(ParameterTokens.TOKEN_QUERY, Joiner.on(QUERY_SEP).join(queries));
     }
     placeManager.updateHistory(builder.build(), true);
-  }
-
-  private List<String> getVariableQueries() {
-    if (queries == null || queries.isEmpty()) return Lists.newArrayList();
-    else return queries.subList(1, queries.size());
   }
 
   private void searchSelected() {
@@ -287,6 +292,10 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
     List<String> invalidTableReferences = Lists.newArrayList();
     List<RQLValueSetVariableCriterionParser> criterions = Lists.newArrayList();
     for (String query : queries) {
+      if (validQueries.size() == CRITERIA_LIMIT) {
+        fireEvent(NotificationEvent.newBuilder().warn("CriteriaLimitReached").args("" + CRITERIA_LIMIT).build());
+        break;
+      }
       RQLValueSetVariableCriterionParser criterion = new RQLValueSetVariableCriterionParser(query);
       if (criterion.isValid()) {
         boolean found = false;
