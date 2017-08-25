@@ -408,9 +408,9 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
       addPanel.setVisible(false);
     }
 
-    //valuesTable.setPageSize(pageSize.getNumberValue().intValue());
     if (dataProvider == null) {
       dataProvider = new ValueSetsDataProvider();
+      dataProvider.setExactMatch(isExactMatch);
       pager.setDisplay(valuesTable);
       dataProvider.addDataDisplay(valuesTable);
     }
