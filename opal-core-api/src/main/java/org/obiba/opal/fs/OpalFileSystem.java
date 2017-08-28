@@ -40,6 +40,14 @@ public interface OpalFileSystem {
   File getLocalFile(FileObject virtualFile);
 
   /**
+   * Gives access to the content of a file from the Virtual File System (VFS) through a local java.io.File.
+   *
+   * @param virtualPath Path to a path in the VFS.
+   * @return
+   */
+  File resolveLocalFile(String virtualPath);
+
+  /**
    * Converts the path of a file in the Virtual File System (VFS) to an "obfuscated" path an returns it.
    *
    * @param virtualFile The file for which we want to get an obfuscated path.

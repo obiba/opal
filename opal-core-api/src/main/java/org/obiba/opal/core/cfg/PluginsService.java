@@ -11,22 +11,97 @@
 package org.obiba.opal.core.cfg;
 
 import org.obiba.opal.core.domain.plugins.PluginPackage;
+import org.obiba.opal.core.runtime.Plugin;
 import org.obiba.opal.core.service.SystemService;
 
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 public interface PluginsService extends SystemService {
 
+  /**
+   * Get the location of the plugin packages repository.
+   *
+   * @return
+   */
   String getUpdateSite();
 
-  List<PluginPackage> getInstalledPlugins();
+  /**
+   * Get the last time at which the update site was successfully.
+   *
+   * @return
+   */
+  Date getLastUpdate();
 
-  List<PluginPackage> getUpdatablePlugins();
-
-  List<PluginPackage> getAvailablePlugins();
-
+  /**
+   * Perform the plugin installation by retrieving the plugin package from the update site.
+   *
+   * @param name
+   * @param version
+   */
   void installPlugin(String name, String version);
 
+  /**
+   * Perform the plugin installation by retrieving the plugin package from the Opal file system.
+   *
+   * @param filePath
+   */
+  void installPlugin(String filePath);
+
+  /**
+   * Uninstall a plugin.
+   *
+   * @param name
+   */
+  void prepareUninstallPlugin(String name);
+
+  /**
+   * Cancel plugin uninstallation before it is effective.
+   *
+   * @param name
+   */
+  void cancelUninstallPlugin(String name);
+
+  /**
+   * Reports if system restart is required to finalize plugin installation.
+   *
+   * @return
+   */
   boolean restartRequired();
+
+  //
+  // Plugins
+  //
+
+  Plugin getInstalledPlugin(String name);
+
+  /**
+   * Get the plugins registered in the system.
+   *
+   * @return
+   */
+  List<PluginPackage> getInstalledPlugins();
+
+  /**
+   * Get the list of plugins that are marked to uninstallation.
+   *
+   * @return
+   */
+  Collection<String> getUninstalledPluginNames();
+
+  /**
+   * Get the plugins registered in the system that can be updated according to the update site registry.
+   *
+   * @return
+   */
+  List<PluginPackage> getUpdatablePlugins();
+
+  /**
+   * Get the plugins that are not installed and that are available from the update site registry.
+   *
+   * @return
+   */
+  List<PluginPackage> getAvailablePlugins();
 
 }

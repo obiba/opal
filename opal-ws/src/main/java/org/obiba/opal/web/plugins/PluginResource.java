@@ -8,10 +8,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.services;
+package org.obiba.opal.web.plugins;
 
-import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.cfg.PluginsService;
 import org.obiba.opal.web.model.Plugins;
+import org.obiba.opal.web.services.ServicePluginResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
@@ -32,11 +33,23 @@ public class PluginResource {
   private ApplicationContext applicationContext;
 
   @Autowired
-  private OpalRuntime opalRuntime;
+  PluginsService pluginsService;
 
   @GET
   public Plugins.PluginDto get() {
-    return Dtos.asDto(opalRuntime.getPlugin(name));
+    return Dtos.asDto(pluginsService.getInstalledPlugin(name));
+  }
+
+  @DELETE
+  public Response uninstall() {
+    pluginsService.prepareUninstallPlugin(name);
+    return Response.noContent().build();
+  }
+
+  @PUT
+  public Response cancelUninstallation() {
+    pluginsService.cancelUninstallPlugin(name);
+    return Response.noContent().build();
   }
 
   @Path("/service")

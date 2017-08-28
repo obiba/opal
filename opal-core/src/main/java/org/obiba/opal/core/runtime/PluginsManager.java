@@ -17,6 +17,7 @@ import com.google.common.io.Files;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.obiba.core.util.FileUtil;
+import org.obiba.magma.type.DateType;
 import org.obiba.opal.spi.ServicePlugin;
 import org.obiba.opal.spi.search.SearchServiceLoader;
 import org.obiba.opal.spi.vcf.VCFStoreServiceLoader;
@@ -39,28 +40,38 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 @Component
-class PluginsManager {
+public class PluginsManager {
 
   private static final Logger log = LoggerFactory.getLogger(PluginsManager.class);
 
   private static final String PLUGINS_REPO_FILE = "plugins.json";
+
+  private static final String PLUGIN_DIST_SUFFIX = "-dist.zip";
+
+  private final File pluginsDir = new File(OpalRuntime.PLUGINS_DIR);
+
+  private final File archiveDir = new File(OpalRuntime.PLUGINS_DIR, ".archive");
 
   @Value("${org.obiba.opal.plugins.site}")
   private String repo;
 
   private Set<PluginDescription> pluginDescriptions = Sets.newLinkedHashSet();
 
+  private Collection<Plugin> registeredPlugins;
+
   private List<ServicePlugin> servicePlugins = Lists.newArrayList();
 
-  boolean hasPlugins() {
-    return getPlugins().size() > 0;
+  public boolean restartRequired() {
+    File[] children = pluginsDir.listFiles(pathname -> !pathname.getName().startsWith("."));
+    if (children == null || children.length == 0) return false;
+    for (File child : children) {
+      if (child.isFile() && child.getName().endsWith(PLUGIN_DIST_SUFFIX)) return true;
+      if (child.isDirectory() && new File(child, Plugin.UNINSTALL_FILE).exists()) return true;
+    }
+    return false;
   }
 
-  boolean hasPlugin(String name) {
-    return getPlugins().stream().anyMatch(p -> p.getName().equals(name));
-  }
-
-  Plugin getPlugin(String name) {
+  public Plugin getPlugin(String name) {
     Optional<Plugin> plugin = getPlugins().stream().filter(p -> p.getName().equals(name)).findFirst();
     if (!plugin.isPresent()) throw new NoSuchElementException("No such plugin with name: " + name);
     return plugin.get();
@@ -68,7 +79,7 @@ class PluginsManager {
 
   void initPlugins() {
     initPluginDescriptions();
-    getPlugins().forEach(Plugin::init);
+    getPlugins(true).forEach(Plugin::init);
   }
 
   /**
@@ -97,15 +108,20 @@ class PluginsManager {
    *
    * @return
    */
-  Collection<Plugin> getPlugins() {
-    Map<String, Plugin> pluginsMap = Maps.newLinkedHashMap();
-    // make sure plugins directory exists
-    // read it to enhance classpath
-    File pluginsDir = new File(OpalRuntime.PLUGINS_DIR);
-    if (!pluginsDir.exists() || !pluginsDir.isDirectory() || !pluginsDir.canRead()) return pluginsMap.values();
-    preparePlugins(pluginsDir);
-    addPlugins(pluginsMap, pluginsDir);
-    return pluginsMap.values();
+  public Collection<Plugin> getPlugins() {
+    if (registeredPlugins != null) return registeredPlugins;
+    return getPlugins(false);
+  }
+
+  public Collection<String> getUninstalledPluginNames() {
+    List<String> names = Lists.newArrayList();
+    File[] children = pluginsDir.listFiles(pathname -> pathname.isDirectory() && !pathname.getName().startsWith("."));
+    if (children == null || children.length == 0) return names;
+    for (File child : children) {
+      Plugin plugin = new Plugin(child);
+      if (plugin.isToUninstall()) names.add(plugin.getName());
+    }
+    return names;
   }
 
   boolean hasServicePlugins(Class clazz) {
@@ -139,6 +155,17 @@ class PluginsManager {
   //
   // Private methods
   //
+
+  private synchronized Collection<Plugin> getPlugins(boolean extract) {
+    Map<String, Plugin> pluginsMap = Maps.newLinkedHashMap();
+    // make sure plugins directory exists
+    // read it to enhance classpath
+    if (!pluginsDir.exists() || !pluginsDir.isDirectory() || !pluginsDir.canRead()) return pluginsMap.values();
+    if (extract) preparePlugins(pluginsDir);
+    processPlugins(pluginsMap, pluginsDir);
+    registeredPlugins = pluginsMap.values();
+    return registeredPlugins;
+  }
 
   /**
    * Register every instance of service plugin.
@@ -179,9 +206,8 @@ class PluginsManager {
    * @param pluginsDir
    */
   private void preparePlugins(File pluginsDir) {
-    File[] children = pluginsDir.listFiles(pathname -> !pathname.isDirectory() && pathname.getName().endsWith("-dist.zip"));
+    File[] children = pluginsDir.listFiles(pathname -> !pathname.isDirectory() && pathname.getName().endsWith(PLUGIN_DIST_SUFFIX));
     if (children == null || children.length == 0) return;
-    File archiveDir = new File(pluginsDir, ".archive");
     if (!archiveDir.exists()) archiveDir.mkdirs();
     for (File child : children) {
       try {
@@ -201,7 +227,7 @@ class PluginsManager {
    */
   private void extractPlugin(File fileZip) throws IOException {
     File destination = new File(fileZip.getParent());
-    File expectedFolder = new File(destination, fileZip.getName().replace("-dist.zip", ""));
+    File expectedFolder = new File(destination, fileZip.getName().replace(PLUGIN_DIST_SUFFIX, ""));
     // backup any site properties
     File sitePropertiesBackup = backupPluginSiteProperties(expectedFolder);
     // Open the zip file
@@ -269,32 +295,43 @@ class PluginsManager {
   }
 
   /**
-   * Discover valid and most recent version plugins.
+   * Discover valid and most recent version plugins and archive plugins prepared for uninstallation.
    *
    * @param pluginsMap
    * @param pluginsDir
    */
-  private void addPlugins(Map<String, Plugin> pluginsMap, File pluginsDir) {
+  private void processPlugins(Map<String, Plugin> pluginsMap, File pluginsDir) {
     File[] children = pluginsDir.listFiles(pathname -> pathname.isDirectory() && !pathname.getName().startsWith("."));
     if (children == null || children.length == 0) return;
     for (File child : children) {
       Plugin plugin = new Plugin(child);
-      addPlugin(pluginsMap, plugin);
+      processPlugin(pluginsMap, plugin);
     }
   }
 
   /**
-   * Add plugin if valid and if most recent version.
+   * Add plugin if valid and if most recent version or archive it if marked for uninstallation.
    *
    * @param pluginsMap
    * @param plugin
    */
-  private void addPlugin(Map<String, Plugin> pluginsMap, Plugin plugin) {
+  private void processPlugin(Map<String, Plugin> pluginsMap, Plugin plugin) {
+    if (plugin.isToUninstall()) {
+      File archiveDest = new File(archiveDir, plugin.getDirectory().getName() + "-" + DateType.get().valueOf(new Date()).toString());
+      log.info("Archiving plugin {} to {}", plugin.getName(), archiveDest.getAbsolutePath());
+      try {
+        if (archiveDest.exists()) FileUtil.delete(archiveDest);
+        archiveDir.mkdirs();
+        FileUtil.moveFile(plugin.getDirectory(), archiveDest);
+      } catch (IOException e) {
+        log.info("Failed to archive plugin directory: {}", plugin.getDirectory().getName(), e);
+      }
+      return;
+    }
     if (!plugin.isValid()) return;
     if (!pluginsMap.containsKey(plugin.getName()))
       pluginsMap.put(plugin.getName(), plugin);
     else if (plugin.getVersion().compareTo(pluginsMap.get(plugin.getName()).getVersion()) > 0)
       pluginsMap.put(plugin.getName(), plugin);
   }
-
 }

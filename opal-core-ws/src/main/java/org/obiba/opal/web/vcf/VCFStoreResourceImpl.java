@@ -21,7 +21,7 @@ import org.obiba.opal.spi.ServicePlugin;
 import org.obiba.opal.spi.vcf.VCFStore;
 import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.model.Plugins;
-import org.obiba.opal.web.services.Dtos;
+import org.obiba.opal.web.plugins.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;

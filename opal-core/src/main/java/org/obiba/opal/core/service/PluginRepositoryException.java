@@ -12,7 +12,7 @@ package org.obiba.opal.core.service;
 
 public class PluginRepositoryException extends RuntimeException {
 
-  public PluginRepositoryException(Throwable error) {
-    super(error);
+  public PluginRepositoryException(String message, Throwable error) {
+    super(message, error);
   }
 }

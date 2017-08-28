@@ -76,40 +76,6 @@ public interface OpalRuntime extends SystemService {
   Service getService(String name) throws NoSuchServiceException;
 
   //
-  // Plugins
-  //
-
-  /**
-   * Check if there is any plugin registered in the system.
-   *
-   * @return
-   */
-  boolean hasPlugins();
-
-  /**
-   * Get the plugins registered in the system.
-   *
-   * @return
-   */
-  Collection<Plugin> getPlugins();
-
-  /**
-   * Check if there is a plugin with given name.
-   *
-   * @param name
-   * @return
-   */
-  boolean hasPlugin(String name);
-
-  /**
-   * Get the plugin registered in the system with the given name.
-   *
-   * @param name
-   * @return
-   */
-  Plugin getPlugin(String name);
-
-  //
   // Service plugins
   //
 

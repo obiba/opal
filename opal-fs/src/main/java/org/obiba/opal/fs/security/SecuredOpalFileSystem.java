@@ -48,6 +48,11 @@ public class SecuredOpalFileSystem implements OpalFileSystem {
   }
 
   @Override
+  public File resolveLocalFile(String virtualPath) {
+    return delegate.resolveLocalFile(virtualPath);
+  }
+
+  @Override
   public String getObfuscatedPath(FileObject virtualFile) {
     return delegate.getObfuscatedPath(virtualFile);
   }

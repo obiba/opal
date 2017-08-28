@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -28,9 +29,11 @@ public class Plugin {
 
   private static final Logger log = LoggerFactory.getLogger(Plugin.class);
 
-  public static  final String PLUGIN_PROPERTIES = "plugin.properties";
+  public static final String UNINSTALL_FILE = "uninstall";
 
-  public static  final String SITE_PROPERTIES = "site.properties";
+  public static final String PLUGIN_PROPERTIES = "plugin.properties";
+
+  public static final String SITE_PROPERTIES = "site.properties";
 
   private final File directory;
 
@@ -40,10 +43,13 @@ public class Plugin {
 
   private final File lib;
 
+  private final File uninstallFile;
+
   public Plugin(File directory) {
     this.directory = directory;
     this.properties = new File(directory, PLUGIN_PROPERTIES);
     this.siteProperties = new File(directory, SITE_PROPERTIES);
+    this.uninstallFile = new File(directory, UNINSTALL_FILE);
     this.lib = new File(directory, "lib");
   }
 
@@ -65,7 +71,8 @@ public class Plugin {
   public boolean isValid() {
     return directory.isDirectory() && directory.canRead()
         && properties.exists() && properties.canRead()
-        && lib.exists() && lib.isDirectory() && lib.canRead();
+        && lib.exists() && lib.isDirectory() && lib.canRead()
+        && !uninstallFile.exists();
   }
 
   public Version getVersion() {
@@ -103,6 +110,14 @@ public class Plugin {
     return prop;
   }
 
+  public boolean isToUninstall() {
+    return uninstallFile.exists();
+  }
+
+  public File getDirectory() {
+    return directory;
+  }
+
   private Properties getDefaultProperties() {
     String name = getName();
     String home = System.getProperty("OPAL_HOME");
@@ -137,4 +152,15 @@ public class Plugin {
     method.invoke(ClassLoader.getSystemClassLoader(), file.toURI().toURL());
   }
 
+  public void cancelUninstall() {
+    if (uninstallFile.exists()) uninstallFile.delete();
+  }
+
+  public void prepareForUninstall() {
+    try {
+      if (!uninstallFile.exists()) uninstallFile.createNewFile();
+    } catch (IOException e) {
+      log.error("Failed to prepare plugin {} for removal", getName(), e);
+    }
+  }
 }

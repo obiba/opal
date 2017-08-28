@@ -71,15 +71,15 @@ public class PluginPackage {
     return fileName;
   }
 
-  public boolean isSameAs(String name, String type) {
-    return this.name.equals(name) && this.type.equals(type);
+  public boolean isSameAs(String name) {
+    return this.name.equals(name);
   }
 
-  public boolean isSameAs(String name, String type, Version version) {
-    return this.name.equals(name) && this.type.equals(type) && this.version.equals(version);
+  public boolean isSameAs(String name, Version version) {
+    return this.name.equals(name) && this.version.equals(version);
   }
 
-  public boolean isNewerThan(String name, String type, Version version) {
-    return this.name.equals(name) && this.type.equals(type) && this.version.compareTo(version)>0;
+  public boolean isNewerThan(String name, Version version) {
+    return this.name.equals(name) && this.version.compareTo(version)>0;
   }
 }
