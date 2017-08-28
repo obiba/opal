@@ -54,26 +54,6 @@ public class OpalRuntimeMock implements OpalRuntime {
   }
 
   @Override
-  public boolean hasPlugins() {
-    return false;
-  }
-
-  @Override
-  public Collection<Plugin> getPlugins() {
-    return Lists.newArrayList();
-  }
-
-  @Override
-  public boolean hasPlugin(String name) {
-    return false;
-  }
-
-  @Override
-  public Plugin getPlugin(String name) {
-    throw new NoSuchElementException(name);
-  }
-
-  @Override
   public boolean hasServicePlugins() {
     return false;
   }

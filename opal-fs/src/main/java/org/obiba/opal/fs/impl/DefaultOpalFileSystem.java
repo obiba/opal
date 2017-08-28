@@ -102,6 +102,16 @@ public class DefaultOpalFileSystem implements OpalFileSystem {
     }
   }
 
+  @Override
+  public File resolveLocalFile(String virtualPath) {
+    try {
+      // note: does not ensure that file exists
+      return getLocalFile(getRoot().resolveFile(virtualPath));
+    } catch(FileSystemException e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
+
   private void makeSureThatFileCanBeConverted(FileObject virtualFile) {
     FileType virtualFileType;
     try {

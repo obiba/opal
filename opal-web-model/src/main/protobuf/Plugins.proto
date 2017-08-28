@@ -7,6 +7,24 @@ message PropertyDto {
     required string value = 2;
 }
 
+message PluginPackageDto {
+    required string name = 1;
+    required string title = 2;
+    required string description = 3;
+    required string version = 4;
+    required string opalVersion = 5;
+    required string type = 6;
+    optional string file = 7;
+    optional bool uninstalled = 8;
+}
+
+message PluginPackagesDto {
+    required string site = 1;
+    required string updated = 2;
+    required bool restart = 3;
+    repeated PluginPackageDto packages = 4;
+}
+
 message PluginDto {
     required string name = 1;
     required string title = 2;

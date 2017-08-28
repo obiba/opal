@@ -165,26 +165,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
   }
 
   @Override
-  public boolean hasPlugins() {
-    return pluginsManager.hasPlugins();
-  }
-
-  @Override
-  public Collection<Plugin> getPlugins() {
-    return pluginsManager.getPlugins();
-  }
-
-  @Override
-  public boolean hasPlugin(String name) {
-    return pluginsManager.hasPlugin(name);
-  }
-
-  @Override
-  public Plugin getPlugin(String name) {
-    return pluginsManager.getPlugin(name);
-  }
-
-  @Override
   public boolean hasServicePlugins() {
     return pluginsManager.getServicePlugins().size()>0;
   }
