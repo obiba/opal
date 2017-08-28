@@ -209,6 +209,17 @@
                 </g:FlowPanel>
               </g:FlowPanel>
 
+              <g:FlowPanel ui:field="pluginsAuthorizable">
+                <o:OpalNavLink ui:field="pluginsPlace" icon="COG">
+                  <ui:msg description="Main Administration Plugins title">Plugins</ui:msg>
+                </o:OpalNavLink>
+                <g:FlowPanel>
+                  <g:Label styleName="help-block">
+                    <ui:msg description="Main Administration Plugins help">Manage system plugins</ui:msg>
+                  </g:Label>
+                </g:FlowPanel>
+              </g:FlowPanel>
+
               <g:FlowPanel ui:field="jvmAuthorizable">
                 <o:OpalNavLink ui:field="javaPlace" icon="COG">
                   <ui:msg description="Main Administration JVM title">Java Virtual Machine</ui:msg>

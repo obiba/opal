@@ -51,6 +51,8 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
 
     HasAuthorization getJVMAuthorizer();
 
+    HasAuthorization getPluginsAuthorizer();
+
     HasAuthorization getDatabasesAuthorizer();
 
     HasAuthorization getSearchAuthorizer();
@@ -86,6 +88,8 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
     void setTasksHistoryToken(String historyToken);
 
     void setJavaHistoryToken(String historyToken);
+
+    void setPluginsHistoryToken(String historyToken);
 
     void setServerHistoryToken(String historyToken);
 
@@ -144,6 +148,10 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
         .authorize(composeAuthorizer(getView().getJVMAuthorizer())).send();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.PLUGINS.create().build()).get()
+        .authorize(composeAuthorizer(getView().getPluginsAuthorizer())).send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
         .forResource(UriBuilders.IDENTIFIERS_TABLES.create().build()).get()
         .authorize(composeAuthorizer(getView().getIdentifiersAuthorizer())).send();
 
@@ -180,6 +188,7 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
     getView().setDataShieldHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.DATASHIELD));
     getView().setReportsHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.REPORT_TEMPLATES));
     getView().setJavaHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.JVM));
+    getView().setPluginsHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.PLUGINS));
     getView().setServerHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.SERVER));
     getView().setTaxonomiesHistoryToken(getHistoryToken(tokenFormatter, adminPlace, Places.TAXONOMIES));
   }

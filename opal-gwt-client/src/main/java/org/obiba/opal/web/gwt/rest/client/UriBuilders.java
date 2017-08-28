@@ -721,6 +721,30 @@ public enum UriBuilders {
     }
   },
 
+  PLUGINS_AVAILABLE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("plugins", "_available");
+
+    }
+  },
+
+  PLUGINS_UPDATES {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("plugins", "_updates");
+
+    }
+  },
+
+  PLUGIN {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("plugin", "{}");
+
+    }
+  },
+
   IDENTIFIERS_MAPPINGS {
     @Override
     public UriBuilder create() {

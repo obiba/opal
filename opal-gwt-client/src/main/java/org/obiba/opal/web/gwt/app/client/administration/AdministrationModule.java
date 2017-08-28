@@ -65,6 +65,8 @@ import org.obiba.opal.web.gwt.app.client.administration.index.view.IndexConfigur
 import org.obiba.opal.web.gwt.app.client.administration.index.view.IndexView;
 import org.obiba.opal.web.gwt.app.client.administration.jvm.JVMPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.jvm.JVMView;
+import org.obiba.opal.web.gwt.app.client.administration.plugins.PluginsAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.plugins.PluginsAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.RAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.RAdministrationView;
@@ -125,7 +127,7 @@ public class AdministrationModule extends AbstractPresenterModule {
 
   private void configureSystemConfig() {
     bindPresenter(JVMPresenter.class, JVMPresenter.Display.class, JVMView.class, JVMPresenter.Proxy.class);
-
+    bindPresenter(PluginsAdministrationPresenter.class, PluginsAdministrationPresenter.Display.class, PluginsAdministrationView.class, PluginsAdministrationPresenter.Proxy.class);
     bindPresenter(FilesAdministrationPresenter.class, FilesAdministrationPresenter.Display.class,
         FilesAdministrationView.class, FilesAdministrationPresenter.Proxy.class);
     bindPresenter(ConfigurationPresenter.class, ConfigurationPresenter.Display.class, ConfigurationView.class,

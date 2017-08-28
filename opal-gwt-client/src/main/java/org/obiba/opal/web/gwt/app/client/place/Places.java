@@ -65,6 +65,8 @@ public final class Places {
 
   public static final String TAXONOMIES = "!taxonomies";
 
+  public static final String PLUGINS = "!plugins";
+
   private Places() {}
 
   public static final class Place extends com.google.gwt.place.shared.Place {

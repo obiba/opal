@@ -64,6 +64,9 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   OpalNavLink javaPlace;
 
   @UiField
+  OpalNavLink pluginsPlace;
+
+  @UiField
   OpalNavLink serverPlace;
 
   @UiField
@@ -103,6 +106,9 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   FlowPanel jvmAuthorizable;
 
   @UiField
+  FlowPanel pluginsAuthorizable;
+
+  @UiField
   FlowPanel reportsAuthorizable;
 
   @UiField
@@ -138,6 +144,11 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   @Override
   public HasAuthorization getJVMAuthorizer() {
     return new WidgetAuthorizer(jvmAuthorizable);
+  }
+
+  @Override
+  public HasAuthorization getPluginsAuthorizer() {
+    return new WidgetAuthorizer(pluginsAuthorizable);
   }
 
   @Override
@@ -228,6 +239,11 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   @Override
   public void setJavaHistoryToken(String historyToken) {
     javaPlace.setHistoryToken(historyToken);
+  }
+
+  @Override
+  public void setPluginsHistoryToken(String historyToken) {
+    pluginsPlace.setHistoryToken(historyToken);
   }
 
   @Override

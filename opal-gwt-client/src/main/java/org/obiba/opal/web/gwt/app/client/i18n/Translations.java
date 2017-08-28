@@ -679,6 +679,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("No Variables")
   String noVariablesLabel();
 
+  @Description("No Plugins label")
+  @DefaultStringValue("No Plugins")
+  String noPluginsLabel();
+
   @Description("Attributes label")
   @DefaultStringValue("Attributes")
   String attributesLabel();
@@ -1822,6 +1826,10 @@ public interface Translations extends Constants {
   @Description("Edit Term")
   @DefaultStringValue("Edit Term")
   String editTerm();
+
+  @Description("Page Plugins title")
+  @DefaultStringValue("Plugins")
+  String pagePluginsTitle();
 
   @Description("Page Java title")
   @DefaultStringValue("Java Virtual Machine")
