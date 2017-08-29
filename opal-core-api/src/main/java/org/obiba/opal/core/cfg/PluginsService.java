@@ -17,6 +17,7 @@ import org.obiba.opal.core.service.SystemService;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 public interface PluginsService extends SystemService {
 
@@ -74,7 +75,21 @@ public interface PluginsService extends SystemService {
   // Plugins
   //
 
+  /**
+   * Get the installed plugin with the given name.
+   *
+   * @param name
+   * @return
+   */
   Plugin getInstalledPlugin(String name);
+
+  /**
+   * Set the site properties of the installed plugin with the given name.
+   *
+   * @param name
+   * @param properties
+   */
+  void setInstalledPluginSiteProperties(String name, Properties properties);
 
   /**
    * Get the plugins registered in the system.
@@ -103,5 +118,7 @@ public interface PluginsService extends SystemService {
    * @return
    */
   List<PluginPackage> getAvailablePlugins();
+
+
 
 }

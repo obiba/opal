@@ -82,6 +82,15 @@ public class PluginsServiceImpl implements PluginsService {
   }
 
   @Override
+  public void setInstalledPluginSiteProperties(String name, Properties properties) {
+    try {
+      pluginsManager.setPluginSiteProperties(name, properties);
+    } catch (IOException e) {
+      throw new PluginRepositoryException("Failed to save plugin " + name + " site properties: " + e.getMessage(), e);
+    }
+  }
+
+  @Override
   public List<PluginPackage> getInstalledPlugins() {
     return pluginsManager.getPlugins().stream()
         .map(rp -> new PluginPackage(rp.getName(), rp.getType(), rp.getTitle(), rp.getDescription(), rp.getVersion().toString(), rp.getOpalVersion().toString(), ""))
@@ -125,7 +134,7 @@ public class PluginsServiceImpl implements PluginsService {
       installPlugin(pluginRepositoryCache.downloadPlugin(name, pVersion, tmpDir), true);
       FileUtil.delete(tmpDir);
     } catch (IOException e) {
-      throw new PluginRepositoryException("Failed to install plugin " + name + ":" + version + " :" + e.getMessage(), e);
+      throw new PluginRepositoryException("Failed to install plugin " + name + ":" + version + " : " + e.getMessage(), e);
     }
   }
   
