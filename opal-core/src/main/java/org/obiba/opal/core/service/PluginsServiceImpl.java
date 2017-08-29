@@ -14,6 +14,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Files;
 import org.obiba.core.util.FileUtil;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.PluginsService;
 import org.obiba.opal.core.domain.plugins.PluginPackage;
 import org.obiba.opal.core.domain.plugins.PluginRepository;
@@ -46,6 +47,9 @@ public class PluginsServiceImpl implements PluginsService {
 
   @Autowired
   private OpalRuntime opalRuntime;
+
+  @Autowired
+  private OpalConfigurationService opalConfigurationService;
 
   private PluginRepositoryCache pluginRepositoryCache = new PluginRepositoryCache();
 
@@ -94,6 +98,7 @@ public class PluginsServiceImpl implements PluginsService {
     // exclude already installed plugin packages whatever the version is
     return pluginRepositoryCache.getOrUpdatePluginRepository().getPlugins().stream()
         .filter(pp -> registeredPlugins.stream().anyMatch(rp -> pp.isNewerThan(rp.getName(), rp.getVersion())))
+        .filter(pp -> opalConfigurationService.getOpalConfiguration().getVersion().compareTo(pp.getOpalVersion())>=0)
         .collect(Collectors.toList());
   }
 
@@ -103,6 +108,7 @@ public class PluginsServiceImpl implements PluginsService {
     // exclude already installed plugin packages whatever the version is
     return pluginRepositoryCache.getOrUpdatePluginRepository().getPlugins().stream()
         .filter(pp -> registeredPlugins.stream().noneMatch(rp -> pp.isSameAs(rp.getName())))
+        .filter(pp -> opalConfigurationService.getOpalConfiguration().getVersion().compareTo(pp.getOpalVersion())>=0)
         .collect(Collectors.toList());
   }
 
