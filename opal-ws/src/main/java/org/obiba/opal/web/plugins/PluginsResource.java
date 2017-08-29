@@ -22,7 +22,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import java.util.stream.Collectors;
 
 @Component
@@ -60,7 +59,7 @@ public class PluginsResource {
 
   @POST
   public Response installPlugin(@QueryParam("name") String name, @QueryParam("version") String version, @QueryParam("file") String file) {
-    if (!Strings.isNullOrEmpty(name) && !Strings.isNullOrEmpty(version)) {
+    if (!Strings.isNullOrEmpty(name)) {
       pluginsService.installPlugin(name, version);
       return Response.ok().build();
     }

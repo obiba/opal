@@ -31,9 +31,10 @@ import opal.perm_variable
 import opal.perm_r
 import opal.perm_datashield
 import opal.perm_system
-import opal.system
+import opal.plugin
 import opal.security.encrypt
 import opal.security.decrypt
+import opal.system
 
 
 def add_opal_arguments(parser):
@@ -106,13 +107,16 @@ add_subcommand('perm-variable', 'Apply permission on a set of variables.', opal.
 add_subcommand('perm-r', 'Apply R permission.', opal.perm_r.add_arguments, opal.perm_r.do_command)
 add_subcommand('perm-datashield', 'Apply DataSHIELD permission.', opal.perm_datashield.add_arguments, opal.perm_datashield.do_command)
 add_subcommand('perm-system', 'Apply system permission.', opal.perm_system.add_arguments, opal.perm_system.do_command)
-add_subcommand('system', 'Query for system status and configuration', opal.system.add_arguments, opal.system.do_command)
-add_subcommand('rest', 'Request directly the Opal REST API, for advanced users.', opal.rest.add_arguments,
-               opal.rest.do_command)
+add_subcommand('plugin', 'Manage system plugins', opal.plugin.add_arguments,
+               opal.plugin.do_command)
 add_subcommand('encrypt', "Encrypt string using Opal's secret key.", opal.security.encrypt.add_arguments,
                opal.security.encrypt.do_command)
 add_subcommand('decrypt', "Decrypt string using Opal's secret key.", opal.security.decrypt.add_arguments,
                opal.security.decrypt.do_command)
+add_subcommand('system', 'Query for system status and configuration', opal.system.add_arguments, opal.system.do_command)
+add_subcommand('rest', 'Request directly the Opal REST API, for advanced users.', opal.rest.add_arguments,
+               opal.rest.do_command)
+
 
 
 # Execute selected command

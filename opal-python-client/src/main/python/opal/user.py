@@ -1,5 +1,5 @@
 """
-Opal data.
+Opal user management.
 """
 
 import sys
