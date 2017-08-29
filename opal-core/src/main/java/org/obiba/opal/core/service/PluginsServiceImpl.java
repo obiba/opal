@@ -12,6 +12,7 @@ package org.obiba.opal.core.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import com.google.common.io.Files;
 import org.obiba.core.util.FileUtil;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
@@ -81,6 +82,15 @@ public class PluginsServiceImpl implements PluginsService {
   }
 
   @Override
+  public void setInstalledPluginSiteProperties(String name, Properties properties) {
+    try {
+      pluginsManager.setPluginSiteProperties(name, properties);
+    } catch (IOException e) {
+      throw new PluginRepositoryException("Failed to save plugin " + name + " site properties: " + e.getMessage(), e);
+    }
+  }
+
+  @Override
   public List<PluginPackage> getInstalledPlugins() {
     return pluginsManager.getPlugins().stream()
         .map(rp -> new PluginPackage(rp.getName(), rp.getType(), rp.getTitle(), rp.getDescription(), rp.getVersion().toString(), rp.getOpalVersion().toString(), ""))
@@ -114,12 +124,17 @@ public class PluginsServiceImpl implements PluginsService {
 
   @Override
   public void installPlugin(String name, String version) {
+    String pVersion = version;
+    if (Strings.isNullOrEmpty(version)) {
+      // no version specified: get the latest
+      pVersion = pluginRepositoryCache.getPluginLatestVersion(name);
+    }
     try {
       File tmpDir = Files.createTempDir();
-      installPlugin(pluginRepositoryCache.downloadPlugin(name, version, tmpDir), true);
+      installPlugin(pluginRepositoryCache.downloadPlugin(name, pVersion, tmpDir), true);
       FileUtil.delete(tmpDir);
     } catch (IOException e) {
-      throw new PluginRepositoryException("Failed to install plugin " + name + ":" + version + " :" + e.getMessage(), e);
+      throw new PluginRepositoryException("Failed to install plugin " + name + ":" + version + " : " + e.getMessage(), e);
     }
   }
   
@@ -206,6 +221,17 @@ public class PluginsServiceImpl implements PluginsService {
     private URL getRepositoryURL(String fileName) throws MalformedURLException {
       String basePath = updateSite.endsWith("/") ? updateSite : updateSite + "/";
       return new URL(basePath + "/" + fileName);
+    }
+
+    public String getPluginLatestVersion(String name) {
+      Version version = new Version("0.0.0");
+      for (PluginPackage pp : getOrUpdatePluginRepository().getPlugins().stream()
+          .filter(pp -> pp.getName().equals(name))
+          .filter(pp -> opalConfigurationService.getOpalConfiguration().getVersion().compareTo(pp.getOpalVersion())>=0)
+          .collect(Collectors.toList())) {
+        if (pp.getVersion().compareTo(version)>0) version = pp.getVersion();
+      }
+      return version.toString();
     }
   }
 }

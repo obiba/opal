@@ -1,5 +1,5 @@
 """
-Opal data.
+Opal groups management.
 """
 
 import sys

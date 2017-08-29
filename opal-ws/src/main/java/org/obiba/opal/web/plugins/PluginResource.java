@@ -68,8 +68,8 @@ public class PluginResource {
   @PUT
   @Path("/cfg")
   public Response saveConfig(Plugins.PluginCfgDto configDto) {
-    // TODO: write plugin properties
-    return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+    pluginsService.setInstalledPluginSiteProperties(name, Dtos.fromDto(configDto));
+    return Response.ok().build();
   }
 
 }

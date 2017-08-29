@@ -14,9 +14,7 @@ import org.obiba.runtime.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -162,5 +160,9 @@ public class Plugin {
     } catch (IOException e) {
       log.error("Failed to prepare plugin {} for removal", getName(), e);
     }
+  }
+
+  public void writeSiteProperties(Properties properties) throws IOException {
+    properties.store(new OutputStreamWriter(new FileOutputStream(siteProperties), "UTF-8"), null);
   }
 }

@@ -12,6 +12,7 @@ package org.obiba.opal.web.plugins;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.core.domain.VCFSamplesMapping;
@@ -22,10 +23,7 @@ import org.obiba.opal.spi.ServicePlugin;
 import org.obiba.opal.spi.vcf.VCFStore;
 import org.obiba.opal.web.model.Plugins;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Dtos {
@@ -66,16 +64,18 @@ public class Dtos {
     return builder.build();
   }
 
-  public static Plugins.PluginDto asDtoForPublic(Plugin plugin) {
-    Plugins.PluginDto.Builder builder = Plugins.PluginDto.newBuilder();
-    setProperties(plugin.getProperties(), builder, true);
-    return builder.build();
-  }
-
   public static Plugins.PluginDto asDto(ServicePlugin plugin) {
     Plugins.PluginDto.Builder builder = Plugins.PluginDto.newBuilder();
     setProperties(plugin.getProperties(), builder, false);
     return builder.build();
+  }
+
+  public static Properties fromDto(Plugins.PluginCfgDto configDto) {
+    Properties configMap = new Properties();
+    for (Plugins.PropertyDto property : configDto.getPropertiesList()) {
+      configMap.setProperty(property.getKey(), property.getValue());
+    }
+    return configMap;
   }
 
   public static Plugins.VCFStoreDto asDto(VCFStore store, VCFSamplesSummaryBuilder.Stats stats) {
