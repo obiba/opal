@@ -128,6 +128,8 @@ public interface Translations extends Constants {
       "Download", "Download", //
       "DownloadCertificate", "Download Certificate", //
       "Index now", "Index now", //
+      "Install", "Install", // //
+      "Reinstate", "Reinstate", //
       "Clear", "Clear",//
       "View", "View",//
       "Remove", "Remove",//
@@ -145,7 +147,7 @@ public interface Translations extends Constants {
       "Download identifiers", "Download identifiers",//
       "Unregister", "Unregister", //
       "Terminate", "Terminate", //
-      "Statistics", "Statistics" //
+      "Statistics", "Statistics"
   })
   Map<String, String> actionMap();
 
@@ -647,7 +649,17 @@ public interface Translations extends Constants {
       "SampleRoleVariableIsRequired", "Sample Role variable name is required.",
       "NoVariableAddedToCart", "No variable added to the cart.",
       "VariableAddedToCart", "1 {1} variable added to the cart.",
-      "VariablesAddedToCart", "{0} {1} variables added to the cart."
+      "VariablesAddedToCart", "{0} {1} variables added to the cart.",
+      "PluginInstalled", "Plugin {0}:{1} installed. System restart is required to finalize installation.",
+      "PluginPackageInstalled", "Plugin package {0} installed. System restart is required to finalize installation.",
+      "PluginInstallationFailed", "Plugin installation failed.",
+      "PluginRemoved", "Plugin {0} removed. System restart is required to finalize removal.",
+      "PluginRemovalFailed", "Plugin removal failed.",
+      "PluginReinstated", "Plugin {0} reinstated.",
+      "PluginReinstateFailed", "Plugin reinstate failed.",
+      "PluginServiceError", "Plugin service error.",
+      "NotPluginArchive", "Not a plugin archive. Expected file suffix is '-dist.zip'",
+      "LastUpdate", "Last repository check {0}."
   })
   Map<String, String> userMessageMap();
 
@@ -678,6 +690,10 @@ public interface Translations extends Constants {
   @Description("No Variables label")
   @DefaultStringValue("No Variables")
   String noVariablesLabel();
+
+  @Description("No Plugins label")
+  @DefaultStringValue("No Plugins")
+  String noPluginsLabel();
 
   @Description("Attributes label")
   @DefaultStringValue("Attributes")
@@ -1822,6 +1838,10 @@ public interface Translations extends Constants {
   @Description("Edit Term")
   @DefaultStringValue("Edit Term")
   String editTerm();
+
+  @Description("Page Plugins title")
+  @DefaultStringValue("Plugins")
+  String pagePluginsTitle();
 
   @Description("Page Java title")
   @DefaultStringValue("Java Virtual Machine")

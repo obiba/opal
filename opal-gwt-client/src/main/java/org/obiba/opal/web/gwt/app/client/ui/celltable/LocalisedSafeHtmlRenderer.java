@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.ui.celltable;
 
 import java.util.Map;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -38,7 +39,9 @@ public class LocalisedSafeHtmlRenderer implements SafeHtmlRenderer<String> {
   }
 
   protected String localise(String key) {
-    return localisations.get(key);
+    if (localisations.containsKey(key)) return localisations.get(key);
+    GWT.log("Untranslated key: " + key);
+    return key;
   }
 
   protected SafeHtml localisedHtml(String key) {
