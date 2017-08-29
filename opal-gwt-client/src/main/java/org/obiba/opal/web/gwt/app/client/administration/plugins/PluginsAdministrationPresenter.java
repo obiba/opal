@@ -148,23 +148,68 @@ public class PluginsAdministrationPresenter extends ItemAdministrationPresenter<
   }
 
   @Override
-  public void onUninstall(String name) {
-
+  public void onUninstall(final String name) {
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.PLUGIN.create().build(name))
+        .withCallback(
+            new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                if (response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_NO_CONTENT)
+                  fireEvent(NotificationEvent.newBuilder().info("PluginRemoved").args(name).build());
+                else
+                  fireEvent(NotificationEvent.newBuilder().error("PluginRemovalFailed").build());
+                getInstalledPlugins();
+              }
+            },
+            Response.SC_OK, Response.SC_NO_CONTENT, Response.SC_INTERNAL_SERVER_ERROR,//
+            Response.SC_NOT_FOUND)
+        .delete().send();
   }
 
   @Override
   public void onCancelUninstall(String name) {
-
+    getInstalledPlugins();
   }
 
   @Override
-  public void onInstall(String name, String version) {
-
+  public void onInstall(final String name, final String version) {
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.PLUGINS.create()
+        .query("name", name)
+        .query("version", version).build())
+        .withCallback(
+            new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                if (response.getStatusCode() == Response.SC_OK)
+                  fireEvent(NotificationEvent.newBuilder().info("PluginInstalled").args(name, version).build());
+                else
+                  fireEvent(NotificationEvent.newBuilder().error("PluginInstallationFailed").build());
+                getInstalledPlugins();
+              }
+            },
+            Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR,//
+            Response.SC_NOT_FOUND) //
+        .post().send();
   }
 
   @Override
-  public void onInstall(String file) {
-
+  public void onInstall(final String file) {
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.PLUGINS.create()
+        .query("file", file).build())
+        .withCallback(
+            new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                if (response.getStatusCode() == Response.SC_OK)
+                  fireEvent(NotificationEvent.newBuilder().info("PluginPackageInstalled").args(file).build());
+                else
+                  fireEvent(NotificationEvent.newBuilder().error("PluginInstallationFailed").build());
+                getInstalledPlugins();
+              }
+            },
+            Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR,//
+            Response.SC_NOT_FOUND) //
+        .post().send();
   }
 
   @ProxyStandard

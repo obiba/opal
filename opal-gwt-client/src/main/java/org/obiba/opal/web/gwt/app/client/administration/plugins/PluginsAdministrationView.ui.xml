@@ -19,20 +19,68 @@
       <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
 
+    <b:Paragraph>
+      <ui:msg description="Plugins information">
+        The plugins enhance system with new functionalities.
+      </ui:msg>
+    </b:Paragraph>
+
+    <b:Alert ui:field="restartNotice" close="false" visible="false">
+      <g:Label>
+        <ui:msg description="System restart information">
+          System restart is required to have the installation/removal of plugins effective.
+        </ui:msg>
+      </g:Label>
+    </b:Alert>
 
     <b:TabPanel tabPosition="above" ui:field="tabPanel">
       <b:Tab heading="Installed" active="true">
+        <b:Paragraph>
+          <ui:msg description="Plugins information">
+            List installed plugins. Installing or removing a plugin requires a system restart to be effective.
+          </ui:msg>
+        </b:Paragraph>
         <o:PluginPackageTable ui:field="installedTable"/>
       </b:Tab>
       <b:Tab heading="Updates">
+        <b:Paragraph>
+          <ui:msg description="Updates Plugins information">
+            List updates of installed plugins available for install.
+          </ui:msg>
+        </b:Paragraph>
         <o:PluginPackageTable ui:field="updatesTable"/>
       </b:Tab>
       <b:Tab heading="Available">
+        <b:Paragraph>
+          <ui:msg description="Updates Plugins information">
+            List new plugins available for install.
+          </ui:msg>
+        </b:Paragraph>
         <o:PluginPackageTable ui:field="availableTable"/>
       </b:Tab>
       <b:Tab heading="Advanced">
         <g:FlowPanel>
+          <b:Heading size="4">
+            <ui:msg description="Plugin Archive Installation label">Plugin Archive Installation</ui:msg>
+          </b:Heading>
+          <b:Paragraph>
+            <ui:msg description="Plugin Archive Installation information">
+              A plugin archive can be installed by direct selection. Expected file suffix is '-dist.zip'.
+            </ui:msg>
+          </b:Paragraph>
+          <b:Button ui:field="selectPlugin" icon="PLUS" type="INFO" addStyleNames="xlarge-bottom-margin">
+            <ui:msg description="Install Plugin label">Install Plugin</ui:msg>
+          </b:Button>
 
+          <b:Heading size="4">
+            <ui:msg description="Plugin Update Site label">Update Site</ui:msg>
+          </b:Heading>
+          <b:Paragraph>
+            <ui:msg description="Plugin Update Site information">
+              Repository of plugin packages.
+            </ui:msg>
+          </b:Paragraph>
+          <g:Anchor ui:field="updateSite"></g:Anchor>
         </g:FlowPanel>
       </b:Tab>
     </b:TabPanel>

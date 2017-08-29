@@ -128,6 +128,7 @@ public interface Translations extends Constants {
       "Download", "Download", //
       "DownloadCertificate", "Download Certificate", //
       "Index now", "Index now", //
+      "Install", "Install", //
       "Clear", "Clear",//
       "View", "View",//
       "Remove", "Remove",//
@@ -647,7 +648,12 @@ public interface Translations extends Constants {
       "SampleRoleVariableIsRequired", "Sample Role variable name is required.",
       "NoVariableAddedToCart", "No variable added to the cart.",
       "VariableAddedToCart", "1 {1} variable added to the cart.",
-      "VariablesAddedToCart", "{0} {1} variables added to the cart."
+      "VariablesAddedToCart", "{0} {1} variables added to the cart.",
+      "PluginInstalled", "Plugin {0}:{1} installed. System restart is required to finalize installation.",
+      "PluginPackageInstalled", "Plugin package {0} installed. System restart is required to finalize installation.",
+      "PluginInstallationFailed", "Plugin installation failed.",
+      "PluginRemoved", "Plugin {0} removed. System restart is required to finalize removal.",
+      "PluginRemovalFailed", "Plugin removal failed."
   })
   Map<String, String> userMessageMap();
 
