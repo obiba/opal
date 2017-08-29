@@ -15,18 +15,31 @@ import com.google.gwt.user.client.ui.InlineLabel;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.model.client.opal.PluginPackageDto;
 
 public class PluginPackageTable extends Table<PluginPackageDto> {
 
   public static final String INSTALL_ACTION = "Install";
 
+  public static final String REINSTATE_ACTION = "Reinstate";
+
   public PluginPackageTable() {
     initColumns();
   }
 
   public void initInstalledPackagesColumns(ActionHandler<PluginPackageDto> actionHandler) {
-    ActionsColumn<PluginPackageDto> actionColumn = new ActionsColumn<PluginPackageDto>(ActionsColumn.REMOVE_ACTION);
+    ActionsColumn<PluginPackageDto> actionColumn = new ActionsColumn<PluginPackageDto>(new ActionsProvider<PluginPackageDto>() {
+      @Override
+      public String[] allActions() {
+        return new String[] { ActionsColumn.REMOVE_ACTION, REINSTATE_ACTION };
+      }
+
+      @Override
+      public String[] getActions(PluginPackageDto value) {
+        return new String[] { value.getUninstalled() ? REINSTATE_ACTION : ActionsColumn.REMOVE_ACTION };
+      }
+    });
     if (actionHandler != null) actionColumn.setActionHandler(actionHandler);
     addColumn(actionColumn, translations.actionsLabel());
   }

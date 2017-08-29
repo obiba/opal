@@ -65,10 +65,10 @@
           </b:Heading>
           <b:Paragraph>
             <ui:msg description="Plugin Archive Installation information">
-              A plugin archive can be installed by direct selection. Expected file suffix is '-dist.zip'.
+              A plugin archive can be installed from a selected file. Expected file suffix is '-dist.zip'.
             </ui:msg>
           </b:Paragraph>
-          <b:Button ui:field="selectPlugin" icon="PLUS" type="INFO" addStyleNames="xlarge-bottom-margin">
+            <b:Button ui:field="selectPluginArchive" icon="PLUS" type="INFO" addStyleNames="xlarge-bottom-margin">
             <ui:msg description="Install Plugin label">Install Plugin</ui:msg>
           </b:Button>
 
@@ -77,10 +77,11 @@
           </b:Heading>
           <b:Paragraph>
             <ui:msg description="Plugin Update Site information">
-              Repository of plugin packages.
+              The repository of plugin packages is checked for installed plugins updates and new plugins available for download and install.
             </ui:msg>
           </b:Paragraph>
           <g:Anchor ui:field="updateSite"></g:Anchor>
+          <g:Label ui:field="lastUpdate" addStyleNames="help-block"></g:Label>
         </g:FlowPanel>
       </b:Tab>
     </b:TabPanel>

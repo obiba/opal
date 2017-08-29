@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.plugins;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -23,6 +24,10 @@ import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequestEvent;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
@@ -41,7 +46,9 @@ public class PluginsAdministrationPresenter extends ItemAdministrationPresenter<
   private Runnable actionRequiringConfirmation;
 
   @Inject
-  public PluginsAdministrationPresenter(EventBus eventBus, Display display, Proxy proxy, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
+  public PluginsAdministrationPresenter(EventBus eventBus, Display display, Proxy proxy,
+                                        DefaultBreadcrumbsBuilder breadcrumbsHelper,
+                                        FileSelectionPresenter fileSelectionPresenter) {
     super(eventBus, display, proxy);
     this.breadcrumbsHelper = breadcrumbsHelper;
     getView().setUiHandlers(this);
@@ -54,6 +61,17 @@ public class PluginsAdministrationPresenter extends ItemAdministrationPresenter<
   }
 
   @Override
+  protected void onBind() {
+    addRegisteredHandler(FileSelectionEvent.getType(), new FileSelectionEvent.Handler() {
+      @Override
+      public void onFileSelection(FileSelectionEvent event) {
+        if (!PluginsAdministrationPresenter.this.equals(event.getSource())) return;
+        installPluginArchive(event.getSelectedFile().getSelectionPath());
+      }
+    });
+  }
+
+  @Override
   protected void onReveal() {
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
     getView().refresh();
@@ -61,23 +79,6 @@ public class PluginsAdministrationPresenter extends ItemAdministrationPresenter<
 
   @Override
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/plugins").get()
-        .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new HasAuthorization() {
-          @Override
-          public void beforeAuthorization() {
-
-          }
-
-          @Override
-          public void authorized() {
-
-          }
-
-          @Override
-          public void unauthorized() {
-
-          }
-        })).send();
   }
 
   @Override
@@ -167,8 +168,22 @@ public class PluginsAdministrationPresenter extends ItemAdministrationPresenter<
   }
 
   @Override
-  public void onCancelUninstall(String name) {
-    getInstalledPlugins();
+  public void onCancelUninstall(final String name) {
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.PLUGIN.create().build(name))
+        .withCallback(
+            new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                if (response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_NO_CONTENT)
+                  fireEvent(NotificationEvent.newBuilder().info("PluginReinstated").args(name).build());
+                else
+                  fireEvent(NotificationEvent.newBuilder().error("PluginReinstateFailed").build());
+                getInstalledPlugins();
+              }
+            },
+            Response.SC_OK, Response.SC_NO_CONTENT, Response.SC_INTERNAL_SERVER_ERROR,//
+            Response.SC_NOT_FOUND)
+        .put().send();
   }
 
   @Override
@@ -192,8 +207,12 @@ public class PluginsAdministrationPresenter extends ItemAdministrationPresenter<
         .post().send();
   }
 
-  @Override
-  public void onInstall(final String file) {
+  private void installPluginArchive(final String file) {
+    if (!file.endsWith("-dist.zip")) {
+      GWT.log("file=" + file);
+      fireEvent(NotificationEvent.newBuilder().error("NotPluginArchive").build());
+      return;
+    }
     ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.PLUGINS.create()
         .query("file", file).build())
         .withCallback(
@@ -210,6 +229,11 @@ public class PluginsAdministrationPresenter extends ItemAdministrationPresenter<
             Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR,//
             Response.SC_NOT_FOUND) //
         .post().send();
+  }
+
+  @Override
+  public void onPluginFileSelection() {
+    fireEvent(new FileSelectionRequestEvent(this, FileSelectorPresenter.FileSelectionType.FILE));
   }
 
   @ProxyStandard

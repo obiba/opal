@@ -79,7 +79,7 @@ public class FileSelectionPresenter extends PresenterWidget<FileSelectionPresent
   }
 
   private void addEventHandlers() {
-    registerHandler(getEventBus().addHandler(FileSelectionEvent.getType(), new FileSelectionEvent.Handler() {
+    addRegisteredHandler(FileSelectionEvent.getType(), new FileSelectionEvent.Handler() {
 
       @Override
           public void onFileSelection(FileSelectionEvent event) {
@@ -90,7 +90,7 @@ public class FileSelectionPresenter extends PresenterWidget<FileSelectionPresent
             }
           }
 
-        }));
+        });
   }
 
   //

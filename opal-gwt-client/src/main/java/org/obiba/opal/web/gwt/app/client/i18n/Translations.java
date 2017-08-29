@@ -128,7 +128,8 @@ public interface Translations extends Constants {
       "Download", "Download", //
       "DownloadCertificate", "Download Certificate", //
       "Index now", "Index now", //
-      "Install", "Install", //
+      "Install", "Install", // //
+      "Reinstate", "Reinstate", //
       "Clear", "Clear",//
       "View", "View",//
       "Remove", "Remove",//
@@ -146,7 +147,7 @@ public interface Translations extends Constants {
       "Download identifiers", "Download identifiers",//
       "Unregister", "Unregister", //
       "Terminate", "Terminate", //
-      "Statistics", "Statistics" //
+      "Statistics", "Statistics"
   })
   Map<String, String> actionMap();
 
@@ -653,7 +654,12 @@ public interface Translations extends Constants {
       "PluginPackageInstalled", "Plugin package {0} installed. System restart is required to finalize installation.",
       "PluginInstallationFailed", "Plugin installation failed.",
       "PluginRemoved", "Plugin {0} removed. System restart is required to finalize removal.",
-      "PluginRemovalFailed", "Plugin removal failed."
+      "PluginRemovalFailed", "Plugin removal failed.",
+      "PluginReinstated", "Plugin {0} reinstated.",
+      "PluginReinstateFailed", "Plugin reinstate failed.",
+      "PluginServiceError", "Plugin service error.",
+      "NotPluginArchive", "Not a plugin archive. Expected file suffix is '-dist.zip'",
+      "LastUpdate", "Last repository check {0}."
   })
   Map<String, String> userMessageMap();
 
