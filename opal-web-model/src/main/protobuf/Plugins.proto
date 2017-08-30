@@ -15,7 +15,7 @@ message PluginPackageDto {
 
 message PluginPackagesDto {
     required string site = 1;
-    required string updated = 2;
+    optional string updated = 2;
     required bool restart = 3;
     repeated PluginPackageDto packages = 4;
 }

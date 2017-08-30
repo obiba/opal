@@ -662,7 +662,8 @@ public interface Translations extends Constants {
       "PluginRestarted", "Plugin service {0} restarted.",
       "PluginStartFailed", "Plugin service start failed.",
       "PluginStopFailed", "Plugin service stop failed.",
-      "PluginServiceError", "Plugin service error.",
+      "PluginsServiceError", "Plugins service error.",
+      "PluginUpdateSiteError", "Plugin update site failed to be accessed.",
       "NotPluginArchive", "Not a plugin archive. Expected file suffix is '-dist.zip'",
       "LastUpdate", "Last repository check {0}."
   })

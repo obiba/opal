@@ -188,7 +188,7 @@ public class PluginsServiceImpl implements PluginsService {
     }
 
     private Date getLastUpdate() {
-      return new Date(lastUpdate * 1000);
+      return lastUpdate == 0 ? null : new Date(lastUpdate * 1000);
     }
 
     private File downloadPlugin(String name, String version, File tmpDir) throws IOException {

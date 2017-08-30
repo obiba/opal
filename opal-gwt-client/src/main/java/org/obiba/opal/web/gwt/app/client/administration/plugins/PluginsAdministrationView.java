@@ -145,6 +145,9 @@ public class PluginsAdministrationView extends ViewWithUiHandlers<PluginsAdminis
     restartNotice.setVisible(pluginPackagesDto.getRestart());
     updateSite.setText(pluginPackagesDto.getSite());
     updateSite.setHref(pluginPackagesDto.getSite());
-    lastUpdate.setText(translations.userMessageMap().get("LastUpdate").replace("{0}", Moment.create(pluginPackagesDto.getUpdated()).fromNow()));
+    if (pluginPackagesDto.hasUpdated())
+      lastUpdate.setText(translations.userMessageMap().get("LastUpdate").replace("{0}", Moment.create(pluginPackagesDto.getUpdated()).fromNow()));
+    else
+      lastUpdate.setText("");
   }
 }

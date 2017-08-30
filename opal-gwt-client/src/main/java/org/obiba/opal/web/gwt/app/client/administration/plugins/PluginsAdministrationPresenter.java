@@ -127,7 +127,7 @@ public class PluginsAdministrationPresenter extends ItemAdministrationPresenter<
         .withCallback(SC_INTERNAL_SERVER_ERROR, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            fireEvent(NotificationEvent.newBuilder().error("PluginsServiceError").build());
+            fireEvent(NotificationEvent.newBuilder().error("PluginUpdateSiteError").build());
           }
         }) //
         .get().send();
@@ -146,7 +146,7 @@ public class PluginsAdministrationPresenter extends ItemAdministrationPresenter<
         .withCallback(SC_INTERNAL_SERVER_ERROR, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            fireEvent(NotificationEvent.newBuilder().error("PluginsServiceError").build());
+            fireEvent(NotificationEvent.newBuilder().error("PluginUpdateSiteError").build());
           }
         }) //
         .get().send();

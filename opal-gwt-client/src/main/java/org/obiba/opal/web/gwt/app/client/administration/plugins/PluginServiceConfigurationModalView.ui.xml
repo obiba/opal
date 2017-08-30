@@ -25,10 +25,10 @@
           <o:RequiredIcon/>
         </b:ControlLabel>
         <b:Controls>
-          <b:TextArea ui:field="properties" alternateSize="XLARGE" visibleLines="10"/>
+          <b:TextArea ui:field="properties" alternateSize="XXLARGE" visibleLines="10"/>
         </b:Controls>
         <b:HelpBlock>
-          <ui:msg description="Site Properties help">Plugin site specific properties. These properties enhance or
+          <ui:msg description="Site Properties help">Plugin installation site specific properties. These properties enhance or
             override the built-in properties of the plugin. Plugin service restart is usually required to make the
             changes effective.
           </ui:msg>

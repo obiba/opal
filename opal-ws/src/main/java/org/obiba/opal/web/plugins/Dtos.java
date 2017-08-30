@@ -12,18 +12,18 @@ package org.obiba.opal.web.plugins;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.core.domain.VCFSamplesMapping;
 import org.obiba.opal.core.domain.plugins.PluginPackage;
 import org.obiba.opal.core.runtime.Plugin;
 import org.obiba.opal.core.support.vcf.VCFSamplesSummaryBuilder;
-import org.obiba.opal.spi.ServicePlugin;
 import org.obiba.opal.spi.vcf.VCFStore;
 import org.obiba.opal.web.model.Plugins;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class Dtos {
@@ -35,13 +35,13 @@ public class Dtos {
   }
 
   public static Plugins.PluginPackagesDto asDto(String site, Date updated, boolean restart, List<PluginPackage> packages, Collection<String> uninstalledNames) {
-    return Plugins.PluginPackagesDto.newBuilder()
+    Plugins.PluginPackagesDto.Builder builder = Plugins.PluginPackagesDto.newBuilder()
         .setSite(site)
-        .setUpdated(DateTimeType.get().valueOf(updated).toString())
         .setRestart(restart)
         .addAllPackages(packages.stream().map(p -> asDto(p, uninstalledNames == null ? null : uninstalledNames.contains(p.getName())))
-            .collect(Collectors.toList()))
-        .build();
+            .collect(Collectors.toList()));
+    if (updated != null) builder.setUpdated(DateTimeType.get().valueOf(updated).toString());
+    return builder.build();
   }
 
   public static Plugins.PluginPackageDto asDto(PluginPackage pluginPackage, Boolean uninstalled) {
