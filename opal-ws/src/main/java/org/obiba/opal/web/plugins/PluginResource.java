@@ -33,7 +33,7 @@ public class PluginResource {
   private ApplicationContext applicationContext;
 
   @Autowired
-  PluginsService pluginsService;
+  private PluginsService pluginsService;
 
   @GET
   public Plugins.PluginDto get() {
@@ -59,16 +59,11 @@ public class PluginResource {
     return resource;
   }
 
-  @GET
-  @Path("/cfg")
-  public Plugins.PluginCfgDto getConfig() {
-    return get().getConfig();
-  }
-
   @PUT
   @Path("/cfg")
-  public Response saveConfig(Plugins.PluginCfgDto configDto) {
-    pluginsService.setInstalledPluginSiteProperties(name, Dtos.fromDto(configDto));
+  @Consumes("text/plain")
+  public Response saveConfig(String properties) {
+    pluginsService.setInstalledPluginSiteProperties(name, properties);
     return Response.ok().build();
   }
 

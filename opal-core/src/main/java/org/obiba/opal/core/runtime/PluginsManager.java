@@ -77,7 +77,7 @@ public class PluginsManager {
     return plugin.get();
   }
 
-  public void setPluginSiteProperties(String name, Properties properties) throws IOException {
+  public void setPluginSiteProperties(String name, String properties) throws IOException {
     Optional<Plugin> plugin = getPlugins().stream().filter(p -> p.getName().equals(name)).findFirst();
     if (!plugin.isPresent()) throw new NoSuchElementException("No such plugin with name: " + name);
     plugin.get().writeSiteProperties(properties);

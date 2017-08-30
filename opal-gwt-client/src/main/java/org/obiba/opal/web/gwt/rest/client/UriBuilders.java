@@ -745,6 +745,22 @@ public enum UriBuilders {
     }
   },
 
+  PLUGIN_CONFIG {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("plugin", "{}", "cfg");
+
+    }
+  },
+
+  PLUGIN_SERVICE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("plugin", "{}", "service");
+
+    }
+  },
+
   IDENTIFIERS_MAPPINGS {
     @Override
     public UriBuilder create() {

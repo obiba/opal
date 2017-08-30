@@ -89,7 +89,7 @@ public interface PluginsService extends SystemService {
    * @param name
    * @param properties
    */
-  void setInstalledPluginSiteProperties(String name, Properties properties);
+  void setInstalledPluginSiteProperties(String name, String properties);
 
   /**
    * Get the plugins registered in the system.

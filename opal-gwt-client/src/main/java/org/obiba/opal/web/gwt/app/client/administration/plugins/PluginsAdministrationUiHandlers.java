@@ -26,5 +26,9 @@ public interface PluginsAdministrationUiHandlers extends UiHandlers {
 
   void onInstall(String name, String version);
 
+  void onRestart(String name);
+
+  void onConfigure(String name);
+
   void onPluginFileSelection();
 }

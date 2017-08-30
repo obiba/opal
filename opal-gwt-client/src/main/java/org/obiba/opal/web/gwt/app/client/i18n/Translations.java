@@ -147,7 +147,9 @@ public interface Translations extends Constants {
       "Download identifiers", "Download identifiers",//
       "Unregister", "Unregister", //
       "Terminate", "Terminate", //
-      "Statistics", "Statistics"
+      "Statistics", "Statistics",
+      "Restart", "Restart",
+      "Configure", "Configure"
   })
   Map<String, String> actionMap();
 
@@ -657,6 +659,9 @@ public interface Translations extends Constants {
       "PluginRemovalFailed", "Plugin removal failed.",
       "PluginReinstated", "Plugin {0} reinstated.",
       "PluginReinstateFailed", "Plugin reinstate failed.",
+      "PluginRestarted", "Plugin service {0} restarted.",
+      "PluginStartFailed", "Plugin service start failed.",
+      "PluginStopFailed", "Plugin service stop failed.",
       "PluginServiceError", "Plugin service error.",
       "NotPluginArchive", "Not a plugin archive. Expected file suffix is '-dist.zip'",
       "LastUpdate", "Last repository check {0}."
@@ -927,6 +932,10 @@ public interface Translations extends Constants {
   @Description("Identifiers Tables title")
   @DefaultStringValue("Identifiers Tables")
   String identifiersTablesTitle();
+
+  @Description("Plugin Service Configuration title")
+  @DefaultStringValue("Plugin Service Configuration")
+  String pluginServiceConfigurationTitle();
 
   @Description("Add Table label")
   @DefaultStringValue("Add table...")

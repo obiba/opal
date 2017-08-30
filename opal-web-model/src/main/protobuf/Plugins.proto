@@ -2,11 +2,6 @@ package Plugins;
 
 option java_package = "org.obiba.opal.web.model";
 
-message PropertyDto {
-    required string key = 1;
-    required string value = 2;
-}
-
 message PluginPackageDto {
     required string name = 1;
     required string title = 2;
@@ -32,11 +27,7 @@ message PluginDto {
     required string version = 4;
     required string opalVersion = 5;
     required string type = 6;
-    optional PluginCfgDto config = 7;
-}
-
-message PluginCfgDto {
-    repeated PropertyDto properties = 1;
+    required string siteProperties = 7;
 }
 
 message VCFStoreDto {

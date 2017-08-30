@@ -24,6 +24,10 @@ public class PluginPackageTable extends Table<PluginPackageDto> {
 
   public static final String REINSTATE_ACTION = "Reinstate";
 
+  public static final String RESTART_ACTION = "Restart";
+
+  public static final String CONFIGURE_ACTION = "Configure";
+
   public PluginPackageTable() {
     initColumns();
   }
@@ -32,12 +36,12 @@ public class PluginPackageTable extends Table<PluginPackageDto> {
     ActionsColumn<PluginPackageDto> actionColumn = new ActionsColumn<PluginPackageDto>(new ActionsProvider<PluginPackageDto>() {
       @Override
       public String[] allActions() {
-        return new String[] { ActionsColumn.REMOVE_ACTION, REINSTATE_ACTION };
+        return new String[] { RESTART_ACTION, CONFIGURE_ACTION, ActionsColumn.REMOVE_ACTION, REINSTATE_ACTION };
       }
 
       @Override
       public String[] getActions(PluginPackageDto value) {
-        return new String[] { value.getUninstalled() ? REINSTATE_ACTION : ActionsColumn.REMOVE_ACTION };
+        return new String[] { RESTART_ACTION, CONFIGURE_ACTION, value.getUninstalled() ? REINSTATE_ACTION : ActionsColumn.REMOVE_ACTION };
       }
     });
     if (actionHandler != null) actionColumn.setActionHandler(actionHandler);

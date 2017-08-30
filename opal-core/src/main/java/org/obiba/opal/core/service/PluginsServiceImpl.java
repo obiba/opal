@@ -82,7 +82,7 @@ public class PluginsServiceImpl implements PluginsService {
   }
 
   @Override
-  public void setInstalledPluginSiteProperties(String name, Properties properties) {
+  public void setInstalledPluginSiteProperties(String name, String properties) {
     try {
       pluginsManager.setPluginSiteProperties(name, properties);
     } catch (IOException e) {

@@ -75,6 +75,8 @@ public class PluginsAdministrationView extends ViewWithUiHandlers<PluginsAdminis
       @Override
       public void doAction(PluginPackageDto object, String actionName) {
         if (ActionsColumn.REMOVE_ACTION.equals(actionName)) getUiHandlers().onUninstall(object.getName());
+        else if (PluginPackageTable.RESTART_ACTION.equals(actionName)) getUiHandlers().onRestart(object.getName());
+        else if (PluginPackageTable.CONFIGURE_ACTION.equals(actionName)) getUiHandlers().onConfigure(object.getName());
         else getUiHandlers().onCancelUninstall(object.getName());
       }
     });

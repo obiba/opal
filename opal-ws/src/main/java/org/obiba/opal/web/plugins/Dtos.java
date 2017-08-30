@@ -59,23 +59,15 @@ public class Dtos {
   }
 
   public static Plugins.PluginDto asDto(Plugin plugin) {
-    Plugins.PluginDto.Builder builder = Plugins.PluginDto.newBuilder();
-    setProperties(plugin.getProperties(), builder, false);
+    Plugins.PluginDto.Builder builder = Plugins.PluginDto.newBuilder()
+        .setName(plugin.getName())
+        .setTitle(plugin.getTitle())
+        .setDescription(plugin.getDescription())
+        .setVersion(plugin.getVersion().toString())
+        .setOpalVersion(plugin.getOpalVersion().toString())
+        .setType(plugin.getType())
+        .setSiteProperties(plugin.getSitePropertiesString());
     return builder.build();
-  }
-
-  public static Plugins.PluginDto asDto(ServicePlugin plugin) {
-    Plugins.PluginDto.Builder builder = Plugins.PluginDto.newBuilder();
-    setProperties(plugin.getProperties(), builder, false);
-    return builder.build();
-  }
-
-  public static Properties fromDto(Plugins.PluginCfgDto configDto) {
-    Properties configMap = new Properties();
-    for (Plugins.PropertyDto property : configDto.getPropertiesList()) {
-      configMap.setProperty(property.getKey(), property.getValue());
-    }
-    return configMap;
   }
 
   public static Plugins.VCFStoreDto asDto(VCFStore store, VCFSamplesSummaryBuilder.Stats stats) {
@@ -128,20 +120,5 @@ public class Dtos {
     }
 
     return builder.build();
-  }
-
-  private static void setProperties(Properties properties, Plugins.PluginDto.Builder builder, boolean isPublic) {
-    Plugins.PluginCfgDto.Builder cfgBuilder = Plugins.PluginCfgDto.newBuilder();
-    properties.entrySet().stream().filter(entry -> !reservedProperties.contains(entry.getKey().toString())).forEach(entry -> {
-      if ("name".equals(entry.getKey())) builder.setName(entry.getValue().toString());
-      else if ("title".equals(entry.getKey())) builder.setTitle(entry.getValue().toString());
-      else if ("description".equals(entry.getKey())) builder.setDescription(entry.getValue().toString());
-      else if ("version".equals(entry.getKey())) builder.setVersion(entry.getValue().toString());
-      else if ("opal.version".equals(entry.getKey())) builder.setOpalVersion(entry.getValue().toString());
-      else if ("type".equals(entry.getKey())) builder.setType(entry.getValue().toString());
-      else if (!isPublic)
-        cfgBuilder.addProperties(Plugins.PropertyDto.newBuilder().setKey(entry.getKey().toString()).setValue(entry.getValue().toString()));
-    });
-    builder.setConfig(cfgBuilder);
   }
 }

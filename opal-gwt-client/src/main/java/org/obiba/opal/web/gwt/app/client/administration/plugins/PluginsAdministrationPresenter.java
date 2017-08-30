@@ -26,14 +26,17 @@ import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdminis
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequestEvent;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
-import org.obiba.opal.web.gwt.rest.client.*;
-import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.opal.PluginDto;
 import org.obiba.opal.web.model.client.opal.PluginPackagesDto;
 
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
@@ -43,14 +46,15 @@ public class PluginsAdministrationPresenter extends ItemAdministrationPresenter<
 
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
 
-  private Runnable actionRequiringConfirmation;
+  private final ModalProvider<PluginServiceConfigurationModalPresenter> pluginServiceConfigurationModalPresenterModalProvider;
 
   @Inject
   public PluginsAdministrationPresenter(EventBus eventBus, Display display, Proxy proxy,
                                         DefaultBreadcrumbsBuilder breadcrumbsHelper,
-                                        FileSelectionPresenter fileSelectionPresenter) {
+                                        ModalProvider<PluginServiceConfigurationModalPresenter> pluginServiceConfigurationModalPresenterModalProvider) {
     super(eventBus, display, proxy);
     this.breadcrumbsHelper = breadcrumbsHelper;
+    this.pluginServiceConfigurationModalPresenterModalProvider = pluginServiceConfigurationModalPresenterModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -205,6 +209,61 @@ public class PluginsAdministrationPresenter extends ItemAdministrationPresenter<
             Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR,//
             Response.SC_NOT_FOUND) //
         .post().send();
+  }
+
+  @Override
+  public void onRestart(final String name) {
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.PLUGIN_SERVICE.create().build(name))
+        .withCallback(
+            new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                if (response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_NO_CONTENT)
+                  onStart(name);
+                else
+                  fireEvent(NotificationEvent.newBuilder().error("PluginStopFailed").build());
+              }
+            },
+            Response.SC_OK, Response.SC_NO_CONTENT, Response.SC_INTERNAL_SERVER_ERROR,//
+            Response.SC_NOT_FOUND)
+        .delete().send();
+  }
+
+  private void onStart(final String name) {
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.PLUGIN_SERVICE.create().build(name))
+        .withCallback(
+            new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                if (response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_NO_CONTENT)
+                  fireEvent(NotificationEvent.newBuilder().info("PluginRestarted").args(name).build());
+                else
+                  fireEvent(NotificationEvent.newBuilder().error("PluginStartFailed").build());
+              }
+            },
+            Response.SC_OK, Response.SC_NO_CONTENT, Response.SC_INTERNAL_SERVER_ERROR,//
+            Response.SC_NOT_FOUND)
+        .put().send();
+  }
+
+  @Override
+  public void onConfigure(final String name) {
+    ResourceRequestBuilderFactory.<PluginDto>newBuilder() //
+        .forResource(UriBuilders.PLUGIN.create().build(name)) //
+        .withCallback(new ResourceCallback<PluginDto>() {
+          @Override
+          public void onResource(Response response, PluginDto resource) {
+            PluginServiceConfigurationModalPresenter p = pluginServiceConfigurationModalPresenterModalProvider.get();
+            p.initialize(name, resource.getSiteProperties());
+          }
+        }) //
+        .withCallback(SC_INTERNAL_SERVER_ERROR, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            fireEvent(NotificationEvent.newBuilder().error("PluginsServiceError").build());
+          }
+        }) //
+        .get().send();
   }
 
   private void installPluginArchive(final String file) {

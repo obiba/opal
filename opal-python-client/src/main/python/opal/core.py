@@ -179,6 +179,9 @@ class OpalRequest:
     def content_type_protobuf(self):
         return self.content_type('application/x-protobuf')
 
+    def content_type_text_plain(self):
+        return self.content_type('text/plain')
+
     def method(self, method):
         if not method:
             self.method = 'GET'

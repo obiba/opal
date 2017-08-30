@@ -10,6 +10,9 @@
 
 package org.obiba.opal.core.runtime;
 
+import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
+import com.google.common.io.Files;
 import org.obiba.runtime.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +21,7 @@ import java.io.*;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.Charset;
 import java.util.Properties;
 
 /**
@@ -162,7 +166,18 @@ public class Plugin {
     }
   }
 
-  public void writeSiteProperties(Properties properties) throws IOException {
-    properties.store(new OutputStreamWriter(new FileOutputStream(siteProperties), "UTF-8"), null);
+  void writeSiteProperties(String properties) throws IOException {
+    String text = Strings.isNullOrEmpty(properties) ? "" : properties;
+    Files.write(text, siteProperties, Charsets.UTF_8);
+  }
+
+  public String getSitePropertiesString() {
+    if (!siteProperties.exists()) return "";
+    try {
+      return Files.toString(siteProperties, Charsets.UTF_8);
+    } catch (IOException e) {
+      log.error("Failed to read plugin site properties: {}", siteProperties.getAbsolutePath(), e);
+      return "";
+    }
   }
 }

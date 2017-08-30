@@ -14,10 +14,11 @@ def add_arguments(parser):
     parser.add_argument('--list', '-ls', action='store_true', help='List the installed plugins.')
     parser.add_argument('--updates', '-lu', action='store_true', help='List the installed plugins that can be updated.')
     parser.add_argument('--available', '-la', action='store_true', help='List the new plugins that could be installed.')
-    parser.add_argument('--install', '-in', required=False, help='Install a plugin by providing its name or name:version or a path to a plugin archive file (in Opal file system). If no version is specified, the latest version is installed. Requires system restart to be effective.')
+    parser.add_argument('--install', '-i', required=False, help='Install a plugin by providing its name or name:version or a path to a plugin archive file (in Opal file system). If no version is specified, the latest version is installed. Requires system restart to be effective.')
     parser.add_argument('--remove', '-rm', required=False, help='Remove a plugin by providing its name. Requires system restart to be effective.')
     parser.add_argument('--reinstate', '-ri', required=False, help='Reinstate a plugin that was previously removed by providing its name.')
-    parser.add_argument('--fetch', '-fe', required=False, help='Get the named plugin description.')
+    parser.add_argument('--fetch', '-f', required=False, help='Get the named plugin description.')
+    parser.add_argument('--configure', '-c', required=False, help='Configure the plugin site properties. Usually requires to restart the associated service to be effective.')
     parser.add_argument('--status', '-su', required=False, help='Get the status of the service associated to the named plugin.')
     parser.add_argument('--start', '-sa', required=False, help='Start the service associated to the named plugin.')
     parser.add_argument('--stop', '-so', required=False, help='Stop the service associated to the named plugin.')
@@ -53,6 +54,11 @@ def do_command(args):
                     response = request.post().resource('/plugins?name=' + nameVersion[0] + '&version=' + nameVersion[1]).send()
         elif args.fetch:
             response = request.get().resource('/plugin/' + args.fetch).send()
+        elif args.configure:
+            request.content_type_text_plain()
+            print 'Enter plugin site properties (one property per line, Ctrl-D to end input):'
+            request.content(sys.stdin.read())
+            response = request.put().resource('/plugin/' + args.configure + '/cfg').send()
         elif args.remove:
             response = request.delete().resource('/plugin/' + args.remove).send()
         elif args.reinstate:

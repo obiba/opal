@@ -24,7 +24,7 @@ def do_command(args):
         if args.verbose:
             request.verbose()
 
-        request.content_type("text/plain")
+        request.content_type_text_plain()
         print 'Enter identifiers (one identifier per line, Ctrl-D to end input):'
         request.content(sys.stdin.read())
 
