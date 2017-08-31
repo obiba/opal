@@ -18,9 +18,9 @@ import java.util.List;
 
 public interface SearchVariablesUiHandlers extends UiHandlers {
 
-  void onSearch(String query, String rqlQuery);
+  void onSearchRange(String query, String rqlQuery, int offset);
 
-  void onSearchRange(String query, String rqlQuery, int offset, int limit);
+  void onSearchAll(String query, SearchVariablesPresenter.QueryResultHandler handler);
 
   void onClear();
 
@@ -33,4 +33,5 @@ public interface SearchVariablesUiHandlers extends UiHandlers {
     void onResult(FacetResultDto facet);
 
   }
+
 }

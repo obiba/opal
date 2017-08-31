@@ -9,26 +9,6 @@
  */
 package org.obiba.opal.web.gwt.app.client.fs.view;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-
-import javax.annotation.Nullable;
-
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsUiHandlers;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.support.ValueRenderingHelper;
-import org.obiba.opal.web.gwt.app.client.ui.Table;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.DateTimeColumn;
-import org.obiba.opal.web.model.client.opal.FileDto;
-import org.obiba.opal.web.model.client.opal.FileDto.FileType;
-
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.common.collect.ComparisonChain;
@@ -51,6 +31,20 @@ import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsUiHandlers;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.support.ValueRenderingHelper;
+import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.DateTimeColumn;
+import org.obiba.opal.web.model.client.opal.FileDto;
+import org.obiba.opal.web.model.client.opal.FileDto.FileType;
+
+import javax.annotation.Nullable;
+import java.util.*;
 
 public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandlers> implements Display {
 
@@ -263,8 +257,9 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
     }
 
     @Override
-    public List<FileDto> getDataList() {
-      return dataProvider.getList();
+    public void selectAllItems(CheckboxColumn.ItemSelectionHandler<FileDto> handler) {
+      for (FileDto item : dataProvider.getList())
+        handler.onItemSelection(item);
     }
 
     @Override

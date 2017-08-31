@@ -280,8 +280,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   private void revealSearchVariables(String rqlQuery) {
     PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.SEARCH_VARIABLES)
         .with(ParameterTokens.TOKEN_RQL_QUERY, rqlQuery)
-        .with(ParameterTokens.TOKEN_OFFSET, "0")
-        .with(ParameterTokens.TOKEN_LIMIT, "50");
+        .with(ParameterTokens.TOKEN_OFFSET, "0");
     placeManager.revealPlaceHierarchy(Lists.newArrayList(PlaceRequestHelper.createRequestBuilder(Places.SEARCH).build(), builder.build()));
   }
 
@@ -397,8 +396,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   public void onSearch(VariableSuggestOracle.AdvancedSearchSuggestion suggestion) {
     PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.SEARCH_VARIABLES)
         .with(ParameterTokens.TOKEN_RQL_QUERY, "contains(" + suggestion.getReplacementString() + ")")
-        .with(ParameterTokens.TOKEN_OFFSET, "0")
-        .with(ParameterTokens.TOKEN_LIMIT, "50");
+        .with(ParameterTokens.TOKEN_OFFSET, "0");
     placeManager.revealPlace(builder.build());
   }
 

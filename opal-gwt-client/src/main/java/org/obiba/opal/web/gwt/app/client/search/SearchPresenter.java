@@ -60,7 +60,6 @@ public class SearchPresenter extends Presenter<SearchPresenter.Display, SearchPr
     getView().setVariablesHistoryToken(getHistoryToken(tokenFormatter, searchPlace, createRequest(Places.SEARCH_VARIABLES)
         .with(ParameterTokens.TOKEN_RQL_QUERY, "exists(project),exists(table)")
         .with(ParameterTokens.TOKEN_OFFSET,"0")
-        .with(ParameterTokens.TOKEN_LIMIT, "50")
         .build()));
     getView().setEntitiesHistoryToken(getHistoryToken(tokenFormatter, searchPlace, createRequest(Places.SEARCH_ENTITIES).build()));
     getView().setEntityHistoryToken(getHistoryToken(tokenFormatter, searchPlace, createRequest(Places.SEARCH_ENTITY).build()));

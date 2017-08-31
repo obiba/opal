@@ -16,6 +16,7 @@ import com.github.gwtbootstrap.client.ui.TextArea;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.*;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -36,6 +37,7 @@ import org.obiba.opal.web.gwt.app.client.ui.CriteriaPanel;
 import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.ToggleAnchor;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.rql.client.RQLParser;
 import org.obiba.opal.web.gwt.rql.client.RQLQuery;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -98,6 +100,12 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   IconAnchor selectAllAnchor;
 
   @UiField
+  Panel selectAllProgressBox;
+
+  @UiField
+  ProgressBar selectAllProgress;
+
+  @UiField
   IconAnchor clearSelectionAnchor;
 
   @UiField
@@ -109,6 +117,8 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   private VariableItemProvider variableItemProvider;
 
   private VariableFieldSuggestOracle oracle;
+
+  private String resultsQuery;
 
   @Inject
   public SearchVariablesView(SearchVariablesView.Binder uiBinder, Translations translations, TranslationMessages translationMessages, PlaceManager placeManager) {
@@ -146,7 +156,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   @UiHandler("searchButton")
   public void onSearch(ClickEvent event) {
     setVariablesVisible(false);
-    getUiHandlers().onSearch(getQuery(), getRQLQuery());
+    getUiHandlers().onSearchRange(getQuery(), getRQLQuery(), 0);
   }
 
   @UiHandler("clearButton")
@@ -218,11 +228,16 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   }
 
   @Override
-  public void showResults(QueryResultDto results, int offset, int limit) {
+  public void showResults(String query, int offset, QueryResultDto results) {
     initVariableItemTable();
-    variableItemTable.clearSelectedItems();
+    // if query has changed, clear selection model
+    if (!query.equals(resultsQuery)) {
+      variableItemTable.clearSelectedItems();
+      resultsQuery = query;
+    }
     variableItemProvider.updateRowData(offset, JsArrays.toList(results.getHitsArray()));
     variableItemProvider.updateRowCount(results.getTotalHits(), true);
+    variableItemTable.setPageStart(offset);
     variableItemPager.setPagerVisible(results.getTotalHits() > Table.DEFAULT_PAGESIZE);
     setVariablesVisible(true);
   }
@@ -376,6 +391,27 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
         public Alert getSelectTipsAlert() {
           return selectItemTipsAlert;
         }
+
+        @Override
+        public void selectAllItems(final CheckboxColumn.ItemSelectionHandler<ItemResultDto> handler) {
+          getUiHandlers().onSearchAll(getQuery(), new SearchVariablesPresenter.QueryResultHandler() {
+            @Override
+            public void onQueryResult(String rqlQuery, int offset, QueryResultDto results) {
+              int last = offset + results.getHitsArray().length();
+              GWT.log("onQueryResult: " + offset + "-" + last + " -> " + results.getTotalHits());
+              boolean queryPending = last<results.getTotalHits();
+              selectAllAnchor.setVisible(!queryPending);
+              selectAllProgressBox.setVisible(queryPending);
+              selectAllProgress.setPercent((last*100)/results.getTotalHits());
+              for (ItemResultDto item : JsArrays.toList(results.getHitsArray()))
+                handler.onItemSelection(item);
+              if (!queryPending) {
+                selectAllProgress.setPercent(0);
+                variableItemTable.redraw();
+              }
+            }
+          });
+        }
       });
       variableItemPager.setDisplay(variableItemTable);
       variableItemProvider.addDataDisplay(variableItemTable);
@@ -394,7 +430,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     protected void onRangeChanged(HasData<ItemResultDto> display) {
       Range range = display.getVisibleRange();
       setVariablesVisible(false);
-      getUiHandlers().onSearchRange(getQuery(), getRQLQuery(), range.getStart(), range.getLength());
+      getUiHandlers().onSearchRange(getQuery(), getRQLQuery(), range.getStart());
     }
   }
 

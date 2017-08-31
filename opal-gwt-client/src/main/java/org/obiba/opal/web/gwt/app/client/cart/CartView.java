@@ -20,7 +20,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
@@ -34,6 +33,7 @@ import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 
 import java.util.List;
 
@@ -161,8 +161,9 @@ public class CartView extends ViewWithUiHandlers<CartUiHandlers> implements Cart
         }
 
         @Override
-        public List<CartVariableItem> getDataList() {
-          return variableCartProvider.getList();
+        public void selectAllItems(CheckboxColumn.ItemSelectionHandler<CartVariableItem> handler) {
+          for (CartVariableItem item : variableCartProvider.getList())
+            handler.onItemSelection(item);
         }
 
         @Override

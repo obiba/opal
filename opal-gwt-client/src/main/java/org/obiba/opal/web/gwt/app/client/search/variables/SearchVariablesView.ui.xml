@@ -53,7 +53,7 @@
       <g:FlowPanel ui:field="variableItemTablePanel">
         <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false" addStyleNames="actions-select">
 
-          <g:FlowPanel addStyleNames="pull-left" width="60%">
+          <g:FlowPanel addStyleNames="pull-left" width="30%">
             <b2:IconAnchor ui:field="addToCart" icon="SHOPPING_CART"
                            addStyleNames="inline">
               <ui:msg description="Add to cart label">Add to cart</ui:msg>
@@ -63,6 +63,9 @@
           <g:FlowPanel addStyleNames="pull-right">
             <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
             <b2:IconAnchor ui:field="selectAllAnchor" icon="CHECK" addStyleNames="inline small-indent"/>
+            <g:FlowPanel ui:field="selectAllProgressBox" addStyleNames="inline-flex small-indent" visible="false">
+              <b:ProgressBar ui:field="selectAllProgress" percent="0" width="60px"/>
+            </g:FlowPanel>
             <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" visible="false"
                            addStyleNames="inline small-indent">
               <ui:msg description="Clear label">Clear</ui:msg>
