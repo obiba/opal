@@ -9,32 +9,22 @@
   -->
 
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
              xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
              xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
              ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
              ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
              ui:generateLocales="default">
 
-  <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false">
-    <g:FlowPanel>
-      <!--Properties-->
-      <b:ControlGroup ui:field="propsGroup">
-        <b:ControlLabel>
-          <ui:msg description="Site Properties label">Site Properties</ui:msg>
-          <o:RequiredIcon/>
-        </b:ControlLabel>
-        <b:Controls>
-          <b:TextArea ui:field="properties" alternateSize="XXLARGE" visibleLines="10"/>
-        </b:Controls>
-        <b:HelpBlock>
-          <ui:msg description="Site Properties help">Plugin installation site specific properties. These properties enhance or
-            override the built-in properties of the plugin. Plugin service restart is usually required to make the
-            changes effective.
-          </ui:msg>
-        </b:HelpBlock>
-      </b:ControlGroup>
-    </g:FlowPanel>
+  <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false" minHeight="700" minWidth="700">
+
+    <b:Paragraph ui:field="information">
+    </b:Paragraph>
+
+    <b:ProgressBar ui:field="progress" percent="0" visible="false" addStyleNames="small-bottom-margin"/>
+    <b:HelpBlock ui:field="progressHelp" visible="false">
+    </b:HelpBlock>
+
+    <o:TaxonomySelector ui:field="taxonomySelector"></o:TaxonomySelector>
 
     <b:ModalFooter>
       <b:Button ui:field="saveButton" type="PRIMARY">

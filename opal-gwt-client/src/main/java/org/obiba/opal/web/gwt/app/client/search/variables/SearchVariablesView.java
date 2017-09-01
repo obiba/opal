@@ -184,7 +184,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
   @Override
   public void setTaxonomies(List<TaxonomyDto> taxonomies) {
-    ((VariableFieldSuggestOracle) queryTypeahead.getSuggestOracle()).setTaxonomies(taxonomies);
+    ((VariableFieldSuggestOracle) queryTypeahead.getSuggestOracle()).setTaxonomyTerms(taxonomies);
   }
 
   @Override

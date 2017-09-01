@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.cart.service.CartVariableItem;
 import java.util.List;
 
 public interface CartUiHandlers extends UiHandlers {
+
   void onClearVariables();
 
   void onRemoveVariable(String variableFullName);
@@ -23,6 +24,10 @@ public interface CartUiHandlers extends UiHandlers {
   void onRemoveVariables(List<CartVariableItem> selectedVariables);
 
   void onSearchEntities(List<CartVariableItem> selectedVariables);
+
+  void onApplyTaxonomyAttribute(List<CartVariableItem> selectedVariables);
+
+  void onDeleteTaxonomyAttribute(List<CartVariableItem> selectedVariables);
 
   void onAddToView(List<CartVariableItem> selectedVariables);
 }

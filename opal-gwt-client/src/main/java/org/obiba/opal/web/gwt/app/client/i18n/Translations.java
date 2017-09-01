@@ -665,7 +665,11 @@ public interface Translations extends Constants {
       "PluginsServiceError", "Plugins service error.",
       "PluginUpdateSiteError", "Plugin update site failed to be accessed.",
       "NotPluginArchive", "Not a plugin archive. Expected file suffix is '-dist.zip'",
-      "LastUpdate", "Last repository check {0}."
+      "LastUpdate", "Last repository check {0}.",
+      "VariablesAnnotationApplied", "Annotation of {0} variables applied in table {1}.",
+      "VariablesAnnotationRemoved", "Annotation of {0} variables removed in table {1}.",
+      "VariablesAnnotationFailed", "Annotation of {0} variables failed for table {1}.",
+      "VariablesAnnotationFailure", "Variables annotation update failed for table {0}."
   })
   Map<String, String> userMessageMap();
 
@@ -962,6 +966,22 @@ public interface Translations extends Constants {
   @DefaultStringValue("Script Evaluation")
   String scriptEvaluationLabel();
 
+  @Description("Apply annotation title")
+  @DefaultStringValue("Apply Annotation")
+  String applyAnnotation();
+
+  @Description("Apply annotation help")
+  @DefaultStringValue("Annotate each selected variable with a taxonomy term.")
+  String applyAnnotationHelp();
+
+  @Description("Remove annotation title")
+  @DefaultStringValue("Remove Annotation")
+  String removeAnnotation();
+
+  @Description("Remove annotation help")
+  @DefaultStringValue("Remove taxonomy term annotation from each selected variable.")
+  String removeAnnotationHelp();
+
   @Description("Apply attribute title")
   @DefaultStringValue("Apply Attribute")
   String applyAttribute();
@@ -969,6 +989,7 @@ public interface Translations extends Constants {
   @Description("Apply attribute help")
   @DefaultStringValue("Add or update variable attributes for each selected variable.")
   String applyAttributeHelp();
+
 
   @Description("Add attribute title")
   @DefaultStringValue("Add Attribute")
@@ -981,6 +1002,10 @@ public interface Translations extends Constants {
   @Description("Add taxonomy attribute title")
   @DefaultStringValue("Add Taxonomy Attribute")
   String addTaxonomyAttribute();
+
+  @Description("Edit annotation title")
+  @DefaultStringValue("Annotations")
+  String editAnnotations();
 
   @Description("Edit attribute title")
   @DefaultStringValue("Edit Attribute")

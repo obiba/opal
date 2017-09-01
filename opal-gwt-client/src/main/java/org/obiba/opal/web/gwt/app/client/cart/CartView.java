@@ -11,6 +11,8 @@
 package org.obiba.opal.web.gwt.app.client.cart;
 
 import com.github.gwtbootstrap.client.ui.Alert;
+import com.github.gwtbootstrap.client.ui.Dropdown;
+import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.common.collect.Lists;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -66,6 +68,12 @@ public class CartView extends ViewWithUiHandlers<CartUiHandlers> implements Cart
   @UiField
   CartVariableTable variableCartTable;
 
+  @UiField
+  DropdownButton editAttributeAll;
+
+  @UiField
+  Dropdown editAttribute;
+
   private final PlaceManager placeManager;
 
   private final TranslationMessages translationMessages;
@@ -80,6 +88,8 @@ public class CartView extends ViewWithUiHandlers<CartUiHandlers> implements Cart
     this.placeManager = placeManager;
     this.translationMessages = translationMessages;
     filter.getTextBox().setPlaceholder(translations.filterVariables());
+    editAttributeAll.setText(translations.editAnnotations());
+    editAttribute.setText(translations.editAnnotations());
   }
 
   @UiHandler("clearVariables")
@@ -97,24 +107,44 @@ public class CartView extends ViewWithUiHandlers<CartUiHandlers> implements Cart
     getUiHandlers().onSearchEntities(variableCartProvider.getList());
   }
 
-  @UiHandler("addToViewAll")
-  public void onAddToViewAll(ClickEvent event) {
-    getUiHandlers().onAddToView(variableCartProvider.getList());
-  }
-
   @UiHandler("searchEntities")
   public void onSearchEntities(ClickEvent event) {
     getUiHandlers().onSearchEntities(variableCartTable.getSelectedItems());
   }
 
-  @UiHandler("removeFromCart")
-  public void onRemoveFromCart(ClickEvent event) {
-    getUiHandlers().onRemoveVariables(variableCartTable.getSelectedItems());
+  @UiHandler("addToViewAll")
+  public void onAddToViewAll(ClickEvent event) {
+    getUiHandlers().onAddToView(variableCartProvider.getList());
   }
 
   @UiHandler("addToView")
   public void onAddToView(ClickEvent event) {
     getUiHandlers().onAddToView(variableCartTable.getSelectedItems());
+  }
+
+  @UiHandler("applyTaxonomyAll")
+  public void onApplyTaxonomyAttributeAll(ClickEvent event) {
+    getUiHandlers().onApplyTaxonomyAttribute(variableCartProvider.getList());
+  }
+
+  @UiHandler("applyTaxonomy")
+  public void onApplyTaxonomyAttribute(ClickEvent event) {
+    getUiHandlers().onApplyTaxonomyAttribute(variableCartTable.getSelectedItems());
+  }
+
+  @UiHandler("deleteTaxonomyAll")
+  public void onDeleteTaxonomyAttributeAll(ClickEvent event) {
+    getUiHandlers().onDeleteTaxonomyAttribute(variableCartProvider.getList());
+  }
+
+  @UiHandler("deleteTaxonomy")
+  public void onDeleteTaxonomyAttribute(ClickEvent event) {
+    getUiHandlers().onDeleteTaxonomyAttribute(variableCartTable.getSelectedItems());
+  }
+
+  @UiHandler("removeFromCart")
+  public void onRemoveFromCart(ClickEvent event) {
+    getUiHandlers().onRemoveVariables(variableCartTable.getSelectedItems());
   }
 
   @Override

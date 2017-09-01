@@ -11,6 +11,7 @@ package org.obiba.opal.web.magma;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.Response;
@@ -54,11 +55,7 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
 
   @Override
   public Response addOrUpdateVariables(List<VariableDto> variables, @Nullable String comment) {
-    if(getValueTable().isView()) {
-      addOrUpdateViewVariables(variables, comment);
-    } else {
-      addOrUpdateTableVariables(variables);
-    }
+    addOrUpdateViewVariables(variables, comment);
     return Response.ok().build();
   }
 
@@ -79,12 +76,20 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
     return Response.ok().build();
   }
 
-  private void addOrUpdateViewVariables(Iterable<VariableDto> variables, @Nullable String comment) {
+  @Override
+  void addOrUpdateTableVariables(Iterable<Variable> variables) {
+    addOrUpdateViewVariables(variables, "Update");
+  }
+
+  private void addOrUpdateViewVariables(List<VariableDto> variables, @Nullable String comment) {
+    addOrUpdateViewVariables(variables.stream().map(Dtos::fromDto).collect(Collectors.toList()), comment);
+  }
+
+  private void addOrUpdateViewVariables(Iterable<Variable> variables, @Nullable String comment) {
     View view = getValueTableAsView();
     VariableOperationContext operationContext = new VariableOperationContext();
     try(VariableWriter variableWriter = view.getListClause().createWriter()) {
-      for(VariableDto variableDto : variables) {
-        Variable variable = Dtos.fromDto(variableDto);
+      for(Variable variable : variables) {
         operationContext.addVariable(view, variable);
         variableWriter.writeVariable(variable);
       }

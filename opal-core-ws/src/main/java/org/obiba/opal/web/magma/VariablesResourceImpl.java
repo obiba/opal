@@ -9,18 +9,10 @@
  */
 package org.obiba.opal.web.magma;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-
-import javax.annotation.Nullable;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-
+import com.google.common.base.Functions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import org.obiba.magma.*;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
@@ -28,19 +20,20 @@ import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
-import org.obiba.opal.web.model.Magma.VariableDto.Builder;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.support.InvalidRequestException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Function;
-import com.google.common.base.Functions;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import javax.annotation.Nullable;
+import javax.ws.rs.core.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
@@ -51,11 +44,11 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
 
   @Override
   public Iterable<VariableDto> getVariables(Request request, UriInfo uriInfo, String script, Integer offset,
-      @Nullable Integer limit) {
-    if(offset < 0) {
+                                            @Nullable Integer limit) {
+    if (offset < 0) {
       throw new InvalidRequestException("IllegalParameterValue", "offset", String.valueOf(limit));
     }
-    if(limit != null && limit < 0) {
+    if (limit != null && limit < 0) {
       throw new InvalidRequestException("IllegalParameterValue", "limit", String.valueOf(limit));
     }
 
@@ -104,7 +97,8 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
       }
     }
     for (Variable v : currentOrderVariables) {
-      if (variables == null || !variables.contains(v.getName())) orderedVariables.add(Dtos.asDto(v).setIndex(i++).build());
+      if (variables == null || !variables.contains(v.getName()))
+        orderedVariables.add(Dtos.asDto(v).setIndex(i++).build());
     }
 
     if (!orderedVariables.isEmpty()) addOrUpdateTableVariables(orderedVariables);
@@ -112,12 +106,20 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
   }
 
   @Override
+  public Response updateAttribute(String namespace, String name, String localeStr, String value, List<String> variableNames) {
+    if (Strings.isNullOrEmpty(name)) return Response.status(BAD_REQUEST).build();
+    if (Strings.isNullOrEmpty(value)) return deleteAttribute(namespace, name, localeStr, variableNames);
+    return setAttribute(namespace, name, localeStr, value, variableNames);
+  }
+
+
+  @Override
   public Response addOrUpdateVariables(List<VariableDto> variables, @Nullable String comment) {
 
     // @TODO Check if table can be modified and respond with "IllegalTableModification"
     // (it seems like this cannot be done with the current Magma implementation).
 
-    if(getValueTable().isView()) {
+    if (getValueTable().isView()) {
       return Response.status(BAD_REQUEST).entity(getErrorMessage(BAD_REQUEST, "CannotWriteToView")).build();
     }
     addOrUpdateTableVariables(variables);
@@ -125,25 +127,28 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
     return Response.ok().build();
   }
 
-  void addOrUpdateTableVariables(Iterable<VariableDto> variables) {
-    try(ValueTableWriter tableWriter = getValueTable().getDatasource()
+  private void addOrUpdateTableVariables(List<VariableDto> variables) {
+    addOrUpdateTableVariables(variables.stream().map(Dtos::fromDto).collect(Collectors.toList()));
+  }
+
+  void addOrUpdateTableVariables(Iterable<Variable> variables) {
+    try (ValueTableWriter tableWriter = getValueTable().getDatasource()
         .createWriter(getValueTable().getName(), getValueTable().getEntityType());
-        VariableWriter variableWriter = tableWriter.writeVariables()) {
-      for(VariableDto variable : variables) {
-        variableWriter.writeVariable(Dtos.fromDto(variable));
+         VariableWriter variableWriter = tableWriter.writeVariables()) {
+      for (Variable variable : variables) {
+        variableWriter.writeVariable(variable);
       }
     }
   }
 
   @Override
   public Response deleteVariables(List<String> variables) {
+    if (getValueTable().isView()) throw new InvalidRequestException("Derived variable must be deleted by the view");
 
-    if(getValueTable().isView()) throw new InvalidRequestException("Derived variable must be deleted by the view");
-
-    try(ValueTableWriter tableWriter = getValueTable().getDatasource()
+    try (ValueTableWriter tableWriter = getValueTable().getDatasource()
         .createWriter(getValueTable().getName(), getValueTable().getEntityType());
-        ValueTableWriter.VariableWriter variableWriter = tableWriter.writeVariables()) {
-      for(String name : variables) {
+         ValueTableWriter.VariableWriter variableWriter = tableWriter.writeVariables()) {
+      for (String name : variables) {
         // The variable must exist
         Variable v = getValueTable().getVariable(name);
         if (tableListeners != null && !tableListeners.isEmpty()) {
@@ -166,6 +171,73 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
   // private methods
   //
 
+  private Response setAttribute(String namespace, String name, String localeStr, String value, List<String> variableNames) {
+    ValueTable table = getValueTable();
+    Iterable<Variable> variables = getVariables(table, variableNames);
+    Locale locale = Strings.isNullOrEmpty(localeStr) ? null : Locale.forLanguageTag(localeStr);
+    final Attribute attribute = Attribute.Builder.newAttribute(name).withNamespace(namespace).withValue(locale, value).build();
+    List<Variable> updatedVariables = Lists.newArrayList();
+
+    for (Variable variable : variables) {
+      // copy variable without the attribute of interest
+      Variable.Builder updatedVariableBuilder = Variable.Builder.sameAs(variable).clearAttributes();
+      if (variable.hasAttributes()) variable.getAttributes().stream()
+          .filter(attr -> !isSameAttribute(attr, attribute))
+          .forEach(updatedVariableBuilder::addAttribute);
+      // empty value means no attribute
+      if (!Strings.isNullOrEmpty(value)) updatedVariableBuilder.addAttribute(attribute);
+      // update variable
+      updatedVariables.add(updatedVariableBuilder.build());
+    }
+    addOrUpdateTableVariables(updatedVariables);
+    return Response.ok().build();
+  }
+
+  private Response deleteAttribute(String namespace, String name, String localeStr, List<String> variableNames) {
+    ValueTable table = getValueTable();
+    Iterable<Variable> variables = getVariables(table, variableNames);
+    Locale locale = Strings.isNullOrEmpty(localeStr) ? null : Locale.forLanguageTag(localeStr);
+    final Attribute attribute = Attribute.Builder.newAttribute(name).withNamespace(namespace).withLocale(locale).build();
+    List<Variable> updatedVariables = Lists.newArrayList();
+
+    for (Variable variable : variables) {
+      if (variable.hasAttributes()) {
+        // copy variable without the attribute of interest
+        Variable.Builder updatedVariableBuilder = Variable.Builder.sameAs(variable).clearAttributes();
+        variable.getAttributes().stream()
+            .filter(attr -> !isSameAttribute(attr, attribute))
+            .forEach(updatedVariableBuilder::addAttribute);
+        Variable updatedVariable = updatedVariableBuilder.build();
+        // update variable only if attributes have changed
+        if (variable.getAttributes().size() != (updatedVariable.hasAttributes() ? updatedVariable.getAttributes().size() : 0))
+          updatedVariables.add(updatedVariableBuilder.build());
+      }
+    }
+    addOrUpdateTableVariables(updatedVariables);
+    return Response.ok().build();
+  }
+
+  /**
+   * Get the {@link Variable}s from their name or all of them if name list is empty.
+   *
+   * @param table
+   * @param variableNames
+   * @return
+   */
+  private Iterable<Variable> getVariables(ValueTable table, List<String> variableNames) {
+    if (variableNames == null || variableNames.isEmpty()) return table.getVariables();
+    return variableNames.stream().map(table::getVariable).collect(Collectors.toList());
+  }
+
+  private boolean isSameAttribute(Attribute source, Attribute target) {
+    if (!source.getName().equals(target.getName())) return false;
+    if (source.hasNamespace() && !source.getNamespace().equals(target.getNamespace())) return false;
+    if (!source.hasNamespace() && target.hasNamespace()) return false;
+    if (source.isLocalised() && !source.getLocale().equals(target.getLocale())) return false;
+    if (!source.isLocalised() && target.isLocalised()) return false;
+    return true;
+  }
+
   ClientErrorDto getErrorMessage(Response.StatusType responseStatus, String errorStatus) {
     return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode()).setStatus(errorStatus).build();
   }
@@ -174,7 +246,7 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
     List<PathSegment> segments = Lists.newArrayList(uriInfo.getPathSegments());
     segments.remove(segments.size() - 1);
     UriBuilder ub = UriBuilder.fromPath("/");
-    for(PathSegment segment : segments) {
+    for (PathSegment segment : segments) {
       ub.segment(segment.getPath());
     }
     return ub;
