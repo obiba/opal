@@ -396,8 +396,9 @@ public class ViewModalView extends ModalPopupViewWithUiHandlers<ViewModalUiHandl
     }
 
     @Override
-    public List<TableDto> getDataList() {
-      return dataProvider.getList();
+    public void selectAllItems(CheckboxColumn.ItemSelectionHandler<TableDto> handler) {
+      for (TableDto item : dataProvider.getList())
+        handler.onItemSelection(item);
     }
 
     @Override

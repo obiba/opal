@@ -22,7 +22,7 @@ import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
-import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
+import org.obiba.opal.web.gwt.app.client.cart.edit.CartVariableAttributeModalPresenter;
 import org.obiba.opal.web.gwt.app.client.cart.event.CartCountsUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.cart.service.CartService;
 import org.obiba.opal.web.gwt.app.client.cart.service.CartVariableItem;
@@ -36,8 +36,6 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class CartPresenter extends Presenter<CartPresenter.Display, CartPresenter.Proxy> implements HasPageTitle, CartUiHandlers {
@@ -50,14 +48,18 @@ public class CartPresenter extends Presenter<CartPresenter.Display, CartPresente
 
   private final ModalProvider<VariablesToViewPresenter> variablesToViewProvider;
 
+  private final ModalProvider<CartVariableAttributeModalPresenter> cartVariableAttributeModalPresenterModalProvider;
+
   @Inject
   public CartPresenter(EventBus eventBus, Display view, Proxy proxy, Translations translations, CartService cartService,
-                       PlaceManager placeManager, ModalProvider<VariablesToViewPresenter> variablesToViewProvider) {
+                       PlaceManager placeManager, ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
+                       ModalProvider<CartVariableAttributeModalPresenter> cartVariableAttributeModalPresenterModalProvider) {
     super(eventBus, view, proxy, ApplicationPresenter.WORKBENCH);
     this.translations = translations;
     this.cartService = cartService;
     this.placeManager = placeManager;
     this.variablesToViewProvider = variablesToViewProvider.setContainer(this);
+    this.cartVariableAttributeModalPresenterModalProvider = cartVariableAttributeModalPresenterModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -132,6 +134,22 @@ public class CartPresenter extends Presenter<CartPresenter.Display, CartPresente
       variablesToViewPresenter.show(variableFullNames);
     }
   }
+
+  @Override
+  public void onApplyTaxonomyAttribute(List<CartVariableItem> selectedVariables) {
+    CartVariableAttributeModalPresenter presenter = cartVariableAttributeModalPresenterModalProvider.get();
+    presenter.initialize(selectedVariables, true);
+  }
+
+  @Override
+  public void onDeleteTaxonomyAttribute(List<CartVariableItem> selectedVariables) {
+    CartVariableAttributeModalPresenter presenter = cartVariableAttributeModalPresenterModalProvider.get();
+    presenter.initialize(selectedVariables, false);
+  }
+
+  //
+  // Private methods
+  //
 
   private void updateView() {
     getView().showVariables(cartService.getVariables());

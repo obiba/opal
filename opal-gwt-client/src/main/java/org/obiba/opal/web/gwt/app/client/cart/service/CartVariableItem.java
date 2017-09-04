@@ -60,4 +60,8 @@ public class CartVariableItem {
   public String getEntityType() {
     return entityType;
   }
+
+  public String getTableReference() {
+    return MagmaPath.Builder.datasource(datasource).table(table).build();
+  }
 }

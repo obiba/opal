@@ -218,8 +218,15 @@ public class VariableItemTable extends Table<ItemResultDto> {
     }
 
     @Override
-    public List<ItemResultDto> getDataList() {
-      return table.getVisibleItems();
+    public void selectAllItems(CheckboxColumn.ItemSelectionHandler<ItemResultDto> handler) {
+      if (table.getVisibleItemCount() == table.getRowCount()) {
+        for (ItemResultDto item : table.getVisibleItems())
+          handler.onItemSelection(item);
+      }
+      else {
+        // TODO query all items
+      }
     }
+
   }
 }

@@ -40,6 +40,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
+import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.EntryDto;
@@ -56,6 +57,10 @@ import java.util.Map;
 public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter.Display, SearchVariablesPresenter.Proxy>
     implements HasPageTitle, SearchVariablesUiHandlers {
 
+  private static final int QUERY_LIMIT = Table.DEFAULT_PAGESIZE;
+
+  private static final int QUERY_ALL_LIMIT = 10000;
+
   private final Translations translations;
 
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
@@ -67,8 +72,6 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
   private String rqlQuery;
 
   private int offset = 0;
-
-  private int limit = 50;
 
   private List<String> locales = Lists.newArrayList();
 
@@ -101,7 +104,6 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
     query = request.getParameter(ParameterTokens.TOKEN_QUERY, null);
     rqlQuery = request.getParameter(ParameterTokens.TOKEN_RQL_QUERY, null);
     offset = Integer.parseInt(request.getParameter(ParameterTokens.TOKEN_OFFSET, "0"));
-    limit = Integer.parseInt(request.getParameter(ParameterTokens.TOKEN_LIMIT, "50"));
     getView().setQuery(query);
     if (hasQuery()) query();
     else if (viewInitialized && hasRQLQuery()) {
@@ -111,21 +113,20 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
   }
 
   @Override
-  public void onSearch(String query, String rqlQuery) {
-    onSearchRange(query, rqlQuery, 0, 50);
-  }
-
-  @Override
-  public void onSearchRange(String query, String rqlQuery, int offset, int limit) {
+  public void onSearchRange(String query, String rqlQuery, int offset) {
     this.query = query;
     this.rqlQuery = rqlQuery;
     this.offset = offset;
-    this.limit = limit;
     if (hasQuery()) query();
     else {
       getView().reset();
       updateHistory();
     }
+  }
+
+  @Override
+  public void onSearchAll(String query, QueryResultHandler handler) {
+    queryAll(query, 0, handler);
   }
 
   @Override
@@ -135,8 +136,7 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
     PlaceRequest.Builder builder = PlaceRequestHelper.createRequestBuilder(placeManager.getCurrentPlaceRequest())
         .without(ParameterTokens.TOKEN_QUERY)
         .without(ParameterTokens.TOKEN_RQL_QUERY)
-        .without(ParameterTokens.TOKEN_OFFSET)
-        .without(ParameterTokens.TOKEN_LIMIT);
+        .without(ParameterTokens.TOKEN_OFFSET);
     placeManager.updateHistory(builder.build(), true);
   }
 
@@ -179,7 +179,7 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
     return !Strings.isNullOrEmpty(rqlQuery);
   }
 
-  private void query() {
+  private UriBuilder createUriBuilder(String query, int offset, int limit) {
     UriBuilder ub = UriBuilders.DATASOURCES_VARIABLES_SEARCH.create()//
         .query("query", query)//
         .query("offset", "" + offset)//
@@ -191,7 +191,11 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
       if (!"en".equals(locale))
         ub.query("field", "label-" + locale);
     }
+    return ub;
+  }
 
+  private void query() {
+    UriBuilder ub = createUriBuilder(query, offset, QUERY_LIMIT);
     // Get candidates from search words.
     ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
         .withCallback(new ResponseCodeCallback() {
@@ -212,8 +216,38 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
           @Override
           public void onResource(Response response, QueryResultDto resource) {
             if (response.getStatusCode() == Response.SC_OK) {
-              getView().showResults(resource, offset, limit);
+              getView().showResults(query, offset, resource);
               updateHistory();
+            }
+          }
+        })//
+        .send();
+  }
+
+  private void queryAll(final String query, final int allOffset, final QueryResultHandler handler) {
+    UriBuilder ub = createUriBuilder(query, allOffset, QUERY_ALL_LIMIT);
+    final int nextOffset = allOffset + QUERY_ALL_LIMIT;
+    // Get candidates from search words.
+    ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            fireEvent(NotificationEvent.newBuilder().warn("MalformedSearchQuery").build());
+          }
+        }, Response.SC_BAD_REQUEST)//
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
+          }
+        }, Response.SC_SERVICE_UNAVAILABLE)//
+        .withCallback(new ResourceCallback<QueryResultDto>() {
+          @Override
+          public void onResource(Response response, QueryResultDto resource) {
+            if (response.getStatusCode() == Response.SC_OK) {
+              handler.onQueryResult(query, allOffset, resource);
+              if (nextOffset<resource.getTotalHits())
+                queryAll(query, nextOffset, handler);
             }
           }
         })//
@@ -304,8 +338,7 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
 
   private void updateHistory() {
     PlaceRequest.Builder builder = PlaceRequestHelper.createRequestBuilder(placeManager.getCurrentPlaceRequest())
-        .with(ParameterTokens.TOKEN_OFFSET, "" + offset)
-        .with(ParameterTokens.TOKEN_LIMIT, "" + limit);
+        .with(ParameterTokens.TOKEN_OFFSET, "" + offset);
     if (Strings.isNullOrEmpty(rqlQuery)) {
       builder.with(ParameterTokens.TOKEN_QUERY, query);
       builder.without(ParameterTokens.TOKEN_RQL_QUERY);
@@ -331,11 +364,15 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
 
     void setRQLQuery(String rqlQuery);
 
-    void showResults(QueryResultDto results, int offset, int limit);
+    void showResults(String rqlQuery, int offset, QueryResultDto results);
 
     void clearResults();
 
     void reset();
+  }
+
+  public interface QueryResultHandler {
+    void onQueryResult(String rqlQuery, int offset, QueryResultDto results);
   }
 
 }

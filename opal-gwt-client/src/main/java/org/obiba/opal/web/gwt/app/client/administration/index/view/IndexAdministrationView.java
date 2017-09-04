@@ -42,7 +42,6 @@ import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.*;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.obiba.opal.web.model.client.opal.ScheduleType.*;
@@ -337,8 +336,9 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     }
 
     @Override
-    public List<TableIndexStatusDto> getDataList() {
-      return dataProvider.getList();
+    public void selectAllItems(CheckboxColumn.ItemSelectionHandler<TableIndexStatusDto> handler) {
+      for (TableIndexStatusDto item : dataProvider.getList())
+        handler.onItemSelection(item);
     }
 
     @Override

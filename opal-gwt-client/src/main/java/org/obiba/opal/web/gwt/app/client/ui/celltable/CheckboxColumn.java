@@ -10,13 +10,6 @@
 
 package org.obiba.opal.web.gwt.app.client.ui.celltable;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
-import org.obiba.opal.web.gwt.app.client.ui.Table;
-
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.common.collect.Lists;
@@ -31,11 +24,16 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.MultiSelectionModel;
 import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.SetSelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.ui.Table;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHandler<Integer> {
 
@@ -132,7 +130,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     display.getClearSelection().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        for(T tc : display.getDataList()) {
+        for(T tc : selectionModel.getSelectedSet()) {
           selectionModel.setSelected(tc, false);
         }
         display.getTable().redraw();
@@ -148,9 +146,12 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     display.getSelectAll().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        for(T tc : display.getDataList()) {
-          selectionModel.setSelected(tc, true);
-        }
+        display.selectAllItems(new ItemSelectionHandler<T>() {
+          @Override
+          public void onItemSelection(T t) {
+            selectionModel.setSelected(t, true);
+          }
+        });
 
         display.getTable().redraw();
         updateStatusAlert();
@@ -172,11 +173,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
    */
   public List<T> getSelectedItems() {
     List<T> list = new LinkedList<T>();
-    for(T tc : display.getDataList()) {
-      if(selectionModel.isSelected(tc)) {
-        list.add(tc);
-      }
-    }
+    list.addAll(selectionModel.getSelectedSet());
     return list;
   }
 
@@ -190,7 +187,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     Header<Boolean> checkHeader = new Header<Boolean>(new CheckboxCell(true, true) {
       @Override
       public void render(Context context, Boolean value, SafeHtmlBuilder sb) {
-        if(display.getDataList().isEmpty()) {
+        if(getTotalRowCount() == 0) {
           sb.append(SafeHtmlUtils.fromSafeConstant("<input type=\"checkbox\" tabindex=\"-1\" disabled=\"disabled\"/>"));
         } else {
           super.render(context, value, sb);
@@ -202,7 +199,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
       @Override
       public Boolean getValue() {
         updateStatusAlert();
-        if(display.getDataList().isEmpty()) {
+        if(getTotalRowCount() == 0) {
           return false;
         }
 
@@ -221,7 +218,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
       @Override
       public void update(Boolean value) {
 
-        if(display.getDataList().isEmpty()) return;
+        if(getTotalRowCount() == 0) return;
 
         for(T tc : display.getTable().getVisibleItems()) {
           selectionModel.setSelected(tc, value);
@@ -243,7 +240,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
       return;
 
     int selectedSize = selectionModel.getSelectedSet().size();
-    int count = display.getDataList().size();
+    int count = getTotalRowCount();
     boolean allSelected = selectedSize == count;
 
     if(display.getSelectActionsAlert() != null && selectedSize == 0) {
@@ -285,7 +282,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     display.getSelectAll().setVisible(true);
 
     args.clear();
-    args.add(display.getNItemLabel(display.getDataList().size()));
+    args.add(display.getNItemLabel(getTotalRowCount()));
     display.getSelectAll().setText(TranslationsUtils.replaceArguments(translations.selectAllNItems(), args));
     display.getClearSelection().setVisible(true);
   }
@@ -293,7 +290,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
   private void doAction() {
     // Count the number of selected items on the current page.
     int nbSelected = selectionModel.getSelectedSet().size();
-    int count = display.getDataList().size();
+    int count = getTotalRowCount();
 
     if(display.getSelectActionsAlert() != null) {
       display.getSelectActionsAlert().setVisible(nbSelected > 0);
@@ -313,6 +310,10 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     actionHandler = handler;
   }
 
+  private int getTotalRowCount() {
+    return display.getTable().getRowCount();
+  }
+  
   public interface Display<T> {
     /**
      * @return The displayed table
@@ -341,9 +342,11 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     HasText getSelectAllStatus();
 
     /**
-     * @return The table data provider
+     * Get all items and trigger there selection.
+     *
+     * @param handler
      */
-    List<T> getDataList();
+    void selectAllItems(ItemSelectionHandler<T> handler);
 
     /**
      * @return The type name of item
@@ -351,14 +354,26 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     String getNItemLabel(int nb);
 
     /**
-     * @return The actions panel after selection was made.
+     * @return The actions panel after selection was made
      */
     Alert getSelectActionsAlert();
 
     /**
-     * @return The info panel when no selection is made.
+     * @return The info panel when no selection is made
      */
     Alert getSelectTipsAlert();
 
   }
+
+  /**
+   * Callback on item selection.
+   *
+   * @param <T>
+   */
+  public interface ItemSelectionHandler<T> {
+
+    void onItemSelection(T item);
+
+  }
+
 }

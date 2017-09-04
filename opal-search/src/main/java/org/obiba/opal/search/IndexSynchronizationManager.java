@@ -46,7 +46,7 @@ public class IndexSynchronizationManager {
   private static final Logger log = LoggerFactory.getLogger(IndexSynchronizationManager.class);
 
   // Grace period before reindexing (in seconds)
-  private static final int GRACE_PERIOD = 300;
+  private static final int GRACE_PERIOD = 30;
 
   @Autowired
   private OpalSearchService opalSearchService;
@@ -176,9 +176,6 @@ public class IndexSynchronizationManager {
      */
     private void submitTask(IndexManager indexManager, ValueTable table) {
       ValueTableIndex index = indexManager.getIndex(table);
-      if(currentTask != null && currentTask.getIndexManager().getName().equals(indexManager.getName()) &&
-          currentTask.getValueTableIndex().getIndexType().equals(index.getIndexType())) return;
-
       if(!isAlreadyQueued(indexManager, index)) {
         log.trace("Queueing for indexing {} in {}", index.getIndexType(), indexManager.getName());
         indexSyncQueue.offer(indexManager.createSyncTask(table, index));

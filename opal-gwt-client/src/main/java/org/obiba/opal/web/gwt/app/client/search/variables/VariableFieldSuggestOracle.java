@@ -38,6 +38,8 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
   private final String currentLocale;
 
+  private final List<VocabularySuggestion> vocabularySuggestions = Lists.newArrayList();
+
   private final List<TermSuggestion> termSuggestions = Lists.newArrayList();
 
   private final List<PropertySuggestion> propertySuggestions = Lists.newArrayList();
@@ -49,13 +51,22 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     initPropertySuggestions();
   }
 
-  public void setTaxonomies(List<TaxonomyDto> taxonomies) {
+  public void setTaxonomyTerms(List<TaxonomyDto> taxonomies) {
     termSuggestions.clear();
     for (TaxonomyDto taxonomy : taxonomies) {
       for (VocabularyDto vocabulary : JsArrays.toIterable(taxonomy.getVocabulariesArray())) {
         for (TermDto term : JsArrays.toIterable(vocabulary.getTermsArray())) {
           termSuggestions.add(new TermSuggestion(taxonomy, vocabulary, term));
         }
+      }
+    }
+  }
+
+  public void setTaxonomyVocabularies(List<TaxonomyDto> taxonomies) {
+    vocabularySuggestions.clear();
+    for (TaxonomyDto taxonomy : taxonomies) {
+      for (VocabularyDto vocabulary : JsArrays.toIterable(taxonomy.getVocabulariesArray())) {
+        vocabularySuggestions.add(new VocabularySuggestion(taxonomy, vocabulary));
       }
     }
   }
@@ -86,6 +97,9 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     int limit = request.getLimit();
     String query = normalizeSearch(request.getQuery());
     List<VariableFieldSuggestion> candidates = Lists.newArrayList();
+    for (VocabularySuggestion suggestion : vocabularySuggestions) {
+      if (suggestion.isCandidate(query)) candidates.add(suggestion);
+    }
     for (TermSuggestion suggestion : termSuggestions) {
       if (suggestion.isCandidate(query)) candidates.add(suggestion);
     }
@@ -389,6 +403,83 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     }
   }
 
+
+  public class VocabularySuggestion implements VariableFieldSuggestion {
+
+    private final TaxonomyDto taxonomy;
+
+    private final VocabularyDto vocabulary;
+
+    private String stringToMatch;
+
+    private VocabularySuggestion(TaxonomyDto taxonomy, VocabularyDto vocabulary) {
+      this.taxonomy = taxonomy;
+      this.vocabulary = vocabulary;
+    }
+
+    public TaxonomyDto getTaxonomy() {
+      return taxonomy;
+    }
+
+    public VocabularyDto getVocabulary() {
+      return vocabulary;
+    }
+
+    @Override
+    public String getDisplayString() {
+      SafeHtmlBuilder accum = new SafeHtmlBuilder();
+      String name = getLocaleText(vocabulary.getTitleArray());
+      accum.appendHtmlConstant("<div id='" + getReplacementString() + "' title=\"" + getLocaleText(vocabulary.getDescriptionArray()).replaceAll("\"","'") + "\">");
+      accum.appendHtmlConstant("  <i class='icon-tag'></i>");
+      accum.appendHtmlConstant("  <strong>");
+      accum.appendEscaped(name);
+      accum.appendHtmlConstant("  </strong>");
+      accum.appendHtmlConstant("</div>");
+      accum.appendHtmlConstant("<div>");
+      accum.appendHtmlConstant("  <small>");
+      accum.appendEscaped(getLocaleText(taxonomy.getTitleArray()));
+      accum.appendHtmlConstant("  </small>");
+      accum.appendHtmlConstant("</div>");
+      return accum.toSafeHtml().asString();
+    }
+
+    @Override
+    public String getReplacementString() {
+      return taxonomy.getName() + ":" + vocabulary.getName();
+    }
+
+    @Override
+    public boolean isCandidate(String query) {
+      if (Strings.isNullOrEmpty(stringToMatch)) {
+        stringToMatch = Joiner.on(" ").join(Lists.newArrayList(getReplacementString(),
+            getLocaleText(vocabulary.getTitleArray()), getLocaleText(vocabulary.getDescriptionArray()),
+            getLocaleText(vocabulary.getKeywordsArray()), getLocaleText(taxonomy.getTitleArray())));
+      }
+      return VariableFieldSuggestOracle.isCandidate(stringToMatch, query);
+    }
+
+    @Override
+    public FieldItem getField() {
+      return null;
+    }
+
+    @Override
+    public List<FieldItem> getFieldTerms() {
+      return Lists.newArrayList();
+    }
+
+    private String getLocaleText(JsArray<LocaleTextDto> texts) {
+      for (LocaleTextDto text : JsArrays.toIterable(texts)) {
+        if (currentLocale.equals(text.getLocale())) return text.getText();
+      }
+      // fallback in english
+      for (LocaleTextDto text : JsArrays.toIterable(texts)) {
+        if ("en".equals(text.getLocale())) return text.getText();
+      }
+      return "";
+    }
+  }
+
   public class TermSuggestion implements VariableFieldSuggestion {
 
     private final TaxonomyDto taxonomy;
@@ -403,6 +494,18 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
       this.taxonomy = taxonomy;
       this.vocabulary = vocabulary;
       this.term = term;
+    }
+
+    public TaxonomyDto getTaxonomy() {
+      return taxonomy;
+    }
+
+    public VocabularyDto getVocabulary() {
+      return vocabulary;
+    }
+
+    public TermDto getTerm() {
+      return term;
     }
 
     @Override
@@ -465,4 +568,5 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
       return "";
     }
   }
+
 }

@@ -85,6 +85,7 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements TablePresenter.Display {
@@ -787,8 +788,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     }
 
     @Override
-    public List<VariableDto> getDataList() {
-      return dataProvider.getList();
+    public void selectAllItems(CheckboxColumn.ItemSelectionHandler<VariableDto> handler) {
+      for (VariableDto item : dataProvider.getList())
+        handler.onItemSelection(item);
     }
 
     @Override

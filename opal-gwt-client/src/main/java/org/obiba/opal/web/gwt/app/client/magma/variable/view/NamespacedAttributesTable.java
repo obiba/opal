@@ -9,12 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.variable.view;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -234,8 +229,9 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
     }
 
     @Override
-    public List<JsArray<AttributeDto>> getDataList() {
-      return provider.getList();
+    public void selectAllItems(CheckboxColumn.ItemSelectionHandler<JsArray<AttributeDto>> handler) {
+      for (JsArray<AttributeDto> item : provider.getList())
+        handler.onItemSelection(item);
     }
 
     @Override
