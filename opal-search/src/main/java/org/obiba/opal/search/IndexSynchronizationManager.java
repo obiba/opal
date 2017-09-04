@@ -46,7 +46,7 @@ public class IndexSynchronizationManager {
   private static final Logger log = LoggerFactory.getLogger(IndexSynchronizationManager.class);
 
   // Grace period before reindexing (in seconds)
-  private static final int GRACE_PERIOD = 300;
+  private static final int GRACE_PERIOD = 30;
 
   @Autowired
   private OpalSearchService opalSearchService;
