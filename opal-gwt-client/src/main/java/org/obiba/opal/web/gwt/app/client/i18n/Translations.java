@@ -344,6 +344,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("No")
   String noLabel();
 
+  @Description("No Label label")
+  @DefaultStringValue("No label.")
+  String noLabelInfo();
+
+  @Description("No Description label")
+  @DefaultStringValue("No description.")
+  String noDescriptionInfo();
+
   @Description("User message map")
   @DefaultStringMapValue({ //
       "VariableNameNotUnique", "The specified variable name already exists.", //
@@ -990,20 +998,27 @@ public interface Translations extends Constants {
   @DefaultStringValue("Add or update variable attributes for each selected variable.")
   String applyAttributeHelp();
 
-
-  @Description("Add attribute title")
-  @DefaultStringValue("Add Attribute")
-  String addAttribute();
-
   @Description("Add custom attribute title")
   @DefaultStringValue("Add Custom Attribute")
   String addCustomAttribute();
 
-  @Description("Add taxonomy attribute title")
-  @DefaultStringValue("Add Taxonomy Attribute")
-  String addTaxonomyAttribute();
+  @Description("Add Annotation title")
+  @DefaultStringValue("Add Annotation")
+  String addAnnotation();
+
+  @Description("Add Annotation help")
+  @DefaultStringValue("Add annotation to the variable by selecting a controlled vocabulary.")
+  String addAnnotationHelp();
 
   @Description("Edit annotation title")
+  @DefaultStringValue("Edit Annotation")
+  String editAnnotation();
+
+  @Description("Edit annotation help")
+  @DefaultStringValue("Edit annotation of the variable by selecting a controlled vocabulary.")
+  String editAnnotationHelp();
+
+  @Description("Edit annotations title")
   @DefaultStringValue("Annotations")
   String editAnnotations();
 

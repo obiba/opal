@@ -79,6 +79,11 @@ public class LocalizedEditor extends FlowPanel {
     add((Widget) editor);
   }
 
+  public void setLocales(List<String> locales) {
+    JsArray<LocaleTextDto> texts = JsArrays.create();
+    setLocaleTexts(texts, locales);
+  }
+
   public void setLocaleTexts(JsArray<LocaleTextDto> texts, List<String> locales) {
     setLocalizedTexts(toMap(texts), locales);
   }

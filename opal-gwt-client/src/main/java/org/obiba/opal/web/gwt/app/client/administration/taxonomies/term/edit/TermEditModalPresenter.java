@@ -25,6 +25,7 @@ import com.gwtplatform.mvp.client.PopupView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularyUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.support.OpalSystemCache;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
@@ -41,6 +42,8 @@ import org.obiba.opal.web.model.client.opal.VocabularyDto;
 public class TermEditModalPresenter extends ModalPresenterWidget<TermEditModalPresenter.Display>
     implements TermEditModalUiHandlers {
 
+  private final OpalSystemCache opalSystemCache;
+
   private TaxonomyDto originalTaxonomy;
 
   private VocabularyDto originalVocabulary;
@@ -55,8 +58,9 @@ public class TermEditModalPresenter extends ModalPresenterWidget<TermEditModalPr
   }
 
   @Inject
-  public TermEditModalPresenter(EventBus eventBus, Display display) {
+  public TermEditModalPresenter(EventBus eventBus, Display display, OpalSystemCache opalSystemCache) {
     super(eventBus, display);
+    this.opalSystemCache = opalSystemCache;
     getView().setUiHandlers(this);
   }
 
@@ -64,6 +68,7 @@ public class TermEditModalPresenter extends ModalPresenterWidget<TermEditModalPr
   public void onSave(String name, JsArray<LocaleTextDto> titles, JsArray<LocaleTextDto> descriptions,
                      JsArray<LocaleTextDto> keywords) {
     if(!new ViewValidator().validate()) return;
+    opalSystemCache.clearTaxonomies();
 
     final TermDto dto = TermDto.create();
     dto.setName(name);
@@ -123,20 +128,13 @@ public class TermEditModalPresenter extends ModalPresenterWidget<TermEditModalPr
     originalVocabulary = vocabularyDto;
     originalTerm = termDto;
     mode = termDto.hasName() ? EDIT_MODE.EDIT : EDIT_MODE.CREATE;
-
-    ResourceRequestBuilderFactory.<GeneralConf>newBuilder()
-        .forResource(UriBuilders.SYSTEM_CONF_GENERAL.create().build())
-        .withCallback(new ResourceCallback<GeneralConf>() {
-          @Override
-          public void onResource(Response response, GeneralConf resource) {
-            JsArrayString locales = JsArrayString.createArray().cast();
-            for(int i = 0; i < resource.getLanguagesArray().length(); i++) {
-              locales.push(resource.getLanguages(i));
-            }
-            getView().setMode(mode);
-            getView().setTerm(termDto, locales);
-          }
-        }).get().send();
+    opalSystemCache.requestLocales(new OpalSystemCache.LocalesHandler() {
+      @Override
+      public void onLocales(JsArrayString locales) {
+        getView().setMode(mode);
+        getView().setTerm(termDto, locales);
+      }
+    });
   }
 
   private final class ViewValidator extends ViewValidationHandler {

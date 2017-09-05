@@ -16,6 +16,7 @@ import org.obiba.opal.web.model.client.magma.AttributeDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.i18n.client.LocaleInfo;
+import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 
 /**
  *
@@ -81,6 +82,18 @@ public class AttributeHelper {
     }
     int separatorIndex = currentLocaleName.indexOf('_');
     return separatorIndex == -1 ? currentLocaleName : currentLocaleName.substring(0, separatorIndex);
+  }
+
+  public static String getLocaleText(JsArray<LocaleTextDto> texts) {
+    String currentLanguage = getCurrentLanguage();
+    for (LocaleTextDto text : JsArrays.toIterable(texts)) {
+      if (currentLanguage.equals(text.getLocale())) return text.getText();
+    }
+    // fallback in english
+    for (LocaleTextDto text : JsArrays.toIterable(texts)) {
+      if ("en".equals(text.getLocale())) return text.getText();
+    }
+    return "";
   }
 
 }

@@ -33,6 +33,8 @@ import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
+import org.obiba.opal.web.gwt.app.client.support.OpalSystemCache;
+import org.obiba.opal.web.gwt.app.client.support.OpalSystemCacheImpl;
 import org.obiba.opal.web.gwt.app.client.view.ApplicationView;
 import org.obiba.opal.web.gwt.app.client.view.ConfirmationView;
 import org.obiba.opal.web.gwt.app.client.view.ItemSelectorView;
@@ -54,7 +56,7 @@ public class OpalGinModule extends AbstractPresenterModule {
   @Override
   protected void configure() {
     bind(BreadcrumbsBuilder.class).to(DefaultBreadcrumbsBuilder.class).in(Singleton.class);
-
+    bind(OpalSystemCache.class).to(OpalSystemCacheImpl.class).in(Singleton.class);
     bind(RequestUrlBuilder.class).to(DefaultRequestUrlBuilder.class).in(Singleton.class);
     bind(UnhandledResponseNotificationPresenter.Display.class).to(UnhandledResponseNotificationView.class)
         .in(Singleton.class);

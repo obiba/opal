@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.administration.configuration.event.Gene
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.support.OpalSystemCache;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
@@ -26,6 +27,7 @@ import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.client.opal.GeneralConf;
 
 import com.google.gwt.core.client.JsArrayString;
@@ -43,17 +45,21 @@ import static org.obiba.opal.web.gwt.app.client.administration.configuration.edi
 public class GeneralConfModalPresenter extends ModalPresenterWidget<GeneralConfModalPresenter.Display>
     implements GeneralConfModalUiHandlers {
 
+  private final OpalSystemCache opalSystemCache;
+
   protected ValidationHandler validationHandler;
 
   @Inject
-  public GeneralConfModalPresenter(Display display, EventBus eventBus) {
+  public GeneralConfModalPresenter(Display display, EventBus eventBus, OpalSystemCache opalSystemCache) {
     super(eventBus, display);
+    this.opalSystemCache = opalSystemCache;
     getView().setUiHandlers(this);
     validationHandler = new GeneralConfValidationHandler();
   }
 
   @Override
   public void save() {
+    opalSystemCache.clearGeneralConf();
     getView().clearErrors();
     if(validationHandler.validate()) {
       GeneralConf dto = GeneralConf.create();

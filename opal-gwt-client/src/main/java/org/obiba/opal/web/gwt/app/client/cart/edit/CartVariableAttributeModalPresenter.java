@@ -11,7 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.cart.edit;
 
 import com.google.common.collect.Maps;
-import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -20,9 +20,9 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 import org.obiba.opal.web.gwt.app.client.cart.service.CartVariableItem;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
+import org.obiba.opal.web.gwt.app.client.support.OpalSystemCache;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 
@@ -39,6 +39,8 @@ public class CartVariableAttributeModalPresenter
 
   private Map<String, List<CartVariableItem>> cartVariableItemsMap = Maps.newHashMap();
 
+  private final OpalSystemCache opalSystemCache;
+
   private boolean apply;
 
   private int progressCount = 0;
@@ -46,8 +48,9 @@ public class CartVariableAttributeModalPresenter
   private int errorCount = 0;
 
   @Inject
-  public CartVariableAttributeModalPresenter(EventBus eventBus, Display display) {
+  public CartVariableAttributeModalPresenter(EventBus eventBus, Display display, OpalSystemCache opalSystemCache) {
     super(eventBus, display);
+    this.opalSystemCache = opalSystemCache;
     getView().setUiHandlers(this);
   }
 
@@ -55,6 +58,7 @@ public class CartVariableAttributeModalPresenter
     this.apply = apply;
     getView().setMode(apply);
     renderTaxonomies();
+    renderLocales();
     cartVariableItemsMap.clear();
     for (CartVariableItem item : cartVariableItems) {
       String tableRef = item.getTableReference();
@@ -65,14 +69,21 @@ public class CartVariableAttributeModalPresenter
   }
 
   private void renderTaxonomies() {
-    ResourceRequestBuilderFactory.<JsArray<TaxonomyDto>>newBuilder()
-        .forResource(UriBuilders.SYSTEM_CONF_TAXONOMIES.create().build()).get()
-        .withCallback(new ResourceCallback<JsArray<TaxonomyDto>>() {
-          @Override
-          public void onResource(Response response, JsArray<TaxonomyDto> resource) {
-            getView().setTaxonomies(JsArrays.toList(resource));
-          }
-        }).send();
+    opalSystemCache.requestTaxonomies(new OpalSystemCache.TaxonomiesHandler() {
+      @Override
+      public void onTaxonomies(List<TaxonomyDto> taxonomies) {
+        getView().setTaxonomies(taxonomies);
+      }
+    });
+  }
+
+  private void renderLocales() {
+    opalSystemCache.requestLocales(new OpalSystemCache.LocalesHandler() {
+      @Override
+      public void onLocales(JsArrayString locales) {
+        getView().setLocales(locales);
+      }
+    });
   }
 
   @Override
@@ -130,6 +141,8 @@ public class CartVariableAttributeModalPresenter
     void showError(String message);
 
     void setProgress(String messageKey, String tableRef, int count, int percent);
+
+    void setLocales(JsArrayString locales);
   }
 
 }

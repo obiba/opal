@@ -26,6 +26,7 @@ import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.Taxonom
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.VocabularyUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.support.OpalSystemCache;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
@@ -41,6 +42,8 @@ import org.obiba.opal.web.model.client.opal.VocabularyDto;
 public class VocabularyEditModalPresenter extends ModalPresenterWidget<VocabularyEditModalPresenter.Display>
     implements VocabularyEditModalUiHandlers {
 
+  private final OpalSystemCache opalSystemCache;
+
   private TaxonomyDto originalTaxonomy;
 
   private VocabularyDto originalVocabulary;
@@ -53,8 +56,9 @@ public class VocabularyEditModalPresenter extends ModalPresenterWidget<Vocabular
   }
 
   @Inject
-  public VocabularyEditModalPresenter(EventBus eventBus, Display display) {
+  public VocabularyEditModalPresenter(EventBus eventBus, Display display, OpalSystemCache opalSystemCache) {
     super(eventBus, display);
+    this.opalSystemCache = opalSystemCache;
     getView().setUiHandlers(this);
   }
 
@@ -62,6 +66,7 @@ public class VocabularyEditModalPresenter extends ModalPresenterWidget<Vocabular
   public void onSave(String name, boolean repeatable, JsArray<LocaleTextDto> titles,
                      JsArray<LocaleTextDto> descriptions) {
     if(!new ViewValidator().validate()) return;
+    opalSystemCache.clearTaxonomies();
 
     final VocabularyDto dto = VocabularyDto.create();
     dto.setName(name);
@@ -119,20 +124,13 @@ public class VocabularyEditModalPresenter extends ModalPresenterWidget<Vocabular
     originalTaxonomy = taxonomyDto;
     originalVocabulary = vocabularyDto;
     mode = vocabularyDto.hasName() ? EDIT_MODE.EDIT : EDIT_MODE.CREATE;
-
-    ResourceRequestBuilderFactory.<GeneralConf>newBuilder()
-        .forResource(UriBuilders.SYSTEM_CONF_GENERAL.create().build())
-        .withCallback(new ResourceCallback<GeneralConf>() {
-          @Override
-          public void onResource(Response response, GeneralConf resource) {
-            JsArrayString locales = JsArrayString.createArray().cast();
-            for(int i = 0; i < resource.getLanguagesArray().length(); i++) {
-              locales.push(resource.getLanguages(i));
-            }
-            getView().setMode(mode);
-            getView().setVocabulary(vocabularyDto, locales);
-          }
-        }).get().send();
+    opalSystemCache.requestLocales(new OpalSystemCache.LocalesHandler() {
+      @Override
+      public void onLocales(JsArrayString locales) {
+        getView().setMode(mode);
+        getView().setVocabulary(vocabularyDto, locales);
+      }
+    });
   }
 
   private final class ViewValidator extends ViewValidationHandler {

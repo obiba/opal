@@ -16,6 +16,7 @@ import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.github.gwtbootstrap.client.ui.ProgressBar;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -97,6 +98,11 @@ public class CartVariableAttributeModalView extends ModalPopupViewWithUiHandlers
   @Override
   public void setTaxonomies(List<TaxonomyDto> taxonomies) {
     taxonomySelector.setTaxonomies(taxonomies);
+  }
+
+  @Override
+  public void setLocales(JsArrayString locales) {
+    taxonomySelector.setLocales(locales);
   }
 
   @Override
