@@ -26,6 +26,7 @@ import com.gwtplatform.mvp.client.PopupView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.support.OpalSystemCache;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
@@ -40,6 +41,8 @@ import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEditModalPresenter.Display>
     implements TaxonomyEditModalUiHandlers {
 
+  private final OpalSystemCache opalSystemCache;
+
   private TaxonomyDto originalTaxonomy;
 
   private EDIT_MODE mode;
@@ -50,14 +53,16 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
   }
 
   @Inject
-  public TaxonomyEditModalPresenter(EventBus eventBus, Display display) {
+  public TaxonomyEditModalPresenter(EventBus eventBus, Display display, OpalSystemCache opalSystemCache) {
     super(eventBus, display);
+    this.opalSystemCache = opalSystemCache;
     getView().setUiHandlers(this);
   }
 
   @Override
   public void onSave(String name, String author, String license, JsArray<LocaleTextDto> titles, JsArray<LocaleTextDto> descriptions) {
     if (!new ViewValidator().validate()) return;
+    opalSystemCache.clearTaxonomies();
 
     final TaxonomyDto dto = TaxonomyDto.create();
     dto.setName(name);
@@ -114,20 +119,13 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
   public void initView(final TaxonomyDto taxonomyDto) {
     originalTaxonomy = taxonomyDto;
     mode = taxonomyDto.hasName() ? EDIT_MODE.EDIT : EDIT_MODE.CREATE;
-
-    ResourceRequestBuilderFactory.<GeneralConf>newBuilder()
-        .forResource(UriBuilders.SYSTEM_CONF_GENERAL.create().build())
-        .withCallback(new ResourceCallback<GeneralConf>() {
-          @Override
-          public void onResource(Response response, GeneralConf resource) {
-            JsArrayString locales = JsArrayString.createArray().cast();
-            for(int i = 0; i < resource.getLanguagesArray().length(); i++) {
-              locales.push(resource.getLanguages(i));
-            }
-            getView().setMode(mode);
-            getView().setTaxonomy(taxonomyDto, locales);
-          }
-        }).get().send();
+    opalSystemCache.requestLocales(new OpalSystemCache.LocalesHandler() {
+      @Override
+      public void onLocales(JsArrayString locales) {
+        getView().setMode(mode);
+        getView().setTaxonomy(taxonomyDto, locales);
+      }
+    });
   }
 
   private final class ViewValidator extends ViewValidationHandler {

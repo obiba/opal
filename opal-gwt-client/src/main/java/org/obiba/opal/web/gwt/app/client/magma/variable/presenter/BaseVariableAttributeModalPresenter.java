@@ -193,6 +193,12 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
     getView().setDialogMode(mode);
   }
 
+  public void setDialogMode(Mode mode, String name) {
+    dialogMode = mode;
+    getView().setDialogMode(mode);
+    getView().setName(name);
+  }
+
   public static native String stringify(JavaScriptObject obj)
   /*-{
     return $wnd.JSON.stringify(obj);

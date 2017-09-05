@@ -15,8 +15,10 @@ import com.github.gwtbootstrap.client.ui.HelpBlock;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -34,6 +36,7 @@ import org.obiba.opal.web.model.client.opal.TermDto;
 import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
 import java.util.List;
+import java.util.Map;
 
 public class TaxonomySelector extends Composite {
 
@@ -73,6 +76,12 @@ public class TaxonomySelector extends Composite {
   @UiField
   HelpBlock termHelp;
 
+  @UiField
+  ControlGroup valuesGroup;
+
+  @UiField
+  LocalizedEditor editor;
+
   private List<TaxonomyDto> taxonomies;
 
   private VariableFieldSuggestOracle oracle = new VariableFieldSuggestOracle();
@@ -104,8 +113,28 @@ public class TaxonomySelector extends Composite {
     }
   }
 
+  public void setLocales(JsArrayString locales) {
+    editor.setLocales(JsArrays.toList(locales));
+  }
+
   public void termSelectable(boolean selectable) {
     termGroup.setVisible(selectable);
+  }
+
+
+  public void selectTaxonomy(String namespace) {
+    taxonomyChooser.setSelectedValue(namespace);
+    onTaxonomySelection(null);
+  }
+
+  public void selectVocabulary(String name) {
+    vocabularyChooser.setSelectedValue(name);
+    onVocabularySelection(null);
+  }
+
+  public void setLocalizedTexts(Map<String, String> localizedTexts, List<String> locales) {
+    //enableTermSelection(false);
+    editor.setLocalizedTexts(localizedTexts, locales);
   }
 
   public void setBusy(boolean busy) {
@@ -147,9 +176,24 @@ public class TaxonomySelector extends Composite {
     return termChooser.getSelectedValue();
   }
 
+  public Map<String, String> getValues() {
+    if (valuesGroup.isVisible())
+      return editor.getLocalizedTexts();
+    else {
+      Map<String, String> values = Maps.newHashMap();
+      values.put("", getTerm());
+      return values;
+    }
+  }
+
   //
   // Private methods
   //
+
+  private void enableTermSelection(boolean enable) {
+    termGroup.setVisible(enable);
+    valuesGroup.setVisible(!enable);
+  }
 
   private void initQuickSearch() {
     quickSearch = new Typeahead(oracle);
@@ -157,7 +201,8 @@ public class TaxonomySelector extends Composite {
       @Override
       public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {
         VariableFieldSuggestOracle.VariableFieldSuggestion suggestion = (VariableFieldSuggestOracle.VariableFieldSuggestion) selectedSuggestion;
-        if (termGroup.isVisible()) {
+        if (termGroup.isVisible() || valuesGroup.isVisible()) {
+          enableTermSelection(true);
           VariableFieldSuggestOracle.TermSuggestion termSuggestion = (VariableFieldSuggestOracle.TermSuggestion) suggestion;
           taxonomyChooser.setSelectedValue(termSuggestion.getTaxonomy().getName());
           setTaxonomyHelp(termSuggestion.getTaxonomy());
@@ -238,7 +283,9 @@ public class TaxonomySelector extends Composite {
       termChooser.addItem(getTermTitle(term), term.getName());
       if (firstTerm == null) firstTerm = term;
     }
-    setTermHelp(firstTerm);
+    enableTermSelection(firstTerm != null);
+    if (firstTerm != null)
+      setTermHelp(firstTerm);
   }
 
   private TaxonomyDto getTaxonomy(String name) {

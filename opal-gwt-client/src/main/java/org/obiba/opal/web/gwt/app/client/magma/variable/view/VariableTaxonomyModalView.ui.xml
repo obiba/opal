@@ -18,57 +18,9 @@
 
   <o:Modal ui:field="modal" closeVisible="true" keyboard="true" animation="false" minHeight="700" minWidth="700">
 
-    <b:Paragraph ui:field="editAttributeHelp"/>
+    <b:Paragraph ui:field="modalHelp"/>
 
-    <b:ControlGroup ui:field="taxonomyGroup">
-      <b:ControlLabel>
-        <ui:msg description="Namespace label">Namespace</ui:msg>
-      </b:ControlLabel>
-      <b:Controls>
-        <o:Chooser ui:field="taxonomyChooser"/>
-      </b:Controls>
-      <b:HelpBlock>
-        <ui:msg description="Attribute Taxonomy help">Taxonomy name is attribute's namespace.</ui:msg>
-      </b:HelpBlock>
-    </b:ControlGroup>
-
-    <b:ControlGroup ui:field="vocabularyGroup">
-      <b:ControlLabel>
-        <ui:msg description="Name label">Name</ui:msg>
-      </b:ControlLabel>
-      <b:Controls>
-        <o:Chooser ui:field="vocabularyChooser"/>
-      </b:Controls>
-      <b:HelpBlock>
-        <ui:msg description="Attribute Vocabulary help">Vocabulary name is attribute's name.</ui:msg>
-      </b:HelpBlock>
-    </b:ControlGroup>
-
-    <b:ControlGroup ui:field="termGroup">
-      <b:ControlLabel>
-        <ui:msg description="Value label">Value</ui:msg>
-      </b:ControlLabel>
-      <b:Controls>
-        <g:SimplePanel ui:field="termPanel"/>
-      </b:Controls>
-      <b:HelpBlock>
-        <ui:msg description="Attribute Term help">Term name is attribute's value.</ui:msg>
-      </b:HelpBlock>
-    </b:ControlGroup>
-
-    <b:ControlGroup ui:field="valuesGroup" visible="false">
-      <b:ControlLabel for="value">
-        <ui:msg description="Values label">Values</ui:msg>
-      </b:ControlLabel>
-      <b:Controls>
-        <o:LocalizedEditor ui:field="editor" type="MARKDOWN"/>
-      </b:Controls>
-      <b:HelpBlock>
-        <ui:msg description="Attribute Values help">Values can be expressed in different languages (at least one value
-          is required).
-        </ui:msg>
-      </b:HelpBlock>
-    </b:ControlGroup>
+    <o:TaxonomySelector ui:field="taxonomySelector"></o:TaxonomySelector>
 
     <b:ModalFooter>
       <b:Button ui:field="saveButton" type="PRIMARY">

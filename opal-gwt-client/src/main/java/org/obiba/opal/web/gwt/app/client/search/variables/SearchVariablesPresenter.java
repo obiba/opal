@@ -14,6 +14,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -39,6 +40,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
+import org.obiba.opal.web.gwt.app.client.support.OpalSystemCache;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.rest.client.*;
@@ -67,6 +69,8 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
 
   private final PlaceManager placeManager;
 
+  private final OpalSystemCache opalSystemCache;
+
   private String query;
 
   private String rqlQuery;
@@ -79,11 +83,12 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
 
   @Inject
   public SearchVariablesPresenter(EventBus eventBus, Display display, Proxy proxy, Translations translations,
-                                  DefaultBreadcrumbsBuilder breadcrumbsHelper, PlaceManager placeManager) {
+                                  DefaultBreadcrumbsBuilder breadcrumbsHelper, PlaceManager placeManager, OpalSystemCache opalSystemCache) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     this.translations = translations;
     this.breadcrumbsHelper = breadcrumbsHelper;
     this.placeManager = placeManager;
+    this.opalSystemCache = opalSystemCache;
     getView().setUiHandlers(this);
   }
 
@@ -292,31 +297,24 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
    */
   private void initializeView() {
     if (viewInitialized) return;
-    ResourceRequestBuilderFactory.<GeneralConf>newBuilder()
-        .forResource(UriBuilders.SYSTEM_CONF_GENERAL.create().build())
-        .withCallback(new ResourceCallback<GeneralConf>() {
-          @Override
-          public void onResource(Response response, GeneralConf resource) {
-            locales.clear();
-            for (int i = 0; i < resource.getLanguagesArray().length(); i++) {
-              locales.add(resource.getLanguages(i));
-            }
-            // cascade taxonomies and tables rendering
-            renderTaxonomies();
-          }
-        }).get().send();
+    opalSystemCache.requestLocales(new OpalSystemCache.LocalesHandler() {
+      @Override
+      public void onLocales(JsArrayString localesStr) {
+        locales = JsArrays.toList(localesStr);
+        // cascade taxonomies and tables rendering
+        renderTaxonomies();
+      }
+    });
   }
 
   private void renderTaxonomies() {
-    ResourceRequestBuilderFactory.<JsArray<TaxonomyDto>>newBuilder()
-        .forResource(UriBuilders.SYSTEM_CONF_TAXONOMIES.create().build()).get()
-        .withCallback(new ResourceCallback<JsArray<TaxonomyDto>>() {
-          @Override
-          public void onResource(Response response, JsArray<TaxonomyDto> resource) {
-            getView().setTaxonomies(JsArrays.toList(resource));
-            renderTables();
-          }
-        }).send();
+    opalSystemCache.requestTaxonomies(new OpalSystemCache.TaxonomiesHandler() {
+      @Override
+      public void onTaxonomies(List<TaxonomyDto> taxonomies) {
+        getView().setTaxonomies(taxonomies);
+        renderTables();
+      }
+    });
   }
 
   private void renderTables() {

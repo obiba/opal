@@ -43,6 +43,7 @@ import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
+import org.obiba.opal.web.gwt.app.client.support.OpalSystemCache;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -58,6 +59,7 @@ import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.opal.TaxonomiesDto;
+import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -108,6 +110,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   private final ModalProvider<VariableTaxonomyModalPresenter> taxonomyModalProvider;
 
+  private final OpalSystemCache opalSystemCache;
+
   private TableDto table;
 
   private VariableDto variable;
@@ -131,7 +135,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
       ModalProvider<VariablePropertiesModalPresenter> propertiesEditorModalProvider,
       ModalProvider<VariableAttributeModalPresenter> attributeModalProvider,
       ModalProvider<VariableTaxonomyModalPresenter> taxonomyModalProvider,
-      TranslationMessages translationMessages) {
+      TranslationMessages translationMessages, OpalSystemCache opalSystemCache) {
     super(eventBus, display);
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
@@ -145,6 +149,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     this.propertiesEditorModalProvider = propertiesEditorModalProvider.setContainer(this);
     this.attributeModalProvider = attributeModalProvider.setContainer(this);
     this.taxonomyModalProvider = taxonomyModalProvider.setContainer(this);
+    this.opalSystemCache = opalSystemCache;
     getView().setUiHandlers(this);
   }
 
@@ -242,20 +247,26 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   private void updateVariableDisplay(VariableDto variableDto) {
     variable = variableDto;
-    getView().setVariable(variable);
-    if(variable.getLink().isEmpty()) {
-      variable.setLink(variable.getParentLink().getLink() + "/variable/" + variable.getName());
-    }
+    opalSystemCache.requestTaxonomies(new OpalSystemCache.TaxonomiesHandler() {
+      @Override
+      public void onTaxonomies(List<TaxonomyDto> taxonomies) {
+        getView().setTaxonomies(taxonomies);
+        getView().setVariable(variable);
+        if(variable.getLink().isEmpty()) {
+          variable.setLink(variable.getParentLink().getLink() + "/variable/" + variable.getName());
+        }
 
-    getView().renderCategoryRows(variable.getCategoriesArray());
+        getView().renderCategoryRows(variable.getCategoriesArray());
 
-    // Attributes editable depending on authorization
-    UriBuilder builder = table.hasViewLink()
-        ? UriBuilders.DATASOURCE_VIEW_VARIABLE.create()
-        : UriBuilders.DATASOURCE_TABLE_VARIABLE.create();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(builder.build(table.getDatasourceName(), table.getName(), variable.getName())).put()
-        .authorize(getView().getVariableAttributesAuthorizer(variable)).send();
+        // Attributes editable depending on authorization
+        UriBuilder builder = table.hasViewLink()
+            ? UriBuilders.DATASOURCE_VIEW_VARIABLE.create()
+            : UriBuilders.DATASOURCE_TABLE_VARIABLE.create();
+        ResourceAuthorizationRequestBuilderFactory.newBuilder()
+            .forResource(builder.build(table.getDatasourceName(), table.getName(), variable.getName())).put()
+            .authorize(getView().getVariableAttributesAuthorizer(variable)).send();
+      }
+    });
   }
 
   private void updateMenuDisplay(@Nullable VariableDto previous, @Nullable VariableDto next) {
@@ -427,7 +438,14 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   }
 
   @Override
-  public void onAddTaxonomy() {
+  public void onAddAttribute(String name) {
+    VariableAttributeModalPresenter presenter = attributeModalProvider.get();
+    presenter.setDialogMode(Mode.CREATE, name);
+    presenter.initialize(table, variable);
+  }
+
+  @Override
+  public void onAddAnnotation() {
     VariableTaxonomyModalPresenter presenter = taxonomyModalProvider.get();
     presenter.setDialogMode(Mode.CREATE);
     presenter.initialize(table, variable);
@@ -754,6 +772,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     enum Slots {
       Permissions, Values, ScriptEditor, Summary, History
     }
+
+    void setTaxonomies(List<TaxonomyDto> taxonomies);
 
     void setVariable(VariableDto variable);
 

@@ -9,10 +9,22 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.*;
+import com.github.gwtbootstrap.client.ui.TabPanel;
+import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.base.IconAnchor;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.Label;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
@@ -20,10 +32,9 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.magma.variable.view.NamespacedAttributesTable;
+import org.obiba.opal.web.gwt.app.client.magma.variable.view.TaxonomyAttributesPanel;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
-import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
-import org.obiba.opal.web.gwt.app.client.ui.TabDeckPanel;
-import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
@@ -31,29 +42,11 @@ import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.CodeBlock;
-import com.github.gwtbootstrap.client.ui.DropdownButton;
-import com.github.gwtbootstrap.client.ui.NavLink;
-import com.github.gwtbootstrap.client.ui.TabPanel;
-import com.github.gwtbootstrap.client.ui.TextBox;
-import com.github.gwtbootstrap.client.ui.base.IconAnchor;
-import com.google.common.base.Strings;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasWidgets;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.REMOVE_ACTION;
@@ -65,7 +58,8 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   private TranslationMessages translationMessages;
 
-  interface Binder extends UiBinder<Widget, VariableView> {}
+  interface Binder extends UiBinder<Widget, VariableView> {
+  }
 
   private static final int DICTIONARY_TAB_INDEX = 0;
 
@@ -173,10 +167,28 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   Button editCategories;
 
   @UiField
-  DropdownButton addAttributeButton;
+  NamedAttributePanel labelPanel;
+
+  @UiField
+  NamedAttributePanel descriptionPanel;
+
+  @UiField
+  Button addAnnotation;
+
+  @UiField
+  Panel annotationPanel;
+
+  @UiField
+  Button addAttribute;
 
   @UiField
   IconAnchor editProperties;
+
+  @UiField
+  IconAnchor editLabel;
+
+  @UiField
+  IconAnchor editDescription;
 
   @UiField
   TextBox comment;
@@ -189,6 +201,8 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   private final Translations translations;
 
+  private List<TaxonomyDto> taxonomies;
+
   @Inject
   public VariableView(Binder uiBinder, Translations translations, TranslationMessages translationMessages) {
     this.translations = translations;
@@ -197,16 +211,15 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     initWidget(uiBinder.createAndBindUi(this));
 
     deriveBtn.setText(translations.derive());
-    addAttributeButton.setText(translations.addAttribute());
     initCategoryTable();
     scriptNavPanel.showWidget(0);
   }
 
   @UiHandler("tabPanel")
   void onShown(TabPanel.ShownEvent shownEvent) {
-    if(shownEvent.getTarget() == null) return;
+    if (shownEvent.getTarget() == null) return;
 
-    switch(tabPanel.getSelectedTab()) {
+    switch (tabPanel.getSelectedTab()) {
       case SUMMARY_TAB_INDEX:
         getUiHandlers().onShowSummary();
         break;
@@ -220,7 +233,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   @Override
   public void setInSlot(Object slot, IsWidget content) {
     HasWidgets panel = null;
-    switch((Slots) slot) {
+    switch ((Slots) slot) {
       case Values:
         panel = values;
         break;
@@ -237,9 +250,9 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
         panel = summaryPanel;
         break;
     }
-    if(panel != null) {
+    if (panel != null) {
       panel.clear();
-      if(content != null) {
+      if (content != null) {
         panel.add(content.asWidget());
       }
     }
@@ -325,14 +338,30 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     getUiHandlers().onAddAttribute();
   }
 
-  @UiHandler("addTaxonomy")
+  @UiHandler("addAnnotation")
   void onAddTaxonomy(ClickEvent event) {
-    getUiHandlers().onAddTaxonomy();
+    getUiHandlers().onAddAnnotation();
   }
 
   @UiHandler("editProperties")
   void onEditProperties(ClickEvent event) {
     getUiHandlers().onEditProperties();
+  }
+
+  @UiHandler("editLabel")
+  void onEditLabel(ClickEvent event) {
+    if (labelPanel.getAttributes().length() == 0)
+      getUiHandlers().onAddAttribute("label");
+    else
+      getUiHandlers().onEditAttributes(Lists.newArrayList(labelPanel.getAttributes()));
+  }
+
+  @UiHandler("editDescription")
+  void onEditDescription(ClickEvent event) {
+    if (descriptionPanel.getAttributes().length() == 0)
+      getUiHandlers().onAddAttribute("description");
+    else
+      getUiHandlers().onEditAttributes(Lists.newArrayList(descriptionPanel.getAttributes()));
   }
 
   @UiHandler("remove")
@@ -344,7 +373,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   void onAddToCart(ClickEvent event) {
     getUiHandlers().onAddToCart();
   }
-
 
   //
   // VariablePresenter.Display Methods
@@ -376,6 +404,11 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   }
 
   @Override
+  public void setTaxonomies(List<TaxonomyDto> taxonomies) {
+    this.taxonomies = taxonomies;
+  }
+
+  @Override
   public void setVariable(VariableDto variable) {
     name.setText(variable.getName());
     entityType.setText(variable.getEntityType());
@@ -404,7 +437,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   }
 
   private void updateScriptNavPanel(int selectedIndex) {
-    switch(ScriptNavPanels.values()[selectedIndex]) {
+    switch (ScriptNavPanels.values()[selectedIndex]) {
       case VIEW:
         backToScript.setVisible(false);
         scriptControls.setVisible(true);
@@ -447,7 +480,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   @Override
   public HasAuthorization getEditAuthorizer() {
-    return new WidgetAuthorizer(remove, scriptHeaderPanel, editProperties, editCategories, addAttributeButton);
+    return new WidgetAuthorizer(remove, scriptHeaderPanel, editProperties, editCategories, addAttribute, addAnnotation, editLabel, editDescription);
   }
 
   @Override
@@ -505,6 +538,9 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
     @Override
     public void beforeAuthorization() {
+      labelPanel.clear();
+      descriptionPanel.clear();
+      annotationPanel.clear();
       attributesPanel.clear();
 
       if (variableDto.getAttributesArray() == null || variableDto.getAttributesArray().length() == 0) {
@@ -515,25 +551,29 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
       List<String> namespaces = new ArrayList<String>();
       JsArray<AttributeDto> attributesArray = JsArrays.toSafeArray(variableDto.getAttributesArray());
-      for(int i = 0; i < attributesArray.length(); i++) {
+      for (int i = 0; i < attributesArray.length(); i++) {
         String namespace = attributesArray.get(i).getNamespace();
-        if(!namespaces.contains(namespace)) {
+        if (!namespaces.contains(namespace)) {
           namespaces.add(namespace);
         }
       }
-
       Collections.sort(namespaces);
-      for(String namespace : namespaces) {
-        NamespacedAttributesTable child = new NamespacedAttributesTable(attributesArray, namespace,
-            translationMessages);
+
+      labelPanel.initialize(attributesArray, translations.noLabelInfo());
+      descriptionPanel.initialize(attributesArray, translations.noDescriptionInfo());
+      annotationPanel.add(new TaxonomyAttributesPanel(attributesArray, taxonomies));
+
+      for (String namespace : namespaces) {
+        NamespacedAttributesTable child = new NamespacedAttributesTable(attributesArray, namespace, translationMessages);
         child.setUiHandlers(getUiHandlers());
         attributesTables.add(child);
       }
     }
 
+
     @Override
     public void authorized() {
-      for(NamespacedAttributesTable attributesTable : attributesTables) {
+      for (NamespacedAttributesTable attributesTable : attributesTables) {
         attributesTable.addEditableColumns();
         attributesTable.getActions().setActionHandler(new ActionHandler<JsArray<AttributeDto>>() {
           @Override
@@ -541,9 +581,9 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
             ArrayList<JsArray<AttributeDto>> selectedItems = new ArrayList<JsArray<AttributeDto>>();
             selectedItems.add(object);
 
-            if(actionName.equalsIgnoreCase(REMOVE_ACTION)) {
+            if (actionName.equalsIgnoreCase(REMOVE_ACTION)) {
               getUiHandlers().onDeleteAttribute(selectedItems);
-            } else if(actionName.equalsIgnoreCase(EDIT_ACTION)) {
+            } else if (actionName.equalsIgnoreCase(EDIT_ACTION)) {
               getUiHandlers().onEditAttributes(selectedItems);
             }
           }
@@ -554,7 +594,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
     @Override
     public void unauthorized() {
-      for(NamespacedAttributesTable attributesTable : attributesTables) {
+      for (NamespacedAttributesTable attributesTable : attributesTables) {
         attributesPanel.add(attributesTable);
       }
     }

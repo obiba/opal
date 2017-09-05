@@ -9,14 +9,14 @@
   -->
 
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-    xmlns:g="urn:import:com.google.gwt.user.client.ui"
-    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
-    xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
-    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
-    xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.magma.view"
-    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
-    ui:generateLocales="default">
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+             xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+             xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.magma.view"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+             ui:generateLocales="default">
 
   <g:FlowPanel>
 
@@ -142,17 +142,41 @@
           <ui:msg description="Attributes label">Attributes</ui:msg>
         </b:Heading>
 
-        <b:DropdownButton type="INFO" icon="PLUS" ui:field="addAttributeButton"
-            addStyleNames="no-left-margin small-top-margin" visible="false">
-          <b:NavLink ui:field="addTaxonomy">
-            <ui:msg description="Add Taxonomy Attribute button label">Add attribute from taxonomy...</ui:msg>
-          </b:NavLink>
-          <b:NavLink ui:field="addAttribute">
-            <ui:msg description="Add Custom Attribute button label">Add custom attribute...</ui:msg>
-          </b:NavLink>
-        </b:DropdownButton>
-        <g:FlowPanel ui:field="attributesPanel" addStyleNames="xxlarge-bottom-margin"/>
-
+        <b:TabPanel tabPosition="above" ui:field="attributesTabPanel">
+          <b:Tab heading="Standard" active="true">
+            <b:FluidRow>
+              <b:Column size="6">
+                <b:Heading size="5" addStyleNames="inline-block">
+                  <ui:msg description="Label label">Label</ui:msg>
+                </b:Heading>
+                <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="editLabel">
+                </b2:IconAnchor>
+                <o:NamedAttributePanel ui:field="labelPanel" name="label"/>
+              </b:Column>
+              <b:Column size="6">
+                <b:Heading size="5" addStyleNames="inline-block top-margin">
+                  <ui:msg description="Description label">Description</ui:msg>
+                </b:Heading>
+                <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="editDescription">
+                </b2:IconAnchor>
+                <o:NamedAttributePanel ui:field="descriptionPanel" name="description"/>
+              </b:Column>
+            </b:FluidRow>
+            <b:Heading size="5">
+              <ui:msg description="Annotations label">Annotations</ui:msg>
+            </b:Heading>
+            <b:Button type="INFO" icon="PLUS" ui:field="addAnnotation">
+              <ui:msg description="Add Annotation label">Add Annotation</ui:msg>
+            </b:Button>
+            <g:SimplePanel ui:field="annotationPanel"/>
+          </b:Tab>
+          <b:Tab heading="Raw">
+            <b:Button type="INFO" icon="PLUS" ui:field="addAttribute">
+              <ui:msg description="Add Attribute label">Add Attribute</ui:msg>
+            </b:Button>
+            <g:FlowPanel ui:field="attributesPanel" addStyleNames="xxlarge-bottom-margin"/>
+          </b:Tab>
+        </b:TabPanel>
       </b:Tab>
 
       <b:Tab heading="Script" ui:field="scriptTab">

@@ -53,5 +53,20 @@
       <b:HelpBlock ui:field="termHelp">
       </b:HelpBlock>
     </b:ControlGroup>
+
+    <b:ControlGroup ui:field="valuesGroup" visible="false">
+      <b:ControlLabel for="value">
+        <ui:msg description="Values label">Values</ui:msg>
+      </b:ControlLabel>
+      <b:Controls>
+        <o:LocalizedEditor ui:field="editor" type="MARKDOWN"/>
+      </b:Controls>
+      <b:HelpBlock>
+        <ui:msg description="Attribute Values help">Values can be expressed in different languages (at least one value
+          is required).
+        </ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+
   </g:FlowPanel>
 </ui:UiBinder>
