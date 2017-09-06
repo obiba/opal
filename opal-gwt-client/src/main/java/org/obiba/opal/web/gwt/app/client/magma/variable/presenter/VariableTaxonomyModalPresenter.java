@@ -26,12 +26,9 @@ import com.google.web.bindery.event.shared.EventBus;
 public class VariableTaxonomyModalPresenter
     extends BaseVariableAttributeModalPresenter<VariableTaxonomyModalPresenter.Display> {
 
-  private final OpalSystemCache opalSystemCache;
-
   @Inject
   public VariableTaxonomyModalPresenter(Display display, EventBus eventBus, OpalSystemCache opalSystemCache) {
-    super(eventBus, display);
-    this.opalSystemCache = opalSystemCache;
+    super(eventBus, display, opalSystemCache);
     getView().setUiHandlers(this);
   }
 

@@ -91,7 +91,7 @@ public class CartVariableAttributeModalView extends ModalPopupViewWithUiHandlers
     }
     else {
       dialog.setTitle(translations.removeAnnotation());
-      information.setText(translations.removeAnnotationHelp());
+      information.setText(translations.removeAnnotationsHelp());
     }
   }
 

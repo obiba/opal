@@ -173,7 +173,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   NamedAttributePanel descriptionPanel;
 
   @UiField
-  Button addAnnotation;
+  DropdownButton editAnnotation;
 
   @UiField
   Panel annotationPanel;
@@ -212,6 +212,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
     deriveBtn.setText(translations.derive());
     initCategoryTable();
+    editAnnotation.setText(translations.editAnnotation());
     scriptNavPanel.showWidget(0);
   }
 
@@ -338,9 +339,14 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     getUiHandlers().onAddAttribute();
   }
 
-  @UiHandler("addAnnotation")
-  void onAddTaxonomy(ClickEvent event) {
-    getUiHandlers().onAddAnnotation();
+  @UiHandler("applyAnnotation")
+  void onApplyAnnotation(ClickEvent event) {
+    getUiHandlers().onApplyAnnotation();
+  }
+
+  @UiHandler("deleteAnnotation")
+  void onDeleteAnnotation(ClickEvent event) {
+    getUiHandlers().onDeleteAnnotation();
   }
 
   @UiHandler("editProperties")
@@ -480,7 +486,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   @Override
   public HasAuthorization getEditAuthorizer() {
-    return new WidgetAuthorizer(remove, scriptHeaderPanel, editProperties, editCategories, addAttribute, addAnnotation, editLabel, editDescription);
+    return new WidgetAuthorizer(remove, scriptHeaderPanel, editProperties, editCategories, addAttribute, editAnnotation, editLabel, editDescription);
   }
 
   @Override

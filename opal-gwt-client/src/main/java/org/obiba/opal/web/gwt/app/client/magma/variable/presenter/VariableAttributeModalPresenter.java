@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.magma.variable.presenter;
 import java.util.Collection;
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.support.OpalSystemCache;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -25,8 +26,8 @@ public class VariableAttributeModalPresenter
     implements VariableAttributeModalUiHandlers {
 
   @Inject
-  public VariableAttributeModalPresenter(Display display, EventBus eventBus) {
-    super(eventBus, display);
+  public VariableAttributeModalPresenter(Display display, EventBus eventBus, OpalSystemCache opalSystemCache) {
+    super(eventBus, display, opalSystemCache);
     getView().setUiHandlers(this);
   }
 

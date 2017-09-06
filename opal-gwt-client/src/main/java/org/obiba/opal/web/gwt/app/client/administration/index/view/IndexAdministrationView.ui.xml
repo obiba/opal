@@ -41,7 +41,7 @@
         </b:Button>
       </b:ButtonGroup>
       <b:ButtonGroup>
-        <b:Button ui:field="configureButton" type="INFO" icon="EDIT" addStyleNames="small-indent">
+        <b:Button ui:field="configureButton" type="INFO" icon="PENCIL" addStyleNames="small-indent">
           <ui:msg description="Configure">Configure</ui:msg>
         </b:Button>
       </b:ButtonGroup>

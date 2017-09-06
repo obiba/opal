@@ -17,7 +17,7 @@
 
   <o:Modal ui:field="modal" closeVisible="true" keyboard="true" animation="false" minHeight="700" minWidth="700">
 
-    <b:Paragraph ui:field="editAttributeHelp"/>
+    <b:Paragraph ui:field="modalHelp"/>
 
     <b:ControlGroup ui:field="namespaceGroup">
       <b:ControlLabel>

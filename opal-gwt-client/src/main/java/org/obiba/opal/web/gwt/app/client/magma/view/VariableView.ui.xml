@@ -131,7 +131,7 @@
           <ui:msg description="Categories label">Categories</ui:msg>
         </b:Heading>
         <g:FlowPanel addStyleNames="clearfix">
-          <b:Button type="INFO" icon="EDIT" ui:field="editCategories" addStyleNames="pull-left">
+          <b:Button type="INFO" icon="PENCIL" ui:field="editCategories" addStyleNames="pull-left">
             <ui:msg description="Edit Categories label">Edit Categories</ui:msg>
           </b:Button>
           <o:OpalSimplePager ui:field="categoryTablePager" location="RIGHT" addStyleNames="pull-right"/>
@@ -165,9 +165,15 @@
             <b:Heading size="5">
               <ui:msg description="Annotations label">Annotations</ui:msg>
             </b:Heading>
-            <b:Button type="INFO" icon="PLUS" ui:field="addAnnotation">
-              <ui:msg description="Add Annotation label">Add Annotation</ui:msg>
-            </b:Button>
+            <b:DropdownButton type="INFO" icon="PENCIL" ui:field="editAnnotation">
+              <b:NavLink icon="TAG" ui:field="applyAnnotation">
+                <ui:msg description="Apply Annotation button label">Apply annotation...</ui:msg>
+              </b:NavLink>
+              <b:NavLink icon="ERASER" ui:field="deleteAnnotation">
+                <ui:msg description="Remove Annotation button label">Remove annotation...
+                </ui:msg>
+              </b:NavLink>
+            </b:DropdownButton>
             <g:SimplePanel ui:field="annotationPanel"/>
           </b:Tab>
           <b:Tab heading="Raw">

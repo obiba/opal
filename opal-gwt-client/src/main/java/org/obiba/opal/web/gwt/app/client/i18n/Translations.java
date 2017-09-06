@@ -979,15 +979,19 @@ public interface Translations extends Constants {
   String applyAnnotation();
 
   @Description("Apply annotation help")
-  @DefaultStringValue("Annotate each selected variable with a taxonomy term.")
+  @DefaultStringValue("Annotate each selected variable with a controlled vocabulary.")
   String applyAnnotationHelp();
 
   @Description("Remove annotation title")
   @DefaultStringValue("Remove Annotation")
   String removeAnnotation();
 
+  @Description("Remove annotations help")
+  @DefaultStringValue("Remove controlled vocabulary annotation from each selected variable.")
+  String removeAnnotationsHelp();
+
   @Description("Remove annotation help")
-  @DefaultStringValue("Remove taxonomy term annotation from each selected variable.")
+  @DefaultStringValue("Remove controlled vocabulary annotation from variable.")
   String removeAnnotationHelp();
 
   @Description("Apply attribute title")
@@ -995,19 +999,15 @@ public interface Translations extends Constants {
   String applyAttribute();
 
   @Description("Apply attribute help")
-  @DefaultStringValue("Add or update variable attributes for each selected variable.")
+  @DefaultStringValue("Apply attribute to each selected variable.")
   String applyAttributeHelp();
 
   @Description("Add custom attribute title")
   @DefaultStringValue("Add Custom Attribute")
   String addCustomAttribute();
 
-  @Description("Add Annotation title")
-  @DefaultStringValue("Add Annotation")
-  String addAnnotation();
-
   @Description("Add Annotation help")
-  @DefaultStringValue("Add annotation to the variable by selecting a controlled vocabulary.")
+  @DefaultStringValue("Apply annotation to the variable by selecting a controlled vocabulary.")
   String addAnnotationHelp();
 
   @Description("Edit annotation title")
@@ -1034,9 +1034,13 @@ public interface Translations extends Constants {
   @DefaultStringValue("Edit the namespace for each selected attribute.")
   String editAttributesHelp();
 
-  @Description("Remove attributes title")
-  @DefaultStringValue("Remove Attributes")
-  String removeAttributes();
+  @Description("Remove attribute title")
+  @DefaultStringValue("Remove Attribute")
+  String removeAttribute();
+
+  @Description("Remove attribute help")
+  @DefaultStringValue("Remove attribute from each selected variable.")
+  String removeAttributeHelp();
 
   @Description("Generate Identifiers label")
   @DefaultStringValue("Generate Identifiers")
