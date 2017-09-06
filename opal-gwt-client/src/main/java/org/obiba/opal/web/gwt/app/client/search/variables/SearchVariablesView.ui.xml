@@ -65,7 +65,7 @@
             <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
             <b2:IconAnchor ui:field="selectAllAnchor" icon="CHECK" addStyleNames="inline small-indent"/>
             <g:FlowPanel ui:field="selectAllProgressBox" addStyleNames="inline-flex small-indent" visible="false">
-              <b:ProgressBar ui:field="selectAllProgress" percent="0" width="60px"/>
+              <b:ProgressBar ui:field="selectAllProgress" percent="0" width="60px" addStyleNames="no-bottom-margin"/>
             </g:FlowPanel>
             <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" visible="false"
                            addStyleNames="inline small-indent">

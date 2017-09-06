@@ -37,17 +37,17 @@
 
     <g:FlowPanel>
       <g:FlowPanel addStyleNames="small-bottom-margin clearfix">
-        <b:Button ui:field="addToViewAll" type="INFO" icon="PLUS" addStyleNames="btn">
+        <b:Button ui:field="addToViewAll" type="INFO" icon="PLUS" addStyleNames="btn" enabled="false">
           <ui:msg description="Add to View Button label">View</ui:msg>
         </b:Button>
-        <b:Button ui:field="searchEntitiesAll" type="INFO" icon="SEARCH" addStyleNames="btn small-indent">
+        <b:Button ui:field="searchEntitiesAll" type="INFO" icon="SEARCH" addStyleNames="btn small-indent" enabled="false">
           <ui:msg description="Search Entities Button label">Entities</ui:msg>
         </b:Button>
         <b:DropdownButton type="INFO" icon="PENCIL" ui:field="editAttributeAll" addStyleNames="small-indent">
-          <b:NavLink icon="TAG" ui:field="applyTaxonomyAll">
+          <b:NavLink icon="TAG" ui:field="applyAnnotationAll" disabled="true">
             <ui:msg description="Apply Annotation button label">Apply annotation...</ui:msg>
           </b:NavLink>
-          <b:NavLink icon="ERASER" ui:field="deleteTaxonomyAll">
+          <b:NavLink icon="ERASER" ui:field="deleteAnnotationAll" disabled="true">
             <ui:msg description="Remove Annotation button label">Remove annotation...
             </ui:msg>
           </b:NavLink>
@@ -78,10 +78,10 @@
             </b2:IconAnchor>
             <b:Dropdown icon="TAG" ui:field="editAttribute"
                         addStyleNames="inline small-indent">
-              <b:NavLink ui:field="applyTaxonomy">
+              <b:NavLink ui:field="applyAnnotation">
                 <ui:msg description="Apply Annotation button label">Apply annotation...</ui:msg>
               </b:NavLink>
-              <b:NavLink ui:field="deleteTaxonomy">
+              <b:NavLink ui:field="deleteAnnotation">
                 <ui:msg description="Remove Annotation button label">Remove annotation...
                 </ui:msg>
               </b:NavLink>

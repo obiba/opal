@@ -136,13 +136,13 @@ public class CartPresenter extends Presenter<CartPresenter.Display, CartPresente
   }
 
   @Override
-  public void onApplyTaxonomyAttribute(List<CartVariableItem> selectedVariables) {
+  public void onApplyAnnotation(List<CartVariableItem> selectedVariables) {
     CartVariableAttributeModalPresenter presenter = cartVariableAttributeModalPresenterModalProvider.get();
     presenter.initialize(selectedVariables, true);
   }
 
   @Override
-  public void onDeleteTaxonomyAttribute(List<CartVariableItem> selectedVariables) {
+  public void onDeleteAnnotation(List<CartVariableItem> selectedVariables) {
     CartVariableAttributeModalPresenter presenter = cartVariableAttributeModalPresenterModalProvider.get();
     presenter.initialize(selectedVariables, false);
   }

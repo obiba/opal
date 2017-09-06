@@ -25,9 +25,9 @@ public interface CartUiHandlers extends UiHandlers {
 
   void onSearchEntities(List<CartVariableItem> selectedVariables);
 
-  void onApplyTaxonomyAttribute(List<CartVariableItem> selectedVariables);
+  void onApplyAnnotation(List<CartVariableItem> selectedVariables);
 
-  void onDeleteTaxonomyAttribute(List<CartVariableItem> selectedVariables);
+  void onDeleteAnnotation(List<CartVariableItem> selectedVariables);
 
   void onAddToView(List<CartVariableItem> selectedVariables);
 }

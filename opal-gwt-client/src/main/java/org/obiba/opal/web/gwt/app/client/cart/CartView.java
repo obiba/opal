@@ -10,9 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.cart;
 
-import com.github.gwtbootstrap.client.ui.Alert;
-import com.github.gwtbootstrap.client.ui.Dropdown;
-import com.github.gwtbootstrap.client.ui.DropdownButton;
+import com.github.gwtbootstrap.client.ui.*;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.common.collect.Lists;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -43,6 +41,18 @@ public class CartView extends ViewWithUiHandlers<CartUiHandlers> implements Cart
 
   interface Binder extends UiBinder<Widget, CartView> {
   }
+
+  @UiField
+  Button addToViewAll;
+
+  @UiField
+  Button searchEntitiesAll;
+
+  @UiField
+  NavLink applyAnnotationAll;
+
+  @UiField
+  NavLink deleteAnnotationAll;
 
   @UiField
   TextBoxClearable filter;
@@ -122,24 +132,24 @@ public class CartView extends ViewWithUiHandlers<CartUiHandlers> implements Cart
     getUiHandlers().onAddToView(variableCartTable.getSelectedItems());
   }
 
-  @UiHandler("applyTaxonomyAll")
-  public void onApplyTaxonomyAttributeAll(ClickEvent event) {
-    getUiHandlers().onApplyTaxonomyAttribute(variableCartProvider.getList());
+  @UiHandler("applyAnnotationAll")
+  public void onApplyAnnotationAll(ClickEvent event) {
+    getUiHandlers().onApplyAnnotation(variableCartProvider.getList());
   }
 
-  @UiHandler("applyTaxonomy")
-  public void onApplyTaxonomyAttribute(ClickEvent event) {
-    getUiHandlers().onApplyTaxonomyAttribute(variableCartTable.getSelectedItems());
+  @UiHandler("applyAnnotation")
+  public void onApplyAnnotation(ClickEvent event) {
+    getUiHandlers().onApplyAnnotation(variableCartTable.getSelectedItems());
   }
 
-  @UiHandler("deleteTaxonomyAll")
-  public void onDeleteTaxonomyAttributeAll(ClickEvent event) {
-    getUiHandlers().onDeleteTaxonomyAttribute(variableCartProvider.getList());
+  @UiHandler("deleteAnnotationAll")
+  public void onDeleteAnnotationAll(ClickEvent event) {
+    getUiHandlers().onDeleteAnnotation(variableCartProvider.getList());
   }
 
-  @UiHandler("deleteTaxonomy")
-  public void onDeleteTaxonomyAttribute(ClickEvent event) {
-    getUiHandlers().onDeleteTaxonomyAttribute(variableCartTable.getSelectedItems());
+  @UiHandler("deleteAnnotation")
+  public void onDeleteAnnotation(ClickEvent event) {
+    getUiHandlers().onDeleteAnnotation(variableCartTable.getSelectedItems());
   }
 
   @UiHandler("removeFromCart")
@@ -152,6 +162,11 @@ public class CartView extends ViewWithUiHandlers<CartUiHandlers> implements Cart
     initCartVariableTable();
     originalVariables = variables;
     renderVariables(originalVariables);
+    boolean hasVariables = variables.size()>0;
+    addToViewAll.setEnabled(hasVariables);
+    searchEntitiesAll.setEnabled(hasVariables);
+    applyAnnotationAll.setDisabled(!hasVariables);
+    deleteAnnotationAll.setDisabled(!hasVariables);
   }
 
   private void renderVariables(List<CartVariableItem> variables) {
