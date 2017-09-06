@@ -178,7 +178,7 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
   public void setDialogMode(Mode mode, String name) {
     dialogMode = mode;
     getView().setDialogMode(mode);
-    getView().setName(name);
+    getView().setSpecificName(name);
   }
 
   public static native String stringify(JavaScriptObject obj)
@@ -514,6 +514,8 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
     void setNamespace(String namespace);
 
     void setName(String name);
+
+    void setSpecificName(String name);
 
     void setLocalizedTexts(Map<String, String> localizedTexts, List<String> locales);
 

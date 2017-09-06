@@ -1002,9 +1002,9 @@ public interface Translations extends Constants {
   @DefaultStringValue("Apply attribute to each selected variable.")
   String applyAttributeHelp();
 
-  @Description("Add custom attribute title")
-  @DefaultStringValue("Add Custom Attribute")
-  String addCustomAttribute();
+  @Description("Add attribute title")
+  @DefaultStringValue("Add Attribute")
+  String addAttribute();
 
   @Description("Add Annotation help")
   @DefaultStringValue("Apply annotation to the variable by selecting a controlled vocabulary.")
@@ -1025,6 +1025,10 @@ public interface Translations extends Constants {
   @Description("Edit attribute title")
   @DefaultStringValue("Edit Attribute")
   String editAttribute();
+
+  @Description("Edit specific attribute title")
+  @DefaultStringValue("Edit {0}")
+  String editSpecificAttribute();
 
   @Description("Edit attributes title")
   @DefaultStringValue("Edit Attributes")

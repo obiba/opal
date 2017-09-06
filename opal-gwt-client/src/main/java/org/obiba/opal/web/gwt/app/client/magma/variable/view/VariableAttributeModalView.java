@@ -90,7 +90,7 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
     super(eventBus);
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
-    modal.setTitle(translations.addCustomAttribute());
+    modal.setTitle(translations.addAttribute());
     new ConstrainedModal(modal);
   }
 
@@ -112,6 +112,14 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
   @Override
   public void setName(String name) {
     this.name.setText(name);
+  }
+
+  @Override
+  public void setSpecificName(String name) {
+    setName(name);
+    namespaceGroup.setVisible(false);
+    nameGroup.setVisible(false);
+    modal.setTitle(translations.editSpecificAttribute().replace("{0}", name));
   }
 
   @Override

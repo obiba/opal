@@ -159,6 +159,11 @@ public class VariableTaxonomyModalView extends ModalPopupViewWithUiHandlers<Vari
   }
 
   @Override
+  public void setSpecificName(String name) {
+    setName(name);
+  }
+
+  @Override
   public void setLocalizedTexts(Map<String, String> localizedTexts, List<String> locales) {
     taxonomySelector.setLocalizedTexts(localizedTexts, locales);
 

@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
 import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariableEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
@@ -442,6 +443,13 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     VariableAttributeModalPresenter presenter = attributeModalProvider.get();
     presenter.setDialogMode(Mode.CREATE, name);
     presenter.initialize(table, variable);
+  }
+
+  @Override
+  public void onEditAttribute(String name, JsArray<AttributeDto> attributes) {
+    VariableAttributeModalPresenter presenter = attributeModalProvider.get();
+    presenter.setDialogMode(Mode.UPDATE_SINGLE, name);
+    presenter.initialize(table, variable, Lists.newArrayList(attributes));
   }
 
   @Override

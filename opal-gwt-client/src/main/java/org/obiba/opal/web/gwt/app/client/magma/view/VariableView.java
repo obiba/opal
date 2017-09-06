@@ -359,7 +359,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     if (labelPanel.getAttributes().length() == 0)
       getUiHandlers().onAddAttribute("label");
     else
-      getUiHandlers().onEditAttributes(Lists.newArrayList(labelPanel.getAttributes()));
+      getUiHandlers().onEditAttribute("label", labelPanel.getAttributes());
   }
 
   @UiHandler("editDescription")
@@ -367,7 +367,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     if (descriptionPanel.getAttributes().length() == 0)
       getUiHandlers().onAddAttribute("description");
     else
-      getUiHandlers().onEditAttributes(Lists.newArrayList(descriptionPanel.getAttributes()));
+      getUiHandlers().onEditAttribute("description", descriptionPanel.getAttributes());
   }
 
   @UiHandler("remove")
