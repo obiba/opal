@@ -115,6 +115,9 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
   }
 
   public VariableFieldSuggestion findSuggestion(String fieldName) {
+    for (VocabularySuggestion suggestion : vocabularySuggestions) {
+      if (suggestion.getField().getName().equals(fieldName)) return suggestion;
+    }
     for (TermSuggestion suggestion : termSuggestions) {
       if (suggestion.getField().getName().equals(fieldName)) return suggestion;
     }
@@ -445,7 +448,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     @Override
     public String getReplacementString() {
-      return taxonomy.getName() + ":" + vocabulary.getName();
+      return getField().getName() + ":*";
     }
 
     @Override
@@ -460,12 +463,19 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
 
     @Override
     public FieldItem getField() {
-      return null;
+      return new FieldItem(taxonomy.getName() + "-" + vocabulary.getName(),
+          getLocaleText(vocabulary.getTitleArray()), getLocaleText(vocabulary.getDescriptionArray()));
     }
 
     @Override
     public List<FieldItem> getFieldTerms() {
-      return Lists.newArrayList();
+      if (vocabulary.getTermsCount() == 0) return Lists.newArrayList();
+      List<FieldItem> fieldTerms = Lists.newArrayList();
+      for (TermDto termDto : JsArrays.toIterable(vocabulary.getTermsArray())) {
+        fieldTerms.add(new FieldItem(termDto.getName(), getLocaleText(termDto.getTitleArray()),
+            getLocaleText(termDto.getDescriptionArray())));
+      }
+      return fieldTerms;
     }
 
     private String getLocaleText(JsArray<LocaleTextDto> texts) {

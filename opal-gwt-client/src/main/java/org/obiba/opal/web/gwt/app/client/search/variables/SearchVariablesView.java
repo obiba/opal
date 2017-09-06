@@ -82,6 +82,9 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   ToggleAnchor queryMode;
 
   @UiField
+  Image resetPending;
+
+  @UiField
   Image refreshPending;
 
   @UiField
@@ -185,11 +188,13 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   @Override
   public void setTaxonomies(List<TaxonomyDto> taxonomies) {
     ((VariableFieldSuggestOracle) queryTypeahead.getSuggestOracle()).setTaxonomyTerms(taxonomies);
+    ((VariableFieldSuggestOracle) queryTypeahead.getSuggestOracle()).setTaxonomyVocabularies(taxonomies);
   }
 
   @Override
   public void setTables(List<TableDto> tables) {
     ((VariableFieldSuggestOracle) queryTypeahead.getSuggestOracle()).setTables(tables);
+    resetPending.setVisible(false);
   }
 
   @Override

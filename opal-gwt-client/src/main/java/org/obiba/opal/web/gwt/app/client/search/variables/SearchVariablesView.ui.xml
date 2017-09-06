@@ -31,6 +31,7 @@
 
     <b:Well>
       <o:CriteriaPanel ui:field="queryPanel" addStyleNames="inline-block"></o:CriteriaPanel>
+      <g:Image ui:field="resetPending" url="image/loading.gif"/>
       <b:TextBox ui:field="containsInput" placeholder="Contains text..." addStyleNames="top-margin"></b:TextBox>
       <b:Typeahead ui:field="queryTypeahead">
         <b:TextBox ui:field="queryInput" placeholder="More criteria..." addStyleNames="top-margin small-indent"/>

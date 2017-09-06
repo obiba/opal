@@ -28,7 +28,6 @@ import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
-import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariableEvent;
 import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariablesEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -46,7 +45,6 @@ import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.EntryDto;
-import org.obiba.opal.web.model.client.opal.GeneralConf;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.search.ItemFieldsDto;
 import org.obiba.opal.web.model.client.search.ItemResultDto;
@@ -251,7 +249,7 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
           public void onResource(Response response, QueryResultDto resource) {
             if (response.getStatusCode() == Response.SC_OK) {
               handler.onQueryResult(query, allOffset, resource);
-              if (nextOffset<resource.getTotalHits())
+              if (nextOffset < resource.getTotalHits())
                 queryAll(query, nextOffset, handler);
             }
           }
