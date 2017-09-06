@@ -18,6 +18,7 @@ import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.*;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.*;
@@ -66,8 +67,7 @@ public class VariableFieldDropdown extends CriterionDropdown {
     if ("exists".equals(rqlQuery.getName())) {
       getRadioControl(0).setValue(true);
       filter = translations.criterionFiltersMap().get("any").toLowerCase();
-    }
-    else if ("not".equals(rqlQuery.getName())) {
+    } else if ("not".equals(rqlQuery.getName())) {
       RQLQuery subQuery = rqlQuery.getRQLQuery(0);
       if ("exists".equals(subQuery.getName())) {
         getRadioControl(1).setValue(true);
@@ -77,8 +77,7 @@ public class VariableFieldDropdown extends CriterionDropdown {
         filter = translations.criterionFiltersMap().get("not_in");
         applySelection(subQuery);
       }
-    }
-    else {
+    } else {
       getRadioControl(isFieldTermWildCard(rqlQuery) ? 3 : 2).setValue(true);
       filter = translations.criterionFiltersMap().get("in");
       applySelection(rqlQuery);
@@ -110,7 +109,7 @@ public class VariableFieldDropdown extends CriterionDropdown {
 
   @Override
   protected Widget createSpecificControls() {
-    return hasFieldTerms() ?  createFieldTermsControls() : createMatchQueryControls();
+    return hasFieldTerms() ? createFieldTermsControls() : createMatchQueryControls();
   }
 
   protected String getSpecificQueryString() {
@@ -135,18 +134,18 @@ public class VariableFieldDropdown extends CriterionDropdown {
   @Override
   public String getQueryString() {
     // Any
-    if(getRadioControl(0).getValue()) return "_exists_:" + fieldName;
+    if (getRadioControl(0).getValue()) return "_exists_:" + fieldName;
     // None
-    if(getRadioControl(1).getValue()) return "NOT _exists_:" + fieldName;
+    if (getRadioControl(1).getValue()) return "NOT _exists_:" + fieldName;
     return getSpecificQueryString();
   }
 
   @Override
   public String getRQLQueryString() {
     // Any
-    if(getRadioControl(0).getValue()) return "exists(" + getRQLField() + ")";
+    if (getRadioControl(0).getValue()) return "exists(" + getRQLField() + ")";
     // None
-    if(getRadioControl(1).getValue()) return "not(exists(" + getRQLField() + "))";
+    if (getRadioControl(1).getValue()) return "not(exists(" + getRQLField() + "))";
     return getSpecificRQLQueryString();
   }
 
@@ -157,7 +156,7 @@ public class VariableFieldDropdown extends CriterionDropdown {
     else {
       String text = hasFieldTerms() ? getFieldTermsQueryText() : matches.getText();
       if (Strings.isNullOrEmpty(text)) super.updateCriterionFilter("");
-      else if (text.length()>30) setText(filter + " " + text.substring(0, 30) + "...");
+      else if (text.length() > 30) setText(filter + " " + text.substring(0, 30) + "...");
       else setText(filter + " " + text);
     }
     setTitle(getQueryString());
@@ -175,7 +174,7 @@ public class VariableFieldDropdown extends CriterionDropdown {
     initializeHeader();
     initializeRadioControls(fieldQuery);
     Widget controls = createSpecificControls();
-    if(controls != null) {
+    if (controls != null) {
       divider = new ListItem();
       divider.addStyleName("divider");
       add(divider);
@@ -256,12 +255,36 @@ public class VariableFieldDropdown extends CriterionDropdown {
     specificControls = new ListItem();
     specificControls.addStyleName("controls");
     ComplexPanel checksPanel;
-    if (fieldTerms.size()>10) {
+    if (fieldTerms.size() > 10) {
       ScrollPanel scrollPanel = new ScrollPanel();
       scrollPanel.setHeight("200px");
       specificControls.add(scrollPanel);
+      FlowPanel content = new FlowPanel();
       checksPanel = new FlowPanel();
-      scrollPanel.add(checksPanel);
+      final TextBox filter = new TextBox();
+      filter.addStyleName("bordered right-indent");
+      filter.setPlaceholder(translations.criterionFiltersMap().get("filter"));
+      filter.addKeyUpHandler(new KeyUpHandler() {
+        @Override
+        public void onKeyUp(KeyUpEvent event) {
+          String filterText = filter.getText().trim().toLowerCase();
+          if (filterText.isEmpty()) {
+            for (CheckBox cb : fieldTermChecks)
+              cb.getParent().setVisible(true);
+            return;
+          } else {
+            for (CheckBox cb : fieldTermChecks) {
+              String title = getFieldTermTitle(cb.getName());
+              if (title != null) title = title.toLowerCase();
+              cb.getParent().setVisible(title.contains(filterText) || cb.getName().toLowerCase().contains(filterText));
+            }
+          }
+        }
+      });
+      content.add(filter);
+      checksPanel.addStyleName("top-margin");
+      content.add(checksPanel);
+      scrollPanel.add(content);
     } else {
       checksPanel = specificControls;
     }
@@ -337,7 +360,7 @@ public class VariableFieldDropdown extends CriterionDropdown {
   }
 
   private String normalizeKeyword(String keyword) {
-    return keyword.replaceAll(" ","+");
+    return keyword.replaceAll(" ", "+");
   }
 
   /**
@@ -354,7 +377,8 @@ public class VariableFieldDropdown extends CriterionDropdown {
         else text = text + "," + title;
       }
     }
-    if (Strings.isNullOrEmpty(text)) return translations.criterionFiltersMap().get(isNot() ? "any" : "none").toLowerCase();
+    if (Strings.isNullOrEmpty(text))
+      return translations.criterionFiltersMap().get(isNot() ? "any" : "none").toLowerCase();
     return text;
   }
 

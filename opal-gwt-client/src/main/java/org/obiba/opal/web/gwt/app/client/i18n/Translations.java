@@ -2297,7 +2297,8 @@ public interface Translations extends Constants {
       "to", "To",//
       "date", "Date",//
       "select", "Select...",//
-      "entity_identifier", "Entity identifier"
+      "entity_identifier", "Entity identifier",
+      "filter", "Filter..."
   })
   Map<String, String> criterionFiltersMap();
 
