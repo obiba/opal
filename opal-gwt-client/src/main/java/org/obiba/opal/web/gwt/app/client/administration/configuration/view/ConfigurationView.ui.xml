@@ -42,7 +42,7 @@
       </ui:msg>
     </b:Paragraph>
     <g:FlowPanel addStyleNames="large-bottom-margin">
-      <b:DropdownButton ui:field="keyPairButton" type="INFO" icon="EDIT">
+      <b:DropdownButton ui:field="keyPairButton" type="INFO" icon="PENCIL">
         <b:NavLink ui:field="importKeyPair">
           <ui:msg description="Import Key Pair label">Import key pair...</ui:msg>
         </b:NavLink>

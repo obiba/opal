@@ -10,40 +10,8 @@
 
 package org.obiba.opal.web.gwt.app.client.magma.variable.presenter;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
-import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
-import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
-import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
-import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.model.client.magma.AttributeDto;
-import org.obiba.opal.web.model.client.magma.CategoryDto;
-import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.opal.LocaleDto;
-
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -54,13 +22,32 @@ import com.google.gwt.user.client.ui.HasValue;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
+import org.obiba.opal.web.gwt.app.client.support.OpalSystemCache;
+import org.obiba.opal.web.gwt.app.client.validator.*;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.magma.AttributeDto;
+import org.obiba.opal.web.model.client.magma.CategoryDto;
+import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
+
+import javax.annotation.Nullable;
+import java.util.*;
 
 public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttributeModalPresenter.Display>
     extends ModalPresenterWidget<V> implements VariableAttributeModalUiHandlers {
 
   public enum Mode {
-    APPLY, UPDATE_SINGLE, UPDATE_MULTIPLE, DELETE, CREATE
+    APPLY, UPDATE_SINGLE, UPDATE_MULTIPLE, DELETE, DELETE_SINGLE, CREATE
   }
+
+  protected final OpalSystemCache opalSystemCache;
 
   private Mode dialogMode;
 
@@ -80,8 +67,9 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
 
   protected List<String> locales;
 
-  public BaseVariableAttributeModalPresenter(EventBus eventBus, V view) {
+  public BaseVariableAttributeModalPresenter(EventBus eventBus, V view, OpalSystemCache opalSystemCache) {
     super(eventBus, view);
+    this.opalSystemCache = opalSystemCache;
   }
 
   @Override
@@ -101,11 +89,11 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
     this.localizedTexts = localizedTexts;
     getView().clearErrors();
 
-    if(validationHandler.validate()) {
+    if (validationHandler.validate()) {
       ResponseCodeCallback successCallback = new AttributeSuccessCallback();
 
       JsArrayString variableDtos = JsArrays.create().cast();
-      for(VariableDto variable : variables) {
+      for (VariableDto variable : variables) {
         VariableDto dto = getVariableDto(variable);
         variableDtos.push(VariableDto.stringify(dto));
       }
@@ -144,44 +132,38 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
     this.selectedItems = selectedItems;
   }
 
-  protected void applySelectedItems() {
-    if(selectedItems.size() == 1) {
+  void applySelectedItems() {
+    if (selectedItems.size() == 1) {
       // Fetch locales and render categories
-      ResourceRequestBuilderFactory.<JsArray<LocaleDto>>newBuilder()
-          .forResource(UriBuilders.DATASOURCE_TABLE_LOCALES.create().build(table.getDatasourceName(), table.getName()))
-          .get().withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
+      opalSystemCache.requestLocales(new OpalSystemCache.LocalesHandler() {
         @Override
-        public void onResource(Response response, JsArray<LocaleDto> resource) {
-          List<LocaleDto> localeDtos = JsArrays.toList(resource);
-          locales = new ArrayList<String>();
-          for(LocaleDto localeDto : localeDtos) {
-            locales.add(localeDto.getName());
-          }
+        public void onLocales(JsArrayString localesStr) {
+          locales = JsArrays.toList(localesStr);
 
           // Add item locale if it contains more locale
           List<AttributeDto> attributes = JsArrays.toList(selectedItems.get(0));
           Map<String, String> localeTexts = new HashMap<String, String>();
-          for(AttributeDto attribute : attributes) {
+          for (AttributeDto attribute : attributes) {
             boolean found = false;
-            for(String locale : locales) {
-              if(locale.equals(attribute.getLocale())) {
+            for (String locale : locales) {
+              if (locale.equals(attribute.getLocale())) {
                 found = true;
                 break;
               }
             }
-            if(!found) {
+            if (!found) {
               locales.add(attribute.getLocale());
             }
             localeTexts.put(attribute.getLocale(), attribute.getValue());
           }
-          if(!locales.contains("")) locales.add("");
+          if (!locales.contains("")) locales.add("");
           Collections.sort(locales);
 
           getView().setNamespace(attributes.get(0).getNamespace());
           getView().setName(attributes.get(0).getName());
           getView().setLocalizedTexts(localeTexts, locales);
         }
-      }).send();
+      });
     } else {
       List<AttributeDto> attributes = JsArrays.toList(selectedItems.get(0));
       getView().setNamespace(attributes.get(0).getNamespace());
@@ -209,23 +191,18 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
   //
 
   private void renderLocalizableTexts() {
-    locales = new ArrayList<String>();
+    locales = Lists.newArrayList();
 
     // Fetch locales and render categories
-    ResourceRequestBuilderFactory.<JsArray<LocaleDto>>newBuilder()
-        .forResource(UriBuilders.DATASOURCE_TABLE_LOCALES.create().build(table.getDatasourceName(), table.getName()))
-        .get().withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
+    opalSystemCache.requestLocales(new OpalSystemCache.LocalesHandler() {
       @Override
-      public void onResource(Response response, JsArray<LocaleDto> resource) {
-        for(LocaleDto localeDto : JsArrays.toList(resource)) {
-          locales.add(localeDto.getName());
-        }
-        if(!locales.contains("")) locales.add("");
+      public void onLocales(JsArrayString localesStr) {
+        locales = JsArrays.toList(localesStr);
+        if (!locales.contains("")) locales.add("");
         Collections.sort(locales);
-
         getView().setLocalizedTexts(new HashMap<String, String>(), locales);
       }
-    }).send();
+    });
   }
 
   private VariableDto getVariableDto(VariableDto variable) {
@@ -247,7 +224,7 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
     dto.setAttributesArray(getAttributesArray(variable));
     dto.setCategoriesArray(getCategoriesDtoArray(variable.getCategoriesArray()));
 
-    if(variable.getCategoriesArray() != null) {
+    if (variable.getCategoriesArray() != null) {
       dto.setCategoriesArray(variable.getCategoriesArray());
     }
 
@@ -257,7 +234,7 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
   private JsArray<AttributeDto> getAttributesArray(VariableDto dto) {
     List<AttributeDto> attributes = JsArrays.toList(dto.getAttributesArray());
 
-    switch(dialogMode) {
+    switch (dialogMode) {
       case APPLY: // fall through
       case CREATE:
         return addNewAttribute(attributes);
@@ -266,6 +243,7 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
         return updateSingleAttribute(attributes);
 
       case DELETE:
+      case DELETE_SINGLE:
         return deleteMultipleAttributes(dto);
 
       default:
@@ -275,7 +253,7 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
 
   private JsArray<CategoryDto> getCategoriesDtoArray(JsArray<CategoryDto> modalCategories) {
     JsArray<CategoryDto> categories = JsArrays.create().cast();
-    for(CategoryDto categoryDto : JsArrays.toIterable(modalCategories)) {
+    for (CategoryDto categoryDto : JsArrays.toIterable(modalCategories)) {
       CategoryDto category = CategoryDto.create();
       category.setName(categoryDto.getName());
       category.setIsMissing(categoryDto.getIsMissing());
@@ -288,7 +266,7 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
 
   private JsArray<AttributeDto> getAttributesDtoArray(JsArray<AttributeDto> attributesArray) {
     JsArray<AttributeDto> attributes = JsArrays.create().cast();
-    for(AttributeDto attributeDto : JsArrays.toIterable(attributesArray)) {
+    for (AttributeDto attributeDto : JsArrays.toIterable(attributesArray)) {
       AttributeDto attribute = AttributeDto.create();
       attribute.setName(attributeDto.getName());
       attribute.setNamespace(attributeDto.getNamespace());
@@ -304,14 +282,14 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
     JsArray<AttributeDto> newAttributes = JsArrays.create().cast();
 
     // Add other attributed
-    for(AttributeDto attribute : attributes) {
+    for (AttributeDto attribute : attributes) {
       newAttributes.push(attribute);
     }
 
     // For each locale
-    for(Map.Entry<String, String> entry : localizedTexts.entrySet()) {
+    for (Map.Entry<String, String> entry : localizedTexts.entrySet()) {
       AttributeDto existingAttr = findAttribute(attributes, entry.getKey());
-      if(existingAttr != null) {
+      if (existingAttr != null) {
         existingAttr.setValue(entry.getValue());
       } else {
         newAttributes.push(getNewAttribute(entry.getKey(), entry.getValue()));
@@ -332,8 +310,8 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
     updateValuesAndNamespace(attributes, newAttributes, originalName, originalNamespace);
 
     // Add other attributes
-    for(AttributeDto attribute : attributes) {
-      if(!attribute.getName().equals(originalName) || !attribute.getNamespace().equals(originalNamespace)) {
+    for (AttributeDto attribute : attributes) {
+      if (!attribute.getName().equals(originalName) || !attribute.getNamespace().equals(originalNamespace)) {
         newAttributes.push(attribute);
       }
     }
@@ -344,9 +322,9 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
   private JsArray<AttributeDto> deleteMultipleAttributes(VariableDto dto) {
     JsArray<AttributeDto> newAttributes = JsArrays.create().cast();
 
-    for(AttributeDto attributeDto : JsArrays.toIterable(dto.getAttributesArray())) {
+    for (AttributeDto attributeDto : JsArrays.toIterable(dto.getAttributesArray())) {
       // Add attribute if its not for the specified namespace or name
-      if(!attributeDto.getNamespace().equals(namespace) || !attributeDto.getName().equals(name)) {
+      if (!attributeDto.getNamespace().equals(namespace) || !attributeDto.getName().equals(name)) {
         newAttributes.push(attributeDto);
       }
     }
@@ -357,10 +335,10 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
   private JsArray<AttributeDto> updateMultipleNamespace(Iterable<AttributeDto> attributes) {
     // Update selected attributes namespace
     JsArray<AttributeDto> newAttributes = JsArrays.create().cast();
-    for(AttributeDto attribute : attributes) {
+    for (AttributeDto attribute : attributes) {
       // if in selectedItems, change namespace fo all locales
-      for(JsArray<AttributeDto> selectedAttributes : selectedItems) {
-        if(attribute.getName().equals(selectedAttributes.get(0).getName())) {
+      for (JsArray<AttributeDto> selectedAttributes : selectedItems) {
+        if (attribute.getName().equals(selectedAttributes.get(0).getName())) {
           attribute.setNamespace(namespace);
           break;
         }
@@ -372,12 +350,12 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
   }
 
   private void updateValuesAndNamespace(Iterable<AttributeDto> attributes, JsArray<AttributeDto> newAttributes,
-      String originalName, String originalNamespace) {
+                                        String originalName, String originalNamespace) {
 
-    for(AttributeDto attribute : attributes) {
+    for (AttributeDto attribute : attributes) {
       // Find attribute to edit
-      if(attribute.getName().equals(originalName) && attribute.getNamespace().equals(originalNamespace)) {
-        for(Map.Entry<String, String> entry : localizedTexts.entrySet()) {
+      if (attribute.getName().equals(originalName) && attribute.getNamespace().equals(originalNamespace)) {
+        for (Map.Entry<String, String> entry : localizedTexts.entrySet()) {
           newAttributes.push(getNewAttribute(entry.getKey(), entry.getValue()));
         }
         break;
@@ -386,8 +364,8 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
   }
 
   private AttributeDto findAttribute(Iterable<AttributeDto> attributes, String locale) {
-    for(AttributeDto attribute : attributes) {
-      if(name.equals(attribute.getName()) && isSameNamespace(namespace, attribute) && isSameLocale(locale, attribute)) {
+    for (AttributeDto attribute : attributes) {
+      if (name.equals(attribute.getName()) && isSameNamespace(namespace, attribute) && isSameLocale(locale, attribute)) {
         return attribute;
       }
     }
@@ -418,7 +396,7 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
     @Override
     public void onResponseCode(Request request, Response response) {
       getView().hide();
-      if(dialogMode != null) fireEvent(new VariableRefreshEvent());
+      if (dialogMode != null) fireEvent(new VariableRefreshEvent());
     }
 
   }
@@ -431,7 +409,7 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
     protected Set<FieldValidator> getValidators() {
       validators = new LinkedHashSet<FieldValidator>();
 
-      if(dialogMode == Mode.UPDATE_MULTIPLE) {
+      if (dialogMode == Mode.UPDATE_MULTIPLE) {
         validators.add(new AttributeConflictValidator("AttributeConflictExists"));
       } else {
         validators.add(new ConditionValidator(hasValidNamespace(), "NamespaceCannotBeEmptyChars",
@@ -439,11 +417,10 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
         validators
             .add(new RequiredTextValidator(hasValidName(), "AttributeNameIsRequired", Display.FormField.NAME.name()));
 
-        if(dialogMode != Mode.DELETE) {
+        if (dialogMode != Mode.DELETE && dialogMode != Mode.DELETE_SINGLE) {
           validators
               .add(new ConditionValidator(hasValue(), "AttributeValueIsRequired", Display.FormField.VALUE.name()));
         }
-        if(dialogMode == Mode.CREATE) validators.add(new UniqueAttributeNameValidator("AttributeAlreadyExists"));
       }
       return validators;
     }
@@ -457,10 +434,10 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
       return new HasBooleanValue() {
         @Override
         public Boolean getValue() {
-          if(localizedTexts == null) return false;
-          for(Map.Entry<String, String> entry : localizedTexts.entrySet()) {
+          if (localizedTexts == null) return false;
+          for (Map.Entry<String, String> entry : localizedTexts.entrySet()) {
             String value = entry.getValue();
-            if(!Strings.isNullOrEmpty(value) && !entry.getValue().trim().isEmpty()) {
+            if (!Strings.isNullOrEmpty(value) && !entry.getValue().trim().isEmpty()) {
               return true;
             }
           }
@@ -502,40 +479,16 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
 
     @Override
     protected boolean hasError() {
-      for(JsArray<AttributeDto> attributesArray : selectedItems) {
+      for (JsArray<AttributeDto> attributesArray : selectedItems) {
         String safeNamespace = Strings.nullToEmpty(namespace);
         String existingName = attributesArray.get(0).getName();
 
-        for(VariableDto variable : variables) {
+        for (VariableDto variable : variables) {
           // Using the same safeNamespace/safeName as an existing attribute is not permitted.
-          for(AttributeDto attributeDto : JsArrays.toIterable(variable.getAttributesArray())) {
-            if(safeNamespace.equals(attributeDto.getNamespace()) && existingName.equals(attributeDto.getName())) {
+          for (AttributeDto attributeDto : JsArrays.toIterable(variable.getAttributesArray())) {
+            if (safeNamespace.equals(attributeDto.getNamespace()) && existingName.equals(attributeDto.getName())) {
               return true;
             }
-          }
-        }
-      }
-
-      return false;
-    }
-  }
-
-  public class UniqueAttributeNameValidator extends AbstractFieldValidator {
-
-    public UniqueAttributeNameValidator(String errorMessageKey) {
-      super(errorMessageKey, Display.FormField.NAME.name());
-    }
-
-    @Override
-    protected boolean hasError() {
-      for(VariableDto variableDto : variables) {
-        String safeNamespace = Strings.nullToEmpty(namespace);
-        String safeName = Strings.nullToEmpty(name);
-
-        // Using the same safeNamespace/safeName as an existing attribute is not permitted.
-        for(AttributeDto attributeDto : JsArrays.toIterable(variableDto.getAttributesArray())) {
-          if(safeNamespace.equals(attributeDto.getNamespace()) && safeName.equals(attributeDto.getName())) {
-            return true;
           }
         }
       }

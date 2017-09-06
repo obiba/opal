@@ -445,9 +445,16 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   }
 
   @Override
-  public void onAddAnnotation() {
+  public void onApplyAnnotation() {
     VariableTaxonomyModalPresenter presenter = taxonomyModalProvider.get();
     presenter.setDialogMode(Mode.CREATE);
+    presenter.initialize(table, variable);
+  }
+
+  @Override
+  public void onDeleteAnnotation() {
+    VariableTaxonomyModalPresenter presenter = taxonomyModalProvider.get();
+    presenter.setDialogMode(Mode.DELETE_SINGLE);
     presenter.initialize(table, variable);
   }
 

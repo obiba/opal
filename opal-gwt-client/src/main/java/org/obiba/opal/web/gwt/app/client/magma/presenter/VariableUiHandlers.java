@@ -46,7 +46,9 @@ public interface VariableUiHandlers extends NamespacedAttributesTableUiHandlers 
 
   void onAddAttribute(String name);
 
-  void onAddAnnotation();
+  void onApplyAnnotation();
+
+  void onDeleteAnnotation();
 
   void onAddToCart();
 }

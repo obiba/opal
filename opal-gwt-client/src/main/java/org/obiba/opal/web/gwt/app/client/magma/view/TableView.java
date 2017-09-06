@@ -67,7 +67,6 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -85,7 +84,6 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements TablePresenter.Display {
@@ -276,7 +274,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     progress.setWidth("150px");
     addVariablesButton.setText(translations.addVariables());
     applyAttributeButton.setText(translations.applyAttribute());
-    deleteAttributeButton.setText(translations.removeAttributes());
+    deleteAttributeButton.setText(translations.removeAttribute());
   }
 
   @Override

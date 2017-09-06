@@ -86,6 +86,8 @@ public class TaxonomySelector extends Composite {
 
   private VariableFieldSuggestOracle oracle = new VariableFieldSuggestOracle();
 
+  private boolean termSelectable = true;
+
   public TaxonomySelector() {
     initQuickSearch();
     initWidget(uiBinder.createAndBindUi(this));
@@ -103,11 +105,11 @@ public class TaxonomySelector extends Composite {
     }
     setTaxonomyHelp(firstTaxo);
     setVocabularies(firstTaxo);
-    if (termGroup.isVisible()){
-      quickSearchInput.setPlaceholder("Search term...");
+    if (termGroup.isVisible()) {
+      quickSearchInput.setPlaceholder("Search vocabulary or term...");
       oracle.setTaxonomyTerms(taxonomies);
-    }
-    else {
+      oracle.setTaxonomyVocabularies(taxonomies);
+    } else {
       quickSearchInput.setPlaceholder("Search vocabulary...");
       oracle.setTaxonomyVocabularies(taxonomies);
     }
@@ -118,9 +120,10 @@ public class TaxonomySelector extends Composite {
   }
 
   public void termSelectable(boolean selectable) {
+    this.termSelectable = selectable;
     termGroup.setVisible(selectable);
+    if (!selectable) valuesGroup.setVisible(false);
   }
-
 
   public void selectTaxonomy(String namespace) {
     taxonomyChooser.setSelectedValue(namespace);
@@ -203,24 +206,37 @@ public class TaxonomySelector extends Composite {
         VariableFieldSuggestOracle.VariableFieldSuggestion suggestion = (VariableFieldSuggestOracle.VariableFieldSuggestion) selectedSuggestion;
         if (termGroup.isVisible() || valuesGroup.isVisible()) {
           enableTermSelection(true);
-          VariableFieldSuggestOracle.TermSuggestion termSuggestion = (VariableFieldSuggestOracle.TermSuggestion) suggestion;
-          taxonomyChooser.setSelectedValue(termSuggestion.getTaxonomy().getName());
-          setTaxonomyHelp(termSuggestion.getTaxonomy());
-          setVocabularies(termSuggestion.getTaxonomy());
-          vocabularyChooser.setSelectedValue(termSuggestion.getVocabulary().getName());
-          setVocabularyHelp(termSuggestion.getVocabulary());
-          setTerms(termSuggestion.getVocabulary());
-          termChooser.setSelectedValue(termSuggestion.getTerm().getName());
-          setTermHelp(termSuggestion.getTerm());
-        } else {
-          VariableFieldSuggestOracle.VocabularySuggestion vocabularySuggestion = (VariableFieldSuggestOracle.VocabularySuggestion) suggestion;
-          taxonomyChooser.setSelectedValue(vocabularySuggestion.getTaxonomy().getName());
-          setTaxonomyHelp(vocabularySuggestion.getTaxonomy());
-          setVocabularies(vocabularySuggestion.getTaxonomy());
-          vocabularyChooser.setSelectedValue(vocabularySuggestion.getVocabulary().getName());
-          setVocabularyHelp(vocabularySuggestion.getVocabulary());
-        }
+          if (suggestion instanceof VariableFieldSuggestOracle.TermSuggestion)
+            applyTermSuggestion((VariableFieldSuggestOracle.TermSuggestion) suggestion);
+          else
+            applyVocabularySuggestion((VariableFieldSuggestOracle.VocabularySuggestion) suggestion);
+        } else
+          applyVocabularySuggestion((VariableFieldSuggestOracle.VocabularySuggestion) suggestion);
         return "";
+      }
+
+      private void applyVocabularySuggestion(VariableFieldSuggestOracle.VocabularySuggestion vocabularySuggestion) {
+        setTaxonomy(vocabularySuggestion.getTaxonomy());
+        setVocabulary(vocabularySuggestion.getVocabulary());
+      }
+
+      private void applyTermSuggestion(VariableFieldSuggestOracle.TermSuggestion termSuggestion) {
+        setTaxonomy(termSuggestion.getTaxonomy());
+        setVocabulary(termSuggestion.getVocabulary());
+        termChooser.setSelectedValue(termSuggestion.getTerm().getName());
+        setTermHelp(termSuggestion.getTerm());
+      }
+
+      private void setTaxonomy(TaxonomyDto taxonomy) {
+        taxonomyChooser.setSelectedValue(taxonomy.getName());
+        setTaxonomyHelp(taxonomy);
+        setVocabularies(taxonomy);
+      }
+
+      private void setVocabulary(VocabularyDto vocabulary) {
+        vocabularyChooser.setSelectedValue(vocabulary.getName());
+        setVocabularyHelp(vocabulary);
+        setTerms(vocabulary);
       }
 
     });
@@ -270,11 +286,12 @@ public class TaxonomySelector extends Composite {
       vocabularyChooser.addItem(getVocabularyTitle(voc), voc.getName());
       if (firstVoc == null) firstVoc = voc;
     }
-    vocabularyHelp.setText(getLocaleText(firstVoc.getDescriptionArray()));
+    vocabularyHelp.setText(firstVoc == null ? "" : getLocaleText(firstVoc.getDescriptionArray()));
     setTerms(firstVoc);
   }
 
   private void setTerms(VocabularyDto vocabulary) {
+    if (!termSelectable) return;
     termChooser.clear();
     boolean repeatable = vocabulary.hasRepeatable() && vocabulary.getRepeatable();
     // TODO repeatable

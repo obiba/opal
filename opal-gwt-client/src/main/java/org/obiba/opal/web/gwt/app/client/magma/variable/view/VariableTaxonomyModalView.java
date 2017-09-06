@@ -9,25 +9,11 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.variable.view;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Nullable;
-
-import com.google.gwt.core.client.JsArrayString;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.BaseVariableAttributeModalPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalUiHandlers;
-import org.obiba.opal.web.gwt.app.client.ui.*;
-import org.obiba.opal.web.gwt.app.client.validator.ConstrainedModal;
-import org.obiba.opal.web.model.client.opal.TaxonomyDto;
-import org.obiba.opal.web.model.client.opal.VocabularyDto;
-
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -35,6 +21,18 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.BaseVariableAttributeModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.TaxonomySelector;
+import org.obiba.opal.web.gwt.app.client.validator.ConstrainedModal;
+import org.obiba.opal.web.model.client.opal.TaxonomyDto;
+
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Map;
 
 import static org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableTaxonomyModalPresenter.Display;
 
@@ -46,9 +44,8 @@ public class VariableTaxonomyModalView extends ModalPopupViewWithUiHandlers<Vari
 
   private final Translations translations;
 
-  private List<TaxonomyDto> taxonomies;
-
-  interface Binder extends UiBinder<Widget, VariableTaxonomyModalView> {}
+  interface Binder extends UiBinder<Widget, VariableTaxonomyModalView> {
+  }
 
   @UiField
   Modal modal;
@@ -70,7 +67,7 @@ public class VariableTaxonomyModalView extends ModalPopupViewWithUiHandlers<Vari
     super(eventBus);
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
-    modal.setTitle(translations.addAnnotation());
+    modal.setTitle(translations.applyAnnotation());
     modalHelp.setText(translations.addAnnotationHelp());
     new ConstrainedModal(modal);
   }
@@ -83,23 +80,6 @@ public class VariableTaxonomyModalView extends ModalPopupViewWithUiHandlers<Vari
   @UiHandler("cancelButton")
   public void onCancel(ClickEvent event) {
     getUiHandlers().cancel();
-  }
-
-  private TaxonomyDto getTaxonomy(String name) {
-    for(TaxonomyDto taxo : taxonomies) {
-      if(taxo.getName().equals(name)) return taxo;
-    }
-    return null;
-  }
-
-  private VocabularyDto getVocabulary(String taxoName, String vocName) {
-    TaxonomyDto taxo = getTaxonomy(taxoName);
-    if(taxo == null) return null;
-
-    for(VocabularyDto voc : JsArrays.toIterable(taxo.getVocabulariesArray())) {
-      if(voc.getName().equals(vocName)) return voc;
-    }
-    return null;
   }
 
   @Override
@@ -119,10 +99,10 @@ public class VariableTaxonomyModalView extends ModalPopupViewWithUiHandlers<Vari
 
   @Override
   public void setDialogMode(BaseVariableAttributeModalPresenter.Mode mode) {
-    switch(mode) {
+    switch (mode) {
       case APPLY:
-        modal.setTitle(translations.applyAttribute());
-        modalHelp.setText(translations.applyAttributeHelp());
+        modal.setTitle(translations.applyAnnotation());
+        modalHelp.setText(translations.applyAnnotationHelp());
         break;
       case UPDATE_MULTIPLE:
         modal.setTitle(translations.editAttributes());
@@ -130,8 +110,13 @@ public class VariableTaxonomyModalView extends ModalPopupViewWithUiHandlers<Vari
         break;
       case DELETE:
         taxonomySelector.termSelectable(false);
-        modal.setTitle(translations.removeAttributes());
-        modalHelp.setText("");
+        modal.setTitle(translations.removeAnnotation());
+        modalHelp.setText(translations.removeAnnotationsHelp());
+        break;
+      case DELETE_SINGLE:
+        taxonomySelector.termSelectable(false);
+        modal.setTitle(translations.removeAnnotation());
+        modalHelp.setText(translations.removeAnnotationHelp());
         break;
       case UPDATE_SINGLE:
         modal.setTitle(translations.editAnnotation());
@@ -143,8 +128,8 @@ public class VariableTaxonomyModalView extends ModalPopupViewWithUiHandlers<Vari
   @Override
   public void showError(@Nullable FormField formField, String message) {
     ControlGroup group = null;
-    if(formField != null) {
-      switch(formField) {
+    if (formField != null) {
+      switch (formField) {
         case NAMESPACE:
           //group = namespaceGroup;
           break;
@@ -156,7 +141,7 @@ public class VariableTaxonomyModalView extends ModalPopupViewWithUiHandlers<Vari
           break;
       }
     }
-    if(group == null) {
+    if (group == null) {
       modal.addAlert(message, AlertType.ERROR);
     } else {
       modal.addAlert(message, AlertType.ERROR, group);

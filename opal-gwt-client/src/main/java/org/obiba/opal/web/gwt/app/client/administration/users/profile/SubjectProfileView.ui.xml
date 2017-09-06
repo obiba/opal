@@ -30,7 +30,7 @@
 
     <b:Form ui:field="accountForm">
       <b:ButtonGroup>
-        <b:Button type="INFO" icon="EDIT" ui:field="changePassword">
+        <b:Button type="INFO" icon="PENCIL" ui:field="changePassword">
           <ui:msg description="Change Password label">Change Password</ui:msg>
         </b:Button>
       </b:ButtonGroup>

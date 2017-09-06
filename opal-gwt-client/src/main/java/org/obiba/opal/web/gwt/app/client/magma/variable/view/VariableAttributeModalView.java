@@ -83,7 +83,7 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
   ControlGroup namespaceGroup;
 
   @UiField
-  Paragraph editAttributeHelp;
+  Paragraph modalHelp;
 
   @Inject
   public VariableAttributeModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
@@ -132,26 +132,26 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
 
   @Override
   public void setDialogMode(BaseVariableAttributeModalPresenter.Mode mode) {
-    editAttributeHelp.setVisible(false);
+    modalHelp.setVisible(true);
     switch(mode) {
       case APPLY:
         modal.setTitle(translations.applyAttribute());
-        editAttributeHelp.setText(translations.applyAttributeHelp());
-        editAttributeHelp.setVisible(true);
+        modalHelp.setText(translations.applyAttributeHelp());
         break;
       case UPDATE_MULTIPLE:
         valuesGroup.setVisible(false);
         nameGroup.setVisible(false);
         modal.setTitle(translations.editAttributes());
-        editAttributeHelp.setText(translations.editAttributesHelp());
-        editAttributeHelp.setVisible(true);
+        modalHelp.setText(translations.editAttributesHelp());
         break;
       case DELETE:
         valuesGroup.setVisible(false);
-        modal.setTitle(translations.removeAttributes());
+        modal.setTitle(translations.removeAttribute());
+        modalHelp.setText(translations.removeAttributeHelp());
         break;
       case UPDATE_SINGLE:
         modal.setTitle(translations.editAttribute());
+        modalHelp.setVisible(false);
         break;
     }
   }
