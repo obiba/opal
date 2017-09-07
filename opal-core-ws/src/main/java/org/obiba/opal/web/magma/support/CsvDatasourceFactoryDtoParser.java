@@ -41,6 +41,7 @@ public class CsvDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoP
     if(csvDto.hasFirstRow()) factory.setFirstRow(csvDto.getFirstRow());
     if(csvDto.hasCharacterSet()) factory.setCharacterSet(csvDto.getCharacterSet());
     if(csvDto.hasMultilines()) factory.setMultilines(csvDto.getMultilines());
+    if(csvDto.hasDefaultValueType()) factory.setDefaultValueType(csvDto.getDefaultValueType());
     factory.setName(dto.getName());
     addTableBundles(factory, csvDto);
     return factory;

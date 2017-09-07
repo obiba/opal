@@ -29,6 +29,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import org.obiba.opal.web.gwt.app.client.ui.ValueTypeChooser;
 
 /**
  *
@@ -68,6 +69,9 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
 
   @UiField
   ControlGroup quoteGroup;
+
+  @UiField
+  ValueTypeChooser valueType;
 
   @UiField
   ControlGroup charsetGroup;
@@ -134,6 +138,21 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
   @Override
   public HasText getFieldSeparator() {
     return field;
+  }
+
+  @Override
+  public HasText getDefaultValueType() {
+    return new HasText() {
+      @Override
+      public String getText() {
+        return valueType.getValue();
+      }
+
+      @Override
+      public void setText(String text) {
+        valueType.setSelectedValue(text);
+      }
+    };
   }
 
   @Override

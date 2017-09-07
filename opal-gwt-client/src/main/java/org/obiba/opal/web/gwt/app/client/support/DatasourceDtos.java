@@ -102,6 +102,7 @@ public class DatasourceDtos {
     factoryDto.setFirstRow(importConfig.getRow());
     factoryDto.setQuote(importConfig.getQuote());
     factoryDto.setSeparator(importConfig.getField());
+    factoryDto.setDefaultValueType(importConfig.getDefaultValueType());
     factoryDto.setTablesArray(tables);
 
     return createAndConfigureDatasourceFactoryDto(importConfig,

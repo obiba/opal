@@ -18,6 +18,7 @@ def add_arguments(parser):
     parser.add_argument('--separator', '-s', required=False, help='Field separator.')
     parser.add_argument('--quote', '-q', required=False, help='Quotation mark character.')
     parser.add_argument('--firstRow', '-f', type=int, required=False, help='From row.')
+    parser.add_argument('--valueType', '-vt', required=False, help='Default value type (text, integer, decimal, boolean etc.). When not specified, "text" is the default.')
     parser.add_argument('--type', '-ty', required=True, help='Entity type (e.g. Participant)')
 
     # non specific import arguments
@@ -36,7 +37,7 @@ def do_command(args):
         # print result
         extension_factory = OpalExtensionFactory(characterSet=args.characterSet, separator=args.separator,
                                                  quote=args.quote,
-                                                 firstRow=args.firstRow, path=args.path, type=args.type,
+                                                 firstRow=args.firstRow, path=args.path, valueType=args.valueType, type=args.type,
                                                  tables=args.tables,
                                                  destination=args.destination)
 
@@ -59,12 +60,13 @@ def do_command(args):
 
 
 class OpalExtensionFactory(opal.io.OpalImporter.ExtensionFactoryInterface):
-    def __init__(self, characterSet, separator, quote, firstRow, path, type, tables, destination):
+    def __init__(self, characterSet, separator, quote, firstRow, path, valueType, type, tables, destination):
         self.characterSet = characterSet
         self.separator = separator
         self.quote = quote
         self.firstRow = firstRow
         self.path = path
+        self.valueType = valueType
         self.type = type
         self.tables = tables
         self.destination = destination
@@ -88,6 +90,9 @@ class OpalExtensionFactory(opal.io.OpalImporter.ExtensionFactoryInterface):
         if self.firstRow:
             csv_factory.firstRow = self.firstRow
 
+        if self.valueType:
+            csv_factory.defaultValueType = self.valueType
+
         table = csv_factory.tables.add()
         table.data = self.path
         table.entityType = self.type
@@ -100,7 +105,7 @@ class OpalExtensionFactory(opal.io.OpalImporter.ExtensionFactoryInterface):
 
             index = name[-1].find('.csv')
             if index > 0:
-                table.name = name[-1][:-index]
+                table.name = name[-1][:index]
             else:
                 table.name = name[-1]
 

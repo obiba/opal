@@ -63,6 +63,8 @@ public class ImportConfig {
 
   private String entityType;
 
+  private String defaultValueType;
+
   private String database;
 
   private String tablePrefix;
@@ -224,6 +226,14 @@ public class ImportConfig {
 
   public void setQuote(String quote) {
     this.quote = quote;
+  }
+
+  public String getDefaultValueType() {
+    return defaultValueType;
+  }
+
+  public void setDefaultValueType(String valueType) {
+    this.defaultValueType = valueType;
   }
 
   public String getField() {

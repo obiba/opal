@@ -48,6 +48,11 @@ public abstract class AbstractCsvOptionsView extends ViewImpl implements CsvOpti
   }
 
   @Override
+  public HasText getDefaultValueType() {
+    return getCsvOptions().getDefaultValueType();
+  }
+
+  @Override
   public void setDefaultCharset(String defaultCharset) {
     getCsvOptions().setDefaultCharset(defaultCharset);
   }

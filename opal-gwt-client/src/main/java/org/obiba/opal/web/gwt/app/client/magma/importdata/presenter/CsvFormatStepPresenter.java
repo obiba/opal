@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.magma.importdata.presenter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -162,6 +161,7 @@ public class CsvFormatStepPresenter extends PresenterWidget<CsvFormatStepPresent
     importConfig.setRow(Integer.parseInt(getView().getRowText().getText()));
     importConfig.setField(getView().getFieldSeparator().getText());
     importConfig.setQuote(getView().getQuote().getText());
+    importConfig.setDefaultValueType(getView().getDefaultValueType().getText());
     importConfig.setCharacterSet(getSelectedCharacterSet());
     return importConfig;
   }

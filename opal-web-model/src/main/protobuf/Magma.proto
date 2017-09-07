@@ -38,6 +38,7 @@ message CsvDatasourceFactoryDto {
   optional string quote = 5;
   optional int32 firstRow = 6;
   optional bool multilines = 7;
+  optional string defaultValueType = 8;
   extend DatasourceFactoryDto {
     optional CsvDatasourceFactoryDto params = 1001;
   }

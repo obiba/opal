@@ -15,6 +15,7 @@ import com.github.gwtbootstrap.client.ui.base.HasType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.google.gwt.user.client.ui.HasText;
 import com.gwtplatform.mvp.client.View;
+import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
 
 public interface CsvOptionsDisplay extends View {
 
@@ -37,6 +38,8 @@ public interface CsvOptionsDisplay extends View {
   HasText getFieldSeparator();
 
   HasText getQuote();
+
+  HasText getDefaultValueType();
 
   HasType<ControlGroupType> getGroupType(String id);
 

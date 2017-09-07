@@ -204,6 +204,8 @@ public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDa
 
     HasText getFieldSeparator();
 
+    HasText getDefaultValueType();
+
     void resetQuote();
 
     void resetFieldSeparator();
