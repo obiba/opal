@@ -9,15 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.index.view;
 
-import javax.annotation.Nullable;
-
-import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexConfigurationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexConfigurationUiHandlers;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.ui.Modal;
-import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
-import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
-
+import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
@@ -26,9 +18,19 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexConfigurationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexConfigurationUiHandlers;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
+import org.obiba.opal.web.model.client.opal.ESCfgDto;
+
+import javax.annotation.Nullable;
 
 /**
  *
@@ -36,7 +38,8 @@ import com.google.web.bindery.event.shared.EventBus;
 public class IndexConfigurationView extends ModalPopupViewWithUiHandlers<IndexConfigurationUiHandlers>
     implements IndexConfigurationPresenter.Display {
 
-  interface Binder extends UiBinder<Widget, IndexConfigurationView> {}
+  interface Binder extends UiBinder<Widget, IndexConfigurationView> {
+  }
 
   @UiField
   Modal dialog;
@@ -88,12 +91,20 @@ public class IndexConfigurationView extends ModalPopupViewWithUiHandlers<IndexCo
 
   @UiHandler("saveButton")
   public void onSaveButton(ClickEvent event) {
-    getUiHandlers().save();
+    getUiHandlers().save(clusterName.getText(), nbShards.getNumberValue().intValue(), nbReplicas.getNumberValue().intValue(), settings.getText());
   }
 
   @UiHandler("cancelButton")
   public void onCancelButton(ClickEvent event) {
     dialog.hide();
+  }
+
+  @Override
+  public void setConfiguration(ESCfgDto cfg) {
+    clusterName.setText(cfg.getClusterName());
+    nbShards.setValue(cfg.getShards());
+    nbReplicas.setValue(cfg.getReplicas());
+    settings.setText(cfg.getSettings());
   }
 
   @Override
@@ -117,16 +128,6 @@ public class IndexConfigurationView extends ModalPopupViewWithUiHandlers<IndexCo
   }
 
   @Override
-  public void setNbShards(int nb) {
-    nbShards.setValue(String.valueOf(nb));
-  }
-
-  @Override
-  public void setNbReplicas(int nb) {
-    nbReplicas.setValue(String.valueOf(nb));
-  }
-
-  @Override
   public void clearErrors() {
     dialog.closeAlerts();
   }
@@ -134,8 +135,8 @@ public class IndexConfigurationView extends ModalPopupViewWithUiHandlers<IndexCo
   @Override
   public void showError(@Nullable IndexConfigurationPresenter.Display.FormField formField, String message) {
     ControlGroup group = null;
-    if(formField != null) {
-      switch(formField) {
+    if (formField != null) {
+      switch (formField) {
         case CLUSTER_NAME:
           group = clusterGroup;
           break;
@@ -147,7 +148,7 @@ public class IndexConfigurationView extends ModalPopupViewWithUiHandlers<IndexCo
           break;
       }
     }
-    if(group == null) {
+    if (group == null) {
       dialog.addAlert(message, AlertType.ERROR);
     } else {
       dialog.addAlert(message, AlertType.ERROR, group);

@@ -157,7 +157,7 @@
                 <g:FlowPanel>
                   <g:Label styleName="help-block">
                     <ui:msg description="Main Administration Index help">
-                      Configure Elastic Search server, schedule table indexing
+                      Configure Elasticsearch server, schedule table indexing
                     </ui:msg>
                   </g:Label>
                 </g:FlowPanel>

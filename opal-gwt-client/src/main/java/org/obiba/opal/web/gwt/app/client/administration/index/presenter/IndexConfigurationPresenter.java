@@ -67,9 +67,26 @@ public class IndexConfigurationPresenter extends ModalPresenterWidget<IndexConfi
   }
 
   @Override
-  public void save() {
-    if(dialogMode == Mode.UPDATE) {
-      updateConfig();
+  public void save(String clusterName, int nbShards, int nbReplicas, String settings) {
+    getView().clearErrors();
+    if(validationHandler.validate()) {
+
+      ServiceCfgDto dto = ServiceCfgDto.create();
+
+      dto.setName("search");
+
+      ESCfgDto config = ESCfgDto.create();
+      config.setEnabled(isEnabled);
+      config.setClusterName(clusterName);
+      config.setIndexName(indexName);
+      config.setDataNode(dataNode);
+      config.setShards(nbShards);
+      config.setReplicas(nbReplicas);
+      config.setSettings(settings);
+
+      dto.setExtension("Opal.ESCfgDto.params", config);
+
+      putESCfg(dto);
     }
   }
 
@@ -81,15 +98,10 @@ public class IndexConfigurationPresenter extends ModalPresenterWidget<IndexConfi
           @Override
           public void onResource(Response response, ServiceCfgDto dto) {
             ESCfgDto cfg = (ESCfgDto) dto.getExtension("Opal.ESCfgDto.params");
-
             isEnabled = cfg.getEnabled();
             dataNode = cfg.getDataNode();
             indexName = cfg.getIndexName();
-
-            getView().getClusterName().setText(cfg.getClusterName());
-            getView().setNbShards(cfg.getShards());
-            getView().setNbReplicas(cfg.getReplicas());
-            getView().getSettings().setText(cfg.getSettings());
+            getView().setConfiguration(cfg);
           }
         }).get().send();
   }
@@ -102,29 +114,6 @@ public class IndexConfigurationPresenter extends ModalPresenterWidget<IndexConfi
   private void setDialogMode(Mode dialogMode) {
     this.dialogMode = dialogMode;
     getView().setDialogMode(dialogMode);
-  }
-
-  private void updateConfig() {
-    getView().clearErrors();
-    if(validationHandler.validate()) {
-
-      ServiceCfgDto dto = ServiceCfgDto.create();
-
-      dto.setName("search");
-
-      ESCfgDto config = ESCfgDto.create();
-      config.setEnabled(isEnabled);
-      config.setClusterName(getView().getClusterName().getText());
-      config.setIndexName(indexName);
-      config.setDataNode(dataNode);
-      config.setShards(getView().getNbShards().intValue());
-      config.setReplicas(getView().getNbReplicas().intValue());
-      config.setSettings(getView().getSettings().getText());
-
-      dto.setExtension("Opal.ESCfgDto.params", config);
-
-      putESCfg(dto);
-    }
   }
 
   private void putESCfg(ServiceCfgDto dto) {
@@ -150,6 +139,8 @@ public class IndexConfigurationPresenter extends ModalPresenterWidget<IndexConfi
 
   public interface Display extends PopupView, HasUiHandlers<IndexConfigurationUiHandlers> {
 
+    void setConfiguration(ESCfgDto cfg);
+
     enum FormField {
       CLUSTER_NAME,
       SHARDS,
@@ -166,11 +157,7 @@ public class IndexConfigurationPresenter extends ModalPresenterWidget<IndexConfi
 
     Number getNbShards();
 
-    void setNbShards(int nb);
-
     Number getNbReplicas();
-
-    void setNbReplicas(int nb);
 
     void clearErrors();
 

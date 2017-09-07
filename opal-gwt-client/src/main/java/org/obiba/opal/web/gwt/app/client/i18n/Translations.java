@@ -1671,8 +1671,8 @@ public interface Translations extends Constants {
   @DefaultStringValue("Public Datasources")
   String publicDatasources();
 
-  @Description("Elastic Search Configuration")
-  @DefaultStringValue("Elastic Search Configuration")
+  @Description("Elasticsearch Configuration")
+  @DefaultStringValue("Elasticsearch Configuration")
   String esConfigurationLabel();
 
   @Description("Specify Generate Identifier")

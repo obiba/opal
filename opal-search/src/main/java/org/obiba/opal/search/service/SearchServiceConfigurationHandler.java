@@ -10,16 +10,19 @@
 
 package org.obiba.opal.search.service;
 
+import com.google.common.base.Strings;
 import org.obiba.core.util.FileUtil;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.search.es.ElasticSearchConfiguration;
 import org.obiba.opal.search.es.ElasticSearchConfigurationService;
+import org.obiba.opal.spi.ServicePlugin;
+import org.obiba.opal.spi.search.SearchService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.services.ServiceConfigurationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -32,8 +35,8 @@ public class SearchServiceConfigurationHandler implements ServiceConfigurationHa
 
   private final ElasticSearchConfigurationService configService;
 
-  @Value("${OPAL_HOME}/work/elastic-search")
-  private String indexPath;
+  @Autowired
+  OpalRuntime opalRuntime;
 
   @Autowired
   public SearchServiceConfigurationHandler(ElasticSearchConfigurationService configService) {
@@ -44,12 +47,17 @@ public class SearchServiceConfigurationHandler implements ServiceConfigurationHa
   public Opal.ServiceCfgDto get(OpalConfigurationExtension opalConfig) {
     ElasticSearchConfiguration config = (ElasticSearchConfiguration) opalConfig;
 
-    Opal.ESCfgDto escDto = Opal.ESCfgDto.newBuilder().setClusterName(config.getClusterName())
-        .setIndexName(config.getIndexName()).setDataNode(config.isDataNode()).setShards(config.getShards())
-        .setEnabled(config.isEnabled()).setReplicas(config.getReplicas()).setSettings(config.getEsSettings()).build();
+    Opal.ESCfgDto.Builder escDto = Opal.ESCfgDto.newBuilder()
+        .setClusterName(config.getClusterName())
+        .setIndexName(config.getIndexName())
+        .setDataNode(config.isDataNode())
+        .setShards(config.getShards())
+        .setEnabled(config.isEnabled())
+        .setReplicas(config.getReplicas())
+        .setSettings(config.getEsSettings());
 
     return Opal.ServiceCfgDto.newBuilder().setName(OpalSearchService.SERVICE_NAME)
-        .setExtension(Opal.ESCfgDto.params, escDto).build();
+        .setExtension(Opal.ESCfgDto.params, escDto.build()).build();
   }
 
   @Override
@@ -59,7 +67,7 @@ public class SearchServiceConfigurationHandler implements ServiceConfigurationHa
     boolean flushIndices = false;
     // When changing cluster name, index name, shards number or replicas number
     Opal.ESCfgDto esCfgDto = serviceDto.getExtension(Opal.ESCfgDto.params);
-    if(!config.getClusterName().equals(esCfgDto.getClusterName()) ||
+    if (!config.getClusterName().equals(esCfgDto.getClusterName()) ||
         !config.getIndexName().equals(esCfgDto.getIndexName()) ||
         config.getShards() != esCfgDto.getShards() ||
         config.getReplicas() != esCfgDto.getReplicas()) {
@@ -75,21 +83,24 @@ public class SearchServiceConfigurationHandler implements ServiceConfigurationHa
     config.setShards(esCfgDto.getShards());
 
     // delete indices and restart service
-    if(flushIndices) {
+    if (flushIndices) {
       deleteESData();
     }
     configService.update(config);
   }
 
   private void deleteESData() {
-    log.info("Clear Elastic Search indexes: {}", indexPath);
+    if (!opalRuntime.hasServicePlugins(SearchService.class)) return;
+    String workPath = opalRuntime.getServicePlugin(SearchService.class).getProperties().getProperty(ServicePlugin.WORK_DIR_PROPERTY);
+    if (Strings.isNullOrEmpty(workPath)) return;
+    log.info("Clear Elastic Search indexes: {}", workPath);
     try {
-      File indexDir = new File(indexPath);
-      if(!FileUtil.delete(indexDir)) {
-        log.warn("Cannot find Elastic Search indexes: {}", indexPath);
+      File indexDir = new File(workPath);
+      if (!FileUtil.delete(indexDir)) {
+        log.warn("Cannot find Elastic Search indexes: {}", workPath);
       }
-    } catch(IOException e) {
-      throw new RuntimeException("Error while clearing Elastic Search indexes " + indexPath, e);
+    } catch (IOException e) {
+      throw new RuntimeException("Error while clearing Elastic Search indexes " + workPath, e);
     }
   }
 

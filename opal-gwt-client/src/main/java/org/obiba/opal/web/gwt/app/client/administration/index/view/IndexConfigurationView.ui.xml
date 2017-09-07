@@ -88,11 +88,9 @@
           <b:ControlLabel>
             <ui:msg description="Index Configuration Settings">Settings</ui:msg>
           </b:ControlLabel>
-          <b:Controls>
-            <b:TextArea name="settings" ui:field="settings" alternateSize="XLARGE" visibleLines="3"/>
-          </b:Controls>
+          <b:TextArea name="settings" ui:field="settings" alternateSize="XLARGE" visibleLines="3"/>
           <b:HelpBlock>
-            <ui:msg description=" help">Any Elastic Search settings, especially
+            <ui:msg description="Index Configuration Settings help">Any Elasticsearch settings, especially
               <a href="http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/modules-discovery-zen.html"
                   target="_blank">node discovery
               </a>
