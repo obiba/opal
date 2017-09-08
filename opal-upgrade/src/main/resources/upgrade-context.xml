@@ -60,6 +60,12 @@
 
   <bean id="credentialsKeyStoreService" class="org.obiba.opal.core.service.security.CredentialsKeyStoreServiceImpl"/>
 
+  <bean id="pluginsManager" class="org.obiba.opal.core.runtime.PluginsManager"/>
+
+  <bean id="pluginsService" class="org.obiba.opal.core.service.PluginsServiceImpl">
+    <property name="opalVersionProvider" ref="runtimeVersionProvider"/>
+  </bean>
+
   <bean id="upgradeManager" class="org.obiba.runtime.upgrade.support.DefaultUpgradeManager">
     <property name="currentVersionProvider" ref="opalVersionModifier"/>
 
@@ -85,6 +91,7 @@
           </property>
         </bean>
         <bean class="org.obiba.opal.core.install.CreateOpalGeneralConfigInstallStep"/>
+        <bean class="org.obiba.opal.core.install.DefaultPluginsInstallStep"/>
       </list>
     </property>
 
@@ -142,6 +149,10 @@
 
         <!-- 2.10.0 / clear ES indexes -->
         <bean parent="clearElasticSearchWorkspace">
+          <property name="appliesTo" value="2.10.0"/>
+        </bean>
+        <bean class="org.obiba.opal.core.upgrade.v2_10_x.DefaultPluginsUpgradeStep">
+          <property name="description" value="Install the default plugins from the OBiBa plugins repository"/>
           <property name="appliesTo" value="2.10.0"/>
         </bean>
 

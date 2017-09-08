@@ -23,6 +23,7 @@ import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Plugin;
 import org.obiba.opal.core.runtime.PluginsManager;
 import org.obiba.runtime.Version;
+import org.obiba.runtime.upgrade.VersionProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -49,14 +50,18 @@ public class PluginsServiceImpl implements PluginsService {
   @Autowired
   private OpalRuntime opalRuntime;
 
-  @Autowired
-  private OpalConfigurationService opalConfigurationService;
+  private VersionProvider opalVersionProvider;
 
   private PluginRepositoryCache pluginRepositoryCache = new PluginRepositoryCache();
 
   @NotNull
   @Value("${org.obiba.opal.plugins.site}")
   private String updateSite;
+
+  @Autowired
+  public void setOpalVersionProvider(VersionProvider opalVersionProvider) {
+    this.opalVersionProvider = opalVersionProvider;
+  }
 
   @Override
   public void start() {
@@ -108,7 +113,7 @@ public class PluginsServiceImpl implements PluginsService {
     // exclude already installed plugin packages whatever the version is
     return pluginRepositoryCache.getOrUpdatePluginRepository().getPlugins().stream()
         .filter(pp -> registeredPlugins.stream().anyMatch(rp -> pp.isNewerThan(rp.getName(), rp.getVersion())))
-        .filter(pp -> opalConfigurationService.getOpalConfiguration().getVersion().compareTo(pp.getOpalVersion())>=0)
+        .filter(pp -> opalVersionProvider.getVersion().compareTo(pp.getOpalVersion())>=0)
         .collect(Collectors.toList());
   }
 
@@ -118,7 +123,7 @@ public class PluginsServiceImpl implements PluginsService {
     // exclude already installed plugin packages whatever the version is
     return pluginRepositoryCache.getOrUpdatePluginRepository().getPlugins().stream()
         .filter(pp -> registeredPlugins.stream().noneMatch(rp -> pp.isSameAs(rp.getName())))
-        .filter(pp -> opalConfigurationService.getOpalConfiguration().getVersion().compareTo(pp.getOpalVersion())>=0)
+        .filter(pp -> opalVersionProvider.getVersion().compareTo(pp.getOpalVersion())>=0)
         .collect(Collectors.toList());
   }
 
@@ -158,6 +163,7 @@ public class PluginsServiceImpl implements PluginsService {
   private void installPlugin(File pluginFile, boolean rmAfterInstall) {
     try {
       File pluginsDir = new File(OpalRuntime.PLUGINS_DIR);
+      pluginsDir.mkdirs();
       FileUtil.copyFile(pluginFile, pluginsDir);
       if (rmAfterInstall) pluginFile.delete();
     } catch (IOException e) {
@@ -227,7 +233,7 @@ public class PluginsServiceImpl implements PluginsService {
       Version version = new Version("0.0.0");
       for (PluginPackage pp : getOrUpdatePluginRepository().getPlugins().stream()
           .filter(pp -> pp.getName().equals(name))
-          .filter(pp -> opalConfigurationService.getOpalConfiguration().getVersion().compareTo(pp.getOpalVersion())>=0)
+          .filter(pp -> opalVersionProvider.getVersion().compareTo(pp.getOpalVersion())>=0)
           .collect(Collectors.toList())) {
         if (pp.getVersion().compareTo(version)>0) version = pp.getVersion();
       }
