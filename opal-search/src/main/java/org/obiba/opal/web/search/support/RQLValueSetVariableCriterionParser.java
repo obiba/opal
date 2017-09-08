@@ -49,7 +49,9 @@ public class RQLValueSetVariableCriterionParser extends RQLCriterionParser imple
     if (resolver.hasTableName()) {
       table = MagmaEngine.get().getDatasource(resolver.getDatasourceName()).getValueTable(resolver.getTableName());
       variable = table.getVariable(resolver.getVariableName());
-      return valuesIndexManager.getIndex(table).getFieldName(resolver.getVariableName());
+      String field = valuesIndexManager.getIndex(table).getFieldName(resolver.getVariableName());
+      field = field.replace("{","\\{").replace("}","\\}").replace("[","\\[").replace("]","\\]");
+      return field;
     } else return variablePath;
   }
 

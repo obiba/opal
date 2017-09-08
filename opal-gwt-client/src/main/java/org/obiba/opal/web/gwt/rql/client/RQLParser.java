@@ -51,7 +51,10 @@ public class RQLParser {
       var converter = parser.converters.string;
       return converter(str);
     };
-    return parser.parse(query);
+    encodedQuery = query.replace(/ /g, '%20')
+      .replace(/\[/g, '%5B').replace(/\]/g, '%5D')
+      .replace(/{/g, '%7B').replace(/}/g, '%7D');
+    return parser.parse(encodedQuery);
   }-*/;
 
 }
