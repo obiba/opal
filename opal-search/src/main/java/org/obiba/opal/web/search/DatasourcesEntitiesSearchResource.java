@@ -76,9 +76,14 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
     QuerySettings querySettings = buildHasChildQuerySearch(offset, limit);
     querySettings.childQueries(childQueries.stream().map(p -> p.asChildQuery(idCriterion == null ? null : idCriterion.getQuery())).collect(Collectors.toList()));
     if (childQueries.size() > 1) querySettings.childQueryOperator(queryNode.getName());
-    Search.EntitiesResultDto.Builder dtoResponseBuilder = opalSearchService.executeEntitiesQuery(querySettings, getSearchPath(), entityType, query);
-    dtoResponseBuilder.addAllPartialResults(partialResults);
-    return Response.ok().entity(dtoResponseBuilder.build()).build();
+    try {
+      Search.EntitiesResultDto.Builder dtoResponseBuilder = opalSearchService.executeEntitiesQuery(querySettings, getSearchPath(), entityType, query);
+      dtoResponseBuilder.addAllPartialResults(partialResults);
+      return Response.ok().entity(dtoResponseBuilder.build()).build();
+    } catch (Exception e) {
+      // Search engine exception
+      throw new SearchException("Query failed to be executed: " + query, e.getCause() == null ? e : e.getCause());
+    }
   }
 
   @GET

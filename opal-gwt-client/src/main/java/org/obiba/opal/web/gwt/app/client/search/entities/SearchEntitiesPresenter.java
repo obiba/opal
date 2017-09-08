@@ -14,6 +14,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -29,6 +30,7 @@ import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableIndexUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
@@ -50,6 +52,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableEntitySummaryDto;
 import org.obiba.opal.web.model.client.search.EntitiesResultDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import java.util.List;
 
@@ -235,6 +238,22 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
             fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
           }
         }, Response.SC_SERVICE_UNAVAILABLE)
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            // ignore
+            getView().clearResults(false);
+            try {
+              ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
+              String msg = errorDto.getStatus();
+              if (translations.userMessageMap().containsKey(msg))
+                msg = TranslationsUtils.replaceArguments(translations.userMessageMap().get(errorDto.getStatus()), errorDto.getArgumentsArray());
+              fireEvent(NotificationEvent.newBuilder().error(msg).build());
+            } catch (Exception ignored) {
+              fireEvent(NotificationEvent.newBuilder().warn("SearchServiceUnavailable").build());
+            }
+          }
+        }, Response.SC_INTERNAL_SERVER_ERROR)
         .withCallback(new ResourceCallback<EntitiesResultDto>() {
           @Override
           public void onResource(Response response, EntitiesResultDto resource) {

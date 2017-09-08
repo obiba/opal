@@ -677,7 +677,8 @@ public interface Translations extends Constants {
       "VariablesAnnotationApplied", "Annotation of {0} variables applied in table {1}.",
       "VariablesAnnotationRemoved", "Annotation of {0} variables removed in table {1}.",
       "VariablesAnnotationFailed", "Annotation of {0} variables failed for table {1}.",
-      "VariablesAnnotationFailure", "Variables annotation update failed for table {0}."
+      "VariablesAnnotationFailure", "Variables annotation update failed for table {0}.",
+      "SearchFailure", "Search failed: {0}"
   })
   Map<String, String> userMessageMap();
 
