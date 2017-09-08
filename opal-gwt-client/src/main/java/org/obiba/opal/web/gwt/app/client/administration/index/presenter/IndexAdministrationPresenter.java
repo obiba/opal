@@ -285,6 +285,7 @@ public class IndexAdministrationPresenter
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
+            fireEvent(NotificationEvent.newBuilder().info("IndicesRemoved").build());
             refresh();
           }
         }, Response.SC_NO_CONTENT)//
