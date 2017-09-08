@@ -10,10 +10,26 @@
 
 package org.obiba.opal.core.runtime;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.common.io.Files;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.obiba.core.util.FileUtil;
@@ -27,17 +43,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileCopyUtils;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.google.common.io.Files;
 
 @Component
 public class PluginsManager {
@@ -80,7 +89,16 @@ public class PluginsManager {
   public void setPluginSiteProperties(String name, String properties) throws IOException {
     Optional<Plugin> plugin = getPlugins().stream().filter(p -> p.getName().equals(name)).findFirst();
     if (!plugin.isPresent()) throw new NoSuchElementException("No such plugin with name: " + name);
-    plugin.get().writeSiteProperties(properties);
+    Plugin thePlugin = plugin.get();
+    thePlugin.writeSiteProperties(properties);
+    updateServiceProperties(name, thePlugin.getProperties());
+  }
+
+  private void updateServiceProperties(String name, Properties properties) {
+    ServicePlugin servicePlugin = getServicePlugin(name);
+    if (servicePlugin != null) {
+      servicePlugin.configure(properties);
+    }
   }
 
   void initPlugins() {
