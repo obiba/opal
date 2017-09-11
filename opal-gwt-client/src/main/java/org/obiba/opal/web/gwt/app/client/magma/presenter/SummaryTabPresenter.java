@@ -33,6 +33,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
@@ -59,6 +60,8 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
   private int entitiesCount;
 
   private HandlerRegistration handlerRegistration;
+
+  private VariableDto variableDto;
 
   private String variable;
 
@@ -204,7 +207,7 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
           @Override
           public void onResource(Response response, SummaryStatisticsDto dto) {
             summary = dto;
-            getView().renderSummary(dto);
+            getView().renderSummary(dto, variableDto);
             getView().renderSummaryLimit(dto.hasLimit() ? dto.getLimit() : entitiesCount, entitiesCount);
             getEventBus().fireEvent(new SummaryReceivedEvent(resourceRequestBuilder.getResource(), dto));
           }
@@ -273,7 +276,7 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     getView().setLimit(limit);
   }
 
-  public void init() {
+  public void initialize(VariableDto variableDto) {
     // Reset limit to the default limit only if it was the full summary
     if(limit == entitiesCount) {
       limit = DEFAULT_LIMIT;
@@ -282,6 +285,7 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     //resetting the message flooding protection fields
     latestClientError = null;
     currentErrorCount = 0;
+    this.variableDto = variableDto;
     onReset();
   }
 
@@ -290,7 +294,13 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
 
     void requestingSummary(int limit, int entitiesCount);
 
-    void renderSummary(SummaryStatisticsDto summary);
+    /**
+     * Summary statistics and optionally the corresponding variable.
+     *
+     * @param summary
+     * @param variableDto may be null
+     */
+    void renderSummary(SummaryStatisticsDto summary, VariableDto variableDto);
 
     void renderNoSummary();
 

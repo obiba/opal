@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.AbstractTabPanel;
 import org.obiba.opal.web.gwt.app.client.ui.SummaryFlexTable;
 import org.obiba.opal.web.gwt.plot.client.FrequencyChartFactory;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 
@@ -57,7 +58,7 @@ public class CategoricalSummaryView extends Composite {
 
   public CategoricalSummaryView(final String title, CategoricalSummaryDto categorical,
       Collection<FrequencyDto> categoriesNonMissing, Collection<FrequencyDto> categoriesMissing, double totalNonMissing,
-      double totalMissing, double totalOther) {
+      double totalMissing, double totalOther, VariableDto variableDto) {
     initWidget(uiBinder.createAndBindUi(this));
 
     chartsPanel.addSelectionHandler(new SelectionHandler<Integer>() {
@@ -77,6 +78,7 @@ public class CategoricalSummaryView extends Composite {
     if(categorical.getFrequenciesArray() != null) {
 
       double total = totalNonMissing + totalMissing + totalOther;
+      stats.setVariable(variableDto);
       stats.drawValuesFrequencies(categoriesNonMissing, translations.nonMissing(), translations.notEmpty(),
           totalNonMissing + totalOther, totalOther, total);
       stats.drawValuesFrequencies(categoriesMissing, translations.missingLabel(), translations.naLabel(), totalMissing,

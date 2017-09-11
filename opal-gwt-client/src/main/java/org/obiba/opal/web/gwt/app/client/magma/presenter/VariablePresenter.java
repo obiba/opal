@@ -732,9 +732,9 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
     @Override
     public void authorized() {
+      summaryTabPresenter.initialize(variable);
       if(getView().isSummaryTabSelected()) {
         requestSummary(variable);
-        summaryTabPresenter.init();
       }
     }
 

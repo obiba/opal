@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.BinarySummaryDto;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
@@ -114,11 +115,11 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
 
   @Override
   @SuppressWarnings("IfStatementWithTooManyBranches")
-  public void renderSummary(SummaryStatisticsDto dto) {
+  public void renderSummary(SummaryStatisticsDto dto, VariableDto variableDto) {
     summary.clear();
 
     if(dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous) != null) {
-      renderContinuousSummary(dto);
+      renderContinuousSummary(dto, variableDto);
     } else if(dto.getExtension(DefaultSummaryDto.SummaryStatisticsDtoExtensions.defaultSummary) != null) {
       renderDefaultSummary(dto);
     } else if(dto.getExtension(BinarySummaryDto.SummaryStatisticsDtoExtensions.binarySummary) != null) {
@@ -126,7 +127,7 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
     } else if(dto.getExtension(TextSummaryDto.SummaryStatisticsDtoExtensions.textSummary) != null) {
       renderTextSummary(dto);
     } else if(dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical) != null) {
-      renderCategoricalSummary(dto);
+      renderCategoricalSummary(dto, variableDto);
     } else if(dto.getExtension(GeoSummaryDto.SummaryStatisticsDtoExtensions.geoSummary) != null) {
       renderGeoSummary(dto);
     } else {
@@ -134,7 +135,7 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
     }
   }
 
-  private void renderContinuousSummary(SummaryStatisticsDto dto) {
+  private void renderContinuousSummary(SummaryStatisticsDto dto, VariableDto variableDto) {
     ContinuousSummaryDto continuous = dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous)
         .cast();
 
@@ -155,10 +156,10 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
         });
 
     summary.add(new ContinuousSummaryView(continuous, frequenciesByMissing.get(false), frequenciesByMissing.get(true),
-        totals[0], totals[1]));
+        totals[0], totals[1], variableDto));
   }
 
-  private void renderCategoricalSummary(SummaryStatisticsDto dto) {
+  private void renderCategoricalSummary(SummaryStatisticsDto dto, VariableDto variableDto) {
     CategoricalSummaryDto categorical = dto
         .getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
 
@@ -180,7 +181,7 @@ public class SummaryTabView extends ViewWithUiHandlers<SummaryTabUiHandlers> imp
         });
 
     summary.add(new CategoricalSummaryView(dto.getResource(), categorical, categoriesByMissing.get(false),
-        categoriesByMissing.get(true), totals[0], totals[1], categorical.getOtherFrequency()));
+        categoriesByMissing.get(true), totals[0], totals[1], categorical.getOtherFrequency(), variableDto));
   }
 
   private void renderDefaultSummary(SummaryStatisticsDto dto) {

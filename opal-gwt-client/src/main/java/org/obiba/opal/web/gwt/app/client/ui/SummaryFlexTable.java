@@ -11,9 +11,19 @@
 package org.obiba.opal.web.gwt.app.client.ui;
 
 import java.util.Collection;
+import java.util.Map;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.InlineLabel;
+import com.google.gwt.user.client.ui.Widget;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.view.SummaryTabView;
+import org.obiba.opal.web.model.client.magma.AttributeDto;
+import org.obiba.opal.web.model.client.magma.CategoryDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 
 import com.github.gwtbootstrap.client.ui.Icon;
@@ -27,6 +37,8 @@ public class SummaryFlexTable extends DefaultFlexTable {
   private static final Translations translations = GWT.create(Translations.class);
 
   private int row = 0;
+
+  private VariableDto variable;
 
   public int drawHeader() {
 
@@ -66,16 +78,61 @@ public class SummaryFlexTable extends DefaultFlexTable {
     } else {
       for(FrequencyDto frequency : frequencies) {
         if(frequency.hasValue()) {
-          drawRow(SummaryTabView.NOT_NULL_VALUE.equals(frequency.getValue())
-              ? translations.notEmpty()
-              : frequency.getValue(), String.valueOf(Math.round(frequency.getFreq())),
-              getPercentage(frequency.getFreq(), subtotal), formatDecimal(frequency.getPct() * 100) + "%");
+          drawRow(SummaryTabView.NOT_NULL_VALUE.equals(frequency.getValue()) ? new Label(translations.notEmpty()) : getValueWidget(frequency.getValue()),
+              String.valueOf(Math.round(frequency.getFreq())),
+              getPercentage(frequency.getFreq(), subtotal),
+              formatDecimal(frequency.getPct() * 100) + "%");
         }
       }
     }
 
     drawOtherValuesRow(totalOther, getPercentage(totalOther, subtotal), getPercentage(totalOther, total));
     drawSubtotal(frequencies, subtotal, total);
+  }
+
+  /**
+   * Decorate frequency value label with corresponding category labels (if any).
+   *
+   * @param value
+   * @return
+   */
+  private Widget getValueWidget(String value) {
+    if (variable != null) {
+      for (CategoryDto category : JsArrays.toIterable(variable.getCategoriesArray())) {
+        if (category.getName().equals(value) ||
+            (variable.getValueType().equals("decimal") && value.endsWith(".0") && category.getName().equals(value.substring(0, value.length() - 2)))) {
+          // find labels
+          Map<String, String> labelsMap = Maps.newHashMap();
+          for (AttributeDto attribute : JsArrays.toIterable(category.getAttributesArray())) {
+            if (attribute.getName().equals("label")) {
+              if (attribute.hasLocale())
+                labelsMap.put(attribute.getLocale(), attribute.getValue());
+              else
+                labelsMap.put("", attribute.getValue());
+            }
+          }
+          if (labelsMap.isEmpty()) return new Label(value);
+          String labels = "";
+          if (labelsMap.containsKey(""))
+            labels = labelsMap.get("");
+          for (String key : labelsMap.keySet()) {
+            if (!Strings.isNullOrEmpty(key)) {
+              labels = (Strings.isNullOrEmpty(labels) ? "" : labels + " ") + "(" + key + ") " + labelsMap.get(key);
+            }
+          }
+
+          FlowPanel panel = new FlowPanel();
+          InlineLabel valueLabel = new InlineLabel(value);
+          panel.add(valueLabel);
+          Icon info = new Icon(IconType.INFO_SIGN);
+          info.addStyleName("small-indent");
+          info.setTitle(labels);
+          panel.add(info);
+          return panel;
+        }
+      }
+    }
+    return new Label(value);
   }
 
   private void drawOtherValuesRow(double frequency, String subtotal, String total) {
@@ -104,8 +161,8 @@ public class SummaryFlexTable extends DefaultFlexTable {
                 String.valueOf(getPercentage(frequency.getFreq(), total)));
           } else {
             drawRow(SummaryTabView.NOT_NULL_VALUE.equals(frequency.getValue())
-                ? translations.notEmpty()
-                : frequency.getValue(), String.valueOf(Math.round(frequency.getFreq())),
+                ? new Label(translations.notEmpty())
+                : getValueWidget(frequency.getValue()), String.valueOf(Math.round(frequency.getFreq())),
                 getPercentage(frequency.getFreq(), subtotal), formatDecimal(frequency.getPct() * 100) + "%");
           }
         }
@@ -116,7 +173,11 @@ public class SummaryFlexTable extends DefaultFlexTable {
   }
 
   private void drawRow(String col1, String col2, String col3, String col4) {
-    setWidget(row, 0, new Label(col1));
+    drawRow(new Label(col1), col2, col3, col4);
+  }
+
+  private void drawRow(Widget col1, String col2, String col3, String col4) {
+    setWidget(row, 0, col1);
     setWidget(row, 1, new Label(col2));
     setWidget(row, 2, new Label(col3));
     setWidget(row++, 3, new Label(col4));
@@ -148,5 +209,9 @@ public class SummaryFlexTable extends DefaultFlexTable {
   private String formatDecimal(double number) {
     NumberFormat nf = NumberFormat.getFormat("#.##");
     return nf.format(number);
+  }
+
+  public void setVariable(VariableDto variable) {
+    this.variable = variable;
   }
 }

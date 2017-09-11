@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.ui.DefaultFlexTable;
 import org.obiba.opal.web.gwt.app.client.ui.SummaryFlexTable;
 import org.obiba.opal.web.gwt.plot.client.HistogramChartFactory;
 import org.obiba.opal.web.gwt.plot.client.NormalProbabilityChartFactory;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
 import org.obiba.opal.web.model.client.math.DescriptiveStatsDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
@@ -58,11 +59,12 @@ public class ContinuousSummaryView extends Composite {
   private NormalProbabilityChartFactory qqPlot;
 
   public ContinuousSummaryView(ContinuousSummaryDto continuous, ImmutableList<FrequencyDto> frequenciesNonMissing,
-      ImmutableList<FrequencyDto> frequenciesMissing, double totalNonMissing, double totalMissing) {
+      ImmutableList<FrequencyDto> frequenciesMissing, double totalNonMissing, double totalMissing, VariableDto variableDto) {
     initWidget(uiBinder.createAndBindUi(this));
 
     initDescriptivestats(continuous);
 
+    stats.setVariable(variableDto);
     stats.drawHeader();
     double total = totalNonMissing + totalMissing;
     stats.drawValuesFrequencies(frequenciesNonMissing, translations.nonMissing(), translations.notEmpty(),
