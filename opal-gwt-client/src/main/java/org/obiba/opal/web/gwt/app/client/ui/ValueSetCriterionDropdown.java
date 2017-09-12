@@ -177,7 +177,7 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
   }
 
   protected void updateCriterionFilter(String filter) {
-    setText(filter.isEmpty() ? variable.getName() : variable.getName() + " " + filter);
+    setText(filter.isEmpty() ? variable.getName() : variable.getName() + " " + filter.toLowerCase());
   }
 
 }

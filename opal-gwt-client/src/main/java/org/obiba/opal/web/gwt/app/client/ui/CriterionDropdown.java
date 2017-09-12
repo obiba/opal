@@ -105,7 +105,7 @@ public abstract class CriterionDropdown extends DropdownButton {
     radio.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        updateCriterionFilter(label.toLowerCase());
+        updateCriterionFilter(label);
       }
     });
 

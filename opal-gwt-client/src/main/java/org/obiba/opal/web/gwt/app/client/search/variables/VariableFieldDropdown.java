@@ -62,6 +62,7 @@ public class VariableFieldDropdown extends CriterionDropdown {
     if (rqlQuery == null) return;
     specificControls.setVisible(false);
     divider.setVisible(false);
+    getRadioControl(0).setValue(false);
     getRadioControl(2).setValue(false);
     String filter;
     if ("exists".equals(rqlQuery.getName())) {
@@ -152,7 +153,7 @@ public class VariableFieldDropdown extends CriterionDropdown {
   @Override
   protected void updateCriterionFilter(String filter) {
     if (getRadioControl(0).getValue() || getRadioControl(1).getValue())
-      setText(filter.isEmpty() ? fieldItem.getTitle() : fieldItem.getTitle() + ": " + filter);
+      setText(filter.isEmpty() ? fieldItem.getTitle() : fieldItem.getTitle() + ": " + filter.toLowerCase());
     else {
       String text = hasFieldTerms() ? getFieldTermsQueryText() : matches.getText();
       if (Strings.isNullOrEmpty(text)) super.updateCriterionFilter("");
@@ -271,7 +272,6 @@ public class VariableFieldDropdown extends CriterionDropdown {
           if (filterText.isEmpty()) {
             for (CheckBox cb : fieldTermChecks)
               cb.getParent().setVisible(true);
-            return;
           } else {
             for (CheckBox cb : fieldTermChecks) {
               String title = getFieldTermTitle(cb.getName());
