@@ -25,7 +25,10 @@
 
     <b:Paragraph>
       <ui:msg description="Search Entities help">
-        Count entities matching variable criteria across tables.
+        Count and list entities matching variable criteria across tables.
+        The variable criteria can be added by searching for the variable by its name/label, or by selecting variables of interest from the <a href="#!cart">cart</a>.
+        Only tables which values have been indexed can be searched.
+        See <a href="https://wiki.obiba.org/display/OPALDOC/Search+Entities" target="_blank">Search Entities</a> documentation for more details.
       </ui:msg>
     </b:Paragraph>
 

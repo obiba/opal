@@ -16,7 +16,9 @@ import com.github.gwtbootstrap.client.ui.TextArea;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.*;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -89,6 +91,9 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
   @UiField
   Panel variableItemTablePanel;
+
+  @UiField
+  Button addToCartAll;
 
   @UiField
   Alert selectItemTipsAlert;
@@ -185,6 +190,26 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     getUiHandlers().onAddToCart(variableItemTable.getSelectedItems());
   }
 
+  @UiHandler("addToCartAll")
+  public void onAddToCartAll(ClickEvent event) {
+    addToCartAll.setEnabled(false);
+    addToCartAll.getElement().getStyle().setCursor(Style.Cursor.WAIT);
+    getUiHandlers().onSearchAll(getQuery(), new SearchVariablesPresenter.QueryResultHandler() {
+
+      private final List<ItemResultDto> allResults = Lists.newArrayList();
+
+      @Override
+      public void onQueryResult(String rqlQuery, int offset, QueryResultDto results) {
+        allResults.addAll(JsArrays.toList(results.getHitsArray()));
+        if (allResults.size() == results.getTotalHits()) {
+          getUiHandlers().onAddToCart(allResults);
+          addToCartAll.setEnabled(true);
+          addToCartAll.getElement().getStyle().setCursor(Style.Cursor.DEFAULT);
+        }
+      }
+    });
+  }
+
   @Override
   public void setTaxonomies(List<TaxonomyDto> taxonomies) {
     ((VariableFieldSuggestOracle) queryTypeahead.getSuggestOracle()).setTaxonomyTerms(taxonomies);
@@ -245,6 +270,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     variableItemTable.setPageStart(offset);
     variableItemPager.setPagerVisible(results.getTotalHits() > Table.DEFAULT_PAGESIZE);
     setVariablesVisible(true);
+    addToCartAll.setEnabled(results.getTotalHits()>0);
   }
 
   @Override
@@ -279,7 +305,10 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   private String getBasicQuery() {
     String queries = queryPanel.getQueryString();
     if ("*".equals(queries)) queries = "";
-    return (queries + " " + containsInput.getText()).trim();
+    String queryText = containsInput.getText().trim();
+    if (Strings.isNullOrEmpty(queryText)) return queries;
+    if (Strings.isNullOrEmpty(queries)) return queryText;
+    return queries + " AND (" + queryText + ")";
   }
 
   private String getBasicRQLQuery() {
@@ -403,7 +432,6 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
             @Override
             public void onQueryResult(String rqlQuery, int offset, QueryResultDto results) {
               int last = offset + results.getHitsArray().length();
-              GWT.log("onQueryResult: " + offset + "-" + last + " -> " + results.getTotalHits());
               boolean queryPending = last<results.getTotalHits();
               selectAllAnchor.setVisible(!queryPending);
               selectAllProgressBox.setVisible(queryPending);
@@ -427,6 +455,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     refreshPending.setVisible(!visible);
     variableItemTablePanel.setVisible(visible);
     variableItemPager.setVisible(visible);
+    addToCartAll.setVisible(visible);
   }
 
   private class VariableItemProvider extends AsyncDataProvider<ItemResultDto> {

@@ -26,6 +26,9 @@
     <b:Paragraph>
       <ui:msg description="Search Variables help">
         Search variables using controlled vocabularies and full-text search.
+        The controlled vocabularies are defined by the <a href="#!search/!taxonomies">taxonomies</a>.
+        The full-text search applies to the variable name and labels.
+        See <a href="https://wiki.obiba.org/display/OPALDOC/Search+Variables" target="_blank">Search Variables</a> documentation for more details.
       </ui:msg>
     </b:Paragraph>
 
@@ -48,6 +51,9 @@
 
     <g:FlowPanel>
       <g:FlowPanel addStyleNames="small-bottom-margin clearfix">
+        <b:Button ui:field="addToCartAll" type="INFO" icon="SHOPPING_CART" addStyleNames="btn">
+          <ui:msg description="Add to Cart Button label">Add to Cart</ui:msg>
+        </b:Button>
         <o:OpalSimplePager ui:field="variableItemPager" location="RIGHT"
                            addStyleNames="pull-right small-indent"/>
       </g:FlowPanel>

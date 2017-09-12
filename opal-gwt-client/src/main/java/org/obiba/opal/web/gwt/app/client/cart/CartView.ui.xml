@@ -31,7 +31,8 @@
     <b:Paragraph>
       <ui:msg description="Cart help">
         The cart is a place where to store temporarily variables of interest before processing them: search entities,
-        batch edition, make a view etc.
+        batch edition, make a view etc. Variables can be added in the cart from the results of a <a href="#!search/!variables;rq=exists(project)%252Cexists(table);o=0">variable search</a>
+        or when navigating in the table and variable pages.
       </ui:msg>
     </b:Paragraph>
 
