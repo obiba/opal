@@ -16,16 +16,15 @@
              ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
              ui:generateLocales="default">
 
-  <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false">
+  <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false" minWidth="700">
     <g:FlowPanel>
       <!--Properties-->
       <b:ControlGroup ui:field="propsGroup">
         <b:ControlLabel>
           <ui:msg description="Site Properties label">Site Properties</ui:msg>
-          <o:RequiredIcon/>
         </b:ControlLabel>
         <b:Controls>
-          <b:TextArea ui:field="properties" alternateSize="XXLARGE" visibleLines="10"/>
+          <b:TextArea ui:field="properties" addStyleNames="input-xxxlarge" visibleLines="13"/>
         </b:Controls>
         <b:HelpBlock>
           <ui:msg description="Site Properties help">Plugin installation site specific properties. These properties enhance or

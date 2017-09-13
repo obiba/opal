@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.plugins;
 
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.InlineLabel;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
@@ -63,12 +64,14 @@ public class PluginPackageTable extends Table<PluginPackageDto> {
         return item.getName();
       }
     }, translations.nameLabel());
+    setColumnWidth(getColumn(0), 100, com.google.gwt.dom.client.Style.Unit.PX);
     addColumn(new TextColumn<PluginPackageDto>() {
       @Override
       public String getValue(PluginPackageDto item) {
         return item.getType();
       }
     }, translations.typeLabel());
+    setColumnWidth(getColumn(1), 100, com.google.gwt.dom.client.Style.Unit.PX);
     addColumn(new TextColumn<PluginPackageDto>() {
       @Override
       public String getValue(PluginPackageDto item) {
