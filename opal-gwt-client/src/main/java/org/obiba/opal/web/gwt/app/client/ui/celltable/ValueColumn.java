@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.ui.celltable;
 
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueDto;
@@ -32,6 +33,8 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
   private final VariableDto variable;
 
   private final ValueRenderer valueRenderer;
+
+  private final Cell<String> cell;
 
   /**
    * Value column, with only one value expected in the value set.
@@ -71,7 +74,7 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
 
   private ValueColumn(int pos, VariableDto variable, Cell<String> cell) {
     super(cell);
-
+    this.cell = cell;
     this.pos = pos;
     this.variable = variable;
     valueRenderer = ValueRenderer.valueOf(variable.getValueType().toUpperCase());
@@ -127,8 +130,17 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
   }
 
   @Override
+  public void render(Cell.Context context, ValueSetDto valueSet, SafeHtmlBuilder sb) {
+    String valueStr = getValue(valueSet);
+    if (valueStr == null)
+      sb.appendHtmlConstant("<span class='help-block no-bottom-margin' style='font-size: smaller'>(null)</span>");
+    else
+      cell.render(context, valueStr, sb);
+  }
+
+  @Override
   public String getValue(ValueSetDto valueSet) {
-    if(valueSet.getValuesArray() == null || valueSet.getValuesArray().length() <= getPosition()) return "";
+    if(valueSet.getValuesArray() == null || valueSet.getValuesArray().length() <= getPosition()) return null;
     ValueDto value = valueSet.getValuesArray().get(getPosition());
     return valueRenderer.render(value, variable.getIsRepeatable());
   }

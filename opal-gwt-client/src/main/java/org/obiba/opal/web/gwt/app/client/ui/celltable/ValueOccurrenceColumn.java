@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.ui.celltable;
 
 import javax.annotation.Nullable;
 
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueOccurrenceColumn.ValueOccurrence;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
@@ -37,8 +38,15 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
 
   private final ValueRenderer valueRenderer;
 
+  private final Cell<String> cell;
+
   public ValueOccurrenceColumn(VariableDto variable, final int pos) {
-    super(createCell(variable));
+    this(createCell(variable), variable, pos);
+  }
+
+  private ValueOccurrenceColumn(Cell<String> cell, VariableDto variable, final int pos) {
+    super(cell);
+    this.cell = cell;
     this.pos = pos;
     this.variable = variable;
     valueRenderer = ValueRenderer.valueOf(variable.getValueType().toUpperCase());
@@ -94,6 +102,15 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
 
   public void setValueSelectionHandler(ValueSelectionHandler valueSelectionHandler) {
     this.valueSelectionHandler = valueSelectionHandler;
+  }
+
+  @Override
+  public void render(Cell.Context context, ValueOccurrence value, SafeHtmlBuilder sb) {
+    String valueStr = getValue(value);
+    if (valueStr == null)
+      sb.appendHtmlConstant("<span class='help-block no-bottom-margin' style='font-size: smaller'>(null)</span>");
+    else
+      cell.render(context, valueStr, sb);
   }
 
   @Override
