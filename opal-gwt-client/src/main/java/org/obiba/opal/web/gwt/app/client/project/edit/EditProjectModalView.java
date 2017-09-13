@@ -10,20 +10,6 @@
 
 package org.obiba.opal.web.gwt.app.client.project.edit;
 
-import javax.annotation.Nullable;
-
-import com.google.gwt.core.client.JsArrayString;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.support.DatasourceDtos;
-import org.obiba.opal.web.gwt.app.client.ui.Chooser;
-import org.obiba.opal.web.gwt.app.client.ui.Modal;
-import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
-import org.obiba.opal.web.gwt.app.client.validator.ConstrainedModal;
-import org.obiba.opal.web.model.client.database.DatabaseDto;
-import org.obiba.opal.web.model.client.opal.PluginDto;
-import org.obiba.opal.web.model.client.opal.ProjectDto;
-
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
@@ -38,6 +24,19 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.support.DatasourceDtos;
+import org.obiba.opal.web.gwt.app.client.ui.Chooser;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.validator.ConstrainedModal;
+import org.obiba.opal.web.model.client.database.DatabaseDto;
+import org.obiba.opal.web.model.client.opal.PluginPackageDto;
+import org.obiba.opal.web.model.client.opal.ProjectDto;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 public class EditProjectModalView extends ModalPopupViewWithUiHandlers<EditProjectUiHandlers>
     implements EditProjectModalPresenter.Display {
@@ -45,7 +44,8 @@ public class EditProjectModalView extends ModalPopupViewWithUiHandlers<EditProje
   private static final String DATABASE_NONE = "_none";
   private static final String VCF_STORE_SERVICE_NONE = "_none";
 
-  interface Binder extends UiBinder<Widget, EditProjectModalView> {}
+  interface Binder extends UiBinder<Widget, EditProjectModalView> {
+  }
 
   @UiField
   Modal modal;
@@ -105,7 +105,7 @@ public class EditProjectModalView extends ModalPopupViewWithUiHandlers<EditProje
     name.setEnabled(false);
     title.setText(project.getTitle());
     description.setText(project.getDescription());
-    if(project.getTagsArray() != null) tags.setText(project.getTagsArray().join(", "));
+    if (project.getTagsArray() != null) tags.setText(project.getTagsArray().join(", "));
     // database will be set when databases list will be available
     database.setEnabled(!DatasourceDtos.hasPersistedTables(project.getDatasource()));
   }
@@ -151,10 +151,10 @@ public class EditProjectModalView extends ModalPopupViewWithUiHandlers<EditProje
 
       @Override
       public void setText(@Nullable String text) {
-        if(Strings.isNullOrEmpty(text)) return;
+        if (Strings.isNullOrEmpty(text)) return;
         int count = database.getItemCount();
-        for(int i = 0; i < count; i++) {
-          if(database.getValue(i).equals(text)) {
+        for (int i = 0; i < count; i++) {
+          if (database.getValue(i).equals(text)) {
             database.setSelectedIndex(i);
             break;
           }
@@ -174,10 +174,10 @@ public class EditProjectModalView extends ModalPopupViewWithUiHandlers<EditProje
 
       @Override
       public void setText(String s) {
-        if(Strings.isNullOrEmpty(s)) return;
+        if (Strings.isNullOrEmpty(s)) return;
         int count = vcfStoreService.getItemCount();
-        for(int i = 0; i < count; i++) {
-          if(vcfStoreService.getValue(i).equals(s)) {
+        for (int i = 0; i < count; i++) {
+          if (vcfStoreService.getValue(i).equals(s)) {
             vcfStoreService.setSelectedIndex(i);
             break;
           }
@@ -192,9 +192,9 @@ public class EditProjectModalView extends ModalPopupViewWithUiHandlers<EditProje
     database.addItem(translations.none(), DATABASE_NONE);
 
     String defaultStorageDatabase = DATABASE_NONE;
-    for(DatabaseDto databaseDto : JsArrays.toIterable(availableDatabases)) {
+    for (DatabaseDto databaseDto : JsArrays.toIterable(availableDatabases)) {
       StringBuilder label = new StringBuilder(databaseDto.getName());
-      if(databaseDto.getDefaultStorage()) {
+      if (databaseDto.getDefaultStorage()) {
         defaultStorageDatabase = databaseDto.getName();
         label.append(" (").append(translations.defaultStorage().toLowerCase()).append(")");
       }
@@ -212,30 +212,28 @@ public class EditProjectModalView extends ModalPopupViewWithUiHandlers<EditProje
   }
 
   @Override
-  public void setAvailableVcfStoreServices(JsArray<PluginDto> availableVcfStoreServices) {
+  public void setAvailableVcfStoreServices(List<PluginPackageDto> installedVcfStoreServices) {
     vcfStoreService.clear();
     vcfStoreService.addItem(translations.none(), VCF_STORE_SERVICE_NONE);
 
-    if (availableVcfStoreServices != null) {
-      for (int i = 0; i < availableVcfStoreServices.length(); i++) {
-        vcfStoreService.addItem(availableVcfStoreServices.get(i).getName());
-      }
+    for (PluginPackageDto pluginPackageDto : installedVcfStoreServices) {
+      vcfStoreService.addItem(pluginPackageDto.getName());
     }
 
-    vcfStoreServiceGroup.setVisible(availableVcfStoreServices != null && availableVcfStoreServices.length()>0);
+    vcfStoreServiceGroup.setVisible(!installedVcfStoreServices.isEmpty());
   }
 
   @Override
   public void showError(@Nullable FormField formField, String message) {
     ControlGroup group = null;
 
-    if(formField == FormField.NAME) {
+    if (formField == FormField.NAME) {
       group = nameGroup;
-    } else if(formField == FormField.DATABASE) {
+    } else if (formField == FormField.DATABASE) {
       group = databaseGroup;
     }
 
-    if(group == null) {
+    if (group == null) {
       modal.addAlert(message, AlertType.ERROR);
     } else {
       modal.addAlert(message, AlertType.ERROR, group);

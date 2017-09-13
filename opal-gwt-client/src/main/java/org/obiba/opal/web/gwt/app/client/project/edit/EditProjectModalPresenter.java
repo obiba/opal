@@ -14,6 +14,7 @@ import java.util.*;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
@@ -32,9 +33,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
-import org.obiba.opal.web.model.client.opal.PluginDto;
-import org.obiba.opal.web.model.client.opal.ProjectDto;
-import org.obiba.opal.web.model.client.opal.ProjectFactoryDto;
+import org.obiba.opal.web.model.client.opal.*;
 
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -111,12 +110,17 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
     Map<String, String> pluginsParams = new HashMap<>();
     pluginsParams.put("type", ProjectAdministrationPresenter.VCF_STORE_SERVICE_TYPE);
 
-    ResourceRequestBuilderFactory.<JsArray<PluginDto>>newBuilder().forResource(UriBuilders.PLUGINS.create().query(pluginsParams).build())
-        .withCallback(new ResourceCallback<JsArray<PluginDto>>() {
+    ResourceRequestBuilderFactory.<PluginPackagesDto>newBuilder().forResource(UriBuilders.PLUGINS.create().query(pluginsParams).build())
+        .withCallback(new ResourceCallback<PluginPackagesDto>() {
 
           @Override
-          public void onResource(Response response, JsArray<PluginDto> resource) {
-            getView().setAvailableVcfStoreServices(resource);
+          public void onResource(Response response, PluginPackagesDto resource) {
+            List<PluginPackageDto> installed = Lists.newArrayList();
+            for (PluginPackageDto pluginPackage : JsArrays.toIterable(resource.getPackagesArray())) {
+              if (ProjectAdministrationPresenter.VCF_STORE_SERVICE_TYPE.equals(pluginPackage.getType()))
+                installed.add(pluginPackage);
+            }
+            getView().setAvailableVcfStoreServices(installed);
           }
         }).get().send();
   }
@@ -307,6 +311,6 @@ public class EditProjectModalPresenter extends ModalPresenterWidget<EditProjectM
 
     void setBusy(boolean busy);
 
-    void setAvailableVcfStoreServices(JsArray<PluginDto> availableVcfStoreServices);
+    void setAvailableVcfStoreServices(List<PluginPackageDto> availableVcfStoreServices);
   }
 }

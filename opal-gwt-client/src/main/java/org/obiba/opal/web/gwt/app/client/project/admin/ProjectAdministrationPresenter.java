@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
@@ -30,6 +31,8 @@ import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.PluginDto;
+import org.obiba.opal.web.model.client.opal.PluginPackageDto;
+import org.obiba.opal.web.model.client.opal.PluginPackagesDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.google.gwt.http.client.Request;
@@ -102,12 +105,19 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     Map<String, String> params = Maps.newHashMap();
     params.put("type", VCF_STORE_SERVICE_TYPE);
 
-    ResourceRequestBuilderFactory.<JsArray<PluginDto>>newBuilder()
+    ResourceRequestBuilderFactory.<PluginPackagesDto>newBuilder()
       .forResource(UriBuilders.PLUGINS.create().query(params).build())
-      .withCallback(new ResourceCallback<JsArray<PluginDto>>() {
+      .withCallback(new ResourceCallback<PluginPackagesDto>() {
         @Override
-        public void onResource(Response response, JsArray<PluginDto> resource) {
-          showVcfServiceNamePanel(resource != null && resource.length() > 0);
+        public void onResource(Response response, PluginPackagesDto resource) {
+          boolean hasPlugin = false;
+          for (PluginPackageDto pluginPackage : JsArrays.toIterable(resource.getPackagesArray())) {
+            if (ProjectAdministrationPresenter.VCF_STORE_SERVICE_TYPE.equals(pluginPackage.getType())) {
+              hasPlugin = true;
+              break;
+            }
+          }
+          showVcfServiceNamePanel(hasPlugin);
         }
       }).get().send();
   }
