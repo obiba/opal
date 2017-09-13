@@ -15,10 +15,7 @@ import com.github.gwtbootstrap.client.ui.ControlLabel;
 import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.common.base.Joiner;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.dom.client.*;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
@@ -52,7 +49,9 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
     values.addKeyUpHandler(new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent event) {
-        updateMatchCriteriaFilter();
+        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+          updateMatchCriteriaFilter();
+        }
       }
     });
     valuesPanel.add(createControlGroup(valuesLabel, values));

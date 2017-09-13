@@ -322,7 +322,7 @@ public class VariableFieldDropdown extends CriterionDropdown {
 
   private String getMatchQueryString() {
     if (matches.getText().isEmpty()) return null;
-    return (isNot() ? "NOT " : "") + fieldName + ":" + matches.getText();
+    return (isNot() ? "NOT " : "") + fieldName + ":(" + matches.getText() + ")";
   }
 
   private String getMatchRQLQueryString() {

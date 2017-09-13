@@ -146,7 +146,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
   }
 
   private void initPropertySuggestions() {
-    propertySuggestions.add(new PropertySuggestion(translations.nameLabel(), "name"));
+    propertySuggestions.add(new PropertySuggestion(translations.nameLabel(), "name.analyzed"));
     propertySuggestions.add(new PropertySuggestion(translations.entityTypeLabel(), "entityType"));
     initPropertySuggestions(translations.valueTypeLabel(), "valueType", new String[]{"integer", "decimal", "text", "boolean", "date", "datetime"});
     initPropertySuggestions(translations.repeatableLabel(), "repeatable", new String[]{"true", "false"});
@@ -260,7 +260,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     public String getDisplayString() {
 
       SafeHtmlBuilder accum = new SafeHtmlBuilder();
-      String name = value.isEmpty() ? property : value;
+      String name = value.isEmpty() ? getField().getTitle() : value;
       accum.appendHtmlConstant("<div id='" + getReplacementString() + "'>");
       accum.appendHtmlConstant("  <i class='icon-list'></i>");
       accum.appendHtmlConstant("  <strong>");
@@ -270,7 +270,7 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
       if (!value.isEmpty()) {
         accum.appendHtmlConstant("<div>");
         accum.appendHtmlConstant("  <small>");
-        accum.appendEscaped(property);
+        accum.appendEscaped(getField().getTitle());
         accum.appendHtmlConstant("  </small>");
         accum.appendHtmlConstant("</div>");
       }
