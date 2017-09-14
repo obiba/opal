@@ -239,6 +239,12 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
     parentTable.setWidget(5, 0, new Label(translations.standardDeviationLabel()));
     parentTable.setWidget(6, 0, new Label(translations.NLabel()));
 
+    parentTable.getFlexCellFormatter().addStyleName(2, 0, "bold-table-cell");
+    parentTable.getFlexCellFormatter().addStyleName(3, 0, "bold-table-cell");
+    parentTable.getFlexCellFormatter().addStyleName(4, 0, "bold-table-cell");
+    parentTable.getFlexCellFormatter().addStyleName(5, 0, "bold-table-cell");
+    parentTable.getFlexCellFormatter().addStyleName(6, 0, "bold-table-cell");
+
     int variableCategoriesSize = variableCategories.size();
     for(int i = 0; i < variableCategoriesSize; i++) {
       writeFacetRow(parentTable, continuousFacets, i + 1, variableCategories.get(i));
