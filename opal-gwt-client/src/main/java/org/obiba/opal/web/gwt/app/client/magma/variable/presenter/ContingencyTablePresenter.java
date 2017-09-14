@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
@@ -40,7 +41,7 @@ import com.gwtplatform.mvp.client.View;
 
 public class ContingencyTablePresenter extends PresenterWidget<ContingencyTablePresenter.Display> {
 
-  public static final String TOTAL_FACET = "total";
+  public static final String TOTAL_FACET = "_total";
 
   @Inject
   public ContingencyTablePresenter(Display display, EventBus eventBus) {
@@ -48,103 +49,21 @@ public class ContingencyTablePresenter extends PresenterWidget<ContingencyTableP
   }
 
   public void initialize(TableDto table, final VariableDto variableDto, final VariableDto crossWithVariable) {
-    QueryTermsDto queries = QueryTermsDto.create();
-
-    JsArray<QueryTermDto> terms = JsArrays.create().cast();
-
-    final List<String> variableCategories = getCategories(variableDto);
-    final List<String> crossWithCategories = getCategories(crossWithVariable);
-
-    addFacetTerms(variableDto.getName(), variableCategories, crossWithVariable.getName(), terms);
-    addTotalTerm(variableDto.getName(), variableCategories, crossWithVariable.getName(), terms);
-
-    queries.setQueriesArray(terms);
-
     ResourceRequestBuilderFactory.<QueryResultDto>newBuilder() //
         .forResource(
-            UriBuilders.DATASOURCE_TABLE_FACETS_SEARCH.create().build(table.getDatasourceName(), table.getName())) //
-        .post() //
-        .withResourceBody(QueryTermsDto.stringify(queries)) //
+            UriBuilders.DATASOURCES_ENTITIES_CONTINGENCY.create()
+                .query("v0", MagmaPath.Builder.datasource(table.getDatasourceName()).table(table.getName()).variable(variableDto.getName()).build())
+                .query("v1", MagmaPath.Builder.datasource(table.getDatasourceName()).table(table.getName()).variable(crossWithVariable.getName()).build())
+                .build()) //
+        .get() //
         .withCallback(new ResourceCallback<QueryResultDto>() {
           @Override
           public void onResource(Response response, QueryResultDto resource) {
-            getView().init(resource, variableDto, variableCategories, crossWithVariable, crossWithCategories);
-            getView().draw();
-
+            List<String> variableCategories = getCategories(variableDto);
+            List<String> crossWithCategories = getCategories(crossWithVariable);
+            getView().show(resource, variableDto, variableCategories, crossWithVariable, crossWithCategories);
           }
         }).send();
-  }
-
-  private void addTotalTerm(String variableName, List<String> variableCategories, String crossWithVariableName,
-      JsArray<QueryTermDto> terms) {
-    QueryTermDto query = QueryTermDto.create();
-    query.setFacet(TOTAL_FACET);
-
-    VariableTermDto variableTerm = VariableTermDto.create();
-    variableTerm.setVariable(crossWithVariableName);
-    query.setExtension("Search.VariableTermDto.field", variableTerm);
-
-    LogicalTermDto logicalTerm = getLogicalTermDto(variableName, variableCategories);
-    query.setExtension("Search.LogicalTermDto.facetFilter", logicalTerm);
-
-    terms.push(query);
-  }
-
-  private LogicalTermDto getLogicalTermDto(String variableName, List<String> variableCategories) {
-    LogicalTermDto logicalTerm = LogicalTermDto.create();
-    logicalTerm.setOperator(TermOperator.AND_OP);
-    FilterDto filter = FilterDto.create();
-    filter.setVariable(variableName);
-    InTermDto inTerm = InTermDto.create();
-    JsArrayString values = JavaScriptObject.createArray().cast();
-
-    for(String variableCategory : variableCategories) {
-      values.push(variableCategory);
-    }
-
-    inTerm.setValuesArray(values);
-    inTerm.setMinimumMatch(1);
-
-    filter.setExtension("Search.InTermDto.terms", inTerm);
-    logicalTerm.setExtension("Search.FilterDto.filters", filter);
-    return logicalTerm;
-  }
-
-  private void addFacetTerms(String variableName, List<String> variableCategories, String crossWithVariableName,
-      JsArray<QueryTermDto> terms) {
-    for(String variableCategory : variableCategories) {
-      terms.push(getQueryTermDto(variableName, crossWithVariableName, variableCategory));
-    }
-  }
-
-  private QueryTermDto getQueryTermDto(String variableName, String crossWithVariableName, String facetName) {
-    QueryTermDto query = QueryTermDto.create();
-    query.setFacet(facetName);
-
-    VariableTermDto variableTerm = VariableTermDto.create();
-    variableTerm.setVariable(crossWithVariableName);
-    query.setExtension("Search.VariableTermDto.field", variableTerm);
-
-    LogicalTermDto logicalTerm = getLogicalTermDto(variableName, facetName);
-
-    query.setExtension("Search.LogicalTermDto.facetFilter", logicalTerm);
-    return query;
-  }
-
-  private LogicalTermDto getLogicalTermDto(String variableName, String facetName) {
-    LogicalTermDto logicalTerm = LogicalTermDto.create();
-    logicalTerm.setOperator(TermOperator.AND_OP);
-    FilterDto filter = FilterDto.create();
-    filter.setVariable(variableName);
-    InTermDto inTerm = InTermDto.create();
-    JsArrayString values = JavaScriptObject.createArray().cast();
-    values.push(facetName);
-    inTerm.setValuesArray(values);
-    inTerm.setMinimumMatch(1);
-
-    filter.setExtension("Search.InTermDto.terms", inTerm);
-    logicalTerm.setExtension("Search.FilterDto.filters", filter);
-    return logicalTerm;
   }
 
   private List<String> getCategories(VariableDto variable) {
@@ -164,10 +83,9 @@ public class ContingencyTablePresenter extends PresenterWidget<ContingencyTableP
 
   public interface Display extends View {
 
-    void init(QueryResultDto resource, VariableDto variableDto, List<String> variableCategories,
+    void show(QueryResultDto resource, VariableDto variableDto, List<String> variableCategories,
         VariableDto crossWithVariable, List<String> crossWithCategories);
 
-    void draw();
   }
 
 }

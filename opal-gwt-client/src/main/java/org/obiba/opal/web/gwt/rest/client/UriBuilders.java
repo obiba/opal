@@ -187,6 +187,13 @@ public enum UriBuilders {
     }
   },
 
+  DATASOURCES_ENTITIES_CONTINGENCY {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasources", "entities", "_contingency");
+    }
+  },
+
   DATASOURCE_TABLES_EXCEL {
     @Override
     public UriBuilder create() {

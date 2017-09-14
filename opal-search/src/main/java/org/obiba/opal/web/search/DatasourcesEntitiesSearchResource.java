@@ -18,6 +18,8 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.support.MagmaEngineVariableResolver;
+import org.obiba.magma.support.VariableNature;
+import org.obiba.magma.type.BooleanType;
 import org.obiba.opal.search.AbstractSearchUtility;
 import org.obiba.opal.spi.search.QuerySettings;
 import org.obiba.opal.spi.search.SearchException;
@@ -116,7 +118,7 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
 
     ValueTable table0 = getValueTable(var0Resolver);
     Variable var0 = table0.getVariable(var0Resolver.getVariableName());
-    if (!var0.hasCategories()) return Response.status(Response.Status.BAD_REQUEST).build();
+    if (!VariableNature.getNature(var0).equals(VariableNature.CATEGORICAL)) return Response.status(Response.Status.BAD_REQUEST).build();
 
     ValueTable table1 = getValueTable(var1Resolver);
     // verify variable exists and is accessible
@@ -124,16 +126,21 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
 
     // one facet per crossVar0 category
     Search.QueryTermsDto.Builder queryBuilder = Search.QueryTermsDto.newBuilder();
-    var0.getCategories().forEach(ct ->
+    List<String> categories;
+    if (var0.hasCategories()) categories = var0.getCategories().stream().map(Category::getName).collect(Collectors.toList());
+    else if (var0.getValueType().equals(BooleanType.get())) categories = Lists.newArrayList("true", "false");
+    else
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    categories.forEach(ct ->
         queryBuilder.addQueries(Search.QueryTermDto.newBuilder()
-            .setFacet(ct.getName())
+            .setFacet(ct)
             .setExtension(Search.VariableTermDto.field, Search.VariableTermDto.newBuilder().setVariable(crossVar1).build())
             .setExtension(Search.LogicalTermDto.facetFilter, Search.LogicalTermDto.newBuilder()
                 .setOperator(Search.TermOperator.AND_OP)
                 .addExtension(Search.FilterDto.filters, Search.FilterDto.newBuilder()
                     .setVariable(crossVar0)
                     .setExtension(Search.InTermDto.terms, Search.InTermDto.newBuilder()
-                        .addValues(ct.getName())
+                        .addValues(ct)
                         .setMinimumMatch(1).build())
                     .build())
                 .build()))

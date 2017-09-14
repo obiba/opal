@@ -21,6 +21,7 @@ import com.google.gwt.user.client.ui.Widget;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.view.SummaryTabView;
+import org.obiba.opal.web.gwt.app.client.support.AttributeHelper;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -101,25 +102,9 @@ public class SummaryFlexTable extends DefaultFlexTable {
       for (CategoryDto category : JsArrays.toIterable(variable.getCategoriesArray())) {
         if (category.getName().equals(value) ||
             (variable.getValueType().equals("decimal") && value.endsWith(".0") && category.getName().equals(value.substring(0, value.length() - 2)))) {
-          // find labels
-          Map<String, String> labelsMap = Maps.newHashMap();
-          for (AttributeDto attribute : JsArrays.toIterable(category.getAttributesArray())) {
-            if (attribute.getName().equals("label")) {
-              if (attribute.hasLocale())
-                labelsMap.put(attribute.getLocale(), attribute.getValue());
-              else
-                labelsMap.put("", attribute.getValue());
-            }
-          }
-          if (labelsMap.isEmpty()) return new Label(value);
-          String labels = "";
-          if (labelsMap.containsKey(""))
-            labels = labelsMap.get("");
-          for (String key : labelsMap.keySet()) {
-            if (!Strings.isNullOrEmpty(key)) {
-              labels = (Strings.isNullOrEmpty(labels) ? "" : labels + " ") + "(" + key + ") " + labelsMap.get(key);
-            }
-          }
+
+          String labels = AttributeHelper.getLabelsAsString(category.getAttributesArray());
+          if (Strings.isNullOrEmpty(labels)) return new Label(value);
 
           FlowPanel panel = new FlowPanel();
           InlineLabel valueLabel = new InlineLabel(value);

@@ -425,6 +425,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @Override
   public void setTable(TableDto dto) {
     tableDto = dto;
+    clear(true);
     name.setText(dto.getName());
     entityType.setText(dto.getEntityType());
     timestamps.setText(Moment.create(dto.getTimestamps().getLastUpdate()).fromNow());

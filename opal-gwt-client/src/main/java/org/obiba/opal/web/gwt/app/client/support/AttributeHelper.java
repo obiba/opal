@@ -11,12 +11,19 @@ package org.obiba.opal.web.gwt.app.client.support;
 
 import javax.validation.constraints.NotNull;
 
+import com.google.common.base.*;
+import com.google.common.collect.Maps;
+import com.google.gwt.user.client.ui.Label;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.i18n.client.LocaleInfo;
+import org.obiba.opal.web.model.client.magma.CategoryDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
+
+import java.util.Map;
 
 /**
  *
@@ -94,6 +101,28 @@ public class AttributeHelper {
       if ("en".equals(text.getLocale())) return text.getText();
     }
     return "";
+  }
+
+  public static String getLabelsAsString(JsArray<AttributeDto> attributes) {
+    // find labels
+    Map<String, String> labelsMap = Maps.newHashMap();
+    for (AttributeDto attribute : JsArrays.toIterable(attributes)) {
+      if (attribute.getName().equals("label")) {
+        if (attribute.hasLocale())
+          labelsMap.put(attribute.getLocale(), attribute.getValue());
+        else
+          labelsMap.put("", attribute.getValue());
+      }
+    }
+    String labels = "";
+    if (labelsMap.containsKey(""))
+      labels = labelsMap.get("");
+    for (String key : labelsMap.keySet()) {
+      if (!com.google.common.base.Strings.isNullOrEmpty(key)) {
+        labels = (com.google.common.base.Strings.isNullOrEmpty(labels) ? "" : labels + " ") + "(" + key + ") " + labelsMap.get(key);
+      }
+    }
+    return labels;
   }
 
 }

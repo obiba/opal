@@ -13,10 +13,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.github.gwtbootstrap.client.ui.Icon;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.common.base.Strings;
+import com.google.gwt.user.client.ui.InlineLabel;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.ContingencyTablePresenter;
+import org.obiba.opal.web.gwt.app.client.support.AttributeHelper;
 import org.obiba.opal.web.gwt.app.client.ui.DefaultFlexTable;
+import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.FacetResultDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
@@ -93,17 +99,17 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
   }
 
   @Override
-  public void init(QueryResultDto resource, VariableDto variableDto, List<String> variableCategories,
+  public void show(QueryResultDto resource, VariableDto variableDto, List<String> variableCategories,
       VariableDto crossWithVariableDto, List<String> crossWithCategories) {
     queryResult = resource;
     variable = variableDto;
     crossWithVariable = crossWithVariableDto;
     this.variableCategories = variableCategories;
     this.crossWithCategories = crossWithCategories;
+    draw();
   }
 
-  @Override
-  public void draw() {
+  private void draw() {
     DefaultFlexTable parentTable = new DefaultFlexTable();
 
     addHeader(parentTable);
@@ -148,7 +154,8 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
     int crossCategoriesSize = crossWithCategories.size();
     for(int i = 0; i < crossCategoriesSize; i++) {
       String crossName = crossWithCategories.get(i);
-      parentTable.setWidget(i + 2, 0, new Label(crossName));
+      parentTable.setWidget(i + 2, 0, getCategoryWidget(crossWithVariable, crossName));
+      parentTable.getFlexCellFormatter().addStyleName(i + 2, 0, "bold-table-cell");
 
       for(int j = 0; j < variableCategoriesSize; j++) {
         String categoryName = variableCategories.get(j);
@@ -162,6 +169,7 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
 
     // N
     parentTable.setWidget(crossCategoriesSize + 3, 0, new Label(translations.totalLabel()));
+    parentTable.getFlexCellFormatter().addStyleName(crossCategoriesSize + 3, 0, "bold-table-cell");
     for(int i = 0; i < variableCategoriesSize; i++) {
       addValue(parentTable, crossCategoriesSize + 3, i + 1, variableFacetTotals.get(variableCategories.get(i)),
           variableFacetTotals.get(ContingencyTablePresenter.TOTAL_FACET));
@@ -263,8 +271,8 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
   }
 
   private void addHeader(DefaultFlexTable parentTable) {
-    parentTable.setWidget(0, 0, new Label(crossWithVariable.getName()));
-    parentTable.setWidget(0, 1, new Label(variable.getName()));
+    parentTable.setWidget(0, 0, getVariableWidget(crossWithVariable));
+    parentTable.setWidget(0, 1, getVariableWidget(variable));
     parentTable.setWidget(0, 2, new Label(translations.totalLabel()));
     parentTable.getFlexCellFormatter().setRowSpan(0, 0, 2);
     parentTable.getFlexCellFormatter().setRowSpan(0, 2, 2);
@@ -280,11 +288,36 @@ public class ContingencyTableView extends ViewImpl implements ContingencyTablePr
     for(int i = 0; i < variableCategories.size(); i++) {
       writeCategoryHeader(parentTable, variableCategories.get(i), width, i);
     }
+  }
 
+  private Widget getVariableWidget(VariableDto variableDto) {
+    return getLabelledWidget(variableDto.getName(), AttributeHelper.getLabelsAsString(variableDto.getAttributesArray()));
+  }
+
+  private Widget getCategoryWidget(VariableDto variableDto, String catName) {
+    for (CategoryDto categoryDto : JsArrays.toIterable(variableDto.getCategoriesArray())) {
+      if (categoryDto.getName().equals(catName)) {
+        return getLabelledWidget(catName, AttributeHelper.getLabelsAsString(categoryDto.getAttributesArray()));
+      }
+    }
+    return new Label(catName);
+  }
+
+  private Widget getLabelledWidget(String value, String labels)  {
+    if (Strings.isNullOrEmpty(labels)) return new Label(value);
+
+    FlowPanel panel = new FlowPanel();
+    InlineLabel valueLabel = new InlineLabel(value);
+    panel.add(valueLabel);
+    Icon info = new Icon(IconType.INFO_SIGN);
+    info.addStyleName("small-indent");
+    info.setTitle(labels);
+    panel.add(info);
+    return panel;
   }
 
   private void writeCategoryHeader(DefaultFlexTable parentTable, String name, int width, int col) {
-    parentTable.setWidget(1, col, new Label(name));
+    parentTable.setWidget(1, col, getCategoryWidget(variable, name));
     parentTable.getFlexCellFormatter().setWidth(1, col, width + "%");
     parentTable.getFlexCellFormatter().addStyleName(1, col, "bold-table-header");
   }
