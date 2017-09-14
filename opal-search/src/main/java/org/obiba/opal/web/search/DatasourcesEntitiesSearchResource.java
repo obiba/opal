@@ -13,6 +13,11 @@ package org.obiba.opal.web.search;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import net.jazdw.rql.parser.ASTNode;
+import org.obiba.magma.Category;
+import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
+import org.obiba.magma.support.MagmaEngineVariableResolver;
 import org.obiba.opal.search.AbstractSearchUtility;
 import org.obiba.opal.spi.search.QuerySettings;
 import org.obiba.opal.spi.search.SearchException;
@@ -94,6 +99,73 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
                         @QueryParam("type") @DefaultValue("Participant") String entityType) throws SearchException {
     return search(query, idQuery, entityType, 0, 0, true);
   }
+
+  @GET
+  @Transactional(readOnly = true)
+  @Path("_contingency")
+  public Response facets(@QueryParam("v0") String crossVar0, @QueryParam("v1") String crossVar1) throws SearchException {
+    if (Strings.isNullOrEmpty(crossVar0) || Strings.isNullOrEmpty(crossVar1))
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    log.info("Contingency table: {} x {}", crossVar0, crossVar1);
+
+    MagmaEngineVariableResolver var0Resolver = MagmaEngineVariableResolver.valueOf(crossVar0);
+    MagmaEngineVariableResolver var1Resolver = MagmaEngineVariableResolver.valueOf(crossVar1);
+    // support only contingency table between variables from the same table (for now)
+    if (!var0Resolver.getDatasourceName().equals(var1Resolver.getDatasourceName()) || !var0Resolver.getTableName().equals(var1Resolver.getTableName()))
+      return Response.status(Response.Status.BAD_REQUEST).build();
+
+    ValueTable table0 = getValueTable(var0Resolver);
+    Variable var0 = table0.getVariable(var0Resolver.getVariableName());
+    if (!var0.hasCategories()) return Response.status(Response.Status.BAD_REQUEST).build();
+
+    ValueTable table1 = getValueTable(var1Resolver);
+    // verify variable exists and is accessible
+    table1.getVariable(var1Resolver.getVariableName());
+
+    // one facet per crossVar0 category
+    Search.QueryTermsDto.Builder queryBuilder = Search.QueryTermsDto.newBuilder();
+    var0.getCategories().forEach(ct ->
+        queryBuilder.addQueries(Search.QueryTermDto.newBuilder()
+            .setFacet(ct.getName())
+            .setExtension(Search.VariableTermDto.field, Search.VariableTermDto.newBuilder().setVariable(crossVar1).build())
+            .setExtension(Search.LogicalTermDto.facetFilter, Search.LogicalTermDto.newBuilder()
+                .setOperator(Search.TermOperator.AND_OP)
+                .addExtension(Search.FilterDto.filters, Search.FilterDto.newBuilder()
+                    .setVariable(crossVar0)
+                    .setExtension(Search.InTermDto.terms, Search.InTermDto.newBuilder()
+                        .addValues(ct.getName())
+                        .setMinimumMatch(1).build())
+                    .build())
+                .build()))
+    );
+
+    // one facet for the total
+    queryBuilder.addQueries(Search.QueryTermDto.newBuilder()
+        .setFacet("_total")
+        .setExtension(Search.VariableTermDto.field, Search.VariableTermDto.newBuilder().setVariable(crossVar1).build())
+        .setExtension(Search.LogicalTermDto.facetFilter, Search.LogicalTermDto.newBuilder()
+            .setOperator(Search.TermOperator.AND_OP)
+            .addExtension(Search.FilterDto.filters, Search.FilterDto.newBuilder()
+                .setVariable(crossVar0)
+                .setExtension(Search.InTermDto.terms, Search.InTermDto.newBuilder()
+                    .addAllValues(var0.getCategories().stream().map(Category::getName).collect(Collectors.toList()))
+                    .setMinimumMatch(1).build())
+                .build())
+            .build()));
+
+    try {
+      Search.QueryResultDto dtoResult = opalSearchService.executeQuery(table0.getDatasource().getName(), table0.getName(), queryBuilder.build());
+      return Response.ok().entity(dtoResult).build();
+    } catch (Exception e) {
+      // Search engine exception
+      throw new SearchException("Contingency query failed to be executed: " + crossVar0 +" x " + crossVar1, e.getCause() == null ? e : e.getCause());
+    }
+  }
+
+  private ValueTable getValueTable(MagmaEngineVariableResolver varResolver) {
+    return MagmaEngine.get().getDatasource(varResolver.getDatasourceName()).getValueTable(varResolver.getTableName());
+  }
+
 
   @Override
   protected String getSearchPath() {

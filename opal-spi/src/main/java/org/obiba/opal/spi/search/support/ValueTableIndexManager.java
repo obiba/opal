@@ -33,8 +33,16 @@ public class ValueTableIndexManager {
     this.table = table;
   }
 
+  public ValueTableIndexManager copy(String datasourceAlt, String tableAlt) {
+    return new ValueTableIndexManager(valuesIndexManager, datasourceAlt, tableAlt);
+  }
+
+  public String getReference() {
+    return datasource + "." + table;
+  }
+
   public String getQuery() {
-    return "datasource:" + datasource.replaceAll(" ", "+") + " AND table:" + table.replaceAll(" ", "+");
+    return "reference:(" + getReference().replaceAll(" ", "+") + ")";
   }
 
   public VariableNature getVariableNature(String variableName) {
