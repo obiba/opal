@@ -10,7 +10,7 @@
 package org.obiba.opal.search;
 
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueTableUpdateListener;
+import org.obiba.opal.core.ValueTableUpdateListener;
 import org.obiba.magma.Variable;
 import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
@@ -70,6 +70,11 @@ public class IndexManagerConfigurationService implements ValueTableUpdateListene
   @Override
   public void onRename(@NotNull ValueTable vt, String newName) {
     onDelete(vt);
+  }
+
+  @Override
+  public void onUpdate(@NotNull ValueTable vt, Iterable<Variable> v) {
+    // does not affect scheduling
   }
 
   @Override

@@ -13,11 +13,14 @@ import com.google.common.base.Functions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+
 import org.obiba.magma.*;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
+
+import org.obiba.opal.core.ValueTableUpdateListener;
 import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
@@ -139,6 +142,9 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
         variableWriter.writeVariable(variable);
       }
     }
+    for (ValueTableUpdateListener listener : getTableListeners()) {
+      listener.onUpdate(getValueTable(), variables);
+    }
   }
 
   @Override
@@ -151,10 +157,8 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
       for (String name : variables) {
         // The variable must exist
         Variable v = getValueTable().getVariable(name);
-        if (tableListeners != null && !tableListeners.isEmpty()) {
-          for (ValueTableUpdateListener listener : tableListeners) {
-            listener.onDelete(getValueTable(), v);
-          }
+        for (ValueTableUpdateListener listener : getTableListeners()) {
+          listener.onDelete(getValueTable(), v);
         }
         variableWriter.removeVariable(v);
       }

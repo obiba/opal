@@ -12,12 +12,13 @@ package org.obiba.opal.search.service;
 import com.google.common.collect.Lists;
 import org.codehaus.jettison.json.JSONException;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueTableUpdateListener;
+import org.obiba.opal.core.ValueTableUpdateListener;
 import org.obiba.magma.Variable;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
+import org.obiba.opal.search.IndexSynchronizationManager;
 import org.obiba.opal.search.es.ElasticSearchConfigurationService;
 import org.obiba.opal.spi.search.support.ItemResultDtoStrategy;
 import org.obiba.opal.spi.search.*;
@@ -50,6 +51,9 @@ public class OpalSearchService implements Service, ValueTableUpdateListener {
 
   @Autowired
   private ThreadFactory threadFactory;
+
+  @Autowired
+  protected IndexSynchronizationManager synchroManager;
 
   public boolean isEnabled() {
     return configService.getConfig().isEnabled();
@@ -186,6 +190,14 @@ public class OpalSearchService implements Service, ValueTableUpdateListener {
   @Override
   public void onRename(@NotNull ValueTable vt, String newName) {
     onDelete(vt);
+  }
+
+  @Override
+  public void onUpdate(@NotNull ValueTable vt, Iterable<Variable> v) {
+    // to ensure variable search is correct
+    getVariablesIndexManager().getIndex(vt).delete();
+    // synchronize variable index
+    synchroManager.synchronizeIndex(getVariablesIndexManager(), vt);
   }
 
   @Override

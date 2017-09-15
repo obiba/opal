@@ -82,8 +82,8 @@ public class ValueTableIndexResource extends IndexResource {
     ValueTable valueTable = getValueTable(datasource, table);
     if(!isInProgress(datasource, table)) {
       // synchronize variable index and values index
-      synchroManager.synchronizeIndex(opalSearchService.getVariablesIndexManager(), valueTable, 0);
-      synchroManager.synchronizeIndex(opalSearchService.getValuesIndexManager(), valueTable, 0);
+      synchroManager.synchronizeIndex(opalSearchService.getVariablesIndexManager(), valueTable);
+      synchroManager.synchronizeIndex(opalSearchService.getValuesIndexManager(), valueTable);
     }
     return Response.ok().build();
   }

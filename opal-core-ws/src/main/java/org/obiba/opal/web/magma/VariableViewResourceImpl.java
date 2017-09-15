@@ -9,22 +9,14 @@
  */
 package org.obiba.opal.web.magma;
 
-import java.util.Collection;
-import java.util.List;
-
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueTableUpdateListener;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.magma.views.support.VariableOperationContext;
+import org.obiba.opal.core.ValueTableUpdateListener;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +26,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
+import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
+import java.util.List;
 
 @Component("variableViewResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -43,15 +40,11 @@ public class VariableViewResourceImpl extends VariableResourceImpl implements Va
   @Autowired
   private ViewManager viewManager;
 
-  @Autowired
-  @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-  private Collection<ValueTableUpdateListener> tableListeners;
-
   @Override
   public VariableDto get(UriInfo uriInfo) {
     UriBuilder uriBuilder = UriBuilder.fromPath("/");
     List<PathSegment> pathSegments = uriInfo.getPathSegments();
-    for(int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++) {
       uriBuilder.segment(pathSegments.get(i).getPath());
     }
     String tableUri = uriBuilder.build().toString();
@@ -68,16 +61,14 @@ public class VariableViewResourceImpl extends VariableResourceImpl implements Va
   @Override
   public Response deleteVariable() {
     View view = getValueTableAsView();
-    try(ValueTableWriter.VariableWriter variableWriter = view.getListClause().createWriter()) {
+    try (ValueTableWriter.VariableWriter variableWriter = view.getListClause().createWriter()) {
 
       // Remove from listClause
-      for(VariableValueSource v : view.getListClause().getVariableValueSources()) {
+      for (VariableValueSource v : view.getListClause().getVariableValueSources()) {
         Variable variable = v.getVariable();
-        if(variable.getName().equals(getName())) {
-          if (tableListeners != null && !tableListeners.isEmpty()) {
-            for (ValueTableUpdateListener listener : tableListeners) {
-              listener.onDelete(getValueTable(), variable);
-            }
+        if (variable.getName().equals(getName())) {
+          for (ValueTableUpdateListener listener : getTableListeners()) {
+            listener.onDelete(getValueTable(), variable);
           }
           variableWriter.removeVariable(variable);
           VariableOperationContext operationContext = new VariableOperationContext();
@@ -118,17 +109,17 @@ public class VariableViewResourceImpl extends VariableResourceImpl implements Va
     ValueTable table = getValueTable();
     Variable variable = table.getVariable(getName());
 
-    if(!variable.getEntityType().equals(updatedVariable.getEntityType())) {
+    if (!variable.getEntityType().equals(updatedVariable.getEntityType())) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
     View view = getValueTableAsView();
     VariableOperationContext operationContext = new VariableOperationContext();
 
-    try(ValueTableWriter.VariableWriter variableWriter = view.getListClause().createWriter()) {
+    try (ValueTableWriter.VariableWriter variableWriter = view.getListClause().createWriter()) {
 
       // Rename existing variable
-      if(!updatedVariable.getName().equals(variable.getName())) {
+      if (!updatedVariable.getName().equals(variable.getName())) {
         operationContext.deleteVariable(view, variable);
         renameVariable(variable, updatedVariable.getName(), table, variableWriter);
       }
@@ -140,10 +131,8 @@ public class VariableViewResourceImpl extends VariableResourceImpl implements Va
   }
 
   private void renameVariable(Variable variable, String newName, ValueTable table, ValueTableWriter.VariableWriter variableWriter) {
-    if(tableListeners != null && !tableListeners.isEmpty()) {
-      for(ValueTableUpdateListener listener : tableListeners) {
-        listener.onRename(table, variable, newName);
-      }
+    for (ValueTableUpdateListener listener : getTableListeners()) {
+      listener.onRename(table, variable, newName);
     }
     variableWriter.removeVariable(variable);
   }

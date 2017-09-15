@@ -84,8 +84,8 @@ public class IndexSynchronizationManager {
     getSubject().execute(syncProducer);
   }
 
-  public void synchronizeIndex(IndexManager indexManager, ValueTable table, int gracePeriod) {
-    syncProducer.index(indexManager, table, gracePeriod);
+  public void synchronizeIndex(IndexManager indexManager, ValueTable table) {
+    syncProducer.index(indexManager, table, 0);
   }
 
   public IndexSynchronization getCurrentTask() {

@@ -9,14 +9,7 @@
  */
 package org.obiba.opal.web.magma;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.core.Response;
-
-import org.obiba.magma.ValueTableUpdateListener;
+import com.google.common.base.Joiner;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
@@ -24,6 +17,7 @@ import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.magma.views.support.VariableOperationContext;
+import org.obiba.opal.core.ValueTableUpdateListener;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
@@ -33,9 +27,12 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Joiner;
-
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component("variablesViewResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -65,8 +62,8 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
     view.initialise();
     View source = getValueTableAsView();
     VariableOperationContext operationContext = new VariableOperationContext();
-    try(VariableWriter variableWriter = source.getListClause().createWriter()) {
-      for(Variable variable : view.getVariables()) {
+    try (VariableWriter variableWriter = source.getListClause().createWriter()) {
+      for (Variable variable : view.getVariables()) {
         operationContext.addVariable(source, variable);
         variableWriter.writeVariable(variable);
       }
@@ -88,12 +85,15 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
   private void addOrUpdateViewVariables(Iterable<Variable> variables, @Nullable String comment) {
     View view = getValueTableAsView();
     VariableOperationContext operationContext = new VariableOperationContext();
-    try(VariableWriter variableWriter = view.getListClause().createWriter()) {
-      for(Variable variable : variables) {
+    try (VariableWriter variableWriter = view.getListClause().createWriter()) {
+      for (Variable variable : variables) {
         operationContext.addVariable(view, variable);
         variableWriter.writeVariable(variable);
       }
       viewManager.addView(getDatasource().getName(), view, comment, operationContext);
+    }
+    for (ValueTableUpdateListener listener : getTableListeners()) {
+      listener.onUpdate(getValueTable(), variables);
     }
   }
 
@@ -101,17 +101,15 @@ public class VariablesViewResourceImpl extends VariablesResourceImpl implements 
   public Response deleteVariables(List<String> variables) {
     View view = getValueTableAsView();
     VariableOperationContext operationContext = new VariableOperationContext();
-    try(ValueTableWriter.VariableWriter variableWriter = view.getListClause().createWriter()) {
+    try (ValueTableWriter.VariableWriter variableWriter = view.getListClause().createWriter()) {
       List<String> names = new ArrayList<>();
       // Remove from listClause
-      for(VariableValueSource variableSource : view.getListClause().getVariableValueSources()) {
+      for (VariableValueSource variableSource : view.getListClause().getVariableValueSources()) {
         Variable variable = variableSource.getVariable();
         String name = variable.getName();
-        if(variables.contains(name)) {
-          if (tableListeners != null && !tableListeners.isEmpty()) {
-            for (ValueTableUpdateListener listener : tableListeners) {
-              listener.onDelete(getValueTable(), variable);
-            }
+        if (variables.contains(name)) {
+          for (ValueTableUpdateListener listener : getTableListeners()) {
+            listener.onDelete(getValueTable(), variable);
           }
           operationContext.deleteVariable(view, variable);
           names.add(name);

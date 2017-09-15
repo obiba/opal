@@ -23,7 +23,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueTableUpdateListener;
+import org.obiba.opal.core.ValueTableUpdateListener;
 import org.obiba.magma.datasource.nil.support.NullDatasourceFactory;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.domain.Project;

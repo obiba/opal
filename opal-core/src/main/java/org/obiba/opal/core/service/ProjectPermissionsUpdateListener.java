@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceUpdateListener;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueTableUpdateListener;
+import org.obiba.opal.core.ValueTableUpdateListener;
 import org.obiba.magma.Variable;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +53,11 @@ public class ProjectPermissionsUpdateListener implements DatasourceUpdateListene
           .addSubjectPermissions(perm.getDomain(), perm.getNode().replace(originalStr, newStr), perm.getSubject(),
               perm.getPermissions());
     }
+  }
+
+  @Override
+  public void onUpdate(@NotNull ValueTable vt, Iterable<Variable> v) {
+    // ignore
   }
 
   @Override

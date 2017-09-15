@@ -34,7 +34,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueTableUpdateListener;
+import org.obiba.opal.core.ValueTableUpdateListener;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.security.MagmaSecurityExtension;

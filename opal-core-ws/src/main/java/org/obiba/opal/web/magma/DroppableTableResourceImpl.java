@@ -15,7 +15,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.core.Response;
 
 import org.obiba.magma.NoSuchValueTableException;
-import org.obiba.magma.ValueTableUpdateListener;
+import org.obiba.opal.core.ValueTableUpdateListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;

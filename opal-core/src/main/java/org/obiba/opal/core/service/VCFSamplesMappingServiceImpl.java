@@ -2,8 +2,13 @@ package org.obiba.opal.core.service;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import org.obiba.magma.*;
+
+import org.obiba.magma.ValueSet;
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
+import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.obiba.opal.core.ValueTableUpdateListener;
 import org.obiba.opal.core.domain.VCFSampleRole;
 import org.obiba.opal.core.domain.VCFSamplesMapping;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,6 +151,11 @@ public class VCFSamplesMappingServiceImpl implements VCFSamplesMappingService, V
         orientDbService.save(n, n);
       });
     });
+  }
+
+  @Override
+  public void onUpdate(@NotNull ValueTable vt, Iterable<Variable> v) {
+    // ignore
   }
 
   @Override

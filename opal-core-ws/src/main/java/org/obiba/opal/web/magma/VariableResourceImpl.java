@@ -9,24 +9,10 @@
  */
 package org.obiba.opal.web.magma;
 
-import java.util.List;
-
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-
 import com.google.common.base.Strings;
 import org.obiba.magma.*;
 import org.obiba.magma.support.VariableNature;
-import org.obiba.opal.web.magma.math.BinarySummaryResource;
-import org.obiba.opal.web.magma.math.CategoricalSummaryResource;
-import org.obiba.opal.web.magma.math.ContinuousSummaryResource;
-import org.obiba.opal.web.magma.math.DefaultSummaryResource;
-import org.obiba.opal.web.magma.math.GeoSummaryResource;
-import org.obiba.opal.web.magma.math.SummaryResource;
-import org.obiba.opal.web.magma.math.TextSummaryResource;
+import org.obiba.opal.web.magma.math.*;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.support.InvalidRequestException;
@@ -34,6 +20,9 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.ws.rs.core.*;
+import java.util.List;
 
 @Component("variableResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -58,7 +47,7 @@ public class VariableResourceImpl extends AbstractValueTableResource implements 
   public VariableDto get(UriInfo uriInfo) {
     UriBuilder uriBuilder = UriBuilder.fromPath("/");
     List<PathSegment> pathSegments = uriInfo.getPathSegments();
-    for(int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++) {
       uriBuilder.segment(pathSegments.get(i).getPath());
     }
     String tableUri = uriBuilder.build().toString();
@@ -73,20 +62,17 @@ public class VariableResourceImpl extends AbstractValueTableResource implements 
 
   @Override
   public Response deleteVariable() {
-    if(getValueTable().isView()) throw new InvalidRequestException("Derived variable must be deleted by the view");
+    if (getValueTable().isView()) throw new InvalidRequestException("Derived variable must be deleted by the view");
 
     // The variable must exist
     Variable v = getValueTable().getVariable(name);
-
-    if (tableListeners != null && !tableListeners.isEmpty()) {
-      for (ValueTableUpdateListener listener : tableListeners) {
-        listener.onDelete(getValueTable(), v);
-      }
+    for (ValueTableUpdateListener listener : getTableListeners()) {
+      listener.onDelete(getValueTable(), v);
     }
 
-    try(ValueTableWriter tableWriter = getValueTable().getDatasource()
+    try (ValueTableWriter tableWriter = getValueTable().getDatasource()
         .createWriter(getValueTable().getName(), getValueTable().getEntityType());
-        ValueTableWriter.VariableWriter variableWriter = tableWriter.writeVariables()) {
+         ValueTableWriter.VariableWriter variableWriter = tableWriter.writeVariables()) {
       variableWriter.removeVariable(v);
       return Response.ok().build();
     }
@@ -139,8 +125,7 @@ public class VariableResourceImpl extends AbstractValueTableResource implements 
       if (foundAttribute(attr, name, namespace, locale)) {
         found = true;
         builder.addAttribute(attrBuilder.build());
-      }
-      else
+      } else
         builder.addAttribute(attr);
     }
     if (!found) builder.addAttribute(attrBuilder.build());
@@ -174,29 +159,29 @@ public class VariableResourceImpl extends AbstractValueTableResource implements 
   }
 
   private Response updateVariable(Variable updatedVariable) {
-    if(getValueTable().isView()) throw new InvalidRequestException("Derived variable must be updated by the view");
+    if (getValueTable().isView()) throw new InvalidRequestException("Derived variable must be updated by the view");
 
     // The variable must exist
     Variable variable = getValueTable().getVariable(name);
 
-    if(!variable.getEntityType().equals(updatedVariable.getEntityType())) {
+    if (!variable.getEntityType().equals(updatedVariable.getEntityType())) {
       throw new InvalidRequestException("Variable entity type must be the same as the one of the table");
     }
 
-    if(!variable.getName().equals(updatedVariable.getName())) {
+    if (!variable.getName().equals(updatedVariable.getName())) {
       throw new InvalidRequestException("Variable cannot be renamed");
     }
 
-    try(ValueTableWriter tableWriter = getValueTable().getDatasource()
+    try (ValueTableWriter tableWriter = getValueTable().getDatasource()
         .createWriter(getValueTable().getName(), getValueTable().getEntityType());
-        ValueTableWriter.VariableWriter variableWriter = tableWriter.writeVariables()) {
+         ValueTableWriter.VariableWriter variableWriter = tableWriter.writeVariables()) {
       variableWriter.writeVariable(updatedVariable);
       return Response.ok().build();
     }
   }
 
   private SummaryResource getSummaryResourceClass(VariableNature nature) {
-    switch(nature) {
+    switch (nature) {
       case CATEGORICAL:
         return applicationContext.getBean(CategoricalSummaryResource.class);
       case CONTINUOUS:
