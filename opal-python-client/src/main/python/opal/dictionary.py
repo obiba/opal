@@ -2,8 +2,8 @@
 Opal data dictionary.
 """
 
-import sys
 import opal.core
+import sys
 
 
 def add_arguments(parser):
@@ -11,7 +11,7 @@ def add_arguments(parser):
     Add variable command specific options
     """
     parser.add_argument('name',
-                        help='Fully qualified name of a datasource or a table or a variable, for instance: opal-data or opal-data.questionnaire or opal-data.questionnaire:Q1. Wild cards can also be used, for instance: "*", "opal-data.*", etc.')
+                        help='Fully qualified name of a datasource/project or a table or a variable, for instance: opal-data or opal-data.questionnaire or opal-data.questionnaire:Q1. Wild cards can also be used, for instance: "*", "opal-data.*", etc.')
     parser.add_argument('--json', '-j', action='store_true', help='Pretty JSON formatting of the response')
 
 

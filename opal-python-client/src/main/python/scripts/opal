@@ -3,6 +3,7 @@
 import argparse
 
 import opal.rest
+import opal.export_annotations
 import opal.dictionary
 import opal.data
 import opal.file
@@ -64,7 +65,6 @@ def add_subcommand(name, help, add_args_func, default_func):
     add_args_func(subparser)
     subparser.set_defaults(func=default_func)
 
-
 # Parse arguments
 parser = argparse.ArgumentParser(description='Opal command line.')
 subparsers = parser.add_subparsers(title='sub-commands',
@@ -114,6 +114,7 @@ add_subcommand('export-sql', 'Export data to a SQL database.', opal.export_sql.a
                opal.export_sql.do_command)
 add_subcommand('export-vcf', 'Export genotypes data to VCF/BCF files.', opal.export_vcf.add_arguments,
                opal.export_vcf.do_command)
+add_subcommand('export-annot', 'Extract data dictionary annotations in CSV/TSV format.', opal.export_annotations.add_arguments, opal.export_annotations.do_command)
 add_subcommand('copy-table', 'Copy a table into another table.', opal.copy_table.add_arguments, opal.copy_table.do_command)
 add_subcommand('delete-table', 'Delete some tables.', opal.delete_table.add_arguments, opal.delete_table.do_command)
 add_subcommand('user', 'Manage users.', opal.user.add_arguments, opal.user.do_command)
