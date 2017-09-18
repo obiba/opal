@@ -3,7 +3,6 @@
 import argparse
 
 import opal.rest
-import opal.export_annotations
 import opal.dictionary
 import opal.data
 import opal.file
@@ -20,6 +19,7 @@ import opal.import_sql
 import opal.import_vcf
 import opal.import_ids
 import opal.import_idsmap
+import opal.import_annotations
 import opal.export_xml
 import opal.export_csv
 import opal.export_rsas
@@ -27,6 +27,7 @@ import opal.export_rspss
 import opal.export_rstata
 import opal.export_sql
 import opal.export_vcf
+import opal.export_annotations
 import opal.copy_table
 import opal.delete_table
 import opal.user
@@ -100,6 +101,7 @@ add_subcommand('import-ids', 'Import system identifiers.', opal.import_ids.add_a
                opal.import_ids.do_command)
 add_subcommand('import-ids-map', 'Import identifiers mappings.', opal.import_idsmap.add_arguments,
                opal.import_idsmap.do_command)
+add_subcommand('import-annot', 'Apply data dictionary annotations specified in a file in CSV/TSV format (see export-annot).', opal.import_annotations.add_arguments, opal.import_annotations.do_command)
 add_subcommand('export-xml', 'Export data to a zip of Opal XML files.', opal.export_xml.add_arguments,
                opal.export_xml.do_command)
 add_subcommand('export-csv', 'Export data to a folder of CSV files.', opal.export_csv.add_arguments,

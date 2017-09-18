@@ -2,11 +2,11 @@
 Opal dictionary annotations extraction.
 """
 
+import argparse
+import csv
 import json
 import opal.core
 import sys
-import csv
-import argparse
 
 
 def add_arguments(parser):
@@ -15,9 +15,12 @@ def add_arguments(parser):
     """
     parser.add_argument('name',
                         help='Fully qualified name of a datasource/project or a table or a variable, for instance: opal-data or opal-data.questionnaire or opal-data.questionnaire:Q1. Wild cards can also be used, for instance: "opal-data.*", etc.')
-    parser.add_argument('--output', '-out', help='CSV/TSV file to output (default is stdout)', type=argparse.FileType('w'), default=sys.stdout)
-    parser.add_argument('--separator', '-s', required=False, help='Separator char for CSV/TSV format (default is the tabulation character)')
-    parser.add_argument('--taxonomies', '-t', nargs='+', required=False, help='The list of taxonomy names of interest (default is any)')
+    parser.add_argument('--output', '-out', help='CSV/TSV file to output (default is stdout)',
+                        type=argparse.FileType('w'), default=sys.stdout)
+    parser.add_argument('--separator', '-s', required=False,
+                        help='Separator char for CSV/TSV format (default is the tabulation character)')
+    parser.add_argument('--taxonomies', '-tx', nargs='+', required=False,
+                        help='The list of taxonomy names of interest (default is any that are found in the variable attributes)')
 
 
 def do_command(args):
@@ -28,7 +31,7 @@ def do_command(args):
     try:
         sep = csv_separator(args)
         writer = csv.writer(args.output, delimiter=sep)
-        writer.writerow(['project','table','variable','namespace','name','value'])
+        writer.writerow(['project', 'table', 'variable', 'namespace', 'name', 'value'])
         handle_item(args, writer, args.name)
     except Exception, e:
         print e
@@ -40,7 +43,7 @@ def do_command(args):
 
 
 def handle_item(args, writer, name):
-    #print 'Handling ' + name
+    # print 'Handling ' + name
     request = opal.core.OpalClient.build(opal.core.OpalClient.LoginInfo.parse(args)).new_request()
     request.fail_on_error().accept_json()
 
@@ -66,6 +69,7 @@ def handle_item(args, writer, name):
     if resolver.is_variable():
         handle_variable(args, writer, resolver.datasource, resolver.table, res)
 
+
 def handle_datasource(args, writer, datasourceObject):
     for table in datasourceObject['table']:
         handle_item(args, writer, datasourceObject['name'] + '.' + table + ':*')
@@ -76,12 +80,13 @@ def handle_table(args, writer, tableObject):
 
 
 def handle_variable(args, writer, datasource, table, variableObject):
-    sep = csv_separator(args)
     if 'attributes' in variableObject:
         for attribute in variableObject['attributes']:
             if 'namespace' in attribute and 'locale' not in attribute:
                 if not args.taxonomies or attribute['namespace'] in args.taxonomies:
-                    writer.writerow([datasource,table,variableObject['name'],attribute['namespace'],attribute['name'],attribute['value']])
+                    row = [datasource, table, variableObject['name'], attribute['namespace'], attribute['name'],
+                           attribute['value']]
+                    writer.writerow([s.encode("utf-8") for s in row])
 
 
 def csv_separator(args):

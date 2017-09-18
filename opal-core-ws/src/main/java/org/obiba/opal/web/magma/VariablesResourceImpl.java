@@ -230,7 +230,7 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
    */
   private Iterable<Variable> getVariables(ValueTable table, List<String> variableNames) {
     if (variableNames == null || variableNames.isEmpty()) return table.getVariables();
-    return variableNames.stream().map(table::getVariable).collect(Collectors.toList());
+    return variableNames.stream().filter(table::hasVariable).map(table::getVariable).collect(Collectors.toList());
   }
 
   private boolean isSameAttribute(Attribute source, Attribute target) {
