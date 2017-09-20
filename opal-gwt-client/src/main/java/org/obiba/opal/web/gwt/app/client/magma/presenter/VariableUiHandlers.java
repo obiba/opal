@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
 import com.google.gwt.core.client.JsArray;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.NamespacedAttributesTableUiHandlers;
+import org.obiba.opal.web.gwt.app.client.magma.variable.view.TaxonomyAttributes;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 
 public interface VariableUiHandlers extends NamespacedAttributesTableUiHandlers {
@@ -55,5 +56,7 @@ public interface VariableUiHandlers extends NamespacedAttributesTableUiHandlers 
   void onDeleteAnnotation();
 
   void onAddToCart();
+
+  void onSearchSimilarVariables(TaxonomyAttributes taxonomyAttributes);
 
 }

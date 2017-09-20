@@ -176,6 +176,9 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   DropdownButton editAnnotation;
 
   @UiField
+  IconAnchor searchSimilar;
+
+  @UiField
   Panel annotationPanel;
 
   @UiField
@@ -202,6 +205,8 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   private final Translations translations;
 
   private List<TaxonomyDto> taxonomies;
+
+  private TaxonomyAttributesPanel taxonomyAttributesPanel;
 
   @Inject
   public VariableView(Binder uiBinder, Translations translations, TranslationMessages translationMessages) {
@@ -380,6 +385,11 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     getUiHandlers().onAddToCart();
   }
 
+  @UiHandler("searchSimilar")
+  void onSearchSimilarVariables(ClickEvent event) {
+    if (taxonomyAttributesPanel != null)
+      getUiHandlers().onSearchSimilarVariables(taxonomyAttributesPanel.getTaxonomyAttributes());
+  }
   //
   // VariablePresenter.Display Methods
   //
@@ -547,6 +557,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
       labelPanel.clear();
       descriptionPanel.clear();
       annotationPanel.clear();
+      searchSimilar.setVisible(false);
       attributesPanel.clear();
 
       if (variableDto.getAttributesArray() == null || variableDto.getAttributesArray().length() == 0) {
@@ -567,7 +578,9 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
       labelPanel.initialize(attributesArray, translations.noLabelInfo());
       descriptionPanel.initialize(attributesArray, translations.noDescriptionInfo());
-      annotationPanel.add(new TaxonomyAttributesPanel(attributesArray, taxonomies));
+      taxonomyAttributesPanel = new TaxonomyAttributesPanel(attributesArray, taxonomies);
+      annotationPanel.add(taxonomyAttributesPanel);
+      searchSimilar.setVisible(!taxonomyAttributesPanel.getTaxonomyAttributes().isEmpty());
 
       for (String namespace : namespaces) {
         NamespacedAttributesTable child = new NamespacedAttributesTable(attributesArray, namespace, translationMessages);

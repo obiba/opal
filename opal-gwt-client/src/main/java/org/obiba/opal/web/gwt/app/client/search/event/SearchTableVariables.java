@@ -11,6 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.search.event;
 
 import com.gwtplatform.dispatch.annotation.GenEvent;
+import org.obiba.opal.web.gwt.app.client.magma.variable.view.TaxonomyAttributes;
 
 @GenEvent
 public class SearchTableVariables {
@@ -18,5 +19,7 @@ public class SearchTableVariables {
   String datasource;
 
   String table;
+
+  TaxonomyAttributes taxonomyAttributes;
 
 }

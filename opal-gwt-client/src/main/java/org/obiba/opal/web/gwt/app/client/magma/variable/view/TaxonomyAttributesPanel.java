@@ -38,11 +38,10 @@ import java.util.Map;
  */
 public class TaxonomyAttributesPanel extends FlowPanel {
 
-  private final List<TaxonomyDto> taxonomies;
+  private final TaxonomyAttributes taxonomyAttributes = new TaxonomyAttributes();
 
   public TaxonomyAttributesPanel(JsArray<AttributeDto> attributes, List<TaxonomyDto> taxonomies) {
     addStyleName("top-margin");
-    this.taxonomies = taxonomies;
 
     // group attributes by taxonomy name
     Map<String, List<AttributeDto>> namespacedAttributes = Maps.newHashMap();
@@ -58,12 +57,16 @@ public class TaxonomyAttributesPanel extends FlowPanel {
     List<String> namespaces = Lists.newArrayList(namespacedAttributes.keySet());
     Collections.sort(namespaces);
     for (String namespace : namespaces) {
-      TaxonomyDto taxonomy = getTaxonomy(namespace);
+      TaxonomyDto taxonomy = getTaxonomy(taxonomies, namespace);
       if (taxonomy != null) {
         // if there is a taxonomy corresponding to this namespace, display corresponding vocabulary
         showTaxonomyAttributes(taxonomy, namespacedAttributes.get(namespace));
       }
     }
+  }
+
+  public TaxonomyAttributes getTaxonomyAttributes() {
+    return taxonomyAttributes;
   }
 
   private void showTaxonomyAttributes(TaxonomyDto taxonomy, List<AttributeDto> taxoAttributes) {
@@ -131,6 +134,7 @@ public class TaxonomyAttributesPanel extends FlowPanel {
     if (Strings.isNullOrEmpty(termTitle)) termTitle = term.getName();
     String termDesc = AttributeHelper.getLocaleText(term.getDescriptionArray());
     propertiesTable.addProperty(makeWidget(vocTitle, vocDesc), makeWidget(termTitle, termDesc));
+    taxonomyAttributes.put(taxonomy, vocabulary, term);
   }
 
   private Widget makeWidget(String title, String description) {
@@ -146,7 +150,7 @@ public class TaxonomyAttributesPanel extends FlowPanel {
     return widget;
   }
 
-  private TaxonomyDto getTaxonomy(String namespace) {
+  private TaxonomyDto getTaxonomy(List<TaxonomyDto> taxonomies, String namespace) {
     for (TaxonomyDto taxonomyDto : taxonomies) {
       if (taxonomyDto.getName().equals(namespace)) return taxonomyDto;
     }

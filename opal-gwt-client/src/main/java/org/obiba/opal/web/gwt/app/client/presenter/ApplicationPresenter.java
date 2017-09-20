@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.presenter;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.gwt.core.client.GWT;
@@ -46,6 +47,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueMapPopupPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.view.TaxonomyAttributes;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectHiddenEvent;
@@ -65,6 +67,8 @@ import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -244,7 +248,20 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     addRegisteredHandler(SearchTableVariablesEvent.getType(), new SearchTableVariablesEvent.SearchTableVariablesHandler() {
       @Override
       public void onSearchTableVariables(SearchTableVariablesEvent event) {
-        revealSearchVariables("in(project,(" + event.getDatasource().replaceAll(" ", "+") + ")),in(table,(" + event.getTable().replaceAll(" ", "+") + "))");
+        StringBuilder rqlQuery = new StringBuilder()
+            .append("in(project,(").append(event.getDatasource().replaceAll(" ", "+")).append("))")
+            .append(",in(table,(").append(event.getTable().replaceAll(" ", "+")).append("))");
+        if (event.getTaxonomyAttributes() != null) {
+          TaxonomyAttributes taxonomyAttributes = event.getTaxonomyAttributes();
+          for (String taxonomyName : event.getTaxonomyAttributes().keySet()) {
+            Map<String, List<String>> vocabularyMap = taxonomyAttributes.get(taxonomyName);
+            for (String vocabularyName : vocabularyMap.keySet()) {
+              rqlQuery.append(",in(").append(taxonomyName).append("-").append(vocabularyName).append(",(")
+                  .append(Joiner.on(",").join(vocabularyMap.get(vocabularyName))).append("))");
+            }
+          }
+        }
+        revealSearchVariables(rqlQuery.toString());
       }
     });
 

@@ -502,7 +502,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onSearchVariables() {
-    fireEvent(new SearchTableVariablesEvent(table.getDatasourceName(), table.getName()));
+    fireEvent(new SearchTableVariablesEvent(table.getDatasourceName(), table.getName(), null));
   }
 
   @Override

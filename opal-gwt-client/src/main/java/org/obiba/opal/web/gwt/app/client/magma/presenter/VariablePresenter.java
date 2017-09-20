@@ -33,6 +33,7 @@ import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.NamespacedAttr
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableTaxonomyModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.view.TaxonomyAttributes;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
@@ -42,6 +43,7 @@ import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
+import org.obiba.opal.web.gwt.app.client.search.event.SearchTableVariablesEvent;
 import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
 import org.obiba.opal.web.gwt.app.client.support.OpalSystemCache;
@@ -469,6 +471,11 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   @Override
   public void onAddToCart() {
     fireEvent(new CartAddVariableEvent(table.getEntityType(), table.getDatasourceName(), table.getName(), variable.getName()));
+  }
+
+  @Override
+  public void onSearchSimilarVariables(TaxonomyAttributes taxonomyAttributes) {
+    fireEvent(new SearchTableVariablesEvent(table.getDatasourceName(), table.getName(), taxonomyAttributes));
   }
 
   @Override
