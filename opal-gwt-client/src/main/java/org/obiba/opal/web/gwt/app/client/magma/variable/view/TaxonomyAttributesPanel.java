@@ -119,6 +119,9 @@ public class TaxonomyAttributesPanel extends FlowPanel {
         attribute = attr;
     }
     if (attribute == null) return;
+    // Not sure it is a good idea to add open terms
+    //if (!attribute.hasLocale())
+    //  taxonomyAttributes.put(taxonomy, vocabulary, attribute.getValue());
 
     String vocTitle = AttributeHelper.getLocaleText(vocabulary.getTitleArray());
     if (Strings.isNullOrEmpty(vocTitle)) vocTitle = vocabulary.getName();
