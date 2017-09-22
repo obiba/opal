@@ -360,24 +360,20 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   }
 
   private void updateDisplay(TableDto tableDto) {
-    //getView().clear(table == null || !table.getLink().equals(tableDto.getLink()));
-    if (table == null || !table.getLink().equals(tableDto.getLink())) {
-      table = tableDto;
-      getView().setTable(tableDto);
-      if(tableIsView()) {
-        showViewProperties(table);
-      } else {
-        getView().setFromTables(null, null);
-        getView().setWhereScript(null);
-      }
-      variableFilter = "";
-      valuesFilter = null;
-      valuesFilterText = "";
-      updateVariables();
-      updateTableIndexStatus();
-      authorize();
+    table = tableDto;
+    getView().setTable(tableDto);
+    if(tableIsView()) {
+      showViewProperties(table);
+    } else {
+      getView().setFromTables(null, null);
+      getView().setWhereScript(null);
     }
-    else table = tableDto;
+    variableFilter = "";
+    valuesFilter = null;
+    valuesFilterText = "";
+    updateVariables();
+    updateTableIndexStatus();
+    authorize();
 
     if(getView().isValuesTabSelected()) {
       valuesTablePresenter.setTable(tableDto);
