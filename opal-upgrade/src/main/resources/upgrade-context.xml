@@ -92,6 +92,9 @@
         </bean>
         <bean class="org.obiba.opal.core.install.CreateOpalGeneralConfigInstallStep"/>
         <bean class="org.obiba.opal.core.install.DefaultPluginsInstallStep"/>
+        <bean class="org.obiba.opal.core.install.DefaultPermissionsInstallStep">
+          <property name="subjectAclService" ref="subjectAclService"/>
+        </bean>
       </list>
     </property>
 
@@ -153,6 +156,10 @@
         </bean>
         <bean class="org.obiba.opal.core.upgrade.v2_10_x.DefaultPluginsUpgradeStep">
           <property name="description" value="Install the default plugins from the OBiBa plugins repository"/>
+          <property name="appliesTo" value="2.10.0"/>
+        </bean>
+        <bean class="org.obiba.opal.core.upgrade.v2_10_x.DefaultPermissionsUpgradeStep">
+          <property name="description" value="Apply default permissions to be consistent with Agate default settings"/>
           <property name="appliesTo" value="2.10.0"/>
         </bean>
 
