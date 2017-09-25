@@ -16,10 +16,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.*;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -63,6 +60,9 @@ public class SearchEntityView extends ViewWithUiHandlers<SearchEntityUiHandlers>
   @UiField
   EntityTypeDropdown typeDropdown;
 
+  @UiField(provided = true)
+  Typeahead entityTypeahead;
+
   @UiField
   TextBox entityId;
 
@@ -96,16 +96,31 @@ public class SearchEntityView extends ViewWithUiHandlers<SearchEntityUiHandlers>
   @UiField
   OpalSimplePager valueSetPager;
 
+  private EntityIdentifierSuggestOracle oracle;
+
   private List<VariableValueRow> variableValueRows;
 
   private ListDataProvider<VariableValueRow> valueSetProvider = new ListDataProvider<VariableValueRow>();
 
   @Inject
   public SearchEntityView(SearchEntityView.Binder uiBinder, Translations translations, PlaceManager placeManager) {
+    initEntityTypeahead();
     initWidget(uiBinder.createAndBindUi(this));
     this.placeManager = placeManager;
     initValueSetTable();
     filter.getTextBox().setPlaceholder(translations.filterVariables());
+    typeDropdown.addChangeHandler(new ChangeHandler() {
+      @Override
+      public void onChange(ChangeEvent event) {
+        oracle.setEntityType(typeDropdown.getSelection());
+      }
+    });
+  }
+
+  private void initEntityTypeahead() {
+    oracle = new EntityIdentifierSuggestOracle("Participant");
+    entityTypeahead = new Typeahead(oracle);
+    entityTypeahead.setDisplayItemCount(10);
   }
 
   @Override
@@ -201,6 +216,8 @@ public class SearchEntityView extends ViewWithUiHandlers<SearchEntityUiHandlers>
     }
     return true;
   }
+
+
 
   /**
    * Build the complete variable value variableValueRows.

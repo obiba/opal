@@ -12,3 +12,10 @@ message IdentifiersMappingConfigDto {
   optional bool allowIdentifierGeneration = 2 [default = false];
   optional bool ignoreUnknownIdentifier = 3 [default = false];
 }
+
+message IdentifierSuggestions {
+  required string entityType = 1;
+  required string query = 2;
+  required uint32 limit = 3;
+  repeated string identifiers = 4;
+}

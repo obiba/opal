@@ -180,6 +180,13 @@ public enum UriBuilders {
     }
   },
 
+  DATASOURCES_ENTITIES_SUGGEST {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasources", "entities", "_suggest");
+    }
+  },
+
   DATASOURCES_ENTITIES_SEARCH {
     @Override
     public UriBuilder create() {

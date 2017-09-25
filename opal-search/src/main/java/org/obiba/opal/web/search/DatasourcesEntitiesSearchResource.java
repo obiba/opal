@@ -13,16 +13,16 @@ package org.obiba.opal.web.search;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import net.jazdw.rql.parser.ASTNode;
-import org.obiba.magma.Category;
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.Variable;
+import org.obiba.magma.*;
 import org.obiba.magma.support.MagmaEngineVariableResolver;
+import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.support.VariableNature;
 import org.obiba.magma.type.BooleanType;
+import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.search.AbstractSearchUtility;
 import org.obiba.opal.spi.search.QuerySettings;
 import org.obiba.opal.spi.search.SearchException;
+import org.obiba.opal.web.model.Identifiers;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.RQLIdentifierCriterionParser;
 import org.obiba.opal.web.search.support.RQLParserFactory;
@@ -31,6 +31,7 @@ import org.obiba.opal.web.search.support.ValueSetVariableCriterionParser;
 import org.obiba.opal.web.ws.SortDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +42,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -50,7 +52,40 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
 
   private static final Logger log = LoggerFactory.getLogger(DatasourcesEntitiesSearchResource.class);
 
+  @Autowired
+  private IdentifiersTableService identifiersTableService;
+
   private String entityType;
+
+  @GET
+  @Transactional(readOnly = true)
+  @Path("_suggest")
+  public Identifiers.IdentifierSuggestions search(@QueryParam("query") String query,
+                                                  @QueryParam("type") @DefaultValue("Participant") String entityType,
+                                                  @QueryParam("limit") @DefaultValue("10") int limit) {
+    String queryStr = Strings.isNullOrEmpty(query) ? "" : query.trim();
+    Identifiers.IdentifierSuggestions.Builder builder = Identifiers.IdentifierSuggestions.newBuilder()
+        .setEntityType(entityType)
+        .setLimit(limit)
+        .setQuery(queryStr);
+
+    if (!identifiersTableService.hasIdentifiersTable(entityType)) return builder.build();
+    Set<VariableEntity> entities = identifiersTableService.getIdentifiersTable(entityType).getVariableEntities();
+
+    if ("*".equals(queryStr))
+      builder.addAllIdentifiers(entities.stream().map(VariableEntity::getIdentifier)
+          .limit(limit).sorted().collect(Collectors.toList()));
+    else {
+      VariableEntity entity = new VariableEntityBean(entityType, queryStr);
+      if (entities.contains(entity)) builder.addIdentifiers(queryStr);
+      builder.addAllIdentifiers(entities.stream().map(VariableEntity::getIdentifier)
+          .filter(id -> !id.equals(queryStr) && id.startsWith(queryStr)).limit(limit - builder.getIdentifiersCount()).sorted().collect(Collectors.toList()));
+      builder.addAllIdentifiers(entities.stream().map(VariableEntity::getIdentifier)
+          .filter(id -> !id.startsWith(queryStr) && id.contains(queryStr)).limit(limit - builder.getIdentifiersCount()).sorted().collect(Collectors.toList()));
+    }
+
+    return builder.build();
+  }
 
   @GET
   @Transactional(readOnly = true)
@@ -118,7 +153,8 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
 
     ValueTable table0 = getValueTable(var0Resolver);
     Variable var0 = table0.getVariable(var0Resolver.getVariableName());
-    if (!VariableNature.getNature(var0).equals(VariableNature.CATEGORICAL)) return Response.status(Response.Status.BAD_REQUEST).build();
+    if (!VariableNature.getNature(var0).equals(VariableNature.CATEGORICAL))
+      return Response.status(Response.Status.BAD_REQUEST).build();
 
     ValueTable table1 = getValueTable(var1Resolver);
     // verify variable exists and is accessible
@@ -127,7 +163,8 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
     // one facet per crossVar0 category
     Search.QueryTermsDto.Builder queryBuilder = Search.QueryTermsDto.newBuilder();
     List<String> categories;
-    if (var0.hasCategories()) categories = var0.getCategories().stream().map(Category::getName).collect(Collectors.toList());
+    if (var0.hasCategories())
+      categories = var0.getCategories().stream().map(Category::getName).collect(Collectors.toList());
     else if (var0.getValueType().equals(BooleanType.get())) categories = Lists.newArrayList("true", "false");
     else
       return Response.status(Response.Status.BAD_REQUEST).build();
@@ -165,7 +202,7 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
       return Response.ok().entity(dtoResult).build();
     } catch (Exception e) {
       // Search engine exception
-      throw new SearchException("Contingency query failed to be executed: " + crossVar0 +" x " + crossVar1, e.getCause() == null ? e : e.getCause());
+      throw new SearchException("Contingency query failed to be executed: " + crossVar0 + " x " + crossVar1, e.getCause() == null ? e : e.getCause());
     }
   }
 

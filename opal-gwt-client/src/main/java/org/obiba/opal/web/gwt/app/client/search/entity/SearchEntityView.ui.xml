@@ -32,7 +32,9 @@
     <g:FlowPanel ui:field="entityPanel">
       <b:Well addStyleNames="form-search">
         <o2:EntityTypeDropdown ui:field="typeDropdown" size="SMALL"/>
-        <b:TextBox ui:field="entityId" placeholder="Entity identifier..." addStyleNames="small-indent"/>
+        <b:Typeahead ui:field="entityTypeahead">
+          <b:TextBox ui:field="entityId" placeholder="Entity identifier..." addStyleNames="small-indent"/>
+        </b:Typeahead>
         <b:Button ui:field="searchButton" addStyleNames="btn btn-primary small-indent">
           <ui:msg description="Search Button label">Search</ui:msg>
         </b:Button>
