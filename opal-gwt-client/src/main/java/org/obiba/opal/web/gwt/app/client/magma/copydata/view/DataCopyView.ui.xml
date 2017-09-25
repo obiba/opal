@@ -73,10 +73,10 @@
             <ui:msg description="Copy Incremental help">Whether only new or updated data will be copied.</ui:msg>
           </b:HelpBlock>
           <b:CheckBox ui:field="copyNullValues">
-            <ui:msg description="Incremental checkbox label">copy null values</ui:msg>
+            <ui:msg description="Copy Null Values label">copy null values</ui:msg>
           </b:CheckBox>
           <b:HelpBlock>
-            <ui:msg description="Copy Destination Name help">Whether a data can be overridden by a null value.</ui:msg>
+            <ui:msg description="Copy Null Values help">Whether a data can be overridden by a null value.</ui:msg>
           </b:HelpBlock>
         </g:FlowPanel>
       </o:CollapsiblePanel>
