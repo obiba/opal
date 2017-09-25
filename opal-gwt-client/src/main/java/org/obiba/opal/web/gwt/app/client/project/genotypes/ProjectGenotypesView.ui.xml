@@ -56,7 +56,7 @@
             </b:Column>
             <b:Column size="6" ui:field="mappingColumn">
               <b:Heading size="4" addStyleNames="inline-block small-top-margin">
-                <ui:msg description="Genotypes Mapping Table label">Sample-Participant Mapping</ui:msg>
+                <ui:msg description="Sample Participant Mapping label">Sample-Participant Mapping</ui:msg>
               </b:Heading>
               <b2:IconAnchor ui:field="editMapping" icon="EDIT" addStyleNames="small-indent">
               </b2:IconAnchor>
@@ -64,7 +64,7 @@
               </b2:IconAnchor>
               <g:FlowPanel>
                 <b:HelpBlock>
-                  <ui:msg description="Genotypes Mapping Table help">Enhance the description of the genotypes with a table describing the samples: associated participant ID and case-controls identification.</ui:msg>
+                  <ui:msg description="Sample Participant Mapping help">Enhance the description of the genotypes with a table describing the samples: associated participant ID and case-controls identification.</ui:msg>
                 </b:HelpBlock>
                 <b:Button type="INFO" icon="PLUS" ui:field="addMapping">
                   <ui:msg description="Add Sample Mapping label">Add Mapping</ui:msg>

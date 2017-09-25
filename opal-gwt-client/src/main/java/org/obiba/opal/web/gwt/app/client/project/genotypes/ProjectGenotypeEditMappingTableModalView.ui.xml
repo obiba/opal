@@ -33,28 +33,28 @@
 
       <b:ControlGroup ui:field="participantIdVariableGroup">
         <b:ControlLabel for="participantIds">
-          <ui:msg description="Mapping Table label">Participant ID Variable</ui:msg>
+          <ui:msg description="Participant ID Variable label">Participant ID Variable</ui:msg>
         </b:ControlLabel>
         <o:Chooser ui:field="participantIds" name="participantIds"/>
         <b:HelpBlock>
-          <ui:msg description="Genotypes Participant ID variable name help">The participant ID variable name.</ui:msg>
+          <ui:msg description="Participant ID Variable help">The participant ID variable name.</ui:msg>
         </b:HelpBlock>
       </b:ControlGroup>
 
       <b:ControlGroup ui:field="sampleRoleVariableGroup">
         <b:ControlLabel for="sampleRoleIds">
-          <ui:msg description="Mapping Table label">Sample Role Variable</ui:msg>
+          <ui:msg description="Sample Role Variable label">Sample Role Variable</ui:msg>
         </b:ControlLabel>
         <o:Chooser ui:field="sampleRoleIds" name="sampleRoleIds"/>
         <b:HelpBlock>
-          <ui:msg description="Genotypes sampleRole ID variable name help">The sample Role variable name.</ui:msg>
+          <ui:msg description="Sample Role Variable help">The sample Role variable name.</ui:msg>
         </b:HelpBlock>
       </b:ControlGroup>
     </g:FlowPanel>
 
     <b:ModalFooter>
       <b:Button ui:field="saveButton" type="PRIMARY">
-        <ui:msg description="Genotypes Save mapping table label">Save</ui:msg>
+        <ui:msg description="Save button label">Save</ui:msg>
       </b:Button>
       <b:Button ui:field="cancelButton">
         <ui:msg description="Cancel button label">Cancel</ui:msg>

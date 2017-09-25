@@ -31,7 +31,7 @@
             <ui:msg description="Sample Identifier label">Sample Identifier:</ui:msg>
           </b1:InlineLabel>
           <b1:InlineLabel ui:field="sampleIdentifier">
-            <ui:msg>99999</ui:msg>
+            99999
           </b1:InlineLabel>
         </b:ControlGroup>
 
