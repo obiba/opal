@@ -38,8 +38,6 @@ public class PluginsManager {
 
   private static final Logger log = LoggerFactory.getLogger(PluginsManager.class);
 
-  private static final String PLUGINS_REPO_FILE = "plugins.json";
-
   private static final String PLUGIN_DIST_SUFFIX = "-dist.zip";
 
   private final File pluginsDir = new File(OpalRuntime.PLUGINS_DIR);
