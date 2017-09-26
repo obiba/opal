@@ -96,6 +96,10 @@
     </dependency>
     <dependency>
       <groupId>org.obiba.commons</groupId>
+      <artifactId>obiba-plugins</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.commons</groupId>
       <artifactId>obiba-git</artifactId>
     </dependency>
     <dependency>

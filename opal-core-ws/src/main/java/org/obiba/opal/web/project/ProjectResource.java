@@ -31,7 +31,7 @@ import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.VCFSamplesMappingService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
-import org.obiba.opal.spi.ServicePlugin;
+import org.obiba.plugins.spi.ServicePlugin;
 import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.security.KeyStoreResource;

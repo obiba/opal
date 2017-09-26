@@ -27,6 +27,10 @@
       <artifactId>obiba-core</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.obiba.commons</groupId>
+      <artifactId>obiba-plugins</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-api</artifactId>
     </dependency>

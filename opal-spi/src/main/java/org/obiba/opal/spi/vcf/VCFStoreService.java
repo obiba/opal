@@ -10,7 +10,8 @@
 
 package org.obiba.opal.spi.vcf;
 
-import org.obiba.opal.spi.ServicePlugin;
+
+import org.obiba.plugins.spi.ServicePlugin;
 
 import java.util.Collection;
 import java.util.NoSuchElementException;

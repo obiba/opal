@@ -10,19 +10,16 @@
 
 package org.obiba.opal.core.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
 import org.obiba.core.util.FileUtil;
-import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.PluginsService;
-import org.obiba.opal.core.domain.plugins.PluginPackage;
-import org.obiba.opal.core.domain.plugins.PluginRepository;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.core.runtime.Plugin;
+import org.obiba.opal.core.runtime.OpalPlugin;
 import org.obiba.opal.core.runtime.PluginsManager;
-import org.obiba.runtime.Version;
+import org.obiba.plugins.PluginPackage;
+import org.obiba.plugins.PluginRepositoryCache;
+import org.obiba.plugins.PluginRepositoryException;
 import org.obiba.runtime.upgrade.VersionProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,19 +27,14 @@ import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class PluginsServiceImpl implements PluginsService {
-
-  private static final String REPO_FILE = "plugins.json";
 
   @Autowired
   private PluginsManager pluginsManager;
@@ -52,7 +44,7 @@ public class PluginsServiceImpl implements PluginsService {
 
   private VersionProvider opalVersionProvider;
 
-  private PluginRepositoryCache pluginRepositoryCache = new PluginRepositoryCache();
+  private PluginRepositoryCache pluginRepositoryCache;
 
   @NotNull
   @Value("${org.obiba.opal.plugins.site}")
@@ -69,6 +61,7 @@ public class PluginsServiceImpl implements PluginsService {
 
   @Override
   public void stop() {
+    pluginRepositoryCache = null;
   }
 
   @Override
@@ -78,11 +71,11 @@ public class PluginsServiceImpl implements PluginsService {
 
   @Override
   public Date getLastUpdate() {
-    return pluginRepositoryCache.getLastUpdate();
+    return getPluginRepositoryCache().getLastUpdate();
   }
 
   @Override
-  public Plugin getInstalledPlugin(String name) {
+  public OpalPlugin getInstalledPlugin(String name) {
     return pluginsManager.getPlugin(name);
   }
 
@@ -98,7 +91,8 @@ public class PluginsServiceImpl implements PluginsService {
   @Override
   public List<PluginPackage> getInstalledPlugins() {
     return pluginsManager.getPlugins().stream()
-        .map(rp -> new PluginPackage(rp.getName(), rp.getType(), rp.getTitle(), rp.getDescription(), rp.getVersion().toString(), rp.getOpalVersion().toString(), ""))
+        .map(rp -> new PluginPackage(rp.getName(), rp.getType(), rp.getTitle(), rp.getDescription(), rp.getVersion().toString(),
+            rp.getOpalVersion().toString(), null, null, ""))
         .collect(Collectors.toList());
   }
 
@@ -109,21 +103,23 @@ public class PluginsServiceImpl implements PluginsService {
 
   @Override
   public List<PluginPackage> getUpdatablePlugins() {
-    Collection<Plugin> registeredPlugins = pluginsManager.getPlugins();
+    Collection<OpalPlugin> registeredPlugins = pluginsManager.getPlugins();
     // exclude already installed plugin packages whatever the version is
-    return pluginRepositoryCache.getOrUpdatePluginRepository().getPlugins().stream()
+    return getPluginRepositoryCache().getOrUpdatePluginRepository().getPlugins().stream()
+        .filter(PluginPackage::hasOpalVersion)
         .filter(pp -> registeredPlugins.stream().anyMatch(rp -> pp.isNewerThan(rp.getName(), rp.getVersion())))
-        .filter(pp -> opalVersionProvider.getVersion().compareTo(pp.getOpalVersion())>=0)
+        .filter(pp -> opalVersionProvider.getVersion().compareTo(pp.getOpalVersion()) >= 0)
         .collect(Collectors.toList());
   }
 
   @Override
   public List<PluginPackage> getAvailablePlugins() {
-    Collection<Plugin> registeredPlugins = pluginsManager.getPlugins();
+    Collection<OpalPlugin> registeredPlugins = pluginsManager.getPlugins();
     // exclude already installed plugin packages whatever the version is
-    return pluginRepositoryCache.getOrUpdatePluginRepository().getPlugins().stream()
+    return getPluginRepositoryCache().getOrUpdatePluginRepository().getPlugins().stream()
+        .filter(PluginPackage::hasOpalVersion)
         .filter(pp -> registeredPlugins.stream().noneMatch(rp -> pp.isSameAs(rp.getName())))
-        .filter(pp -> opalVersionProvider.getVersion().compareTo(pp.getOpalVersion())>=0)
+        .filter(pp -> opalVersionProvider.getVersion().compareTo(pp.getOpalVersion()) >= 0)
         .collect(Collectors.toList());
   }
 
@@ -132,17 +128,17 @@ public class PluginsServiceImpl implements PluginsService {
     String pVersion = version;
     if (Strings.isNullOrEmpty(version)) {
       // no version specified: get the latest
-      pVersion = pluginRepositoryCache.getPluginLatestVersion(name);
+      pVersion = getPluginRepositoryCache().getPluginLatestVersion(name);
     }
     try {
       File tmpDir = Files.createTempDir();
-      installPlugin(pluginRepositoryCache.downloadPlugin(name, pVersion, tmpDir), true);
+      installPlugin(getPluginRepositoryCache().downloadPlugin(name, pVersion, tmpDir), true);
       FileUtil.delete(tmpDir);
     } catch (IOException e) {
       throw new PluginRepositoryException("Failed to install plugin " + name + ":" + version + " : " + e.getMessage(), e);
     }
   }
-  
+
   @Override
   public void installPlugin(String filePath) {
     installPlugin(opalRuntime.getFileSystem().resolveLocalFile(filePath), false);
@@ -150,13 +146,13 @@ public class PluginsServiceImpl implements PluginsService {
 
   @Override
   public void prepareUninstallPlugin(String name) {
-    Plugin plugin = pluginsManager.getPlugin(name);
+    OpalPlugin plugin = pluginsManager.getPlugin(name);
     plugin.prepareForUninstall();
   }
 
   @Override
   public void cancelUninstallPlugin(String name) {
-    Plugin plugin = pluginsManager.getPlugin(name);
+    OpalPlugin plugin = pluginsManager.getPlugin(name);
     plugin.cancelUninstall();
   }
 
@@ -176,68 +172,9 @@ public class PluginsServiceImpl implements PluginsService {
     return pluginsManager.restartRequired();
   }
 
-  /**
-   * Cache to not query for update site at each request while managing the plugins.
-   */
-  private class PluginRepositoryCache {
-    private static final int DELAY = 600;
-    private PluginRepository pluginRepository;
-    private long lastUpdate;
-
-    private PluginRepository getOrUpdatePluginRepository() {
-      if (hasExpired()) initializePluginRepository();
-      return pluginRepository;
-    }
-
-    private boolean hasExpired() {
-      return pluginRepository == null || (nowInSeconds() - lastUpdate) > DELAY;
-    }
-
-    private Date getLastUpdate() {
-      return lastUpdate == 0 ? null : new Date(lastUpdate * 1000);
-    }
-
-    private File downloadPlugin(String name, String version, File tmpDir) throws IOException {
-      Version versionObj = new Version(version);
-      Optional<PluginPackage> pluginPackage = getOrUpdatePluginRepository().getPlugins().stream().filter(pp -> pp.isSameAs(name, versionObj)).findFirst();
-      if (!pluginPackage.isPresent())
-        throw new NoSuchElementException("Plugin " + name + ":" + version + " cannot be found");
-      File pluginFile = new File(tmpDir, pluginPackage.get().getFileName());
-      ReadableByteChannel rbc = Channels.newChannel(getRepositoryURL(pluginFile.getName()).openStream());
-      FileOutputStream fos = new FileOutputStream(pluginFile);
-      fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-      return pluginFile;
-    }
-
-
-    private void initializePluginRepository() {
-      ObjectMapper mapper = new ObjectMapper();
-      try {
-        pluginRepository = mapper.readValue(getRepositoryURL(REPO_FILE), new TypeReference<PluginRepository>() {});
-        lastUpdate = nowInSeconds();
-      } catch (Exception e) {
-        throw new PluginRepositoryException("Cannot update plugin site: " + e.getMessage(), e);
-      }
-    }
-
-    private long nowInSeconds() {
-      return new Date().getTime() / 1000;
-    }
-
-    private URL getRepositoryURL(String fileName) throws MalformedURLException {
-      String basePath = updateSite.endsWith("/") ? updateSite : updateSite + "/";
-      return new URL(basePath + "/" + fileName);
-    }
-
-    public String getPluginLatestVersion(String name) {
-      Version version = new Version("0.0.0");
-      for (PluginPackage pp : getOrUpdatePluginRepository().getPlugins().stream()
-          .filter(pp -> pp.getName().equals(name))
-          .filter(pp -> opalVersionProvider.getVersion().compareTo(pp.getOpalVersion())>=0)
-          .collect(Collectors.toList())) {
-        if (pp.getVersion().compareTo(version)>0) version = pp.getVersion();
-      }
-      return version.toString();
-    }
+  private PluginRepositoryCache getPluginRepositoryCache() {
+    if (pluginRepositoryCache == null)
+      pluginRepositoryCache = new PluginRepositoryCache(opalVersionProvider, updateSite);
+    return pluginRepositoryCache;
   }
 }
