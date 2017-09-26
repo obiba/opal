@@ -10,43 +10,28 @@
 
 package org.obiba.opal.core.runtime;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONObject;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.io.Files;
 import org.obiba.core.util.FileUtil;
 import org.obiba.magma.type.DateType;
-import org.obiba.opal.spi.ServicePlugin;
+import org.obiba.plugins.spi.ServicePlugin;
 import org.obiba.opal.spi.search.SearchServiceLoader;
 import org.obiba.opal.spi.vcf.VCFStoreServiceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.FileCopyUtils;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.common.io.Files;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 @Component
 public class PluginsManager {
@@ -64,9 +49,7 @@ public class PluginsManager {
   @Value("${org.obiba.opal.plugins.site}")
   private String repo;
 
-  private Set<PluginDescription> pluginDescriptions = Sets.newLinkedHashSet();
-
-  private Collection<Plugin> registeredPlugins;
+  private Collection<OpalPlugin> registeredPlugins;
 
   private List<ServicePlugin> servicePlugins = Lists.newArrayList();
 
@@ -75,21 +58,21 @@ public class PluginsManager {
     if (children == null || children.length == 0) return false;
     for (File child : children) {
       if (child.isFile() && child.getName().endsWith(PLUGIN_DIST_SUFFIX)) return true;
-      if (child.isDirectory() && new File(child, Plugin.UNINSTALL_FILE).exists()) return true;
+      if (child.isDirectory() && new File(child, OpalPlugin.UNINSTALL_FILE).exists()) return true;
     }
     return false;
   }
 
-  public Plugin getPlugin(String name) {
-    Optional<Plugin> plugin = getPlugins().stream().filter(p -> p.getName().equals(name)).findFirst();
+  public OpalPlugin getPlugin(String name) {
+    Optional<OpalPlugin> plugin = getPlugins().stream().filter(p -> p.getName().equals(name)).findFirst();
     if (!plugin.isPresent()) throw new NoSuchElementException("No such plugin with name: " + name);
     return plugin.get();
   }
 
   public void setPluginSiteProperties(String name, String properties) throws IOException {
-    Optional<Plugin> plugin = getPlugins().stream().filter(p -> p.getName().equals(name)).findFirst();
+    Optional<OpalPlugin> plugin = getPlugins().stream().filter(p -> p.getName().equals(name)).findFirst();
     if (!plugin.isPresent()) throw new NoSuchElementException("No such plugin with name: " + name);
-    Plugin thePlugin = plugin.get();
+    OpalPlugin thePlugin = plugin.get();
     thePlugin.writeSiteProperties(properties);
     updateServiceProperties(name, thePlugin.getProperties());
   }
@@ -102,29 +85,7 @@ public class PluginsManager {
   }
 
   void initPlugins() {
-    initPluginDescriptions();
-    getPlugins(true).forEach(Plugin::init);
-  }
-
-  /**
-   * Fetch the plugin descriptions from the configured repositories.
-   */
-  void initPluginDescriptions() {
-    pluginDescriptions.clear();
-    String location = repo + (repo.endsWith("/") ? "" : "/") + PLUGINS_REPO_FILE;
-    try (InputStream input = new URL(location).openStream()) {
-      JSONObject pluginsObject = new JSONObject(new String(FileCopyUtils.copyToByteArray(input), StandardCharsets.UTF_8));
-      if (pluginsObject.has("plugins")) {
-        JSONArray pluginsArray = pluginsObject.getJSONArray("plugins");
-        for (int i = 0; i < pluginsArray.length(); i++) {
-          JSONObject pluginObject = pluginsArray.getJSONObject(i);
-          PluginDescription desc = new PluginDescription(pluginObject, repo);
-          pluginDescriptions.add(desc);
-        }
-      }
-    } catch (Exception e) {
-      log.warn("Could not retrieve plugins list from {}: {}: {}", repo, e.getClass().getName(), e.getMessage());
-    }
+    getPlugins(true).forEach(OpalPlugin::init);
   }
 
   /**
@@ -132,7 +93,7 @@ public class PluginsManager {
    *
    * @return
    */
-  public Collection<Plugin> getPlugins() {
+  public Collection<OpalPlugin> getPlugins() {
     if (registeredPlugins != null) return registeredPlugins;
     return getPlugins(false);
   }
@@ -142,7 +103,7 @@ public class PluginsManager {
     File[] children = pluginsDir.listFiles(pathname -> pathname.isDirectory() && !pathname.getName().startsWith("."));
     if (children == null || children.length == 0) return names;
     for (File child : children) {
-      Plugin plugin = new Plugin(child);
+      OpalPlugin plugin = new OpalPlugin(child);
       if (plugin.isToUninstall()) names.add(plugin.getName());
     }
     return names;
@@ -167,7 +128,7 @@ public class PluginsManager {
   }
 
   void initServicePlugins() {
-    Map<String, Plugin> pluginsMap = getPlugins().stream().collect(Collectors.toMap(Plugin::getName, Function.identity()));
+    Map<String, OpalPlugin> pluginsMap = getPlugins().stream().collect(Collectors.toMap(OpalPlugin::getName, Function.identity()));
     VCFStoreServiceLoader.get().getServices().stream()
         .filter(service -> pluginsMap.containsKey(service.getName()))
         .forEach(service -> registerServicePlugin(pluginsMap, service));
@@ -180,8 +141,8 @@ public class PluginsManager {
   // Private methods
   //
 
-  private synchronized Collection<Plugin> getPlugins(boolean extract) {
-    Map<String, Plugin> pluginsMap = Maps.newLinkedHashMap();
+  private synchronized Collection<OpalPlugin> getPlugins(boolean extract) {
+    Map<String, OpalPlugin> pluginsMap = Maps.newLinkedHashMap();
     // make sure plugins directory exists
     // read it to enhance classpath
     if (!pluginsDir.exists() || !pluginsDir.isDirectory() || !pluginsDir.canRead()) return pluginsMap.values();
@@ -197,9 +158,9 @@ public class PluginsManager {
    * @param pluginsMap
    * @param service
    */
-  private void registerServicePlugin(Map<String, Plugin> pluginsMap, ServicePlugin service) {
+  private void registerServicePlugin(Map<String, OpalPlugin> pluginsMap, ServicePlugin service) {
     try {
-      Plugin plugin = pluginsMap.get(service.getName());
+      OpalPlugin plugin = pluginsMap.get(service.getName());
       service.configure(plugin.getProperties());
       service.start();
       servicePlugins.add(service);
@@ -214,11 +175,11 @@ public class PluginsManager {
    * @param pluginsMap
    * @param service
    */
-  private void registerSingletonServicePlugin(Map<String, Plugin> pluginsMap, ServicePlugin service) {
-    Plugin plugin = pluginsMap.get(service.getName());
+  private void registerSingletonServicePlugin(Map<String, OpalPlugin> pluginsMap, ServicePlugin service) {
+    OpalPlugin plugin = pluginsMap.get(service.getName());
     // check if service plugin of same type is already registered
     for (ServicePlugin servicePlugin : servicePlugins) {
-      Plugin p = pluginsMap.get(servicePlugin.getName());
+      OpalPlugin p = pluginsMap.get(servicePlugin.getName());
       if (p.getType().equals(plugin.getType())) return;
     }
     registerServicePlugin(pluginsMap, service);
@@ -293,7 +254,7 @@ public class PluginsManager {
   private File backupPluginSiteProperties(File pluginFolder) throws IOException {
     File sitePropertiesBackup = null;
     if (pluginFolder.exists()) {
-      File siteProperties = new File(pluginFolder, Plugin.SITE_PROPERTIES);
+      File siteProperties = new File(pluginFolder, OpalPlugin.SITE_PROPERTIES);
       sitePropertiesBackup = File.createTempFile("site", ".properties");
       if (siteProperties.exists()) {
         FileUtil.copyFile(siteProperties, sitePropertiesBackup);
@@ -312,7 +273,7 @@ public class PluginsManager {
    */
   private void restorePluginSiteProperties(File pluginFolder, File sitePropertiesBackup) throws IOException {
     if (sitePropertiesBackup == null || !sitePropertiesBackup.exists()) return;
-    File siteProperties = new File(pluginFolder, Plugin.SITE_PROPERTIES);
+    File siteProperties = new File(pluginFolder, OpalPlugin.SITE_PROPERTIES);
     if (siteProperties.exists()) FileUtil.delete(siteProperties);
     FileUtil.copyFile(sitePropertiesBackup, siteProperties);
     sitePropertiesBackup.delete();
@@ -324,11 +285,11 @@ public class PluginsManager {
    * @param pluginsMap
    * @param pluginsDir
    */
-  private void processPlugins(Map<String, Plugin> pluginsMap, File pluginsDir) {
+  private void processPlugins(Map<String, OpalPlugin> pluginsMap, File pluginsDir) {
     File[] children = pluginsDir.listFiles(pathname -> pathname.isDirectory() && !pathname.getName().startsWith("."));
     if (children == null || children.length == 0) return;
     for (File child : children) {
-      Plugin plugin = new Plugin(child);
+      OpalPlugin plugin = new OpalPlugin(child);
       processPlugin(pluginsMap, plugin);
     }
   }
@@ -339,7 +300,7 @@ public class PluginsManager {
    * @param pluginsMap
    * @param plugin
    */
-  private void processPlugin(Map<String, Plugin> pluginsMap, Plugin plugin) {
+  private void processPlugin(Map<String, OpalPlugin> pluginsMap, OpalPlugin plugin) {
     if (plugin.isToUninstall()) {
       File archiveDest = new File(archiveDir, plugin.getDirectory().getName() + "-" + DateType.get().valueOf(new Date()).toString());
       log.info("Archiving plugin {} to {}", plugin.getName(), archiveDest.getAbsolutePath());

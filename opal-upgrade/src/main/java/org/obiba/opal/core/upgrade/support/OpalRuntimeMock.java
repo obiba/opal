@@ -17,11 +17,9 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.core.runtime.Plugin;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.fs.OpalFileSystem;
-import org.obiba.opal.spi.ServicePlugin;
-import org.obiba.opal.spi.vcf.VCFStoreService;
+import org.obiba.plugins.spi.ServicePlugin;
 
 /**
  * Upgrade purpose only to fix injection dependencies.

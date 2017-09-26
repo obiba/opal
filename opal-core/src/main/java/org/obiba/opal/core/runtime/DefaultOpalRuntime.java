@@ -24,7 +24,7 @@ import org.obiba.opal.core.tx.TransactionalThread;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
 import org.obiba.opal.fs.security.SecuredOpalFileSystem;
-import org.obiba.opal.spi.ServicePlugin;
+import org.obiba.plugins.spi.ServicePlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

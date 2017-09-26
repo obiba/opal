@@ -15,11 +15,11 @@ import com.google.common.collect.Lists;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.core.domain.VCFSamplesMapping;
-import org.obiba.opal.core.domain.plugins.PluginPackage;
-import org.obiba.opal.core.runtime.Plugin;
+import org.obiba.opal.core.runtime.OpalPlugin;
 import org.obiba.opal.core.support.vcf.VCFSamplesSummaryBuilder;
 import org.obiba.opal.spi.vcf.VCFStore;
 import org.obiba.opal.web.model.Plugins;
+import org.obiba.plugins.PluginPackage;
 
 import java.util.Collection;
 import java.util.Date;
@@ -58,7 +58,7 @@ public class Dtos {
     return buider.build();
   }
 
-  public static Plugins.PluginDto asDto(Plugin plugin) {
+  public static Plugins.PluginDto asDto(OpalPlugin plugin) {
     Plugins.PluginDto.Builder builder = Plugins.PluginDto.newBuilder()
         .setName(plugin.getName())
         .setTitle(plugin.getTitle())

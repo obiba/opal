@@ -11,8 +11,8 @@
 package org.obiba.opal.spi.search;
 
 import org.obiba.opal.spi.search.support.ItemResultDtoStrategy;
-import org.obiba.opal.spi.ServicePlugin;
 import org.obiba.opal.web.model.Search;
+import org.obiba.plugins.spi.ServicePlugin;
 
 import java.util.concurrent.ThreadFactory;
 

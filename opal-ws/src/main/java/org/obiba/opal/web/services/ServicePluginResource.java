@@ -2,7 +2,7 @@ package org.obiba.opal.web.services;
 
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.spi.ServicePlugin;
+import org.obiba.plugins.spi.ServicePlugin;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.plugins.PluginResource;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -19,7 +19,7 @@ import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.shell.commands.options.ImportVCFCommandOptions;
-import org.obiba.opal.spi.ServicePlugin;
+import org.obiba.plugins.spi.ServicePlugin;
 import org.obiba.opal.spi.vcf.VCFStore;
 import org.obiba.opal.spi.vcf.VCFStoreException;
 import org.obiba.opal.spi.vcf.VCFStoreService;

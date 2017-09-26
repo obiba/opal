@@ -10,7 +10,8 @@
 
 package org.obiba.opal.spi.search;
 
-import org.obiba.opal.spi.ServicePluginLoader;
+
+import org.obiba.plugins.spi.ServicePluginLoader;
 
 import java.util.ServiceLoader;
 

@@ -17,7 +17,7 @@ import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.NoSuchVCFSamplesMappingException;
 import org.obiba.opal.core.service.VCFSamplesMappingService;
 import org.obiba.opal.core.support.vcf.VCFSamplesSummaryBuilder;
-import org.obiba.opal.spi.ServicePlugin;
+import org.obiba.plugins.spi.ServicePlugin;
 import org.obiba.opal.spi.vcf.VCFStore;
 import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.model.Plugins;
