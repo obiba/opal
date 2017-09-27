@@ -20,6 +20,7 @@ import org.obiba.opal.core.support.vcf.VCFSamplesSummaryBuilder;
 import org.obiba.opal.spi.vcf.VCFStore;
 import org.obiba.opal.web.model.Plugins;
 import org.obiba.plugins.PluginPackage;
+import org.obiba.plugins.PluginResources;
 
 import java.util.Collection;
 import java.util.Date;
@@ -58,13 +59,13 @@ public class Dtos {
     return buider.build();
   }
 
-  public static Plugins.PluginDto asDto(OpalPlugin plugin) {
+  public static Plugins.PluginDto asDto(PluginResources plugin) {
     Plugins.PluginDto.Builder builder = Plugins.PluginDto.newBuilder()
         .setName(plugin.getName())
         .setTitle(plugin.getTitle())
         .setDescription(plugin.getDescription())
         .setVersion(plugin.getVersion().toString())
-        .setOpalVersion(plugin.getOpalVersion().toString())
+        .setOpalVersion(plugin.getHostVersion().toString())
         .setType(plugin.getType())
         .setSiteProperties(plugin.getSitePropertiesString());
     return builder.build();

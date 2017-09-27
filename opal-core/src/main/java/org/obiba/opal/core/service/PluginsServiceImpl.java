@@ -17,9 +17,11 @@ import org.obiba.opal.core.cfg.PluginsService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.OpalPlugin;
 import org.obiba.opal.core.runtime.PluginsManager;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.plugins.PluginPackage;
 import org.obiba.plugins.PluginRepositoryCache;
 import org.obiba.plugins.PluginRepositoryException;
+import org.obiba.plugins.PluginResources;
 import org.obiba.runtime.upgrade.VersionProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -75,7 +77,7 @@ public class PluginsServiceImpl implements PluginsService {
   }
 
   @Override
-  public OpalPlugin getInstalledPlugin(String name) {
+  public PluginResources getInstalledPlugin(String name) {
     return pluginsManager.getPlugin(name);
   }
 
@@ -92,7 +94,7 @@ public class PluginsServiceImpl implements PluginsService {
   public List<PluginPackage> getInstalledPlugins() {
     return pluginsManager.getPlugins().stream()
         .map(rp -> new PluginPackage(rp.getName(), rp.getType(), rp.getTitle(), rp.getDescription(), rp.getVersion().toString(),
-            rp.getOpalVersion().toString(), null, null, ""))
+            rp.getHostVersion().toString(), null, null, ""))
         .collect(Collectors.toList());
   }
 
@@ -103,7 +105,7 @@ public class PluginsServiceImpl implements PluginsService {
 
   @Override
   public List<PluginPackage> getUpdatablePlugins() {
-    Collection<OpalPlugin> registeredPlugins = pluginsManager.getPlugins();
+    Collection<PluginResources> registeredPlugins = pluginsManager.getPlugins();
     // exclude already installed plugin packages whatever the version is
     return getPluginRepositoryCache().getOrUpdatePluginRepository().getPlugins().stream()
         .filter(PluginPackage::hasOpalVersion)
@@ -114,7 +116,7 @@ public class PluginsServiceImpl implements PluginsService {
 
   @Override
   public List<PluginPackage> getAvailablePlugins() {
-    Collection<OpalPlugin> registeredPlugins = pluginsManager.getPlugins();
+    Collection<PluginResources> registeredPlugins = pluginsManager.getPlugins();
     // exclude already installed plugin packages whatever the version is
     return getPluginRepositoryCache().getOrUpdatePluginRepository().getPlugins().stream()
         .filter(PluginPackage::hasOpalVersion)
@@ -146,13 +148,13 @@ public class PluginsServiceImpl implements PluginsService {
 
   @Override
   public void prepareUninstallPlugin(String name) {
-    OpalPlugin plugin = pluginsManager.getPlugin(name);
+    PluginResources plugin = pluginsManager.getPlugin(name);
     plugin.prepareForUninstall();
   }
 
   @Override
   public void cancelUninstallPlugin(String name) {
-    OpalPlugin plugin = pluginsManager.getPlugin(name);
+    PluginResources plugin = pluginsManager.getPlugin(name);
     plugin.cancelUninstall();
   }
 

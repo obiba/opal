@@ -13,6 +13,7 @@ package org.obiba.opal.core.cfg;
 import org.obiba.opal.core.runtime.OpalPlugin;
 import org.obiba.opal.core.service.SystemService;
 import org.obiba.plugins.PluginPackage;
+import org.obiba.plugins.PluginResources;
 
 import java.util.Collection;
 import java.util.Date;
@@ -80,7 +81,7 @@ public interface PluginsService extends SystemService {
    * @param name
    * @return
    */
-  OpalPlugin getInstalledPlugin(String name);
+  PluginResources getInstalledPlugin(String name);
 
   /**
    * Set the site properties of the installed plugin with the given name.
