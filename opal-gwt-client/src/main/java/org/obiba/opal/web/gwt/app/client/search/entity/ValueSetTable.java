@@ -148,21 +148,26 @@ public class ValueSetTable extends Table<VariableValueRow> {
         @Override
         public SafeHtml render(VariableValueRow object) {
           String valueStr = renderValue(object);
-          if(valueStr == null || valueStr.trim().isEmpty()) return new SafeHtmlBuilder().toSafeHtml();
-          if(object.getVariableDto().getIsRepeatable()) {
+          if (valueStr == null)
+            return renderNullValue();
+          if(valueStr.trim().isEmpty())
+            return new SafeHtmlBuilder().toSafeHtml();
+          if(object.getVariableDto().getIsRepeatable())
             return renderLink(valueStr, IconType.LIST);
-          }
-          if(object.getVariableDto().getValueType().equalsIgnoreCase("binary")) {
+          if(object.getVariableDto().getValueType().equalsIgnoreCase("binary"))
             return renderLink(valueStr, IconType.DOWNLOAD);
-          }
-          if(object.getVariableDto().getValueType().matches("point|linestring|polygon")) {
+          if(object.getVariableDto().getValueType().matches("point|linestring|polygon"))
             return renderLink(valueStr, IconType.MAP_MARKER);
-          }
           if(object.getVariableDto().getValueType().equalsIgnoreCase("text") &&
-              !Strings.isNullOrEmpty(object.getVariableDto().getReferencedEntityType())) {
+              !Strings.isNullOrEmpty(object.getVariableDto().getReferencedEntityType()))
             return renderLink(valueStr, IconType.ELLIPSIS_VERTICAL);
-          }
           return SimpleSafeHtmlRenderer.getInstance().render(valueStr);
+        }
+
+        private SafeHtml renderNullValue() {
+          return new SafeHtmlBuilder()
+              .appendHtmlConstant("<span class='help-block no-bottom-margin' style='font-size: smaller'>(null)</span>")
+              .toSafeHtml();
         }
 
         private SafeHtml renderLink(String valueStr, IconType iconType) {
