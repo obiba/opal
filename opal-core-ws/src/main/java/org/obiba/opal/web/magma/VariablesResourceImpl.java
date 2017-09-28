@@ -13,13 +13,12 @@ import com.google.common.base.Functions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-
 import org.obiba.magma.*;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
-
+import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.ValueTableUpdateListener;
 import org.obiba.opal.web.model.Magma.LinkDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
@@ -31,6 +30,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.core.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -111,10 +111,15 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
   @Override
   public Response updateAttribute(String namespace, String name, String localeStr, String value, List<String> variableNames) {
     if (Strings.isNullOrEmpty(name)) return Response.status(BAD_REQUEST).build();
-    if (Strings.isNullOrEmpty(value)) return deleteAttribute(namespace, name, localeStr, variableNames);
+    if (Strings.isNullOrEmpty(value)) return removeAttribute(namespace, name, localeStr, value, variableNames);
     return setAttribute(namespace, name, localeStr, value, variableNames);
   }
 
+  @Override
+  public Response deleteAttribute(String namespace, String name, String localeStr, String value, @FormParam("variable") List<String> variableNames) {
+    if (Strings.isNullOrEmpty(name)) return Response.status(BAD_REQUEST).build();
+    return removeAttribute(namespace, name, localeStr, value, variableNames);
+  }
 
   @Override
   public Response addOrUpdateVariables(List<VariableDto> variables, @Nullable String comment) {
@@ -197,11 +202,13 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
     return Response.ok().build();
   }
 
-  private Response deleteAttribute(String namespace, String name, String localeStr, List<String> variableNames) {
+  private Response removeAttribute(String namespace, String name, String localeStr, String value, List<String> variableNames) {
     ValueTable table = getValueTable();
     Iterable<Variable> variables = getVariables(table, variableNames);
     Locale locale = Strings.isNullOrEmpty(localeStr) ? null : Locale.forLanguageTag(localeStr);
-    final Attribute attribute = Attribute.Builder.newAttribute(name).withNamespace(namespace).withLocale(locale).build();
+    Attribute.Builder builder = Attribute.Builder.newAttribute(name).withNamespace(namespace).withLocale(locale);
+    if (!Strings.isNullOrEmpty(value)) builder.withValue(value);
+    final Attribute attribute = builder.build();
     List<Variable> updatedVariables = Lists.newArrayList();
 
     for (Variable variable : variables) {
@@ -209,7 +216,7 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
         // copy variable without the attribute of interest
         Variable.Builder updatedVariableBuilder = Variable.Builder.sameAs(variable).clearAttributes();
         variable.getAttributes().stream()
-            .filter(attr -> !isSameAttribute(attr, attribute))
+            .filter(attr -> attribute.getValue().isNull() ? !isSameAttribute(attr, attribute) : !isSameAttributeWithValue(attr, attribute))
             .forEach(updatedVariableBuilder::addAttribute);
         Variable updatedVariable = updatedVariableBuilder.build();
         // update variable only if attributes have changed
@@ -240,6 +247,13 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
     if (source.isLocalised() && !source.getLocale().equals(target.getLocale())) return false;
     if (!source.isLocalised() && target.isLocalised()) return false;
     return true;
+  }
+
+  private boolean isSameAttributeWithValue(Attribute source, Attribute target) {
+    if (!isSameAttribute(source, target)) return false;
+    if (target.getValue().isNull()) return source.getValue().isNull();
+    if (source.getValue().isNull()) return target.getValue().isNull();
+    return source.getValue().equals(target.getValue());
   }
 
   ClientErrorDto getErrorMessage(Response.StatusType responseStatus, String errorStatus) {

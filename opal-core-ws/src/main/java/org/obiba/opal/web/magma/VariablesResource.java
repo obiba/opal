@@ -73,6 +73,21 @@ public interface VariablesResource {
                         @QueryParam("locale") String locale, @QueryParam("value") String value,
                         @FormParam("variable") List<String> variables);
 
+  /**
+   * Batch removal of a specific attribute in all the specified variables.
+   * @param namespace
+   * @param name
+   * @param locale
+   * @param value If null or empty, the attribute is removed whatever the value is.
+   * @param variables
+   * @return
+   */
+  @DELETE
+  @Path("/_attribute")
+  Response deleteAttribute(@QueryParam("namespace") String namespace, @QueryParam("name") String name,
+                           @QueryParam("locale") String locale, @QueryParam("value") String value,
+                           @FormParam("variable") List<String> variables);
+
   @POST
   Response addOrUpdateVariables(List<Magma.VariableDto> variables, @Nullable @QueryParam("comment") String comment);
 
