@@ -207,7 +207,11 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       @Override
       public void onCartAddVariable(CartAddVariableEvent event) {
         int originalCount = cartService.getVariablesCount();
-        cartService.addVariable(event.getEntityType(), event.getDatasource(), event.getTable(), event.getVariable());
+        try {
+          cartService.addVariable(event.getDatasource(), event.getTable(), event.getVariable());
+        } catch (Exception e) {
+          fireEvent(NotificationEvent.newBuilder().warn("CartLimitExceeded").build());
+        }
         updateCartVariablesCount(originalCount, event.getEntityType(), cartService.getVariablesCount());
       }
     });
@@ -216,7 +220,11 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       @Override
       public void onCartAddVariables(CartAddVariablesEvent event) {
         int originalCount = cartService.getVariablesCount();
-        cartService.addVariables(event.getEntityType(), event.getTableVariables());
+        try {
+          cartService.addVariables(event.getTableVariables());
+        } catch (Exception e) {
+          fireEvent(NotificationEvent.newBuilder().warn("CartLimitExceeded").build());
+        }
         updateCartVariablesCount(originalCount, event.getEntityType(), cartService.getVariablesCount());
       }
     });
@@ -225,7 +233,11 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       @Override
       public void onCartAddVariableItems(CartAddVariableItemsEvent event) {
         int originalCount = cartService.getVariablesCount();
-        cartService.addVariableItems(event.getEntityType(), event.getTableVariables());
+        try {
+          cartService.addVariableItems(event.getTableVariables());
+        } catch (Exception e) {
+          fireEvent(NotificationEvent.newBuilder().warn("CartLimitExceeded").build());
+        }
         updateCartVariablesCount(originalCount, event.getEntityType(), cartService.getVariablesCount());
       }
     });

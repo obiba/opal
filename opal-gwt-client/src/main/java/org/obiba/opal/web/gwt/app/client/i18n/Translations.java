@@ -679,7 +679,8 @@ public interface Translations extends Constants {
       "VariablesAnnotationFailed", "Annotation of {0} variables failed for table {1}.",
       "VariablesAnnotationFailure", "Variables annotation update failed for table {0}.",
       "SearchFailure", "Search failed: {0}",
-      "IndicesRemoved", "All indices were removed."
+      "IndicesRemoved", "All indices were removed.",
+      "CartLimitExceeded", "Cart is full, no items can be added anymore."
   })
   Map<String, String> userMessageMap();
 

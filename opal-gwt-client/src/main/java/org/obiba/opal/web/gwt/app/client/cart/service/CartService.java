@@ -45,59 +45,35 @@ public class CartService {
     GWT.log("Local storage is supported: " + (stockStore != null));
   }
 
-  public void addVariableItems(String entityType, Map<String, List<ItemResultDto>> tableVariableItems) {
+  public void addVariableItems(Map<String, List<ItemResultDto>> tableVariableItems) {
     for (String tableRef : tableVariableItems.keySet()) {
       MagmaPath.Parser refParser = MagmaPath.Parser.parse(tableRef);
       for (ItemResultDto item : tableVariableItems.get(tableRef)) {
-        addVariable(entityType, refParser.getDatasource(), refParser.getTable(), asVariable(item));
+        addVariable(refParser.getDatasource(), refParser.getTable(), asVariable(item));
       }
     }
   }
 
-  private VariableDto asVariable(ItemResultDto item) {
-    ItemFieldsDto fields = (ItemFieldsDto) item.getExtension("Search.ItemFieldsDto.item");
-    VariableDto variable = VariableDto.create();
-    JsArray<AttributeDto> attributes = JsArrays.create();
-    for (EntryDto entry : JsArrays.toIterable(fields.getFieldsArray())) {
-      if ("name".equals(entry.getKey())) variable.setName(entry.getValue());
-      else if ("entityType".equals(entry.getKey())) variable.setEntityType(entry.getValue());
-      else if ("label".equals(entry.getKey())) {
-        AttributeDto attr = AttributeDto.create();
-        attr.setName("label");
-        attr.setValue(entry.getValue());
-        attributes.push(attr);
-      }
-      else if (entry.getKey().startsWith("label-")) {
-        AttributeDto attr = AttributeDto.create();
-        attr.setName("label");
-        attr.setLocale(entry.getKey().substring(6));
-        attr.setValue(entry.getValue());
-        attributes.push(attr);
-      }
-    }
-    variable.setAttributesArray(attributes);
-    return variable;
-  }
-
-  public void addVariables(String entityType, Map<String, List<VariableDto>> tableVariables) {
+  public void addVariables(Map<String, List<VariableDto>> tableVariables) {
     for (String tableRef : tableVariables.keySet()) {
       MagmaPath.Parser refParser = MagmaPath.Parser.parse(tableRef);
       for (VariableDto variable : tableVariables.get(tableRef)) {
-        addVariable(entityType, refParser.getDatasource(), refParser.getTable(), variable);
+        addVariable(refParser.getDatasource(), refParser.getTable(), stripVariable(variable));
       }
     }
   }
 
-  public void addVariable(String entityType, String datasource, String table, VariableDto variable) {
-    addVariable(entityType, getVariableFullName(datasource, table, variable.getName()), variable);
+  public void addVariable(String datasource, String table, VariableDto variable) {
+    addVariable(getVariableFullName(datasource, table, variable.getName()), stripVariable(variable));
   }
 
-  public void addVariable(String entityType, String variableFullName, VariableDto variable) {
+  private void addVariable(String variableFullName, VariableDto variable) {
     if (Strings.isNullOrEmpty(variableFullName)) return;
+    String variableStr = VariableDto.stringify(variable);
     if (isStoreSupported())
-      stockStore.setItem(VARIABLES_PREFIX + variableFullName, VariableDto.stringify(variable));
+      stockStore.setItem(VARIABLES_PREFIX + variableFullName, variableStr);
     else
-      addVariableInMemory(entityType, variableFullName);
+      addVariableInMemory(variableFullName, variableStr);
   }
 
   public void removeVariable(String variableFullName) {
@@ -142,6 +118,50 @@ public class CartService {
     return MagmaPath.Builder.datasource(datasource).table(table).variable(variable).build();
   }
 
+  private VariableDto asVariable(ItemResultDto item) {
+    ItemFieldsDto fields = (ItemFieldsDto) item.getExtension("Search.ItemFieldsDto.item");
+    VariableDto variable = VariableDto.create();
+    JsArray<AttributeDto> attributes = JsArrays.create();
+    for (EntryDto entry : JsArrays.toIterable(fields.getFieldsArray())) {
+      if ("name".equals(entry.getKey())) variable.setName(entry.getValue());
+      else if ("entityType".equals(entry.getKey())) variable.setEntityType(entry.getValue());
+      else if ("label".equals(entry.getKey())) {
+        AttributeDto attr = AttributeDto.create();
+        attr.setName("label");
+        attr.setValue(entry.getValue());
+        attributes.push(attr);
+      }
+      else if (entry.getKey().startsWith("label-")) {
+        AttributeDto attr = AttributeDto.create();
+        attr.setName("label");
+        attr.setLocale(entry.getKey().substring(6));
+        attr.setValue(entry.getValue());
+        attributes.push(attr);
+      }
+    }
+    variable.setAttributesArray(attributes);
+    return variable;
+  }
+
+  /**
+   * Remove unnecessary information to save space in the store.
+   *
+   * @param variable
+   * @return
+   */
+  private VariableDto stripVariable(VariableDto variable) {
+    VariableDto stripped = VariableDto.create();
+    stripped.setName(variable.getName());
+    stripped.setEntityType(variable.getEntityType());
+    JsArray<AttributeDto> attributes = JsArrays.create();
+    for (AttributeDto attr : JsArrays.toIterable(variable.getAttributesArray())) {
+      if (!attr.hasNamespace() && "label".equals(attr.getName()))
+        attributes.push(attr);
+    }
+    stripped.setAttributesArray(attributes);
+    return stripped;
+  }
+
   //
   // Local store
   //
@@ -181,8 +201,8 @@ public class CartService {
   // In memory
   //
 
-  private void addVariableInMemory(String entityType, String variableFullName) {
-    variables.put(variableFullName, new CartVariableItem(variableFullName, entityType));
+  private void addVariableInMemory(String variableFullName, String variableStr) {
+    variables.put(variableFullName, new CartVariableItem(variableFullName, variableStr));
   }
 
   private boolean hasVariableInMemory(String variableFullName) {
