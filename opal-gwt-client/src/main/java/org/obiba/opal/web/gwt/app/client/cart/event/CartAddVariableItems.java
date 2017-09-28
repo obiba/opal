@@ -12,16 +12,17 @@ package org.obiba.opal.web.gwt.app.client.cart.event;
 
 import com.gwtplatform.dispatch.annotation.GenEvent;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.search.ItemResultDto;
+
+import java.util.List;
+import java.util.Map;
 
 @GenEvent
-public class CartAddVariable {
+public class CartAddVariableItems {
 
   String entityType;
 
-  String datasource;
-
-  String table;
-
-  VariableDto variable;
+  // variables by table full names
+  Map<String, List<ItemResultDto>> tableVariables;
 
 }

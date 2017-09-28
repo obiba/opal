@@ -11,6 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.cart.service;
 
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 
 public class CartVariableItem {
 
@@ -20,25 +21,14 @@ public class CartVariableItem {
 
   private final String table;
 
-  private final String variable;
+  private final VariableDto variable;
 
-  private final String entityType;
-
-  public CartVariableItem(String variableFullName, String entityType) {
+  public CartVariableItem(String variableFullName, String variableStr) {
     this.identifier = variableFullName;
     MagmaPath.Parser parser = MagmaPath.Parser.parse(variableFullName);
     this.datasource = parser.getDatasource();
     this.table = parser.getTable();
-    this.variable = parser.getVariable();
-    this.entityType = entityType;
-  }
-
-  public CartVariableItem(String datasource, String table, String variable, String entityType) {
-    this.identifier = MagmaPath.Builder.datasource(datasource).table(table).variable(variable).build();
-    this.datasource = datasource;
-    this.table = table;
-    this.variable = variable;
-    this.entityType = entityType;
+    this.variable = VariableDto.parse(variableStr);
   }
 
   public String getIdentifier() {
@@ -53,12 +43,12 @@ public class CartVariableItem {
     return table;
   }
 
-  public String getVariable() {
+  public VariableDto getVariable() {
     return variable;
   }
 
   public String getEntityType() {
-    return entityType;
+    return variable.getEntityType();
   }
 
   public String getTableReference() {

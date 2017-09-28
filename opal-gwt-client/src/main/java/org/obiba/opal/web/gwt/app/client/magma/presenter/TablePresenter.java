@@ -9,12 +9,10 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
 import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariableEvent;
 import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariablesEvent;
@@ -525,10 +523,10 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @Override
   public void onAddVariablesToCart(List<VariableDto> variables) {
     if(variables.isEmpty()) return;
-    List<String> names = Lists.newArrayList();
-    for (VariableDto variable : variables)
-      names.add(MagmaPath.Builder.datasource(table.getDatasourceName()).table(table.getName()).variable(variable.getName()).build());
-    fireEvent(new CartAddVariablesEvent(table.getEntityType(), names));
+    Map<String, List<VariableDto>> tableVariables = Maps.newHashMap();
+    String tableRef = MagmaPath.Builder.datasource(table.getDatasourceName()).table(table.getName()).build();
+    tableVariables.put(tableRef, variables);
+    fireEvent(new CartAddVariablesEvent(table.getEntityType(), tableVariables));
   }
 
   @Override

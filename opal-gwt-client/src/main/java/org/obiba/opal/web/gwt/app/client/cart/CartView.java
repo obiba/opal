@@ -181,7 +181,7 @@ public class CartView extends ViewWithUiHandlers<CartUiHandlers> implements Cart
     if (originalVariables == null || originalVariables.isEmpty()) return variables;
     List<String> tokens = FilterHelper.tokenize(filterText);
     for (CartVariableItem var : originalVariables) {
-      if (FilterHelper.matches(var.getIdentifier(), tokens)) variables.add(var);
+      if (FilterHelper.matches(var.getIdentifier(), tokens) || FilterHelper.labelMatches(var.getVariable().getAttributesArray(), tokens)) variables.add(var);
     }
     return variables;
   }

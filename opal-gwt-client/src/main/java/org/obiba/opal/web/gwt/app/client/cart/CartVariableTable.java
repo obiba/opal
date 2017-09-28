@@ -11,6 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.cart;
 
 import com.google.gwt.cell.client.Cell;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.InlineLabel;
@@ -19,10 +20,8 @@ import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import org.obiba.opal.web.gwt.app.client.cart.service.CartVariableItem;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.*;
+import org.obiba.opal.web.model.client.magma.AttributeDto;
 
 import java.util.List;
 
@@ -56,7 +55,7 @@ public class CartVariableTable extends Table<CartVariableItem> {
       addColumn(new TextColumn<CartVariableItem>() {
         @Override
         public String getValue(CartVariableItem item) {
-          return item.getVariable();
+          return item.getVariable().getName();
         }
       }, translations.variableLabel());
       addColumn(new TextColumn<CartVariableItem>() {
@@ -67,6 +66,7 @@ public class CartVariableTable extends Table<CartVariableItem> {
       }, translations.tableLabel());
     }
 
+    addColumn(new VariableItemLabelColumn(), translations.labelLabel());
     addColumn(new TextColumn<CartVariableItem>() {
       @Override
       public String getValue(CartVariableItem item) {
@@ -91,6 +91,18 @@ public class CartVariableTable extends Table<CartVariableItem> {
 
   public void clearSelectedItems() {
     checkColumn.clearSelection();
+  }
+
+  private static class VariableItemLabelColumn extends AttributeColumn<CartVariableItem> {
+
+    public VariableItemLabelColumn() {
+      super("label");
+    }
+
+    @Override
+    protected JsArray<AttributeDto> getAttributes(CartVariableItem object) {
+      return object.getVariable().getAttributesArray();
+    }
   }
 
   private static class VariableItemColumn extends Column<CartVariableItem, CartVariableItem> {
@@ -134,12 +146,12 @@ public class CartVariableTable extends Table<CartVariableItem> {
 
     @Override
     public PlaceRequest getPlaceRequest(CartVariableItem item) {
-      return ProjectPlacesHelper.getVariablePlace(item.getDatasource(), item.getTable(), item.getVariable());
+      return ProjectPlacesHelper.getVariablePlace(item.getDatasource(), item.getTable(), item.getVariable().getName());
     }
 
     @Override
     public String getText(CartVariableItem item) {
-      return item.getVariable();
+      return item.getVariable().getName();
     }
   }
 

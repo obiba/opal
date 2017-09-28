@@ -30,6 +30,7 @@ import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import org.obiba.opal.web.gwt.app.client.administration.configuration.event.GeneralConfigSavedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariableEvent;
+import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariableItemsEvent;
 import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariablesEvent;
 import org.obiba.opal.web.gwt.app.client.cart.event.CartCountsUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.cart.service.CartService;
@@ -215,7 +216,16 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       @Override
       public void onCartAddVariables(CartAddVariablesEvent event) {
         int originalCount = cartService.getVariablesCount();
-        cartService.addVariables(event.getEntityType(), event.getVariables());
+        cartService.addVariables(event.getEntityType(), event.getTableVariables());
+        updateCartVariablesCount(originalCount, event.getEntityType(), cartService.getVariablesCount());
+      }
+    });
+
+    addRegisteredHandler(CartAddVariableItemsEvent.getType(), new CartAddVariableItemsEvent.CartAddVariableItemsHandler() {
+      @Override
+      public void onCartAddVariableItems(CartAddVariableItemsEvent event) {
+        int originalCount = cartService.getVariablesCount();
+        cartService.addVariableItems(event.getEntityType(), event.getTableVariables());
         updateCartVariablesCount(originalCount, event.getEntityType(), cartService.getVariablesCount());
       }
     });

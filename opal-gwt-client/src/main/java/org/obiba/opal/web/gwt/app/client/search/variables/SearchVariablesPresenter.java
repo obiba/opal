@@ -28,7 +28,7 @@ import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
-import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariablesEvent;
+import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariableItemsEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -51,6 +51,7 @@ import org.obiba.opal.web.model.client.search.ItemResultDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -151,7 +152,8 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
   @Override
   public void onAddToCart(List<ItemResultDto> selectedItems) {
     if (selectedItems.isEmpty()) return;
-    Map<String, List<String>> namesByType = Maps.newHashMap();
+    // group items by entity type and table reference
+    Map<String, Map<String, List<ItemResultDto>>> typeTableVariables = Maps.newHashMap();
     for (ItemResultDto item : selectedItems) {
       MagmaPath.Parser parser = MagmaPath.Parser.parse(item.getIdentifier());
       ItemFieldsDto fields = (ItemFieldsDto) item.getExtension("Search.ItemFieldsDto.item");
@@ -162,12 +164,15 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
           break;
         }
       }
-      if (!namesByType.containsKey(entityType))
-        namesByType.put(entityType, new ArrayList<String>());
-      namesByType.get(entityType).add(MagmaPath.Builder.datasource(parser.getDatasource()).table(parser.getTable()).variable(parser.getVariable()).build());
+      if (!typeTableVariables.containsKey(entityType))
+        typeTableVariables.put(entityType, new HashMap<String, List<ItemResultDto>>());
+      String tableRef = MagmaPath.Builder.datasource(parser.getDatasource()).table(parser.getTable()).build();
+      if (!typeTableVariables.get(entityType).containsKey(tableRef))
+        typeTableVariables.get(entityType).put(tableRef, new ArrayList<ItemResultDto>());
+      typeTableVariables.get(entityType).get(tableRef).add(item);
     }
-    for (String type : namesByType.keySet())
-      fireEvent(new CartAddVariablesEvent(type, namesByType.get(type)));
+    for (String type : typeTableVariables.keySet())
+      fireEvent(new CartAddVariableItemsEvent(type, typeTableVariables.get(type)));
   }
 
   //

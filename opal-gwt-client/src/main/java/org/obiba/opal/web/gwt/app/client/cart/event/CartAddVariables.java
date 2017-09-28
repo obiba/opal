@@ -11,15 +11,17 @@
 package org.obiba.opal.web.gwt.app.client.cart.event;
 
 import com.gwtplatform.dispatch.annotation.GenEvent;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import java.util.List;
+import java.util.Map;
 
 @GenEvent
 public class CartAddVariables {
 
   String entityType;
 
-  // variable full names
-  List<String> variables;
+  // variables by table full names
+  Map<String, List<VariableDto>> tableVariables;
 
 }

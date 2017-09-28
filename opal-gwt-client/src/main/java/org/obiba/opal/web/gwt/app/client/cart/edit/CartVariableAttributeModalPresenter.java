@@ -105,7 +105,7 @@ public class CartVariableAttributeModalPresenter
             }
           }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_FORBIDDEN, Response.SC_NOT_FOUND, Response.SC_OK);
       for (CartVariableItem item : cartVariableItemsMap.get(tableRef))
-        builder.withFormBody("variable", item.getVariable());
+        builder.withFormBody("variable", item.getVariable().getName());
       builder.put().send();
     }
   }

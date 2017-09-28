@@ -13,6 +13,9 @@ package org.obiba.opal.web.gwt.app.client.support;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.google.gwt.core.client.JsArray;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.model.client.magma.AttributeDto;
 
 import java.util.List;
 
@@ -53,10 +56,20 @@ public class FilterHelper {
       if (!nQuery.isEmpty()) {
         if (not) {
           if (nText.contains(nQuery)) return false;
-        }
-        else if (!nText.contains(nQuery)) return false;
+        } else if (!nText.contains(nQuery)) return false;
       }
     }
     return true;
+  }
+
+  public static boolean labelMatches(JsArray<AttributeDto> attributes, List<String> tokens) {
+    return attributeMatches("label", attributes, tokens);
+  }
+
+  public static boolean attributeMatches(String name, JsArray<AttributeDto> attributes, List<String> tokens) {
+    for (AttributeDto attr : JsArrays.toIterable(attributes)) {
+      if (attr.getName().equals(name) && matches(attr.getValue(), tokens)) return true;
+    }
+    return false;
   }
 }

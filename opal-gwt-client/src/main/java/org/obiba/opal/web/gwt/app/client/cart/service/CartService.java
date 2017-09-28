@@ -14,12 +14,19 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.storage.client.Storage;
 import com.google.gwt.storage.client.StorageMap;
 import com.google.inject.Singleton;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
+import org.obiba.opal.web.model.Search;
+import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.opal.EntryDto;
+import org.obiba.opal.web.model.client.search.ItemFieldsDto;
+import org.obiba.opal.web.model.client.search.ItemResultDto;
 
 import java.util.List;
 import java.util.Map;
@@ -38,27 +45,61 @@ public class CartService {
     GWT.log("Local storage is supported: " + (stockStore != null));
   }
 
-  public void addVariables(String entityType, List<String> variables) {
-    for (String variable : variables)
-      addVariable(entityType, variable);
+  public void addVariableItems(String entityType, Map<String, List<ItemResultDto>> tableVariableItems) {
+    for (String tableRef : tableVariableItems.keySet()) {
+      MagmaPath.Parser refParser = MagmaPath.Parser.parse(tableRef);
+      for (ItemResultDto item : tableVariableItems.get(tableRef)) {
+        addVariable(entityType, refParser.getDatasource(), refParser.getTable(), asVariable(item));
+      }
+    }
   }
 
-  public void addVariable(String entityType, String datasource, String table, String variable) {
-    addVariable(entityType, getVariableFullName(datasource, table, variable));
+  private VariableDto asVariable(ItemResultDto item) {
+    ItemFieldsDto fields = (ItemFieldsDto) item.getExtension("Search.ItemFieldsDto.item");
+    VariableDto variable = VariableDto.create();
+    JsArray<AttributeDto> attributes = JsArrays.create();
+    for (EntryDto entry : JsArrays.toIterable(fields.getFieldsArray())) {
+      if ("name".equals(entry.getKey())) variable.setName(entry.getValue());
+      else if ("entityType".equals(entry.getKey())) variable.setEntityType(entry.getValue());
+      else if ("label".equals(entry.getKey())) {
+        AttributeDto attr = AttributeDto.create();
+        attr.setName("label");
+        attr.setValue(entry.getValue());
+        attributes.push(attr);
+      }
+      else if (entry.getKey().startsWith("label-")) {
+        AttributeDto attr = AttributeDto.create();
+        attr.setName("label");
+        attr.setLocale(entry.getKey().substring(6));
+        attr.setValue(entry.getValue());
+        attributes.push(attr);
+      }
+    }
+    variable.setAttributesArray(attributes);
+    return variable;
   }
 
-  public void addVariable(String entityType, String variableFullName) {
+  public void addVariables(String entityType, Map<String, List<VariableDto>> tableVariables) {
+    for (String tableRef : tableVariables.keySet()) {
+      MagmaPath.Parser refParser = MagmaPath.Parser.parse(tableRef);
+      for (VariableDto variable : tableVariables.get(tableRef)) {
+        addVariable(entityType, refParser.getDatasource(), refParser.getTable(), variable);
+      }
+    }
+  }
+
+  public void addVariable(String entityType, String datasource, String table, VariableDto variable) {
+    addVariable(entityType, getVariableFullName(datasource, table, variable.getName()), variable);
+  }
+
+  public void addVariable(String entityType, String variableFullName, VariableDto variable) {
     if (Strings.isNullOrEmpty(variableFullName)) return;
     if (isStoreSupported())
-      stockStore.setItem(VARIABLES_PREFIX + variableFullName, entityType);
+      stockStore.setItem(VARIABLES_PREFIX + variableFullName, VariableDto.stringify(variable));
     else
       addVariableInMemory(entityType, variableFullName);
   }
 
-  public void removeVariable(String datasource, String table, String variable) {
-    removeVariable(getVariableFullName(datasource, table, variable));
-  }
-  
   public void removeVariable(String variableFullName) {
     if (Strings.isNullOrEmpty(variableFullName)) return;
     if (isStoreSupported()) removeVariableInStore(variableFullName);
@@ -115,7 +156,7 @@ public class CartService {
     for (int i=0; i<stockStore.getLength(); i++) {
       String key = stockStore.key(i);
       if (key.startsWith(VARIABLES_PREFIX))
-        vars.add(new CartVariableItem(key.replace(VARIABLES_PREFIX,""), stockStore.getItem(key)));
+        vars.add(new CartVariableItem(getVariableFullName(key), stockStore.getItem(key)));
     }
     return vars;
   }
@@ -126,7 +167,7 @@ public class CartService {
       String key = stockStore.key(i);
       if (key.startsWith(VARIABLES_PREFIX)) {
         String type = stockStore.getItem(key);
-        if (type.equals(entityType)) vars.add(new CartVariableItem(key.replace(VARIABLES_PREFIX, ""), type));
+        if (type.equals(entityType)) vars.add(new CartVariableItem(getVariableFullName(key), type));
       }
     }
     return vars;
@@ -146,5 +187,9 @@ public class CartService {
 
   private boolean hasVariableInMemory(String variableFullName) {
     return variables.containsKey(variableFullName);
+  }
+
+  private String getVariableFullName(String storeKey) {
+    return storeKey.replace(VARIABLES_PREFIX, "");
   }
 }
