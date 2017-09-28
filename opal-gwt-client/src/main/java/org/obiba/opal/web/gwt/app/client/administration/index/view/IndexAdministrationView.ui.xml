@@ -99,7 +99,7 @@
 
         <g:FlowPanel addStyleNames="pull-right">
           <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
-          <b2:IconAnchor ui:field="selectAllAnchor" icon="CHECK" addStyleNames="inline small-indent"/>
+          <b2:IconAnchor ui:field="selectAllAnchor" icon="CHECK_EMPTY" addStyleNames="inline small-indent"/>
           <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" addStyleNames="inline small-indent">
             <ui:msg description="Clear label">Clear</ui:msg>
           </b2:IconAnchor>

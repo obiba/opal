@@ -69,7 +69,7 @@
 
           <g:FlowPanel addStyleNames="pull-right">
             <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
-            <b2:IconAnchor ui:field="selectAllAnchor" icon="CHECK" addStyleNames="inline small-indent"/>
+            <b2:IconAnchor ui:field="selectAllAnchor" icon="CHECK_EMPTY" addStyleNames="inline small-indent"/>
             <g:FlowPanel ui:field="selectAllProgressBox" addStyleNames="inline-flex small-indent" visible="false">
               <b:ProgressBar ui:field="selectAllProgress" percent="0" width="60px" addStyleNames="no-bottom-margin"/>
             </g:FlowPanel>
