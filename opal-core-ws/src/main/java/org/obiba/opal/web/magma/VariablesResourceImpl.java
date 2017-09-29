@@ -10,9 +10,11 @@
 package org.obiba.opal.web.magma;
 
 import com.google.common.base.Functions;
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.obiba.magma.*;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
@@ -36,6 +38,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
@@ -109,10 +112,25 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
   }
 
   @Override
-  public Response updateAttribute(String namespace, String name, String localeStr, String value, List<String> variableNames) {
-    if (Strings.isNullOrEmpty(name)) return Response.status(BAD_REQUEST).build();
-    if (Strings.isNullOrEmpty(value)) return removeAttribute(namespace, name, localeStr, value, variableNames);
-    return setAttribute(namespace, name, localeStr, value, variableNames);
+  public Response updateAttribute(String namespace, String name, List<String> locales, List<String> values, List<String> variableNames) {
+    if (Strings.isNullOrEmpty(name) || locales.contains("")) return Response.status(BAD_REQUEST).build();
+    if (locales.isEmpty()) {
+      String valueStr = values.isEmpty() ? null : Joiner.on("|").join(values);
+      if (Strings.isNullOrEmpty(valueStr)) return removeAttribute(namespace, name, null, valueStr, variableNames);
+      return setAttribute(namespace, name, null, valueStr, variableNames);
+    }
+    if (locales.size() != values.size())
+      return Response.status(BAD_REQUEST).build();
+
+    Map<String,String> localizedValues = Maps.newHashMap();
+    for (int i=0; i<locales.size(); i++) {
+      String locale = locales.get(i);
+      String value = values.get(i);
+      // check locales are all different
+      if (localizedValues.containsKey(locale)) return Response.status(BAD_REQUEST).build();
+      localizedValues.put(locale, value);
+    }
+    return setAttributes(namespace, name, localizedValues, variableNames);
   }
 
   @Override
@@ -180,6 +198,36 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
   // private methods
   //
 
+  private Response setAttributes(final String namespace, final String name, final Map<String,String> localizedValues, final List<String> variableNames) {
+    ValueTable table = getValueTable();
+    Iterable<Variable> variables = getVariables(table, variableNames);
+    List<Variable> updatedVariables = Lists.newArrayList();
+    List<Attribute> attributes = localizedValues.keySet().stream().map(localeStr -> {
+      Locale locale = Strings.isNullOrEmpty(localeStr) ? null : Locale.forLanguageTag(localeStr);
+      String value = localizedValues.get(localeStr);
+      return Attribute.Builder.newAttribute(name).withNamespace(namespace).withValue(locale, value).build();
+    }).collect(Collectors.toList());
+
+    for (Variable variable : variables) {
+      // copy variable without the attribute of interest
+      Variable.Builder updatedVariableBuilder = Variable.Builder.sameAs(variable).clearAttributes();
+      if (variable.hasAttributes()) {
+        // filter out same attributes
+        variable.getAttributes().stream()
+            .filter(attr -> attributes.stream().noneMatch(attribute -> isSameAttribute(attr, attribute)))
+            .forEach(updatedVariableBuilder::addAttribute);
+      }
+      // add new/updated valid attributes
+      attributes.stream()
+          .filter(attribute -> !attribute.getValue().isNull())
+          .forEach(updatedVariableBuilder::addAttribute);
+      // update variable
+      updatedVariables.add(updatedVariableBuilder.build());
+    }
+    addOrUpdateTableVariables(updatedVariables);
+    return Response.ok().build();
+  }
+
   private Response setAttribute(String namespace, String name, String localeStr, String value, List<String> variableNames) {
     ValueTable table = getValueTable();
     Iterable<Variable> variables = getVariables(table, variableNames);
@@ -190,7 +238,8 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
     for (Variable variable : variables) {
       // copy variable without the attribute of interest
       Variable.Builder updatedVariableBuilder = Variable.Builder.sameAs(variable).clearAttributes();
-      if (variable.hasAttributes()) variable.getAttributes().stream()
+      if (variable.hasAttributes())
+        variable.getAttributes().stream()
           .filter(attr -> !isSameAttribute(attr, attribute))
           .forEach(updatedVariableBuilder::addAttribute);
       // empty value means no attribute
@@ -210,13 +259,15 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
     if (!Strings.isNullOrEmpty(value)) builder.withValue(value);
     final Attribute attribute = builder.build();
     List<Variable> updatedVariables = Lists.newArrayList();
+    boolean removeAnyValues = Strings.isNullOrEmpty(localeStr) && Strings.isNullOrEmpty(value);
 
     for (Variable variable : variables) {
       if (variable.hasAttributes()) {
         // copy variable without the attribute of interest
         Variable.Builder updatedVariableBuilder = Variable.Builder.sameAs(variable).clearAttributes();
         variable.getAttributes().stream()
-            .filter(attr -> attribute.getValue().isNull() ? !isSameAttribute(attr, attribute) : !isSameAttributeWithValue(attr, attribute))
+            .filter(attr -> removeAnyValues ? !isSameAttributeAnyValue(attr, attribute) :
+                attribute.getValue().isNull() ? !isSameAttribute(attr, attribute) : !isSameAttributeWithValue(attr, attribute))
             .forEach(updatedVariableBuilder::addAttribute);
         Variable updatedVariable = updatedVariableBuilder.build();
         // update variable only if attributes have changed
@@ -240,11 +291,18 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
     return variableNames.stream().filter(table::hasVariable).map(table::getVariable).collect(Collectors.toList());
   }
 
+  private boolean isSameAttributeAnyValue(Attribute source, Attribute target) {
+    if (!source.getName().equals(target.getName())) return false;
+    if (source.hasNamespace() && !source.getNamespace().equals(target.getNamespace())) return false;
+    if (!source.hasNamespace() && target.hasNamespace()) return false;
+    return true;
+  }
+
   private boolean isSameAttribute(Attribute source, Attribute target) {
     if (!source.getName().equals(target.getName())) return false;
     if (source.hasNamespace() && !source.getNamespace().equals(target.getNamespace())) return false;
     if (!source.hasNamespace() && target.hasNamespace()) return false;
-    if (source.isLocalised() && !source.getLocale().equals(target.getLocale())) return false;
+    if (source.isLocalised() && (!target.isLocalised() || !source.getLocale().equals(target.getLocale()))) return false;
     if (!source.isLocalised() && target.isLocalised()) return false;
     return true;
   }

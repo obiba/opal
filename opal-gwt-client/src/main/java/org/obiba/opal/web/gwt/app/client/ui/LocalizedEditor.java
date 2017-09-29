@@ -55,6 +55,8 @@ public class LocalizedEditor extends FlowPanel {
 
   private Map<String, String> localizedTexts;
 
+  private List<String> locales;
+
   public LocalizedEditor() {
     localeTabs = new NavTabs();
     add(localeTabs);
@@ -90,6 +92,7 @@ public class LocalizedEditor extends FlowPanel {
 
   public void setLocalizedTexts(Map<String, String> localizedTexts, List<String> locales) {
     this.localizedTexts = localizedTexts;
+    this.locales = locales;
 
     localeTabs.clear();
     NavLink first = null;
@@ -119,7 +122,12 @@ public class LocalizedEditor extends FlowPanel {
 
   public Map<String, String> getLocalizedTexts() {
     // make sure current edition is applied
-    if(localizedTexts != null) localizedTexts.put(currentLocale.getName(), editor.getText());
+    if(localizedTexts != null && locales != null) {
+      localizedTexts.put(currentLocale.getName(), editor.getText());
+      for (String locale : locales) {
+        if (!localizedTexts.containsKey(locale)) localizedTexts.put(locale,"");
+      }
+    }
     return localizedTexts;
   }
 

@@ -10,6 +10,8 @@
 
 package org.obiba.opal.web.gwt.app.client.cart.edit;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.http.client.Request;
@@ -91,23 +93,51 @@ public class CartVariableAttributeModalPresenter
     getView().setBusy(true);
     progressCount = 0;
     for (String tableRef : cartVariableItemsMap.keySet()) {
-      final MagmaPath.Parser parser = MagmaPath.Parser.parse(tableRef);
-      UriBuilder uriBuilder = UriBuilders.DATASOURCE_TABLE_VARIABLES_ATTRIBUTE.create()
-          .query("namespace", taxonomy)
-          .query("name", vocabulary);
-      if (apply) uriBuilder.query("value", term);
-      ResourceRequestBuilder builder = ResourceRequestBuilderFactory.newBuilder()
-          .forResource(uriBuilder.build(parser.getDatasource(), parser.getTable()))
-          .withCallback(new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              incrementProgress(parser, response.getStatusCode());
-            }
-          }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_FORBIDDEN, Response.SC_NOT_FOUND, Response.SC_OK);
-      for (CartVariableItem item : cartVariableItemsMap.get(tableRef))
-        builder.withFormBody("variable", item.getVariable().getName());
-      builder.put().send();
+      onSubmit(tableRef, taxonomy, vocabulary, term);
     }
+  }
+
+  @Override
+  public void onSubmit(String taxonomy, String vocabulary, Map<String, String> localizedValues) {
+    getView().setBusy(true);
+    progressCount = 0;
+    for (String tableRef : cartVariableItemsMap.keySet()) {
+      if (apply) {
+        List<String> locales = Lists.newArrayList(localizedValues.keySet());
+        List<String> values = Lists.newArrayList(localizedValues.values());
+        onSubmit(tableRef, taxonomy, vocabulary, locales, values);
+      } else
+        onSubmit(tableRef, taxonomy, vocabulary, null);
+    }
+  }
+  private void onSubmit(String tableRef, String namespace, String name, String value) {
+    onSubmit(tableRef, namespace, name, null, Strings.isNullOrEmpty(value) ? null : Lists.newArrayList(value));
+  }
+  private void onSubmit(String tableRef, String namespace, String name, List<String> locales, List<String> values) {
+    final MagmaPath.Parser parser = MagmaPath.Parser.parse(tableRef);
+    UriBuilder uriBuilder = UriBuilders.DATASOURCE_TABLE_VARIABLES_ATTRIBUTE.create()
+        .query("namespace", namespace)
+        .query("name", name);
+    if (locales != null) {
+      for (String locale : locales)
+        uriBuilder.query("locale", locale);
+    }
+    if (values != null){
+      for (String value : values)
+        uriBuilder.query("value", value);
+    }
+    ResourceRequestBuilder builder = ResourceRequestBuilderFactory.newBuilder()
+        .forResource(uriBuilder.build(parser.getDatasource(), parser.getTable()))
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            incrementProgress(parser, response.getStatusCode());
+          }
+        }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_FORBIDDEN, Response.SC_NOT_FOUND, Response.SC_OK);
+    for (CartVariableItem item : cartVariableItemsMap.get(tableRef))
+      builder.withFormBody("variable", item.getVariable().getName());
+    if (apply) builder.put().send();
+    else builder.delete().send();
   }
 
   private void incrementProgress(MagmaPath.Parser parser, int status) {

@@ -189,7 +189,7 @@ public class EditProjectModalView extends ModalPopupViewWithUiHandlers<EditProje
   @Override
   public void setAvailableDatabases(JsArray<DatabaseDto> availableDatabases) {
     database.clear();
-    database.addItem(translations.none(), DATABASE_NONE);
+    database.addItem("(" + translations.none() + ")", DATABASE_NONE);
 
     String defaultStorageDatabase = DATABASE_NONE;
     for (DatabaseDto databaseDto : JsArrays.toIterable(availableDatabases)) {
@@ -214,7 +214,7 @@ public class EditProjectModalView extends ModalPopupViewWithUiHandlers<EditProje
   @Override
   public void setAvailableVcfStoreServices(List<PluginPackageDto> installedVcfStoreServices) {
     vcfStoreService.clear();
-    vcfStoreService.addItem(translations.none(), VCF_STORE_SERVICE_NONE);
+    vcfStoreService.addItem("(" + translations.none() + ")", VCF_STORE_SERVICE_NONE);
 
     for (PluginPackageDto pluginPackageDto : installedVcfStoreServices) {
       vcfStoreService.addItem(pluginPackageDto.getName());

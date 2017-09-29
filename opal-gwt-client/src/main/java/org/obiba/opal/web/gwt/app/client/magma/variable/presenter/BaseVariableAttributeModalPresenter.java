@@ -322,9 +322,19 @@ public class BaseVariableAttributeModalPresenter<V extends BaseVariableAttribute
   private JsArray<AttributeDto> deleteMultipleAttributes(VariableDto dto) {
     JsArray<AttributeDto> newAttributes = JsArrays.create().cast();
 
+    String specificValue = "";
+    if (localizedTexts.size() == 1 && localizedTexts.containsKey(""))
+      specificValue = localizedTexts.get("");
+
     for (AttributeDto attributeDto : JsArrays.toIterable(dto.getAttributesArray())) {
-      // Add attribute if its not for the specified namespace or name
-      if (!attributeDto.getNamespace().equals(namespace) || !attributeDto.getName().equals(name)) {
+      if (!Strings.isNullOrEmpty(specificValue)) {
+        // remove only attributes with specific non-localized values
+        if (!(attributeDto.getNamespace().equals(namespace) && attributeDto.getName().equals(name)
+        && Strings.isNullOrEmpty(attributeDto.getLocale()) && attributeDto.getValue().equals(specificValue)))
+          newAttributes.push(attributeDto);
+      }
+      else if (!attributeDto.getNamespace().equals(namespace) || !attributeDto.getName().equals(name)) {
+        // Add attribute if its not for the specified namespace or name
         newAttributes.push(attributeDto);
       }
     }

@@ -109,12 +109,12 @@ public class VariableTaxonomyModalView extends ModalPopupViewWithUiHandlers<Vari
         modalHelp.setText(translations.editAttributesHelp());
         break;
       case DELETE:
-        taxonomySelector.termSelectable(false);
+        taxonomySelector.setTermSelectionOptional(true);
         modal.setTitle(translations.removeAnnotation());
         modalHelp.setText(translations.removeAnnotationsHelp());
         break;
       case DELETE_SINGLE:
-        taxonomySelector.termSelectable(false);
+        taxonomySelector.setTermSelectionOptional(true);
         modal.setTitle(translations.removeAnnotation());
         modalHelp.setText(translations.removeAnnotationHelp());
         break;

@@ -79,12 +79,15 @@ public class CartVariableAttributeModalView extends ModalPopupViewWithUiHandlers
 
   @UiHandler("saveButton")
   void onSave(ClickEvent event) {
-    getUiHandlers().onSubmit(taxonomySelector.getTaxonomy(), taxonomySelector.getVocabulary(), taxonomySelector.getTerm());
+    if (taxonomySelector.hasVocabularyTerm())
+      getUiHandlers().onSubmit(taxonomySelector.getTaxonomy(), taxonomySelector.getVocabulary(), taxonomySelector.getTerm());
+    else
+      getUiHandlers().onSubmit(taxonomySelector.getTaxonomy(), taxonomySelector.getVocabulary(), taxonomySelector.getValues());
   }
 
   @Override
   public void setMode(boolean apply) {
-    taxonomySelector.termSelectable(apply);
+    taxonomySelector.setTermSelectionOptional(!apply);
     if (apply) {
       dialog.setTitle(translations.applyAnnotation());
       information.setText(translations.applyAnnotationHelp());

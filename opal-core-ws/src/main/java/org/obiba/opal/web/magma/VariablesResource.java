@@ -62,15 +62,15 @@ public interface VariablesResource {
    *
    * @param namespace
    * @param name
-   * @param locale
-   * @param value If null or empty, the attribute is removed.
+   * @param locales
+   * @param values If null or empty, the attribute is removed.
    * @param variables
    * @return
    */
   @PUT
   @Path("/_attribute")
   Response updateAttribute(@QueryParam("namespace") String namespace, @QueryParam("name") String name,
-                        @QueryParam("locale") String locale, @QueryParam("value") String value,
+                        @QueryParam("locale") List<String> locales, @QueryParam("value") List<String> values,
                         @FormParam("variable") List<String> variables);
 
   /**

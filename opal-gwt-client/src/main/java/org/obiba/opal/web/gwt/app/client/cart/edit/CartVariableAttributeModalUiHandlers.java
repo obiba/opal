@@ -12,8 +12,12 @@ package org.obiba.opal.web.gwt.app.client.cart.edit;
 
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
+import java.util.Map;
+
 public interface CartVariableAttributeModalUiHandlers extends ModalUiHandlers {
 
   void onSubmit(String taxonomy, String vocabulary, String term);
+
+  void onSubmit(String taxonomy, String vocabulary, Map<String, String> localizedValues);
 
 }

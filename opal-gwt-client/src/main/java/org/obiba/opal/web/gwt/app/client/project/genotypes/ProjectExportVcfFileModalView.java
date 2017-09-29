@@ -168,7 +168,7 @@ public class ProjectExportVcfFileModalView extends ModalPopupViewWithUiHandlers<
   @Override
   public void setParticipants(JsArray<TableDto> tables) {
     participantsFilter.clear();
-    participantsFilter.addItem(translations.none(), PARTICIPANT_FILTER_NONE);
+    participantsFilter.addItem("(" + translations.none() + ")", PARTICIPANT_FILTER_NONE);
 
     List<String> groups = Lists.newArrayList();
 
@@ -199,7 +199,7 @@ public class ProjectExportVcfFileModalView extends ModalPopupViewWithUiHandlers<
 
   private void updateParticipantsIdentifiersGroupVisibility() {
     participantsIdentifiersMapping.clear();
-    participantsIdentifiersMapping.addItem(translations.none(), PARTICIPANT_FILTER_NONE);
+    participantsIdentifiersMapping.addItem("(" + translations.none() + ")", PARTICIPANT_FILTER_NONE);
     for (String participantIdentifiersMapping : participantIdentifiersMappingList) {
       participantsIdentifiersMapping.addItem(participantIdentifiersMapping);
     }

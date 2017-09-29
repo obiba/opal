@@ -47,6 +47,8 @@ public class TaxonomySelector extends Composite {
 
   private static final Translations translations = GWT.create(Translations.class);
 
+  private static final String ANY_VALUE = "_any_";
+
   private final String currentLocale = AttributeHelper.getCurrentLanguage();
 
   @UiField(provided = true)
@@ -86,7 +88,7 @@ public class TaxonomySelector extends Composite {
 
   private VariableFieldSuggestOracle oracle = new VariableFieldSuggestOracle();
 
-  private boolean termSelectable = true;
+  private boolean termSelectionOptional = false;
 
   public TaxonomySelector() {
     initQuickSearch();
@@ -119,10 +121,13 @@ public class TaxonomySelector extends Composite {
     editor.setLocales(JsArrays.toList(locales));
   }
 
-  public void termSelectable(boolean selectable) {
-    this.termSelectable = selectable;
-    termGroup.setVisible(selectable);
-    if (!selectable) valuesGroup.setVisible(false);
+  /**
+   * Term selection or value entry is optional (case of deletion of any values).
+   *
+   * @param optional
+   */
+  public void setTermSelectionOptional(boolean optional) {
+    this.termSelectionOptional = optional;
   }
 
   public void selectTaxonomy(String namespace) {
@@ -136,7 +141,6 @@ public class TaxonomySelector extends Composite {
   }
 
   public void setLocalizedTexts(Map<String, String> localizedTexts, List<String> locales) {
-    //enableTermSelection(false);
     editor.setLocalizedTexts(localizedTexts, locales);
   }
 
@@ -175,18 +179,24 @@ public class TaxonomySelector extends Composite {
     return vocabularyChooser.getSelectedValue();
   }
 
+  public boolean hasVocabularyTerm() {
+    return termChooser.getItemCount() > 0;
+  }
+
   public String getTerm() {
+    if (!hasVocabularyTerm()) return "";
+    // selection at first position represents any selection
+    if (ANY_VALUE.equals(termChooser.getSelectedValue())) return "";
     return termChooser.getSelectedValue();
   }
 
   public Map<String, String> getValues() {
-    if (valuesGroup.isVisible())
-      return editor.getLocalizedTexts();
-    else {
+    if (hasVocabularyTerm()) {
       Map<String, String> values = Maps.newHashMap();
       values.put("", getTerm());
       return values;
     }
+    return editor.getLocalizedTexts();
   }
 
   //
@@ -195,7 +205,7 @@ public class TaxonomySelector extends Composite {
 
   private void enableTermSelection(boolean enable) {
     termGroup.setVisible(enable);
-    valuesGroup.setVisible(!enable);
+    valuesGroup.setVisible(!enable && !termSelectionOptional);
   }
 
   private void initQuickSearch() {
@@ -291,18 +301,22 @@ public class TaxonomySelector extends Composite {
   }
 
   private void setTerms(VocabularyDto vocabulary) {
-    if (!termSelectable) return;
     termChooser.clear();
+
     boolean repeatable = vocabulary.hasRepeatable() && vocabulary.getRepeatable();
     // TODO repeatable
     TermDto firstTerm = null;
+    if (vocabulary.getTermsCount() > 0 && termSelectionOptional) {
+      termChooser.addItem("(" + translations.any() + ")", ANY_VALUE);
+    }
     for (TermDto term : JsArrays.toIterable(vocabulary.getTermsArray())) {
       termChooser.addItem(getTermTitle(term), term.getName());
       if (firstTerm == null) firstTerm = term;
     }
     enableTermSelection(firstTerm != null);
-    if (firstTerm != null)
+    if (firstTerm != null && !termSelectionOptional) {
       setTermHelp(firstTerm);
+    }
   }
 
   private TaxonomyDto getTaxonomy(String name) {
