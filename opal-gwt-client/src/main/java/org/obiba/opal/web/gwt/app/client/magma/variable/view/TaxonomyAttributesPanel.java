@@ -87,10 +87,10 @@ public class TaxonomyAttributesPanel extends FlowPanel {
     }
 
     List<String> names = Lists.newArrayList(namedAttributes.keySet());
-    Collections.sort(names);
-    for (String name : names) {
-      VocabularyDto vocabulary = getVocabulary(taxonomy, name);
-      if (vocabulary != null) {
+    // display in vocabulary order
+    for (VocabularyDto vocabulary : JsArrays.toIterable(taxonomy.getVocabulariesArray())) {
+      if (names.contains(vocabulary.getName())) {
+        String name = vocabulary.getName();
         if (vocabulary.getTermsCount() == 0) {
           showVocabularyAttribute(propertiesTable, taxonomy, vocabulary, namedAttributes.get(name));
         } else {
@@ -156,14 +156,6 @@ public class TaxonomyAttributesPanel extends FlowPanel {
   private TaxonomyDto getTaxonomy(List<TaxonomyDto> taxonomies, String namespace) {
     for (TaxonomyDto taxonomyDto : taxonomies) {
       if (taxonomyDto.getName().equals(namespace)) return taxonomyDto;
-    }
-    return null;
-  }
-
-  private VocabularyDto getVocabulary(TaxonomyDto taxonomy, String name) {
-    if (taxonomy.getVocabulariesCount() == 0) return null;
-    for (VocabularyDto vocabulary : JsArrays.toIterable(taxonomy.getVocabulariesArray())) {
-      if (vocabulary.getName().equals(name)) return vocabulary;
     }
     return null;
   }
