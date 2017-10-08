@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
@@ -267,6 +268,50 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
       }
 
       return valuesQuery;
+    }
+
+    return "";
+  }
+
+
+  @Override
+  protected String getMagmaJsStatement() {
+    String statement = super.getMagmaJsStatement();
+    if (!Strings.isNullOrEmpty(statement)) return statement;
+
+    statement = "$('" + getRQLField() + "')";
+    // RANGE
+    if(rangeValueChooser.isItemSelected(0)) {
+      if (min.getText().isEmpty() && max.getText().isEmpty()) {
+        statement = "";
+      }
+      if (!min.getText().isEmpty() && !max.getText().isEmpty())
+        statement = statement + ".ge(" + min.getText() + ").and(" + statement + ".le(" + max.getText() + "))";
+      else if (!min.getText().isEmpty()) statement = statement + ".ge(" + min.getText() + ")";
+      else if (!max.getText().isEmpty()) statement = statement + ".le(" + max.getText() + ")";
+
+      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
+        statement = Strings.isNullOrEmpty(statement) ?
+            "$('" + getRQLField() + "').isNull()" : statement + ".not()";
+      }
+
+      return statement;
+    }
+
+    // VALUES
+    if(rangeValueChooser.isItemSelected(1) && !values.getText().isEmpty()) {
+      // Parse numbers
+      List<String> numbers = Lists.newArrayList();
+      for (String nb : values.getText().trim().split("\\s+")) {
+        if (!nb.trim().isEmpty()) numbers.add(nb);
+      }
+      statement = statement + ".any(" + Joiner.on(",").join(numbers) + ")";
+
+      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
+        statement = statement + ".not()";
+      }
+
+      return statement;
     }
 
     return "";

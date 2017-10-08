@@ -15,6 +15,7 @@ import com.github.gwtbootstrap.client.ui.Icon;
 import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -140,6 +141,28 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
     }
 
     return null;
+  }
+
+  @Override
+  protected String getMagmaJsStatement() {
+    String statement = super.getMagmaJsStatement();
+    if (!Strings.isNullOrEmpty(statement)) return statement;
+
+    statement = "$('" + getRQLField() + "')";
+    List<String> selected = getSelectedCategories();
+    // in
+    if(((CheckBox) radioControls.getWidget(3)).getValue()) {
+      if (selected.isEmpty()) return statement + ".isNull()";
+      return statement + ".any('" + Joiner.on("','").join(selected) + "')";
+    }
+
+    // not in
+    if(((CheckBox) radioControls.getWidget(4)).getValue()) {
+      if (selected.isEmpty()) return "";
+      return statement + ".any('" + Joiner.on("','").join(selected) + "').not()";
+    }
+
+    return "";
   }
 
   private void initialize(RQLValueSetVariableCriterionParser criterion) {

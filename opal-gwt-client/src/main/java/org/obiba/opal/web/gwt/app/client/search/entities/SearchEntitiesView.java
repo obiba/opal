@@ -180,6 +180,11 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
     getUiHandlers().onClear();
   }
 
+  @UiHandler("addToView")
+  public void onAddToView(ClickEvent event) {
+    getUiHandlers().onAddToView(criteriaPanel.getRQLFields(), criteriaPanel.getMagmaJsStatements());
+  }
+
   @Override
   public void setIndexedTables(List<TableDto> tables) {
     oracle.setIndexedTables(tables);

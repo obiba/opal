@@ -93,6 +93,38 @@ public class CriteriaPanel extends FlowPanel {
   }
 
   /**
+   * Get the fields for each criterion.
+   *
+   * @return
+   */
+  public List<String> getRQLFields() {
+    List<String> fieldNames = Lists.newArrayList();
+    for(int i = 0; i < getWidgetCount(); i++) {
+      if(getWidget(i) instanceof CriterionPanel) {
+        String fieldName = ((CriterionPanel) getWidget(i)).getRQLField();
+        if(!Strings.isNullOrEmpty(fieldName)) fieldNames.add(fieldName);
+      }
+    }
+    return fieldNames;
+  }
+
+  /**
+   * Get query expressed as Magma javascript statements.
+   *
+   * @return
+   */
+  public List<String> getMagmaJsStatements() {
+    List<String> statements = Lists.newArrayList();
+    for(int i = 0; i < getWidgetCount(); i++) {
+      if(getWidget(i) instanceof CriterionPanel) {
+        String statement = ((CriterionPanel) getWidget(i)).getMagmaJsStatement();
+        if(!Strings.isNullOrEmpty(statement)) statements.add(statement);
+      }
+    }
+    return statements;
+  }
+
+  /**
    * Get human readable query string.
    *
    * @return

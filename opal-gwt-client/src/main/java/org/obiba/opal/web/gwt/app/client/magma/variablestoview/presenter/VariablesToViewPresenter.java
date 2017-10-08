@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gwt.core.client.GWT;
@@ -59,6 +60,8 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
   private List<VariableDto> variables = new LinkedList<VariableDto>();
 
   private JsArray<DatasourceDto> datasources;
+
+  private String entityFilter;
 
   @Inject
   public VariablesToViewPresenter(Display display, EventBus eventBus, PlaceManager placeManager) {
@@ -182,6 +185,11 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
   }
 
   public void show(List<String> variableFullNames) {
+    show(variableFullNames, "");
+  }
+
+  public void show(List<String> variableFullNames, String entityFilter) {
+    this.entityFilter = entityFilter;
     this.tableReferences = Lists.newArrayList();
     this.variableTableReferences = Maps.newHashMap();
     final int expectedCount = variableFullNames.size();
@@ -249,6 +257,10 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
       variablesDto.push(v);
     }
     derivedVariables.setVariablesArray(variablesDto);
+
+    if (!Strings.isNullOrEmpty(entityFilter)) {
+      view.setWhere(entityFilter);
+    }
 
     ResponseCodeCallback createCodingViewCallback = new CreateViewCallBack(view);
     ResourceCallback<ViewDto> alreadyExistCodingViewCallback = new UpdateExistViewCallBack(variablesDto);

@@ -53,6 +53,11 @@
         <b:Heading size="4" addStyleNames="top-margin">
           <ui:msg description="Counts label">Counts</ui:msg>
         </b:Heading>
+        <g:FlowPanel addStyleNames="small-bottom-margin clearfix">
+          <b:Button ui:field="addToView" type="INFO" icon="PLUS" addStyleNames="btn">
+            <ui:msg description="Add to View Button label">View</ui:msg>
+          </b:Button>
+        </g:FlowPanel>
         <g:FlowPanel ui:field="countsPanel"/>
       </g:FlowPanel>
       <g:FlowPanel ui:field="entitiesResultPanel" visible="false">

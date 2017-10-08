@@ -65,11 +65,11 @@ public abstract class CriterionDropdown extends DropdownButton {
 
   public String getRQLQueryString() {
     if(getRadioButtonValue(1)) {
-      // Not empty
+      // Empty
       return "not(exists(" + getRQLField() + "))";
     }
     if(getRadioButtonValue(2)) {
-      // Empty
+      // Not empty
       return "exists(" + getRQLField() + ")";
     }
     if(getRadioButtonValue(0)) {

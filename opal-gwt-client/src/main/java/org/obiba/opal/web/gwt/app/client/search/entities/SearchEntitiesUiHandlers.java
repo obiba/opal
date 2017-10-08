@@ -25,4 +25,6 @@ public interface SearchEntitiesUiHandlers extends UiHandlers {
   void onClear();
 
   void onEntityType(String selection);
+
+  void onAddToView(List<String> variableFullNames, List<String> magmaJsStatements);
 }

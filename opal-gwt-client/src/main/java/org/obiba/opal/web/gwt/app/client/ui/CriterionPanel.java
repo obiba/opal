@@ -76,6 +76,16 @@ public class CriterionPanel extends FlowPanel {
     return criterion.getRQLQueryString();
   }
 
+  public String getRQLField() {
+    return criterion.getRQLField();
+  }
+
+  public String getMagmaJsStatement() {
+    if (criterion instanceof ValueSetCriterionDropdown)
+      return ((ValueSetCriterionDropdown) criterion).getMagmaJsStatement();
+    return "";
+  }
+
   public String getQueryText() {
     return criterion.getText();
   }

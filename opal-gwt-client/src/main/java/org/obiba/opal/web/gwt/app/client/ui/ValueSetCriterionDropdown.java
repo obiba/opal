@@ -121,6 +121,23 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
     return datasource + "." + table + ":" + variable.getName();
   }
 
+  protected String getMagmaJsStatement() {
+    String statement = "$('" + getRQLField() + "')";
+    if(getRadioButtonValue(1)) {
+      // Empty
+      return statement + ".isNull()";
+    }
+    if(getRadioButtonValue(2)) {
+      // Not empty
+      return statement + ".isNull().not()";
+    }
+    if(getRadioButtonValue(0)) {
+      // All: No filter is necessary
+      return "";
+    }
+    return "";
+  }
+
 
   protected ControlGroup createControlGroup(ControlLabel label, TextBox textBox) {
     ControlGroup c = new ControlGroup();

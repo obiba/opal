@@ -13,6 +13,7 @@ package org.obiba.opal.web.gwt.app.client.search.entities;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
@@ -33,11 +34,13 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableIndexUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtoNature;
@@ -71,6 +74,8 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
 
   private final PlaceManager placeManager;
 
+  private final ModalProvider<VariablesToViewPresenter> variablesToViewProvider;
+
   private String selectedType;
 
   private String idQuery;
@@ -83,11 +88,13 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
 
   @Inject
   public SearchEntitiesPresenter(EventBus eventBus, Display display, Proxy proxy, Translations translations,
-                                 DefaultBreadcrumbsBuilder breadcrumbsHelper, PlaceManager placeManager) {
+                                 DefaultBreadcrumbsBuilder breadcrumbsHelper, PlaceManager placeManager,
+                                 ModalProvider<VariablesToViewPresenter> variablesToViewProvider) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     this.translations = translations;
     this.breadcrumbsHelper = breadcrumbsHelper;
     this.placeManager = placeManager;
+    this.variablesToViewProvider = variablesToViewProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -158,6 +165,20 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
     queries = null;
     indexedTables = null;
     renderTables();
+  }
+
+  @Override
+  public void onAddToView(List<String> variableFullNames, List<String> magmaJsStatements) {
+    VariablesToViewPresenter variablesToViewPresenter = variablesToViewProvider.get();
+    String entityFilter = "";
+    if (!magmaJsStatements.isEmpty()) {
+      entityFilter = magmaJsStatements.get(0);
+    }
+    if (magmaJsStatements.size()>1) {
+      entityFilter = entityFilter + "\n  .and(" + Joiner.on(")\n  .and(").join(magmaJsStatements.subList(1, magmaJsStatements.size())) + ")";
+    }
+    GWT.log(entityFilter);
+    variablesToViewPresenter.show(variableFullNames, entityFilter);
   }
 
   @Override
