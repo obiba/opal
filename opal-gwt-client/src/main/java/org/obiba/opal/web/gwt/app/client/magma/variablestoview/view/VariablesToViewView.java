@@ -326,6 +326,8 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
 
     dataProvider.setList(list);
     dataProvider.refresh();
+    pager.setPagerVisible(dataProvider.getList().size() > PAGE_SIZE);
+    table.redraw();
   }
 
   @Override
