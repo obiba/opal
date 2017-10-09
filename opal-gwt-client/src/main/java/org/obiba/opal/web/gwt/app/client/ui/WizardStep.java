@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.ui;
 
 import com.github.gwtbootstrap.client.ui.Heading;
+import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 
@@ -18,7 +19,7 @@ import com.google.gwt.user.client.ui.Label;
  */
 public class WizardStep extends FlowPanel {
 
-  private final Heading title;
+  private final Paragraph title;
 
   public WizardStep() {
     this("");
@@ -26,7 +27,7 @@ public class WizardStep extends FlowPanel {
 
   public WizardStep(String title) {
     addStyleName("step");
-    add(this.title = new Heading(5, title));
+    add(this.title = new Paragraph(title));
   }
 
   public void setStepTitle(String text) {
