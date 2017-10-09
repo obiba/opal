@@ -9,59 +9,8 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
-import java.util.*;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
-import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariableEvent;
-import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariablesEvent;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.event.*;
-import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewModalPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewWhereModalPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.BaseVariableAttributeModalPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.ContingencyTablePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableTaxonomyModalPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
-import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
-import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
-import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
-import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
-import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
-import org.obiba.opal.web.gwt.app.client.search.event.SearchTableVariablesEvent;
-import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
-import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
-import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
-import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
-import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.magma.ViewDto;
-import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
-import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
-
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
@@ -77,12 +26,48 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
+import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariablesEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.copy.DataCopyPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.copy.ViewCopyPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.event.*;
+import org.obiba.opal.web.gwt.app.client.magma.copy.DataExportPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewWhereModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.*;
+import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.search.event.SearchTableVariablesEvent;
+import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
+import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
+import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
+import org.obiba.opal.web.gwt.rest.client.*;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.magma.ViewDto;
+import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
+import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
-import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
-import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
-import static com.google.gwt.http.client.Response.SC_OK;
-import static com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE;
+import java.util.*;
+
+import static com.google.gwt.http.client.Response.*;
 
 public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     implements TableUiHandlers, TableSelectionChangeEvent.Handler {
@@ -117,6 +102,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final ModalProvider<DataCopyPresenter> dataCopyModalProvider;
 
+  private final ModalProvider<ViewCopyPresenter> viewCopyModalProvider;
+
   private final ValuesTablePresenter valuesTablePresenter;
 
   private final ModalProvider<IndexPresenter> indexPresenter;
@@ -149,22 +136,23 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
    * @param display
    * @param eventBus
    */
-  @SuppressWarnings({ "ConstructorWithTooManyParameters", "PMD.ExcessiveParameterList" })
+  @SuppressWarnings({"ConstructorWithTooManyParameters", "PMD.ExcessiveParameterList"})
   @Inject
   public TablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
-      ValuesTablePresenter valuesTablePresenter, Provider<ContingencyTablePresenter> crossVariableProvider,
-      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, ModalProvider<IndexPresenter> indexPresenter,
-      ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
-      ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider,
-      ModalProvider<ViewModalPresenter> viewPropertiesModalProvider,
-      ModalProvider<ViewWhereModalPresenter> viewWhereModalProvider,
-      ModalProvider<AddVariablesModalPresenter> addVariablesModalProvider,
-      ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider,
-      ModalProvider<DataExportPresenter> dataExportModalProvider,
-      ModalProvider<DataCopyPresenter> dataCopyModalProvider,
-      ModalProvider<VariableAttributeModalPresenter> attributeModalProvider,
-      ModalProvider<VariableTaxonomyModalPresenter> taxonomyModalProvider, Translations translations,
-      TranslationMessages translationMessages) {
+                        ValuesTablePresenter valuesTablePresenter, Provider<ContingencyTablePresenter> crossVariableProvider,
+                        Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, ModalProvider<IndexPresenter> indexPresenter,
+                        ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
+                        ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider,
+                        ModalProvider<ViewModalPresenter> viewPropertiesModalProvider,
+                        ModalProvider<ViewWhereModalPresenter> viewWhereModalProvider,
+                        ModalProvider<AddVariablesModalPresenter> addVariablesModalProvider,
+                        ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider,
+                        ModalProvider<DataExportPresenter> dataExportModalProvider,
+                        ModalProvider<DataCopyPresenter> dataCopyModalProvider,
+                        ModalProvider<ViewCopyPresenter> viewCopyModalProvider,
+                        ModalProvider<VariableAttributeModalPresenter> attributeModalProvider,
+                        ModalProvider<VariableTaxonomyModalPresenter> taxonomyModalProvider, Translations translations,
+                        TranslationMessages translationMessages) {
     super(eventBus, display);
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
@@ -180,6 +168,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     this.viewWhereModalProvider = viewWhereModalProvider.setContainer(this);
     this.dataExportModalProvider = dataExportModalProvider.setContainer(this);
     this.dataCopyModalProvider = dataCopyModalProvider.setContainer(this);
+    this.viewCopyModalProvider = viewCopyModalProvider.setContainer(this);
     this.crossVariableProvider = crossVariableProvider;
     this.attributeModalProvider = attributeModalProvider.setContainer(this);
     this.taxonomyModalProvider = taxonomyModalProvider.setContainer(this);
@@ -189,14 +178,14 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @Override
   protected void onReset() {
     super.onReset();
-    if(indexProgressTimer != null) {
+    if (indexProgressTimer != null) {
       indexProgressTimer.cancel();
     }
   }
 
   @Override
   public void onTableSelectionChanged(TableSelectionChangeEvent event) {
-    if(event.hasTable()) {
+    if (event.hasTable()) {
       updateDisplay(event.getTable());
     } else {
       updateDisplay(event.getDatasourceName(), event.getTableName());
@@ -213,7 +202,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @Override
   protected void onHide() {
     super.onHide();
-    if(indexProgressTimer != null) {
+    if (indexProgressTimer != null) {
       indexProgressTimer.cancel();
     }
   }
@@ -236,7 +225,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     addRegisteredHandler(VariableRefreshEvent.getType(), new VariableRefreshEvent.Handler() {
       @Override
       public void onVariableRefresh(VariableRefreshEvent event) {
-        if(table != null) {
+        if (table != null) {
           updateVariables();
         }
       }
@@ -263,7 +252,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   }
 
   private void authorize() {
-    if(table == null) return;
+    if (table == null) return;
 
     // export data
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
@@ -279,7 +268,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/variables/excel").get()
         .authorize(getView().getExcelDownloadAuthorizer()).send();
 
-    if(table.hasViewLink()) {
+    if (table.hasViewLink()) {
       // download view
       ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getViewLink() + "/xml").get()
           .authorize(getView().getViewDownloadAuthorizer()).send();
@@ -321,13 +310,13 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   private void updateDisplay(final String datasourceName, final String tableName, final boolean withSummary) {
     // rely on 304 response
     UriBuilder ub = UriBuilders.DATASOURCE_TABLE.create();
-    if(withSummary) ub.query("counts", "true");
+    if (withSummary) ub.query("counts", "true");
     ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(datasourceName, tableName))
         .get().withCallback(new ResourceCallback<TableDto>() {
       @Override
       public void onResource(Response response, TableDto resource) {
-        if(resource != null) {
-          if(!withSummary) {
+        if (resource != null) {
+          if (!withSummary) {
             updateDisplay(resource);
             // then get the summary
             updateDisplay(datasourceName, tableName, true);
@@ -360,7 +349,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   private void updateDisplay(TableDto tableDto) {
     table = tableDto;
     getView().setTable(tableDto);
-    if(tableIsView()) {
+    if (tableIsView()) {
       showViewProperties(table);
     } else {
       getView().setFromTables(null, null);
@@ -373,7 +362,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     updateTableIndexStatus();
     authorize();
 
-    if(getView().isValuesTabSelected()) {
+    if (getView().isValuesTabSelected()) {
       valuesTablePresenter.setTable(tableDto);
       valuesTablePresenter.updateValuesDisplay("");
     }
@@ -394,7 +383,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private void updateIndexStatus() {
     // If cancellation, call the delete ws
-    if(cancelIndexation) {
+    if (cancelIndexation) {
       ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()
           .forResource(getIndexResource(table.getDatasourceName(), table.getName())).delete()
           .withCallback(new TableIndexStatusUnavailableCallback(), SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN, SC_NOT_FOUND,
@@ -418,9 +407,9 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
       @Override
       public void onVariableResourceCallback() {
-        if(table.getLink().equals(TablePresenter.this.table.getLink())) {
+        if (table.getLink().equals(TablePresenter.this.table.getLink())) {
           variables = JsArrays.create();
-          for(VariableDto v : results) {
+          for (VariableDto v : results) {
             variables.push(v);
           }
 
@@ -448,7 +437,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     getView().setVariableFilter(variableFilter);
 
     // Fetch variables
-    if(Strings.isNullOrEmpty(variableFilter)) {
+    if (Strings.isNullOrEmpty(variableFilter)) {
       updateVariables();
     } else {
       doFilterVariables();
@@ -473,12 +462,18 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onCopyData() {
-    DataCopyPresenter provider = dataCopyModalProvider.get();
+    DataCopyPresenter presenter = dataCopyModalProvider.get();
     Set<TableDto> copyTables = new HashSet<>();
     copyTables.add(table);
-    provider.setCopyTables(copyTables, false);
-    provider.setDatasourceName(table.getDatasourceName());
-    provider.setValuesQuery(valuesFilter, valuesFilterText);
+    presenter.setCopyTables(copyTables, false);
+    presenter.setDatasourceName(table.getDatasourceName());
+    presenter.setValuesQuery(valuesFilter, valuesFilterText);
+  }
+
+  @Override
+  public void onCopyView() {
+    ViewCopyPresenter presenter = viewCopyModalProvider.get();
+    presenter.setView(table);
   }
 
   @Override
@@ -512,7 +507,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onAddVariablesToView(List<VariableDto> variableDtos) {
-    if(variableDtos.isEmpty()) {
+    if (variableDtos.isEmpty()) {
       fireEvent(NotificationEvent.newBuilder().error("CopyVariableSelectAtLeastOne").build());
     } else {
       VariablesToViewPresenter variablesToViewPresenter = variablesToViewProvider.get();
@@ -522,7 +517,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onAddVariablesToCart(List<VariableDto> variables) {
-    if(variables.isEmpty()) return;
+    if (variables.isEmpty()) return;
     Map<String, List<VariableDto>> tableVariables = Maps.newHashMap();
     String tableRef = MagmaPath.Builder.datasource(table.getDatasourceName()).table(table.getName()).build();
     tableVariables.put(tableRef, variables);
@@ -531,11 +526,11 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onDeleteVariables(List<VariableDto> variableDtos) {
-    if(variableDtos.isEmpty()) {
+    if (variableDtos.isEmpty()) {
       fireEvent(NotificationEvent.newBuilder().error("DeleteVariableSelectAtLeastOne").build());
     } else {
       JsArrayString variableNames = JsArrays.create().cast();
-      for(VariableDto variable : variableDtos) {
+      for (VariableDto variable : variableDtos) {
         variableNames.push(variable.getName());
       }
 
@@ -549,7 +544,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onEdit() {
-    if(table.hasViewLink()) {
+    if (table.hasViewLink()) {
       UriBuilder ub = UriBuilders.DATASOURCE_VIEW.create();
       ResourceRequestBuilderFactory.<ViewDto>newBuilder()
           .forResource(ub.build(table.getDatasourceName(), table.getName())).get()
@@ -568,7 +563,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onEditWhere() {
-    if(table.hasViewLink()) {
+    if (table.hasViewLink()) {
       UriBuilder ub = UriBuilders.DATASOURCE_VIEW.create();
       ResourceRequestBuilderFactory.<ViewDto>newBuilder()
           .forResource(ub.build(table.getDatasourceName(), table.getName())).get()
@@ -591,7 +586,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         ? ConfirmationRequiredEvent.createWithMessages(removeConfirmation, translationMessages.removeView(),
         translationMessages.confirmRemoveView())
         : ConfirmationRequiredEvent.createWithMessages(removeConfirmation, translationMessages.removeTable(),
-            translationMessages.confirmRemoveTable());
+        translationMessages.confirmRemoveTable());
 
     fireEvent(event);
   }
@@ -601,7 +596,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     ResponseCodeCallback callback = new ResponseCodeCallback() {
       @Override
       public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() == SC_OK) {
+        if (response.getStatusCode() == SC_OK) {
           updateIndexStatus();
         } else {
           fireEvent(
@@ -621,7 +616,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
       @Override
       public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() == SC_OK) {
+        if (response.getStatusCode() == SC_OK) {
           // Wait a few seconds for the task to launch before checking its status
           indexProgressTimer = new Timer() {
             @Override
@@ -649,7 +644,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
       @Override
       public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() == SC_OK) {
+        if (response.getStatusCode() == SC_OK) {
           cancelIndexation = true;
           updateIndexStatus();
         } else {
@@ -681,7 +676,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     String selectedVariableName = getView().getSelectedVariableName();
     final String crossWithVariableName = getView().getCrossWithVariableName();
 
-    if(!selectedVariableName.isEmpty() && !crossWithVariableName.isEmpty()) {
+    if (!selectedVariableName.isEmpty() && !crossWithVariableName.isEmpty()) {
       ResourceRequestBuilderFactory.<VariableDto>newBuilder() //
           .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
               .build(table.getDatasourceName(), table.getName(), selectedVariableName)) //
@@ -723,9 +718,9 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @Override
   public void onVariablesFilterUpdate(String filter) {
     variableFilter = filter;
-    if(Strings.isNullOrEmpty(filter)) {
+    if (Strings.isNullOrEmpty(filter)) {
       updateVariables();
-    } else if(filter.length() > 1) {
+    } else if (filter.length() > 1) {
       doFilterVariables();
     }
   }
@@ -749,11 +744,11 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
       @Override
       public void onVariableResourceCallback() {
-        if(table.getLink().equals(TablePresenter.this.table.getLink())) {
+        if (table.getLink().equals(TablePresenter.this.table.getLink())) {
           TablePresenter.this.table = table;
 
           variables = JsArrays.create();
-          for(VariableDto v : results) {
+          for (VariableDto v : results) {
             variables.push(v);
           }
           getView().renderRows(variables);
@@ -773,7 +768,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
     @Override
     public void onConfirmation(ConfirmationEvent event) {
-      if(removeConfirmation != null && event.getSource().equals(removeConfirmation) && event.isConfirmed()) {
+      if (removeConfirmation != null && event.getSource().equals(removeConfirmation) && event.isConfirmed()) {
         removeConfirmation.run();
         removeConfirmation = null;
       }
@@ -784,7 +779,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
     @Override
     public void onConfirmation(ConfirmationEvent event) {
-      if(deleteVariablesConfirmation != null && event.getSource().equals(deleteVariablesConfirmation) &&
+      if (deleteVariablesConfirmation != null && event.getSource().equals(deleteVariablesConfirmation) &&
           event.isConfirmed()) {
         deleteVariablesConfirmation.run();
         deleteVariablesConfirmation = null;
@@ -806,13 +801,13 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
       // Hide contingency table and show only if up to date or outdated
       getView().hideContingencyTable();
-      if(response.getStatusCode() == SC_OK) {
+      if (response.getStatusCode() == SC_OK) {
         getView().setIndexStatusVisible(true);
         statusDto = TableIndexStatusDto.get(JsArrays.toSafeArray(resource));
         getView().setIndexStatusAlert(statusDto);
 
         // Refetch if in progress
-        if(statusDto.getStatus().getName().equals(TableIndexationStatus.IN_PROGRESS.getName())) {
+        if (statusDto.getStatus().getName().equals(TableIndexationStatus.IN_PROGRESS.getName())) {
 
           // Hide the Cancel button if progress is 100%
           getView().setCancelVisible(Double.compare(statusDto.getProgress(), 1d) < 0);
@@ -826,7 +821,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
           // Schedule the timer to run once in X seconds.
           indexProgressTimer.schedule(DELAY_MILLIS);
-        } else if(statusDto.getStatus().isTableIndexationStatus(TableIndexationStatus.UPTODATE) ||
+        } else if (statusDto.getStatus().isTableIndexationStatus(TableIndexationStatus.UPTODATE) ||
             statusDto.getStatus().isTableIndexationStatus(TableIndexationStatus.OUTDATED)) {
           updateContingencyTableVariables();
         }
@@ -835,7 +830,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
     private void updateContingencyTableVariables() {
       TableIndexationStatus status = statusDto.getStatus();
-      if(status.isTableIndexationStatus(TableIndexationStatus.UPTODATE)) {
+      if (status.isTableIndexationStatus(TableIndexationStatus.UPTODATE)) {
         ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(table.getLink() + "/variables")
             .get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
           @Override
@@ -934,7 +929,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   private class RemoveRunnable implements Runnable {
     @Override
     public void run() {
-      if(tableIsView()) {
+      if (tableIsView()) {
         removeView();
       } else {
         removeTable();
@@ -958,13 +953,14 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
           .withCallback(SC_OK, callbackHandler).withCallback(SC_FORBIDDEN, callbackHandler)
           .withCallback(SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(SC_NOT_FOUND, callbackHandler).send();
     }
+
     private ResponseCodeCallback newResponseCodeCallback() {
       return new ResponseCodeCallback() {
 
         @Override
         public void onResponseCode(Request request, Response response) {
           fireEvent(ConfirmationTerminatedEvent.create());
-          if(response.getStatusCode() == SC_OK) {
+          if (response.getStatusCode() == SC_OK) {
             gotoDatasource();
           } else {
             String errorMessage = response.getText().isEmpty() ? response.getStatusCode() == SC_FORBIDDEN
@@ -995,7 +991,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
           ? UriBuilders.DATASOURCE_VIEW_VARIABLES.create()
           : UriBuilders.DATASOURCE_TABLE_VARIABLES.create();
 
-      for(int i = nb_deleted, added = 0; i < variableNames.length() && added < BATCH_SIZE; i++, added++) {
+      for (int i = nb_deleted, added = 0; i < variableNames.length() && added < BATCH_SIZE; i++, added++) {
         uriBuilder.query("variable", variableNames.get(i));
       }
 
@@ -1012,10 +1008,10 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
             @Override
             public void onResponseCode(Request request, Response response) {
               fireEvent(ConfirmationTerminatedEvent.create());
-              if(response.getStatusCode() == SC_OK) {
+              if (response.getStatusCode() == SC_OK) {
                 nb_deleted += BATCH_SIZE;
 
-                if(nb_deleted < variableNames.length()) {
+                if (nb_deleted < variableNames.length()) {
                   run();
                 } else {
                   placeManager
@@ -1083,7 +1079,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     @Override
     public void onResource(Response response, final VariableDto variableDto) {
       // check selected variable is valid
-      if(VariableDtos.nature(variableDto) == VariableDtos.VariableNature.CATEGORICAL) {
+      if (VariableDtos.nature(variableDto) == VariableDtos.VariableNature.CATEGORICAL) {
         ResourceRequestBuilderFactory.<VariableDto>newBuilder() //
             .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
                 .build(table.getDatasourceName(), table.getName(), crossWithVariableName)) //
@@ -1110,7 +1106,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     public void onResource(Response response, VariableDto crossWithVariable) {
       // check cross variable is valid
       VariableDtos.VariableNature nature = VariableDtos.nature(crossWithVariable);
-      if(nature == VariableDtos.VariableNature.CATEGORICAL || nature == VariableDtos.VariableNature.CONTINUOUS) {
+      if (nature == VariableDtos.VariableNature.CATEGORICAL || nature == VariableDtos.VariableNature.CONTINUOUS) {
         ContingencyTablePresenter crossVariablePresenter = crossVariableProvider.get();
         crossVariablePresenter.initialize(table, variableDto, crossWithVariable);
         setInSlot(Display.Slots.ContingencyTable, crossVariablePresenter);

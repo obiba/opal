@@ -185,7 +185,13 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   Button exportData;
 
   @UiField
+  ButtonGroup copyDataBtn;
+
+  @UiField
   Button copyData;
+
+  @UiField
+  DropdownButton copyViewBtn;
 
   @UiField
   NavLink downloadDictionary;
@@ -434,6 +440,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     addVariablesButton.setVisible(dto.hasViewLink());
     tableAddVariableGroup.setVisible(!addVariablesButton.isVisible());
 
+    copyDataBtn.setVisible(!tableDto.hasViewLink());
+    copyViewBtn.setVisible(tableDto.hasViewLink());
+
     VariableSuggestOracle oracle = (VariableSuggestOracle) categoricalVariables.getSuggestOracle();
     oracle.setDatasource("\"" + tableDto.getDatasourceName() + "\"");
     oracle.setTable("\"" + tableDto.getName() + "\"");
@@ -565,6 +574,16 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiHandler("copyData")
   void onCopyData(ClickEvent event) {
     getUiHandlers().onCopyData();
+  }
+
+  @UiHandler("copyViewData")
+  void onCopyViewData(ClickEvent event) {
+    getUiHandlers().onCopyData();
+  }
+
+  @UiHandler("copyView")
+  void onCopyView(ClickEvent event) {
+    getUiHandlers().onCopyView();
   }
 
   @UiHandler("copyVariables")

@@ -7,15 +7,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.magma.exportdata.view;
+package org.obiba.opal.web.gwt.app.client.magma.copy;
 
 import java.util.Date;
 
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportUiHandlers;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;

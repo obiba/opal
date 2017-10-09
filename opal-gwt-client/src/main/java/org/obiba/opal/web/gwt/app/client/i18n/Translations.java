@@ -1101,6 +1101,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Copy Data")
   String copyData();
 
+  @Description("View copy title")
+  @DefaultStringValue("Copy View")
+  String copyView();
+
   @Description("Variables Import File Selection Step")
   @DefaultStringValue(
       "Select an Excel or SPSS variables file for batch edition of tables and variables.")

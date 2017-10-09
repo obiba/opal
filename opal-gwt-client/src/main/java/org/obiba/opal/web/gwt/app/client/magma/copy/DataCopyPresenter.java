@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.magma.copydata.presenter;
+package org.obiba.opal.web.gwt.app.client.magma.copy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 
-public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Display> implements DataCopyUiHandlers {
+public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Display> implements CopyUiHandlers {
 
   private String datasourceName;
 
@@ -200,7 +200,7 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
     }
   }
 
-  public interface Display extends PopupView, HasUiHandlers<DataCopyUiHandlers> {
+  public interface Display extends PopupView, HasUiHandlers<CopyUiHandlers> {
 
     enum FormField {
       NEW_TABLE_NAME

@@ -22,6 +22,8 @@ public interface TableUiHandlers extends UiHandlers {
 
   void onCopyData();
 
+  void onCopyView();
+
   void onDownloadDictionary();
 
   void onDownloadView();

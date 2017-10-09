@@ -38,11 +38,19 @@
           <ui:msg description="Export label">Export</ui:msg>
         </b:Button>
       </b:ButtonGroup>
-      <b:ButtonGroup>
+      <b:ButtonGroup ui:field="copyDataBtn">
         <b:Button icon="COPY" ui:field="copyData">
           <ui:msg description="Copy label">Copy</ui:msg>
         </b:Button>
       </b:ButtonGroup>
+      <b:DropdownButton text="Copy" icon="COPY" ui:field="copyViewBtn" rightDropdown="true">
+        <b:NavLink ui:field="copyViewData">
+          <ui:msg description="Copy Data label">Copy data...</ui:msg>
+        </b:NavLink>
+        <b:NavLink ui:field="copyView">
+          <ui:msg description="Copy View label">Copy view...</ui:msg>
+        </b:NavLink>
+      </b:DropdownButton>
       <b:ButtonGroup>
         <b:Button icon="TRASH" ui:field="remove">
         </b:Button>

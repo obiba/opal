@@ -7,22 +7,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.magma.exportdata;
+package org.obiba.opal.web.gwt.app.client.magma.copy;
 
 import org.obiba.opal.web.gwt.app.client.inject.AbstractOpalModule;
-import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.copydata.view.DataCopyView;
-import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.exportdata.view.DataExportView;
 
 /**
  * Bind concrete implementations to interfaces within the export wizard.
  */
-public class ExportModule extends AbstractOpalModule {
+public class CopyModule extends AbstractOpalModule {
 
   @Override
   protected void configure() {
     bindPresenterWidget(DataExportPresenter.class, DataExportPresenter.Display.class, DataExportView.class);
     bindPresenterWidget(DataCopyPresenter.class, DataCopyPresenter.Display.class, DataCopyView.class);
+    bindPresenterWidget(ViewCopyPresenter.class, ViewCopyPresenter.Display.class, ViewCopyView.class);
   }
 }

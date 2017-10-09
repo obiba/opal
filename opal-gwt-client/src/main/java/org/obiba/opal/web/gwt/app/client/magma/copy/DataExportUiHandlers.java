@@ -8,17 +8,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.magma.copydata.presenter;
+package org.obiba.opal.web.gwt.app.client.magma.copy;
 
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
-public interface DataCopyUiHandlers extends ModalUiHandlers {
+public interface DataExportUiHandlers extends ModalUiHandlers {
   void cancel();
 
   /**
    *
-   * @param destination Name of the destination datasource
-   * @param newName New name of the copied table (if applicable)
+   * @param dataFormat
+   * @param out Destination folder or database depending on the data format.
+   * @param idMapping
    */
-  void onSubmit(String destination, String newName);
+  void onSubmit(String dataFormat, String out, String idMapping);
 }

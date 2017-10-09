@@ -7,15 +7,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.magma.copydata.view;
+package org.obiba.opal.web.gwt.app.client.magma.copy;
 
 import java.util.List;
 
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -40,7 +38,7 @@ import com.google.web.bindery.event.shared.EventBus;
 /**
  * View of the dialog used to export data from Opal.
  */
-public class DataCopyView extends ModalPopupViewWithUiHandlers<DataCopyUiHandlers>
+public class DataCopyView extends ModalPopupViewWithUiHandlers<CopyUiHandlers>
     implements DataCopyPresenter.Display {
 
   interface Binder extends UiBinder<Widget, DataCopyView> {}

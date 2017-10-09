@@ -52,7 +52,7 @@
   <extend-configuration-property name="gin.ginjector.modules"
       value="org.obiba.opal.web.gwt.app.client.dashboard.DashboardModule"/>
   <extend-configuration-property name="gin.ginjector.modules"
-      value="org.obiba.opal.web.gwt.app.client.magma.exportdata.ExportModule"/>
+      value="org.obiba.opal.web.gwt.app.client.magma.copy.CopyModule"/>
   <extend-configuration-property name="gin.ginjector.modules"
       value="org.obiba.opal.web.gwt.app.client.fs.FileSystemModule"/>
   <extend-configuration-property name="gin.ginjector.modules"
