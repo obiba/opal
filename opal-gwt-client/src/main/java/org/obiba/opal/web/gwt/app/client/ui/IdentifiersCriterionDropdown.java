@@ -13,6 +13,7 @@ package org.obiba.opal.web.gwt.app.client.ui;
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
@@ -136,6 +137,25 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
     if (getRadioButtonValue(1)) return query;
     if (getRadioButtonValue(2)) return "not(" + query + ")";
     return null;
+  }
+
+  @Override
+  protected String getMagmaJsStatement() {
+    // all
+    if (getRadioButtonValue(0)) return "";
+    String statement = "$id()";
+    String match = ".matches(/" + matches.getText()  + "/)";
+    if (getRadioButtonValue(1)) {
+      if (matches.getText().equals("*")) return "";
+      if (Strings.isNullOrEmpty(matches.getText())) return statement + ".isNull()";
+      return statement + match;
+    }
+    if (getRadioButtonValue(2)) {
+      if (matches.getText().equals("*")) return statement + ".isNull()";
+      if (Strings.isNullOrEmpty(matches.getText())) return "";
+      return statement + match + ".not()";
+    }
+    return "";
   }
 
   @Override

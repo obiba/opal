@@ -61,8 +61,6 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
 
   private JsArray<DatasourceDto> datasources;
 
-  private String entityFilter;
-
   @Inject
   public VariablesToViewPresenter(Display display, EventBus eventBus, PlaceManager placeManager) {
     super(eventBus, display);
@@ -189,7 +187,7 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
   }
 
   public void show(List<String> variableFullNames, String entityFilter) {
-    this.entityFilter = entityFilter;
+    getView().renderEntityFilter(entityFilter);
     this.tableReferences = Lists.newArrayList();
     this.variableTableReferences = Maps.newHashMap();
     final int expectedCount = variableFullNames.size();
@@ -258,8 +256,8 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
     }
     derivedVariables.setVariablesArray(variablesDto);
 
-    if (!Strings.isNullOrEmpty(entityFilter)) {
-      view.setWhere(entityFilter);
+    if (getView().hasEntityFilter() && !Strings.isNullOrEmpty(getView().getEntityFilter())) {
+      view.setWhere(getView().getEntityFilter());
     }
 
     ResponseCodeCallback createCodingViewCallback = new CreateViewCallBack(view);
@@ -322,6 +320,7 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
       VariableListViewDto derivedVariables = (VariableListViewDto) viewDto
           .getExtension(VariableListViewDto.ViewDtoExtensions.view);
       updateFromTables(viewDto);
+      updateWhere(viewDto);
 
       JsArray<VariableDto> existingVariables = JsArrays.toSafeArray(derivedVariables.getVariablesArray());
       for (int i = 0; i < variables.length(); i++) {
@@ -358,6 +357,12 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
         if (addTable) {
           fromTables.push(tableRef);
         }
+      }
+    }
+
+    private void updateWhere(ViewDto viewDto) {
+      if (getView().hasEntityFilter() && !Strings.isNullOrEmpty(getView().getEntityFilter())) {
+        viewDto.setWhere(getView().getEntityFilter());
       }
     }
 
@@ -425,9 +430,15 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
 
     void setDatasources(JsArray<DatasourceDto> datasources, String name);
 
+    void renderEntityFilter(String entityFilter);
+
     void renderVariables(List<VariableDto> originalVariables, List<VariableDto> rows, boolean clearNames);
 
     HasText getViewName();
+
+    boolean hasEntityFilter();
+
+    String getEntityFilter();
 
     List<VariableDto> getVariables(boolean withNewNames);
 

@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -131,6 +132,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
       @Override
       public void onKeyUp(KeyUpEvent event) {
         if (values.getText().isEmpty()) return;
+        if (!checkIsNumberValues(values.getText())) return;
         updateRangeValuesCriterionFilter();
       }
     });
@@ -142,6 +144,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
     min.addKeyUpHandler(new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent event) {
+        if (!min.getText().isEmpty() && !checkIsNumberValue(min.getText())) return;
         updateRangeValuesCriterionFilter();
       }
     });
@@ -152,9 +155,33 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
     max.addKeyUpHandler(new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent event) {
+        if (!max.getText().isEmpty() && !checkIsNumberValue(max.getText())) return;
         updateRangeValuesCriterionFilter();
       }
     });
+  }
+
+  private boolean checkIsNumberValues(String str) {
+    if (str.isEmpty()) return false;
+    for (String token : Splitter.on(" ").splitToList(str.replaceAll(",", " "))) {
+      if (!checkIsNumberValue(token)) return false;
+    }
+    return true;
+  }
+
+  private boolean checkIsNumberValue(String str) {
+    String value = str.trim();
+    if (value.isEmpty() || value.endsWith(".")) return false;
+    if ("*".equals(value)) return true;
+    try {
+      if (variable.getValueType().equals("integer"))
+        Long.parseLong(value);
+      else
+        Double.parseDouble(value);
+    } catch (NumberFormatException e) {
+      return false;
+    }
+    return true;
   }
 
   private Widget getRangeValuePanel() {
@@ -259,7 +286,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
       // Parse numbers
       List<String> numbers = Lists.newArrayList();
       for (String nb : values.getText().trim().split("\\s+")) {
-        if (!nb.trim().isEmpty()) numbers.add(nb);
+        if (!nb.trim().isEmpty()) numbers.add(nb.trim());
       }
       String valuesQuery = "in(" + rqlField + ",(" + Joiner.on(",").join(numbers) + "))";
 
@@ -279,7 +306,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
     String statement = super.getMagmaJsStatement();
     if (!Strings.isNullOrEmpty(statement)) return statement;
 
-    statement = "$('" + getRQLField() + "')";
+    statement = "$('" + variable.getName() + "')";
     // RANGE
     if(rangeValueChooser.isItemSelected(0)) {
       if (min.getText().isEmpty() && max.getText().isEmpty()) {
@@ -292,7 +319,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
 
       if(((CheckBox) radioControls.getWidget(4)).getValue()) {
         statement = Strings.isNullOrEmpty(statement) ?
-            "$('" + getRQLField() + "').isNull()" : statement + ".not()";
+            "$('" + variable.getName() + "').isNull()" : statement + ".not()";
       }
 
       return statement;
@@ -303,7 +330,8 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
       // Parse numbers
       List<String> numbers = Lists.newArrayList();
       for (String nb : values.getText().trim().split("\\s+")) {
-        if (!nb.trim().isEmpty()) numbers.add(nb);
+        for (String n : nb.trim().split(","))
+          if (!n.trim().isEmpty()) numbers.add(n.trim());
       }
       statement = statement + ".any(" + Joiner.on(",").join(numbers) + ")";
 

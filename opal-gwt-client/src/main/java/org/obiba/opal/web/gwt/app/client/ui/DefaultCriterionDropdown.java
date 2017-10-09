@@ -15,11 +15,15 @@ import com.github.gwtbootstrap.client.ui.ControlLabel;
 import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.gwt.event.dom.client.*;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+
+import java.util.List;
 
 public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown {
 
@@ -107,13 +111,37 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
     if (emptyNotEmpty != null) return emptyNotEmpty;
 
     if (!values.getText().isEmpty()) {
-      String[] vals = values.getText().trim().split("\\s+");
+      List<String> vals = Lists.newArrayList();
+      for (String val : values.getText().trim().split("\\s+")) {
+        for (String v : val.trim().split(","))
+          if (!v.trim().isEmpty()) vals.add(v.trim());
+      }
       String valuesQuery = "in(" + getRQLField() + ",(" + Joiner.on(",").join(vals) + "))";
       if (isInSelected()) {
         return valuesQuery;
       } else if (isNotInSelected()) {
         return "not(" + valuesQuery + ")";
       }
+    }
+
+    return null;
+  }
+
+  @Override
+  protected String getMagmaJsStatement() {
+    String statement = super.getMagmaJsStatement();
+    if (!Strings.isNullOrEmpty(statement)) return statement;
+
+    statement = "$('" + variable.getName() + "')";
+    if (!values.getText().isEmpty()) {
+      List<String> vals = Lists.newArrayList();
+      for (String val : values.getText().trim().split("\\s+")) {
+        for (String v : val.trim().split(","))
+          if (!v.trim().isEmpty()) vals.add(v.trim());
+      }
+      statement = statement + ".any('" + Joiner.on("','").join(vals) + "')";
+      if (isInSelected()) return statement;
+      else if (isNotInSelected()) return statement + ".not()";
     }
 
     return null;

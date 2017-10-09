@@ -103,6 +103,8 @@ public class RQLCriterionParser {
         return parseField(node.getArgument(0).toString()) + ":(" + parseValue(node.getArgument(1)) + ")";
       case "like":
         String valueStr = parseValue(node.getArgument(1));
+        if (Strings.isNullOrEmpty(valueStr))
+          valueStr = "''";
         return "(" + parseField(node.getArgument(0).toString()) + ":(" + valueStr + ") OR "
             + parseFieldLike(node.getArgument(0).toString()) + ":(" + valueStr + "))";
       case "range":

@@ -8,11 +8,12 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
-    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
-    xmlns:v="urn:import:org.obiba.opal.web.gwt.app.client.magma.variablestoview.view"
-    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
+             xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+             xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+             xmlns:v="urn:import:org.obiba.opal.web.gwt.app.client.magma.variablestoview.view"
+             xmlns:ace="urn:import:org.obiba.opal.web.gwt.ace.client"
+             ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+             ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <o:Modal ui:field="dialog" closeVisible="true" keyboard="true" animation="false">
     <g:FlowPanel>
@@ -49,14 +50,36 @@
         </b:ControlGroup>
       </g:FlowPanel>
 
+      <!-- Entity Filter -->
+      <g:FlowPanel ui:field="filterGroup" visible="false">
+        <b:ControlGroup>
+          <b:ControlLabel>
+            <ui:msg description="Entity Filter label">Entity Filter</ui:msg>
+          </b:ControlLabel>
+          <b:Controls>
+            <ace:AceEditor ui:field="filterScript" addStyleNames="ace-editor xsmall-ace-editor"/>
+          </b:Controls>
+          <b:HelpBlock>
+            <ui:msg description="Entity Filter help">When returned value is true, the entity is selected. Otherwise it
+              is rejected. See also detailed documentation about
+              <a href="http://wiki.obiba.org/display/OPALDOC/Magma+Javascript+API" target="_blank">Magma Javascript
+                API</a>.
+            </ui:msg>
+          </b:HelpBlock>
+        </b:ControlGroup>
+      </g:FlowPanel>
+
       <!-- Per Occurrence -->
       <g:FlowPanel ui:field="perOccurrencePanel">
         <b:CheckBox ui:field="perOccurrence" addStyleNames="inline-block">
-          <ui:msg description="Split repeatable variable per occurrence label">Split repeatable variable per occurrence</ui:msg>
+          <ui:msg description="Split repeatable variable per occurrence label">Split repeatable variable per
+            occurrence
+          </ui:msg>
         </b:CheckBox>
         <o:NumericTextBox ui:field="occurrenceCount" min="1" max="50" enabled="false" addStyleNames="span1 inline-box"/>
         <b:HelpBlock addStyleNames="help-block">
-          <ui:msg description="Split repeatable variable per occurrence help label">A repeatable has a sequence of values. This option will create a derived variable per occurrence.
+          <ui:msg description="Split repeatable variable per occurrence help label">A repeatable has a sequence of
+            values. This option will create a derived variable per occurrence.
           </ui:msg>
         </b:HelpBlock>
       </g:FlowPanel>
@@ -64,7 +87,7 @@
       <!-- Derived variable: Single -->
       <g:FlowPanel ui:field="singleVariablePanel">
         <b:ControlGroup ui:field="variableGroup">
-          <b:ControlLabel >
+          <b:ControlLabel addStyleNames="pull-left">
             <ui:msg description="Derived variable label">Derived variable</ui:msg>
           </b:ControlLabel>
           <b:TextBox ui:field="singleVariable"/>
@@ -74,7 +97,7 @@
       <!-- Derived variables: Multiple -->
       <g:FlowPanel ui:field="multipleVariablePanel">
         <b:ControlGroup ui:field="variablesGroup">
-          <b:ControlLabel>
+          <b:ControlLabel addStyleNames="pull-left">
             <ui:msg description="Derived variables label">Derived variables</ui:msg>
           </b:ControlLabel>
           <g:InlineLabel ui:field="noVariables">

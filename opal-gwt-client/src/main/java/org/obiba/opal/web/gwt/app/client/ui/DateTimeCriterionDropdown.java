@@ -16,7 +16,10 @@ import com.github.gwtbootstrap.client.ui.ControlLabel;
 import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.github.gwtbootstrap.datepicker.client.ui.DateBoxAppended;
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -255,6 +258,44 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
       return "not(" + valuesQuery + ")";
     }
     return valuesQuery;
+  }
+
+  @Override
+  protected String getMagmaJsStatement() {
+    String statement = super.getMagmaJsStatement();
+    if (!Strings.isNullOrEmpty(statement)) return statement;
+
+    statement = "$('" + variable.getName() + "')";
+    DateTimeFormat df = DateTimeFormat.getFormat("yyyy-MM-dd");
+    if(rangeValueChooser.isItemSelected(0)) {
+      if (from.getValue() == null && to.getValue() == null) {
+        statement = "";
+      }
+      if (from.getValue() != null && to.getValue() != null)
+        statement = statement + ".after('" + df.format(from.getValue()) + "').and(" + statement + ".before('" + df.format(to.getValue()) + "'))";
+      else if (from.getValue() != null) statement = statement + ".after('" + df.format(from.getValue()) + "')";
+      else if (to.getValue() != null) statement = statement + ".before('" + df.format(to.getValue()) + "')";
+
+      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
+        statement = Strings.isNullOrEmpty(statement) ?
+            "$('" + variable.getName() + "').isNull()" : statement + ".not()";
+      }
+
+      return statement;
+    }
+
+    // VALUES
+    if(rangeValueChooser.isItemSelected(1) && date.getValue() != null) {
+      statement = statement + ".eq('" + df.format(date.getValue()) + "')";
+
+      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
+        statement = statement + ".not()";
+      }
+
+      return statement;
+    }
+
+    return "";
   }
 
   private void setFilterText() {

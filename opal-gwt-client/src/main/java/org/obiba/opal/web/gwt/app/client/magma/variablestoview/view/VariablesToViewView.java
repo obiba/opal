@@ -15,9 +15,11 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import org.obiba.opal.web.gwt.ace.client.AceEditor;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
@@ -129,6 +131,12 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
   @UiField
   FlowPanel renameWithNumberPanel;
 
+  @UiField
+  FlowPanel filterGroup;
+
+  @UiField
+  AceEditor filterScript;
+
   private JsArray<DatasourceDto> datasources;
 
   private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
@@ -188,6 +196,12 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
     table.setEmptyTableWidget(noVariables);
     pager.setDisplay(table);
     dataProvider.addDataDisplay(table);
+  }
+
+  @Override
+  public void renderEntityFilter(String entityFilter) {
+    filterScript.setText(entityFilter);
+    filterGroup.setVisible(!Strings.isNullOrEmpty(entityFilter));
   }
 
   @Override
@@ -333,6 +347,16 @@ public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesT
   @Override
   public HasText getViewName() {
     return viewListBox;
+  }
+
+  @Override
+  public boolean hasEntityFilter() {
+    return filterGroup.isVisible();
+  }
+
+  @Override
+  public String getEntityFilter() {
+    return hasEntityFilter() ? filterScript.getText().trim() : "";
   }
 
   @Override

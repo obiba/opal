@@ -122,7 +122,7 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
   }
 
   protected String getMagmaJsStatement() {
-    String statement = "$('" + getRQLField() + "')";
+    String statement = "$('" + variable.getName() + "')";
     if(getRadioButtonValue(1)) {
       // Empty
       return statement + ".isNull()";

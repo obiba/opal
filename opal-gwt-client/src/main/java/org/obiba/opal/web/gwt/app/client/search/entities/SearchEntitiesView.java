@@ -16,6 +16,7 @@ import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -182,7 +183,11 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
 
   @UiHandler("addToView")
   public void onAddToView(ClickEvent event) {
-    getUiHandlers().onAddToView(criteriaPanel.getRQLFields(), criteriaPanel.getMagmaJsStatements());
+    List<String> statements = Lists.newArrayList();
+    String idJs = idCriterionPanel.getMagmaJsStatement();
+    if (!Strings.isNullOrEmpty(idJs)) statements.add(idJs);
+    statements.addAll(criteriaPanel.getMagmaJsStatements());
+    getUiHandlers().onAddToView(criteriaPanel.getRQLFields(), statements);
   }
 
   @Override
@@ -351,12 +356,10 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   }
 
   private String getIDCriterionRQLPrefix() {
-    GWT.log("isAll=" + idCriterionPanel.isAll());
     return idCriterionPanel.isAll() ? "" : idCriterionPanel.getRQLQueryString() + " AND ";
   }
 
   private String getIDCriterionPrefix() {
-    GWT.log("isAll=" + idCriterionPanel.isAll());
     return idCriterionPanel.isAll() ? "" : idCriterionPanel.getQueryText() + " AND " ;
   }
 

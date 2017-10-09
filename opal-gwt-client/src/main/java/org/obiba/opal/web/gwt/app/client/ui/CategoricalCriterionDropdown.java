@@ -148,8 +148,14 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
     String statement = super.getMagmaJsStatement();
     if (!Strings.isNullOrEmpty(statement)) return statement;
 
-    statement = "$('" + getRQLField() + "')";
+    statement = "$('" + variable.getName() + "')";
     List<String> selected = getSelectedCategories();
+    if (isBooleanVariable()) {
+      for (int i=0; i<selected.size(); i++) {
+        if (selected.get(i).equals("T")) selected.set(i, "true");
+        else if (selected.get(i).equals("F")) selected.set(i, "false");
+      }
+    }
     // in
     if(((CheckBox) radioControls.getWidget(3)).getValue()) {
       if (selected.isEmpty()) return statement + ".isNull()";
