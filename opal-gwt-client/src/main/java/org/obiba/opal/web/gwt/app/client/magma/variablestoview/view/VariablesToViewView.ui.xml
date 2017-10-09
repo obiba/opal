@@ -87,7 +87,7 @@
       <!-- Derived variable: Single -->
       <g:FlowPanel ui:field="singleVariablePanel">
         <b:ControlGroup ui:field="variableGroup">
-          <b:ControlLabel addStyleNames="pull-left">
+          <b:ControlLabel>
             <ui:msg description="Derived variable label">Derived variable</ui:msg>
           </b:ControlLabel>
           <b:TextBox ui:field="singleVariable"/>
