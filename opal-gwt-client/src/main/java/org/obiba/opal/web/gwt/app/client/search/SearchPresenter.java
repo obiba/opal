@@ -58,7 +58,7 @@ public class SearchPresenter extends Presenter<SearchPresenter.Display, SearchPr
   private void setHistoryTokens(TokenFormatter tokenFormatter) {
     PlaceRequest searchPlace = createRequest(Places.SEARCH).build();
     getView().setVariablesHistoryToken(getHistoryToken(tokenFormatter, searchPlace, createRequest(Places.SEARCH_VARIABLES)
-        .with(ParameterTokens.TOKEN_RQL_QUERY, "exists(project),exists(table)")
+        .with(ParameterTokens.TOKEN_RQL_QUERY, "exists(project),exists(table),exists(name.analyzed)")
         .with(ParameterTokens.TOKEN_OFFSET,"0")
         .build()));
     getView().setEntitiesHistoryToken(getHistoryToken(tokenFormatter, searchPlace, createRequest(Places.SEARCH_ENTITIES).build()));

@@ -263,7 +263,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     addRegisteredHandler(SearchDatasourceVariablesEvent.getType(), new SearchDatasourceVariablesEvent.SearchDatasourceVariablesHandler() {
       @Override
       public void onSearchDatasourceVariables(SearchDatasourceVariablesEvent event) {
-        revealSearchVariables("in(project,(" + event.getDatasource().replaceAll(" ", "+") + "))");
+        revealSearchVariables("in(project,(" + event.getDatasource().replaceAll(" ", "+") + ")),exists(table),exists(name.analyzed)");
       }
     });
 
@@ -272,7 +272,8 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       public void onSearchTableVariables(SearchTableVariablesEvent event) {
         StringBuilder rqlQuery = new StringBuilder()
             .append("in(project,(").append(event.getDatasource().replaceAll(" ", "+")).append("))")
-            .append(",in(table,(").append(event.getTable().replaceAll(" ", "+")).append("))");
+            .append(",in(table,(").append(event.getTable().replaceAll(" ", "+")).append("))")
+            .append(",exists(name.analyzed)");
         if (event.getTaxonomyAttributes() != null) {
           TaxonomyAttributes taxonomyAttributes = event.getTaxonomyAttributes();
           for (String taxonomyName : event.getTaxonomyAttributes().keySet()) {
