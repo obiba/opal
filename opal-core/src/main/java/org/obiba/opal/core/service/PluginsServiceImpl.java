@@ -93,8 +93,7 @@ public class PluginsServiceImpl implements PluginsService {
   @Override
   public List<PluginPackage> getInstalledPlugins() {
     return pluginsManager.getPlugins().stream()
-        .map(rp -> new PluginPackage(rp.getName(), rp.getType(), rp.getTitle(), rp.getDescription(), rp.getVersion().toString(),
-            rp.getHostVersion().toString(), null, null, ""))
+        .map(PluginPackage::new)
         .collect(Collectors.toList());
   }
 

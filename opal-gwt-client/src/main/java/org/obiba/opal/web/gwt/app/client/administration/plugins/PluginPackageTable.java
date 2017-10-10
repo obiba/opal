@@ -10,7 +10,12 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.plugins;
 
-import com.google.gwt.dom.client.Style;
+import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.client.SafeHtmlTemplates;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.InlineLabel;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
@@ -37,12 +42,12 @@ public class PluginPackageTable extends Table<PluginPackageDto> {
     ActionsColumn<PluginPackageDto> actionColumn = new ActionsColumn<PluginPackageDto>(new ActionsProvider<PluginPackageDto>() {
       @Override
       public String[] allActions() {
-        return new String[] { RESTART_ACTION, CONFIGURE_ACTION, ActionsColumn.REMOVE_ACTION, REINSTATE_ACTION };
+        return new String[]{RESTART_ACTION, CONFIGURE_ACTION, ActionsColumn.REMOVE_ACTION, REINSTATE_ACTION};
       }
 
       @Override
       public String[] getActions(PluginPackageDto value) {
-        return new String[] { RESTART_ACTION, CONFIGURE_ACTION, value.getUninstalled() ? REINSTATE_ACTION : ActionsColumn.REMOVE_ACTION };
+        return new String[]{RESTART_ACTION, CONFIGURE_ACTION, value.getUninstalled() ? REINSTATE_ACTION : ActionsColumn.REMOVE_ACTION};
       }
     });
     if (actionHandler != null) actionColumn.setActionHandler(actionHandler);
@@ -72,17 +77,46 @@ public class PluginPackageTable extends Table<PluginPackageDto> {
       }
     }, translations.typeLabel());
     setColumnWidth(getColumn(1), 100, com.google.gwt.dom.client.Style.Unit.PX);
-    addColumn(new TextColumn<PluginPackageDto>() {
-      @Override
-      public String getValue(PluginPackageDto item) {
-        return item.getDescription();
-      }
-    }, translations.descriptionLabel());
+    addColumn(new PluginDescriptionColumn(), translations.descriptionLabel());
     addColumn(new TextColumn<PluginPackageDto>() {
       @Override
       public String getValue(PluginPackageDto item) {
         return item.getVersion();
       }
     }, translations.versionLabel());
+  }
+
+  private class PluginDescriptionColumn extends Column<PluginPackageDto, PluginPackageDto> {
+
+    public PluginDescriptionColumn() {
+      super(new PluginDescriptionCell());
+    }
+
+    @Override
+    public PluginPackageDto getValue(PluginPackageDto item) {
+      return item;
+    }
+
+  }
+
+  private class PluginDescriptionCell extends AbstractCell<PluginPackageDto> {
+
+    private PluginTemplate template = GWT.create(PluginTemplate.class);
+
+    @Override
+    public void render(Context context, PluginPackageDto value, SafeHtmlBuilder sb) {
+      if (value.hasAuthor() && !"-".equals(value.getAuthor()))
+        sb.append(template.fullDescription(value.getDescription(), value.getAuthor(), value.getMaintainer(), value.getLicense(), value.getWebsite()));
+      else
+        sb.append(template.simpleDescription(value.getDescription()));
+    }
+  }
+
+  protected interface PluginTemplate extends SafeHtmlTemplates {
+    @Template("<p>{0}</p>")
+    SafeHtml simpleDescription(String description);
+
+    @Template("<p>{0}</p><div class=\"help-block\"><a href=\"{4}\" target=\"_blank\">{1}</a> [{2}] <code>{3}</code></div>")
+    SafeHtml fullDescription(String description, String author, String maintainer, String license, String website);
   }
 }

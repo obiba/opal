@@ -11,11 +11,9 @@
 package org.obiba.opal.web.plugins;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.core.domain.VCFSamplesMapping;
-import org.obiba.opal.core.runtime.OpalPlugin;
 import org.obiba.opal.core.support.vcf.VCFSamplesSummaryBuilder;
 import org.obiba.opal.spi.vcf.VCFStore;
 import org.obiba.opal.web.model.Plugins;
@@ -28,8 +26,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Dtos {
-
-  private static List<String> reservedProperties = Lists.newArrayList("OPAL_HOME", "install.dir", "data.dir", "work.dir");
 
   public static Plugins.PluginPackagesDto asDto(String site, Date updated, boolean restart, List<PluginPackage> packages) {
     return asDto(site, updated, restart, packages, null);
@@ -51,8 +47,13 @@ public class Dtos {
         .setType(pluginPackage.getType())
         .setTitle(pluginPackage.getTitle())
         .setDescription(pluginPackage.getDescription())
+        .setAuthor(Strings.isNullOrEmpty(pluginPackage.getAuthor()) ? "-" : pluginPackage.getAuthor())
+        .setMaintainer(Strings.isNullOrEmpty(pluginPackage.getMaintainer()) ? "-" : pluginPackage.getMaintainer())
+        .setLicense(Strings.isNullOrEmpty(pluginPackage.getLicense()) ? "-" : pluginPackage.getLicense())
         .setVersion(pluginPackage.getVersion().toString())
         .setOpalVersion(pluginPackage.getOpalVersion().toString());
+    if (!Strings.isNullOrEmpty(pluginPackage.getWebsite()))
+      buider.setWebsite(pluginPackage.getWebsite());
     if (!Strings.isNullOrEmpty(pluginPackage.getFileName()))
       buider.setFile(pluginPackage.getFileName());
     if (uninstalled != null) buider.setUninstalled(uninstalled);

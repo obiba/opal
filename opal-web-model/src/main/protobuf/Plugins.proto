@@ -6,11 +6,15 @@ message PluginPackageDto {
     required string name = 1;
     required string title = 2;
     required string description = 3;
-    required string version = 4;
-    required string opalVersion = 5;
-    required string type = 6;
-    optional string file = 7;
-    optional bool uninstalled = 8;
+    required string author = 4;
+    required string maintainer = 5;
+    required string license = 6;
+    optional string website = 7;
+    required string version = 8;
+    required string opalVersion = 9;
+    required string type = 10;
+    optional string file = 11;
+    optional bool uninstalled = 12;
 }
 
 message PluginPackagesDto {
@@ -24,10 +28,14 @@ message PluginDto {
     required string name = 1;
     required string title = 2;
     required string description = 3;
-    required string version = 4;
-    required string opalVersion = 5;
-    required string type = 6;
-    required string siteProperties = 7;
+    required string author = 4;
+    required string maintainer = 5;
+    required string license = 6;
+    optional string website = 7;
+    required string version = 8;
+    required string opalVersion = 9;
+    required string type = 10;
+    required string siteProperties = 11;
 }
 
 message VCFStoreDto {
