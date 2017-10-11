@@ -434,10 +434,17 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   @Override
   public void onSearch(VariableSuggestOracle.AdvancedSearchSuggestion suggestion) {
+    String rql = "";
+    if (!Strings.isNullOrEmpty(suggestion.getDatasource()))
+      rql = "in(project," + suggestion.getDatasource() + ")";
+    if (!Strings.isNullOrEmpty(suggestion.getTable()))
+      rql = rql + ",in(table," + suggestion.getTable() + ")";
+    rql = (Strings.isNullOrEmpty(rql) ? "" : rql + ",") + "contains(" + suggestion.getReplacementString() + ")";
+    
     PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.SEARCH_VARIABLES)
-        .with(ParameterTokens.TOKEN_RQL_QUERY, "contains(" + suggestion.getReplacementString() + ")")
+        .with(ParameterTokens.TOKEN_RQL_QUERY, rql)
         .with(ParameterTokens.TOKEN_OFFSET, "0");
-    placeManager.revealPlace(builder.build());
+    placeManager.revealPlaceHierarchy(Lists.newArrayList(PlaceRequestHelper.createRequestBuilder(Places.SEARCH).build(), builder.build()));
   }
 
   public interface Display extends View, HasUiHandlers<ApplicationUiHandlers> {

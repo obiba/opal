@@ -18,7 +18,6 @@ import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.*;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.*;
@@ -47,8 +46,12 @@ public class VariableFieldDropdown extends CriterionDropdown {
 
   private List<CheckBox> fieldTermChecks = Lists.newArrayList();
 
+  private boolean analyzed = false;
+
   public VariableFieldDropdown(VariableFieldSuggestOracle.VariableFieldSuggestion suggestion, FacetResultDto facet) {
-    super(suggestion.getField().getName());
+    super(suggestion.getField().getName().replaceAll("\\.analyzed$",""));
+    // when "analyzed", a field has 2 flavors: exact match (in) or ordinary match (like)
+    this.analyzed = suggestion.getField().getName().endsWith(".analyzed");
     this.fieldItem = suggestion.getField();
     this.fieldTerms = suggestion.getFieldTerms();
     if (facet != null) {
@@ -64,6 +67,8 @@ public class VariableFieldDropdown extends CriterionDropdown {
     divider.setVisible(false);
     getRadioControl(0).setValue(false);
     getRadioControl(2).setValue(false);
+    if (hasLike())
+      getRadioControl(4).setValue(false);
     String filter;
     if ("exists".equals(rqlQuery.getName())) {
       getRadioControl(0).setValue(true);
@@ -73,14 +78,22 @@ public class VariableFieldDropdown extends CriterionDropdown {
       if ("exists".equals(subQuery.getName())) {
         getRadioControl(1).setValue(true);
         filter = translations.criterionFiltersMap().get("none").toLowerCase();
+      } else if ("like".equals(rqlQuery.getName())) {
+        getRadioControl(isFieldTermWildCard(subQuery) ? 4 : 5).setValue(true);
+        filter = translations.criterionFiltersMap().get("not_like");
+        applySelection(subQuery);
       } else {
         getRadioControl(isFieldTermWildCard(subQuery) ? 2 : 3).setValue(true);
-        filter = translations.criterionFiltersMap().get(isLike() ? "not_like" : "not_in");
+        filter = translations.criterionFiltersMap().get("not_in");
         applySelection(subQuery);
       }
+    } else if ("like".equals(rqlQuery.getName())) {
+      getRadioControl(isFieldTermWildCard(rqlQuery) ? 5 : 4).setValue(true);
+      filter = translations.criterionFiltersMap().get("like");
+      applySelection(rqlQuery);
     } else {
       getRadioControl(isFieldTermWildCard(rqlQuery) ? 3 : 2).setValue(true);
-      filter = translations.criterionFiltersMap().get(isLike() ? "like" : "in");
+      filter = translations.criterionFiltersMap().get("in");
       applySelection(rqlQuery);
     }
     updateCriterionFilter(filter);
@@ -191,7 +204,7 @@ public class VariableFieldDropdown extends CriterionDropdown {
       }
     }
     updateCriterionFilter(getRadioControl(0).getValue() ? translations.criterionFiltersMap().get("any")
-        : translations.criterionFiltersMap().get(isLike() ? "like" : "in"));
+        : translations.criterionFiltersMap().get(isLikeSelected() ? "like" : "in"));
     if (getRadioControl(0).getValue() || getRadioControl(1).getValue()) resetSpecificControls();
   }
 
@@ -217,13 +230,23 @@ public class VariableFieldDropdown extends CriterionDropdown {
     radioControls.add(createRadioButtonResetSpecific(translations.criterionFiltersMap().get("any"), null));
     radioControls.add(createRadioButtonResetSpecific(translations.criterionFiltersMap().get("none"), null));
 
-    RadioButton in = createRadioButton(translations.criterionFiltersMap().get(isLike() ? "like" : "in"), null);
+    RadioButton in = createRadioButton(translations.criterionFiltersMap().get("in"), null);
     in.addClickHandler(new OperatorClickHandler());
     radioControls.add(in);
 
-    RadioButton notIn = createRadioButton(translations.criterionFiltersMap().get(isLike() ? "not_like" : "not_in"), null);
+    RadioButton notIn = createRadioButton(translations.criterionFiltersMap().get("not_in"), null);
     notIn.addClickHandler(new OperatorClickHandler());
     radioControls.add(notIn);
+
+    if (hasLike()) {
+      RadioButton like = createRadioButton(translations.criterionFiltersMap().get("like"), null);
+      like.addClickHandler(new OperatorClickHandler());
+      radioControls.add(like);
+
+      RadioButton notLike = createRadioButton(translations.criterionFiltersMap().get("not_like"), null);
+      notLike.addClickHandler(new OperatorClickHandler());
+      radioControls.add(notLike);
+    }
 
     if (value.isEmpty() || "*".equals(value)) getRadioControl(0).setValue(true);
     else in.setValue(true);
@@ -245,7 +268,7 @@ public class VariableFieldDropdown extends CriterionDropdown {
       public void onKeyUp(KeyUpEvent event) {
         //updateMatchCriteriaFilter();
         if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-          updateCriterionFilter(translations.criterionFiltersMap().get((isNot() ? "not_" : "") + (isLike() ? "like" : "in")));
+          updateCriterionFilter(translations.criterionFiltersMap().get((isNot() ? "not_" : "") + (isLikeSelected() ? "like" : "in")));
           doFilter();
         }
       }
@@ -322,14 +345,19 @@ public class VariableFieldDropdown extends CriterionDropdown {
     return specificControls;
   }
 
+  private String getMatchFieldName() {
+    return fieldName + (isLikeSelected() ? ".analyzed" : "");
+  }
+
   private String getMatchQueryString() {
     if (matches.getText().isEmpty()) return null;
-    return (isNot() ? "NOT " : "") + fieldName + ":(" + matches.getText() + ")";
+    return (isNot() ? "NOT " : "") + getMatchFieldName() + ":(" + matches.getText() + ")";
   }
 
   private String getMatchRQLQueryString() {
     if (matches.getText().isEmpty()) return null;
-    String q = "in(" + getRQLField() + ",(" + matches.getText() + "))";
+    String op = isLikeSelected() ? "like" : "in";
+    String q = op + "(" + getRQLField() + ",(" + matches.getText() + "))";
     return isNot() ? "not(" + q + ")" : q;
   }
 
@@ -353,12 +381,11 @@ public class VariableFieldDropdown extends CriterionDropdown {
         else rval = rval + "," + normalizeKeyword(checkbox.getName());
       }
     }
-    String func = isLike() ? "like" : "in";
     if (Strings.isNullOrEmpty(rval)) {
-      String q = func + "(" + getRQLField() + ",*)";
+      String q = "in(" + getRQLField() + ",*)";
       return isNot() ? q : "not(" + q + ")";
     }
-    String q = func + "(" + getRQLField() + ",(" + rval + "))";
+    String q = "in(" + getRQLField() + ",(" + rval + "))";
     return isNot() ? "not(" + q + ")" : q;
   }
 
@@ -392,13 +419,32 @@ public class VariableFieldDropdown extends CriterionDropdown {
     return name;
   }
 
+  /**
+   * Not selection: neither in, nor like.
+   *
+   * @return
+   */
   private boolean isNot() {
     // Not in or Not like
-    return getRadioControl(3).getValue();
+    return getRadioControl(3).getValue() || (hasLike() && getRadioControl(5).getValue());
   }
 
-  private boolean isLike() {
-    return !hasFieldTerms();
+  /**
+   * Whether like or not like is selected (when applicable).
+   *
+   * @return
+   */
+  private boolean isLikeSelected() {
+    return hasLike() && (getRadioControl(4).getValue() || getRadioControl(5).getValue());
+  }
+
+  /**
+   * No field terms and analyzed field.
+   *
+   * @return
+   */
+  private boolean hasLike() {
+    return !hasFieldTerms() && analyzed;
   }
 
   private class OperatorClickHandler implements ClickHandler {

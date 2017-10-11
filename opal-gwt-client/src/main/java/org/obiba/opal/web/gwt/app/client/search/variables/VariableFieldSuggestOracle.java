@@ -127,6 +127,9 @@ public class VariableFieldSuggestOracle extends SuggestOracle {
     for (PropertySuggestion suggestion : propertySuggestions) {
       if (suggestion.getField().getName().equals(fieldName)) return suggestion;
     }
+    for (PropertySuggestion suggestion : propertySuggestions) {
+      if (suggestion.getField().getName().equals(fieldName + ".analyzed")) return suggestion;
+    }
     return null;
   }
 

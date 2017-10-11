@@ -11,6 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.ui;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -237,7 +238,12 @@ public class VariableSuggestOracle extends SuggestOracle {
   public void requestSuggestions(final Request request, final Callback callback) {
     originalQuery = request.getQuery();
     if(originalQuery == null || originalQuery.trim().isEmpty()) return;
-    final String query = getQueryPrefix() + getOriginalQuery();
+    String prefix = getQueryPrefix();
+    final String query;
+    if (Strings.isNullOrEmpty(prefix.trim()))
+      query = getOriginalQuery();
+    else
+      query = prefix + " AND (" + getOriginalQuery() + ")";
 
     UriBuilder ub = UriBuilder.create().segment("datasources", "variables", "_search")//
         .query("query", query)//
@@ -274,7 +280,7 @@ public class VariableSuggestOracle extends SuggestOracle {
                   suggestions.add(convertToFormattedSuggestions(query, attributes));
                 }
                 if (addAdvancedSearchSuggestion())
-                  suggestions.add(new AdvancedSearchSuggestion(query, resultDto.getTotalHits(), resultDto.getHitsArray().length(), datasource, table));
+                  suggestions.add(new AdvancedSearchSuggestion(getOriginalQuery(), resultDto.getTotalHits(), resultDto.getHitsArray().length(), datasource, table));
               }
 
               // Convert candidates to suggestions.
