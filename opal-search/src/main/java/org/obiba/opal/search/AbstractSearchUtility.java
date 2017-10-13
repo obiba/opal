@@ -17,6 +17,7 @@ import org.obiba.opal.web.ws.SortDir;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Base class for searching in variable or value indices.
@@ -34,13 +35,19 @@ public abstract class AbstractSearchUtility {
 
   protected QuerySettings buildQuerySearch(String query, int offset, int limit, Collection<String> fields,
                                            Collection<String> facets, String sortField, String sortDir) {
+    String sortBy = Strings.isNullOrEmpty(sortField) ? DEFAULT_SORT_FIELD : sortField;
+    String sortOrder = Strings.isNullOrEmpty(sortDir) ? SortDir.DESC.toString() : sortDir;
+    return buildQuerySearch(query, offset, limit, fields, facets, Lists.newArrayList(sortBy + ":" + sortOrder));
+  }
+
+  protected QuerySettings buildQuerySearch(String query, int offset, int limit, Collection<String> fields,
+                                           Collection<String> facets, List<String> sortWithOrder) {
 
     Collection<String> safeFields = fields == null ? Lists.newArrayList() : fields;
     addDefaultFields(safeFields);
     QuerySettings querySettings = QuerySettings.newSettings(query)
         .fields(safeFields).facets(facets).from(offset).size(limit) //
-        .sortField(Strings.isNullOrEmpty(sortField) ? DEFAULT_SORT_FIELD : sortField) //
-        .sortDir(Strings.isNullOrEmpty(sortDir) ? SortDir.DESC.toString() : sortDir);
+        .sortWithOrder(sortWithOrder);
 
     return querySettings;
   }

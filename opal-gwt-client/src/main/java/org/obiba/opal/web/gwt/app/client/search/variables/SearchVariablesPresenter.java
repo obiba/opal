@@ -192,7 +192,7 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
         .query("query", query)//
         .query("offset", "" + offset)//
         .query("limit", "" + limit)//
-        .query("sort", "name")//
+        .query("sort", getView().getSortWithOrder())//
         .query("field", "name", "field", "datasource", "field", "table", "field", "label", "field", "label-en", "field", "entityType");
 
     for (String locale : locales) {
@@ -370,6 +370,8 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
     void clearResults();
 
     void reset();
+
+    String getSortWithOrder();
   }
 
   public interface QueryResultHandler {

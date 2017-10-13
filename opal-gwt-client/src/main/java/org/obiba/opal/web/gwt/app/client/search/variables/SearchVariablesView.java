@@ -122,6 +122,9 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   @UiField
   OpalSimplePager variableItemPager;
 
+  @UiField
+  SortDropdown sortDropdown;
+
   private VariableItemProvider variableItemProvider;
 
   private VariableFieldSuggestOracle oracle;
@@ -152,6 +155,12 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
         if (visible) queryArea.setText(getQuery());
         showAdvancedQuery(visible);
         onSearch(null);
+      }
+    });
+    sortDropdown.addClickListener(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        onSearch(event);
       }
     });
   }
@@ -287,6 +296,11 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     queryInput.setText("");
     queryArea.setText("");
     queryMode.setOn(true);
+  }
+
+  @Override
+  public String getSortWithOrder() {
+    return sortDropdown.getSelection();
   }
 
   //
@@ -455,6 +469,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     refreshPending.setVisible(!visible);
     variableItemTablePanel.setVisible(visible);
     variableItemPager.setVisible(visible);
+    sortDropdown.setVisible(visible);
     addToCartAll.setVisible(visible);
   }
 

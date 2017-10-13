@@ -230,7 +230,7 @@ public class DatasourcesEntitiesSearchResource extends AbstractSearchUtility {
 
   private QuerySettings buildHasChildQuerySearch(int offset, int limit) {
     QuerySettings querySettings = new QuerySettings();
-    querySettings.from(offset).size(limit).sortField("identifier").sortDir(SortDir.ASC.name()).noDefaultFields();
+    querySettings.from(offset).size(limit).sortField("identifier", SortDir.ASC.name()).noDefaultFields();
     return querySettings;
   }
 

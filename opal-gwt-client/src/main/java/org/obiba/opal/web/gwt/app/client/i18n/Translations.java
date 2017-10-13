@@ -2632,4 +2632,11 @@ public interface Translations extends Constants {
   @Description("Genotypes selection items default tip message for export only")
   @DefaultStringValue("Select VCF files to export.")
   String vcfItemTipsAlertMessageExport();
+
+  @Description("Sort map")
+  @DefaultStringMapValue({ "_score:desc", "Relevance",
+      "name:asc", "Name (asc)",
+      "name:desc", "Name (desc)" })
+  Map<String, String> sortOrderMap();
+
 }

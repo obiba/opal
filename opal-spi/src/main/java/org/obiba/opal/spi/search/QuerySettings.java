@@ -12,11 +12,13 @@ package org.obiba.opal.spi.search;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import org.apache.commons.math3.util.Pair;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Settings to be used to build a search query.
@@ -57,9 +59,7 @@ public class QuerySettings {
 
   private String childQueryOperator = "must";
 
-  private String sortField;
-
-  private String sortDir;
+  private List<String> sortWithOrder = Lists.newArrayList();
 
   private boolean withDefaultQueryFields = true;
 
@@ -120,29 +120,27 @@ public class QuerySettings {
     return this;
   }
 
-  public boolean hasSortField() {
-    return !Strings.isNullOrEmpty(sortField);
+  public boolean hasSort() {
+    return !sortWithOrder.isEmpty();
   }
 
-  public String getSortField() {
-    return sortField;
+  public List<String> getSort() {
+    return sortWithOrder;
   }
 
-  public QuerySettings sortField(@NotNull String value) {
-    sortField = value;
+  public QuerySettings sortField(@NotNull String field, @NotNull String order) {
+    sortWithOrder.add(field + ":" + order.toLowerCase());
     return this;
   }
 
-  public boolean hasSortDir() {
-    return !Strings.isNullOrEmpty(sortDir);
-  }
-
-  public String getSortDir() {
-    return sortDir;
-  }
-
-  public QuerySettings sortDir(@NotNull String value) {
-    sortDir = value.toLowerCase(); // elastic search accepts only lower case
+  /**
+   * A list of [field]:[order] strings (both tokens required).
+   *
+   * @param sortsWithOrder
+   * @return
+   */
+  public QuerySettings sortWithOrder(List<String> sortsWithOrder) {
+    if (sortsWithOrder != null) this.sortWithOrder.addAll(sortsWithOrder);
     return this;
   }
 

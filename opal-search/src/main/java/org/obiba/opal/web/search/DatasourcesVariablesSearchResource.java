@@ -20,6 +20,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
@@ -44,15 +45,25 @@ public class DatasourcesVariablesSearchResource extends AbstractSearchUtility {
   @Path("_search")
   @Transactional(readOnly = true)
   public Response search(@QueryParam("query") String query, @QueryParam("offset") @DefaultValue("0") int offset,
-      @QueryParam("limit") @DefaultValue("10") int limit, @QueryParam("sort") String sort, @QueryParam("order") String order,
+      @QueryParam("limit") @DefaultValue("10") int limit, @QueryParam("sort") List<String> sorts, @QueryParam("order") String order,
       @SuppressWarnings("TypeMayBeWeakened") @QueryParam("field") List<String> fields,
       @SuppressWarnings("TypeMayBeWeakened") @QueryParam("facet") List<String> facets) {
 
     try {
       if(!searchServiceAvailable()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-      String sortField = Strings.isNullOrEmpty(sort) ? DEFAULT_SORT_FIELD : sort;
-      String sortOrder = Strings.isNullOrEmpty(order) ? Strings.isNullOrEmpty(sort) ? SortDir.DESC.toString() : SortDir.ASC.toString() : order;
-      Search.QueryResultDto dtoResponse = opalSearchService.executeQuery(buildQuerySearch(query, offset, limit, fields, facets, sortField, sortOrder),
+      String defaultOrder = Strings.isNullOrEmpty(order) ? SortDir.ASC.toString() : order;
+      List<String> sortsWithOrder = Lists.newArrayList();
+      if (sorts == null || sorts.isEmpty()) {
+        sortsWithOrder.add(DEFAULT_SORT_FIELD + ":desc");
+      } else {
+        for (String sortWithOrder : sorts) {
+          String[] tokens = sortWithOrder.split(":");
+          String sortField = tokens[0];
+          String sortOrder = tokens.length == 1 || Strings.isNullOrEmpty(tokens[1]) ? defaultOrder : tokens[1];
+          sortsWithOrder.add(sortField + ":" + sortOrder);
+        }
+      }
+      Search.QueryResultDto dtoResponse = opalSearchService.executeQuery(buildQuerySearch(query, offset, limit, fields, facets, sortsWithOrder),
           getSearchPath(), null);
       return Response.ok().entity(dtoResponse).build();
     } catch(Exception e) {
@@ -68,8 +79,8 @@ public class DatasourcesVariablesSearchResource extends AbstractSearchUtility {
 
   @Override
   protected QuerySettings buildQuerySearch(String query, int offset, int limit, Collection<String> fields,
-                                           Collection<String> facets, String sortField, String sortDir) {
-    return super.buildQuerySearch(query, offset, limit, fields, facets, sortField, sortDir).filterReferences(getTableReferencesFilter());
+                                           Collection<String> facets, List<String> sortWithOrder) {
+    return super.buildQuerySearch(query, offset, limit, fields, facets, sortWithOrder).filterReferences(getTableReferencesFilter());
   }
 
   //

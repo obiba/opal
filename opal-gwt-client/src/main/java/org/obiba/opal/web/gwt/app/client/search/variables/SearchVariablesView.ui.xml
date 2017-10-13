@@ -56,6 +56,7 @@
         </b:Button>
         <o:OpalSimplePager ui:field="variableItemPager" location="RIGHT"
                            addStyleNames="pull-right small-indent"/>
+        <o2:SortDropdown ui:field="sortDropdown" addStyleNames="pull-right"/>
       </g:FlowPanel>
       <g:FlowPanel ui:field="variableItemTablePanel">
         <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false" addStyleNames="actions-select">
