@@ -279,9 +279,9 @@ public class IndexAdministrationPresenter
   }
 
   @Override
-  public void remove() {
+  public void removeIndices(String type) {
     ResourceRequestBuilderFactory.newBuilder()//
-        .forResource(Resources.valuesIndices())//
+        .forResource(Resources.typeIndices(type))//
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {

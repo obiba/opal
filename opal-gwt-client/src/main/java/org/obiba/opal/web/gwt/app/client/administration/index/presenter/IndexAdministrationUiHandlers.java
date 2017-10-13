@@ -27,7 +27,7 @@ public interface IndexAdministrationUiHandlers extends UiHandlers {
 
   void refresh();
 
-  void remove();
+  void removeIndices(String type);
 
   void configure();
 

@@ -24,6 +24,10 @@ final class Resources {
     return UriBuilder.create().segment("service", "search","indices").query("type", "values").build();
   }
 
+  static String typeIndices(String type) {
+    return UriBuilder.create().segment("service", "search","indices").query("type", type).build();
+  }
+
   static String indicesEnabled() {
     return "/service/search/indices/cfg/enabled";
   }

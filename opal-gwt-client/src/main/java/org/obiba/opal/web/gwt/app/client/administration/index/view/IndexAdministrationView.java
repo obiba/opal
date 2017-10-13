@@ -79,6 +79,9 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
   OpalSimplePager indexTablePager;
 
   @UiField
+  Panel indicesPanel;
+
+  @UiField
   Panel indexPanel;
 
   @UiField
@@ -190,9 +193,14 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     getUiHandlers().refresh();
   }
 
-  @UiHandler("removeIndicesButton")
-  public void onRemove(ClickEvent event) {
-    getUiHandlers().remove();
+  @UiHandler("removeValuesIndexButton")
+  public void onValuesRemove(ClickEvent event) {
+    getUiHandlers().removeIndices("values");
+  }
+
+  @UiHandler("removeVariablesIndexButton")
+  public void onVariablesRemove(ClickEvent event) {
+    getUiHandlers().removeIndices("variables");
   }
 
   @UiHandler("filter")
@@ -270,10 +278,7 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;
     enableButton.setText(enabled ? translations.suspendLabel() : translations.resumeLabel());
-    indexPanel.setVisible(enabled);
-    indexTablePager.setVisible(enabled);
-    filterControls.setVisible(enabled);
-    refreshIndicesButton.setVisible(enabled);
+    indicesPanel.setVisible(enabled);
   }
 
   @Override
