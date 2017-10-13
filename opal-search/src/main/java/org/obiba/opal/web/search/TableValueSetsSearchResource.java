@@ -30,6 +30,7 @@ import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.RQLParserFactory;
 import org.obiba.opal.web.search.support.RQLValueSetVariableCriterionParser;
 import org.obiba.opal.web.search.support.VariableEntityValueSetDtoFunction;
+import org.obiba.opal.web.ws.SortDir;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,7 +77,7 @@ public class TableValueSetsSearchResource extends AbstractSearchUtility {
     esQuery = "reference:\"" + getValueTable().getTableReference() + "\" AND " + esQuery;
     OpalSearchService.IdentifiersQueryCallback callback = new OpalSearchService.IdentifiersQueryCallback();
     opalSearchService.executeIdentifiersQuery(buildQuerySearch(esQuery, offset, limit,
-        Lists.newArrayList("identifier"), null, null, null), getSearchPath(), callback);
+        Lists.newArrayList("identifier"), null, "identifier", SortDir.ASC.name()).noDefaultFields(), getSearchPath(), callback);
     Search.ValueSetsResultDto.Builder dtoResponseBuilder = getValueSetsDtoBuilder(uriInfo, select, callback.getTotal(), callback.getIdentifiers());
     return Response.ok().entity(dtoResponseBuilder.build()).build();
   }
