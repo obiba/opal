@@ -62,6 +62,8 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
 
   private static final int QUERY_ALL_LIMIT = 10000;
 
+  private static final String QUERY_DEFAULT_SORT = "_score:desc";
+
   private final Translations translations;
 
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
@@ -75,6 +77,8 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
   private String rqlQuery;
 
   private int offset = 0;
+
+  private String sort = QUERY_DEFAULT_SORT;
 
   private List<String> locales = Lists.newArrayList();
 
@@ -108,7 +112,8 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
     query = request.getParameter(ParameterTokens.TOKEN_QUERY, null);
     rqlQuery = request.getParameter(ParameterTokens.TOKEN_RQL_QUERY, null);
     offset = Integer.parseInt(request.getParameter(ParameterTokens.TOKEN_OFFSET, "0"));
-    getView().setQuery(query, offset);
+    sort = request.getParameter(ParameterTokens.TOKEN_SORT, QUERY_DEFAULT_SORT);
+    getView().setQuery(query, offset, sort);
     if (hasQuery()) query();
     else if (viewInitialized && hasRQLQuery()) {
       getView().reset();
@@ -117,10 +122,11 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
   }
 
   @Override
-  public void onSearchRange(String query, String rqlQuery, int offset) {
+  public void onSearchRange(String query, String rqlQuery, int offset, String sort) {
     this.query = query;
     this.rqlQuery = rqlQuery;
     this.offset = offset;
+    this.sort = sort;
     if (hasQuery()) query();
     else {
       getView().reset();
@@ -187,12 +193,12 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
     return !Strings.isNullOrEmpty(rqlQuery);
   }
 
-  private UriBuilder createUriBuilder(String query, int offset, int limit) {
+  private UriBuilder createUriBuilder(String query, int offset, int limit, String sort) {
     UriBuilder ub = UriBuilders.DATASOURCES_VARIABLES_SEARCH.create()//
         .query("query", query)//
         .query("offset", "" + offset)//
         .query("limit", "" + limit)//
-        .query("sort", getView().getSortWithOrder())//
+        .query("sort", sort)//
         .query("field", "name", "field", "datasource", "field", "table", "field", "label", "field", "label-en", "field", "entityType");
 
     for (String locale : locales) {
@@ -203,7 +209,7 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
   }
 
   private void query() {
-    UriBuilder ub = createUriBuilder(query, offset, QUERY_LIMIT);
+    UriBuilder ub = createUriBuilder(query, offset, QUERY_LIMIT, sort);
     // Get candidates from search words.
     ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
         .withCallback(new ResponseCodeCallback() {
@@ -233,7 +239,7 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
   }
 
   private void queryAll(final String query, final int allOffset, final QueryResultHandler handler) {
-    UriBuilder ub = createUriBuilder(query, allOffset, QUERY_ALL_LIMIT);
+    UriBuilder ub = createUriBuilder(query, allOffset, QUERY_ALL_LIMIT, QUERY_DEFAULT_SORT);
     final int nextOffset = allOffset + QUERY_ALL_LIMIT;
     // Get candidates from search words.
     ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()
@@ -334,12 +340,13 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
   }
 
   private void searchProvidedRQLQueryIfReady() {
-    if (viewInitialized && hasRQLQuery()) getView().setRQLQuery(rqlQuery, offset);
+    if (viewInitialized && hasRQLQuery()) getView().setRQLQuery(rqlQuery, offset, sort);
   }
 
   private void updateHistory() {
     PlaceRequest.Builder builder = PlaceRequestHelper.createRequestBuilder(placeManager.getCurrentPlaceRequest())
-        .with(ParameterTokens.TOKEN_OFFSET, "" + offset);
+        .with(ParameterTokens.TOKEN_OFFSET, "" + offset)
+        .with(ParameterTokens.TOKEN_SORT, sort);
     if (Strings.isNullOrEmpty(rqlQuery)) {
       builder.with(ParameterTokens.TOKEN_QUERY, query);
       builder.without(ParameterTokens.TOKEN_RQL_QUERY);
@@ -361,17 +368,15 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
 
     void setTables(List<TableDto> tables);
 
-    void setQuery(String query, int offset);
+    void setQuery(String query, int offset, String sort);
 
-    void setRQLQuery(String rqlQuery, int offset);
+    void setRQLQuery(String rqlQuery, int offset, String sort);
 
     void showResults(String rqlQuery, int offset, QueryResultDto results);
 
     void clearResults();
 
     void reset();
-
-    String getSortWithOrder();
   }
 
   public interface QueryResultHandler {

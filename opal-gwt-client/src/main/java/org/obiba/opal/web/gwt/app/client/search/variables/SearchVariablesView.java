@@ -230,7 +230,8 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   }
 
   @Override
-  public void setQuery(String query, int offset) {
+  public void setQuery(String query, int offset, String sort) {
+    sortDropdown.setSelection(sort);
     if (Strings.isNullOrEmpty(query) || query.equals(getBasicQuery())) {
       queryMode.setOn(true, false);
       showAdvancedQuery(false);
@@ -242,8 +243,9 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   }
 
   @Override
-  public void setRQLQuery(String rqlQuery, int offset) {
+  public void setRQLQuery(String rqlQuery, int offset, String sort) {
     reset();
+    sortDropdown.setSelection(sort);
     if (Strings.isNullOrEmpty(rqlQuery)) return;
     showAdvancedQuery(false);
     RQLQuery root = RQLParser.parse(rqlQuery.replaceAll(" ", "+"));
@@ -296,10 +298,6 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     queryMode.setOn(true);
   }
 
-  @Override
-  public String getSortWithOrder() {
-    return sortDropdown.getSelection();
-  }
 
   //
   // Private methods
@@ -307,7 +305,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
   private void onSearch(int offset) {
     setVariablesVisible(false);
-    getUiHandlers().onSearchRange(getQuery(), getRQLQuery(), offset);
+    getUiHandlers().onSearchRange(getQuery(), getRQLQuery(), offset, getSortWithOrder());
   }
 
   private String getQuery() {
@@ -317,6 +315,10 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
   private String getRQLQuery() {
     return queryArea.isVisible() ? null : getBasicRQLQuery();
+  }
+
+  private String getSortWithOrder() {
+    return sortDropdown.getSelection();
   }
 
   private String getBasicQuery() {
@@ -482,7 +484,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     protected void onRangeChanged(HasData<ItemResultDto> display) {
       Range range = display.getVisibleRange();
       setVariablesVisible(false);
-      getUiHandlers().onSearchRange(getQuery(), getRQLQuery(), range.getStart());
+      getUiHandlers().onSearchRange(getQuery(), getRQLQuery(), range.getStart(), getSortWithOrder());
     }
   }
 

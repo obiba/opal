@@ -17,7 +17,7 @@ public class ParameterTokens {
 
   public static final String TOKEN_OFFSET = "o";
 
-  public static final String TOKEN_LIMIT = "lm";
+  public static final String TOKEN_SORT = "s";
 
   public static final String TOKEN_NAME = "name";
 

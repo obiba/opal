@@ -18,7 +18,7 @@ import java.util.List;
 
 public interface SearchVariablesUiHandlers extends UiHandlers {
 
-  void onSearchRange(String query, String rqlQuery, int offset);
+  void onSearchRange(String query, String rqlQuery, int offset, String sort);
 
   void onSearchAll(String query, SearchVariablesPresenter.QueryResultHandler handler);
 
