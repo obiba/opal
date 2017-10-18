@@ -17,7 +17,6 @@ import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.*;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -154,7 +153,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
       private void advancedVisible(boolean visible) {
         if (visible) queryArea.setText(getQuery());
         showAdvancedQuery(visible);
-        onSearch(null);
+        onSearch(0);
       }
     });
     sortDropdown.addClickListener(new ClickHandler() {
@@ -172,8 +171,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
   @UiHandler("searchButton")
   public void onSearch(ClickEvent event) {
-    setVariablesVisible(false);
-    getUiHandlers().onSearchRange(getQuery(), getRQLQuery(), 0);
+    onSearch(0);
   }
 
   @UiHandler("clearButton")
@@ -185,13 +183,13 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
   @UiHandler("containsInput")
   public void onContainsTyped(KeyUpEvent event) {
-    if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER || getQuery().isEmpty()) onSearch(null);
+    if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER || getQuery().isEmpty()) onSearch(0);
   }
 
   @UiHandler("queryArea")
   public void onAdvancedQueryTyped(KeyUpEvent event) {
     if ((event.getNativeKeyCode() == KeyCodes.KEY_ENTER && event.isControlKeyDown()) || getQuery().isEmpty())
-      onSearch(null);
+      onSearch(0);
   }
 
   @UiHandler("addToCart")
@@ -232,7 +230,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   }
 
   @Override
-  public void setQuery(String query) {
+  public void setQuery(String query, int offset) {
     if (Strings.isNullOrEmpty(query) || query.equals(getBasicQuery())) {
       queryMode.setOn(true, false);
       showAdvancedQuery(false);
@@ -244,11 +242,11 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   }
 
   @Override
-  public void setRQLQuery(String rqlQuery) {
+  public void setRQLQuery(String rqlQuery, int offset) {
     reset();
     if (Strings.isNullOrEmpty(rqlQuery)) return;
     showAdvancedQuery(false);
-    RQLQuery root = RQLParser.parse(rqlQuery.replaceAll(" ","+"));
+    RQLQuery root = RQLParser.parse(rqlQuery.replaceAll(" ", "+"));
     for (int i = 0; i < root.getArgumentsSize(); i++) {
       RQLQuery query = root.getRQLQuery(i);
       if (!query.getName().equals("contains")) {
@@ -263,7 +261,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
         containsInput.setText(query.getString(0).replaceAll("\\+", " "));
       }
     }
-    onSearch(null);
+    onSearch(offset);
   }
 
   @Override
@@ -279,7 +277,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     variableItemTable.setPageStart(offset);
     variableItemPager.setPagerVisible(results.getTotalHits() > Table.DEFAULT_PAGESIZE);
     setVariablesVisible(true);
-    addToCartAll.setEnabled(results.getTotalHits()>0);
+    addToCartAll.setEnabled(results.getTotalHits() > 0);
   }
 
   @Override
@@ -306,6 +304,11 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   //
   // Private methods
   //
+
+  private void onSearch(int offset) {
+    setVariablesVisible(false);
+    getUiHandlers().onSearchRange(getQuery(), getRQLQuery(), offset);
+  }
 
   private String getQuery() {
     if (queryArea.isVisible()) return getAdvancedQuery();
@@ -391,19 +394,19 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
     VariableFieldDropdown dd = new VariableFieldDropdown(fieldSuggestion, facet) {
       @Override
       public void doFilter() {
-        onSearch(null);
+        onSearch(0);
       }
     };
     dd.addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent event) {
-        onSearch(null);
+        onSearch(0);
       }
     });
     dd.initialize(rqlQuery);
     queryPanel.addCriterion(dd, true, true);
     queryInput.setText("");
-    if (rqlQuery == null) onSearch(null);
+    if (rqlQuery == null) onSearch(0);
   }
 
   private void initVariableItemTable() {
@@ -446,10 +449,10 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
             @Override
             public void onQueryResult(String rqlQuery, int offset, QueryResultDto results) {
               int last = offset + results.getHitsArray().length();
-              boolean queryPending = last<results.getTotalHits();
+              boolean queryPending = last < results.getTotalHits();
               selectAllAnchor.setVisible(!queryPending);
               selectAllProgressBox.setVisible(queryPending);
-              selectAllProgress.setPercent((last*100)/results.getTotalHits());
+              selectAllProgress.setPercent((last * 100) / results.getTotalHits());
               for (ItemResultDto item : JsArrays.toList(results.getHitsArray()))
                 handler.onItemSelection(item);
               if (!queryPending) {

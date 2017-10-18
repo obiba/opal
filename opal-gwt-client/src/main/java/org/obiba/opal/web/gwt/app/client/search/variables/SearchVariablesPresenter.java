@@ -108,7 +108,7 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
     query = request.getParameter(ParameterTokens.TOKEN_QUERY, null);
     rqlQuery = request.getParameter(ParameterTokens.TOKEN_RQL_QUERY, null);
     offset = Integer.parseInt(request.getParameter(ParameterTokens.TOKEN_OFFSET, "0"));
-    getView().setQuery(query);
+    getView().setQuery(query, offset);
     if (hasQuery()) query();
     else if (viewInitialized && hasRQLQuery()) {
       getView().reset();
@@ -334,7 +334,7 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
   }
 
   private void searchProvidedRQLQueryIfReady() {
-    if (viewInitialized && hasRQLQuery()) getView().setRQLQuery(rqlQuery);
+    if (viewInitialized && hasRQLQuery()) getView().setRQLQuery(rqlQuery, offset);
   }
 
   private void updateHistory() {
@@ -361,9 +361,9 @@ public class SearchVariablesPresenter extends Presenter<SearchVariablesPresenter
 
     void setTables(List<TableDto> tables);
 
-    void setQuery(String query);
+    void setQuery(String query, int offset);
 
-    void setRQLQuery(String rqlQuery);
+    void setRQLQuery(String rqlQuery, int offset);
 
     void showResults(String rqlQuery, int offset, QueryResultDto results);
 
