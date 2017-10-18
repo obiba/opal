@@ -33,7 +33,7 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.event.TableIndexUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.TableValuesIndexUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
@@ -106,24 +106,10 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
 
   @Override
   protected void onBind() {
-    addRegisteredHandler(TableIndexUpdatedEvent.getType(), new TableIndexUpdatedEvent.Handler() {
+    addRegisteredHandler(TableValuesIndexUpdatedEvent.getType(), new TableValuesIndexUpdatedEvent.Handler() {
       @Override
-      public void onRefresh(TableIndexUpdatedEvent event) {
-        if (indexedTables == null) return;
-        // update the list of indexed tables following an indexing event
-        int found = -1;
-        for (int i=0; i<indexedTables.size(); i++) {
-          TableDto idxTable = indexedTables.get(i);
-          if (idxTable.getLink().equals(event.getTable().getLink())) {
-            found = i;
-            break;
-          }
-        }
-        if (event.isIndexed() && found == -1)
-          indexedTables.add(event.getTable());
-        else if (!event.isIndexed() && found>-1)
-          indexedTables.remove(found);
-        if (indexedTables != null && indexedTables.size() == 0) indexedTables = null;
+      public void onRefresh(TableValuesIndexUpdatedEvent event) {
+        indexedTables = null;
       }
     });
   }

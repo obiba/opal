@@ -30,6 +30,7 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableIndexStatusRefreshEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.TableValuesIndexUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
@@ -197,6 +198,7 @@ public class IndexAdministrationPresenter
           }
         }, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_BAD_REQUEST) //
         .put().send();
+    fireEvent(new TableValuesIndexUpdatedEvent());
   }
 
   @Override
@@ -223,6 +225,7 @@ public class IndexAdministrationPresenter
           }
         }) //
         .delete().send();
+    fireEvent(new TableValuesIndexUpdatedEvent());
   }
 
   @Override
@@ -247,6 +250,7 @@ public class IndexAdministrationPresenter
           }
         }) //
         .put().send();
+    fireEvent(new TableValuesIndexUpdatedEvent());
   }
 
   @Override
@@ -271,6 +275,7 @@ public class IndexAdministrationPresenter
           }
         }) //
         .delete().send();
+    fireEvent(new TableValuesIndexUpdatedEvent());
   }
 
   @Override
@@ -291,6 +296,7 @@ public class IndexAdministrationPresenter
         }, Response.SC_NO_CONTENT)//
         .withCallback(Response.SC_SERVICE_UNAVAILABLE, ResponseCodeCallback.NO_OP) //
         .delete().send();
+    fireEvent(new TableValuesIndexUpdatedEvent());
   }
 
   @Override
@@ -316,6 +322,7 @@ public class IndexAdministrationPresenter
           .delete().send();
       getView().unselectIndex(statusDto);
     }
+    fireEvent(new TableValuesIndexUpdatedEvent());
   }
 
   @Override
@@ -345,6 +352,7 @@ public class IndexAdministrationPresenter
             }
           }).put().send();
     }
+    fireEvent(new TableValuesIndexUpdatedEvent());
   }
 
   private void refresh(boolean clearIndices) {
@@ -354,6 +362,7 @@ public class IndexAdministrationPresenter
         .withCallback(new TableIndexStatusResourceCallback(clearIndices))//
         .withCallback(Response.SC_SERVICE_UNAVAILABLE, ResponseCodeCallback.NO_OP) //
         .get().send();
+    fireEvent(new TableValuesIndexUpdatedEvent());
   }
 
   private class TableIndexStatusResourceCallback implements ResourceCallback<JsArray<TableIndexStatusDto>> {

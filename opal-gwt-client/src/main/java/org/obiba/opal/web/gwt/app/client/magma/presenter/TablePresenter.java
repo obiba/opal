@@ -382,6 +382,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   }
 
   private void updateIndexStatus() {
+    fireEvent(new TableValuesIndexUpdatedEvent());
     // If cancellation, call the delete ws
     if (cancelIndexation) {
       ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()
@@ -838,10 +839,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
             getView().initContingencyTable(JsArrays.toSafeArray(resource));
           }
         }).send();
-        fireEvent(new TableIndexUpdatedEvent(table, true));
-      } else {
-        fireEvent(new TableIndexUpdatedEvent(table, false));
       }
+      fireEvent(new TableValuesIndexUpdatedEvent());
     }
   }
 

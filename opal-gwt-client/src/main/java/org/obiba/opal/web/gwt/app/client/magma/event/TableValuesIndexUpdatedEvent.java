@@ -11,37 +11,18 @@ package org.obiba.opal.web.gwt.app.client.magma.event;
 
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
-import org.obiba.opal.web.model.client.magma.TableDto;
 
-public class TableIndexUpdatedEvent extends GwtEvent<TableIndexUpdatedEvent.Handler> {
+public class TableValuesIndexUpdatedEvent extends GwtEvent<TableValuesIndexUpdatedEvent.Handler> {
 
   public interface Handler extends EventHandler {
 
-    void onRefresh(TableIndexUpdatedEvent event);
+    void onRefresh(TableValuesIndexUpdatedEvent event);
 
   }
 
   private static final Type<Handler> TYPE = new Type<Handler>();
 
-  private final TableDto table;
-
-  private final boolean indexed;
-
-  public TableIndexUpdatedEvent(TableDto table) {
-    this(table, true);
-  }
-
-  public TableIndexUpdatedEvent(TableDto table, boolean indexed) {
-    this.table = table;
-    this.indexed = indexed;
-  }
-
-  public TableDto getTable() {
-    return table;
-  }
-
-  public boolean isIndexed() {
-    return indexed;
+  public TableValuesIndexUpdatedEvent() {
   }
 
   public static Type<Handler> getType() {
