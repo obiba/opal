@@ -10,7 +10,6 @@
 package org.obiba.opal.search.service;
 
 import com.google.common.collect.Lists;
-import org.codehaus.jettison.json.JSONException;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.ValueTableUpdateListener;
 import org.obiba.magma.Variable;
@@ -18,7 +17,9 @@ import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
+import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.search.IndexSynchronizationManager;
+import org.obiba.opal.search.es.ElasticSearchConfiguration;
 import org.obiba.opal.search.es.ElasticSearchConfigurationService;
 import org.obiba.opal.spi.search.support.ItemResultDtoStrategy;
 import org.obiba.opal.spi.search.*;
@@ -47,6 +48,9 @@ public class OpalSearchService implements Service, ValueTableUpdateListener {
   private OpalRuntime opalRuntime;
 
   @Autowired
+  private OpalGeneralConfigService opalGeneralConfigService;
+
+  @Autowired
   private VariableSummaryHandler variableSummaryHandler;
 
   @Autowired
@@ -67,7 +71,7 @@ public class OpalSearchService implements Service, ValueTableUpdateListener {
   @Override
   public void start() {
     if (isRunning()) return;
-    SearchSettings esConfig = configService.getConfig();
+    SearchSettings esConfig = new OpalSearchSettings(configService.getConfig());
     if (!esConfig.isEnabled()) return;
     if (!hasSearchServicePlugin()) {
       log.warn("No Search Service plugin found.");
@@ -172,6 +176,55 @@ public class OpalSearchService implements Service, ValueTableUpdateListener {
     
     public List<String> getIdentifiers() {
       return identifiers;
+    }
+  }
+
+  public class OpalSearchSettings implements SearchSettings {
+
+    private final ElasticSearchConfiguration elasticSearchConfiguration;
+
+    public OpalSearchSettings(ElasticSearchConfiguration elasticSearchConfiguration) {
+      this.elasticSearchConfiguration = elasticSearchConfiguration;
+    }
+
+    @Override
+    public String getClusterName() {
+      return elasticSearchConfiguration.getClusterName();
+    }
+
+    @Override
+    public String getIndexName() {
+      return elasticSearchConfiguration.getIndexName();
+    }
+
+    @Override
+    public boolean isDataNode() {
+      return elasticSearchConfiguration.isDataNode();
+    }
+
+    @Override
+    public String getEsSettings() {
+      return elasticSearchConfiguration.getEsSettings();
+    }
+
+    @Override
+    public boolean isEnabled() {
+      return elasticSearchConfiguration.isEnabled();
+    }
+
+    @Override
+    public Integer getShards() {
+      return elasticSearchConfiguration.getShards();
+    }
+
+    @Override
+    public Integer getReplicas() {
+      return elasticSearchConfiguration.getReplicas();
+    }
+
+    @Override
+    public List<String> getLocales() {
+      return opalGeneralConfigService.getConfig().getLocalesAsString();
     }
   }
 

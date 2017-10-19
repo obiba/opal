@@ -24,8 +24,6 @@ public interface SearchService extends ServicePlugin {
 
   void configure(SearchSettings settings, VariableSummaryHandler variableSummaryHandler, ThreadFactory threadFactory);
 
-  SearchSettings getConfig();
-
   boolean isEnabled();
 
   //

@@ -10,6 +10,8 @@
 
 package org.obiba.opal.spi.search;
 
+import java.util.List;
+
 public interface SearchSettings {
 
   String getClusterName();
@@ -25,4 +27,6 @@ public interface SearchSettings {
   Integer getShards();
 
   Integer getReplicas();
+
+  List<String> getLocales();
 }
