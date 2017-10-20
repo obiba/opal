@@ -18,6 +18,7 @@ import org.obiba.magma.*;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.r.MagmaRRuntimeException;
@@ -244,7 +245,8 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
    */
   private Iterable<Variable> filterVariables() {
     List<Variable> filteredVariables;
-    List<Variable> allVariables = Lists.newArrayList(table.getVariables());
+    List<Variable> allVariables = StreamSupport.stream(table.getVariables().spliterator(), false)
+      .filter(v -> !BinaryType.get().equals(v.getValueType())).collect(Collectors.toList());
 
     if (Strings.isNullOrEmpty(magmaAssignROperation.getVariableFilter())) {
       filteredVariables = allVariables;

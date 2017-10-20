@@ -21,7 +21,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-import com.google.common.base.Stopwatch;
+import com.google.common.base.*;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
@@ -60,9 +60,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -101,7 +98,12 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   @Autowired
   private TransactionTemplate txTemplate;
 
-  @Value("${org.obiba.magma.entityIdColumnName}")
+  private Map<String, String> entityIdMap;
+
+  @Value("${org.obiba.magma.entityIdNames}")
+  private String entityIdNames;
+
+  @Value("${org.obiba.magma.entityIdName}")
   private String entityIdName;
 
   @NotNull
@@ -171,6 +173,44 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     return errorCode;
   }
 
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+
+    sb.append("copy");
+
+    if(options != null) {
+      appendOption(sb, "unit", options.isUnit(), options.getUnit());
+      appendOption(sb, "source", options.isSource(), options.getSource());
+      appendOption(sb, "destination", options.isDestination(), options.getDestination());
+      appendOption(sb, "out", options.isOut(), options.getOut());
+      appendOption(sb, "multiplex", options.isMultiplex(), options.getMultiplex());
+      appendOption(sb, "transform", options.isTransform(), options.getTransform());
+      appendFlag(sb, "non-incremental", options.getNonIncremental());
+      appendFlag(sb, "no-values", options.getNoValues());
+      appendFlag(sb, "no-variables", options.getNoVariables());
+      appendFlag(sb, "copy-null", options.getCopyNullValues());
+      appendUnparsedList(sb, options.getTables());
+    }
+
+    return sb.toString();
+  }
+
+  //
+  // Private methods
+  //
+
+  private Map<String, String> getEntityIdMap() {
+    if (entityIdMap == null) {
+      entityIdMap = Maps.newHashMap();
+      if (!Strings.isNullOrEmpty(entityIdNames))
+        Splitter.on(",").split(entityIdNames).forEach(token -> {
+          String[] entry = token.trim().split("=");
+          if (entry.length == 2) entityIdMap.put(entry[0].trim(),entry[1].trim());
+        });
+    }
+    return entityIdMap;
+  }
+
   private String getTableNames() {
     List<String> names = Lists.newArrayList();
 
@@ -193,28 +233,6 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
         return input.substring(input.indexOf('.') + 1);
       }
     }));
-  }
-
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-
-    sb.append("copy");
-
-    if(options != null) {
-      appendOption(sb, "unit", options.isUnit(), options.getUnit());
-      appendOption(sb, "source", options.isSource(), options.getSource());
-      appendOption(sb, "destination", options.isDestination(), options.getDestination());
-      appendOption(sb, "out", options.isOut(), options.getOut());
-      appendOption(sb, "multiplex", options.isMultiplex(), options.getMultiplex());
-      appendOption(sb, "transform", options.isTransform(), options.getTransform());
-      appendFlag(sb, "non-incremental", options.getNonIncremental());
-      appendFlag(sb, "no-values", options.getNoValues());
-      appendFlag(sb, "no-variables", options.getNoVariables());
-      appendFlag(sb, "copy-null", options.getCopyNullValues());
-      appendUnparsedList(sb, options.getTables());
-    }
-
-    return sb.toString();
   }
 
   private DatasourceCopier.Builder buildDatasourceCopier(Datasource destinationDatasource) {
@@ -512,7 +530,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
     protected void addCsvValueTable(CsvDatasource ds, ValueTable table, @Nullable File variablesFile,
         @Nullable File dataFile) {
-      ds.addValueTable(table.getName(), variablesFile, dataFile);
+      ds.addValueTable(table.getName(), variablesFile, dataFile, table.getEntityType());
       ds.setVariablesHeader(table.getName(), CsvUtil.getCsvVariableHeader(table));
     }
 
@@ -538,6 +556,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     private Datasource getMultipleFileCsvDatasource(File directory) throws IOException {
       CsvDatasource ds = new CsvDatasource(directory.getName());
       ds.setMultilines(options.getMultilines());
+      ds.setEntityIdNames(getEntityIdMap());
       ds.setEntityIdName(entityIdName);
       for(ValueTable table : getValueTables()) {
         File tableDir = new File(directory, table.getName());
@@ -572,6 +591,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     private Datasource getSingleFileCsvDatasource(String name, File csvFile) throws IOException {
       CsvDatasource ds = new CsvDatasource(name);
       ds.setMultilines(options.getMultilines());
+      ds.setEntityIdNames(getEntityIdMap());
       ds.setEntityIdName(entityIdName);
       // one table only
       Set<ValueTable> tables = getValueTables();
@@ -647,7 +667,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
           });
         }
         getValueTables().size();
-        RDatasource ds = new RDatasource(outputFile.getName().getBaseName(), rSession, outFiles, txTemplate, entityIdName) {
+        RDatasource ds = new RDatasource(outputFile.getName().getBaseName(), rSession, outFiles, txTemplate, entityIdName, getEntityIdMap()) {
           @Override
           protected void onDispose() {
             opalRSessionManager.removeRSession(rSession.getId());

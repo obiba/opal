@@ -11,12 +11,11 @@
 package org.obiba.opal.r.magma;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.support.AbstractDatasource;
-import org.obiba.magma.support.StaticValueTable;
 import org.obiba.opal.r.AbstractROperation;
 import org.obiba.opal.r.DataReadROperation;
 import org.obiba.opal.r.FileWriteROperation;
@@ -26,6 +25,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -52,19 +52,24 @@ public class RDatasource extends AbstractDatasource {
 
   private final String entityType;
 
+  private final Map<String, String> idColumnNames;
+
   private final String idColumnName;
 
   private String locale;
 
   /**
    * Empty datasource with files to be written to.
-   *  @param name
+   *
+   * @param name
    * @param rSession
+   * @param files
    * @param txTemplate
    * @param idColumnName
+   * @param idColumnNames
    */
-  public RDatasource(@NotNull String name, OpalRSession rSession, List<File> files, TransactionTemplate txTemplate, String idColumnName) {
-    this(name, rSession, null, null, null, null, idColumnName);
+  public RDatasource(@NotNull String name, OpalRSession rSession, List<File> files, TransactionTemplate txTemplate, String idColumnName, Map<String, String> idColumnNames) {
+    this(name, rSession, null, null, null, null, idColumnName, idColumnNames);
     this.outputFiles = files;
     this.txTemplate = txTemplate;
   }
@@ -94,6 +99,10 @@ public class RDatasource extends AbstractDatasource {
    * @param idColumnName
    */
   public RDatasource(@NotNull String name, OpalRSession rSession, File file, File categoryFile, String symbol, String entityType, String idColumnName) {
+    this(name, rSession, file, categoryFile, symbol, entityType, idColumnName, null);
+  }
+
+  private RDatasource(@NotNull String name, OpalRSession rSession, File file, File categoryFile, String symbol, String entityType, String idColumnName, Map<String, String> idColumnNames) {
     super(name, "r");
     this.rSession = rSession;
     this.file = file;
@@ -101,6 +110,7 @@ public class RDatasource extends AbstractDatasource {
     this.symbol = symbol;
     this.entityType = Strings.isNullOrEmpty(entityType) ? DEFAULT_ENTITY_TYPE : entityType;
     this.idColumnName = idColumnName;
+    this.idColumnNames = idColumnNames == null ? Maps.newHashMap() : idColumnNames;
     this.txTemplate = null;
   }
 
@@ -135,7 +145,7 @@ public class RDatasource extends AbstractDatasource {
 
   @Override
   protected ValueTable initialiseValueTable(String tableName) {
-    return new RValueTable(this, tableName, symbol, entityType, idColumnName);
+    return new RValueTable(this, tableName, symbol, entityType, getIdColumnName(entityType));
   }
 
   @Override
@@ -145,7 +155,7 @@ public class RDatasource extends AbstractDatasource {
       outputFile = outputFiles.get(0);
     else
       outputFile = outputFiles.stream().filter(f -> f.getName().startsWith(tableName + ".")).findFirst().get();
-    return new RValueTableWriter(tableName, entityType, outputFile, getRSession(), txTemplate, idColumnName);
+    return new RValueTableWriter(tableName, entityType, outputFile, getRSession(), txTemplate, getIdColumnName(entityType));
   }
 
   private boolean hasCategoryFile() {
@@ -158,6 +168,10 @@ public class RDatasource extends AbstractDatasource {
 
   public String getLocale() {
     return Strings.isNullOrEmpty(locale) ? "en" : locale;
+  }
+
+  private String getIdColumnName(String entityType) {
+    return idColumnNames.getOrDefault(entityType, idColumnName);
   }
 
 }
