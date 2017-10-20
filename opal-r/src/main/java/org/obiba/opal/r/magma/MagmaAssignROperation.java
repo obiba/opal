@@ -58,7 +58,7 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   private SortedSet<VariableEntity> entities;
 
-  public MagmaAssignROperation(@NotNull String symbol, @NotNull ValueTable valueTable, TransactionTemplate txTemplate) {
+  public MagmaAssignROperation(@NotNull String symbol, @NotNull ValueTable valueTable, TransactionTemplate txTemplate, String idColumnName) {
     if (symbol == null) throw new IllegalArgumentException("symbol cannot be null");
     this.symbol = symbol;
     this.path = "";
@@ -67,7 +67,7 @@ public class MagmaAssignROperation extends AbstractROperation {
     this.withMissings = true;
     this.identifiersMapping = "";
     this.identifiersTableService = null;
-    this.idColumnName = "id";
+    this.idColumnName = idColumnName;
     this.updatedColumnName = "";
     this.transactionTemplate = txTemplate;
     this.rClass = RClass.TIBBLE;

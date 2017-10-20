@@ -86,7 +86,7 @@ class RVariableEntityProvider implements VariableEntityProvider {
       try {
         idColumn = colnames.asStrings()[0];
       } catch (REXPMismatchException e) {
-        idColumn = "id";
+        idColumn = RDatasource.DEFAULT_ID_COLUMN_NAME;
       }
     }
   }

@@ -73,7 +73,7 @@ class ValueTableRTibbleConverter extends ValueTableRConverter {
   @Override
   protected String getIdColumnName() {
     String col = super.getIdColumnName();
-    return Strings.isNullOrEmpty(col) ? "id" : col;
+    return Strings.isNullOrEmpty(col) ? RDatasource.DEFAULT_ID_COLUMN_NAME : col;
   }
 
   @Override

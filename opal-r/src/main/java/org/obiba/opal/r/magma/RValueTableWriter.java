@@ -10,6 +10,7 @@
 
 package org.obiba.opal.r.magma;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.obiba.magma.*;
 import org.obiba.magma.support.StaticDatasource;
@@ -40,13 +41,16 @@ public class RValueTableWriter implements ValueTableWriter {
 
   private final TransactionTemplate txTemplate;
 
-  public RValueTableWriter(String tableName, String entityType, File destination, OpalRSession rSession, TransactionTemplate txTemplate) {
+  private final String idColumnName;
+
+  public RValueTableWriter(String tableName, String entityType, File destination, OpalRSession rSession, TransactionTemplate txTemplate, String idColumnName) {
     this.tableName = tableName;
     this.datasource = new StaticDatasource(destination.getName());
     this.valueTableWriter = datasource.createWriter(tableName, entityType);
     this.destination = destination;
     this.rSession = rSession;
     this.txTemplate = txTemplate;
+    this.idColumnName = Strings.isNullOrEmpty(idColumnName) ? RDatasource.DEFAULT_ID_COLUMN_NAME : idColumnName;
   }
 
   @Override
@@ -66,7 +70,7 @@ public class RValueTableWriter implements ValueTableWriter {
     if (valueTable.getValueSetCount()>0) {
       String symbol = "D";
       // push table to a R tibble
-      rSession.execute(new MagmaAssignROperation(symbol, valueTable, txTemplate));
+      rSession.execute(new MagmaAssignROperation(symbol, valueTable, txTemplate, idColumnName));
       // save tibble in file in R
       rSession.execute(new DataSaveROperation(symbol, destination.getName()));
       // read back file from R to opal

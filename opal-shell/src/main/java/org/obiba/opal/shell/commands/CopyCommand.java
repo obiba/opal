@@ -57,6 +57,7 @@ import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 
 import com.google.common.base.Function;
@@ -99,6 +100,9 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
   @Autowired
   private TransactionTemplate txTemplate;
+
+  @Value("${org.obiba.magma.entityIdColumnName}")
+  private String entityIdName;
 
   @NotNull
   private final FileDatasourceFactory fileDatasourceFactory;
@@ -534,6 +538,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     private Datasource getMultipleFileCsvDatasource(File directory) throws IOException {
       CsvDatasource ds = new CsvDatasource(directory.getName());
       ds.setMultilines(options.getMultilines());
+      ds.setEntityIdName(entityIdName);
       for(ValueTable table : getValueTables()) {
         File tableDir = new File(directory, table.getName());
         if(tableDir.exists() || tableDir.mkdir()) {
@@ -567,7 +572,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     private Datasource getSingleFileCsvDatasource(String name, File csvFile) throws IOException {
       CsvDatasource ds = new CsvDatasource(name);
       ds.setMultilines(options.getMultilines());
-
+      ds.setEntityIdName(entityIdName);
       // one table only
       Set<ValueTable> tables = getValueTables();
       if(tables.size() > 1) {
@@ -642,7 +647,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
           });
         }
         getValueTables().size();
-        RDatasource ds = new RDatasource(outputFile.getName().getBaseName(), rSession, outFiles, txTemplate) {
+        RDatasource ds = new RDatasource(outputFile.getName().getBaseName(), rSession, outFiles, txTemplate, entityIdName) {
           @Override
           protected void onDispose() {
             opalRSessionManager.removeRSession(rSession.getId());

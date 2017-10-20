@@ -36,7 +36,7 @@ public class RDatasource extends AbstractDatasource {
 
   private static final String DEFAULT_ENTITY_TYPE = "Participant";
 
-  private static final String DEFAULT_ID_COLUMN = "entity_id";
+  static final String DEFAULT_ID_COLUMN_NAME = "id";
 
   private final OpalRSession rSession;
 
@@ -52,7 +52,7 @@ public class RDatasource extends AbstractDatasource {
 
   private final String entityType;
 
-  private final String idColumn;
+  private final String idColumnName;
 
   private String locale;
 
@@ -61,9 +61,10 @@ public class RDatasource extends AbstractDatasource {
    *  @param name
    * @param rSession
    * @param txTemplate
+   * @param idColumnName
    */
-  public RDatasource(@NotNull String name, OpalRSession rSession, List<File> files, TransactionTemplate txTemplate) {
-    this(name, rSession, null, null, null, null, null);
+  public RDatasource(@NotNull String name, OpalRSession rSession, List<File> files, TransactionTemplate txTemplate, String idColumnName) {
+    this(name, rSession, null, null, null, null, idColumnName);
     this.outputFiles = files;
     this.txTemplate = txTemplate;
   }
@@ -90,16 +91,16 @@ public class RDatasource extends AbstractDatasource {
    * @param categoryFile
    * @param symbol
    * @param entityType
-   * @param idColumn
+   * @param idColumnName
    */
-  public RDatasource(@NotNull String name, OpalRSession rSession, File file, File categoryFile, String symbol, String entityType, String idColumn) {
+  public RDatasource(@NotNull String name, OpalRSession rSession, File file, File categoryFile, String symbol, String entityType, String idColumnName) {
     super(name, "r");
     this.rSession = rSession;
     this.file = file;
     this.categoryFile = categoryFile;
     this.symbol = symbol;
     this.entityType = Strings.isNullOrEmpty(entityType) ? DEFAULT_ENTITY_TYPE : entityType;
-    this.idColumn = idColumn;
+    this.idColumnName = idColumnName;
     this.txTemplate = null;
   }
 
@@ -134,7 +135,7 @@ public class RDatasource extends AbstractDatasource {
 
   @Override
   protected ValueTable initialiseValueTable(String tableName) {
-    return new RValueTable(this, tableName, symbol, entityType, idColumn);
+    return new RValueTable(this, tableName, symbol, entityType, idColumnName);
   }
 
   @Override
@@ -144,7 +145,7 @@ public class RDatasource extends AbstractDatasource {
       outputFile = outputFiles.get(0);
     else
       outputFile = outputFiles.stream().filter(f -> f.getName().startsWith(tableName + ".")).findFirst().get();
-    return new RValueTableWriter(tableName, entityType, outputFile, getRSession(), txTemplate);
+    return new RValueTableWriter(tableName, entityType, outputFile, getRSession(), txTemplate, idColumnName);
   }
 
   private boolean hasCategoryFile() {
