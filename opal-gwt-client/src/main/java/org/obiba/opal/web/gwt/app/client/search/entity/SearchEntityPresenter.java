@@ -193,8 +193,10 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
             } else {
               getView().showTables(tables);
               String tableRef = selectedTable;
-              if (Strings.isNullOrEmpty(selectedTable))
+              if (Strings.isNullOrEmpty(selectedTable)) {
                 tableRef = tables.get(0).getDatasourceName() + "." + tables.get(0).getName();
+                selectedTable = tableRef;
+              }
               loadTable(tableRef);
             }
             updateHistory();
