@@ -150,17 +150,17 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
   private void initialize(RQLValueSetVariableCriterionParser criterion) {
     if (criterion.hasWildcardValue()) {
       if (criterion.isNot()) {
-        ((CheckBox) radioControls.getWidget(3)).setValue(true);
+        ((CheckBox) radioControls.getWidget(2)).setValue(true);
         valuesPanel.setVisible(false);
         divider.setVisible(true);
       }
     } else if (criterion.hasValue()) {
-      ((CheckBox) radioControls.getWidget(criterion.isNot() ? 4 : 3)).setValue(true);
+      ((CheckBox) radioControls.getWidget(criterion.isNot() ? 3 : 2)).setValue(true);
       values.setText(criterion.getValueString());
       valuesPanel.setVisible(true);
       divider.setVisible(true);
     } else if (criterion.isExists())
-      ((CheckBox) radioControls.getWidget(criterion.isNot() ? 1 : 2)).setValue(true);
+      ((CheckBox) radioControls.getWidget(criterion.isNot() ? 1 : 0)).setValue(true);
     setFilterText();
   }
 
@@ -169,11 +169,11 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
   }
 
   private boolean isInSelected() {
-    return isCheckSelected(3);
+    return isCheckSelected(2);
   }
 
   private boolean isNotInSelected() {
-    return isCheckSelected(4);
+    return isCheckSelected(3);
   }
 
   private boolean isCheckSelected(int idx) {
@@ -195,8 +195,6 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
   private void setFilterText() {
     if (isCheckSelected(1))
       updateCriterionFilter(translations.criterionFiltersMap().get("empty").toLowerCase());
-    else if (isCheckSelected(2))
-      updateCriterionFilter(translations.criterionFiltersMap().get("not_empty").toLowerCase());
     else if (isInSelected() || isNotInSelected()){
       String op = null;
       String value = null;
@@ -215,7 +213,7 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
       }
     }
     else
-    updateCriterionFilter(translations.criterionFiltersMap().get("all").toLowerCase());
+      updateCriterionFilter(translations.criterionFiltersMap().get("any").toLowerCase());
   }
 
   private void updateControls() {

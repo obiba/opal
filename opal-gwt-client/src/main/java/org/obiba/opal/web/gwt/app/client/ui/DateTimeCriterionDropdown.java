@@ -80,18 +80,18 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
   private void initialize(RQLValueSetVariableCriterionParser criterion) {
     if (criterion.hasWildcardValue()) {
       if (criterion.isNot()) {
-        ((CheckBox) radioControls.getWidget(3)).setValue(true);
+        ((CheckBox) radioControls.getWidget(2)).setValue(true);
         updateRangeValuesFields();
         divider.setVisible(true);
       }
     } else if (criterion.hasValue()) {
       if (criterion.isRange()) selectRange(criterion.getValues());
       else selectValues(criterion.getValueString());
-      ((CheckBox) radioControls.getWidget(criterion.isNot() ? 4 : 3)).setValue(true);
+      ((CheckBox) radioControls.getWidget(criterion.isNot() ? 3 : 2)).setValue(true);
       updateRangeValuesFields();
       divider.setVisible(true);
     } else if (criterion.isExists())
-      ((CheckBox) radioControls.getWidget(criterion.isNot() ? 1 : 2)).setValue(true);
+      ((CheckBox) radioControls.getWidget(criterion.isNot() ? 1 : 0)).setValue(true);
     setFilterText();
   }
 
@@ -221,7 +221,7 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
       String rangeQuery = fieldName + ":[" + (from.getValue() == null ? "*" : df.format(from.getValue())) + " TO " +
           (to.getValue() == null ? "*" : df.format(to.getValue())) + "]";
 
-      if (((CheckBox) radioControls.getWidget(4)).getValue()) {
+      if (((CheckBox) radioControls.getWidget(3)).getValue()) {
         return "NOT " + rangeQuery;
       }
       return rangeQuery;
@@ -229,7 +229,7 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
 
     // VALUES
     String valuesQuery = fieldName + ":(>=" + df.format(date.getValue()) + " AND <=" + df.format(date.getValue()) + ")";
-    if (((CheckBox) radioControls.getWidget(4)).getValue()) {
+    if (((CheckBox) radioControls.getWidget(3)).getValue()) {
       return "NOT " + valuesQuery;
     }
     return valuesQuery;
@@ -246,7 +246,7 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
       String rangeQuery = "range(" + getRQLField() + ",(" + (from.getValue() == null ? "*" : df.format(from.getValue())) + "," +
           (to.getValue() == null ? "*" : df.format(to.getValue())) + "))";
 
-      if (((CheckBox) radioControls.getWidget(4)).getValue()) {
+      if (((CheckBox) radioControls.getWidget(3)).getValue()) {
         return "not(" + rangeQuery + ")";
       }
       return rangeQuery;
@@ -254,7 +254,7 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
 
     // VALUES
     String valuesQuery = "in(" + getRQLField() + ",(" + df.format(date.getValue()) + "))";
-    if (((CheckBox) radioControls.getWidget(4)).getValue()) {
+    if (((CheckBox) radioControls.getWidget(3)).getValue()) {
       return "not(" + valuesQuery + ")";
     }
     return valuesQuery;
@@ -276,7 +276,7 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
       else if (from.getValue() != null) statement = statement + ".after('" + df.format(from.getValue()) + "')";
       else if (to.getValue() != null) statement = statement + ".before('" + df.format(to.getValue()) + "')";
 
-      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
+      if(((CheckBox) radioControls.getWidget(3)).getValue()) {
         statement = Strings.isNullOrEmpty(statement) ?
             "$('" + variable.getName() + "').isNull()" : statement + ".not()";
       }
@@ -288,7 +288,7 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
     if(rangeValueChooser.isItemSelected(1) && date.getValue() != null) {
       statement = statement + ".eq('" + df.format(date.getValue()) + "')";
 
-      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
+      if(((CheckBox) radioControls.getWidget(3)).getValue()) {
         statement = statement + ".not()";
       }
 
@@ -302,18 +302,16 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
     String filter = variable.getName() + " ";
     if (getRadioButtonValue(1))
       setText(filter + translations.criterionFiltersMap().get("empty").toLowerCase());
-    else if (getRadioButtonValue(2))
-      setText(filter + translations.criterionFiltersMap().get("not_empty").toLowerCase());
-    else if (getRadioButtonValue(3)) {
+    else if (getRadioButtonValue(2)) {
       filter += translations.criterionFiltersMap().get("in").toLowerCase();
       setText(filter + getRangeOrValueFilterText());
     }
-    else if (getRadioButtonValue(4)) {
+    else if (getRadioButtonValue(3)) {
       filter += translations.criterionFiltersMap().get("not_in").toLowerCase();
       setText(filter + getRangeOrValueFilterText());
     }
     else
-      setText(filter + translations.criterionFiltersMap().get("all").toLowerCase());
+      setText(filter + translations.criterionFiltersMap().get("any").toLowerCase());
   }
 
   private String getRangeOrValueFilterText() {

@@ -531,10 +531,10 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   }
 
   @Override
-  public void populateValues(int offset, ValueSetsDto resource) {
+  public void populateValues(int offset, int total, ValueSetsDto resource) {
     searchEntities.setVisible(criteriaPanel.getQueryStrings().size()>1);
     if(dataProvider != null) {
-      dataProvider.populateValues(offset, resource);
+      dataProvider.populateValues(offset, total, resource);
     }
   }
 
@@ -588,6 +588,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
       });
     }
     criteriaPanel.addCriterion(criterion);
+    onSearch(null);
   }
 
   @Override
@@ -797,12 +798,13 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
 
     @Override
-    public void populateValues(int offset, ValueSetsDto valueSets) {
+    public void populateValues(int offset, int total, ValueSetsDto valueSets) {
       setRefreshing(false);
 
       listValueSetVariable = JsArrays.toList(valueSets.getVariablesArray());
       updateRowData(offset, JsArrays.toList(valueSets.getValueSetsArray()));
 
+      valuesTable.setRowCount(total);
       valuesTable.setVisibleRange(offset, getPageSize());
     }
   }

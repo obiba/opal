@@ -181,7 +181,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
           @Override
           public void onResource(Response response, ValueSetsResultDto resource) {
             // TODO make one call only
-            getView().populateValues(offset, resource.getValueSets());
+            getView().populateValues(offset, resource.getTotalHits(), resource.getValueSets());
           }
         })//
         .withCallback(new ResponseCodeCallback() {
@@ -276,7 +276,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
           //applyAllValueSetsFilter(offset);
           //onSearchValueSets(Lists.newArrayList(), 0, getView().getPageSize());
         } else {
-          getView().populateValues(offset, resource == null ? ValueSetsDto.create() : resource);
+          getView().populateValues(offset, resource == null ? 0 : originalTable.getValueSetCount(), resource == null ? ValueSetsDto.create() : resource);
         }
       }
     }
@@ -503,7 +503,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     TextBoxClearable getFilter();
 
-    void populateValues(int offset, ValueSetsDto resource);
+    void populateValues(int offset, int total, ValueSetsDto resource);
 
     void addCategoricalCriterion(RQLValueSetVariableCriterionParser criterion, QueryResultDto facet);
 
@@ -528,7 +528,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
 
   public interface ValueSetsProvider {
-    void populateValues(int offset, ValueSetsDto valueSets);
+    void populateValues(int offset, int total, ValueSetsDto valueSets);
   }
 
   public interface EntitySelectionHandler {

@@ -95,7 +95,7 @@ public class CriterionPanel extends FlowPanel {
   }
 
   public boolean isAll() {
-    return criterion.isAll();
+    return criterion.isAny();
   }
 }
 

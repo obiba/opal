@@ -62,7 +62,7 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
 
   private void initialize() {
     initializeHeader();
-    updateCriterionFilter(translations.criterionFiltersMap().get("all").toLowerCase());
+    updateCriterionFilter(translations.criterionFiltersMap().get("any").toLowerCase());
     initializeRadioControls(getNoEmptyCount());
     Widget specificControls = createSpecificControls();
     if(specificControls != null) {
@@ -123,18 +123,10 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
 
   protected String getMagmaJsStatement() {
     String statement = "$('" + variable.getName() + "')";
-    if(getRadioButtonValue(1)) {
-      // Empty
-      return statement + ".isNull()";
-    }
-    if(getRadioButtonValue(2)) {
-      // Not empty
-      return statement + ".isNull().not()";
-    }
-    if(getRadioButtonValue(0)) {
-      // All: No filter is necessary
-      return "";
-    }
+    // Any
+    if(getRadioButtonValue(0)) return statement + ".isNull().not()";
+    // Empty
+    if(getRadioButtonValue(1)) return statement + ".isNull()";
     return "";
   }
 
@@ -180,16 +172,13 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
   }
 
   private void initializeRadioControls(int noEmpty) {
-    // All, Empty, Not Empty radio buttons
-    RadioButton radioAll = createRadioButtonResetSpecific(translations.criterionFiltersMap().get("all"),
-        queryResult == null ? null : queryResult.getTotalHits());
-    radioAll.setValue(true);
-    radioControls.add(radioAll);
-
+    // Any, Empty radio buttons
+    RadioButton radioAny = createRadioButtonResetSpecific(translations.criterionFiltersMap().get("any"),
+        queryResult == null ? null : noEmpty);
+    radioAny.setValue(true);
+    radioControls.add(radioAny);
     radioControls.add(createRadioButtonResetSpecific(translations.criterionFiltersMap().get("empty"),
         queryResult == null ? null : queryResult.getTotalHits() - noEmpty));
-    radioControls.add(createRadioButtonResetSpecific(translations.criterionFiltersMap().get("not_empty"),
-        queryResult == null ? null : noEmpty));
     add(radioControls);
   }
 
