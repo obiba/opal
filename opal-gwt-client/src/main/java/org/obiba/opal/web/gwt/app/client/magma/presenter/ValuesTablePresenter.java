@@ -108,8 +108,10 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
               .revealPlace(ProjectPlacesHelper.getVariablePlace(table.getDatasourceName(), table.getName(), value));
         }
       });
-    } else if (table.hasValueSetCount())
+    } else if (table.hasValueSetCount()) {
+      originalTable = table;
       getView().setTable(table);
+    }
   }
 
   /**
@@ -272,12 +274,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     @Override
     public void onResource(Response response, ValueSetsDto resource) {
       if (link.equals(originalTable.getLink())) {
-        if (isIndexed) {
-          //applyAllValueSetsFilter(offset);
-          //onSearchValueSets(Lists.newArrayList(), 0, getView().getPageSize());
-        } else {
-          getView().populateValues(offset, resource == null ? 0 : originalTable.getValueSetCount(), resource == null ? ValueSetsDto.create() : resource);
-        }
+        getView().populateValues(offset, resource == null ? 0 : originalTable.getValueSetCount(), resource == null ? ValueSetsDto.create() : resource);
       }
     }
   }
