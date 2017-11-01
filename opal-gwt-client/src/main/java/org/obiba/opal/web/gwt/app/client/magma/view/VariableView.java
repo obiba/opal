@@ -581,6 +581,10 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
       taxonomyAttributesPanel = new TaxonomyAttributesPanel(attributesArray, taxonomies);
       annotationPanel.add(taxonomyAttributesPanel);
       searchSimilar.setVisible(!taxonomyAttributesPanel.getTaxonomyAttributes().isEmpty());
+      if (taxonomyAttributesPanel.getTaxonomyAttributes().isEmpty())
+        editAnnotation.addStyleName("xxlarge-bottom-margin");
+      else
+        editAnnotation.removeStyleName("xxlarge-bottom-margin");
 
       for (String namespace : namespaces) {
         NamespacedAttributesTable child = new NamespacedAttributesTable(attributesArray, namespace, translationMessages);

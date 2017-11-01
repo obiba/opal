@@ -165,7 +165,7 @@
             <b:Heading size="5">
               <ui:msg description="Annotations label">Annotations</ui:msg>
             </b:Heading>
-            <b:DropdownButton type="INFO" icon="PENCIL" ui:field="editAnnotation" addStyleNames="right-indent">
+            <b:DropdownButton type="INFO" icon="PENCIL" ui:field="editAnnotation" addStyleNames="right-indent xxlarge-bottom-margin">
               <b:NavLink icon="TAG" ui:field="applyAnnotation">
                 <ui:msg description="Apply Annotation button label">Apply annotation...</ui:msg>
               </b:NavLink>
@@ -180,7 +180,7 @@
             <g:SimplePanel ui:field="annotationPanel"/>
           </b:Tab>
           <b:Tab heading="Raw">
-            <b:Button type="INFO" icon="PLUS" ui:field="addAttribute">
+            <b:Button type="INFO" icon="PLUS" ui:field="addAttribute" addStyleNames="bottom-margin">
               <ui:msg description="Add Attribute label">Add Attribute</ui:msg>
             </b:Button>
             <g:FlowPanel ui:field="attributesPanel" addStyleNames="xxlarge-bottom-margin"/>
