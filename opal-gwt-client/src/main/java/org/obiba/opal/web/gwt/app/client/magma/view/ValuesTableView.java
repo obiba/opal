@@ -9,12 +9,35 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
-import java.util.AbstractList;
-import java.util.List;
-
+import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.Typeahead;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.gwt.cell.client.*;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.*;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.text.shared.SafeHtmlRenderer;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.Header;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.*;
+import com.google.gwt.view.client.AbstractDataProvider;
+import com.google.gwt.view.client.HasData;
+import com.google.gwt.view.client.Range;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.ValuesQueryEvent;
@@ -31,40 +54,10 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
-
-import com.github.gwtbootstrap.client.ui.ControlGroup;
-import com.github.gwtbootstrap.client.ui.TextBox;
-import com.github.gwtbootstrap.client.ui.Typeahead;
-import com.github.gwtbootstrap.client.ui.constants.IconType;
-import com.google.gwt.cell.client.AbstractCell;
-import com.google.gwt.cell.client.AbstractSafeHtmlCell;
-import com.google.gwt.cell.client.ClickableTextCell;
-import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.cell.client.TextCell;
-import com.google.gwt.cell.client.ValueUpdater;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.dom.client.NativeEvent;
-import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.text.shared.SafeHtmlRenderer;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.Header;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.Timer;
-import com.google.gwt.view.client.AbstractDataProvider;
-import com.google.gwt.view.client.HasData;
-import com.google.gwt.view.client.Range;
-import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
+
+import java.util.AbstractList;
+import java.util.List;
 
 @SuppressWarnings("OverlyCoupledClass")
 public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> implements ValuesTablePresenter.Display {
@@ -76,7 +69,8 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   private int page = DEFAULT_PAGE_SIZE;
 
   @UiTemplate("ValuesTableView.ui.xml")
-  interface ValuesTableViewUiBinder extends UiBinder<Widget, ValuesTableView> {}
+  interface ValuesTableViewUiBinder extends UiBinder<Widget, ValuesTableView> {
+  }
 
   private static final ValuesTableViewUiBinder uiBinder = GWT.create(ValuesTableViewUiBinder.class);
 
@@ -213,13 +207,13 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
   @UiHandler("searchButton")
   public void onSearch(ClickEvent event) {
-    onSearch( 0, getPageSize());
+    onSearch(0, getPageSize());
   }
 
 
   @UiHandler("clearButton")
   public void onClear(ClickEvent event) {
-    while (criteriaPanel.getCriterions().size()>1) {
+    while (criteriaPanel.getCriterions().size() > 1) {
       criteriaPanel.remove(1);
     }
     onSearch(null);
@@ -237,7 +231,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     searchBox.addKeyDownHandler(new KeyDownHandler() {
       @Override
       public void onKeyDown(KeyDownEvent event) {
-        if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
           handler.onSearch(searchBox.getText());
         }
       }
@@ -264,7 +258,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     valuesTable.setRowCount(table.getValueSetCount());
     valuesTable.setPageStart(0);
 
-    if(dataProvider != null) {
+    if (dataProvider != null) {
       dataProvider.removeDataDisplay(valuesTable);
       dataProvider = null;
     }
@@ -303,7 +297,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     viewMode = mode;
     searchPanel.setVisible(viewMode == ValuesTablePresenter.ViewMode.DETAILED_MODE);
 
-    if(listVariable != null && !listVariable.isEmpty()) {
+    if (listVariable != null && !listVariable.isEmpty()) {
       setTable(table);
       setVariables(listVariable);
     }
@@ -333,7 +327,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   static class VariableHeaderHtmlRenderer implements SafeHtmlRenderer<String> {
     @Override
     public SafeHtml render(String object) {
-      if(object == null) return SafeHtmlUtils.EMPTY_SAFE_HTML;
+      if (object == null) return SafeHtmlUtils.EMPTY_SAFE_HTML;
 
       return new SafeHtmlBuilder().appendHtmlConstant("<a>").appendEscaped(object).appendHtmlConstant("</a>")
           .toSafeHtml();
@@ -366,7 +360,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   }
 
   private AbstractSafeHtmlCell<String> createColumnHeaderCell() {
-    if(viewMode == ValuesTablePresenter.ViewMode.SIMPLE_MODE) {
+    if (viewMode == ValuesTablePresenter.ViewMode.SIMPLE_MODE) {
       return new TextCell();
     }
 
@@ -385,7 +379,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
         return listValueSetVariable.indexOf(variable.getName());
       }
     };
-    if(variableValueSelectionHandler == null) {
+    if (variableValueSelectionHandler == null) {
       variableValueSelectionHandler = new VariableValueSelectionHandler();
     }
     col.setValueSelectionHandler(variableValueSelectionHandler);
@@ -399,7 +393,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
     insertColumns(variables);
 
-    if(listVariable.size() == 1 && table.getVariableCount() != 1 && filter.getTextBox().getText().isEmpty()) {
+    if (listVariable.size() == 1 && table.getVariableCount() != 1 && filter.getTextBox().getText().isEmpty()) {
       lastFilter = escape(listVariable.get(0).getName());
       filter.getTextBox().setValue(lastFilter, false);
       isExactMatch = true;
@@ -421,18 +415,18 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   private void insertColumns(List<VariableDto> variables) {
     listVariable = variables;
     int visible = listVariable.size() < getMaxVisibleColumns() ? listVariable.size() : getMaxVisibleColumns();
-    for(int i = 0; i < visible; i++) {
+    for (int i = 0; i < visible; i++) {
       valuesTable.addColumn(createColumn(getVariableAt(i)), getColumnHeader(i));
     }
 
-    if(listVariable.size() > getMaxVisibleColumns()) {
+    if (listVariable.size() > getMaxVisibleColumns()) {
       valuesTable.insertColumn(1, createEmptyColumn(), createHeader(new PreviousActionCell()));
       valuesTable.insertColumn(valuesTable.getColumnCount(), createEmptyColumn(), createHeader(new NextActionCell()));
     }
   }
 
   private void initValuesTable() {
-    while(valuesTable.getColumnCount() > 0) {
+    while (valuesTable.getColumnCount() > 0) {
       valuesTable.removeColumn(0);
     }
     firstVisibleIndex = 0;
@@ -456,7 +450,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
     };
 
-    if(entitySelectionHandler == null) {
+    if (entitySelectionHandler == null) {
       entitySelectionHandler = new EntitySelectionHandlerImpl();
     }
 
@@ -510,11 +504,11 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
   @Override
   public void setFilterText(String text) {
-    if(text != null && !text.isEmpty()) {
+    if (text != null && !text.isEmpty()) {
       filter.setText(text);
 
       getUiHandlers().updateVariables(text);
-      if(!text.isEmpty()) {
+      if (!text.isEmpty()) {
         addPanel.setOpen(true);
       }
     }
@@ -532,8 +526,8 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
   @Override
   public void populateValues(int offset, int total, ValueSetsDto resource) {
-    searchEntities.setVisible(criteriaPanel.getQueryStrings().size()>1);
-    if(dataProvider != null) {
+    searchEntities.setVisible(criteriaPanel.getQueryStrings().size() > 0);
+    if (dataProvider != null) {
       dataProvider.populateValues(offset, total, resource);
     }
   }
@@ -646,10 +640,10 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
     @Override
     public void executeClick(NativeEvent event, String value) {
-      if(timer != null) {
+      if (timer != null) {
         timer.cancel();
       }
-      if(navigationPopup.isShowing()) return;
+      if (navigationPopup.isShowing()) return;
 
       navigate(1);
       refreshRows();
@@ -712,11 +706,11 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     protected MenuBar createMenuBar() {
       MenuBar menuBar = new MenuBar(true);
       int currentIdx = firstVisibleIndex + getMaxVisibleColumns();
-      for(int i = currentIdx; i < Math.min(currentIdx + MAX_NUMBER_OF_ITEMS, listVariable.size()); i++) {
+      for (int i = currentIdx; i < Math.min(currentIdx + MAX_NUMBER_OF_ITEMS, listVariable.size()); i++) {
         int increment = i - currentIdx + 1;
         menuBar.addItem(new MenuItem(getColumnLabel(i), createCommand(increment)));
       }
-      if(Math.min(currentIdx + MAX_NUMBER_OF_ITEMS, listVariable.size()) < listVariable.size()) {
+      if (Math.min(currentIdx + MAX_NUMBER_OF_ITEMS, listVariable.size()) < listVariable.size()) {
         MenuItem more = new MenuItem("...", (Command) null);
         more.setEnabled(false);
         menuBar.addItem(more);
@@ -726,7 +720,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
     @Override
     protected void navigate(int steps) {
-      for(int i = 0; i < steps; i++) {
+      for (int i = 0; i < steps; i++) {
         valuesTable.removeColumn(2);
         int idx = firstVisibleIndex++ + getMaxVisibleColumns();
         valuesTable
@@ -750,11 +744,11 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     protected MenuBar createMenuBar() {
       MenuBar menuBar = new MenuBar(true);
       int currentIdx = firstVisibleIndex;
-      for(int i = currentIdx - 1; i >= Math.max(currentIdx - MAX_NUMBER_OF_ITEMS, 0); i--) {
+      for (int i = currentIdx - 1; i >= Math.max(currentIdx - MAX_NUMBER_OF_ITEMS, 0); i--) {
         int decrement = currentIdx - i;
         menuBar.addItem(new MenuItem(getColumnLabel(i), createCommand(decrement)));
       }
-      if(Math.max(currentIdx - MAX_NUMBER_OF_ITEMS, 0) > 0) {
+      if (Math.max(currentIdx - MAX_NUMBER_OF_ITEMS, 0) > 0) {
         MenuItem more = new MenuItem("...", (Command) null);
         more.setEnabled(false);
         menuBar.addItem(more);
@@ -764,7 +758,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
     @Override
     protected void navigate(int steps) {
-      for(int i = 0; i < steps; i++) {
+      for (int i = 0; i < steps; i++) {
         valuesTable.removeColumn(valuesTable.getColumnCount() - 2);
         int idx = --firstVisibleIndex;
         valuesTable.insertColumn(2, createColumn(getVariableAt(idx)), getColumnHeader(idx));
@@ -790,7 +784,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
       String filterText = filter.getText();
       if (searchPanel.isVisible())
         onSearch(range.getStart(), range.getLength());
-      else if(filterText.isEmpty())
+      else if (filterText.isEmpty())
         getUiHandlers().onRequestValueSets(visibleListVariable, range.getStart(), range.getLength());
       else
         getUiHandlers().onRequestValueSets(filterText, range.getStart(), range.getLength(), exactMatch);
@@ -817,13 +811,13 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
     @Override
     public void onGeoValueSelection(VariableDto variable, int row, int column, ValueSetDto valueSet,
-        ValueSetsDto.ValueDto value) {
+                                    ValueSetsDto.ValueDto value) {
       getUiHandlers().requestGeoValue(variable, valueSet.getIdentifier(), value);
     }
 
     @Override
     public void onEntityIDSelection(VariableDto variableDto, int row, int column, ValueSetDto valueSet,
-        ValueSetsDto.ValueDto value) {
+                                    ValueSetsDto.ValueDto value) {
       entitySelectionHandler.onEntitySelection(variableDto.getReferencedEntityType(), value.getValue());
     }
 
@@ -845,25 +839,25 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
     @Override
     public void onKeyUp(KeyUpEvent event) {
-      if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER || filter.getTextBox().getText().isEmpty()) {
+      if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER || filter.getTextBox().getText().isEmpty()) {
 
         int page = DEFAULT_PAGE_SIZE;
         int columns = DEFAULT_MAX_VISIBLE_COLUMNS;
 
-        if(!pageSize.getText().isEmpty()) {
+        if (!pageSize.getText().isEmpty()) {
           page = pageSize.getNumberValue().intValue();
         }
-        if(!visibleColumns.getText().isEmpty()) {
+        if (!visibleColumns.getText().isEmpty()) {
           columns = visibleColumns.getNumberValue().intValue();
         }
 
-        if(!lastFilter.equals(filter.getTextBox().getText()) || maxVisibleColumns != columns) {
+        if (!lastFilter.equals(filter.getTextBox().getText()) || maxVisibleColumns != columns) {
           // variables list has changed so update all
           lastFilter = filter.getTextBox().getText();
           maxVisibleColumns = columns;
           setRefreshing(true);
           getUiHandlers().updateVariables(filter.getTextBox().getText());
-        } else if(valuesTable.getPageSize() != page) {
+        } else if (valuesTable.getPageSize() != page) {
           // page size only has changed
           setRefreshing(true);
           valuesTable.setPageSize(page);
@@ -877,25 +871,25 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
     @Override
     public void onKeyUp(KeyUpEvent event) {
-      if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+      if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
 
         int columns = DEFAULT_MAX_VISIBLE_COLUMNS;
 
-        if(!pageSize.getText().isEmpty()) {
+        if (!pageSize.getText().isEmpty()) {
           page = pageSize.getNumberValue().intValue();
         }
-        if(!visibleColumns.getText().isEmpty()) {
+        if (!visibleColumns.getText().isEmpty()) {
           columns = visibleColumns.getNumberValue().intValue();
         }
 
-        if(!lastFilter.equals(filter.getTextBox().getText()) || maxVisibleColumns != columns) {
+        if (!lastFilter.equals(filter.getTextBox().getText()) || maxVisibleColumns != columns) {
           // variables list has changed so update all
           lastFilter = filter.getTextBox().getText();
           maxVisibleColumns = columns;
           setRefreshing(true);
           valuesTable.setPageSize(page);
           getUiHandlers().updateVariables(filter.getTextBox().getText());
-        } else if(valuesTable.getPageSize() != page) {
+        } else if (valuesTable.getPageSize() != page) {
           // page size only has changed
           setRefreshing(true);
           valuesTable.setPageSize(page);

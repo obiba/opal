@@ -23,7 +23,6 @@ import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
@@ -35,16 +34,16 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
 
   protected final VariableDto variable;
 
-  protected final QueryResultDto queryResult;
+  protected final QueryResultDto facetDto;
 
   protected ListItem divider;
 
-  ValueSetCriterionDropdown(String datasource, String table, VariableDto variableDto, String fieldName, @Nullable QueryResultDto termDto) {
+  ValueSetCriterionDropdown(String datasource, String table, VariableDto variableDto, String fieldName, @Nullable QueryResultDto facetDto) {
     super(fieldName);
     this.datasource = datasource;
     this.table = table;
     variable = variableDto;
-    queryResult = termDto;
+    this.facetDto = facetDto;
     initialize();
   }
 
@@ -65,7 +64,7 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
     updateCriterionFilter(translations.criterionFiltersMap().get("all").toLowerCase());
     initializeRadioControls(getNoEmptyCount());
     Widget specificControls = createSpecificControls();
-    if(specificControls != null) {
+    if (specificControls != null) {
       divider = new ListItem();
       divider.addStyleName("divider");
       divider.setVisible(false);
@@ -123,15 +122,15 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
 
   protected String getMagmaJsStatement() {
     String statement = "$('" + variable.getName() + "')";
-    if(getRadioButtonValue(1)) {
+    if (getRadioButtonValue(1)) {
       // Empty
       return statement + ".isNull()";
     }
-    if(getRadioButtonValue(2)) {
+    if (getRadioButtonValue(2)) {
       // Not empty
       return statement + ".isNull().not()";
     }
-    if(getRadioButtonValue(0)) {
+    if (getRadioButtonValue(0)) {
       // All: No filter is necessary
       return "";
     }
@@ -162,18 +161,15 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
 
   private int getNoEmptyCount() {
     int nb = 0;
-    if(queryResult != null) {
+    if (facetDto == null || facetDto.getFacetsArray().length() == 0) return nb;
 
-      if(queryResult.getFacetsArray().length() > 0) {
-        if(queryResult.getFacetsArray().get(0).hasStatistics()) {
-          // Statistics facet
-          nb += queryResult.getFacetsArray().get(0).getStatistics().getCount();
-        } else if (queryResult.getFacetsArray().get(0).getFrequenciesArray() != null) {
-          // Categories frequency facet
-          for(int i = 0; i < queryResult.getFacetsArray().get(0).getFrequenciesArray().length(); i++) {
-            nb += queryResult.getFacetsArray().get(0).getFrequenciesArray().get(i).getCount();
-          }
-        }
+    if (facetDto.getFacetsArray().get(0).hasStatistics()) {
+      // Statistics facet
+      nb += facetDto.getFacetsArray().get(0).getStatistics().getCount();
+    } else if (facetDto.getFacetsArray().get(0).getFrequenciesArray() != null) {
+      // Categories frequency facet
+      for (int i = 0; i < facetDto.getFacetsArray().get(0).getFrequenciesArray().length(); i++) {
+        nb += facetDto.getFacetsArray().get(0).getFrequenciesArray().get(i).getCount();
       }
     }
     return nb;
@@ -182,14 +178,14 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
   private void initializeRadioControls(int noEmpty) {
     // All, Empty, Not Empty radio buttons
     RadioButton radioAll = createRadioButtonResetSpecific(translations.criterionFiltersMap().get("all"),
-        queryResult == null ? null : queryResult.getTotalHits());
+        facetDto == null || variable.getIsRepeatable() ? null : facetDto.getTotalHits());
     radioAll.setValue(true);
     radioControls.add(radioAll);
 
     radioControls.add(createRadioButtonResetSpecific(translations.criterionFiltersMap().get("empty"),
-        queryResult == null ? null : queryResult.getTotalHits() - noEmpty));
+        facetDto == null || variable.getIsRepeatable() ? null : facetDto.getTotalHits() - noEmpty));
     radioControls.add(createRadioButtonResetSpecific(translations.criterionFiltersMap().get("not_empty"),
-        queryResult == null ? null : noEmpty));
+        facetDto == null || variable.getIsRepeatable() ? null : noEmpty));
     add(radioControls);
   }
 

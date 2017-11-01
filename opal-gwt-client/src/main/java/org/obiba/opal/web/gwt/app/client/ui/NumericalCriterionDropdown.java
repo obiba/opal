@@ -10,18 +10,11 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import com.github.gwtbootstrap.client.ui.*;
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.search.QueryResultDto;
-
-import com.github.gwtbootstrap.client.ui.CheckBox;
-import com.github.gwtbootstrap.client.ui.ControlGroup;
-import com.github.gwtbootstrap.client.ui.ControlLabel;
-import com.github.gwtbootstrap.client.ui.RadioButton;
-import com.github.gwtbootstrap.client.ui.TextBox;
-import com.google.common.base.Joiner;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
@@ -29,6 +22,8 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
+import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import java.util.List;
 
@@ -48,12 +43,12 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
 
   private TextBox values;
 
-  public NumericalCriterionDropdown(String datasource, String table, VariableDto variableDto, String fieldName, QueryResultDto termDto) {
-    super(datasource, table, variableDto, fieldName, termDto);
+  public NumericalCriterionDropdown(String datasource, String table, VariableDto variableDto, String fieldName, QueryResultDto facetDto) {
+    super(datasource, table, variableDto, fieldName, facetDto);
   }
 
-  public NumericalCriterionDropdown(RQLValueSetVariableCriterionParser criterion, QueryResultDto termDto) {
-    this(criterion.getDatasourceName(), criterion.getTableName(), criterion.getVariable(), criterion.getField(), termDto);
+  public NumericalCriterionDropdown(RQLValueSetVariableCriterionParser criterion, QueryResultDto facetDto) {
+    this(criterion.getDatasourceName(), criterion.getTableName(), criterion.getVariable(), criterion.getField(), facetDto);
     initialize(criterion);
   }
 
@@ -91,23 +86,21 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
         updateRangeValuesFields();
         divider.setVisible(true);
       }
-    }
-    else if (criterion.hasValue()) {
+    } else if (criterion.hasValue()) {
       if (criterion.isRange()) selectRange(criterion.getValues());
       else selectValues(criterion.getValueString());
-      ((CheckBox)radioControls.getWidget(criterion.isNot() ? 4 : 3)).setValue(true);
+      ((CheckBox) radioControls.getWidget(criterion.isNot() ? 4 : 3)).setValue(true);
       updateRangeValuesFields();
       divider.setVisible(true);
-    }
-    else if (criterion.isExists())
-      ((CheckBox)radioControls.getWidget(criterion.isNot() ? 1 : 2)).setValue(true);
+    } else if (criterion.isExists())
+      ((CheckBox) radioControls.getWidget(criterion.isNot() ? 1 : 2)).setValue(true);
     setFilterText();
   }
 
   private void selectRange(List<String> values) {
     rangeValueChooser.setSelectedIndex(0);
     if (!values.isEmpty() && !"*".equals(values.get(0))) min.setText(values.get(0));
-    if (values.size()>1 && !"*".equals(values.get(1))) max.setText(values.get(1));
+    if (values.size() > 1 && !"*".equals(values.get(1))) max.setText(values.get(1));
   }
 
   private void selectValues(String valueString) {
@@ -188,11 +181,11 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
     FlowPanel panel = new FlowPanel();
 
     // TODO: Round digit
-    min.setPlaceholder(">= " + queryResult.getFacetsArray().get(0).getStatistics().getMin());
+    min.setPlaceholder(">= " + facetDto.getFacetsArray().get(0).getStatistics().getMin());
     min.setWidth("100px");
 
     // TODO: Round digit
-    max.setPlaceholder("<= " + queryResult.getFacetsArray().get(0).getStatistics().getMax());
+    max.setPlaceholder("<= " + facetDto.getFacetsArray().get(0).getStatistics().getMax());
     max.setWidth("100px");
 
     panel.add(createControlGroup(minLabel, min));
@@ -233,14 +226,14 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
   @Override
   public String getQueryString() {
     String emptyNotEmpty = super.getQueryString();
-    if(emptyNotEmpty != null) return emptyNotEmpty;
+    if (emptyNotEmpty != null) return emptyNotEmpty;
 
     // RANGE
-    if(rangeValueChooser.isItemSelected(0)) {
+    if (rangeValueChooser.isItemSelected(0)) {
       String rangeQuery = fieldName + ":[" + (min.getText().isEmpty() ? "*" : min.getText()) + " TO " +
           (max.getText().isEmpty() ? "*" : max.getText()) + "]";
 
-      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
+      if (((CheckBox) radioControls.getWidget(4)).getValue()) {
         return "NOT " + rangeQuery;
       }
 
@@ -248,12 +241,12 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
     }
 
     // VALUES
-    if(rangeValueChooser.isItemSelected(1) && !values.getText().isEmpty()) {
+    if (rangeValueChooser.isItemSelected(1) && !values.getText().isEmpty()) {
       // Parse numbers
       String[] numbers = values.getText().trim().split(",");
       String valuesQuery = fieldName + ":(" + Joiner.on(" OR ").join(numbers) + ")";
 
-      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
+      if (((CheckBox) radioControls.getWidget(4)).getValue()) {
         return "NOT " + valuesQuery;
       }
 
@@ -266,15 +259,15 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
   @Override
   public String getRQLQueryString() {
     String emptyNotEmpty = super.getRQLQueryString();
-    if(emptyNotEmpty != null) return emptyNotEmpty;
+    if (emptyNotEmpty != null) return emptyNotEmpty;
 
     String rqlField = getRQLField();
     // RANGE
-    if(rangeValueChooser.isItemSelected(0)) {
+    if (rangeValueChooser.isItemSelected(0)) {
       String rangeQuery = "range(" + rqlField + ",(" + (min.getText().isEmpty() ? "*" : min.getText()) + "," +
           (max.getText().isEmpty() ? "*" : max.getText()) + "))";
 
-      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
+      if (((CheckBox) radioControls.getWidget(4)).getValue()) {
         return "not(" + rangeQuery + ")";
       }
 
@@ -282,7 +275,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
     }
 
     // VALUES
-    if(rangeValueChooser.isItemSelected(1) && !values.getText().isEmpty()) {
+    if (rangeValueChooser.isItemSelected(1) && !values.getText().isEmpty()) {
       // Parse numbers
       List<String> numbers = Lists.newArrayList();
       for (String nb : values.getText().trim().split("\\s+")) {
@@ -290,7 +283,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
       }
       String valuesQuery = "in(" + rqlField + ",(" + Joiner.on(",").join(numbers) + "))";
 
-      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
+      if (((CheckBox) radioControls.getWidget(4)).getValue()) {
         return "not(" + valuesQuery + ")";
       }
 
@@ -308,7 +301,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
 
     statement = "$('" + variable.getName() + "')";
     // RANGE
-    if(rangeValueChooser.isItemSelected(0)) {
+    if (rangeValueChooser.isItemSelected(0)) {
       if (min.getText().isEmpty() && max.getText().isEmpty()) {
         statement = "";
       }
@@ -317,7 +310,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
       else if (!min.getText().isEmpty()) statement = statement + ".ge(" + min.getText() + ")";
       else if (!max.getText().isEmpty()) statement = statement + ".le(" + max.getText() + ")";
 
-      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
+      if (((CheckBox) radioControls.getWidget(4)).getValue()) {
         statement = Strings.isNullOrEmpty(statement) ?
             "$('" + variable.getName() + "').isNull()" : statement + ".not()";
       }
@@ -326,7 +319,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
     }
 
     // VALUES
-    if(rangeValueChooser.isItemSelected(1) && !values.getText().isEmpty()) {
+    if (rangeValueChooser.isItemSelected(1) && !values.getText().isEmpty()) {
       // Parse numbers
       List<String> numbers = Lists.newArrayList();
       for (String nb : values.getText().trim().split("\\s+")) {
@@ -335,7 +328,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
       }
       statement = statement + ".any(" + Joiner.on(",").join(numbers) + ")";
 
-      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
+      if (((CheckBox) radioControls.getWidget(4)).getValue()) {
         statement = statement + ".not()";
       }
 
@@ -359,12 +352,10 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
     else if (getRadioButtonValue(3)) {
       filter += translations.criterionFiltersMap().get("in").toLowerCase();
       setText(filter + getRangeOrValueFilterText());
-    }
-    else if (getRadioButtonValue(4)) {
+    } else if (getRadioButtonValue(4)) {
       filter += translations.criterionFiltersMap().get("not_in").toLowerCase();
       setText(filter + getRangeOrValueFilterText());
-    }
-    else
+    } else
       setText(filter + translations.criterionFiltersMap().get("all").toLowerCase());
   }
 

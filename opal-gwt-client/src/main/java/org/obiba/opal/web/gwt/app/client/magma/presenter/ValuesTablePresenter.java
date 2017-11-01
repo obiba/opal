@@ -51,7 +51,6 @@ import org.obiba.opal.web.model.client.search.VariableItemDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.google.gwt.http.client.Response.*;
@@ -563,9 +562,10 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
                   else getView().addCategoricalCriterion(criterion, resource);
                 }
               }).get().send();
-
-        } else if (nature == TEMPORAL) getView().addDateCriterion(criterion);
-        else getView().addDefaultCriterion(criterion);
+        } else if (nature == TEMPORAL)
+          getView().addDateCriterion(criterion);
+        else
+          getView().addDefaultCriterion(criterion);
       }
     }
   }

@@ -20,7 +20,10 @@ import com.google.common.collect.Lists;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.ComplexPanel;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.Widget;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
@@ -36,12 +39,12 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
 
   private List<CheckBox> categoryChecks;
 
-  public CategoricalCriterionDropdown(String datasource, String table, VariableDto variableDto, String fieldName, QueryResultDto termDto) {
-    super(datasource, table, variableDto, fieldName, termDto);
+  public CategoricalCriterionDropdown(String datasource, String table, VariableDto variableDto, String fieldName, QueryResultDto facetDto) {
+    super(datasource, table, variableDto, fieldName, facetDto);
   }
 
-  public CategoricalCriterionDropdown(RQLValueSetVariableCriterionParser criterion, QueryResultDto termDto) {
-    this(criterion.getDatasourceName(), criterion.getTableName(), criterion.getVariable(), criterion.getField(), termDto);
+  public CategoricalCriterionDropdown(RQLValueSetVariableCriterionParser criterion, QueryResultDto facetDto) {
+    this(criterion.getDatasourceName(), criterion.getTableName(), criterion.getVariable(), criterion.getField(), facetDto);
     initialize(criterion);
   }
 
@@ -59,7 +62,7 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
     specificControls = new ListItem();
     specificControls.addStyleName("controls");
     ComplexPanel checksPanel;
-    if (variable.getCategoriesArray() != null && variable.getCategoriesArray().length()>10) {
+    if (variable.getCategoriesArray() != null && variable.getCategoriesArray().length() > 10) {
       ScrollPanel scrollPanel = new ScrollPanel();
       scrollPanel.setHeight("200px");
       specificControls.add(scrollPanel);
@@ -72,8 +75,7 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
     if (isBooleanVariable()) {
       appendCategoryCheck(checksPanel, "T", translations.trueLabel(), "", getCategoryFrequency("1"));
       appendCategoryCheck(checksPanel, "F", translations.falseLabel(), "", getCategoryFrequency("0"));
-    }
-    else
+    } else
       for (CategoryDto cat : JsArrays.toIterable(variable.getCategoriesArray()))
         appendCategoryCheck(checksPanel, cat);
 
@@ -93,7 +95,7 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
   @Override
   public String getQueryString() {
     String emptyNotEmpty = super.getQueryString();
-    if(emptyNotEmpty != null) return emptyNotEmpty;
+    if (emptyNotEmpty != null) return emptyNotEmpty;
 
     List<String> selected = Lists.newArrayList();
     for (String sel : getSelectedCategories()) {
@@ -101,14 +103,14 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
     }
 
     // in
-    if(((CheckBox) radioControls.getWidget(3)).getValue()) {
+    if (((CheckBox) radioControls.getWidget(3)).getValue()) {
       if (selected.isEmpty()) return "NOT " + fieldName + ":*";
       if (selected.size() == 1) return fieldName + ":" + selected.get(0);
       return fieldName + ":(\"" + Joiner.on("\" OR \"").join(selected) + "\")";
     }
 
     // not in
-    if(((CheckBox) radioControls.getWidget(4)).getValue()) {
+    if (((CheckBox) radioControls.getWidget(4)).getValue()) {
       if (selected.isEmpty()) return fieldName + ":*";
       if (selected.size() == 1) return "NOT " + fieldName + ":" + selected.get(0);
       return "NOT " + fieldName + ":(\"" + Joiner.on("\" OR \"").join(selected) + "\")";
@@ -120,7 +122,7 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
   @Override
   public String getRQLQueryString() {
     String emptyNotEmpty = super.getRQLQueryString();
-    if(emptyNotEmpty != null) return emptyNotEmpty;
+    if (emptyNotEmpty != null) return emptyNotEmpty;
 
     List<String> selected = Lists.newArrayList();
     for (String sel : getSelectedCategories()) {
@@ -129,13 +131,13 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
 
     String rqlField = getRQLField();
     // in
-    if(((CheckBox) radioControls.getWidget(3)).getValue()) {
+    if (((CheckBox) radioControls.getWidget(3)).getValue()) {
       if (selected.isEmpty()) return "not(in(" + rqlField + ",*))";
       return "in(" + rqlField + ",(" + Joiner.on(",").join(selected) + "))";
     }
 
     // not in
-    if(((CheckBox) radioControls.getWidget(4)).getValue()) {
+    if (((CheckBox) radioControls.getWidget(4)).getValue()) {
       if (selected.isEmpty()) return "in(" + rqlField + ",*)";
       return "not(in(" + rqlField + ",(" + Joiner.on(",").join(selected) + ")))";
     }
@@ -151,19 +153,19 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
     statement = "$('" + variable.getName() + "')";
     List<String> selected = getSelectedCategories();
     if (isBooleanVariable()) {
-      for (int i=0; i<selected.size(); i++) {
+      for (int i = 0; i < selected.size(); i++) {
         if (selected.get(i).equals("T")) selected.set(i, "true");
         else if (selected.get(i).equals("F")) selected.set(i, "false");
       }
     }
     // in
-    if(((CheckBox) radioControls.getWidget(3)).getValue()) {
+    if (((CheckBox) radioControls.getWidget(3)).getValue()) {
       if (selected.isEmpty()) return statement + ".isNull()";
       return statement + ".any('" + Joiner.on("','").join(selected) + "')";
     }
 
     // not in
-    if(((CheckBox) radioControls.getWidget(4)).getValue()) {
+    if (((CheckBox) radioControls.getWidget(4)).getValue()) {
       if (selected.isEmpty()) return "";
       return statement + ".any('" + Joiner.on("','").join(selected) + "').not()";
     }
@@ -178,17 +180,15 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
         specificControls.setVisible(true);
         divider.setVisible(true);
       }
-    }
-    else if (criterion.hasValue()) {
+    } else if (criterion.hasValue()) {
       for (String value : criterion.getValues()) {
         selectCategory(value);
       }
-      ((CheckBox)radioControls.getWidget(criterion.isNot() ? 4 : 3)).setValue(true);
+      ((CheckBox) radioControls.getWidget(criterion.isNot() ? 4 : 3)).setValue(true);
       specificControls.setVisible(true);
       divider.setVisible(true);
-    }
-    else if (criterion.isExists())
-      ((CheckBox)radioControls.getWidget(criterion.isNot() ? 1 : 2)).setValue(true);
+    } else if (criterion.isExists())
+      ((CheckBox) radioControls.getWidget(criterion.isNot() ? 1 : 2)).setValue(true);
     setFilterText();
   }
 
@@ -213,15 +213,15 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
     }
 
     List<String> selected = getSelectedCategories();
-    if(getRadioButtonValue(3)) {
-      if(selected.isEmpty()) setText(filter + translations.criterionFiltersMap().get("none").toLowerCase());
+    if (getRadioButtonValue(3)) {
+      if (selected.isEmpty()) setText(filter + translations.criterionFiltersMap().get("none").toLowerCase());
       else setText(filter + translations.criterionFiltersMap().get("in").toLowerCase() + " (" +
           Joiner.on(",").join(selected) + ")");
       return;
     }
 
     if (getRadioButtonValue(4)) {
-      if(selected.isEmpty()) setText(filter + translations.criterionFiltersMap().get("all").toLowerCase());
+      if (selected.isEmpty()) setText(filter + translations.criterionFiltersMap().get("all").toLowerCase());
       else setText(filter + translations.criterionFiltersMap().get("not_in").toLowerCase() + " (" +
           Joiner.on(",").join(selected) + ")");
       return;
@@ -237,8 +237,8 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
 
   private List<String> getSelectedCategories() {
     List<String> selectedCategories = Lists.newArrayList();
-    for(CheckBox check : categoryChecks) {
-      if(check.getValue()) selectedCategories.add(check.getName());
+    for (CheckBox check : categoryChecks) {
+      if (check.getValue()) selectedCategories.add(check.getName());
     }
     return selectedCategories;
   }
@@ -280,8 +280,8 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
 
   private int getCategoryFrequency(String name) {
     int count = 0;
-    for(FacetResultDto.TermFrequencyResultDto result : JsArrays.toIterable(queryResult.getFacetsArray().get(0).getFrequenciesArray())) {
-      if(result.getTerm().equals(name)) {
+    for (FacetResultDto.TermFrequencyResultDto result : JsArrays.toIterable(facetDto.getFacetsArray().get(0).getFrequenciesArray())) {
+      if (result.getTerm().equals(name)) {
         count = result.getCount();
         break;
       }
@@ -291,10 +291,10 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
 
   private String getCategoryLabel(CategoryDto cat) {
     StringBuilder label = new StringBuilder();
-    for(AttributeDto attr : JsArrays.toIterable(cat.getAttributesArray())) {
-      if(!attr.hasNamespace() && attr.getName().equals("label")) {
-        if(label.length() > 0) label.append(" ");
-        if(attr.hasLocale()) {
+    for (AttributeDto attr : JsArrays.toIterable(cat.getAttributesArray())) {
+      if (!attr.hasNamespace() && attr.getName().equals("label")) {
+        if (label.length() > 0) label.append(" ");
+        if (attr.hasLocale()) {
           label.append("(").append(attr.getLocale()).append(") ");
         }
         label.append(attr.getValue());
