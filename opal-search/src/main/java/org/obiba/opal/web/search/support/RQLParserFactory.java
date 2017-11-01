@@ -11,6 +11,7 @@
 package org.obiba.opal.web.search.support;
 
 
+import com.google.common.base.Strings;
 import net.jazdw.rql.parser.ASTNode;
 import net.jazdw.rql.parser.RQLParser;
 import org.obiba.opal.spi.search.ValuesIndexManager;
@@ -36,6 +37,7 @@ public class RQLParserFactory {
     if ("and".equals(queryNode.getName()) || "or".equals(queryNode.getName()) || "".equals(queryNode.getName())) {
       esQuery = queryNode.getArguments().stream()
           .map(qn -> new RQLValueSetVariableCriterionParser(valuesIndexManager, (ASTNode) qn).getQuery())
+          .filter(q -> !Strings.isNullOrEmpty(q))
           .collect(Collectors.joining("or".equals(queryNode.getName()) ? " OR " : " AND "));
     } else { // single query
       esQuery = new RQLValueSetVariableCriterionParser(valuesIndexManager, queryNode).getQuery();

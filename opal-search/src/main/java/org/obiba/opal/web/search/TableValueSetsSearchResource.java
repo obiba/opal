@@ -11,6 +11,7 @@
 package org.obiba.opal.web.search;
 
 import com.google.common.base.Function;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -74,7 +75,7 @@ public class TableValueSetsSearchResource extends AbstractSearchUtility {
     if (!opalSearchService.getValuesIndexManager().hasIndex(getValueTable()))
       return Response.status(Response.Status.NOT_FOUND).build();
 
-    esQuery = "reference:\"" + getValueTable().getTableReference() + "\" AND " + esQuery;
+    esQuery = "reference:\"" + getValueTable().getTableReference() + (Strings.isNullOrEmpty(esQuery) ? "\"" : "\" AND " + esQuery);
     OpalSearchService.IdentifiersQueryCallback callback = new OpalSearchService.IdentifiersQueryCallback();
     opalSearchService.executeIdentifiersQuery(buildQuerySearch(esQuery, offset, limit,
         Lists.newArrayList("identifier"), null, "identifier", SortDir.ASC.name()).noDefaultFields(), getSearchPath(), callback);

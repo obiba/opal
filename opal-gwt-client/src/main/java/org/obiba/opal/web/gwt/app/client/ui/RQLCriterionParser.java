@@ -33,6 +33,7 @@ public class RQLCriterionParser {
   private String value;
   private JsArrayString values;
   private boolean not;
+  private boolean all;
   private boolean exists;
   private boolean like;
   private boolean in;
@@ -54,6 +55,10 @@ public class RQLCriterionParser {
 
   public boolean isExists() {
     return exists;
+  }
+
+  public boolean isAll() {
+    return all;
   }
 
   public boolean isIn() {
@@ -105,6 +110,11 @@ public class RQLCriterionParser {
     }
     exists = "exists".equals(node.getName());
     if (exists) {
+      parseField(node.getString(0));
+      return;
+    }
+    all = "all".equals(node.getName());
+    if (all) {
       parseField(node.getString(0));
       return;
     }

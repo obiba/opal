@@ -38,8 +38,9 @@ public class RQLValueSetVariableCriterionParser extends RQLCriterionParser imple
   @Override
   public QuerySettings.ChildQuery asChildQuery(String idQuery) {
     String query = getQuery(); // make sure ES query is built
-    if (!Strings.isNullOrEmpty(idQuery)) query = idQuery + " AND " + query;
-    query = "reference:\"" + table.getTableReference() + "\" AND " + query;
+    if (!Strings.isNullOrEmpty(query)) query = " AND " + query;
+    if (!Strings.isNullOrEmpty(idQuery)) query = " AND " + idQuery + query;
+    query = "reference:\"" + table.getTableReference() + "\"" + query;
     return new QuerySettings.ChildQuery(valuesIndexManager.getIndex(table).getIndexType(), query);
   }
 

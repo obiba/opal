@@ -99,6 +99,9 @@ public class RQLCriterionParser {
         return "NOT " + parseNode((ASTNode) node.getArgument(0));
       case "exists":
         return "_exists_:" + parseField(node.getArgument(0).toString());
+      case "all":
+        parseField(node.getArgument(0).toString());
+        return "";
       case "in":
         return parseField(node.getArgument(0).toString()) + ":(" + parseValue(node.getArgument(1)) + ")";
       case "like":

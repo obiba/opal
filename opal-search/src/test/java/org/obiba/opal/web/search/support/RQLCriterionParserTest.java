@@ -148,6 +148,13 @@ public class RQLCriterionParserTest {
   }
 
   @Test
+  public void test_all() {
+    String rql = "all(field)";
+    RQLCriterionParser parser = new RQLCriterionParser(rql);
+    assertThat(parser.getQuery()).isEqualTo("");
+  }
+
+  @Test
   public void test_exists() {
     String rql = "exists(field)";
     RQLCriterionParser parser = new RQLCriterionParser(rql);

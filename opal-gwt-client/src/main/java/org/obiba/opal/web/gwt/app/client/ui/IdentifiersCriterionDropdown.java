@@ -86,8 +86,8 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
     return translations.criterionFiltersMap().get("entity_identifier");
   }
 
-  private void setupRadioControls() {
-    // Remove empty radio
+  private void setupRadioControls() {// Remove empty/not empty radio
+    radioControls.remove(1);
     radioControls.remove(1);
 
     // Update radio controls
@@ -141,7 +141,7 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
 
   @Override
   protected String getMagmaJsStatement() {
-    // any
+    // all
     if (getRadioButtonValue(0)) return "";
     String statement = "$id()";
     String match = ".matches(/" + matches.getText()  + "/)";
@@ -164,7 +164,7 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
   }
 
   protected void updateCriterionFilter(String filter) {
-    setText(filter.isEmpty() ? "ID" : "ID " + filter);
+    setText(filter.isEmpty() ? "ID" : "ID " + filter.toLowerCase());
   }
 
   private void updateMatchCriteriaFilter() {
@@ -181,7 +181,7 @@ public abstract class IdentifiersCriterionDropdown extends ValueSetCriterionDrop
       updateCriterionFilter(prefix + matches.getText() + ")");
     }
     else
-      updateCriterionFilter(translations.criterionFiltersMap().get("any").toLowerCase());
+      updateCriterionFilter(translations.criterionFiltersMap().get("all").toLowerCase());
   }
 
   private class OperatorClickHandler implements ClickHandler {

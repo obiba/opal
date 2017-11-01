@@ -101,7 +101,7 @@ public class CartPresenter extends Presenter<CartPresenter.Display, CartPresente
     String entityType = "";
     boolean entityTypeError = false;
     for (CartVariableItem var : selectedVariables) {
-      queries.add("exists(" + var.getIdentifier() + ")");
+      queries.add("all(" + var.getIdentifier() + ")");
       if (Strings.isNullOrEmpty(entityType)) entityType = var.getEntityType();
       else if (!entityType.equals(var.getEntityType())) {
         entityTypeError = true;

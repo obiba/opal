@@ -101,14 +101,14 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
     }
 
     // in
-    if(((CheckBox) radioControls.getWidget(2)).getValue()) {
+    if(((CheckBox) radioControls.getWidget(3)).getValue()) {
       if (selected.isEmpty()) return "NOT " + fieldName + ":*";
       if (selected.size() == 1) return fieldName + ":" + selected.get(0);
       return fieldName + ":(\"" + Joiner.on("\" OR \"").join(selected) + "\")";
     }
 
     // not in
-    if(((CheckBox) radioControls.getWidget(3)).getValue()) {
+    if(((CheckBox) radioControls.getWidget(4)).getValue()) {
       if (selected.isEmpty()) return fieldName + ":*";
       if (selected.size() == 1) return "NOT " + fieldName + ":" + selected.get(0);
       return "NOT " + fieldName + ":(\"" + Joiner.on("\" OR \"").join(selected) + "\")";
@@ -129,13 +129,13 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
 
     String rqlField = getRQLField();
     // in
-    if(((CheckBox) radioControls.getWidget(2)).getValue()) {
+    if(((CheckBox) radioControls.getWidget(3)).getValue()) {
       if (selected.isEmpty()) return "not(in(" + rqlField + ",*))";
       return "in(" + rqlField + ",(" + Joiner.on(",").join(selected) + "))";
     }
 
     // not in
-    if(((CheckBox) radioControls.getWidget(3)).getValue()) {
+    if(((CheckBox) radioControls.getWidget(4)).getValue()) {
       if (selected.isEmpty()) return "in(" + rqlField + ",*)";
       return "not(in(" + rqlField + ",(" + Joiner.on(",").join(selected) + ")))";
     }
@@ -157,13 +157,13 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
       }
     }
     // in
-    if(((CheckBox) radioControls.getWidget(2)).getValue()) {
+    if(((CheckBox) radioControls.getWidget(3)).getValue()) {
       if (selected.isEmpty()) return statement + ".isNull()";
       return statement + ".any('" + Joiner.on("','").join(selected) + "')";
     }
 
     // not in
-    if(((CheckBox) radioControls.getWidget(3)).getValue()) {
+    if(((CheckBox) radioControls.getWidget(4)).getValue()) {
       if (selected.isEmpty()) return "";
       return statement + ".any('" + Joiner.on("','").join(selected) + "').not()";
     }
@@ -174,7 +174,7 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
   private void initialize(RQLValueSetVariableCriterionParser criterion) {
     if (criterion.hasWildcardValue()) {
       if (criterion.isNot()) {
-        ((CheckBox) radioControls.getWidget(2)).setValue(true);
+        ((CheckBox) radioControls.getWidget(3)).setValue(true);
         specificControls.setVisible(true);
         divider.setVisible(true);
       }
@@ -183,12 +183,12 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
       for (String value : criterion.getValues()) {
         selectCategory(value);
       }
-      ((CheckBox)radioControls.getWidget(criterion.isNot() ? 3 : 2)).setValue(true);
+      ((CheckBox)radioControls.getWidget(criterion.isNot() ? 4 : 3)).setValue(true);
       specificControls.setVisible(true);
       divider.setVisible(true);
     }
     else if (criterion.isExists())
-      ((CheckBox)radioControls.getWidget(criterion.isNot() ? 1 : 0)).setValue(true);
+      ((CheckBox)radioControls.getWidget(criterion.isNot() ? 1 : 2)).setValue(true);
     setFilterText();
   }
 
@@ -207,16 +207,20 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
       setText(filter + translations.criterionFiltersMap().get("empty").toLowerCase());
       return;
     }
+    if (getRadioButtonValue(2)) {
+      setText(filter + translations.criterionFiltersMap().get("not_empty").toLowerCase());
+      return;
+    }
 
     List<String> selected = getSelectedCategories();
-    if(getRadioButtonValue(2)) {
+    if(getRadioButtonValue(3)) {
       if(selected.isEmpty()) setText(filter + translations.criterionFiltersMap().get("none").toLowerCase());
       else setText(filter + translations.criterionFiltersMap().get("in").toLowerCase() + " (" +
           Joiner.on(",").join(selected) + ")");
       return;
     }
 
-    if (getRadioButtonValue(3)) {
+    if (getRadioButtonValue(4)) {
       if(selected.isEmpty()) setText(filter + translations.criterionFiltersMap().get("all").toLowerCase());
       else setText(filter + translations.criterionFiltersMap().get("not_in").toLowerCase() + " (" +
           Joiner.on(",").join(selected) + ")");
@@ -224,7 +228,7 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
     }
 
     if (getRadioButtonValue(0)) {
-      setText(filter + translations.criterionFiltersMap().get("any").toLowerCase());
+      setText(filter + translations.criterionFiltersMap().get("all").toLowerCase());
       return;
     }
 

@@ -77,7 +77,7 @@ public class ProjectPlacesHelper {
   }
 
   public static PlaceRequest getSearchEntitiesPlace(String entityType, List<String> queries) {
-    return getSearchEntitiesPlace(entityType, "in(identifier,*)", queries);
+    return getSearchEntitiesPlace(entityType, "all(identifier)", queries);
   }
 
   public static PlaceRequest getSearchEntitiesPlace(String entityType, String identifierQuery, List<String> queries) {

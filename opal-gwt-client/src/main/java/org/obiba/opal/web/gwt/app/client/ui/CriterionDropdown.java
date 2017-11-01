@@ -47,22 +47,40 @@ public abstract class CriterionDropdown extends DropdownButton {
   public abstract void doFilter();
 
   public String getQueryString() {
-    // Any
-    if(getRadioButtonValue(0)) return "_exists_:" + fieldName;
-    // Empty
-    if(getRadioButtonValue(1)) return "NOT _exists_:" + fieldName;
+    if(getRadioButtonValue(1)) {
+      // Empty
+      return "NOT _exists_:" + fieldName;
+    }
+    if(getRadioButtonValue(2)) {
+      // Not empty
+      return "_exists_:" + fieldName;
+    }
+    if(getRadioButtonValue(0)) {
+      // All: No filter is necessary
+      return "";
+    }
+
     return null;
   }
 
   public String getRQLQueryString() {
-    // Any
-    if(getRadioButtonValue(0)) return "exists(" + getRQLField() + ")";
-    // Empty
-    if(getRadioButtonValue(1)) return "not(exists(" + getRQLField() + "))";
+    if(getRadioButtonValue(1)) {
+      // Empty
+      return "not(exists(" + getRQLField() + "))";
+    }
+    if(getRadioButtonValue(2)) {
+      // Not empty
+      return "exists(" + getRQLField() + ")";
+    }
+    if(getRadioButtonValue(0)) {
+      // All: No filter is necessary
+      return "all(" + getRQLField() + ")";
+    }
+
     return null;
   }
 
-  public boolean isAny() {
+  public boolean isAll() {
     return getRadioButtonValue(0);
   }
 

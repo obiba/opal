@@ -87,7 +87,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
   private void initialize(RQLValueSetVariableCriterionParser criterion) {
     if (criterion.hasWildcardValue()) {
       if (criterion.isNot()) {
-        ((CheckBox) radioControls.getWidget(2)).setValue(true);
+        ((CheckBox) radioControls.getWidget(3)).setValue(true);
         updateRangeValuesFields();
         divider.setVisible(true);
       }
@@ -95,12 +95,12 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
     else if (criterion.hasValue()) {
       if (criterion.isRange()) selectRange(criterion.getValues());
       else selectValues(criterion.getValueString());
-      ((CheckBox)radioControls.getWidget(criterion.isNot() ? 3 : 2)).setValue(true);
+      ((CheckBox)radioControls.getWidget(criterion.isNot() ? 4 : 3)).setValue(true);
       updateRangeValuesFields();
       divider.setVisible(true);
     }
     else if (criterion.isExists())
-      ((CheckBox)radioControls.getWidget(criterion.isNot() ? 1 : 0)).setValue(true);
+      ((CheckBox)radioControls.getWidget(criterion.isNot() ? 1 : 2)).setValue(true);
     setFilterText();
   }
 
@@ -240,7 +240,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
       String rangeQuery = fieldName + ":[" + (min.getText().isEmpty() ? "*" : min.getText()) + " TO " +
           (max.getText().isEmpty() ? "*" : max.getText()) + "]";
 
-      if(((CheckBox) radioControls.getWidget(3)).getValue()) {
+      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
         return "NOT " + rangeQuery;
       }
 
@@ -253,7 +253,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
       String[] numbers = values.getText().trim().split(",");
       String valuesQuery = fieldName + ":(" + Joiner.on(" OR ").join(numbers) + ")";
 
-      if(((CheckBox) radioControls.getWidget(3)).getValue()) {
+      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
         return "NOT " + valuesQuery;
       }
 
@@ -274,7 +274,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
       String rangeQuery = "range(" + rqlField + ",(" + (min.getText().isEmpty() ? "*" : min.getText()) + "," +
           (max.getText().isEmpty() ? "*" : max.getText()) + "))";
 
-      if(((CheckBox) radioControls.getWidget(3)).getValue()) {
+      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
         return "not(" + rangeQuery + ")";
       }
 
@@ -290,7 +290,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
       }
       String valuesQuery = "in(" + rqlField + ",(" + Joiner.on(",").join(numbers) + "))";
 
-      if(((CheckBox) radioControls.getWidget(3)).getValue()) {
+      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
         return "not(" + valuesQuery + ")";
       }
 
@@ -317,7 +317,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
       else if (!min.getText().isEmpty()) statement = statement + ".ge(" + min.getText() + ")";
       else if (!max.getText().isEmpty()) statement = statement + ".le(" + max.getText() + ")";
 
-      if(((CheckBox) radioControls.getWidget(3)).getValue()) {
+      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
         statement = Strings.isNullOrEmpty(statement) ?
             "$('" + variable.getName() + "').isNull()" : statement + ".not()";
       }
@@ -335,7 +335,7 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
       }
       statement = statement + ".any(" + Joiner.on(",").join(numbers) + ")";
 
-      if(((CheckBox) radioControls.getWidget(3)).getValue()) {
+      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
         statement = statement + ".not()";
       }
 
@@ -354,16 +354,18 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
     String filter = variable.getName() + " ";
     if (getRadioButtonValue(1))
       setText(filter + translations.criterionFiltersMap().get("empty").toLowerCase());
-    else if (getRadioButtonValue(2)) {
+    else if (getRadioButtonValue(2))
+      setText(filter + translations.criterionFiltersMap().get("not_empty").toLowerCase());
+    else if (getRadioButtonValue(3)) {
       filter += translations.criterionFiltersMap().get("in").toLowerCase();
       setText(filter + getRangeOrValueFilterText());
     }
-    else if (getRadioButtonValue(3)) {
+    else if (getRadioButtonValue(4)) {
       filter += translations.criterionFiltersMap().get("not_in").toLowerCase();
       setText(filter + getRangeOrValueFilterText());
     }
     else
-      setText(filter + translations.criterionFiltersMap().get("any").toLowerCase());
+      setText(filter + translations.criterionFiltersMap().get("all").toLowerCase());
   }
 
   private String getRangeOrValueFilterText() {
