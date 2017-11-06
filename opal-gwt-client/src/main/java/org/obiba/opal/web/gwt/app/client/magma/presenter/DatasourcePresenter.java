@@ -32,6 +32,7 @@ import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionR
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.search.event.SearchDatasourceVariablesEvent;
+import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -279,12 +280,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
    */
   private boolean tableMatches(TableDto table, String filter) {
     String name = table.getName().toLowerCase();
-    for(String token : filter.toLowerCase().split(" ")) {
-      if(!Strings.isNullOrEmpty(token)) {
-        if(!name.contains(token)) return false;
-      }
-    }
-    return true;
+    return FilterHelper.matches(name, FilterHelper.tokenize(filter));
   }
 
   //

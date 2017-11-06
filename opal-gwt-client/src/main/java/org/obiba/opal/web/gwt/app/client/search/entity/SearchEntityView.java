@@ -207,18 +207,6 @@ public class SearchEntityView extends ViewWithUiHandlers<SearchEntityUiHandlers>
     tableChooser.setSelectedValue(datasource + "." + table);
   }
 
-  public boolean variableMatches(VariableDto variable, String filter) {
-    String name = variable.getName().toLowerCase();
-    for(String token : filter.toLowerCase().split(" ")) {
-      if(!Strings.isNullOrEmpty(token)) {
-        if(!name.contains(token)) return false;
-      }
-    }
-    return true;
-  }
-
-
-
   /**
    * Build the complete variable value variableValueRows.
    *

@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.project.edit.EditProjectModalPresenter;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
+import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -191,12 +192,7 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
    */
   private boolean projectMatches(ProjectDto project, String filter) {
     String name = project.getName().toLowerCase();
-    for(String token : filter.toLowerCase().split(" ")) {
-      if(!Strings.isNullOrEmpty(token)) {
-        if(!name.contains(token)) return false;
-      }
-    }
-    return true;
+    return FilterHelper.matches(name, FilterHelper.tokenize(filter));
   }
 
   public interface Display extends View, HasUiHandlers<ProjectsUiHandlers> {

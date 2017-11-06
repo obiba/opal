@@ -42,6 +42,7 @@ import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfFileUploadRe
 import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfMappingDeleteRequestEvent;
 import org.obiba.opal.web.gwt.app.client.project.genotypes.event.VcfMappingEditRequestEvent;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectPresenter;
+import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
 import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -310,13 +311,7 @@ public class ProjectGenotypesPresenter extends PresenterWidget<ProjectGenotypesP
 
   private boolean vcfMatches(VCFSummaryDto dto, String filter) {
     String name = dto.getName().toLowerCase();
-    for(String token : filter.toLowerCase().split(" ")) {
-      if(!Strings.isNullOrEmpty(token)) {
-        if(!name.contains(token))
-          return false;
-      }
-    }
-    return true;
+    return FilterHelper.matches(name, FilterHelper.tokenize(filter));
   }
 
   public void refresh() {

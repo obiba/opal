@@ -22,6 +22,7 @@ import com.google.gwt.event.dom.client.*;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
 import org.obiba.opal.web.gwt.app.client.ui.CriterionDropdown;
 import org.obiba.opal.web.gwt.app.client.ui.ListItem;
 import org.obiba.opal.web.gwt.rql.client.RQLQuery;
@@ -293,15 +294,15 @@ public class VariableFieldDropdown extends CriterionDropdown {
       filter.addKeyUpHandler(new KeyUpHandler() {
         @Override
         public void onKeyUp(KeyUpEvent event) {
-          String filterText = filter.getText().trim().toLowerCase();
-          if (filterText.isEmpty()) {
+          List<String> tokens = FilterHelper.tokenize(filter.getText().trim().toLowerCase());
+          if (tokens.isEmpty()) {
             for (CheckBox cb : fieldTermChecks)
               cb.getParent().setVisible(true);
           } else {
             for (CheckBox cb : fieldTermChecks) {
               String title = getFieldTermTitle(cb.getName());
               if (title != null) title = title.toLowerCase();
-              cb.getParent().setVisible(title.contains(filterText) || cb.getName().toLowerCase().contains(filterText));
+              cb.getParent().setVisible(FilterHelper.matches(title, tokens) || FilterHelper.matches(cb.getName().toLowerCase(), tokens));
             }
           }
         }
