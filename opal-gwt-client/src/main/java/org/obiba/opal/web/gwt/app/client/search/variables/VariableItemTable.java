@@ -28,6 +28,7 @@ import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
+import org.obiba.opal.web.gwt.markdown.client.Markdown;
 import org.obiba.opal.web.model.client.opal.EntryDto;
 import org.obiba.opal.web.model.client.search.ItemFieldsDto;
 import org.obiba.opal.web.model.client.search.ItemResultDto;
@@ -85,8 +86,8 @@ public class VariableItemTable extends Table<ItemResultDto> {
       }, translations.tableLabel());
     }
 
-    addColumn(new ItemFieldColumn("label"), translations.labelLabel());
-    addColumn(new ItemFieldColumn("entityType"), translations.entityTypeLabel());
+    addColumn(new ItemFieldColumn("label", true), translations.labelLabel());
+    addColumn(new ItemFieldColumn("entityType", false), translations.entityTypeLabel());
   }
 
   private void addCheckColumn(CheckboxColumn.Display<ItemResultDto> checkboxDisplay) {
@@ -153,7 +154,9 @@ public class VariableItemTable extends Table<ItemResultDto> {
 
     private final String name;
 
-    ItemFieldColumn(String name) {
+    private final boolean markdown;
+
+    ItemFieldColumn(String name, boolean markdown) {
       super(new TextCell(new SafeHtmlRenderer<String>() {
 
         @Override
@@ -167,6 +170,7 @@ public class VariableItemTable extends Table<ItemResultDto> {
         }
       }));
       this.name = name;
+      this.markdown = markdown;
     }
 
     @Override
@@ -187,8 +191,12 @@ public class VariableItemTable extends Table<ItemResultDto> {
           if (!Strings.isNullOrEmpty(locale))
             fieldsHtml.append("<span class=\"label\">").append(locale).append("</span> ");
           String value = entry.getValue();
-          String safeValue = SafeHtmlUtils.fromString(value).asString().replaceAll("\\n", "<br />");
-          fieldsHtml.append(safeValue);
+          if (markdown)
+            fieldsHtml.append(Markdown.parse(value));
+          else {
+            String safeValue = SafeHtmlUtils.fromString(value).asString().replaceAll("\\n", "<br />");
+            fieldsHtml.append(safeValue);
+          }
           fieldsHtml.append("</div>");
         }
       }

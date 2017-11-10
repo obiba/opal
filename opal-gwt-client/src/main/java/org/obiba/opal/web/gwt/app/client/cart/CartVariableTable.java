@@ -100,6 +100,11 @@ public class CartVariableTable extends Table<CartVariableItem> {
     }
 
     @Override
+    protected boolean isMarkdown() {
+      return true;
+    }
+
+    @Override
     protected JsArray<AttributeDto> getAttributes(CartVariableItem object) {
       return object.getVariable().getAttributesArray();
     }
