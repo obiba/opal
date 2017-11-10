@@ -65,6 +65,10 @@ public class TaxonomyAttributesPanel extends FlowPanel {
     }
   }
 
+  public boolean isEmpty() {
+    return getWidgetCount() == 0;
+  }
+
   public TaxonomyAttributes getTaxonomyAttributes() {
     return taxonomyAttributes;
   }

@@ -12,10 +12,13 @@ package org.obiba.opal.web.gwt.app.client.ui;
 
 import com.github.gwtbootstrap.client.ui.HelpBlock;
 import com.github.gwtbootstrap.client.ui.Label;
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.markdown.client.Markdown;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 
 /**
@@ -49,17 +52,19 @@ public class NamedAttributePanel extends FlowPanel {
     attributes = JsArrays.create();
     for (AttributeDto attributeDto : JsArrays.toIterable(attributesArray)) {
       if (attributeDto.getName().equals(name)) {
-        attributes.push(attributeDto);
-        FlowPanel attrPanel = new FlowPanel();
-        attrPanel.addStyleName("attribute-value");
         String value = attributeDto.getValue();
-        if (attributeDto.hasLocale()) {
-          Label localeLabel = new Label(attributeDto.getLocale());
-          localeLabel.addStyleName("xsmall-right-indent");
-          attrPanel.add(localeLabel);
+        if (!Strings.isNullOrEmpty(value)) {
+          attributes.push(attributeDto);
+          FlowPanel attrPanel = new FlowPanel();
+          attrPanel.addStyleName("attribute-value");
+          if (attributeDto.hasLocale()) {
+            Label localeLabel = new Label(attributeDto.getLocale());
+            localeLabel.addStyleName("top-margin");
+            attrPanel.add(localeLabel);
+          }
+          attrPanel.add(new HTMLPanel(Markdown.parse((value))));
+          add(attrPanel);
         }
-        attrPanel.add(new InlineLabel(value));
-        add(attrPanel);
       }
     }
     if (attributes.length() == 0) {
