@@ -561,7 +561,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
       attributesPanel.clear();
 
       if (variableDto.getAttributesArray() == null || variableDto.getAttributesArray().length() == 0) {
-        attributesPanel.setStyleName("xxlarge-bottom-margin");
+        attributesPanel.addStyleName("xxlarge-bottom-margin");
       } else {
         attributesPanel.removeStyleName("xxlarge-bottom-margin");
       }
@@ -581,7 +581,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
       taxonomyAttributesPanel = new TaxonomyAttributesPanel(attributesArray, taxonomies);
       annotationPanel.add(taxonomyAttributesPanel);
       searchSimilar.setVisible(!taxonomyAttributesPanel.getTaxonomyAttributes().isEmpty());
-      if (taxonomyAttributesPanel.getTaxonomyAttributes().isEmpty())
+      if (taxonomyAttributesPanel.isEmpty())
         editAnnotation.addStyleName("xxlarge-bottom-margin");
       else
         editAnnotation.removeStyleName("xxlarge-bottom-margin");
