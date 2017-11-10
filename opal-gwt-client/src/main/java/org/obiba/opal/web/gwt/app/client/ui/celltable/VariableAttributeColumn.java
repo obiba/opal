@@ -21,6 +21,11 @@ public class VariableAttributeColumn extends AttributeColumn<VariableDto> {
   }
 
   @Override
+  protected boolean isMarkdown() {
+    return "label".equals(attributeName) || "description".equals(attributeName);
+  }
+
+  @Override
   protected JsArray<AttributeDto> getAttributes(VariableDto object) {
     return object.getAttributesArray();
   }

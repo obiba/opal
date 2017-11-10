@@ -9,8 +9,10 @@
  */
 package org.obiba.opal.web.gwt.app.client.ui.celltable;
 
+import com.google.common.base.Splitter;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.AttributeDtos;
+import org.obiba.opal.web.gwt.markdown.client.Markdown;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 
 import com.google.gwt.cell.client.TextCell;
@@ -22,9 +24,11 @@ import com.google.gwt.safehtml.shared.UriUtils;
 import com.google.gwt.text.shared.SafeHtmlRenderer;
 import com.google.gwt.user.cellview.client.Column;
 
+import java.util.List;
+
 public abstract class AttributeColumn<T> extends Column<T, String> {
 
-  private final String attributeName;
+  protected final String attributeName;
 
   public AttributeColumn(String attributeName) {
     super(new TextCell(new SafeHtmlRenderer<String>() {
@@ -46,6 +50,10 @@ public abstract class AttributeColumn<T> extends Column<T, String> {
 
   protected String getAttributeName(T object) {
     return attributeName;
+  }
+
+  protected boolean isMarkdown() {
+    return false;
   }
 
   @Override
@@ -71,25 +79,38 @@ public abstract class AttributeColumn<T> extends Column<T, String> {
   private void appendLabel(AttributeDto attr, StringBuilder labels) {
     if(attr.hasValue() && attr.getValue().trim().length() > 0) {
       labels.append("<div class=\"attribute-value\">");
-      if(AttributeDtos.SCRIPT_ATTRIBUTE.equals(attr.getName())) {
-        labels.append("<pre>");
-      }
-      if(attr.hasLocale() && attr.getLocale().trim().length() > 0) {
-        labels.append("<span class=\"label\">").append(attr.getLocale()).append("</span> ");
-      }
-      String value = attr.getValue();
-      String safeValue = SafeHtmlUtils.fromString(value).asString().replaceAll("\\n", "<br />");
-      try {
-        if(UriUtils.extractScheme(value) != null && UriUtils.isSafeUri(value)) {
-          labels.append("<a href=").append(value).append(" target=\"_blank\">").append(safeValue).append("</a>");
-        } else {
+      if (isMarkdown()) {
+        if (attr.hasLocale() && attr.getLocale().trim().length() > 0) {
+          labels.append("<span class=\"label\">").append(attr.getLocale()).append("</span> ");
+        }
+        String value = attr.getValue();
+        labels.append(Markdown.parse(value));
+      } else {
+        if (AttributeDtos.SCRIPT_ATTRIBUTE.equals(attr.getName())) {
+          labels.append("<pre>");
+        }
+        if (attr.hasLocale() && attr.getLocale().trim().length() > 0) {
+          labels.append("<span class=\"label\">").append(attr.getLocale()).append("</span> ");
+        }
+        String value = attr.getValue();
+        String safeValue = SafeHtmlUtils.fromString(value).asString().replaceAll("\\n", "<br/>");
+        try {
+          List<String> valueStrs = Splitter.on(" ").splitToList(safeValue);
+          for (int i = 0; i < valueStrs.size(); i++) {
+            if (i > 0) labels.append(" ");
+            String valueStr = valueStrs.get(i);
+            if (UriUtils.extractScheme(valueStr) != null && UriUtils.isSafeUri(valueStr)) {
+              labels.append("<a href=").append(valueStr).append(" target=\"_blank\">").append(valueStr).append("</a>");
+            } else {
+              labels.append(valueStr);
+            }
+          }
+        } catch (Exception e) {
           labels.append(safeValue);
         }
-      } catch(Exception e) {
-        labels.append(safeValue);
-      }
-      if(AttributeDtos.SCRIPT_ATTRIBUTE.equals(attr.getName())) {
-        labels.append("</pre>");
+        if (AttributeDtos.SCRIPT_ATTRIBUTE.equals(attr.getName())) {
+          labels.append("</pre>");
+        }
       }
       labels.append("</div>");
     }
