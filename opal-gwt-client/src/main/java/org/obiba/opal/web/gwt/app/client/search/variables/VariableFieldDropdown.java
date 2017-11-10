@@ -49,7 +49,7 @@ public class VariableFieldDropdown extends CriterionDropdown {
 
   private boolean analyzed = false;
 
-  public VariableFieldDropdown(VariableFieldSuggestOracle.VariableFieldSuggestion suggestion, FacetResultDto facet) {
+  public VariableFieldDropdown(VariableFieldSuggestOracle.VariableFieldSuggestion suggestion, boolean useSuggestion, FacetResultDto facet) {
     super(suggestion.getField().getName().replaceAll("\\.analyzed$",""));
     // when "analyzed", a field has 2 flavors: exact match (in) or ordinary match (like)
     this.analyzed = suggestion.getField().getName().endsWith(".analyzed");
@@ -59,7 +59,7 @@ public class VariableFieldDropdown extends CriterionDropdown {
       for (FacetResultDto.TermFrequencyResultDto termCount : JsArrays.toIterable(facet.getFrequenciesArray()))
         fieldTermFrequencies.put(termCount.getTerm(), termCount.getCount());
     }
-    initialize(suggestion.getReplacementString());
+    initialize(useSuggestion ? suggestion.getReplacementString() : "");
   }
 
   public void initialize(RQLQuery rqlQuery) {
@@ -206,7 +206,10 @@ public class VariableFieldDropdown extends CriterionDropdown {
     }
     updateCriterionFilter(getRadioControl(0).getValue() ? translations.criterionFiltersMap().get("any")
         : translations.criterionFiltersMap().get(isLikeSelected() ? "like" : "in"));
-    if (getRadioControl(0).getValue() || getRadioControl(1).getValue()) resetSpecificControls();
+    if (getRadioControl(0).getValue() || getRadioControl(1).getValue()) {
+      resetSpecificControls();
+      for (CheckBox checkbox : fieldTermChecks) checkbox.setValue(false);
+    }
   }
 
   private void initializeHeader() {

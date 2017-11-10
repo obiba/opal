@@ -393,7 +393,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
   }
 
   private void addCriterion(VariableFieldSuggestOracle.VariableFieldSuggestion fieldSuggestion, RQLQuery rqlQuery, FacetResultDto facet) {
-    VariableFieldDropdown dd = new VariableFieldDropdown(fieldSuggestion, facet) {
+    VariableFieldDropdown dd = new VariableFieldDropdown(fieldSuggestion, rqlQuery == null, facet) {
       @Override
       public void doFilter() {
         onSearch(0);
