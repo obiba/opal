@@ -107,13 +107,7 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
 
   private void selectValues(String valueString) {
     rangeValueChooser.setSelectedIndex(1);
-    String nValues = valueString.substring(1, valueString.length() - 1);
-    List<String> minMax = Splitter.on(" AND ").splitToList(nValues);
-    Date minDate = null;
-    Date maxDate = null;
-    if (!"*".equals(minMax.get(0))) minDate = getDate(minMax.get(0));
-    if (!"*".equals(minMax.get(1))) maxDate = getDate(minMax.get(1));
-    if (minDate != null && maxDate != null) date.setValue(minDate);
+    date.setValue(getDate(valueString));
   }
 
   private Date getDate(String dateString) {
@@ -265,20 +259,28 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
     String statement = super.getMagmaJsStatement();
     if (!Strings.isNullOrEmpty(statement)) return statement;
 
-    statement = "$('" + variable.getName() + "')";
+    String dateAccessor = "$('" + variable.getName() + "')";
+    if ("datetime".equals(variable.getValueType()))
+      dateAccessor = dateAccessor + ".type('date')";
+
+    statement = dateAccessor;
     DateTimeFormat df = DateTimeFormat.getFormat("yyyy-MM-dd");
     if(rangeValueChooser.isItemSelected(0)) {
       if (from.getValue() == null && to.getValue() == null) {
-        statement = "";
+        return ((CheckBox) radioControls.getWidget(4)).getValue() ?
+            statement + ".isNull()" : "";
       }
-      if (from.getValue() != null && to.getValue() != null)
+      else if (from.getValue() != null && to.getValue() != null)
         statement = statement + ".after('" + df.format(from.getValue()) + "').and(" + statement + ".before('" + df.format(to.getValue()) + "'))";
       else if (from.getValue() != null) statement = statement + ".after('" + df.format(from.getValue()) + "')";
       else if (to.getValue() != null) statement = statement + ".before('" + df.format(to.getValue()) + "')";
 
-      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
-        statement = Strings.isNullOrEmpty(statement) ?
-            "$('" + variable.getName() + "').isNull()" : statement + ".not()";
+      if(((CheckBox) radioControls.getWidget(4)).getValue())
+         statement = statement + ".not()";
+
+      if (variable.getIsRepeatable()) {
+        statement = statement.replace(dateAccessor, "v");
+        statement = dateAccessor + ".any(function(v) { return " + statement + " })";
       }
 
       return statement;
@@ -286,7 +288,7 @@ public abstract class DateTimeCriterionDropdown extends ValueSetCriterionDropdow
 
     // VALUES
     if(rangeValueChooser.isItemSelected(1) && date.getValue() != null) {
-      statement = statement + ".eq('" + df.format(date.getValue()) + "')";
+      statement = dateAccessor + ".any('" + df.format(date.getValue()) + "')";
 
       if(((CheckBox) radioControls.getWidget(4)).getValue()) {
         statement = statement + ".not()";

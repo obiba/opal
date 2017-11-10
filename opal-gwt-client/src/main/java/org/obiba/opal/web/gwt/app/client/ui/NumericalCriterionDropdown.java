@@ -302,30 +302,21 @@ public abstract class NumericalCriterionDropdown extends ValueSetCriterionDropdo
     statement = "$('" + variable.getName() + "')";
     // RANGE
     if (rangeValueChooser.isItemSelected(0)) {
-      if (min.getText().isEmpty() && max.getText().isEmpty())
-        statement = "";
-      else if (variable.getIsRepeatable())
-        statement = statement + ".filter(function(v) { return v";
-
-      if (!min.getText().isEmpty() && !max.getText().isEmpty()) {
-        if (variable.getIsRepeatable())
-          statement = statement + ".ge(" + min.getText() + ").and(v.le(" + max.getText() + "))";
-        else
-          statement = statement + ".ge(" + min.getText() + ").and(" + statement + ".le(" + max.getText() + "))";
+      if (min.getText().isEmpty() && max.getText().isEmpty()) {
+        return ((CheckBox) radioControls.getWidget(4)).getValue() ?
+            statement + ".isNull()" : "";
       }
+      else if (!min.getText().isEmpty() && !max.getText().isEmpty())
+        statement = statement + ".ge(" + min.getText() + ").and(" + statement + ".le(" + max.getText() + "))";
       else if (!min.getText().isEmpty()) statement = statement + ".ge(" + min.getText() + ")";
       else if (!max.getText().isEmpty()) statement = statement + ".le(" + max.getText() + ")";
 
-      if (variable.getIsRepeatable() && !Strings.isNullOrEmpty(statement))
-        statement = statement + " }).empty().not()";
+      if (((CheckBox) radioControls.getWidget(4)).getValue())
+        statement = statement + ".not()";
 
-      if (((CheckBox) radioControls.getWidget(4)).getValue()) {
-        if (Strings.isNullOrEmpty(statement))
-          statement = "$('" + variable.getName() + "').isNull()";
-        else if (variable.getIsRepeatable())
-          statement = statement.replace(".not()", "");
-        else
-          statement = statement + ".not()";
+      if (variable.getIsRepeatable()) {
+        statement = statement.replace("$('" + variable.getName() + "')", "v");
+        statement = "$('" + variable.getName() + "').any(function(v) { return " + statement + " })";
       }
 
       return statement;
