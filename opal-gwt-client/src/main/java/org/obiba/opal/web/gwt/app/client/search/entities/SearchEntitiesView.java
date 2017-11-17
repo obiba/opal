@@ -18,6 +18,7 @@ import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -42,6 +43,8 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.search.entity.*;
 import org.obiba.opal.web.gwt.app.client.ui.*;
+import org.obiba.opal.web.gwt.markdown.client.Markdown;
+import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.VariableEntitySummaryDto;
@@ -344,7 +347,7 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
       Label all = new Label(translations.allLabel());
       all.addStyleName("property-key");
       resultsTable.setWidget(row, 0, all);
-      resultsTable.getFlexCellFormatter().setColSpan(row, 0, 2);
+      resultsTable.getFlexCellFormatter().setColSpan(row, 0, 3);
       Label query = new Label(getIDCriterionPrefix() + criteriaPanel.getQueryText());
       query.setTitle(getIDCriterionRQLPrefix() + results.getQuery());
       resultsTable.setWidget(row, 1, query);
@@ -377,18 +380,20 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
     countsPanel.add(resultsTable);
     resultsTable.setHeader(0, translations.tableLabel());
     resultsTable.setHeader(1, translations.variableLabel());
-    resultsTable.setHeader(2, translations.queryLabel());
-    resultsTable.setHeader(3, translations.countLabel());
+    resultsTable.setHeader(2, translations.labelLabel());
+    resultsTable.setHeader(3, translations.queryLabel());
+    resultsTable.setHeader(4, translations.countLabel());
   }
 
   private void setCountResultRow(int row, ValueSetCriterionDropdown criterion, int count) {
     resultsTable.setWidget(row, 0, createTableLink(criterion.getDatasource(), criterion.getTable()));
     resultsTable.getFlexCellFormatter().setColSpan(row, 0, 1);
     resultsTable.setWidget(row, 1, createVariableLink(criterion.getDatasource(), criterion.getTable(), criterion.getVariable()));
+    resultsTable.setWidget(row, 2, createVariableLabel(criterion.getVariable()));
     Label query = new Label(getIDCriterionPrefix() + criterion.getText());
     query.setTitle(getIDCriterionRQLPrefix() + criterion.getRQLQueryString());
-    resultsTable.setWidget(row, 2, query);
-    resultsTable.setText(row, 3, count + "");
+    resultsTable.setWidget(row, 3, query);
+    resultsTable.setText(row, 4, count + "");
   }
 
   private Widget createTableLink(final String datasource, final String table) {
@@ -415,6 +420,13 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
       }
     });
     return link;
+  }
+
+  private Widget createVariableLabel(final VariableDto variable) {
+    NamedAttributePanel labelPanel = new NamedAttributePanel("label");
+    JsArray<AttributeDto> attributesArray = JsArrays.toSafeArray(variable.getAttributesArray());
+    labelPanel.initialize(attributesArray, null);
+    return labelPanel;
   }
 
   private void initEntityItemTable() {
