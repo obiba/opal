@@ -14,9 +14,9 @@ import com.github.gwtbootstrap.client.ui.HelpBlock;
 import com.github.gwtbootstrap.client.ui.Label;
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.InlineLabel;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.markdown.client.Markdown;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
@@ -29,6 +29,10 @@ public class NamedAttributePanel extends FlowPanel {
   private String name;
 
   private JsArray<AttributeDto> attributes;
+
+  public NamedAttributePanel(String name) {
+    this.name = name;
+  }
 
   public NamedAttributePanel() {
     addStyleName("well");
@@ -55,19 +59,18 @@ public class NamedAttributePanel extends FlowPanel {
         String value = attributeDto.getValue();
         if (!Strings.isNullOrEmpty(value)) {
           attributes.push(attributeDto);
-          FlowPanel attrPanel = new FlowPanel();
-          attrPanel.addStyleName("attribute-value");
+          SafeHtmlBuilder builder = new SafeHtmlBuilder();
           if (attributeDto.hasLocale()) {
-            Label localeLabel = new Label(attributeDto.getLocale());
-            localeLabel.addStyleName("top-margin");
-            attrPanel.add(localeLabel);
+            builder.appendHtmlConstant("<span class=\"label xsmall-right-indent\" style=\"vertical-align: top\">" + attributeDto.getLocale() + "</span>");
           }
-          attrPanel.add(new HTMLPanel(Markdown.parse((value))));
+          builder.appendHtmlConstant(Markdown.parse(value));
+          HTMLPanel attrPanel = new HTMLPanel(builder.toSafeHtml());
+          attrPanel.addStyleName("attribute-value");
           add(attrPanel);
         }
       }
     }
-    if (attributes.length() == 0) {
+    if (attributes.length() == 0 && !Strings.isNullOrEmpty(missingMsg)) {
       HelpBlock missingBlock = new HelpBlock(missingMsg);
       missingBlock.addStyleName("no-bottom-margin");
       add(missingBlock);
