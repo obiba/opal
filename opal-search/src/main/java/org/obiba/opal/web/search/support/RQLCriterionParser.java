@@ -164,7 +164,7 @@ public class RQLCriterionParser {
   }
 
   private String normalizeString(String str) {
-    return str.replaceAll(" ","+");
+    return str.replace(" ","+");
   }
 
   private String normalizeDate(DateTime date) {
@@ -173,7 +173,11 @@ public class RQLCriterionParser {
 
   private String quote(Object value) {
     String valueStr = value.toString();
-    return valueStr.contains("*") ? normalizeString(valueStr) : "\"" + valueStr + "\"";
+    if (valueStr.contains("*")) return normalizeString(valueStr);
+    if (valueStr.startsWith("\"") && valueStr.endsWith("\"")) return valueStr;
+    valueStr = valueStr.replace("+", " ");
+    if (valueStr.contains(" ")) return "\"" + valueStr + "\"";
+    return valueStr;
   }
 
   private String parseRange(Object value) {
@@ -192,11 +196,11 @@ public class RQLCriterionParser {
   }
 
   private String parseAnd(Collection<?> args) {
-    return join(" AND ", args);
+    return join(" AND ", args.stream().map(arg -> parseValue(arg)).collect(Collectors.toList()));
   }
 
   private String parseOr(Collection<?> args) {
-    return join(" OR ", args);
+    return join(" OR ", args.stream().map(arg -> parseValue(arg)).collect(Collectors.toList()));
   }
 
 }

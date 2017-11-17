@@ -51,7 +51,7 @@ public class RQLCriterionParserTest {
         return VariableNature.CATEGORICAL;
       }
     };
-    assertThat(parser.getQuery()).isEqualTo("field:(\"1\")");
+    assertThat(parser.getQuery()).isEqualTo("field:(1)");
   }
 
 
@@ -111,7 +111,31 @@ public class RQLCriterionParserTest {
         return VariableNature.CATEGORICAL;
       }
     };
-    assertThat(parser.getQuery()).isEqualTo("field:(\"1\" OR \"2\")");
+    assertThat(parser.getQuery()).isEqualTo("field:(1 OR 2)");
+  }
+
+  @Test
+  public void test_in_multiple_categorical_with_spaces() {
+    String rql = "in(field,(\"Visit 1\",\"Visit 2\"))";
+    RQLCriterionParser parser = new RQLCriterionParser(rql) {
+      @Override
+      protected VariableNature getNature() {
+        return VariableNature.CATEGORICAL;
+      }
+    };
+    assertThat(parser.getQuery()).isEqualTo("field:(\"Visit 1\" OR \"Visit 2\")");
+  }
+
+  @Test
+  public void test_in_multiple_categorical_with_spaces2() {
+    String rql = "in(field,(Visit 1,Visit 2))";
+    RQLCriterionParser parser = new RQLCriterionParser(rql) {
+      @Override
+      protected VariableNature getNature() {
+        return VariableNature.CATEGORICAL;
+      }
+    };
+    assertThat(parser.getQuery()).isEqualTo("field:(\"Visit 1\" OR \"Visit 2\")");
   }
 
   @Test
@@ -123,7 +147,7 @@ public class RQLCriterionParserTest {
         return VariableNature.CATEGORICAL;
       }
     };
-    assertThat(parser.getQuery()).isEqualTo("field:(1* OR \"2\")");
+    assertThat(parser.getQuery()).isEqualTo("field:(1* OR 2)");
   }
 
   @Test

@@ -126,7 +126,7 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
 
     List<String> selected = Lists.newArrayList();
     for (String sel : getSelectedCategories()) {
-      selected.add(sel.replaceAll(" ", "+"));
+      selected.add(sel.replace(" ", "+"));
     }
 
     String rqlField = getRQLField();
@@ -193,8 +193,9 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
   }
 
   private void selectCategory(String value) {
+    String valueStr = value.replace("+"," ");
     for (CheckBox checkBox : categoryChecks) {
-      if (checkBox.getName().equals(value)) {
+      if (checkBox.getName().equals(valueStr)) {
         checkBox.setValue(true);
         break;
       }
@@ -249,9 +250,10 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
 
   private void appendCategoryCheck(ComplexPanel checksPanel, String name, String title, String label, int count) {
     SafeHtmlBuilder builder = new SafeHtmlBuilder().appendEscaped(title);
-    builder.appendHtmlConstant("<span style=\"font-size:x-small\"> (")
-        .append(count).appendEscaped(")")
-        .appendHtmlConstant("</span>");
+    if (!variable.getIsRepeatable())
+      builder.appendHtmlConstant("<span style=\"font-size:x-small\"> (")
+          .append(count).appendEscaped(")")
+          .appendHtmlConstant("</span>");
     FlowPanel checkPanel = new FlowPanel();
     CheckBox checkBox = new CheckBox(builder.toSafeHtml());
     checkBox.setName(name);
