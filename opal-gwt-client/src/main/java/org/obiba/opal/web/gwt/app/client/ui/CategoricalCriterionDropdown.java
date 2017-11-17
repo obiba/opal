@@ -13,18 +13,22 @@ package org.obiba.opal.web.gwt.app.client.ui;
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.Icon;
 import com.github.gwtbootstrap.client.ui.RadioButton;
+import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.ComplexPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -66,8 +70,31 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
       ScrollPanel scrollPanel = new ScrollPanel();
       scrollPanel.setHeight("200px");
       specificControls.add(scrollPanel);
+      FlowPanel content = new FlowPanel();
+      scrollPanel.add(content);
+      final TextBox filter = new TextBox();
+      filter.addStyleName("bordered right-indent");
+      filter.setPlaceholder(translations.criterionFiltersMap().get("filter"));
+      filter.addKeyUpHandler(new KeyUpHandler() {
+        @Override
+        public void onKeyUp(KeyUpEvent event) {
+          List<String> tokens = FilterHelper.tokenize(filter.getText().trim().toLowerCase());
+          if (tokens.isEmpty()) {
+            for (CheckBox cb : categoryChecks)
+              cb.getParent().setVisible(true);
+          } else {
+            for (CheckBox cb : categoryChecks) {
+              String title = cb.getTitle();
+              if (title != null) title = title.toLowerCase();
+              cb.getParent().setVisible(FilterHelper.matches(title, tokens) || FilterHelper.matches(cb.getName().toLowerCase(), tokens));
+            }
+          }
+        }
+      });
+      content.add(filter);
       checksPanel = new FlowPanel();
-      scrollPanel.add(checksPanel);
+      checksPanel.addStyleName("top-margin");
+      content.add(checksPanel);
     } else {
       checksPanel = specificControls;
     }
