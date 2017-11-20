@@ -90,7 +90,7 @@ public class RQLCriterionParser {
       builder.append(")");
     }
     else if (arg instanceof DateTime) builder.append(normalizeDate((DateTime)arg));
-    else builder.append(arg);
+    else builder.append(arg.toString().replace("%","%25"));
   }
 
   private String parseNode(ASTNode node) {

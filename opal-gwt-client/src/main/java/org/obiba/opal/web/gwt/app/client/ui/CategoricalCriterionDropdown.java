@@ -18,10 +18,12 @@ import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.ComplexPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -29,6 +31,7 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
+import org.obiba.opal.web.gwt.rql.client.RQLQuery;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -126,7 +129,7 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
 
     List<String> selected = Lists.newArrayList();
     for (String sel : getSelectedCategories()) {
-      selected.add(sel.replaceAll(" ", "+"));
+      selected.add(sel.replace(" ", "+"));
     }
 
     // in
@@ -153,7 +156,7 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
 
     List<String> selected = Lists.newArrayList();
     for (String sel : getSelectedCategories()) {
-      selected.add(sel.replace(" ", "+"));
+      selected.add(URL.encode(sel).replace(" ", "+"));
     }
 
     String rqlField = getRQLField();

@@ -43,6 +43,24 @@ public class RQLCriterionParserTest {
   }
 
   @Test
+  public void test_in_single_with_percent() {
+    String rql = "in(field,1%25)";
+    RQLCriterionParser parser = new RQLCriterionParser(rql);
+    assertThat(parser.getQuery()).isEqualTo("field:(1%)");
+    assertThat(parser.getOriginalQuery()).isEqualTo("in(field,1%25)");
+    parser = new RQLCriterionParser(RQLParserFactory.newParser().parse(rql));
+    assertThat(parser.getQuery()).isEqualTo("field:(1%)");
+    assertThat(parser.getOriginalQuery()).isEqualTo("in(field,1%25)");
+  }
+
+  @Test
+  public void test_in_single_with_space() {
+    String rql = "in(field,1 )";
+    RQLCriterionParser parser = new RQLCriterionParser(rql);
+    assertThat(parser.getQuery()).isEqualTo("field:(1+)");
+  }
+
+  @Test
   public void test_in_single_categorical() {
     String rql = "in(field,1)";
     RQLCriterionParser parser = new RQLCriterionParser(rql) {
