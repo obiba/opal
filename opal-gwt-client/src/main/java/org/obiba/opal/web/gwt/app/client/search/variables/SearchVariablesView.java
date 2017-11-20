@@ -258,7 +258,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
         } else
           fieldName = query.getString(0);
         VariableFieldSuggestOracle.VariableFieldSuggestion suggestion = oracle.findSuggestion(fieldName);
-        addCriterion(suggestion, query, null);
+        addCriterion(suggestion, query, null, false);
       } else {
         containsInput.setText(query.getString(0).replaceAll("\\+", " "));
       }
@@ -363,7 +363,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
         //if (!fieldSuggestion.getFieldTerms().isEmpty()) {
         //  getUiHandlers().onFacet(fieldSuggestion.getField(), fieldSuggestion.getFieldTerms().size(), new VariableFieldFacetHandler(fieldSuggestion));
         //} else
-        addCriterion(fieldSuggestion, null, null);
+        addCriterion(fieldSuggestion, null, null, true);
         return "";
       }
 
@@ -388,11 +388,11 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
 
     @Override
     public void onResult(FacetResultDto facet) {
-      addCriterion(fieldSuggestion, null, facet);
+      addCriterion(fieldSuggestion, null, facet, true);
     }
   }
 
-  private void addCriterion(VariableFieldSuggestOracle.VariableFieldSuggestion fieldSuggestion, RQLQuery rqlQuery, FacetResultDto facet) {
+  private void addCriterion(VariableFieldSuggestOracle.VariableFieldSuggestion fieldSuggestion, RQLQuery rqlQuery, FacetResultDto facet, boolean opened) {
     VariableFieldDropdown dd = new VariableFieldDropdown(fieldSuggestion, rqlQuery == null, facet) {
       @Override
       public void doFilter() {
@@ -406,7 +406,7 @@ public class SearchVariablesView extends ViewWithUiHandlers<SearchVariablesUiHan
       }
     });
     dd.initialize(rqlQuery);
-    queryPanel.addCriterion(dd, true, true);
+    queryPanel.addCriterion(dd, true, opened);
     queryInput.setText("");
     if (rqlQuery == null) onSearch(0);
   }
