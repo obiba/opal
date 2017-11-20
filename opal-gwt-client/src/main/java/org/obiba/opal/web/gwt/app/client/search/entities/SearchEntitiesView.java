@@ -256,48 +256,48 @@ public class SearchEntitiesView extends ViewWithUiHandlers<SearchEntitiesUiHandl
   }
 
   @Override
-  public void addCategoricalCriterion(RQLIdentifierCriterionParser idFilter, RQLValueSetVariableCriterionParser filter, QueryResultDto facet) {
+  public void addCategoricalCriterion(RQLIdentifierCriterionParser idFilter, RQLValueSetVariableCriterionParser filter, QueryResultDto facet, boolean opened) {
     addVariableFilter(idFilter, new CategoricalCriterionDropdown(filter, facet) {
       @Override
       public void doFilter() {
         onSearch(null);
       }
-    });
+    }, opened);
   }
 
   @Override
-  public void addNumericalCriterion(RQLIdentifierCriterionParser idFilter, RQLValueSetVariableCriterionParser filter, QueryResultDto facet) {
+  public void addNumericalCriterion(RQLIdentifierCriterionParser idFilter, RQLValueSetVariableCriterionParser filter, QueryResultDto facet, boolean opened) {
     addVariableFilter(idFilter, new NumericalCriterionDropdown(filter, facet) {
       @Override
       public void doFilter() {
         onSearch(null);
       }
-    });
+    }, opened);
   }
 
   @Override
-  public void addDateCriterion(RQLIdentifierCriterionParser idFilter, RQLValueSetVariableCriterionParser filter) {
+  public void addDateCriterion(RQLIdentifierCriterionParser idFilter, RQLValueSetVariableCriterionParser filter, boolean opened) {
     addVariableFilter(idFilter, new DateTimeCriterionDropdown(filter) {
       @Override
       public void doFilter() {
         onSearch(null);
       }
-    });
+    }, opened);
   }
 
   @Override
-  public void addDefaultCriterion(RQLIdentifierCriterionParser idFilter, RQLValueSetVariableCriterionParser filter) {
+  public void addDefaultCriterion(RQLIdentifierCriterionParser idFilter, RQLValueSetVariableCriterionParser filter, boolean opened) {
     addVariableFilter(idFilter, new DefaultCriterionDropdown(filter) {
       @Override
       public void doFilter() {
         onSearch(null);
       }
-    });
+    }, opened);
   }
 
-  private void addVariableFilter(RQLIdentifierCriterionParser idFilter, CriterionDropdown criterion) {
+  private void addVariableFilter(RQLIdentifierCriterionParser idFilter, CriterionDropdown criterion, boolean opened) {
     initIdCriterionPanel(idFilter);
-    criteriaPanel.addCriterion(criterion);
+    criteriaPanel.addCriterion(criterion, true, opened);
   }
 
   private void onSearch(int offset, int limit) {

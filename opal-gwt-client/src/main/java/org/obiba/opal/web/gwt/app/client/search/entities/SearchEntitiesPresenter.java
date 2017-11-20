@@ -382,13 +382,13 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
 
     void reset();
 
-    void addCategoricalCriterion(RQLIdentifierCriterionParser idCriterion, RQLValueSetVariableCriterionParser criterion, QueryResultDto facet);
+    void addCategoricalCriterion(RQLIdentifierCriterionParser idCriterion, RQLValueSetVariableCriterionParser criterion, QueryResultDto facet, boolean opened);
 
-    void addNumericalCriterion(RQLIdentifierCriterionParser idCriterion, RQLValueSetVariableCriterionParser criterion, QueryResultDto facet);
+    void addNumericalCriterion(RQLIdentifierCriterionParser idCriterion, RQLValueSetVariableCriterionParser criterion, QueryResultDto facet, boolean opened);
 
-    void addDateCriterion(RQLIdentifierCriterionParser idCriterion, RQLValueSetVariableCriterionParser criterion);
+    void addDateCriterion(RQLIdentifierCriterionParser idCriterion, RQLValueSetVariableCriterionParser criterion, boolean opened);
 
-    void addDefaultCriterion(RQLIdentifierCriterionParser idCriterion, RQLValueSetVariableCriterionParser criterion);
+    void addDefaultCriterion(RQLIdentifierCriterionParser idCriterion, RQLValueSetVariableCriterionParser criterion, boolean opened);
 
     void showResults(EntitiesResultDto results, int offset, int limit);
 
@@ -405,6 +405,7 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
     private RQLValueSetVariableCriterionParser criterion;
     private final List<RQLValueSetVariableCriterionParser> criterions;
     private final int currentIdx;
+    private final boolean opened;
 
     public VariableCriterionProcessor(String datasource, String table) {
       this.criterion = null;
@@ -412,6 +413,7 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
       this.currentIdx = -1;
       this.datasource = datasource;
       this.table = table;
+      this.opened = true;
     }
 
     public VariableCriterionProcessor(List<RQLValueSetVariableCriterionParser> criterions, int idx) {
@@ -420,6 +422,7 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
       this.currentIdx = idx;
       this.datasource = criterion.getDatasourceName();
       this.table = criterion.getTableName();
+      this.opened = false;
     }
 
     @Override
@@ -447,17 +450,17 @@ public class SearchEntitiesPresenter extends Presenter<SearchEntitiesPresenter.D
               @Override
               public void onResource(Response response, QueryResultDto resource) {
                 if (nature == CONTINUOUS)
-                  getView().addNumericalCriterion(idCriterion, criterion, resource);
+                  getView().addNumericalCriterion(idCriterion, criterion, resource, opened);
                 else
-                  getView().addCategoricalCriterion(idCriterion, criterion, resource);
+                  getView().addCategoricalCriterion(idCriterion, criterion, resource, opened);
                 renderNextVariableCriterionOrSearch();
               }
             }).get().send();
       } else {
         if (nature == TEMPORAL)
-          getView().addDateCriterion(idCriterion, criterion);
+          getView().addDateCriterion(idCriterion, criterion, opened);
         else
-          getView().addDefaultCriterion(idCriterion, criterion);
+          getView().addDefaultCriterion(idCriterion, criterion, opened);
         renderNextVariableCriterionOrSearch();
       }
     }
