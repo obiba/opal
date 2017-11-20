@@ -63,7 +63,7 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
 
     specificControls.add(valuesPanel);
 
-    updateControls();
+    updateControls(false);
     return specificControls;
   }
 
@@ -114,7 +114,7 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
       List<String> vals = Lists.newArrayList();
       for (String val : values.getText().trim().split("\\s+")) {
         for (String v : val.trim().split(","))
-          if (!v.trim().isEmpty()) vals.add(v.trim());
+          if (!v.trim().isEmpty()) vals.add(v.trim().replace("%","%25"));
       }
       String valuesQuery = "in(" + getRQLField() + ",(" + Joiner.on(",").join(vals) + "))";
       if (isInSelected()) {
@@ -212,17 +212,17 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
     updateCriterionFilter(translations.criterionFiltersMap().get("all").toLowerCase());
   }
 
-  private void updateControls() {
+  private void updateControls(boolean trigger) {
     valuesPanel.setVisible(isValuesSelected());
     if (divider != null) divider.setVisible(isValuesSelected());
-    updateMatchCriteriaFilter();
+    if (trigger) updateMatchCriteriaFilter();
   }
 
   private class OperatorClickHandler implements ClickHandler {
 
     @Override
     public void onClick(ClickEvent event) {
-      updateControls();
+      updateControls(true);
     }
   }
 }
