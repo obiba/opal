@@ -40,7 +40,7 @@ public class ValueTableIndexResource extends IndexResource {
   @GET
   @OPTIONS
   public Response getTableStatus() {
-    if(!opalSearchService.getValuesIndexManager().isReady()) {
+    if(!opalSearchService.isRunning() || !opalSearchService.isEnabled() || opalSearchService.getValuesIndexManager() == null || !opalSearchService.getValuesIndexManager().isReady()) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
     }
 
