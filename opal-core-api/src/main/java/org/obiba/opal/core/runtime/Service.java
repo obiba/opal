@@ -17,6 +17,13 @@ import org.obiba.opal.core.cfg.OpalConfigurationExtension;
  */
 public interface Service {
 
+  /**
+   * Called by {@link OpalRuntime} before the very first start.
+   *
+   * @param opalRuntime
+   */
+  default void initialize(OpalRuntime opalRuntime) {}
+
   boolean isRunning();
 
   void start();
