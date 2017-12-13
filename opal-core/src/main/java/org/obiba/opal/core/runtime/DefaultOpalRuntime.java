@@ -249,6 +249,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
   private void initServices() {
     for (Service service : services) {
       try {
+        service.initialize(this);
         service.start();
       } catch (RuntimeException e) {
         //noinspection StringConcatenationArgumentToLogCall

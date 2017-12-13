@@ -44,7 +44,6 @@ public class OpalSearchService implements Service, ValueTableUpdateListener {
   @Autowired
   private ElasticSearchConfigurationService configService;
 
-  @Autowired
   private OpalRuntime opalRuntime;
 
   @Autowired
@@ -61,6 +60,11 @@ public class OpalSearchService implements Service, ValueTableUpdateListener {
 
   public boolean isEnabled() {
     return configService.getConfig().isEnabled();
+  }
+
+  @Override
+  public void initialize(OpalRuntime opalRuntime) {
+    this.opalRuntime = opalRuntime;
   }
 
   @Override

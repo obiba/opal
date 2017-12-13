@@ -45,7 +45,6 @@ public class OpalSshServer implements Service {
 
   private final SshServer sshd;
 
-  @Autowired
   private OpalRuntime opalRuntime;
 
   @Autowired
@@ -94,6 +93,11 @@ public class OpalSshServer implements Service {
       }
     });
     sshd.setSubsystemFactories(ImmutableList.<NamedFactory<Command>>of(new SftpSubsystem.Factory()));
+  }
+
+  @Override
+  public void initialize(OpalRuntime opalRuntime) {
+    this.opalRuntime = opalRuntime;
   }
 
   @Override
