@@ -13,6 +13,7 @@ package org.obiba.opal.web.gwt.app.client.support;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import com.google.common.base.*;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
@@ -60,9 +61,16 @@ public class ErrorResponseCallback implements ResponseCodeCallback {
         builder.violations(violationDtos);
       }
     } catch(IllegalArgumentException e) {
-      // response does not contain JSON, it is a simple server error
-      builder.message(TranslationsUtils
-          .replaceArguments(translations.userMessageMap().get("UnhandledException"), response.getText()));
+      String text = response.getText();
+      if (com.google.common.base.Strings.isNullOrEmpty(text)) {
+        text = response.getStatusText();
+        builder.message(TranslationsUtils.replaceArguments(translations.userMessageMap().get(text)));
+      }
+      else {
+        // response does not contain JSON, it is a simple server error
+        builder.message(TranslationsUtils
+            .replaceArguments(translations.userMessageMap().get("UnhandledException"), text));
+      }
     }
     RequestErrorEvent.fire(widget, builder.build());
   }
