@@ -151,7 +151,7 @@ public class DeriveOpenTextualVariableStepPresenter
                 derivationHelper = new OpenTextualVariableDerivationHelper(getOriginalVariable(), getDerivedVariable(),
                     summaryStatisticsDto, getView().getMethod());
                 derivationHelper.initializeValueMapEntries();
-                JsArray<FrequencyDto> frequenciesArray = categoricalSummaryDto.getFrequenciesArray();
+                JsArray<FrequencyDto> frequenciesArray = categoricalSummaryDto == null ? null : categoricalSummaryDto.getFrequenciesArray();
                 if(frequenciesArray != null) {
                   for(int i = 0; i < frequenciesArray.length(); i++) {
                     FrequencyDto frequencyDto = frequenciesArray.get(i);

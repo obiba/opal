@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.google.common.collect.Lists;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -58,6 +59,7 @@ public class OpenTextualVariableDerivationHelper extends CategoricalVariableDeri
   }
 
   private Iterable<FrequencyDto> sortByFrequency() {
+    if (categoricalSummaryDto == null) return Lists.newArrayList();
     List<FrequencyDto> list = JsArrays.toList(categoricalSummaryDto.getFrequenciesArray());
     Collections.sort(list, new Comparator<FrequencyDto>() {
       @Override

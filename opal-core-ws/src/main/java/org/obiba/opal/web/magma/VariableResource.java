@@ -49,7 +49,7 @@ public interface VariableResource {
 
   @Path("/summary")
   @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
-  SummaryResource getSummary(@Context Request request, @QueryParam("nature") String natureStr);
+  SummaryResource getSummary(@Context UriInfo uriInfo, @Context Request request, @QueryParam("nature") String natureStr);
 
   VariableValueSource getVariableValueSource();
 }

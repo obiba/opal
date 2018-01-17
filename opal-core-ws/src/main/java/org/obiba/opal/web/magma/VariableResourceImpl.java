@@ -10,6 +10,7 @@
 package org.obiba.opal.web.magma;
 
 import com.google.common.base.Strings;
+import org.apache.shiro.SecurityUtils;
 import org.obiba.magma.*;
 import org.obiba.magma.support.VariableNature;
 import org.obiba.opal.web.magma.math.*;
@@ -92,22 +93,36 @@ public class VariableResourceImpl extends AbstractValueTableResource implements 
   }
 
   @Override
-  public SummaryResource getSummary(Request request, String natureStr) {
+  public SummaryResource getSummary(UriInfo uriInfo, Request request, String natureStr) {
     Variable variable = variableValueSource.getVariable();
+
+    // OPAL-2979 if user does not have access to individual values, summary should not provide details about top value frequencies
+    String path = uriInfo.getPath();
+    path = path.replaceAll("\\/variable\\/" + variable.getName() + "\\/summary$", "/valueSets");
+    boolean viewValuesPermitted = SecurityUtils.getSubject().isPermitted("rest:" + path + ":GET");
+
     VariableNature nature = natureStr == null
         ? VariableNature.getNature(variable)
         : VariableNature.valueOf(natureStr.toUpperCase());
 
+    // OPAL-2979 if user forces categorical nature without having the right to see values, go back to default summary
+    if (!viewValuesPermitted && !variable.hasCategories() && nature == VariableNature.CATEGORICAL)
+      nature = VariableNature.UNDETERMINED;
+
     SummaryResource resource;
 
-    resource = nature == VariableNature.UNDETERMINED && "text".equals(variable.getValueType().getName())
-        ? applicationContext.getBean(TextSummaryResource.class)
-        : getSummaryResourceClass(nature);
+    if (nature == VariableNature.UNDETERMINED && "text".equals(variable.getValueType().getName())) {
+      resource = viewValuesPermitted ?
+          applicationContext.getBean(TextSummaryResource.class) :
+          applicationContext.getBean(DefaultSummaryResource.class);
+    }
+    else {
+      resource = getSummaryResourceClass(nature);
+    }
     resource.setValueTable(getValueTable());
     resource.setVariable(variable);
     resource.setVariableValueSource(variableValueSource);
     return resource;
-
   }
 
   //
