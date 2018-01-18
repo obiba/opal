@@ -46,6 +46,7 @@ import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.ProjectService;
+import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
 import org.obiba.opal.search.IndexManagerConfiguration;
 import org.obiba.opal.search.IndexManagerConfigurationService;
@@ -459,8 +460,13 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     mockViewManager.removeView(mockDatasourceName, viewName);
     expectLastCall().once();
 
+    SubjectProfileService mockSubjectProfileService = createMock(SubjectProfileService.class);
+    mockSubjectProfileService.deleteBookmarks("/datasource/" + mockDatasourceName + "/table/" + viewName);
+    expectLastCall().once();
+
     ViewResourceImpl viewResource = new ViewResourceImpl();
     viewResource.setViewManager(mockViewManager);
+    viewResource.setSubjectProfileService(mockSubjectProfileService);
     viewResource.setViewDtos(newViewDtos());
 
     ApplicationContext mockContext = createMock(ApplicationContext.class);
@@ -469,13 +475,13 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     DatasourceResource datasourceResource = createDatasource(mockDatasourceName, mockDatasource,
         createMock(OpalConfigurationService.class), mockViewManager, mockContext);
 
-    replay(mockDatasource, mockFromTable, mockViewManager, mockContext);
+    replay(mockDatasource, mockFromTable, mockViewManager, mockSubjectProfileService, mockContext);
 
     // Exercise
     Response response = datasourceResource.getView(viewName).removeView();
 
     // Verify behaviour
-    verify(mockViewManager, mockContext);
+    verify(mockViewManager, mockSubjectProfileService, mockContext);
 
     // Verify state
     assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());

@@ -70,7 +70,29 @@ public interface SubjectProfileService extends SystemService {
    */
   Iterable<SubjectProfile> getProfiles();
 
+  /**
+   * Add a bookmark to principal's profile.
+   *
+   * @param principal
+   * @param resources
+   * @throws SubjectProfileNotFoundException
+   */
   void addBookmarks(String principal, List<String> resources) throws SubjectProfileNotFoundException;
 
+  /**
+   * Delete principal's bookmark (if it exists).
+   *
+   * @param principal
+   * @param path
+   * @throws SubjectProfileNotFoundException
+   */
   void deleteBookmark(String principal, String path) throws SubjectProfileNotFoundException;
+
+  /**
+   * Delete all bookmarks (which resource is equal to or starts with) from all profiles.
+   *
+   * @param path
+   * @throws SubjectProfileNotFoundException
+   */
+  void deleteBookmarks(String path) throws SubjectProfileNotFoundException;
 }
