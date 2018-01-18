@@ -15,6 +15,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.ValueTableUpdateListener;
 import org.obiba.magma.security.Authorizer;
@@ -22,6 +23,7 @@ import org.obiba.magma.security.MagmaSecurityExtension;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
+import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.obiba.opal.web.support.InvalidRequestException;
@@ -47,6 +49,8 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
   @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
   private Collection<ValueTableUpdateListener> tableListeners;
 
+  private SubjectProfileService subjectProfileService;
+
   @Autowired
   public void setViewDtos(ViewDtos viewDtos) {
     this.viewDtos = viewDtos;
@@ -55,6 +59,11 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
   @Autowired
   public void setViewManager(ViewManager viewManager) {
     this.viewManager = viewManager;
+  }
+
+  @Autowired
+  public void setSubjectProfileService(SubjectProfileService subjectProfileService) {
+    this.subjectProfileService = subjectProfileService;
   }
 
   @Override
@@ -76,6 +85,7 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
         }
       }
       viewManager.removeView(getDatasource().getName(), getValueTable().getName());
+      subjectProfileService.deleteBookmarks("/datasource/" + getDatasource().getName() + "/table/" + getValueTable().getName());
     }
     viewManager.addView(getDatasource().getName(), viewDtos.fromDto(viewDto), comment, null);
 
@@ -92,7 +102,17 @@ public class ViewResourceImpl extends TableResourceImpl implements ViewResource 
 
   @Override
   public Response removeView() {
-    viewManager.removeView(getDatasource().getName(), getValueTable().getName());
+    try {
+      if(tableListeners != null && !tableListeners.isEmpty()) {
+        for(ValueTableUpdateListener listener : tableListeners) {
+          listener.onDelete(getValueTable());
+        }
+      }
+      viewManager.removeView(getDatasource().getName(), getValueTable().getName());
+      subjectProfileService.deleteBookmarks("/datasource/" + getDatasource().getName() + "/table/" + getValueTable().getName());
+    } catch (NoSuchValueTableException e) {
+      // ignore
+    }
     return Response.ok().build();
   }
 

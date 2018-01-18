@@ -12,16 +12,20 @@ package org.obiba.opal.core.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.obiba.opal.core.domain.HasUniqueProperties;
+import org.obiba.opal.core.domain.security.Bookmark;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.runtime.OpalRuntime;
@@ -137,8 +141,22 @@ public class SubjectProfileServiceImpl implements SubjectProfileService {
   @Override
   public void deleteBookmark(String principal, String path) throws SubjectProfileNotFoundException {
     SubjectProfile profile = getProfile(principal);
-    if(profile.removeBookmark(path)) {
+    if(profile.hasBookmark(path) && profile.removeBookmark(path)) {
       orientDbService.save(profile, profile);
+    }
+  }
+
+  @Override
+  public void deleteBookmarks(String path) throws SubjectProfileNotFoundException{
+    for (SubjectProfile profile : orientDbService.list(SubjectProfile.class)) {
+      if (!profile.hasBookmarks()) return;
+      List<Bookmark> toRemove = profile.getBookmarks().stream()
+          .filter(b -> b.getResource().equals(path) || b.getResource().startsWith(path + "/"))
+          .collect(Collectors.toList());
+      if (!toRemove.isEmpty()) {
+        toRemove.forEach(profile::removeBookmark);
+        orientDbService.save(profile, profile);
+      }
     }
   }
 

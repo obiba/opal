@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response;
 
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.opal.core.ValueTableUpdateListener;
+import org.obiba.opal.core.service.SubjectProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -34,6 +35,9 @@ public class DroppableTableResourceImpl extends TableResourceImpl implements Dro
   @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
   private Collection<ValueTableUpdateListener> tableListeners;
 
+  @Autowired
+  private SubjectProfileService subjectProfileService;
+
   @Override
   @DELETE
   public Response drop() {
@@ -44,6 +48,7 @@ public class DroppableTableResourceImpl extends TableResourceImpl implements Dro
         }
       }
       getDatasource().dropTable(getValueTable().getName());
+      subjectProfileService.deleteBookmarks("/datasource/" + getDatasource().getName() + "/table/" + getValueTable().getName());
     } catch (NoSuchValueTableException e) {
       // ignore
     }

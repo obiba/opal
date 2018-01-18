@@ -87,8 +87,16 @@ public class SubjectProfile extends AbstractTimestamped implements HasUniqueProp
     return bookmarks != null && bookmarks.remove(new Bookmark(resource));
   }
 
+  public boolean removeBookmark(Bookmark bookmark) {
+    return bookmarks != null && bookmarks.remove(bookmark);
+  }
+
   public boolean hasBookmark(String resource) {
     return bookmarks != null && bookmarks.contains(new Bookmark(resource));
+  }
+
+  public boolean hasBookmarks() {
+    return bookmarks != null;
   }
 
   @Override
