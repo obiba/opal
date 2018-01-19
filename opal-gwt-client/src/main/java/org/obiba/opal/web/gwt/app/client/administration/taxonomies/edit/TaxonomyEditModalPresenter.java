@@ -14,6 +14,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.http.client.Request;
@@ -25,21 +26,21 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.event.TaxonomyUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.support.OpalSystemCache;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.opal.GeneralConf;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 
 public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEditModalPresenter.Display>
     implements TaxonomyEditModalUiHandlers {
+
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final OpalSystemCache opalSystemCache;
 
@@ -73,47 +74,97 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
 
     if (mode == EDIT_MODE.EDIT) {
       dto.setVocabulariesArray(originalTaxonomy.getVocabulariesArray());
-
-      ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder().forResource(
-          UriBuilders.SYSTEM_CONF_TAXONOMY.create().build(originalTaxonomy.getName()))//
-          .withResourceBody(TaxonomyDto.stringify(dto))//
-          .withCallback(new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              getView().hide();
-              getEventBus().fireEvent(new TaxonomyUpdatedEvent(dto.getName()));
-            }
-          }, Response.SC_OK, Response.SC_CREATED)//
-          .withCallback(new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              if (response.getText() != null && !response.getText().isEmpty()) {
-                fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+      if (originalTaxonomy.getName().equals(dto.getName())) {
+        doUpdate(dto);
+      } else {
+        // first verify that there is no taxonomy with same name
+        ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder().forResource(
+        UriBuilders.SYSTEM_CONF_TAXONOMY.create().build(dto.getName()))//
+            .withCallback(new ResourceCallback<TaxonomyDto>() {
+              @Override
+              public void onResource(Response response, TaxonomyDto resource) {
+                if (response.getStatusCode() == Response.SC_OK) {
+                  getView().showError(Display.FormField.NAME, translations.userMessageMap().get("TaxonomyNameAlreadyExists"));
+                } else {
+                  getView().showError(Display.FormField.NAME, translations.userMessageMap().get("UnknownError"));
+                }
               }
-            }
-          }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR)//
-          .put().send();
+            })
+            .withCallback(new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                doUpdate(dto);
+              }
+            }, Response.SC_NOT_FOUND)
+            .get().send();
+      }
     } else {
+      // first verify that there is no taxonomy with same name
       ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder().forResource(
-          UriBuilders.SYSTEM_CONF_TAXONOMIES.create().build())//
-          .withResourceBody(TaxonomyDto.stringify(dto))//
-          .withCallback(new ResponseCodeCallback() {
+          UriBuilders.SYSTEM_CONF_TAXONOMY.create().build(dto.getName()))//
+          .withCallback(new ResourceCallback<TaxonomyDto>() {
             @Override
-            public void onResponseCode(Request request, Response response) {
-              getView().hide();
-              getEventBus().fireEvent(new TaxonomyUpdatedEvent(dto.getName()));
-            }
-          }, Response.SC_OK, Response.SC_CREATED)//
-          .withCallback(new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              if (response.getText() != null && !response.getText().isEmpty()) {
-                fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+            public void onResource(Response response, TaxonomyDto resource) {
+              if (response.getStatusCode() == Response.SC_OK) {
+                getView().showError(Display.FormField.NAME, translations.userMessageMap().get("TaxonomyNameAlreadyExists"));
+              } else {
+                getView().showError(Display.FormField.NAME, translations.userMessageMap().get("UnknownError"));
               }
             }
-          }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR)//
-          .post().send();
+          })
+
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              doCreate(dto);
+            }
+          }, Response.SC_NOT_FOUND)
+          .get().send();
     }
+  }
+
+  private void doCreate(final TaxonomyDto dto) {
+    ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder().forResource(
+        UriBuilders.SYSTEM_CONF_TAXONOMIES.create().build())//
+        .withResourceBody(TaxonomyDto.stringify(dto))//
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().hide();
+            getEventBus().fireEvent(new TaxonomyUpdatedEvent(dto.getName()));
+          }
+        }, Response.SC_OK, Response.SC_CREATED)//
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if (response.getText() != null && !response.getText().isEmpty()) {
+              fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+            }
+          }
+        }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR)//
+        .post().send();
+  }
+
+  private void doUpdate(final TaxonomyDto dto) {
+    ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder().forResource(
+        UriBuilders.SYSTEM_CONF_TAXONOMY.create().build(originalTaxonomy.getName()))//
+        .withResourceBody(TaxonomyDto.stringify(dto))//
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().hide();
+            getEventBus().fireEvent(new TaxonomyUpdatedEvent(dto.getName()));
+          }
+        }, Response.SC_OK, Response.SC_CREATED)//
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if (response.getText() != null && !response.getText().isEmpty()) {
+              fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+            }
+          }
+        }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR)//
+        .put().send();
   }
 
   public void initView(final TaxonomyDto taxonomyDto) {

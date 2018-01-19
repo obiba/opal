@@ -647,6 +647,7 @@ public interface Translations extends Constants {
       "TaxonomyTagsImportFailed", "Failed to retrieve taxonomy released versions. Please contact technical support.",
       "TaxonomyNoTagsFound", "There are no released versions available. Please contact your administrator for further assistance.", //
       "TaxonomyNotFound", "No such taxonomy with name: {0}.", //
+      "TaxonomyNameAlreadyExists", "A taxonomy with the same name already exists.",
       "TaxonomyAlreadyExists", "A taxonomy with the name '{0}' already exists. To override, click on 'Override existing taxonomy' option.", //
       "VocabularyNotFound", "No such vocabulary in taxonomy '{0}' with name: {1}.", //
       "TermNotFound", "No such term in taxonomy '{0}' and vocabulary '{1}' with name: {2}.", //
