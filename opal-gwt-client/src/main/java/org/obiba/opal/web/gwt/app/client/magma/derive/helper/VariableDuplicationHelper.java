@@ -51,6 +51,7 @@ public class VariableDuplicationHelper extends DerivationHelper {
       if (Strings.isNullOrEmpty(originalTableReference)) script = script + ".valueAt(" + valueAt + ")";
       derived.setName(derived.getName() + "_" + (valueAt + 1));
       derived.setIsRepeatable(false);
+      derived.setOccurrenceGroup("");
     }
     VariableDtos.setScript(derived, script);
     return derived;

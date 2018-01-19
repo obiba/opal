@@ -153,6 +153,7 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
       } else {
         derived.setValueType(ValueType.TEXT.getLabel());
         derived.setIsRepeatable(false);
+        derived.setOccurrenceGroup("");
         script = selectedScript;
       }
 
