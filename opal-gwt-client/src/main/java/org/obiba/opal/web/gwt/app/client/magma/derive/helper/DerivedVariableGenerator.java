@@ -81,6 +81,7 @@ public abstract class DerivedVariableGenerator {
 
     if (valueAt>=0) {
       derived.setIsRepeatable(false);
+      derived.setOccurrenceGroup("");
       derived.setName(derived.getName() + "_" + (valueAt + 1));
     }
 

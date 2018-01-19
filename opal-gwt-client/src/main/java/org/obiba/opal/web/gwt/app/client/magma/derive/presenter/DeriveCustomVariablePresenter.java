@@ -76,6 +76,7 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
       if(!Strings.isNullOrEmpty(selectedScript)) {
         variable.setValueType(ValueType.TEXT.getLabel());
         variable.setIsRepeatable(false);
+        variable.setOccurrenceGroup("");
         VariableDtos.setScript(variable, selectedScript);
       }
       return variable;
