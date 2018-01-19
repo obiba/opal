@@ -251,7 +251,8 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
 
     JsArray<VariableDto> variablesDto = JsArrays.create();
     for (VariableDto v : getView().getVariables(true)) {
-      // Push with the right name if it was changed
+      // Push with the right name if it was changed and initialize index
+      v.setIndex(0);
       variablesDto.push(v);
     }
     derivedVariables.setVariablesArray(variablesDto);
@@ -324,11 +325,13 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
 
       JsArray<VariableDto> existingVariables = JsArrays.toSafeArray(derivedVariables.getVariablesArray());
       for (int i = 0; i < variables.length(); i++) {
-        int index = getVariableIndex(existingVariables, variables.get(i).getName());
-        if (index == -1) {
-          existingVariables.push(variables.get(i));
+        VariableDto var = variables.get(i);
+        int pos = getVariablePosition(existingVariables, var.getName());
+        var.setIndex(getVariableIndex(existingVariables, var.getName(), pos));
+        if (pos == -1) {
+          existingVariables.push(var);
         } else {
-          existingVariables.set(index, variables.get(i));
+          existingVariables.set(pos, var);
         }
       }
       derivedVariables.setVariablesArray(existingVariables);
@@ -366,7 +369,22 @@ public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToVi
       }
     }
 
-    private int getVariableIndex(JsArray<VariableDto> vars, String name) {
+    private int getVariableIndex(JsArray<VariableDto> vars, String name, int pos) {
+      if (pos == -1) {
+        int max = 0;
+        for (int i = 0; i < vars.length(); i++) {
+          VariableDto var = vars.get(i);
+          if (max<var.getIndex()) {
+            max = var.getIndex();
+          }
+        }
+        return max == 0 ? 0 : max + 1;
+      } else {
+        return vars.get(pos).getIndex();
+      }
+    }
+
+    private int getVariablePosition(JsArray<VariableDto> vars, String name) {
       for (int i = 0; i < vars.length(); i++) {
         if (vars.get(i).getName().equals(name)) {
           return i;

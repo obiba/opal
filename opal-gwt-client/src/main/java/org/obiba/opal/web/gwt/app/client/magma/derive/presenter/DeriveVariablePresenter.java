@@ -552,6 +552,8 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
       VariableListViewDto variableListViewDto = (VariableListViewDto) view
           .getExtension(VariableListViewDto.ViewDtoExtensions.view);
       JsArray<VariableDto> variables = JsArrays.toSafeArray(variableListViewDto.getVariablesArray());
+      // get the right index
+      newDerived.setIndex(getVariableIndex(view, newDerived, pos));
       if(pos == -1) {
         variables.push(newDerived);
       } else {
@@ -562,11 +564,29 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
       doRequest(view);
     }
 
+    private int getVariableIndex(ViewDto view, VariableDto derivedVariable, int pos) {
+      VariableListViewDto variableListViewDto = (VariableListViewDto) view
+          .getExtension(VariableListViewDto.ViewDtoExtensions.view);
+      JsArray<VariableDto> variables = JsArrays.toSafeArray(variableListViewDto.getVariablesArray());
+      if (pos == -1) {
+        int max = 0;
+        for(int i = 0; i < variables.length(); i++) {
+          VariableDto var = variables.get(i);
+          if (max<var.getIndex()) {
+            max = var.getIndex();
+          }
+        }
+        return max == 0 ? 0 : max + 1;
+      } else {
+        return variables.get(pos).getIndex();
+      }
+    }
+
     /**
      * Get the position of the variable with the same name in the view
      *
      * @param view
-     * @param derived
+     * @param derivedVariable
      * @return -1 if not found
      */
     private int getVariablePosition(ViewDto view, VariableDto derivedVariable) {
