@@ -94,11 +94,6 @@ public class VariablePropertiesModalView extends ModalPopupViewWithUiHandlers<Va
     index.setMinConstrained(false);
   }
 
-  @UiHandler("repeatable")
-  void onRepeatable(ClickEvent event) {
-    occurenceGroup.setEnabled(getRepeatable());
-  }
-
   @UiHandler("closeButton")
   void onClose(ClickEvent event) {
     dialog.hide();
@@ -127,7 +122,6 @@ public class VariablePropertiesModalView extends ModalPopupViewWithUiHandlers<Va
     variableName.setEnabled(modifyName);
     valueType.setEnabled(modifyValueType);
     repeatable.setEnabled(modifyValueType);
-    occurenceGroup.setEnabled(getRepeatable());
   }
 
   @Override

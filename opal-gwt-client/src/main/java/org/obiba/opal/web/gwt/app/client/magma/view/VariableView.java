@@ -433,7 +433,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     mimeType.setText(variable.hasMimeType() ? variable.getMimeType() : "");
     unit.setText(variable.hasUnit() ? variable.getUnit() : "");
     repeatable.setText(variable.getIsRepeatable() ? translations.yesLabel() : translations.noLabel());
-    occurrenceGroup.setText(variable.getIsRepeatable() ? variable.getOccurrenceGroup() : "");
+    occurrenceGroup.setText(variable.getOccurrenceGroup());
 
     updateComment(variable.getName());
     updateScriptNavPanel(scriptNavPanel.getVisibleWidget());
