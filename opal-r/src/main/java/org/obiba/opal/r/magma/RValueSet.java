@@ -60,7 +60,7 @@ class RValueSet extends ValueSetBean {
         List<Integer> rowIdx = Lists.newArrayList();
         int row = 0;
         for (String id : ids) {
-          if (getVariableEntity().getIdentifier().equals(RVariableEntityProvider.normalizeId(id))) {
+          if (getRVariableEntity().getRIdentifier().equals(id)) {
             rowIdx.add(row);
           }
           row++;
@@ -81,6 +81,10 @@ class RValueSet extends ValueSetBean {
         // ignore
       }
     }
+  }
+
+  private RVariableEntity getRVariableEntity() {
+    return (RVariableEntity)getVariableEntity();
   }
 
   private int getIdPosition() {

@@ -63,8 +63,7 @@ class RVariableEntityProvider implements VariableEntityProvider {
         int length = ((REXPVector)idVector).length();
         try {
           for (String id : idVector.asStrings()) {
-            String identifier = normalizeId(id);
-            entities.add(new VariableEntityBean(entityType, identifier));
+            entities.add(new RVariableEntity(entityType, id));
           }
         } catch (REXPMismatchException e) {
           // ignore
@@ -73,22 +72,6 @@ class RVariableEntityProvider implements VariableEntityProvider {
       }
     }
     return entities;
-  }
-
-  static String normalizeId(String id) {
-    return id.endsWith(".0") ?
-      id.substring(0, id.lastIndexOf(".0")) : id;
-  }
-
-  void initialiseIdColumn() {
-    if (Strings.isNullOrEmpty(idColumn)) {
-      REXPVector colnames = (REXPVector) valueTable.execute(String.format("colnames(`%s`)", valueTable.getSymbol()));
-      try {
-        idColumn = colnames.asStrings()[0];
-      } catch (REXPMismatchException e) {
-        idColumn = RDatasource.DEFAULT_ID_COLUMN_NAME;
-      }
-    }
   }
 
   String getIdColumn() {
@@ -100,5 +83,16 @@ class RVariableEntityProvider implements VariableEntityProvider {
     // make sure it was initialized
     getVariableEntities();
     return multilines;
+  }
+
+  private void initialiseIdColumn() {
+    if (Strings.isNullOrEmpty(idColumn)) {
+      REXPVector colnames = (REXPVector) valueTable.execute(String.format("colnames(`%s`)", valueTable.getSymbol()));
+      try {
+        idColumn = colnames.asStrings()[0];
+      } catch (REXPMismatchException e) {
+        idColumn = RDatasource.DEFAULT_ID_COLUMN_NAME;
+      }
+    }
   }
 }
