@@ -31,12 +31,15 @@ class RValueSetFetcher {
   REXP getREXP(VariableEntity entity) {
     // subset tibble: get the row(s) matching the entity id (result is a tibble)
     String cmd = String.format("`%s`[`%s`$`%s`=='%s',]", table.getSymbol(), table.getSymbol(),
-        table.getIdColumn(), entity.getIdentifier());
+        table.getIdColumn(), ((RVariableEntity)entity).getRIdentifier());
     return table.execute(cmd);
   }
 
   REXP getREXP(List<VariableEntity> entities) {
-    String ids = entities.stream().map(e -> e.getIdentifier()).collect(Collectors.joining("','", "'", "'"));
+    // to query R, we need the original R entity identifier
+    String ids = entities.stream()
+        .map(e -> ((RVariableEntity)e).getRIdentifier())
+        .collect(Collectors.joining("','", "'", "'"));
     // subset tibble: get the row(s) matching the entity ids (result is a tibble)
     String cmd = String.format("`%s`[`%s`$`%s`%%in%% c(%s),]", table.getSymbol(), table.getSymbol(),
         table.getIdColumn(), ids);
