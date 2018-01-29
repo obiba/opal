@@ -176,7 +176,7 @@ public class RQLCriterionParser {
     if (valueStr.contains("*")) return normalizeString(valueStr);
     if (valueStr.startsWith("\"") && valueStr.endsWith("\"")) return valueStr;
     valueStr = valueStr.replace("+", " ");
-    if (valueStr.contains(" ")) return "\"" + valueStr + "\"";
+    if (valueStr.contains(" ") || valueStr.startsWith("-")) return "\"" + valueStr + "\"";
     return valueStr;
   }
 
