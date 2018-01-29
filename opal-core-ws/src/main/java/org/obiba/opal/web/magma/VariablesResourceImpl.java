@@ -112,7 +112,11 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
   }
 
   @Override
-  public Response updateAttribute(String namespace, String name, List<String> locales, List<String> values, List<String> variableNames) {
+  public Response updateAttribute(String namespace, String name, List<String> locales, List<String> values, String action, List<String> variableNames) {
+    if ("delete".equals(action)) {
+      return removeAttribute(namespace, name, locales.isEmpty() ? null : locales.get(0),
+          values.isEmpty() ? null : values.get(0), variableNames);
+    }
     if (Strings.isNullOrEmpty(name) || locales.contains("")) return Response.status(BAD_REQUEST).build();
     if (locales.isEmpty()) {
       String valueStr = values.isEmpty() ? null : Joiner.on("|").join(values);
@@ -134,9 +138,9 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
   }
 
   @Override
-  public Response deleteAttribute(String namespace, String name, String localeStr, String value, @FormParam("variable") List<String> variableNames) {
+  public Response deleteAttribute(String namespace, String name, String localeStr, String value) {
     if (Strings.isNullOrEmpty(name)) return Response.status(BAD_REQUEST).build();
-    return removeAttribute(namespace, name, localeStr, value, variableNames);
+    return removeAttribute(namespace, name, localeStr, value, null);
   }
 
   @Override
