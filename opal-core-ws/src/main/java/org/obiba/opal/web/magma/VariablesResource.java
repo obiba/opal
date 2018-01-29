@@ -64,6 +64,7 @@ public interface VariablesResource {
    * @param name
    * @param locales
    * @param values If null or empty, the attribute is removed.
+   * @param action Type of edition: 'apply' (default) or 'delete'.
    * @param variables
    * @return
    */
@@ -71,7 +72,7 @@ public interface VariablesResource {
   @Path("/_attribute")
   Response updateAttribute(@QueryParam("namespace") String namespace, @QueryParam("name") String name,
                         @QueryParam("locale") List<String> locales, @QueryParam("value") List<String> values,
-                        @FormParam("variable") List<String> variables);
+                        @QueryParam("action") @DefaultValue("apply") String action, @FormParam("variable") List<String> variables);
 
   /**
    * Batch removal of a specific attribute in all the specified variables.
@@ -79,14 +80,12 @@ public interface VariablesResource {
    * @param name
    * @param locale
    * @param value If null or empty, the attribute is removed whatever the value is.
-   * @param variables
    * @return
    */
   @DELETE
   @Path("/_attribute")
   Response deleteAttribute(@QueryParam("namespace") String namespace, @QueryParam("name") String name,
-                           @QueryParam("locale") String locale, @QueryParam("value") String value,
-                           @FormParam("variable") List<String> variables);
+                           @QueryParam("locale") String locale, @QueryParam("value") String value);
 
   @POST
   Response addOrUpdateVariables(List<Magma.VariableDto> variables, @Nullable @QueryParam("comment") String comment);
