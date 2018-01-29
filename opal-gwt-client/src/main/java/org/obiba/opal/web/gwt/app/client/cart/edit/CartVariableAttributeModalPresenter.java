@@ -126,6 +126,7 @@ public class CartVariableAttributeModalPresenter
       for (String value : values)
         uriBuilder.query("value", value);
     }
+    if (!apply) uriBuilder.query("action", "delete");
     ResourceRequestBuilder builder = ResourceRequestBuilderFactory.newBuilder()
         .forResource(uriBuilder.build(parser.getDatasource(), parser.getTable()))
         .withCallback(new ResponseCodeCallback() {
@@ -136,8 +137,7 @@ public class CartVariableAttributeModalPresenter
         }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_FORBIDDEN, Response.SC_NOT_FOUND, Response.SC_OK);
     for (CartVariableItem item : cartVariableItemsMap.get(tableRef))
       builder.withFormBody("variable", item.getVariable().getName());
-    if (apply) builder.put().send();
-    else builder.delete().send();
+    builder.put().send();
   }
 
   private void incrementProgress(MagmaPath.Parser parser, int status) {
