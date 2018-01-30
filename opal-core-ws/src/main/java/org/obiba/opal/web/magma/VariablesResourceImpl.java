@@ -114,13 +114,17 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
   @Override
   public Response updateAttribute(String namespace, String name, List<String> locales, List<String> values, String action, List<String> variableNames) {
     if ("delete".equals(action)) {
-      return removeAttribute(namespace, name, locales.isEmpty() ? null : locales.get(0),
-          values.isEmpty() ? null : values.get(0), variableNames);
+      if (Strings.isNullOrEmpty(name)) return Response.status(BAD_REQUEST).build();
+      removeAttributes(namespace, name, locales, values, variableNames);
+      return Response.ok().build();
     }
     if (Strings.isNullOrEmpty(name) || locales.contains("")) return Response.status(BAD_REQUEST).build();
     if (locales.isEmpty()) {
       String valueStr = values.isEmpty() ? null : Joiner.on("|").join(values);
-      if (Strings.isNullOrEmpty(valueStr)) return removeAttribute(namespace, name, null, valueStr, variableNames);
+      if (Strings.isNullOrEmpty(valueStr)) {
+        removeAttribute(namespace, name, null, valueStr, variableNames);
+        return Response.ok().build();
+      }
       return setAttribute(namespace, name, null, valueStr, variableNames);
     }
     if (locales.size() != values.size())
@@ -140,7 +144,8 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
   @Override
   public Response deleteAttribute(String namespace, String name, String localeStr, String value) {
     if (Strings.isNullOrEmpty(name)) return Response.status(BAD_REQUEST).build();
-    return removeAttribute(namespace, name, localeStr, value, null);
+    removeAttribute(namespace, name, localeStr, value, null);
+    return Response.ok().build();
   }
 
   @Override
@@ -255,7 +260,30 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
     return Response.ok().build();
   }
 
-  private Response removeAttribute(String namespace, String name, String localeStr, String value, List<String> variableNames) {
+
+  private void removeAttributes(String namespace, String name, List<String> locales, List<String> values, List<String> variableNames) {
+    if (values.isEmpty()) {
+      if (locales.isEmpty()) {
+        removeAttribute(namespace, name, null,null, variableNames);
+      } else {
+        for (String locale : locales) {
+          removeAttribute(namespace, name, locale, null, variableNames);
+        }
+      }
+    } else {
+      for (String value : values) {
+        if (locales.isEmpty()) {
+          removeAttribute(namespace, name, null, value, variableNames);
+        } else {
+          for (String locale : locales) {
+            removeAttribute(namespace, name, locale, value, variableNames);
+          }
+        }
+      }
+    }
+  }
+
+  private void removeAttribute(String namespace, String name, String localeStr, String value, List<String> variableNames) {
     ValueTable table = getValueTable();
     Iterable<Variable> variables = getVariables(table, variableNames);
     Locale locale = Strings.isNullOrEmpty(localeStr) ? null : Locale.forLanguageTag(localeStr);
@@ -280,7 +308,6 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
       }
     }
     addOrUpdateTableVariables(updatedVariables);
-    return Response.ok().build();
   }
 
   /**
