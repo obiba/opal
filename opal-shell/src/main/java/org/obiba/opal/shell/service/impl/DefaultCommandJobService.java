@@ -15,12 +15,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executor;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.shiro.SecurityUtils;
@@ -216,7 +211,7 @@ public class DefaultCommandJobService implements CommandJobService {
   }
 
   protected Executor createExecutor() {
-    return new ThreadPoolExecutor(10, 10, 0, TimeUnit.MILLISECONDS, jobsNotStarted) {
+    return new ThreadPoolExecutor(1, 1, 0, TimeUnit.MILLISECONDS, jobsNotStarted) {
       @Override
       protected void beforeExecute(Thread t, Runnable r) {
         log.info("Starting task {}", ((FutureCommandJob) r).commandJob.getId());
