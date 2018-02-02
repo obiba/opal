@@ -259,7 +259,7 @@ public enum VectorType {
   }
 
   protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings) {
-    return asStringValuesVector(variable, values);
+    return variable != null && variable.getValueType().isGeo() ? asGeoJSONValuesVector(variable, values) : asStringValuesVector(variable, values);
   }
 
   protected REXP asFactors(Variable variable, List<Value> values, boolean withMissings) {
@@ -310,6 +310,30 @@ public enum VectorType {
     }
 
     return variable == null ? new REXPString(strs) : new REXPString(strs, getVariableRAttributes(variable, null));
+  }
+
+  /**
+   * Build a R vector of strings representing GeoJSON values (see https://tools.ietf.org/html/rfc7946).
+   *
+   * @param variable
+   * @param values
+   * @return
+   */
+  protected REXP asGeoJSONValuesVector(Variable variable, List<Value> values) {
+    String strs[] = new String[values.size()];
+    String type = "Point";
+    if (variable.getValueType().equals(LineStringType.get())) type = "LineString";
+    else if (variable.getValueType().equals(PolygonType.get())) type = "Polygon";
+    int i = 0;
+    for (Value value : values) {
+      String str = value.toString();
+      if (str == null || str.isEmpty())
+        strs[i] = null;
+      else
+        strs[i] = "{\"type\":\"" + type + "\",\"coordinates\":" + str + "}";
+      i++;
+    }
+    return new REXPString(strs, getVariableRAttributes(variable, null));
   }
 
   /**
