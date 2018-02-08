@@ -16,15 +16,22 @@ import javax.validation.constraints.NotNull;
 
 class RVariableEntity extends VariableEntityBean {
 
-  private String rEntityIdentifier;
+  private final String rEntityIdentifier;
 
-  RVariableEntity(@NotNull String entityType, @NotNull String entityIdentifier) {
+  private final boolean numeric;
+
+  RVariableEntity(@NotNull String entityType, @NotNull String entityIdentifier, boolean isNumeric) {
     super(entityType, normalizeId(entityIdentifier));
     this.rEntityIdentifier = entityIdentifier;
+    this.numeric = isNumeric;
   }
 
   String getRIdentifier() {
     return rEntityIdentifier;
+  }
+
+  boolean isNumeric() {
+    return numeric;
   }
 
   private static String normalizeId(String id) {
