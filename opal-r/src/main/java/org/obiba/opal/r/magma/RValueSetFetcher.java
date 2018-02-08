@@ -29,20 +29,26 @@ class RValueSetFetcher {
   }
 
   REXP getREXP(VariableEntity entity) {
+    RVariableEntity re = ((RVariableEntity)entity);
+    String rid = re.getRIdentifier();
+    if (!re.isNumeric()) rid = String.format("'%s'", rid);
     // subset tibble: get the row(s) matching the entity id (result is a tibble)
-    String cmd = String.format("`%s`[`%s`$`%s`=='%s',]", table.getSymbol(), table.getSymbol(),
-        table.getIdColumn(), ((RVariableEntity)entity).getRIdentifier());
+    String cmd = String.format("`%s`[`%s`$`%s` == %s,]", table.getSymbol(), table.getSymbol(), table.getIdColumn(), rid);
     return table.execute(cmd);
   }
 
   REXP getREXP(List<VariableEntity> entities) {
     // to query R, we need the original R entity identifier
     String ids = entities.stream()
-        .map(e -> ((RVariableEntity)e).getRIdentifier())
-        .collect(Collectors.joining("','", "'", "'"));
+        .map(e -> {
+          RVariableEntity re = ((RVariableEntity)e);
+          String rid = re.getRIdentifier();
+          if (!re.isNumeric()) rid = String.format("'%s'", rid);
+          return rid;
+        })
+        .collect(Collectors.joining(","));
     // subset tibble: get the row(s) matching the entity ids (result is a tibble)
-    String cmd = String.format("`%s`[`%s`$`%s`%%in%% c(%s),]", table.getSymbol(), table.getSymbol(),
-        table.getIdColumn(), ids);
+    String cmd = String.format("`%s`[`%s`$`%s` %%in%% c(%s),]", table.getSymbol(), table.getSymbol(), table.getIdColumn(), ids);
     return table.execute(cmd);
   }
 

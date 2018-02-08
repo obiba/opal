@@ -59,11 +59,12 @@ class RVariableEntityProvider implements VariableEntityProvider {
       entities = Sets.newLinkedHashSet();
       initialiseIdColumn();
       REXP idVector = valueTable.execute(String.format("`%s`$`%s`", valueTable.getSymbol(), idColumn));
+      boolean isNumeric = idVector.isNumeric();
       if (idVector instanceof REXPVector) {
         int length = ((REXPVector)idVector).length();
         try {
           for (String id : idVector.asStrings()) {
-            entities.add(new RVariableEntity(entityType, id));
+            entities.add(new RVariableEntity(entityType, id, isNumeric));
           }
         } catch (REXPMismatchException e) {
           // ignore
