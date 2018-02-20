@@ -86,7 +86,7 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
   }
 
   protected String getTmpVectorName(String symbol, String name) {
-    return ("opal__" + symbol + "__" + name).replace("-", ".").replace("+", ".").replace(" ", ".").replace("\"", ".")
+    return ("opal__" + symbol + "__" + name).replace("@", ".").replace("-", ".").replace("+", ".").replace(" ", ".").replace("\"", ".")
         .replace("'", ".").replace("[", ".").replace("]", ".").replace("{", ".").replace("}", ".").replace("(", ".").replace(")", ".");
   }
 
