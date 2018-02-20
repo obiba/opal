@@ -184,28 +184,27 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
     Map<String, Map<String, Value>> variableValues = Maps.newConcurrentMap();
     variables.forEach(variable -> variableValues.put(variable.getName(), Maps.newConcurrentMap()));
 
-    // parallelize value set extraction
-    StreamSupport.stream(table.getValueSets(entities).spliterator(), true) //
-        .forEach(valueSet ->
-            magmaAssignROperation.getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
-              @Override
-              protected void doInTransactionWithoutResult(TransactionStatus status) {
-                variables.forEach(variable -> {
-                  String identifier = valueSet.getVariableEntity().getIdentifier();
-                  Value value = table.getValue(variable, valueSet);
-                  if (variable.isRepeatable()) {
-                    int seqSize = value.asSequence().getSize();
-                    if (!lineCounts.containsKey(identifier)) {
-                      lineCounts.put(identifier, seqSize);
-                    } else {
-                      lineCounts.put(identifier, Math.max(lineCounts.get(identifier), seqSize));
-                    }
-                  }
-                  variableValues.get(variable.getName()).put(identifier, value);
-                });
+    // OPAL-3013 do not parallelize value set extraction
+    for (ValueSet valueSet : table.getValueSets(entities)) {
+      magmaAssignROperation.getTransactionTemplate().execute(new TransactionCallbackWithoutResult() {
+        @Override
+        protected void doInTransactionWithoutResult(TransactionStatus status) {
+          variables.forEach(variable -> {
+            String identifier = valueSet.getVariableEntity().getIdentifier();
+            Value value = table.getValue(variable, valueSet);
+            if (variable.isRepeatable()) {
+              int seqSize = value.asSequence().getSize();
+              if (!lineCounts.containsKey(identifier)) {
+                lineCounts.put(identifier, seqSize);
+              } else {
+                lineCounts.put(identifier, Math.max(lineCounts.get(identifier), seqSize));
               }
-            })
-        );
+            }
+            variableValues.get(variable.getName()).put(identifier, value);
+          });
+        }
+      });
+    }
 
     // vector for each variable, values in the same order as entities
     variables.forEach(v -> {
