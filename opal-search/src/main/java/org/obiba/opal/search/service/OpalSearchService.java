@@ -122,7 +122,7 @@ public class OpalSearchService implements Service, ValueTableUpdateListener {
     final int size = 1000;
     while (!callback.hasTotal() || callback.getIdentifiers().size() < callback.getTotal()) {
       querySettings.from(from);
-      querySettings.size(from + size);
+      querySettings.size(size);
       getSearchServicePlugin().executeIdentifiersQuery(querySettings, searchPath, callback);
       from = from + size;
     }
