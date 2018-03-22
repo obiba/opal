@@ -124,6 +124,11 @@ public class VariableFieldDropdown extends CriterionDropdown {
   }
 
   @Override
+  protected void onDropdownChange() {
+    updateCriterionFilter(translations.criterionFiltersMap().get((isNot() ? "not_" : "") + (isLikeSelected() ? "like" : "in")));
+  }
+
+  @Override
   protected Widget createSpecificControls() {
     return hasFieldTerms() ? createFieldTermsControls() : createMatchQueryControls();
   }

@@ -16,6 +16,8 @@ import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.resources.ButtonSize;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -38,7 +40,16 @@ public abstract class CriterionDropdown extends DropdownButton {
     groupId = String.valueOf(Random.nextInt(1000000)); //to be used in radio button names, to make sure they don't clash
     setSize(ButtonSize.SMALL);
     radioControls.addStyleName("controls");
+
+    addChangeHandler(new ChangeHandler() {
+      @Override
+      public void onChange(ChangeEvent event) {
+        onDropdownChange();
+      }
+    });
   }
+
+  protected abstract void onDropdownChange();
 
   protected abstract Widget createSpecificControls();
 

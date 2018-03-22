@@ -116,6 +116,10 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
   }
 
   @Override
+  protected void onDropdownChange() {
+  }
+
+  @Override
   protected String getRQLField() {
     return datasource + "." + table + ":" + variable.getName();
   }
@@ -178,14 +182,14 @@ public abstract class ValueSetCriterionDropdown extends CriterionDropdown {
   private void initializeRadioControls(int noEmpty) {
     // All, Empty, Not Empty radio buttons
     RadioButton radioAll = createRadioButtonResetSpecific(translations.criterionFiltersMap().get("all"),
-        facetDto == null || variable.getIsRepeatable() ? null : facetDto.getTotalHits());
+      facetDto == null || variable.getIsRepeatable() ? null : facetDto.getTotalHits());
     radioAll.setValue(true);
     radioControls.add(radioAll);
 
     radioControls.add(createRadioButtonResetSpecific(translations.criterionFiltersMap().get("empty"),
-        facetDto == null || variable.getIsRepeatable() ? null : facetDto.getTotalHits() - noEmpty));
+      facetDto == null || variable.getIsRepeatable() ? null : facetDto.getTotalHits() - noEmpty));
     radioControls.add(createRadioButtonResetSpecific(translations.criterionFiltersMap().get("not_empty"),
-        facetDto == null || variable.getIsRepeatable() ? null : noEmpty));
+      facetDto == null || variable.getIsRepeatable() ? null : noEmpty));
     add(radioControls);
   }
 

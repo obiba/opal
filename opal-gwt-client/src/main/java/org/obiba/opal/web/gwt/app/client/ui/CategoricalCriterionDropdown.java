@@ -18,7 +18,6 @@ import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
@@ -31,7 +30,6 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.FilterHelper;
-import org.obiba.opal.web.gwt.rql.client.RQLQuery;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -223,7 +221,7 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
   }
 
   private void selectCategory(String value) {
-    String valueStr = value.replace("+"," ");
+    String valueStr = value.replace("+", " ");
     for (CheckBox checkBox : categoryChecks) {
       if (checkBox.getName().equals(valueStr)) {
         checkBox.setValue(true);
@@ -247,14 +245,14 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
     if (getRadioButtonValue(3)) {
       if (selected.isEmpty()) setText(filter + translations.criterionFiltersMap().get("none").toLowerCase());
       else setText(filter + translations.criterionFiltersMap().get("in").toLowerCase() + " (" +
-          Joiner.on(",").join(selected) + ")");
+        Joiner.on(",").join(selected) + ")");
       return;
     }
 
     if (getRadioButtonValue(4)) {
       if (selected.isEmpty()) setText(filter + translations.criterionFiltersMap().get("all").toLowerCase());
       else setText(filter + translations.criterionFiltersMap().get("not_in").toLowerCase() + " (" +
-          Joiner.on(",").join(selected) + ")");
+        Joiner.on(",").join(selected) + ")");
       return;
     }
 
@@ -282,8 +280,8 @@ public abstract class CategoricalCriterionDropdown extends ValueSetCriterionDrop
     SafeHtmlBuilder builder = new SafeHtmlBuilder().appendEscaped(title);
     if (!variable.getIsRepeatable())
       builder.appendHtmlConstant("<span style=\"font-size:x-small\"> (")
-          .append(count).appendEscaped(")")
-          .appendHtmlConstant("</span>");
+        .append(count).appendEscaped(")")
+        .appendHtmlConstant("</span>");
     FlowPanel checkPanel = new FlowPanel();
     CheckBox checkBox = new CheckBox(builder.toSafeHtml());
     checkBox.setName(name);
