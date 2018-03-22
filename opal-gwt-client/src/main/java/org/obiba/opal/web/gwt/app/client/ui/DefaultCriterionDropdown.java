@@ -41,6 +41,11 @@ public abstract class DefaultCriterionDropdown extends ValueSetCriterionDropdown
   }
 
   @Override
+  protected void onDropdownChange() {
+    updateMatchCriteriaFilter();
+  }
+
+  @Override
   public Widget createSpecificControls() {
     ListItem specificControls = new ListItem();
     specificControls.addStyleName("controls");
