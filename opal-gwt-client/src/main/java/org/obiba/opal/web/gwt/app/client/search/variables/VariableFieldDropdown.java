@@ -18,6 +18,7 @@ import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.*;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.*;
@@ -112,7 +113,7 @@ public class VariableFieldDropdown extends CriterionDropdown {
       else
         selections = Lists.newArrayList(rqlQuery.getString(1));
       for (CheckBox check : fieldTermChecks) {
-        check.setValue(selections.contains(check.getName()));
+        check.setValue(selections.contains(normalizeKeyword(check.getName())));
       }
     } else {
       String selection = rqlQuery.isArray(1) ? rqlQuery.getArray(1).get(0) : rqlQuery.getString(1);
@@ -369,8 +370,8 @@ public class VariableFieldDropdown extends CriterionDropdown {
     String rval = null;
     for (CheckBox checkbox : fieldTermChecks) {
       if (checkbox.getValue()) {
-        if (Strings.isNullOrEmpty(rval)) rval = normalizeKeyword(checkbox.getName());
-        else rval = rval + " OR " + normalizeKeyword(checkbox.getName());
+        if (Strings.isNullOrEmpty(rval)) rval = normalizeESKeyword(checkbox.getName());
+        else rval = rval + " OR " + normalizeESKeyword(checkbox.getName());
       }
     }
     if (Strings.isNullOrEmpty(rval)) return (isNot() ? "" : "NOT ") + fieldName + ":*";
@@ -391,6 +392,10 @@ public class VariableFieldDropdown extends CriterionDropdown {
     }
     String q = "in(" + getRQLField() + ",(" + rval + "))";
     return isNot() ? "not(" + q + ")" : q;
+  }
+
+  private String normalizeESKeyword(String keyword) {
+    return keyword.contains(" ") ? "\"" + keyword + "\"" : keyword;
   }
 
   private String normalizeKeyword(String keyword) {
