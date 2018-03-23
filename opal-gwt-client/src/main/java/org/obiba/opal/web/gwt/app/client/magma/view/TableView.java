@@ -9,51 +9,14 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
-import com.github.gwtbootstrap.client.ui.constants.IconType;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.TableUiHandlers;
-import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
-import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
-import org.obiba.opal.web.gwt.app.client.ui.CategoricalVariableSuggestOracle;
-import org.obiba.opal.web.gwt.app.client.ui.CrossableVariableSuggestOracle;
-import org.obiba.opal.web.gwt.app.client.ui.OpalSimplePager;
-import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
-import org.obiba.opal.web.gwt.app.client.ui.Table;
-import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
-import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.VariableAttributeColumn;
-import org.obiba.opal.web.gwt.datetime.client.Moment;
-import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
-import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
-import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
-import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
-import org.obiba.opal.web.model.client.magma.CategoryDto;
-import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
-import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
-
-import com.github.gwtbootstrap.client.ui.Alert;
+import com.github.gwtbootstrap.client.ui.*;
 import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.ButtonGroup;
-import com.github.gwtbootstrap.client.ui.CodeBlock;
-import com.github.gwtbootstrap.client.ui.Dropdown;
-import com.github.gwtbootstrap.client.ui.DropdownButton;
-import com.github.gwtbootstrap.client.ui.FluidRow;
-import com.github.gwtbootstrap.client.ui.NavLink;
-import com.github.gwtbootstrap.client.ui.ProgressBar;
 import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.github.gwtbootstrap.client.ui.TextBox;
-import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
@@ -67,13 +30,8 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasWidgets;
-import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.SuggestOracle;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.Inject;
@@ -82,13 +40,34 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.TableUiHandlers;
+import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
+import org.obiba.opal.web.gwt.app.client.ui.*;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.VariableAnnotationColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.VariableAttributeColumn;
+import org.obiba.opal.web.gwt.datetime.client.Moment;
+import org.obiba.opal.web.gwt.rest.client.authorization.*;
+import org.obiba.opal.web.model.client.magma.CategoryDto;
+import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
+import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
+import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements TablePresenter.Display {
 
-  interface Binder extends UiBinder<Widget, TableView> {}
+  interface Binder extends UiBinder<Widget, TableView> {
+  }
 
   private static final int VALUES_TAB_INDEX = 2;
 
@@ -259,11 +238,13 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   private CheckboxColumn<VariableDto> checkColumn;
 
+  private VariableAnnotationColumn variableAnnotationColumn;
+
   private boolean hasLinkAuthorization = true;
 
   @Inject
   public TableView(Binder uiBinder, EventBus eventBus, Translations translations,
-      TranslationMessages translationMessages, PlaceManager placeManager) {
+                   TranslationMessages translationMessages, PlaceManager placeManager) {
     this.translations = translations;
     this.translationMessages = translationMessages;
     this.placeManager = placeManager;
@@ -286,18 +267,18 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @Override
   public void setInSlot(Object slot, IsWidget content) {
     HasWidgets panel = null;
-    if(slot == Slots.Values) {
+    if (slot == Slots.Values) {
       panel = valuesPanel;
-    } else if(slot == Slots.Permissions) {
+    } else if (slot == Slots.Permissions) {
       panel = permissionsPanel;
-    } else if(slot == Slots.ContingencyTable) {
+    } else if (slot == Slots.ContingencyTable) {
       panel = crossResultsPanel;
     }
 
-    if(panel != null) {
+    if (panel != null) {
       panel.clear();
 
-      if(content != null) {
+      if (content != null) {
         panel.add(content.asWidget());
       }
     }
@@ -326,12 +307,12 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
       public String getValue(VariableDto object) {
         StringBuilder categories = new StringBuilder();
         int count = 1;
-        for(CategoryDto category : JsArrays.toIterable(JsArrays.toSafeArray(object.getCategoriesArray()))) {
-          if(count > 10) {
+        for (CategoryDto category : JsArrays.toIterable(JsArrays.toSafeArray(object.getCategoriesArray()))) {
+          if (count > 10) {
             categories.append(" ...");
             break;
           }
-          if(categories.length() == 0) {
+          if (categories.length() == 0) {
             categories.append(category.getName());
           } else {
             categories.append(", ").append(category.getName());
@@ -367,7 +348,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     selectAllItemsAlert.setVisible(false);
     table.showLoadingIndicator(dataProvider);
 
-    if(checkColumn != null) {
+    if (checkColumn != null) {
       checkColumn.clearSelection();
     }
   }
@@ -423,7 +404,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   public void clear(boolean cleanFilter) {
     renderRows((JsArray<VariableDto>) JavaScriptObject.createArray());
     checkColumn.clearSelection();
-    if(cleanFilter) filter.setText("");
+    if (cleanFilter) filter.setText("");
     crossResultsPanel.clear();
     contingencyTablePanel.setVisible(false);
   }
@@ -456,6 +437,15 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   }
 
   @Override
+  public void setTaxonomies(List<TaxonomyDto> taxonomies) {
+    if (variableAnnotationColumn == null && taxonomies != null) {
+      table.addColumn(variableAnnotationColumn = new VariableAnnotationColumn(), translations.annotationsLabel());
+    }
+    if (variableAnnotationColumn != null)
+      variableAnnotationColumn.setTaxonomies(taxonomies);
+  }
+
+  @Override
   public void setTableSummary(String varCount, String valueSetCount) {
     variableCount.setText(varCount);
     entityCount.setText(valueSetCount);
@@ -463,23 +453,23 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @Override
   public void setFromTables(JsArrayString tableNames, JsArrayString innerTables) {
-    if(propertiesTable.getRowCount() > 2) {
+    if (propertiesTable.getRowCount() > 2) {
       propertiesTable.removeProperty(2);
     }
     List<String> innerTablesList = new ArrayList<String>(JsArrays.toList(innerTables));
-    if(tableNames != null) {
+    if (tableNames != null) {
       FlowPanel fromTableLinks = new FlowPanel();
-      for(int i = 0; i < tableNames.length(); i++) {
+      for (int i = 0; i < tableNames.length(); i++) {
         String tableFullName = tableNames.get(i);
         IconAnchor a = new IconAnchor();
         a.setText(tableFullName);
         a.setIcon(innerTablesList.contains(tableFullName) ? IconType.CIRCLE_BLANK : IconType.CIRCLE);
         MagmaPath.Parser parser = MagmaPath.Parser.parse(tableFullName);
         a.setHref("#" + placeManager
-            .buildHistoryToken(ProjectPlacesHelper.getTablePlace(parser.getDatasource(), parser.getTable())));
+          .buildHistoryToken(ProjectPlacesHelper.getTablePlace(parser.getDatasource(), parser.getTable())));
         fromTableLinks.add(a);
 
-        if(i < tableNames.length() - 1) {
+        if (i < tableNames.length() - 1) {
           fromTableLinks.add(new InlineLabel(", "));
         }
       }
@@ -489,7 +479,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @Override
   public void setWhereScript(String script) {
-    if(Strings.isNullOrEmpty(script)) {
+    if (Strings.isNullOrEmpty(script)) {
       whereScript.setText("// " + translations.noFilter());
     } else {
       whereScript.setText(script);
@@ -556,7 +546,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     getUiHandlers().onEditWhere();
   }
 
-  @UiHandler({ "addVariable", "addTableVariable" })
+  @UiHandler({"addVariable", "addTableVariable"})
   void onAddVariable(ClickEvent event) {
     getUiHandlers().onAddVariable();
   }
@@ -709,8 +699,8 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @Override
   public HasAuthorization getTableIndexEditAuthorizer() {
     return new CompositeAuthorizer(new UIObjectAuthorizer(indexStatusAlert), new UIObjectAuthorizer(clearIndexLink),
-        new UIObjectAuthorizer(indexNowLink), new UIObjectAuthorizer(scheduleLink),
-        new UIObjectAuthorizer(cancelLink)) {
+      new UIObjectAuthorizer(indexNowLink), new UIObjectAuthorizer(scheduleLink),
+      new UIObjectAuthorizer(cancelLink)) {
       @Override
       public void authorized() {
         super.authorized();
@@ -740,20 +730,20 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     indexStatus.setVisible(b);
   }
 
-  @SuppressWarnings({ "IfStatementWithTooManyBranches" })
+  @SuppressWarnings({"IfStatementWithTooManyBranches"})
   @Override
   public void setIndexStatusAlert(TableIndexStatusDto statusDto) {
 
-    if(statusDto.getStatus().getName().equals(TableIndexationStatus.UPTODATE.getName())) {
+    if (statusDto.getStatus().getName().equals(TableIndexationStatus.UPTODATE.getName())) {
       setStatusText(translations.indexAlertUpToDate(), AlertType.SUCCESS, true, false, true, false, false);
       setProgressBar(false, 0);
-    } else if(statusDto.getStatus().getName().equals(TableIndexationStatus.OUTDATED.getName())) {
+    } else if (statusDto.getStatus().getName().equals(TableIndexationStatus.OUTDATED.getName())) {
       setStatusText(translations.indexStatusOutOfDate(), AlertType.ERROR, false, true, true, false, false);
       setProgressBar(false, 0);
-    } else if(statusDto.getStatus().getName().equals(TableIndexationStatus.IN_PROGRESS.getName())) {
+    } else if (statusDto.getStatus().getName().equals(TableIndexationStatus.IN_PROGRESS.getName())) {
       setStatusText(translations.indexStatusInProgress(), AlertType.INFO, false, false, false, true, true);
       setProgressBar(true, (int) (statusDto.getProgress() * 100));
-    } else if(statusDto.getStatus().getName().equals(TableIndexationStatus.NOT_INDEXED.getName())) {
+    } else if (statusDto.getStatus().getName().equals(TableIndexationStatus.NOT_INDEXED.getName())) {
       setStatusText(translations.indexStatusNotIndexed(), AlertType.WARNING, false, true, true, false, false);
       setProgressBar(false, 0);
     }
@@ -761,10 +751,10 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @SuppressWarnings("PMD.ExcessiveParameterList")
   private void setStatusText(String text, AlertType type, boolean clear, boolean indexNow, boolean schedule,
-      boolean cancel, boolean progressBar) {
+                             boolean cancel, boolean progressBar) {
     indexStatusText.setText(text);
     indexStatusAlert.setType(type);
-    if(hasLinkAuthorization) {
+    if (hasLinkAuthorization) {
       clearIndexLink.setVisible(clear);
       indexNowLink.setVisible(indexNow);
       scheduleLink.setVisible(schedule);
@@ -774,7 +764,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   }
 
   private void setProgressBar(boolean progressBar, int percent) {
-    if(progressBar) {
+    if (progressBar) {
       progress.setVisible(true);
       progress.setType(ProgressBar.Style.ANIMATED);
       progress.setPercent(percent);

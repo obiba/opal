@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.ui.celltable;
 
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.AttributeDtos;
 import org.obiba.opal.web.gwt.markdown.client.Markdown;
@@ -28,9 +29,15 @@ import java.util.List;
 
 public abstract class AttributeColumn<T> extends Column<T, String> {
 
+  protected final String attributeNamespace;
+
   protected final String attributeName;
 
   public AttributeColumn(String attributeName) {
+    this(null, attributeName);
+  }
+
+  public AttributeColumn(String attributeNamespace, String attributeName) {
     super(new TextCell(new SafeHtmlRenderer<String>() {
 
       @Override
@@ -43,10 +50,15 @@ public abstract class AttributeColumn<T> extends Column<T, String> {
         appendable.append(SafeHtmlUtils.fromTrustedString(object));
       }
     }));
+    this.attributeNamespace = attributeNamespace;
     this.attributeName = attributeName;
   }
 
   protected abstract JsArray<AttributeDto> getAttributes(T object);
+
+  public String getAttributeNamespace(T object) {
+    return attributeNamespace;
+  }
 
   protected String getAttributeName(T object) {
     return attributeName;
@@ -66,9 +78,11 @@ public abstract class AttributeColumn<T> extends Column<T, String> {
     AttributeDto attribute;
     StringBuilder labels = new StringBuilder();
 
+    String namespace = getAttributeNamespace(object);
+    String name = getAttributeName(object);
     for(int i = 0; i < attributes.length(); i++) {
       attribute = attributes.get(i);
-      if(attribute.getName().equals(getAttributeName(object))) {
+      if(isForAttribute(namespace, name, attribute)) {
         appendLabel(attribute, labels);
       }
     }
@@ -76,7 +90,19 @@ public abstract class AttributeColumn<T> extends Column<T, String> {
     return labels.toString();
   }
 
-  private void appendLabel(AttributeDto attr, StringBuilder labels) {
+  private boolean isForAttribute(String namespace, String name, AttributeDto attribute) {
+    if (Strings.isNullOrEmpty(namespace) && (attribute.hasNamespace() && !Strings.isNullOrEmpty(attribute.getNamespace())))
+      return false;
+    if ("*".equals(namespace)) {
+      if (!attribute.hasNamespace()) return false;
+    }
+    else if (!Strings.isNullOrEmpty(namespace) && (!attribute.hasNamespace() || !namespace.equals(attribute.getNamespace())))
+      return false;
+    if ("*".equals(name)) return true; // any attribute, most likely filtered by namespace
+    return attribute.getName().equals(name);
+  }
+
+  protected void appendLabel(AttributeDto attr, StringBuilder labels) {
     if(attr.hasValue() && attr.getValue().trim().length() > 0) {
       labels.append("<div class=\"attribute-value\">");
       if (isMarkdown()) {

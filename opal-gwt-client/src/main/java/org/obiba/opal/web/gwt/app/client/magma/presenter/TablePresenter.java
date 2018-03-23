@@ -53,6 +53,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.search.event.SearchTableVariablesEvent;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
+import org.obiba.opal.web.gwt.app.client.support.OpalSystemCache;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
 import org.obiba.opal.web.gwt.rest.client.*;
@@ -63,6 +64,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
+import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import java.util.*;
@@ -118,6 +120,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final TranslationMessages translationMessages;
 
+  private final OpalSystemCache opalSystemCache;
+
   private Runnable removeConfirmation;
 
   private Runnable deleteVariablesConfirmation;
@@ -152,7 +156,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
                         ModalProvider<ViewCopyPresenter> viewCopyModalProvider,
                         ModalProvider<VariableAttributeModalPresenter> attributeModalProvider,
                         ModalProvider<VariableTaxonomyModalPresenter> taxonomyModalProvider, Translations translations,
-                        TranslationMessages translationMessages) {
+                        TranslationMessages translationMessages, OpalSystemCache opalSystemCache) {
     super(eventBus, display);
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
@@ -172,6 +176,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     this.crossVariableProvider = crossVariableProvider;
     this.attributeModalProvider = attributeModalProvider.setContainer(this);
     this.taxonomyModalProvider = taxonomyModalProvider.setContainer(this);
+    this.opalSystemCache = opalSystemCache;
     getView().setUiHandlers(this);
   }
 
@@ -346,26 +351,32 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         }).send();
   }
 
-  private void updateDisplay(TableDto tableDto) {
-    table = tableDto;
-    getView().setTable(tableDto);
-    if (tableIsView()) {
-      showViewProperties(table);
-    } else {
-      getView().setFromTables(null, null);
-      getView().setWhereScript(null);
-    }
-    variableFilter = "";
-    valuesFilter = null;
-    valuesFilterText = "";
-    updateVariables();
-    updateTableIndexStatus();
-    authorize();
+  private void updateDisplay(final TableDto tableDto) {
+    opalSystemCache.requestTaxonomies(new OpalSystemCache.TaxonomiesHandler() {
+      @Override
+      public void onTaxonomies(List<TaxonomyDto> taxonomies) {
+        getView().setTaxonomies(taxonomies);
+        table = tableDto;
+        getView().setTable(tableDto);
+        if (tableIsView()) {
+          showViewProperties(table);
+        } else {
+          getView().setFromTables(null, null);
+          getView().setWhereScript(null);
+        }
+        variableFilter = "";
+        valuesFilter = null;
+        valuesFilterText = "";
+        updateVariables();
+        updateTableIndexStatus();
+        authorize();
 
-    if (getView().isValuesTabSelected()) {
-      valuesTablePresenter.setTable(tableDto);
-      valuesTablePresenter.updateValuesDisplay("");
-    }
+        if (getView().isValuesTabSelected()) {
+          valuesTablePresenter.setTable(tableDto);
+          valuesTablePresenter.updateValuesDisplay("");
+        }
+      }
+    });
   }
 
   private void showViewProperties(TableDto tableDto) {
@@ -879,6 +890,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     void clear(boolean cleanFilter);
 
     void setTable(TableDto dto);
+
+    void setTaxonomies(List<TaxonomyDto> taxonomies);
 
     void setTableSummary(String variableCount, String valueSetCount);
 
