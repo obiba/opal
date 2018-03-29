@@ -158,7 +158,7 @@ public class VariableSuggestOracle extends SuggestOracle {
 
     @Override
     public String getReplacementString() {
-      return query;
+      return query.replaceAll("[!^~*:/\"\\\\+]", "");
     }
 
     public int getTotalHits() {
