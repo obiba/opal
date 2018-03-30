@@ -99,7 +99,7 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
     }
     namespaceLabel.setVisible(!namespace.isEmpty());
 
-    initColumns();
+    initColumns(namespace);
 
     List<AttributeDto> attributesArray = JsArrays.toList(attributes);
     Collections.sort(attributesArray, new Comparator<AttributeDto>() {
@@ -123,11 +123,11 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
     checkColumn.clearSelection();
   }
 
-  public void initColumns() {
+  public void initColumns(String namespace) {
     table.setPageSize(Table.DEFAULT_PAGESIZE);
     table.setEmptyTableWidget(new InlineLabel(translations.noAttributesLabel()));
     table.addColumn(Columns.NAME, translations.nameLabel());
-    table.addColumn(new ListAttributeValueColumn(), translations.valueLabel());
+    table.addColumn(new ListAttributeValueColumn(namespace), translations.valueLabel());
 
     pager.setDisplay(table);
     provider.addDataDisplay(table);

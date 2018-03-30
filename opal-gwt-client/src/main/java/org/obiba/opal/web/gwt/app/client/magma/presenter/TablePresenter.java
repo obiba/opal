@@ -355,7 +355,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     opalSystemCache.requestTaxonomies(new OpalSystemCache.TaxonomiesHandler() {
       @Override
       public void onTaxonomies(List<TaxonomyDto> taxonomies) {
-        getView().setTaxonomies(taxonomies);
         table = tableDto;
         getView().setTable(tableDto);
         if (tableIsView()) {
@@ -370,6 +369,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         updateVariables();
         updateTableIndexStatus();
         authorize();
+        getView().setTaxonomies(taxonomies);
 
         if (getView().isValuesTabSelected()) {
           valuesTablePresenter.setTable(tableDto);

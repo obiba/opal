@@ -11,10 +11,10 @@ package org.obiba.opal.web.gwt.app.client.ui.celltable;
 
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
-import org.obiba.opal.core.domain.taxonomy.Vocabulary;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.AttributeHelper;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.opal.TermDto;
@@ -24,15 +24,13 @@ import java.util.List;
 
 public class VariableAnnotationColumn extends AttributeColumn<VariableDto> {
 
+  private final TableDto table;
+
   private List<TaxonomyDto> taxonomies;
 
-  public VariableAnnotationColumn() {
+  public VariableAnnotationColumn(TableDto table) {
     super("*", "*");
-  }
-
-
-  public VariableAnnotationColumn(String taxonomyName) {
-    super(taxonomyName, "*");
+    this.table = table;
   }
 
   @Override
@@ -61,23 +59,34 @@ public class VariableAnnotationColumn extends AttributeColumn<VariableDto> {
   private String getTermLabel(TaxonomyDto taxonomy, AttributeDto attr) {
     for (VocabularyDto vocabulary : JsArrays.toIterable(taxonomy.getVocabulariesArray())) {
       if (vocabulary.getName().equals(attr.getName())) {
-        String label = getTermLabel(vocabulary, attr);
+        String label = getTermLabel(taxonomy, vocabulary, attr);
         if (!Strings.isNullOrEmpty(label)) return label;
       }
     }
     return null;
   }
 
-  private String getTermLabel(VocabularyDto vocabulary, AttributeDto attr) {
+  private String getTermLabel(TaxonomyDto taxonomy, VocabularyDto vocabulary, AttributeDto attr) {
     for (TermDto term : JsArrays.toIterable(vocabulary.getTermsArray())) {
       if (term.getName().equals(attr.getValue())) {
-        return AttributeHelper.getLocaleText(term.getTitleArray());
+        return "<a href='#!search/!variables;rq=" + getRQL(taxonomy, vocabulary, term) + "'>" + AttributeHelper.getLocaleText(term.getTitleArray()) + "</a>";
       }
     }
     return null;
   }
 
-    public void setTaxonomies(List<TaxonomyDto> taxonomies) {
+  public void setTaxonomies(List<TaxonomyDto> taxonomies) {
     this.taxonomies = taxonomies;
+  }
+
+  private String getRQL(TaxonomyDto taxonomy, VocabularyDto vocabulary, TermDto term) {
+    StringBuilder rqlQuery = new StringBuilder();
+    if (table != null) {
+      rqlQuery.append("in(project,(").append(table.getDatasourceName().replaceAll(" ", "+")).append(")),")
+        .append("in(table,(").append(table.getName().replaceAll(" ", "+")).append(")),")
+        .append("exists(name.analyzed),");
+    }
+    rqlQuery.append("in(").append(taxonomy.getName()).append("-").append(vocabulary.getName()).append(",").append(term.getName()).append(")");
+    return rqlQuery.toString();
   }
 }

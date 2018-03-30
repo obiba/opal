@@ -439,7 +439,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @Override
   public void setTaxonomies(List<TaxonomyDto> taxonomies) {
     if (variableAnnotationColumn == null && taxonomies != null) {
-      table.addColumn(variableAnnotationColumn = new VariableAnnotationColumn(), translations.annotationsLabel());
+      table.addColumn(variableAnnotationColumn = new VariableAnnotationColumn(tableDto), translations.annotationsLabel());
     }
     if (variableAnnotationColumn != null)
       variableAnnotationColumn.setTaxonomies(taxonomies);

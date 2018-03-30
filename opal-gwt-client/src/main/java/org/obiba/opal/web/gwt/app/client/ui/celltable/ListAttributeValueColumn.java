@@ -16,8 +16,8 @@ import com.google.gwt.core.client.JsArray;
 
 public class ListAttributeValueColumn extends AttributeColumn<JsArray<AttributeDto>> {
 
-  public ListAttributeValueColumn() {
-    super("");
+  public ListAttributeValueColumn(String attributeNamespace) {
+    super(attributeNamespace, "*");
   }
 
   @Override
