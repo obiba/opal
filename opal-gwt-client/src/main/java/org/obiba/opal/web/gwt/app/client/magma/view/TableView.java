@@ -410,39 +410,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   }
 
   @Override
-  public void setTable(TableDto dto) {
-    tableDto = dto;
-    clear(true);
-    name.setText(dto.getName());
-    entityType.setText(dto.getEntityType());
-    timestamps.setText(Moment.create(dto.getTimestamps().getLastUpdate()).fromNow());
-    variableCount.setText(dto.hasVariableCount() ? dto.getVariableCount() + "" : "-");
-    entityCount.setText(dto.hasValueSetCount() ? dto.getValueSetCount() + "" : "-");
-    addVariablesButton.setVisible(dto.hasViewLink());
-    tableAddVariableGroup.setVisible(!addVariablesButton.isVisible());
-
-    copyDataBtn.setVisible(!tableDto.hasViewLink());
-    copyViewBtn.setVisible(tableDto.hasViewLink());
-
-    VariableSuggestOracle oracle = (VariableSuggestOracle) categoricalVariables.getSuggestOracle();
-    oracle.setDatasource("\"" + tableDto.getDatasourceName() + "\"");
-    oracle.setTable("\"" + tableDto.getName() + "\"");
-
-    VariableSuggestOracle crossOracle = (VariableSuggestOracle) crossWithVariables.getSuggestOracle();
-    crossOracle.setDatasource("\"" + tableDto.getDatasourceName() + "\"");
-    crossOracle.setTable("\"" + tableDto.getName() + "\"");
-
-    viewProperties.setVisible(dto.hasViewLink());
-    initializeFilter();
-  }
-
-  @Override
-  public void setTaxonomies(List<TaxonomyDto> taxonomies) {
-    if (variableAnnotationColumn == null && taxonomies != null) {
-      table.addColumn(variableAnnotationColumn = new VariableAnnotationColumn(tableDto), translations.annotationsLabel());
-    }
-    if (variableAnnotationColumn != null)
-      variableAnnotationColumn.setTaxonomies(taxonomies);
+  public void initialize(TableDto dto, List<TaxonomyDto> taxonomies) {
+    setTable(dto);
+    setTaxonomies(taxonomies);
   }
 
   @Override
@@ -746,6 +716,45 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     } else if (statusDto.getStatus().getName().equals(TableIndexationStatus.NOT_INDEXED.getName())) {
       setStatusText(translations.indexStatusNotIndexed(), AlertType.WARNING, false, true, true, false, false);
       setProgressBar(false, 0);
+    }
+  }
+
+  //
+  // Private methods
+  //
+
+  private void setTable(TableDto dto) {
+    tableDto = dto;
+    clear(true);
+    name.setText(dto.getName());
+    entityType.setText(dto.getEntityType());
+    timestamps.setText(Moment.create(dto.getTimestamps().getLastUpdate()).fromNow());
+    variableCount.setText(dto.hasVariableCount() ? dto.getVariableCount() + "" : "-");
+    entityCount.setText(dto.hasValueSetCount() ? dto.getValueSetCount() + "" : "-");
+    addVariablesButton.setVisible(dto.hasViewLink());
+    tableAddVariableGroup.setVisible(!addVariablesButton.isVisible());
+
+    copyDataBtn.setVisible(!tableDto.hasViewLink());
+    copyViewBtn.setVisible(tableDto.hasViewLink());
+
+    VariableSuggestOracle oracle = (VariableSuggestOracle) categoricalVariables.getSuggestOracle();
+    oracle.setDatasource("\"" + tableDto.getDatasourceName() + "\"");
+    oracle.setTable("\"" + tableDto.getName() + "\"");
+
+    VariableSuggestOracle crossOracle = (VariableSuggestOracle) crossWithVariables.getSuggestOracle();
+    crossOracle.setDatasource("\"" + tableDto.getDatasourceName() + "\"");
+    crossOracle.setTable("\"" + tableDto.getName() + "\"");
+
+    viewProperties.setVisible(dto.hasViewLink());
+    initializeFilter();
+  }
+
+  private void setTaxonomies(List<TaxonomyDto> taxonomies) {
+    if (variableAnnotationColumn == null && taxonomies != null) {
+      table.addColumn(variableAnnotationColumn = new VariableAnnotationColumn(), translations.annotationsLabel());
+    }
+    if (variableAnnotationColumn != null) {
+      variableAnnotationColumn.initialize(tableDto, taxonomies);
     }
   }
 

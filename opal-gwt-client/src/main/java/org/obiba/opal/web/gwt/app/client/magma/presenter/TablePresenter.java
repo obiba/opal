@@ -356,7 +356,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       @Override
       public void onTaxonomies(List<TaxonomyDto> taxonomies) {
         table = tableDto;
-        getView().setTable(tableDto);
+        getView().initialize(tableDto, taxonomies);
         if (tableIsView()) {
           showViewProperties(table);
         } else {
@@ -369,7 +369,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         updateVariables();
         updateTableIndexStatus();
         authorize();
-        getView().setTaxonomies(taxonomies);
 
         if (getView().isValuesTabSelected()) {
           valuesTablePresenter.setTable(tableDto);
@@ -889,9 +888,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
     void clear(boolean cleanFilter);
 
-    void setTable(TableDto dto);
-
-    void setTaxonomies(List<TaxonomyDto> taxonomies);
+    void initialize(TableDto dto, List<TaxonomyDto> taxonomies);
 
     void setTableSummary(String variableCount, String valueSetCount);
 

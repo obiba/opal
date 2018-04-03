@@ -24,13 +24,12 @@ import java.util.List;
 
 public class VariableAnnotationColumn extends AttributeColumn<VariableDto> {
 
-  private final TableDto table;
+  private TableDto table;
 
   private List<TaxonomyDto> taxonomies;
 
-  public VariableAnnotationColumn(TableDto table) {
+  public VariableAnnotationColumn() {
     super("*", "*");
-    this.table = table;
   }
 
   @Override
@@ -75,7 +74,8 @@ public class VariableAnnotationColumn extends AttributeColumn<VariableDto> {
     return null;
   }
 
-  public void setTaxonomies(List<TaxonomyDto> taxonomies) {
+  public void initialize(TableDto table, List<TaxonomyDto> taxonomies) {
+    this.table = table;
     this.taxonomies = taxonomies;
   }
 
