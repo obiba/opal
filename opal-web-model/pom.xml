@@ -397,6 +397,25 @@
         </executions>
       </plugin>
 
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptors>
+            <descriptor>src/main/assembly/protobuf-python.xml</descriptor>
+          </descriptors>
+          <filters />
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
 
