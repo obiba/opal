@@ -172,10 +172,9 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
       Set<View> result = ImmutableSet.of();
       File datasourceViewsFile = getDatasourceViewsFile();
       if(!datasourceViewsFile.exists()) {
-        log.debug("The legacy views '{}' does not exist.", datasourceViewsFile.getAbsolutePath());
         return result;
       }
-
+      log.debug("Reading the legacy views '{}'.", datasourceViewsFile.getAbsolutePath());
       InputStreamReader reader = null;
       try {
         reader = new InputStreamReader(new FileInputStream(datasourceViewsFile), Charsets.UTF_8);
