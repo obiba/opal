@@ -254,6 +254,9 @@ public enum VectorType {
    * @return
    */
   protected REXP asValuesVector(Variable variable, List<Value> values, boolean withMissings, boolean withFactors) {
+    if (variable.getValueType().equals(BooleanType.get())) {
+      return asContinuousVector(variable, values, withMissings);
+    }
     return VariableNature.CATEGORICAL.equals(VariableNature.getNature(variable)) && withFactors ?
         asFactors(variable, values, withMissings) : asContinuousVector(variable, values, withMissings);
   }
