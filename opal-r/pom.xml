@@ -25,6 +25,10 @@
   <name>opal-r</name>
   <description>Opal R Module</description>
 
+  <properties>
+    <maven.deploy.skip>true</maven.deploy.skip>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.obiba.opal</groupId>

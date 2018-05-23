@@ -21,6 +21,10 @@
   <artifactId>opal-datashield</artifactId>
   <name>opal-datashield</name>
 
+  <properties>
+    <maven.deploy.skip>true</maven.deploy.skip>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.obiba.opal</groupId>

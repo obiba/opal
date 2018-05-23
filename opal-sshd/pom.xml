@@ -20,6 +20,10 @@
   <artifactId>opal-sshd</artifactId>
   <name>opal-sshd</name>
 
+  <properties>
+    <maven.deploy.skip>true</maven.deploy.skip>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.sshd</groupId>

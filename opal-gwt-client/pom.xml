@@ -22,6 +22,10 @@
   <name>opal-gwt-client</name>
   <packaging>war</packaging>
 
+  <properties>
+    <maven.deploy.skip>true</maven.deploy.skip>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>com.google.gwt</groupId>

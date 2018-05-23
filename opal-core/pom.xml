@@ -25,6 +25,10 @@
   <name>opal-core</name>
   <description>Opal Core Module</description>
 
+  <properties>
+    <maven.deploy.skip>true</maven.deploy.skip>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.obiba.commons</groupId>
@@ -37,6 +41,10 @@
     <dependency>
       <groupId>org.obiba.commons</groupId>
       <artifactId>obiba-shiro</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.commons</groupId>
+      <artifactId>obiba-git</artifactId>
     </dependency>
     <dependency>
       <groupId>org.obiba.opal</groupId>
@@ -271,15 +279,6 @@
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.obiba.commons</groupId>
-      <artifactId>obiba-shiro</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.obiba.commons</groupId>
-      <artifactId>obiba-git</artifactId>
     </dependency>
 
     <dependency>

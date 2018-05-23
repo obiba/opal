@@ -20,6 +20,10 @@
   <artifactId>opal-shell</artifactId>
   <name>opal-shell</name>
 
+  <properties>
+    <maven.deploy.skip>true</maven.deploy.skip>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.obiba.commons</groupId>

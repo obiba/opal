@@ -25,6 +25,10 @@
   <name>opal-upgrade</name>
   <description>Opal Upgrade Module</description>
 
+  <properties>
+    <maven.deploy.skip>true</maven.deploy.skip>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.obiba.commons</groupId>

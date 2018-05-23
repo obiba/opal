@@ -159,16 +159,25 @@
           </execution>
         </executions>
       </plugin>
+
+      <!-- Disable default deployer. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
   <profiles>
     <profile>
       <!-- A profile for the builds performed by the continuous integration server -->
-      <id>ci-build</id>
+      <id>release</id>
       <build>
         <plugins>
-          <plugin>
+          <!--plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>rpm-maven-plugin</artifactId>
             <executions>
@@ -189,7 +198,6 @@
                   <changelogFile>/usr/share/changelog</changelogFile>
                   <targetOS>Linux</targetOS>
                   <mappings>
-                    <!-- Add init.d files  -->
                     <mapping>
                       <directory>/etc/init.d</directory>
                       <directoryIncluded>false</directoryIncluded>
@@ -357,7 +365,6 @@
                     <property name="deb.dir" value="${basedir}/target/deb" />
                     <property name="deb.version" value="${project.version}-b${buildNumber}" />
                     <tstamp>
-                      <!-- http://www.debian.org/doc/debian-policy/ch-source.html -->
                       <format property="deb.date" pattern="EEE, d MMM yyyy HH:mm:ss Z" locale="en" />
                     </tstamp>
 
@@ -375,67 +382,58 @@
                     <unzip src="${basedir}/target/opal-server-${project.version}-dist.zip" dest="${deb.dir}/usr/share" />
 
                     <mkdir dir="${deb.dir}/etc" />
-                    <move todir="${deb.dir}/etc/opal">
+                    <copy todir="${deb.dir}/etc/opal">
                       <fileset dir="${deb.dir}/usr/share/opal-server-${project.version}/conf" />
-                    </move>
+                    </copy>
 
                     <exec executable="debuild" dir="${deb.dir}" failonerror="true" osfamily="unix">
                       <arg value="-b" />
-                      <!-- Uncomment following options to package locally  -->
-                      <!--<arg value="-i" />-->
-                      <!--<arg value="-us" />-->
-                      <!--<arg value="-uc" />-->
+                      <arg value="-i" />
+                      <arg value="-us" />
+                      <arg value="-uc" />
                     </exec>
                   </target>
                 </configuration>
               </execution>
+            </executions>
+          </plugin-->
+
+          <plugin>
+            <groupId>de.jutzig</groupId>
+            <artifactId>github-release-plugin</artifactId>
+            <executions>
               <execution>
-                <id>deploy-deb</id>
+                <id>make-release</id>
                 <phase>deploy</phase>
                 <goals>
-                  <goal>run</goal>
+                  <goal>release</goal>
                 </goals>
                 <configuration>
-                  <target>
-                    <property name="deb.version" value="${project.version}-b${buildNumber}" />
-                    <!-- Deploy deb file in deb repo -->
-                    <copy todir="${obiba.deb.dir}/${obiba.deploy.dir}" file="target/opal_${deb.version}_all.deb" />
-                  </target>
-                </configuration>
-              </execution>
-              <execution>
-                <id>deploy-package</id>
-                <phase>deploy</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <target>
-                    <!-- Deploy Opal package file in download repo -->
-                    <copy todir="${obiba.download.dir}/opal/${obiba.deploy.dir}" file="target/opal-server-${project.version}-dist.zip" />
-                  </target>
-                </configuration>
-              </execution>
-              <execution>
-                <id>deploy-rpm</id>
-                <phase>deploy</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <target>
-                    <!-- Deploy rpm file in rpm repo -->
-                    <copy todir="${obiba.rpm.dir}/${obiba.deploy.dir}">
-                        <fileset dir="target/rpm/opal-server/RPMS/noarch" />
-                    </copy>
-                  </target>
+                  <releaseName>${project.version}</releaseName>
+                  <tag>${project.version}</tag>
+                  <repositoryId>obiba/opal</repositoryId>
+                  <artifact>donotuploadjar</artifact>
+                  <fileSets>
+                    <fileSet>
+                      <directory>${basedir}/target</directory>
+                      <includes>
+                        <include>*.zip</include>
+                        <include>*.deb</include>
+                      </includes>
+                    </fileSet>
+                    <fileSet>
+                      <directory>${basedir}/target/rpm/opal-server/RPMS/noarch</directory>
+                      <includes>
+                        <include>*.rpm</include>
+                      </includes>
+                    </fileSet>
+                  </fileSets>
                 </configuration>
               </execution>
             </executions>
           </plugin>
         </plugins>
       </build>
-
     </profile>
   </profiles>
 
