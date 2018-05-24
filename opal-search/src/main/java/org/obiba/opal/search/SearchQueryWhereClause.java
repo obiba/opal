@@ -10,6 +10,7 @@
 
 package org.obiba.opal.search;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
@@ -43,13 +44,19 @@ public class SearchQueryWhereClause extends AbstractSearchUtility implements Que
 
   private String query;
 
+  private boolean allEntities = false;
+
   private Collection<VariableEntity> entities = Lists.newArrayList();
 
   @Override
   public void initialise() {
-    if (!entities.isEmpty()) return;
+    if (!entities.isEmpty() || allEntities) return; // already initialised
     try {
       String esQuery = RQLParserFactory.parse(query, opalSearchService.getValuesIndexManager());
+      if (Strings.isNullOrEmpty(esQuery)) {
+        allEntities = true;
+        return;
+      }
       String safeQuery = "reference:\"" + valueTable.getTableReference() + "\" AND " + esQuery;
       opalSearchService.executeAllIdentifiersQuery(
           buildQuerySearch(safeQuery, 0, Integer.MAX_VALUE, Lists.newArrayList("identifier"), null, null, null),
@@ -68,15 +75,18 @@ public class SearchQueryWhereClause extends AbstractSearchUtility implements Que
   public void setQuery(String query) {
     this.query = query;
     entities.clear();
+    allEntities = false;
   }
 
   @Override
   public boolean where(ValueSet valueSet) {
+    if (allEntities) return true;
     return entities.contains(valueSet.getVariableEntity());
   }
 
   @Override
   public boolean where(ValueSet valueSet, View view) {
+    if (allEntities) return true;
     return entities.contains(valueSet.getVariableEntity());
   }
 
