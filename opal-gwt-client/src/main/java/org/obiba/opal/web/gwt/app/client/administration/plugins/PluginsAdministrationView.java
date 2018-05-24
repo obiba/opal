@@ -144,7 +144,10 @@ public class PluginsAdministrationView extends ViewWithUiHandlers<PluginsAdminis
   private void refreshPackagesInfo(PluginPackagesDto pluginPackagesDto) {
     restartNotice.setVisible(pluginPackagesDto.getRestart());
     updateSite.setText(pluginPackagesDto.getSite());
-    updateSite.setHref(pluginPackagesDto.getSite());
+    String pluginsIndex = pluginPackagesDto.getSite();
+    if (!pluginsIndex.endsWith("/")) pluginsIndex = pluginsIndex + "/";
+    pluginsIndex = pluginsIndex + "plugins.json";
+    updateSite.setHref(pluginsIndex);
     if (pluginPackagesDto.hasUpdated())
       lastUpdate.setText(translations.userMessageMap().get("LastUpdate").replace("{0}", Moment.create(pluginPackagesDto.getUpdated()).fromNow()));
     else
