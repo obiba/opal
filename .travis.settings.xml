@@ -15,8 +15,7 @@
     </server>
     <server>
       <id>github</id>
-      <username>${env.GITHUB_USER}</username>
-      <password>${env.GITHUB_PWD}</password>
+      <privateKey>${env.GITHUB_ACCESS_TOKEN}</privateKey>
     </server>
   </servers>
 </settings>
