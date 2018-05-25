@@ -435,6 +435,31 @@
         </plugins>
       </build>
     </profile>
+      <profile>
+          <id>deploy-dev</id>
+          <build>
+              <plugins>
+                  <plugin>
+                      <artifactId>maven-antrun-plugin</artifactId>
+                      <executions>
+                          <execution>
+                              <id>opal-dev</id>
+                              <phase>test</phase>
+                              <goals>
+                                  <goal>run</goal>
+                              </goals>
+                              <configuration>
+                                  <tasks>
+                                      <ant antfile="src/main/ant/opal-dev.xml" target="deploy"/>
+                                  </tasks>
+                              </configuration>
+                          </execution>
+                      </executions>
+                  </plugin>
+              </plugins>
+          </build>
+      </profile>
+
   </profiles>
 
 </project>

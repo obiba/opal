@@ -1,0 +1,31 @@
+<project name="opal-dev" default="deploy" basedir="../../../">
+
+    <property name="target" location="${user.home}/.opal"/>
+
+    <xmlproperty file="../pom.xml" keeproot="false" prefix="pom"/>
+
+    <property name="opal.version" value="${pom.version}" />
+    <property name="opal.home" location="${target}/var/lib/opal"/>
+    <property name="opal.conf" location="${opal.home}/conf"/>
+    <property name="opal.dist" location="${target}/usr/share/opal"/>
+    <property name="opal.webapp" location="${opal.dist}/webapp"/>
+    <property name="opal.war" location="../opal-gwt-client/target/opal-gwt-client-${opal.version}.war"/>
+
+    <property name="build" location="build"/>
+    <property name="dist"  location="dist"/>
+
+    <target name="init">
+        <mkdir dir="${target}"/>
+        <mkdir dir="${opal.home}"/>
+        <mkdir dir="${opal.conf}"/>
+    </target>
+
+    <target name="deploy" depends="init">
+        <copy todir="${opal.conf}">
+            <fileset dir="src/main/conf"/>
+        </copy>
+        <unwar src="${opal.war}" dest="${opal.webapp}"  />
+
+    </target>
+
+</project>
