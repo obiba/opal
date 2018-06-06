@@ -28,6 +28,8 @@ public abstract class AbstractROperation implements ROperation {
 
   private static final Logger log = LoggerFactory.getLogger(AbstractROperation.class);
 
+  private static int DEFAULT_BUFFER_SIZE = 81920;
+
   RConnection connection;
 
   /**
@@ -174,7 +176,7 @@ public abstract class AbstractROperation implements ROperation {
    * @param out local stream
    */
   protected void readFile(String fileName, OutputStream out) {
-    try (InputStream in = new BufferedInputStream(connection.openFile(fileName))) {
+    try (InputStream in = new BufferedInputStream(connection.openFile(fileName), DEFAULT_BUFFER_SIZE)) {
       IOUtils.copy(in, out);
       out.close();
     } catch( IOException e){
