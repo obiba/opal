@@ -1,24 +1,11 @@
-# Opal [![Build Status](http://ci.obiba.org/view/Opal/job/Opal/badge/icon)](http://ci.obiba.org/view/Opal/job/Opal/)
+# Opal [![Build Status](https://travis-ci.org/obiba/opal.svg?branch=master)](https://travis-ci.org/obiba/opal)
 
 Opal is OBiBa’s core database application for biobanks or epidemiological studies.
 
-## Documentation
-
-[Opal Presentation](http://www.obiba.org/pages/products/opal/)
-
-[Opal Documentation](https://wiki.obiba.org/display/OPALDOC)
-
-## Download
-
-See download and installation instructions [Opal Installation Guide](https://wiki.obiba.org/display/OPALDOC/Opal+Installation+Guide)
-
-## Bug tracker
-
-Have a bug? Please create an issue on [OBiBa JIRA](http://jira.obiba.org/jira/browse/OPAL).
-
-## Continuous integration
-
-See [OBiBa Jenkins](http://ci.obiba.org/view/Opal).
+* See [download instructions](http://www.obiba.org/pages/products/opal/#download).
+* Read the [documentation](http://opaldoc.obiba.org).
+* Have a bug or a question? Please create an issue on [GitHub](https://github.com/obiba/opal/issues).
+* Continuous integration is on [Travis](https://travis-ci.org/obiba/opal).
 
 ## Mailing list
 
