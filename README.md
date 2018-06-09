@@ -7,6 +7,22 @@ Opal is OBiBa’s core database application for biobanks or epidemiological stud
 * Have a bug or a question? Please create an issue on [GitHub](https://github.com/obiba/opal/issues).
 * Continuous integration is on [Travis](https://travis-ci.org/obiba/opal).
 
+## Developers
+
+Set up a development environment:
+
+* Make sure Java8 is available.
+* Make sure you have a MongoDB, MySQL or MariaDB database running.
+* Compile with `make all`
+* Get the [obiba-home](https://github.com/obiba/obiba-home) repository to have some seeding material.
+* Prepare execution environment: `make prepare` (do it only once, this will create a opal_home directory)
+* Run in debug mode: `make debug`
+* Login http://localhost:8080 with administrator/password credentials.
+* Declare the databases (only at the first connection)
+* Go to _obiba-home_ project and `make seed-opal`
+
+There are many other targets, just check the _Makefile_ and change variables to match your environment.
+
 ## Mailing list
 
 Have a question? Ask on our mailing list!
