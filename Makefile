@@ -1,7 +1,6 @@
 ##
 ## Makefile for Opal developers
 ##
-projects=$(HOME)/projects
 version=2.11-SNAPSHOT
 magma_version=1.17-SNAPSHOT
 #version=2.10-SNAPSHOT
@@ -9,7 +8,8 @@ magma_version=1.17-SNAPSHOT
 commons_version=1.10-SNAPSHOT
 java_opts="-Xms1G -Xmx4G -XX:MaxPermSize=256M -XX:+UseG1GC"
 
-opal_project=${projects}/opal
+projects=$(CURDIR)/..
+opal_project=$(CURDIR)
 magma_project=${projects}/magma
 commons_project=${projects}/obiba-commons
 opal_home=${opal_project}/opal_home
