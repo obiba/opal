@@ -1722,7 +1722,7 @@
           <configuration>
             <!-- Use parent version as modules' version -->
             <autoVersionSubmodules>true</autoVersionSubmodules>
-            <releaseProfiles>ci-build,release</releaseProfiles>
+            <releaseProfiles>release</releaseProfiles>
             <!-- Comment this profile because Jenkins crashes while performing the release -->
             <!--<preparationGoals>clean verify install</preparationGoals>-->
           </configuration>
@@ -1790,6 +1790,12 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>rpm-maven-plugin</artifactId>
           <version>${rpm-maven-plugin.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>com.carrotgarden.maven</groupId>
+          <artifactId>bintray-maven-plugin</artifactId>
+          <version>${bintray-maven-plugin.version}</version>
         </plugin>
       </plugins>
 
@@ -1921,5 +1927,44 @@
       <url>https://www.gnu.org/licenses/gpl-3.0.txt</url>
     </license>
   </licenses>
+
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <!-- Disable default deployer. -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-deploy-plugin</artifactId>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </plugin>
+
+          <!-- Enable alternative deployer. -->
+          <plugin>
+            <groupId>com.carrotgarden.maven</groupId>
+            <artifactId>bintray-maven-plugin</artifactId>
+            <configuration>
+              <skip>false</skip>
+              <subject>obiba</subject>
+              <repository>maven</repository>
+              <serverId>obiba-bintray</serverId>
+              <packageVcsUrl>https://github.com/obiba/onyx</packageVcsUrl>
+            </configuration>
+            <executions>
+              <!-- Activate "bintray:deploy" during "deploy" -->
+              <execution>
+                <goals>
+                  <goal>deploy</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>
