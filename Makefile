@@ -18,7 +18,6 @@ obiba_home=${projects}/obiba-home
 
 skipTests=false
 mvn_exec=mvn -Dmaven.test.skip=${skipTests}
-gradle_exec=${magma_project}/gradlew
 orientdb_version=2.1.2
 
 mysql_root=root
@@ -160,15 +159,15 @@ magma-update:
 #
 magma:
 	cd ${magma_project}/${p} && \
-	${gradle_exec} build install && \
-	cp target/libs/${p}-${magma_version}.jar ${opal_project}/opal-server/target/opal-server-${version}/lib
+	${mvn_exec} clean install && \
+	cp target/${p}-${magma_version}.jar ${opal_project}/opal-server/target/opal-server-${version}/lib
 
 #
 # Compile and install all Magma sub-projects
 #
 magma-all:
 	cd ${magma_project} && \
-	${gradle_exec} build install && \
+	${mvn_exec} clean install && \
 	find ${opal_project}/opal-server/target/opal-server-${version}/lib -type f | grep magma | grep -v health-canada | grep -v geonames | xargs rm && \
 	cp `find . -type f | grep jar$$ | grep -v sources | grep -v javadoc | grep -v jacoco` ${opal_project}/opal-server/target/opal-server-${version}/lib
 
@@ -231,7 +230,7 @@ check-plugin-updates:
 	cd ${opal_project} && ${mvn_exec} versions:display-plugin-updates
 
 check-magma-updates:
-	cd ${magma_project} && ${gradle_exec} dependencyUpdates -Drevision=release
+	cd ${magma_project} && ${mvn_exec} versions:display-dependency-updates
 
 #
 # Dump MySQL databases
