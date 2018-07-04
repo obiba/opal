@@ -204,6 +204,14 @@ message RHavenDatasourceFactoryDto {
   }
 }
 
+message PluginDatasourceFactoryDto {
+  required string name = 1; // plugin name
+  optional string parameters = 2; // user parameters
+  extend DatasourceFactoryDto {
+    optional PluginDatasourceFactoryDto params = 1015;
+  }
+}
+
 message DatasourceParsingErrorDto {
   required string defaultMessage = 1;
   required string key = 2;
