@@ -44,6 +44,6 @@ public interface DatasourceService extends ServicePlugin {
    * @param parameters
    * @return
    */
-  DatasourceFactory createDatasource(@NotNull DatasourceUsage usage, @NotNull JSONObject parameters);
+  DatasourceFactory createDatasourceFactory(@NotNull DatasourceUsage usage, @NotNull JSONObject parameters);
 
 }

@@ -52,7 +52,7 @@ public class PluginDatasourceFactoryDtoParser extends AbstractDatasourceFactoryD
     } catch (Exception e) {
       log.warn("Cannot parse datasource plugin {} parameters: {}", pluginDto.getName(), pluginDto.getParameters(), e);
     }
-    return datasourceService.createDatasource(DatasourceUsage.IMPORT, parameters == null ? new JSONObject() : parameters);
+    return datasourceService.createDatasourceFactory(DatasourceUsage.IMPORT, parameters == null ? new JSONObject() : parameters);
   }
 
   /**
