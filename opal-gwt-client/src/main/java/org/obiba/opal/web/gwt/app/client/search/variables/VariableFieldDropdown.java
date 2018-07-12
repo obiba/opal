@@ -125,7 +125,15 @@ public class VariableFieldDropdown extends CriterionDropdown {
 
   @Override
   protected void onDropdownChange() {
-    updateCriterionFilter(translations.criterionFiltersMap().get((isNot() ? "not_" : "") + (isLikeSelected() ? "like" : "in")));
+    String filter = "";
+    if (getRadioControl(0).getValue()) {
+      filter = translations.criterionFiltersMap().get("any");
+    } else if (getRadioControl(1).getValue()) {
+      filter = translations.criterionFiltersMap().get("none");
+    } else {
+      filter = translations.criterionFiltersMap().get((isNot() ? "not_" : "") + (isLikeSelected() ? "like" : "in"));
+    }
+    updateCriterionFilter(filter);
   }
 
   @Override
