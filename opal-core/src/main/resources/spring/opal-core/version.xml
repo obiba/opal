@@ -12,7 +12,7 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
   <bean name="runtimeVersionProvider" class="org.obiba.opal.core.cfg.RuntimeVersionProvider">
-    <constructor-arg value="${project.version}-b${buildNumber}"/>
+    <constructor-arg value="${project.version}"/>
   </bean>
 
 </beans>

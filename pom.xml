@@ -126,7 +126,6 @@
     <maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>
     <maven-assembly-plugin.version>2.4</maven-assembly-plugin.version>
     <maven-build-helper-plugin.version>1.8</maven-build-helper-plugin.version>
-    <maven-buildnumber-plugin.version>1.2</maven-buildnumber-plugin.version>
     <maven-clean-plugin.version>2.5</maven-clean-plugin.version>
     <maven-cobertura-plugin.version>2.6</maven-cobertura-plugin.version>
     <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
@@ -1680,27 +1679,6 @@
         </plugin>
 
         <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>buildnumber-maven-plugin</artifactId>
-          <version>${maven-buildnumber-plugin.version}</version>
-          <executions>
-            <execution>
-              <id>createBuildNumber</id>
-              <phase>validate</phase>
-              <goals>
-                <goal>create</goal>
-              </goals>
-              <configuration>
-                <format>{0,date,yyyyMMddHHmmss}</format>
-                <items>
-                  <item>timestamp</item>
-                </items>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
           <version>${maven-source-plugin.version}</version>
@@ -1806,11 +1784,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>buildnumber-maven-plugin</artifactId>
       </plugin>
 
       <plugin>
