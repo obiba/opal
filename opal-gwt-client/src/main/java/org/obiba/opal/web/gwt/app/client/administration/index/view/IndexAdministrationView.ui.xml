@@ -28,7 +28,7 @@
     <b:Paragraph>
       <ui:msg description="Search service text">Changes in search service configuration will take effect on service
         start. See details in
-        <a href="http://wiki.obiba.org/display/OPALDOC/Administrating+Opal#AdministratingOpal-Search"
+        <a href="http://opaldoc.obiba.org/en/latest/web-user-guide/administration/search.html"
            target="_blank">Search Service Administration documentation
         </a>.
       </ui:msg>

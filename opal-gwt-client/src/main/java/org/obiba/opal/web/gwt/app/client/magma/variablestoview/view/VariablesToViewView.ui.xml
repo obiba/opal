@@ -62,7 +62,7 @@
           <b:HelpBlock>
             <ui:msg description="Entity Filter help">When returned value is true, the entity is selected. Otherwise it
               is rejected. See also detailed documentation about
-              <a href="http://wiki.obiba.org/display/OPALDOC/Magma+Javascript+API" target="_blank">Magma Javascript
+              <a href="http://opaldoc.obiba.org/en/latest/magma-user-guide/index.html" target="_blank">Magma Javascript
                 API</a>.
             </ui:msg>
           </b:HelpBlock>

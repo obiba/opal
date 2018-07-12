@@ -19,7 +19,7 @@
     <b:Paragraph>
       <ui:msg description="Taxonomies text">Taxonomies are controlled vocabularies that can be used to classify or qualify
         variables. Some predefined taxonomies are available and can be imported at any time. See details in
-        <a href="http://wiki.obiba.org/display/OPALDOC/Taxonomies+Administration"
+        <a href="http://opaldoc.obiba.org/en/latest/web-user-guide/administration/taxonomies.html"
             target="_blank">Taxonomies Administration documentation</a>.
       </ui:msg>
     </b:Paragraph>
