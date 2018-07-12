@@ -28,7 +28,7 @@
         Count and list entities that meet a specific filtering criteria.
         The filtering criteria can be specified by selecting variables from the cart or by searching variable(s)
         by their name/label or other attributes. Only tables that have been indexed can be searched.
-        See <a href="https://wiki.obiba.org/display/OPALDOC/Search+Entities" target="_blank">Search Entities</a> documentation for more details.
+        See <a href="http://opaldoc.obiba.org/en/latest/web-user-guide/search/entities.html" target="_blank">Search Entities</a> documentation for more details.
       </ui:msg>
     </b:Paragraph>
 

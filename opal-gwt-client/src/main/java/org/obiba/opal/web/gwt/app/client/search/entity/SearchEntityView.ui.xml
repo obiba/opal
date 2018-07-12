@@ -25,7 +25,7 @@
     <b:Paragraph>
       <ui:msg description="Search Entities help">
         Search an entity by providing its type and its identifier.
-        See <a href="https://wiki.obiba.org/display/OPALDOC/Search+Entity" target="_blank">Search Entity</a> documentation for more details.
+        See <a href="http://opaldoc.obiba.org/en/latest/web-user-guide/search/entity.html" target="_blank">Search Entity</a> documentation for more details.
       </ui:msg>
     </b:Paragraph>
 

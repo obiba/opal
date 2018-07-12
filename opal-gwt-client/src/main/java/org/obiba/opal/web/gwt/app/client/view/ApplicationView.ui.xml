@@ -38,7 +38,7 @@
         <b:NavLink ui:field="administrationItem">
           <ui:msg description="Administration label">Administration</ui:msg>
         </b:NavLink>
-        <b:NavLink target="_blank" href="http://wiki.obiba.org/display/OPALDOC/Opal+Web+Application+User+Guide">
+        <b:NavLink target="_blank" href="http://opaldoc.obiba.org/en/latest/web-user-guide/index.html">
           <ui:msg description="Help link text">Help</ui:msg>
         </b:NavLink>
         <b:Nav>
@@ -72,7 +72,7 @@
           <b:Column size="9">
             <g:InlineLabel>© 2018</g:InlineLabel>
             <b:NavLink target="_blank" href="http://obiba.org" addStyleNames="inline-block xsmall-indent">OBiBa</b:NavLink>
-            <b:NavLink target="_blank" href="http://wiki.obiba.org/display/OPALDOC" addStyleNames="inline-block small-indent">
+            <b:NavLink target="_blank" href="http://opaldoc.obiba.org" addStyleNames="inline-block small-indent">
               <ui:msg description="Documentation label">Documentation</ui:msg>
             </b:NavLink>
             <b:NavLink target="_blank" href="https://github.com/obiba/opal" addStyleNames="inline-block small-indent">

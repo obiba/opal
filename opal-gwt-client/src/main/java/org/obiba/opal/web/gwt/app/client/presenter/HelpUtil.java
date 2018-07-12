@@ -18,11 +18,11 @@ import com.google.gwt.user.client.Window;
  */
 public class HelpUtil {
 
-  private static final String OPALDOC_URL = "http://wiki.obiba.org/confluence/display/OPALDOC";
+  private static final String OPALDOC_URL = "http://opaldoc.obiba.org/en/latest";
 
-  private static final String OPALDOCDEV_URL = "http://wiki.obiba.org/confluence/display/OPALDOCDEV";
+  private static final String OPALDOCDEV_URL = "http://opaldoc.obiba.org/en/dev";
 
-  private static final String OPALDOC_USERGUIDE_PAGE = "Opal+Web+Application+User+Guide";
+  private static final String OPALDOC_USERGUIDE_PAGE = "web-user-guide/index.html";
 
   private HelpUtil() {}
 

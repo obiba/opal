@@ -28,7 +28,7 @@
         Search variables using controlled vocabularies and full-text search.
         The controlled vocabularies are defined by the <a href="#!search/!taxonomies">taxonomies</a>.
         The full-text search applies to the variable name and labels.
-        See <a href="https://wiki.obiba.org/display/OPALDOC/Search+Variables" target="_blank">Search Variables</a> documentation for more details.
+        See <a href="http://opaldoc.obiba.org/en/latest/web-user-guide/search/variables.html" target="_blank">Search Variables</a> documentation for more details.
       </ui:msg>
     </b:Paragraph>
 
