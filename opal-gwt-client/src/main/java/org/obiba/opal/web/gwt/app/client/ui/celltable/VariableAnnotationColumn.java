@@ -39,8 +39,11 @@ public class VariableAnnotationColumn extends AttributeColumn<VariableDto> {
 
   @Override
   protected void appendLabel(AttributeDto attr, StringBuilder labels) {
-    if (labels.toString().length() > 0) labels.append(" | ");
-    labels.append(getTermLabel(attr));
+    String label = getTermLabel(attr);
+    if (!Strings.isNullOrEmpty(label)) {
+      if (labels.toString().length() > 0) labels.append(" | ");
+      labels.append(label);
+    }
   }
 
   private String getTermLabel(AttributeDto attr) {
@@ -52,7 +55,7 @@ public class VariableAnnotationColumn extends AttributeColumn<VariableDto> {
         }
       }
     }
-    return attr.getValue();
+    return null;
   }
 
   private String getTermLabel(TaxonomyDto taxonomy, AttributeDto attr) {
