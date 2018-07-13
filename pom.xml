@@ -1926,6 +1926,7 @@
               <repository>maven</repository>
               <serverId>obiba-bintray</serverId>
               <packageVcsUrl>https://github.com/obiba/onyx</packageVcsUrl>
+              <performCleanup>false</performCleanup>
             </configuration>
             <executions>
               <!-- Activate "bintray:deploy" during "deploy" -->
