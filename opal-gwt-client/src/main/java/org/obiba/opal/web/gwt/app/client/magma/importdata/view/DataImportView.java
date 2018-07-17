@@ -19,19 +19,26 @@ import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.WizardModalBox;
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.Skippable;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
+import org.obiba.opal.web.model.client.opal.PluginPackageDto;
+import org.obiba.opal.web.model.client.opal.PluginPackagesDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.github.gwtbootstrap.client.ui.base.HasType;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -120,6 +127,9 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
   @UiField
   Chooser formatChooser;
 
+  @UiField
+  FlowPanel helpOpalDatasourcePluginPanel;
+
   private WizardStepChain stepChain;
 
   private StepInHandler comparedDatasourcesReportStepInHandler;
@@ -129,6 +139,8 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
   private ImportDataStepHandler datasourceValuesStepInHandler;
 
   private ImportDataInputsHandler importDataInputsHandler;
+
+  private JsArray<PluginPackageDto> pluginPackageDtoJsArray;
 
   @Inject
   public DataImportView(EventBus eventBus, Binder uiBinder, Translations translations) {
@@ -140,6 +152,7 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
   }
 
   private void initWizardDialog() {
+
     stepChain = WizardStepChain.Builder.create(dialog)//
         .append(formatSelectionStep)//
         .title(translations.dataImportFormatStep())//
@@ -202,6 +215,25 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
   }
 
   private void initWidgets() {
+    ResourceRequestBuilderFactory.<PluginPackagesDto>newBuilder() //
+        .forResource(UriBuilders.PLUGINS.create().query("type", "opal-datasource").build()) //
+        .withCallback(new ResourceCallback<PluginPackagesDto>() {
+          @Override
+          public void onResource(Response response, PluginPackagesDto resource) {
+            pluginPackageDtoJsArray = resource.getPackagesArray();
+            int count = pluginPackageDtoJsArray.length();
+
+            formatChooser.addGroup(translations.pluginBasedDatasources());
+
+            for (int i = 0; i < count; i++) {
+              GWT.log(pluginPackageDtoJsArray.get(i).getFile());
+              formatChooser.addItemToGroup(pluginPackageDtoJsArray.get(i).getTitle(), pluginPackageDtoJsArray.get(i).getName());
+            }
+
+          }
+        })
+        .get().send();
+
     formatChooser.addGroup(translations.fileBasedDatasources());
     formatChooser.addItemToGroup(translations.csvLabel(), ImportFormat.CSV.name());
     formatChooser.addItemToGroup(translations.opalXmlLabel(), ImportFormat.XML.name());
@@ -385,34 +417,40 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
 
   @SuppressWarnings({ "PMD.NcssMethodCount", "OverlyLongMethod" })
   private void updateHelpPanelsVisibility() {
-    switch(getImportFormat()) {
-      case CSV:
-        helpCsv.setVisible(true);
-        break;
-      case XML:
-        helpOpalXml.setVisible(true);
-        break;
-      case LIMESURVEY:
-        helpLimeSurvey.setVisible(true);
-        break;
-      case REST:
-        helpOpalRest.setVisible(true);
-        break;
-      case JDBC:
-        helpJDBC.setVisible(true);
-        break;
-      case SPSS:
-        helpSpss.setVisible(true);
-        break;
-      case RSAS:
-        helpRSASHaven.setVisible(true);
-        break;
-      case RSPSS:
-        helpRSPSSHaven.setVisible(true);
-        break;
-      case RSTATA:
-        helpRStataHaven.setVisible(true);
-        break;
+    PluginPackageDto foundPluginPackage = getPluginPackage(formatChooser.getSelectedValue());
+    if (foundPluginPackage != null) {
+      helpOpalDatasourcePluginPanel.setVisible(true);
+      helpOpalDatasourcePluginPanel.getElement().getFirstChildElement().setInnerHTML(foundPluginPackage.getDescription());
+    } else {
+      switch(getImportFormat()) {
+        case CSV:
+          helpCsv.setVisible(true);
+          break;
+        case XML:
+          helpOpalXml.setVisible(true);
+          break;
+        case LIMESURVEY:
+          helpLimeSurvey.setVisible(true);
+          break;
+        case REST:
+          helpOpalRest.setVisible(true);
+          break;
+        case JDBC:
+          helpJDBC.setVisible(true);
+          break;
+        case SPSS:
+          helpSpss.setVisible(true);
+          break;
+        case RSAS:
+          helpRSASHaven.setVisible(true);
+          break;
+        case RSPSS:
+          helpRSPSSHaven.setVisible(true);
+          break;
+        case RSTATA:
+          helpRStataHaven.setVisible(true);
+          break;
+      }
     }
   }
 
@@ -428,5 +466,20 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
     helpRStataHaven.setVisible(false);
     helpHealthCanada.setVisible(false);
     helpGeonamesPostalCodes.setVisible(false);
+    helpOpalDatasourcePluginPanel.setVisible(false);
+  }
+
+  private PluginPackageDto getPluginPackage(String name) {
+    boolean found = false;
+    int index = 0;
+
+    if (pluginPackageDtoJsArray != null) {
+      do {
+        found = pluginPackageDtoJsArray.get(index).getName().equals(name);
+        if (!found) index++;
+      } while(!found && index < pluginPackageDtoJsArray.length());
+    }
+
+    return found ? pluginPackageDtoJsArray.get(index) : null;
   }
 }

@@ -109,6 +109,13 @@
               </ui:msg>
             </g:Label>
           </g:FlowPanel>
+
+          <g:FlowPanel addStyleNames="small-top-margin" ui:field="helpOpalDatasourcePluginPanel" visible="false">
+            <g:Label styleName="help-block">
+
+            </g:Label>
+          </g:FlowPanel>
+
         </g:FlowPanel>
       </o:WizardStep>
 
