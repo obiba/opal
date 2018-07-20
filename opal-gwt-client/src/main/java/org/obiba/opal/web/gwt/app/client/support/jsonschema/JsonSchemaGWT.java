@@ -1,19 +1,56 @@
 package org.obiba.opal.web.gwt.app.client.support.jsonschema;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.ControlLabel;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.Widget;
 
 public class JsonSchemaGWT {
 
-  private static boolean typeIsValueBox(String type) {
-    return type.equals("string") || type.equals("number") || type.equals("integer");
+  public static List<String> getRequired(final JSONObject jsonSchema) {
+    JSONValue required = jsonSchema.get("required");
+    JSONArray jsonArray = required != null && required.isArray() != null ? required.isArray() : new JSONArray();
+    List<String> list = new ArrayList<>();
+
+    for(int i = 0; i < jsonArray.size(); i++) {
+      JSONString key = jsonArray.get(i).isString();
+      if (key != null) {
+        list.add(key.stringValue());
+      }
+    }
+
+    return list;
+  }
+
+  public static String getType(final JSONObject schema) {
+    final JSONValue type = schema.get("type");
+    return type != null && type.isString() != null ? type.isString().stringValue() : "string";
+  }
+
+  public static void buildUiIntoPanel(final JSONObject jsonSchema, Panel containerPanel) {
+    JSONObject properties = getProperties(jsonSchema);
+
+    Set<String> keys = properties.keySet();
+    for(String key : keys) {
+      JSONObject schema = getSchema(properties, key);
+      if(schema != null) {
+        containerPanel.add(buildControlGroup(schema, key));
+      }
+    }
+  }
+
+  private static JSONObject getProperties(final JSONObject jsonSchema) {
+    JSONValue properties = jsonSchema.get("properties");
+    return properties != null && properties.isObject() != null ? properties.isObject() : new JSONObject();
   }
 
   private static JSONObject getSchema(final JSONObject rootSchema, String key) {
@@ -21,42 +58,37 @@ public class JsonSchemaGWT {
     return schema != null && schema.isObject() != null ? schema.isObject() : null;
   }
 
-  private static JSONObject getSchemaProperties(final JSONObject jsonSchema) {
-    JSONValue properties = jsonSchema.get("properties");
-    return properties != null && properties.isObject() != null ? properties.isObject() : null;
-  }
+  private static ControlGroup buildControlGroup(final JSONObject schema, String key) {
+    ControlGroup controlGroup = new ControlGroup();
 
-  private static String getSchemaType(final JSONObject schema) {
-    final JSONValue type = schema.get("type");
-    return type != null && type.isString() != null ? type.isString().stringValue() : "string";
-  }
-
-  public static FlowPanel createUI(final JSONObject jsonSchema, FlowPanel containerPanel) {
-    JSONObject properties = getSchemaProperties(jsonSchema);
-
-    if (properties != null) {
-      Set<String> keys = properties.keySet();
-      for(Iterator<String> i = keys.iterator(); i.hasNext(); ) {
-        String key = i.next();
-
-        JSONObject schema = getSchema(properties, key);
-        if (schema != null) {
-          ControlGroup controlGroup = new ControlGroup();
-
-          JSONValue title = schema.get("title");
-          if(title != null && title.isString() != null) {
-            controlGroup.add(new ControlLabel(title.isString().stringValue()));
-          }
-
-          TextBox input = new TextBox();
-          input.setId(key);
-          controlGroup.add(input);
-
-          containerPanel.add(controlGroup);
-        }
-      }
+    JSONValue title = schema.get("title");
+    if(title != null && title.isString() != null) {
+      controlGroup.add(new ControlLabel(title.isString().stringValue()));
     }
 
-    return containerPanel;
+    // find out what to do with type
+    controlGroup.add(buildInputWidget(schema, key));
+
+    JSONValue description = schema.get("description");
+    if(description != null && description.isString() != null) {
+      controlGroup.add(new ControlLabel(description.isString().stringValue()));
+    }
+
+    return controlGroup;
+  }
+
+  private static Widget buildInputWidget(final JSONObject schema, String key) {
+    String type = getType(schema);
+
+    JSONValue anEnum = schema.get("enum");
+    if (anEnum != null && anEnum.isArray() != null) {
+      // validation for enum, must create a ListBox for those, currently easy to implement for type == string
+    }
+
+    // most generic, must take into account that type can be one of the six primitive types ("null", "boolean", "object", "array", "number", or "string"), or "integer"
+    TextBox input = new TextBox();
+    input.setId(key);
+
+    return input;
   }
 }

@@ -1,5 +1,7 @@
 package org.obiba.opal.web.gwt.app.client.magma.importdata.view;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DatasourcePluginFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.support.jsonschema.JsonSchemaGWT;
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
@@ -42,8 +44,9 @@ public class DatasourcePluginFormatStepView extends ViewImpl implements Datasour
 
           @Override
           public void onResource(Response response, JavaScriptObject resource) {
-            GWT.log(resource.toString());
-            JsonSchemaGWT.createUI(new JSONObject(resource), containerPanel);
+            JSONObject jsonSchema = new JSONObject(resource);
+            List<String> required = JsonSchemaGWT.getRequired(jsonSchema);
+            JsonSchemaGWT.buildUiIntoPanel(jsonSchema, containerPanel);
           }
         })
         .get().send();
