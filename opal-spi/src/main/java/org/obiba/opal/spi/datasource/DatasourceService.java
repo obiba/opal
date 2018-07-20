@@ -22,6 +22,8 @@ import java.util.Collection;
  */
 public interface DatasourceService extends ServicePlugin {
 
+  String SERVICE_TYPE = "opal-datasource";
+
   /**
    * Get the {@link DatasourceUsage}s that are covered by this datasource factory.
    *

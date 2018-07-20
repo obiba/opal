@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.importdata.view;
 
+import org.obiba.opal.spi.datasource.DatasourceService;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter;
@@ -34,7 +35,6 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 import com.github.gwtbootstrap.client.ui.base.HasType;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -216,20 +216,20 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
 
   private void initWidgets() {
     ResourceRequestBuilderFactory.<PluginPackagesDto>newBuilder() //
-        .forResource(UriBuilders.PLUGINS.create().query("type", "opal-datasource").build()) //
+        .forResource(UriBuilders.PLUGINS.create().query("type", DatasourceService.SERVICE_TYPE).build()) //
         .withCallback(new ResourceCallback<PluginPackagesDto>() {
           @Override
           public void onResource(Response response, PluginPackagesDto resource) {
             pluginPackageDtoJsArray = resource.getPackagesArray();
             int count = pluginPackageDtoJsArray.length();
 
-            formatChooser.addGroup(translations.pluginBasedDatasources());
+            if (count > 0) {
+              formatChooser.addGroup(translations.pluginBasedDatasources());
 
-            for (int i = 0; i < count; i++) {
-              GWT.log(pluginPackageDtoJsArray.get(i).getFile());
-              formatChooser.addItemToGroup(pluginPackageDtoJsArray.get(i).getTitle(), pluginPackageDtoJsArray.get(i).getName());
+              for (int i = 0; i < count; i++) {
+                formatChooser.addItemToGroup(pluginPackageDtoJsArray.get(i).getTitle(), pluginPackageDtoJsArray.get(i).getName());
+              }
             }
-
           }
         })
         .get().send();
@@ -278,6 +278,26 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
   }
 
   @Override
+  public JsArray<PluginPackageDto> getDatasourcePluginPackages() {
+    return pluginPackageDtoJsArray;
+  }
+
+  @Override
+  public PluginPackageDto getPluginPackage(String name) {
+    boolean found = false;
+    int index = 0;
+
+    if (pluginPackageDtoJsArray != null) {
+      do {
+        found = pluginPackageDtoJsArray.get(index).getName().equals(name);
+        if (!found) index++;
+      } while(!found && index < pluginPackageDtoJsArray.length());
+    }
+
+    return found ? pluginPackageDtoJsArray.get(index) : null;
+  }
+
+  @Override
   public Widget asWidget() {
     return dialog;
   }
@@ -305,8 +325,8 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
   }
 
   @Override
-  public ImportFormat getImportFormat() {
-    return ImportFormat.valueOf(formatChooser.getSelectedValue());
+  public String getSelectedFormat() {
+    return formatChooser.getSelectedValue(); // ImportFormat.valueOf(formatChooser.getSelectedValue());
   }
 
   @Override
@@ -422,7 +442,7 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
       helpOpalDatasourcePluginPanel.setVisible(true);
       helpOpalDatasourcePluginPanel.getElement().getFirstChildElement().setInnerHTML(foundPluginPackage.getDescription());
     } else {
-      switch(getImportFormat()) {
+      switch(ImportFormat.valueOf(getSelectedFormat())) {
         case CSV:
           helpCsv.setVisible(true);
           break;
@@ -467,19 +487,5 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
     helpHealthCanada.setVisible(false);
     helpGeonamesPostalCodes.setVisible(false);
     helpOpalDatasourcePluginPanel.setVisible(false);
-  }
-
-  private PluginPackageDto getPluginPackage(String name) {
-    boolean found = false;
-    int index = 0;
-
-    if (pluginPackageDtoJsArray != null) {
-      do {
-        found = pluginPackageDtoJsArray.get(index).getName().equals(name);
-        if (!found) index++;
-      } while(!found && index < pluginPackageDtoJsArray.length());
-    }
-
-    return found ? pluginPackageDtoJsArray.get(index) : null;
   }
 }
