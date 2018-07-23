@@ -9,7 +9,6 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.json.client.JSONObject;
@@ -50,6 +49,11 @@ public class DatasourcePluginFormatStepView extends ViewImpl implements Datasour
           }
         })
         .get().send();
+  }
+
+  @Override
+  public boolean validate() {
+    return false;
   }
 
   interface Binder extends UiBinder<Widget, DatasourcePluginFormatStepView> {}

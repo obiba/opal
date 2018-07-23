@@ -31,5 +31,7 @@ public class DatasourcePluginFormatStepPresenter extends PresenterWidget<Datasou
   public interface Display extends View, WizardStepDisplay, HasUiHandlers<ModalUiHandlers> {
 
     void setDatasourcePluginName(String name);
+
+    boolean validate();
   }
 }

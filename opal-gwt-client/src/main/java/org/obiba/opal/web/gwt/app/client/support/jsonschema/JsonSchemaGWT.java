@@ -6,12 +6,16 @@ import java.util.Set;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.ControlLabel;
-import com.github.gwtbootstrap.client.ui.TextBox;
+import com.google.gwt.i18n.client.HasDirection;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
+import com.google.gwt.user.client.ui.DoubleBox;
+import com.google.gwt.user.client.ui.IntegerBox;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 public class JsonSchemaGWT {
@@ -58,6 +62,11 @@ public class JsonSchemaGWT {
     return schema != null && schema.isObject() != null ? schema.isObject() : null;
   }
 
+  private static String getFormat(final JSONObject schema) {
+    final JSONValue format = schema.get("format");
+    return format != null && format.isString() != null ? format.isString().stringValue() : null;
+  }
+
   private static ControlGroup buildControlGroup(final JSONObject schema, String key) {
     ControlGroup controlGroup = new ControlGroup();
 
@@ -79,16 +88,51 @@ public class JsonSchemaGWT {
 
   private static Widget buildInputWidget(final JSONObject schema, String key) {
     String type = getType(schema);
+    String format = getFormat(schema);
 
     JSONValue anEnum = schema.get("enum");
-    if (anEnum != null && anEnum.isArray() != null) {
-      // validation for enum, must create a ListBox for those, currently easy to implement for type == string
+    boolean hasEnum = anEnum != null && anEnum.isArray() != null;
+    // validation for enum, must create a ListBox for those, currently easy to implement for type == string
+
+    switch(type) {
+      case "number": {
+        DoubleBox input = new DoubleBox();
+        input.setName(key);
+        input.getElement().setAttribute("type", "number");
+        input.getElement().setAttribute("step", "0.001");
+        return input;
+      }
+      case "integer": {
+        IntegerBox input = new IntegerBox();
+        input.setName(key);
+        input.getElement().setAttribute("type", "number");
+        input.getElement().setAttribute("step", "1");
+        return input;
+      }
+      case "string": {
+        if (hasEnum) {
+          ListBox listBox = new ListBox();
+          listBox.setName(key);
+
+          JSONArray array = anEnum.isArray();
+          listBox.addItem("", HasDirection.Direction.DEFAULT, null);
+          for(int i = 0; i < array.size(); i++) {
+            listBox.addItem(array.get(i).isString().stringValue());
+          }
+
+          return listBox;
+        }
+
+        TextBox input = new TextBox();
+        input.setName(key);
+        return input;
+      }
+      default: {
+        // most generic, must take into account that type can be one of the six primitive types ("null", "boolean", "object", "array", "number", or "string"), or "integer"
+        TextBox input = new TextBox();
+        input.setName(key);
+        return input;
+      }
     }
-
-    // most generic, must take into account that type can be one of the six primitive types ("null", "boolean", "object", "array", "number", or "string"), or "integer"
-    TextBox input = new TextBox();
-    input.setId(key);
-
-    return input;
   }
 }
