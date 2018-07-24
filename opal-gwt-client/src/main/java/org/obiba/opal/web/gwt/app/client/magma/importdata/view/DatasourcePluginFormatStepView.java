@@ -10,6 +10,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -52,7 +53,7 @@ public class DatasourcePluginFormatStepView extends ViewImpl implements Datasour
   }
 
   @Override
-  public boolean validate() {
+  public boolean jsonSchemaValuesAreValid() {
     return false;
   }
 

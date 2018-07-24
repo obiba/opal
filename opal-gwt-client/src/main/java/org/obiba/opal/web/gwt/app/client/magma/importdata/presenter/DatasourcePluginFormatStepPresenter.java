@@ -25,13 +25,13 @@ public class DatasourcePluginFormatStepPresenter extends PresenterWidget<Datasou
 
   @Override
   public boolean validate() {
-    return false;
+    return getView().jsonSchemaValuesAreValid();
   }
 
   public interface Display extends View, WizardStepDisplay, HasUiHandlers<ModalUiHandlers> {
 
     void setDatasourcePluginName(String name);
 
-    boolean validate();
+    boolean jsonSchemaValuesAreValid();
   }
 }
