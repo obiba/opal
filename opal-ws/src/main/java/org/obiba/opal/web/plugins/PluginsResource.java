@@ -14,6 +14,7 @@ package org.obiba.opal.web.plugins;
 import com.google.common.base.Strings;
 import org.obiba.opal.core.cfg.PluginsService;
 import org.obiba.opal.web.model.Plugins;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +33,7 @@ public class PluginsResource {
   PluginsService pluginsService;
 
   @GET
+  @NoAuthorization
   public Plugins.PluginPackagesDto getInstalledPlugins(@QueryParam("type") String type) {
     return Dtos.asDto(pluginsService.getUpdateSite(), pluginsService.getLastUpdate(), pluginsService.restartRequired(),
         pluginsService.getInstalledPlugins().stream()
