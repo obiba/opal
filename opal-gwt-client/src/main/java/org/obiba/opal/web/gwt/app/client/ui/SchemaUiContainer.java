@@ -1,56 +1,84 @@
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.support.jsonschema.JsonSchemaGWT;
 
 import com.github.gwtbootstrap.client.ui.ControlLabel;
-import com.google.gwt.i18n.client.HasDirection;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.ui.DoubleBox;
-import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.IntegerBox;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Widget;
 
 public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.ControlGroup {
 
   private JSONObject schema;
   private String key;
 
-  public SchemaUiContainer(JSONObject schema, String key) {
+  private String type;
+
+  private boolean required;
+
+  public SchemaUiContainer(JSONObject schema, String key, boolean required) {
     this.schema = schema;
     this.key = key;
+    this.required = required;
+
+    type = JsonSchemaGWT.getType(schema);
 
     setUp();
   }
 
-  public SchemaUiContainer(JSONObject schema, String key, String html) {
-    super(html);
-    this.schema = schema;
-    this.key = key;
+  public Object getValue() {
+    String type = JsonSchemaGWT.getType(schema);
 
-    setUp();
+    Iterator<Widget> iterator = getChildren().iterator();
+    List<Object> values = new ArrayList<>();
+
+    boolean isSingleValueType = "integer".equals(type) || "number".equals(type) || "string".equals(type);
+    boolean found = false;
+
+    while(!found || iterator.hasNext()) {
+      Widget widget = iterator.next();
+
+      if (widget instanceof HasValue || widget instanceof ListBox) {
+        if (isSingleValueType) found = true;
+        values.add(widget instanceof HasValue ? ((HasValue) widget).getValue() : ((ListBox) widget).getSelectedValue());
+      }
+    }
+
+    return isSingleValueType ? values.get(0) : values;
   }
 
-  public void getValue() {
+  public boolean isValid() {
+    // create a schema validator? is this useful if the validation is done through the browser (HTML5)
+    boolean valid = false;
+    Object value = getValue();
 
+    if (required) {
+      valid = (value != null);
+    }
+
+    return valid;
   }
 
   public JSONObject getSchema() {
     return schema;
   }
 
-  public void setSchema(JSONObject schema) {
-    this.schema = schema;
-  }
-
   public String getKey() {
     return key;
   }
 
-  public void setKey(String key) {
-    this.key = key;
+  public boolean isRequired() {
+    return required;
   }
 
   private void setUp() {
@@ -60,7 +88,9 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
     }
 
     // find out what to do with type
-    add(buildInputWidget());
+    Widget widget = buildInputWidget();
+    if (required) widget.getElement().setAttribute("required", "");
+    add(widget);
 
     JSONValue description = schema.get("description");
     if(description != null && description.isString() != null) {
@@ -68,10 +98,7 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
     }
   }
 
-  private FocusWidget buildInputWidget() {
-    String type = JsonSchemaGWT.getType(schema);
-    String format = JsonSchemaGWT.getFormat(schema);
-
+  private Widget buildInputWidget() {
     JSONValue anEnum = schema.get("enum");
     boolean hasEnum = anEnum != null && anEnum.isArray() != null;
     // validation for enum, must create a ListBox for those, currently easy to implement for type == string
@@ -100,8 +127,6 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
           ListBox listBox = new ListBox();
           listBox.setName(key);
 
-          listBox.addItem("", HasDirection.Direction.DEFAULT, null);
-          listBox.getElement().getFirstChildElement().setAttribute("disabled" ,"disabled" );
           for(int i = 0; i < enumArray.size(); i++) {
             listBox.addItem(enumArray.get(i).isString().stringValue());
           }

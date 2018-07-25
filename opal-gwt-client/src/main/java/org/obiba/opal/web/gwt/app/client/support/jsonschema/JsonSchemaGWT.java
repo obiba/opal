@@ -61,12 +61,13 @@ public abstract class JsonSchemaGWT {
 
   public static void buildUiIntoPanel(final JSONObject jsonSchema, Panel containerPanel) {
     JSONObject properties = getProperties(jsonSchema);
+    List<String> required = getRequired(jsonSchema);
 
     Set<String> keys = properties.keySet();
     for(String key : keys) {
       JSONObject schema = getSchema(properties, key);
       if(schema != null) {
-        containerPanel.add(new SchemaUiContainer(schema, key));
+        containerPanel.add(new SchemaUiContainer(schema, key, required.indexOf(key) > -1));
       }
     }
   }

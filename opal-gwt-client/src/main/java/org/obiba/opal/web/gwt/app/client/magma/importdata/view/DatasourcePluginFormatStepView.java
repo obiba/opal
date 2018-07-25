@@ -1,16 +1,18 @@
 package org.obiba.opal.web.gwt.app.client.magma.importdata.view;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DatasourcePluginFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.support.jsonschema.JsonSchemaGWT;
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.SchemaUiContainer;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.dom.client.Document;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -45,7 +47,6 @@ public class DatasourcePluginFormatStepView extends ViewImpl implements Datasour
           @Override
           public void onResource(Response response, JavaScriptObject resource) {
             JSONObject jsonSchema = new JSONObject(resource);
-            List<String> required = JsonSchemaGWT.getRequired(jsonSchema);
             JsonSchemaGWT.buildUiIntoPanel(jsonSchema, containerPanel);
           }
         })
@@ -54,7 +55,33 @@ public class DatasourcePluginFormatStepView extends ViewImpl implements Datasour
 
   @Override
   public boolean jsonSchemaValuesAreValid() {
-    return false;
+    boolean isValid = true;
+    Iterator<Widget> iterator = containerPanel.iterator();
+
+    while(isValid && iterator.hasNext()) {
+      Widget widget = iterator.next();
+
+      if (widget instanceof SchemaUiContainer) {
+        SchemaUiContainer widgetAsSchemaUiContainer = (SchemaUiContainer) widget;
+        isValid = isValid && widgetAsSchemaUiContainer.isValid();
+      }
+    }
+
+    return isValid;
+  }
+
+  @Override
+  public Map<String, Object> getCurrentValues() {
+    Map<String, Object> valueMap = new HashMap<>();
+
+    for(Widget widget : containerPanel) {
+      if(widget instanceof SchemaUiContainer) {
+        SchemaUiContainer widgetAsSchemaUiContainer = (SchemaUiContainer) widget;
+        valueMap.put(widgetAsSchemaUiContainer.getKey(), widgetAsSchemaUiContainer.getValue());
+      }
+    }
+
+    return valueMap;
   }
 
   interface Binder extends UiBinder<Widget, DatasourcePluginFormatStepView> {}

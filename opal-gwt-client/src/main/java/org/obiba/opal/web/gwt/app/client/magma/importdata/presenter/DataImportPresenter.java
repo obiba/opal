@@ -447,25 +447,30 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       Set<Map.Entry<HasType<ControlGroupType>, String>> entries
           = new HashSet<Map.Entry<HasType<ControlGroupType>, String>>();
 
-      switch(ImportFormat.valueOf(getView().getSelectedFormat())) {
-        case CSV:
-          entries = csvFormatStepPresenter.getErrors().entrySet();
-          break;
-        case XML:
-          entries = xmlFormatStepPresenter.getErrors().entrySet();
-          break;
-        case REST:
-          entries = restStepPresenter.getErrors().entrySet();
-          break;
-        case SPSS:
-          entries = spssFormatStepPresenter.getErrors().entrySet();
-          break;
-        case RSPSS:
-        case RSAS:
-        case RSTATA:
-          entries = rHavenStepPresenter.getErrors().entrySet();
-          break;
+      try {
+        switch(ImportFormat.valueOf(getView().getSelectedFormat())) {
+          case CSV:
+            entries = csvFormatStepPresenter.getErrors().entrySet();
+            break;
+          case XML:
+            entries = xmlFormatStepPresenter.getErrors().entrySet();
+            break;
+          case REST:
+            entries = restStepPresenter.getErrors().entrySet();
+            break;
+          case SPSS:
+            entries = spssFormatStepPresenter.getErrors().entrySet();
+            break;
+          case RSPSS:
+          case RSAS:
+          case RSTATA:
+            entries = rHavenStepPresenter.getErrors().entrySet();
+            break;
+        }
+      } catch(IllegalArgumentException e) {
+        entries = datasourcePluginFormatStepPresenter.getErrors().entrySet();
       }
+
       return entries;
     }
 
