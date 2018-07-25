@@ -34,9 +34,9 @@ abstract class AbstractMagmaRConverter implements MagmaRConverter {
     return vt.asVector(vvs, entities, withMissings);
   }
 
-  REXP getVector(Variable variable, List<Value> values, SortedSet<VariableEntity> entities, boolean withMissings, boolean withFactors) {
+  REXP getVector(Variable variable, List<Value> values, SortedSet<VariableEntity> entities, boolean withMissings, boolean withFactors, boolean withLabelled) {
     VectorType vt = VectorType.forValueType(variable.getValueType());
-    return vt.asVector(variable, values, entities, withMissings, withFactors);
+    return vt.asVector(variable, values, entities, withMissings, withFactors, withLabelled);
   }
 
   ValueTable applyIdentifiersMapping(ValueTable table) {

@@ -80,4 +80,9 @@ class ValueTableRTibbleConverter extends ValueTableRConverter {
   protected boolean withFactors() {
     return false;
   }
+
+  @Override
+  protected boolean withLabelled() {
+    return true;
+  }
 }
