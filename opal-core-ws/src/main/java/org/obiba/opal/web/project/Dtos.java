@@ -20,16 +20,21 @@ import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
+import org.obiba.magma.datasource.nil.NullDatasource;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.web.magma.DatasourceResource;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Projects;
 
 import com.google.common.collect.Sets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.obiba.opal.web.model.Projects.ProjectDto;
 
 public class Dtos {
+
+  private static final Logger log = LoggerFactory.getLogger(Dtos.class);
 
   private Dtos() {}
 
@@ -45,9 +50,15 @@ public class Dtos {
     if(project.hasDatabase()) builder.setDatabase(project.getDatabase());
     if(project.hasVCFStoreService()) builder.setVcfStoreService(project.getVCFStoreService());
     Datasource datasource = project.getDatasource();
-    builder.setDatasource(org.obiba.opal.web.magma.Dtos.asDto(datasource)
-        .setLink(UriBuilder.fromPath("/").path(DatasourceResource.class).build(project.getName()).toString()));
-
+    Magma.DatasourceDto.Builder dsDtoBuilder;
+    try {
+      dsDtoBuilder = org.obiba.opal.web.magma.Dtos.asDto(datasource);
+    } catch (Exception e) {
+      log.error("Error when accessing project's datasource: {}", project.getName(), e);
+      datasource = new NullDatasource(project.getName());
+      dsDtoBuilder = org.obiba.opal.web.magma.Dtos.asDto(datasource);
+    }
+    builder.setDatasource(dsDtoBuilder.setLink(UriBuilder.fromPath("/").path(DatasourceResource.class).build(project.getName()).toString()));
     builder.setTimestamps(asTimestampsDto(project, datasource));
 
     return builder.build();
