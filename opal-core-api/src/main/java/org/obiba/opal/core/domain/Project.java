@@ -20,6 +20,8 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.magma.*;
+import org.obiba.magma.datasource.nil.NullDatasource;
+import org.obiba.magma.security.MagmaSecurityExtension;
 import org.obiba.magma.type.DateTimeType;
 
 import com.google.common.base.MoreObjects;
@@ -143,7 +145,15 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
 
   @Transient
   public Datasource getDatasource() {
-    return MagmaEngine.get().getDatasource(name);
+    if (MagmaEngine.get().hasDatasource(name))
+      return MagmaEngine.get().getDatasource(name);
+    // if datasource is not permitted
+    if(!MagmaEngine.get().getExtension(MagmaSecurityExtension.class).getAuthorizer().isPermitted(
+      "rest:/datasource/" + name + ":GET")) {
+      throw new NoSuchDatasourceException(name);
+    }
+    // if datasource init failed, return the null one so that project keeps being accessible
+    return new NullDatasource(name);
   }
 
   @Transient

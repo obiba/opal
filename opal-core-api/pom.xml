@@ -36,7 +36,15 @@
     </dependency>
     <dependency>
       <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-security</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.magma</groupId>
       <artifactId>magma-crypt</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-datasource-null</artifactId>
     </dependency>
     <dependency>
       <groupId>org.obiba.magma</groupId>

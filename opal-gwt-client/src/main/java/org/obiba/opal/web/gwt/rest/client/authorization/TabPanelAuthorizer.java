@@ -48,6 +48,9 @@ public class TabPanelAuthorizer implements HasAuthorization {
   @Override
   public void unauthorized() {
     getNavTab(index).setVisible(false);
+    if(selectedIndex == index) {
+      tabs.selectTab(index + 1);
+    }
   }
 
   private ListItem getNavTab(int i) {

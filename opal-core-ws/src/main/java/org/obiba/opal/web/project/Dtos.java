@@ -48,7 +48,7 @@ public class Dtos {
     builder.setDatasource(org.obiba.opal.web.magma.Dtos.asDto(datasource)
         .setLink(UriBuilder.fromPath("/").path(DatasourceResource.class).build(project.getName()).toString()));
 
-    builder.setTimestamps(asTimestampsDto(datasource));
+    builder.setTimestamps(asTimestampsDto(project, datasource));
 
     return builder.build();
   }
@@ -96,9 +96,23 @@ public class Dtos {
     builder.setVariableCount(variablesCount);
     builder.setEntityCount(ids.size());
 
-    builder.setTimestamps(asTimestampsDto(project.getDatasource()));
+    builder.setTimestamps(asTimestampsDto(project, project.getDatasource()));
 
     return builder.build();
+  }
+
+  /**
+   * Get the best representation of project's timestamps.
+   *
+   * @param project
+   * @param datasource
+   * @return
+   */
+  private static Magma.TimestampsDto asTimestampsDto(Project project, Datasource datasource) {
+    if (datasource.getValueTables().size() == 0)
+      return asTimestampsDto(project);
+    else
+      return asTimestampsDto(datasource);
   }
 
   private static Magma.TimestampsDto asTimestampsDto(Timestamped timestamped) {
