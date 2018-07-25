@@ -59,9 +59,10 @@ import static org.obiba.opal.web.gwt.app.client.administration.database.edit.Abs
  *
  */
 public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseUiHandlers>
-    implements SqlDatabaseModalPresenter.Display {
+  implements SqlDatabaseModalPresenter.Display {
 
-  interface Binder extends UiBinder<Widget, SqlDatabaseModalView> {}
+  interface Binder extends UiBinder<Widget, SqlDatabaseModalView> {
+  }
 
   private static final int JDBC_TABLES_TAB_INDEX = 1;
 
@@ -191,7 +192,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
     driver.addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent event) {
-        initUrl();
+        initExistingUrl();
       }
     });
 
@@ -205,8 +206,8 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
     constrainedModal.registerWidget("usage", translations.usageLabel(), usageGroup);
     constrainedModal.registerWidget("sqlSchema", translations.sqlSchemaLabel(), sqlSchemaGroup);
     constrainedModal
-        .registerWidget("sqlSchema.jdbcDatasourceSettings.defaultEntityType", translations.defaultEntityTypeLabel(),
-            defaultEntityTypeGroup);
+      .registerWidget("sqlSchema.jdbcDatasourceSettings.defaultEntityType", translations.defaultEntityTypeLabel(),
+        defaultEntityTypeGroup);
 
     limesurveyOptions.setText(translations.limesurveyOptionsLabel());
     jdbcOptions.setText(translations.jdbcOptionsLabel());
@@ -224,19 +225,37 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   }
 
   @Override
-  public void setIsIdentifiers(boolean isIdentifiers) {this.isIdentifiers = isIdentifiers;}
+  public void setIsIdentifiers(boolean isIdentifiers) {
+    this.isIdentifiers = isIdentifiers;
+  }
 
   @Override
   public void initUrl() {
-    if (!name.isEnabled()) return;
-    
     String defaultName = isIdentifiers ? "opal_ids" : "opal_data";
-    if(getDriver().getText() == null || "com.mysql.jdbc.Driver".equals(getDriver().getText())) {
+    if (getDriver().getText() == null || "com.mysql.jdbc.Driver".equals(getDriver().getText())) {
       url.setText("jdbc:mysql://localhost:3306/" + defaultName);
-    } else if(getDriver().getText() == null || "org.mariadb.jdbc.Driver".equals(getDriver().getText())) {
+    } else if (getDriver().getText() == null || "org.mariadb.jdbc.Driver".equals(getDriver().getText())) {
       url.setText("jdbc:mariadb://localhost:3306/" + defaultName);
-    } else if("org.postgresql.Driver".equals(getDriver().getText())) {
+    } else if ("org.postgresql.Driver".equals(getDriver().getText())) {
       url.setText("jdbc:postgresql://localhost:5432/" + defaultName);
+    }
+  }
+
+  private void initExistingUrl() {
+    String urlTxt = url.getText();
+    int start = urlTxt.indexOf(':');
+    if (start == -1) {
+      initUrl();
+    } else {
+      int end = urlTxt.indexOf(':', start + 1);
+      if (getDriver().getText().contains("mysql")) {
+        urlTxt = "jdbc:mysql" + urlTxt.substring(end);
+      } else if (getDriver().getText().contains("mariadb")) {
+        urlTxt = "jdbc:mariadb" + urlTxt.substring(end);
+      }else if (getDriver().getText().contains("postgresql")) {
+        urlTxt = "jdbc:postgresql" + urlTxt.substring(end);
+      }
+      url.setText(urlTxt);
     }
   }
 
@@ -267,11 +286,11 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   }
 
   @Override
-  @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
+  @SuppressWarnings({"OverlyLongMethod", "PMD.NcssMethodCount"})
   public void showError(@Nullable FormField formField, String message) {
     ControlGroup group = null;
-    if(formField != null) {
-      switch(formField) {
+    if (formField != null) {
+      switch (formField) {
         case NAME:
           group = nameGroup;
           break;
@@ -298,7 +317,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
           break;
       }
     }
-    if(group == null) {
+    if (group == null) {
       modal.addAlert(message, AlertType.ERROR);
     } else {
       modal.addAlert(message, AlertType.ERROR, group);
@@ -336,10 +355,10 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
 
       @Override
       public void setValue(SqlSchema selectedSqlSchema) {
-        if(selectedSqlSchema == null) return;
+        if (selectedSqlSchema == null) return;
         int count = sqlSchema.getItemCount();
-        for(int i = 0; i < count; i++) {
-          if(sqlSchema.getValue(i).equals(selectedSqlSchema.name())) {
+        for (int i = 0; i < count; i++) {
+          if (sqlSchema.getValue(i).equals(selectedSqlSchema.name())) {
             sqlSchema.setSelectedIndex(i);
             initDrivers();
             toggleLimesurveyOptions(selectedSqlSchema == SqlSchema.LIMESURVEY);
@@ -358,7 +377,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   }
 
   private void setAvailableUsages() {
-    for(Usage usageType : Usage.values()) {
+    for (Usage usageType : Usage.values()) {
       usage.addItem(usageType.getLabel(), usageType.name());
     }
     getUsage().setValue(Usage.STORAGE);
@@ -367,8 +386,8 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   @Override
   public void setSupportedSqlSchemas(SqlSchema... sqlSchemas) {
     sqlSchema.clear();
-    if(sqlSchemas != null) {
-      for(SqlSchema schema : sqlSchemas) {
+    if (sqlSchemas != null) {
+      for (SqlSchema schema : sqlSchemas) {
         sqlSchema.addItem(schema.getLabel(), schema.name());
       }
       getSqlSchema().setValue(sqlSchemas[0]);
@@ -386,10 +405,10 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
 
       @Override
       public void setValue(Usage selectedUsage) {
-        if(selectedUsage == null) return;
+        if (selectedUsage == null) return;
         int count = usage.getItemCount();
-        for(int i = 0; i < count; i++) {
-          if(usage.getValue(i).equals(selectedUsage.name())) {
+        for (int i = 0; i < count; i++) {
+          if (usage.getValue(i).equals(selectedUsage.name())) {
             usage.setSelectedIndex(i);
             setSupportedSqlSchemas(selectedUsage.getSupportedSqlSchemas());
             toggleDefaultStorage(selectedUsage == Usage.STORAGE);
@@ -439,8 +458,8 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
       public void setText(@Nullable String text) {
         selectedDriver = text;
         int count = driver.getItemCount();
-        for(int i = 0; i < count; i++) {
-          if(driver.getValue(i).equals(text)) {
+        for (int i = 0; i < count; i++) {
+          if (driver.getValue(i).equals(text)) {
             driver.setSelectedIndex(i);
             break;
           }
@@ -470,7 +489,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
       @Override
       public void setText(String text) {
         properties.setText(text);
-        if(!Strings.isNullOrEmpty(text)) {
+        if (!Strings.isNullOrEmpty(text)) {
           advancedOptions.setOpen(true);
         }
       }
@@ -503,7 +522,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
     JdbcDatasourceSettingsDto jdbcSettings = JdbcDatasourceSettingsDto.create();
     jdbcSettings.setDefaultEntityType(defaultEntityType.getText());
     jdbcSettings.setDefaultEntityIdColumnName(defaultEntityIdColumn.getText());
-    if(getUsageValue() == Usage.STORAGE) jdbcSettings.setDefaultCreatedTimestampColumnName("opal_created");
+    if (getUsageValue() == Usage.STORAGE) jdbcSettings.setDefaultCreatedTimestampColumnName("opal_created");
     jdbcSettings.setDefaultUpdatedTimestampColumnName(defaultUpdatedTimestampColumn.getText());
     jdbcSettings.setUseMetadataTables(useMetadataTables.getValue());
     jdbcSettings.setMultipleDatasources(getUsageValue() == Usage.STORAGE);
@@ -522,7 +541,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
     if (!mappedTables.isEmpty())
       jdbcSettings.setMappedTablesArray(JsArrays.fromIterable(mappedTables));
 
-    if(!batchSize.getText().isEmpty())
+    if (!batchSize.getText().isEmpty())
       jdbcSettings.setBatchSize(batchSize.getNumberValue().intValue());
 
     return jdbcSettings;
@@ -551,7 +570,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   @Override
   public void disableFieldsForDatabaseWithDatasource() {
     sqlSchema.setEnabled(false);
-    driver.setEnabled(false);
+    //driver.setEnabled(false);
     tablePrefix.setEnabled(false);
     defaultEntityType.setEnabled(false);
     defaultUpdatedTimestampColumn.setEnabled(false);
@@ -581,13 +600,13 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
 
   @Override
   public void toggleDefaultStorage(boolean show) {
-    if(!show) defaultStorage.setValue(false);
+    if (!show) defaultStorage.setValue(false);
     defaultStorageGroup.setVisible(show);
   }
 
   @Override
   public void toggleLimesurveyOptions(boolean show) {
-    if(!show) tablePrefix.setValue(null);
+    if (!show) tablePrefix.setValue(null);
     limesurveyOptions.setVisible(show);
   }
 
@@ -606,7 +625,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
     jdbcOptions.setOpen(true);
     if (show && !storage) {
       HasAuthorization authorizer = new CompositeAuthorizer(new TabPanelAuthorizer(jdbcOptionsTabPanel, JDBC_TABLES_TAB_INDEX),
-          new TabPanelAuthorizer(jdbcOptionsTabPanel, JDBC_TABLE_PARTITIONS_TAB_INDEX));
+        new TabPanelAuthorizer(jdbcOptionsTabPanel, JDBC_TABLE_PARTITIONS_TAB_INDEX));
       if (usageValue == Usage.IMPORT) authorizer.authorized();
       else authorizer.unauthorized();
     }
@@ -620,12 +639,11 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   private void initDrivers() {
     String selectedSchema = getSqlSchema().getValue().name().toLowerCase();
     driver.clear();
-    for(JdbcDriverDto driverDto : JsArrays.toIterable(availableDrivers)) {
-      if(JsArrays.toList(driverDto.getSupportedSchemasArray()).contains(selectedSchema))
+    for (JdbcDriverDto driverDto : JsArrays.toIterable(availableDrivers)) {
+      if (JsArrays.toList(driverDto.getSupportedSchemasArray()).contains(selectedSchema))
         driver.addItem(driverDto.getDriverName(), driverDto.getDriverClass());
     }
     // select MySQL by default but do not override previously selected driver if any
     getDriver().setText(selectedDriver == null ? "com.mysql.jdbc.Driver" : selectedDriver);
-    initUrl();
   }
 }
