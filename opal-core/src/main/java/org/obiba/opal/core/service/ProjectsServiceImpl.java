@@ -153,17 +153,23 @@ public class ProjectsServiceImpl implements ProjectService {
       String originalDb = nullToEmpty(original.getDatabase());
       String newDb = nullToEmpty(project.getDatabase());
       if(!newDb.equals(originalDb)) {
-        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-          @Override
-          protected void doInTransactionWithoutResult(TransactionStatus status) {
-            Datasource datasource = MagmaEngine.get().getDatasource(project.getName());
-            MagmaEngine.get().removeDatasource(datasource);
-            viewManager.unregisterDatasource(datasource.getName());
-            if(datasource.canDrop()) {
-              datasource.drop();
+        if (MagmaEngine.get().hasDatasource(project.getName())) {
+          transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus status) {
+              Datasource datasource = MagmaEngine.get().getDatasource(project.getName());
+              MagmaEngine.get().removeDatasource(datasource);
+              viewManager.unregisterDatasource(datasource.getName());
+              if (datasource.canDrop()) {
+                try {
+                  datasource.drop();
+                } catch (Exception e) {
+                  log.warn("Project's datasource drop failed: {}", project.getName(), e);
+                }
+              }
             }
-          }
-        });
+          });
+        }
         databaseRegistry.unregister(originalDb, project.getName());
         registerDatasource(project);
       }
