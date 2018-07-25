@@ -32,7 +32,7 @@ public enum VectorType {
 
   booleans(BooleanType.get()) {
     @Override
-    protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings) {
+    protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings, boolean withLabelled) {
       byte bools[] = new byte[values.size()];
       int i = 0;
       for (Value value : values) {
@@ -45,7 +45,7 @@ public enum VectorType {
           bools[i++] = REXPLogical.FALSE;
         }
       }
-      return variable == null ? new REXPLogical(bools) : new REXPLogical(bools, getVariableRAttributes(variable, null));
+      return variable == null ? new REXPLogical(bools) : new REXPLogical(bools, getVariableRAttributes(variable, null, withLabelled));
     }
 
     @Override
@@ -64,7 +64,7 @@ public enum VectorType {
 
   ints(IntegerType.get()) {
     @Override
-    protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings) {
+    protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings, boolean withLabelled) {
       int ints[] = new int[values.size()];
       int i = 0;
       for (Value value : values) {
@@ -75,7 +75,7 @@ public enum VectorType {
           ints[i++] = ((Number) value.getValue()).intValue();
         }
       }
-      return variable == null ? new REXPInteger(ints) : new REXPInteger(ints, getVariableRAttributes(variable, null));
+      return variable == null ? new REXPInteger(ints) : new REXPInteger(ints, getVariableRAttributes(variable, null, withLabelled));
     }
 
     @Override
@@ -95,7 +95,7 @@ public enum VectorType {
 
   doubles(DecimalType.get()) {
     @Override
-    protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings) {
+    protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings, boolean withLabelled) {
       double doubles[] = new double[values.size()];
       int i = 0;
       for (Value value : values) {
@@ -106,7 +106,7 @@ public enum VectorType {
           doubles[i++] = ((Number) value.getValue()).doubleValue();
         }
       }
-      return variable == null ? new REXPDouble(doubles) : new REXPDouble(doubles, getVariableRAttributes(variable, null));
+      return variable == null ? new REXPDouble(doubles) : new REXPDouble(doubles, getVariableRAttributes(variable, null, withLabelled));
     }
 
     @Override
@@ -125,7 +125,7 @@ public enum VectorType {
 
   datetimes(DateTimeType.get()) {
     @Override
-    protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings) {
+    protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings, boolean withLabelled) {
       int ints[] = new int[values.size()];
       int i = 0;
       for (Value value : values) {
@@ -138,7 +138,7 @@ public enum VectorType {
           ints[i++] = Long.valueOf(Math.round(t)).intValue();
         }
       }
-      return variable == null ? new REXPInteger(ints) : new REXPInteger(ints, getVariableRAttributes(variable, null));
+      return variable == null ? new REXPInteger(ints) : new REXPInteger(ints, getVariableRAttributes(variable, null, withLabelled));
     }
 
     @Override
@@ -154,7 +154,7 @@ public enum VectorType {
 
   dates(DateType.get()) {
     @Override
-    protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings) {
+    protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings, boolean withLabelled) {
       int ints[] = new int[values.size()];
       int i = 0;
       for (Value value : values) {
@@ -173,7 +173,7 @@ public enum VectorType {
           ints[i++] = Long.valueOf(Math.round(d)).intValue();
         }
       }
-      return variable == null ? new REXPInteger(ints) : new REXPInteger(ints, getVariableRAttributes(variable, null));
+      return variable == null ? new REXPInteger(ints) : new REXPInteger(ints, getVariableRAttributes(variable, null, withLabelled));
     }
 
     @Override
@@ -189,13 +189,13 @@ public enum VectorType {
 
   binaries(BinaryType.get()) {
     @Override
-    protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings) {
+    protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings, boolean withLabelled) {
       REXPRaw raws[] = new REXPRaw[values.size()];
       int i = 0;
       for (Value value : values) {
         raws[i++] = new REXPRaw(value.isNull() ? null : (byte[]) value.getValue());
       }
-      return variable == null ? new REXPList(new RList(raws)) : new REXPList(new RList(raws), getVariableRAttributes(variable, null));
+      return variable == null ? new REXPList(new RList(raws)) : new REXPList(new RList(raws), getVariableRAttributes(variable, null, withLabelled));
     }
   },
 
@@ -229,7 +229,7 @@ public enum VectorType {
    * @return
    */
   public REXP asVector(VariableValueSource vvs, SortedSet<VariableEntity> entities, boolean withMissings) {
-    return asVector(vvs.getVariable(), ImmutableList.copyOf(vvs.asVectorSource().getValues(entities)), entities, withMissings, true);
+    return asVector(vvs.getVariable(), ImmutableList.copyOf(vvs.asVectorSource().getValues(entities)), entities, withMissings, true, false);
   }
 
   /**
@@ -239,10 +239,12 @@ public enum VectorType {
    * @param values
    * @param entities
    * @param withMissings
+   * @param withFactors
+   * @param withLabelled
    * @return
    */
-  public REXP asVector(Variable variable, List<Value> values, SortedSet<VariableEntity> entities, boolean withMissings, boolean withFactors) {
-    return asValuesVector(variable, values, withMissings, withFactors);
+  public REXP asVector(Variable variable, List<Value> values, SortedSet<VariableEntity> entities, boolean withMissings, boolean withFactors, boolean withLabelled) {
+    return asValuesVector(variable, values, withMissings, withFactors, withLabelled);
   }
 
   /**
@@ -251,18 +253,20 @@ public enum VectorType {
    * @param variable
    * @param values
    * @param withMissings
+   * @param withFactors
+   * @param withLabelled
    * @return
    */
-  protected REXP asValuesVector(Variable variable, List<Value> values, boolean withMissings, boolean withFactors) {
+  protected REXP asValuesVector(Variable variable, List<Value> values, boolean withMissings, boolean withFactors, boolean withLabelled) {
     if (variable.getValueType().equals(BooleanType.get())) {
-      return asContinuousVector(variable, values, withMissings);
+      return asContinuousVector(variable, values, withMissings, withLabelled);
     }
     return VariableNature.CATEGORICAL.equals(VariableNature.getNature(variable)) && withFactors ?
-        asFactors(variable, values, withMissings) : asContinuousVector(variable, values, withMissings);
+        asFactors(variable, values, withMissings) : asContinuousVector(variable, values, withMissings, withLabelled);
   }
 
-  protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings) {
-    return variable != null && variable.getValueType().isGeo() ? asGeoJSONValuesVector(variable, values) : asStringValuesVector(variable, values);
+  protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings, boolean withLabelled) {
+    return variable != null && variable.getValueType().isGeo() ? asGeoJSONValuesVector(variable, values, withLabelled) : asStringValuesVector(variable, values, withLabelled);
   }
 
   protected REXP asFactors(Variable variable, List<Value> values, boolean withMissings) {
@@ -282,7 +286,7 @@ public enum VectorType {
       i++;
     }
     String[] levelsArray = levels.toArray(new String[levels.size()]);
-    return new REXPFactor(ints, levelsArray, getVariableRAttributes(variable, levelsArray));
+    return new REXPFactor(ints, levelsArray, getVariableRAttributes(variable, levelsArray, false));
   }
 
   private void populateCodesAndLevels(Variable variable, boolean withMissings, Map<String, Integer> codes,
@@ -300,10 +304,12 @@ public enum VectorType {
   /**
    * Build a R vector of strings.
    *
+   * @param variable
    * @param values
+   * @param withLabelled
    * @return
    */
-  protected REXP asStringValuesVector(Variable variable, List<Value> values) {
+  protected REXP asStringValuesVector(Variable variable, List<Value> values, boolean withLabelled) {
     String strs[] = new String[values.size()];
     int i = 0;
     for (Value value : values) {
@@ -312,7 +318,7 @@ public enum VectorType {
       i++;
     }
 
-    return variable == null ? new REXPString(strs) : new REXPString(strs, getVariableRAttributes(variable, null));
+    return variable == null ? new REXPString(strs) : new REXPString(strs, getVariableRAttributes(variable, null, withLabelled));
   }
 
   /**
@@ -320,9 +326,10 @@ public enum VectorType {
    *
    * @param variable
    * @param values
+   * @param withLabelled
    * @return
    */
-  protected REXP asGeoJSONValuesVector(Variable variable, List<Value> values) {
+  protected REXP asGeoJSONValuesVector(Variable variable, List<Value> values, boolean withLabelled) {
     String strs[] = new String[values.size()];
     String type = "Point";
     if (variable.getValueType().equals(LineStringType.get())) type = "LineString";
@@ -336,7 +343,7 @@ public enum VectorType {
         strs[i] = "{\"type\":\"" + type + "\",\"coordinates\":" + str + "}";
       i++;
     }
-    return new REXPString(strs, getVariableRAttributes(variable, null));
+    return new REXPString(strs, getVariableRAttributes(variable, null, withLabelled));
   }
 
   /**
@@ -345,9 +352,10 @@ public enum VectorType {
    *
    * @param variable
    * @param levels
+   * @param withLabelled 
    * @return
    */
-  protected REXPList getVariableRAttributes(Variable variable, String[] levels) {
+  protected REXPList getVariableRAttributes(Variable variable, String[] levels, boolean withLabelled) {
     List<REXP> contents = Lists.newArrayList();
     List<String> names = Lists.newArrayList();
     asAttributesMap(variable).forEach((name, content) -> {
@@ -367,7 +375,7 @@ public enum VectorType {
       contents.add(new REXPString("factor"));
       names.add("levels");
       contents.add(new REXPString(levels));
-    } else if (variable.hasCategories() && !variable.areAllCategoriesMissing()) {
+    } else if (variable.hasCategories() && withLabelled) {
       names.add("class");
       contents.add(new REXPString("labelled"));
       names.add("labels");

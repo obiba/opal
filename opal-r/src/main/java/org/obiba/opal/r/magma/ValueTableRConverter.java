@@ -117,13 +117,32 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
   protected List<VariableEntity> getEntitiesAsList() {
     return ImmutableList.copyOf(magmaAssignROperation.getEntities());
   }
-  
+
+  /**
+   * Assign values matching categories with "missing" flag.
+   *
+   * @return
+   */
   protected boolean withMissings() {
     return magmaAssignROperation.withMissings();
   }
 
+  /**
+   * R class "factor".
+   *
+   * @return
+   */
   protected boolean  withFactors() {
     return true;
+  }
+
+  /**
+   * R class "labelled".
+   *
+   * @return
+   */
+  protected boolean withLabelled() {
+    return false;
   }
 
   protected REXP getIdsVector(boolean withMissings) {
@@ -154,7 +173,7 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
         }
       }
 
-      return getVector(vvs.getVariable(), values, getEntities(), withMissings, false);
+      return getVector(vvs.getVariable(), values, getEntities(), withMissings, false, false);
     }
   }
 
@@ -230,7 +249,7 @@ abstract class ValueTableRConverter extends AbstractMagmaRConverter {
         }
       });
 
-      contents.add(getVector(v, values, entities, withMissings(), withFactors()));
+      contents.add(getVector(v, values, entities, withMissings(), withFactors(), withLabelled()));
       names.add(v.getName());
     });
 
