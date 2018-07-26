@@ -22,9 +22,10 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
   private JSONObject schema;
   private String key;
 
-  private String type;
-
   private boolean required;
+
+  private String type;
+  private boolean isSingleValueType;
 
   public SchemaUiContainer(JSONObject schema, String key, boolean required) {
     this.schema = schema;
@@ -32,17 +33,15 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
     this.required = required;
 
     type = JsonSchemaGWT.getType(schema);
+    isSingleValueType = "integer".equals(type) || "number".equals(type) || "string".equals(type);
 
     setUp();
   }
 
   public Object getValue() {
-    String type = JsonSchemaGWT.getType(schema);
-
     Iterator<Widget> iterator = getChildren().iterator();
     List<Object> values = new ArrayList<>();
 
-    boolean isSingleValueType = "integer".equals(type) || "number".equals(type) || "string".equals(type);
     boolean found = false;
 
     while(!found || iterator.hasNext()) {
@@ -58,12 +57,24 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
   }
 
   public boolean isValid() {
-    // create a schema validator? is this useful if the validation is done through the browser (HTML5)
-    boolean valid = false;
+    // create a schema validator? is this useful if the validation is done through the browser (HTML5)?
+    boolean valid = true;
     Object value = getValue();
 
     if (required) {
       valid = (value != null);
+    }
+
+    switch(type) {
+      case "string": {
+        valid = valid && JsonSchemaGWT.valueForStringSchemaIsValid(value instanceof String ? (String) value : null, schema);
+        break;
+      }
+      case "integer":
+      case "number": {
+        valid = valid && JsonSchemaGWT.valueForNumericSchemaIsValid(value instanceof Number ? (Number) value : null, schema);
+        break;
+      }
     }
 
     return valid;
@@ -89,7 +100,7 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
 
     // find out what to do with type
     Widget widget = buildInputWidget();
-    if (required) widget.getElement().setAttribute("required", "");
+    if (required) widget.getElement().setAttribute("required", "required");
     add(widget);
 
     JSONValue description = schema.get("description");
@@ -110,6 +121,7 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
         input.setName(key);
         input.getElement().setAttribute("type", "number");
         input.getElement().setAttribute("step", "0.001");
+        setNumericSchemaValidations(input);
         return input;
       }
       case "integer": {
@@ -117,6 +129,7 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
         input.setName(key);
         input.getElement().setAttribute("type", "number");
         input.getElement().setAttribute("step", "1");
+        setNumericSchemaValidations(input);
         return input;
       }
       default: {
@@ -136,8 +149,38 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
 
         TextBox input = new TextBox();
         input.setName(key);
+        setStringSchemaValidations(input);
         return input;
       }
+    }
+  }
+
+  private void setStringSchemaValidations(Widget widget) {
+    JSONValue maxLength = schema.get("maxLength");
+    if (maxLength != null && maxLength.isNumber() != null) {
+      if (maxLength.isNumber().doubleValue() > 0) widget.getElement().setAttribute("max", maxLength.isNumber().toString());
+    }
+
+    JSONValue minLength = schema.get("minLength");
+    if (minLength != null && minLength.isNumber() != null) {
+      if (minLength.isNumber().doubleValue() > 0) widget.getElement().setAttribute("min", minLength.isNumber().toString());
+    }
+
+    JSONValue pattern = schema.get("pattern");
+    if (pattern != null && pattern.isString() != null) {
+      widget.getElement().setAttribute("pattern", pattern.isString().stringValue());
+    }
+  }
+
+  private void setNumericSchemaValidations(Widget widget) {
+    JSONValue maximum = schema.get("maximum");
+    if (maximum != null && maximum.isNumber() != null) {
+      widget.getElement().setAttribute("max", maximum.isNumber().toString());
+    }
+
+    JSONValue minimum = schema.get("minimum");
+    if (minimum != null && minimum.isNumber() != null) {
+      widget.getElement().setAttribute("min", minimum.isNumber().toString());
     }
   }
 }
