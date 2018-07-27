@@ -10,8 +10,8 @@ import com.github.gwtbootstrap.client.ui.ControlLabel;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
+import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.DoubleBox;
-import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.IntegerBox;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
@@ -47,9 +47,9 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
     while(!found || iterator.hasNext()) {
       Widget widget = iterator.next();
 
-      if (widget instanceof HasValue || widget instanceof ListBox) {
+      if (widget instanceof TakesValue || widget instanceof ListBox) {
         if (isSingleValueType) found = true;
-        values.add(widget instanceof HasValue ? ((HasValue) widget).getValue() : ((ListBox) widget).getSelectedValue());
+        values.add(widget instanceof TakesValue ? ((TakesValue) widget).getValue() : ((ListBox) widget).getSelectedValue());
       }
     }
 
@@ -61,17 +61,21 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
     boolean valid = true;
     Object value = getValue();
 
-    if (required) {
-      valid = (value != null);
-    }
-
     switch(type) {
       case "string": {
+        if (required) {
+          valid = value != null && ((String) value).trim().length() > 0;
+        }
+
         valid = valid && JsonSchemaGWT.valueForStringSchemaIsValid(value instanceof String ? (String) value : null, schema);
         break;
       }
       case "integer":
       case "number": {
+        if (required) {
+          valid = value != null;
+        }
+
         valid = valid && JsonSchemaGWT.valueForNumericSchemaIsValid(value instanceof Number ? (Number) value : null, schema);
         break;
       }
@@ -93,19 +97,24 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
   }
 
   private void setUp() {
-    JSONValue title = schema.get("title");
-    if(title != null && title.isString() != null) {
-      add(new ControlLabel(title.isString().stringValue()));
-    }
-
-    // find out what to do with type
     Widget widget = buildInputWidget();
-    if (required) widget.getElement().setAttribute("required", "required");
-    add(widget);
 
-    JSONValue description = schema.get("description");
-    if(description != null && description.isString() != null) {
-      add(new ControlLabel(description.isString().stringValue()));
+    if (widget != null) {
+      JSONValue title = schema.get("title");
+      if(title != null && title.isString() != null) {
+        String titleStringValue = title.isString().stringValue();
+        add(new ControlLabel(titleStringValue));
+        setTitle(titleStringValue);
+      }
+
+      // find out what to do with type
+      if (required) widget.getElement().setAttribute("required", "required");
+      add(widget);
+
+      JSONValue description = schema.get("description");
+      if(description != null && description.isString() != null) {
+        add(new ControlLabel(description.isString().stringValue()));
+      }
     }
   }
 
@@ -113,6 +122,8 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
     JSONValue anEnum = schema.get("enum");
     boolean hasEnum = anEnum != null && anEnum.isArray() != null;
     // validation for enum, must create a ListBox for those, currently easy to implement for type == string
+
+    JSONValue aDefault = schema.get("default");
 
     // for now 3 cases: number, integer and string
     switch(type) {
@@ -122,6 +133,12 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
         input.getElement().setAttribute("type", "number");
         input.getElement().setAttribute("step", "0.001");
         setNumericSchemaValidations(input);
+
+        if (aDefault != null && aDefault.isNumber() != null) {
+          double defaultDoubleValue = aDefault.isNumber().doubleValue();
+          input.setValue(defaultDoubleValue);
+        }
+
         return input;
       }
       case "integer": {
@@ -130,10 +147,15 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
         input.getElement().setAttribute("type", "number");
         input.getElement().setAttribute("step", "1");
         setNumericSchemaValidations(input);
+
+        if (aDefault != null && aDefault.isNumber() != null) {
+          double defaultDoubleValue = aDefault.isNumber().doubleValue();
+          input.setValue(Double.valueOf(defaultDoubleValue).intValue());
+        }
+
         return input;
       }
-      default: {
-        // most generic, must take into account that type can be one of the six primitive types ("null", "boolean", "object", "array", "number", or "string"), or "integer"
+      case "string": {
         if (hasEnum) {
           JSONArray enumArray = anEnum.isArray();
 
@@ -150,9 +172,17 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
         TextBox input = new TextBox();
         input.setName(key);
         setStringSchemaValidations(input);
+
+        if (aDefault != null && aDefault.isString() != null) {
+          String defaultStringValue = aDefault.isString().stringValue();
+          input.setValue(defaultStringValue);
+        }
+
         return input;
       }
     }
+
+    return null;
   }
 
   private void setStringSchemaValidations(Widget widget) {

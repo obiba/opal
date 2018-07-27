@@ -15,6 +15,9 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
 
 @SuppressWarnings("UnusedDeclaration")
 public class ImportConfig {
@@ -23,7 +26,7 @@ public class ImportConfig {
 
   public enum ImportFormat {
 
-    CSV, EXCEL, XML, LIMESURVEY, REST, JDBC, SPSS, RSPSS, RSAS, RSTATA
+    CSV, EXCEL, XML, LIMESURVEY, REST, JDBC, SPSS, RSPSS, RSAS, RSTATA, FROM_PLUGIN
 
   }
 
@@ -80,6 +83,8 @@ public class ImportConfig {
   private String locale;
 
   private String idColumn;
+
+  private JSONObject pluginImportConfig = new JSONObject();
 
   @SuppressWarnings({ "PMD.NcssMethodCount", "OverlyLongMethod" })
   public void clear() {
@@ -347,5 +352,13 @@ public class ImportConfig {
 
   public String getIdColumn() {
     return idColumn;
+  }
+
+  public JSONObject getPluginImportConfig() {
+    return pluginImportConfig;
+  }
+
+  public void setPluginImportConfig(JSONObject pluginImportConfig) {
+    this.pluginImportConfig = pluginImportConfig;
   }
 }

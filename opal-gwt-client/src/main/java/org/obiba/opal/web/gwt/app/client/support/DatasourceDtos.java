@@ -51,9 +51,17 @@ public class DatasourceDtos {
       case RSAS:
       case RSTATA:
         return createRHavenDatasourceFactoryDto(importConfig);
+      case FROM_PLUGIN:
+
       default:
         throw new IllegalArgumentException("Import data format not supported: " + importConfig.getImportFormat());
     }
+  }
+
+  private static DatasourceFactoryDto createDatasourceFactoryDtoFromPlugin(ImportConfig importConfig) {
+    PluginBasedDatasourceFactoryDto factoryDto = PluginBasedDatasourceFactoryDto.create();
+    factoryDto.setPluginParams(importConfig.getPluginImportConfig().toString());
+    return createAndConfigureDatasourceFactoryDto(importConfig, PluginBasedDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
   }
 
   private static DatasourceFactoryDto createJdbcDatasourceFactoryDto(ImportConfig importConfig) {

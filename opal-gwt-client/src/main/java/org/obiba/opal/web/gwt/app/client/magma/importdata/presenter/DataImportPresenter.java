@@ -53,6 +53,7 @@ import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.json.client.JSONObject;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
@@ -368,6 +369,9 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       case RSTATA:
         submitJob(createImportCommandOptionsDto(importConfig.getFile()));
         break;
+      case FROM_PLUGIN:
+        submitPluginJob();
+        break;
     }
   }
 
@@ -378,6 +382,11 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         .withResourceBody(ImportCommandOptionsDto.stringify(dto)) //
         .withCallback(new SubmitJobResponseCodeCallBack(), SC_CREATED, SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR) //
         .send();
+  }
+
+  private void submitPluginJob() {
+    // send to plugin resource
+    importConfig.getPluginImportConfig();
   }
 
   private ImportCommandOptionsDto createLimesurveyImportCommandOptionsDto() {
@@ -558,14 +567,27 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       getView().prepareDatasourceCreation();
 
       DatasourceFactoryDto factory = DatasourceDtos.createDatasourceFactoryDto(importConfig);
-
       String factoryStr = DatasourceFactoryDto.stringify(factory);
-      transientRequest = ResourceRequestBuilderFactory.<DatasourceFactoryDto>newBuilder().forResource(
-          UriBuilders.PROJECT_TRANSIENT_DATASOURCE.create().build(importConfig.getDestinationDatasourceName())) //
-          .withResourceBody(factoryStr) //
-          .withCallback(new CreateTransientDatasourceCallback(factory), SC_CREATED, SC_BAD_REQUEST,
-              SC_INTERNAL_SERVER_ERROR) //
-          .post().send();
+
+      datasourcePluginFormatStepPresenter.getView();
+
+      if (importConfig.getImportFormat().equals(ImportFormat.FROM_PLUGIN)) {
+        ResourceRequestBuilderFactory.<DatasourceFactoryDto>newBuilder().forResource(
+            UriBuilders.PROJECT_TRANSIENT_DATASOURCE_FOR_PLUGIN.create()
+                .query("plugin", datasourcePluginFormatStepPresenter.getView().getSelectedPluginName())
+                .build(importConfig.getDestinationDatasourceName())).withResourceBody(factoryStr)
+            .withCallback(new CreateTransientDatasourceCallback(factory), SC_CREATED, SC_BAD_REQUEST,
+                SC_INTERNAL_SERVER_ERROR);
+
+        //
+      } else {
+        transientRequest = ResourceRequestBuilderFactory.<DatasourceFactoryDto>newBuilder().forResource(
+            UriBuilders.PROJECT_TRANSIENT_DATASOURCE.create().build(importConfig.getDestinationDatasourceName())) //
+            .withResourceBody(factoryStr) //
+            .withCallback(new CreateTransientDatasourceCallback(factory), SC_CREATED, SC_BAD_REQUEST,
+                SC_INTERNAL_SERVER_ERROR) //
+            .post().send();
+      }
     }
 
     private class CreateTransientDatasourceCallback implements ResponseCodeCallback {

@@ -1,6 +1,5 @@
 package org.obiba.opal.web.gwt.app.client.magma.importdata.presenter;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
@@ -9,6 +8,7 @@ import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay;
 
 import com.github.gwtbootstrap.client.ui.base.HasType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
+import com.google.gwt.json.client.JSONObject;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -25,7 +25,10 @@ public class DatasourcePluginFormatStepPresenter extends PresenterWidget<Datasou
 
   @Override
   public ImportConfig getImportConfig() {
-    return null;
+    ImportConfig importConfig = new ImportConfig();
+    importConfig.setFormat(ImportConfig.ImportFormat.FROM_PLUGIN);
+    importConfig.setPluginImportConfig(getView().getCurrentValues());
+    return importConfig;
   }
 
   @Override
@@ -34,7 +37,7 @@ public class DatasourcePluginFormatStepPresenter extends PresenterWidget<Datasou
   }
 
   public Map<HasType<ControlGroupType>, String> getErrors() {
-    return new HashMap<>();
+    return getView().getErrors();
   }
 
   public interface Display extends View, WizardStepDisplay, HasUiHandlers<ModalUiHandlers> {
@@ -43,6 +46,10 @@ public class DatasourcePluginFormatStepPresenter extends PresenterWidget<Datasou
 
     boolean jsonSchemaValuesAreValid();
 
-    Map<String, Object> getCurrentValues();
+    JSONObject getCurrentValues();
+
+    Map<HasType<ControlGroupType>, String> getErrors();
+
+    String getSelectedPluginName();
   }
 }

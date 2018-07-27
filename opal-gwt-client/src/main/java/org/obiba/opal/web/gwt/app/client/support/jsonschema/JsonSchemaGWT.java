@@ -50,16 +50,6 @@ public abstract class JsonSchemaGWT {
     return type != null && type.isString() != null ? type.isString().stringValue() : "string";
   }
 
-  public static String getType(final JSONObject jsonSchema, String key) {
-    JSONObject properties = getProperties(jsonSchema);
-    JSONValue schema = properties.get(key);
-    if (schema != null && schema.isObject() != null) {
-      return getType(schema.isObject());
-    } else {
-      return null;
-    }
-  }
-
   public static void buildUiIntoPanel(final JSONObject jsonSchema, Panel containerPanel) {
     JSONObject properties = getProperties(jsonSchema);
     List<String> required = getRequired(jsonSchema);

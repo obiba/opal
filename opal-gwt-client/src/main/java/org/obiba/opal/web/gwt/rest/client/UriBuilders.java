@@ -96,6 +96,13 @@ public enum UriBuilders {
     }
   },
 
+  PROJECT_TRANSIENT_DATASOURCE_FOR_PLUGIN {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "transient-datasources", "dsplugin");
+    }
+  },
+
   PROJECT_PERMISSIONS_PROJECT {
     @Override
     public UriBuilder create() {
