@@ -18,6 +18,7 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONString;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -89,7 +90,7 @@ public class DatasourcePluginFormatStepView extends ViewImpl implements Datasour
 
         Object value = widgetAsSchemaUiContainer.getValue();
         if (value != null) {
-          jsonObject.put(widgetAsSchemaUiContainer.getKey(), JSONParser.parseStrict(value.toString()));
+          jsonObject.put(widgetAsSchemaUiContainer.getKey(), new JSONString(value.toString()));
         }
       }
     }
