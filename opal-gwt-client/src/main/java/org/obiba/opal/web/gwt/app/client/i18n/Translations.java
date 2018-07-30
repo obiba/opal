@@ -2611,6 +2611,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("VCF File")
   String vcfFileLabel();
 
+  @Description("Browse button label")
+  @DefaultStringValue("Browse")
+  String browseButtonLabel();
+
   @Description("Genotypes Identified Samples count label")
   @DefaultStringValue("Identified Samples")
   String vcfIdentifiedSamplesCountLabel();

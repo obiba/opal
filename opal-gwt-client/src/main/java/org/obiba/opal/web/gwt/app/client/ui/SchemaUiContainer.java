@@ -16,22 +16,27 @@ import com.google.gwt.user.client.ui.IntegerBox;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.web.bindery.event.shared.EventBus;
 
 public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.ControlGroup {
 
+  private final EventBus eventBus;
+
   private JSONObject schema;
-  private String key;
 
-  private boolean required;
+  private final String key;
 
-  private String type;
-  private boolean isSingleValueType;
+  private final boolean required;
 
-  public SchemaUiContainer(JSONObject schema, String key, boolean required) {
+  private final String type;
+
+  private final boolean isSingleValueType;
+
+  public SchemaUiContainer(JSONObject schema, String key, boolean required, EventBus eventBus) {
     this.schema = schema;
     this.key = key;
     this.required = required;
-
+    this.eventBus = eventBus;
     type = JsonSchemaGWT.getType(schema);
     isSingleValueType = "integer".equals(type) || "number".equals(type) || "string".equals(type);
 
@@ -124,6 +129,7 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
     // validation for enum, must create a ListBox for those, currently easy to implement for type == string
 
     JSONValue aDefault = schema.get("default");
+    JSONValue format = schema.get("format");
 
     // for now 3 cases: number, integer and string
     switch(type) {
@@ -156,6 +162,12 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
         return input;
       }
       case "string": {
+        if (format != null && format.isString() != null) {
+          if (format.isString().stringValue().equals("file")) {
+            return new FileSelection(eventBus);
+          }
+        }
+
         if (hasEnum) {
           JSONArray enumArray = anEnum.isArray();
 

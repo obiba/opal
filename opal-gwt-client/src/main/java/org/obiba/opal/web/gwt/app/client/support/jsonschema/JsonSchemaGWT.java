@@ -12,6 +12,7 @@ import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.ui.Panel;
+import com.google.web.bindery.event.shared.EventBus;
 
 public abstract class JsonSchemaGWT {
 
@@ -50,7 +51,7 @@ public abstract class JsonSchemaGWT {
     return type != null && type.isString() != null ? type.isString().stringValue() : "string";
   }
 
-  public static void buildUiIntoPanel(final JSONObject jsonSchema, Panel containerPanel) {
+  public static void buildUiIntoPanel(final JSONObject jsonSchema, Panel containerPanel, EventBus eventBus) {
     JSONObject properties = getProperties(jsonSchema);
     List<String> required = getRequired(jsonSchema);
 
@@ -58,7 +59,7 @@ public abstract class JsonSchemaGWT {
     for(String key : keys) {
       JSONObject schema = getSchema(properties, key);
       if(schema != null) {
-        containerPanel.add(new SchemaUiContainer(schema, key, required.indexOf(key) > -1));
+        containerPanel.add(new SchemaUiContainer(schema, key, required.indexOf(key) > -1, eventBus));
       }
     }
   }
