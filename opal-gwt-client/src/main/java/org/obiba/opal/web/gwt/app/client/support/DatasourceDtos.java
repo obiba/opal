@@ -52,7 +52,7 @@ public class DatasourceDtos {
       case RSTATA:
         return createRHavenDatasourceFactoryDto(importConfig);
       case FROM_PLUGIN:
-
+        return createDatasourceFactoryDtoFromPlugin(importConfig);
       default:
         throw new IllegalArgumentException("Import data format not supported: " + importConfig.getImportFormat());
     }
