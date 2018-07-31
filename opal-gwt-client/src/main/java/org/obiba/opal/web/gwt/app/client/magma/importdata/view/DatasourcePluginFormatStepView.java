@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DatasourcePluginFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.support.jsonschema.JsonSchemaGWT;
+import org.obiba.opal.web.gwt.app.client.ui.FileSelection;
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.SchemaUiContainer;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -23,6 +24,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 public class DatasourcePluginFormatStepView extends ViewImpl implements DatasourcePluginFormatStepPresenter.Display {
@@ -34,9 +36,12 @@ public class DatasourcePluginFormatStepView extends ViewImpl implements Datasour
 
   private String selectedPluginName;
 
+  private final EventBus eventBus;
+
   @Inject
-  public DatasourcePluginFormatStepView(Binder uiBinder) {
+  public DatasourcePluginFormatStepView(Binder uiBinder, EventBus eventBus) {
     initWidget(uiBinder.createAndBindUi(this));
+    this.eventBus = eventBus;
   }
 
   @Override
@@ -56,7 +61,7 @@ public class DatasourcePluginFormatStepView extends ViewImpl implements Datasour
           @Override
           public void onResource(Response response, JavaScriptObject resource) {
             JSONObject jsonSchema = new JSONObject(resource);
-            JsonSchemaGWT.buildUiIntoPanel(jsonSchema, containerPanel);
+            JsonSchemaGWT.buildUiIntoPanel(jsonSchema, containerPanel, eventBus);
           }
         })
         .get().send();
