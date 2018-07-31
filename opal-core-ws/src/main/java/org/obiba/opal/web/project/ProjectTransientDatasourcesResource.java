@@ -104,7 +104,7 @@ public class ProjectTransientDatasourcesResource {
     try {
       safeRemoveParseErrorLogCache();
 
-      DatasourceFactory factory = pluginDatasourceFactoryDtoParser.canParse(factoryDto) ? datasourceFactoryRegistry.parse(factoryDto, getDatasourceEncryptionStrategy()) : pluginDatasourceFactoryDtoParser.parse(factoryDto, getDatasourceEncryptionStrategy());
+      DatasourceFactory factory = pluginDatasourceFactoryDtoParser.canParse(factoryDto) ? pluginDatasourceFactoryDtoParser.parse(factoryDto, getDatasourceEncryptionStrategy()) : datasourceFactoryRegistry.parse(factoryDto, getDatasourceEncryptionStrategy());
       uid = MagmaEngine.get().addTransientDatasource(factory);
       Datasource ds = MagmaEngine.get().getTransientDatasourceInstance(uid);
       return Response.created(UriBuilder.fromPath("/").path(DatasourceResource.class).build(uid))
