@@ -571,23 +571,12 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
       datasourcePluginFormatStepPresenter.getView();
 
-      if (importConfig.getImportFormat().equals(ImportFormat.FROM_PLUGIN)) {
-        ResourceRequestBuilderFactory.<DatasourceFactoryDto>newBuilder().forResource(
-            UriBuilders.PROJECT_TRANSIENT_DATASOURCE_FOR_PLUGIN.create()
-                .query("plugin", datasourcePluginFormatStepPresenter.getView().getSelectedPluginName())
-                .build(importConfig.getDestinationDatasourceName())).withResourceBody(importConfig.getPluginImportConfig().toString())
-            .withCallback(new CreateTransientDatasourceCallback(factory), SC_CREATED, SC_BAD_REQUEST,
-                SC_INTERNAL_SERVER_ERROR).post().send();
-
-        //
-      } else {
-        transientRequest = ResourceRequestBuilderFactory.<DatasourceFactoryDto>newBuilder().forResource(
-            UriBuilders.PROJECT_TRANSIENT_DATASOURCE.create().build(importConfig.getDestinationDatasourceName())) //
-            .withResourceBody(factoryStr) //
-            .withCallback(new CreateTransientDatasourceCallback(factory), SC_CREATED, SC_BAD_REQUEST,
-                SC_INTERNAL_SERVER_ERROR) //
-            .post().send();
-      }
+      transientRequest = ResourceRequestBuilderFactory.<DatasourceFactoryDto>newBuilder().forResource(
+          UriBuilders.PROJECT_TRANSIENT_DATASOURCE.create().build(importConfig.getDestinationDatasourceName())) //
+          .withResourceBody(factoryStr) //
+          .withCallback(new CreateTransientDatasourceCallback(factory), SC_CREATED, SC_BAD_REQUEST,
+              SC_INTERNAL_SERVER_ERROR) //
+          .post().send();
     }
 
     private class CreateTransientDatasourceCallback implements ResponseCodeCallback {

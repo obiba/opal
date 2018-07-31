@@ -59,9 +59,10 @@ public class DatasourceDtos {
   }
 
   private static DatasourceFactoryDto createDatasourceFactoryDtoFromPlugin(ImportConfig importConfig) {
-    PluginBasedDatasourceFactoryDto factoryDto = PluginBasedDatasourceFactoryDto.create();
-    factoryDto.setPluginParams(importConfig.getPluginImportConfig().toString());
-    return createAndConfigureDatasourceFactoryDto(importConfig, PluginBasedDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
+    PluginDatasourceFactoryDto factoryDto = PluginDatasourceFactoryDto.create();
+    factoryDto.setName(importConfig.getPluginName());
+    factoryDto.setParameters(importConfig.getPluginImportConfig().toString());
+    return createAndConfigureDatasourceFactoryDto(importConfig, PluginDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
   }
 
   private static DatasourceFactoryDto createJdbcDatasourceFactoryDto(ImportConfig importConfig) {

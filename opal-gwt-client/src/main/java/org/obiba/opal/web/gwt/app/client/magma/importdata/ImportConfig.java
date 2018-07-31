@@ -84,6 +84,8 @@ public class ImportConfig {
 
   private String idColumn;
 
+  private String pluginName;
+
   private JSONObject pluginImportConfig = new JSONObject();
 
   @SuppressWarnings({ "PMD.NcssMethodCount", "OverlyLongMethod" })
@@ -360,5 +362,13 @@ public class ImportConfig {
 
   public void setPluginImportConfig(JSONObject pluginImportConfig) {
     this.pluginImportConfig = pluginImportConfig;
+  }
+
+  public String getPluginName() {
+    return pluginName;
+  }
+
+  public void setPluginName(String pluginName) {
+    this.pluginName = pluginName;
   }
 }

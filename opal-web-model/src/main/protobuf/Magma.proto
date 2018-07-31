@@ -22,14 +22,6 @@ message DatasourceFactoryDto {
   extensions 1000 to max;
 }
 
-message PluginBasedDatasourceFactoryDto {
-  optional string pluginParams = 1;
-
-  extend DatasourceFactoryDto {
-    optional PluginBasedDatasourceFactoryDto params = 1100;
-  }
-}
-
 message ExcelDatasourceFactoryDto {
   required string file = 1;
   optional bool readOnly = 2;

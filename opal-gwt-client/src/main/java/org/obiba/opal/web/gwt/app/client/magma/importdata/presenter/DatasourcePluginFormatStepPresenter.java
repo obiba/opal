@@ -27,6 +27,7 @@ public class DatasourcePluginFormatStepPresenter extends PresenterWidget<Datasou
   public ImportConfig getImportConfig() {
     ImportConfig importConfig = new ImportConfig();
     importConfig.setFormat(ImportConfig.ImportFormat.FROM_PLUGIN);
+    importConfig.setPluginName(getView().getSelectedPluginName());
     importConfig.setPluginImportConfig(getView().getCurrentValues());
     return importConfig;
   }

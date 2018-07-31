@@ -46,7 +46,9 @@ import org.obiba.opal.spi.datasource.DatasourceUsage;
 import org.obiba.opal.web.magma.DatasourceResource;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
+import org.obiba.opal.web.magma.support.PluginDatasourceFactoryDtoParser;
 import org.obiba.opal.web.model.Magma;
+import org.obiba.opal.web.model.client.magma.PluginDatasourceFactoryDto;
 import org.obiba.plugins.spi.ServicePlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +75,7 @@ public class ProjectTransientDatasourcesResource {
   private CacheManager cacheManager;
 
   @Autowired
-  private OpalRuntime opalRuntime;
+  PluginDatasourceFactoryDtoParser pluginDatasourceFactoryDtoParser;
 
   private DatasourceFactoryRegistry datasourceFactoryRegistry;
 
@@ -101,7 +103,8 @@ public class ProjectTransientDatasourcesResource {
     String uid = null;
     try {
       safeRemoveParseErrorLogCache();
-      DatasourceFactory factory = datasourceFactoryRegistry.parse(factoryDto, getDatasourceEncryptionStrategy());
+
+      DatasourceFactory factory = pluginDatasourceFactoryDtoParser.canParse(factoryDto) ? datasourceFactoryRegistry.parse(factoryDto, getDatasourceEncryptionStrategy()) : pluginDatasourceFactoryDtoParser.parse(factoryDto, getDatasourceEncryptionStrategy());
       uid = MagmaEngine.get().addTransientDatasource(factory);
       Datasource ds = MagmaEngine.get().getTransientDatasourceInstance(uid);
       return Response.created(UriBuilder.fromPath("/").path(DatasourceResource.class).build(uid))
@@ -115,40 +118,6 @@ public class ProjectTransientDatasourcesResource {
 
       throw e;
     }
-  }
-
-  @POST
-  @Path("/dsplugin")
-  public Magma.DatasourceDto createDatasource(@QueryParam("plugin") String plugin,
-      @QueryParam("usage") @DefaultValue("import") String usage, String factoryDto) {
-    String uid = null;
-
-    if(plugin != null && opalRuntime.hasServicePlugin(plugin)) {
-      ServicePlugin servicePlugin = opalRuntime.getServicePlugin(plugin);
-      if(servicePlugin instanceof DatasourceService) {
-        DatasourceService asDatasourceService = (DatasourceService) servicePlugin;
-
-        DatasourceFactory datasourceFactory = asDatasourceService
-            .createDatasourceFactory(DatasourceUsage.valueOf(usage.toUpperCase()), new JSONObject(factoryDto));
-
-        try {
-          uid = MagmaEngine.get().addTransientDatasource(datasourceFactory);
-          Datasource ds = MagmaEngine.get().getTransientDatasourceInstance(uid);
-
-          return Dtos.asDto(ds).build();
-        } catch(MagmaRuntimeException e) {
-          MagmaEngine.get().removeTransientDatasource(uid);
-
-          if(e instanceof DatasourceParsingException) {
-            safeCacheParseErrorLog((DatasourceParsingException) e);
-          }
-
-          throw e;
-        }
-      }
-    }
-
-    return null;
   }
 
   private void safeCacheParseErrorLog(DatasourceParsingException parseException) {
