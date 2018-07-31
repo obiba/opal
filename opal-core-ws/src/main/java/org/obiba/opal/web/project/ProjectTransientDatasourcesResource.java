@@ -13,13 +13,11 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 import javax.annotation.Nullable;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
@@ -28,7 +26,6 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
 import org.apache.shiro.SecurityUtils;
-import org.json.JSONObject;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
@@ -37,19 +34,14 @@ import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy;
 import org.obiba.magma.support.DatasourceParsingException;
 import org.obiba.opal.core.domain.Project;
-import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
-import org.obiba.opal.spi.datasource.DatasourceService;
-import org.obiba.opal.spi.datasource.DatasourceUsage;
 import org.obiba.opal.web.magma.DatasourceResource;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.magma.support.PluginDatasourceFactoryDtoParser;
 import org.obiba.opal.web.model.Magma;
-import org.obiba.opal.web.model.client.magma.PluginDatasourceFactoryDto;
-import org.obiba.plugins.spi.ServicePlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,11 +63,15 @@ public class ProjectTransientDatasourcesResource {
   @PathParam("name")
   private String name;
 
-  @Autowired
   private CacheManager cacheManager;
 
+  private PluginDatasourceFactoryDtoParser pluginDatasourceFactoryDtoParser;
+
   @Autowired
-  PluginDatasourceFactoryDtoParser pluginDatasourceFactoryDtoParser;
+  public ProjectTransientDatasourcesResource(CacheManager cacheManager, PluginDatasourceFactoryDtoParser pluginDatasourceFactoryDtoParser) {
+    this.cacheManager = cacheManager;
+    this.pluginDatasourceFactoryDtoParser = pluginDatasourceFactoryDtoParser;
+  }
 
   private DatasourceFactoryRegistry datasourceFactoryRegistry;
 
