@@ -26,6 +26,7 @@ import javax.ws.rs.core.UriBuilder;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+
 import org.apache.shiro.SecurityUtils;
 import org.json.JSONObject;
 import org.obiba.magma.Datasource;
@@ -108,7 +109,7 @@ public class ProjectTransientDatasourcesResource {
     } catch(MagmaRuntimeException e) {
       MagmaEngine.get().removeTransientDatasource(uid);
 
-      if (e instanceof DatasourceParsingException) {
+      if(e instanceof DatasourceParsingException) {
         safeCacheParseErrorLog((DatasourceParsingException) e);
       }
 
@@ -116,19 +117,34 @@ public class ProjectTransientDatasourcesResource {
     }
   }
 
-
   @POST
   @Path("/dsplugin")
-  public Magma.DatasourceDto createDatasource(@QueryParam("plugin") String plugin, @QueryParam("usage") @DefaultValue("import") String usage, JSONObject parameters) {
-    if (plugin != null && opalRuntime.hasServicePlugin(plugin)) {
+  public Magma.DatasourceDto createDatasource(@QueryParam("plugin") String plugin,
+      @QueryParam("usage") @DefaultValue("import") String usage, String factoryDto) {
+    String uid = null;
+
+    if(plugin != null && opalRuntime.hasServicePlugin(plugin)) {
       ServicePlugin servicePlugin = opalRuntime.getServicePlugin(plugin);
-      if (servicePlugin instanceof DatasourceService) {
+      if(servicePlugin instanceof DatasourceService) {
         DatasourceService asDatasourceService = (DatasourceService) servicePlugin;
 
         DatasourceFactory datasourceFactory = asDatasourceService
-            .createDatasourceFactory(DatasourceUsage.valueOf(usage.toUpperCase()), parameters);
+            .createDatasourceFactory(DatasourceUsage.valueOf(usage.toUpperCase()), new JSONObject(factoryDto));
 
-        return Dtos.asDto(datasourceFactory.create()).build();
+        try {
+          uid = MagmaEngine.get().addTransientDatasource(datasourceFactory);
+          Datasource ds = MagmaEngine.get().getTransientDatasourceInstance(uid);
+
+          return Dtos.asDto(ds).build();
+        } catch(MagmaRuntimeException e) {
+          MagmaEngine.get().removeTransientDatasource(uid);
+
+          if(e instanceof DatasourceParsingException) {
+            safeCacheParseErrorLog((DatasourceParsingException) e);
+          }
+
+          throw e;
+        }
       }
     }
 
@@ -138,15 +154,15 @@ public class ProjectTransientDatasourcesResource {
   private void safeCacheParseErrorLog(DatasourceParsingException parseException) {
     try {
       cacheDatarsourceParseErrorLog(parseException);
-    } catch (Exception e) {
+    } catch(Exception e) {
       log.warn("Error caching error log cache.", e);
     }
   }
 
   private void safeRemoveParseErrorLogCache() {
     try {
-      if (getSessionId() != null) getDatasourceParseErrorLogCache().remove(getSessionId());
-    } catch (Exception e) {
+      if(getSessionId() != null) getDatasourceParseErrorLogCache().remove(getSessionId());
+    } catch(Exception e) {
       log.warn("Error removing parse error log cache.", e);
     }
   }
@@ -157,28 +173,26 @@ public class ProjectTransientDatasourcesResource {
     for(DatasourceParsingException c : de.getChildrenAsList()) {
       Object[] args = c.getParameters().toArray();
 
-      if (args.length > 2)
-        log.append(String.format("[%s: %s] ", Arrays.copyOfRange(args, 0, 2)));
+      if(args.length > 2) log.append(String.format("[%s: %s] ", Arrays.copyOfRange(args, 0, 2)));
 
       log.append(c.getMessage());
 
-      if (args.length == 5)
+      if(args.length == 5)
         log.append(String.format("(table: %s, variable: %s, category: %s)", Arrays.copyOfRange(args, 2, args.length)));
-      else if (args.length == 4)
+      else if(args.length == 4)
         log.append(String.format("(table: %s, variable: %s)", Arrays.copyOfRange(args, 2, args.length)));
 
       log.append('\n');
     }
 
     Serializable sessionId = getSessionId();
-    if(sessionId != null)
-      getDatasourceParseErrorLogCache().put(new Element(sessionId, log.toString()));
+    if(sessionId != null) getDatasourceParseErrorLogCache().put(new Element(sessionId, log.toString()));
   }
 
   private Serializable getSessionId() {
     try {
       return SecurityUtils.getSubject().getSession().getId();
-    } catch (Exception e) {
+    } catch(Exception e) {
       log.error("Error getting subject session.", e);
       return null;
     }
@@ -194,13 +208,11 @@ public class ProjectTransientDatasourcesResource {
     Serializable sessionId = getSessionId();
     Element cached = null;
 
-    if(sessionId != null)
-       cached = getDatasourceParseErrorLogCache().get(sessionId);
+    if(sessionId != null) cached = getDatasourceParseErrorLogCache().get(sessionId);
 
-    if (cached == null)
-      throw new NotFoundException();
+    if(cached == null) throw new NotFoundException();
 
-    String log = (String)cached.getObjectValue();
+    String log = (String) cached.getObjectValue();
     Response.ResponseBuilder builder = Response.ok(log, "text/plain");
     builder.header("Content-Disposition", "attachment; filename=\"opal-datasource-parse-error-log.txt\"");
 

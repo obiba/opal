@@ -575,9 +575,9 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         ResourceRequestBuilderFactory.<DatasourceFactoryDto>newBuilder().forResource(
             UriBuilders.PROJECT_TRANSIENT_DATASOURCE_FOR_PLUGIN.create()
                 .query("plugin", datasourcePluginFormatStepPresenter.getView().getSelectedPluginName())
-                .build(importConfig.getDestinationDatasourceName())).withResourceBody(factoryStr)
+                .build(importConfig.getDestinationDatasourceName())).withResourceBody(importConfig.getPluginImportConfig().toString())
             .withCallback(new CreateTransientDatasourceCallback(factory), SC_CREATED, SC_BAD_REQUEST,
-                SC_INTERNAL_SERVER_ERROR);
+                SC_INTERNAL_SERVER_ERROR).post().send();
 
         //
       } else {
