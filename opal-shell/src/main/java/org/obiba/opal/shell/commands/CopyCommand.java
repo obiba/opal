@@ -344,7 +344,11 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   private Datasource getDatasourceByName(String datasourceName) {
-    return MagmaEngine.get().getDatasource(datasourceName);
+    if (MagmaEngine.get().hasDatasource(datasourceName))
+      return MagmaEngine.get().getDatasource(datasourceName);
+    if (MagmaEngine.get().hasTransientDatasource(datasourceName))
+      return MagmaEngine.get().getTransientDatasourceInstance(datasourceName);
+    throw new NoSuchDatasourceException(datasourceName);
   }
 
   private boolean validateOptions() {

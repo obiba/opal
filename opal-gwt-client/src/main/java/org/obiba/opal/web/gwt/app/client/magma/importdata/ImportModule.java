@@ -37,5 +37,7 @@ public class ImportModule extends AbstractOpalModule {
     bind(JdbcStepPresenter.Display.class).to(JdbcStepView.class);
     bind(RestStepPresenter.Display.class).to(RestStepView.class);
     bind(NoFormatStepPresenter.Display.class).to(NoFormatStepView.class);
+
+    bind(DatasourcePluginFormatStepPresenter.Display.class).to(DatasourcePluginFormatStepView.class);
   }
 }

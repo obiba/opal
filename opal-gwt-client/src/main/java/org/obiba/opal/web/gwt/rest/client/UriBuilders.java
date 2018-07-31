@@ -782,6 +782,14 @@ public enum UriBuilders {
     }
   },
 
+  DS_PLUGIN_SERVICE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("dsplugin", "{}");
+
+    }
+  },
+
   IDENTIFIERS_MAPPINGS {
     @Override
     public UriBuilder create() {

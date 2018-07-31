@@ -42,6 +42,7 @@ import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingConfigDto;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.opal.ImportCommandOptionsDto;
+import org.obiba.opal.web.model.client.opal.PluginPackageDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.github.gwtbootstrap.client.ui.base.HasType;
@@ -52,6 +53,7 @@ import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.json.client.JSONObject;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
@@ -96,6 +98,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   private final DatasourceValuesStepPresenter datasourceValuesStepPresenter;
 
+  private final DatasourcePluginFormatStepPresenter datasourcePluginFormatStepPresenter;
+
   private final Translations translations;
 
   private TransientDatasourceHandler transientDatasourceHandler;
@@ -116,7 +120,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       IdentifiersMappingSelectionStepPresenter identifiersMappingSelectionStepPresenter, //
       ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter,
       ArchiveStepPresenter archiveStepPresenter, //
-      DatasourceValuesStepPresenter datasourceValuesStepPresenter, Translations translations) {
+      DatasourceValuesStepPresenter datasourceValuesStepPresenter, Translations translations,
+      DatasourcePluginFormatStepPresenter datasourcePluginFormatStepPresenter) {
     super(eventBus, display);
     this.csvFormatStepPresenter = csvFormatStepPresenter;
     this.xmlFormatStepPresenter = xmlFormatStepPresenter;
@@ -129,6 +134,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     this.identifiersMappingSelectionStepPresenter = identifiersMappingSelectionStepPresenter;
     this.comparedDatasourcesReportPresenter = comparedDatasourcesReportPresenter;
     this.datasourceValuesStepPresenter = datasourceValuesStepPresenter;
+    this.datasourcePluginFormatStepPresenter = datasourcePluginFormatStepPresenter;
     this.translations = translations;
     getView().setUiHandlers(this);
   }
@@ -285,45 +291,54 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   }
 
   @SuppressWarnings({ "PMD.NcssMethodCount", "OverlyLongMethod" })
-  private void updateFormatStepDisplay() {
+  private void updateFormatStepDisplay() { //
     getView().updateHelp();
-    switch(getView().getImportFormat()) {
-      case CSV:
-        csvFormatStepPresenter.clear();
-        formatStepPresenter = csvFormatStepPresenter;
-        getView().setFormatStepDisplay(csvFormatStepPresenter.getView());
-        break;
-      case XML:
-        formatStepPresenter = xmlFormatStepPresenter;
-        getView().setFormatStepDisplay(xmlFormatStepPresenter.getView());
-        break;
-      case LIMESURVEY:
-        formatStepPresenter = limesurveyStepPresenter;
-        getView().setFormatStepDisplay(limesurveyStepPresenter.getView());
-        break;
-      case JDBC:
-        formatStepPresenter = jdbcStepPresenter;
-        getView().setFormatStepDisplay(jdbcStepPresenter.getView());
-        break;
-      case REST:
-        formatStepPresenter = restStepPresenter;
-        getView().setFormatStepDisplay(restStepPresenter.getView());
-        break;
-      case SPSS:
-        formatStepPresenter = spssFormatStepPresenter;
-        getView().setFormatStepDisplay(spssFormatStepPresenter.getView());
-        break;
-      case RSPSS:
-      case RSAS:
-      case RSTATA:
-        rHavenStepPresenter.setImportFormat(getView().getImportFormat());
-        formatStepPresenter = rHavenStepPresenter;
-        getView().setFormatStepDisplay(rHavenStepPresenter.getView());
-        break;
-      default:
-        noFormatStepPresenter.setImportFormat(getView().getImportFormat());
-        formatStepPresenter = noFormatStepPresenter;
-        getView().setFormatStepDisplay(noFormatStepPresenter.getView());
+    try {
+      ImportFormat format = ImportFormat.valueOf(getView().getSelectedFormat());
+
+      switch(format) {
+        case CSV:
+          csvFormatStepPresenter.clear();
+          formatStepPresenter = csvFormatStepPresenter;
+          getView().setFormatStepDisplay(csvFormatStepPresenter.getView());
+          break;
+        case XML:
+          formatStepPresenter = xmlFormatStepPresenter;
+          getView().setFormatStepDisplay(xmlFormatStepPresenter.getView());
+          break;
+        case LIMESURVEY:
+          formatStepPresenter = limesurveyStepPresenter;
+          getView().setFormatStepDisplay(limesurveyStepPresenter.getView());
+          break;
+        case JDBC:
+          formatStepPresenter = jdbcStepPresenter;
+          getView().setFormatStepDisplay(jdbcStepPresenter.getView());
+          break;
+        case REST:
+          formatStepPresenter = restStepPresenter;
+          getView().setFormatStepDisplay(restStepPresenter.getView());
+          break;
+        case SPSS:
+          formatStepPresenter = spssFormatStepPresenter;
+          getView().setFormatStepDisplay(spssFormatStepPresenter.getView());
+          break;
+        case RSPSS:
+        case RSAS:
+        case RSTATA:
+          rHavenStepPresenter.setImportFormat(format);
+          formatStepPresenter = rHavenStepPresenter;
+          getView().setFormatStepDisplay(rHavenStepPresenter.getView());
+          break;
+        default:
+          noFormatStepPresenter.setImportFormat(format);
+          formatStepPresenter = noFormatStepPresenter;
+          getView().setFormatStepDisplay(noFormatStepPresenter.getView());
+      }
+    } catch(IllegalArgumentException e) {
+      // HERE> must be a format from a plugin datasource
+      formatStepPresenter = datasourcePluginFormatStepPresenter;
+      datasourcePluginFormatStepPresenter.getView().setDatasourcePluginName(getView().getSelectedFormat());
+      getView().setFormatStepDisplay(datasourcePluginFormatStepPresenter.getView());
     }
   }
 
@@ -354,6 +369,9 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       case RSTATA:
         submitJob(createImportCommandOptionsDto(importConfig.getFile()));
         break;
+      case FROM_PLUGIN:
+        submitPluginJob();
+        break;
     }
   }
 
@@ -364,6 +382,11 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         .withResourceBody(ImportCommandOptionsDto.stringify(dto)) //
         .withCallback(new SubmitJobResponseCodeCallBack(), SC_CREATED, SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR) //
         .send();
+  }
+
+  private void submitPluginJob() {
+    // send to plugin resource
+    importConfig.getPluginImportConfig();
   }
 
   private ImportCommandOptionsDto createLimesurveyImportCommandOptionsDto() {
@@ -433,25 +456,30 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       Set<Map.Entry<HasType<ControlGroupType>, String>> entries
           = new HashSet<Map.Entry<HasType<ControlGroupType>, String>>();
 
-      switch(getView().getImportFormat()) {
-        case CSV:
-          entries = csvFormatStepPresenter.getErrors().entrySet();
-          break;
-        case XML:
-          entries = xmlFormatStepPresenter.getErrors().entrySet();
-          break;
-        case REST:
-          entries = restStepPresenter.getErrors().entrySet();
-          break;
-        case SPSS:
-          entries = spssFormatStepPresenter.getErrors().entrySet();
-          break;
-        case RSPSS:
-        case RSAS:
-        case RSTATA:
-          entries = rHavenStepPresenter.getErrors().entrySet();
-          break;
+      try {
+        switch(ImportFormat.valueOf(getView().getSelectedFormat())) {
+          case CSV:
+            entries = csvFormatStepPresenter.getErrors().entrySet();
+            break;
+          case XML:
+            entries = xmlFormatStepPresenter.getErrors().entrySet();
+            break;
+          case REST:
+            entries = restStepPresenter.getErrors().entrySet();
+            break;
+          case SPSS:
+            entries = spssFormatStepPresenter.getErrors().entrySet();
+            break;
+          case RSPSS:
+          case RSAS:
+          case RSTATA:
+            entries = rHavenStepPresenter.getErrors().entrySet();
+            break;
+        }
+      } catch(IllegalArgumentException e) {
+        entries = datasourcePluginFormatStepPresenter.getErrors().entrySet();
       }
+
       return entries;
     }
 
@@ -539,8 +567,10 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       getView().prepareDatasourceCreation();
 
       DatasourceFactoryDto factory = DatasourceDtos.createDatasourceFactoryDto(importConfig);
-
       String factoryStr = DatasourceFactoryDto.stringify(factory);
+
+      datasourcePluginFormatStepPresenter.getView();
+
       transientRequest = ResourceRequestBuilderFactory.<DatasourceFactoryDto>newBuilder().forResource(
           UriBuilders.PROJECT_TRANSIENT_DATASOURCE.create().build(importConfig.getDestinationDatasourceName())) //
           .withResourceBody(factoryStr) //
@@ -612,7 +642,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       Destination, Unit, Values, Archive, Limesurvey, Jdbc, Rest
     }
 
-    ImportFormat getImportFormat();
+    String getSelectedFormat();
 
     void updateHelp();
 
@@ -643,6 +673,10 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     void showError(String errorMessage, HasType<ControlGroupType> errorType);
 
     void clearError();
+
+    JsArray<PluginPackageDto> getDatasourcePluginPackages();
+
+    PluginPackageDto getPluginPackage(String name);
   }
 
   public interface DataConfigFormatStepPresenter {
