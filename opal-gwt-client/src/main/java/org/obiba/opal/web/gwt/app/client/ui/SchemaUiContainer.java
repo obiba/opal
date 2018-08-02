@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 import org.obiba.opal.web.gwt.app.client.support.jsonschema.JsonSchemaGWT;
 
 import com.github.gwtbootstrap.client.ui.ControlLabel;
@@ -23,14 +25,13 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
   private final EventBus eventBus;
 
   private JSONObject schema;
-
   private final String key;
 
   private final boolean required;
 
   private final String type;
-
   private final boolean isSingleValueType;
+  private final String format;
 
   public SchemaUiContainer(JSONObject schema, String key, boolean required, EventBus eventBus) {
     this.schema = schema;
@@ -39,6 +40,9 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
     this.eventBus = eventBus;
     type = JsonSchemaGWT.getType(schema);
     isSingleValueType = "integer".equals(type) || "number".equals(type) || "string".equals(type);
+
+    JSONValue formatValue = schema.get("format");
+    format = formatValue != null && formatValue.isString() != null ? formatValue.isString().stringValue() : "";
 
     setUp();
   }
@@ -124,77 +128,98 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
   }
 
   private Widget buildInputWidget() {
-    JSONValue anEnum = schema.get("enum");
-    boolean hasEnum = anEnum != null && anEnum.isArray() != null;
-    // validation for enum, must create a ListBox for those, currently easy to implement for type == string
-
     JSONValue aDefault = schema.get("default");
-    JSONValue format = schema.get("format");
 
     // for now 3 cases: number, integer and string
     switch(type) {
       case "number": {
-        DoubleBox input = new DoubleBox();
-        input.setName(key);
-        input.getElement().setAttribute("type", "number");
-        input.getElement().setAttribute("step", "0.001");
-        setNumericSchemaValidations(input);
-
-        if (aDefault != null && aDefault.isNumber() != null) {
-          double defaultDoubleValue = aDefault.isNumber().doubleValue();
-          input.setValue(defaultDoubleValue);
-        }
-
-        return input;
+        return createWidgetForNumber(aDefault);
       }
       case "integer": {
-        IntegerBox input = new IntegerBox();
-        input.setName(key);
-        input.getElement().setAttribute("type", "number");
-        input.getElement().setAttribute("step", "1");
-        setNumericSchemaValidations(input);
-
-        if (aDefault != null && aDefault.isNumber() != null) {
-          double defaultDoubleValue = aDefault.isNumber().doubleValue();
-          input.setValue(Double.valueOf(defaultDoubleValue).intValue());
-        }
-
-        return input;
+        return createWidgetForInteger(aDefault);
       }
       case "string": {
-        if (format != null && format.isString() != null) {
-          if (format.isString().stringValue().equals("file")) {
-            return new FileSelection(eventBus);
-          }
-        }
-
-        if (hasEnum) {
-          JSONArray enumArray = anEnum.isArray();
-
-          ListBox listBox = new ListBox();
-          listBox.setName(key);
-
-          for(int i = 0; i < enumArray.size(); i++) {
-            listBox.addItem(enumArray.get(i).isString().stringValue());
-          }
-
-          return listBox;
-        }
-
-        TextBox input = new TextBox();
-        input.setName(key);
-        setStringSchemaValidations(input);
-
-        if (aDefault != null && aDefault.isString() != null) {
-          String defaultStringValue = aDefault.isString().stringValue();
-          input.setValue(defaultStringValue);
-        }
-
-        return input;
+        return createWidgetForString(aDefault);
       }
     }
 
     return null;
+  }
+
+  private Widget createWidgetForNumber(final JSONValue aDefault) {
+    DoubleBox input = new DoubleBox();
+    input.setName(key);
+    input.getElement().setAttribute("type", "number");
+    input.getElement().setAttribute("step", "0.001");
+    setNumericSchemaValidations(input);
+
+    if (aDefault != null && aDefault.isNumber() != null) {
+      double defaultDoubleValue = aDefault.isNumber().doubleValue();
+      input.setValue(defaultDoubleValue);
+    }
+
+    return input;
+  }
+
+  private Widget createWidgetForInteger(final JSONValue aDefault) {
+    IntegerBox input = new IntegerBox();
+    input.setName(key);
+    input.getElement().setAttribute("type", "number");
+    input.getElement().setAttribute("step", "1");
+    setNumericSchemaValidations(input);
+
+    if (aDefault != null && aDefault.isNumber() != null) {
+      double defaultDoubleValue = aDefault.isNumber().doubleValue();
+      input.setValue(Double.valueOf(defaultDoubleValue).intValue());
+    }
+
+    return input;
+  }
+
+  private Widget createWidgetForString(final JSONValue aDefault) {
+    JSONValue anEnum = schema.get("enum");
+    boolean hasEnum = anEnum != null && anEnum.isArray() != null;
+
+    if (format.equals("file")) {
+      return new FileSelection(eventBus);
+    }
+
+    if (hasEnum) {
+      return createWidgetForStringWithEnum(anEnum);
+    }
+
+    TextBox input = new TextBox();
+    input.setName(key);
+    setStringSchemaValidations(input);
+
+    if (aDefault != null && aDefault.isString() != null) {
+      String defaultStringValue = aDefault.isString().stringValue();
+      input.setValue(defaultStringValue);
+    }
+
+    return input;
+  }
+
+  private Widget createWidgetForStringWithEnum(@NotNull final JSONValue anEnum) {
+    JSONArray enumArray = anEnum.isArray();
+
+    if (format.equals("radio")) {
+      List<String> radios = new ArrayList<>();
+      for(int i = 0; i < enumArray.size(); i++) {
+        radios.add(enumArray.get(i).isString().stringValue());
+      }
+
+      return new DynamicRadioGroup(key, radios);
+    }
+
+    ListBox listBox = new ListBox();
+    listBox.setName(key);
+
+    for(int i = 0; i < enumArray.size(); i++) {
+      listBox.addItem(enumArray.get(i).isString().stringValue());
+    }
+
+    return listBox;
   }
 
   private void setStringSchemaValidations(Widget widget) {
