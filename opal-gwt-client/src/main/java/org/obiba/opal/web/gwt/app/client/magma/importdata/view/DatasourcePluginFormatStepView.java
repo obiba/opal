@@ -60,6 +60,8 @@ public class DatasourcePluginFormatStepView extends ViewImpl implements Datasour
 
           @Override
           public void onResource(Response response, JavaScriptObject resource) {
+            containerPanel.clear();
+
             JSONObject jsonSchema = new JSONObject(resource);
             JsonSchemaGWT.buildUiIntoPanel(jsonSchema, containerPanel, eventBus);
           }

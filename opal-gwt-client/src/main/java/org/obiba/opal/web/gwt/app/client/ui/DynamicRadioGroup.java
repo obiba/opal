@@ -13,6 +13,7 @@ import com.google.gwt.user.client.ui.RadioButton;
 public class DynamicRadioGroup extends Composite implements TakesValue<String> {
 
   private String value;
+  private final String key;
 
   private List<RadioButton> radios = new ArrayList<>();
 
@@ -26,12 +27,21 @@ public class DynamicRadioGroup extends Composite implements TakesValue<String> {
     return value;
   }
 
-  public DynamicRadioGroup(List<String> items) {
+  public String getKey() {
+    return key;
+  }
+
+  public DynamicRadioGroup(String key, List<String> items) {
+    this.key = key;
+
     FlowPanel panel = new FlowPanel();
 
     if (items != null) {
       for(String item: items) {
         RadioButton radioButton = new RadioButton(item);
+        radioButton.setName(key);
+        radioButton.setFormValue(item);
+
         radioButton.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
           @Override
           public void onValueChange(ValueChangeEvent<Boolean> event) {
@@ -39,10 +49,10 @@ public class DynamicRadioGroup extends Composite implements TakesValue<String> {
             Boolean value = event.getValue();
 
             if (value != null && value) {
-              setValue(source.getName());
+              setValue(source.getFormValue());
 
               for(RadioButton radio : radios) {
-                if (!radio.getName().equals(source.getName())) {
+                if (!radio.equals(source)) {
                   radio.setValue(false, false);
                 }
               }
@@ -51,7 +61,13 @@ public class DynamicRadioGroup extends Composite implements TakesValue<String> {
         });
 
         radios.add(radioButton);
-        panel.add(radioButton);
+        radioButton.setText(item);
+
+        FlowPanel radioPanel = new FlowPanel();
+        radioPanel.getElement().addClassName("radio");
+        radioPanel.add(radioButton);
+
+        panel.add(radioPanel);
       }
     }
 
