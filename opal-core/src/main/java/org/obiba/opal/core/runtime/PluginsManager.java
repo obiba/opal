@@ -132,7 +132,7 @@ public class PluginsManager {
         .forEach(service -> PluginsManagerHelper.registerSingletonServicePlugin(servicePlugins, pluginsMap, service));
     DatasourceServiceLoader.get().getServices().stream()
         .filter(service -> pluginsMap.containsKey(service.getName()))
-        .forEach(service -> PluginsManagerHelper.registerSingletonServicePlugin(servicePlugins, pluginsMap, service));
+        .forEach(service -> PluginsManagerHelper.registerServicePlugin(servicePlugins, pluginsMap, service));
   }
 
   //
