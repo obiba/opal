@@ -370,7 +370,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         submitJob(createImportCommandOptionsDto(importConfig.getFile()));
         break;
       case FROM_PLUGIN:
-        submitPluginJob();
+        submitJob(createPluginImportCommandOptionsDto());
         break;
     }
   }
@@ -384,11 +384,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         .send();
   }
 
-  private void submitPluginJob() {
-    // send to plugin resource
-    importConfig.getPluginImportConfig();
-  }
-
   private ImportCommandOptionsDto createLimesurveyImportCommandOptionsDto() {
     return createImportCommandOptionsDto(null);
   }
@@ -398,6 +393,10 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   }
 
   private ImportCommandOptionsDto createRestImportCommandOptionsDto() {
+    return createImportCommandOptionsDto(null);
+  }
+
+  private ImportCommandOptionsDto createPluginImportCommandOptionsDto() {
     return createImportCommandOptionsDto(null);
   }
 
