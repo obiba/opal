@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DatasourcePluginFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.support.jsonschema.JsonSchemaGWT;
-import org.obiba.opal.web.gwt.app.client.ui.FileSelection;
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.SchemaUiContainer;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -18,7 +17,6 @@ import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONString;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -93,11 +91,7 @@ public class DatasourcePluginFormatStepView extends ViewImpl implements Datasour
     for(Widget widget : containerPanel) {
       if(widget instanceof SchemaUiContainer) {
         SchemaUiContainer widgetAsSchemaUiContainer = (SchemaUiContainer) widget;
-
-        Object value = widgetAsSchemaUiContainer.getValue();
-        if (value != null) {
-          jsonObject.put(widgetAsSchemaUiContainer.getKey(), new JSONString(value.toString()));
-        }
+        jsonObject.put(widgetAsSchemaUiContainer.getKey(), widgetAsSchemaUiContainer.getJSONValue());
       }
     }
 

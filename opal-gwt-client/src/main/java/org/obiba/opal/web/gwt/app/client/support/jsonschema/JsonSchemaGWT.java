@@ -1,6 +1,7 @@
 package org.obiba.opal.web.gwt.app.client.support.jsonschema;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -49,6 +50,21 @@ public abstract class JsonSchemaGWT {
   public static String getType(final JSONObject schema) {
     final JSONValue type = schema.get("type");
     return type != null && type.isString() != null ? type.isString().stringValue() : "string";
+  }
+
+  public static List<String> getEnum(final JSONObject schema) {
+    List<String> result = new ArrayList<>();
+
+    JSONValue anEnum = schema.get("enum");
+    if (anEnum != null && anEnum.isArray() != null) {
+      JSONArray enumArray = anEnum.isArray();
+
+      for(int i = 0; i < enumArray.size(); i++) {
+        result.add(enumArray.get(i).isString().stringValue());
+      }
+    }
+
+    return result;
   }
 
   public static void buildUiIntoPanel(final JSONObject jsonSchema, Panel containerPanel, EventBus eventBus) {
@@ -106,6 +122,26 @@ public abstract class JsonSchemaGWT {
       if (minimum != null && minimum.isNumber() != null) {
         double minimumValue = minimum.isNumber().doubleValue();
         valid = valid && doubleValue >= minimumValue;
+      }
+    }
+
+    return valid;
+  }
+
+  public static boolean valueForArraySchemaIsValid(Collection value, JSONObject schema) {
+    boolean valid = true;
+
+    if (value != null) {
+      JSONValue maxItems = schema.get("maxItems");
+      if (maxItems != null && maxItems.isNumber() != null) {
+        double maxItemsValue = maxItems.isNumber().doubleValue();
+        valid = value.size() <= maxItemsValue;
+      }
+
+      JSONValue minItems = schema.get("minItems");
+      if (minItems != null && minItems.isNumber() != null) {
+        double minItemsValue = minItems.isNumber().doubleValue();
+        valid = value.size() >= minItemsValue;
       }
     }
 

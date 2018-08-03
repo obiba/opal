@@ -15,11 +15,15 @@ public class DynamicRadioGroup extends Composite implements TakesValue<String> {
   private String value;
   private final String key;
 
-  private List<RadioButton> radios = new ArrayList<>();
+  private final List<RadioButton> radios;
 
   @Override
   public void setValue(String value) {
     this.value = value;
+
+    for (RadioButton radioButton : radios) {
+      radioButton.setValue(radioButton.getFormValue().equals(value), false);
+    }
   }
 
   @Override
@@ -33,6 +37,7 @@ public class DynamicRadioGroup extends Composite implements TakesValue<String> {
 
   public DynamicRadioGroup(String key, List<String> items) {
     this.key = key;
+    radios = new ArrayList<>();
 
     FlowPanel panel = new FlowPanel();
 
@@ -50,12 +55,6 @@ public class DynamicRadioGroup extends Composite implements TakesValue<String> {
 
             if (value != null && value) {
               setValue(source.getFormValue());
-
-              for(RadioButton radio : radios) {
-                if (!radio.equals(source)) {
-                  radio.setValue(false, false);
-                }
-              }
             }
           }
         });

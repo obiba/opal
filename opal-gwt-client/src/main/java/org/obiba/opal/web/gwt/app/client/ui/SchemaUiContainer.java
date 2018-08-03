@@ -1,6 +1,6 @@
 package org.obiba.opal.web.gwt.app.client.ui;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -11,11 +11,13 @@ import org.obiba.opal.web.gwt.app.client.support.jsonschema.JsonSchemaGWT;
 import com.github.gwtbootstrap.client.ui.ControlLabel;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.DoubleBox;
 import com.google.gwt.user.client.ui.IntegerBox;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.web.bindery.event.shared.EventBus;
@@ -30,7 +32,6 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
   private final boolean required;
 
   private final String type;
-  private final boolean isSingleValueType;
   private final String format;
 
   public SchemaUiContainer(JSONObject schema, String key, boolean required, EventBus eventBus) {
@@ -39,7 +40,6 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
     this.required = required;
     this.eventBus = eventBus;
     type = JsonSchemaGWT.getType(schema);
-    isSingleValueType = "integer".equals(type) || "number".equals(type) || "string".equals(type);
 
     JSONValue formatValue = schema.get("format");
     format = formatValue != null && formatValue.isString() != null ? formatValue.isString().stringValue() : "";
@@ -49,20 +49,38 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
 
   public Object getValue() {
     Iterator<Widget> iterator = getChildren().iterator();
-    List<Object> values = new ArrayList<>();
-
+    Object value = null;
     boolean found = false;
 
     while(!found || iterator.hasNext()) {
       Widget widget = iterator.next();
 
       if (widget instanceof TakesValue || widget instanceof ListBox) {
-        if (isSingleValueType) found = true;
-        values.add(widget instanceof TakesValue ? ((TakesValue) widget).getValue() : ((ListBox) widget).getSelectedValue());
+        found = true;
+        value = widget instanceof TakesValue ? ((TakesValue) widget).getValue() : ((ListBox) widget).getSelectedValue();
       }
     }
 
-    return isSingleValueType ? values.get(0) : values;
+    return value;
+  }
+
+  public JSONValue getJSONValue() {
+    Object value = getValue();
+
+    if (value == null) return null;
+    if (type.equals("array")) {
+      HashSet set = (HashSet) value;
+      JSONArray jsonArray = new JSONArray();
+
+      int i = 0;
+      for(Object item : set) {
+        jsonArray.set(i++, new JSONString(item.toString()));
+      }
+
+      return jsonArray;
+    } else {
+      return new JSONString(value.toString());
+    }
   }
 
   public boolean isValid() {
@@ -88,6 +106,14 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
         valid = valid && JsonSchemaGWT.valueForNumericSchemaIsValid(value instanceof Number ? (Number) value : null, schema);
         break;
       }
+      case "array": {
+        if (required) {
+          valid = value != null && ((HashSet) value).size() > 0;
+        }
+
+        valid = valid && JsonSchemaGWT.valueForArraySchemaIsValid(value instanceof HashSet ? (HashSet) value : null, schema);
+        break;
+      }
     }
 
     return valid;
@@ -103,6 +129,10 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
 
   public boolean isRequired() {
     return required;
+  }
+
+  public String getType() {
+    return type;
   }
 
   private void setUp() {
@@ -141,6 +171,9 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
       case "string": {
         return createWidgetForString(aDefault);
       }
+      case "array": {
+        return createWidgetForArrayWithEnumItems();
+      }
     }
 
     return null;
@@ -177,18 +210,19 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
   }
 
   private Widget createWidgetForString(final JSONValue aDefault) {
-    JSONValue anEnum = schema.get("enum");
-    boolean hasEnum = anEnum != null && anEnum.isArray() != null;
+
+    List<String> enumItems = JsonSchemaGWT.getEnum(schema);
+    boolean hasEnum = enumItems.size() > 0;
 
     if (format.equals("file")) {
       return new FileSelection(eventBus);
     }
 
     if (hasEnum) {
-      return createWidgetForStringWithEnum(anEnum);
+      return createWidgetForStringWithEnum(enumItems);
     }
 
-    TextBox input = new TextBox();
+    TextBox input = format.equals("password") ? new PasswordTextBox() : new TextBox();
     input.setName(key);
     setStringSchemaValidations(input);
 
@@ -200,26 +234,26 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
     return input;
   }
 
-  private Widget createWidgetForStringWithEnum(@NotNull final JSONValue anEnum) {
-    JSONArray enumArray = anEnum.isArray();
-
+  private Widget createWidgetForStringWithEnum(@NotNull final List<String> enumItems) {
     if (format.equals("radio")) {
-      List<String> radios = new ArrayList<>();
-      for(int i = 0; i < enumArray.size(); i++) {
-        radios.add(enumArray.get(i).isString().stringValue());
-      }
-
-      return new DynamicRadioGroup(key, radios);
+      return new DynamicRadioGroup(key, enumItems);
     }
 
     ListBox listBox = new ListBox();
     listBox.setName(key);
 
-    for(int i = 0; i < enumArray.size(); i++) {
-      listBox.addItem(enumArray.get(i).isString().stringValue());
+    for (String item : enumItems) {
+      listBox.addItem(item);
     }
 
     return listBox;
+  }
+
+  private Widget createWidgetForArrayWithEnumItems() {
+    JSONValue itemsSchema = schema.get("items");
+    JSONObject items = itemsSchema != null && itemsSchema.isObject() != null ? itemsSchema.isObject() : new JSONObject();
+
+    return new DynamicCheckboxGroup(key, JsonSchemaGWT.getEnum(items));
   }
 
   private void setStringSchemaValidations(Widget widget) {
