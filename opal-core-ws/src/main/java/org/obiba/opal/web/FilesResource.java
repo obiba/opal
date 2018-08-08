@@ -345,9 +345,16 @@ public class FilesResource {
   private Response doUploadFile(String folderPath, FileObject folder, FileItem uploadedFile, UriInfo uriInfo)
       throws FileSystemException {
     String fileName = uploadedFile.getName();
-    FileObject file = folder.resolveFile(fileName);
-    boolean overwrite = file.exists();
+    // #3275 make sure file name is valid
+    if (Strings.isNullOrEmpty(fileName) || fileName.contains("/"))
+      return Response.status(Status.BAD_REQUEST).entity("Not a valid file name.").build();
 
+    // #3275 make sure parent folder of the written file is the provided destination folder
+    FileObject file = folder.resolveFile(fileName);
+    if (!file.getParent().getURL().equals(folder.getURL()))
+      return Response.status(Status.BAD_REQUEST).entity("Not a valid file name.").build();
+
+    boolean overwrite = file.exists();
     writeUploadedFileToFileSystem(uploadedFile, file);
 
     log.info("The following file was uploaded to Opal file system : {}", file.getURL());
