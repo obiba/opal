@@ -36,6 +36,30 @@ installOrUpdate() {
     ln -s /etc/opal /var/lib/opal/conf
   fi
 
+  if [ ! -e /var/lib/opal/data ] ; then
+    mkdir /var/lib/opal/data
+  fi
+
+  if [ ! -e /var/lib/opal/work ] ; then
+    mkdir /var/lib/opal/work
+  fi
+
+  if [ ! -e /var/lib/opal/plugins ] ; then
+    mkdir /var/lib/opal/plugins
+  fi
+
+  if [ ! -e /var/lib/opal/extensions ] ; then
+    mkdir /var/lib/opal/extensions
+  fi
+
+  if [ ! -e /var/lib/opal/fs ] ; then
+    mkdir /var/lib/opal/fs
+  fi
+
+  if [ ! -e /var/lib/opal/logs ] ; then
+    mkdir /var/lib/opal/logs
+  fi
+
   EXPORT_FILE=$OPAL_HOME/data/orientdb/opal-config.export
 
   JAR_CMD="java -jar /usr/share/opal/tools/lib/opal-config-migrator-*-cli.jar"
