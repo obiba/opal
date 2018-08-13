@@ -268,11 +268,14 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
   }
 
   private boolean validateFileFormat(Object value, JSONArray fileFormatsArray) {
+    String stringValue = value == null ? "" : (String) value;
+    if(stringValue.trim().length() == 0) return true;
+
     boolean formatIsvalid = false;
     int i = 0;
     while(!formatIsvalid && i < fileFormatsArray.size()) {
       String fileFormat = fileFormatsArray.get(i).isString().stringValue();
-      formatIsvalid = fileFormat.equals(value);
+      formatIsvalid = stringValue.endsWith(fileFormat);
       i++;
     }
 
