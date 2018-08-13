@@ -94,7 +94,14 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
           valid = value != null && ((String) value).trim().length() > 0;
         }
 
-        valid = valid && JsonSchemaGWT.valueForStringSchemaIsValid(value instanceof String ? (String) value : null, schema);
+        JSONValue fileFormats = schema.get("fileFormats");
+        if(format.equals("file") && (fileFormats != null && fileFormats.isArray() != null)) {
+          valid = valid && validateFileFormat(value, fileFormats.isArray());
+        } else {
+          valid = valid &&
+              JsonSchemaGWT.valueForStringSchemaIsValid(value instanceof String ? (String) value : null, schema);
+        }
+
         break;
       }
       case "integer":
@@ -103,7 +110,8 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
           valid = value != null;
         }
 
-        valid = valid && JsonSchemaGWT.valueForNumericSchemaIsValid(value instanceof Number ? (Number) value : null, schema);
+        valid = valid &&
+            JsonSchemaGWT.valueForNumericSchemaIsValid(value instanceof Number ? (Number) value : null, schema);
         break;
       }
       case "array": {
@@ -111,7 +119,8 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
           valid = value != null && ((HashSet) value).size() > 0;
         }
 
-        valid = valid && JsonSchemaGWT.valueForArraySchemaIsValid(value instanceof HashSet ? (HashSet) value : null, schema);
+        valid = valid &&
+            JsonSchemaGWT.valueForArraySchemaIsValid(value instanceof HashSet ? (HashSet) value : null, schema);
         break;
       }
     }
@@ -186,7 +195,7 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
     input.getElement().setAttribute("step", "0.001");
     setNumericSchemaValidations(input);
 
-    if (aDefault != null && aDefault.isNumber() != null) {
+    if(aDefault != null && aDefault.isNumber() != null) {
       double defaultDoubleValue = aDefault.isNumber().doubleValue();
       input.setValue(defaultDoubleValue);
     }
@@ -201,7 +210,7 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
     input.getElement().setAttribute("step", "1");
     setNumericSchemaValidations(input);
 
-    if (aDefault != null && aDefault.isNumber() != null) {
+    if(aDefault != null && aDefault.isNumber() != null) {
       double defaultDoubleValue = aDefault.isNumber().doubleValue();
       input.setValue(Double.valueOf(defaultDoubleValue).intValue());
     }
@@ -235,14 +244,14 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
   }
 
   private Widget createWidgetForStringWithEnum(@NotNull final List<String> enumItems) {
-    if (format.equals("radio")) {
+    if(format.equals("radio")) {
       return new DynamicRadioGroup(key, enumItems);
     }
 
     ListBox listBox = new ListBox();
     listBox.setName(key);
 
-    for (String item : enumItems) {
+    for(String item : enumItems) {
       listBox.addItem(item);
     }
 
@@ -251,20 +260,34 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
 
   private Widget createWidgetForArrayWithEnumItems() {
     JSONValue itemsSchema = schema.get("items");
-    JSONObject items = itemsSchema != null && itemsSchema.isObject() != null ? itemsSchema.isObject() : new JSONObject();
+    JSONObject items = itemsSchema != null && itemsSchema.isObject() != null
+        ? itemsSchema.isObject()
+        : new JSONObject();
 
     return new DynamicCheckboxGroup(key, JsonSchemaGWT.getEnum(items));
+  }
+
+  private boolean validateFileFormat(Object value, JSONArray fileFormatsArray) {
+    boolean formatIsvalid = false;
+    int i = 0;
+    while (!formatIsvalid && i < fileFormatsArray.size()) {
+      String fileFormat = fileFormatsArray.get(i).isString().stringValue();
+      formatIsvalid = fileFormat.equals(value);
+      i++;
+    }
+
+    return formatIsvalid;
   }
 
   private void setStringSchemaValidations(Widget widget) {
     JSONValue maxLength = schema.get("maxLength");
     if (maxLength != null && maxLength.isNumber() != null) {
-      if (maxLength.isNumber().doubleValue() > 0) widget.getElement().setAttribute("max", maxLength.isNumber().toString());
+      if (maxLength.isNumber().doubleValue() > 0) widget.getElement().setAttribute("maxlength", maxLength.isNumber().toString());
     }
 
     JSONValue minLength = schema.get("minLength");
     if (minLength != null && minLength.isNumber() != null) {
-      if (minLength.isNumber().doubleValue() > 0) widget.getElement().setAttribute("min", minLength.isNumber().toString());
+      if (minLength.isNumber().doubleValue() > 0) widget.getElement().setAttribute("minlength", minLength.isNumber().toString());
     }
 
     JSONValue pattern = schema.get("pattern");
