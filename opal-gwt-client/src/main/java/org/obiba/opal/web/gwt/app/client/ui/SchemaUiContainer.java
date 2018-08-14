@@ -55,7 +55,7 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
     while(!found || iterator.hasNext()) {
       Widget widget = iterator.next();
 
-      if (widget instanceof TakesValue || widget instanceof ListBox) {
+      if(widget instanceof TakesValue || widget instanceof ListBox) {
         found = true;
         value = widget instanceof TakesValue ? ((TakesValue) widget).getValue() : ((ListBox) widget).getSelectedValue();
       }
@@ -67,8 +67,8 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
   public JSONValue getJSONValue() {
     Object value = getValue();
 
-    if (value == null) return null;
-    if (type.equals("array")) {
+    if(value == null) return null;
+    if(type.equals("array")) {
       HashSet set = (HashSet) value;
       JSONArray jsonArray = new JSONArray();
 
@@ -90,28 +90,37 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
 
     switch(type) {
       case "string": {
-        if (required) {
+        if(required) {
           valid = value != null && ((String) value).trim().length() > 0;
         }
 
-        valid = valid && JsonSchemaGWT.valueForStringSchemaIsValid(value instanceof String ? (String) value : null, schema);
+        JSONValue fileFormats = schema.get("fileFormats");
+        if(format.equals("file") && (fileFormats != null && fileFormats.isArray() != null)) {
+          valid = valid && validateFileFormat(value, fileFormats.isArray());
+        } else {
+          valid = valid &&
+              JsonSchemaGWT.valueForStringSchemaIsValid(value instanceof String ? (String) value : null, schema);
+        }
+
         break;
       }
       case "integer":
       case "number": {
-        if (required) {
+        if(required) {
           valid = value != null;
         }
 
-        valid = valid && JsonSchemaGWT.valueForNumericSchemaIsValid(value instanceof Number ? (Number) value : null, schema);
+        valid = valid &&
+            JsonSchemaGWT.valueForNumericSchemaIsValid(value instanceof Number ? (Number) value : null, schema);
         break;
       }
       case "array": {
-        if (required) {
+        if(required) {
           valid = value != null && ((HashSet) value).size() > 0;
         }
 
-        valid = valid && JsonSchemaGWT.valueForArraySchemaIsValid(value instanceof HashSet ? (HashSet) value : null, schema);
+        valid = valid &&
+            JsonSchemaGWT.valueForArraySchemaIsValid(value instanceof HashSet ? (HashSet) value : null, schema);
         break;
       }
     }
@@ -138,7 +147,7 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
   private void setUp() {
     Widget widget = buildInputWidget();
 
-    if (widget != null) {
+    if(widget != null) {
       JSONValue title = schema.get("title");
       if(title != null && title.isString() != null) {
         String titleStringValue = title.isString().stringValue();
@@ -147,7 +156,7 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
       }
 
       // find out what to do with type
-      if (required) widget.getElement().setAttribute("required", "required");
+      if(required) widget.getElement().setAttribute("required", "required");
       add(widget);
 
       JSONValue description = schema.get("description");
@@ -186,7 +195,7 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
     input.getElement().setAttribute("step", "0.001");
     setNumericSchemaValidations(input);
 
-    if (aDefault != null && aDefault.isNumber() != null) {
+    if(aDefault != null && aDefault.isNumber() != null) {
       double defaultDoubleValue = aDefault.isNumber().doubleValue();
       input.setValue(defaultDoubleValue);
     }
@@ -201,7 +210,7 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
     input.getElement().setAttribute("step", "1");
     setNumericSchemaValidations(input);
 
-    if (aDefault != null && aDefault.isNumber() != null) {
+    if(aDefault != null && aDefault.isNumber() != null) {
       double defaultDoubleValue = aDefault.isNumber().doubleValue();
       input.setValue(Double.valueOf(defaultDoubleValue).intValue());
     }
@@ -214,11 +223,11 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
     List<String> enumItems = JsonSchemaGWT.getEnum(schema);
     boolean hasEnum = enumItems.size() > 0;
 
-    if (format.equals("file")) {
+    if(format.equals("file")) {
       return new FileSelection(eventBus);
     }
 
-    if (hasEnum) {
+    if(hasEnum) {
       return createWidgetForStringWithEnum(enumItems);
     }
 
@@ -226,7 +235,7 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
     input.setName(key);
     setStringSchemaValidations(input);
 
-    if (aDefault != null && aDefault.isString() != null) {
+    if(aDefault != null && aDefault.isString() != null) {
       String defaultStringValue = aDefault.isString().stringValue();
       input.setValue(defaultStringValue);
     }
@@ -235,14 +244,14 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
   }
 
   private Widget createWidgetForStringWithEnum(@NotNull final List<String> enumItems) {
-    if (format.equals("radio")) {
+    if(format.equals("radio")) {
       return new DynamicRadioGroup(key, enumItems);
     }
 
     ListBox listBox = new ListBox();
     listBox.setName(key);
 
-    for (String item : enumItems) {
+    for(String item : enumItems) {
       listBox.addItem(item);
     }
 
@@ -251,36 +260,55 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
 
   private Widget createWidgetForArrayWithEnumItems() {
     JSONValue itemsSchema = schema.get("items");
-    JSONObject items = itemsSchema != null && itemsSchema.isObject() != null ? itemsSchema.isObject() : new JSONObject();
+    JSONObject items = itemsSchema != null && itemsSchema.isObject() != null
+        ? itemsSchema.isObject()
+        : new JSONObject();
 
     return new DynamicCheckboxGroup(key, JsonSchemaGWT.getEnum(items));
   }
 
+  private boolean validateFileFormat(Object value, JSONArray fileFormatsArray) {
+    String stringValue = value == null ? "" : (String) value;
+    if(stringValue.trim().length() == 0) return true;
+
+    boolean formatIsvalid = false;
+    int i = 0;
+    while(!formatIsvalid && i < fileFormatsArray.size()) {
+      String fileFormat = fileFormatsArray.get(i).isString().stringValue();
+      formatIsvalid = stringValue.endsWith(fileFormat);
+      i++;
+    }
+
+    return formatIsvalid;
+  }
+
   private void setStringSchemaValidations(Widget widget) {
     JSONValue maxLength = schema.get("maxLength");
-    if (maxLength != null && maxLength.isNumber() != null) {
-      if (maxLength.isNumber().doubleValue() > 0) widget.getElement().setAttribute("max", maxLength.isNumber().toString());
+    if(maxLength != null && maxLength.isNumber() != null) {
+      if(maxLength.isNumber().doubleValue() > 0)
+        widget.getElement().setAttribute("maxlength", maxLength.isNumber().toString());
     }
 
     JSONValue minLength = schema.get("minLength");
-    if (minLength != null && minLength.isNumber() != null) {
-      if (minLength.isNumber().doubleValue() > 0) widget.getElement().setAttribute("min", minLength.isNumber().toString());
+    if(minLength != null && minLength.isNumber() != null) {
+      if(minLength.isNumber().doubleValue() > 0)
+        widget.getElement().setAttribute("minlength", minLength.isNumber().toString());
     }
 
     JSONValue pattern = schema.get("pattern");
-    if (pattern != null && pattern.isString() != null) {
+    if(pattern != null && pattern.isString() != null) {
       widget.getElement().setAttribute("pattern", pattern.isString().stringValue());
     }
   }
 
   private void setNumericSchemaValidations(Widget widget) {
     JSONValue maximum = schema.get("maximum");
-    if (maximum != null && maximum.isNumber() != null) {
+    if(maximum != null && maximum.isNumber() != null) {
       widget.getElement().setAttribute("max", maximum.isNumber().toString());
     }
 
     JSONValue minimum = schema.get("minimum");
-    if (minimum != null && minimum.isNumber() != null) {
+    if(minimum != null && minimum.isNumber() != null) {
       widget.getElement().setAttribute("min", minimum.isNumber().toString());
     }
   }
