@@ -9,10 +9,12 @@ import javax.validation.constraints.NotNull;
 import org.obiba.opal.web.gwt.app.client.support.jsonschema.JsonSchemaGWT;
 
 import com.github.gwtbootstrap.client.ui.ControlLabel;
+import com.github.gwtbootstrap.client.ui.HelpBlock;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
+import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
 import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.DoubleBox;
 import com.google.gwt.user.client.ui.IntegerBox;
@@ -151,17 +153,23 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
       JSONValue title = schema.get("title");
       if(title != null && title.isString() != null) {
         String titleStringValue = title.isString().stringValue();
-        add(new ControlLabel(titleStringValue));
+        add(new ControlLabel(SimpleHtmlSanitizer.sanitizeHtml(titleStringValue).asString()));
         setTitle(titleStringValue);
       }
 
-      // find out what to do with type
       if(required) widget.getElement().setAttribute("required", "required");
+
+      JSONValue readOnly = schema.get("readOnly");
+      if (readOnly != null && readOnly.isBoolean() != null && readOnly.isBoolean().booleanValue()) {
+        widget.getElement().setAttribute("readonly", "true");
+      }
+
       add(widget);
 
       JSONValue description = schema.get("description");
       if(description != null && description.isString() != null) {
-        add(new ControlLabel(description.isString().stringValue()));
+        String descriptionStringValue = description.isString().stringValue();
+        add(new HelpBlock(SimpleHtmlSanitizer.sanitizeHtml(descriptionStringValue).asString()));
       }
     }
   }
