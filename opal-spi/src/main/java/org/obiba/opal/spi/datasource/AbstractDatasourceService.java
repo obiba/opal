@@ -4,10 +4,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.validation.constraints.NotNull;
 
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -20,11 +24,59 @@ public abstract class AbstractDatasourceService implements DatasourceService {
   public static final String SCHEMA_FILE_EXT = ".json";
   public static final String DEFAULT_PROPERTY_KEY_FORMAT = "usage.%s.";
 
+  protected Properties properties;
+  protected boolean running;
+  protected Collection<DatasourceUsage> usages;
+
   public Set<DatasourceUsage> initUsages() {
     String usagesString = getProperties().getProperty("usages", "").trim();
     return usagesString.isEmpty() ? new HashSet<>()
         : Stream.of(usagesString.split(",")).map(usage -> DatasourceUsage.valueOf(usage.trim().toUpperCase()))
             .collect(Collectors.toSet());
+  }
+
+  @Override
+  public Properties getProperties() {
+    return properties;
+  }
+
+  @Override
+  public void configure(Properties properties) {
+    this.properties = properties;
+  }
+
+  @Override
+  public boolean isRunning() {
+    return running;
+  }
+
+  @Override
+  public void start() {
+    usages = initUsages();
+    running = true;
+  }
+
+  @Override
+  public void stop() {
+    running = false;
+  }
+
+  @Override
+  public Collection<DatasourceUsage> getUsages() {
+    return usages;
+  }
+
+  @Override
+  public JSONObject getJSONSchemaForm(@NotNull DatasourceUsage usage) {
+    JSONObject jsonObject = new JSONObject();
+
+    try {
+      jsonObject = processDefaultPropertiesValue(usage, new JSONObject(readUsageSchema(usage)));
+    } catch (IOException e) {
+      log.error("Error reading usage jsonSchema: %s", e.getMessage());
+    }
+
+    return jsonObject;
   }
 
   public JSONObject processDefaultPropertiesValue(DatasourceUsage usage, JSONObject jsonObject) {
