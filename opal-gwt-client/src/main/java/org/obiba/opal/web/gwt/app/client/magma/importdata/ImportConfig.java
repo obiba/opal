@@ -26,7 +26,7 @@ public class ImportConfig {
 
   public enum ImportFormat {
 
-    CSV, EXCEL, XML, LIMESURVEY, REST, JDBC, SPSS, RSPSS, RSAS, RSTATA, FROM_PLUGIN
+    CSV, EXCEL, XML, LIMESURVEY, REST, JDBC, RSPSS, RSAS, RSTATA, FROM_PLUGIN
 
   }
 
@@ -334,10 +334,6 @@ public class ImportConfig {
 
   public void setIgnoreUnknownIdentifier(boolean ignoreUnknownIdentifier) {
     this.ignoreUnknownIdentifier = ignoreUnknownIdentifier;
-  }
-
-  public String getSpssFile() {
-    return file;
   }
 
   public String getLocale() {

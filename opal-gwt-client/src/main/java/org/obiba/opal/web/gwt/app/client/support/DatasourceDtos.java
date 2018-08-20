@@ -11,7 +11,20 @@ package org.obiba.opal.web.gwt.app.client.support;
 
 import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
 import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingConfigDto;
-import org.obiba.opal.web.model.client.magma.*;
+import org.obiba.opal.web.model.client.magma.CsvDatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.CsvDatasourceTableBundleDto;
+import org.obiba.opal.web.model.client.magma.DatasourceBatchConfigDto;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
+import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.DatasourceIncrementalConfigDto;
+import org.obiba.opal.web.model.client.magma.FsDatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.GNPostalCodesDatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.HCDatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.JdbcDatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.LimesurveyDatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.PluginDatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.RHavenDatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.RestDatasourceFactoryDto;
 
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -45,8 +58,6 @@ public class DatasourceDtos {
         return createJdbcDatasourceFactoryDto(importConfig);
       case REST:
         return createRestDatasourceFactoryDto(importConfig);
-      case SPSS:
-        return createSpssDatasourceFactoryDto(importConfig);
       case RSPSS:
       case RSAS:
       case RSTATA:
@@ -162,17 +173,6 @@ public class DatasourceDtos {
       configDto.setIgnoreUnknownIdentifier(importConfig.isIgnoreUnknownIdentifier());
       dto.setIdConfig(configDto);
     }
-  }
-
-  private static DatasourceFactoryDto createSpssDatasourceFactoryDto(ImportConfig importConfig) {
-    SpssDatasourceFactoryDto factoryDto = SpssDatasourceFactoryDto.create();
-    factoryDto.setFile(importConfig.getFile());
-    factoryDto.setCharacterSet(importConfig.getCharacterSet());
-    factoryDto.setEntityType(importConfig.getEntityType());
-    factoryDto.setLocale(importConfig.getLocale());
-
-    return createAndConfigureDatasourceFactoryDto(importConfig,
-        SpssDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
   }
 
   private static DatasourceFactoryDto createRHavenDatasourceFactoryDto(ImportConfig importConfig) {

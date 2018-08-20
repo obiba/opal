@@ -10,7 +10,6 @@
 
 package org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -23,14 +22,12 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
@@ -63,7 +60,6 @@ import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto;
 import org.obiba.opal.web.model.client.magma.ExcelDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.FileViewDto;
 import org.obiba.opal.web.model.client.magma.FileViewDto.FileViewType;
-import org.obiba.opal.web.model.client.magma.SpssDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.StaticDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
@@ -124,14 +120,6 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   private void init() {
     getView().setUiHandlers(this);
     setDefaultCharset();
-
-    getEventBus().addHandler(FileSelectionUpdatedEvent.getType(), new FileSelectionUpdatedEvent.Handler() {
-      @Override
-      public void onFileSelectionUpdated(FileSelectionUpdatedEvent event) {
-        String selectedFile = ((FileSelectionPresenter) event.getSource()).getSelectedFile();
-        getView().showSpssSpecificPanel(DatasourceFileType.isSpssFile(selectedFile));
-      }
-    });
   }
 
   @Override
@@ -242,9 +230,6 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
       case XLS:
       case XLSX:
         return createExcelDatasourceFactoryDto(tmpFilePath);
-
-      case SAV:
-        return createSpssDatasourceFactoryDto(tmpFilePath);
     }
 
     return createStaticDatasourceFactoryDto(tmpFilePath);
@@ -257,19 +242,6 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
     dto.setExtension(ExcelDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, excelDto);
-
-    return dto;
-  }
-
-  private DatasourceFactoryDto createSpssDatasourceFactoryDto(String tmpFilePath) {
-    SpssDatasourceFactoryDto spssDto = SpssDatasourceFactoryDto.create();
-    spssDto.setFile(tmpFilePath);
-    spssDto.setCharacterSet(getView().getCharsetText().getText());
-    spssDto.setEntityType(getView().getSpssEntityType().getText());
-    spssDto.setLocale(getView().getLocale());
-
-    DatasourceFactoryDto dto = DatasourceFactoryDto.create();
-    dto.setExtension(SpssDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, spssDto);
 
     return dto;
   }
@@ -491,8 +463,6 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
     void setComparedDatasourcesReportDisplay(ComparedDatasourcesReportStepPresenter.Display display);
 
-    void showSpssSpecificPanel(boolean show);
-
     String getSelectedFile();
 
     void clearErrors();
@@ -502,8 +472,6 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     void showError(@Nullable FormField formField, String message);
 
     boolean withMerge();
-
-    HasText getSpssEntityType();
 
     String getLocale();
 
