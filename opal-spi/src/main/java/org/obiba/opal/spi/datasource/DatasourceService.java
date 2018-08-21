@@ -10,13 +10,13 @@
 
 package org.obiba.opal.spi.datasource;
 
+import java.io.File;
 import java.util.Collection;
 
 import javax.validation.constraints.NotNull;
 
 import org.json.JSONObject;
 import org.obiba.magma.DatasourceFactory;
-import org.obiba.opal.spi.support.OpalFileSystemPathResolver;
 import org.obiba.plugins.spi.ServicePlugin;
 
 /**
@@ -24,7 +24,13 @@ import org.obiba.plugins.spi.ServicePlugin;
  */
 public interface DatasourceService extends ServicePlugin {
 
+  interface OpalFileSystemPathResolver {
+    File resolve(String path);
+  }
+
   String SERVICE_TYPE = "opal-datasource";
+  String SCHEMA_FILE_EXT = ".json";
+  String DEFAULT_PROPERTY_KEY_FORMAT = "usage.%s.";
 
   /**
    * Get the {@link DatasourceUsage}s that are covered by this datasource factory.
@@ -57,4 +63,10 @@ public interface DatasourceService extends ServicePlugin {
    */
   void setOpalFileSystemPathResolver(OpalFileSystemPathResolver resolver);
 
+  /**
+   *
+   * @param virtualPath
+   * @return File object based on virtualPath
+   */
+  File resolvePath(String virtualPath);
 }
