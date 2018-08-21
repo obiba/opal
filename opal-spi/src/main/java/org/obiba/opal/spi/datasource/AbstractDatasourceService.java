@@ -10,10 +10,12 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javax.validation.constraints.NotNull;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.obiba.opal.spi.support.OpalFileSystemPathResolver;
 import org.slf4j.Logger;
@@ -24,16 +26,21 @@ public abstract class AbstractDatasourceService implements DatasourceService {
   public static final Logger log = LoggerFactory.getLogger(AbstractDatasourceService.class);
 
   public static final String SCHEMA_FILE_EXT = ".json";
+
   public static final String DEFAULT_PROPERTY_KEY_FORMAT = "usage.%s.";
 
   protected Properties properties;
+
   protected boolean running;
+
   protected Collection<DatasourceUsage> usages;
+
   protected OpalFileSystemPathResolver pathResolver;
 
   public Set<DatasourceUsage> initUsages() {
     String usagesString = getProperties().getProperty("usages", "").trim();
-    return usagesString.isEmpty() ? new HashSet<>()
+    return usagesString.isEmpty()
+        ? new HashSet<>()
         : Stream.of(usagesString.split(",")).map(usage -> DatasourceUsage.valueOf(usage.trim().toUpperCase()))
             .collect(Collectors.toSet());
   }
@@ -75,7 +82,7 @@ public abstract class AbstractDatasourceService implements DatasourceService {
 
     try {
       jsonObject = processDefaultPropertiesValue(usage, new JSONObject(readUsageSchema(usage)));
-    } catch (IOException e) {
+    } catch(IOException e) {
       log.error("Error reading usage jsonSchema: %s", e.getMessage());
     }
 
@@ -105,10 +112,9 @@ public abstract class AbstractDatasourceService implements DatasourceService {
 
     log.info("Reading usage jsonSchema at %s", usageSchemaPath);
 
-    if (hasUsage(usage) && usageSchemaPath.toFile().exists()) {
+    if(hasUsage(usage) && usageSchemaPath.toFile().exists()) {
       String schema = Files.lines(usageSchemaPath).reduce("", String::concat).trim();
-      if (!schema.isEmpty())
-        result = schema;
+      if(!schema.isEmpty()) result = schema;
     }
 
     return result;
@@ -123,22 +129,38 @@ public abstract class AbstractDatasourceService implements DatasourceService {
   }
 
   private void setDefaultValue(String schemaName, String defaultValue, JSONObject jsonObject) {
-    if (defaultValue != null && !defaultValue.isEmpty()) {
+    if(defaultValue != null && !defaultValue.isEmpty()) {
       log.info("setting default value \"{}\" for schema \"{}\"", defaultValue, schemaName);
 
-      JSONObject properties = jsonObject.optJSONObject("properties");
-      if (properties != null) {
-        JSONObject schema = properties.optJSONObject(schemaName);
-        if (schema != null) {
-          String type = schema.getString("type");
-          if ("integer".equals(type) || "number".equals(type)) {
-            schema.put("default", Double.valueOf(defaultValue));
-          } else if ("boolean".equals(type)) {
-            schema.put("default", Boolean.valueOf(defaultValue));
-          } else {
-            schema.put("default", defaultValue);
-          }
+      String rootSchemaType = jsonObject.optString("type");
+
+      if("object".equals(rootSchemaType)) {
+        JSONObject properties = jsonObject.optJSONObject("properties");
+
+        if(properties != null) {
+          JSONObject schema = properties.optJSONObject(schemaName);
+          setDefault(schema, defaultValue);
         }
+      } else if ("array".equals(rootSchemaType)) {
+        JSONArray items = jsonObject.optJSONArray("items");
+
+        if (items != null) {
+          IntStream.range(0, items.length()).filter(index -> {
+            JSONObject schema = items.optJSONObject(index);
+            return schema != null && schemaName.equals(schema.optString("key"));
+          }).forEach(index -> setDefault(items.optJSONObject(index), defaultValue));
+        }
+      }
+    }
+  }
+
+  private void setDefault(JSONObject schema, String value) {
+    if(schema != null) {
+      String type = schema.getString("type");
+      if("integer".equals(type) || "number".equals(type)) {
+        schema.put("default", Double.valueOf(value));
+      } else {
+        schema.put("default", value);
       }
     }
   }

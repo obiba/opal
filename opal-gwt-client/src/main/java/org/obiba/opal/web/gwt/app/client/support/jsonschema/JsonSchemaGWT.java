@@ -68,14 +68,33 @@ public abstract class JsonSchemaGWT {
   }
 
   public static void buildUiIntoPanel(final JSONObject jsonSchema, Panel containerPanel, EventBus eventBus) {
-    JSONObject properties = getProperties(jsonSchema);
+    String rootSchemaType = getType(jsonSchema);
     List<String> required = getRequired(jsonSchema);
 
-    Set<String> keys = properties.keySet();
-    for(String key : keys) {
-      JSONObject schema = getSchema(properties, key);
-      if(schema != null) {
-        containerPanel.add(new SchemaUiContainer(schema, key, required.indexOf(key) > -1, eventBus));
+    if ("object".equals(rootSchemaType)) {
+      JSONObject properties = getProperties(jsonSchema);
+
+      Set<String> keys = properties.keySet();
+      for(String key : keys) {
+        JSONObject schema = getSchema(properties, key);
+        if(schema != null) {
+          containerPanel.add(new SchemaUiContainer(schema, key, required.indexOf(key) > -1, eventBus));
+        }
+      }
+    } else {
+      JSONValue itemsValue = jsonSchema.get("items");
+      if (itemsValue != null && itemsValue.isArray() != null) {
+        JSONArray items = itemsValue.isArray();
+
+        for(int i = 0; i < items.size(); i++) {
+          JSONValue schemaValue = items.get(i);
+          if (schemaValue != null && schemaValue.isObject() != null) {
+            JSONObject schema = schemaValue.isObject();
+            JSONValue keyValue = schema.get("key");
+            String key = keyValue != null && keyValue.isString() != null ? keyValue.isString().stringValue() : "key" + i;
+            containerPanel.add(new SchemaUiContainer(schema, key, required.indexOf(key) > -1, eventBus));
+          }
+        }
       }
     }
   }
