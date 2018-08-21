@@ -40,10 +40,6 @@ public enum DatasourceFileType {
     return type == XLS || type == XLSX;
   }
 
-  public static boolean isSpssFile(String filename) {
-    return SAV == getFileType(filename);
-  }
-
   public static boolean isXMLFile(String filename) {
     return XML == getFileType(filename);
   }

@@ -86,16 +86,10 @@ public class VariablesImportView extends ModalPopupViewWithUiHandlers<VariablesI
   CheckBox merge;
 
   @UiField
-  Panel spssOptions;
-
-  @UiField
   ControlGroup charsetGroup;
 
   @UiField
   CharacterSetView charsetView;
-
-  @UiField
-  TextBox spssEntityType;
 
   @UiField
   ControlGroup localeGroup;
@@ -127,8 +121,6 @@ public class VariablesImportView extends ModalPopupViewWithUiHandlers<VariablesI
   }
 
   private void initWizardDialog() {
-    spssOptions.setVisible(false);
-
     stepChain = WizardStepChain.Builder.create(dialog)//
         .append(fileSelectionStep)//
         .title(translations.variablesImportFileSelectionStep())//
@@ -293,11 +285,6 @@ public class VariablesImportView extends ModalPopupViewWithUiHandlers<VariablesI
   }
 
   @Override
-  public HasText getSpssEntityType() {
-    return spssEntityType;
-  }
-
-  @Override
   public String getLocale() {
     return localeNameBox.getText();
   }
@@ -305,11 +292,6 @@ public class VariablesImportView extends ModalPopupViewWithUiHandlers<VariablesI
   @Override
   public void setDefaultCharset(String defaultCharset) {
     charsetView.setDefaultCharset(defaultCharset);
-  }
-
-  @Override
-  public void showSpssSpecificPanel(boolean show) {
-    spssOptions.setVisible(show);
   }
 
   //

@@ -1,5 +1,6 @@
 package org.obiba.opal.spi.datasource;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,6 +15,7 @@ import java.util.stream.Stream;
 import javax.validation.constraints.NotNull;
 
 import org.json.JSONObject;
+import org.obiba.opal.spi.support.OpalFileSystemPathResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +29,7 @@ public abstract class AbstractDatasourceService implements DatasourceService {
   protected Properties properties;
   protected boolean running;
   protected Collection<DatasourceUsage> usages;
+  protected OpalFileSystemPathResolver pathResolver;
 
   public Set<DatasourceUsage> initUsages() {
     String usagesString = getProperties().getProperty("usages", "").trim();
@@ -77,6 +80,15 @@ public abstract class AbstractDatasourceService implements DatasourceService {
     }
 
     return jsonObject;
+  }
+
+  @Override
+  public void setOpalFileSystemPathResolver(OpalFileSystemPathResolver resolver) {
+    pathResolver = resolver;
+  }
+
+  public File resolvePath(String path) {
+    return pathResolver == null ? new File(path) : pathResolver.resolve(path);
   }
 
   public JSONObject processDefaultPropertiesValue(DatasourceUsage usage, JSONObject jsonObject) {

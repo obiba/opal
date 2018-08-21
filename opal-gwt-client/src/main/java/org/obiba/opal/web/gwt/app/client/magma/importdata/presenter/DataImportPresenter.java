@@ -53,7 +53,6 @@ import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.json.client.JSONObject;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
@@ -79,8 +78,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   private final CsvFormatStepPresenter csvFormatStepPresenter;
 
   private final XmlFormatStepPresenter xmlFormatStepPresenter;
-
-  private final SpssFormatStepPresenter spssFormatStepPresenter;
 
   private final RHavenStepPresenter rHavenStepPresenter;
 
@@ -113,7 +110,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   public DataImportPresenter(Display display, EventBus eventBus, //
       CsvFormatStepPresenter csvFormatStepPresenter, XmlFormatStepPresenter xmlFormatStepPresenter, //
       LimesurveyStepPresenter limesurveyStepPresenter, JdbcStepPresenter jdbcStepPresenter, //
-      SpssFormatStepPresenter spssFormatStepPresenter,//
       RHavenStepPresenter rHavenStepPresenter,//
       RestStepPresenter restStepPresenter,//
       NoFormatStepPresenter noFormatStepPresenter,//
@@ -125,7 +121,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     super(eventBus, display);
     this.csvFormatStepPresenter = csvFormatStepPresenter;
     this.xmlFormatStepPresenter = xmlFormatStepPresenter;
-    this.spssFormatStepPresenter = spssFormatStepPresenter;
     this.rHavenStepPresenter = rHavenStepPresenter;
     this.limesurveyStepPresenter = limesurveyStepPresenter;
     this.jdbcStepPresenter = jdbcStepPresenter;
@@ -178,7 +173,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   private void bindPresenters() {
     csvFormatStepPresenter.bind();
     xmlFormatStepPresenter.bind();
-    spssFormatStepPresenter.bind();
     rHavenStepPresenter.bind();
     limesurveyStepPresenter.bind();
     jdbcStepPresenter.bind();
@@ -254,7 +248,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     super.onUnbind();
     csvFormatStepPresenter.unbind();
     xmlFormatStepPresenter.unbind();
-    spssFormatStepPresenter.unbind();
     rHavenStepPresenter.unbind();
     limesurveyStepPresenter.unbind();
     jdbcStepPresenter.unbind();
@@ -318,10 +311,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
           formatStepPresenter = restStepPresenter;
           getView().setFormatStepDisplay(restStepPresenter.getView());
           break;
-        case SPSS:
-          formatStepPresenter = spssFormatStepPresenter;
-          getView().setFormatStepDisplay(spssFormatStepPresenter.getView());
-          break;
         case RSPSS:
         case RSAS:
         case RSTATA:
@@ -360,9 +349,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         break;
       case REST:
         submitJob(createRestImportCommandOptionsDto());
-        break;
-      case SPSS:
-        submitJob(createImportCommandOptionsDto(importConfig.getFile()));
         break;
       case RSPSS:
       case RSAS:
@@ -465,9 +451,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
             break;
           case REST:
             entries = restStepPresenter.getErrors().entrySet();
-            break;
-          case SPSS:
-            entries = spssFormatStepPresenter.getErrors().entrySet();
             break;
           case RSPSS:
           case RSAS:

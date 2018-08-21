@@ -98,9 +98,6 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
   FlowPanel helpOpalXml;
 
   @UiField
-  FlowPanel helpSpss;
-
-  @UiField
   FlowPanel helpRSASHaven;
 
   @UiField
@@ -237,7 +234,6 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
     formatChooser.addGroup(translations.fileBasedDatasources());
     formatChooser.addItemToGroup(translations.csvLabel(), ImportFormat.CSV.name());
     formatChooser.addItemToGroup(translations.opalXmlLabel(), ImportFormat.XML.name());
-    formatChooser.addItemToGroup(translations.spssLabel(), ImportFormat.SPSS.name());
     formatChooser.addItemToGroup(translations.rSPSSLabel(), ImportFormat.RSPSS.name());
     formatChooser.addItemToGroup(translations.rSASLabel(), ImportFormat.RSAS.name());
     formatChooser.addItemToGroup(translations.rStataLabel(), ImportFormat.RSTATA.name());
@@ -458,9 +454,6 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
         case JDBC:
           helpJDBC.setVisible(true);
           break;
-        case SPSS:
-          helpSpss.setVisible(true);
-          break;
         case RSAS:
           helpRSASHaven.setVisible(true);
           break;
@@ -480,7 +473,6 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
     helpLimeSurvey.setVisible(false);
     helpJDBC.setVisible(false);
     helpOpalRest.setVisible(false);
-    helpSpss.setVisible(false);
     helpRSASHaven.setVisible(false);
     helpRSPSSHaven.setVisible(false);
     helpRStataHaven.setVisible(false);

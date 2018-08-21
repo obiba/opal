@@ -9,7 +9,8 @@
  */
 package org.obiba.opal.web.magma.support;
 
-import com.google.common.base.Strings;
+import javax.validation.constraints.NotNull;
+
 import org.json.JSONObject;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
@@ -23,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.NotNull;
+import com.google.common.base.Strings;
 
 /**
  * Plugin datasource is used as a transient datasource.
@@ -52,6 +53,8 @@ public class PluginDatasourceFactoryDtoParser extends AbstractDatasourceFactoryD
     } catch (Exception e) {
       log.warn("Cannot parse datasource plugin {} parameters: {}", pluginDto.getName(), pluginDto.getParameters(), e);
     }
+
+    datasourceService.setOpalFileSystemPathResolver(path -> opalRuntime.getFileSystem().resolveLocalFile(path));
     return datasourceService.createDatasourceFactory(DatasourceUsage.IMPORT, parameters == null ? new JSONObject() : parameters);
   }
 
