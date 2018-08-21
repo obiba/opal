@@ -1,5 +1,6 @@
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -86,48 +87,69 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
   }
 
   public boolean isValid() {
-    // create a schema validator? is this useful if the validation is done through the browser (HTML5)?
-    boolean valid = true;
-    Object value = getValue();
+    return validate().length() == 0;
+  }
 
+  public String validate() {
+    Object value = getValue();
     switch(type) {
       case "string": {
-        if(required) {
-          valid = value != null && ((String) value).trim().length() > 0;
-        }
-
-        JSONValue fileFormats = schema.get("fileFormats");
-        if(format.equals("file") && (fileFormats != null && fileFormats.isArray() != null)) {
-          valid = valid && validateFileFormat(value, fileFormats.isArray());
-        } else {
-          valid = valid &&
-              JsonSchemaGWT.valueForStringSchemaIsValid(value instanceof String ? (String) value : null, schema);
-        }
-
-        break;
+        return validateString(value);
       }
       case "integer":
       case "number": {
-        if(required) {
-          valid = value != null;
-        }
-
-        valid = valid &&
-            JsonSchemaGWT.valueForNumericSchemaIsValid(value instanceof Number ? (Number) value : null, schema);
-        break;
+        return validateNumber(value);
       }
       case "array": {
-        if(required) {
-          valid = value != null && ((HashSet) value).size() > 0;
-        }
-
-        valid = valid &&
-            JsonSchemaGWT.valueForArraySchemaIsValid(value instanceof HashSet ? (HashSet) value : null, schema);
-        break;
+        return validateArray(value);
       }
     }
 
-    return valid;
+    return "";
+  }
+
+  private boolean validateFileFormat(Object value, JSONArray fileFormatsArray) {
+    String stringValue = value == null ? "" : (String) value;
+    if(stringValue.trim().length() == 0) return true;
+
+    boolean formatIsvalid = false;
+    int i = 0;
+    while(!formatIsvalid && i < fileFormatsArray.size()) {
+      String fileFormat = fileFormatsArray.get(i).isString().stringValue();
+      formatIsvalid = stringValue.endsWith(fileFormat);
+      i++;
+    }
+
+    return formatIsvalid;
+  }
+
+  private String validateString(Object value) {
+    if(required && value == null || (value instanceof String && ((String) value).trim().length() == 0)) {
+      return "required";
+    }
+
+    JSONValue fileFormats = schema.get("fileFormats");
+    if(format.equals("file") && (fileFormats != null && fileFormats.isArray() != null)) {
+      if(!validateFileFormat(value, fileFormats.isArray())) return "fileFormats";
+    }
+
+    return JsonSchemaGWT.valueForStringSchemaIsValid(value instanceof String ? (String) value : null, schema);
+  }
+
+  private String validateNumber(Object value) {
+    if(required && value == null) {
+      return "required";
+    }
+
+    return JsonSchemaGWT.valueForNumericSchemaIsValid((Number) value, schema);
+  }
+
+  private String validateArray(Object value) {
+    if(required && value == null || (value instanceof HashSet && ((HashSet) value).size() == 0)) {
+      return "required";
+    }
+
+    return JsonSchemaGWT.valueForArraySchemaIsValid(value instanceof HashSet ? (HashSet) value : null, schema);
   }
 
   public JSONObject getSchema() {
@@ -273,21 +295,6 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
         : new JSONObject();
 
     return new DynamicCheckboxGroup(key, JsonSchemaGWT.getEnum(items));
-  }
-
-  private boolean validateFileFormat(Object value, JSONArray fileFormatsArray) {
-    String stringValue = value == null ? "" : (String) value;
-    if(stringValue.trim().length() == 0) return true;
-
-    boolean formatIsvalid = false;
-    int i = 0;
-    while(!formatIsvalid && i < fileFormatsArray.size()) {
-      String fileFormat = fileFormatsArray.get(i).isString().stringValue();
-      formatIsvalid = stringValue.endsWith(fileFormat);
-      i++;
-    }
-
-    return formatIsvalid;
   }
 
   private void setStringSchemaValidations(Widget widget) {

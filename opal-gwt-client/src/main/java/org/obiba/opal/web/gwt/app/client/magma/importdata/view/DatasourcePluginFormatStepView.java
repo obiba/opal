@@ -105,7 +105,8 @@ public class DatasourcePluginFormatStepView extends ViewImpl implements Datasour
     for(Widget widget : containerPanel) {
       if (widget instanceof SchemaUiContainer) {
         SchemaUiContainer widgetAsSchemaUiContainer = (SchemaUiContainer) widget;
-        if (!widgetAsSchemaUiContainer.isValid()) errors.put(widgetAsSchemaUiContainer, widgetAsSchemaUiContainer.getTitle());
+        String validationError = widgetAsSchemaUiContainer.validate();
+        if (validationError.length() > 0) errors.put(widgetAsSchemaUiContainer, widgetAsSchemaUiContainer.getTitle() + ": " + validationError);
       }
     }
 

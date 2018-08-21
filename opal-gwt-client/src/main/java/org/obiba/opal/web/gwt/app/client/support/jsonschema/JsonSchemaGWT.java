@@ -99,34 +99,34 @@ public abstract class JsonSchemaGWT {
     }
   }
 
-  public static boolean valueForStringSchemaIsValid(String value, JSONObject schema) {
-    boolean valid = true;
+  public static String valueForStringSchemaIsValid(String value, JSONObject schema) {
+    String error = "";
 
     if (value != null) {
       JSONValue maxLength = schema.get("maxLength");
       if (maxLength != null && maxLength.isNumber() != null) {
         double maxLengthValue = maxLength.isNumber().doubleValue();
-        if (maxLengthValue > 0) valid = value.length() <= maxLengthValue;
+        if (maxLengthValue > 0 && value.length() > maxLengthValue) return "maxLength";
       }
 
       JSONValue minLength = schema.get("minLength");
       if (minLength != null && minLength.isNumber() != null) {
         double minLengthValue = minLength.isNumber().doubleValue();
-        if (minLengthValue > 0) valid = valid && value.length() >= minLengthValue;
+        if (minLengthValue > 0 && value.length() < minLengthValue) return "minLength";
       }
 
       JSONValue pattern = schema.get("pattern");
       if (pattern != null && pattern.isString().stringValue() != null) {
         String patternValue = pattern.isString().stringValue();
-        valid = valid && RegExp.compile(patternValue).test(value);
+        if (!RegExp.compile(patternValue).test(value)) return "pattern";
       }
     }
 
-    return valid;
+    return error;
   }
 
-  public static boolean valueForNumericSchemaIsValid(Number value, JSONObject schema) {
-    boolean valid = true;
+  public static String valueForNumericSchemaIsValid(Number value, JSONObject schema) {
+    String error = "";
 
     if (value != null) {
       double doubleValue = value.doubleValue();
@@ -134,36 +134,36 @@ public abstract class JsonSchemaGWT {
       JSONValue maximum = schema.get("maximum");
       if (maximum != null && maximum.isNumber() != null) {
         double maximumValue = maximum.isNumber().doubleValue();
-        valid = doubleValue <= maximumValue;
+        if (doubleValue > maximumValue) return "maximum";
       }
 
       JSONValue minimum = schema.get("minimum");
       if (minimum != null && minimum.isNumber() != null) {
         double minimumValue = minimum.isNumber().doubleValue();
-        valid = valid && doubleValue >= minimumValue;
+        if (doubleValue < minimumValue) return "minimum";
       }
     }
 
-    return valid;
+    return error;
   }
 
-  public static boolean valueForArraySchemaIsValid(Collection value, JSONObject schema) {
-    boolean valid = true;
+  public static String valueForArraySchemaIsValid(Collection value, JSONObject schema) {
+    String error = "";
 
     if (value != null) {
       JSONValue maxItems = schema.get("maxItems");
       if (maxItems != null && maxItems.isNumber() != null) {
         double maxItemsValue = maxItems.isNumber().doubleValue();
-        valid = value.size() <= maxItemsValue;
+        if (value.size() > maxItemsValue) return "maxItems";
       }
 
       JSONValue minItems = schema.get("minItems");
       if (minItems != null && minItems.isNumber() != null) {
         double minItemsValue = minItems.isNumber().doubleValue();
-        valid = value.size() >= minItemsValue;
+        if (value.size() < minItemsValue) return "minItems";
       }
     }
 
-    return valid;
+    return error;
   }
 }
