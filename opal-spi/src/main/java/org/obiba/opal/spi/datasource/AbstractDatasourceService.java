@@ -17,7 +17,6 @@ import javax.validation.constraints.NotNull;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.obiba.opal.spi.support.OpalFileSystemPathResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,17 +24,13 @@ public abstract class AbstractDatasourceService implements DatasourceService {
 
   public static final Logger log = LoggerFactory.getLogger(AbstractDatasourceService.class);
 
-  public static final String SCHEMA_FILE_EXT = ".json";
-
-  public static final String DEFAULT_PROPERTY_KEY_FORMAT = "usage.%s.";
-
   protected Properties properties;
 
   protected boolean running;
 
-  protected Collection<DatasourceUsage> usages;
+  private Collection<DatasourceUsage> usages;
 
-  protected OpalFileSystemPathResolver pathResolver;
+  private OpalFileSystemPathResolver pathResolver;
 
   public Set<DatasourceUsage> initUsages() {
     String usagesString = getProperties().getProperty("usages", "").trim();
@@ -94,8 +89,9 @@ public abstract class AbstractDatasourceService implements DatasourceService {
     pathResolver = resolver;
   }
 
-  public File resolvePath(String path) {
-    return pathResolver == null ? new File(path) : pathResolver.resolve(path);
+  @Override
+  public File resolvePath(String virtualPath) {
+    return pathResolver == null ? new File(virtualPath) : pathResolver.resolve(virtualPath);
   }
 
   public JSONObject processDefaultPropertiesValue(DatasourceUsage usage, JSONObject jsonObject) {
