@@ -124,7 +124,7 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
   }
 
   private String validateString(Object value) {
-    if(required && value == null || (value instanceof String && ((String) value).trim().length() == 0)) {
+    if(required && (value == null || (value instanceof String && ((String) value).trim().length() == 0))) {
       return "required";
     }
 
@@ -145,7 +145,7 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
   }
 
   private String validateArray(Object value) {
-    if(required && value == null || (value instanceof HashSet && ((HashSet) value).size() == 0)) {
+    if(required && (value == null || (value instanceof HashSet && ((HashSet) value).size() == 0))) {
       return "required";
     }
 
