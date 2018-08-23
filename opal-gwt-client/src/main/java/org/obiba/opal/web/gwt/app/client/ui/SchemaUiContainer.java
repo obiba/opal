@@ -1,6 +1,5 @@
 package org.obiba.opal.web.gwt.app.client.ui;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -21,6 +20,7 @@ import com.google.gwt.user.client.ui.DoubleBox;
 import com.google.gwt.user.client.ui.IntegerBox;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.PasswordTextBox;
+import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.web.bindery.event.shared.EventBus;
@@ -255,6 +255,20 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
 
     if(format.equals("file")) {
       return new FileSelection(eventBus);
+    }
+
+    if (format.equals("textarea")) {
+      TextArea textArea = new TextArea();
+
+      JSONValue rowsValue = schema.get("rows");
+      if (rowsValue != null && rowsValue.isNumber() != null) {
+        int numberOfRows = Double.valueOf(rowsValue.isNumber().doubleValue()).intValue();
+        textArea.setVisibleLines(numberOfRows > 2 ? numberOfRows : 2);
+      } else {
+        textArea.setVisibleLines(2);
+      }
+
+      return textArea;
     }
 
     if(hasEnum) {
