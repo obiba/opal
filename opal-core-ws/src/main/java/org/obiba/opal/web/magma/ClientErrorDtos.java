@@ -16,6 +16,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.ws.rs.core.Response;
 
+import org.apache.shiro.authc.AuthenticationException;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.WrappedException;
 import org.obiba.magma.support.DatasourceParsingException;
@@ -66,7 +67,7 @@ public class ClientErrorDtos {
   @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
   public static ClientErrorDto getErrorMessage(Response.StatusType responseStatus, String errorStatus,
       RuntimeException e) {
-    log.warn(errorStatus, e);
+    if (!(e instanceof AuthenticationException)) log.warn(errorStatus, e);
     Throwable cause = getRootCause(e);
     return getErrorMessage(responseStatus, errorStatus)
         .addArguments(cause.getMessage() == null ? cause.getClass().getName() : cause.getMessage()).build();

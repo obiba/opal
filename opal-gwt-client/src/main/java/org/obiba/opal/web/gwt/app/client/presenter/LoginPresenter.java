@@ -9,8 +9,11 @@
  */
 package org.obiba.opal.web.gwt.app.client.presenter;
 
+import com.google.gwt.core.client.JsonUtils;
 import org.obiba.opal.web.gwt.app.client.administration.configuration.event.GeneralConfigSavedEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
@@ -39,6 +42,7 @@ import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.NoGatekeeper;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPresenter.Proxy> {
 
@@ -49,6 +53,8 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
     void clear();
 
     void showErrorMessageAndClearPassword();
+
+    void showErrorMessageAndClearPassword(String message);
 
     HasValue<String> getUserName();
 
@@ -74,14 +80,17 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
 
   private final ResourceAuthorizationCache authorizationCache;
 
-    private HandlerRegistration unhandledExceptionHandler;
+  private final Translations translations;
+
+  private HandlerRegistration unhandledExceptionHandler;
 
   @Inject
   public LoginPresenter(Display display, EventBus eventBus, Proxy proxy, RequestCredentials credentials,
-      ResourceAuthorizationCache authorizationCache) {
+      ResourceAuthorizationCache authorizationCache, Translations translations) {
     super(eventBus, display, proxy, RevealType.Root);
     this.credentials = credentials;
     this.authorizationCache = authorizationCache;
+    this.translations = translations;
   }
 
   @Override
@@ -168,6 +177,15 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
       @Override
       public void onResponseCode(Request request, Response response) {
         getView().setBusy(false);
+        try {
+          ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
+          String msg = errorDto.getStatus();
+          if (translations.userMessageMap().containsKey(msg)) {
+            getView().showErrorMessageAndClearPassword(TranslationsUtils.replaceArguments(translations.userMessageMap().get(errorDto.getStatus()), errorDto.getArgumentsArray()));
+            return;
+          }
+        } catch (Exception ignored) {
+        }
         getView().showErrorMessageAndClearPassword();
       }
     };

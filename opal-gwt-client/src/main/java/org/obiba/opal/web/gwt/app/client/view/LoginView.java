@@ -102,8 +102,13 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
 
   @Override
   public void showErrorMessageAndClearPassword() {
+    showErrorMessageAndClearPassword(translations.authFailed());
+  }
+
+  @Override
+  public void showErrorMessageAndClearPassword(String message) {
     clear();
-    final Alert alert = new Alert(translations.authFailed(), AlertType.ERROR);
+    final Alert alert = new Alert(message, AlertType.ERROR);
     alert.addClosedHandler(new ClosedHandler() {
       @Override
       public void onClosed(ClosedEvent closedEvent) {

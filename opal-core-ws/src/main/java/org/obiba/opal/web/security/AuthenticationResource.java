@@ -34,6 +34,7 @@ import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.obiba.shiro.web.filter.AuthenticationExecutor;
+import org.obiba.shiro.web.filter.UserBannedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,11 +61,13 @@ public class AuthenticationResource extends AbstractSecurityComponent {
       authenticationExecutor.login(new UsernamePasswordToken(username, password));
       String sessionId = SecurityUtils.getSubject().getSession().getId().toString();
       log.info("Successful session creation for user '{}' at ip: '{}': session ID is '{}'.", username,
-          servletRequest.getRemoteAddr(), sessionId);
+              servletRequest.getRemoteAddr(), sessionId);
       return Response.created(
-          UriBuilder.fromPath("/").path(AuthenticationResource.class).path(AuthenticationResource.class, "checkSession")
-              .build(sessionId)).build();
-
+              UriBuilder.fromPath("/").path(AuthenticationResource.class).path(AuthenticationResource.class, "checkSession")
+                      .build(sessionId)).build();
+    } catch (UserBannedException e) {
+      log.info("Authentication failure: {}", e.getMessage());
+      throw e;
     } catch(AuthenticationException e) {
       log.info("Authentication failure of user '{}' at ip: '{}': {}", username, servletRequest.getRemoteAddr(),
           e.getMessage());
