@@ -45,7 +45,7 @@ public class AuthenticationExecutorImpl extends AbstractAuthenticationExecutor {
     private SubjectProfileService subjectProfileService;
 
     @PostConstruct
-    public void configureBan() {
+    public void configure() {
         configureBan(maxRetry, retryTime, banTime);
     }
 
