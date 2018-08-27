@@ -28,11 +28,11 @@ import javax.annotation.PostConstruct;
 @Component
 public class AuthenticationExecutorImpl extends AbstractAuthenticationExecutor {
 
-    @Value("${org.obiba.opal.security.login.maxRetry}")
-    private int maxRetry;
+    @Value("${org.obiba.opal.security.login.maxTry}")
+    private int maxTry;
 
-    @Value("${org.obiba.opal.security.login.retryTime}")
-    private int retryTime;
+    @Value("${org.obiba.opal.security.login.trialTime}")
+    private int trialTime;
 
     @Value("${org.obiba.opal.security.login.banTime}")
     private int banTime;
@@ -46,7 +46,7 @@ public class AuthenticationExecutorImpl extends AbstractAuthenticationExecutor {
 
     @PostConstruct
     public void configure() {
-        configureBan(maxRetry, retryTime, banTime);
+        configureBan(maxTry, trialTime, banTime);
     }
 
     @Override
