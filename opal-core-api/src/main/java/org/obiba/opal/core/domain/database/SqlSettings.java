@@ -21,7 +21,7 @@ import com.google.common.base.MoreObjects;
 public class SqlSettings {
 
   public enum SqlSchema {
-    HIBERNATE, JDBC, LIMESURVEY
+    HIBERNATE, JDBC
   }
 
   /**
@@ -48,9 +48,6 @@ public class SqlSettings {
 
   @Nullable
   private JdbcDatasourceSettings jdbcDatasourceSettings;
-
-  @Nullable
-  private LimesurveyDatasourceSettings limesurveyDatasourceSettings;
 
   @NotNull
   public String getDriverClass() {
@@ -113,40 +110,11 @@ public class SqlSettings {
     this.jdbcDatasourceSettings = jdbcDatasourceSettings;
   }
 
-  @Nullable
-  public LimesurveyDatasourceSettings getLimesurveyDatasourceSettings() {
-    return limesurveyDatasourceSettings;
-  }
-
-  public void setLimesurveyDatasourceSettings(@Nullable LimesurveyDatasourceSettings limesurveyDatasourceSettings) {
-    this.limesurveyDatasourceSettings = limesurveyDatasourceSettings;
-  }
-
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this).omitNullValues().add("driverClass", driverClass).add("url", url)
         .add("username", username).add("password", password).add("properties", properties)
         .add("magmaDatasourceType", sqlSchema).toString();
-  }
-
-  public static class LimesurveyDatasourceSettings {
-
-    private String tablePrefix;
-
-    public LimesurveyDatasourceSettings() {
-    }
-
-    public LimesurveyDatasourceSettings(String tablePrefix) {
-      this.tablePrefix = tablePrefix;
-    }
-
-    public String getTablePrefix() {
-      return tablePrefix;
-    }
-
-    public void setTablePrefix(String tablePrefix) {
-      this.tablePrefix = tablePrefix;
-    }
   }
 
   @SuppressWarnings("ParameterHidesMemberVariable")
@@ -195,11 +163,6 @@ public class SqlSettings {
 
     public Builder jdbcDatasourceSettings(JdbcDatasourceSettings jdbcDatasourceSettings) {
       settings.jdbcDatasourceSettings = jdbcDatasourceSettings;
-      return this;
-    }
-
-    public Builder limesurveyDatasourceSettings(LimesurveyDatasourceSettings limesurveyDatasourceSettings) {
-      settings.limesurveyDatasourceSettings = limesurveyDatasourceSettings;
       return this;
     }
 

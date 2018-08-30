@@ -57,16 +57,7 @@ public class Dtos {
     if(dto.hasJdbcDatasourceSettings()) {
       settings.setJdbcDatasourceSettings(fromDto(dto.getJdbcDatasourceSettings()));
     }
-    if(dto.hasLimesurveyDatasourceSettings()) {
-      settings.setLimesurveyDatasourceSettings(fromDto(dto.getLimesurveyDatasourceSettings()));
-    }
     return settings;
-  }
-
-  @Nullable
-  private static SqlSettings.LimesurveyDatasourceSettings fromDto(
-      @NotNull SqlSettingsDto.LimesurveyDatasourceSettingsDto dto) {
-    return new SqlSettings.LimesurveyDatasourceSettings(dto.getTablePrefix());
   }
 
   @Nullable
@@ -167,29 +158,13 @@ public class Dtos {
         .setUsername(db.getUsername());
 
     if(!Strings.isNullOrEmpty(db.getProperties())) builder.setProperties(db.getProperties());
-    switch(db.getSqlSchema()) {
-      case JDBC:
-        JdbcDatasourceSettings jdbcSettings = db.getJdbcDatasourceSettings();
-        if(jdbcSettings != null) {
-          builder.setJdbcDatasourceSettings(asDto(jdbcSettings));
-        }
-        break;
-      case LIMESURVEY:
-        SqlSettings.LimesurveyDatasourceSettings limesurveySettings = db.getLimesurveyDatasourceSettings();
-        if(limesurveySettings != null) {
-          builder.setLimesurveyDatasourceSettings(asDto(limesurveySettings));
-        }
-        break;
-    }
-    return builder;
-  }
 
-  private static SqlSettingsDto.LimesurveyDatasourceSettingsDto.Builder asDto(
-      SqlSettings.LimesurveyDatasourceSettings limesurveySettings) {
-    SqlSettingsDto.LimesurveyDatasourceSettingsDto.Builder builder = SqlSettingsDto.LimesurveyDatasourceSettingsDto
-        .newBuilder();
-    String tablePrefix = limesurveySettings.getTablePrefix();
-    if(!Strings.isNullOrEmpty(tablePrefix)) builder.setTablePrefix(tablePrefix);
+    if (db.getSqlSchema() == SqlSettings.SqlSchema.JDBC) {
+      JdbcDatasourceSettings jdbcSettings = db.getJdbcDatasourceSettings();
+      if(jdbcSettings != null) {
+        builder.setJdbcDatasourceSettings(asDto(jdbcSettings));
+      }
+    }
     return builder;
   }
 

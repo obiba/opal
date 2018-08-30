@@ -125,13 +125,6 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
 
   @UiField
   CheckBox defaultStorage;
-
-  @UiField
-  CollapsiblePanel limesurveyOptions;
-
-  @UiField
-  TextBox tablePrefix;
-
   @UiField
   CollapsiblePanel jdbcOptions;
 
@@ -209,7 +202,6 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
       .registerWidget("sqlSchema.jdbcDatasourceSettings.defaultEntityType", translations.defaultEntityTypeLabel(),
         defaultEntityTypeGroup);
 
-    limesurveyOptions.setText(translations.limesurveyOptionsLabel());
     jdbcOptions.setText(translations.jdbcOptionsLabel());
 
     sqlSchema.addChangeHandler(new ChangeHandler() {
@@ -361,7 +353,6 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
           if (sqlSchema.getValue(i).equals(selectedSqlSchema.name())) {
             sqlSchema.setSelectedIndex(i);
             initDrivers();
-            toggleLimesurveyOptions(selectedSqlSchema == SqlSchema.LIMESURVEY);
             toggleJdbcOptions(selectedSqlSchema == SqlSchema.JDBC);
             break;
           }
@@ -502,11 +493,6 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   }
 
   @Override
-  public HasText getTablePrefix() {
-    return tablePrefix;
-  }
-
-  @Override
   public void setJdbcDatasourceSettings(JdbcDatasourceSettingsDto jdbcDatasourceSettings) {
     defaultEntityType.setText(jdbcDatasourceSettings.getDefaultEntityType());
     defaultEntityIdColumn.setText(jdbcDatasourceSettings.getDefaultEntityIdColumnName());
@@ -571,7 +557,6 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   public void disableFieldsForDatabaseWithDatasource() {
     sqlSchema.setEnabled(false);
     //driver.setEnabled(false);
-    tablePrefix.setEnabled(false);
     defaultEntityType.setEnabled(false);
     defaultUpdatedTimestampColumn.setEnabled(false);
     useMetadataTables.setEnabled(false);
@@ -602,12 +587,6 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   public void toggleDefaultStorage(boolean show) {
     if (!show) defaultStorage.setValue(false);
     defaultStorageGroup.setVisible(show);
-  }
-
-  @Override
-  public void toggleLimesurveyOptions(boolean show) {
-    if (!show) tablePrefix.setValue(null);
-    limesurveyOptions.setVisible(show);
   }
 
   @Override

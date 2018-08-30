@@ -306,7 +306,6 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
       ResultSet res = ds.getConnection().getMetaData().getTables(null, null, null, new String[] { "TABLE" });
       while(res.next()) {
         if("value_set_value".equalsIgnoreCase(res.getString("TABLE_NAME"))) return SqlSettings.SqlSchema.HIBERNATE;
-        if("surveys".equalsIgnoreCase(res.getString("TABLE_NAME"))) return SqlSettings.SqlSchema.LIMESURVEY;
       }
     } catch(SQLException e) {
       log.error("Cannot check database schema: {}", url, e);
