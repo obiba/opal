@@ -816,14 +816,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Opal")
   String opalRestLabel();
 
-  @Description("Limesurvey label")
-  @DefaultStringValue("LimeSurvey")
-  String limesurveyLabel();
-
-  @Description("Limesurvey label")
-  @DefaultStringValue("LimeSurvey Options")
-  String limesurveyOptionsLabel();
-
   @Description("Error label")
   @DefaultStringValue("Error")
   String errorLabel();

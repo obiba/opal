@@ -76,13 +76,6 @@
               </ui:msg>
             </b:HelpBlock>
           </g:FlowPanel>
-          <g:FlowPanel addStyleNames="small-top-margin" ui:field="helpLimeSurvey" visible="false">
-            <g:Label styleName="help-block">
-              <ui:msg description="LimeSurvey Information">This format imports variable dictionaries and data from a
-                LimeSurvey database.
-              </ui:msg>
-            </g:Label>
-          </g:FlowPanel>
           <g:FlowPanel addStyleNames="small-top-margin" ui:field="helpOpalRest" visible="false">
             <g:Label styleName="help-block">
               <ui:msg description="Opal REST Information">This format imports variable dictionaries and data from a

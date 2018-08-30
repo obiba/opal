@@ -107,9 +107,6 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
   FlowPanel helpRStataHaven;
 
   @UiField
-  FlowPanel helpLimeSurvey;
-
-  @UiField
   FlowPanel helpOpalRest;
 
   @UiField
@@ -238,7 +235,6 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
     formatChooser.addItemToGroup(translations.rSASLabel(), ImportFormat.RSAS.name());
     formatChooser.addItemToGroup(translations.rStataLabel(), ImportFormat.RSTATA.name());
     formatChooser.addGroup(translations.remoteServerBasedDatasources());
-    formatChooser.addItemToGroup(translations.limesurveyLabel(), ImportFormat.LIMESURVEY.name());
     formatChooser.addItemToGroup(translations.opalRestLabel(), ImportFormat.REST.name());
     formatChooser.addItemToGroup(translations.sqlLabel(), ImportFormat.JDBC.name());
   }
@@ -445,9 +441,6 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
         case XML:
           helpOpalXml.setVisible(true);
           break;
-        case LIMESURVEY:
-          helpLimeSurvey.setVisible(true);
-          break;
         case REST:
           helpOpalRest.setVisible(true);
           break;
@@ -470,7 +463,6 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
   private void hideHelpPanels() {
     helpCsv.setVisible(false);
     helpOpalXml.setVisible(false);
-    helpLimeSurvey.setVisible(false);
     helpJDBC.setVisible(false);
     helpOpalRest.setVisible(false);
     helpRSASHaven.setVisible(false);

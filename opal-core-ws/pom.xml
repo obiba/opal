@@ -105,10 +105,6 @@
     </dependency>
     <dependency>
       <groupId>org.obiba.magma</groupId>
-      <artifactId>magma-datasource-limesurvey</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.obiba.magma</groupId>
       <artifactId>magma-datasource-mongodb</artifactId>
     </dependency>
     <dependency>

@@ -116,15 +116,6 @@ message HibernateDatasourceFactoryDto {
   }
 }
 
-message LimesurveyDatasourceFactoryDto {
-  optional bool key = 1;
-  required string database = 2;
-  optional string tablePrefix = 3;
-  extend DatasourceFactoryDto {
-    optional LimesurveyDatasourceFactoryDto params = 1005;
-  }
-}
-
 message StaticDatasourceFactoryDto {
   repeated TableDto tables = 1;
   repeated ViewDto views = 2;
