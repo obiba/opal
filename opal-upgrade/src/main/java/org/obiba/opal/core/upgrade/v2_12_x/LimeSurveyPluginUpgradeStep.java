@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.NoSuchElementException;
 import java.util.Properties;
 
 import org.obiba.opal.core.cfg.PluginsService;
@@ -63,13 +64,18 @@ public class LimeSurveyPluginUpgradeStep extends AbstractUpgradeStep {
   private Path getPropertiesBackupDirectoryPath() {
     File installedDirectory;
 
-    PluginResources installedPlugin = pluginsService.getInstalledPlugin(OPAL_DATASOURCE_LIMESURVEY);
-    if (installedPlugin != null) {
-      installedDirectory = installedPlugin.getDirectory();
-    } else {
-      pluginsService.installPlugin(OPAL_DATASOURCE_LIMESURVEY, null);
-      installedPlugin = pluginsService.getInstalledPlugin(OPAL_DATASOURCE_LIMESURVEY);
-      installedDirectory = installedPlugin != null ? installedPlugin.getDirectory() : new File(OpalRuntime.PLUGINS_DIR);
+    try {
+      PluginResources installedPlugin = pluginsService.getInstalledPlugin(OPAL_DATASOURCE_LIMESURVEY);
+      if (installedPlugin != null) {
+        installedDirectory = installedPlugin.getDirectory();
+      } else {
+        pluginsService.installPlugin(OPAL_DATASOURCE_LIMESURVEY, null);
+        installedPlugin = pluginsService.getInstalledPlugin(OPAL_DATASOURCE_LIMESURVEY);
+        installedDirectory = installedPlugin != null ? installedPlugin.getDirectory() : new File(OpalRuntime.PLUGINS_DIR);
+      }
+    } catch(NoSuchElementException e) {
+      log.error(e.getMessage());
+      installedDirectory = new File(OpalRuntime.PLUGINS_DIR);
     }
 
     Path path = installedDirectory.toPath().resolve("limesurvey-conf").toAbsolutePath();
