@@ -65,14 +65,10 @@ public class LimeSurveyPluginUpgradeStep extends AbstractUpgradeStep {
     File installedDirectory;
 
     try {
+      pluginsService.installPlugin(OPAL_DATASOURCE_LIMESURVEY, null);
       PluginResources installedPlugin = pluginsService.getInstalledPlugin(OPAL_DATASOURCE_LIMESURVEY);
-      if (installedPlugin != null) {
-        installedDirectory = installedPlugin.getDirectory();
-      } else {
-        pluginsService.installPlugin(OPAL_DATASOURCE_LIMESURVEY, null);
-        installedPlugin = pluginsService.getInstalledPlugin(OPAL_DATASOURCE_LIMESURVEY);
-        installedDirectory = installedPlugin != null ? installedPlugin.getDirectory() : new File(OpalRuntime.PLUGINS_DIR);
-      }
+      installedDirectory = installedPlugin != null ? installedPlugin.getDirectory() : new File(OpalRuntime.PLUGINS_DIR);
+
     } catch(NoSuchElementException e) {
       log.error(e.getMessage());
       installedDirectory = new File(OpalRuntime.PLUGINS_DIR);
