@@ -48,7 +48,9 @@ public class LimeSurveyPluginUpgradeStep extends AbstractUpgradeStep {
           Properties properties = toProperties(sqlSettings);
 
           try {
-            properties.store(new FileWriter(propertiesBackupDirectoryPath.resolve(limeSurveyDatabase.getName() + ".properties").toString()), limeSurveyDatabase.getName());
+            Path resolvedPath = propertiesBackupDirectoryPath.resolve(limeSurveyDatabase.getName() + ".properties");
+            resolvedPath.toFile().createNewFile();
+            properties.store(new FileWriter(resolvedPath.toString()), limeSurveyDatabase.getName());
           } catch(IOException e) {
             log.error(e.getMessage());
           }
