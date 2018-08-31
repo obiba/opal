@@ -48,9 +48,7 @@ public class LimeSurveyPluginUpgradeStep extends AbstractUpgradeStep {
           Properties properties = toProperties(sqlSettings);
 
           try {
-            Path resolvedPath = propertiesBackupDirectoryPath.resolve(limeSurveyDatabase.getName() + ".properties");
-            resolvedPath.toFile().createNewFile();
-            properties.store(new FileWriter(resolvedPath.toString()), limeSurveyDatabase.getName());
+            properties.store(new FileWriter(propertiesBackupDirectoryPath.resolve(limeSurveyDatabase.getName() + ".properties").toString()), limeSurveyDatabase.getName());
           } catch(IOException e) {
             log.error(e.getMessage());
           }
@@ -74,7 +72,9 @@ public class LimeSurveyPluginUpgradeStep extends AbstractUpgradeStep {
       installedDirectory = installedPlugin != null ? installedPlugin.getDirectory() : new File(OpalRuntime.PLUGINS_DIR);
     }
 
-    return installedDirectory.toPath().resolve("limesurvey-conf").toAbsolutePath();
+    Path path = installedDirectory.toPath().resolve("limesurvey-conf").toAbsolutePath();
+    path.toFile().mkdirs();
+    return path;
   }
 
   private Properties toProperties(SqlSettings sqlSettings) {
