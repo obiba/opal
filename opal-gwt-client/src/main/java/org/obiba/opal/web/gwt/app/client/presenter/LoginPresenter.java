@@ -9,12 +9,16 @@
  */
 package org.obiba.opal.web.gwt.app.client.presenter;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import org.obiba.opal.web.gwt.app.client.administration.configuration.event.GeneralConfigSavedEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -43,6 +47,8 @@ import com.gwtplatform.mvp.client.annotations.NoGatekeeper;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
+
+import java.util.Date;
 
 public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPresenter.Proxy> {
 
@@ -180,11 +186,24 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
         try {
           ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
           String msg = errorDto.getStatus();
-          if (translations.userMessageMap().containsKey(msg)) {
-            getView().showErrorMessageAndClearPassword(TranslationsUtils.replaceArguments(translations.userMessageMap().get(errorDto.getStatus()), errorDto.getArgumentsArray()));
+          if (translations.userMessageMap().containsKey(msg) || "BannedUser".equals(msg)) {
+            String status = errorDto.getStatus();
+            JsArrayString args = errorDto.getArgumentsArray();
+            if ("BannedUser".equals(status)) {
+              int remainingBanTime = Integer.parseInt(args.get(1));
+              String arg = remainingBanTime + "";
+              status = "BannedUserSecs";
+              if (remainingBanTime>60) {
+                arg = (remainingBanTime / 60) + "";
+                status = "BannedUserMin" + ("1".equals(arg) ? "" : "s");
+              }
+              args = JsArrays.from(arg);
+            }
+            getView().showErrorMessageAndClearPassword(TranslationsUtils.replaceArguments(translations.userMessageMap().get(status), args));
             return;
           }
         } catch (Exception ignored) {
+          GWT.log(ignored.getMessage());
         }
         getView().showErrorMessageAndClearPassword();
       }

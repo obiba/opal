@@ -683,7 +683,9 @@ public interface Translations extends Constants {
       "SearchFailure", "Search failed: {0}",
       "IndicesRemoved", "All indices were removed.",
       "CartLimitExceeded", "Cart is full, no items can be added anymore.",
-      "BannedUser", "Too many login failures. Please try again later."
+      "BannedUserMins", "Too many login failures for. Please try again in {0}mins.",
+      "BannedUserMin", "Too many login failures for. Please try again in {0}min.",
+      "BannedUserSecs", "Too many login failures for. Please try again in {0}secs."
   })
   Map<String, String> userMessageMap();
 

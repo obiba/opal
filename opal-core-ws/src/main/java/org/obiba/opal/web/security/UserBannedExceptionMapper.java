@@ -12,6 +12,7 @@ package org.obiba.opal.web.security;
 
 import com.google.protobuf.GeneratedMessage;
 import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.model.Ws;
 import org.obiba.opal.web.provider.ErrorDtoExceptionMapper;
 import org.obiba.shiro.web.filter.UserBannedException;
 import org.springframework.stereotype.Component;
@@ -32,7 +33,8 @@ public class UserBannedExceptionMapper extends ErrorDtoExceptionMapper<UserBanne
 
   @Override
   protected GeneratedMessage.ExtendableMessage<?> getErrorDto(UserBannedException exception) {
-    return ClientErrorDtos.getErrorMessage(getStatus(), "BannedUser", exception);
+    Ws.ClientErrorDto.Builder builder = ClientErrorDtos.getErrorMessage(getStatus(), "BannedUser", exception).toBuilder();
+    return builder.clearArguments().addArguments(exception.getUser()).addArguments(exception.getRemainingBanTime() + "").build();
   }
 
 }
