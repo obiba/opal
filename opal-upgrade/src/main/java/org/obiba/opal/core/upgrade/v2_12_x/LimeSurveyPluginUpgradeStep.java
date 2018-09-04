@@ -82,10 +82,10 @@ public class LimeSurveyPluginUpgradeStep extends AbstractUpgradeStep {
   private Properties toProperties(SqlSettings sqlSettings) {
     Properties properties = new Properties();
 
-    properties.setProperty("url", sqlSettings.getUrl());
-    properties.setProperty("username", sqlSettings.getUsername());
-    properties.setProperty("password", sqlSettings.getPassword());
-    properties.setProperty("properties", sqlSettings.getProperties());
+    properties.setProperty("usage.IMPORT.url", sqlSettings.getUrl());
+    properties.setProperty("usage.IMPORT.username", sqlSettings.getUsername());
+    properties.setProperty("usage.IMPORT.password", sqlSettings.getPassword());
+    properties.setProperty("usage.IMPORT.properties", sqlSettings.getProperties());
 
     return properties;
   }
