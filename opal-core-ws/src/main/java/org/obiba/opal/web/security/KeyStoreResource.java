@@ -18,6 +18,7 @@ import java.net.URI;
 import java.net.URL;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -200,12 +201,14 @@ public class KeyStoreResource {
   }
 
   private String getPEMCertificate(OpalKeyStore keystore, String alias) throws KeyStoreException, IOException {
-    Certificate certificate = keystore.getKeyStore().getCertificate(alias);
-    if(certificate == null) throw new IllegalArgumentException("Cannot find certificate for alias: " + alias);
+    Certificate[] certificates = keystore.getKeyStore().getCertificateChain(alias);
+    if(certificates == null || certificates.length == 0) throw new IllegalArgumentException("Cannot find certificate for alias: " + alias);
 
     StringWriter writer = new StringWriter();
     PEMWriter pemWriter = new PEMWriter(writer);
-    pemWriter.writeObject(certificate);
+    for (Certificate certificate : certificates) {
+      pemWriter.writeObject(certificate);
+    }
     pemWriter.flush();
     return writer.getBuffer().toString();
   }
