@@ -13,6 +13,7 @@ package org.obiba.opal.core.domain.database;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
+import org.obiba.magma.SocketFactoryProvider;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasource;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasourceFactory;
 
@@ -34,8 +35,12 @@ public class MongoDbSettings {
   private int batchSize = 100;
 
   public MongoDBDatasourceFactory createMongoDBDatasourceFactory(String datasourceName) {
+    return createMongoDBDatasourceFactory(datasourceName, null);
+  }
+
+  public MongoDBDatasourceFactory createMongoDBDatasourceFactory(String datasourceName, SocketFactoryProvider socketFactoryProvider) {
     MongoDBDatasourceFactory factory = new MongoDBDatasourceFactory(datasourceName, url, username, password,
-        properties);
+        properties, socketFactoryProvider);
     factory.setBatchSize(batchSize);
 
     return factory;

@@ -12,6 +12,7 @@ package org.obiba.opal.web.magma.support;
 import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.SocketFactoryProvider;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.opal.core.domain.database.MongoDbSettings;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
@@ -29,6 +30,9 @@ public class MongoDBDatasourceFactoryDtoParser extends AbstractDatasourceFactory
   private final DatabaseRegistry databaseRegistry;
 
   @Autowired
+  private SocketFactoryProvider socketFactoryProvider;
+
+  @Autowired
   public MongoDBDatasourceFactoryDtoParser(DatabaseRegistry databaseRegistry) {
     this.databaseRegistry = databaseRegistry;
   }
@@ -41,7 +45,7 @@ public class MongoDBDatasourceFactoryDtoParser extends AbstractDatasourceFactory
     if(mongoDbSettings == null) {
       throw new IllegalArgumentException("Cannot find mongoDbSettings for database " + dto.getName());
     }
-    return mongoDbSettings.createMongoDBDatasourceFactory(dto.getName());
+    return mongoDbSettings.createMongoDBDatasourceFactory(dto.getName(), socketFactoryProvider);
   }
 
   @Override

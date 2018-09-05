@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLSocketFactory;
 import javax.sql.DataSource;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -25,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.SocketFactoryProvider;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbSettings;
@@ -418,6 +421,11 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     @Bean
     public DatabaseRegistry databaseRegistry() {
       return new DefaultDatabaseRegistry();
+    }
+
+    @Bean
+    public SocketFactoryProvider socketFactoryProvider() {
+      return () -> SSLSocketFactory.getDefault();
     }
 
     @Bean

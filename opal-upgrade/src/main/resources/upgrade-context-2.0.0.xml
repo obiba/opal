@@ -66,6 +66,10 @@
 
   <bean id="credentialsKeyStoreService" class="org.obiba.opal.core.service.security.CredentialsKeyStoreServiceImpl"/>
 
+  <bean id="socketFactoryProvider" class="org.obiba.opal.core.service.security.OpalSocketFactoryProvider"/>
+  
+  <bean id="systemKeyStoreService" class="org.obiba.opal.core.service.security.SystemKeyStoreServiceImpl"/>
+
   <bean id="versionProvider" class="org.obiba.runtime.upgrade.support.JdbcVersionModifier">
     <property name="datasource" ref="dataSource"/>
   </bean>

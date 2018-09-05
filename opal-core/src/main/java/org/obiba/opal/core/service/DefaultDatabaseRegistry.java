@@ -25,10 +25,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.DatasourceFactory;
-import org.obiba.magma.DatasourceUpdateListener;
-import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.*;
 import org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory;
 import org.obiba.magma.datasource.jdbc.JdbcDatasourceFactory;
 import org.obiba.magma.support.EntitiesPredicate;
@@ -90,6 +87,9 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
 
   @Autowired
   private JtaTransactionManager jtaTransactionManager;
+
+  @Autowired
+  private SocketFactoryProvider socketFactoryProvider;
 
   private final LoadingCache<String, DataSource> dataSourceCache = CacheBuilder.newBuilder() //
       .removalListener(new DataSourceRemovalListener()) //
@@ -346,7 +346,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
     MongoDbSettings mongoDbSettings = database.getMongoDbSettings();
 
     if(mongoDbSettings != null) {
-      return mongoDbSettings.createMongoDBDatasourceFactory(datasourceName);
+      return mongoDbSettings.createMongoDBDatasourceFactory(datasourceName, socketFactoryProvider);
     }
 
     unregister(databaseName, datasourceName);

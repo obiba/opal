@@ -60,6 +60,10 @@
 
   <bean id="credentialsKeyStoreService" class="org.obiba.opal.core.service.security.CredentialsKeyStoreServiceImpl"/>
 
+  <bean id="socketFactoryProvider" class="org.obiba.opal.core.service.security.OpalSocketFactoryProvider"/>
+
+  <bean id="systemKeyStoreService" class="org.obiba.opal.core.service.security.SystemKeyStoreServiceImpl"/>
+
   <bean id="pluginsManager" class="org.obiba.opal.core.runtime.PluginsManager"/>
 
   <bean id="pluginsService" class="org.obiba.opal.core.service.PluginsServiceImpl">
