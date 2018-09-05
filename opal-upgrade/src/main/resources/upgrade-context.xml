@@ -163,6 +163,11 @@
           <property name="appliesTo" value="2.10.0"/>
         </bean>
 
+        <bean class="org.obiba.opal.core.upgrade.v2_12_x.LimeSurveyPluginUpgradeStep">
+          <property name="description" value="Remove LimeSurvey databases"/>
+          <property name="appliesTo" value="2.12.0"/>
+        </bean>
+
       </list>
     </property>
 

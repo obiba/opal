@@ -95,16 +95,6 @@
       <b:PasswordTextBox ui:field="password" b:id="password"/>
     </b:ControlGroup>
 
-    <o:CollapsiblePanel ui:field="limesurveyOptions">
-      <b:ControlLabel for="tablePrefix">
-        <ui:msg description="tablePrefix label">Table prefix</ui:msg>
-      </b:ControlLabel>
-      <b:TextBox ui:field="tablePrefix" b:id="tablePrefix"/>
-      <b:HelpBlock>
-        <ui:msg description="Table prefix help label">Specifies the prefix used to identify LimeSurvey tables.</ui:msg>
-      </b:HelpBlock>
-    </o:CollapsiblePanel>
-
     <o:CollapsiblePanel ui:field="jdbcOptions">
 
       <b:TabPanel tabPosition="above" ui:field="jdbcOptionsTabPanel">

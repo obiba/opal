@@ -17,7 +17,6 @@ import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DatasourcePl
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DatasourceValuesStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.IdentifiersMappingSelectionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.JdbcStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.LimesurveyStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.NoFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.RHavenStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.RestStepPresenter;
@@ -29,7 +28,6 @@ import org.obiba.opal.web.gwt.app.client.magma.importdata.view.DatasourcePluginF
 import org.obiba.opal.web.gwt.app.client.magma.importdata.view.DatasourceValuesStepView;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.view.IdentifiersMappingSelectionStepView;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.view.JdbcStepView;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.view.LimesurveyStepView;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.view.NoFormatStepView;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.view.RHavenStepView;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.view.RestStepView;
@@ -54,7 +52,6 @@ public class ImportModule extends AbstractOpalModule {
     bind(CsvFormatStepPresenter.Display.class).to(CsvFormatStepView.class);
     bind(XmlFormatStepPresenter.Display.class).to(XmlFormatStepView.class);
     bind(RHavenStepPresenter.Display.class).to(RHavenStepView.class);
-    bind(LimesurveyStepPresenter.Display.class).to(LimesurveyStepView.class);
     bind(JdbcStepPresenter.Display.class).to(JdbcStepView.class);
     bind(RestStepPresenter.Display.class).to(RestStepView.class);
     bind(NoFormatStepPresenter.Display.class).to(NoFormatStepView.class);

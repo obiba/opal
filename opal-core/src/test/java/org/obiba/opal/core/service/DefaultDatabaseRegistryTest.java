@@ -381,7 +381,6 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
 
     //TODO
 //    expected.getJdbcDatasourceSettings()
-//    expected.getLimesurveyDatasourceSettings()
   }
 
   private void assertMongoDbSettingsEquals(MongoDbSettings expected, MongoDbSettings found) {

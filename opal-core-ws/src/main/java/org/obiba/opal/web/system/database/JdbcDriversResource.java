@@ -53,7 +53,6 @@ public class JdbcDriversResource {
         .setJdbcUrlExample("jdbc:mysql://localhost:3306/opal") //
         .addSupportedSchemas("hibernate") //
         .addSupportedSchemas("jdbc") //
-        .addSupportedSchemas("limesurvey") //
         .build());
     drivers.add(Database.JdbcDriverDto.newBuilder() //
         .setDriverName("MariaDB") //
@@ -62,7 +61,6 @@ public class JdbcDriversResource {
         .setJdbcUrlExample("jdbc:mariadb://localhost:3306/opal") //
         .addSupportedSchemas("hibernate") //
         .addSupportedSchemas("jdbc") //
-        .addSupportedSchemas("limesurvey") //
         .build());
     drivers.add(Database.JdbcDriverDto.newBuilder() //
         .setDriverName("PostgreSQL") //
@@ -70,7 +68,6 @@ public class JdbcDriversResource {
         .setJdbcUrlTemplate("jdbc:postgresql://{hostname}:{port}/{databaseName}") //
         .setJdbcUrlExample("jdbc:postgresql://localhost:5432/opal") //
         .addSupportedSchemas("jdbc") //
-        .addSupportedSchemas("limesurvey") //
         .build());
     return drivers;
   }

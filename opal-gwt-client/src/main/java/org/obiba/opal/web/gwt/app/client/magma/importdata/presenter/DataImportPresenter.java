@@ -81,8 +81,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   private final RHavenStepPresenter rHavenStepPresenter;
 
-  private final LimesurveyStepPresenter limesurveyStepPresenter;
-
   private final JdbcStepPresenter jdbcStepPresenter;
 
   private final RestStepPresenter restStepPresenter;
@@ -109,7 +107,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
   public DataImportPresenter(Display display, EventBus eventBus, //
       CsvFormatStepPresenter csvFormatStepPresenter, XmlFormatStepPresenter xmlFormatStepPresenter, //
-      LimesurveyStepPresenter limesurveyStepPresenter, JdbcStepPresenter jdbcStepPresenter, //
+      JdbcStepPresenter jdbcStepPresenter, //
       RHavenStepPresenter rHavenStepPresenter,//
       RestStepPresenter restStepPresenter,//
       NoFormatStepPresenter noFormatStepPresenter,//
@@ -122,7 +120,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     this.csvFormatStepPresenter = csvFormatStepPresenter;
     this.xmlFormatStepPresenter = xmlFormatStepPresenter;
     this.rHavenStepPresenter = rHavenStepPresenter;
-    this.limesurveyStepPresenter = limesurveyStepPresenter;
     this.jdbcStepPresenter = jdbcStepPresenter;
     this.restStepPresenter = restStepPresenter;
     this.noFormatStepPresenter = noFormatStepPresenter;
@@ -165,7 +162,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   private void setInSlotPresenters() {
     setInSlot(Display.Slots.Unit, identifiersMappingSelectionStepPresenter);
     setInSlot(Display.Slots.Values, datasourceValuesStepPresenter);
-    setInSlot(Display.Slots.Limesurvey, limesurveyStepPresenter);
     setInSlot(Display.Slots.Jdbc, jdbcStepPresenter);
     setInSlot(Display.Slots.Rest, restStepPresenter);
   }
@@ -174,34 +170,26 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     csvFormatStepPresenter.bind();
     xmlFormatStepPresenter.bind();
     rHavenStepPresenter.bind();
-    limesurveyStepPresenter.bind();
     jdbcStepPresenter.bind();
     restStepPresenter.bind();
     comparedDatasourcesReportPresenter.bind();
   }
 
   private void updateFormatChooser() {
-    // Remove LimeSurvey and/or JDBC formats if no database of those types exists
+    // Remove JDBC format if no database of this type exists
     ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder()
         .forResource(UriBuilders.DATABASES_SQL.create().build())
         .withCallback(new ResourceCallback<JsArray<DatabaseDto>>() {
 
           @Override
           public void onResource(Response response, JsArray<DatabaseDto> resource) {
-            boolean limeSurvey = false;
             boolean jdbc = false;
             for(int i = 0; i < resource.length(); i++) {
               SqlSettingsDto sqlSettingsDto = resource.get(i).getSqlSettings();
-              if(sqlSettingsDto.getSqlSchema().getName().equals(SqlSettingsDto.SqlSchema.LIMESURVEY.getName())) {
-                limeSurvey = true;
-              } else if(sqlSettingsDto.getSqlSchema().getName().equals(SqlSettingsDto.SqlSchema.JDBC.getName()) &&
+              if(sqlSettingsDto.getSqlSchema().getName().equals(SqlSettingsDto.SqlSchema.JDBC.getName()) &&
                   resource.get(i).getUsage().getName().equals(DatabaseDto.Usage.IMPORT.getName())) {
                 jdbc = true;
               }
-            }
-            // Hide if not found
-            if(!limeSurvey) {
-              getView().removeFormat(ImportFormat.LIMESURVEY);
             }
             if(!jdbc) {
               getView().removeFormat(ImportFormat.JDBC);
@@ -211,7 +199,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            getView().removeFormat(ImportFormat.LIMESURVEY);
             getView().removeFormat(ImportFormat.JDBC);
           }
         }, Response.SC_FORBIDDEN, Response.SC_INTERNAL_SERVER_ERROR) //
@@ -249,7 +236,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     csvFormatStepPresenter.unbind();
     xmlFormatStepPresenter.unbind();
     rHavenStepPresenter.unbind();
-    limesurveyStepPresenter.unbind();
     jdbcStepPresenter.unbind();
     restStepPresenter.unbind();
   }
@@ -299,10 +285,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
           formatStepPresenter = xmlFormatStepPresenter;
           getView().setFormatStepDisplay(xmlFormatStepPresenter.getView());
           break;
-        case LIMESURVEY:
-          formatStepPresenter = limesurveyStepPresenter;
-          getView().setFormatStepDisplay(limesurveyStepPresenter.getView());
-          break;
         case JDBC:
           formatStepPresenter = jdbcStepPresenter;
           getView().setFormatStepDisplay(jdbcStepPresenter.getView());
@@ -341,9 +323,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       case CSV:
         submitJob(createImportCommandOptionsDto(importConfig.getFile()));
         break;
-      case LIMESURVEY:
-        submitJob(createLimesurveyImportCommandOptionsDto());
-        break;
       case JDBC:
         submitJob(createJdbcImportCommandOptionsDto());
         break;
@@ -368,10 +347,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         .withResourceBody(ImportCommandOptionsDto.stringify(dto)) //
         .withCallback(new SubmitJobResponseCodeCallBack(), SC_CREATED, SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR) //
         .send();
-  }
-
-  private ImportCommandOptionsDto createLimesurveyImportCommandOptionsDto() {
-    return createImportCommandOptionsDto(null);
   }
 
   private ImportCommandOptionsDto createJdbcImportCommandOptionsDto() {
@@ -621,7 +596,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   public interface Display extends WizardView, HasUiHandlers<ModalUiHandlers> {
 
     enum Slots {
-      Destination, Unit, Values, Archive, Limesurvey, Jdbc, Rest
+      Destination, Unit, Values, Archive, Jdbc, Rest
     }
 
     String getSelectedFormat();

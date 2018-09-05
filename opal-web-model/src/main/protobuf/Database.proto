@@ -38,10 +38,6 @@ message SqlSettingsDto {
   enum SqlSchema {
     HIBERNATE = 0;
     JDBC = 1;
-    LIMESURVEY = 2;
-  }
-  message LimesurveyDatasourceSettingsDto {
-    optional string tablePrefix = 1;
   }
   required string url = 1; // jdbc:{mysql|postgresql}://{hostname}:{port}/{databaseName}
   required string driverClass = 2;
@@ -50,7 +46,6 @@ message SqlSettingsDto {
   optional string properties = 5;
   required SqlSchema sqlSchema = 6;
   optional Magma.JdbcDatasourceSettingsDto jdbcDatasourceSettings = 7;
-  optional LimesurveyDatasourceSettingsDto limesurveyDatasourceSettings = 8;
 }
 
 message MongoDbSettingsDto {

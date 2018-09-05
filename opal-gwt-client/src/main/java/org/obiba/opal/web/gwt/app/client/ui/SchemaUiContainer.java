@@ -17,6 +17,7 @@ import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
 import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.DoubleBox;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.IntegerBox;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.PasswordTextBox;
@@ -268,6 +269,10 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
         textArea.setVisibleLines(2);
       }
 
+      textArea.setName(key);
+      setStringSchemaValidations(textArea);
+      setDefaultStringValue(textArea, aDefault);
+
       return textArea;
     }
 
@@ -279,12 +284,16 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
     input.setName(key);
     setStringSchemaValidations(input);
 
-    if(aDefault != null && aDefault.isString() != null) {
-      String defaultStringValue = aDefault.isString().stringValue();
-      input.setValue(defaultStringValue);
-    }
+    setDefaultStringValue(input, aDefault);
 
     return input;
+  }
+
+  private void setDefaultStringValue(final HasValue<String> widget, final JSONValue aDefault) {
+    if(aDefault != null && aDefault.isString() != null) {
+      String defaultStringValue = aDefault.isString().stringValue();
+      widget.setValue(defaultStringValue);
+    }
   }
 
   private Widget createWidgetForStringWithEnum(@NotNull final List<String> enumItems) {

@@ -21,7 +21,6 @@ import org.obiba.opal.web.model.client.magma.FsDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.GNPostalCodesDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.HCDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.JdbcDatasourceFactoryDto;
-import org.obiba.opal.web.model.client.magma.LimesurveyDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.PluginDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.RHavenDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.RestDatasourceFactoryDto;
@@ -52,8 +51,6 @@ public class DatasourceDtos {
         return createCSVDatasourceFactoryDto(importConfig);
       case XML:
         return createXMLDatasourceFactoryDto(importConfig);
-      case LIMESURVEY:
-        return createLimesurveyDatasourceFactoryDto(importConfig);
       case JDBC:
         return createJdbcDatasourceFactoryDto(importConfig);
       case REST:
@@ -82,14 +79,6 @@ public class DatasourceDtos {
 
     return createAndConfigureDatasourceFactoryDto(importConfig,
         JdbcDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
-  }
-
-  private static DatasourceFactoryDto createLimesurveyDatasourceFactoryDto(ImportConfig importConfig) {
-    LimesurveyDatasourceFactoryDto factoryDto = LimesurveyDatasourceFactoryDto.create();
-    factoryDto.setDatabase(importConfig.getDatabase());
-    factoryDto.setTablePrefix(importConfig.getTablePrefix());
-    return createAndConfigureDatasourceFactoryDto(importConfig,
-        LimesurveyDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
   }
 
   private static DatasourceFactoryDto createRestDatasourceFactoryDto(ImportConfig importConfig) {

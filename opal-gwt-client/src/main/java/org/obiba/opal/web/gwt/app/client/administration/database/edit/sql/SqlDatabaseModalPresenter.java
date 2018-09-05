@@ -73,7 +73,6 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
       public void onChange(ChangeEvent event) {
         SqlSchema sqlSchema = getView().getSqlSchema().getValue();
         getView().toggleJdbcOptions(sqlSchema == SqlSchema.JDBC);
-        getView().toggleLimesurveyOptions(sqlSchema == SqlSchema.LIMESURVEY);
       }
     });
   }
@@ -96,9 +95,6 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
         jdbcDatasourceSettings != null) {
       getView().setJdbcDatasourceSettings(jdbcDatasourceSettings);
 
-    } else if(SqlSettingsDto.SqlSchema.LIMESURVEY.getName().equals(sqlSettings.getSqlSchema().getName()) &&
-        sqlSettings.getLimesurveyDatasourceSettings() != null) {
-      getView().getTablePrefix().setText(sqlSettings.getLimesurveyDatasourceSettings().getTablePrefix());
     }
   }
 
@@ -136,19 +132,10 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
 
     if(SqlSettingsDto.SqlSchema.JDBC.getName().equals(sqlSchema.getName())) {
       sqlDto.setJdbcDatasourceSettings(getJdbcDatasourceSettingsDto());
-    } else if(SqlSettingsDto.SqlSchema.LIMESURVEY.getName().equals(sqlSchema.getName())) {
-      sqlDto.setLimesurveyDatasourceSettings(getLimesurveyDatasourceSettingsDto());
     }
 
     dto.setSqlSettings(sqlDto);
     return dto;
-  }
-
-  private SqlSettingsDto.LimesurveyDatasourceSettingsDto getLimesurveyDatasourceSettingsDto() {
-    SqlSettingsDto.LimesurveyDatasourceSettingsDto limesurveySettings = SqlSettingsDto.LimesurveyDatasourceSettingsDto
-        .create();
-    limesurveySettings.setTablePrefix(getView().getTablePrefix().getText());
-    return limesurveySettings;
   }
 
   private JdbcDatasourceSettingsDto getJdbcDatasourceSettingsDto() {
@@ -162,8 +149,6 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
         return SqlSettingsDto.SqlSchema.HIBERNATE;
       case JDBC:
         return SqlSettingsDto.SqlSchema.JDBC;
-      case LIMESURVEY:
-        return SqlSettingsDto.SqlSchema.LIMESURVEY;
       default:
         throw new IllegalArgumentException("Unknown Sql Schema: " + sqlSchema);
     }
@@ -268,8 +253,6 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
 
     HasText getDriver();
 
-    HasText getTablePrefix();
-
     void setJdbcDatasourceSettings(JdbcDatasourceSettingsDto jdbcDatasourceSettings);
 
     JdbcDatasourceSettingsDto getJdbcDatasourceSettings();
@@ -283,8 +266,6 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
     HasText getDefaultEntityType();
 
     HasChangeHandlers getSqlSchemaChangeHandlers();
-
-    void toggleLimesurveyOptions(boolean show);
 
     void toggleJdbcOptions(boolean show);
 
