@@ -22,6 +22,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import org.obiba.magma.SocketFactoryProvider;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasourceFactory;
 import org.obiba.magma.datasource.mongodb.MongoDBFactory;
 import org.obiba.opal.core.domain.database.Database;
@@ -55,6 +56,9 @@ public class DatabaseResource {
 
   @Autowired
   private DatabaseRegistry databaseRegistry;
+
+  @Autowired
+  private SocketFactoryProvider socketFactoryProvider;
 
   @PathParam("name")
   private String name;
@@ -126,7 +130,7 @@ public class DatabaseResource {
 
   private Response testMongoConnection(MongoDbSettings mongoDbSettings) {
     try {
-      MongoDBDatasourceFactory datasourceFactory = mongoDbSettings.createMongoDBDatasourceFactory("_test");
+      MongoDBDatasourceFactory datasourceFactory = mongoDbSettings.createMongoDBDatasourceFactory("_test", socketFactoryProvider);
       List<String> dbs = datasourceFactory.getMongoDBFactory().getMongoClient().getDatabaseNames();
       if(dbs.contains(datasourceFactory.getMongoDbDatabaseName())) {
         return Response.ok().build();

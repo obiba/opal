@@ -22,6 +22,7 @@ import javax.net.ssl.*;
 import java.io.InputStream;
 import java.security.*;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 public class OpalKeyStore extends KeyStoreManager implements KeyProvider {
@@ -85,25 +86,29 @@ public class OpalKeyStore extends KeyStoreManager implements KeyProvider {
     }
   }
 
-  public SSLContext getSSLContext() throws NoSuchAlgorithmException, KeyManagementException, UnrecoverableKeyException, KeyStoreException {
+  public SSLContext getSSLContext(boolean allowInvalidCertificates) throws NoSuchAlgorithmException, KeyManagementException, UnrecoverableKeyException, KeyStoreException {
     KeyManager[] keyManagers = getKeyManagers();
-    TrustManager[] trustManagers = getTrustManagers();
+    TrustManager[] trustManagers = getTrustManagers(allowInvalidCertificates);
     SSLContext context = SSLContext.getInstance("SSL");
     context.init(keyManagers, trustManagers, null);
     return context;
   }
 
-  private TrustManager[] getTrustManagers() throws NoSuchAlgorithmException, KeyStoreException {
-    TrustManagerFactory tmFact = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-    tmFact.init((KeyStore) null); // default trust managers
-    return tmFact.getTrustManagers();
+  private TrustManager[] getTrustManagers(boolean allowInvalidCertificates) throws NoSuchAlgorithmException, KeyStoreException {
+    if (allowInvalidCertificates) {
+      return new TrustManager[]{new AnyTrustManager()};
+    } else {
+      TrustManagerFactory tmFact = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+      tmFact.init((KeyStore) null); // default trust managers
+      return tmFact.getTrustManagers();
+    }
   }
 
-  private KeyManager[] getKeyManagers() throws NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException {
+  private KeyManager[] getKeyManagers() /*throws NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException*/ {
 //    KeyManagerFactory kmFact = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 //    kmFact.init(getKeyStore(), "".toCharArray());
 //    return kmFact.getKeyManagers();
-    return new KeyManager[] { new X509ExtendedKeyManagerImpl(this) };
+    return new KeyManager[]{new X509ExtendedKeyManagerImpl(this)};
   }
 
 
@@ -121,4 +126,24 @@ public class OpalKeyStore extends KeyStoreManager implements KeyProvider {
   }
 
 
+  /**
+   * Do not check certificate validity.
+   */
+  private static class AnyTrustManager implements X509TrustManager {
+
+    @Override
+    public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+
+    }
+
+    @Override
+    public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+
+    }
+
+    @Override
+    public X509Certificate[] getAcceptedIssuers() {
+      return null;
+    }
+  }
 }
