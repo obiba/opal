@@ -86,32 +86,6 @@ public class OpalKeyStore extends KeyStoreManager implements KeyProvider {
     }
   }
 
-  public SSLContext getSSLContext(boolean allowInvalidCertificates) throws NoSuchAlgorithmException, KeyManagementException, UnrecoverableKeyException, KeyStoreException {
-    KeyManager[] keyManagers = getKeyManagers();
-    TrustManager[] trustManagers = getTrustManagers(allowInvalidCertificates);
-    SSLContext context = SSLContext.getInstance("SSL");
-    context.init(keyManagers, trustManagers, null);
-    return context;
-  }
-
-  private TrustManager[] getTrustManagers(boolean allowInvalidCertificates) throws NoSuchAlgorithmException, KeyStoreException {
-    if (allowInvalidCertificates) {
-      return new TrustManager[]{new AnyTrustManager()};
-    } else {
-      TrustManagerFactory tmFact = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-      tmFact.init((KeyStore) null); // default trust managers
-      return tmFact.getTrustManagers();
-    }
-  }
-
-  private KeyManager[] getKeyManagers() /*throws NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException*/ {
-//    KeyManagerFactory kmFact = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-//    kmFact.init(getKeyStore(), "".toCharArray());
-//    return kmFact.getKeyManagers();
-    return new KeyManager[]{new X509ExtendedKeyManagerImpl(this)};
-  }
-
-
   public static class Builder extends KeyStoreManager.Builder {
 
     public static Builder newStore() {
@@ -125,25 +99,4 @@ public class OpalKeyStore extends KeyStoreManager implements KeyProvider {
     }
   }
 
-
-  /**
-   * Do not check certificate validity.
-   */
-  private static class AnyTrustManager implements X509TrustManager {
-
-    @Override
-    public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-
-    }
-
-    @Override
-    public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-
-    }
-
-    @Override
-    public X509Certificate[] getAcceptedIssuers() {
-      return null;
-    }
-  }
 }
