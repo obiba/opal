@@ -11,6 +11,7 @@
 package org.obiba.opal.core.upgrade.v2_2_x;
 
 import org.mongeez.Mongeez;
+import org.obiba.magma.SocketFactoryProvider;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasourceFactory;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbSettings;
@@ -29,6 +30,9 @@ public class MongoDBDatasourceUpgradeStep extends AbstractUpgradeStep {
   @Autowired
   private DatabaseRegistry databaseRegistry;
 
+  @Autowired
+  private SocketFactoryProvider socketFactoryProvider;
+
   @Override
   public void execute(Version currentVersion) {
     for(Database database : databaseRegistry.listMongoDatabases()) {
@@ -43,7 +47,7 @@ public class MongoDBDatasourceUpgradeStep extends AbstractUpgradeStep {
 
   private void upgradeMongoDBSchema(MongoDbSettings settings) {
     try {
-      MongoDBDatasourceFactory factory = settings.createMongoDBDatasourceFactory("_");
+      MongoDBDatasourceFactory factory = settings.createMongoDBDatasourceFactory("_", socketFactoryProvider);
       Mongeez mongeez = new Mongeez();
       mongeez
           .setFile(new ClassPathResource("/META-INF/opal/upgrade-scripts/2.2.x/mongeez.xml"));
