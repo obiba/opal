@@ -1,12 +1,10 @@
 package org.obiba.opal.core.security;
 
+import com.google.common.base.Joiner;
 import org.junit.Test;
 
 import javax.net.ssl.*;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
+import java.security.*;
 
 public class OpalKeyStoreTest {
 
@@ -33,6 +31,13 @@ public class OpalKeyStoreTest {
     for (KeyManager keyManager : kmFact.getKeyManagers()) {
       System.out.println(keyManager);
     }
+  }
+
+  @Test
+  public void sslContextProtocols() throws NoSuchAlgorithmException, KeyManagementException {
+    SSLContext context = SSLContext.getInstance("TLS");
+    context.init(null, null, null);
+    System.out.println("Protocol:" + Joiner.on(", ").join(context.getDefaultSSLParameters().getProtocols()));
   }
 
 }

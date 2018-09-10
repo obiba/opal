@@ -53,7 +53,7 @@ public class OpalSocketFactoryProvider implements SocketFactoryProvider {
   private SSLContext getSSLContext(boolean allowInvalidCertificates) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, UnrecoverableKeyException {
     KeyManager[] keyManagers = getKeyManagers();
     TrustManager[] trustManagers = getTrustManagers(allowInvalidCertificates);
-    SSLContext context = SSLContext.getInstance("SSL");
+    SSLContext context = SSLContext.getInstance("TLS"); // note: could be restricted to a specific TLS version
     context.init(keyManagers, trustManagers, null);
     return context;
   }
