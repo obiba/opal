@@ -104,6 +104,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
     ValueType type = TextType.get();
     if (isNumeric()) type = isInteger() ? IntegerType.get() : DecimalType.get();
     else if (isInteger()) type = IntegerType.get();
+    else if (isDecimal()) type = DecimalType.get();
     else if (isDate()) type = DateType.get();
     else if (isDateTime()) type = DateTimeType.get();
     else if (isBoolean()) type = BooleanType.get();
@@ -117,9 +118,11 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   }
 
   private boolean isInteger() {
-    return "integer".equals(colClass)
-        || isNumeric() && colTypes.contains("int")
-        || hasCategories() && (colTypes.contains("dbl") || colTypes.contains("int"));
+    return "integer".equals(colClass) || colTypes.contains("int");
+  }
+
+  private boolean isDecimal() {
+    return colTypes.contains("dbl");
   }
 
   private boolean isBoolean() {
@@ -211,7 +214,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
       }
       int i = 0;
       for (String name : labels.asStrings()) {
-        String catName = isInteger() && name.endsWith(".0") ? name.substring(0, name.length() - 2) : name;
+        String catName = (isNumeric() || isInteger() || isDecimal()) && name.endsWith(".0") ? name.substring(0, name.length() - 2) : name;
         Category.Builder builder = Category.Builder.newCategory(catName);
         if (catLabels != null) {
           extractLocalizedAttributes(null,"label", catLabels[i]).forEach(builder::addAttribute);
