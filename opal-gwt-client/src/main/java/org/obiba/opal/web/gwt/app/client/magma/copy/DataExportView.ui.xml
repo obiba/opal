@@ -43,8 +43,7 @@
         <g:SimplePanel ui:field="filePanel"/>
       </b:Controls>
       <b:HelpBlock>
-        <ui:msg description="Destination Folder help">Data will be exported in the selected folder, with a timestamp in the name. Exporting in SAS, SPSS or Stata is still an experimental feature;
-          it requires a functional R server with the <a href="https://cran.r-project.org/web/packages/tibble/" target="_blank">tibble</a> and
+        <ui:msg description="Destination Folder help">Data will be exported in the selected folder, with a timestamp in the name. Exporting in SAS, SPSS or Stata requires a functional R server with the <a href="https://cran.r-project.org/web/packages/tibble/" target="_blank">tibble</a> and
           <a href="https://cran.r-project.org/web/packages/haven/" target="_blank">haven</a> packages installed.
         </ui:msg>
       </b:HelpBlock>

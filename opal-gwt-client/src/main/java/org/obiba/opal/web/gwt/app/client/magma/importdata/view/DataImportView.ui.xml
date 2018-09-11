@@ -52,7 +52,6 @@
                 containing the variables and the data. This import procedure requires a functional R server with the
                 <a href="https://cran.r-project.org/web/packages/tibble/" target="_blank">tibble</a> and
                 <a href="https://cran.r-project.org/web/packages/haven/" target="_blank">haven</a> packages installed.
-                Note that this is still an experimental feature: value type mappings with R could change in a future release.
               </ui:msg>
             </b:HelpBlock>
           </g:FlowPanel>
@@ -62,7 +61,6 @@
                 containing the variables and the data. This import procedure requires a functional R server with the
                 <a href="https://cran.r-project.org/web/packages/tibble/" target="_blank">tibble</a> and
                 <a href="https://cran.r-project.org/web/packages/haven/" target="_blank">haven</a> packages installed.
-                Note that this is still an experimental feature: value type mappings with R could change in a future release.
               </ui:msg>
             </b:HelpBlock>
           </g:FlowPanel>
@@ -72,7 +70,6 @@
                 containing the variables and the data. This import procedure requires a functional R server with the
                 <a href="https://cran.r-project.org/web/packages/tibble/" target="_blank">tibble</a> and
                 <a href="https://cran.r-project.org/web/packages/haven/" target="_blank">haven</a> packages installed.
-                Note that this is still an experimental feature: value type mappings with R could change in a future release.
               </ui:msg>
             </b:HelpBlock>
           </g:FlowPanel>
