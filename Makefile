@@ -284,9 +284,18 @@ locales:
 # Plugins
 #
 
-plugins: search-plugin
+plugins: search-plugin opal-datasource-spss-plugin opal-datasource-limesurvey-plugin opal-datasource-redcap-plugin
 
 vcf-plugin: jennite
 
 search-plugin:
 	cd ${projects}/opal-search-es && mvn clean install && cp target/opal-search-es-*-dist.zip ${opal_home}/plugins/
+
+opal-datasource-spss-plugin:
+	cd ${projects}/opal-datasource-spss && mvn clean install && cp target/opal-datasource-spss-*-dist.zip ${opal_home}/plugins/
+
+opal-datasource-limesurvey-plugin:
+	cd ${projects}/opal-datasource-limesurvey && mvn clean install && cp target/opal-datasource-limesurvey-*-dist.zip ${opal_home}/plugins/
+
+opal-datasource-redcap-plugin:
+	cd ${projects}/opal-datasource-redcap && mvn clean install && cp target/opal-datasource-redcap-*-dist.zip ${opal_home}/plugins/
