@@ -142,7 +142,7 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   }
 
   private boolean hasCategories() {
-    return "labelled".equals(colClass) || "factor".equals(colClass);
+    return "labelled".equals(colClass) || "labelled_spss".equals(colClass) || "factor".equals(colClass);
   }
 
   private List<Attribute> extractAttributes(REXP attr) {
@@ -198,13 +198,15 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
 
   private List<Category> extractCategories(REXP attr) {
     if ("labelled".equals(colClass))
-      return extractCategoriesFromLabels(extractAttribute(attr, "labels"));
+      return extractCategoriesFromLabels(extractAttribute(attr, "labels"), null);
+    else if ("labelled_spss".equals(colClass))
+      return extractCategoriesFromLabels(extractAttribute(attr, "labels"), extractAttribute(attr, "na_values"));
     else if ("factor".equals(colClass))
       return extractCategoriesFromLevels(extractAttribute(attr, "levels"));
     return Lists.newArrayList();
   }
 
-  private List<Category> extractCategoriesFromLabels(REXP labels) {
+  private List<Category> extractCategoriesFromLabels(REXP labels, REXP missings) {
     List<Category> categories = Lists.newArrayList();
     if (labels == null) return categories;
     try {
@@ -213,12 +215,19 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
         catLabels = labels.getAttribute("names").asStrings();
       }
       int i = 0;
+      List<String> missingNames = Lists.newArrayList();
+      if (missings != null) {
+        for (String name : missings.asStrings()) {
+          missingNames.add(normalizeCategoryName(name));
+        }
+      }
       for (String name : labels.asStrings()) {
-        String catName = (isNumeric() || isInteger() || isDecimal()) && name.endsWith(".0") ? name.substring(0, name.length() - 2) : name;
+        String catName = normalizeCategoryName(name);
         Category.Builder builder = Category.Builder.newCategory(catName);
         if (catLabels != null) {
           extractLocalizedAttributes(null,"label", catLabels[i]).forEach(builder::addAttribute);
         }
+        builder.missing(missingNames.contains(catName));
         categories.add(builder.build());
         i++;
       }
@@ -227,6 +236,10 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
       log.warn("Error while parsing variable categories: {}", colName, e);
     }
     return categories;
+  }
+
+  private String normalizeCategoryName(String name) {
+    return (isNumeric() || isInteger() || isDecimal()) && name.endsWith(".0") ? name.substring(0, name.length() - 2) : name;
   }
 
   private List<Category> extractCategoriesFromLevels(REXP levels) {
