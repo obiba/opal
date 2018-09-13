@@ -421,6 +421,7 @@ public interface Translations extends Constants {
       "JavascriptError", "Error in script '{0}': {1} ({2}:{3})",//
       "JavaScriptException", "Error in script: {0}",//
       "MagmaRuntimeException", "{0}",//
+      "MagmaRRuntimeException", "R error: {0}",//
       "ValuesEvaluationError", "Error when evaluating values: {0}",//
       "CopyFromVariableNameIsRequired",
       "You must enter the name of a variable from which the new variable will be created from.",//

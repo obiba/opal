@@ -27,7 +27,12 @@ public class DataReadROperation extends AbstractROperation {
 
     DTA("haven::read_dta","dta"),
 
-    SAV("haven::read_sav","sav");
+    SPSS("haven::read_spss","sav", "zsav", "por") {
+      @Override
+      public String getCommand(DataReadROperation op) {
+        return String.format("%s('%s', user_na = TRUE)", command, op.source);
+      }
+    };
 
     protected final String command;
 

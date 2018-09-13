@@ -15,6 +15,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import com.google.common.base.Joiner;
 import org.obiba.opal.r.REvaluationRuntimeException;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +25,7 @@ public class REvaluationRuntimeExceptionMapper implements ExceptionMapper<REvalu
 
   @Override
   public Response toResponse(REvaluationRuntimeException exception) {
-    String message = exception.getMessage() + ": " + exception.getRMessages();
+    String message = exception.getMessage() + ": " + Joiner.on("; ").join(exception.getRMessages());
     message = message.replace("\n", "");
     message = message.replace("\r", "");
     return Response.status(Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN).entity(message).build();

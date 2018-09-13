@@ -10,9 +10,12 @@
 
 package org.obiba.opal.r.magma;
 
+import com.google.common.base.Joiner;
 import org.obiba.magma.*;
 import org.obiba.magma.support.AbstractValueTable;
 import org.obiba.magma.support.NullTimestamps;
+import org.obiba.opal.r.MagmaRRuntimeException;
+import org.obiba.opal.r.REvaluationRuntimeException;
 import org.obiba.opal.r.ROperationWithResult;
 import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.service.OpalRSession;
@@ -113,7 +116,13 @@ public class RValueTable extends AbstractValueTable {
   }
 
   REXP execute(ROperationWithResult rop) {
-    getRSession().execute(rop);
+    try {
+      getRSession().execute(rop);
+    } catch (REvaluationRuntimeException e) {
+      String rmsg = Joiner.on("; ").join(e.getRMessages());
+      log.error("R operation failed: {}", rmsg, e);
+      throw new MagmaRRuntimeException(rmsg);
+    }
     return rop.getResult();
   }
 

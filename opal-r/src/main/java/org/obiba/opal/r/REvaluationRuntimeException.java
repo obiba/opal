@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.r;
 
+import com.google.common.base.Joiner;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.slf4j.Logger;
@@ -49,4 +50,8 @@ public class REvaluationRuntimeException extends RuntimeException {
     return Arrays.asList(strs);
   }
 
+  @Override
+  public String getMessage() {
+    return super.getMessage() + " -> " + Joiner.on("; ").join(getRMessages());
+  }
 }
