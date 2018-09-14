@@ -214,22 +214,27 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
       if (labels.hasAttribute("names")) {
         catLabels = labels.getAttribute("names").asStrings();
       }
-      int i = 0;
       List<String> missingNames = Lists.newArrayList();
       if (missings != null) {
         for (String name : missings.asStrings()) {
           missingNames.add(normalizeCategoryName(name));
         }
       }
+      int i = 0;
       for (String name : labels.asStrings()) {
-        String catName = normalizeCategoryName(name);
-        Category.Builder builder = Category.Builder.newCategory(catName);
-        if (catLabels != null) {
-          extractLocalizedAttributes(null,"label", catLabels[i]).forEach(builder::addAttribute);
+        if ("NaN".equals(name) && (labels.isNumeric() || labels.isInteger())) {
+          // skip
+          i++;
+        } else {
+          String catName = normalizeCategoryName(name);
+          Category.Builder builder = Category.Builder.newCategory(catName);
+          if (catLabels != null) {
+            extractLocalizedAttributes(null, "label", catLabels[i]).forEach(builder::addAttribute);
+          }
+          builder.missing(missingNames.contains(catName));
+          categories.add(builder.build());
+          i++;
         }
-        builder.missing(missingNames.contains(catName));
-        categories.add(builder.build());
-        i++;
       }
     } catch (REXPMismatchException e) {
       // ignore
