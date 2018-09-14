@@ -96,6 +96,12 @@ public abstract class AbstractDatasourceService implements DatasourceService {
 
   public JSONObject processDefaultPropertiesValue(DatasourceUsage usage, JSONObject jsonObject) {
     String format = String.format(DEFAULT_PROPERTY_KEY_FORMAT, usage);
+
+    // general property definition (usage independent)
+    getProperties().stringPropertyNames().stream().filter(property -> !property.startsWith(format)).forEach(
+        property -> setDefaultValue(property, getProperties().getProperty(property), jsonObject));
+
+    // specific property definition (usage dependent)
     getProperties().stringPropertyNames().stream().filter(property -> property.startsWith(format)).forEach(
         property -> setDefaultValue(property.replace(format, ""), getProperties().getProperty(property), jsonObject));
 
