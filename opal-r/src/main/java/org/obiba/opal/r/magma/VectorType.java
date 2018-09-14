@@ -363,9 +363,12 @@ public enum VectorType {
         names.add(name);
         contents.add(new REXPString(content));
       }
+      // to help haven R package to write spss or stata formats
       if (name.equals("spss::format")) {
-        // to help haven R package to write spss format
         names.add("format.spss");
+        contents.add(new REXPString(content));
+      } else if (name.equals("stata::format")) {
+        names.add("format.stata");
         contents.add(new REXPString(content));
       }
     });
@@ -376,8 +379,21 @@ public enum VectorType {
       names.add("levels");
       contents.add(new REXPString(levels));
     } else if (variable.hasCategories() && withLabelled) {
-      names.add("class");
-      contents.add(new REXPString("labelled"));
+      List<String> missingCats = Lists.newArrayList();
+      for (Category cat : variable.getCategories()) {
+        if (cat.isMissing()) {
+          missingCats.add(cat.getName());
+        }
+      }
+      if (!missingCats.isEmpty()) {
+        names.add("class");
+        contents.add(new REXPString(new String[] { "labelled_spss", "labelled" }));
+        names.add("na_values");
+        contents.add(getCategoriesRAttributes(variable, missingCats, null));
+      } else {
+        names.add("class");
+        contents.add(new REXPString("labelled"));
+      }
       names.add("labels");
       contents.add(getCategoriesRAttributes(variable));
     } else {
