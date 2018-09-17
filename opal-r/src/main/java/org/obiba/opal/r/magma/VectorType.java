@@ -17,6 +17,8 @@ import org.obiba.magma.*;
 import org.obiba.magma.support.VariableNature;
 import org.obiba.magma.type.*;
 import org.obiba.opal.r.MagmaRRuntimeException;
+import org.obiba.opal.r.magma.util.DoubleRange;
+import org.obiba.opal.r.magma.util.IntegerRange;
 import org.rosuda.REngine.*;
 
 import java.util.Date;
@@ -79,6 +81,16 @@ public enum VectorType {
     }
 
     @Override
+    protected REXP getCategoriesMissingRange(Variable variable, List<String> missingCats) {
+      if (missingCats.size()<=3) return null; // spss allows a max of 3 discrete missings
+      IntegerRange range = new IntegerRange(variable.getCategories().stream().map(Category::getName).collect(Collectors.toList()), missingCats);
+      if (range.hasRange()) {
+        return new REXPInteger(new int[] { range.getMin(), range.getMax() });
+      }
+      return null;
+    }
+
+    @Override
     protected REXP getCategoriesRAttributes(Variable variable, List<String> labels, REXPList attr) {
       int ints[] = new int[labels.size()];
       for (int i=0; i<labels.size(); i++) {
@@ -107,6 +119,16 @@ public enum VectorType {
         }
       }
       return variable == null ? new REXPDouble(doubles) : new REXPDouble(doubles, getVariableRAttributes(variable, null, withLabelled));
+    }
+
+    @Override
+    protected REXP getCategoriesMissingRange(Variable variable, List<String> missingCats) {
+      if (missingCats.size()<=3) return null; // spss allows a max of 3 discrete missings
+      DoubleRange range = new DoubleRange(variable.getCategories().stream().map(Category::getName).collect(Collectors.toList()), missingCats);
+      if (range.hasRange()) {
+        return new REXPDouble(new double[] { range.getMin(), range.getMax() });
+      }
+      return null;
     }
 
     @Override
@@ -388,8 +410,16 @@ public enum VectorType {
       if (!missingCats.isEmpty()) {
         names.add("class");
         contents.add(new REXPString(new String[] { "labelled_spss", "labelled" }));
-        names.add("na_values");
-        contents.add(getCategoriesRAttributes(variable, missingCats, null));
+        REXP naRange = getCategoriesMissingRange(variable, missingCats);
+        if (naRange != null) {
+          names.add("na_range");
+          contents.add(naRange);
+        }
+        // add discrete missing values after na_range as the missingCats may have been modified
+        if (!missingCats.isEmpty()) {
+          names.add("na_values");
+          contents.add(getCategoriesRAttributes(variable, missingCats, null));
+        }
       } else {
         names.add("class");
         contents.add(new REXPString("labelled"));
@@ -416,6 +446,16 @@ public enum VectorType {
     // no-op
   }
 
+  /**
+   * Try to identify a range of missings, and optionally set one discrete value.
+   *
+   * @param variable
+   * @param missingCats Known discrete missing values, can be modified after a range has been identified
+   * @return
+   */
+  protected REXP getCategoriesMissingRange(Variable variable, List<String> missingCats) {
+    return null;
+  }
 
   /**
    * Build the R attributes that describe the categories of the variable.
