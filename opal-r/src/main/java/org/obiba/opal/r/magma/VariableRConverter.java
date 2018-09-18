@@ -19,7 +19,6 @@ import org.rosuda.REngine.REXP;
 /**
  * Build a R vector from a variable: vector of values.
  *
- * @see VectorType
  */
 class VariableRConverter extends AbstractMagmaRConverter {
 

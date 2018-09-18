@@ -1,12 +1,3 @@
-/*
- * Copyright (c) 2018 OBiBa. All rights reserved.
- *
- * This program and the accompanying materials
- * are made available under the terms of the GNU Public License v3.0.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package org.obiba.opal.r.magma;
 
 import com.google.common.base.Strings;
@@ -15,231 +6,30 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.obiba.magma.*;
 import org.obiba.magma.support.VariableNature;
-import org.obiba.magma.type.*;
-import org.obiba.opal.r.MagmaRRuntimeException;
-import org.obiba.opal.r.magma.util.DoubleRange;
-import org.obiba.opal.r.magma.util.IntegerRange;
+import org.obiba.magma.type.BooleanType;
+import org.obiba.magma.type.LineStringType;
+import org.obiba.magma.type.PolygonType;
 import org.rosuda.REngine.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
 
-/**
- * A utility class for mapping {@code ValueType} to R {@code REXP}.
- */
-public enum VectorType {
+public class VectorType {
 
-  booleans(BooleanType.get()) {
-    @Override
-    protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings, boolean withLabelled) {
-      byte bools[] = new byte[values.size()];
-      int i = 0;
-      for (Value value : values) {
-        // OPAL-1536 do not push missings
-        if (!withMissings && variable.isMissingValue(value) || value.isNull()) {
-          bools[i++] = REXPLogical.NA;
-        } else if ((Boolean) value.getValue()) {
-          bools[i++] = REXPLogical.TRUE;
-        } else {
-          bools[i++] = REXPLogical.FALSE;
-        }
-      }
-      return variable == null ? new REXPLogical(bools) : new REXPLogical(bools, getVariableRAttributes(variable, null, withLabelled));
-    }
+  private static final Logger log = LoggerFactory.getLogger(VectorType.class);
 
-    @Override
-    protected REXP getCategoriesRAttributes(Variable variable, List<String> labels, REXPList attr) {
-      byte bools[] = new byte[labels.size()];
-      for (int i=0; i<labels.size(); i++) {
-        try {
-          bools[i] = Boolean.parseBoolean(labels.get(i)) ? REXPLogical.TRUE : REXPLogical.FALSE;
-        } catch (NumberFormatException e) {
-          bools[i] = REXPLogical.NA;
-        }
-      }
-      return new REXPLogical(bools, attr);
-    }
-  },
+  private final ValueType valueType;
 
-  ints(IntegerType.get()) {
-    @Override
-    protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings, boolean withLabelled) {
-      int ints[] = new int[values.size()];
-      int i = 0;
-      for (Value value : values) {
-        // OPAL-1536 do not push missings
-        if (!withMissings && variable.isMissingValue(value) || value.isNull()) {
-          ints[i++] = REXPInteger.NA;
-        } else {
-          ints[i++] = ((Number) value.getValue()).intValue();
-        }
-      }
-      return variable == null ? new REXPInteger(ints) : new REXPInteger(ints, getVariableRAttributes(variable, null, withLabelled));
-    }
-
-    @Override
-    protected REXP getCategoriesMissingRange(Variable variable, List<String> missingCats) {
-      if (missingCats.size()<=3) return null; // spss allows a max of 3 discrete missings
-      IntegerRange range = new IntegerRange(variable.getCategories().stream().map(Category::getName).collect(Collectors.toList()), missingCats);
-      if (range.hasRange()) {
-        return new REXPInteger(new int[] { range.getMin(), range.getMax() });
-      }
-      return null;
-    }
-
-    @Override
-    protected REXP getCategoriesRAttributes(Variable variable, List<String> labels, REXPList attr) {
-      int ints[] = new int[labels.size()];
-      for (int i=0; i<labels.size(); i++) {
-        try {
-          ints[i] = Integer.parseInt(labels.get(i));
-        } catch (NumberFormatException e) {
-          ints[i] = REXPInteger.NA;
-        }
-      }
-      return new REXPInteger(ints, attr);
-    }
-
-  },
-
-  doubles(DecimalType.get()) {
-    @Override
-    protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings, boolean withLabelled) {
-      double doubles[] = new double[values.size()];
-      int i = 0;
-      for (Value value : values) {
-        // OPAL-1536 do not push missings
-        if (!withMissings && variable.isMissingValue(value) || value.isNull()) {
-          doubles[i++] = REXPDouble.NA;
-        } else {
-          doubles[i++] = ((Number) value.getValue()).doubleValue();
-        }
-      }
-      return variable == null ? new REXPDouble(doubles) : new REXPDouble(doubles, getVariableRAttributes(variable, null, withLabelled));
-    }
-
-    @Override
-    protected REXP getCategoriesMissingRange(Variable variable, List<String> missingCats) {
-      if (missingCats.size()<=3) return null; // spss allows a max of 3 discrete missings
-      DoubleRange range = new DoubleRange(variable.getCategories().stream().map(Category::getName).collect(Collectors.toList()), missingCats);
-      if (range.hasRange()) {
-        return new REXPDouble(new double[] { range.getMin(), range.getMax() });
-      }
-      return null;
-    }
-
-    @Override
-    protected REXP getCategoriesRAttributes(Variable variable, List<String> labels, REXPList attr) {
-      double doubles[] = new double[labels.size()];
-      for (int i=0; i<labels.size(); i++) {
-        try {
-          doubles[i] = Double.parseDouble(labels.get(i));
-        } catch (NumberFormatException e) {
-          doubles[i] = REXPDouble.NA;
-        }
-      }
-      return new REXPDouble(doubles, attr);
-    }
-  },
-
-  datetimes(DateTimeType.get()) {
-    @Override
-    protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings, boolean withLabelled) {
-      int ints[] = new int[values.size()];
-      int i = 0;
-      for (Value value : values) {
-        // do not support categories in this type
-        if (value.isNull()) {
-          ints[i++] = REXPInteger.NA;
-        } else {
-          Date d = (Date) value.getValue();
-          double t = ((double)d.getTime()) / 1000;
-          ints[i++] = Long.valueOf(Math.round(t)).intValue();
-        }
-      }
-      return variable == null ? new REXPInteger(ints) : new REXPInteger(ints, getVariableRAttributes(variable, null, withLabelled));
-    }
-
-    @Override
-    protected void addTypeRAttributes(Variable variable, List<String> names, List<REXP> contents) {
-      names.add("class");
-      contents.add(new REXPString(new String[] {"POSIXct", "POSIXt"}));
-      if (!names.contains("tzone")) {
-        names.add("tzone");
-        contents.add(new REXPString("UTC"));
-      }
-    }
-  },
-
-  dates(DateType.get()) {
-    @Override
-    protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings, boolean withLabelled) {
-      int ints[] = new int[values.size()];
-      int i = 0;
-      for (Value value : values) {
-        // do not support categories in this type
-        if (value.isNull()) {
-          ints[i++] = REXPInteger.NA;
-        } else {
-          Object val = value.getValue();
-          Date date;
-          if (val instanceof MagmaDate) {
-            date = ((MagmaDate)val).asDate();
-          } else {
-            date = (Date) val;
-          }
-          double d = ((double)date.getTime()) / (24 * 3600 * 1000);
-          ints[i++] = Long.valueOf(Math.round(d)).intValue();
-        }
-      }
-      return variable == null ? new REXPInteger(ints) : new REXPInteger(ints, getVariableRAttributes(variable, null, withLabelled));
-    }
-
-    @Override
-    protected void addTypeRAttributes(Variable variable, List<String> names, List<REXP> contents) {
-      names.add("class");
-      contents.add(new REXPString("Date"));
-    }
-  },
-
-  locales(LocaleType.get()),
-
-  strings(TextType.get()),
-
-  binaries(BinaryType.get()) {
-    @Override
-    protected REXP asContinuousVector(Variable variable, List<Value> values, boolean withMissings, boolean withLabelled) {
-      REXPRaw raws[] = new REXPRaw[values.size()];
-      int i = 0;
-      for (Value value : values) {
-        raws[i++] = new REXPRaw(value.isNull() ? null : (byte[]) value.getValue());
-      }
-      return variable == null ? new REXPList(new RList(raws)) : new REXPList(new RList(raws), getVariableRAttributes(variable, null, withLabelled));
-    }
-  },
-
-  points(PointType.get()),
-
-  linestrings(LineStringType.get()),
-
-  polygons(PolygonType.get());
-
-  private final ValueType type;
-
-  VectorType(ValueType type) {
-    this.type = type;
+  public VectorType(ValueType valueType) {
+    this.valueType = valueType;
   }
 
-  public static VectorType forValueType(ValueType type) {
-    for (VectorType v : VectorType.values()) {
-      if (v.type == type) {
-        return v;
-      }
-    }
-    throw new MagmaRRuntimeException("No VectorType for ValueType " + type);
+  public ValueType getValueType() {
+    return valueType;
   }
 
   /**
@@ -374,7 +164,7 @@ public enum VectorType {
    *
    * @param variable
    * @param levels
-   * @param withLabelled 
+   * @param withLabelled
    * @return
    */
   protected REXPList getVariableRAttributes(Variable variable, String[] levels, boolean withLabelled) {
@@ -417,6 +207,9 @@ public enum VectorType {
         }
         // add discrete missing values after na_range as the missingCats may have been modified
         if (!missingCats.isEmpty()) {
+          if (naRange != null && missingCats.size()>1) {
+            log.warn("Variable {}: SPSS format does not support more than one discrete missing value in addition to a missing values range.", variable.getName());
+          }
           names.add("na_values");
           contents.add(getCategoriesRAttributes(variable, missingCats, null));
         }
@@ -530,5 +323,10 @@ public enum VectorType {
       rval.put(name, content);
     });
     return rval;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getName() + ":" + valueType.toString();
   }
 }
