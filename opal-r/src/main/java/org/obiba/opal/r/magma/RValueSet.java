@@ -84,7 +84,7 @@ class RValueSet extends ValueSetBean {
   }
 
   private RVariableEntity getRVariableEntity() {
-    return (RVariableEntity)getVariableEntity();
+    return getRValueTable().getRVariableEntity(getVariableEntity());
   }
 
   private int getIdPosition() {

@@ -11,15 +11,15 @@
 package org.obiba.opal.r.magma;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.obiba.magma.VariableEntity;
-import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.support.VariableEntityProvider;
 import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.REXPDouble;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REXPVector;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -34,6 +34,8 @@ class RVariableEntityProvider implements VariableEntityProvider {
   private String idColumn;
 
   private Set<VariableEntity> entities;
+
+  private Map<String, RVariableEntity> entitiesMap;
 
   private boolean multilines = false;
 
@@ -57,6 +59,7 @@ class RVariableEntityProvider implements VariableEntityProvider {
   public Set<VariableEntity> getVariableEntities() {
     if (entities == null || entities.isEmpty()) {
       entities = Sets.newLinkedHashSet();
+      entitiesMap = Maps.newHashMap();
       initialiseIdColumn();
       REXP idVector = valueTable.execute(String.format("`%s`$`%s`", valueTable.getSymbol(), idColumn));
       boolean isNumeric = idVector.isNumeric();
@@ -64,7 +67,9 @@ class RVariableEntityProvider implements VariableEntityProvider {
         int length = ((REXPVector)idVector).length();
         try {
           for (String id : idVector.asStrings()) {
-            entities.add(new RVariableEntity(entityType, id, isNumeric));
+            RVariableEntity e = new RVariableEntity(entityType, id, isNumeric);
+            entities.add(e);
+            entitiesMap.put(e.getIdentifier(), e);
           }
         } catch (REXPMismatchException e) {
           // ignore
@@ -73,6 +78,10 @@ class RVariableEntityProvider implements VariableEntityProvider {
       }
     }
     return entities;
+  }
+
+  public RVariableEntity getRVariableEntity(VariableEntity entity) {
+    return entitiesMap.get(entity.getIdentifier());
   }
 
   String getIdColumn() {

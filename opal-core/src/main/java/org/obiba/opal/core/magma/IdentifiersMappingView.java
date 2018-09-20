@@ -9,20 +9,25 @@
  */
 package org.obiba.opal.core.magma;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
-
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.Variable;
-import org.obiba.magma.VariableEntity;
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
+import org.obiba.magma.*;
+import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.transform.BijectiveFunction;
+import org.obiba.magma.type.TextType;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.identifiers.IdentifierGenerator;
+import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.NoSuchPrivateIdentifierMappingException;
 import org.obiba.opal.core.service.NoSuchSystemIdentifierMappingException;
 import org.obiba.opal.core.service.OpalPrivateVariableEntityMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * When an Opal table is exported, entities identifiers can be mapped. The "public" (or system) identifiers will
@@ -56,15 +61,20 @@ public class IdentifiersMappingView extends View {
   @NotNull
   private final String idMapping;
 
-  @NotNull
-  private final PrivateVariableEntityMap entityMap;
+  private final IdentifiersTableService identifiersTableService;
 
   private final boolean allowIdentifierGeneration;
 
   private final boolean ignoreUnknownIdentifier;
 
+  private final Policy policy;
+
+  private final IdentifierGenerator identifierGenerator;
+
   @NotNull
-  private final BijectiveFunction<VariableEntity, VariableEntity> mappingFunction;
+  private final UnitIdentifiersMappingFunction mappingFunction;
+
+  private final Map<String, UnitIdentifiersMappingFunction> entityTypeMappingFunctions = Maps.newHashMap();
 
   /**
    * Do not ignore unknown identifiers and do not generate ones.
@@ -72,11 +82,11 @@ public class IdentifiersMappingView extends View {
    * @param idMapping name of the variable in the identifiers table to be used for retrieving the identifiers
    * @param policy the policy of which identifier to make public (opal identifier or unit identifier)
    * @param dataTable data value table to be wrapped
-   * @param identifiersTable identifiers table
+   * @param identifiersTableService identifiers table service
    */
   public IdentifiersMappingView(@NotNull String idMapping, @NotNull Policy policy, @NotNull ValueTable dataTable,
-      @NotNull ValueTable identifiersTable) {
-    this(idMapping, policy, dataTable, identifiersTable, null, false);
+                                @NotNull IdentifiersTableService identifiersTableService) {
+    this(idMapping, policy, dataTable, identifiersTableService, null, false);
   }
 
   /**
@@ -86,25 +96,43 @@ public class IdentifiersMappingView extends View {
    * @param idMapping name of the variable in the identifiers table to be used for retrieving the identifiers
    * @param policy the policy of which identifier to make public (opal identifier or unit identifier)
    * @param dataTable data value table to be wrapped
-   * @param identifiersTable identifiers table
+   * @param identifiersTableService identifiers table service
    * @param identifierGenerator strategy for generating missing identifiers. can be null, in which case, identifiers
    * will not be generated
    * @param ignoreUnknownIdentifier error is thrown when an identifier that cannot be mapped is encountered
    */
   public IdentifiersMappingView(@NotNull String idMapping, @NotNull Policy policy, @NotNull ValueTable dataTable,
-      @NotNull ValueTable identifiersTable, @Nullable IdentifierGenerator identifierGenerator,
+      @NotNull IdentifiersTableService identifiersTableService, @Nullable IdentifierGenerator identifierGenerator,
       boolean ignoreUnknownIdentifier) {
 
     // Null check on dataTable is required. If dataTable is null, we'll get NPE instead of IllegalArgumentException
     super(dataTable == null ? null : dataTable.getName(), dataTable);
-
+    this.identifiersTableService = identifiersTableService;
     this.idMapping = idMapping;
-    allowIdentifierGeneration = identifierGenerator != null;
+    this.identifierGenerator = identifierGenerator;
+    this.allowIdentifierGeneration = identifierGenerator != null;
     this.ignoreUnknownIdentifier = ignoreUnknownIdentifier;
+    this.policy = policy;
+    this.mappingFunction = getMappingFunction(dataTable.getEntityType());
+  }
 
-    Variable idVariable = identifiersTable.getVariable(idMapping);
+  private UnitIdentifiersMappingFunction getMappingFunction(String entityType) {
+    if (entityTypeMappingFunctions.containsKey(entityType)) return entityTypeMappingFunctions.get(entityType);
 
-    entityMap = new OpalPrivateVariableEntityMap(identifiersTable, idVariable,
+    if (identifiersTableService.hasIdentifiersTable(entityType)) {
+      ValueTable identifiersTable = identifiersTableService.getIdentifiersTable(entityType);
+      if (identifiersTable.hasVariable(idMapping)) {
+        Variable idVariable = identifiersTable.getVariable(idMapping);
+        return makeMappingFunction(identifiersTable, idVariable, identifierGenerator, policy);
+      }
+    }
+
+    throw new IllegalArgumentException("No identifier mapping for type " + entityType + " with name " + idMapping);
+  }
+
+  private UnitIdentifiersMappingFunction makeMappingFunction(ValueTable identifiersTable, Variable idVariable, IdentifierGenerator identifierGenerator, Policy policy) {
+    UnitIdentifiersMappingFunction mappingFunction;
+    PrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(identifiersTable, idVariable,
         identifierGenerator == null ? new IdentifierGenerator() {
           @Override
           public String generateIdentifier() {
@@ -112,19 +140,19 @@ public class IdentifiersMappingView extends View {
           }
         } : identifierGenerator);
 
-    switch(policy) {
+    switch (policy) {
       case UNIT_IDENTIFIERS_ARE_PUBLIC:
-        mappingFunction = new UnitIdentifiersArePublic();
+        mappingFunction = new UnitIdentifiersArePublic(entityMap);
         break;
       case UNIT_IDENTIFIERS_ARE_PRIVATE:
-        mappingFunction = new UnitIdentifiersArePrivate();
+        mappingFunction = new UnitIdentifiersArePrivate(entityMap);
         break;
       default:
         throw new IllegalArgumentException("unknown policy '" + policy + "'");
     }
-
-    log.debug("View created: Table={}, identifiers={}:{}, policy={}", dataTable.getName(), identifiersTable.getName(),
-        idMapping, policy);
+    log.debug("View created: Table={}, identifiers={}:{}, policy={}", getName(), identifiersTable.getName(), idMapping, policy);
+    entityTypeMappingFunctions.put(identifiersTable.getEntityType(), mappingFunction);
+    return mappingFunction;
   }
 
   public String getIdentifiersMapping() {
@@ -133,12 +161,100 @@ public class IdentifiersMappingView extends View {
 
   @NotNull
   public PrivateVariableEntityMap getPrivateVariableEntityMap() {
-    return entityMap;
+    return mappingFunction.getPrivateVariableEntityMap();
   }
 
   @Override
   public BijectiveFunction<VariableEntity, VariableEntity> getVariableEntityMappingFunction() {
     return mappingFunction;
+  }
+
+  @NotNull
+  @Override
+  public BijectiveFunction<VariableValueSource, VariableValueSource> getVariableValueSourceMappingFunction() {
+    return new BijectiveFunction<VariableValueSource, VariableValueSource>() {
+      @Override
+      public VariableValueSource apply(VariableValueSource from) {
+        return new IdentifiersMappingViewVariableValueSource(from);
+      }
+
+      @Override
+      public VariableValueSource unapply(@SuppressWarnings("ParameterHidesMemberVariable") VariableValueSource from) {
+        return ((VariableValueSourceWrapper) from).getWrapped();
+      }
+    };
+  }
+
+  //
+  // Private classes
+  //
+  
+  /**
+   * Map values that represent entity IDs.
+   */
+  private class IdentifiersMappingViewVariableValueSource extends ViewVariableValueSource {
+
+    private final Variable idVariable;
+
+    private final String refEntityType;
+
+    public IdentifiersMappingViewVariableValueSource(VariableValueSource wrapped) {
+      super(wrapped);
+      this.refEntityType = wrapped.getVariable().getReferencedEntityType();
+
+      if (Strings.isNullOrEmpty(refEntityType)) {
+        this.idVariable = null;
+      } else {
+        this.idVariable = VariableBean.Builder.sameAs(super.getVariable()).type(TextType.get()).build();
+      }
+    }
+
+    @NotNull
+    @Override
+    public Value getValue(ValueSet valueSet) {
+      Value value = super.getValue(valueSet);
+      if (idVariable == null || value.isNull()) return value;
+
+      if (value.isSequence()) {
+        return TextType.get().sequenceOf(value.asSequence().getValues().stream()
+            .map(this::mapIdentifierValue).collect(Collectors.toList()));
+      }
+      return mapIdentifierValue(value);
+    }
+
+    @NotNull
+    @Override
+    public ValueType getValueType() {
+      return idVariable == null ? super.getValueType() : idVariable.getValueType();
+    }
+
+    @NotNull
+    @Override
+    public Variable getVariable() {
+      return idVariable == null ? super.getVariable() : idVariable;
+    }
+
+    /**
+     * Map value that represents an ID to a new value.
+     *
+     * @param value
+     * @return
+     */
+    private Value mapIdentifierValue(Value value) {
+      String identifier = value.toString();
+      if (Strings.isNullOrEmpty(identifier)) return TextType.get().nullValue();
+      VariableEntity entity = new VariableEntityBean(refEntityType, identifier);
+      VariableEntity mappedEntity = getMappingFunction(refEntityType).apply(entity);
+      if (mappedEntity == null) return TextType.get().nullValue();
+      return TextType.get().valueOf(mappedEntity.getIdentifier());
+    }
+
+  }
+
+  private interface UnitIdentifiersMappingFunction extends BijectiveFunction<VariableEntity, VariableEntity> {
+
+    PrivateVariableEntityMap getPrivateVariableEntityMap();
+
   }
 
   /**
@@ -149,7 +265,19 @@ public class IdentifiersMappingView extends View {
    * unapply: privateEntity --> publicEntity
    * </pre>
    */
-  private class UnitIdentifiersArePublic implements BijectiveFunction<VariableEntity, VariableEntity> {
+  private class UnitIdentifiersArePublic implements UnitIdentifiersMappingFunction {
+
+    private final PrivateVariableEntityMap entityMap;
+
+    private UnitIdentifiersArePublic(PrivateVariableEntityMap entityMap) {
+      this.entityMap = entityMap;
+    }
+
+    @Override
+    public PrivateVariableEntityMap getPrivateVariableEntityMap() {
+      return entityMap;
+    }
+
     @Override
     public VariableEntity apply(VariableEntity from) {
       VariableEntity privateEntity = entityMap.privateEntity(from);
@@ -179,7 +307,19 @@ public class IdentifiersMappingView extends View {
    * unapply: publicEntity --> privateEntity
    * </pre>
    */
-  private class UnitIdentifiersArePrivate implements BijectiveFunction<VariableEntity, VariableEntity> {
+  private class UnitIdentifiersArePrivate implements UnitIdentifiersMappingFunction {
+
+    private final PrivateVariableEntityMap entityMap;
+
+    private UnitIdentifiersArePrivate(PrivateVariableEntityMap entityMap) {
+      this.entityMap = entityMap;
+    }
+
+    @Override
+    public PrivateVariableEntityMap getPrivateVariableEntityMap() {
+      return entityMap;
+    }
+
     @Override
     public VariableEntity apply(VariableEntity from) {
       VariableEntity publicEntity = entityMap.publicEntity(from);

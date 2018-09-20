@@ -13,18 +13,19 @@ import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.NoSuchValueSetException;
-import org.obiba.magma.ValueSet;
-import org.obiba.magma.VariableEntity;
+import org.obiba.magma.*;
 import org.obiba.magma.support.StaticValueTable;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.type.IntegerType;
 import org.obiba.magma.type.TextType;
+import org.obiba.opal.core.identifiers.IdentifiersMapping;
 import org.obiba.opal.core.magma.IdentifiersMappingView.Policy;
 
 import com.google.common.collect.ImmutableSet;
+import org.obiba.opal.core.service.IdentifiersTableService;
+
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -194,11 +195,90 @@ public class IdentifiersMappingViewTest {
   }
 
   private IdentifiersMappingView createViewOnOpalDataTable() {
-    return new IdentifiersMappingView("keys-variable", Policy.UNIT_IDENTIFIERS_ARE_PUBLIC, opalDataTable, keysTable);
+    return new IdentifiersMappingView("keys-variable", Policy.UNIT_IDENTIFIERS_ARE_PUBLIC, opalDataTable, new IdentifiersTableServiceTester());
   }
 
   private IdentifiersMappingView createViewOnUnitDataTable() {
-    return new IdentifiersMappingView("keys-variable", Policy.UNIT_IDENTIFIERS_ARE_PRIVATE, unitDataTable, keysTable);
+    return new IdentifiersMappingView("keys-variable", Policy.UNIT_IDENTIFIERS_ARE_PRIVATE, unitDataTable, new IdentifiersTableServiceTester());
+  }
+
+  private class IdentifiersTableServiceTester implements IdentifiersTableService {
+
+    @NotNull
+    @Override
+    public Datasource getDatasource() {
+      return null;
+    }
+
+    @Override
+    public boolean hasIdentifiersTable(@NotNull String entityType) {
+      return keysTable.getEntityType().equals(entityType);
+    }
+
+    @NotNull
+    @Override
+    public ValueTable getIdentifiersTable(@NotNull String entityType) throws NoSuchValueTableException {
+      return keysTable;
+    }
+
+    @NotNull
+    @Override
+    public ValueTable ensureIdentifiersTable(@NotNull String entityType) {
+      return null;
+    }
+
+    @NotNull
+    @Override
+    public Variable ensureIdentifiersMapping(@NotNull IdentifiersMapping idMapping) {
+      return null;
+    }
+
+    @Override
+    public ValueTableWriter createIdentifiersTableWriter(@NotNull String entityType) {
+      return null;
+    }
+
+    @Override
+    public boolean hasIdentifiersMapping(@NotNull String idMapping) {
+      return keysTable.hasVariable(idMapping);
+    }
+
+    @Override
+    public boolean hasIdentifiersMapping(@NotNull String entityType, @NotNull String idMapping) {
+      return keysTable.getEntityType().equals(entityType) && keysTable.hasVariable(idMapping);
+    }
+
+    @Nullable
+    @Override
+    public String getSelectScript(@NotNull String entityType, @NotNull String idMapping) {
+      return null;
+    }
+
+    @NotNull
+    @Override
+    public String getTableReference(@NotNull String entityType) {
+      return null;
+    }
+
+    @Override
+    public String getDatasourceName() {
+      return null;
+    }
+
+    @Override
+    public boolean hasEntities() {
+      return false;
+    }
+
+    @Override
+    public void start() {
+
+    }
+
+    @Override
+    public void stop() {
+
+    }
   }
 
 }

@@ -84,9 +84,8 @@ public class IdentifierServiceImpl implements IdentifierService {
     String idMapping = dataTable.getIdentifiersMapping();
     ValueTable table = dataTable.getWrappedValueTable();
 
-    IdentifiersMappingView publicTable = new IdentifiersMappingView(idMapping,
-        IdentifiersMappingView.Policy.UNIT_IDENTIFIERS_ARE_PRIVATE, table,
-        identifiersTableService.getIdentifiersTable(table.getEntityType()),
+    IdentifiersMappingView publicTable = new IdentifiersMappingView(idMapping, IdentifiersMappingView.Policy.UNIT_IDENTIFIERS_ARE_PRIVATE,
+        table, identifiersTableService,
         allowIdentifierGeneration ? participantIdentifier : null, ignoreUnknownIdentifier);
     final String select = identifiersTableService.getSelectScript(table.getEntityType(), idMapping);
     if(!Strings.isNullOrEmpty(select)) {

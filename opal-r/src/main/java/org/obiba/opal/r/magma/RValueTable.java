@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * A value table based on a tibble.
@@ -139,4 +138,8 @@ public class RValueTable extends AbstractValueTable {
     return ((RDatasource) getDatasource()).getRSession();
   }
 
+  public RVariableEntity getRVariableEntity(VariableEntity entity) {
+    if (entity instanceof RVariableEntity) return (RVariableEntity) entity;
+    return ((RVariableEntityProvider)getVariableEntityProvider()).getRVariableEntity(entity);
+  }
 }
