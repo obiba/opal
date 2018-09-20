@@ -52,10 +52,7 @@ public class IdentifiersMappingDatasource extends AbstractDatasourceWrapperWithC
   protected ValueTable createValueTable(ValueTable table) {
     // verify there is a identifiers mapping for the table's entity type
     if (identifiersTableService.hasIdentifiersTable(table.getEntityType())) {
-      ValueTable identifiersTable = identifiersTableService.getIdentifiersTable(table.getEntityType());
-      if (identifiersTable.hasVariable(idMapping)) {
-        return new IdentifiersMappingView(idMapping, policy, table, identifiersTable, identifierGenerator, ignoreUnknownIdentifier);
-      }
+      return new IdentifiersMappingView(idMapping, policy, table, identifiersTableService, identifierGenerator, ignoreUnknownIdentifier);
     }
     return table;
   }

@@ -47,7 +47,7 @@ abstract class AbstractMagmaRConverter implements MagmaRConverter {
         magmaAssignROperation.getIdentifiersTableService().hasIdentifiersMapping(table.getEntityType(), idMapping)) {
       // Make a view that converts opal identifiers to unit identifiers
       return new IdentifiersMappingView(idMapping, IdentifiersMappingView.Policy.UNIT_IDENTIFIERS_ARE_PUBLIC, table,
-          magmaAssignROperation.getIdentifiersTableService().getIdentifiersTable(table.getEntityType()));
+          magmaAssignROperation.getIdentifiersTableService());
     }
     return table;
   }

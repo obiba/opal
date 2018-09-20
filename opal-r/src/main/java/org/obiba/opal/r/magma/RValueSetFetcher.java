@@ -29,7 +29,7 @@ class RValueSetFetcher {
   }
 
   REXP getREXP(VariableEntity entity) {
-    RVariableEntity re = ((RVariableEntity)entity);
+    RVariableEntity re = table.getRVariableEntity(entity);
     String rid = re.getRIdentifier();
     if (!re.isNumeric()) rid = String.format("'%s'", rid);
     // subset tibble: get the row(s) matching the entity id (result is a tibble)
@@ -41,7 +41,7 @@ class RValueSetFetcher {
     // to query R, we need the original R entity identifier
     String ids = entities.stream()
         .map(e -> {
-          RVariableEntity re = ((RVariableEntity)e);
+          RVariableEntity re = table.getRVariableEntity(e);
           String rid = re.getRIdentifier();
           if (!re.isNumeric()) rid = String.format("'%s'", rid);
           return rid;

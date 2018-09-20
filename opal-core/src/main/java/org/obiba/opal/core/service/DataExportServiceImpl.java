@@ -124,12 +124,7 @@ public class DataExportServiceImpl implements DataExportService {
     private ExportActionTemplate(@NotNull Set<ValueTable> sourceTables, @NotNull Datasource destinationDatasource,
         @NotNull Builder datasourceCopier, boolean incremental, @Nullable String idMapping,
         @Nullable DatasourceCopierProgressListener progressListener) {
-      this.sourceTables = Sets.filter(sourceTables, new Predicate<ValueTable>() {
-        @Override
-        public boolean apply(@Nullable ValueTable input) {
-          return input != null && !Strings.isNullOrEmpty(input.getName());
-        }
-      });
+      this.sourceTables = Sets.filter(sourceTables, input -> input != null && !Strings.isNullOrEmpty(input.getName()));
       this.destinationDatasource = destinationDatasource;
       this.datasourceCopier = datasourceCopier;
       this.incremental = incremental;
@@ -193,7 +188,7 @@ public class DataExportServiceImpl implements DataExportService {
             identifiersTableService.hasIdentifiersMapping(tableToCopy.getEntityType(), idMapping)) {
           // Make a view that converts opal identifiers to unit identifiers
           tableToCopy = new IdentifiersMappingView(idMapping, Policy.UNIT_IDENTIFIERS_ARE_PUBLIC, tableToCopy,
-              identifiersTableService.getIdentifiersTable(tableToCopy.getEntityType()));
+              identifiersTableService);
         }
 
         // Go ahead and copy the result to the destination datasource.
