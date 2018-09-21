@@ -557,6 +557,7 @@ public interface Translations extends Constants {
       "IdentifiersImportationCompleted", "Identifiers importation completed.",//
       "IdentifiersImportationFailed", "Identifiers importation failed: {0}.",//
       "DataWriteNotAuthorized", "You are not allowed to write in project: {0}.",//
+      "TableWriteNotAuthorized", "You are not allowed to write in table: {0}.{1}.",//
       "AccessDeniedToTableValues", "You are not allowed to view the values of table: {0}.",//
       "NoTablesForEntityIdType", "Failed to retrieve tables for entity {0} and type {1}.",//
       "NoVariablesFound", "Failed to retrieve the list of variables",//

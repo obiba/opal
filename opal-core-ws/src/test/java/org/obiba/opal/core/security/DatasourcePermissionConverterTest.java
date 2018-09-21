@@ -52,10 +52,15 @@ public class DatasourcePermissionConverterTest
     testConversion("/datasource/patate", DatasourcePermissionConverter.Permission.TABLE_ADD, //
         "rest:/datasource/patate/tables:GET:GET", //
         "rest:/datasource/patate/tables:POST:GET", //
+        "rest:/datasource/patate/tables:DELETE", //
         "rest:/datasource/patate/views:POST:GET", //
+        "rest:/identifiers/mappings:GET", //
         "rest:/project/patate:GET:GET", //
         "rest:/project/patate/summary:GET:GET", //
         "rest:/project/patate/transient-datasources:POST", //
+        "rest:/project/patate/commands/_import:POST:GET", //
+        "rest:/project/patate/commands/_export:POST:GET", //
+        "rest:/project/patate/commands/_copy:POST:GET", //
         "rest:/files/projects/patate:GET:GET/*", //
         "rest:/files/projects/patate:POST:GET/*",//
         "rest:/files/projects/patate:PUT:GET/*");

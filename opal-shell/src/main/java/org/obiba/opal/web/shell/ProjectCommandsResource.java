@@ -11,6 +11,7 @@ package org.obiba.opal.web.shell;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -19,7 +20,13 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import com.google.common.collect.Lists;
 import org.apache.shiro.SecurityUtils;
+import org.obiba.magma.Datasource;
+import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.NoSuchDatasourceException;
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.security.SecuredDatasource;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.shell.CommandJob;
@@ -77,13 +84,29 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
       throw new InvalidRequestException("DataCanOnlyBeImportedInCurrentDatasource", name);
     }
 
-    // TODO check file access
+    // check import does not override an existing but not visible table
+    if (options.getTablesCount()>0) {
+      ensureTableWriteAccess(options.getDestination(),
+          options.getTablesList().stream().map(tablePath -> MagmaEngineTableResolver.valueOf(tablePath).getTableName()).collect(Collectors.toList()));
+    }
+    if (options.hasSource()) {
+      Datasource ds = getDatasourceOrTransientDatasource(options.getSource());
+      ensureTableWriteAccess(options.getDestination(),
+          ds.getValueTables().stream().map(ValueTable::getName).collect(Collectors.toList()));
+    }
+
 
     ImportCommandOptions importOptions = new ImportCommandOptionsDtoImpl(options);
     Command<ImportCommandOptions> importCommand = commandRegistry.newCommand("import");
     importCommand.setOptions(importOptions);
 
     return launchCommand(importCommand);
+  }
+
+  private Datasource getDatasourceOrTransientDatasource(String datasourceName) throws NoSuchDatasourceException {
+    return MagmaEngine.get().hasDatasource(datasourceName)
+        ? MagmaEngine.get().getDatasource(datasourceName)
+        : MagmaEngine.get().getTransientDatasourceInstance(datasourceName);
   }
 
   @POST
@@ -95,7 +118,10 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
       ensureTableValuesAccess(table);
     }
 
-    ensureDatasourceWriteAccess(options.getDestination());
+    if (options.hasDestinationTableName())
+      ensureTableWriteAccess(options.getDestination(), options.getDestinationTableName());
+    if (options.getTablesCount()>0)
+      ensureTableWriteAccess(options.getDestination(), options.getTablesList());
 
     CopyCommandOptions copyOptions = new CopyCommandOptionsDtoImpl(options);
     Command<CopyCommandOptions> copyCommand = commandRegistry.newCommand(commandName);
@@ -179,8 +205,31 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
     }
   }
 
+  private void ensureTableWriteAccess(String datasource, String table) {
+    ensureTableWriteAccess(datasource, Lists.newArrayList(table));
+  }
+
+  private void ensureTableWriteAccess(String datasource, List<String> tables) {
+    Datasource ds = MagmaEngine.get().getDatasource(datasource);
+    if(ds instanceof SecuredDatasource) {
+      // by-pass security otherwise existing but not visible table could confuse
+      ds = ((SecuredDatasource) ds).getWrappedDatasource();
+    }
+    for (String table : tables) {
+      if (ds.hasValueTable(table)) {
+        // if table exists, check for higher level of permission on table
+        if (!SecurityUtils.getSubject().isPermitted("rest:/datasource/" + datasource + "/table/" + table + ":DELETE")) {
+          throw new InvalidRequestException("TableWriteNotAuthorized", datasource, table);
+        }
+      } else {
+        // make sure it can be created
+        ensureDatasourceWriteAccess(datasource);
+      }
+    }
+  }
+
   private void ensureDatasourceWriteAccess(String datasource) {
-    if(!SecurityUtils.getSubject().isPermitted("rest:/datasource/" + datasource + "/commands/_import:POST")) {
+    if(!SecurityUtils.getSubject().isPermitted("rest:/project/" + datasource + "/commands/_import:POST")) {
       throw new InvalidRequestException("DataWriteNotAuthorized", datasource);
     }
   }

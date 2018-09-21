@@ -30,6 +30,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.shiro.SecurityUtils;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
@@ -49,6 +50,7 @@ import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Opal.AclAction;
 import org.obiba.opal.web.security.AuthorizationInterceptor;
+import org.obiba.opal.web.support.InvalidRequestException;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.AuthorizeResource;
 import org.slf4j.Logger;
@@ -190,25 +192,28 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
   @Override
   @DELETE
   public Response deleteTables(@QueryParam("table") List<String> tables) {
-
     for(String table : tables) {
-      if(datasource.hasValueTable(table) && datasource.canDropTable(table)) {
-        if(tableListeners != null && !tableListeners.isEmpty()) {
-          for(ValueTableUpdateListener listener : tableListeners) {
-            listener.onDelete(datasource.getValueTable(table));
-          }
-        }
+      if(datasource.hasValueTable(table) && datasource.canDropTable(table) && hasDropPermission(table)) {
         ValueTable toDrop = datasource.getValueTable(table);
         if(toDrop.isView()) {
           viewManager.removeView(datasource.getName(), table);
         } else {
           datasource.dropTable(table);
         }
+        if(tableListeners != null && !tableListeners.isEmpty()) {
+          for(ValueTableUpdateListener listener : tableListeners) {
+            listener.onDelete(toDrop);
+          }
+        }
         subjectProfileService.deleteBookmarks("/datasource/" + datasource.getName() + "/table/" + table);
       }
     }
 
     return Response.ok().build();
+  }
+
+  private boolean hasDropPermission(String table) {
+    return SecurityUtils.getSubject().isPermitted("rest:/datasource/" + datasource.getName() + "/table/" + table + ":DELETE");
   }
 
   private void writeVariablesToTable(TableDto table) {

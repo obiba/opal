@@ -37,7 +37,8 @@ public class UnhandledResponseNotificationPresenter
 
   public UnhandledResponseNotificationPresenter withResponseEvent(UnhandledResponseEvent event) {
     getView().clearErrorMessages();
-    getView().setErrorMessage(translations.systemErrorLablel(),
+
+    getView().setErrorMessage(event.getResponse().getStatusCode()>=500 ? translations.systemErrorLablel() : translations.errorLabel(),
         ErrorResponseMessageBuilder.get(event.getResponse()).withDefaultMessage(event.getShortMessage()).build());
     return this;
   }

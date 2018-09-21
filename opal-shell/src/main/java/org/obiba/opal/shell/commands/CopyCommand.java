@@ -47,13 +47,16 @@ import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.support.AllClause;
 import org.obiba.opal.core.domain.database.Database;
+import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.magma.QueryWhereClause;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
+import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.r.magma.RDatasource;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
+import org.obiba.opal.web.model.Opal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,6 +100,9 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
   @Autowired
   private TransactionTemplate txTemplate;
+
+  @Autowired
+  private SubjectAclService subjectAclService;
 
   private Map<String, String> entityIdMap;
 
@@ -686,12 +692,19 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   private class CopyProgressListener implements DatasourceCopierProgressListener {
 
     private int currentPercentComplete = -1;
+    
+    private List<String> tablesWithPermission = Lists.newArrayList();
 
     @Override
-    public void status(String message, long entitiesCopied, long entitiesToCopy, int percentComplete) {
+    public void status(String table, long entitiesCopied, long entitiesToCopy, int percentComplete) {
       if(percentComplete != currentPercentComplete) {
-        getShell().progress(message, entitiesCopied, entitiesToCopy, percentComplete);
+        getShell().progress(table, entitiesCopied, entitiesToCopy, percentComplete);
         currentPercentComplete = percentComplete;
+      }
+      if (!tablesWithPermission.contains(table)) {
+        String node = "/datasource/" + options.getDestination() + "/table/" + table;
+        subjectAclService.addSubjectPermission("opal", node, SubjectAcl.SubjectType.USER.subjectFor(getOwner()), Opal.AclAction.TABLE_ALL.name());
+        tablesWithPermission.add(table);
       }
     }
   }
