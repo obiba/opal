@@ -18,6 +18,7 @@ import java.util.List;
 import com.google.common.base.Strings;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
+import org.obiba.opal.shell.commands.AbstractOpalRuntimeDependentCommand;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
 import org.obiba.opal.web.model.Commands.Message;
@@ -192,6 +193,7 @@ public class CommandJob implements OpalShell, Runnable {
 
   public void setOwner(String owner) {
     this.owner = owner;
+    this.command.setOwner(owner);
   }
 
   public boolean hasProject() {

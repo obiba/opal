@@ -225,6 +225,16 @@ public class QuartzCommandSchedulerServiceImplTest {
     }
 
     @Override
+    public void setOwner(String owner) {
+
+    }
+
+    @Override
+    public String getOwner() {
+      return null;
+    }
+
+    @Override
     public String toString() {
       return commandLine;
     }

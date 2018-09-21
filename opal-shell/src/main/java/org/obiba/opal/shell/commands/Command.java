@@ -35,6 +35,20 @@ public interface Command<T> {
   void setOptions(T options);
 
   /**
+   * Principal of the user that launched the command.
+   *
+   * @param owner
+   */
+  void setOwner(String owner);
+
+  /**
+   * Get user name who launched the command.
+   *
+   * @return
+   */
+  String getOwner();
+
+  /**
    * Executes the command.
    * <p/>
    * Note that commands must not contain any business logic. All business logic should reside in a service method called

@@ -15,6 +15,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.core.Response;
 
 import org.obiba.magma.NoSuchValueTableException;
+import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.ValueTableUpdateListener;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,12 +43,13 @@ public class DroppableTableResourceImpl extends TableResourceImpl implements Dro
   @DELETE
   public Response drop() {
     try {
+      ValueTable table = getValueTable();
+      getDatasource().dropTable(table.getName());
       if (tableListeners != null && !tableListeners.isEmpty()) {
         for (ValueTableUpdateListener listener : tableListeners) {
-          listener.onDelete(getValueTable());
+          listener.onDelete(table);
         }
       }
-      getDatasource().dropTable(getValueTable().getName());
       subjectProfileService.deleteBookmarks("/datasource/" + getDatasource().getName() + "/table/" + getValueTable().getName());
     } catch (NoSuchValueTableException e) {
       // ignore

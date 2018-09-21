@@ -25,6 +25,8 @@ public abstract class AbstractCommand<T> implements Command<T> {
 
   private OpalShell shell;
 
+  private String owner;
+
   protected T options;
 
   //
@@ -38,6 +40,16 @@ public abstract class AbstractCommand<T> implements Command<T> {
       name = annotation.application();
     }
     return name;
+  }
+
+  @Override
+  public void setOwner(String owner) {
+    this.owner = owner;
+  }
+
+  @Override
+  public String getOwner() {
+    return owner;
   }
 
   @Override

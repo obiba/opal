@@ -22,13 +22,17 @@ import org.apache.commons.vfs2.FileSelectInfo;
 import org.apache.commons.vfs2.FileSelector;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
+import org.apache.shiro.SecurityUtils;
 import org.obiba.magma.DatasourceCopierProgressListener;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.crypt.KeyProviderException;
+import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.DataImportService;
 import org.obiba.opal.core.service.NonExistentVariableEntitiesException;
+import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
+import org.obiba.opal.web.model.Opal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +61,9 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
 
   @Autowired
   private DataImportService dataImportService;
+
+  @Autowired
+  private SubjectAclService subjectAclService;
 
   @Override
   public int execute() {
@@ -313,11 +320,18 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
 
     private int currentPercentComplete = -1;
 
+    private List<String> tablesWithPermission = Lists.newArrayList();
+
     @Override
     public void status(String table, long entitiesCopied, long entitiesToCopy, int percentComplete) {
       if (percentComplete != currentPercentComplete) {
         getShell().progress(table, entitiesCopied, entitiesToCopy, percentComplete);
         currentPercentComplete = percentComplete;
+      }
+      if (!tablesWithPermission.contains(table)) {
+        String node = "/datasource/" + options.getDestination() + "/table/" + table;
+        subjectAclService.addSubjectPermission("opal", node, SubjectAcl.SubjectType.USER.subjectFor(getOwner()), Opal.AclAction.TABLE_ALL.name());
+        tablesWithPermission.add(table);
       }
     }
   }
