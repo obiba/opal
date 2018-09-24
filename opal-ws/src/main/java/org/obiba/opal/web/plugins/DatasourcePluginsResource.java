@@ -12,6 +12,7 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -27,11 +28,20 @@ public class DatasourcePluginsResource {
   @GET
   public Plugins.PluginPackagesDto list(@QueryParam("usage") @DefaultValue("import") String usage) {
     DatasourceUsage dsUsage = DatasourceUsage.valueOf(usage.toUpperCase());
-    return Dtos.asDto(pluginsService.getUpdateSite(), pluginsService.getLastUpdate(), pluginsService.restartRequired(),
-        pluginsService.getInstalledPlugins().stream()
-            .filter(p -> DatasourceService.SERVICE_TYPE.equals(p.getType()))
-            .filter(p -> ((DatasourceService) opalRuntime.getServicePlugin(p.getName())).getUsages().contains(dsUsage))
-            .collect(Collectors.toList()));
+    List<Plugins.PluginPackageDto> dsPackages = pluginsService.getInstalledPlugins().stream()
+        .filter(p -> DatasourceService.SERVICE_TYPE.equals(p.getType()))
+        .filter(p -> ((DatasourceService) opalRuntime.getServicePlugin(p.getName())).getUsages().contains(dsUsage))
+        .map(p -> {
+          Plugins.PluginPackageDto.Builder builder = Dtos.asDto(p, null).toBuilder();
+          DatasourceService dsService = ((DatasourceService) opalRuntime.getServicePlugin(p.getName()));
+          builder.setExtension(Plugins.DatasourcePluginPackageDto.datasource, Plugins.DatasourcePluginPackageDto.newBuilder()
+              .addAllUsages(dsService.getUsages().stream().map(Enum::name).collect(Collectors.toList()))
+              .setGroup(dsService.getGroup().name()).build());
+          return builder.build();
+        })
+        .collect(Collectors.toList());
+    return Dtos.asDto(pluginsService.getUpdateSite(), pluginsService.getLastUpdate(), pluginsService.restartRequired())
+        .addAllPackages(dsPackages).build();
   }
 
 }

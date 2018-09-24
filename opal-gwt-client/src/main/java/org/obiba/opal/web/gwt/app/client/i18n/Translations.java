@@ -1677,10 +1677,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Servers")
   String remoteServerBasedDatasources();
 
-  @Description("Plugin based datasources label")
-  @DefaultStringValue("Plugins")
-  String pluginBasedDatasources();
-
   @Description("Public datasources label")
   @DefaultStringValue("Public Datasources")
   String publicDatasources();

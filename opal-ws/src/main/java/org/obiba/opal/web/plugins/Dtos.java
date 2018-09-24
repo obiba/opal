@@ -32,13 +32,18 @@ public class Dtos {
   }
 
   public static Plugins.PluginPackagesDto asDto(String site, Date updated, boolean restart, List<PluginPackage> packages, Collection<String> uninstalledNames) {
+    Plugins.PluginPackagesDto.Builder builder = asDto(site, updated, restart);
+    builder.addAllPackages(packages.stream().map(p -> asDto(p, uninstalledNames == null ? null : uninstalledNames.contains(p.getName())))
+        .collect(Collectors.toList()));
+    return builder.build();
+  }
+
+  public static Plugins.PluginPackagesDto.Builder asDto(String site, Date updated, boolean restart) {
     Plugins.PluginPackagesDto.Builder builder = Plugins.PluginPackagesDto.newBuilder()
         .setSite(site)
-        .setRestart(restart)
-        .addAllPackages(packages.stream().map(p -> asDto(p, uninstalledNames == null ? null : uninstalledNames.contains(p.getName())))
-            .collect(Collectors.toList()));
+        .setRestart(restart);
     if (updated != null) builder.setUpdated(DateTimeType.get().valueOf(updated).toString());
-    return builder.build();
+    return builder;
   }
 
   public static Plugins.PluginPackageDto asDto(PluginPackage pluginPackage, Boolean uninstalled) {

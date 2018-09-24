@@ -9,9 +9,13 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.importdata.view;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.gwt.core.client.GWT;
 import org.obiba.opal.spi.datasource.DatasourceService;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter.ImportDataInputsHandler;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
@@ -28,6 +32,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
+import org.obiba.opal.web.model.client.opal.DatasourcePluginPackageDto;
 import org.obiba.opal.web.model.client.opal.PluginPackageDto;
 import org.obiba.opal.web.model.client.opal.PluginPackagesDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
@@ -50,6 +55,10 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig.ImportFormat;
 import static org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter.ImportDataStepHandler;
@@ -209,24 +218,6 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
   }
 
   private void initWidgets() {
-    ResourceRequestBuilderFactory.<PluginPackagesDto>newBuilder() //
-        .forResource(UriBuilders.DS_PLUGINS.create().query("usage", "import").build()) //
-        .withCallback(new ResourceCallback<PluginPackagesDto>() {
-          @Override
-          public void onResource(Response response, PluginPackagesDto resource) {
-            pluginPackageDtoJsArray = resource.getPackagesArray();
-            int count = pluginPackageDtoJsArray.length();
-
-            if (count > 0) {
-              formatChooser.addGroup(translations.pluginBasedDatasources());
-
-              for (int i = 0; i < count; i++) {
-                formatChooser.addItemToGroup(pluginPackageDtoJsArray.get(i).getTitle(), pluginPackageDtoJsArray.get(i).getName());
-              }
-            }
-          }
-        })
-        .get().send();
 
     formatChooser.addGroup(translations.fileBasedDatasources());
     formatChooser.addItemToGroup(translations.csvLabel(), ImportFormat.CSV.name());
@@ -237,6 +228,25 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
     formatChooser.addGroup(translations.remoteServerBasedDatasources());
     formatChooser.addItemToGroup(translations.opalRestLabel(), ImportFormat.REST.name());
     formatChooser.addItemToGroup(translations.sqlLabel(), ImportFormat.JDBC.name());
+
+    ResourceRequestBuilderFactory.<PluginPackagesDto>newBuilder() //
+        .forResource(UriBuilders.DS_PLUGINS.create().query("usage", "import").build()) //
+        .withCallback(new ResourceCallback<PluginPackagesDto>() {
+          @Override
+          public void onResource(Response response, PluginPackagesDto resource) {
+            pluginPackageDtoJsArray = JsArrays.toSafeArray(resource.getPackagesArray());
+            for (PluginPackageDto plugin : JsArrays.toIterable(pluginPackageDtoJsArray)) {
+              DatasourcePluginPackageDto dsPlugin = plugin.getExtension(DatasourcePluginPackageDto.PluginPackageDtoExtensions.datasource).cast();
+              if ("FILE".equals(dsPlugin.getGroup())) {
+                formatChooser.addItemToGroup(plugin.getTitle(), plugin.getName(), 0);
+              }
+              if ("SERVER".equals(dsPlugin.getGroup())) {
+                formatChooser.addItemToGroup(plugin.getTitle(), plugin.getName(), 1);
+              }
+            }
+          }
+        })
+        .get().send();
   }
 
   @Override
