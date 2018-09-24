@@ -22,6 +22,7 @@ public class DatasourcePermissionConverterTest
     testConversion("/datasource/patate", DatasourcePermissionConverter.Permission.DATASOURCE_ALL, //
         "rest:/datasource/patate:*:GET/*", //
         "rest:/identifiers/mappings:GET", //
+        "rest:/dsplugin:GET:GET/GET", //
         "rest:/project/patate:GET:GET", //
         "rest:/project/patate/transient-datasource:*:GET/*", //
         "rest:/project/patate/report-template:*:GET/*", //
@@ -55,6 +56,7 @@ public class DatasourcePermissionConverterTest
         "rest:/datasource/patate/tables:DELETE", //
         "rest:/datasource/patate/views:POST:GET", //
         "rest:/identifiers/mappings:GET", //
+        "rest:/dsplugin:GET:GET/GET", //
         "rest:/project/patate:GET:GET", //
         "rest:/project/patate/summary:GET:GET", //
         "rest:/project/patate/transient-datasources:POST", //
