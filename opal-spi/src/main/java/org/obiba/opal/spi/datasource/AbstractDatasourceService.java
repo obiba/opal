@@ -89,8 +89,7 @@ public abstract class AbstractDatasourceService implements DatasourceService {
     pathResolver = resolver;
   }
 
-  @Override
-  public File resolvePath(String virtualPath) {
+  protected File resolvePath(String virtualPath) {
     return pathResolver == null ? new File(virtualPath) : pathResolver.resolve(virtualPath);
   }
 

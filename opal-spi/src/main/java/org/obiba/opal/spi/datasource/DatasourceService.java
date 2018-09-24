@@ -24,6 +24,9 @@ import org.obiba.plugins.spi.ServicePlugin;
  */
 public interface DatasourceService extends ServicePlugin {
 
+  /**
+   * Resolve a Opal file system path to a local file.
+   */
   interface OpalFileSystemPathResolver {
     File resolve(String path);
   }
@@ -63,10 +66,4 @@ public interface DatasourceService extends ServicePlugin {
    */
   void setOpalFileSystemPathResolver(OpalFileSystemPathResolver resolver);
 
-  /**
-   *
-   * @param virtualPath
-   * @return File object based on virtualPath
-   */
-  File resolvePath(String virtualPath);
 }
