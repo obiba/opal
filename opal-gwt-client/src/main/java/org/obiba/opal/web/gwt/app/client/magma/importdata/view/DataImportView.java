@@ -9,10 +9,6 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.importdata.view;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.gwt.core.client.GWT;
-import org.obiba.opal.spi.datasource.DatasourceService;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -55,10 +51,6 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import static org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig.ImportFormat;
 import static org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter.ImportDataStepHandler;
@@ -244,6 +236,7 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
                 formatChooser.addItemToGroup(plugin.getTitle(), plugin.getName(), 1);
               }
             }
+            formatChooser.update();
           }
         })
         .get().send();
