@@ -53,5 +53,18 @@
       <g:SimplePanel ui:field="permissions"></g:SimplePanel>
     </g:FlowPanel>
 
+    <b:Heading size="4">
+      <ui:msg description="DataSHIELD Logs label">Logs</ui:msg>
+    </b:Heading>
+    <g:FlowPanel addStyleNames="xlarge-bottom-margin">
+      <b:Paragraph>
+        <ui:msg description="Datashield logs description">Datashield activity logs can be downloaded in their raw form.</ui:msg>
+      </b:Paragraph>
+      <b:Button ui:field="downloadLogs" icon="DOWNLOAD" type="INFO">
+        <ui:msg description="Download datashield logs label">Download</ui:msg>
+      </b:Button>
+    </g:FlowPanel>
+
+
   </g:FlowPanel>
 </ui:UiBinder>

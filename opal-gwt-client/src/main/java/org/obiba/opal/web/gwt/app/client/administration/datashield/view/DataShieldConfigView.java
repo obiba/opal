@@ -9,7 +9,11 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.NavPillsPanel;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -26,7 +30,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
 
-public class DataShieldConfigView extends ViewImpl implements DataShieldConfigPresenter.Display {
+public class DataShieldConfigView extends ViewWithUiHandlers<DataShieldConfigUiHandlers> implements DataShieldConfigPresenter.Display {
 
   interface Binder extends UiBinder<Widget, DataShieldConfigView> {}
 
@@ -88,6 +92,11 @@ public class DataShieldConfigView extends ViewImpl implements DataShieldConfigPr
   @Override
   public HasWidgets getBreadcrumbs() {
     return breadcrumbs;
+  }
+
+  @UiHandler("downloadLogs")
+  void onDownloadLogs(ClickEvent event) {
+    getUiHandlers().onDownloadLogs();
   }
 
 

@@ -42,7 +42,7 @@ public class SystemLogResource {
   private Response getLog(File file) {
     StreamingOutput stream = os -> Files.copy(file.toPath(), os);
     return Response.ok(stream, "text/plain")
-        .header("Content-Disposition", "attachment; filename=opal.log").build();
+        .header("Content-Disposition", "attachment; filename=" + file.getName()).build();
   }
 
 }

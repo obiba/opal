@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.administration.jvm;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
@@ -137,6 +138,16 @@ public class JVMPresenter extends ItemAdministrationPresenter<JVMPresenter.Displ
             //ignore
           }
         }, Response.SC_NO_CONTENT, SC_INTERNAL_SERVER_ERROR).send();
+  }
+
+  @Override
+  public void onDownloadOpalLogs() {
+    fireEvent(new FileDownloadRequestEvent("/system/log/opal.log"));
+  }
+
+  @Override
+  public void onDownloadRestLogs() {
+    fireEvent(new FileDownloadRequestEvent("/system/log/rest.log"));
   }
 
   private final class ListEnvironmentAuthorization implements HasAuthorization {

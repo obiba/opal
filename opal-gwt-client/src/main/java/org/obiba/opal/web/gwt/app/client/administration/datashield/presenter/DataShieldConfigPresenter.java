@@ -9,8 +9,10 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.permissions.support.AclRequest;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
@@ -32,13 +34,14 @@ import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
 public class DataShieldConfigPresenter
-    extends ItemAdministrationPresenter<DataShieldConfigPresenter.Display, DataShieldConfigPresenter.Proxy> {
+    extends ItemAdministrationPresenter<DataShieldConfigPresenter.Display, DataShieldConfigPresenter.Proxy>
+    implements DataShieldConfigUiHandlers {
 
   @ProxyStandard
   @NameToken(Places.DATASHIELD)
   public interface Proxy extends ProxyPlace<DataShieldConfigPresenter> {}
 
-  public interface Display extends View, HasBreadcrumbs {
+  public interface Display extends View, HasBreadcrumbs, HasUiHandlers<DataShieldConfigUiHandlers> {
 
     HasAuthorization getPermissionsAuthorizer();
 
@@ -75,6 +78,7 @@ public class DataShieldConfigPresenter
       Provider<DataShieldROptionsPresenter> dataShieldROptionsProvider,
       DataShieldPackageAdministrationPresenter packagePresenter, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
+    getView().setUiHandlers(this);
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.packagePresenter = packagePresenter;
     dataShieldROptionsPresenter = dataShieldROptionsProvider.get();
@@ -104,6 +108,11 @@ public class DataShieldConfigPresenter
     // set permissions
     AclRequest.newResourceAuthorizationRequestBuilder()
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
+  }
+
+  @Override
+  public void onDownloadLogs() {
+    fireEvent(new FileDownloadRequestEvent("/system/log/datashield.log"));
   }
 
   @Override

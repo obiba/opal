@@ -29,6 +29,23 @@
     </b:Row>
 
     <b:Heading size="4">
+      <ui:msg description="System Logs label">Logs</ui:msg>
+    </b:Heading>
+    <g:FlowPanel addStyleNames="xlarge-bottom-margin">
+      <b:Paragraph>
+        <ui:msg description="System logs description">System logs (server and web services activity) can be downloaded in their raw form.</ui:msg>
+      </b:Paragraph>
+      <b:DropdownButton text="Download" icon="DOWNLOAD" ui:field="downloadBtn" type="INFO">
+        <b:NavLink ui:field="downloadOpalLogs">
+          <ui:msg description="Server logs label">Server logs</ui:msg>
+        </b:NavLink>
+        <b:NavLink ui:field="downloadRestLogs">
+          <ui:msg description="Web services logs label">Web services logs</ui:msg>
+        </b:NavLink>
+      </b:DropdownButton>
+    </g:FlowPanel>
+
+    <b:Heading size="4">
       <ui:msg description="JVM Status header">Status</ui:msg>
     </b:Heading>
     <g:Label ui:field="uptime" addStyleNames="bottom-margin"/>
