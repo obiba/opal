@@ -42,7 +42,7 @@ public class DatasourcePermissionConverter extends OpalPermissionConverter {
         String[] args = args(node, "/datasource/(.+)");
         return Lists.newArrayList(toRest("/datasource/{0}", "*:GET/*", args), //
             toRest("/identifiers/mappings", "GET"), //
-            toRest("/dsplugin", "GET:GET/GET"), //
+            toRest("/datasource-plugin", "GET:GET/GET"), //
             toRest("/project/{0}", "GET:GET", args),//
             toRest("/project/{0}/transient-datasource", "*:GET/*", args),//
             toRest("/project/{0}/report-template", "*:GET/*", args),//
@@ -66,7 +66,7 @@ public class DatasourcePermissionConverter extends OpalPermissionConverter {
             toRest("/datasource/{0}/tables", "DELETE", args),//
             toRest("/datasource/{0}/views", "POST:GET", args),//
             toRest("/identifiers/mappings", "GET"), //
-            toRest("/dsplugin", "GET:GET/GET"), //
+            toRest("/datasource-plugin", "GET:GET/GET"), //
             toRest("/project/{0}", "GET:GET", args),//
             toRest("/project/{0}/summary", "GET:GET", args),//
             toRest("/project/{0}/transient-datasources", "POST", args),//

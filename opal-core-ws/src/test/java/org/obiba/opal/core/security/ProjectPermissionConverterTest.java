@@ -23,7 +23,7 @@ public class ProjectPermissionConverterTest
     testConversion("/project/patate", ProjectPermissionConverter.Permission.PROJECT_ALL, //
         "rest:/datasource/patate:*:GET/*", //
         "rest:/identifiers/mappings:GET", //
-        "rest:/dsplugin:GET:GET/GET", //
+        "rest:/datasource-plugin:GET:GET/GET", //
         "rest:/project/patate:*:GET/*",//
         "rest:/files/projects/patate:*:GET/*");
   }

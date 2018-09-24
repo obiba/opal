@@ -53,7 +53,7 @@ public class DatasourcePluginFormatStepView extends ViewImpl implements Datasour
     selectedPluginName = name;
 
     ResourceRequestBuilderFactory.<JavaScriptObject>newBuilder()
-        .forResource(UriBuilders.DS_PLUGIN_SERVICE.create().build(name))
+        .forResource(UriBuilders.DS_PLUGIN_FORM.create().build(name))
         .withCallback(new ResourceCallback<JavaScriptObject>() {
 
           @Override

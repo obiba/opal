@@ -30,15 +30,9 @@ public abstract class AbstractDatasourceService implements DatasourceService {
 
   private Collection<DatasourceUsage> usages;
 
-  private OpalFileSystemPathResolver pathResolver;
+  private DatasourceGroup group;
 
-  public Set<DatasourceUsage> initUsages() {
-    String usagesString = getProperties().getProperty("usages", "").trim();
-    return usagesString.isEmpty()
-        ? new HashSet<>()
-        : Stream.of(usagesString.split(",")).map(usage -> DatasourceUsage.valueOf(usage.trim().toUpperCase()))
-            .collect(Collectors.toSet());
-  }
+  private OpalFileSystemPathResolver pathResolver;
 
   @Override
   public Properties getProperties() {
@@ -58,6 +52,7 @@ public abstract class AbstractDatasourceService implements DatasourceService {
   @Override
   public void start() {
     usages = initUsages();
+    group = initGroup();
     running = true;
   }
 
@@ -69,6 +64,11 @@ public abstract class AbstractDatasourceService implements DatasourceService {
   @Override
   public Collection<DatasourceUsage> getUsages() {
     return usages;
+  }
+
+  @Override
+  public DatasourceGroup getGroup() {
+    return group;
   }
 
   @Override
@@ -89,11 +89,7 @@ public abstract class AbstractDatasourceService implements DatasourceService {
     pathResolver = resolver;
   }
 
-  protected File resolvePath(String virtualPath) {
-    return pathResolver == null ? new File(virtualPath) : pathResolver.resolve(virtualPath);
-  }
-
-  public JSONObject processDefaultPropertiesValue(DatasourceUsage usage, JSONObject jsonObject) {
+  protected JSONObject processDefaultPropertiesValue(DatasourceUsage usage, JSONObject jsonObject) {
     String format = String.format(DEFAULT_PROPERTY_KEY_FORMAT, usage);
 
     // general property definition (usage independent)
@@ -107,7 +103,7 @@ public abstract class AbstractDatasourceService implements DatasourceService {
     return jsonObject;
   }
 
-  public String readUsageSchema(DatasourceUsage usage) throws IOException {
+  protected String readUsageSchema(DatasourceUsage usage) throws IOException {
     Path usageSchemaPath = getUsageSchemaPath(usage).toAbsolutePath();
     String result = "{}";
 
@@ -119,6 +115,23 @@ public abstract class AbstractDatasourceService implements DatasourceService {
     }
 
     return result;
+  }
+
+  protected File resolvePath(String virtualPath) {
+    return pathResolver == null ? new File(virtualPath) : pathResolver.resolve(virtualPath);
+  }
+
+  protected Set<DatasourceUsage> initUsages() {
+    String usagesString = getProperties().getProperty("usages", "").trim();
+    return usagesString.isEmpty()
+        ? new HashSet<>()
+        : Stream.of(usagesString.split(",")).map(usage -> DatasourceUsage.valueOf(usage.trim().toUpperCase()))
+        .collect(Collectors.toSet());
+  }
+
+  protected DatasourceGroup initGroup() {
+    String groupStr = getProperties().getProperty("group", "").trim();
+    return groupStr.isEmpty() ? DatasourceGroup.FILE : DatasourceGroup.valueOf(groupStr.toUpperCase());
   }
 
   private Path getUsageSchemaPath(DatasourceUsage usage) {

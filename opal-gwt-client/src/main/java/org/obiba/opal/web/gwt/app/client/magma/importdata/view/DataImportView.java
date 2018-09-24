@@ -210,7 +210,7 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
 
   private void initWidgets() {
     ResourceRequestBuilderFactory.<PluginPackagesDto>newBuilder() //
-        .forResource(UriBuilders.PLUGINS.create().query("type", DatasourceService.SERVICE_TYPE).build()) //
+        .forResource(UriBuilders.DS_PLUGINS.create().query("usage", "import").build()) //
         .withCallback(new ResourceCallback<PluginPackagesDto>() {
           @Override
           public void onResource(Response response, PluginPackagesDto resource) {

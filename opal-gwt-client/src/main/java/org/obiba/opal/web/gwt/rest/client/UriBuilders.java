@@ -782,10 +782,18 @@ public enum UriBuilders {
     }
   },
 
-  DS_PLUGIN_SERVICE {
+  DS_PLUGINS {
     @Override
     public UriBuilder create() {
-      return UriBuilder.create().segment("dsplugin", "{}");
+      return UriBuilder.create().segment("datasource-plugins");
+
+    }
+  },
+
+  DS_PLUGIN_FORM {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasource-plugin", "{}", "form");
 
     }
   },

@@ -43,6 +43,13 @@ public interface DatasourceService extends ServicePlugin {
   @NotNull Collection<DatasourceUsage> getUsages();
 
   /**
+   * Get the {@link DatasourceGroup} to which the datasource belongs.
+   *
+   * @return
+   */
+  @NotNull DatasourceGroup getGroup();
+
+  /**
    * Get the user parameters form specifications for a specific usage as a JSON object.
    *
    * @param usage

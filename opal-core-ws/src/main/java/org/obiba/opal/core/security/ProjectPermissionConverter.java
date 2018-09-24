@@ -42,7 +42,7 @@ public class ProjectPermissionConverter extends OpalPermissionConverter {
         String[] args = args(node, "/project/(.+)");
         return Lists.newArrayList(toRest("/datasource/{0}", "*:GET/*", args), //
             toRest("/identifiers/mappings", "GET"), //
-            toRest("/dsplugin", "GET:GET/GET"), //
+            toRest("/datasource-plugin", "GET:GET/GET"), //
             toRest("/project/{0}", "*:GET/*", args),//
             toRest("/files/projects/{0}", "*:GET/*", args));
       }
