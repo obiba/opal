@@ -70,7 +70,12 @@ class RValueSet extends ValueSetBean {
           int position = col + 1;
           columnValues.put(position, Lists.newArrayList());
           REXP vector = (REXP) vectors.get(col);
+          boolean[] nas = vector.isNA();
           String[] strValues = vector.asStrings();
+          // #3303 force NA representation
+          for (int i=0; i<nas.length; i++) {
+            if (nas[i]) strValues[i] = null;
+          }
           for (int r = 0; r < strValues.length; r++) {
             if (rowIdx.contains(r)) {
               columnValues.get(position).add(strValues[r]);
