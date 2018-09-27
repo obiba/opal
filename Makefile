@@ -1,11 +1,11 @@
 ##
 ## Makefile for Opal developers
 ##
-version=2.12-SNAPSHOT
-magma_version=1.18-SNAPSHOT
-#version=2.10-SNAPSHOT
-#magma_version=1.16-SNAPSHOT
-commons_version=1.11-SNAPSHOT
+version=2.13-SNAPSHOT
+magma_version=1.19-SNAPSHOT
+#version=2.12-SNAPSHOT
+#magma_version=1.18-SNAPSHOT
+commons_version=1.12-SNAPSHOT
 java_opts="-Xms1G -Xmx4G -XX:MaxPermSize=256M -XX:+UseG1GC"
 
 projects=$(CURDIR)/..
