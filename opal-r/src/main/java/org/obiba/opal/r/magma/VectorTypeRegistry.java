@@ -9,9 +9,8 @@
  */
 package org.obiba.opal.r.magma;
 
-import org.obiba.magma.*;
+import org.obiba.magma.ValueType;
 import org.obiba.magma.type.*;
-import org.obiba.opal.r.MagmaRRuntimeException;
 
 /**
  * A utility class for mapping {@code ValueType} to R {@code REXP}.

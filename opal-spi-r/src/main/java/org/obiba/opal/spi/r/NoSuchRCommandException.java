@@ -7,22 +7,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.r;
 
-import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.REXPRaw;
+package org.obiba.opal.spi.r;
 
-/**
- * A {@link ROperation} that has a result.
- */
-public interface ROperationWithResult extends ROperation {
 
-  boolean hasResult();
+public class NoSuchRCommandException extends RuntimeException {
 
-  REXP getResult();
+  private final String id;
 
-  boolean hasRawResult();
+  public NoSuchRCommandException(String id) {
+    super("No such R command with ID: " + id);
+    this.id = id;
+  }
 
-  REXPRaw getRawResult();
-
+  public String getId() {
+    return id;
+  }
 }

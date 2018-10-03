@@ -9,20 +9,17 @@
  */
 package org.obiba.opal.web.r;
 
-import javax.annotation.Nullable;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.core.service.IdentifiersTableService;
-import org.obiba.opal.r.*;
+import org.obiba.opal.r.StringAssignROperation;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
-import org.obiba.opal.r.service.RCommand;
+import org.obiba.opal.spi.r.RCommand;
+import org.obiba.opal.spi.r.ROperationWithResult;
 import org.obiba.opal.web.model.OpalR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import javax.annotation.Nullable;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
 /**

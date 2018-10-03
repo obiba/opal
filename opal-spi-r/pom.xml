@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright (c) 2018 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses />.
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>opal</artifactId>
+    <groupId>org.obiba.opal</groupId>
+    <version>2.13-SNAPSHOT</version>
+    <relativePath>../</relativePath>
+  </parent>
+  <artifactId>opal-spi-r</artifactId>
+  <name>opal-spi-r</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.obiba.commons</groupId>
+      <artifactId>obiba-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.commons</groupId>
+      <artifactId>obiba-plugins</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-spi</artifactId>
+    </dependency>
+
+    <!-- R dependencies -->
+    <dependency>
+      <groupId>net.rforge</groupId>
+      <artifactId>Rserve</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.rforge</groupId>
+      <artifactId>REngine</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.jettison</groupId>
+      <artifactId>jettison</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easytesting</groupId>
+      <artifactId>fest-assert-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+</project>

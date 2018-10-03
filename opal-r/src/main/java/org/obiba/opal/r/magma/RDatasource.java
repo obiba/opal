@@ -16,10 +16,10 @@ import com.google.common.collect.Sets;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.support.AbstractDatasource;
-import org.obiba.opal.r.AbstractROperation;
-import org.obiba.opal.r.DataReadROperation;
-import org.obiba.opal.r.FileWriteROperation;
 import org.obiba.opal.r.service.OpalRSession;
+import org.obiba.opal.spi.r.AbstractROperation;
+import org.obiba.opal.spi.r.DataReadROperation;
+import org.obiba.opal.spi.r.FileWriteROperation;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.validation.constraints.NotNull;

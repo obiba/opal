@@ -15,13 +15,15 @@ import com.google.common.collect.Lists;
 import org.obiba.magma.*;
 import org.obiba.magma.type.*;
 import org.rosuda.REngine.REXP;
-import org.rosuda.REngine.REXPGenericVector;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.RList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;

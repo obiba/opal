@@ -11,7 +11,6 @@ package org.obiba.opal.web.r;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import org.obiba.core.util.FileUtil;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.model.OpalR;
@@ -24,8 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;

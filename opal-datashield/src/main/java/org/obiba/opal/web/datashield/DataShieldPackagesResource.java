@@ -20,8 +20,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.obiba.opal.r.RScriptROperation;
-import org.obiba.opal.r.RStringMatrix;
+import org.obiba.opal.spi.r.RScriptROperation;
+import org.obiba.opal.spi.r.RStringMatrix;
 import org.obiba.opal.web.datashield.support.DataShieldPackageMethodImpl;
 import org.obiba.opal.web.model.OpalR;
 import org.rosuda.REngine.REXP;

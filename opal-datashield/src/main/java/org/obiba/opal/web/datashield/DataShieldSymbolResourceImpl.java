@@ -14,7 +14,7 @@ import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.RestrictedAssignmentROperation;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.datashield.expr.ParseException;
-import org.obiba.opal.r.ROperation;
+import org.obiba.opal.spi.r.ROperation;
 import org.obiba.opal.web.r.AbstractRSymbolResourceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;

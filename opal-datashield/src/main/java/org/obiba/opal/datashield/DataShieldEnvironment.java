@@ -12,10 +12,9 @@ package org.obiba.opal.datashield;
 import java.util.List;
 
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration.Environment;
-import org.obiba.opal.r.ROperation;
-import org.obiba.opal.r.ROperations;
+import org.obiba.opal.spi.r.ROperation;
+import org.obiba.opal.spi.r.ROperations;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;

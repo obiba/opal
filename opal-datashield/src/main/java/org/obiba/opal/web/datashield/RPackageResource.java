@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.r.RMatrix;
-import org.obiba.opal.r.RScriptROperation;
-import org.obiba.opal.r.RStringMatrix;
+import org.obiba.opal.spi.r.RMatrix;
+import org.obiba.opal.spi.r.RScriptROperation;
+import org.obiba.opal.spi.r.RStringMatrix;
 import org.obiba.opal.r.service.OpalRService;
 import org.obiba.opal.web.datashield.support.NoSuchRPackageException;
 import org.obiba.opal.web.model.Opal;

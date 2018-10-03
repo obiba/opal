@@ -10,11 +10,11 @@
 package org.obiba.opal.web.r;
 
 import org.obiba.opal.core.service.IdentifiersTableService;
-import org.obiba.opal.r.magma.MagmaAssignROperation;
-import org.obiba.opal.r.ROperation;
-import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.StringAssignROperation;
+import org.obiba.opal.r.magma.MagmaAssignROperation;
 import org.obiba.opal.r.service.OpalRSession;
+import org.obiba.opal.spi.r.ROperation;
+import org.obiba.opal.spi.r.RScriptROperation;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.validation.constraints.NotNull;

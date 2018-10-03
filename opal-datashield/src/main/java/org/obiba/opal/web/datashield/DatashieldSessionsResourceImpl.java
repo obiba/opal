@@ -12,7 +12,7 @@ package org.obiba.opal.web.datashield;
 import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
-import org.obiba.opal.r.RScriptROperation;
+import org.obiba.opal.spi.r.RScriptROperation;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.web.datashield.support.DataShieldROptionsScriptBuilder;
 import org.obiba.opal.web.r.RSessionsResourceImpl;

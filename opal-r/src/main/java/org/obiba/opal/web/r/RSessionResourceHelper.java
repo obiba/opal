@@ -9,10 +9,10 @@
  */
 package org.obiba.opal.web.r;
 
-import org.obiba.opal.r.RASyncOperationTemplate;
-import org.obiba.opal.r.ROperationTemplate;
-import org.obiba.opal.r.ROperationWithResult;
-import org.obiba.opal.r.RScriptROperation;
+import org.obiba.opal.spi.r.RASyncOperationTemplate;
+import org.obiba.opal.spi.r.ROperationTemplate;
+import org.obiba.opal.spi.r.ROperationWithResult;
+import org.obiba.opal.spi.r.RScriptROperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

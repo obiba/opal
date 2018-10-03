@@ -8,11 +8,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.r.service;
+package org.obiba.opal.spi.r;
 
 import com.google.common.base.Strings;
-import org.obiba.opal.r.ROperation;
-import org.obiba.opal.r.ROperationWithResult;
 
 import java.util.Date;
 
@@ -89,17 +87,17 @@ public class RCommand {
     return (ROperationWithResult) rOperation;
   }
 
-  void inProgress() {
+  public void inProgress() {
     status = Status.IN_PROGRESS;
     startDate = new Date();
   }
 
-  void completed() {
+  public void completed() {
     status = Status.COMPLETED;
     endDate = new Date();
   }
 
-  void failed(String message) {
+  public void failed(String message) {
     status = Status.FAILED;
     endDate = new Date();
     error = message;

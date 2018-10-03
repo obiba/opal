@@ -7,20 +7,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package org.obiba.opal.spi.r;
 
-package org.obiba.opal.r.service;
+/**
+ * R related runtime errors.
+ */
+public class RRuntimeException extends RuntimeException {
 
+  private static final long serialVersionUID = 1L;
 
-public class NoSuchRCommandException extends RuntimeException {
-
-  private final String id;
-
-  public NoSuchRCommandException(String id) {
-    super("No such R command with ID: " + id);
-    this.id = id;
+  public RRuntimeException(String msg) {
+    super(msg);
   }
 
-  public String getId() {
-    return id;
+  public RRuntimeException(Throwable cause) {
+    super(cause.getMessage(), cause);
   }
+
 }
