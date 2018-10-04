@@ -1,12 +1,12 @@
 package org.obiba.opal.spi.analysis;
 
-import com.google.common.collect.Lists;
 import org.obiba.magma.ValueTable;
 import org.obiba.plugins.spi.ServicePlugin;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public interface AnalysisService<T extends Analysis> extends ServicePlugin  {
+public interface AnalysisService<T extends Analysis, U extends AnalysisResult> extends ServicePlugin  {
 
   /**
    * Get the list of analysis that can be performed.
@@ -21,7 +21,7 @@ public interface AnalysisService<T extends Analysis> extends ServicePlugin  {
    * @param analyses
    * @return
    */
-  List<AnalysisResult> analyse(List<T> analyses) throws NoSuchAnalysisTemplateException;
+  List<U> analyse(List<T> analyses) throws NoSuchAnalysisTemplateException;
 
   /**
    * Perform an analysis on the tibble representation of a {@link ValueTable} and report result.
@@ -29,7 +29,9 @@ public interface AnalysisService<T extends Analysis> extends ServicePlugin  {
    * @param analysis
    * @return
    */
-  default AnalysisResult analyse(T analysis) throws NoSuchAnalysisTemplateException {
-    return analyse(Lists.newArrayList(analysis)).get(0);
+  default U analyse(T analysis) throws NoSuchAnalysisTemplateException {
+    List<T> list = new ArrayList<>();
+    list.add(analysis);
+    return analyse(list).get(0);
   }
 }

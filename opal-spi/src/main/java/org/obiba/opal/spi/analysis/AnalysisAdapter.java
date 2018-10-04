@@ -14,12 +14,11 @@ public class AnalysisAdapter implements Analysis {
 
   private final String templateName;
 
-  private final JSONObject parameters;
+  private JSONObject parameters;
 
-  public AnalysisAdapter(String name, String templateName, JSONObject parameters) {
+  public AnalysisAdapter(String name, String templateName) {
     this.name = name;
     this.templateName = templateName;
-    this.parameters = parameters;
   }
 
   @Override
@@ -36,5 +35,9 @@ public class AnalysisAdapter implements Analysis {
   @Override
   public JSONObject getParameters() {
     return parameters;
+  }
+
+  public void setParameters(JSONObject parameters) {
+    this.parameters = parameters;
   }
 }
