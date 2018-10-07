@@ -1,6 +1,9 @@
 package org.obiba.opal.spi.analysis;
 
 import org.json.JSONObject;
+import org.obiba.magma.ValueType;
+
+import java.util.List;
 
 public interface AnalysisTemplate {
 
@@ -31,5 +34,12 @@ public interface AnalysisTemplate {
    * @return
    */
   JSONObject getJSONSchemaForm();
+
+  /**
+   * Get the value types handled by the analysis. If empty, any value type is handled.
+   *
+   * @return
+   */
+  List<ValueType> getValueTypes();
 
 }

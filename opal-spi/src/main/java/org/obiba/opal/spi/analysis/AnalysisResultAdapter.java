@@ -1,6 +1,8 @@
 package org.obiba.opal.spi.analysis;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Convenient class for implementing data processing engine specific results.
@@ -17,6 +19,8 @@ public abstract class AnalysisResultAdapter<T extends Analysis> implements Analy
   private Date startDate;
 
   private Date endDate;
+
+  private List<AnalysisResult<T>> subResults;
 
   protected AnalysisResultAdapter(T analysis) {
     this.analysis = analysis;
@@ -62,5 +66,23 @@ public abstract class AnalysisResultAdapter<T extends Analysis> implements Analy
   @Override
   public Date getEndDate() {
     return endDate;
+  }
+
+  @Override
+  public boolean hasSubResults() {
+    return subResults != null && !subResults.isEmpty();
+  }
+
+  @Override
+  public List<AnalysisResult<T>> getSubResults() {
+    return subResults == null ? subResults = new ArrayList<>() : subResults;
+  }
+
+  protected void addSubResults(List<AnalysisResult<T>> results) {
+    getSubResults().addAll(results);
+  }
+
+  protected void addSubResult(AnalysisResult<T> result) {
+    getSubResults().add(result);
   }
 }
