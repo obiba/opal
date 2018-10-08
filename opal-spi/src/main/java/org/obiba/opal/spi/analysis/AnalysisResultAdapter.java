@@ -20,7 +20,7 @@ public abstract class AnalysisResultAdapter<T extends Analysis> implements Analy
 
   private Date endDate;
 
-  private List<AnalysisResult<T>> subResults;
+  private List<AnalysisResult<T>> resultItems;
 
   protected AnalysisResultAdapter(T analysis) {
     this.analysis = analysis;
@@ -69,20 +69,20 @@ public abstract class AnalysisResultAdapter<T extends Analysis> implements Analy
   }
 
   @Override
-  public boolean hasSubResults() {
-    return subResults != null && !subResults.isEmpty();
+  public boolean hasResultItems() {
+    return resultItems != null && !resultItems.isEmpty();
   }
 
   @Override
-  public List<AnalysisResult<T>> getSubResults() {
-    return subResults == null ? subResults = new ArrayList<>() : subResults;
+  public List<AnalysisResult<T>> getResultItems() {
+    return resultItems == null ? resultItems = new ArrayList<>() : resultItems;
   }
 
-  protected void addSubResults(List<AnalysisResult<T>> results) {
-    getSubResults().addAll(results);
+  protected void addResultItems(List<AnalysisResult<T>> results) {
+    getResultItems().addAll(results);
   }
 
-  protected void addSubResult(AnalysisResult<T> result) {
-    getSubResults().add(result);
+  protected void addResultItem(AnalysisResult<T> result) {
+    getResultItems().add(result);
   }
 }

@@ -2,9 +2,10 @@ package org.obiba.opal.spi.analysis;
 
 public enum AnalysisStatus {
 
-  IN_PROGRESS, // test is on going
-  SUCCESS, // test was successful
-  WARNING, // test is positive but there are some notifications
-  FAILURE  // test has failed
+  IN_PROGRESS, // test is in progress
+  PASSED,      // test was successful
+  FAILURE,     // test has failed
+  ERROR,       // test could not be run due to an execution error
+  IGNORED      // test execution did not return a result
 
 }

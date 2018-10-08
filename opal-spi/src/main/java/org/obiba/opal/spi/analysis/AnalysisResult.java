@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Result of the analysis: status and report.
  */
-public interface AnalysisResult<T extends Analysis> {
+public interface AnalysisResult<T extends Analysis> extends AnalysisResultItem {
 
   /**
    * The original analysis request.
@@ -15,20 +15,6 @@ public interface AnalysisResult<T extends Analysis> {
    * @return
    */
   T getAnalysis();
-
-  /**
-   * Get the status of the analysis.
-   *
-   * @return
-   */
-  AnalysisStatus getStatus();
-
-  /**
-   * Get analysis associated message (may be empty), Markdown format is supported.
-   *
-   * @return
-   */
-  String getMessage();
 
   /**
    * Date at which the analysis was started.
@@ -49,7 +35,7 @@ public interface AnalysisResult<T extends Analysis> {
    *
    * @return
    */
-  boolean hasSubResults();
+  boolean hasResultItems();
 
   /**
    * Depending on the nature of the analysis, there could be some sub-results (for instance validation of several variables
@@ -57,7 +43,7 @@ public interface AnalysisResult<T extends Analysis> {
    *
    * @return
    */
-  @Nullable List<AnalysisResult<T>> getSubResults();
+  @Nullable List<AnalysisResultItem> getResultItems();
 
   /**
    * Get ellapsed time.
