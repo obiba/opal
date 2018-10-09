@@ -7,18 +7,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.r;
+package org.obiba.opal.spi.r;
+
+import org.rosuda.REngine.Rserve.RConnection;
 
 /**
- * R operation template is responsible for managing the R connection and make it available to a {@link ROperation}.
+ * Once a R connection is setup by a {@link ROperationTemplate}, this class handles the real things to be done on it.
  */
-public interface ROperationTemplate {
+public interface ROperation {
 
   /**
-   * Set up the R connection, do the R operation and clean up the R connection.
+   * Does anything with the provided R connection.
    *
-   * @param rop
+   * @param connection
    */
-  void execute(ROperation rop);
+  void doWithConnection(RConnection connection);
 
 }

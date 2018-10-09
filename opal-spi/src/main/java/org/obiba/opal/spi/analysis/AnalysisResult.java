@@ -1,0 +1,60 @@
+package org.obiba.opal.spi.analysis;
+
+import javax.annotation.Nullable;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Result of the analysis: status and report.
+ */
+public interface AnalysisResult<T extends Analysis> extends AnalysisResultItem {
+
+  /**
+   * The original analysis request.
+   *
+   * @return
+   */
+  T getAnalysis();
+
+  /**
+   * Date at which the analysis was started.
+   *
+   * @return
+   */
+  Date getStartDate();
+
+  /**
+   * Date at which the analysis ended.
+   *
+   * @return
+   */
+  Date getEndDate();
+
+  /**
+   * Get if there are sub-results.
+   *
+   * @return
+   */
+  boolean hasResultItems();
+
+  /**
+   * Depending on the nature of the analysis, there could be some sub-results (for instance validation of several variables
+   * gives one result per variable and a global result).
+   *
+   * @return
+   */
+  @Nullable List<AnalysisResultItem> getResultItems();
+
+  /**
+   * Get ellapsed time.
+   *
+   * @return
+   */
+  default long getTime() {
+    if (getStartDate() == null) return 0;
+    if (getEndDate() == null) return new Date().getTime() - getStartDate().getTime();
+
+    return getEndDate().getTime() - getStartDate().getTime();
+  }
+
+}

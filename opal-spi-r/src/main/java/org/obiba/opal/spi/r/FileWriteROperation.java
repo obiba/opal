@@ -7,31 +7,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.r;
+package org.obiba.opal.spi.r;
 
 import java.io.File;
 
 /**
  * Read a file from R into a local file.
  */
-public class FileReadROperation extends AbstractROperation {
+public class FileWriteROperation extends AbstractROperation {
 
   private final String fileName;
 
-  private final File destination;
+  private final File source;
 
-  public FileReadROperation(String fileName, File destination) {
+  public FileWriteROperation(String fileName, File source) {
     this.fileName = fileName;
-    this.destination = destination;
+    this.source = source;
   }
 
   @Override
   public void doWithConnection() {
-    readFile(fileName, destination);
+    writeFile(fileName, source);
   }
 
   @Override
   public String toString() {
-    return String.format("%s -> %s", fileName, destination);
+    return String.format("%s <- %s", fileName, source.getAbsolutePath());
   }
 }

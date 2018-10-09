@@ -17,8 +17,8 @@ import org.obiba.opal.datashield.expr.InvalidScriptException;
 import org.obiba.opal.datashield.expr.ParseException;
 import org.obiba.opal.datashield.expr.RScriptGenerator;
 import org.obiba.opal.datashield.expr.SimpleNode;
-import org.obiba.opal.r.AbstractROperationWithResult;
-import org.obiba.opal.r.ROperation;
+import org.obiba.opal.spi.r.AbstractROperationWithResult;
+import org.obiba.opal.spi.r.ROperation;
 
 import com.google.common.base.Preconditions;
 

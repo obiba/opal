@@ -11,18 +11,17 @@
 package org.obiba.opal.r.magma;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import org.obiba.magma.*;
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableWriter;
+import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.StaticDatasource;
-import org.obiba.magma.support.StaticValueTable;
-import org.obiba.opal.r.DataSaveROperation;
-import org.obiba.opal.r.FileReadROperation;
 import org.obiba.opal.r.service.OpalRSession;
+import org.obiba.opal.spi.r.DataSaveROperation;
+import org.obiba.opal.spi.r.FileReadROperation;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
-import java.util.List;
 
 /**
  * Writes a tibble in a R session.

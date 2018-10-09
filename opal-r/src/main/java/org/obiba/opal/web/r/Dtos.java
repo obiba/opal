@@ -9,13 +9,12 @@
  */
 package org.obiba.opal.web.r;
 
-import javax.ws.rs.core.UriBuilder;
-
 import org.apache.commons.io.FileUtils;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.web.model.OpalR;
 
+import javax.ws.rs.core.UriBuilder;
 import java.io.File;
 import java.util.Date;
 

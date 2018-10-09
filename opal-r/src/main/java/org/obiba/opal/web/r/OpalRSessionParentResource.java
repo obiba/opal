@@ -9,9 +9,6 @@
  */
 package org.obiba.opal.web.r;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-
 import org.obiba.opal.core.DeprecatedOperationException;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +16,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 
 /**
  *

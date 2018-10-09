@@ -153,6 +153,7 @@
     <module>opal-core</module>
     <module>opal-core-ws</module>
     <module>opal-spi</module>
+    <module>opal-spi-r</module>
     <module>opal-sshd</module>
     <module>opal-shell</module>
     <module>opal-server</module>
@@ -192,6 +193,11 @@
       <dependency>
         <groupId>org.obiba.opal</groupId>
         <artifactId>opal-spi</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-spi-r</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

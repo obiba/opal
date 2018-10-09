@@ -14,7 +14,7 @@ import com.google.common.collect.ImmutableSortedSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.opal.core.service.IdentifiersTableService;
-import org.obiba.opal.r.AbstractROperation;
+import org.obiba.opal.spi.r.AbstractROperation;
 import org.rosuda.REngine.REXP;
 import org.springframework.transaction.support.TransactionTemplate;
 

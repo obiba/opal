@@ -7,21 +7,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.r;
+package org.obiba.opal.spi.r;
 
 /**
- * R related runtime errors.
+ * R operation template is responsible for managing the R connection and make it available to a {@link ROperation}.
  */
-public class RRuntimeException extends RuntimeException {
+public interface ROperationTemplate {
 
-  private static final long serialVersionUID = 1L;
-
-  public RRuntimeException(String msg) {
-    super(msg);
-  }
-
-  public RRuntimeException(Throwable cause) {
-    super(cause.getMessage(), cause);
-  }
+  /**
+   * Set up the R connection, do the R operation and clean up the R connection.
+   *
+   * @param rop
+   */
+  void execute(ROperation rop);
 
 }

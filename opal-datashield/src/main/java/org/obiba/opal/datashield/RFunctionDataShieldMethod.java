@@ -12,8 +12,8 @@ package org.obiba.opal.datashield;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration.Environment;
-import org.obiba.opal.r.ROperation;
-import org.obiba.opal.r.ROperations;
+import org.obiba.opal.spi.r.ROperation;
+import org.obiba.opal.spi.r.ROperations;
 
 public class RFunctionDataShieldMethod implements DataShieldMethod {
 

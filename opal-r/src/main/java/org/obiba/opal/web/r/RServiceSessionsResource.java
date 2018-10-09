@@ -10,11 +10,7 @@
 
 package org.obiba.opal.web.r;
 
-import java.util.List;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-
+import com.google.common.collect.Lists;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.model.OpalR;
@@ -22,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Lists;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import java.util.List;
 
 @Component
 @Scope("request")

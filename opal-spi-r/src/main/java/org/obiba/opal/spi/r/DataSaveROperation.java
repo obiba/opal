@@ -7,16 +7,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.r;
+package org.obiba.opal.spi.r;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import org.obiba.magma.ValueType;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPLogical;
-import org.rosuda.REngine.REXPRaw;
 
-import java.util.Base64;
 import java.util.List;
 
 /**

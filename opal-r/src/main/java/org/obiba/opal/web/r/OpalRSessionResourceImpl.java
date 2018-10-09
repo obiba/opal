@@ -14,9 +14,9 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.r.FileReadROperation;
-import org.obiba.opal.r.FileWriteROperation;
-import org.obiba.opal.r.RScriptROperation;
+import org.obiba.opal.spi.r.FileReadROperation;
+import org.obiba.opal.spi.r.FileWriteROperation;
+import org.obiba.opal.spi.r.RScriptROperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.core.Response;
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Handles web services on a particular R session of the invoking Opal user.
