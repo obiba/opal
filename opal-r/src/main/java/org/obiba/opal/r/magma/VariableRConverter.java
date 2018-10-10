@@ -13,7 +13,7 @@ package org.obiba.opal.r.magma;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.support.MagmaEngineVariableResolver;
-import org.obiba.opal.r.MagmaRRuntimeException;
+import org.obiba.opal.spi.r.datasource.magma.MagmaRRuntimeException;
 import org.rosuda.REngine.REXP;
 
 /**

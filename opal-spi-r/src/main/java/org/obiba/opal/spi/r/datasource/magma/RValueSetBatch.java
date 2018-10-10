@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.r.magma;
+package org.obiba.opal.spi.r.datasource.magma;
 
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueSetBatch;

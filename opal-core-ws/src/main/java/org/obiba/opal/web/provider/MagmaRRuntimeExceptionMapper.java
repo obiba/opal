@@ -13,7 +13,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
 import com.google.protobuf.GeneratedMessage;
-import org.obiba.opal.r.MagmaRRuntimeException;
+import org.obiba.opal.spi.r.datasource.magma.MagmaRRuntimeException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

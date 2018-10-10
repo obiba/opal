@@ -15,18 +15,19 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.StaticDatasource;
-import org.obiba.opal.r.service.OpalRSession;
-import org.obiba.opal.spi.r.DataSaveROperation;
+import org.obiba.opal.r.DataSaveROperation;
 import org.obiba.opal.spi.r.FileReadROperation;
+import org.obiba.opal.spi.r.ROperationTemplate;
+import org.obiba.opal.spi.r.datasource.magma.RDatasource;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
 
 /**
- * Writes a tibble in a R session.
+ * Writes a tibble in a R session, save it as a file and get this file back in the opal file system.
  */
-public class RValueTableWriter implements ValueTableWriter {
+public class RFileValueTableWriter implements ValueTableWriter {
 
   private final String tableName;
 
@@ -36,13 +37,13 @@ public class RValueTableWriter implements ValueTableWriter {
 
   private final File destination;
 
-  private final OpalRSession rSession;
+  private final ROperationTemplate rSession;
 
   private final TransactionTemplate txTemplate;
 
   private final String idColumnName;
 
-  public RValueTableWriter(String tableName, String entityType, File destination, OpalRSession rSession, TransactionTemplate txTemplate, String idColumnName) {
+  public RFileValueTableWriter(String tableName, String entityType, File destination, ROperationTemplate rSession, TransactionTemplate txTemplate, String idColumnName) {
     this.tableName = tableName;
     this.datasource = new StaticDatasource(destination.getName());
     this.valueTableWriter = datasource.createWriter(tableName, entityType);

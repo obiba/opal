@@ -12,8 +12,11 @@ package org.obiba.opal.web.magma.support;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.r.magma.RDatasourceFactory;
+import org.obiba.opal.r.datasource.RDatasourceFactoryImpl;
+import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
+import org.obiba.opal.spi.r.ROperationTemplate;
+import org.obiba.opal.spi.r.datasource.RSessionHandler;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,13 +43,25 @@ public class RHavenDatasourceFactoryDtoParser extends AbstractDatasourceFactoryD
   @NotNull
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto, DatasourceEncryptionStrategy encryptionStrategy) {
-    RDatasourceFactory factory = new RDatasourceFactory();
+    RDatasourceFactoryImpl factory = new RDatasourceFactoryImpl();
     Magma.RHavenDatasourceFactoryDto rDto = dto.getExtension(Magma.RHavenDatasourceFactoryDto.params);
+    final OpalRSession rSession = opalRSessionManager.newSubjectRSession();
+    rSession.setExecutionContext("Import");
     factory.setName(dto.getName());
     factory.setSymbol(rDto.getSymbol());
     factory.setFile(rDto.getFile());
     factory.setOpalRuntime(opalRuntime);
-    factory.setOpalRSessionManager(opalRSessionManager);
+    factory.setRSessionHandler(new RSessionHandler() {
+      @Override
+      public ROperationTemplate getSession() {
+        return rSession;
+      }
+
+      @Override
+      public void onDispose() {
+        opalRSessionManager.removeRSession(rSession.getId());
+      }
+    });
 
     if(rDto.hasCatFile()) factory.setCategoryFile(rDto.getCatFile());
     if(rDto.hasEntityType()) factory.setEntityType(rDto.getEntityType());
