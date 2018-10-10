@@ -21,7 +21,7 @@ import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.magma.type.TextType;
-import org.obiba.opal.r.MagmaRRuntimeException;
+import org.obiba.opal.spi.r.datasource.magma.MagmaRRuntimeException;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.RList;
 import org.slf4j.Logger;

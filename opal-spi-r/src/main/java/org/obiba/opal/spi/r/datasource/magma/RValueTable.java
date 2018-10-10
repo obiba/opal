@@ -8,15 +8,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.r.magma;
+package org.obiba.opal.spi.r.datasource.magma;
 
 import com.google.common.base.Joiner;
 import org.obiba.magma.*;
 import org.obiba.magma.support.AbstractValueTable;
 import org.obiba.magma.support.NullTimestamps;
-import org.obiba.opal.r.MagmaRRuntimeException;
-import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.spi.r.REvaluationRuntimeException;
+import org.obiba.opal.spi.r.ROperationTemplate;
 import org.obiba.opal.spi.r.ROperationWithResult;
 import org.obiba.opal.spi.r.RScriptROperation;
 import org.rosuda.REngine.*;
@@ -134,7 +133,7 @@ public class RValueTable extends AbstractValueTable {
     return ((RDatasource) getDatasource()).getLocale();
   }
 
-  private OpalRSession getRSession() {
+  private ROperationTemplate getRSession() {
     return ((RDatasource) getDatasource()).getRSession();
   }
 

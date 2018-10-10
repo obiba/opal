@@ -9,30 +9,16 @@
  */
 package org.obiba.opal.shell.commands;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
-
 import com.google.common.base.*;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.obiba.core.util.FileUtil;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.DatasourceCopierProgressListener;
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.NoSuchDatasourceException;
-import org.obiba.magma.NoSuchValueTableException;
-import org.obiba.magma.RenameValueTable;
-import org.obiba.magma.ValueTable;
+import org.obiba.magma.*;
 import org.obiba.magma.datasource.csv.CsvDatasource;
 import org.obiba.magma.datasource.csv.support.CsvUtil;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
@@ -52,22 +38,30 @@ import org.obiba.opal.core.magma.QueryWhereClause;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.security.SubjectAclService;
-import org.obiba.opal.r.magma.RDatasource;
+import org.obiba.opal.r.magma.RFileDatasource;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
+import org.obiba.opal.spi.r.ROperationTemplate;
+import org.obiba.opal.spi.r.datasource.RSessionHandler;
 import org.obiba.opal.web.model.Opal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+import java.io.File;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.obiba.opal.shell.commands.CommandResultCode.SUCCESS;
 
@@ -665,6 +659,17 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       if ("sav".equals(ext) || "sas7bdat".equals(ext) || "dta".equals(ext)) {
         final OpalRSession rSession = opalRSessionManager.newSubjectRSession();
         rSession.setExecutionContext("Export");
+        RSessionHandler sessionHandler = new RSessionHandler() {
+          @Override
+          public ROperationTemplate getSession() {
+            return rSession;
+          }
+
+          @Override
+          public void onDispose() {
+            opalRSessionManager.removeRSession(rSession.getId());
+          }
+        };
         List<File> outFiles = Lists.newArrayList();
         File outFile = getLocalFile(outputFile);
         FileUtil.delete(outFile);
@@ -677,13 +682,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
           });
         }
         getValueTables().size();
-        RDatasource ds = new RDatasource(outputFile.getName().getBaseName(), rSession, outFiles, txTemplate, entityIdName, getEntityIdMap()) {
-          @Override
-          protected void onDispose() {
-            opalRSessionManager.removeRSession(rSession.getId());
-          }
-        };
-        return ds;
+        return new RFileDatasource(outputFile.getName().getBaseName(), sessionHandler, outFiles, txTemplate, entityIdName, getEntityIdMap());
       }
       return null;
     }

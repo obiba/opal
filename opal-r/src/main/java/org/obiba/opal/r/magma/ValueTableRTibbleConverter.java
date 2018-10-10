@@ -11,6 +11,7 @@
 package org.obiba.opal.r.magma;
 
 import com.google.common.base.Strings;
+import org.obiba.opal.spi.r.datasource.magma.RDatasource;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.RList;
 import org.slf4j.Logger;

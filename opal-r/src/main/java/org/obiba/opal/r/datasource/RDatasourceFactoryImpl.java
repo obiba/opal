@@ -8,28 +8,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.r.magma;
+package org.obiba.opal.r.datasource;
 
 import com.google.common.base.Strings;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
-import org.obiba.magma.AbstractDatasourceFactory;
 import org.obiba.magma.Datasource;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.r.service.OpalRSession;
-import org.obiba.opal.r.service.OpalRSessionManager;
+import org.obiba.opal.r.DataReadROperation;
+import org.obiba.opal.spi.r.datasource.AbstractRDatasourceFactory;
+import org.obiba.opal.spi.r.datasource.magma.RDatasource;
+
+import java.io.File;
 
 /**
  * Factory of {@link RDatasource}, either based on a symbol to be found in a R session or on file
  * to be read into a symbol in a R session.
  */
-public class RDatasourceFactory extends AbstractDatasourceFactory {
-
-  private OpalRSessionManager opalRSessionManager;
+public class RDatasourceFactoryImpl extends AbstractRDatasourceFactory {
 
   private OpalRuntime opalRuntime;
-
-  private String rSessionId;
 
   private String symbol;
 
@@ -47,16 +45,8 @@ public class RDatasourceFactory extends AbstractDatasourceFactory {
 
   private String categoryFile;
 
-  public void setOpalRSessionManager(OpalRSessionManager opalRSessionManager) {
-    this.opalRSessionManager = opalRSessionManager;
-  }
-
   public void setOpalRuntime(OpalRuntime opalRuntime) {
     this.opalRuntime = opalRuntime;
-  }
-
-  public void setRSessionId(String rSessionId) {
-    this.rSessionId = rSessionId;
   }
 
   public void setSymbol(String symbol) {
@@ -98,14 +88,9 @@ public class RDatasourceFactory extends AbstractDatasourceFactory {
 
   @Override
   protected Datasource internalCreate() {
-    final OpalRSession rSession = Strings.isNullOrEmpty(rSessionId) ?
-        opalRSessionManager.newSubjectRSession() : opalRSessionManager.getSubjectRSession(rSessionId);
-
-    if (Strings.isNullOrEmpty(rSessionId)) rSession.setExecutionContext("Import");
-
     RDatasource ds;
 
-    if (Strings.isNullOrEmpty(file)) ds = new RDatasource(getName(), rSession, symbol, entityType, idColumn);
+    if (Strings.isNullOrEmpty(file)) ds = new RDatasource(getName(), getRSessionHandler(), symbol, entityType, idColumn);
     else
       try {
         FileObject fileObj = resolveFileInFileSystem(file);
@@ -120,14 +105,20 @@ public class RDatasourceFactory extends AbstractDatasourceFactory {
           catFileObj = resolveFileInFileSystem(categoryFile);
         }
 
-        ds = new RDatasource(getName(), rSession, opalRuntime.getFileSystem().getLocalFile(fileObj),
-            catFileObj != null && catFileObj.exists() && catFileObj.isReadable() ? opalRuntime.getFileSystem().getLocalFile(catFileObj) : null,
-            symbol, entityType, idColumn) {
-          @Override
-          protected void onDispose() {
-            opalRSessionManager.removeRSession(rSession.getId());
-          }
-        };
+        File file = opalRuntime.getFileSystem().getLocalFile(fileObj);
+        File categoryFile =
+            catFileObj != null && catFileObj.exists() && catFileObj.isReadable() ? opalRuntime.getFileSystem().getLocalFile(catFileObj) : null;
+
+        // create tibble if file is provided
+        if (file != null && file.exists()) {
+          // copy file(s) to R session
+          prepareFile(file);
+          prepareFile(categoryFile);
+          // read it into the symbol
+          execute(new DataReadROperation(symbol, file.getName(),  categoryFile != null ? categoryFile.getName() : null));
+        }
+
+        ds = new RDatasource(getName(), getRSessionHandler(), symbol, entityType, idColumn);
       } catch (FileSystemException e) {
         throw new IllegalArgumentException("Failed resolving file path: " + file);
       }
