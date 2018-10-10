@@ -120,7 +120,7 @@ public abstract class RPackageResource {
   }
 
   private String getInstallGitHubCommand(String name, String username, String ref) {
-    return "devtools::install_github('" + name + "', username='" + username + "', ref='" + ref + "')";
+    return String.format("devtools::install_github('%s/%s', ref='%s')", username, name, ref);
   }
 
   protected RScriptROperation execute(String rscript) {

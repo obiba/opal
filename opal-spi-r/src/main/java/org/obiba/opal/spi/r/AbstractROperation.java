@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.spi.r;
 
+import com.google.common.base.Strings;
 import org.apache.commons.io.IOUtils;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REngineException;
@@ -192,6 +193,21 @@ public abstract class AbstractROperation implements ROperation {
   protected REXP ensurePackage(String packageName) {
     String cmd = String.format("if (!require(%s)) { install.packages('%s', repos=c('https://cran.rstudio.com/', 'https://cran.obiba.org'), dependencies=TRUE) }",
         packageName, packageName);
+    return eval(cmd, false);
+  }
+
+  /**
+   * Ensure R package is installed: check it is available, if not install it from Github repository.
+   *
+   * @param user
+   * @param packageName
+   * @param reference if null, master is used
+   * @return
+   */
+  protected REXP ensureGitHubPackage(String user, String packageName, String reference) {
+    ensurePackage("devtools");
+    String cmd = String.format("if (!require(%s)) { devtools::install_github('%s/%s', ref='%s') }",
+        packageName, user, packageName, Strings.isNullOrEmpty(reference) ? "master" : reference);
     return eval(cmd, false);
   }
 
