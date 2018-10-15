@@ -91,8 +91,10 @@ public class RValueTable extends AbstractValueTable {
   }
 
   private void initialiseVariables() {
-    REXPGenericVector columnDescs = (REXPGenericVector) execute(String.format("lapply(colnames(`%s`), function(n) { list(name=n,class=class(`%s`[[n]]),type=tibble::type_sum(`%s`[[n]]), attributes=attributes(`%s`[[n]])) })",
-        getSymbol(), getSymbol(), getSymbol(), getSymbol()));
+    String lambdaParam = "n";
+    if (lambdaParam.equals(getSymbol())) lambdaParam = ".n";
+    REXPGenericVector columnDescs = (REXPGenericVector) execute(String.format("lapply(colnames(`%s`), function(%s) { list(name=%s,class=class(`%s`[[%s]]),type=tibble::type_sum(`%s`[[%s]]), attributes=attributes(`%s`[[%s]])) })",
+        getSymbol(), lambdaParam, lambdaParam, getSymbol(), lambdaParam, getSymbol(), lambdaParam, getSymbol(), lambdaParam));
     RList columns = columnDescs.asList();
     try {
       for (int i=0; i<columns.size(); i++) {
