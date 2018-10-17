@@ -38,7 +38,7 @@
             <ui:msg description="Add Taxonomy label">Add taxonomy...</ui:msg>
           </b:NavLink>
           <b:NavLink ui:field="importGithubMaelstrom">
-            <ui:msg description="Import Maelstorm Taxonomy Git label">Import Maelstorm Research Taxonomies...</ui:msg>
+            <ui:msg description="Import Maelstrom Taxonomy Git label">Import Maelstrom Research Taxonomies...</ui:msg>
           </b:NavLink>
           <b:NavLink ui:field="importGithub">
             <ui:msg description="Import Taxonomy Git label">Import from Github...</ui:msg>
