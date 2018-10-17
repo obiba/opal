@@ -10,11 +10,11 @@ import java.util.List;
 public interface AnalysisResult<T extends Analysis> extends AnalysisResultItem {
 
   /**
-   * The original analysis request.
+   * The original analysis request identifier.
    *
    * @return
    */
-  T getAnalysis();
+  String getAnalysisId();
 
   /**
    * Date at which the analysis was started.

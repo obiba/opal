@@ -11,6 +11,13 @@ import java.util.List;
 public interface Analysis {
 
   /**
+   * Unique analysis request identifier.
+   *
+   * @return
+   */
+  String getId();
+
+  /**
    * Analysis name.
    *
    * @return

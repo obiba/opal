@@ -10,7 +10,7 @@ import java.util.List;
  */
 public abstract class AnalysisResultAdapter<T extends Analysis> implements AnalysisResult {
 
-  private final T analysis;
+  private final String analysisId;
 
   private AnalysisStatus status;
 
@@ -23,12 +23,12 @@ public abstract class AnalysisResultAdapter<T extends Analysis> implements Analy
   private List<AnalysisResult<T>> resultItems;
 
   protected AnalysisResultAdapter(T analysis) {
-    this.analysis = analysis;
+    this.analysisId = analysis.getId();
   }
 
   @Override
-  public T getAnalysis() {
-    return analysis;
+  public String getAnalysisId() {
+    return analysisId;
   }
 
   protected void setStatus(AnalysisStatus status) {

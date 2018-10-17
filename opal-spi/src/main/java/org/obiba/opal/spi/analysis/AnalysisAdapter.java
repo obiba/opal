@@ -5,6 +5,8 @@ import com.google.common.collect.Lists;
 import org.json.JSONObject;
 
 import javax.validation.constraints.NotNull;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -12,6 +14,10 @@ import java.util.List;
  *
  */
 public class AnalysisAdapter implements Analysis {
+
+  private static final SimpleDateFormat ISO_8601 = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+
+  private final String id;
 
   private final String name;
 
@@ -22,8 +28,14 @@ public class AnalysisAdapter implements Analysis {
   private List<String> variables;
 
   public AnalysisAdapter(String name, String templateName) {
+    this.id = ISO_8601.format(new Date());
     this.name = name;
     this.templateName = templateName;
+  }
+
+  @Override
+  public String getId() {
+    return id;
   }
 
   @Override
