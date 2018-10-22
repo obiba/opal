@@ -97,7 +97,7 @@
     <obiba-commons.version>1.11.0</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <opencsv.version>2.3</opencsv.version>
-    <orientdb.version>2.1.25</orientdb.version>
+    <orientdb.version>2.2.36</orientdb.version>
     <ow2-spec.version>1.0.13</ow2-spec.version>
     <postgresql.version>42.2.5</postgresql.version>
     <protobuf-java-format.version>1.2.1-obiba</protobuf-java-format.version>
@@ -169,7 +169,6 @@
     <module>opal-datashield</module>
     <module>opal-search</module>
     <module>opal-upgrade</module>
-    <module>opal-config-migrator</module>
   </modules>
 
   <dependencyManagement>
@@ -289,12 +288,6 @@
         <groupId>org.obiba.opal</groupId>
         <artifactId>opal-upgrade</artifactId>
         <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.obiba.opal</groupId>
-        <artifactId>opal-config-migrator</artifactId>
-        <version>${project.version}</version>
-        <classifier>cli</classifier>
       </dependency>
 
       <!-- Obiba dependencies -->
@@ -1405,11 +1398,21 @@
         </exclusions>
       </dependency>
 
-      <dependency>
+      <!--dependency>
         <groupId>com.orientechnologies</groupId>
-        <artifactId>orientdb-enterprise</artifactId>
+        <artifactId>orientdb-community</artifactId>
         <version>${orientdb.version}</version>
-      </dependency>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency-->
       <dependency>
         <groupId>com.orientechnologies</groupId>
         <artifactId>orientdb-server</artifactId>

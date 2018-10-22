@@ -14,6 +14,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.validation.constraints.NotNull;
 
+import com.orientechnologies.common.log.OLogManager;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +25,8 @@ import com.orientechnologies.orient.core.db.ODatabaseRecordThreadLocal;
 import com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.server.OServer;
+
+import java.io.*;
 
 @Component
 public class LocalOrientDbServerFactory implements OrientDbServerFactory {
@@ -68,6 +72,8 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
     System.setProperty("ORIENTDB_HOME", url.replaceFirst("^" + DEFAULT_SCHEME + ":", ""));
     System.setProperty("ORIENTDB_ROOT_PASSWORD", PASSWORD);
 
+    ensureSecurityConfig();
+
     server = new OServer() //
         .startup(LocalOrientDbServerFactory.class.getResourceAsStream("/orientdb-server-config.xml")) //
         .activate();
@@ -96,6 +102,21 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
     log.trace("Open OrientDB connection with username: {}", USERNAME);
 
     return poolFactory.get(url, USERNAME, PASSWORD).acquire();
+  }
+
+  private void ensureSecurityConfig() throws IOException {
+    File securityFile = new File(System.getProperty("ORIENTDB_HOME") + File.separator + "config", "security.json");
+    if (!securityFile.exists()) {
+      if (!securityFile.getParentFile().exists()) {
+        securityFile.getParentFile().mkdirs();
+      }
+      securityFile.createNewFile();
+      JSONObject securityObject = new JSONObject();
+      securityObject.put("enabled", false);
+      try (PrintWriter out = new PrintWriter(securityFile.getAbsolutePath())) {
+        out.println(securityObject.toString());
+      }
+    }
   }
 
   private void ensureDatabaseExists() {

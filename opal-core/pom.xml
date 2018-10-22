@@ -239,10 +239,10 @@
       <artifactId>commons-configuration</artifactId>
     </dependency>
 
-    <dependency>
+    <!--dependency>
       <groupId>com.orientechnologies</groupId>
-      <artifactId>orientdb-enterprise</artifactId>
-    </dependency>
+      <artifactId>orientdb-community</artifactId>
+    </dependency-->
     <dependency>
       <groupId>com.orientechnologies</groupId>
       <artifactId>orientdb-server</artifactId>

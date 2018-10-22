@@ -61,22 +61,6 @@ case "$1" in
         ln -s /etc/opal /var/lib/opal/conf
       fi
 
-      EXPORT_FILE=$OPAL_HOME/data/orientdb/opal-config.export
-
-      JAR_CMD="java -jar /usr/share/opal-*/tools/lib/opal-config-migrator-*-cli.jar"
-
-      [ -r $OPAL_HOME/data/orientdb/opal-config ] && $JAR_CMD --check $OPAL_HOME/data/orientdb/opal-config && \
-          { $JAR_CMD $OPAL_HOME/data/orientdb/opal-config $EXPORT_FILE  && \
-              echo "Legacy export completed ..." && \
-              mv $OPAL_HOME/data/orientdb/opal-config $OPAL_HOME/data/orientdb/opal-config.bak || exit 1; }
-
-      [ -r $EXPORT_FILE.gz ] && { \
-      java -cp "/usr/share/opal/lib/*" -DOPAL_HOME=$OPAL_HOME org.obiba.opal.core.tools.OrientDbUtil import $EXPORT_FILE.gz && \
-      rm $EXPORT_FILE.gz && \
-      chown -R opal:adm $OPAL_HOME/data/orientdb && \
-      rm -Rf $OPAL_HOME/data/orientdb/opal-config.bak || { mv $OPAL_HOME/data/orientdb/opal-config.bak $OPAL_HOME/data/orientdb/opal-config; \
-      exit 1; }; }
-
       chown -R opal:adm /var/lib/opal /var/log/opal /etc/opal /tmp/opal
       chmod -R 750      /var/lib/opal /var/log/opal /etc/opal/ /tmp/opal
       chmod +x /usr/share/opal/tools/shiro-hasher
