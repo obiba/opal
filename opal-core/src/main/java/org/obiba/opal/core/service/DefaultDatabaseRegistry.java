@@ -380,7 +380,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
       DataSource dataSource = notification.getValue();
       if(dataSource == null) {
         log.info("Cannot close null DataSource {}", database);
-      } else {
+      } else if (dataSource instanceof BasicDataSource) {
         try {
           ((BasicDataSource) dataSource).close();
         } catch(SQLException e) {

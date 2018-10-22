@@ -9,29 +9,8 @@
  */
 package org.obiba.opal.server;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
-import org.apache.commons.io.FileUtils;
+import com.google.common.base.Strings;
 import org.obiba.core.util.FileUtil;
-import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.upgrade.v2_0_x.ConfigFolderUpgrade;
 import org.obiba.opal.core.upgrade.v2_0_x.database.Opal2PropertiesConfigurator;
 import org.obiba.runtime.upgrade.UpgradeException;
@@ -46,10 +25,16 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Properties;
 
 /**
  * Command to perform an upgrade (i.e., invoke the upgrade manager).
@@ -69,10 +54,6 @@ public class UpgradeCommand {
       opal2Upgrade();
     }
 
-    if(needUpgradeOrientDb()) {
-      upgradeOrientDb();
-    }
-
     standardUpgrade();
   }
 
@@ -88,123 +69,6 @@ public class UpgradeCommand {
 
   private boolean needToUpgradeToOpal2() {
     return !hasVersionInConfigXml() && hasDatasourceInConfigProperties();
-  }
-
-  private boolean needUpgradeOrientDb() {
-    log.info("Checking orientdb upgrade");
-    ProcessResult result = executeOpalMigrator("--check", opalConfigPath);
-
-    if(result.exitCode == 0) {
-      log.info("Older version detected. Upgrade needed.");
-      return true;
-    } else if(result.exitCode == 65) {
-      log.info("Upgrade not needed");
-      return false;
-    }
-
-    throw new RuntimeException(result.output);
-  }
-
-  private void upgradeOrientDb() {
-    log.info("Upgrading orientdb");
-    File exportFile = null;
-    File tmpFile = null;
-    Path configBackup = Paths.get(String.format("%s.bak", opalConfigPath));
-    Path config = Paths.get(opalConfigPath);
-
-    try {
-      tmpFile = File.createTempFile("opal_orientdb_export", null);
-      String exportFilePrefix = tmpFile.getAbsolutePath();
-      exportFile = Paths.get(exportFilePrefix + ".gz").toFile();
-
-      exportOpalConfig(opalConfigPath, exportFilePrefix);
-      Files.move(config, configBackup, StandardCopyOption.ATOMIC_MOVE);
-    } catch(IOException e) {
-      if(exportFile != null && exportFile.exists()) exportFile.delete();
-
-      throw Throwables.propagate(e);
-    } finally {
-      if(tmpFile != null) tmpFile.delete();
-    }
-
-    try(ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(CONTEXT_PATHS)) {
-      OrientDbService orientDbService = ctx.getBean("orientDbService", OrientDbService.class);
-      orientDbService.importDatabase(exportFile);
-      log.info("Upgraded orientdb successfully");
-
-      try {
-        FileUtils.deleteDirectory(configBackup.toFile());
-      } catch(Exception e) {
-        log.error("Error cleaning up orientdb upgrade back up directory. Ignoring.", e);
-      }
-    } catch(IOException e) {
-      //roll back
-      try {
-        FileUtils.deleteDirectory(config.toFile());
-        Files.move(configBackup, config, StandardCopyOption.ATOMIC_MOVE);
-      } catch(Exception ex) {
-        log.error("Error in orientdb upgrade rollback. Ignoring.", ex);
-      }
-
-      throw Throwables.propagate(e);
-    } finally {
-      if(exportFile != null && exportFile.exists()) exportFile.delete();
-    }
-  }
-
-  private void exportOpalConfig(String opalConfigPath, String exportFilePrefix) {
-    ProcessResult result = executeOpalMigrator(opalConfigPath, exportFilePrefix);
-    if(result.exitCode != 0) throw new RuntimeException(result.output);
-  }
-
-  private ProcessResult executeOpalMigrator(String... args) {
-    ProcessBuilder pb = getOpalMigratorProcessBuilder(args);
-
-    try {
-      Process p = pb.start();
-      p.waitFor();
-      BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-      String line;
-      StringBuilder stringBuilder = new StringBuilder();
-
-      while((line = br.readLine()) != null) {
-        stringBuilder.append(line + "\n");
-      }
-
-      return new ProcessResult(p.exitValue(), stringBuilder.toString());
-    } catch(IOException | InterruptedException e) {
-      throw Throwables.propagate(e);
-    }
-  }
-
-  private ProcessBuilder getOpalMigratorProcessBuilder(String... args) {
-    String dist = System.getenv("OPAL_DIST");
-    if(Strings.isNullOrEmpty(dist))
-      throw new RuntimeException("Cannot locate opal tools directory: OPAL_DIST is not defined.");
-
-    File toolsDir = Paths.get(dist, "tools", "lib").toFile();
-    if(!toolsDir.exists() || !toolsDir.isDirectory())
-      throw new RuntimeException("No such directory: " + toolsDir.getAbsolutePath());
-
-    File[] jars = toolsDir.listFiles(new FilenameFilter() {
-      @Override
-      public boolean accept(File dir, String name) {
-        return name.startsWith("opal-config-migrator-") && name.endsWith("-cli.jar");
-      }
-    });
-    if(jars == null || jars.length == 0) throw new RuntimeException(
-        String.format("Cannot find any opal-config-migrator-*-cli.jar file in '%s'", toolsDir.getAbsolutePath()));
-
-    List<String> processArgs = Lists.newArrayList("java", "-jar", jars[0].getName());
-    processArgs.addAll(Arrays.asList(args));
-
-    log.info("Running Opal config migrator command: {}", Joiner.on(" ").join(processArgs));
-
-    ProcessBuilder pb = new ProcessBuilder(processArgs);
-    pb.redirectErrorStream(true);
-    pb.directory(toolsDir);
-
-    return pb;
   }
 
   /**
