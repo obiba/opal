@@ -92,8 +92,8 @@
     <!-- <entry name="profiler.config" value="30,10,10" />  -->
 
     <!-- LOG: enable/Disable logging. Levels are: finer, fine, finest, info, warning -->
-    <entry name="log.console.level" value="info"/>
-    <entry name="log.file.level" value="info"/>
+    <entry name="log.console.level" value="warning"/>
+    <entry name="log.file.level" value="warning"/>
   </properties>
 
 </orient-server>
