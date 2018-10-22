@@ -2,13 +2,13 @@ package org.obiba.opal.spi.r.analysis;
 
 import com.google.common.base.Strings;
 import org.json.JSONObject;
-import org.obiba.opal.spi.analysis.AnalysisAdapter;
+import org.obiba.opal.spi.analysis.AbstractAnalysis;
 import org.obiba.opal.spi.r.ROperationTemplate;
 
 /**
  * R analysis are performed on tibble (see https://www.tidyverse.org/).
  */
-public class RAnalysis extends AnalysisAdapter {
+public class RAnalysis extends AbstractAnalysis {
 
   private ROperationTemplate session;
 

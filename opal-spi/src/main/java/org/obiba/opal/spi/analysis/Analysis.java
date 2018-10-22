@@ -1,6 +1,7 @@
 package org.obiba.opal.spi.analysis;
 
 import org.json.JSONObject;
+import org.obiba.magma.Variable;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -44,6 +45,6 @@ public interface Analysis {
    *
    * @return
    */
-  List<String> getVariables();
+  List<Variable> getVariables();
 
 }

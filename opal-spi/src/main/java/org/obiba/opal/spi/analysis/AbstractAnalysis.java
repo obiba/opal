@@ -1,21 +1,22 @@
 package org.obiba.opal.spi.analysis;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.json.JSONObject;
+import org.obiba.magma.Variable;
 
 import javax.validation.constraints.NotNull;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Convenient class for implementing data processing engine specific analysis.
  *
  */
-public class AnalysisAdapter implements Analysis {
+public class AbstractAnalysis implements Analysis {
 
-  private static final SimpleDateFormat ISO_8601 = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+  private static final SimpleDateFormat DATE_ID = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 
   private final String id;
 
@@ -25,10 +26,10 @@ public class AnalysisAdapter implements Analysis {
 
   private JSONObject parameters;
 
-  private List<String> variables;
+  private List<Variable> variables;
 
-  public AnalysisAdapter(String name, String templateName) {
-    this.id = ISO_8601.format(new Date());
+  public AbstractAnalysis(String name, String templateName) {
+    this.id = DATE_ID.format(new Date()) + "-" + new Random().nextInt();
     this.name = name;
     this.templateName = templateName;
   }
@@ -59,17 +60,17 @@ public class AnalysisAdapter implements Analysis {
   }
 
   @Override
-  public List<String> getVariables() {
+  public List<Variable> getVariables() {
     return variables == null ? variables = Lists.newArrayList() : variables;
   }
 
-  public void addVariables(List<String> variables) {
+  public void addVariables(List<Variable> variables) {
     if (variables == null) return;
     variables.forEach(this::addVariable);
   }
 
-  public void addVariable(String var) {
-    if (Strings.isNullOrEmpty(var) || getVariables().contains(var)) return;
+  public void addVariable(Variable var) {
+    if (var == null || getVariables().contains(var)) return;
     getVariables().add(var);
   }
 }

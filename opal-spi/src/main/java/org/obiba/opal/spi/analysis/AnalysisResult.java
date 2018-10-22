@@ -10,6 +10,13 @@ import java.util.List;
 public interface AnalysisResult<T extends Analysis> extends AnalysisResultItem {
 
   /**
+   * Analysis result identifier.
+   *
+   * @return
+   */
+  String getId();
+
+  /**
    * The original analysis request identifier.
    *
    * @return

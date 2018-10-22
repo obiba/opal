@@ -1,11 +1,11 @@
 package org.obiba.opal.spi.r.analysis;
 
-import org.obiba.opal.spi.analysis.AnalysisResultAdapter;
+import org.obiba.opal.spi.analysis.AbstractAnalysisResult;
 import org.obiba.opal.spi.analysis.AnalysisStatus;
 
 import java.util.Date;
 
-public class RAnalysisResult extends AnalysisResultAdapter<RAnalysis> {
+public class RAnalysisResult extends AbstractAnalysisResult<RAnalysis> {
 
   private String reportPath;
 

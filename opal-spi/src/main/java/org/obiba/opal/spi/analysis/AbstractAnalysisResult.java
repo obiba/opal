@@ -8,7 +8,9 @@ import java.util.List;
  * Convenient class for implementing data processing engine specific results.
  *
  */
-public abstract class AnalysisResultAdapter<T extends Analysis> implements AnalysisResult {
+public abstract class AbstractAnalysisResult<T extends Analysis> implements AnalysisResult {
+
+  private String id;
 
   private final String analysisId;
 
@@ -22,8 +24,13 @@ public abstract class AnalysisResultAdapter<T extends Analysis> implements Analy
 
   private List<AnalysisResult<T>> resultItems;
 
-  protected AnalysisResultAdapter(T analysis) {
+  protected AbstractAnalysisResult(T analysis) {
     this.analysisId = analysis.getId();
+  }
+
+  @Override
+  public String getId() {
+    return id;
   }
 
   @Override
