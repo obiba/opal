@@ -18,7 +18,7 @@ obiba_home=${projects}/obiba-home
 
 skipTests=false
 mvn_exec=mvn -Dmaven.test.skip=${skipTests}
-orientdb_version=2.1.2
+orientdb_version=2.2.37
 
 mysql_root=root
 mysql_password=1234
@@ -259,10 +259,10 @@ sql-key-import:
 download-orientdb:
 	mkdir -p ${opal_home}/work && \
 	cd ${opal_home}/work && \
-	wget "http://orientdb.com/download.php?email=unknown@unknown.com&file=orientdb-community-$(orientdb_version).zip&os=multi" -O orientdb-community-$(orientdb_version).zip && \
-	unzip orientdb-community-$(orientdb_version).zip && \
-	rm orientdb-community-$(orientdb_version).zip && \
-	chmod a+x orientdb-community-$(orientdb_version)/bin/*.sh
+	wget "https://s3.us-east-2.amazonaws.com/orientdb3/releases/$(orientdb_version)/orientdb-community-importers-$(orientdb_version).zip" && \
+	unzip orientdb-community-importers-$(orientdb_version).zip && \
+	rm orientdb-community-importers-$(orientdb_version).zip && \
+	chmod a+x orientdb-community-importers-$(orientdb_version)/bin/*.sh
 
 orientdb-console:
 	@echo
@@ -271,7 +271,7 @@ orientdb-console:
 	@echo "or"
 	@echo "  connect plocal:$(opal_home)/data/orientdb/opal-config admin admin"
 	@echo
-	@cd ${opal_home}/work/orientdb-community-$(orientdb_version)/bin && ./console.sh
+	@cd ${opal_home}/work/orientdb-community-importers-$(orientdb_version)/bin && ./console.sh
 
 #
 # GWT locales

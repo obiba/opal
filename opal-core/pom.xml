@@ -239,10 +239,6 @@
       <artifactId>commons-configuration</artifactId>
     </dependency>
 
-    <!--dependency>
-      <groupId>com.orientechnologies</groupId>
-      <artifactId>orientdb-community</artifactId>
-    </dependency-->
     <dependency>
       <groupId>com.orientechnologies</groupId>
       <artifactId>orientdb-server</artifactId>
