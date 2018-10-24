@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import com.google.gwt.user.client.ui.*;
 import org.obiba.opal.web.gwt.app.client.support.jsonschema.JsonSchemaGWT;
 
 import com.github.gwtbootstrap.client.ui.ControlLabel;
@@ -16,14 +17,6 @@ import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
 import com.google.gwt.user.client.TakesValue;
-import com.google.gwt.user.client.ui.DoubleBox;
-import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.IntegerBox;
-import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.PasswordTextBox;
-import com.google.gwt.user.client.ui.TextArea;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.web.bindery.event.shared.EventBus;
 
 public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.ControlGroup {
@@ -211,12 +204,25 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
       case "string": {
         return createWidgetForString(aDefault);
       }
+      case "boolean": {
+        return createWidgetForBoolean(aDefault);
+      }
       case "array": {
         return createWidgetForArrayWithEnumItems();
       }
     }
 
     return null;
+  }
+
+  private Widget createWidgetForBoolean(final JSONValue aDefault) {
+    CheckBox checkBox = new CheckBox();
+
+    if (aDefault != null && aDefault.isBoolean() != null) {
+      checkBox.setValue(aDefault.isBoolean().booleanValue());
+    }
+
+    return checkBox;
   }
 
   private Widget createWidgetForNumber(final JSONValue aDefault) {
