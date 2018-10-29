@@ -687,7 +687,8 @@ public interface Translations extends Constants {
       "CartLimitExceeded", "Cart is full, no items can be added anymore.",
       "BannedUserMins", "Too many login failures. Please try again in {0}mins.",
       "BannedUserMin", "Too many login failures. Please try again in {0}min.",
-      "BannedUserSecs", "Too many login failures. Please try again in {0}secs."
+      "BannedUserSecs", "Too many login failures. Please try again in {0}secs.",
+      "RServerRuntimeError", "An R operation failed. Please contact technical support."
   })
   Map<String, String> userMessageMap();
 

@@ -13,7 +13,9 @@ import org.apache.commons.io.FileUtils;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.web.model.OpalR;
+import org.obiba.opal.web.model.Ws;
 
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.io.File;
 import java.util.Date;
@@ -54,4 +56,15 @@ public class Dtos {
         .build();
   }
 
+
+  public static Ws.ClientErrorDto getErrorMessage(Response.StatusType status,
+                                                  String errorStatus,
+                                                  RuntimeException exception) {
+    return Ws.ClientErrorDto.newBuilder()
+            .setStatus(errorStatus)
+            .setCode(status.getStatusCode())
+            .addArguments(exception.getMessage())
+            .addExtension(OpalR.RServerRuntimeErrorDto.errors, OpalR.RServerRuntimeErrorDto.newBuilder().build())
+            .build();
+  }
 }
