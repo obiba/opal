@@ -206,7 +206,7 @@ public abstract class AbstractROperation implements ROperation {
    */
   protected REXP ensureGitHubPackage(String user, String packageName, String reference) {
     ensurePackage("devtools");
-    String cmd = String.format("if (!require(%s)) { devtools::install_github('%s/%s', ref='%s') }",
+    String cmd = String.format("if (!require(%s)) { devtools::install_github('%s/%s', ref='%s', dependencies=TRUE) }",
         packageName, user, packageName, Strings.isNullOrEmpty(reference) ? "master" : reference);
     return eval(cmd, false);
   }
