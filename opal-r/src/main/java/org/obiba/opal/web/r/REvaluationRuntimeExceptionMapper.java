@@ -26,7 +26,7 @@ public class REvaluationRuntimeExceptionMapper implements ExceptionMapper<REvalu
     return Response
             .status(Status.BAD_REQUEST)
             .type("application/x-protobuf+json")
-            .entity(Dtos.getErrorMessage(Status.BAD_REQUEST, "RServerRuntimeError", exception))
+            .entity(Dtos.getErrorMessage(Status.BAD_REQUEST, exception))
             .build();
   }
 

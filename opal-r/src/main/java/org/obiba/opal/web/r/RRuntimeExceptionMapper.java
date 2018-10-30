@@ -12,9 +12,7 @@ package org.obiba.opal.web.r;
 import org.obiba.opal.spi.r.RRuntimeException;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -25,14 +23,11 @@ public class RRuntimeExceptionMapper implements ExceptionMapper<RRuntimeExceptio
 
   @Override
   public Response toResponse(RRuntimeException exception) {
-    String message = exception.getMessage();
-    ResponseBuilder response = Response.status(Status.INTERNAL_SERVER_ERROR);
-
-    if(message != null) {
-      response.type(MediaType.TEXT_PLAIN).entity(message);
-    }
-
-    return response.build();
+    return Response
+      .status(Status.INTERNAL_SERVER_ERROR)
+      .type("application/x-protobuf+json")
+      .entity(Dtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, exception))
+      .build();
   }
 
 }

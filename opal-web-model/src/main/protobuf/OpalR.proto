@@ -49,3 +49,9 @@ message REvaluationRuntimeErrorDto {
     repeated REvaluationRuntimeErrorDto errors = 2000;
   }
 }
+
+message RRuntimeErrorDto {
+  extend Ws.ClientErrorDto {
+    repeated RRuntimeErrorDto errors = 2001;
+  }
+}
