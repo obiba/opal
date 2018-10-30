@@ -284,7 +284,7 @@ locales:
 # Plugins
 #
 
-plugins: search-plugin opal-datasource-spss-plugin opal-datasource-limesurvey-plugin opal-datasource-redcap-plugin
+plugins: search-plugin opal-datasource-spss-plugin opal-datasource-limesurvey-plugin opal-datasource-redcap-plugin opal-datasource-googlesheets4-plugin opal-datasource-readr-plugin
 
 vcf-plugin: jennite
 
@@ -299,3 +299,9 @@ opal-datasource-limesurvey-plugin:
 
 opal-datasource-redcap-plugin:
 	cd ${projects}/opal-datasource-redcap && mvn clean install && cp target/opal-datasource-redcap-*-dist.zip ${opal_home}/plugins/
+
+opal-datasource-googlesheets4-plugin:
+	cd ${projects}/opal-datasource-googlesheets4 && mvn clean install && cp target/opal-datasource-googlesheets4-*-dist.zip ${opal_home}/plugins/
+
+opal-datasource-readr-plugin:
+	cd ${projects}/opal-datasource-readr && mvn clean install && cp target/opal-datasource-readr-*-dist.zip ${opal_home}/plugins/
