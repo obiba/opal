@@ -9,9 +9,11 @@
  */
 package org.obiba.opal.web.r;
 
+import com.google.common.base.Joiner;
 import org.apache.commons.io.FileUtils;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.r.service.OpalRSession;
+import org.obiba.opal.spi.r.REvaluationRuntimeException;
 import org.obiba.opal.web.model.OpalR;
 import org.obiba.opal.web.model.Ws;
 
@@ -59,12 +61,14 @@ public class Dtos {
 
   public static Ws.ClientErrorDto getErrorMessage(Response.StatusType status,
                                                   String errorStatus,
-                                                  RuntimeException exception) {
+                                                  REvaluationRuntimeException exception) {
+    String message = exception.getMessage() + ": " + Joiner.on("; ").join(exception.getRMessages());
+
     return Ws.ClientErrorDto.newBuilder()
             .setStatus(errorStatus)
             .setCode(status.getStatusCode())
-            .addArguments(exception.getMessage())
-            .addExtension(OpalR.RServerRuntimeErrorDto.errors, OpalR.RServerRuntimeErrorDto.newBuilder().build())
+            .addArguments(message.replace("\n", "").replace("\r", ""))
+            .addExtension(OpalR.REvaluationRuntimeErrorDto.errors, OpalR.REvaluationRuntimeErrorDto.newBuilder().build())
             .build();
   }
 }
