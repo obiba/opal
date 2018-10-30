@@ -17,6 +17,7 @@ import java.sql.Driver;
 import java.sql.DriverManager;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
@@ -51,17 +52,17 @@ public class DefaultJdbcDriverRegistry implements JdbcDriverRegistry {
   @Override
   public String getDriverName(Driver driver) {
     String className = driver.getClass().getName();
-    return Objects.firstNonNull(SUPPORTED_DRIVER_CLASS_TO_NAME.get(className), className);
+    return Optional.ofNullable(SUPPORTED_DRIVER_CLASS_TO_NAME.get(className)).orElse(className);
   }
 
   @Override
   public String getJdbcUrlTemplate(Driver driver) {
-    return Objects.firstNonNull(DRIVER_CLASS_TO_URL_TEMPLATE.get(driver.getClass().getName()), "");
+    return Optional.ofNullable(DRIVER_CLASS_TO_URL_TEMPLATE.get(driver.getClass().getName())).orElse("");
   }
 
   @Override
   public String getJdbcUrlExample(Driver driver) {
-    return Objects.firstNonNull(DRIVER_CLASS_TO_URL_EXAMPLE.get(driver.getClass().getName()), "");
+    return Optional.ofNullable(DRIVER_CLASS_TO_URL_EXAMPLE.get(driver.getClass().getName())).orElse("");
   }
 
   @Override
