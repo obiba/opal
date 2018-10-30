@@ -79,7 +79,7 @@ public class Dtos {
     Ws.ClientErrorDto.Builder builder = Ws.ClientErrorDto.newBuilder()
             .setStatus("RServerRuntimeError")
             .setCode(status.getStatusCode())
-            .addExtension(OpalR.REvaluationRuntimeErrorDto.errors, OpalR.REvaluationRuntimeErrorDto.newBuilder().build());
+            .addExtension(OpalR.RRuntimeErrorDto.errors, OpalR.RRuntimeErrorDto.newBuilder().build());
 
     String message = exception.getMessage();
 
