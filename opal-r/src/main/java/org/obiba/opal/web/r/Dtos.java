@@ -9,11 +9,17 @@
  */
 package org.obiba.opal.web.r;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import org.apache.commons.io.FileUtils;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.r.service.OpalRSession;
+import org.obiba.opal.spi.r.REvaluationRuntimeException;
+import org.obiba.opal.spi.r.RRuntimeException;
 import org.obiba.opal.web.model.OpalR;
+import org.obiba.opal.web.model.Ws;
 
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.io.File;
 import java.util.Date;
@@ -54,4 +60,33 @@ public class Dtos {
         .build();
   }
 
+
+  public static Ws.ClientErrorDto getErrorMessage(Response.StatusType status,
+                                                  REvaluationRuntimeException exception) {
+    String message = exception.getMessage() + ": " + Joiner.on("; ").join(exception.getRMessages());
+
+    return Ws.ClientErrorDto.newBuilder()
+            .setStatus("RServerRuntimeError")
+            .setCode(status.getStatusCode())
+            .addArguments(message.replace("\n", "").replace("\r", ""))
+            .addExtension(OpalR.REvaluationRuntimeErrorDto.errors, OpalR.REvaluationRuntimeErrorDto.newBuilder().build())
+            .build();
+  }
+
+  public static Ws.ClientErrorDto getErrorMessage(Response.StatusType status,
+                                                  RRuntimeException exception) {
+
+    Ws.ClientErrorDto.Builder builder = Ws.ClientErrorDto.newBuilder()
+            .setStatus("RServerRuntimeError")
+            .setCode(status.getStatusCode())
+            .addExtension(OpalR.RRuntimeErrorDto.errors, OpalR.RRuntimeErrorDto.newBuilder().build());
+
+    String message = exception.getMessage();
+
+    builder.addArguments(
+            Strings.isNullOrEmpty(message)
+                    ? String.format(exception.getClass().getSimpleName())
+                    : message);
+
+    return builder.build();  }
 }

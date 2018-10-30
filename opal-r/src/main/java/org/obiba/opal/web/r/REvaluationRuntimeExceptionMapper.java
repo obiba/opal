@@ -9,11 +9,9 @@
  */
 package org.obiba.opal.web.r;
 
-import com.google.common.base.Joiner;
 import org.obiba.opal.spi.r.REvaluationRuntimeException;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -25,10 +23,11 @@ public class REvaluationRuntimeExceptionMapper implements ExceptionMapper<REvalu
 
   @Override
   public Response toResponse(REvaluationRuntimeException exception) {
-    String message = exception.getMessage() + ": " + Joiner.on("; ").join(exception.getRMessages());
-    message = message.replace("\n", "");
-    message = message.replace("\r", "");
-    return Response.status(Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN).entity(message).build();
+    return Response
+            .status(Status.BAD_REQUEST)
+            .type("application/x-protobuf+json")
+            .entity(Dtos.getErrorMessage(Status.BAD_REQUEST, exception))
+            .build();
   }
 
 }
