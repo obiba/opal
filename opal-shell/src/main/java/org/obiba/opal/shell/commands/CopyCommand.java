@@ -17,6 +17,7 @@ import com.google.common.collect.Maps;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
+import org.json.JSONObject;
 import org.obiba.core.util.FileUtil;
 import org.obiba.magma.*;
 import org.obiba.magma.datasource.csv.CsvDatasource;
@@ -26,24 +27,28 @@ import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.datasource.nil.NullDatasource;
 import org.obiba.magma.js.support.JavascriptMultiplexingStrategy;
 import org.obiba.magma.js.support.JavascriptVariableTransformer;
-import org.obiba.magma.support.DatasourceCopier;
-import org.obiba.magma.support.Disposables;
-import org.obiba.magma.support.Initialisables;
-import org.obiba.magma.support.MagmaEngineTableResolver;
+import org.obiba.magma.support.*;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.support.AllClause;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.magma.QueryWhereClause;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.r.magma.RFileDatasource;
+import org.obiba.opal.r.magma.RSymbolValueTableWriter;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
+import org.obiba.opal.spi.datasource.DatasourceService;
+import org.obiba.opal.spi.datasource.DatasourceUsage;
 import org.obiba.opal.spi.r.ROperationTemplate;
+import org.obiba.opal.spi.r.datasource.RDatasourceFactory;
+import org.obiba.opal.spi.r.datasource.RDatasourceService;
 import org.obiba.opal.spi.r.datasource.RSessionHandler;
+import org.obiba.opal.spi.r.datasource.magma.RSymbolWriter;
 import org.obiba.opal.web.model.Opal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +102,9 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
   @Autowired
   private SubjectAclService subjectAclService;
+
+  @Autowired
+  private OpalRuntime opalRuntime;
 
   private Map<String, String> entityIdMap;
 
@@ -276,7 +284,10 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       Database database = databaseRegistry.getDatabase(options.getOut());
       destinationDatasource = databaseRegistry.createDatasourceFactory(DATE_FORMAT.format(new Date()), database).create();
       destinationDatasourceName = destinationDatasource.getName();
-    } else {
+    } else if (opalRuntime.hasServicePlugin(options.getOutFormat())) {
+      destinationDatasource = createDestinationPluginDatasource();
+    }
+    else {
       destinationDatasource = fileDatasourceFactory.createDatasource(getOutputFile());
     }
 
@@ -286,6 +297,51 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
 
     Initialisables.initialise(destinationDatasource);
     return destinationDatasource;
+  }
+
+  private Datasource createDestinationPluginDatasource() {
+    DatasourceService datasourceService = (DatasourceService) opalRuntime.getServicePlugin(options.getOutFormat());
+    if (!datasourceService.getUsages().contains(DatasourceUsage.EXPORT)) return null;
+
+    datasourceService.setOpalFileSystemPathResolver(path -> {
+      try {
+        FileObject fileObject = opalRuntime.getFileSystem().getRoot().resolveFile(path);
+        // check security
+        if (fileObject.exists()) {
+          if (!fileObject.isWriteable()) {
+            throw new IllegalArgumentException("File cannot be written: " + path);
+          }
+        } else if (!fileObject.getParent().isWriteable()) {
+          throw new IllegalArgumentException("File cannot be written: " + path);
+        }
+        return opalRuntime.getFileSystem().getLocalFile(fileObject);
+      } catch (FileSystemException e) {
+        throw new IllegalArgumentException("Failed resolving file path: " + path);
+      }
+    });
+
+    JSONObject parameters = new JSONObject(options.getOut());
+    if (datasourceService instanceof RDatasourceService) {
+      final OpalRSession rSession = opalRSessionManager.newSubjectRSession();
+      rSession.setExecutionContext("Export");
+      RSessionHandler rSessionHandler = new RSessionHandler() {
+        @Override
+        public ROperationTemplate getSession() {
+          return rSession;
+        }
+
+        @Override
+        public void onDispose() {
+          opalRSessionManager.removeRSession(rSession.getId());
+        }
+      };
+      ((RDatasourceService) datasourceService).setRSessionHandler(rSessionHandler);
+      RDatasourceFactory rDatasourceFactory = (RDatasourceFactory) datasourceService.createDatasourceFactory(DatasourceUsage.EXPORT, parameters);
+      return new RPluginDatasource(rDatasourceFactory.create(), rSessionHandler, rDatasourceFactory.createSymbolWriter());
+
+    } else {
+      return datasourceService.createDatasourceFactory(DatasourceUsage.EXPORT, parameters).create();
+    }
   }
 
   private Set<ValueTable> getValueTables() {
@@ -685,6 +741,26 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
         return new RFileDatasource(outputFile.getName().getBaseName(), sessionHandler, outFiles, txTemplate, entityIdName, getEntityIdMap());
       }
       return null;
+    }
+  }
+
+  private class RPluginDatasource extends StaticDatasource {
+
+    private final RSessionHandler sessionHandler;
+
+    private final RSymbolWriter rSymbolWriter;
+
+    RPluginDatasource(@NotNull Datasource wrapped, RSessionHandler rSessionHandler, RSymbolWriter rSymbolWriter) {
+      super(wrapped.getName());
+      this.sessionHandler = rSessionHandler;
+      this.rSymbolWriter = rSymbolWriter;
+    }
+
+    @NotNull
+    @Override
+    public ValueTableWriter createWriter(@NotNull String tableName, @NotNull String entityType) {
+      ValueTableWriter wrapped = super.createWriter(tableName, entityType);
+      return new RSymbolValueTableWriter(this, wrapped, tableName, rSymbolWriter, sessionHandler, txTemplate, getEntityIdMap().getOrDefault(entityType, entityIdName));
     }
   }
 

@@ -162,6 +162,11 @@ public class OpalRSession implements RASyncOperationTemplate {
     return ws;
   }
 
+  @Override
+  public String toString() {
+    return id;
+  }
+
   //
   // ROperationTemplate methods
   //

@@ -1,10 +1,7 @@
 package org.obiba.opal.r.magma;
 
-import com.google.common.collect.Sets;
-import org.obiba.magma.NoSuchValueTableException;
-import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.support.AbstractDatasource;
+import org.obiba.magma.support.StaticDatasource;
 import org.obiba.opal.spi.r.datasource.RSessionHandler;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -12,12 +9,11 @@ import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
- * Writes a file through R.
+ * Writes a file through R using the haven package.
  */
-public class RFileDatasource extends AbstractDatasource {
+public class RFileDatasource extends StaticDatasource {
 
   private final RSessionHandler sessionHandler;
 
@@ -32,7 +28,7 @@ public class RFileDatasource extends AbstractDatasource {
 
 
   public RFileDatasource(String name, RSessionHandler sessionHandler, List<File> outputFiles, TransactionTemplate txTemplate,  String idColumnName, Map<String, String> idColumnNames) {
-    super(name, "r");
+    super(name);
     this.sessionHandler = sessionHandler;
     this.outputFiles = outputFiles;
     this.txTemplate = txTemplate;
@@ -41,24 +37,11 @@ public class RFileDatasource extends AbstractDatasource {
   }
 
   @Override
+  @NotNull
   public ValueTableWriter createWriter(@NotNull String tableName, @NotNull String entityType) {
-    File outputFile;
-    if (outputFiles.size() == 1)
-      outputFile = outputFiles.get(0);
-    else
-      outputFile = outputFiles.stream().filter(f -> f.getName().startsWith(tableName + ".")).findFirst().get();
-    return new RFileValueTableWriter(tableName, entityType, outputFile, sessionHandler.getSession(), txTemplate, getIdColumnName(entityType));
-  }
-
-  @Override
-  protected Set<String> getValueTableNames() {
-    return Sets.newHashSet();
-  }
-
-  @Override
-  protected ValueTable initialiseValueTable(String tableName) {
-    // not supposed to be here
-    throw new NoSuchValueTableException(tableName);
+    ValueTableWriter staticValueTableWriter = super.createWriter(tableName, entityType);
+    return new RSymbolValueTableWriter(this, staticValueTableWriter, tableName, new RFileSymbolWriter(sessionHandler, outputFiles),
+        sessionHandler, txTemplate, getIdColumnName(entityType));
   }
 
   private String getIdColumnName(String entityType) {

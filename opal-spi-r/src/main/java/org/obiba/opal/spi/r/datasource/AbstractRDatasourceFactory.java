@@ -3,6 +3,7 @@ package org.obiba.opal.spi.r.datasource;
 import org.obiba.magma.AbstractDatasourceFactory;
 import org.obiba.opal.spi.r.FileWriteROperation;
 import org.obiba.opal.spi.r.ROperation;
+import org.obiba.opal.spi.r.datasource.magma.RSymbolWriter;
 
 import java.io.File;
 
@@ -13,6 +14,12 @@ public abstract class AbstractRDatasourceFactory extends AbstractDatasourceFacto
   @Override
   public void setRSessionHandler(RSessionHandler sessionHandler) {
     this.sessionHandler = sessionHandler;
+    setName(sessionHandler.getSession().toString());
+  }
+
+  @Override
+  public RSymbolWriter createSymbolWriter() {
+    throw new NoSuchMethodError("R symbol writing is not supported");
   }
 
   protected RSessionHandler getRSessionHandler() {
@@ -40,18 +47,4 @@ public abstract class AbstractRDatasourceFactory extends AbstractDatasourceFacto
     sessionHandler.getSession().execute(rop);
   }
 
-  /**
-   * Make the symbol that will refer to the data file.
-   *
-   * @param file
-   * @return
-   */
-  protected String getSymbol(File file) {
-    String symbol = file.getName().replaceAll(" ", "_");
-    int suffix = symbol.lastIndexOf(".");
-    if (suffix>0) {
-      symbol = symbol.substring(0, suffix);
-    }
-    return symbol;
-  }
 }

@@ -15,19 +15,18 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.StaticDatasource;
-import org.obiba.opal.r.DataSaveROperation;
-import org.obiba.opal.spi.r.FileReadROperation;
 import org.obiba.opal.spi.r.ROperationTemplate;
+import org.obiba.opal.spi.r.datasource.RSessionHandler;
 import org.obiba.opal.spi.r.datasource.magma.RDatasource;
+import org.obiba.opal.spi.r.datasource.magma.RSymbolWriter;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.validation.constraints.NotNull;
-import java.io.File;
 
 /**
  * Writes a tibble in a R session, save it as a file and get this file back in the opal file system.
  */
-public class RFileValueTableWriter implements ValueTableWriter {
+public class RSymbolValueTableWriter implements ValueTableWriter {
 
   private final String tableName;
 
@@ -35,22 +34,22 @@ public class RFileValueTableWriter implements ValueTableWriter {
 
   private final ValueTableWriter valueTableWriter;
 
-  private final File destination;
+  private final RSymbolWriter symbolWriter;
 
-  private final ROperationTemplate rSession;
+  private final RSessionHandler rSessionHandler;
 
   private final TransactionTemplate txTemplate;
 
   private final String idColumnName;
 
-  public RFileValueTableWriter(String tableName, String entityType, File destination, ROperationTemplate rSession, TransactionTemplate txTemplate, String idColumnName) {
+  public RSymbolValueTableWriter(StaticDatasource datasource, ValueTableWriter wrapped, String tableName, RSymbolWriter symbolWriter, RSessionHandler rSessionHandler, TransactionTemplate txTemplate, String idColumnName) {
     this.tableName = tableName;
-    this.datasource = new StaticDatasource(destination.getName());
-    this.valueTableWriter = datasource.createWriter(tableName, entityType);
-    this.destination = destination;
-    this.rSession = rSession;
+    this.datasource = datasource;
+    this.valueTableWriter = wrapped;
+    this.rSessionHandler = rSessionHandler;
     this.txTemplate = txTemplate;
     this.idColumnName = Strings.isNullOrEmpty(idColumnName) ? RDatasource.DEFAULT_ID_COLUMN_NAME : idColumnName;
+    this.symbolWriter = symbolWriter;
   }
 
   @Override
@@ -66,15 +65,13 @@ public class RFileValueTableWriter implements ValueTableWriter {
   @Override
   public void close() {
     valueTableWriter.close();
+    // get in-memory table and persist it in R
     ValueTable valueTable = datasource.getValueTable(tableName);
     if (valueTable.getValueSetCount()>0) {
-      String symbol = "D";
       // push table to a R tibble
-      rSession.execute(new MagmaAssignROperation(symbol, valueTable, txTemplate, idColumnName));
-      // save tibble in file in R
-      rSession.execute(new DataSaveROperation(symbol, destination.getName()));
-      // read back file from R to opal
-      rSession.execute(new FileReadROperation(destination.getName(), destination));
+      rSessionHandler.getSession().execute(new MagmaAssignROperation(symbolWriter.getSymbol(valueTable), valueTable, txTemplate, idColumnName));
+      symbolWriter.write(valueTable);
     }
   }
+
 }
