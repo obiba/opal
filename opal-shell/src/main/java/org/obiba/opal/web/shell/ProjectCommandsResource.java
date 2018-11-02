@@ -141,7 +141,7 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
 
     if(options.hasDestination()) {
       ensureDatasourceWriteAccess(options.getDestination());
-    } else if(options.hasOut()) {
+    } else if(options.hasOut() && !options.getOut().trim().startsWith("{")) {
       ensureFileWriteAccess(options.getOut());
     }
 
