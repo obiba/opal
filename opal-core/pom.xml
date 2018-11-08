@@ -284,6 +284,11 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-spi-r</artifactId>
+    </dependency>
+
   </dependencies>
 
   <build>

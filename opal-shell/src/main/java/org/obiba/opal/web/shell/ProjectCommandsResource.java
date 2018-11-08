@@ -9,17 +9,6 @@
  */
 package org.obiba.opal.web.shell;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-
 import com.google.common.collect.Lists;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.magma.Datasource;
@@ -42,6 +31,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @Transactional
@@ -150,6 +149,21 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
     copyCommand.setOptions(copyOptions);
 
     return launchCommand(commandName, copyCommand);
+  }
+
+  @POST
+  @Path("/_analyse")
+  public Response analyse(Commands.AnalyseCommandOptionsDto options) {
+    if(!name.equals(options.getProject())) {
+      throw new InvalidRequestException("InvalidProjectName", name);
+    }
+
+    String commandName = "analyse";
+    AnalyseCommandOptions analyseCommandOptions = new AnalyseCommandOptionsDtoImpl(options);
+    Command<AnalyseCommandOptions> analyseCommand = commandRegistry.newCommand(commandName);
+    analyseCommand.setOptions(analyseCommandOptions);
+
+    return launchCommand(commandName, analyseCommand);
   }
 
   //
