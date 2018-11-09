@@ -208,7 +208,7 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
         return createWidgetForBoolean(aDefault);
       }
       case "array": {
-        return createWidgetForArrayWithEnumItems();
+        return createWidgetForArray();
       }
     }
 
@@ -317,13 +317,20 @@ public class SchemaUiContainer extends com.github.gwtbootstrap.client.ui.Control
     return listBox;
   }
 
-  private Widget createWidgetForArrayWithEnumItems() {
+  private Widget createWidgetForArray() {
     JSONValue itemsSchema = schema.get("items");
     JSONObject items = itemsSchema != null && itemsSchema.isObject() != null
         ? itemsSchema.isObject()
         : new JSONObject();
 
-    return new DynamicCheckboxGroup(key, JsonSchemaGWT.getEnum(items));
+    List<String> enumItems = JsonSchemaGWT.getEnum(items);
+
+    if (enumItems.size() == 0) {
+      JsonSchemaGWT.getType(items);
+      return new DynamicArrayItems(key, type);
+    }
+
+    return new DynamicCheckboxGroup(key, enumItems);
   }
 
   private void setStringSchemaValidations(Widget widget) {
