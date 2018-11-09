@@ -16,6 +16,7 @@ import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.shell.commands.options.AnalyseCommandOptions;
 import org.obiba.opal.spi.analysis.AnalysisService;
 import org.obiba.opal.spi.r.ROperationTemplate;
+import org.obiba.opal.spi.r.RUtils;
 import org.obiba.opal.spi.r.analysis.RAnalysis;
 import org.obiba.opal.spi.r.analysis.RAnalysisResult;
 import org.obiba.opal.spi.r.analysis.RAnalysisService;
@@ -95,7 +96,7 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
         RAnalysisResult result = rAnalysisService.analyse(
           RAnalysis.create(analyseOptions.getName(), analyseOptions.getTemplate())
             .session(rSession)
-            .symbol(tableName)
+            .symbol(RUtils.getSymbol(tableName))
             .parameters(analyseOptions.getParams())
             .build()
         );
@@ -114,10 +115,12 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
 
   private class ValueTableToTibbleWriter {
 
-    public void write(@NotNull Datasource datasource, String tableName, RSessionHandler rSessionHandler) {
+    void write(@NotNull Datasource datasource, String tableName, RSessionHandler rSessionHandler) {
       ValueTable valueTable = datasource.getValueTable(tableName);
       if (valueTable.getValueSetCount()>0) {
-        rSessionHandler.getSession().execute(new MagmaAssignROperation(valueTable.getName(), valueTable, txTemplate, "id"));
+        rSessionHandler
+          .getSession()
+          .execute(new MagmaAssignROperation(RUtils.getSymbol(tableName), valueTable, txTemplate, "id"));
       }
     }
 
