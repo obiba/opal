@@ -96,3 +96,18 @@ message ExportVCFCommandOptionsDto {
   optional bool caseControl = 5 [default = true];
   optional string participantIdentifiersMapping = 6;
 }
+
+message AnalyseCommandOptionsDto {
+
+  message AnalyseDto {
+    required string table = 1;
+    required string name = 2;
+    required string plugin = 3;
+    required string template = 4;
+    required string params = 5;
+    optional string variables = 6;
+  }
+
+  required string project = 1;
+  repeated AnalyseDto analyses = 2;
+}
