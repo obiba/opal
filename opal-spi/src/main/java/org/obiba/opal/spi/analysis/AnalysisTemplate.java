@@ -3,6 +3,7 @@ package org.obiba.opal.spi.analysis;
 import org.json.JSONObject;
 import org.obiba.magma.ValueType;
 
+import java.nio.file.Path;
 import java.util.List;
 
 public interface AnalysisTemplate {
@@ -41,5 +42,16 @@ public interface AnalysisTemplate {
    * @return
    */
   List<ValueType> getValueTypes();
+
+  /**
+   * @return the reportPath
+   */
+  Path getReportPath();
+
+
+  /**
+   * @return the routinePath
+   */
+  Path getRoutinePath();
 
 }

@@ -41,6 +41,11 @@ public class RAnalysisResult extends AbstractAnalysisResult<RAnalysis> {
       this.result = result;
     }
 
+    public Builder status(AnalysisStatus status) {
+      result.setStatus(status);
+      return this;
+    }
+
     public Builder status(String status) {
       result.setStatus(AnalysisStatus.valueOf(status.toUpperCase()));
       return this;
