@@ -100,6 +100,13 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
             .parameters(analyseOptions.getParams())
             .build()
         );
+
+        log.info("Analysis result:\nstarted: {}\nended: {}\nstatus: {}\nmessage: {}\n",
+          result.getStartDate(),
+          result.getEndDate(),
+          result.getStatus(),
+          result.getMessage());
+
         // TODO persist result
 
       } catch (NoSuchServiceException ignored) {
