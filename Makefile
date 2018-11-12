@@ -284,7 +284,7 @@ locales:
 # Plugins
 #
 
-plugins: vcf-plugin search-plugin datasource-plugins
+plugins: vcf-plugin search-plugin datasource-plugins analysis-plugins
 
 vcf-plugin: jennite
 
