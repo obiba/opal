@@ -109,8 +109,8 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
 
         // TODO persist result
 
-      } catch (NoSuchServiceException ignored) {
-        log.error("Could not find plugin {}.", ignored);
+      } catch (RuntimeException ignored) {
+        log.error("Error in analysis operation: {}.", ignored);
       }
     });
 
