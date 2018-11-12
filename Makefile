@@ -284,24 +284,27 @@ locales:
 # Plugins
 #
 
-plugins: search-plugin opal-datasource-spss-plugin opal-datasource-limesurvey-plugin opal-datasource-redcap-plugin opal-datasource-googlesheets4-plugin opal-datasource-readr-plugin
+plugins: vcf-plugin search-plugin datasource-plugins
 
 vcf-plugin: jennite
 
 search-plugin:
-	cd ${projects}/opal-search-es && mvn clean install && cp target/opal-search-es-*-dist.zip ${opal_home}/plugins/
+	$(call install-plugin,opal-search-es)
 
-opal-datasource-spss-plugin:
-	cd ${projects}/opal-datasource-spss && mvn clean install && cp target/opal-datasource-spss-*-dist.zip ${opal_home}/plugins/
+datasource-plugins:
+	$(call install-plugin,opal-datasource-spss)
+	$(call install-plugin,opal-datasource-limesurvey)
+	$(call install-plugin,opal-datasource-redcap)
+	$(call install-plugin,opal-datasource-googlesheets4)
+	$(call install-plugin,opal-datasource-readr)
 
-opal-datasource-limesurvey-plugin:
-	cd ${projects}/opal-datasource-limesurvey && mvn clean install && cp target/opal-datasource-limesurvey-*-dist.zip ${opal_home}/plugins/
+analysis-plugins:
+	$(call install-plugin,opal-analysis-validate)
 
-opal-datasource-redcap-plugin:
-	cd ${projects}/opal-datasource-redcap && mvn clean install && cp target/opal-datasource-redcap-*-dist.zip ${opal_home}/plugins/
+plugin:
+	$(call install-plugin,${p})
 
-opal-datasource-googlesheets4-plugin:
-	cd ${projects}/opal-datasource-googlesheets4 && mvn clean install && cp target/opal-datasource-googlesheets4-*-dist.zip ${opal_home}/plugins/
-
-opal-datasource-readr-plugin:
-	cd ${projects}/opal-datasource-readr && mvn clean install && cp target/opal-datasource-readr-*-dist.zip ${opal_home}/plugins/
+#
+# Functions
+#
+install-plugin = cd ${projects}/$(1) && mvn clean install && cp target/$(1)-*-dist.zip ${opal_home}/plugins/
