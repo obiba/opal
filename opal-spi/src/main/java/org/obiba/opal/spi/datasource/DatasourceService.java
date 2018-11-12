@@ -10,26 +10,17 @@
 
 package org.obiba.opal.spi.datasource;
 
-import java.io.File;
 import java.util.Collection;
-
 import javax.validation.constraints.NotNull;
-
 import org.json.JSONObject;
 import org.obiba.magma.DatasourceFactory;
+import org.obiba.opal.spi.OpalServicePlugin;
 import org.obiba.plugins.spi.ServicePlugin;
 
 /**
  * {@link ServicePlugin} that acts as a {@link DatasourceFactory} factory.
  */
-public interface DatasourceService extends ServicePlugin {
-
-  /**
-   * Resolve a Opal file system path to a local file.
-   */
-  interface OpalFileSystemPathResolver {
-    File resolve(String path);
-  }
+public interface DatasourceService extends OpalServicePlugin {
 
   String SERVICE_TYPE = "opal-datasource";
   String SCHEMA_FILE_EXT = ".json";
@@ -65,12 +56,5 @@ public interface DatasourceService extends ServicePlugin {
    * @return
    */
   DatasourceFactory createDatasourceFactory(@NotNull DatasourceUsage usage, @NotNull JSONObject parameters);
-
-  /**
-   * Sets an instance of an Opal file system path resolver.
-   *
-   * @param resolver
-   */
-  void setOpalFileSystemPathResolver(OpalFileSystemPathResolver resolver);
 
 }

@@ -1,13 +1,12 @@
 package org.obiba.opal.spi.analysis;
 
-import org.obiba.magma.ValueTable;
-import org.obiba.plugins.spi.ServicePlugin;
-
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import org.obiba.magma.ValueTable;
+import org.obiba.opal.spi.OpalServicePlugin;
 
-public interface AnalysisService<T extends Analysis, U extends AnalysisResult> extends ServicePlugin  {
+public interface AnalysisService<T extends Analysis, U extends AnalysisResult> extends
+    OpalServicePlugin {
 
   /**
    * Get the list of analysis that can be performed.
@@ -26,13 +25,6 @@ public interface AnalysisService<T extends Analysis, U extends AnalysisResult> e
 
 
   /**
-   * Resolve a Opal file system path to a local file.
-   */
-  interface OpalFileSystemPathResolver {
-    File resolve(String path);
-  }
-
-  /**
    * Perform an analysis on the tibble representation of a {@link ValueTable} and report result.
    *
    * @param analysis
@@ -44,11 +36,4 @@ public interface AnalysisService<T extends Analysis, U extends AnalysisResult> e
     return analyse(list).get(0);
   }
 
-
-  /**
-   * Sets an instance of an Opal file system path resolver.
-   *
-   * @param resolver
-   */
-  void setOpalFileSystemPathResolver(AnalysisService.OpalFileSystemPathResolver resolver);
 }
