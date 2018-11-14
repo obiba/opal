@@ -2,20 +2,21 @@ package org.obiba.opal.core.domain;
 
 import com.google.common.collect.Lists;
 import java.util.List;
+import javax.validation.constraints.NotNull;
 import org.obiba.opal.spi.analysis.AnalysisResult;
 
-public class AnalysisResultWrapper implements HasUniqueProperties {
+public class OpalAnalysisResult implements HasUniqueProperties {
 
   private static final String DEFAULT_ID = "empty";
 
   private String id;
   private AnalysisResult analysisResult;
 
-  public AnalysisResultWrapper() {
+  public OpalAnalysisResult() {
     this.id = DEFAULT_ID;
   }
 
-  public AnalysisResultWrapper(AnalysisResult analysisResult) {
+  public OpalAnalysisResult(@NotNull AnalysisResult analysisResult) {
     setAnalysisResult(analysisResult);
   }
 

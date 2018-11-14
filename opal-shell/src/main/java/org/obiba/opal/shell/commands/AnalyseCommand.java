@@ -10,10 +10,10 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.core.domain.AnalysisResultWrapper;
+import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.core.service.AnalysisResultService;
+import org.obiba.opal.core.service.OpalAnalysisResultService;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.r.magma.MagmaAssignROperation;
 import org.obiba.opal.r.service.OpalRSession;
@@ -52,7 +52,7 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
   private TransactionTemplate txTemplate;
 
   @Autowired
-  private AnalysisResultService analysisResultService;
+  private OpalAnalysisResultService analysisResultService;
 
   @Override
   public int execute() {
@@ -110,8 +110,7 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
           result.getStatus(),
           result.getMessage());
 
-        // TODO persist result
-        analysisResultService.save(new AnalysisResultWrapper(result));
+        analysisResultService.save(new OpalAnalysisResult(result));
 
       } catch (RuntimeException ignored) {
         log.error("Error in analysis operation: {}.", ignored);
