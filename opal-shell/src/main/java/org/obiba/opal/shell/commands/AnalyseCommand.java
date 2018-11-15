@@ -1,14 +1,19 @@
 package org.obiba.opal.shell.commands;
 
 import com.google.common.collect.Sets;
+import java.io.File;
+import java.util.List;
+import java.util.Set;
+import javax.validation.constraints.NotNull;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
+import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.domain.Project;
-import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.OpalAnalysisResultService;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.r.magma.MagmaAssignROperation;
 import org.obiba.opal.r.service.OpalRSession;
@@ -25,11 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.support.TransactionTemplate;
-
-import javax.validation.constraints.NotNull;
-import java.io.File;
-import java.util.List;
-import java.util.Set;
 
 
 @CommandUsage(
@@ -50,6 +50,9 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
 
   @Autowired
   private TransactionTemplate txTemplate;
+
+  @Autowired
+  private OpalAnalysisResultService analysisResultService;
 
   @Override
   public int execute() {
@@ -107,14 +110,15 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
           result.getStatus(),
           result.getMessage());
 
-        // TODO persist result
+        analysisResultService.save(new OpalAnalysisResult(result));
 
       } catch (RuntimeException ignored) {
         log.error("Error in analysis operation: {}.", ignored);
+        throw new RuntimeException(ignored);
+      } finally {
+        sessionHandler.onDispose();
       }
     });
-
-    sessionHandler.onDispose();
 
     return 0;
   }

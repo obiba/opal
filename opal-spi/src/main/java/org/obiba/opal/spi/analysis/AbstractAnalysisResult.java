@@ -3,6 +3,7 @@ package org.obiba.opal.spi.analysis;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Convenient class for implementing data processing engine specific results.
@@ -25,6 +26,7 @@ public abstract class AbstractAnalysisResult<T extends Analysis> implements Anal
   private List<AnalysisResult<T>> resultItems;
 
   protected AbstractAnalysisResult(T analysis) {
+    this.id = UUID.randomUUID().toString();
     this.analysisId = analysis.getId();
   }
 
