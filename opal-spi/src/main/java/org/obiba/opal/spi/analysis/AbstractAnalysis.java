@@ -5,20 +5,16 @@ import org.json.JSONObject;
 import org.obiba.magma.Variable;
 
 import javax.validation.constraints.NotNull;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Convenient class for implementing data processing engine specific analysis.
  *
  */
-public class AbstractAnalysis implements Analysis {
+public abstract class AbstractAnalysis implements Analysis {
 
-  private static final SimpleDateFormat DATE_ID = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 
-  private final String id;
+  private String id;
 
   private final String name;
 
@@ -29,7 +25,6 @@ public class AbstractAnalysis implements Analysis {
   private List<Variable> variables;
 
   public AbstractAnalysis(String name, String templateName) {
-    this.id = DATE_ID.format(new Date()) + "-" + new Random().nextInt();
     this.name = name;
     this.templateName = templateName;
   }
@@ -37,6 +32,10 @@ public class AbstractAnalysis implements Analysis {
   @Override
   public String getId() {
     return id;
+  }
+
+  protected void setId(String value) {
+    id = value;
   }
 
   @Override

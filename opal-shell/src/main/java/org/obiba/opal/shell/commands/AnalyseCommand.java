@@ -1,10 +1,13 @@
 package org.obiba.opal.shell.commands;
 
 import com.google.common.collect.Sets;
+
+import java.io.Closeable;
 import java.io.File;
 import java.util.List;
 import java.util.Set;
 import javax.validation.constraints.NotNull;
+
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
@@ -68,23 +71,11 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
     Datasource datasource = project.getDatasource();
 
     List<AnalyseCommandOptions.AnalyseOptions> analyses = options.getAnalyses();
-    final OpalRSession rSession = opalRSessionManager.newSubjectRSession();
-    rSession.setExecutionContext("Analyse");
-    RSessionHandler sessionHandler = new RSessionHandler() {
-      @Override
-      public ROperationTemplate getSession() {
-        return rSession;
-      }
-
-      @Override
-      public void onDispose() {
-        opalRSessionManager.removeRSession(rSession.getId());
-      }
-    };
 
     Set<String> loadedTables = Sets.newHashSet();
-    analyses.forEach(analyseOptions -> {
-      try {
+    try (RSessionHandlerImpl sessionHandler = new RSessionHandlerImpl()) {
+
+      analyses.forEach(analyseOptions -> {
         String tableName = analyseOptions.getTable();
         if (!datasource.hasValueTable(tableName)) {
           throw new NoSuchValueTableException(tableName);
@@ -103,30 +94,26 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
         log.info("Analysing {} table using {} routines.", tableName, String.format("%s::%s", pluginName, templateName));
 
         RAnalysis analysis = RAnalysis.create(analyseOptions.getName(), analyseOptions.getTemplate())
-            .session(rSession)
-            .symbol(RUtils.getSymbol(tableName))
-            .parameters(analyseOptions.getParams())
-            .build();
+          .session(sessionHandler.getSession())
+          .symbol(RUtils.getSymbol(tableName))
+          .parameters(analyseOptions.getParams())
+          .build();
 
         analysisService.save(new OpalAnalysis(analysis));
 
         RAnalysisResult result = rAnalysisService.analyse(analysis);
 
-        log.info("Analysis result:\nstarted: {}\nended: {}\nstatus: {}\nmessage: {}\n",
+        log.info("Analysis result:\nstarted: {}\nended: {}\nstatus: {}\nmessage: {}\nreport: {}",
           result.getStartDate(),
           result.getEndDate(),
           result.getStatus(),
-          result.getMessage());
+          result.getMessage(),
+          result.getReportPath());
 
         analysisResultService.save(new OpalAnalysisResult(result));
+      });
 
-      } catch (RuntimeException ignored) {
-        log.error("Error in analysis operation: {}.", ignored);
-        throw new RuntimeException(ignored);
-      } finally {
-        sessionHandler.onDispose();
-      }
-    });
+    }
 
     return 0;
   }
@@ -136,13 +123,37 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
 
     void write(@NotNull Datasource datasource, String tableName, RSessionHandler rSessionHandler) {
       ValueTable valueTable = datasource.getValueTable(tableName);
-      if (valueTable.getValueSetCount()>0) {
+      if (valueTable.getValueSetCount() > 0) {
         rSessionHandler
           .getSession()
           .execute(new MagmaAssignROperation(RUtils.getSymbol(tableName), valueTable, txTemplate, "id"));
       }
     }
 
+  }
+
+  private class RSessionHandlerImpl implements RSessionHandler, Closeable {
+    private final OpalRSession rSession;
+
+    RSessionHandlerImpl() {
+      rSession = opalRSessionManager.newSubjectRSession();
+      rSession.setExecutionContext("Analyse");
+    }
+
+    @Override
+    public ROperationTemplate getSession() {
+      return rSession;
+    }
+
+    @Override
+    public void onDispose() {
+      opalRSessionManager.removeRSession(rSession.getId());
+    }
+
+    @Override
+    public void close() {
+      onDispose();
+    }
   }
 
   private class OpalPathResolver implements AnalysisService.OpalFileSystemPathResolver {
