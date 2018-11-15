@@ -18,8 +18,8 @@ public class OpalAnalysisResultServiceImpl implements OpalAnalysisResultService 
   }
 
   @Override
-  public OpalAnalysisResult getAnalysisResult(String id) {
-    return orientDbService.uniqueResult(OpalAnalysisResult.class, "select from " + OpalAnalysisResult.class.getSimpleName() + " where id = ?", id);
+  public OpalAnalysisResult getAnalysisResult(String analysisId, String resultId) {
+    return orientDbService.uniqueResult(OpalAnalysisResult.class, "select from " + OpalAnalysisResult.class.getSimpleName() + " where analysisId = ? and id = ?", analysisId, resultId);
   }
 
   @Override
