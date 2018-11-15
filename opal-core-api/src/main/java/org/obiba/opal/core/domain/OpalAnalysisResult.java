@@ -9,6 +9,7 @@ public class OpalAnalysisResult implements HasUniqueProperties {
 
   private static final String DEFAULT_ID = "empty";
 
+  private String analysisId;
   private String id;
   private AnalysisResult analysisResult;
 
@@ -24,6 +25,10 @@ public class OpalAnalysisResult implements HasUniqueProperties {
     return id;
   }
 
+  public String getAnalysisId() {
+    return analysisId;
+  }
+
   public AnalysisResult getAnalysisResult() {
     return analysisResult;
   }
@@ -31,6 +36,7 @@ public class OpalAnalysisResult implements HasUniqueProperties {
   public void setAnalysisResult(AnalysisResult analysisResult) {
     this.analysisResult = analysisResult;
     this.id = analysisResult.getId();
+    this.analysisId = analysisResult.getAnalysisId();
   }
 
   @Override
