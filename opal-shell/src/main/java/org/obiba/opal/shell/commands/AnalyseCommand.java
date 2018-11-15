@@ -10,10 +10,12 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
+import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.OpalAnalysisResultService;
+import org.obiba.opal.core.service.OpalAnalysisService;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.r.magma.MagmaAssignROperation;
 import org.obiba.opal.r.service.OpalRSession;
@@ -53,6 +55,9 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
 
   @Autowired
   private OpalAnalysisResultService analysisResultService;
+
+  @Autowired
+  private OpalAnalysisService analysisService;
 
   @Override
   public int execute() {
@@ -96,13 +101,16 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
 
         String templateName = analyseOptions.getTemplate();
         log.info("Analysing {} table using {} routines.", tableName, String.format("%s::%s", pluginName, templateName));
-        RAnalysisResult result = rAnalysisService.analyse(
-          RAnalysis.create(analyseOptions.getName(), analyseOptions.getTemplate())
+
+        RAnalysis analysis = RAnalysis.create(analyseOptions.getName(), analyseOptions.getTemplate())
             .session(rSession)
             .symbol(RUtils.getSymbol(tableName))
             .parameters(analyseOptions.getParams())
-            .build()
-        );
+            .build();
+
+        analysisService.save(new OpalAnalysis(analysis));
+
+        RAnalysisResult result = rAnalysisService.analyse(analysis);
 
         log.info("Analysis result:\nstarted: {}\nended: {}\nstatus: {}\nmessage: {}\n",
           result.getStartDate(),
