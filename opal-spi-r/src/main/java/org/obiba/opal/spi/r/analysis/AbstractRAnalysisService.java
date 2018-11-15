@@ -128,7 +128,7 @@ public abstract class AbstractRAnalysisService extends AbstractAnalysisService<R
                 .setSchemaForm(new JSONObject(Strings.isNullOrEmpty(schemaForm) ? "{}" : schemaForm));
 
               analysisTemplate.setTitle(analysisTemplate.getJSONSchemaForm().optString("title"));
-              analysisTemplate.setTitle(analysisTemplate.getJSONSchemaForm().optString("description"));
+              analysisTemplate.setDescription(analysisTemplate.getJSONSchemaForm().optString("description"));
             } catch (IOException e) {
               log.error("Error reading file at path {}", schemaFormPath);
             }
