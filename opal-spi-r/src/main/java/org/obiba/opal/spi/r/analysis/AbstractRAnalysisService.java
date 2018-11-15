@@ -7,6 +7,7 @@ import org.obiba.opal.spi.analysis.AbstractAnalysisService;
 import org.obiba.opal.spi.analysis.AnalysisStatus;
 import org.obiba.opal.spi.analysis.AnalysisTemplate;
 import org.obiba.opal.spi.analysis.NoSuchAnalysisTemplateException;
+import org.obiba.opal.spi.r.FileReadROperation;
 import org.obiba.opal.spi.r.FileWriteROperation;
 import org.obiba.opal.spi.r.ROperationTemplate;
 import org.rosuda.REngine.REXP;
@@ -61,11 +62,27 @@ public abstract class AbstractRAnalysisService extends AbstractAnalysisService<R
         ParsedAnalysisResult parsedResult = parseResult(run(analysis));
         analysisResultBuilder.message(parsedResult.getMessage());
         analysisResultBuilder.status(parsedResult.getStatus());
-      }
 
+        Path reportFileName = template.getReportPath().getFileName();
+        Path reportPath = generateReportPath(analysis.getId(), analysisResultBuilder.getResultId(), reportFileName);
+        analysisResultBuilder.report(reportPath.toString());
+        downloadFileToFromRSession(analysis.getSession(), generateAblosuteReportPath(reportPath));
+      }
       analysisResultBuilder.end();
+
       return analysisResultBuilder.build();
     }).collect(Collectors.toList());
+  }
+
+
+  private Path generateReportPath(String analysisId, String resultId, Path reportPath) {
+    // TODO template type should be an option HTML | PDF
+    String reportHtmlPath = reportPath.toString().replace("Rmd", "html");
+    return Paths.get("analyses",analysisId, "results", resultId, reportHtmlPath);
+  }
+
+  private Path generateAblosuteReportPath(Path reportFileName) {
+    return Paths.get(System.getProperty("OPAL_HOME"), "data", reportFileName.toString());
   }
 
   @Override
@@ -95,17 +112,29 @@ public abstract class AbstractRAnalysisService extends AbstractAnalysisService<R
   }
 
   protected void prepare(ROperationTemplate session, AnalysisTemplate template) {
-    if (Files.isRegularFile(template.getRoutinePath())) {
-      File routineFile = template.getRoutinePath().toFile();
+    uploadFileToRSession(session, template.getRoutinePath());
+    uploadFileToRSession(session, template.getReportPath());
+  }
+
+  private void uploadFileToRSession(ROperationTemplate session, Path path) {
+    if (Files.isRegularFile(path)) {
+      File routineFile = path.toFile();
       FileWriteROperation routineWriteOperation = new FileWriteROperation(routineFile.getName(), routineFile);
       session.execute(routineWriteOperation);
     }
+  }
 
-    if (Files.isRegularFile(template.getReportPath())) {
-      File reportFile = template.getReportPath().toFile();
-      FileWriteROperation reportWriteOperation = new FileWriteROperation(reportFile.getName(), reportFile);
-      session.execute(reportWriteOperation);
+  private void downloadFileToFromRSession(ROperationTemplate session, Path path) {
+    File reportDir = path.getParent().toFile();
+    if (!reportDir.exists()) {
+      if (!reportDir.mkdirs()) {
+        log.error("Failed to create report folder {}", path);
+        return;
+      }
     }
+
+    FileReadROperation fileReadROperation = new FileReadROperation(path.getFileName().toString(), path.toFile());
+    session.execute(fileReadROperation);
   }
 
   protected List<AnalysisTemplate> initAnalysisTemplates() {
@@ -151,7 +180,7 @@ public abstract class AbstractRAnalysisService extends AbstractAnalysisService<R
       RList rList = rexp.asList();
       return new ParsedAnalysisResult(
         AnalysisStatus.valueOf(((REXPString) rList.get("status")).asString()),
-        ((REXPString)rList.get("message")).asString()
+        ((REXPString) rList.get("message")).asString()
       );
     } catch (REXPMismatchException e) {
       log.error("Failed to parse analysis result {}", e);

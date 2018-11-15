@@ -26,13 +26,16 @@ public abstract class AbstractAnalysisResult<T extends Analysis> implements Anal
   private List<AnalysisResult<T>> resultItems;
 
   protected AbstractAnalysisResult(T analysis) {
-    this.id = UUID.randomUUID().toString();
     this.analysisId = analysis.getId();
   }
 
   @Override
   public String getId() {
     return id;
+  }
+
+  protected void setId(String value) {
+    id = value;
   }
 
   @Override
