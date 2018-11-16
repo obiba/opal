@@ -64,8 +64,6 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
 
   @Override
   public int execute() {
-    // TODO validate subject permissions
-
     String projectName = options.getProject();
     Project project = projectService.getProject(projectName);
     Datasource datasource = project.getDatasource();

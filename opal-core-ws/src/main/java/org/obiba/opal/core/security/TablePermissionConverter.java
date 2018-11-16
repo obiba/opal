@@ -98,6 +98,7 @@ public class TablePermissionConverter extends OpalPermissionConverter {
             toRest("/datasource/{0}/table/{1}/index/_search", "GET", args),//
             toRest("/datasource/{0}/table/{1}/index/_search", "POST", args),//
             toRest("/datasource/{0}/table/{1}/index/_schema", "GET", args),//
+            toRest("/project/{0}/commands/_analyse", "POST:GET", args),//
             toRest("/project/{0}/commands/_export", "POST:GET", args),//
             toRest("/project/{0}/commands/_copy", "POST:GET", args),//
             toRest("/project/{0}/report-templates", "GET:GET", args),//
