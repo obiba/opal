@@ -3,13 +3,11 @@ package org.obiba.opal.spi.r.analysis;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.json.JSONObject;
-import org.obiba.opal.spi.analysis.AbstractAnalysisService;
-import org.obiba.opal.spi.analysis.AnalysisStatus;
-import org.obiba.opal.spi.analysis.AnalysisTemplate;
-import org.obiba.opal.spi.analysis.NoSuchAnalysisTemplateException;
+import org.obiba.opal.spi.analysis.*;
 import org.obiba.opal.spi.r.FileReadROperation;
 import org.obiba.opal.spi.r.FileWriteROperation;
 import org.obiba.opal.spi.r.ROperationTemplate;
+import org.obiba.opal.spi.r.RScriptROperation;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REXPString;
@@ -63,10 +61,10 @@ public abstract class AbstractRAnalysisService extends AbstractAnalysisService<R
         analysisResultBuilder.message(parsedResult.getMessage());
         analysisResultBuilder.status(parsedResult.getStatus());
 
-        Path reportFileName = template.getReportPath().getFileName();
-        Path reportPath = generateReportPath(analysis.getId(), analysisResultBuilder.getResultId(), reportFileName);
+        Path fileName = template.getReportPath().getFileName();
+        Path reportPath = generateReportPath(analysis, analysisResultBuilder.getResultId(), fileName);
         analysisResultBuilder.report(reportPath.toString());
-        downloadFileToFromRSession(analysis.getSession(), generateAblosuteReportPath(reportPath));
+        downloadFilesFromRSession(analysis.getSession(), generateAbsoluteReportPath(reportPath.getParent()));
       }
       analysisResultBuilder.end();
 
@@ -75,13 +73,13 @@ public abstract class AbstractRAnalysisService extends AbstractAnalysisService<R
   }
 
 
-  private Path generateReportPath(String analysisId, String resultId, Path reportPath) {
-    // TODO template type should be an option HTML | PDF
-    String reportHtmlPath = reportPath.toString().replace("Rmd", "html");
-    return Paths.get("analyses",analysisId, "results", resultId, reportHtmlPath);
+  private Path generateReportPath(RAnalysis analysis, String resultId, Path fileName) {
+    AnalysisReportType reportType = AnalysisReportType.safeValueOf((String) analysis.getParameters().get("reportType"));
+    String reportFileName = fileName.toString().replaceAll("Rmd", reportType.toString().toLowerCase());
+    return Paths.get("analyses",analysis.getId(), "results", resultId, reportFileName);
   }
 
-  private Path generateAblosuteReportPath(Path reportFileName) {
+  private Path generateAbsoluteReportPath(Path reportFileName) {
     return Paths.get(System.getProperty("OPAL_HOME"), "data", reportFileName.toString());
   }
 
@@ -114,6 +112,21 @@ public abstract class AbstractRAnalysisService extends AbstractAnalysisService<R
   protected void prepare(ROperationTemplate session, AnalysisTemplate template) {
     uploadFileToRSession(session, template.getRoutinePath());
     uploadFileToRSession(session, template.getReportPath());
+  }
+
+  private void downloadFilesFromRSession(ROperationTemplate session, Path path) {
+    String rscript = "list.files(path = '.', recursive = TRUE)";
+    RScriptROperation rop = new RScriptROperation(rscript, false);
+    session.execute(rop);
+    if (!rop.hasResult()) return;
+    REXPString files = (REXPString) rop.getResult();
+
+
+    Lists.newArrayList(files.asStrings())
+      .stream()
+      .filter(file -> !REPORT_FILE_NAME.equals(file) && !ROUTINE_FILE_NAME.equals(file))
+      .forEach(file -> downloadFileToFromRSession(session, Paths.get(path.toString(), file)));
+
   }
 
   private void uploadFileToRSession(ROperationTemplate session, Path path) {
