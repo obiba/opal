@@ -64,8 +64,7 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
 
   @Override
   public int execute() {
-    String projectName = options.getProject();
-    Project project = projectService.getProject(projectName);
+    Project project = projectService.getProject(options.getProject());
     Datasource datasource = project.getDatasource();
 
     List<AnalyseCommandOptions.AnalyseOptions> analyses = options.getAnalyses();
