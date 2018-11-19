@@ -1,18 +1,15 @@
 package org.obiba.opal.shell.commands;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
-import java.io.Closeable;
-import java.io.File;
-import java.util.List;
-import java.util.Set;
-import javax.validation.constraints.NotNull;
-
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
-import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
+import org.obiba.magma.js.views.VariablesClause;
+import org.obiba.magma.views.View;
+import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.domain.Project;
@@ -35,6 +32,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import javax.validation.constraints.NotNull;
+import java.io.Closeable;
+import java.io.File;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @CommandUsage(
@@ -62,45 +66,51 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
   @Autowired
   private OpalAnalysisService analysisService;
 
+  @Autowired
+  ViewManager viewManager;
+
   @Override
   public int execute() {
     Project project = projectService.getProject(options.getProject());
     Datasource datasource = project.getDatasource();
 
     List<AnalyseCommandOptions.AnalyseOptions> analyses = options.getAnalyses();
-
+    AnalysisValueTableResolver valueTableResolver = new AnalysisValueTableResolver();
     Set<String> loadedTables = Sets.newHashSet();
+
     try (RSessionHandlerImpl sessionHandler = new RSessionHandlerImpl()) {
 
       analyses.forEach(analyseOptions -> {
-        String tableName = analyseOptions.getTable();
-        if (!datasource.hasValueTable(tableName)) {
-          throw new NoSuchValueTableException(tableName);
-        }
-
+        ValueTable table = datasource.getValueTable(analyseOptions.getTable());
         String pluginName = analyseOptions.getPlugin();
         RAnalysisService rAnalysisService = (RAnalysisService) opalRuntime.getServicePlugin(pluginName);
         rAnalysisService.setOpalFileSystemPathResolver(new OpalPathResolver());
 
-        if (!loadedTables.contains(tableName)) {
-          loadedTables.add(tableName);
-          new ValueTableToTibbleWriter().write(datasource, tableName, sessionHandler);
+        ValueTable targetValueTable = valueTableResolver.resolve(table, analyseOptions.getVariables());
+        String tibbleName = targetValueTable.getName();
+
+        if (!loadedTables.contains(tibbleName)) {
+          loadedTables.add(tibbleName);
+          new ValueTableToTibbleWriter().write(datasource, tibbleName, sessionHandler);
         }
 
+        valueTableResolver.cleanup();
+
         String templateName = analyseOptions.getTemplate();
-        log.info("Analysing {} table using {} routines.", tableName, String.format("%s::%s", pluginName, templateName));
+        log.info("Analysing {} table using {} routines.", tibbleName, String.format("%s::%s", pluginName, templateName));
 
         RAnalysis analysis = RAnalysis.create(analyseOptions.getName(), analyseOptions.getTemplate())
           .session(sessionHandler.getSession())
-          .symbol(RUtils.getSymbol(tableName))
+          .symbol(RUtils.getSymbol(tibbleName))
           .parameters(analyseOptions.getParams())
           .build();
 
-        analysisService.save(new OpalAnalysis(analysis, datasource.getName(), tableName));
+        analysisService.save(new OpalAnalysis(analysis, datasource.getName(), tibbleName));
 
         RAnalysisResult result = rAnalysisService.analyse(analysis);
 
-        log.info("Analysis result:\nstarted: {}\nended: {}\nstatus: {}\nmessage: {}\nreport: {}",
+        log.info("Analysed {} table with status {}.", tibbleName, result.getStatus());
+        log.debug("Analysis result:\nstarted: {}\nended: {}\nstatus: {}\nmessage: {}\nreport: {}",
           result.getStartDate(),
           result.getEndDate(),
           result.getStatus(),
@@ -115,6 +125,59 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
     return 0;
   }
 
+  private class AnalysisValueTableResolver {
+    ValueTable view = null;
+
+    public ValueTable resolve(ValueTable source, String variableNamesCsv) {
+      List<String> variableNames = getVariableNames(variableNamesCsv);
+      if (variableNames.isEmpty()) return source;
+
+      view = createView(source, variableNames);
+      log.debug("Created view {} for variables {}", view.getName(), variableNamesCsv);
+
+      return view;
+    }
+
+    private ValueTable createView(ValueTable table, List<String> variableNames) {
+      String viewName = table.getName() + "View";
+      View.Builder builder = View.Builder.newView(viewName, Lists.newArrayList(table));
+      List<Variable> variables = variableNames.stream()
+        .filter(variableName -> table.hasVariable(variableName))
+        .map(variableName -> {
+          Variable variable = table.getVariable(variableName);
+          return Variable.Builder
+            .sameAs(variable, true)
+            .addAttribute("script", String.format("$('%s')", variableName))
+            .build();
+        })
+        .collect(Collectors.toList());
+
+      VariablesClause listClause = new VariablesClause();
+      listClause.setVariables(variables);
+      builder.list(listClause);
+      View view = builder.build();
+      view.initialise();
+      viewManager.addView(table.getDatasource().getName(), view, null, null);
+
+      return view;
+    }
+
+    private List<String> getVariableNames(String variableNamesCsv) {
+      List<String> variableNames = Lists.newArrayList();
+      if (variableNamesCsv != null && !"".equals(variableNamesCsv)) {
+        variableNames = Lists.newArrayList(variableNamesCsv.split("\\s*,\\s*"));
+      }
+
+      return variableNames;
+    }
+
+    void cleanup() {
+      if (view != null) {
+        viewManager.removeView(view.getDatasource().getName(), view.getName());
+        view = null;
+      }
+    }
+  }
 
   private class ValueTableToTibbleWriter {
 
