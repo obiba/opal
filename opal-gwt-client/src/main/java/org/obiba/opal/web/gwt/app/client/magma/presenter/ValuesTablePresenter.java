@@ -409,7 +409,10 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   @Override
   public void requestEntitySearch(String entityType, String entityId) {
-    fireEvent(new SearchEntityEvent(entityType, entityId, originalTable.getDatasourceName() + "." + originalTable.getName()));
+    String tableRef = null;
+    if (originalTable.getEntityType().equals(entityType))
+      tableRef = originalTable.getDatasourceName() + "." + originalTable.getName();
+    fireEvent(new SearchEntityEvent(entityType, entityId, tableRef));
   }
 
   @Override

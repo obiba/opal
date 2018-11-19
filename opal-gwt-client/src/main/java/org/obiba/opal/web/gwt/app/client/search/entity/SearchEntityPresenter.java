@@ -194,13 +194,35 @@ public class SearchEntityPresenter extends Presenter<SearchEntityPresenter.Displ
               getView().showTables(tables);
               String tableRef = selectedTable;
               if (Strings.isNullOrEmpty(selectedTable)) {
-                tableRef = tables.get(0).getDatasourceName() + "." + tables.get(0).getName();
+                tableRef = getTableReference(0);
                 selectedTable = tableRef;
+              } else {
+                // verify selected is one of the tables
+                boolean seen = false;
+                for (TableDto table : JsArrays.toIterable(tables)) {
+                  if (selectedTable.equals(getTableReference(table))) {
+                    seen = true;
+                    break;
+                  }
+                }
+                if (!seen) {
+                  tableRef = getTableReference(0);
+                  selectedTable = tableRef;
+                }
               }
               loadTable(tableRef);
             }
             updateHistory();
           }
+
+          private String getTableReference(int index) {
+            return getTableReference(tables.get(index));
+          }
+
+          private String getTableReference(TableDto table) {
+            return table.getDatasourceName() + "." + table.getName();
+          }
+
         }).send();
   }
 

@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.ui.celltable;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
@@ -69,6 +70,10 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
       if(Strings.isNullOrEmpty(variable.getReferencedEntityType())) return new TextCell(new MultilineTextRenderer());
       else return new ClickableTextCell(new ClickableIconRenderer(IconType.ELLIPSIS_VERTICAL));
     }
+    if((VariableDtos.ValueType.INTEGER.is(variable.getValueType()) || VariableDtos.ValueType.DECIMAL.is(variable.getValueType()))
+        && !Strings.isNullOrEmpty(variable.getReferencedEntityType())) {
+      return new ClickableTextCell(new ClickableIconRenderer(IconType.ELLIPSIS_VERTICAL));
+    }
     return new TextCell();
   }
 
@@ -110,7 +115,7 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
           }
         }
       });
-    } else if(VariableDtos.ValueType.TEXT.is(variable.getValueType()) &&
+    } else if((VariableDtos.ValueType.TEXT.is(variable.getValueType()) || VariableDtos.ValueType.INTEGER.is(variable.getValueType()) || VariableDtos.ValueType.DECIMAL.is(variable.getValueType())) &&
         !Strings.isNullOrEmpty(variable.getReferencedEntityType())) {
       setFieldUpdater(new FieldUpdater<ValueSetsDto.ValueSetDto, String>() {
 
