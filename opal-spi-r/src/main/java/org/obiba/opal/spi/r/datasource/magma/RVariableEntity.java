@@ -13,6 +13,7 @@ package org.obiba.opal.spi.r.datasource.magma;
 import org.obiba.magma.support.VariableEntityBean;
 
 import javax.validation.constraints.NotNull;
+import java.text.NumberFormat;
 
 class RVariableEntity extends VariableEntityBean {
 
@@ -20,10 +21,16 @@ class RVariableEntity extends VariableEntityBean {
 
   private final boolean numeric;
 
-  RVariableEntity(@NotNull String entityType, @NotNull String entityIdentifier, boolean isNumeric) {
+  RVariableEntity(@NotNull String entityType, @NotNull String entityIdentifier) {
     super(entityType, normalizeId(entityIdentifier));
     this.rEntityIdentifier = entityIdentifier;
-    this.numeric = isNumeric;
+    this.numeric = false;
+  }
+
+  RVariableEntity(@NotNull String entityType, @NotNull double entityIdentifier) {
+    super(entityType, normalizeId(entityIdentifier));
+    this.rEntityIdentifier = normalizeId(entityIdentifier);
+    this.numeric = true;
   }
 
   String getRIdentifier() {
@@ -35,7 +42,16 @@ class RVariableEntity extends VariableEntityBean {
   }
 
   private static String normalizeId(String id) {
-    return id.endsWith(".0") ?
-        id.substring(0, id.lastIndexOf(".0")) : id;
+    String nid = id.replaceAll(",",".").trim();
+    return nid.endsWith(".0") ?
+        nid.substring(0, nid.lastIndexOf(".0")) : id;
+  }
+
+  private static String normalizeId(double id) {
+    NumberFormat fmt = NumberFormat.getInstance();
+    fmt.setGroupingUsed(false);
+    fmt.setMaximumIntegerDigits(999);
+    fmt.setMaximumFractionDigits(999);
+    return normalizeId(fmt.format(id));
   }
 }

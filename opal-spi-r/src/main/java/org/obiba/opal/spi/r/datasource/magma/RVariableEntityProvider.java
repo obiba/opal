@@ -19,6 +19,7 @@ import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REXPVector;
 
+import java.text.NumberFormat;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,6 +31,8 @@ class RVariableEntityProvider implements VariableEntityProvider {
   private RValueTable valueTable;
 
   private final String entityType;
+
+  private final NumberFormat fmt = NumberFormat.getInstance();
 
   private String idColumn;
 
@@ -43,6 +46,9 @@ class RVariableEntityProvider implements VariableEntityProvider {
     this.valueTable = valueTable;
     this.entityType = Strings.isNullOrEmpty(entityType) ? "Participant" : entityType;
     this.idColumn = idColumn;
+    fmt.setGroupingUsed(false);
+    fmt.setMaximumIntegerDigits(999);
+    fmt.setMaximumFractionDigits(999);
   }
 
   @Override
@@ -66,10 +72,14 @@ class RVariableEntityProvider implements VariableEntityProvider {
       if (idVector instanceof REXPVector) {
         int length = ((REXPVector)idVector).length();
         try {
-          for (String id : idVector.asStrings()) {
-            RVariableEntity e = new RVariableEntity(entityType, id, isNumeric);
-            entities.add(e);
-            entitiesMap.put(e.getIdentifier(), e);
+          if (isNumeric) {
+            for (double id : idVector.asDoubles()) {
+              registerEntity(new RVariableEntity(entityType, id));
+            }
+          } else {
+            for (String id : idVector.asStrings()) {
+              registerEntity(new RVariableEntity(entityType, id));
+            }
           }
         } catch (REXPMismatchException e) {
           // ignore
@@ -78,6 +88,11 @@ class RVariableEntityProvider implements VariableEntityProvider {
       }
     }
     return entities;
+  }
+
+  private void registerEntity(RVariableEntity e) {
+    entities.add(e);
+    entitiesMap.put(e.getIdentifier(), e);
   }
 
   public RVariableEntity getRVariableEntity(VariableEntity entity) {
