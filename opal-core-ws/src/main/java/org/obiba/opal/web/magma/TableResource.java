@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.obiba.magma.ValueTable;
+import org.obiba.opal.web.TableAnalysisResource;
 import org.obiba.opal.web.model.Magma;
 
 public interface TableResource {
@@ -169,4 +170,6 @@ public interface TableResource {
 
   @Path("/locales")
   LocalesResource getLocalesResource();
+
+  TableAnalysisResource getAnalysisResource();
 }

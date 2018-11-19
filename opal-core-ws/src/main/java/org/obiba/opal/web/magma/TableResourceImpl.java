@@ -24,6 +24,7 @@ import org.obiba.magma.views.View;
 import org.obiba.opal.core.ValueTableUpdateListener;
 import org.obiba.opal.core.service.DataImportService;
 import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
+import org.obiba.opal.web.TableAnalysisResource;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
@@ -241,6 +242,16 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
   @Override
   public LocalesResource getLocalesResource() {
     return super.getLocalesResource();
+  }
+
+  @Override
+  public TableAnalysisResource getAnalysisResource() {
+    TableAnalysisResource bean = applicationContext.getBean(TableAnalysisResource.class);
+
+    bean.setDatasource(getValueTable().getDatasource().getName());
+    bean.setTable(getValueTable().getName());
+
+    return bean;
   }
 
   //

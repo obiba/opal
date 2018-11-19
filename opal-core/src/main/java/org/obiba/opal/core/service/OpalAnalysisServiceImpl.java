@@ -27,6 +27,16 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
   }
 
   @Override
+  public Iterable<OpalAnalysis> getAnalysesByDatasource(String datasource) {
+    return orientDbService.list(OpalAnalysis.class, "select * from " + OpalAnalysis.class.getSimpleName() + " where datasource = ?", datasource);
+  }
+
+  @Override
+  public Iterable<OpalAnalysis> getAnalysesByDatasourceAndTable(String datasource, String table) {
+    return orientDbService.list(OpalAnalysis.class, "select * from " + OpalAnalysis.class.getSimpleName() + " where datasource = ? and table = ?", datasource, table);
+  }
+
+  @Override
   public void save(OpalAnalysis analysis) {
     orientDbService.save(analysis, analysis);
   }
