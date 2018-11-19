@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.project;
 
+import com.google.common.collect.Lists;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -19,6 +20,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.vfs2.FileSystemException;
+import org.json.JSONArray;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceUpdateListener;
 import org.obiba.magma.Timestamped;
@@ -28,10 +30,12 @@ import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.security.OpalKeyStore;
+import org.obiba.opal.core.service.OpalAnalysisService;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.VCFSamplesMappingService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
+import org.obiba.opal.web.TableAnalysisResource;
 import org.obiba.plugins.spi.ServicePlugin;
 import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.model.Projects;
@@ -72,6 +76,9 @@ public class ProjectResource {
 
   @Autowired
   private SubjectProfileService subjectProfileService;
+
+  @Autowired
+  private OpalAnalysisService analysisService;
 
   @GET
   @Transactional(readOnly = true)
@@ -140,6 +147,25 @@ public class ProjectResource {
     VCFStoreResource resource = applicationContext.getBean(VCFStoreResource.class);
     resource.setVCFStore(project.getVCFStoreService(), name);
     return resource;
+  }
+
+  @GET
+  @Path("/analyses")
+  public String getProjectAnalyses() {
+    return new JSONArray(Lists.newArrayList(analysisService.getAnalysesByDatasource(name))).toString();
+  }
+
+  @GET
+  @Path("/table/{table}/analyses")
+  public String getProjectTableAnalyses(@PathParam("table") String table) {
+    return new JSONArray(Lists.newArrayList(analysisService.getAnalysesByDatasourceAndTable(name, table))).toString();
+  }
+
+  @Path("/table/{table}/analysis/{analysisId}")
+  public TableAnalysisResource getTableAnalysisResult(@PathParam("table") String table, @PathParam("analysisId") String analysisId) {
+    TableAnalysisResource bean = applicationContext.getBean(TableAnalysisResource.class);
+    bean.setAnalysisId(analysisId);
+    return bean;
   }
 
   private Project getProject() {

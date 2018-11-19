@@ -1,9 +1,11 @@
 package org.obiba.opal.web;
 
+import com.google.common.collect.Lists;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Response;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.obiba.opal.core.service.OpalAnalysisResultService;
 import org.obiba.opal.core.service.OpalAnalysisService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +20,7 @@ public class TableAnalysisResource {
   private final OpalAnalysisService analysisService;
   private final OpalAnalysisResultService analysisResultService;
 
-  private String datasource;
-  private String table;
+  private String analysisId;
 
   @Autowired
   public TableAnalysisResource(OpalAnalysisService analysisService,
@@ -28,36 +29,25 @@ public class TableAnalysisResource {
     this.analysisResultService = analysisResultService;
   }
 
-  public void setDatasource(String datasource) {
-    this.datasource = datasource;
-  }
-
-  public void setTable(String table) {
-    this.table = table;
+  public void setAnalysisId(String analysisId) {
+    this.analysisId = analysisId;
   }
 
   @GET
-  @Path("/analyses")
-  public Response getAnalyses() {
-    return Response.ok(analysisService.getAnalysesByDatasourceAndTable(datasource, table)).build();
+  public String getAnalysis() {
+    return new JSONObject(analysisService.getAnalysis(analysisId)).toString();
   }
 
   @GET
-  @Path("/analysis/{id}")
-  public Response getAnalysis(@PathParam("id") String id) {
-    return Response.ok(analysisService.getAnalysis(id)).build();
+  @Path("/results")
+  public String getAnalysisResults() {
+    return new JSONArray(Lists.newArrayList(analysisResultService.getAnalysisResults(analysisId))).toString();
   }
 
   @GET
-  @Path("/analysis/{id}/results")
-  public Response getAnalysisResults(@PathParam("id") String id) {
-    return Response.ok(analysisResultService.getAnalysisResults(id)).build();
-  }
-
-  @GET
-  @Path("/analysis/{id}/result/{rid}")
-  public Response getAnalysisResult(@PathParam("id") String id, @PathParam("rid") String rid) {
-    return Response.ok(analysisResultService.getAnalysisResult(id, rid)).build();
+  @Path("/result/{rid}")
+  public String getAnalysisResult(@PathParam("rid") String rid) {
+    return new JSONObject(analysisResultService.getAnalysisResult(analysisId, rid)).toString();
   }
 
 }
