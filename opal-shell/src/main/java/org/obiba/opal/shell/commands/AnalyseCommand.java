@@ -7,7 +7,6 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.views.View;
-import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.domain.Project;
@@ -63,9 +62,6 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
   @Autowired
   private OpalAnalysisService analysisService;
 
-  @Autowired
-  ViewManager viewManager;
-
   @Override
   public int execute() {
     Project project = projectService.getProject(options.getProject());
@@ -88,10 +84,8 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
 
         if (!loadedTables.contains(tibbleName)) {
           loadedTables.add(tibbleName);
-          new ValueTableToTibbleWriter().write(datasource, tibbleName, sessionHandler);
+          new ValueTableToTibbleWriter().write(targetValueTable, sessionHandler);
         }
-
-        valueTableResolver.cleanup();
 
         String templateName = analyseOptions.getTemplate();
         log.info("Analysing {} table using {} routines.", tibbleName, String.format("%s::%s", pluginName, templateName));
@@ -123,26 +117,22 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
   }
 
   private class AnalysisValueTableResolver {
-    ValueTable view = null;
 
     ValueTable resolve(ValueTable source, String variableNamesCsv) {
       List<String> variableNames = getVariableNames(variableNamesCsv);
       if (variableNames.isEmpty()) return source;
 
-      view = createView(source, variableNames);
-      log.debug("Created view {} for variables {}", view.getName(), variableNamesCsv);
-
-      return view;
+      return createView(source, variableNames);
     }
 
     private ValueTable createView(ValueTable table, List<String> variableNames) {
       String viewName = table.getName() + "View";
-      View view =  View.Builder
+      ValueTable view = View.Builder
         .newView(viewName, table)
         .select(variable -> variableNames.contains(variable.getName()))
         .build();
 
-      viewManager.addView(table.getDatasource().getName(), view, null, null);
+      log.debug("View {} has {} variable(s) out of {}.", viewName, view.getVariableCount(), variableNames.size());
 
       return view;
     }
@@ -156,22 +146,15 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
       return variableNames;
     }
 
-    void cleanup() {
-      if (view != null) {
-        viewManager.removeView(view.getDatasource().getName(), view.getName());
-        view = null;
-      }
-    }
   }
 
   private class ValueTableToTibbleWriter {
 
-    void write(@NotNull Datasource datasource, String tableName, RSessionHandler rSessionHandler) {
-      ValueTable valueTable = datasource.getValueTable(tableName);
+    void write(@NotNull ValueTable valueTable, RSessionHandler rSessionHandler) {
       if (valueTable.getValueSetCount() > 0) {
         rSessionHandler
           .getSession()
-          .execute(new MagmaAssignROperation(RUtils.getSymbol(tableName), valueTable, txTemplate, "id"));
+          .execute(new MagmaAssignROperation(RUtils.getSymbol(valueTable.getName()), valueTable, txTemplate, "id"));
       }
     }
 
