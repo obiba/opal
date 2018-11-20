@@ -30,7 +30,7 @@ public class OpalAnalysisResultServiceImpl implements OpalAnalysisResultService 
   @Override
   public Iterable<OpalAnalysisResult> getAnalysisResults(String analysisId)
       throws NoSuchAnalysisException {
-    return orientDbService.list(OpalAnalysisResult.class, "select from " + OpalAnalysisResult.class.getSimpleName() + " where analysisId = ?", analysisId);
+    return orientDbService.list(OpalAnalysisResult.class, "select from " + OpalAnalysisResult.class.getSimpleName() + " where analysis.analysisId = ?", analysisId);
   }
 
   @Override
