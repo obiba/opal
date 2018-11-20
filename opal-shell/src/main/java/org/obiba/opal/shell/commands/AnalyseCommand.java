@@ -96,7 +96,7 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
           .parameters(analyseOptions.getParams())
           .build();
 
-        analysisService.save(new OpalAnalysis(datasource.getName(), tableName, analysis));
+        analysisService.save(new OpalAnalysis(datasource.getName(), table.getName(), analysis));
 
         RAnalysisResult result = rAnalysisService.analyse(analysis);
 
