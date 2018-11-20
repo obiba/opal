@@ -17,16 +17,38 @@ public class OpalAnalysis implements Analysis, HasUniqueProperties {
   private JSONObject parameters;
   private List<Variable> variables;
 
+  private String datasource;
+  private String table;
+
   public OpalAnalysis() {
     this.id = DEFAULT_ID;
   }
 
-  public OpalAnalysis(@NotNull Analysis analysis) {
+  public OpalAnalysis(@NotNull String datasource, @NotNull String table, @NotNull Analysis analysis) {
     id = analysis.getId();
     name = analysis.getName();
     templateName = analysis.getTemplateName();
     parameters = analysis.getParameters();
     variables = analysis.getVariables();
+
+    this.datasource = datasource;
+    this.table = table;
+  }
+
+  public String getDatasource() {
+    return datasource;
+  }
+
+  public void setDatasource(String datasource) {
+    this.datasource = datasource;
+  }
+
+  public String getTable() {
+    return table;
+  }
+
+  public void setTable(String table) {
+    this.table = table;
   }
 
   @Override
