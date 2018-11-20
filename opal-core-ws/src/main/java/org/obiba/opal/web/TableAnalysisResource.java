@@ -1,17 +1,16 @@
 package org.obiba.opal.web;
 
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.service.OpalAnalysisResultService;
 import org.obiba.opal.core.service.OpalAnalysisService;
 import org.obiba.opal.web.model.Projects.OpalAnalysisDto;
 import org.obiba.opal.web.model.Projects.OpalAnalysisDto.Builder;
 import org.obiba.opal.web.model.Projects.OpalAnalysisResultDto;
+import org.obiba.opal.web.model.Projects.OpalAnalysisResultsDto;
 import org.obiba.opal.web.project.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -50,9 +49,10 @@ public class TableAnalysisResource {
 
   @GET
   @Path("/results")
-  public List<OpalAnalysisResultDto> getAnalysisResults() {
-    return StreamSupport.stream(analysisResultService.getAnalysisResults(analysisId).spliterator(), false)
-        .map(analysisResult -> Dtos.asDto(analysisResult).build()).collect(Collectors.toList());
+  public OpalAnalysisResultsDto getAnalysisResults() {
+    return OpalAnalysisResultsDto.newBuilder()
+        .addAllAnalysisResults(StreamSupport.stream(analysisResultService.getAnalysisResults(analysisId).spliterator(), false)
+            .map(analysisResult -> Dtos.asDto(analysisResult).build()).collect(Collectors.toList())).build();
   }
 
   @GET

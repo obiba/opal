@@ -49,6 +49,10 @@ message OpalAnalysisDto {
   repeated OpalAnalysisResultDto analysisResults = 8;
 }
 
+message OpalAnalysesDto {
+  repeated OpalAnalysisDto analyses = 1;
+}
+
 message OpalAnalysisResultDto {
   required string id = 1;
   required string analysisId = 2;
@@ -72,4 +76,8 @@ enum AnalysisStatusDto {
   FAILURE = 3;
   ERROR = 4;
   IGNORED = 5;
+}
+
+message OpalAnalysisResultsDto {
+  repeated OpalAnalysisResultDto analysisResults = 1;
 }

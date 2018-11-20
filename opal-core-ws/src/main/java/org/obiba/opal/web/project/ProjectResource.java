@@ -10,7 +10,6 @@
 package org.obiba.opal.web.project;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
 import java.util.stream.Collectors;
@@ -26,9 +25,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceUpdateListener;
 import org.obiba.magma.Timestamped;
 import org.obiba.magma.Timestamps;
-import org.obiba.magma.Variable;
 import org.obiba.magma.support.UnionTimestamps;
-import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
@@ -39,8 +36,7 @@ import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.VCFSamplesMappingService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
 import org.obiba.opal.web.TableAnalysisResource;
-import org.obiba.opal.web.model.Projects.OpalAnalysisDto;
-import org.obiba.opal.web.model.Projects.OpalAnalysisDto.Builder;
+import org.obiba.opal.web.model.Projects.OpalAnalysesDto;
 import org.obiba.plugins.spi.ServicePlugin;
 import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.model.Projects;
@@ -156,16 +152,18 @@ public class ProjectResource {
 
   @GET
   @Path("/analyses")
-  public List<OpalAnalysisDto> getProjectAnalyses() {
-    return StreamSupport.stream(analysisService.getAnalysesByDatasource(name).spliterator(), false)
-        .map(analysis -> Dtos.asDto(analysis).build()).collect(Collectors.toList());
+  public OpalAnalysesDto getProjectAnalyses() {
+    return OpalAnalysesDto.newBuilder()
+        .addAllAnalyses(StreamSupport.stream(analysisService.getAnalysesByDatasource(name).spliterator(), false)
+            .map(analysis -> Dtos.asDto(analysis).build()).collect(Collectors.toList())).build();
   }
 
   @GET
   @Path("/table/{table}/analyses")
-  public List<OpalAnalysisDto> getProjectTableAnalyses(@PathParam("table") String table) {
-    return StreamSupport.stream(analysisService.getAnalysesByDatasourceAndTable(name, table).spliterator(), false)
-        .map(analysis -> Dtos.asDto(analysis).build()).collect(Collectors.toList());
+  public OpalAnalysesDto getProjectTableAnalyses(@PathParam("table") String table) {
+    return OpalAnalysesDto.newBuilder()
+        .addAllAnalyses(StreamSupport.stream(analysisService.getAnalysesByDatasourceAndTable(name, table).spliterator(), false)
+            .map(analysis -> Dtos.asDto(analysis).build()).collect(Collectors.toList())).build();
   }
 
   @Path("/table/{table}/analysis/{analysisId}")
