@@ -6,6 +6,8 @@ import org.obiba.opal.spi.analysis.AbstractAnalysis;
 import org.obiba.opal.spi.analysis.support.generator.IdGenetatorFactory;
 import org.obiba.opal.spi.r.ROperationTemplate;
 
+import java.util.List;
+
 /**
  * R analysis are performed on tibble (see https://www.tidyverse.org/).
  */
@@ -62,6 +64,11 @@ public class RAnalysis extends AbstractAnalysis {
 
     public Builder parameters(JSONObject parameters) {
       analysis.setParameters(parameters);
+      return this;
+    }
+
+    public Builder variables(List<String> value) {
+      analysis.setVariables(value);
       return this;
     }
 

@@ -22,7 +22,7 @@ public abstract class AbstractAnalysis implements Analysis {
 
   private JSONObject parameters;
 
-  private List<Variable> variables;
+  private List<String> variables;
 
   public AbstractAnalysis(String name, String templateName) {
     this.name = name;
@@ -54,22 +54,18 @@ public abstract class AbstractAnalysis implements Analysis {
     return parameters;
   }
 
-  public void setParameters(JSONObject parameters) {
+  protected void setParameters(JSONObject parameters) {
     this.parameters = parameters;
   }
 
   @Override
-  public List<Variable> getVariables() {
+  public List<String> getVariables() {
     return variables == null ? variables = Lists.newArrayList() : variables;
   }
 
-  public void addVariables(List<Variable> variables) {
+  protected void setVariables(List<String> variables) {
     if (variables == null) return;
-    variables.forEach(this::addVariable);
+    this.variables = variables;
   }
 
-  public void addVariable(Variable var) {
-    if (var == null || getVariables().contains(var)) return;
-    getVariables().add(var);
-  }
 }
