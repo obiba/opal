@@ -1,11 +1,10 @@
 package org.obiba.opal.web;
 
-import com.google.common.collect.Lists;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.obiba.opal.core.domain.OpalAnalysis;
+import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.service.OpalAnalysisResultService;
 import org.obiba.opal.core.service.OpalAnalysisService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,39 +14,34 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class TableAnalysisResource {
+public class AnalysisResource {
 
   private final OpalAnalysisService analysisService;
   private final OpalAnalysisResultService analysisResultService;
 
-  private String analysisId;
-
   @Autowired
-  public TableAnalysisResource(OpalAnalysisService analysisService,
+  public AnalysisResource(OpalAnalysisService analysisService,
       OpalAnalysisResultService analysisResultService) {
     this.analysisService = analysisService;
     this.analysisResultService = analysisResultService;
   }
 
-  public void setAnalysisId(String analysisId) {
-    this.analysisId = analysisId;
+  @GET
+  @Path("/analysis/{id}")
+  public OpalAnalysis getAnalysis(@PathParam("id") String id) {
+    return analysisService.getAnalysis(id);
   }
 
   @GET
-  public String getAnalysis() {
-    return new JSONObject(analysisService.getAnalysis(analysisId)).toString();
+  @Path("/analysis/{id}/results")
+  public Iterable<OpalAnalysisResult> getAnalysisResults(@PathParam("id") String id) {
+    return analysisResultService.getAnalysisResults(id);
   }
 
   @GET
-  @Path("/results")
-  public String getAnalysisResults() {
-    return new JSONArray(Lists.newArrayList(analysisResultService.getAnalysisResults(analysisId))).toString();
-  }
-
-  @GET
-  @Path("/result/{rid}")
-  public String getAnalysisResult(@PathParam("rid") String rid) {
-    return new JSONObject(analysisResultService.getAnalysisResult(analysisId, rid)).toString();
+  @Path("/analysis/{id}/result/{rid}")
+  public OpalAnalysisResult getAnalysisResult(String id, String rid) {
+    return analysisResultService.getAnalysisResult(id, rid);
   }
 
 }

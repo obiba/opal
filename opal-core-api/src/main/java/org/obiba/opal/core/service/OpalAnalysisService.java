@@ -8,10 +8,6 @@ public interface OpalAnalysisService extends SystemService {
 
   Iterable<OpalAnalysis> getAnalyses();
 
-  Iterable<OpalAnalysis> getAnalysesByDatasource(String datasource);
-
-  Iterable<OpalAnalysis> getAnalysesByDatasourceAndTable(String datasource, String table);
-
   void save(OpalAnalysis analysis);
 
   void delete(OpalAnalysis analysis) throws NoSuchAnalysisException;
