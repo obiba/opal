@@ -11,6 +11,7 @@ package org.obiba.opal.web.project;
 
 import java.util.Set;
 
+import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.UriBuilder;
 
@@ -19,14 +20,24 @@ import org.obiba.magma.Timestamped;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.datasource.nil.NullDatasource;
+import org.obiba.opal.core.domain.OpalAnalysis;
+import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.domain.Project;
+import org.obiba.opal.spi.analysis.AnalysisResult;
+import org.obiba.opal.spi.analysis.AnalysisResultItem;
 import org.obiba.opal.web.magma.DatasourceResource;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Projects;
 
 import com.google.common.collect.Sets;
+import org.obiba.opal.web.model.Projects.AnalysisResultItemDto;
+import org.obiba.opal.web.model.Projects.AnalysisStatusDto;
+import org.obiba.opal.web.model.Projects.OpalAnalysisDto;
+import org.obiba.opal.web.model.Projects.OpalAnalysisDto.Builder;
+import org.obiba.opal.web.model.Projects.OpalAnalysisResultDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,6 +119,52 @@ public class Dtos {
     builder.setEntityCount(ids.size());
 
     builder.setTimestamps(asTimestampsDto(project, project.getDatasource()));
+
+    return builder.build();
+  }
+
+  public static OpalAnalysisDto.Builder asDto(OpalAnalysis analysis) {
+    Builder builder = OpalAnalysisDto.newBuilder();
+
+    builder.setId(analysis.getId());
+    builder.setName(analysis.getName());
+
+    builder.setDatasource(analysis.getDatasource());
+    builder.setTable(analysis.getTable());
+
+    builder.setTemplateName(analysis.getTemplateName());
+    builder.setParameters(analysis.getParameters().toString());
+
+    builder.addAllVariables(analysis.getVariables().stream().map(Variable::getName).collect(
+        Collectors.toList()));
+
+    return builder;
+  }
+
+  public static OpalAnalysisResultDto.Builder asDto(OpalAnalysisResult analysisResult) {
+    OpalAnalysisResultDto.Builder builder = OpalAnalysisResultDto.newBuilder();
+
+    builder.setId(analysisResult.getId());
+    builder.setAnalysisId(analysisResult.getAnalysisId());
+
+    builder.setStartDate(analysisResult.getStartDate().toString());
+    builder.setEndDate(analysisResult.getEndDate().toString());
+
+    if (analysisResult.hasResultItems()) {
+      analysisResult.getResultItems().forEach(item -> builder.addResultItems(asDto((AnalysisResultItem) item)));
+    }
+
+    builder.setStatus(AnalysisStatusDto.valueOf(analysisResult.getStatus().name()));
+    builder.setMessage(analysisResult.getMessage());
+
+    return builder;
+  }
+
+  private static AnalysisResultItemDto asDto(AnalysisResultItem item) {
+    AnalysisResultItemDto.Builder builder = AnalysisResultItemDto.newBuilder();
+
+    builder.setStatus(AnalysisStatusDto.valueOf(item.getStatus().name()));
+    builder.setMessage(item.getMessage());
 
     return builder.build();
   }

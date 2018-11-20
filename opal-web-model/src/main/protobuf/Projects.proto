@@ -34,3 +34,42 @@ message ProjectSummaryDto {
   required int32 entityCount = 4;
   optional Magma.TimestampsDto timestamps = 5;
 }
+
+message OpalAnalysisDto {
+  required string id = 1;
+  required string name = 2;
+
+  required string datasource = 3;
+  required string table = 4;
+
+  required string templateName = 5;
+  required string parameters = 6;
+  repeated string variables = 7;
+
+  repeated OpalAnalysisResultDto analysisResults = 8;
+}
+
+message OpalAnalysisResultDto {
+  required string id = 1;
+  required string analysisId = 2;
+
+  optional string startDate = 3;
+  optional string endDate = 4;
+  repeated AnalysisResultItemDto resultItems = 5;
+
+  required AnalysisStatusDto status = 6;
+  optional string message = 7;
+}
+
+message AnalysisResultItemDto {
+  required AnalysisStatusDto status = 1;
+  optional string message = 2;
+}
+
+enum AnalysisStatusDto {
+  IN_PROGRESS = 1;
+  PASSED = 2;
+  FAILURE = 3;
+  ERROR = 4;
+  IGNORED = 5;
+}

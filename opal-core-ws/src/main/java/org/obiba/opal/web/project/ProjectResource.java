@@ -10,8 +10,11 @@
 package org.obiba.opal.web.project;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import javax.annotation.Nonnull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -23,15 +26,21 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceUpdateListener;
 import org.obiba.magma.Timestamped;
 import org.obiba.magma.Timestamps;
+import org.obiba.magma.Variable;
 import org.obiba.magma.support.UnionTimestamps;
+import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.security.OpalKeyStore;
+import org.obiba.opal.core.service.OpalAnalysisService;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.VCFSamplesMappingService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
+import org.obiba.opal.web.TableAnalysisResource;
+import org.obiba.opal.web.model.Projects.OpalAnalysisDto;
+import org.obiba.opal.web.model.Projects.OpalAnalysisDto.Builder;
 import org.obiba.plugins.spi.ServicePlugin;
 import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.model.Projects;
@@ -72,6 +81,9 @@ public class ProjectResource {
 
   @Autowired
   private SubjectProfileService subjectProfileService;
+
+  @Autowired
+  private OpalAnalysisService analysisService;
 
   @GET
   @Transactional(readOnly = true)
@@ -140,6 +152,27 @@ public class ProjectResource {
     VCFStoreResource resource = applicationContext.getBean(VCFStoreResource.class);
     resource.setVCFStore(project.getVCFStoreService(), name);
     return resource;
+  }
+
+  @GET
+  @Path("/analyses")
+  public List<OpalAnalysisDto> getProjectAnalyses() {
+    return StreamSupport.stream(analysisService.getAnalysesByDatasource(name).spliterator(), false)
+        .map(analysis -> Dtos.asDto(analysis).build()).collect(Collectors.toList());
+  }
+
+  @GET
+  @Path("/table/{table}/analyses")
+  public List<OpalAnalysisDto> getProjectTableAnalyses(@PathParam("table") String table) {
+    return StreamSupport.stream(analysisService.getAnalysesByDatasourceAndTable(name, table).spliterator(), false)
+        .map(analysis -> Dtos.asDto(analysis).build()).collect(Collectors.toList());
+  }
+
+  @Path("/table/{table}/analysis/{analysisId}")
+  public TableAnalysisResource getTableAnalysisResult(@PathParam("table") String table, @PathParam("analysisId") String analysisId) {
+    TableAnalysisResource bean = applicationContext.getBean(TableAnalysisResource.class);
+    bean.setAnalysisId(analysisId);
+    return bean;
   }
 
   private Project getProject() {
