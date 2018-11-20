@@ -1,18 +1,12 @@
 package org.obiba.opal.shell.commands;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
-import java.io.Closeable;
-import java.io.File;
-import java.util.List;
-import java.util.Set;
-import javax.validation.constraints.NotNull;
-
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
-import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.domain.Project;
@@ -35,6 +29,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import javax.validation.constraints.NotNull;
+import java.io.Closeable;
+import java.io.File;
+import java.util.List;
+import java.util.Set;
 
 
 @CommandUsage(
@@ -68,31 +68,31 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
     Datasource datasource = project.getDatasource();
 
     List<AnalyseCommandOptions.AnalyseOptions> analyses = options.getAnalyses();
-
+    AnalysisValueTableResolver valueTableResolver = new AnalysisValueTableResolver();
     Set<String> loadedTables = Sets.newHashSet();
+
     try (RSessionHandlerImpl sessionHandler = new RSessionHandlerImpl()) {
 
       analyses.forEach(analyseOptions -> {
-        String tableName = analyseOptions.getTable();
-        if (!datasource.hasValueTable(tableName)) {
-          throw new NoSuchValueTableException(tableName);
-        }
-
+        ValueTable table = datasource.getValueTable(analyseOptions.getTable());
         String pluginName = analyseOptions.getPlugin();
         RAnalysisService rAnalysisService = (RAnalysisService) opalRuntime.getServicePlugin(pluginName);
         rAnalysisService.setOpalFileSystemPathResolver(new OpalPathResolver());
 
-        if (!loadedTables.contains(tableName)) {
-          loadedTables.add(tableName);
-          new ValueTableToTibbleWriter().write(datasource, tableName, sessionHandler);
+        ValueTable targetValueTable = valueTableResolver.resolve(table, analyseOptions.getVariables());
+        String tibbleName = targetValueTable.getName();
+
+        if (!loadedTables.contains(tibbleName)) {
+          loadedTables.add(tibbleName);
+          new ValueTableToTibbleWriter().write(targetValueTable, sessionHandler);
         }
 
         String templateName = analyseOptions.getTemplate();
-        log.info("Analysing {} table using {} routines.", tableName, String.format("%s::%s", pluginName, templateName));
+        log.info("Analysing {} table using {} routines.", tibbleName, String.format("%s::%s", pluginName, templateName));
 
         RAnalysis analysis = RAnalysis.create(analyseOptions.getName(), analyseOptions.getTemplate())
           .session(sessionHandler.getSession())
-          .symbol(RUtils.getSymbol(tableName))
+          .symbol(RUtils.getSymbol(tibbleName))
           .parameters(analyseOptions.getParams())
           .build();
 
@@ -100,7 +100,8 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
 
         RAnalysisResult result = rAnalysisService.analyse(analysis);
 
-        log.info("Analysis result:\nstarted: {}\nended: {}\nstatus: {}\nmessage: {}\nreport: {}",
+        log.info("Analysed {} table with status {}.", tibbleName, result.getStatus());
+        log.debug("Analysis result:\nstarted: {}\nended: {}\nstatus: {}\nmessage: {}\nreport: {}",
           result.getStartDate(),
           result.getEndDate(),
           result.getStatus(),
@@ -115,15 +116,45 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
     return 0;
   }
 
+  private class AnalysisValueTableResolver {
+
+    ValueTable resolve(ValueTable source, String variableNamesCsv) {
+      List<String> variableNames = getVariableNames(variableNamesCsv);
+      if (variableNames.isEmpty()) return source;
+
+      return createView(source, variableNames);
+    }
+
+    private ValueTable createView(ValueTable table, List<String> variableNames) {
+      String viewName = table.getName() + "View";
+      ValueTable view = View.Builder
+        .newView(viewName, table)
+        .select(variable -> variableNames.contains(variable.getName()))
+        .build();
+
+      log.debug("View {} has {} variable(s) out of {}.", viewName, view.getVariableCount(), variableNames.size());
+
+      return view;
+    }
+
+    private List<String> getVariableNames(String variableNamesCsv) {
+      List<String> variableNames = Lists.newArrayList();
+      if (variableNamesCsv != null && !"".equals(variableNamesCsv)) {
+        variableNames = Lists.newArrayList(variableNamesCsv.split("\\s*,\\s*"));
+      }
+
+      return variableNames;
+    }
+
+  }
 
   private class ValueTableToTibbleWriter {
 
-    void write(@NotNull Datasource datasource, String tableName, RSessionHandler rSessionHandler) {
-      ValueTable valueTable = datasource.getValueTable(tableName);
+    void write(@NotNull ValueTable valueTable, RSessionHandler rSessionHandler) {
       if (valueTable.getValueSetCount() > 0) {
         rSessionHandler
           .getSession()
-          .execute(new MagmaAssignROperation(RUtils.getSymbol(tableName), valueTable, txTemplate, "id"));
+          .execute(new MagmaAssignROperation(RUtils.getSymbol(valueTable.getName()), valueTable, txTemplate, "id"));
       }
     }
 
