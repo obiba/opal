@@ -37,25 +37,29 @@ public class LimeSurveyPluginUpgradeStep extends AbstractUpgradeStep {
         .list(Database.class, "select * from Database where sqlSettings containsKey ? and sqlSettings containsValue ?",
             "sqlSchema", "LIMESURVEY");
 
-    if (limeSurveyDatabases != null) {
+    if (limeSurveyDatabases != null && limeSurveyDatabases.iterator().hasNext()) {
       log.info("Deleting all registered LimeSurvey databases");
 
-      Path propertiesBackupDirectoryPath = getPropertiesBackupDirectoryPath();
+      try {
+        Path propertiesBackupDirectoryPath = getPropertiesBackupDirectoryPath();
 
-      for(Database limeSurveyDatabase : limeSurveyDatabases) {
-        SqlSettings sqlSettings = limeSurveyDatabase.getSqlSettings();
+        for (Database limeSurveyDatabase : limeSurveyDatabases) {
+          SqlSettings sqlSettings = limeSurveyDatabase.getSqlSettings();
 
-        if (limeSurveyDatabase.hasSqlSettings() && sqlSettings != null) {
-          Properties properties = toProperties(sqlSettings);
+          if (limeSurveyDatabase.hasSqlSettings() && sqlSettings != null) {
+            Properties properties = toProperties(sqlSettings);
 
-          try {
-            properties.store(new FileWriter(propertiesBackupDirectoryPath.resolve(limeSurveyDatabase.getName() + ".properties").toString()), limeSurveyDatabase.getName());
-          } catch(IOException e) {
-            log.error(e.getMessage());
+            try {
+              properties.store(new FileWriter(propertiesBackupDirectoryPath.resolve(limeSurveyDatabase.getName() + ".properties").toString()), limeSurveyDatabase.getName());
+            } catch (IOException e) {
+              log.error(e.getMessage());
+            }
           }
-        }
 
-        orientDbService.delete(limeSurveyDatabase);
+          orientDbService.delete(limeSurveyDatabase);
+        }
+      } catch(Exception e) {
+        log.error("Unable to migrate the Limesurvey database settings to opal-datasource-limesurvey plugin configuration", e);
       }
     }
 
