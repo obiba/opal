@@ -16,6 +16,7 @@ public interface Analysis {
    *
    * @return
    */
+  @NotNull
   String getId();
 
   /**
@@ -23,6 +24,7 @@ public interface Analysis {
    *
    * @return
    */
+  @NotNull
   String getName();
 
   /**
@@ -30,6 +32,7 @@ public interface Analysis {
    *
    * @return
    */
+  @NotNull
   String getTemplateName();
 
   /**
@@ -37,7 +40,6 @@ public interface Analysis {
    *
    * @return
    */
-  @NotNull
   JSONObject getParameters();
 
   /**

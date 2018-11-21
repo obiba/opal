@@ -3,6 +3,8 @@ package org.obiba.opal.spi.analysis;
 import com.google.common.collect.Lists;
 import org.json.JSONObject;
 import org.obiba.magma.Variable;
+import org.obiba.opal.spi.analysis.support.generator.IdGenetatorFactory;
+import org.springframework.util.Assert;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -24,31 +26,33 @@ public abstract class AbstractAnalysis implements Analysis {
 
   private List<String> variables;
 
-  public AbstractAnalysis(String name, String templateName) {
+  public AbstractAnalysis(@NotNull String name, @NotNull String templateName) {
+    Assert.notNull(name, "name cannot be null");
+    Assert.notNull(templateName , "templateName cannot be null");
+
+    this.id = IdGenetatorFactory.createDateIdGenerator().generate();
     this.name = name;
     this.templateName = templateName;
   }
 
+  @NotNull
   @Override
   public String getId() {
     return id;
   }
 
-  protected void setId(String value) {
-    id = value;
-  }
-
+  @NotNull
   @Override
   public String getName() {
     return name;
   }
 
+  @NotNull
   @Override
   public String getTemplateName() {
     return templateName;
   }
 
-  @NotNull
   @Override
   public JSONObject getParameters() {
     return parameters;

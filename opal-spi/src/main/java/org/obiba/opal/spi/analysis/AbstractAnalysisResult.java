@@ -1,5 +1,7 @@
 package org.obiba.opal.spi.analysis;
 
+import org.obiba.opal.spi.analysis.support.generator.IdGenetatorFactory;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,16 +28,13 @@ public abstract class AbstractAnalysisResult<T extends Analysis> implements Anal
   private List<AnalysisResult<T>> resultItems;
 
   protected AbstractAnalysisResult(T analysis) {
+    this.id = IdGenetatorFactory.createDateIdGenerator().generate();
     this.analysisId = analysis.getId();
   }
 
   @Override
   public String getId() {
     return id;
-  }
-
-  protected void setId(String value) {
-    id = value;
   }
 
   @Override

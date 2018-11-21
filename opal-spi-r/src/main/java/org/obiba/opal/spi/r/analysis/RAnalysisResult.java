@@ -2,7 +2,6 @@ package org.obiba.opal.spi.r.analysis;
 
 import org.obiba.opal.spi.analysis.AbstractAnalysisResult;
 import org.obiba.opal.spi.analysis.AnalysisStatus;
-import org.obiba.opal.spi.analysis.support.generator.IdGenetatorFactory;
 
 import java.util.Date;
 
@@ -36,9 +35,8 @@ public class RAnalysisResult extends AbstractAnalysisResult<RAnalysis> {
     private RAnalysisResult result;
 
     private Builder(RAnalysis analysis) {
-      this.resultId = IdGenetatorFactory.createDateIdGenerator().generate();
       this.result = new RAnalysisResult(analysis);
-      this.result.setId(resultId);
+      this.resultId = result.getId();
     }
 
     public Builder(RAnalysisResult result) {
