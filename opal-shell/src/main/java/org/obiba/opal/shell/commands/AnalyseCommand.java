@@ -37,7 +37,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 
@@ -99,7 +98,7 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
           .symbol(RUtils.getSymbol(tibbleName))
           .parameters(analyseOptions.getParams());
 
-        if (targetValueTable.isView()) {
+        if (!analyseOptions.getVariables().isEmpty()) {
           builder.variables(StreamSupport.stream(targetValueTable.getVariables().spliterator(), false)
             .map(Variable::getName)
             .collect(Collectors.toList()));
@@ -142,7 +141,9 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
         .select(variable -> variableNames.contains(variable.getName()))
         .build();
 
-      log.debug("View {} has {} variable(s) out of {}.", viewName, view.getVariableCount(), variableNames.size());
+      if (view.getVariableCount() == 0) {
+        throw new RuntimeException(String.format("Invalid variable names provided: %s", variableNames.toString()));
+      }
 
       return view;
     }
