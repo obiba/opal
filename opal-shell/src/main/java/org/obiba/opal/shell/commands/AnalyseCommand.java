@@ -6,6 +6,7 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
@@ -35,6 +36,8 @@ import java.io.Closeable;
 import java.io.File;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 
 @CommandUsage(
@@ -90,14 +93,20 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
         String templateName = analyseOptions.getTemplate();
         log.info("Analysing {} table using {} routines.", tibbleName, String.format("%s::%s", pluginName, templateName));
 
-        RAnalysis analysis = RAnalysis.create(analyseOptions.getName(), analyseOptions.getTemplate())
+        RAnalysis.Builder builder = RAnalysis.create(analyseOptions.getName(), analyseOptions.getTemplate())
           .session(sessionHandler.getSession())
           .symbol(RUtils.getSymbol(tibbleName))
-          .parameters(analyseOptions.getParams())
-          .build();
+          .parameters(analyseOptions.getParams());
+
+        if (!analyseOptions.getVariables().isEmpty()) {
+          builder.variables(StreamSupport.stream(targetValueTable.getVariables().spliterator(), false)
+            .map(Variable::getName)
+            .collect(Collectors.toList()));
+        }
+
+        RAnalysis analysis = builder.build();
 
         analysisService.save(new OpalAnalysis(datasource.getName(), table.getName(), analysis));
-
         RAnalysisResult result = rAnalysisService.analyse(analysis);
 
         log.info("Analysed {} table with status {}.", tibbleName, result.getStatus());
@@ -132,7 +141,9 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
         .select(variable -> variableNames.contains(variable.getName()))
         .build();
 
-      log.debug("View {} has {} variable(s) out of {}.", viewName, view.getVariableCount(), variableNames.size());
+      if (view.getVariableCount() == 0) {
+        throw new RuntimeException(String.format("Invalid variable names provided: %s", variableNames.toString()));
+      }
 
       return view;
     }

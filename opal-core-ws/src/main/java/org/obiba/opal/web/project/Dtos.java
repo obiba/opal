@@ -134,9 +134,7 @@ public class Dtos {
 
     builder.setTemplateName(analysis.getTemplateName());
     builder.setParameters(analysis.getParameters().toString());
-
-    builder.addAllVariables(analysis.getVariables().stream().map(Variable::getName).collect(
-        Collectors.toList()));
+    builder.addAllVariables(analysis.getVariables());
 
     return builder;
   }

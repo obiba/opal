@@ -45,6 +45,6 @@ public interface Analysis {
    *
    * @return
    */
-  List<Variable> getVariables();
+  List<String> getVariables();
 
 }

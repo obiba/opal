@@ -1,11 +1,11 @@
 package org.obiba.opal.core.domain;
 
 import com.google.common.collect.Lists;
-import java.util.List;
-import javax.validation.constraints.NotNull;
 import org.json.JSONObject;
-import org.obiba.magma.Variable;
 import org.obiba.opal.spi.analysis.Analysis;
+
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 public class OpalAnalysis implements Analysis, HasUniqueProperties {
 
@@ -15,7 +15,7 @@ public class OpalAnalysis implements Analysis, HasUniqueProperties {
   private String name;
   private String templateName;
   private JSONObject parameters;
-  private List<Variable> variables;
+  private List<String> variables;
 
   private String datasource;
   private String table;
@@ -72,7 +72,7 @@ public class OpalAnalysis implements Analysis, HasUniqueProperties {
   }
 
   @Override
-  public List<Variable> getVariables() {
+  public List<String> getVariables() {
     return variables;
   }
 
