@@ -3,7 +3,6 @@ package org.obiba.opal.spi.r.analysis;
 import com.google.common.base.Strings;
 import org.json.JSONObject;
 import org.obiba.opal.spi.analysis.AbstractAnalysis;
-import org.obiba.opal.spi.analysis.support.generator.IdGenetatorFactory;
 import org.obiba.opal.spi.r.ROperationTemplate;
 
 import java.util.List;
@@ -49,7 +48,6 @@ public class RAnalysis extends AbstractAnalysis {
 
     private Builder(String name, String templateName) {
       this.analysis = new RAnalysis(name, templateName);
-      this.analysis.setId(IdGenetatorFactory.createDateIdGenerator().generate());
     }
 
     public Builder session(ROperationTemplate session) {

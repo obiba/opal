@@ -3,9 +3,11 @@ package org.obiba.opal.core.domain;
 import com.google.common.collect.Lists;
 import org.json.JSONObject;
 import org.obiba.opal.spi.analysis.Analysis;
+import org.springframework.util.Assert;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Optional;
 
 public class OpalAnalysis implements Analysis, HasUniqueProperties {
 
@@ -25,11 +27,15 @@ public class OpalAnalysis implements Analysis, HasUniqueProperties {
   }
 
   public OpalAnalysis(@NotNull String datasource, @NotNull String table, @NotNull Analysis analysis) {
+    Assert.notNull(datasource, "datasource cannot be null");
+    Assert.notNull(table , "table cannot be null");
+    Assert.notNull(analysis, "analysis cannot be null");
+
     id = analysis.getId();
     name = analysis.getName();
     templateName = analysis.getTemplateName();
-    parameters = analysis.getParameters();
-    variables = analysis.getVariables();
+    parameters = Optional.of(analysis.getParameters()).orElseGet(JSONObject::new);
+    variables = Optional.of(analysis.getVariables()).orElseGet(Lists::newArrayList);
 
     this.datasource = datasource;
     this.table = table;
@@ -51,16 +57,19 @@ public class OpalAnalysis implements Analysis, HasUniqueProperties {
     this.table = table;
   }
 
+  @NotNull
   @Override
   public String getId() {
     return id;
   }
 
+  @NotNull
   @Override
   public String getName() {
     return name;
   }
 
+  @NotNull
   @Override
   public String getTemplateName() {
     return templateName;
