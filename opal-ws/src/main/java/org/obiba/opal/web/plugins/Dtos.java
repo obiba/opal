@@ -11,12 +11,20 @@
 package org.obiba.opal.web.plugins;
 
 import com.google.common.base.Strings;
+import org.obiba.magma.ValueType;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.core.domain.VCFSamplesMapping;
 import org.obiba.opal.core.support.vcf.VCFSamplesSummaryBuilder;
+import org.obiba.opal.spi.analysis.Analysis;
+import org.obiba.opal.spi.analysis.AnalysisResult;
+import org.obiba.opal.spi.analysis.AnalysisService;
+import org.obiba.opal.spi.analysis.AnalysisTemplate;
 import org.obiba.opal.spi.vcf.VCFStore;
 import org.obiba.opal.web.model.Plugins;
+import org.obiba.opal.web.model.Plugins.AnalysisPluginPackageDto;
+import org.obiba.opal.web.model.Plugins.AnalysisPluginTemplateDto;
+import org.obiba.opal.web.model.Plugins.AnalysisPluginTemplateDto.Builder;
 import org.obiba.plugins.PluginPackage;
 import org.obiba.plugins.PluginResources;
 
@@ -127,6 +135,36 @@ public class Dtos {
       builder.setTableReference(sampleMappings.getTableReference())
           .setParticipantIdVariable(sampleMappings.getParticipantIdVariable())
           .setSampleRoleVariable(sampleMappings.getSampleRoleVariable());
+    }
+
+    return builder.build();
+  }
+
+  public static <T extends Analysis, U extends AnalysisResult> Plugins.AnalysisPluginPackageDto.Builder asDto(AnalysisService<T, U> analysisService) {
+    Plugins.AnalysisPluginPackageDto.Builder builder = AnalysisPluginPackageDto.newBuilder();
+
+    builder.addAllAnalysisTemplates(analysisService.getAnalysisTemplates().stream().map(Dtos::asDto).collect(Collectors.toList()));
+
+    return builder;
+  }
+
+  public static AnalysisPluginTemplateDto asDto(AnalysisTemplate template) {
+    Builder builder = AnalysisPluginTemplateDto.newBuilder()
+        .setName(template.getName())
+        .setTitle(template.getTitle())
+        .setDescription(template.getDescription())
+        .setSchemaForm(template.getJSONSchemaForm().toString());
+
+    if (template.getValueTypes() != null) {
+      builder.addAllValueTypes(template.getValueTypes().stream().map(ValueType::getName).collect(Collectors.toList()));
+    }
+
+    if (template.getReportPath() != null) {
+      builder.setReportPath(template.getReportPath().toString());
+    }
+
+    if (template.getRoutinePath() != null) {
+      builder.setRoutinePath(template.getRoutinePath().toString());
     }
 
     return builder.build();
