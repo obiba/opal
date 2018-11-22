@@ -33,6 +33,25 @@ message DatasourcePluginPackageDto {
     }
 }
 
+message AnalysisPluginPackageDto {
+    repeated AnalysisPluginTemplateDto analysisTemplates = 1;
+
+    extend PluginPackageDto {
+        optional AnalysisPluginPackageDto analysis = 2000;
+    }
+}
+
+message AnalysisPluginTemplateDto {
+    required string name = 1;
+    required string title = 2;
+    optional string description = 3;
+    required string schemaForm = 4;
+    repeated string valueTypes = 5;
+
+    optional string reportPath = 6;
+    optional string routinePath = 7;
+}
+
 message PluginDto {
     required string name = 1;
     required string title = 2;

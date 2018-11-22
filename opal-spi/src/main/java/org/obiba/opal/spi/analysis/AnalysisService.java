@@ -8,6 +8,8 @@ import org.obiba.opal.spi.OpalServicePlugin;
 public interface AnalysisService<T extends Analysis, U extends AnalysisResult> extends
     OpalServicePlugin {
 
+  String SERVICE_TYPE = "opal-analysis";
+
   /**
    * Get the list of analysis that can be performed.
    *
