@@ -97,6 +97,11 @@ message ExportVCFCommandOptionsDto {
   optional string participantIdentifiersMapping = 6;
 }
 
+message ExportAnalysisCommandOptionsDto {
+  required string project = 1;
+  repeated string tables = 2;
+}
+
 message AnalyseCommandOptionsDto {
 
   message AnalyseDto {

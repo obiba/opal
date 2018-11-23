@@ -22,6 +22,7 @@ import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.Dtos;
 import org.obiba.opal.shell.commands.Command;
+import org.obiba.opal.shell.commands.ExportAnalysisCommand;
 import org.obiba.opal.shell.commands.options.*;
 import org.obiba.opal.shell.web.*;
 import org.obiba.opal.web.model.Commands;
@@ -167,6 +168,24 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
     analyseCommand.setOptions(analyseCommandOptions);
 
     return launchCommand(commandName, analyseCommand);
+  }
+
+  @POST
+  @Path("/_export-analysis")
+  public Response exportAnalysis(Commands.ExportAnalysisCommandOptionsDto options) {
+    if(!name.equals(options.getProject())) {
+      throw new InvalidRequestException("InvalidProjectName", name);
+    }
+
+    options.getTablesList().forEach(table -> ensureTableValuesAccess(String.format("%s.%s", name, table)));
+
+    String commandName = "export-analysis";
+    ExportAnalysisCommandOptions exportAnalysisCommandOptions = new ExportAnalysisCommandOptionsImpl(options);
+
+    Command<ExportAnalysisCommandOptions> exportAnalysisCommand = commandRegistry.newCommand(commandName);
+    exportAnalysisCommand.setOptions(exportAnalysisCommandOptions);
+
+    return launchCommand(commandName, exportAnalysisCommand);
   }
 
   //

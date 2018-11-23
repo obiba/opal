@@ -41,6 +41,7 @@ public class DatasourcePermissionConverterTest
     testConversion("/datasource/patate", DatasourcePermissionConverter.Permission.DATASOURCE_VIEW, //
         "rest:/datasource/patate:GET:GET/GET", //
         "rest:/project/patate/commands/_analyse:POST:GET", //
+        "rest:/project/patate/commands/_export-analysis:POST:GET", //
         "rest:/project/patate/commands/_export:POST:GET", //
         "rest:/project/patate/commands/_copy:POST:GET", //
         "rest:/project/patate/report-templates:GET:GET", //
