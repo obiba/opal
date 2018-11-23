@@ -60,7 +60,7 @@ public class ExportAnalysisCommand extends AbstractOpalRuntimeDependentCommand<E
       : mergeTableAnalyses(projectName);
 
     if (analyses.isEmpty()) {
-      log.info("There are no analysis for project {}", projectName);
+      log.info("There are no analysis for project: {} tables: {}", projectName, options.getTables());
       return 0;
     }
 
