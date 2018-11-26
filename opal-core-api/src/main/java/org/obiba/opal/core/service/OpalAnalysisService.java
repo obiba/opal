@@ -8,9 +8,9 @@ public interface OpalAnalysisService extends SystemService {
 
   Iterable<OpalAnalysis> getAnalyses();
 
-  Iterable<OpalAnalysis> getAnalysesByDatasource(String datasource);
+  Iterable<OpalAnalysis> getAnalysesByDatasource(String datasource, String order, int limit);
 
-  Iterable<OpalAnalysis> getAnalysesByDatasourceAndTable(String datasource, String table);
+  Iterable<OpalAnalysis> getAnalysesByDatasourceAndTable(String datasource, String table, String order, int limit);
 
   void save(OpalAnalysis analysis);
 

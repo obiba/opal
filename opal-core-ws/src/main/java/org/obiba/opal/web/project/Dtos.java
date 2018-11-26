@@ -9,30 +9,16 @@
  */
 package org.obiba.opal.web.project;
 
-import java.util.Set;
-
-import java.util.stream.Collectors;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.core.UriBuilder;
-
-import org.obiba.magma.Datasource;
-import org.obiba.magma.Timestamped;
-import org.obiba.magma.Timestamps;
-import org.obiba.magma.Value;
-import org.obiba.magma.ValueTable;
-import org.obiba.magma.Variable;
-import org.obiba.magma.VariableEntity;
+import com.google.common.collect.Sets;
+import org.obiba.magma.*;
 import org.obiba.magma.datasource.nil.NullDatasource;
 import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.domain.Project;
-import org.obiba.opal.spi.analysis.AnalysisResult;
 import org.obiba.opal.spi.analysis.AnalysisResultItem;
 import org.obiba.opal.web.magma.DatasourceResource;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Projects;
-
-import com.google.common.collect.Sets;
 import org.obiba.opal.web.model.Projects.AnalysisResultItemDto;
 import org.obiba.opal.web.model.Projects.AnalysisStatusDto;
 import org.obiba.opal.web.model.Projects.OpalAnalysisDto;
@@ -40,6 +26,10 @@ import org.obiba.opal.web.model.Projects.OpalAnalysisDto.Builder;
 import org.obiba.opal.web.model.Projects.OpalAnalysisResultDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.core.UriBuilder;
+import java.util.Set;
 
 import static org.obiba.opal.web.model.Projects.ProjectDto;
 
@@ -134,6 +124,8 @@ public class Dtos {
 
     builder.setTemplateName(analysis.getTemplateName());
     builder.setParameters(analysis.getParameters().toString());
+    builder.setCreated(analysis.getCreated().toString());
+    builder.setUpdated(analysis.getUpdated().toString());
     builder.addAllVariables(analysis.getVariables());
 
     return builder;
@@ -154,6 +146,9 @@ public class Dtos {
 
     builder.setStatus(AnalysisStatusDto.valueOf(analysisResult.getStatus().name()));
     builder.setMessage(analysisResult.getMessage());
+
+    builder.setCreated(analysisResult.getCreated().toString());
+    builder.setUpdated(analysisResult.getUpdated().toString());
 
     return builder;
   }

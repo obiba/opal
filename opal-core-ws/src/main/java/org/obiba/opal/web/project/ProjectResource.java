@@ -9,17 +9,6 @@
  */
 package org.obiba.opal.web.project;
 
-import java.util.Arrays;
-import java.util.Set;
-
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-import javax.annotation.Nonnull;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceUpdateListener;
@@ -30,23 +19,26 @@ import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.security.OpalKeyStore;
-import org.obiba.opal.core.service.OpalAnalysisService;
-import org.obiba.opal.core.service.ProjectService;
-import org.obiba.opal.core.service.SubjectProfileService;
-import org.obiba.opal.core.service.VCFSamplesMappingService;
+import org.obiba.opal.core.service.*;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
-import org.obiba.opal.web.TableAnalysisResource;
-import org.obiba.opal.web.model.Projects.OpalAnalysesDto;
-import org.obiba.plugins.spi.ServicePlugin;
 import org.obiba.opal.spi.vcf.VCFStoreService;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.security.KeyStoreResource;
 import org.obiba.opal.web.vcf.VCFStoreResource;
+import org.obiba.plugins.spi.ServicePlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Nonnull;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
+import java.util.Arrays;
+import java.util.Set;
 
 @Component
 @Scope("request")
@@ -77,9 +69,6 @@ public class ProjectResource {
 
   @Autowired
   private SubjectProfileService subjectProfileService;
-
-  @Autowired
-  private OpalAnalysisService analysisService;
 
   @GET
   @Transactional(readOnly = true)
@@ -148,29 +137,6 @@ public class ProjectResource {
     VCFStoreResource resource = applicationContext.getBean(VCFStoreResource.class);
     resource.setVCFStore(project.getVCFStoreService(), name);
     return resource;
-  }
-
-  @GET
-  @Path("/analyses")
-  public OpalAnalysesDto getProjectAnalyses() {
-    return OpalAnalysesDto.newBuilder()
-        .addAllAnalyses(StreamSupport.stream(analysisService.getAnalysesByDatasource(name).spliterator(), false)
-            .map(analysis -> Dtos.asDto(analysis).build()).collect(Collectors.toList())).build();
-  }
-
-  @GET
-  @Path("/table/{table}/analyses")
-  public OpalAnalysesDto getProjectTableAnalyses(@PathParam("table") String table) {
-    return OpalAnalysesDto.newBuilder()
-        .addAllAnalyses(StreamSupport.stream(analysisService.getAnalysesByDatasourceAndTable(name, table).spliterator(), false)
-            .map(analysis -> Dtos.asDto(analysis).build()).collect(Collectors.toList())).build();
-  }
-
-  @Path("/table/{table}/analysis/{analysisId}")
-  public TableAnalysisResource getTableAnalysisResult(@PathParam("table") String table, @PathParam("analysisId") String analysisId) {
-    TableAnalysisResource bean = applicationContext.getBean(TableAnalysisResource.class);
-    bean.setAnalysisId(analysisId);
-    return bean;
   }
 
   private Project getProject() {
