@@ -236,7 +236,8 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
                 formatChooser.addItemToGroup(plugin.getTitle(), plugin.getName(), 1);
               }
             }
-            formatChooser.update();
+            if (pluginPackageDtoJsArray.length()>0)
+              formatChooser.update();
           }
         })
         .get().send();
@@ -273,20 +274,15 @@ public class DataImportView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
   }
 
   @Override
-  public JsArray<PluginPackageDto> getDatasourcePluginPackages() {
-    return pluginPackageDtoJsArray;
-  }
-
-  @Override
   public PluginPackageDto getPluginPackage(String name) {
     boolean found = false;
     int index = 0;
 
     if (pluginPackageDtoJsArray != null) {
-      do {
+      while (!found && index < pluginPackageDtoJsArray.length()) {
         found = pluginPackageDtoJsArray.get(index).getName().equals(name);
         if (!found) index++;
-      } while(!found && index < pluginPackageDtoJsArray.length());
+      }
     }
 
     return found ? pluginPackageDtoJsArray.get(index) : null;
