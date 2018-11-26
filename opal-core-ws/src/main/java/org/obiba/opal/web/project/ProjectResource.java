@@ -9,17 +9,6 @@
  */
 package org.obiba.opal.web.project;
 
-import java.util.Arrays;
-import java.util.Set;
-
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-import javax.annotation.Nonnull;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceUpdateListener;
@@ -30,23 +19,33 @@ import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.runtime.NoSuchServiceException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.security.OpalKeyStore;
-import org.obiba.opal.core.service.OpalAnalysisService;
-import org.obiba.opal.core.service.ProjectService;
-import org.obiba.opal.core.service.SubjectProfileService;
-import org.obiba.opal.core.service.VCFSamplesMappingService;
+import org.obiba.opal.core.service.*;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
-import org.obiba.opal.web.TableAnalysisResource;
-import org.obiba.opal.web.model.Projects.OpalAnalysesDto;
-import org.obiba.plugins.spi.ServicePlugin;
 import org.obiba.opal.spi.vcf.VCFStoreService;
+import org.obiba.opal.web.TableAnalysisResource;
 import org.obiba.opal.web.model.Projects;
+import org.obiba.opal.web.model.Projects.OpalAnalysesDto;
 import org.obiba.opal.web.security.KeyStoreResource;
 import org.obiba.opal.web.vcf.VCFStoreResource;
+import org.obiba.plugins.spi.ServicePlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.activation.MimetypesFileTypeMap;
+import javax.annotation.Nonnull;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+import java.io.BufferedOutputStream;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Component
 @Scope("request")
@@ -80,6 +79,9 @@ public class ProjectResource {
 
   @Autowired
   private OpalAnalysisService analysisService;
+
+  @Autowired
+  private AnalysisExportService analysisExportService;
 
   @GET
   @Transactional(readOnly = true)
@@ -164,6 +166,34 @@ public class ProjectResource {
     return OpalAnalysesDto.newBuilder()
         .addAllAnalyses(StreamSupport.stream(analysisService.getAnalysesByDatasourceAndTable(name, table).spliterator(), false)
             .map(analysis -> Dtos.asDto(analysis).build()).collect(Collectors.toList())).build();
+  }
+
+  @POST
+  @Path("/_export-analysis")
+  @Produces("application/zip")
+  public Response exportProjectAnalysis() {
+    Project project = getProject();
+    StreamingOutput outputStream = stream -> analysisExportService.exportProjectAnalysis(project.getName(), new BufferedOutputStream(stream));
+
+    String fileName = String.format("%s-analysis.zip", project.getName());
+    String mimeType = new MimetypesFileTypeMap().getContentType(fileName);
+    return Response.ok(outputStream, mimeType)
+      .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+  }
+
+  @POST
+  @Path("/table/{table}/_export-analysis")
+  @Produces("application/zip")
+  public Response exportTableAnalysis(@PathParam("table") String table) {
+    getProject();
+    getProject().getDatasource().getValueTable(table);
+
+    StreamingOutput outputStream = stream -> analysisExportService.exportProjectAnalysis(name, new BufferedOutputStream(stream), table);
+
+    String fileName = String.format("%s-%s-analsis.zip", name, table);
+    String mimeType = new MimetypesFileTypeMap().getContentType(fileName);
+    return Response.ok(outputStream, mimeType)
+      .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
   }
 
   @Path("/table/{table}/analysis/{analysisId}")
