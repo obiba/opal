@@ -631,8 +631,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
     void clearError();
 
-    JsArray<PluginPackageDto> getDatasourcePluginPackages();
-
     PluginPackageDto getPluginPackage(String name);
   }
 
