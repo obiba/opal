@@ -14,6 +14,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.obiba.magma.*;
 import org.obiba.magma.type.*;
+import org.obiba.opal.spi.r.RUtils;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.RList;
@@ -184,13 +185,16 @@ class RVariableValueSource extends AbstractVariableValueSource implements Variab
   private List<Attribute> extractLocalizedAttributes(String namespace, String name, String value) {
     List<Attribute> attributes = Lists.newArrayList();
     String[] strValues = value.split("\\|");
-    Pattern pattern = Pattern.compile("\\(([a-z]+)\\) (.+)");
+    Pattern pattern = Pattern.compile("^\\(([a-z]{2})\\) (.+)");
     for (String strValue : strValues) {
       Matcher matcher = pattern.matcher(strValue);
-      if (matcher.find())
+      if (matcher.find()) {
+        String localeStr = matcher.group(1);
+        if (!RUtils.isLocaleValid(localeStr))
+          localeStr = valueTable.getDefaultLocale();
         attributes.add(Attribute.Builder.newAttribute(name).withNamespace(namespace)
-            .withLocale(matcher.group(1)).withValue(matcher.group(2)).build());
-      else if (Strings.isNullOrEmpty(namespace) && ("label".equals(name) || "description".equals(name)))
+            .withLocale(localeStr).withValue(matcher.group(2)).build());
+      } else if (Strings.isNullOrEmpty(namespace) && ("label".equals(name) || "description".equals(name)))
         attributes.add(Attribute.Builder.newAttribute(name).withLocale(valueTable.getDefaultLocale()).withValue(strValue).build());
       else
         attributes.add(Attribute.Builder.newAttribute(name).withNamespace(namespace).withValue(strValue).build());
