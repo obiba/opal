@@ -29,7 +29,7 @@ class RVariableEntity extends VariableEntityBean {
 
   RVariableEntity(@NotNull String entityType, @NotNull double entityIdentifier) {
     super(entityType, normalizeId(entityIdentifier));
-    this.rEntityIdentifier = normalizeId(entityIdentifier);
+    this.rEntityIdentifier = Double.toString(entityIdentifier);
     this.numeric = true;
   }
 
