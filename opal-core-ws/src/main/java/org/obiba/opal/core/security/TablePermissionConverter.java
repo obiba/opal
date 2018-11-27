@@ -107,6 +107,7 @@ public class TablePermissionConverter extends OpalPermissionConverter {
             toRest("/project/{0}/summary", "GET:GET", args),
             toRest("/project/{0}/analyses", "GET:GET", args),
             toRest("/project/{0}/table/{1}/analyses", "GET:GET", args),
+            toRest("/project/{0}/table/{1}/analyses/_export", "GET:GET", args),
             toRest("/project/{0}/table/{1}/analysis", "GET:GET/GET", args));
         Iterables.addAll(perms, TABLE_READ.convert(node));
         return perms;

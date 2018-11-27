@@ -101,6 +101,7 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
         "rest:/project/patate/summary:GET:GET", //
         "rest:/project/patate/analyses:GET:GET", //
         "rest:/project/patate/table/pwel/analyses:GET:GET",
+        "rest:/project/patate/table/pwel/analyses/_export:GET:GET",
         "rest:/project/patate/table/pwel/analysis:GET:GET/GET",
         "rest:/datasource/patate/table/pwel:GET:GET", //
         "rest:/datasource/patate/table/pwel/index:GET", //
@@ -166,6 +167,7 @@ public class TablePermissionConverterTest extends OpalPermissionConverterTest<Ta
         "rest:/project/patate/summary:GET:GET", //
         "rest:/project/patate/analyses:GET:GET",
         "rest:/project/patate/table/pwel/analyses:GET:GET",
+        "rest:/project/patate/table/pwel/analyses/_export:GET:GET",
         "rest:/project/patate/table/pwel/analysis:GET:GET/GET",
         "rest:/datasource/patate/table/pwel:GET:GET", //
         "rest:/datasource/patate/table/pwel/index:GET", //
