@@ -37,8 +37,8 @@ public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl im
 
   @Override
   public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean withMissings, String idName,
-                           String updatedName, String rClass, String identifiersMapping,
-      boolean async) {
+                           String updatedName, String identifiersMapping, String rClass,
+                           boolean async) {
     DataShieldLog.userLog("creating symbol '{}' from opal data '{}'", getName(), path);
     return super.putMagma(uri, path, variableFilter, withMissings, null, null, identifiersMapping, rClass, async);
   }
