@@ -45,12 +45,11 @@ public class TableAnalysisResource {
 
   @GET
   @Path("analyses")
-  public Projects.OpalAnalysesDto getProjectTableAnalyses(@QueryParam("order") @DefaultValue("desc") String order,
-                                                          @QueryParam("limit") @DefaultValue("0") int limit) {
+  public Projects.OpalAnalysesDto getProjectTableAnalyses() {
     return Projects.OpalAnalysesDto.newBuilder()
       .addAllAnalyses(
         StreamSupport
-          .stream(analysisService.getAnalysesByDatasourceAndTable(datasourceName, tableName, order, limit).spliterator(), false)
+          .stream(analysisService.getAnalysesByDatasourceAndTable(datasourceName, tableName).spliterator(), false)
           .map(analysis -> Dtos.asDto(analysis).build()).collect(Collectors.toList()))
         .build();
   }
@@ -58,13 +57,12 @@ public class TableAnalysisResource {
   @GET
   @Path("/analysis/{analysisId}")
   public OpalAnalysisDto getAnalysis(@PathParam("analysisId") String analysisId,
-                                     @QueryParam("order") @DefaultValue("desc") String order,
-                                     @QueryParam("limit") @DefaultValue("0") int limit) {
+                                     @QueryParam("lastResult") @DefaultValue("false") boolean lastResult) {
     Builder builder = Dtos.asDto(analysisService.getAnalysis(analysisId));
 
     builder.addAllAnalysisResults(
       StreamSupport
-        .stream(analysisResultService.getAnalysisResults(analysisId, order, limit).spliterator(), false)
+        .stream(analysisResultService.getAnalysisResults(analysisId, lastResult).spliterator(), false)
         .map(analysisResult -> Dtos.asDto(analysisResult).build())
         .collect(Collectors.toList()));
 
@@ -74,12 +72,11 @@ public class TableAnalysisResource {
   @GET
   @Path("/analysis/{analysisId}/results")
   public OpalAnalysisResultsDto getAnalysisResults(@PathParam("analysisId") String analysisId,
-                                                   @QueryParam("order") @DefaultValue("desc") String order,
-                                                   @QueryParam("limit") @DefaultValue("0") int limit) {
+                                                   @QueryParam("lastResult") @DefaultValue("false") boolean lastResult) {
     return OpalAnalysisResultsDto.newBuilder()
         .addAllAnalysisResults(
           StreamSupport
-            .stream(analysisResultService.getAnalysisResults(analysisId, order, limit).spliterator(), false)
+            .stream(analysisResultService.getAnalysisResults(analysisId, lastResult).spliterator(), false)
             .map(analysisResult -> Dtos.asDto(analysisResult).build()).collect(Collectors.toList()))
         .build();
   }
@@ -94,18 +91,12 @@ public class TableAnalysisResource {
   @GET
   @Path("analyses/_export")
   @Produces("application/zip")
-  public Response exportTableAnalysis(@QueryParam("aOrder") @DefaultValue("desc") String aOrder,
-                                      @QueryParam("aLimit") @DefaultValue("0") int aLimit,
-                                      @QueryParam("rOrder") @DefaultValue("desc") String rOrder,
-                                      @QueryParam("rLimit") @DefaultValue("0") int rLimit) {
+  public Response exportTableAnalysis(@QueryParam("all") @DefaultValue("false") boolean all) {
     StreamingOutput outputStream =
       stream -> analysisExportService.exportProjectAnalyses(
         datasourceName,
         new BufferedOutputStream(stream),
-        aOrder,
-        aLimit,
-        rOrder,
-        rLimit,
+        !all,
         tableName);
 
     String fileName = String.format("%s-%s-analsis.zip", datasourceName, tableName);

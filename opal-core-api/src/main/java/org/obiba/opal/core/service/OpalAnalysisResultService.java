@@ -11,9 +11,9 @@ public interface OpalAnalysisResultService extends SystemService {
 
   OpalAnalysisResult getAnalysisResult(String analysisId, String resultId);
 
-  Iterable<OpalAnalysisResult> getAnalysisResults(@Nullable String order, int limit);
+  Iterable<OpalAnalysisResult> getAnalysisResults(boolean lastResult);
 
-  Iterable<OpalAnalysisResult> getAnalysisResults(@NotNull String analysisId, @Nullable String order, int limit) throws NoSuchAnalysisException;
+  Iterable<OpalAnalysisResult> getAnalysisResults(@NotNull String analysisId, boolean lastResult) throws NoSuchAnalysisException;
 
   void save(@NotNull OpalAnalysisResult analysisResult) throws ConstraintViolationException;
 

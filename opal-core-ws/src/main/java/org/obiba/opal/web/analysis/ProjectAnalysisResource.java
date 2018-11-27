@@ -42,26 +42,22 @@ public class ProjectAnalysisResource {
 
   @GET
   @Path("/analyses")
-  public Projects.OpalAnalysesDto getAnalyses(@QueryParam("order") @DefaultValue("desc") String order,
-                                              @QueryParam("limit") @DefaultValue("0") int limit) {
+  public Projects.OpalAnalysesDto getAnalyses() {
     getProject();
 
     return Projects.OpalAnalysesDto.newBuilder()
-      .addAllAnalyses(StreamSupport.stream(analysisService.getAnalysesByDatasource(name, order, limit).spliterator(), false)
+      .addAllAnalyses(StreamSupport.stream(analysisService.getAnalysesByDatasource(name).spliterator(), false)
         .map(analysis -> Dtos.asDto(analysis).build()).collect(Collectors.toList())).build();
   }
 
   @GET
   @Path("/analyses/_export")
   @Produces("application/zip")
-  public Response exportProjectAnalysis(@QueryParam("aOrder") @DefaultValue("desc") String aOrder,
-                                        @QueryParam("aLimit") @DefaultValue("0") int aLimit,
-                                        @QueryParam("rOrder") @DefaultValue("desc") String rOrder,
-                                        @QueryParam("rLimit") @DefaultValue("0") int rLimit) {
+  public Response exportProjectAnalysis(@QueryParam("all") @DefaultValue("false") boolean all) {
     getProject();
 
     StreamingOutput outputStream =
-      stream -> analysisExportService.exportProjectAnalyses(name, new BufferedOutputStream(stream), aOrder, aLimit, rOrder, rLimit);
+      stream -> analysisExportService.exportProjectAnalyses(name, new BufferedOutputStream(stream), !all);
 
     String fileName = String.format("%s-analysis.zip", name);
     String mimeType = new MimetypesFileTypeMap().getContentType(fileName);

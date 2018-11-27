@@ -31,27 +31,29 @@ public class OpalAnalysisResultServiceImpl implements OpalAnalysisResultService 
   }
 
   @Override
-  public Iterable<OpalAnalysisResult> getAnalysisResults(@Nullable String order, int limit) {
-    String query = SimpleOrientDbQueryBuilder.newInstance()
-      .table(OpalAnalysisResult.class.getSimpleName())
-      .order(order)
-      .limit(limit)
-      .build();
+  public Iterable<OpalAnalysisResult> getAnalysisResults(boolean lastResult) {
+    SimpleOrientDbQueryBuilder builder = SimpleOrientDbQueryBuilder.newInstance()
+      .table(OpalAnalysisResult.class.getSimpleName());
 
-    return orientDbService.list(OpalAnalysisResult.class, query);
+    if (lastResult) {
+      builder.order("desc").limit(1);
+    }
+
+    return orientDbService.list(OpalAnalysisResult.class, builder.build());
   }
 
   @Override
-  public Iterable<OpalAnalysisResult> getAnalysisResults(String analysisId, String order, int limit)
+  public Iterable<OpalAnalysisResult> getAnalysisResults(String analysisId, boolean lastResult)
       throws NoSuchAnalysisException {
-    String query = SimpleOrientDbQueryBuilder.newInstance()
+    SimpleOrientDbQueryBuilder builder = SimpleOrientDbQueryBuilder.newInstance()
       .table(OpalAnalysisResult.class.getSimpleName())
-      .whereClauses("analysisId = ?")
-      .order(order)
-      .limit(limit)
-      .build();
+      .whereClauses("analysisId = ?");
 
-    return orientDbService.list(OpalAnalysisResult.class, query, analysisId);
+    if (lastResult) {
+      builder.order("desc").limit(1);
+    }
+
+    return orientDbService.list(OpalAnalysisResult.class, builder.build(), analysisId);
   }
 
   @Override

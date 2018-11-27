@@ -34,12 +34,10 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
   }
 
   @Override
-  public Iterable<OpalAnalysis> getAnalysesByDatasource(String datasource, String order, int limit) {
+  public Iterable<OpalAnalysis> getAnalysesByDatasource(String datasource) {
     String query = SimpleOrientDbQueryBuilder.newInstance()
       .table(OpalAnalysis.class.getSimpleName())
       .whereClauses("datasource = ?")
-      .order(order)
-      .limit(limit)
       .build();
 
     return orientDbService.list(OpalAnalysis.class, query, datasource);
@@ -47,14 +45,10 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
 
   @Override
   public Iterable<OpalAnalysis> getAnalysesByDatasourceAndTable(String datasource,
-                                                                String table,
-                                                                String order,
-                                                                int limit) {
+                                                                String table) {
     String query = SimpleOrientDbQueryBuilder.newInstance()
       .table(OpalAnalysis.class.getSimpleName())
       .whereClauses("datasource = ?", "table = ?")
-      .order(order)
-      .limit(limit)
       .build();
 
     return orientDbService.list(OpalAnalysis.class, query, datasource, table);

@@ -40,28 +40,22 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
   @Override
   public void exportProjectAnalyses(@NotNull String projectName,
                                     OutputStream outputStream,
-                                    @Nullable String aOrder,
-                                    int aLimit,
-                                    @Nullable String rOrder,
-                                    int rLimit) throws IOException {
-    exportProjectAnalyses(projectName, outputStream, aOrder, aLimit, rOrder, rLimit, null);
+                                    boolean lastResult) throws IOException {
+    exportProjectAnalyses(projectName, outputStream, lastResult, null);
   }
 
   @Override
   public void exportProjectAnalyses(@NotNull String projectName,
                                     @NotNull OutputStream outputStream,
-                                    @Nullable String aOrder,
-                                    int aLimit,
-                                    @Nullable String rOrder,
-                                    int rLimit,
+                                    boolean lastResult,
                                     @Nullable String tableName) throws IOException {
 
     Assert.isTrue(!Strings.isNullOrEmpty(projectName), "Project name cannot be empty or null.");
     Assert.notNull(outputStream, "outputStream cannot be null.");
 
     List<OpalAnalysis> analyses = Strings.isNullOrEmpty(tableName)
-      ? Lists.newArrayList(opalAnalysisService.getAnalysesByDatasource(projectName, aOrder, aLimit))
-      : Lists.newArrayList(opalAnalysisService.getAnalysesByDatasourceAndTable(projectName, tableName, aOrder, aLimit));
+      ? Lists.newArrayList(opalAnalysisService.getAnalysesByDatasource(projectName))
+      : Lists.newArrayList(opalAnalysisService.getAnalysesByDatasourceAndTable(projectName, tableName));
 
     ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
 
@@ -72,7 +66,7 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
       zipOutputStream.write(new JSONObject(analyse).toString().getBytes());
       zipOutputStream.closeEntry();
 
-      for (OpalAnalysisResult result : opalAnalysisResultService.getAnalysisResults(analysisId, rOrder, rLimit)) {
+      for (OpalAnalysisResult result : opalAnalysisResultService.getAnalysisResults(analysisId, lastResult)) {
         String resultId = result.getId();
         String resultPath = Paths.get("analyses", analysisId, "results", resultId).toString();
 
