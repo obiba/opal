@@ -46,7 +46,10 @@ message OpalAnalysisDto {
   required string parameters = 6;
   repeated string variables = 7;
 
-  repeated OpalAnalysisResultDto analysisResults = 8;
+  optional string created = 8;
+  optional string updated = 9;
+
+  repeated OpalAnalysisResultDto analysisResults = 10;
 }
 
 message OpalAnalysesDto {
@@ -63,6 +66,10 @@ message OpalAnalysisResultDto {
 
   required AnalysisStatusDto status = 6;
   optional string message = 7;
+
+  optional string created = 8;
+  optional string updated = 9;
+
 }
 
 message AnalysisResultItemDto {

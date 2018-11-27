@@ -10,7 +10,7 @@ import org.obiba.opal.spi.analysis.AnalysisResult;
 import org.obiba.opal.spi.analysis.AnalysisResultItem;
 import org.obiba.opal.spi.analysis.AnalysisStatus;
 
-public class OpalAnalysisResult<T extends Analysis> implements AnalysisResult<T>, HasUniqueProperties {
+public class OpalAnalysisResult<T extends Analysis> extends AbstractTimestamped implements AnalysisResult<T>, HasUniqueProperties {
 
   private static final String DEFAULT_ID = "empty";
 

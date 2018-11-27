@@ -1,10 +1,12 @@
 package org.obiba.opal.core.service;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import org.obiba.opal.core.domain.OpalAnalysis;
+import org.obiba.opal.core.tools.SimpleOrientDbQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 @Component
 public class OpalAnalysisServiceImpl implements OpalAnalysisService {
@@ -18,7 +20,12 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
 
   @Override
   public OpalAnalysis getAnalysis(String id) throws NoSuchAnalysisException {
-    return orientDbService.uniqueResult(OpalAnalysis.class, "select * from " + OpalAnalysis.class.getSimpleName() + " where id = ?", id);
+    String query = SimpleOrientDbQueryBuilder.newInstance()
+      .table(OpalAnalysis.class.getSimpleName())
+      .whereClauses("id = ?")
+      .build();
+    
+    return orientDbService.uniqueResult(OpalAnalysis.class, query, id);
   }
 
   @Override
@@ -28,11 +35,23 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
 
   @Override
   public Iterable<OpalAnalysis> getAnalysesByDatasource(String datasource) {
-    return orientDbService.list(OpalAnalysis.class, "select * from " + OpalAnalysis.class.getSimpleName() + " where datasource = ?", datasource);
+    String query = SimpleOrientDbQueryBuilder.newInstance()
+      .table(OpalAnalysis.class.getSimpleName())
+      .whereClauses("datasource = ?")
+      .build();
+
+    return orientDbService.list(OpalAnalysis.class, query, datasource);
   }
+
   @Override
-  public Iterable<OpalAnalysis> getAnalysesByDatasourceAndTable(String datasource, String table) {
-    return orientDbService.list(OpalAnalysis.class, "select * from " + OpalAnalysis.class.getSimpleName() + " where datasource = ? and table = ?", datasource, table);
+  public Iterable<OpalAnalysis> getAnalysesByDatasourceAndTable(String datasource,
+                                                                String table) {
+    String query = SimpleOrientDbQueryBuilder.newInstance()
+      .table(OpalAnalysis.class.getSimpleName())
+      .whereClauses("datasource = ?", "table = ?")
+      .build();
+
+    return orientDbService.list(OpalAnalysis.class, query, datasource, table);
   }
 
   @Override

@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 
-public class OpalAnalysis implements Analysis, HasUniqueProperties {
+public class OpalAnalysis extends AbstractTimestamped implements Analysis, HasUniqueProperties {
 
   private static final String DEFAULT_ID = "empty";
 

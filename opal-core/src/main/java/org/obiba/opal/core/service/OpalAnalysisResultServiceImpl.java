@@ -1,11 +1,14 @@
 package org.obiba.opal.core.service;
 
+import com.sun.istack.Nullable;
+import org.obiba.opal.core.domain.OpalAnalysisResult;
+import org.obiba.opal.core.tools.SimpleOrientDbQueryBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.validation.ConstraintViolationException;
-import org.obiba.opal.core.domain.OpalAnalysisResult;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 @Component
 public class OpalAnalysisResultServiceImpl implements OpalAnalysisResultService {
@@ -19,18 +22,38 @@ public class OpalAnalysisResultServiceImpl implements OpalAnalysisResultService 
 
   @Override
   public OpalAnalysisResult getAnalysisResult(String analysisId, String resultId) {
-    return orientDbService.uniqueResult(OpalAnalysisResult.class, "select from " + OpalAnalysisResult.class.getSimpleName() + " where analysisId = ? and id = ?", analysisId, resultId);
+    String query = SimpleOrientDbQueryBuilder.newInstance()
+      .table(OpalAnalysisResult.class.getSimpleName())
+      .whereClauses("analysisId = ?" ,"id = ?")
+      .build();
+
+    return orientDbService.uniqueResult(OpalAnalysisResult.class, query, analysisId, resultId);
   }
 
   @Override
-  public Iterable<OpalAnalysisResult> getAnalysisResults() {
-    return orientDbService.list(OpalAnalysisResult.class);
+  public Iterable<OpalAnalysisResult> getAnalysisResults(boolean lastResult) {
+    SimpleOrientDbQueryBuilder builder = SimpleOrientDbQueryBuilder.newInstance()
+      .table(OpalAnalysisResult.class.getSimpleName());
+
+    if (lastResult) {
+      builder.order("desc").limit(1);
+    }
+
+    return orientDbService.list(OpalAnalysisResult.class, builder.build());
   }
 
   @Override
-  public Iterable<OpalAnalysisResult> getAnalysisResults(String analysisId)
+  public Iterable<OpalAnalysisResult> getAnalysisResults(String analysisId, boolean lastResult)
       throws NoSuchAnalysisException {
-    return orientDbService.list(OpalAnalysisResult.class, "select from " + OpalAnalysisResult.class.getSimpleName() + " where analysisId = ?", analysisId);
+    SimpleOrientDbQueryBuilder builder = SimpleOrientDbQueryBuilder.newInstance()
+      .table(OpalAnalysisResult.class.getSimpleName())
+      .whereClauses("analysisId = ?");
+
+    if (lastResult) {
+      builder.order("desc").limit(1);
+    }
+
+    return orientDbService.list(OpalAnalysisResult.class, builder.build(), analysisId);
   }
 
   @Override
