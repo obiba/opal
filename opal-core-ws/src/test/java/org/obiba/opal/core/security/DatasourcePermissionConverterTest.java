@@ -46,7 +46,9 @@ public class DatasourcePermissionConverterTest
         "rest:/project/patate/report-templates:GET:GET", //
         "rest:/project/patate/report-templates:POST:GET", //
         "rest:/project/patate:GET:GET", //
-        "rest:/project/patate/summary:GET:GET");
+        "rest:/project/patate/summary:GET:GET",
+        "rest:/project/patate/analyses:GET:GET",
+        "rest:/project/patate/analyses/_export:GET:GET");
   }
 
   @Test
