@@ -1,16 +1,7 @@
 package org.obiba.opal.web.analysis;
 
-import java.io.BufferedOutputStream;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-import javax.activation.MimetypesFileTypeMap;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
-
-import org.obiba.opal.core.service.AnalysisExportService;
-import org.obiba.opal.core.service.OpalAnalysisResultService;
-import org.obiba.opal.core.service.OpalAnalysisService;
+import org.obiba.opal.core.domain.OpalAnalysis;
+import org.obiba.opal.core.service.*;
 import org.obiba.opal.web.model.Projects;
 import org.obiba.opal.web.model.Projects.OpalAnalysisDto;
 import org.obiba.opal.web.model.Projects.OpalAnalysisDto.Builder;
@@ -21,6 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import javax.activation.MimetypesFileTypeMap;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+import java.io.BufferedOutputStream;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -44,7 +43,7 @@ public class TableAnalysisResource {
   }
 
   @GET
-  @Path("analyses")
+  @Path("/analyses")
   public Projects.OpalAnalysesDto getProjectTableAnalyses() {
     return Projects.OpalAnalysesDto.newBuilder()
       .addAllAnalyses(
@@ -58,7 +57,9 @@ public class TableAnalysisResource {
   @Path("/analysis/{analysisId}")
   public OpalAnalysisDto getAnalysis(@PathParam("analysisId") String analysisId,
                                      @QueryParam("lastResult") @DefaultValue("false") boolean lastResult) {
-    Builder builder = Dtos.asDto(analysisService.getAnalysis(analysisId));
+
+    getAnalysis(analysisId);
+    Builder builder = Dtos.asDto(getAnalysis(analysisId));
 
     builder.addAllAnalysisResults(
       StreamSupport
@@ -87,17 +88,16 @@ public class TableAnalysisResource {
     return Dtos.asDto(analysisResultService.getAnalysisResult(analysisId, rid)).build();
   }
 
-
   @GET
-  @Path("analyses/_export")
+  @Path("/analyses/_export")
   @Produces("application/zip")
   public Response exportTableAnalysis(@QueryParam("all") @DefaultValue("false") boolean all) {
     StreamingOutput outputStream =
-      stream -> analysisExportService.exportProjectAnalyses(
+      stream -> analysisExportService.exportProjectTableAnalyses(
         datasourceName,
+        tableName,
         new BufferedOutputStream(stream),
-        !all,
-        tableName);
+        !all);
 
     String fileName = String.format("%s-%s-analsis.zip", datasourceName, tableName);
     String mimeType = new MimetypesFileTypeMap().getContentType(fileName);
@@ -105,6 +105,36 @@ public class TableAnalysisResource {
       .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
   }
 
+  @GET
+  @Path("/analysis/{analysisId}/_export")
+  @Produces("application/zip")
+  public Response exportTableAnalysis(@PathParam("analysisId") String analysisId,
+                                      @QueryParam("all") @DefaultValue("false") boolean all) {
+    getAnalysis(analysisId);
+
+    StreamingOutput outputStream =
+      stream -> analysisExportService.exportProjectAnalysis(analysisId, new BufferedOutputStream(stream), !all);
+
+    String fileName = String.format("%s-%s-analsis.zip", datasourceName, tableName);
+    String mimeType = new MimetypesFileTypeMap().getContentType(fileName);
+    return Response.ok(outputStream, mimeType)
+      .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+  }
+
+  private OpalAnalysis getAnalysis(String analysisId) throws NoSuchAnalysisException, NoSuchDatasourceTableAnalysisException {
+    OpalAnalysis analysis = analysisService.getAnalysis(analysisId);
+
+    if (analysis == null) {
+      throw new NoSuchAnalysisException(analysisId);
+    }
+
+    if (datasourceName.equals(analysis.getDatasource()) && tableName.equals(analysis.getTable())) {
+      return analysis;
+    }
+
+    throw new NoSuchDatasourceTableAnalysisException(datasourceName, tableName, analysisId);
+  }
+  
   void setDatasourceName(String value) {
     datasourceName = value;
   }
