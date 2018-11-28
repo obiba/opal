@@ -29,6 +29,15 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
   }
 
   @Override
+  public OpalAnalysis getAnalysisByDatasourceAndTableAndId(String datasource, String table, String id) {
+    String query = SimpleOrientDbQueryBuilder.newInstance()
+      .table(OpalAnalysis.class.getSimpleName())
+      .whereClauses("datasource = ?", "table = ?", "id = ?")
+      .build();
+    return orientDbService.uniqueResult(OpalAnalysis.class, query, datasource, table, id);
+  }
+
+  @Override
   public Iterable<OpalAnalysis> getAnalyses() {
     return orientDbService.list(OpalAnalysis.class);
   }
