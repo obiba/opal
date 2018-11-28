@@ -18,6 +18,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import java.io.BufferedOutputStream;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -121,18 +122,10 @@ public class TableAnalysisResource {
       .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
   }
 
-  private OpalAnalysis getAnalysis(String analysisId) throws NoSuchAnalysisException, NoSuchDatasourceTableAnalysisException {
-    OpalAnalysis analysis = analysisService.getAnalysis(analysisId);
-
-    if (analysis == null) {
-      throw new NoSuchAnalysisException(analysisId);
-    }
-
-    if (datasourceName.equals(analysis.getDatasource()) && tableName.equals(analysis.getTable())) {
-      return analysis;
-    }
-
-    throw new NoSuchDatasourceTableAnalysisException(datasourceName, tableName, analysisId);
+  private OpalAnalysis getAnalysis(String analysisId) throws NoSuchAnalysisException {
+    return Optional.ofNullable(
+      analysisService.getAnalysisByDatasourceAndTableAndId(datasourceName, tableName, analysisId)
+    ).orElseThrow(() -> new NoSuchAnalysisException(analysisId));
   }
   
   void setDatasourceName(String value) {
