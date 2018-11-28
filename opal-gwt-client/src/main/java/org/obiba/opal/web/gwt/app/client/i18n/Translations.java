@@ -1462,6 +1462,27 @@ public interface Translations extends Constants {
   @DefaultStringValue("Values")
   String values();
 
+  @Description("Analyses label")
+  @DefaultStringValue("Analyses")
+  String analyses();
+
+  @Description("Analysis label")
+  @DefaultStringValue("Analysis")
+  String analysis();
+
+
+  @Description("Analysis Name label")
+  @DefaultStringValue("Name")
+  String analysisNameLabel();
+
+  @Description("Analysis Type label")
+  @DefaultStringValue("Type")
+  String analysisTypeLabel();
+
+  @Description("Filter Analyses placeholder")
+  @DefaultStringValue("Filter Analyses...")
+  String filterAnalysePlaceholder();
+
   @Description("Participant label")
   @DefaultStringValue("Participant")
   String participant();

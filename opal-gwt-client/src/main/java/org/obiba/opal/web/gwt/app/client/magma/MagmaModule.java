@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma;
 
+import org.obiba.opal.web.gwt.app.client.analysis.AnalysesPresenter;
+import org.obiba.opal.web.gwt.app.client.analysis.AnalysesView;
 import org.obiba.opal.web.gwt.app.client.inject.AbstractOpalModule;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.CsvDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.DatasourceFormPresenterSubscriber;
@@ -83,6 +85,8 @@ public class MagmaModule extends AbstractOpalModule {
         VariableVcsCommitHistoryView.class);
     bindPresenterWidget(VcsCommitHistoryModalPresenter.class, VcsCommitHistoryModalPresenter.Display.class,
         VcsCommitHistoryModalView.class);
+
+    bindPresenterWidget(AnalysesPresenter.class, AnalysesPresenter.Display.class, AnalysesView.class);
 
     bindPresenterWidget(TablePropertiesModalPresenter.class, TablePropertiesModalPresenter.Display.class,
         TablePropertiesModalView.class);
