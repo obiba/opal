@@ -3,7 +3,6 @@ package org.obiba.opal.core.service;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.sun.istack.NotNull;
-import com.sun.istack.Nullable;
 import org.json.JSONObject;
 import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
@@ -41,43 +40,60 @@ public class AnalysisExportServiceImpl implements AnalysisExportService {
   public void exportProjectAnalyses(@NotNull String projectName,
                                     OutputStream outputStream,
                                     boolean lastResult) throws IOException {
-    exportProjectAnalyses(projectName, outputStream, lastResult, null);
-  }
-
-  @Override
-  public void exportProjectAnalyses(@NotNull String projectName,
-                                    @NotNull OutputStream outputStream,
-                                    boolean lastResult,
-                                    @Nullable String tableName) throws IOException {
-
     Assert.isTrue(!Strings.isNullOrEmpty(projectName), "Project name cannot be empty or null.");
     Assert.notNull(outputStream, "outputStream cannot be null.");
 
-    List<OpalAnalysis> analyses = Strings.isNullOrEmpty(tableName)
-      ? Lists.newArrayList(opalAnalysisService.getAnalysesByDatasource(projectName))
-      : Lists.newArrayList(opalAnalysisService.getAnalysesByDatasourceAndTable(projectName, tableName));
+    createZip(outputStream, lastResult, Lists.newArrayList(opalAnalysisService.getAnalysesByDatasource(projectName)));
+  }
 
-    ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
+  @Override
+  public void exportProjectTableAnalyses(@NotNull String projectName,
+                                         @NotNull String tableName,
+                                         OutputStream outputStream,
+                                         boolean lastResult) throws IOException {
+    Assert.isTrue(!Strings.isNullOrEmpty(projectName), "Project name cannot be empty or null.");
+    Assert.isTrue(!Strings.isNullOrEmpty(tableName), "Table name cannot be empty or null.");
+    Assert.notNull(outputStream, "outputStream cannot be null.");
 
-    for (OpalAnalysis analyse : analyses) {
-      String analysisId = analyse.getId();
+    createZip(outputStream,
+      lastResult,
+      Lists.newArrayList(opalAnalysisService.getAnalysesByDatasourceAndTable(projectName, tableName))
+    );
+  }
 
-      zipOutputStream.putNextEntry(new ZipEntry(Paths.get("analyses", analysisId, "analysis.json").toString()));
-      zipOutputStream.write(new JSONObject(analyse).toString().getBytes());
-      zipOutputStream.closeEntry();
+  @Override
+  public void exportProjectAnalysis(@NotNull String analysisId,
+                                    @NotNull OutputStream outputStream,
+                                    boolean lastResult) throws IOException {
 
-      for (OpalAnalysisResult result : opalAnalysisResultService.getAnalysisResults(analysisId, lastResult)) {
-        String resultId = result.getId();
-        String resultPath = Paths.get("analyses", analysisId, "results", resultId).toString();
+    Assert.isTrue(!Strings.isNullOrEmpty(analysisId), "Analysis ID cannot be empty or null.");
+    Assert.notNull(outputStream, "outputStream cannot be null.");
 
-        zipOutputStream.putNextEntry(new ZipEntry(Paths.get(resultPath, "result.json").toString()));
-        zipOutputStream.write(new JSONObject(result).toString().getBytes());
+    createZip(outputStream, lastResult, Lists.newArrayList(opalAnalysisService.getAnalysis(analysisId)));
+  }
+
+  private void createZip(@NotNull OutputStream outputStream, boolean lastResult, List<OpalAnalysis> analyses) throws IOException {
+    try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
+
+      for (OpalAnalysis analyse : analyses) {
+        String id = analyse.getId();
+
+        zipOutputStream.putNextEntry(new ZipEntry(Paths.get("analyses", id, "analysis.json").toString()));
+        zipOutputStream.write(new JSONObject(analyse).toString().getBytes());
         zipOutputStream.closeEntry();
 
-        writeResultDataFiles(zipOutputStream, resultPath);
+        for (OpalAnalysisResult result : opalAnalysisResultService.getAnalysisResults(id, lastResult)) {
+          String resultId = result.getId();
+          String resultPath = Paths.get("analyses", id, "results", resultId).toString();
+
+          zipOutputStream.putNextEntry(new ZipEntry(Paths.get(resultPath, "result.json").toString()));
+          zipOutputStream.write(new JSONObject(result).toString().getBytes());
+          zipOutputStream.closeEntry();
+
+          writeResultDataFiles(zipOutputStream, resultPath);
+        }
       }
     }
-
   }
 
   private void writeResultDataFiles(ZipOutputStream out, String resultPath) throws IOException {

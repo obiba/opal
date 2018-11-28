@@ -1,7 +1,5 @@
 package org.obiba.opal.core.service;
 
-import com.sun.istack.Nullable;
-
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -11,29 +9,40 @@ import java.io.OutputStream;
  */
 public interface AnalysisExportService {
   /**
-   * Exports all analyses of a given project.
+   * Exports all analyses of a project.
    *
    * @param projectName
    * @param outputStream
-   * @param lastResult - if 'false' all results are exported
+   * @param lastResult   - if 'false' all results are exported
    * @throws IOException
    */
   void exportProjectAnalyses(@NotNull String projectName,
                              @NotNull OutputStream outputStream,
-                             boolean lastResult
-                             ) throws IOException;
+                             boolean lastResult) throws IOException;
 
   /**
-   * Exports all analyses of a table in a given project.
+   * Exports all analyses of a project table.
    *
    * @param projectName
-   * @param outputStream
-   * @param lastResult
    * @param tableName
+   * @param outputStream
+   * @param lastResult   - if 'false' all results are exported
    * @throws IOException
    */
-  void exportProjectAnalyses(@NotNull String projectName,
+  void exportProjectTableAnalyses(@NotNull String projectName,
+                                  @NotNull String tableName,
+                                  @NotNull OutputStream outputStream,
+                                  boolean lastResult) throws IOException;
+
+  /**
+   * Exports a specific analysis.
+   *
+   * @param analysisId
+   * @param outputStream
+   * @param lastResult
+   * @throws IOException
+   */
+  void exportProjectAnalysis(@NotNull String analysisId,
                              @NotNull OutputStream outputStream,
-                             boolean lastResult,
-                             @Nullable String tableName) throws IOException;
+                             boolean lastResult) throws IOException;
 }
