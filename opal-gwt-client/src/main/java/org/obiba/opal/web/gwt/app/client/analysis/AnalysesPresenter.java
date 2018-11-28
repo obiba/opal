@@ -1,5 +1,6 @@
 package org.obiba.opal.web.gwt.app.client.analysis;
 
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -33,8 +34,9 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
     String DELETE_ANALYSIS = "Delete";
 
     void beforeRenderRows();
-    void renderRows(OpalAnalysesDto analyses);
+    void renderRows(JsArray<OpalAnalysisDto> analyses);
     void afterRenderRows();
+    void clearTable();
 
     HasActionHandler<OpalAnalysisDto> getActionColumn();
   }
@@ -52,6 +54,8 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
   }
 
   public void setTable(final TableDto table) {
+    getView().clearTable();
+
     if (originalTable == null || !originalTable.getLink().equals(table.getLink())) {
       originalTable = table;
     }
@@ -65,7 +69,7 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
             @Override
             public void onResource(Response response, OpalAnalysesDto resource) {
               if (resource != null) {
-                getView().renderRows(resource);
+                getView().renderRows(resource.getAnalysesArray());
               }
 
               getView().afterRenderRows();

@@ -71,7 +71,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   private static final int VALUES_TAB_INDEX = 2;
 
-  private static final int PERMISSIONS_TAB_INDEX = 3;
+  private static final int ANALYSES_TAB_INDEX = 3;
+
+  private static final int PERMISSIONS_TAB_INDEX = 4;
 
   @UiField
   Label name;
@@ -703,6 +705,11 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @Override
   public boolean isValuesTabSelected() {
     return tabPanel.getSelectedTab() == VALUES_TAB_INDEX;
+  }
+
+  @Override
+  public boolean isAnalysesTabSelected() {
+    return tabPanel.getSelectedTab() == ANALYSES_TAB_INDEX;
   }
 
   @Override

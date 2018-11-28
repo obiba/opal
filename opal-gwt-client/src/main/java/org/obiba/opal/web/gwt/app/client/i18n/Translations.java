@@ -133,6 +133,10 @@ public interface Translations extends Constants {
       "Clear", "Clear",//
       "View", "View",//
       "Remove", "Remove",//
+      "Run", "Run",//
+      "View", "View",//
+      "Duplicate", "Duplicate",//
+      "Delete", "Delete",//
       "PublishMethods", "Publish methods", //
       "Permissions", "Permissions", //
       "CommitDiff", "Diff", //

@@ -27,6 +27,14 @@ public interface Analysis {
   @NotNull
   String getName();
 
+
+  /**
+   * The name of the plugin used to create this analysis.
+   *
+   * @return
+   */
+  String getPluginName();
+
   /**
    * Refers to one of the {@link AnalysisTemplate} made available by the analysis service.
    *

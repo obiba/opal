@@ -380,6 +380,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         if (getView().isValuesTabSelected()) {
           valuesTablePresenter.setTable(tableDto);
           valuesTablePresenter.updateValuesDisplay("");
+        } else if (getView().isAnalysesTabSelected()) {
+          analysesPresenter.setTable(tableDto);
         }
       }
     });
@@ -928,6 +930,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     HasAuthorization getPermissionsAuthorizer();
 
     boolean isValuesTabSelected();
+
+    boolean isAnalysesTabSelected();
 
     void setIndexStatusVisible(boolean b);
 
