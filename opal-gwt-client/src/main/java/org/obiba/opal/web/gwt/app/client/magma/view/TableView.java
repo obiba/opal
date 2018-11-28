@@ -226,6 +226,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiField
   ButtonGroup tableAddVariableGroup;
 
+  @UiField
+  SimplePanel analysesPanel;
+
   private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<>();
 
   private final Translations translations;
@@ -273,6 +276,8 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
       panel = permissionsPanel;
     } else if (slot == Slots.ContingencyTable) {
       panel = crossResultsPanel;
+    } else if (slot == Slots.Analyses) {
+      panel = analysesPanel;
     }
 
     if (panel != null) {
@@ -484,6 +489,11 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiHandler("valuesTab")
   void onValuesTabSelect(ClickEvent event) {
     getUiHandlers().onShowValues();
+  }
+
+  @UiHandler("analysesTab")
+  void onAnalysesTabSelect(ClickEvent event) {
+    getUiHandlers().onShowAnalyses();
   }
 
   @UiHandler("downloadDictionary")

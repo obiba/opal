@@ -64,6 +64,8 @@ public interface TableUiHandlers extends UiHandlers {
 
   void onShowValues();
 
+  void onShowAnalyses();
+
   void onDeleteTaxonomyAttribute(List<VariableDto> selectedItems);
 
   void onDeleteCustomAttribute(List<VariableDto> selectedItems);

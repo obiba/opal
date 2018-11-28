@@ -1,0 +1,33 @@
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+  xmlns:g='urn:import:com.google.gwt.user.client.ui'
+  xmlns:b='urn:import:com.github.gwtbootstrap.client.ui'
+  xmlns:b2='urn:import:com.github.gwtbootstrap.client.ui.base'
+  xmlns:o='urn:import:org.obiba.opal.web.gwt.app.client.ui'
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys='com.google.gwt.i18n.server.keygen.MD5KeyGenerator'
+  ui:generateLocales='default'>
+
+  <g:FlowPanel>
+    <b:HelpBlock>Analyses can help at improving the data quality by detecting inconsistencies etc</b:HelpBlock>
+
+    <g:FlowPanel addStyleNames="pull-left">
+      <b:Button icon="PLUS" addStyleNames="small-top-margin">
+        <ui:msg description="Add new analysis">New Analysis</ui:msg>
+      </b:Button>
+
+      <b:Button icon="REFRESH" addStyleNames="small-top-margin small-indent">
+        <ui:msg description="Refresh analyses list">Refresh</ui:msg>
+      </b:Button>
+    </g:FlowPanel>
+
+    <g:FlowPanel>
+      <b:Controls addStyleNames="small-top-margin pull-right">
+        <b:InputAddOn prependIcon="FILTER">
+          <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
+        </b:InputAddOn>
+      </b:Controls>
+    </g:FlowPanel>
+
+    <o:Table ui:field="table"></o:Table>
+  </g:FlowPanel>
+</ui:UiBinder>

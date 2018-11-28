@@ -301,6 +301,10 @@
         <g:SimplePanel ui:field="valuesPanel"/>
       </b:Tab>
 
+      <b:Tab heading="Analyses" ui:field="analysesTab">
+        <g:SimplePanel ui:field="analysesPanel"/>
+      </b:Tab>
+
       <b:Tab heading="Permissions">
         <g:SimplePanel ui:field="permissionsPanel"/>
       </b:Tab>

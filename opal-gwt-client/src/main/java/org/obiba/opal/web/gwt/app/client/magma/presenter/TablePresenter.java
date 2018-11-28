@@ -27,6 +27,7 @@ import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
+import org.obiba.opal.web.gwt.app.client.analysis.AnalysesPresenter;
 import org.obiba.opal.web.gwt.app.client.cart.event.CartAddVariablesEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
@@ -41,6 +42,7 @@ import org.obiba.opal.web.gwt.app.client.magma.copy.DataCopyPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.copy.ViewCopyPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.*;
 import org.obiba.opal.web.gwt.app.client.magma.copy.DataExportPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter.Display.Slots;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewWhereModalPresenter;
@@ -108,6 +110,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final ValuesTablePresenter valuesTablePresenter;
 
+  private final AnalysesPresenter analysesPresenter;
+
   private final ModalProvider<IndexPresenter> indexPresenter;
 
   private final Provider<ContingencyTablePresenter> crossVariableProvider;
@@ -143,7 +147,9 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @SuppressWarnings({"ConstructorWithTooManyParameters", "PMD.ExcessiveParameterList"})
   @Inject
   public TablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
-                        ValuesTablePresenter valuesTablePresenter, Provider<ContingencyTablePresenter> crossVariableProvider,
+                        ValuesTablePresenter valuesTablePresenter,
+                        AnalysesPresenter analysesPresenter,
+                        Provider<ContingencyTablePresenter> crossVariableProvider,
                         Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, ModalProvider<IndexPresenter> indexPresenter,
                         ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
                         ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider,
@@ -160,6 +166,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     super(eventBus, display);
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
+    this.analysesPresenter = analysesPresenter;
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.translations = translations;
     this.translationMessages = translationMessages;
@@ -459,6 +466,12 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   public void onShowValues() {
     valuesTablePresenter.setTable(table);
     valuesTablePresenter.updateValuesDisplay(variableFilter);
+  }
+
+  @Override
+  public void onShowAnalyses() {
+    analysesPresenter.setTable(table);
+    setInSlot(Slots.Analyses, analysesPresenter);
   }
 
   @Override
@@ -875,7 +888,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   public interface Display extends View, HasUiHandlers<TableUiHandlers> {
 
     enum Slots {
-      Permissions, Values, ContingencyTable
+      Permissions, Values, ContingencyTable, Analyses
     }
 
     void beforeRenderRows();

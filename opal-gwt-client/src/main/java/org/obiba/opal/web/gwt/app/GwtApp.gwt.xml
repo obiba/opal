@@ -81,6 +81,8 @@
       value="org.obiba.opal.web.gwt.app.client.cart.CartModule"/>
   <extend-configuration-property name="gin.ginjector.modules"
       value="org.obiba.opal.web.gwt.app.client.magma.derive.DeriveModule"/>
+  <extend-configuration-property name="gin.ginjector.modules"
+    value="org.obiba.opal.web.gwt.app.client.analysis.AnalysisModule"/>
 
   <!-- Client-side REST framework -->
   <inherits name='org.obiba.opal.web.gwt.rest.Rest'/>

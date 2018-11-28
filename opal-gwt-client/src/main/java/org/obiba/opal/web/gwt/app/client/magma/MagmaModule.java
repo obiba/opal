@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma;
 
+import org.obiba.opal.web.gwt.app.client.analysis.AnalysesPresenter;
+import org.obiba.opal.web.gwt.app.client.analysis.AnalysesView;
 import org.obiba.opal.web.gwt.app.client.inject.AbstractOpalModule;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.CsvDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.DatasourceFormPresenterSubscriber;
