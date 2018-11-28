@@ -122,6 +122,7 @@ public class Dtos {
     builder.setDatasource(analysis.getDatasource());
     builder.setTable(analysis.getTable());
 
+    builder.setPluginName(analysis.getPluginName());
     builder.setTemplateName(analysis.getTemplateName());
     builder.setParameters(analysis.getParameters().toString());
     builder.setCreated(analysis.getCreated().toString());

@@ -93,7 +93,7 @@ public class AnalyseCommand extends AbstractOpalRuntimeDependentCommand<AnalyseC
         String templateName = analyseOptions.getTemplate();
         log.info("Analysing {} table using {} routines.", tibbleName, String.format("%s::%s", pluginName, templateName));
 
-        RAnalysis.Builder builder = RAnalysis.create(analyseOptions.getName(), analyseOptions.getTemplate())
+        RAnalysis.Builder builder = RAnalysis.create(analyseOptions.getName(), analyseOptions.getPlugin(), analyseOptions.getTemplate())
           .session(sessionHandler.getSession())
           .symbol(RUtils.getSymbol(tibbleName))
           .parameters(analyseOptions.getParams());

@@ -2,7 +2,6 @@ package org.obiba.opal.spi.analysis;
 
 import com.google.common.collect.Lists;
 import org.json.JSONObject;
-import org.obiba.magma.Variable;
 import org.obiba.opal.spi.analysis.support.generator.IdGenetatorFactory;
 import org.springframework.util.Assert;
 
@@ -15,10 +14,11 @@ import java.util.List;
  */
 public abstract class AbstractAnalysis implements Analysis {
 
-
   private String id;
 
   private final String name;
+
+  private final String pluginName;
 
   private final String templateName;
 
@@ -26,12 +26,16 @@ public abstract class AbstractAnalysis implements Analysis {
 
   private List<String> variables;
 
-  public AbstractAnalysis(@NotNull String name, @NotNull String templateName) {
+  public AbstractAnalysis(@NotNull String name, @NotNull String pluginName,
+      @NotNull String templateName) {
+
     Assert.notNull(name, "name cannot be null");
     Assert.notNull(templateName , "templateName cannot be null");
+    Assert.notNull(templateName , "pluginName cannot be null");
 
     this.id = IdGenetatorFactory.createDateIdGenerator().generate();
     this.name = name;
+    this.pluginName = pluginName;
     this.templateName = templateName;
   }
 
@@ -60,6 +64,11 @@ public abstract class AbstractAnalysis implements Analysis {
 
   protected void setParameters(JSONObject parameters) {
     this.parameters = parameters;
+  }
+
+  @Override
+  public String getPluginName() {
+    return pluginName;
   }
 
   @Override

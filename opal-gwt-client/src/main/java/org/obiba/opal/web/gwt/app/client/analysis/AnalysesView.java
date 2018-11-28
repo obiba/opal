@@ -1,6 +1,8 @@
 package org.obiba.opal.web.gwt.app.client.analysis;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -16,7 +18,6 @@ import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
-import org.obiba.opal.web.model.client.opal.OpalAnalysesDto;
 import org.obiba.opal.web.model.client.opal.OpalAnalysisDto;
 
 public class AnalysesView extends ViewWithUiHandlers<AnalysesUiHandlers> implements AnalysesPresenter.Display {
@@ -104,14 +105,19 @@ public class AnalysesView extends ViewWithUiHandlers<AnalysesUiHandlers> impleme
   }
 
   @Override
-  public void renderRows(OpalAnalysesDto analyses) {
-    dataProvider.setList(JsArrays.toList(analyses.getAnalysesArray()));
+  public void renderRows(JsArray<OpalAnalysisDto> analyses) {
+    dataProvider.setList(JsArrays.toList(analyses));
     dataProvider.refresh();
   }
 
   @Override
   public void afterRenderRows() {
     table.hideLoadingIndicator();
+  }
+
+  @Override
+  public void clearTable() {
+    renderRows((JsArray<OpalAnalysisDto>) JavaScriptObject.createArray());
   }
 
   @Override

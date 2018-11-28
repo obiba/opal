@@ -16,6 +16,7 @@ public class OpalAnalysis extends AbstractTimestamped implements Analysis, HasUn
   private String id;
   private String name;
   private String templateName;
+  private String pluginName;
   private JSONObject parameters;
   private List<String> variables;
 
@@ -36,6 +37,7 @@ public class OpalAnalysis extends AbstractTimestamped implements Analysis, HasUn
     templateName = analysis.getTemplateName();
     parameters = Optional.of(analysis.getParameters()).orElseGet(JSONObject::new);
     variables = Optional.of(analysis.getVariables()).orElseGet(Lists::newArrayList);
+    pluginName = analysis.getPluginName();
 
     this.datasource = datasource;
     this.table = table;
@@ -67,6 +69,11 @@ public class OpalAnalysis extends AbstractTimestamped implements Analysis, HasUn
   @Override
   public String getName() {
     return name;
+  }
+
+  @Override
+  public String getPluginName() {
+    return pluginName;
   }
 
   @NotNull
