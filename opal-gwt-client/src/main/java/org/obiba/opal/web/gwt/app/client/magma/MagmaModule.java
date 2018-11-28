@@ -86,8 +86,6 @@ public class MagmaModule extends AbstractOpalModule {
     bindPresenterWidget(VcsCommitHistoryModalPresenter.class, VcsCommitHistoryModalPresenter.Display.class,
         VcsCommitHistoryModalView.class);
 
-    bindPresenterWidget(AnalysesPresenter.class, AnalysesPresenter.Display.class, AnalysesView.class);
-
     bindPresenterWidget(TablePropertiesModalPresenter.class, TablePropertiesModalPresenter.Display.class,
         TablePropertiesModalView.class);
     bindPresenterWidget(ViewModalPresenter.class, ViewModalPresenter.Display.class,

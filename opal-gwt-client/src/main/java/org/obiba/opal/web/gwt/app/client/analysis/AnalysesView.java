@@ -8,6 +8,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import javax.inject.Inject;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
@@ -37,6 +38,7 @@ public class AnalysesView extends ViewWithUiHandlers<AnalysesUiHandlers> impleme
 
   private static AnalysesViewUiBinder uiBinder = GWT.create(AnalysesViewUiBinder.class);
 
+  @Inject
   public AnalysesView(Translations translations) {
     initWidget(uiBinder.createAndBindUi(this));
 
