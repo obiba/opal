@@ -168,6 +168,10 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Remove Variables")
   String removeVariables();
 
+  @Description("Delete Analysis label")
+  @DefaultMessage("Delete Analysis")
+  String deleteAnalysis();
+
   @Description("Remove Tables label")
   @DefaultMessage("Remove Tables")
   String removeTables();
@@ -214,6 +218,11 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("{0} variables")
   @AlternateMessage({ "=0", "No variables", "one", "1 variable" })
   String variableCount(@PluralCount int count);
+
+  @Description("Analysis count label")
+  @DefaultMessage("{0} analyses")
+  @AlternateMessage({ "=0", "No analysis", "one", "1 analysis" })
+  String analysisCount(@PluralCount int count);
 
   @Description("Entities count label")
   @DefaultMessage("{0} entities")
@@ -382,6 +391,12 @@ public interface TranslationMessages extends Messages {
       "Please confirm that you want to remove the current table. This cannot be undone and all data associated with " +
           "this table will be lost.")
   String confirmRemoveTable();
+
+  @Description("Please confirm that you want to delete the current analysis and " +
+      "its associated results. This cannot be undone and all data will be lost message")
+  @DefaultMessage("Please confirm that you want to delete the current analysis and " +
+      "its associated results. This cannot be undone and all data will be lost.")
+  String confirmDeleteAnalysis();
 
   @Description(
       "Please confirm that you want to remove the current identifiers table. This cannot be undone and all identifiers " +
