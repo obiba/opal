@@ -16,5 +16,5 @@ public interface OpalAnalysisService extends SystemService {
 
   void save(OpalAnalysis analysis);
 
-  void delete(OpalAnalysis analysis) throws NoSuchAnalysisException;
+  void delete(OpalAnalysis analysis, boolean cascade) throws NoSuchAnalysisException;
 }

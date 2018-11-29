@@ -71,6 +71,13 @@ public class TableAnalysisResource {
     return builder.build();
   }
 
+  @DELETE
+  @Path("/analysis/{analysisId}")
+  public Response deleteAnalysis(@PathParam("analysisId") String analysisId, @QueryParam("cascade") @DefaultValue("true") boolean cascade) {
+    analysisService.delete(getAnalysis(analysisId), cascade);
+    return Response.ok().build();
+  }
+
   @GET
   @Path("/analysis/{analysisId}/results")
   public OpalAnalysisResultsDto getAnalysisResults(@PathParam("analysisId") String analysisId,

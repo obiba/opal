@@ -7,10 +7,12 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import javax.inject.Inject;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
@@ -36,14 +38,17 @@ public class AnalysesView extends ViewWithUiHandlers<AnalysesUiHandlers> impleme
   private ActionsColumn<OpalAnalysisDto> analysesActionColumn;
 
   private final Translations translations;
+  private final TranslationMessages translationMessages;
 
   private static AnalysesViewUiBinder uiBinder = GWT.create(AnalysesViewUiBinder.class);
 
   @Inject
-  public AnalysesView(Translations translations) {
+  public AnalysesView(Translations translations,
+      TranslationMessages translationMessages) {
     initWidget(uiBinder.createAndBindUi(this));
 
     this.translations = translations;
+    this.translationMessages = translationMessages;
 
     addTableColumns();
     initFilter();
@@ -76,10 +81,14 @@ public class AnalysesView extends ViewWithUiHandlers<AnalysesUiHandlers> impleme
     table.addColumn(analysesActionColumn, translations.actionsLabel());
     table.setColumnWidth(table.getColumn(3), 175, com.google.gwt.dom.client.Style.Unit.PX);
 
+    table.setPageSize(Table.DEFAULT_PAGESIZE);
+    table.setEmptyTableWidget(new InlineLabel(translationMessages.analysisCount(0)));
+
     dataProvider.addDataDisplay(table);
   }
 
   private void initFilter() {
+    filter.setText("");
     filter.getTextBox().setPlaceholder(translations.filterAnalysePlaceholder());
     filter.getTextBox().addStyleName("input-xlarge");
     filter.getClear().setTitle(translations.clearFilter());

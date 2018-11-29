@@ -1,16 +1,26 @@
 package org.obiba.opal.web.gwt.app.client.analysis;
 
+import static com.google.gwt.http.client.Response.SC_OK;
+
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import javax.inject.Inject;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent.Handler;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.OpalAnalysesDto;
@@ -20,9 +30,15 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
 
   private TableDto originalTable;
 
+  private Runnable deleteAnalysisConfirmation;
+
+  private final TranslationMessages translationMessages;
+
   @Inject
-  public AnalysesPresenter(EventBus eventBus, Display view) {
+  public AnalysesPresenter(EventBus eventBus, Display view,
+      TranslationMessages translationMessages) {
     super(eventBus, view);
+    this.translationMessages = translationMessages;
     getView().setUiHandlers(this);
   }
 
@@ -45,10 +61,27 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
   protected void onBind() {
     super.onBind();
 
+    addRegisteredHandler(ConfirmationEvent.getType(), new Handler() {
+      @Override
+      public void onConfirmation(ConfirmationEvent event) {
+        if (deleteAnalysisConfirmation != null && event.getSource().equals(deleteAnalysisConfirmation) && event.isConfirmed()) {
+          deleteAnalysisConfirmation.run();
+          deleteAnalysisConfirmation = null;
+        }
+      }
+    });
+
+
     getView().getActionColumn().setActionHandler(new ActionHandler<OpalAnalysisDto>() {
       @Override
       public void doAction(OpalAnalysisDto object, String actionName) {
-
+        switch (actionName) {
+          case Display.DELETE_ANALYSIS: {
+            deleteAnalysisConfirmation = new DeleteAnalysisRunnable(object);
+            fireEvent(ConfirmationRequiredEvent.createWithMessages(deleteAnalysisConfirmation, translationMessages.deleteAnalysis(), translationMessages.confirmDeleteAnalysis()));
+            break;
+          }
+        }
       }
     });
   }
@@ -76,6 +109,29 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
             }
           })
           .get().send();
+    }
+  }
+
+  private class DeleteAnalysisRunnable implements Runnable {
+
+    private OpalAnalysisDto toDelete;
+
+    private DeleteAnalysisRunnable(OpalAnalysisDto toDelete) {
+      this.toDelete = toDelete;
+    }
+
+    @Override
+    public void run() {
+      ResourceRequestBuilderFactory.newBuilder()
+          .forResource(UriBuilder.create().segment("project", "{}", "table", "{}", "analysis", "{}")
+              .build(originalTable.getDatasourceName(), originalTable.getName(), toDelete.getId()))
+          .withCallback(SC_OK, new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              setTable(originalTable);
+              fireEvent(ConfirmationTerminatedEvent.create());
+            }
+          }).delete().send();
     }
   }
 

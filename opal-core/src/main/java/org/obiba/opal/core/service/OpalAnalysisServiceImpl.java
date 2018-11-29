@@ -1,6 +1,8 @@
 package org.obiba.opal.core.service;
 
+import java.util.stream.StreamSupport;
 import org.obiba.opal.core.domain.OpalAnalysis;
+import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.tools.SimpleOrientDbQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -69,8 +71,18 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
   }
 
   @Override
-  public void delete(OpalAnalysis analysis) throws NoSuchAnalysisException {
+  public void delete(OpalAnalysis analysis, boolean cascade) throws NoSuchAnalysisException {
     orientDbService.delete(analysis);
+
+    String query = SimpleOrientDbQueryBuilder.newInstance()
+        .table(OpalAnalysisResult.class.getSimpleName())
+        .whereClauses("analysisId = ? ")
+        .build();
+
+    StreamSupport
+        .stream(orientDbService.list(OpalAnalysisResult.class, query, analysis.getId()).spliterator(), false)
+        .forEach(orientDbService::delete);
+
   }
 
   @Override
