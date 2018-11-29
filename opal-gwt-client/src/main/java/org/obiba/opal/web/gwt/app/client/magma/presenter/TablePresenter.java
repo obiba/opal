@@ -472,6 +472,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onShowAnalyses() {
+    setInSlot(Slots.Analyses, null);
     analysesPresenter.setTable(table);
     setInSlot(Slots.Analyses, analysesPresenter);
   }
