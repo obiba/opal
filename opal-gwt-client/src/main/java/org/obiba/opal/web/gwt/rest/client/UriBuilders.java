@@ -566,6 +566,14 @@ public enum UriBuilders {
     }
   },
 
+  PROJECT_ANALYSES_TABLE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "table", "{}", "analyses");
+    }
+
+  },
+
   SUBJECT_CREDENTIALS {
     @Override
     public UriBuilder create() {
@@ -754,7 +762,13 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("plugins", "_updates");
+    }
+  },
 
+  PLUGINS_ANALYSIS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("analysis-plugins");
     }
   },
 

@@ -5,8 +5,10 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.InlineLabel;
@@ -38,6 +40,9 @@ public class AnalysesView extends ViewWithUiHandlers<AnalysesUiHandlers> impleme
 
   @UiField
   Button refreshButton;
+
+  @UiField
+  Button newButton;
 
   private ListDataProvider<OpalAnalysisDto> dataProvider = new ListDataProvider<>();
 
@@ -143,5 +148,10 @@ public class AnalysesView extends ViewWithUiHandlers<AnalysesUiHandlers> impleme
   @Override
   public HasActionHandler<OpalAnalysisDto> getActionColumn() {
     return analysesActionColumn;
+  }
+
+  @UiHandler("newButton")
+  public void onNewButton(ClickEvent event) {
+    getUiHandlers().createAnalysis();
   }
 }

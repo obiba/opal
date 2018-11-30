@@ -1,7 +1,5 @@
 package org.obiba.opal.web.gwt.app.client.analysis;
 
-import static com.google.gwt.http.client.Response.SC_OK;
-
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -13,24 +11,37 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import javax.inject.Inject;
+import org.obiba.opal.web.gwt.app.client.analysis.service.PluginService;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent.Handler;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationTerminatedEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.*;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.opal.AnalysisPluginPackageDto;
 import org.obiba.opal.web.model.client.opal.OpalAnalysesDto;
 import org.obiba.opal.web.model.client.opal.OpalAnalysisDto;
+import org.obiba.opal.web.model.client.opal.PluginPackagesDto;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.google.gwt.http.client.Response.SC_OK;
 
 public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display> implements AnalysesUiHandlers {
 
+  private final PluginService analysisService;
   private TableDto originalTable;
+
+  private final ModalProvider<AnalysisEditModalPresenter> AnalysisEditModalPresenterProvider;
+
+  private List<AnalysisPluginPackageDto> plugins = new ArrayList<AnalysisPluginPackageDto>();
 
   private Runnable deleteAnalysisConfirmation;
 
@@ -38,10 +49,14 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
 
   @Inject
   public AnalysesPresenter(EventBus eventBus, Display view,
-      TranslationMessages translationMessages) {
+                           TranslationMessages translationMessages,
+                           ModalProvider<AnalysisEditModalPresenter> analysisEditModalPresenter,
+                           PluginService service) {
     super(eventBus, view);
     this.translationMessages = translationMessages;
-    getView().setUiHandlers(this);
+      AnalysisEditModalPresenterProvider = analysisEditModalPresenter.setContainer(this);
+      analysisService = service;
+      getView().setUiHandlers(this);
   }
 
   public interface Display extends View, HasUiHandlers<AnalysesUiHandlers> {
@@ -84,16 +99,46 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
 
     getView().getActionColumn().setActionHandler(new ActionHandler<OpalAnalysisDto>() {
       @Override
-      public void doAction(OpalAnalysisDto object, String actionName) {
+      public void doAction(OpalAnalysisDto analysis, String actionName) {
         switch (actionName) {
+          case Display.VIEW_ANALYSIS:
+            AnalysisEditModalPresenter modal = AnalysisEditModalPresenterProvider.get();
+            modal.initialize(analysis);
+            break;
+
           case Display.DELETE_ANALYSIS: {
-            deleteAnalysisConfirmation = new DeleteAnalysisRunnable(object);
+            deleteAnalysisConfirmation = new DeleteAnalysisRunnable(analysis);
             fireEvent(ConfirmationRequiredEvent.createWithMessages(deleteAnalysisConfirmation, translationMessages.deleteAnalysis(), translationMessages.confirmDeleteAnalysis()));
             break;
           }
         }
+
       }
     });
+
+    fetchAnalysisPlugins();
+  }
+
+  @Override
+  public void createAnalysis() {
+    AnalysisEditModalPresenter modal = AnalysisEditModalPresenterProvider.get();
+    modal.initialize(null);
+  }
+
+  private void fetchAnalysisPlugins() {
+    ResourceRequestBuilderFactory.<PluginPackagesDto>newBuilder()
+      .forResource(UriBuilders.PLUGINS_ANALYSIS.create().build())
+      .withCallback(new ResourceCallback<PluginPackagesDto>() {
+
+
+        @Override
+        public void onResource(Response response, PluginPackagesDto resource) {
+          if (resource != null) {
+            analysisService.setPlugins(JsArrays.toList(resource.getPackagesArray()));
+          }
+        }
+      })
+      .get().send();
   }
 
   public void setTable(final TableDto table) {
@@ -107,7 +152,8 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
       getView().beforeRenderRows();
 
       ResourceRequestBuilderFactory.<OpalAnalysesDto>newBuilder()
-          .forResource(UriBuilder.create().segment("project", "{}", "table", "{}", "analyses").build(originalTable.getDatasourceName(), originalTable.getName()))
+          .forResource(UriBuilders.PROJECT_ANALYSES_TABLE.create()
+            .build(originalTable.getDatasourceName(), originalTable.getName()))
           .withCallback(new ResourceCallback<OpalAnalysesDto>() {
             @Override
             public void onResource(Response response, OpalAnalysesDto resource) {
