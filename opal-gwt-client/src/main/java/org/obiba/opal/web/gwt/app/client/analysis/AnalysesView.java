@@ -1,8 +1,10 @@
 package org.obiba.opal.web.gwt.app.client.analysis;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -10,6 +12,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import javax.inject.Inject;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
@@ -32,6 +35,9 @@ public class AnalysesView extends ViewWithUiHandlers<AnalysesUiHandlers> impleme
 
   @UiField
   TextBoxClearable filter;
+
+  @UiField
+  Button refreshButton;
 
   private ListDataProvider<OpalAnalysisDto> dataProvider = new ListDataProvider<>();
 
@@ -127,6 +133,11 @@ public class AnalysesView extends ViewWithUiHandlers<AnalysesUiHandlers> impleme
   @Override
   public void clearTable() {
     renderRows((JsArray<OpalAnalysisDto>) JavaScriptObject.createArray());
+  }
+
+  @Override
+  public HandlerRegistration addRefreshButtonHandler(ClickHandler handler) {
+    return refreshButton.addClickHandler(handler);
   }
 
   @Override
