@@ -76,11 +76,11 @@ public abstract class AbstractRAnalysisService extends AbstractAnalysisService<R
   private Path generateReportPath(RAnalysis analysis, String resultId, Path fileName) {
     AnalysisReportType reportType = AnalysisReportType.safeValueOf((String) analysis.getParameters().get("reportType"));
     String reportFileName = fileName.toString().replaceAll("Rmd", reportType.toString().toLowerCase());
-    return Paths.get("analyses",analysis.getId(), "results", resultId, reportFileName);
+    return Paths.get(analysis.getId(), "results", resultId, reportFileName);
   }
 
   private Path generateAbsoluteReportPath(Path reportFileName) {
-    return Paths.get(System.getProperty("OPAL_HOME"), "data", reportFileName.toString());
+    return Paths.get(Analysis.ANALYSES_HOME.toString(), reportFileName.toString());
   }
 
   @Override

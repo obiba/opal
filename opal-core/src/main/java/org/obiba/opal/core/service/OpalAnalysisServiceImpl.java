@@ -1,9 +1,19 @@
 package org.obiba.opal.core.service;
 
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.stream.StreamSupport;
 import org.obiba.opal.core.domain.OpalAnalysis;
 import org.obiba.opal.core.domain.OpalAnalysisResult;
 import org.obiba.opal.core.tools.SimpleOrientDbQueryBuilder;
+import org.obiba.opal.spi.analysis.Analysis;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +22,8 @@ import javax.annotation.PreDestroy;
 
 @Component
 public class OpalAnalysisServiceImpl implements OpalAnalysisService {
+
+  private static final Logger logger = LoggerFactory.getLogger(OpalAnalysisServiceImpl.class);
 
   private final OrientDbService orientDbService;
 
@@ -26,7 +38,7 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
       .table(OpalAnalysis.class.getSimpleName())
       .whereClauses("id = ?")
       .build();
-    
+
     return orientDbService.uniqueResult(OpalAnalysis.class, query, id);
   }
 
@@ -83,6 +95,7 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
         .stream(orientDbService.list(OpalAnalysisResult.class, query, analysis.getId()).spliterator(), false)
         .forEach(orientDbService::delete);
 
+    deleteAnalysisFiles(Paths.get(Analysis.ANALYSES_HOME.toString(), analysis.getId()));
   }
 
   @Override
@@ -93,7 +106,25 @@ public class OpalAnalysisServiceImpl implements OpalAnalysisService {
 
   @Override
   @PreDestroy
-  public void stop() {
+  public void stop() { }
 
+  private void deleteAnalysisFiles(Path analysisDir) {
+    try {
+      Files.walkFileTree(analysisDir, new SimpleFileVisitor<Path>() {
+        @Override
+        public FileVisitResult visitFile(Path path, BasicFileAttributes basicFileAttributes) throws IOException {
+          Files.delete(path);
+          return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult postVisitDirectory(Path path, IOException e) throws IOException {
+          Files.delete(path);
+          return FileVisitResult.CONTINUE;
+        }
+      });
+    } catch (IOException e) {
+      logger.warn("Unable to delete analysis files at \"{}\"", analysisDir.toString());
+    }
   }
 }

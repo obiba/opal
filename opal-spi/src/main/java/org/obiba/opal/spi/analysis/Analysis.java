@@ -1,5 +1,7 @@
 package org.obiba.opal.spi.analysis;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.json.JSONObject;
 import org.obiba.magma.Variable;
 
@@ -10,6 +12,8 @@ import java.util.List;
  * An analysis represents the user data analysis request.
  */
 public interface Analysis {
+
+  Path ANALYSES_HOME = Paths.get(System.getProperty("OPAL_HOME"), "data", "analyses");
 
   /**
    * Unique analysis request identifier.

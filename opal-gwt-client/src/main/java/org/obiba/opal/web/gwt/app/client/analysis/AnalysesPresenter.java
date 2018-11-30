@@ -3,13 +3,15 @@ package org.obiba.opal.web.gwt.app.client.analysis;
 import static com.google.gwt.http.client.Response.SC_OK;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import javax.inject.Inject;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent.Handler;
@@ -54,12 +56,21 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
     void afterRenderRows();
     void clearTable();
 
+    HandlerRegistration addRefreshButtonHandler(ClickHandler handler);
+
     HasActionHandler<OpalAnalysisDto> getActionColumn();
   }
 
   @Override
   protected void onBind() {
     super.onBind();
+
+    getView().addRefreshButtonHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        setTable(originalTable);
+      }
+    });
 
     addRegisteredHandler(ConfirmationEvent.getType(), new Handler() {
       @Override
@@ -70,7 +81,6 @@ public class AnalysesPresenter extends PresenterWidget<AnalysesPresenter.Display
         }
       }
     });
-
 
     getView().getActionColumn().setActionHandler(new ActionHandler<OpalAnalysisDto>() {
       @Override

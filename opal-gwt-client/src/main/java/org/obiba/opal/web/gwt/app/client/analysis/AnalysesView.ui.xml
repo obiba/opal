@@ -15,7 +15,7 @@
         <ui:msg description="Add new analysis">New Analysis</ui:msg>
       </b:Button>
 
-      <b:Button icon="REFRESH" addStyleNames="small-top-margin small-indent">
+      <b:Button ui:field="refreshButton" icon="REFRESH" addStyleNames="small-top-margin small-indent">
         <ui:msg description="Refresh analyses list">Refresh</ui:msg>
       </b:Button>
     </g:FlowPanel>
